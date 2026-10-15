@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
@@ -22,6 +23,12 @@ export default async function DocPage({ params }: Props) {
   const page = pageBySlug((await params).slug)
   if (!page) notFound()
   const source = exampleCode(page.slug)
+  const order = ["start", "components", "guides"].flatMap((s) =>
+    pages.filter((p) => p.section === s),
+  )
+  const at = order.findIndex((p) => p.slug === page.slug)
+  const prev = order[at - 1]
+  const next = order[at + 1]
   const { intro, html, toc: outline } = render(page, { hasExample: Boolean(source) })
   const toc = source ? [{ id: "examples", text: "Examples" }, ...outline] : outline
   return (
@@ -49,6 +56,22 @@ export default async function DocPage({ params }: Props) {
         {source && <ExamplesSection slug={page.slug} source={source} />}
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs */}
         <div className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
+        <nav className={styles.pager} aria-label="Pages">
+          {prev ? (
+            <Link href={`/docs/${prev.slug}/`} rel="prev">
+              <small>Previous</small>
+              {prev.title}
+            </Link>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <Link href={`/docs/${next.slug}/`} rel="next" data-next="">
+              <small>Next</small>
+              {next.title}
+            </Link>
+          )}
+        </nav>
       </article>
       {toc.length > 0 && (
         <nav className={styles.toc} aria-label="On this page">

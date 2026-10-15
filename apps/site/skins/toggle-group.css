@@ -1,0 +1,46 @@
+/* ── Toggle Group: a joined row (or column) of toggle buttons; the pressed ones fill ── */
+[data-skin] [data-scope="toggle-group"][data-part="root"] {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: calc(var(--s-r-sm) + 4px);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift);
+}
+[data-skin] [data-scope="toggle-group"][data-part="root"][data-orientation="vertical"] {
+  flex-direction: column;
+}
+[data-skin] [data-scope="toggle-group"][data-part="item"] {
+  font: 600 14px var(--s-font);
+  padding: 9px 14px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background 0.35s var(--s-ease),
+    color 0.35s var(--s-ease),
+    scale 0.4s var(--s-pop);
+}
+[data-skin] [data-scope="toggle-group"][data-part="item"][data-hover] {
+  background: color-mix(in oklab, var(--s-ink) 7%, transparent);
+}
+[data-skin] [data-scope="toggle-group"][data-part="item"][data-pressed] {
+  scale: 0.96;
+  transition-duration: 0.12s;
+}
+[data-skin] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+[data-skin="juicy"] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
+  background: var(--s-acc);
+  color: var(--s-ink);
+  box-shadow: 0 3px 0 var(--s-acc-deep);
+}
+[data-skin="bare"] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
+  color: #fff;
+}

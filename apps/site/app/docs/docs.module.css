@@ -230,6 +230,39 @@
   }
 }
 
+.pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 64px;
+}
+.pager a {
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+  border: var(--bw) solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  font: 700 17px var(--text);
+  transition:
+    translate 0.45s var(--spring),
+    box-shadow 0.45s var(--spring);
+}
+.pager a:hover {
+  translate: 0 -2px;
+}
+.pager a[data-next] {
+  text-align: right;
+}
+.pager small {
+  font: 600 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: color-mix(in oklab, var(--ink) 70%, transparent);
+}
+
 /* crisp character on paper: acid markers, hard rules, square bullets */
 .title {
   background: linear-gradient(transparent 64%, #d4ff3a 64%, #d4ff3a 92%, transparent 92%) no-repeat;

@@ -14,6 +14,7 @@ import * as radioGroup from "./radio-group"
 import * as switchEx from "./switch"
 import * as textField from "./text-field"
 import * as toggle from "./toggle"
+import * as toggleGroup from "./toggle-group"
 import type { Variants } from "./types"
 
 /** A component's example module: its live examples as exported functions, titled by `variants`. */
@@ -36,6 +37,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   switch: switchEx,
   "text-field": textField,
   toggle,
+  "toggle-group": toggleGroup,
 }
 
 /** The example function `name` of a module, if it is one. */

@@ -83,9 +83,8 @@ export function Why() {
           </h2>
         </Reveal>
         <div className={styles.features}>
-          {FEATURES.map((f, i) => (
+          {FEATURES.map((f) => (
             <Reveal key={f.title} className={styles.feature}>
-              <span className={styles.num}>{String(i + 1).padStart(2, "0")}</span>
               {f.visual}
               <h3>{f.title}</h3>
               <p>{f.text}</p>

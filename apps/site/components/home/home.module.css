@@ -83,13 +83,6 @@
   line-height: 1.5;
   opacity: 0.8;
 }
-.num {
-  position: absolute;
-  top: 18px;
-  right: 20px;
-  font: 600 12px var(--mono);
-  color: color-mix(in oklab, var(--ink) 70%, transparent);
-}
 
 .vSkins {
   position: relative;
