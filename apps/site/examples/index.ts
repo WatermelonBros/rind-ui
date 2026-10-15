@@ -12,6 +12,7 @@ import * as label from "./label"
 import * as link from "./link"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
+import * as separator from "./separator"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as textField from "./text-field"
@@ -37,6 +38,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   link,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
+  separator,
   switch: switchEx,
   tabs,
   "text-field": textField,
