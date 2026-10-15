@@ -78,7 +78,9 @@ export function ExampleFrame({
       </div>
 
       <div className={styles.stage} data-view={skin} data-skin={skin}>
-        <Example />
+        <div className={styles.canvas}>
+          <Example />
+        </div>
       </div>
 
       {tab !== null && shown && (

@@ -84,7 +84,10 @@
   min-height: 300px;
   padding: 56px 28px;
 }
-.stage > * {
+/* one box per example, so multi-root examples (headings, rows) keep their own layout */
+.canvas {
+  width: fit-content;
+  min-width: min(100%, 340px);
   max-width: min(100%, 440px);
 }
 .stage[data-view="crisp"] {
