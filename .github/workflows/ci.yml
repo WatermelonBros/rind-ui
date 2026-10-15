@@ -43,4 +43,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm --filter @rind-ui/site audit
+      - run: pnpm --filter @rind-ui/site run audit
