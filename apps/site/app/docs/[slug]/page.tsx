@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
+import { Toc } from "@/components/toc"
 import { exampleCode, pageBySlug, pages, render } from "@/lib/docs"
 import styles from "../docs.module.css"
 
@@ -73,16 +74,7 @@ export default async function DocPage({ params }: Props) {
           )}
         </nav>
       </article>
-      {toc.length > 0 && (
-        <nav className={styles.toc} aria-label="On this page">
-          <p>On this page</p>
-          {toc.map((t) => (
-            <a key={t.id} href={`#${t.id}`}>
-              {t.text}
-            </a>
-          ))}
-        </nav>
-      )}
+      {toc.length > 0 && <Toc entries={toc} />}
     </div>
   )
 }
