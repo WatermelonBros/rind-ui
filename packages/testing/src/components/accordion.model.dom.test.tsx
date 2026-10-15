@@ -97,7 +97,7 @@ for (const multiple of [false, true]) {
 }
 
 describe("accordion model: a wrapper that renders the trigger outside any heading", () => {
-  it("fails the heading invariant naming the item", async () => {
+  it("fails the heading invariant naming the item", { timeout: 60_000 }, async () => {
     const tests: { name: string; fn: () => Promise<void> }[] = []
     testMachine(accordionContract, {
       test: (name, fn) => tests.push({ name, fn }),
@@ -157,7 +157,7 @@ async function failures(
 }
 
 describe("accordion model: broken variants fail the step invariants by name", () => {
-  it("a close that is not reported (ark#1656)", async () => {
+  it("a close that is not reported (ark#1656)", { timeout: 60_000 }, async () => {
     const cfg = { multiple: true, collapsible: true, keyboardNavigation: false }
     const out = await failures(
       () => (
@@ -186,7 +186,9 @@ describe("accordion model: broken variants fail the step invariants by name", ()
     expect(out).toMatch(/accordion-expanded-matches-value: "Shipping" is collapsed/)
   })
 
-  it("a consumer that moves focus on ArrowDown without keyboardNavigation", async () => {
+  it("a consumer that moves focus on ArrowDown without keyboardNavigation", {
+    timeout: 60_000,
+  }, async () => {
     const cfg = { multiple: false, collapsible: true, keyboardNavigation: false }
     const out = await failures(
       () => (

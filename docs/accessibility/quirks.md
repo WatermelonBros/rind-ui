@@ -158,3 +158,11 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: `packages/core/src/dom/scroll-lock.ts`
 - Last verified: 2026-10-14
 - Remove when: iOS Safari stops page scrolling under overflow: hidden on the root
+
+## `firefox-label-focus-unfocused-window`
+
+- Bugs: <https://github.com/WatermelonBros/rind-ui/pull/5>
+- Repro test: `packages/testing/src/components/label-activation.browser.test.tsx`
+- Checked in: component code (none yet)
+- Last verified: 2026-10-16
+- Remove when: Firefox on Linux focuses a label's control on activation

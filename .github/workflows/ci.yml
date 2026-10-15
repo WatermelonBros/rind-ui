@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  check:
+  static:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,10 +25,51 @@ jobs:
       # 2.5 kB min+gz budget (packages/core/scripts/size.mjs).
       - run: pnpm build
       - run: pnpm --filter @rind-ui/core size
-      - run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - run: pnpm test
+
+  # The test suite split by Vitest project and browser, so the slices run in parallel.
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { slice: node, projects: "--project node", browsers: "" }
+          - { slice: jsdom, projects: "--project jsdom", browsers: "" }
+          - { slice: browser-chromium, projects: "--project 'browser (chromium)'", browsers: chromium }
+          - { slice: browser-firefox, projects: "--project 'browser (firefox)'", browsers: firefox }
+          - { slice: browser-webkit, projects: "--project 'browser (webkit)'", browsers: webkit }
+          - { slice: storybook-chromium, projects: "--project 'storybook (chromium)'", browsers: chromium }
+          - { slice: storybook-firefox, projects: "--project 'storybook (firefox)'", browsers: firefox }
+          - { slice: storybook-webkit, projects: "--project 'storybook (webkit)'", browsers: webkit }
+          # Playwright fixtures drive all three engines themselves.
+          - { slice: playwright, projects: "--project playwright", browsers: "chromium,firefox,webkit" }
+    name: test (${{ matrix.slice }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Packages, Storybook (storybook-static for the Playwright fixtures) and the site.
+      - run: pnpm build
+      - if: matrix.browsers != ''
+        run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
-          RIND_BROWSERS: chromium,firefox,webkit
+          BROWSERS: ${{ matrix.browsers }}
+      - run: pnpm exec vitest run ${{ matrix.projects }}
+        env:
+          RIND_BROWSERS: ${{ matrix.browsers != '' && matrix.browsers || 'chromium' }}
+
+  # The required status check: green only when every slice above is.
+  check:
+    if: always()
+    needs: [static, test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          [ "${{ needs.static.result }}" = "success" ] && [ "${{ needs.test.result }}" = "success" ]
 
   site-audit:
     # The docs site, built and walked page by page: every example in every skin, axe in both

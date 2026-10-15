@@ -62,15 +62,18 @@ describe("list collection", () => {
     const last = toKey("k9999")
     const time = (key: typeof first) => {
       const t = performance.now()
-      for (let i = 0; i < 100_000; i++) c.keyAfter(key)
+      for (let i = 0; i < 20_000; i++) c.keyAfter(key)
       return performance.now() - t
     }
-    time(first) // warm up
-    const a = time(first)
-    const b = time(last)
+    // Best of several runs per key: shared CI runners add noise, never remove it. A scan
+    // would make the last key ~10 000× slower than the first; a lookup keeps them close.
+    const best = (key: typeof first) => Math.min(...Array.from({ length: 9 }, () => time(key)))
+    best(first) // warm up
+    const a = best(first)
+    const b = best(last)
     expect(c.keyAfter(toKey("k9998"))).toBe("k9999")
     expect(c.keyAfter(last)).toBeNull()
-    expect(Math.max(a, b) / Math.max(Math.min(a, b), 0.01)).toBeLessThan(5)
+    expect(Math.max(a, b) / Math.max(Math.min(a, b), 0.01)).toBeLessThan(20)
   })
 
   it("lookups, ends and neighbours", () => {

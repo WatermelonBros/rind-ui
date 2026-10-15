@@ -210,6 +210,17 @@ export const quirks = defineQuirks([
     removeWhen: "iOS Safari stops page scrolling under overflow: hidden on the root",
     verified: "2026-10-14",
   },
+  {
+    id: "firefox-label-focus-unfocused-window",
+    // Firefox on Linux (headless CI) forwards a label's activation click to its control but
+    // does not move focus, even when the document reports focus (macOS Firefox does). Tests
+    // assert the forwarded click and check focus outside Firefox. No runtime workaround.
+    when: (p) => p.firefox,
+    links: ["https://github.com/WatermelonBros/rind-ui/pull/5"],
+    test: "packages/testing/src/components/label-activation.browser.test.tsx",
+    removeWhen: "Firefox on Linux focuses a label's control on activation",
+    verified: "2026-10-16",
+  },
 ])
 
 export type QuirkId = (typeof quirks)[number]["id"]
