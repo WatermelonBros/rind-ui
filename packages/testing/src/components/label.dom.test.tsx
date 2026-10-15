@@ -319,11 +319,7 @@ describe("driver click forwards a real click (ariakit#7176)", () => {
     render(
       <>
         <Label htmlFor="agree">Agree</Label>
-        <input
-          id="agree"
-          type="checkbox"
-          onClick={(e) => seen.push({ detail: e.detail })}
-        />
+        <input id="agree" type="checkbox" onClick={(e) => seen.push({ detail: e.detail })} />
       </>,
     )
     await getLabel(screen, { text: "Agree" }).click()
