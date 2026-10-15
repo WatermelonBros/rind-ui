@@ -371,6 +371,19 @@ function createPlaywrightEnv(
       isInert: async () => (await now()).evaluate((el) => el.closest("[inert]") !== null),
       attr: async (name) => (await now()).getAttribute(name),
       tagName: async () => (await now()).evaluate((el) => el.tagName.toLowerCase()),
+      accessibleName: async () => {
+        const { root } = await getBase()
+        await ensureInPage(root)
+        return (await now()).evaluate(
+          (el) => (globalThis as InPageWindow).__rindTesting?.accessibleName(el) ?? "",
+        )
+      },
+      labelled: () =>
+        handle(`the control of ${label}`, async () => {
+          const text = ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim()
+          return (await getBase()).root.getByLabel(text, { exact: true })
+        }),
+      doubleClick: async () => (await waitFor()).dblclick(),
       text: async () => ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim(),
       value: async () => (await now()).inputValue(),
       exists: async () => {
@@ -434,6 +447,8 @@ function createPlaywrightEnv(
     },
     instance,
     anchorCount: async () => (await anchorLocator()).count(),
+    selectedText: async () =>
+      (await getBase()).root.evaluate(() => globalThis.getSelection()?.toString() ?? ""),
     markNavigations: async () => {
       navigationsFrom = await navigationState()
     },

@@ -15,6 +15,7 @@ import {
 import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
 import { installAnnouncementLog } from "../announcements"
 import { collectDom, isVisible } from "../collect"
+import { labelledControl } from "../labelled"
 import { interceptNativeNavigation, navigatedSince, navigationLog } from "../navigation"
 import { composeInPage } from "./compose"
 
@@ -24,6 +25,7 @@ export interface UserLike {
   hover(element: Element): Promise<unknown>
   keyboard(text: string): Promise<unknown>
   type(element: Element, text: string, options?: { skipClick?: boolean }): Promise<unknown>
+  dblClick?(element: Element): Promise<unknown>
   /** user-event only; used for distinct coordinates and touch. */
   pointer?(actions: unknown): Promise<unknown>
 }
@@ -421,6 +423,24 @@ function createDomEnv(
         )
       },
       count: async () => (await resolve()).length,
+      accessibleName: async () => {
+        const { computeAccessibleName } = await import("dom-accessibility-api")
+        return normalize(computeAccessibleName(await now()))
+      },
+      labelled: () =>
+        handle(`the control of ${label}`, async () => {
+          const control = labelledControl(await now())
+          return control ? [control] : []
+        }),
+      async doubleClick() {
+        const el = await waitFor()
+        const u = await getUser()
+        if (u.dblClick) await act(() => u.dblClick?.(el))
+        else {
+          await press(el, false)
+          await press(el, false)
+        }
+      },
       nth: (index) =>
         handle(`${label}[${index}]`, async () => {
           const el = (await resolve())[index]
@@ -483,6 +503,7 @@ function createDomEnv(
       return [...installAnnouncementLog()]
     },
     takeErrors: async () => errors().splice(0),
+    selectedText: async () => doc().getSelection()?.toString() ?? "",
     markNavigations: async () => {
       navigationsFrom = navigationLog().length
     },

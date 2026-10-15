@@ -13,6 +13,7 @@ export { missingAriaLines } from "./aria-snapshot"
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
 export { getButton } from "./components/button"
 export { getHeading } from "./components/heading"
+export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
 export {
   type ContractModality,

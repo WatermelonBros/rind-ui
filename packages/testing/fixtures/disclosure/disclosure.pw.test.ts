@@ -10,6 +10,7 @@ import { states as announceStates } from "../../../../apps/storybook/stories/Ann
 import { states as buttonStates } from "../../../../apps/storybook/stories/Button.stories"
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
 import { states as headingStates } from "../../../../apps/storybook/stories/Heading.stories"
+import { states as labelStates } from "../../../../apps/storybook/stories/Label.stories"
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
 import { states as linkStates } from "../../../../apps/storybook/stories/Link.stories"
 import { states as pressStates } from "../../../../apps/storybook/stories/PressFixture.stories"
@@ -302,6 +303,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Link.stories.tsx": linkStates,
     "./stories/Heading.stories.tsx": headingStates,
     "./stories/Button.stories.tsx": buttonStates,
+    "./stories/Label.stories.tsx": labelStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

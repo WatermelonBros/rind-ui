@@ -40,6 +40,32 @@ describe("label activation", () => {
     expect(presses()).toBe(0)
   })
 
+  it.each([
+    [undefined, 1],
+    ["focus", 0],
+  ] as const)("a consumer <label for> with %s: %i press(es), focused", async (mode, n) => {
+    let presses = 0
+    // The part derives its own id (element-ids): read it, then point the label at it.
+    const ui = (htmlFor: string) => (
+      <>
+        <label htmlFor={htmlFor}>Quantity</label>
+        <CounterButton onPress={() => presses++} {...(mode ? { labelActivation: mode } : {})}>
+          Add
+        </CounterButton>
+      </>
+    )
+    const { rerender } = render(ui("none"))
+    rerender(ui(screen.getByRole("button").id))
+    const env = domEnv().create({
+      scope: "counter",
+      anchor: { role: "button" },
+      modality: "pointer",
+    })
+    await env.find({ text: "Quantity" }).click()
+    expect(document.activeElement).toBe(screen.getByRole("button"))
+    expect(presses).toBe(n)
+  })
+
   it.each([undefined, "focus"] as const)("direct click with %s: one press", async (mode) => {
     const { presses, clickButton } = setup(mode)
     await clickButton()

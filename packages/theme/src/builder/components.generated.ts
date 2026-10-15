@@ -43,6 +43,7 @@ export type ComponentTokens = {
     | "6FontWeight"
     | "6LineHeight"
     | "color"
+  readonly label: "color" | "cursor" | "disabledCursor" | "fontSize" | "fontWeight"
   readonly link:
     | "color"
     | "colorHover"

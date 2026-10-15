@@ -214,6 +214,36 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### label
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "label.css"
+    },
+    "cursor": {
+      "fallback": "pointer",
+      "file": "label.css"
+    },
+    "disabled-cursor": {
+      "fallback": "default",
+      "file": "label.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-control, var(--rind-text-sm))",
+      "file": "label.css"
+    },
+    "font-weight": {
+      "fallback": "500",
+      "file": "label.css"
+    }
+  }
+}
+```
+
 ### link
 
 ```json

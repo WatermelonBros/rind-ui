@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-label (r1) | — | packages/core/src/components/shared/label-interaction.ts:31-35 | labelTarget: a substituted label (render={<span/>}) without htmlFor finds no wrapped control — fall back to first labelable descendant or document the limit |
+| add-label (r1) | — | add-checkbox / add-field / add-radio-group | Re-check "Group target" (focus the checked or first enabled radio) and "Labels Focus Popup Triggers" (Select) with real consumers; fix the test's dangling aria-labelledby="size" |
+| add-label (r1) | — | packages/react/src/label/label.tsx | checkLabelTarget only re-runs when htmlFor changes; a target mounting later with the same htmlFor isn't re-evaluated |
+| add-label (r1) | — | packages/testing/src/adapters/playwright.ts | labelled() via getByLabel(text, exact) may match several controls when two labels share text (DOM adapter resolves the label's own control) — unverified |
 | add-button (r1) | — | packages/core/src/dom/fieldset-disabled.ts:45 | watchFieldsetDisabled observes only `disabled`; re-parenting into a disabled fieldset or legend order changes aren't tracked (observe childList) |
 | add-button (r1) | — | packages/core/src/dom/press.ts:549 | Space on submit/reset leaves state "key" until the native click; if it never comes data-pressed sticks until blur — add a scheduler timeout guard; check Firefox/WebKit |
 | add-button (r1) | — | packages/testing/src/invariants.ts:213 | stateAttrs accepts aria-disabled="false" together with disabled + data-disabled |

@@ -12,3 +12,4 @@ apps/storybook/stories/**/*.d.ts
 .reado/
 # Vitest browser-mode attachments / captures
 .vitest/
+.impeccable/

@@ -71,3 +71,15 @@ devices for every component that positions a popup (Select, Combobox, Menu, Popo
       to its trigger and is not dragged away from it. It remains usable and scrollable.
 - [ ] **Android Chrome, keyboard**: the same combobox check as iOS; the popup follows the
       visual viewport and does not end up behind the keyboard.
+
+## Device checklist: Label (add-label 10.1)
+
+Story: Components/Label → ForInput (and AsSpan, NonLabelableTarget). Record each pass in
+`tested-with.json` with `component: "label"`.
+
+- [ ] **NVDA + Chrome (Windows)**: Tab to the input: NVDA reads "Email, edit". Click the
+      Label: the input is focused and its name is read once (not twice).
+- [ ] **VoiceOver + Safari (macOS)**: VO+Right onto the input reads "Email, edit text".
+      Click the Label: the input is focused, and VoiceOver reads its name once.
+- [ ] **Both**: on NonLabelableTarget, clicking the Label focuses the group and its name
+      ("Colour") comes from the Label through `aria-labelledby`.

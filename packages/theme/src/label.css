@@ -1,0 +1,22 @@
+/*
+ * Label. In no family: typography only, so it never changes the layout of the control it wraps.
+ * `data-size` (on the label or an ancestor) scales the text through the control text token.
+ * `data-tone="danger"` re-points the accent roles, so this reads accent roles only.
+ */
+@layer rind.components {
+  :where([data-scope="label"][data-part="root"]) {
+    font-size: var(--rind-label-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    font-weight: var(--rind-label-font-weight, 500);
+    color: var(--rind-label-color, var(--rind-color-text));
+    cursor: var(--rind-label-cursor, pointer);
+  }
+
+  /* A label whose control is disabled does nothing on press: the pointer says so. */
+  :where([data-scope="label"][data-part="root"]:has(:disabled)) {
+    cursor: var(--rind-label-disabled-cursor, default);
+  }
+
+  :where([data-scope="label"][data-part="root"][data-tone="danger"]) {
+    color: var(--rind-label-color, var(--rind-color-accent-text));
+  }
+}

@@ -83,6 +83,12 @@ export interface Part {
   attr(name: string): Promise<string | null>
   /** The element's tag name, lowercase ("h3", "div"). */
   tagName(): Promise<string>
+  /** Its accessible name (accname computation). */
+  accessibleName(): Promise<string>
+  /** The control this label names (`for`, wrapping, or `aria-labelledby`), as a lazy part. */
+  labelled(): Part
+  /** Two pointer clicks in a row (the second with `detail: 2`). */
+  doubleClick(): Promise<void>
   /** Whitespace-normalised textContent. */
   text(): Promise<string>
   /** The value of a form control. */
@@ -116,5 +122,7 @@ export interface Env<P extends string = string> {
    * opened elsewhere (another tab or window, a download).
    */
   navigated(options?: { readonly newTab?: boolean }): Promise<boolean>
+  /** The document's selected text (`""` when nothing is selected). */
+  selectedText(): Promise<string>
   readonly modality: Modality
 }
