@@ -2,7 +2,7 @@
 
 rind is a set of headless components. You get behaviour, keyboard support, accessibility and state. You do not get styles, so the look is entirely yours.
 
-> rind is pre-release. The packages are not on npm yet, and the API can still change.
+> rind is at 0.1: the packages are on npm, and the API can still change before 1.0.
 
 ## Packages
 
@@ -21,7 +21,7 @@ You install the framework package. Everything else is optional.
 pnpm add @rind-ui/react
 ```
 
-React 19 or newer is required.
+`@rind-ui/core` comes with it as a dependency. React 19 or newer is required.
 
 ## Your first component
 
@@ -89,7 +89,12 @@ export default { test: { environment: "jsdom", setupFiles: ["@rind-ui/testing/se
 ```
 
 ```ts
+import { cleanup } from "@testing-library/react"
+import { afterEach } from "vitest"
 import { getAccordion } from "@rind-ui/testing"
+
+// Without `globals: true`, Testing Library does not clean up between tests on its own.
+afterEach(cleanup)
 
 const faq = getAccordion(container, { item: "Shipping" })
 await faq.expand("Shipping")
