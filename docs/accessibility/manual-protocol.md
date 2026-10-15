@@ -115,3 +115,16 @@ Story: Components/Form → SignUp. Record each pass in `tested-with.json` with
       submit with 1 error: focus lands on the field and its error is read; no summary.
 - [ ] **All**: submit with 3 errors: focus on the first field, its error read, and
       "3 fields have errors" spoken once.
+
+## Device checklist: Text Field (add-text-field 11.1)
+
+Stories: Components/TextField → WithDescriptionAndError, SearchBox, CharacterCountSoft.
+Record each pass in `tested-with.json` with `component: "text-field"`.
+
+- [ ] **NVDA + Chrome, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS, TalkBack**:
+      the name and the description (with the count) are read; after a failed submit the
+      error is read on focus.
+- [ ] **All**: the Clear button is named "Clear" and is not reached with Tab.
+- [ ] **All**: near the limit, the remaining count is announced once after a pause.
+- [ ] **Japanese IME on macOS and Windows**: composing and committing "テスト" works,
+      with no stray characters and one validation after the commit.

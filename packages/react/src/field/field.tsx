@@ -58,6 +58,16 @@ declare module "../provider" {
 /** The binding a rind-ui form control reads in its Root (field-control). */
 const FieldControlContext = createContext<FieldControlBinding | null>(null)
 
+/** Whether an enclosing Field exists (a Field host then joins it instead of creating one). */
+export function useIsInsideField(): boolean {
+  return useContext(FieldControlContext) !== null
+}
+
+/** The enclosing Field's binding without claiming it (a host's root reads its state). */
+export function useFieldBindingPeek(): FieldControlBinding | null {
+  return useContext(FieldControlContext)
+}
+
 /** For control authors: the enclosing Field's binding, or null outside a Field. */
 export function useFieldControl(): FieldControlBinding | null {
   const binding = useContext(FieldControlContext)
@@ -114,6 +124,11 @@ export type FieldRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   readonly errorMessageAttribute?: "describedby" | "both"
   readonly messages?: MessageOverrides<FieldMessages>
   readonly render?: RenderProp<FieldState>
+  /**
+   * For Field hosts (Text Field, …): the scope the Field's parts carry, so a host's Label
+   * is `data-scope="text-field"`. Default `field`.
+   */
+  readonly scope?: string
 }
 
 function Root({
@@ -132,6 +147,7 @@ function Root({
   errorMessageAttribute = "describedby",
   messages: ownMessages,
   render,
+  scope,
   id,
   ref,
   children,
@@ -193,6 +209,7 @@ function Root({
       : null,
     initial: baseline.current,
     name,
+    scope,
   })
   const hasErrorPart = useRef(0)
   const controlId = partId("field", instance, "control")

@@ -28,6 +28,16 @@ export function defineQuirks<const Q extends readonly Quirk[]>(entries: Q): Q {
 
 export const quirks = defineQuirks([
   {
+    id: "firefox-textarea-overflow",
+    // Firefox shows a scrollbar when overflow is toggled on an autosizing textarea; it keeps
+    // its own overflow (as React Aria does).
+    when: (p) => p.firefox,
+    links: ["https://bugzilla.mozilla.org/show_bug.cgi?id=1787062"],
+    test: "packages/core/src/dom/autosize.browser.test.ts",
+    removeWhen: "Firefox supports field-sizing: content (the measured fallback is then unused)",
+    verified: "2026-10-15",
+  },
+  {
     id: "talkback-unfocusable-link",
     // TalkBack cannot be detected: always on, and harmless elsewhere (Tab still skips it).
     when: () => true,

@@ -11,6 +11,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | Module | Quirks |
 |---|---|
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
+| `packages/core/src/dom/autosize.ts` | `firefox-textarea-overflow` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
 | `packages/core/src/dom/keyboard.ts` | `safari-ime-commit-enter` |
 | `packages/core/src/dom/link.ts` | `webkit-synthetic-click-modifiers`, `talkback-unfocusable-link` |
@@ -20,6 +21,14 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
 | `packages/react/src/form/form.tsx` | `react-action-form-reset` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+
+## `firefox-textarea-overflow`
+
+- Bugs: <https://bugzilla.mozilla.org/show_bug.cgi?id=1787062>
+- Repro test: `packages/core/src/dom/autosize.browser.test.ts`
+- Checked in: `packages/core/src/dom/autosize.ts`
+- Last verified: 2026-10-15
+- Remove when: Firefox supports field-sizing: content (the measured fallback is then unused)
 
 ## `talkback-unfocusable-link`
 

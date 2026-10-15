@@ -817,10 +817,11 @@ describe("announcements", () => {
     expect(f.log.map((a) => a.message)).toEqual(["Email: bad:short"])
   })
 
-  it("is skipped while the control is composing, and spoken once the composition ends", () => {
+  it("is not evaluated while the control is composing, and validated and spoken once it ends", () => {
     const f = make({ props: changeMode() })
+    const before = f.state()
     f.type("あ", { composing: true })
-    expect(f.state()).toBe("invalid")
+    expect(f.state()).toBe(before)
     expect(f.log).toHaveLength(0)
     f.type("あい", { composing: false })
     expect(f.log).toHaveLength(1)

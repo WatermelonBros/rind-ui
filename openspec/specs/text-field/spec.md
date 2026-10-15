@@ -1,11 +1,10 @@
-## Purpose
+# text-field Specification
 
+## Purpose
 Defines rind-ui's Text Field: a native `<input>` or `<textarea>` with a controllable value,
 correct IME handling, a clear trigger, a character count, autosize, and the Field's label,
 description, error and validation through `field-control`. Introduced by `add-text-field`.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 The Text Field SHALL consist of a `root` part (`div`), the Field parts `label`,
@@ -295,10 +294,14 @@ located by role `textbox` and exact accessible name, with:
 ### Requirement: Text Field Invariants
 
 The Text Field contract SHALL ship invariants, always on: the component renders exactly
-one element with role `textbox`; the input's value equals the oracle's value after every
-step; no step inside a composition changes the value except through the composition
-itself; no announcement is made during a composition; the ClearTrigger is rendered exactly
-when the value is non-empty and the field is enabled and editable.
+one element with role `textbox`; the ClearTrigger is rendered only when the value is
+non-empty and the field is enabled and editable. `@rind-ui/testing` SHALL export, as
+consumer invariants usable with `testMachine(textFieldContract, { invariants })`
+(`textFieldStepInvariants({ composedText })`), the invariants that need the page's
+announcement log or the story's text: no announcement is made during a composition; no
+step inside a composition changes the value except through the composition itself. The
+value after each action SHALL be checked by the actions' postconditions (`fill`, `clear`:
+`value`), because the oracle does not see the text a user types.
 
 #### Scenario: Broken variant writes value while composing
 
@@ -320,3 +323,4 @@ only `--rind-text-field-*` tokens with semantic fallbacks.
 
 - **WHEN** a Text Field has `data-variant="soft"`
 - **THEN** it renders with the soft background and a boundary of at least 3:1
+

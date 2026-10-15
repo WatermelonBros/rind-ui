@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-text-field (r1) | — | packages/react/src/text-field/text-field.tsx | soft-max error key is customError, not tooLong as spec/tasks say — map the key or amend the spec (match="tooLong" won't match) |
+| add-text-field (r1) | — | packages/core/src/components/text-field/text-field.contract.ts | ClearTrigger invariant only checks "rendered while not clearable" (spec: exactly when) — add the reverse check |
+| add-text-field (r1) | — | packages/core/src/contract | contract event-mapping `args` type loses action parameters; text-field uses `as never` — widen the args type to the action's parameters |
+| add-text-field (r1) | — | packages/core/src/components/text-field/text-field.machine.ts | buildTextFieldMachine merges presets with `as never`: preset event names unchecked — type it when Search Field/Password Input/Number Input reuse it |
 | add-form (r1) | — | packages/react/src/form/form.tsx | Field unmounting while Form is validating never sends FIELD.SETTLED → hold stranded, data-validating stuck; send settled() from register cleanup |
 | add-form (r1) | — | packages/react/src/form/form.tsx (byName memo) | inline errors={{...}} re-applies a cleared server error on every parent re-render (identity-keyed) — compare by content or document stable object |
 | add-form (r1) | — | packages/core/src/components/field/field.machine.ts (lastAsync) | cache never expires, not cleared on RESET or validate identity change; File/Blob collide as {}; stringify failure → null key could re-hold loop |

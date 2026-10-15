@@ -1,0 +1,3 @@
+- text: Greeting
+- textbox "Greeting": Hello
+- paragraph: "Value: Hello"

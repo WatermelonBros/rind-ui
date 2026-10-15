@@ -17,6 +17,7 @@ import { states as labelStates } from "../../../../apps/storybook/stories/Label.
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
 import { states as linkStates } from "../../../../apps/storybook/stories/Link.stories"
 import { states as pressStates } from "../../../../apps/storybook/stories/PressFixture.stories"
+import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
 import { createDriver, missingAriaLines, playwrightEnv, testMachine } from "../../src/index"
 import { chromiumTree } from "../../src/playwright"
 import { streamContract } from "../announce/announce.contract"
@@ -309,6 +310,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Label.stories.tsx": labelStates,
     "./stories/Fieldset.stories.tsx": fieldsetStates,
     "./stories/Field.stories.tsx": fieldStates,
+    "./stories/TextField.stories.tsx": textFieldStates,
     "./stories/Form.stories.tsx": formStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {

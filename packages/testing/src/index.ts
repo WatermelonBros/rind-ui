@@ -18,6 +18,7 @@ export { getForm } from "./components/form"
 export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
+export { getTextField } from "./components/text-field"
 export {
   type ContractModality,
   createDriver,
@@ -64,4 +65,5 @@ export {
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
 export { missingStateStories, type StateStories } from "./state-stories"
+export { type TextFieldStepInvariants, textFieldStepInvariants } from "./text-field-invariants"
 export { liveAnnouncements, spokenLog } from "./virtual-sr"

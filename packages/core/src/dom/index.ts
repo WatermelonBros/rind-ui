@@ -1,3 +1,4 @@
+export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { collectionLayout } from "./collection-layout"
 export {
   type ConstraintElement,

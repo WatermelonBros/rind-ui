@@ -5,6 +5,7 @@
 ## Guides
 
 - [Announcements](docs/guides/announcements.md): Some changes have no focus move to carry them — "3 results", "Copied", a streamed answer. Components announce them through the environment's `Announcer`; they never render their own live region.
+- [Autosize](docs/guides/autosize.md): A textarea that takes the height of its content, used by Text Field's `autosize` and later by Prompt Input and Editable. Native first, measured only where the browser cannot do it.
 - [Collections](docs/guides/collections.md): Listbox, Select, Combobox, Menu, Tabs, Tree View and every other component that shows a set of items share one collection layer in `@rind-ui/core`: a key-based model of the items, selection, navigation, typeahead and the props of the collection parts. A component spreads these pieces into its machine; it never re-implements them.
 - [Implementing field-control](docs/guides/field-control.md): How a form control works inside a Field. Every rind-ui form control (Text Field, Checkbox, Select, …) does this, and your own control can too: the Field then labels, describes, validates and disables it like a built-in one.
 - [Focus and input modality](docs/guides/focus-and-modality.md): Every focusable part carries `data-focus` while focused and `data-focus-visible` only when the focus came from the keyboard or from assistive technology, so a theme draws the focus ring for keyboard and screen-reader users and never after a mouse click.
@@ -30,6 +31,7 @@
 - [Heading](docs/components/heading.md): A heading whose level comes from where it is: sections nest, and each `Heading` renders the native `h1`–`h6` for its depth, so the document outline stays right without counting levels by hand.
 - [Label](docs/components/label.md): A native `<label>` that names a control through `for` or by wrapping it, and fixes what native labels get wrong: no text selection on double click, focus forwarding for controls a label cannot name, and a development check of what `for` points at.
 - [Link](docs/components/link.md): A navigational link that behaves like a native `<a href>` wherever it appears: client routing without double navigation, modifier clicks left to the browser, disabled and current states, and a driver to test it.
+- [Text Field](docs/components/text-field.md): A native `<input>` or `<textarea>` with a controllable value, correct IME handling, a clear button, a character count and autosize, labelled, described and validated like any Field.
 
 ## Accessibility
 

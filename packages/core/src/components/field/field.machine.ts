@@ -163,6 +163,7 @@ export const fieldMachine = setup({
     invalidReleased: ({ props }) => props.invalid === undefined,
     isStale: ({ context, event }) => event.type === "VALIDATED" && event.token !== context.token,
     hasError: ({ context }) => context.current !== null,
+    composingChange: ({ event }) => event.type === "CONTROL.CHANGE" && event.composing,
     keepsExternal: ({ event, context }) =>
       event.type === "RESET" && event.keepExternal === true && context.external.length > 0,
     displayAllowed: ({ context, props }) => {
@@ -406,7 +407,11 @@ export const fieldMachine = setup({
     // untouched Field with a failing `validate` blocks submission.
     "CONTROL.REGISTER": { actions: ["syncValue", "evaluate", "dropPending"] },
     "CONTROL.UNREGISTER": {},
-    "CONTROL.CHANGE": { actions: ["recordChange", "evaluate", "decide"] },
+    // A composition's updates are recorded, never validated: the commit validates once.
+    "CONTROL.CHANGE": [
+      { guard: "composingChange", actions: ["recordChange"] },
+      { actions: ["recordChange", "evaluate", "decide"] },
+    ],
     "CONTROL.COMMIT": { actions: ["evaluate", "decide"] },
     "FOCUS.ENTER": { actions: ["enter"] },
     "FOCUS.LEAVE": { actions: ["leave", "evaluate", "decide"] },

@@ -468,3 +468,165 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   }
 }
 ```
+
+### text-field
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "text-field.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "text-field.css"
+    },
+    "clear-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "text-field.css"
+    },
+    "clear-color-hover": {
+      "fallback": "var(--rind-color-text)",
+      "file": "text-field.css"
+    },
+    "clear-icon": {
+      "fallback": "var(--rind-icon-x)",
+      "file": "text-field.css"
+    },
+    "clear-icon-size": {
+      "fallback": "1em",
+      "file": "text-field.css"
+    },
+    "clear-radius": {
+      "fallback": "var(--rind-radius-indicator)",
+      "file": "text-field.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "text-field.css"
+    },
+    "count-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "text-field.css"
+    },
+    "count-font-size": {
+      "fallback": "var(--rind-text-xs)",
+      "file": "text-field.css"
+    },
+    "count-over-color": {
+      "fallback": "var(--rind-color-danger-text)",
+      "file": "text-field.css"
+    },
+    "count-over-weight": {
+      "fallback": "650",
+      "file": "text-field.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "text-field.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "text-field.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "text-field.css"
+    },
+    "disabled-border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "text-field.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "text-field.css"
+    },
+    "disabled-fg": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "text-field.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-color-danger-text)",
+      "file": "text-field.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "text-field.css"
+    },
+    "error-gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "text-field.css"
+    },
+    "error-icon": {
+      "fallback": "var(--rind-icon-warning)",
+      "file": "text-field.css"
+    },
+    "fg": {
+      "fallback": "var(--rind-color-text)",
+      "file": "text-field.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-control, var(--rind-text-sm))",
+      "file": "text-field.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "text-field.css"
+    },
+    "height": {
+      "fallback": "var(--rind-size-control, var(--rind-size-md))",
+      "file": "text-field.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "text-field.css"
+    },
+    "label-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "text-field.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "text-field.css"
+    },
+    "label-font-weight": {
+      "fallback": "580",
+      "file": "text-field.css"
+    },
+    "label-line-height": {
+      "fallback": "var(--rind-leading-normal)",
+      "file": "text-field.css"
+    },
+    "padding-block": {
+      "fallback": "var(--rind-space-2)",
+      "file": "text-field.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-space-control, var(--rind-space-3))",
+      "file": "text-field.css"
+    },
+    "placeholder": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "text-field.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "text-field.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "text-field.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-key-pressed)",
+      "file": "text-field.css"
+    },
+    "soft-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "text-field.css"
+    }
+  }
+}
+```

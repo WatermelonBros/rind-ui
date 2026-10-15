@@ -1,0 +1,240 @@
+/*
+ * Text Field (family: field): the control is a recessed field, the counterpart of the raised
+ * key. Outline (default) sits on the raised surface, soft on the accent tint; both draw their
+ * edge in border-strong, so the boundary keeps 3:1 against the background. `data-variant` and
+ * `data-size` go on the Root (or the control itself). Focus is the base ring. Invalid adds a
+ * non-colour cue (a doubled border) beside the danger border. Colours never transition.
+ */
+@layer rind.components {
+  :where([data-scope="text-field"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-text-field-gap, var(--rind-space-1));
+    color: var(--rind-text-field-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="text-field"][data-part="label"]) {
+    font-size: var(--rind-text-field-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-text-field-label-font-weight, 580);
+    line-height: var(--rind-text-field-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-text-field-label-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="text-field"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-text-field-description-font-size, var(--rind-text-sm));
+    color: var(--rind-text-field-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="text-field"][data-part="error-message"]) {
+    display: flex;
+    gap: var(--rind-text-field-error-gap, var(--rind-space-1));
+    margin: 0;
+    font-size: var(--rind-text-field-error-font-size, var(--rind-text-sm));
+    color: var(--rind-text-field-error-color, var(--rind-color-danger-text));
+  }
+
+  /* An icon in currentColor: an error is never shown by colour alone. */
+  :where([data-scope="text-field"][data-part="error-message"])::before {
+    content: "";
+    flex: none;
+    inline-size: 1.25em;
+    block-size: 1lh;
+    background-color: currentColor;
+    mask-image: var(--rind-text-field-error-icon, var(--rind-icon-warning));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 1.25em;
+  }
+
+  :where([data-scope="text-field"][data-part="error-message"] ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where([data-scope="text-field"][data-part="root"][data-disabled] [data-part="label"]) {
+    color: var(--rind-text-field-disabled-color, var(--rind-color-text-disabled));
+  }
+
+  :where([data-scope="text-field"][data-part="root"][data-tone="danger"] [data-part="label"]) {
+    color: var(--rind-text-field-label-color, var(--rind-color-accent-text));
+  }
+
+  /* The control. */
+  :where(
+    [data-scope="text-field"][data-part="input"],
+    [data-scope="text-field"][data-part="textarea"]
+  ) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: 0;
+    margin: 0;
+    padding-inline: var(
+      --rind-text-field-padding-inline,
+      var(--rind-space-control, var(--rind-space-3))
+    );
+    border: var(--rind-border-width) solid
+      var(--rind-text-field-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-text-field-radius, var(--rind-radius-control));
+    background: var(--rind-text-field-bg, var(--rind-color-surface-raised));
+    color: var(--rind-text-field-fg, var(--rind-color-text));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    line-height: var(--rind-leading-normal);
+    box-shadow: var(--rind-text-field-shadow, var(--rind-shadow-key-pressed));
+  }
+
+  :where([data-scope="text-field"][data-part="input"]) {
+    block-size: var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)));
+  }
+
+  :where([data-scope="text-field"][data-part="textarea"]) {
+    min-block-size: var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)));
+    padding-block: var(--rind-text-field-padding-block, var(--rind-space-2));
+    resize: vertical;
+  }
+
+  :where([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]))::placeholder {
+    color: var(--rind-text-field-placeholder, var(--rind-color-text-muted));
+    opacity: 1;
+  }
+
+  /* Soft: the accent tint instead of the raised surface; the edge stays border-strong. */
+  :where(
+    [data-scope="text-field"][data-part="root"][data-variant="soft"]
+      :is([data-part="input"], [data-part="textarea"]),
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"])[data-variant="soft"]
+  ) {
+    background: var(--rind-text-field-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  /* Invalid: danger edge plus a doubled border, so the cue survives without colour. */
+  :where(
+    [data-scope="text-field"][data-part="root"][data-invalid]
+      :is([data-part="input"], [data-part="textarea"])
+  ) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-text-field-invalid-border, var(--rind-color-danger-border));
+    padding-inline: calc(
+      var(--rind-text-field-padding-inline, var(--rind-space-control, var(--rind-space-3))) -
+      var(--rind-border-width)
+    );
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"][data-disabled]
+      :is([data-part="input"], [data-part="textarea"]),
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]):disabled
+  ) {
+    background: var(--rind-text-field-disabled-bg, var(--rind-color-surface));
+    color: var(--rind-text-field-disabled-fg, var(--rind-color-text-disabled));
+    border-color: var(--rind-text-field-disabled-border, var(--rind-color-border));
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* Read-only: flat and unshaded, still full-contrast text. */
+  :where(
+    [data-scope="text-field"][data-part="root"][data-readonly]
+      :is([data-part="input"], [data-part="textarea"])
+  ) {
+    background: var(--rind-text-field-readonly-bg, var(--rind-color-surface));
+    box-shadow: none;
+  }
+
+  /* ClearTrigger: a 24px key (WCAG 2.5.8) drawing an x in currentColor. */
+  :where([data-scope="text-field"][data-part="clear-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-text-field-clear-radius, var(--rind-radius-indicator));
+    background: transparent;
+    color: var(--rind-text-field-clear-color, var(--rind-color-text-muted));
+    cursor: pointer;
+  }
+
+  :where([data-scope="text-field"][data-part="clear-trigger"])::after {
+    content: "";
+    inline-size: var(--rind-text-field-clear-icon-size, 1em);
+    block-size: var(--rind-text-field-clear-icon-size, 1em);
+    background-color: currentColor;
+    mask-image: var(--rind-text-field-clear-icon, var(--rind-icon-x));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="text-field"][data-part="clear-trigger"][data-hover]) {
+    color: var(--rind-text-field-clear-color-hover, var(--rind-color-text));
+  }
+
+  :where([data-scope="text-field"][data-part="character-count"]) {
+    font-size: var(--rind-text-field-count-font-size, var(--rind-text-xs));
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-text-field-count-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="text-field"][data-part="character-count"][data-over-limit]) {
+    color: var(--rind-text-field-count-over-color, var(--rind-color-danger-text));
+    font-weight: var(--rind-text-field-count-over-weight, 650);
+  }
+
+  @media (forced-colors: active) {
+    :where(
+        [data-scope="text-field"][data-part="input"],
+        [data-scope="text-field"][data-part="textarea"]
+      ) {
+      background: Field;
+      color: FieldText;
+      border-color: FieldText;
+    }
+
+    :where(
+        [data-scope="text-field"][data-part="root"][data-disabled]
+          :is([data-part="input"], [data-part="textarea"]),
+        [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]):disabled
+      ) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    :where([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"])):focus-visible,
+    :where(
+        [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"])
+      )[data-focus-visible] {
+      outline-color: Highlight;
+    }
+
+    :where(
+        [data-scope="text-field"][data-part="root"],
+        [data-scope="text-field"][data-part="label"],
+        [data-scope="text-field"][data-part="description"],
+        [data-scope="text-field"][data-part="error-message"],
+        [data-scope="text-field"][data-part="character-count"]
+      ) {
+      color: CanvasText;
+    }
+
+    :where([data-scope="text-field"][data-part="error-message"])::before,
+    :where([data-scope="text-field"][data-part="clear-trigger"])::after {
+      background-color: CanvasText;
+    }
+
+    :where([data-scope="text-field"][data-part="clear-trigger"]) {
+      color: ButtonText;
+    }
+
+    :where(
+        [data-scope="text-field"][data-part="root"][data-disabled] [data-part="label"],
+        [data-scope="text-field"][data-part="root"][data-disabled] [data-part="description"]
+      ) {
+      color: GrayText;
+    }
+  }
+}

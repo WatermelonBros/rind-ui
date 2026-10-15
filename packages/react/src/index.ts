@@ -22,6 +22,7 @@ export {
   useTypeaheadTimeout,
 } from "./provider"
 export { type RenderProp, renderPart } from "./render"
+export * from "./text-field"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,
