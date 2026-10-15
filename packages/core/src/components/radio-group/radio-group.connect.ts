@@ -28,18 +28,31 @@ export type RadioGroupPart =
   | "item-label"
   | "item-description"
 
-export const radioGroupIds = (root: string) => ({
-  list: partId("radio-group", root, "root"),
-  item: (key: CollectionKey) => itemId("radio-group", root, "item-control", key),
-  label: partId("radio-group", root, "label"),
-  description: partId("radio-group", root, "description"),
-  errorMessage: partId("radio-group", root, "error-message"),
-  itemLabel: (key: CollectionKey) => itemId("radio-group", root, "item-label", key),
-  itemDescription: (key: CollectionKey) => itemId("radio-group", root, "item-description", key),
-  hiddenInput: (key: CollectionKey) => itemId("radio-group", root, "hidden-input", key),
-  /** The default `name`: two groups never form one browser group (ariakit#3833). */
-  name: partId("radio-group", root, "name"),
-})
+/**
+ * The scope and the radio's part name: Radio Group's, or a component that is a radio group
+ * under its own name (Segmented Control: one `item` element per segment, ark#2629).
+ */
+export interface RadioNaming {
+  readonly scope: string
+  readonly control: string
+}
+const RADIO_GROUP: RadioNaming = { scope: "radio-group", control: "item-control" }
+
+export const radioGroupIds = (root: string, naming: RadioNaming = RADIO_GROUP) => {
+  const sc = naming.scope
+  return {
+    list: partId(sc, root, "root"),
+    item: (key: CollectionKey) => itemId(sc, root, naming.control, key),
+    label: partId(sc, root, "label"),
+    description: partId(sc, root, "description"),
+    errorMessage: partId(sc, root, "error-message"),
+    itemLabel: (key: CollectionKey) => itemId(sc, root, "item-label", key),
+    itemDescription: (key: CollectionKey) => itemId(sc, root, "item-description", key),
+    hiddenInput: (key: CollectionKey) => itemId(sc, root, "hidden-input", key),
+    /** The default `name`: two groups never form one browser group (ariakit#3833). */
+    name: partId(sc, root, "name"),
+  }
+}
 
 export interface RadioGroupConnectInput {
   readonly instance: string
@@ -73,6 +86,8 @@ export interface RadioGroupConnectInput {
       }
     | undefined
   readonly ariaLabel?: string | undefined
+  /** Default Radio Group's. */
+  readonly naming?: RadioNaming | undefined
 }
 
 /** One radio's interaction state (its own press, hover and focus). */
@@ -96,7 +111,9 @@ export function radioGroupConnect(
   send: (event: RadioGroupEvent) => void,
   env: CompositeEnv & LinkEnv,
 ) {
-  const ids = radioGroupIds(input.instance)
+  const naming = input.naming ?? RADIO_GROUP
+  const sc = naming.scope
+  const ids = radioGroupIds(input.instance, naming)
   const c = input.collection
   const selection = radioSelection(input.value)
   const inert = input.disabled && !input.focusableWhenDisabled
@@ -131,7 +148,7 @@ export function radioGroupConnect(
 
   return {
     root: (): PartProps => ({
-      ...scopeAttrs("radio-group", "root", input.instance),
+      ...scopeAttrs(sc, "root", input.instance),
       id: ids.list,
       role: "radiogroup",
       "aria-orientation": input.orientation,
@@ -158,7 +175,7 @@ export function radioGroupConnect(
         // Only keys on a radio of this group (a link inside an item keeps its keys).
         if (
           inert ||
-          target?.getAttribute("data-part") !== "item-control" ||
+          target?.getAttribute("data-part") !== naming.control ||
           target.getAttribute("data-instance") !== input.instance
         ) {
           return
@@ -181,22 +198,22 @@ export function radioGroupConnect(
       },
     }),
     label: (): PartProps => ({
-      ...scopeAttrs("radio-group", "label", input.instance),
+      ...scopeAttrs(sc, "label", input.instance),
       id: ids.label,
       ...groupState,
     }),
     description: (): PartProps => ({
-      ...scopeAttrs("radio-group", "description", input.instance),
+      ...scopeAttrs(sc, "description", input.instance),
       id: ids.description,
       ...groupState,
     }),
     errorMessage: (): PartProps => ({
-      ...scopeAttrs("radio-group", "error-message", input.instance),
+      ...scopeAttrs(sc, "error-message", input.instance),
       id: ids.errorMessage,
       ...groupState,
     }),
     item: (key: CollectionKey, own: { disabled: boolean }): PartProps => ({
-      ...scopeAttrs("radio-group", "item", input.instance),
+      ...scopeAttrs(sc, "item", input.instance),
       ...itemState(key, isDisabled(key, own.disabled)),
     }),
     itemControl: (key: CollectionKey, s: RadioItemState): PartProps => {
@@ -224,7 +241,7 @@ export function radioGroupConnect(
           },
           env,
         ),
-        ...scopeAttrs("radio-group", "item-control", input.instance),
+        ...scopeAttrs(sc, naming.control, input.instance),
         id: ids.item(key),
         role: "radio",
         "aria-checked": String(checked(key)),
@@ -242,24 +259,24 @@ export function radioGroupConnect(
       }
     },
     itemIndicator: (key: CollectionKey, own: { disabled: boolean }): PartProps => ({
-      ...scopeAttrs("radio-group", "item-indicator", input.instance),
+      ...scopeAttrs(sc, "item-indicator", input.instance),
       "aria-hidden": "true",
       ...itemState(key, isDisabled(key, own.disabled)),
     }),
     itemLabel: (key: CollectionKey, own: { disabled: boolean; labelable: boolean }): PartProps => ({
-      ...scopeAttrs("radio-group", "item-label", input.instance),
+      ...scopeAttrs(sc, "item-label", input.instance),
       id: ids.itemLabel(key),
       htmlFor: own.labelable ? ids.item(key) : undefined,
       ...itemState(key, isDisabled(key, own.disabled)),
     }),
     itemDescription: (key: CollectionKey, own: { disabled: boolean }): PartProps => ({
-      ...scopeAttrs("radio-group", "item-description", input.instance),
+      ...scopeAttrs(sc, "item-description", input.instance),
       id: ids.itemDescription(key),
       ...itemState(key, isDisabled(key, own.disabled)),
     }),
     /** The item's native radio: shared name, its value; checked as a property. */
     hiddenInput: (key: CollectionKey, own: { disabled: boolean }): PartProps => ({
-      ...scopeAttrs("radio-group", "hidden-input", input.instance),
+      ...scopeAttrs(sc, "hidden-input", input.instance),
       type: "radio",
       id: ids.hiddenInput(key),
       "aria-hidden": "true",

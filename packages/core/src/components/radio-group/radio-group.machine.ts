@@ -12,7 +12,12 @@ import {
   initialCollectionContext,
 } from "../../collection/machine"
 import type { Modality } from "../../contract/env"
-import type { IndicatorBox } from "../../dom/selection-indicator"
+import {
+  type IndicatorBox,
+  type IndicatorCause,
+  type MeasuredIndicator,
+  nextIndicator,
+} from "../../dom/selection-indicator"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
 
@@ -27,7 +32,11 @@ export type RadioGroupEvent =
   | { readonly type: "BLUR" }
   | { readonly type: "COLLECTION.CHANGE" }
   | { readonly type: "RESET" }
-  | { readonly type: "INDICATOR.MEASURE"; readonly box: IndicatorBox | null }
+  | {
+      readonly type: "INDICATOR.MEASURE"
+      readonly box: IndicatorBox | null
+      readonly cause: IndicatorCause
+    }
 
 export interface RadioGroupProps extends CollectionProps {
   readonly value?: string | null | undefined
@@ -39,7 +48,10 @@ export interface RadioGroupProps extends CollectionProps {
   readonly readOnly?: boolean | undefined
 }
 
-export type RadioGroupContext = CollectionContext & { readonly indicator: IndicatorBox | null }
+export type RadioGroupContext = CollectionContext & {
+  /** The measured selection indicator (Segmented Control's; Radio Group renders none). */
+  readonly indicator: MeasuredIndicator | null
+}
 
 const pieces = collectionPieces({})
 
@@ -100,8 +112,10 @@ export const radioGroupMachine = setup({
     /** Leaving the group: the tab stop goes back to the checked radio (else the first). */
     clearHighlight: ({ set }) => set("highlightedKey", null),
     resetToDefault: ({ props, set }) => set("value", props.defaultValue ?? NONE),
-    setIndicator: ({ event, set }) => {
-      if (event.type === "INDICATOR.MEASURE") set("indicator", event.box)
+    setIndicator: ({ event, context, set }) => {
+      if (event.type !== "INDICATOR.MEASURE") return
+      const next = nextIndicator(context.indicator, event.box, event.cause)
+      if (next !== undefined) set("indicator", next)
     },
   },
 }).machine({

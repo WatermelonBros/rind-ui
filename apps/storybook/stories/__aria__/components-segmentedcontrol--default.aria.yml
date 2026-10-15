@@ -1,0 +1,5 @@
+- radiogroup "Range":
+  - radio "Day" [checked]
+  - radio "Week"
+  - radio "Month"
+- button "After"

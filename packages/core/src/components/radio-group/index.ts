@@ -2,6 +2,7 @@ export {
   type RadioGroupConnectInput,
   type RadioGroupPart,
   type RadioItemState,
+  type RadioNaming,
   radioGroupConnect,
   radioGroupIds,
 } from "./radio-group.connect"

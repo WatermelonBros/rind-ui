@@ -125,3 +125,33 @@ export function selectionIndicator(o: SelectionIndicatorOptions) {
     },
   }
 }
+
+/** A measurement as a machine keeps it: the box and why it moved. */
+export interface MeasuredIndicator {
+  readonly box: IndicatorBox
+  readonly cause: IndicatorCause
+}
+
+/**
+ * The context value after an INDICATOR.MEASURE, or `undefined` when nothing changed (an
+ * unchanged box: measuring after every commit must settle).
+ */
+export function nextIndicator(
+  prev: MeasuredIndicator | null,
+  box: IndicatorBox | null,
+  cause: IndicatorCause,
+): MeasuredIndicator | null | undefined {
+  if (box === null) return prev === null ? undefined : null
+  if (
+    prev !== null &&
+    prev.box.left === box.left &&
+    prev.box.top === box.top &&
+    prev.box.width === box.width &&
+    prev.box.height === box.height &&
+    prev.box.right === box.right &&
+    prev.box.bottom === box.bottom
+  ) {
+    return undefined
+  }
+  return { box, cause }
+}

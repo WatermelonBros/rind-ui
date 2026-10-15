@@ -4,7 +4,6 @@ import {
   createListCollection,
   type InactivePanels,
   observeTabbable,
-  selectionIndicator,
   type TabsEvent,
   tabsConnect,
   tabsIds,
@@ -36,6 +35,7 @@ import { useMachine } from "../use-machine"
 import { useModality } from "../use-modality"
 import { useHover, usePress } from "../use-press"
 import { useRenderedTag } from "../use-rendered-tag"
+import { useSelectionIndicator } from "../use-selection-indicator"
 
 declare const process: { env: { NODE_ENV?: string } }
 
@@ -331,45 +331,14 @@ export type TabsIndicatorProps = ComponentPropsWithRef<"span"> & {
 function Indicator({ render, ref, ...rest }: TabsIndicatorProps) {
   const ctx = useTabs("Indicator")
   const el = useRef<HTMLElement | null>(null)
-  const { send, instance, collection } = ctx
-  const latest = useRef(ctx.value)
-  latest.current = ctx.value
-  const tabOf = (key: string | null, node: HTMLElement) =>
-    key === null ? null : node.ownerDocument.getElementById(tabsIds(instance).tab(toKey(key)))
-  const handle = useRef<ReturnType<typeof selectionIndicator> | null>(null)
-  useIsoLayoutEffect(() => {
-    const node = el.current
-    if (!node) return
-    const h = selectionIndicator({
-      container: () => node.parentElement,
-      item: () => tabOf(latest.current, node),
-      items: () =>
-        [...(node.parentElement?.querySelectorAll<HTMLElement>('[data-part="tab"]') ?? [])].filter(
-          (t) => t.getAttribute("data-instance") === instance,
-        ),
-      onMeasure: (box, cause) => send({ type: "INDICATOR.MEASURE", box, cause }),
-    })
-    handle.current = h
-    // The first measurement never animates (base-ui#998).
-    h.measure("layout")
-    return () => {
-      h.dispose()
-      handle.current = null
-    }
-  }, [instance, send])
-  // A selection change moves it (animatable); a registration change re-observes (layout).
-  const lastValue = useRef(ctx.value)
-  useIsoLayoutEffect(() => {
-    if (lastValue.current === ctx.value) return
-    lastValue.current = ctx.value
-    handle.current?.measure("selection")
-  }, [ctx.value])
-  const lastCollection = useRef(collection)
-  useIsoLayoutEffect(() => {
-    if (lastCollection.current === collection) return
-    lastCollection.current = collection
-    handle.current?.refresh()
-  }, [collection])
+  const { send, instance } = ctx
+  useSelectionIndicator({
+    el,
+    selectedId: ctx.value === null ? null : tabsIds(instance).tab(toKey(ctx.value)),
+    itemSelector: `[data-part="tab"][data-instance="${instance}"]`,
+    collection: ctx.collection,
+    onMeasure: (box, cause) => send({ type: "INDICATOR.MEASURE", box, cause }),
+  })
   const props = mergeProps(
     { ...normalizeProps(ctx.api.indicator()), ref: composeRefs(el, ref) },
     rest,

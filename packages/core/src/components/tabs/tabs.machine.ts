@@ -14,7 +14,12 @@ import {
 } from "../../collection/machine"
 import { navigableWhen, repair } from "../../collection/navigation"
 import type { Modality } from "../../contract/env"
-import type { IndicatorBox, IndicatorCause } from "../../dom/selection-indicator"
+import {
+  type IndicatorBox,
+  type IndicatorCause,
+  type MeasuredIndicator,
+  nextIndicator,
+} from "../../dom/selection-indicator"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
 
@@ -49,7 +54,7 @@ export interface TabsProps extends CollectionProps {
 }
 
 export type TabsContext = CollectionContext & {
-  readonly indicator: { readonly box: IndicatorBox; readonly cause: IndicatorCause } | null
+  readonly indicator: MeasuredIndicator | null
   /** Whether each visible panel contains a tabbable element (else it is itself a stop). */
   readonly panelTabbable: Readonly<Record<string, boolean>>
   /** The direction of the last selection change in collection order. */
@@ -88,14 +93,6 @@ function selection(
         : "previous"
   return { key, direction }
 }
-
-const sameBox = (a: IndicatorBox, b: IndicatorBox) =>
-  a.left === b.left &&
-  a.top === b.top &&
-  a.width === b.width &&
-  a.height === b.height &&
-  a.right === b.right &&
-  a.bottom === b.bottom
 
 export const tabsMachine = setup({
   types: type<{
@@ -182,11 +179,8 @@ export const tabsMachine = setup({
     },
     setIndicator: ({ event, context, set }) => {
       if (event.type !== "INDICATOR.MEASURE") return
-      const prev = context.indicator
-      const box = event.box
-      // An unchanged box is not a change: measuring after every commit must settle.
-      if (box === null ? prev === null : prev !== null && sameBox(prev.box, box)) return
-      set("indicator", box ? { box, cause: event.cause } : null)
+      const next = nextIndicator(context.indicator, event.box, event.cause)
+      if (next !== undefined) set("indicator", next)
     },
   },
 }).machine({

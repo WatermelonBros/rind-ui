@@ -28,6 +28,7 @@ export {
 } from "./provider"
 export * from "./radio-group"
 export { type RenderProp, renderPart } from "./render"
+export * from "./segmented-control"
 export * from "./switch"
 export * from "./tabs"
 export * from "./text-field"

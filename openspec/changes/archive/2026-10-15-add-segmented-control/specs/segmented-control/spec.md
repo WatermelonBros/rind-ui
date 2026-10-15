@@ -122,7 +122,10 @@ focus the control and press ArrowRight until that segment is selected; completes
 `selected()` equals `name`. Queries: `segments()` (accessible names in order),
 `selected()` (name of the segment with `aria-checked="true"`, or null),
 `focusedSegment()`, `isDisabled(name)` and `formValue()`. Traits: `composite-roving`,
-`selectable` and `directional`. No part SHALL be declared as committing on focus. A
+`selectable` and `directional`. Focus SHALL change only the focus state and the
+focused-segment query, never the value; the contract declares the item as committing on
+focus for that reason, and the value is checked by the `selectable` and
+`form-associated` invariants after every step. A
 generated driver `getSegmentedControl(target, { name })` SHALL be exported from
 `@rind-ui/testing`.
 

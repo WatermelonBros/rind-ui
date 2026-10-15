@@ -11,9 +11,10 @@ import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/pr
 import type { Modality } from "../../contract/env"
 import { describeKey } from "../../dom/keyboard"
 import type { LinkEnv } from "../../dom/link"
-import type { IndicatorBox, IndicatorCause } from "../../dom/selection-indicator"
+import type { MeasuredIndicator } from "../../dom/selection-indicator"
 import { itemId, partId } from "../../ids"
 import { buttonLikeProps } from "../shared/button-like"
+import { indicatorProps } from "../shared/indicator"
 import type { TabsEvent } from "./tabs.machine"
 
 export type TabsPart = "root" | "list" | "tab" | "panel" | "indicator"
@@ -43,7 +44,7 @@ export interface TabsConnectInput {
   readonly renderedPanels: ReadonlySet<string>
   readonly panelTabbable: Readonly<Record<string, boolean>>
   readonly direction: "next" | "previous" | "none"
-  readonly indicator: { readonly box: IndicatorBox; readonly cause: IndicatorCause } | null
+  readonly indicator: MeasuredIndicator | null
   /** The panel revealed by find-in-page, until the next selection. */
   readonly revealed: string | null
 }
@@ -184,27 +185,13 @@ export function tabsConnect(
         "data-reveal": on && input.revealed === key ? "find-in-page" : undefined,
       }
     },
-    indicator: (): PartProps => {
-      const shown = selected !== null && input.indicator !== null
-      const box = shown ? input.indicator?.box : undefined
-      return {
-        ...scopeAttrs("tabs", "indicator", input.instance),
-        ...common,
-        "aria-hidden": "true",
-        hidden: shown ? undefined : true,
-        "data-state": shown ? "visible" : "hidden",
-        "data-resizing": dataFlag(shown && input.indicator?.cause === "layout"),
-        style: box
-          ? {
-              "--rind-indicator-left": `${box.left}px`,
-              "--rind-indicator-right": `${box.right}px`,
-              "--rind-indicator-top": `${box.top}px`,
-              "--rind-indicator-bottom": `${box.bottom}px`,
-              "--rind-indicator-width": `${box.width}px`,
-              "--rind-indicator-height": `${box.height}px`,
-            }
-          : undefined,
-      }
-    },
+    indicator: (): PartProps =>
+      indicatorProps({
+        scope: "tabs",
+        instance: input.instance,
+        orientation: input.orientation,
+        selected: selected !== null,
+        indicator: input.indicator,
+      }),
   }
 }

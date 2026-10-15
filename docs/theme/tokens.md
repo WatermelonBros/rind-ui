@@ -624,19 +624,19 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "height": {
       "fallback": "0",
-      "file": "tabs.css"
+      "file": "segmented-control.css"
     },
     "left": {
       "fallback": "0",
-      "file": "tabs.css"
+      "file": "segmented-control.css"
     },
     "top": {
       "fallback": "0",
-      "file": "tabs.css"
+      "file": "segmented-control.css"
     },
     "width": {
       "fallback": "0",
-      "file": "tabs.css"
+      "file": "segmented-control.css"
     }
   }
 }
@@ -787,6 +787,84 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "size": {
       "fallback": "1.25rem",
       "file": "radio-group.css"
+    }
+  }
+}
+```
+
+### segmented-control
+
+```json
+{
+  "family": "selector",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "segmented-control.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "segmented-control.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "segmented-control.css"
+    },
+    "color-selected": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "segmented-control.css"
+    },
+    "cursor": {
+      "fallback": "pointer",
+      "file": "segmented-control.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "segmented-control.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "segmented-control.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "segmented-control.css"
+    },
+    "gap": {
+      "fallback": "0",
+      "file": "segmented-control.css"
+    },
+    "indicator-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "segmented-control.css"
+    },
+    "item-gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "segmented-control.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "segmented-control.css"
+    },
+    "label-font-weight": {
+      "fallback": "600",
+      "file": "segmented-control.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "segmented-control.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-space-3)",
+      "file": "segmented-control.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "segmented-control.css"
+    },
+    "selected-weight": {
+      "fallback": "600",
+      "file": "segmented-control.css"
     }
   }
 }

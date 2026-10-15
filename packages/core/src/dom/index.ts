@@ -148,7 +148,9 @@ export { lockScroll, lockScrollForModals } from "./scroll-lock"
 export {
   type IndicatorBox,
   type IndicatorCause,
+  type MeasuredIndicator,
   measureIndicator,
+  nextIndicator,
   type SelectionIndicatorOptions,
   selectionIndicator,
 } from "./selection-indicator"
