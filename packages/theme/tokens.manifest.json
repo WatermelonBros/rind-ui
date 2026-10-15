@@ -858,6 +858,23 @@
         }
       }
     },
+    "separator": {
+      "family": "decoration",
+      "tokens": {
+        "color": {
+          "fallback": "var(--rind-color-border)",
+          "file": "separator.css"
+        },
+        "spacing": {
+          "fallback": "var(--rind-space-2)",
+          "file": "separator.css"
+        },
+        "thickness": {
+          "fallback": "1px",
+          "file": "separator.css"
+        }
+      }
+    },
     "switch": {
       "family": "choice",
       "tokens": {

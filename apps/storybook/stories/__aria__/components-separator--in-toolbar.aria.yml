@@ -1,0 +1,4 @@
+- toolbar "Format":
+  - button "Bold"
+  - separator
+  - button "Italic"

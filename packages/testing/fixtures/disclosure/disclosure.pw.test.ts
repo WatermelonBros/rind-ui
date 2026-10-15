@@ -23,6 +23,7 @@ import { states as linkStates } from "../../../../apps/storybook/stories/Link.st
 import { states as pressStates } from "../../../../apps/storybook/stories/PressFixture.stories"
 import { states as radioGroupStates } from "../../../../apps/storybook/stories/RadioGroup.stories"
 import { states as segmentedControlStates } from "../../../../apps/storybook/stories/SegmentedControl.stories"
+import { states as separatorStates } from "../../../../apps/storybook/stories/Separator.stories"
 import { states as switchStates } from "../../../../apps/storybook/stories/Switch.stories"
 import { states as tabsStates } from "../../../../apps/storybook/stories/Tabs.stories"
 import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
@@ -316,6 +317,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/LayerFixture.stories.tsx": layerStates,
     "./stories/Link.stories.tsx": linkStates,
     "./stories/Heading.stories.tsx": headingStates,
+    "./stories/Separator.stories.tsx": separatorStates,
     "./stories/Button.stories.tsx": buttonStates,
     "./stories/Label.stories.tsx": labelStates,
     "./stories/Fieldset.stories.tsx": fieldsetStates,

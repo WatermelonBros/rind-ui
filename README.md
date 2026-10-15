@@ -95,8 +95,9 @@ with status, is in [`docs/components.md`](docs/components.md).
 | Forms | Label, Field, Fieldset, Form, Text Field, Checkbox, Switch, Checkbox Group, Radio Group, Segmented Control |
 | Disclosure | Collapsible, Accordion, Tabs |
 | Typography | Heading |
+| Layout | Separator |
 
-Next up: Separator, Toolbar,
+Next up: Toolbar,
 Dialog, Popover, Tooltip, Menu, Select, Combobox, Slider, and the AI-interface
 primitives (Prompt Input, Message Thread, Streaming Message, Tool Approval).
 

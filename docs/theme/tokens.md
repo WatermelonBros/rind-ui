@@ -870,6 +870,28 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### separator
+
+```json
+{
+  "family": "decoration",
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-border)",
+      "file": "separator.css"
+    },
+    "spacing": {
+      "fallback": "var(--rind-space-2)",
+      "file": "separator.css"
+    },
+    "thickness": {
+      "fallback": "1px",
+      "file": "separator.css"
+    }
+  }
+}
+```
+
 ### switch
 
 ```json

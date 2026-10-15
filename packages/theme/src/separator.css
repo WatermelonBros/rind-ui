@@ -1,0 +1,37 @@
+/*
+ * Separator: family `decoration`, no variant, size or tone rules. Drawn as a border, not a
+ * background-filled box, so it survives forced colors. A vertical one stretches to the
+ * cross size of a flex row (radix-ui/primitives#1926). Spacing is the margin along the
+ * cross axis only.
+ */
+@layer rind.components {
+  :where([data-scope="separator"][data-part="root"]) {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    /* <hr> reset: the border is drawn below, from the tokens. */
+    border: 0;
+    padding: 0;
+    block-size: auto;
+    inline-size: auto;
+    color: var(--rind-separator-color, var(--rind-color-border));
+  }
+
+  :where([data-scope="separator"][data-part="root"][data-orientation="horizontal"]) {
+    border-block-start: var(--rind-separator-thickness, 1px) solid currentColor;
+    margin-block: var(--rind-separator-spacing, var(--rind-space-2));
+    margin-inline: 0;
+  }
+
+  :where([data-scope="separator"][data-part="root"][data-orientation="vertical"]) {
+    border-inline-start: var(--rind-separator-thickness, 1px) solid currentColor;
+    margin-inline: var(--rind-separator-spacing, var(--rind-space-2));
+    margin-block: 0;
+    align-self: stretch;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="separator"][data-part="root"]) {
+      color: CanvasText;
+    }
+  }
+}

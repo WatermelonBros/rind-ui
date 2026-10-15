@@ -178,6 +178,7 @@ export type ComponentTokens = {
     | "paddingInline"
     | "radius"
     | "selectedWeight"
+  readonly separator: "color" | "spacing" | "thickness"
   readonly switch:
     | "bg"
     | "blockSize"

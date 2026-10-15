@@ -1,0 +1,5 @@
+- menu "Edit":
+  - menuitem "Cut"
+  - menuitem "Copy"
+  - separator
+  - menuitem "Delete"

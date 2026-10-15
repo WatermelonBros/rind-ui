@@ -6,3 +6,8 @@ packages:
 # per-platform optional dependency, so its postinstall is not needed.
 allowBuilds:
   esbuild: false
+
+# Next 15.5 pins postcss 8.4.31, which has known advisories (GHSA-fxqj-rqcc-2cmp and others);
+# 8.5.28 is the patched line. Scoped to Next so nothing else moves.
+overrides:
+  "next>postcss": 8.5.28

@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-separator (r1) | — | packages/react/src/separator/separator.tsx:~66 | warnKey omits aria-value* and tag; tabIndex "0" (string) skips the splitter warning — add VALUE_ATTRS to the key, normalise Number(tabIndex) |
+| add-separator (r1) | — | packages/react/src/separator/separator.tsx (tag) | function/component render: first render assumes div (role=separator on an <hr>) until the layout effect — harmless, document |
+| add-separator (r1) | — | packages/testing/src/adapters/dom.ts:232 + driver docs | `part` anchor never matches the container itself and only data-scope=separator root (host-drawn toolbar separators found only by role/name) — document; add-toolbar decides |
+| add-separator (r1) | — | packages/testing/src/entries.test.ts | "optional peers" timed out at 5s under full-suite load — new load flake |
 | add-tabs (r1) | — | packages/core/src/dom/tabbable-content.ts (hasTabbable) | ignores CSS-hidden (display/visibility) and fieldset-disabled descendants: a panel whose only control is hidden or in a disabled fieldset loses its own tab stop |
 | add-tabs (r1) | — | packages/react/src/tabs/tabs.tsx (Panel) | the panel's tabindex=0 renders before the tabbable observer's first report: a one-commit flash on panels with controls (could seed from hasTabbable in a layout effect) |
 | add-tabs (r1) | — | docs/components/tabs.md, tabs.meta.ts | `defaultValue={null}` (uncontrolled, start with nothing selected → still picks the first enabled) is undocumented |

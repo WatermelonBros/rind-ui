@@ -145,7 +145,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
-| Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | spec |  |
+| Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Reado has PersonAvatar |
 | Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |

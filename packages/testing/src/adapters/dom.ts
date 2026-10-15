@@ -229,6 +229,13 @@ function createDomEnv(
           : { name: typeof name === "string" ? (n: string) => normalize(n) === name : name }),
       })
     }
+    if ("part" in by) {
+      return Array.from(
+        within.querySelectorAll(
+          `[data-scope="${CSS.escape(scope)}"][data-part="${CSS.escape(by.part)}"]`,
+        ),
+      )
+    }
     const { text } = by
     const matches = (el: Element) => {
       const own = normalize(el.textContent)

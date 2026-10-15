@@ -49,6 +49,11 @@ export type AriaRole = string
 export type By =
   | { readonly role: AriaRole; readonly name?: string | RegExp }
   | { readonly text: string | RegExp }
+  /**
+   * The contract's own `data-scope` and this `data-part`, inside the driver's target (a
+   * container): for an unnamed part that may not be exposed (a decorative Separator).
+   */
+  | { readonly part: string }
 
 /** Modifier keys held during a click (Shift+click extends, mod+click toggles a selection). */
 export interface ClickOptions {
