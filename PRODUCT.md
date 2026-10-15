@@ -52,9 +52,9 @@ first real consumer is Reado, an IDE (dense, long sessions, light and dark).
 
 ## Brand Commitments
 
-Name: rind-ui (part of Watermelon). No logo or visual identity yet. The user judged
-the first theme's look unacceptable ("fa cagare") and asked for a complete visual
-redesign; the old look is evidence only.
+Name: rind-ui (part of Watermelon). The logo and visual identity live with the docs site
+(apps/site). The theme's visual design is provisional and will be redone after the
+components are complete.
 
 ## Evidence on Hand
 
