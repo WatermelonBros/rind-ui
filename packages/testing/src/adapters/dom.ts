@@ -64,6 +64,31 @@ const nextCoords = (el?: Element) => {
   return { clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY }
 }
 
+/**
+ * Resolves once no finite transition or animation is running in the document (or after `max`
+ * ms). A sibling panel opening shifts the target's box for a while, and a press aimed at
+ * coordinates read before the shift releases outside it (the press is then not a press).
+ * Without running animations (every jsdom test, most browser ones) it returns at once; fake
+ * timers have no frames to wait on.
+ */
+const settled = async (el: Element, fake: boolean, max = 1000) => {
+  const doc = el.ownerDocument
+  const view = doc.defaultView
+  if (fake || !view?.requestAnimationFrame || !doc.getAnimations) return
+  const running = () =>
+    doc
+      .getAnimations()
+      .some(
+        (a) =>
+          a.playState === "running" &&
+          a.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY,
+      )
+  const end = Date.now() + max
+  while (running() && Date.now() < end) {
+    await new Promise<void>((done) => view.requestAnimationFrame(() => done()))
+  }
+}
+
 const KEY_NAMES: Record<Key, string> = {
   Enter: "{Enter}",
   Escape: "{Escape}",
@@ -325,6 +350,7 @@ function createDomEnv(
     const press = async (el: Element, touch: boolean) => {
       const u = await getUser()
       if (!u.pointer) return act(() => u.click(el))
+      await settled(el, options.advanceTimers !== undefined)
       const coords = nextCoords(el)
       // Touch: no mouse pointer moves first, so hover logic never sees a tap.
       const steps = touch

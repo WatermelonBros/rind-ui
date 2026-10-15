@@ -1,7 +1,7 @@
 import { domEnvironment } from "@rind-ui/core"
 import { Label, Link } from "@rind-ui/react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { expect } from "storybook/test"
+import { expect, waitFor } from "storybook/test"
 import { getLabel } from "../../../packages/testing/src/components/label"
 
 const meta = {
@@ -123,6 +123,8 @@ export const DriverExample: Story = {
       { platform: domEnvironment().platform },
     )
     await label.click()
-    await expect(label.isControlFocused()).resolves.toBe(true)
+    // The label's click action has no postcondition to wait on (CI Firefox flaked reading
+    // focus right after it), so wait for the control's focus.
+    await waitFor(async () => expect(await label.isControlFocused()).toBe(true))
   },
 }

@@ -794,13 +794,22 @@ describe("Form participation", () => {
         <div
           data-testid="box"
           dir="rtl"
-          style={{ width: 60, height: 60, overflow: "auto", position: "relative" }}
+          style={{
+            width: 200,
+            height: 60,
+            overflowX: "auto",
+            overflowY: "hidden",
+            position: "relative",
+          }}
         >
           <Grp defaultValue="m" after={false} />
         </div>,
       )
       await frame()
       const box = screen.getByTestId("box")
+      // The box is wide enough for the visible content in any font (Linux metrics differ) and
+      // overflowY is hidden so a classic vertical scrollbar cannot narrow clientWidth: any
+      // horizontal overflow left is the hidden input's.
       expect(box.scrollWidth).toBe(box.clientWidth)
     },
   )

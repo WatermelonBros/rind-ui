@@ -86,7 +86,11 @@ describe("DOM adapter", () => {
   it("tap is touch only: no mouse pointer before it", async () => {
     document.body.innerHTML = '<button id="b">x</button>'
     const events: string[] = []
-    const record = (e: Event) => events.push(`${e.type}:${(e as PointerEvent).pointerType ?? ""}`)
+    // Only what the adapter dispatches: the browser itself sends a trusted mouse pointerover when
+    // the new button lands under the real cursor left by an earlier test.
+    const record = (e: Event) => {
+      if (!e.isTrusted) events.push(`${e.type}:${(e as PointerEvent).pointerType ?? ""}`)
+    }
     for (const t of ["pointerover", "pointerdown", "mousedown"]) {
       document.addEventListener(t, record, true)
     }

@@ -129,7 +129,8 @@ export function Pop(p: PopProps) {
                 />
               ) : null}
               <h2 {...normalizeProps(parts.title())}>Details</h2>
-              <input aria-label="Note" />
+              {/* Fixed width: the UA default (size=20) is font-dependent, 212 px in WebKit on Linux. */}
+              <input aria-label="Note" style={{ width: 100 }} />
               <div data-filler style={{ width, height }} />
               <button type="button" {...normalizeProps(parts.close())}>
                 Close
