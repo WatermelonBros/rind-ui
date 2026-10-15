@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-heading (r1) | — | packages/react/src/heading/heading.tsx + heading.connect.ts | warnEmptyHeading has no once-guard (dependency-less effect) → logs on every re-render; guard with a ref like warnedDeep |
+| add-heading (r1) | — | packages/core/src/components/heading/heading.connect.ts | warnEmptyHeading false positive for image-only (img alt) or aria-label-only content; check accessible name instead of textContent |
+| add-heading (r1) | — | packages/core/src/collection/list.test.ts | "Constant-time navigation" timing test flakes under full-suite load (passes in isolation) — loosen or move to a perf project |
 | add-link (r1) | — | packages/react/src/link/link.tsx:62-68 | `staticTag` guesses "a" for a FUNCTION render: server output for render={(p)=><div {...p}/>} is <div href> without role/tabindex until hydration — document or dev-warn |
 | add-link (r1) | — | packages/core/src/dom/link.ts:279-290 | onAuxClick fires onActivate without honoring a prevented event, and the consumer's onAuxClick isn't suppressed on a disabled link |
 | add-link (r1) | — | link tests | "innermost provider wins" test cites react-spectrum#6557 (that's the external _blank case) — fix citation |

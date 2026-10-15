@@ -26,6 +26,7 @@ import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useModality } from "../use-modality"
 import { useHover, usePress } from "../use-press"
+import { useRenderedTag } from "../use-rendered-tag"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -60,14 +61,6 @@ export type LinkProps = Omit<ComponentPropsWithRef<"a">, "href" | "download" | "
 const noSubscription = () => () => {}
 const clientOrigin = () => globalThis.location?.origin
 const serverOrigin = () => undefined
-
-/** The tag a `render` element will produce when it says so statically. */
-const staticTag = (render: RenderProp<LinkState> | undefined) =>
-  render === undefined
-    ? "a"
-    : isValidElement(render) && typeof render.type === "string"
-      ? render.type
-      : "a"
 
 type Props = Readonly<Record<string, unknown>>
 
@@ -113,12 +106,10 @@ export function Link(props: LinkProps) {
   const env = useEnvironment()
   const instance = useRootId(id)
   const el = useRef<HTMLElement | null>(null)
-  const [tag, setTag] = useState(() => staticTag(render))
+  const tag = useRenderedTag("a", render, el)
   useIsoLayoutEffect(() => {
     const node = el.current
     if (!node) return
-    const actual = node.tagName.toLowerCase()
-    if (actual !== tag) setTag(actual)
     warnLinkFallback(node)
     warnInteractiveContent(node, "link")
   })

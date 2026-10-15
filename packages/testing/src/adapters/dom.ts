@@ -409,6 +409,7 @@ function createDomEnv(
       },
       isInert: async () => (await now()).closest("[inert]") !== null,
       attr: async (name) => (await now()).getAttribute(name),
+      tagName: async () => (await now()).tagName.toLowerCase(),
       text: async () => normalize((await now()).textContent),
       value: async () => ((await now()) as HTMLInputElement).value ?? "",
       exists: async () => (await resolve()).some(isVisible),

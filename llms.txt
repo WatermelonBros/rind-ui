@@ -21,6 +21,7 @@
 
 ## Components
 
+- [Heading](docs/components/heading.md): A heading whose level comes from where it is: sections nest, and each `Heading` renders the native `h1`–`h6` for its depth, so the document outline stays right without counting levels by hand.
 - [Link](docs/components/link.md): A navigational link that behaves like a native `<a href>` wherever it appears: client routing without double navigation, modifier clicks left to the browser, disabled and current states, and a driver to test it.
 
 ## Accessibility

@@ -81,6 +81,8 @@ export interface Part {
   /** The part is inside an `inert` subtree (computed from its ancestors). */
   isInert(): Promise<boolean>
   attr(name: string): Promise<string | null>
+  /** The element's tag name, lowercase ("h3", "div"). */
+  tagName(): Promise<string>
   /** Whitespace-normalised textContent. */
   text(): Promise<string>
   /** The value of a form control. */

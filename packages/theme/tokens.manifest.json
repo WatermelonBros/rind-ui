@@ -89,6 +89,87 @@
     "--rind-transform-origin"
   ],
   "components": {
+    "heading": {
+      "family": null,
+      "tokens": {
+        "1-font-size": {
+          "fallback": "calc(var(--rind-text-lg) * 1.75)",
+          "file": "heading.css"
+        },
+        "1-font-weight": {
+          "fallback": "700",
+          "file": "heading.css"
+        },
+        "1-line-height": {
+          "fallback": "var(--rind-leading-tight)",
+          "file": "heading.css"
+        },
+        "2-font-size": {
+          "fallback": "calc(var(--rind-text-lg) * 1.4)",
+          "file": "heading.css"
+        },
+        "2-font-weight": {
+          "fallback": "700",
+          "file": "heading.css"
+        },
+        "2-line-height": {
+          "fallback": "var(--rind-leading-tight)",
+          "file": "heading.css"
+        },
+        "3-font-size": {
+          "fallback": "var(--rind-text-lg)",
+          "file": "heading.css"
+        },
+        "3-font-weight": {
+          "fallback": "600",
+          "file": "heading.css"
+        },
+        "3-line-height": {
+          "fallback": "var(--rind-leading-tight)",
+          "file": "heading.css"
+        },
+        "4-font-size": {
+          "fallback": "var(--rind-text-md)",
+          "file": "heading.css"
+        },
+        "4-font-weight": {
+          "fallback": "600",
+          "file": "heading.css"
+        },
+        "4-line-height": {
+          "fallback": "var(--rind-leading-tight)",
+          "file": "heading.css"
+        },
+        "5-font-size": {
+          "fallback": "var(--rind-text-sm)",
+          "file": "heading.css"
+        },
+        "5-font-weight": {
+          "fallback": "600",
+          "file": "heading.css"
+        },
+        "5-line-height": {
+          "fallback": "var(--rind-leading-normal)",
+          "file": "heading.css"
+        },
+        "6-font-size": {
+          "fallback": "var(--rind-text-xs)",
+          "file": "heading.css"
+        },
+        "6-font-weight": {
+          "fallback": "600",
+          "file": "heading.css"
+        },
+        "6-line-height": {
+          "fallback": "var(--rind-leading-normal)",
+          "file": "heading.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "heading.css"
+        }
+      }
+    },
     "link": {
       "family": "link",
       "tokens": {

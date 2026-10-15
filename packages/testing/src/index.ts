@@ -11,6 +11,7 @@ export {
 export { installAnnouncementLog, recordingAnnouncer } from "./announcements"
 export { missingAriaLines } from "./aria-snapshot"
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
+export { getHeading } from "./components/heading"
 export { getLink } from "./components/link"
 export {
   type ContractModality,

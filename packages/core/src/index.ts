@@ -1,5 +1,6 @@
 export * from "./a11y"
 export * from "./collection"
+export * from "./components/heading"
 export * from "./components/link"
 export * from "./connect"
 export * from "./contract"

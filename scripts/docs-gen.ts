@@ -185,22 +185,30 @@ export function renderApi(meta: ComponentMeta): string {
       ),
     ),
     "",
-    "### Keyboard",
-    "",
-    table(
-      ["Key", ""],
-      meta.keyboard.map(([key, what]) => [key, what]),
-    ),
-    "",
+    ...(meta.keyboard.length
+      ? [
+          "### Keyboard",
+          "",
+          table(
+            ["Key", ""],
+            meta.keyboard.map(([key, what]) => [key, what]),
+          ),
+          "",
+        ]
+      : []),
     ...(meta.stateless
       ? ["### States", "", "None: the component is stateless (no machine, no `testMachine`).", ""]
       : []),
     "### Contract",
     "",
-    table(
-      ["Action", "Modalities"],
-      Object.entries(actions).map(([name, m]) => [`\`${name}\``, m.join(", ")]),
-    ),
+    ...(Object.keys(actions).length
+      ? [
+          table(
+            ["Action", "Modalities"],
+            Object.entries(actions).map(([name, m]) => [`\`${name}\``, m.join(", ")]),
+          ),
+        ]
+      : ["No actions."]),
     "",
     `Queries: ${queries.map((q) => `\`${q}\``).join(", ")}. Traits: ${
       traits.length ? traits.map((t) => `\`${t}\``).join(", ") : "none"

@@ -150,7 +150,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | spec | Docs recipe (native CSS `aspect-ratio`), no component — see add-aspect-ratio |
-| Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | spec |  |
+| Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |

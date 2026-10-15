@@ -1,0 +1,54 @@
+/*
+ * Heading. In no family: typography tokens only. The look follows `data-level`, which is the
+ * outline level, not the tag; a consumer changes the size per level with
+ * `--rind-heading-<n>-font-size` and the level (and the accessibility tree) stays put.
+ */
+@layer rind.components {
+  :where([data-scope="heading"][data-part="root"][data-level="1"]) {
+    font-size: var(--rind-heading-1-font-size, calc(var(--rind-text-lg) * 1.75));
+    line-height: var(--rind-heading-1-line-height, var(--rind-leading-tight));
+    font-weight: var(--rind-heading-1-font-weight, 700);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="2"]) {
+    font-size: var(--rind-heading-2-font-size, calc(var(--rind-text-lg) * 1.4));
+    line-height: var(--rind-heading-2-line-height, var(--rind-leading-tight));
+    font-weight: var(--rind-heading-2-font-weight, 700);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="3"]) {
+    font-size: var(--rind-heading-3-font-size, var(--rind-text-lg));
+    line-height: var(--rind-heading-3-line-height, var(--rind-leading-tight));
+    font-weight: var(--rind-heading-3-font-weight, 600);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="4"]) {
+    font-size: var(--rind-heading-4-font-size, var(--rind-text-md));
+    line-height: var(--rind-heading-4-line-height, var(--rind-leading-tight));
+    font-weight: var(--rind-heading-4-font-weight, 600);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="5"]) {
+    font-size: var(--rind-heading-5-font-size, var(--rind-text-sm));
+    line-height: var(--rind-heading-5-line-height, var(--rind-leading-normal));
+    font-weight: var(--rind-heading-5-font-weight, 600);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="6"]) {
+    font-size: var(--rind-heading-6-font-size, var(--rind-text-xs));
+    line-height: var(--rind-heading-6-line-height, var(--rind-leading-normal));
+    font-weight: var(--rind-heading-6-font-weight, 600);
+    color: var(--rind-heading-color, var(--rind-color-text));
+    margin: 0;
+  }
+}

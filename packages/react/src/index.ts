@@ -1,3 +1,4 @@
+export * from "./heading"
 export { type IconName, type RindIcons, useIconChildren } from "./icons"
 export { LayerProvider, useParentLayer } from "./layer-context"
 export * from "./link"

@@ -370,6 +370,7 @@ function createPlaywrightEnv(
       },
       isInert: async () => (await now()).evaluate((el) => el.closest("[inert]") !== null),
       attr: async (name) => (await now()).getAttribute(name),
+      tagName: async () => (await now()).evaluate((el) => el.tagName.toLowerCase()),
       text: async () => ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim(),
       value: async () => (await now()).inputValue(),
       exists: async () => {
