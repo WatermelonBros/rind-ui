@@ -1,5 +1,5 @@
 import { domEnvironment } from "@rind-ui/core"
-import { Button, RindProvider, RouterProvider } from "@rind-ui/react"
+import { Button, Fieldset, Portal, RindProvider, RouterProvider } from "@rind-ui/react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -763,10 +763,23 @@ describe("disabled fieldset through the component", () => {
     await vi.waitFor(() => expect(attr("Nested")).toBe(true))
   })
 
-  // A.1: needs a rind-ui Fieldset, which does not exist yet.
-  it.todo(
-    "portalled part under a disabled rind-ui Fieldset is disabled (add-fieldset provides the context)",
-  )
+  it("portalled part under a disabled rind-ui Fieldset is disabled (A.1)", async () => {
+    const onPress = vi.fn()
+    render(
+      <Fieldset.Root disabled>
+        <Fieldset.Legend>Group</Fieldset.Legend>
+        <Portal>
+          <Button onPress={onPress}>Portalled</Button>
+        </Portal>
+      </Fieldset.Root>,
+    )
+    const el = screen.getByRole("button", { name: "Portalled" })
+    expect(el.closest("fieldset")).toBeNull()
+    expect(el.hasAttribute("data-disabled")).toBe(true)
+    expect(el.hasAttribute("disabled")).toBe(true)
+    await getButton(screen, { name: "Portalled" }).press()
+    expect(onPress).not.toHaveBeenCalled()
+  })
 })
 
 describe("held Enter on a submit Button", () => {

@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-fieldset (r1) | — | packages/core/src/dom/fieldset-disabled.ts | watchFieldsetDisabled returns early when the part has no fieldset ancestor at watch time, so moving it into a disabled fieldset later is missed |
+| add-fieldset (r1) | — | packages/core/src/dom/fieldset-disabled.ts | document-level childList observer re-checks every watch on every mutation batch — filter records to fieldset/legend changes |
+| add-fieldset (r1) | — | openspec specs (fieldset) / docs | substituted Legend (render={<div/>}) gets no first-legend exemption (matches native) — state it in spec/docs; reconcile "ErrorMessage listed while rendered" vs forceMount-while-valid not listed |
+| add-fieldset (r1) | — | add-switch/radio-group/select/checkbox/text-field | it.todo Fieldset scenarios (6.1, 8.1 partial) must become tests when those components land |
 | add-label (r1) | — | packages/core/src/components/shared/label-interaction.ts:31-35 | labelTarget: a substituted label (render={<span/>}) without htmlFor finds no wrapped control — fall back to first labelable descendant or document the limit |
 | add-label (r1) | — | add-checkbox / add-field / add-radio-group | Re-check "Group target" (focus the checked or first enabled radio) and "Labels Focus Popup Triggers" (Select) with real consumers; fix the test's dangling aria-labelledby="size" |
 | add-label (r1) | — | packages/react/src/label/label.tsx | checkLabelTarget only re-runs when htmlFor changes; a target mounting later with the same htmlFor isn't re-evaluated |

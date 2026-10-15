@@ -208,12 +208,18 @@ const stateAttrs: GenericInvariant = (f) => {
     ["aria-selected", "data-selected"],
   ]
   for (const el of f.after.elements) {
+    // rind-ui's own parts: a consumer's plain markup carries no data-* state.
+    if (el.attrs["data-scope"] === undefined) continue
     for (const [aria, data] of pairs) {
       if (el.attrs[aria] === undefined && el.attrs[data] === undefined) continue
       // A native `disabled` attribute is the element's aria-disabled.
       const on =
         isTrue(el.attrs[aria]) || (aria === "aria-disabled" && el.attrs["disabled"] !== undefined)
-      if (on !== (el.attrs[data] !== undefined)) {
+      const flagged = el.attrs[data] !== undefined
+      // A data-* flag on a part that is not interactive (a Fieldset's legend, an invalid
+      // group) is a styling hook: the ARIA state belongs to its controls.
+      if (flagged && !on && !el.focusable) continue
+      if (on !== flagged) {
         out.push(`${el.describe}: ${aria}="${el.attrs[aria] ?? ""}" disagrees with ${data}`)
       }
     }

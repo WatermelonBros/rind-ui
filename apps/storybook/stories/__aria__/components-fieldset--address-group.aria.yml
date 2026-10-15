@@ -1,0 +1,7 @@
+- group "Shipping address":
+  - text: Shipping address
+  - paragraph: Where we send the parcel.
+  - text: Street
+  - textbox "Street"
+  - text: City
+  - textbox "City"

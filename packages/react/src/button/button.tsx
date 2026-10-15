@@ -19,6 +19,7 @@ import {
   useRef,
   useSyncExternalStore,
 } from "react"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -95,8 +96,11 @@ export function Button(props: ButtonProps) {
   const { render, href } = anchorOf(renderProp)
   const el = useRef<HTMLElement | null>(null)
   const tag = useRenderedTag("button", render, el)
+  // A rind-ui Fieldset's context reaches portalled parts; the DOM tracker native fieldsets.
+  const fieldsetContext = useFieldsetDisabled()
   const { view, send } = useMachine(buttonMachine, {
-    disabled,
+    // The machine guards activation on it as on the prop.
+    disabled: disabled || fieldsetContext,
     pending,
     onPress,
     onPressStart,
@@ -105,7 +109,7 @@ export function Button(props: ButtonProps) {
     id: instance,
   })
   const fieldsetDisabled = view.context.fieldsetDisabled
-  const effectiveDisabled = disabled || fieldsetDisabled
+  const effectiveDisabled = disabled || fieldsetDisabled || fieldsetContext
   // The modality tracker must see the pointerdown that comes before focus.
   useEffect(() => env.modality.subscribe(() => {}), [env])
   useEffect(() => {

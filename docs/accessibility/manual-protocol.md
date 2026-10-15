@@ -83,3 +83,14 @@ Story: Components/Label → ForInput (and AsSpan, NonLabelableTarget). Record ea
       Click the Label: the input is focused, and VoiceOver reads its name once.
 - [ ] **Both**: on NonLabelableTarget, clicking the Label focuses the group and its name
       ("Colour") comes from the Label through `aria-labelledby`.
+
+## Device checklist: Fieldset (add-fieldset 10.1)
+
+Stories: Components/Fieldset → AddressGroup, Disabled, Invalid. Record each pass in
+`tested-with.json` with `component: "fieldset"`.
+
+- [ ] **NVDA + Chrome**, **JAWS + Chrome**, **VoiceOver + Safari**: Tab into the first
+      field of AddressGroup: the group name "Shipping address" is spoken on entering, and
+      the description is read.
+- [ ] **All three**: in Disabled, the controls are announced as dimmed / unavailable.
+- [ ] **All three**: in Invalid, the group's description includes the error text.

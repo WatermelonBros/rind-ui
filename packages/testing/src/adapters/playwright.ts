@@ -378,6 +378,13 @@ function createPlaywrightEnv(
           (el) => (globalThis as InPageWindow).__rindTesting?.accessibleName(el) ?? "",
         )
       },
+      accessibleDescription: async () => {
+        const { root } = await getBase()
+        await ensureInPage(root)
+        return (await now()).evaluate(
+          (el) => (globalThis as InPageWindow).__rindTesting?.accessibleDescription(el) ?? "",
+        )
+      },
       labelled: () =>
         handle(`the control of ${label}`, async () => {
           const text = ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim()

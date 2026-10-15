@@ -1,0 +1,4 @@
+- group "Shipping address":
+  - text: Shipping address Street
+  - textbox "Street" [disabled]
+  - button "Save" [disabled]

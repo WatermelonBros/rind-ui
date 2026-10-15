@@ -128,6 +128,60 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### fieldset
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "fieldset.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "fieldset.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "fieldset.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "fieldset.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-color-danger-text)",
+      "file": "fieldset.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "fieldset.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "fieldset.css"
+    },
+    "legend-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "fieldset.css"
+    },
+    "legend-font-size": {
+      "fallback": "var(--rind-text-md)",
+      "file": "fieldset.css"
+    },
+    "legend-font-weight": {
+      "fallback": "600",
+      "file": "fieldset.css"
+    },
+    "legend-line-height": {
+      "fallback": "var(--rind-leading-tight)",
+      "file": "fieldset.css"
+    }
+  }
+}
+```
+
 ### heading
 
 ```json

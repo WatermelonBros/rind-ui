@@ -427,6 +427,10 @@ function createDomEnv(
         const { computeAccessibleName } = await import("dom-accessibility-api")
         return normalize(computeAccessibleName(await now()))
       },
+      accessibleDescription: async () => {
+        const { computeAccessibleDescription } = await import("dom-accessibility-api")
+        return normalize(computeAccessibleDescription(await now()))
+      },
       labelled: () =>
         handle(`the control of ${label}`, async () => {
           const control = labelledControl(await now())

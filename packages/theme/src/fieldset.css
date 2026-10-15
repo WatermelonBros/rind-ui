@@ -1,0 +1,83 @@
+/*
+ * Fieldset. In no family: layout normalisation and typography only. The native `<fieldset>`
+ * and `<legend>` defaults (border, notch, min-content width) are removed so the group lays
+ * out as an ordinary block that shrinks with its container.
+ */
+@layer rind.components {
+  :where([data-scope="fieldset"][data-part="root"]) {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+    display: grid;
+    gap: var(--rind-fieldset-gap, var(--rind-space-2));
+    color: var(--rind-fieldset-color, var(--rind-color-text));
+  }
+
+  /* float + full width turns the legend into a plain block: no notch cut into a border. */
+  :where([data-scope="fieldset"][data-part="legend"]) {
+    float: inline-start;
+    inline-size: 100%;
+    padding: 0;
+    font-size: var(--rind-fieldset-legend-font-size, var(--rind-text-md));
+    font-weight: var(--rind-fieldset-legend-font-weight, 600);
+    line-height: var(--rind-fieldset-legend-line-height, var(--rind-leading-tight));
+    color: var(--rind-fieldset-legend-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="fieldset"][data-part="legend"] + *) {
+    clear: inline-start;
+  }
+
+  :where([data-scope="fieldset"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-fieldset-description-font-size, var(--rind-text-sm));
+    color: var(--rind-fieldset-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="fieldset"][data-part="error-message"]) {
+    margin: 0;
+    font-size: var(--rind-fieldset-error-font-size, var(--rind-text-sm));
+    color: var(--rind-fieldset-error-color, var(--rind-color-danger-text));
+  }
+
+  /* The disabled text role is chosen to stay at 3:1 or more. */
+  :where([data-scope="fieldset"][data-part="root"][data-disabled]) {
+    color: var(--rind-fieldset-disabled-color, var(--rind-color-text-disabled));
+  }
+
+  :where(
+    [data-scope="fieldset"][data-part="root"][data-disabled]
+      [data-scope="fieldset"][data-part="legend"],
+    [data-scope="fieldset"][data-part="root"][data-disabled]
+      [data-scope="fieldset"][data-part="description"]
+  ) {
+    color: var(--rind-fieldset-disabled-color, var(--rind-color-text-disabled));
+  }
+
+  /* `data-tone` re-points the accent roles: the legend reads them. */
+  :where([data-scope="fieldset"][data-part="root"][data-tone="danger"] [data-part="legend"]) {
+    color: var(--rind-fieldset-legend-color, var(--rind-color-accent-text));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="fieldset"][data-part="root"]) {
+      border-color: CanvasText;
+      color: CanvasText;
+    }
+
+    :where([data-scope="fieldset"][data-part="root"][data-disabled]),
+    :where(
+        [data-scope="fieldset"][data-part="root"][data-disabled]
+          [data-scope="fieldset"][data-part="legend"],
+        [data-scope="fieldset"][data-part="root"][data-disabled]
+          [data-scope="fieldset"][data-part="description"]
+      ) {
+      color: GrayText;
+    }
+
+    :where([data-scope="fieldset"][data-part="error-message"]) {
+      color: CanvasText;
+    }
+  }
+}

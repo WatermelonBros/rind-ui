@@ -9,6 +9,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { states as announceStates } from "../../../../apps/storybook/stories/AnnounceFixture.stories"
 import { states as buttonStates } from "../../../../apps/storybook/stories/Button.stories"
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
+import { states as fieldsetStates } from "../../../../apps/storybook/stories/Fieldset.stories"
 import { states as headingStates } from "../../../../apps/storybook/stories/Heading.stories"
 import { states as labelStates } from "../../../../apps/storybook/stories/Label.stories"
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
@@ -304,6 +305,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Heading.stories.tsx": headingStates,
     "./stories/Button.stories.tsx": buttonStates,
     "./stories/Label.stories.tsx": labelStates,
+    "./stories/Fieldset.stories.tsx": fieldsetStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

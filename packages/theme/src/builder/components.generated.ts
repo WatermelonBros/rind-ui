@@ -23,6 +23,18 @@ export type ComponentTokens = {
     | "solidBg"
     | "solidBgHover"
     | "solidFg"
+  readonly fieldset:
+    | "color"
+    | "descriptionColor"
+    | "descriptionFontSize"
+    | "disabledColor"
+    | "errorColor"
+    | "errorFontSize"
+    | "gap"
+    | "legendColor"
+    | "legendFontSize"
+    | "legendFontWeight"
+    | "legendLineHeight"
   readonly heading:
     | "1FontSize"
     | "1FontWeight"

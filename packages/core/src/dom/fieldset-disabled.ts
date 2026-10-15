@@ -51,7 +51,13 @@ export function watchFieldsetDisabled(
         w.onChange(now)
       }
     })
-    observer.observe(doc, { subtree: true, attributes: true, attributeFilter: ["disabled"] })
+    // childList too: moving a part into a disabled fieldset, or reordering its legends.
+    observer.observe(doc, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["disabled"],
+    })
     entry = { observer, watches }
     watchers.set(doc, entry)
   }

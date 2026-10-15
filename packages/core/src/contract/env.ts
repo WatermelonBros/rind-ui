@@ -85,6 +85,8 @@ export interface Part {
   tagName(): Promise<string>
   /** Its accessible name (accname computation). */
   accessibleName(): Promise<string>
+  /** Its accessible description (`aria-describedby`, accname computation). */
+  accessibleDescription(): Promise<string>
   /** The control this label names (`for`, wrapping, or `aria-labelledby`), as a lazy part. */
   labelled(): Part
   /** Two pointer clicks in a row (the second with `detail: 2`). */
