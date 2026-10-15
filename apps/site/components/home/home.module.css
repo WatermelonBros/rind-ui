@@ -429,6 +429,83 @@
   white-space: pre-wrap;
   word-break: break-word;
 }
+/* PASS: lines go green one after the other, then the banner pops with a little burst */
+.pass {
+  opacity: 1;
+  background: none;
+  box-shadow: none;
+  color: #9be7c4;
+  animation: line-pass 0.5s var(--spring) backwards;
+}
+@keyframes line-pass {
+  from {
+    color: inherit;
+    translate: -6px 0;
+  }
+}
+.passBanner {
+  grid-column: 1 / -1;
+  order: 3;
+  position: relative;
+  margin: 0;
+  min-height: 0;
+  max-height: 0;
+  overflow: visible;
+  padding: 0 18px;
+  font: 600 14px var(--mono);
+  color: #0b0b0c;
+  background: #9be7c4;
+  transition:
+    max-height 0.5s var(--spring),
+    padding 0.5s var(--spring);
+}
+.passBanner[data-show] {
+  max-height: 80px;
+  padding: 14px 18px;
+  animation: pass-pop 0.6s var(--spring-pop);
+}
+.passBanner b {
+  background: #0b0b0c;
+  color: #9be7c4;
+  padding: 3px 8px;
+  border-radius: 99px;
+  margin-right: 8px;
+}
+@keyframes pass-pop {
+  0% {
+    scale: 0.96;
+  }
+  60% {
+    scale: 1.01;
+  }
+}
+.confetti {
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  pointer-events: none;
+}
+.confetti i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: hsl(calc(var(--i) * 47) 90% 60%);
+  animation: burst 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  rotate: calc(var(--i) * 26deg);
+}
+@keyframes burst {
+  from {
+    translate: 0 0;
+    opacity: 1;
+  }
+  to {
+    translate: calc(cos(calc(var(--i) * 25.7deg)) * 90px)
+      calc(sin(calc(var(--i) * 25.7deg)) * 60px - 20px);
+    opacity: 0;
+  }
+}
+
 .testStage {
   padding: 40px 28px;
   display: grid;

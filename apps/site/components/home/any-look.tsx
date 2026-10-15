@@ -8,15 +8,35 @@ import { Reveal } from "./reveal"
 
 type Skin = "crisp" | "juicy" | "bare"
 
+const DEFAULT_BRAND: Record<Skin, string> = { crisp: "#0b0b0c", juicy: "#ff8fb1", bare: "#18181b" }
+
+/** Ink or white, whichever reads better on `hex` (WCAG relative luminance). */
+function textOn(hex: string): string {
+  const [r = 0, g = 0, b = 0] = [1, 3, 5].map((i) => {
+    const c = Number.parseInt(hex.slice(i, i + 2), 16) / 255
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+  })
+  const l = 0.2126 * r + 0.7152 * g + 0.0722 * b
+  // contrast against white vs against near-black ink; pick the larger
+  return 1.05 / (l + 0.05) >= (l + 0.05) / 0.055 ? "#ffffff" : "#0b0b0c"
+}
+
 /** One set of real components; the reader swaps the skin and tunes it live. */
 export function AnyLook() {
   const { phase } = usePhase()
   const [picked, setPicked] = useState<Skin | null>(null)
   const skin = picked ?? phase
-  const [accent, setAccent] = useState<string | null>(null)
+  // the brand colour fills buttons, pressed toggles and checked controls; text follows contrast
+  const [brand, setBrand] = useState<string | null>(null)
   const [radius, setRadius] = useState<number | null>(null)
   const vars = {
-    ...(accent ? { "--s-acc": accent, "--s-acc-deep": accent } : {}),
+    ...(brand
+      ? {
+          "--s-brand": brand,
+          "--s-brand-text": textOn(brand),
+          "--s-brand-deep": `color-mix(in oklab, ${brand} 70%, #000)`,
+        }
+      : {}),
     ...(radius !== null
       ? { "--s-r": `${radius}px`, "--s-r-sm": `${Math.round(radius * 0.6)}px` }
       : {}),
@@ -50,13 +70,11 @@ export function AnyLook() {
             ))}
           </div>
           <label className={styles.tune}>
-            Accent
+            Brand
             <input
               type="color"
-              value={
-                accent ?? (skin === "juicy" ? "#ff8fb1" : skin === "bare" ? "#2563eb" : "#ff3d8b")
-              }
-              onChange={(e) => setAccent(e.currentTarget.value)}
+              value={brand ?? DEFAULT_BRAND[skin]}
+              onChange={(e) => setBrand(e.currentTarget.value)}
             />
           </label>
           <label className={styles.tune}>
@@ -72,7 +90,7 @@ export function AnyLook() {
           <Button
             className={styles.reset}
             onPress={() => {
-              setAccent(null)
+              setBrand(null)
               setRadius(null)
             }}
           >

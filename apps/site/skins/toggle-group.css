@@ -33,14 +33,11 @@
   transition-duration: 0.12s;
 }
 [data-skin] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
-  background: var(--s-ink);
-  color: var(--s-on);
+  background: var(--s-brand);
+  color: var(--s-brand-text);
 }
 [data-skin="juicy"] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
-  background: var(--s-acc);
-  color: var(--s-ink);
-  box-shadow: 0 3px 0 var(--s-acc-deep);
-}
-[data-skin="bare"] [data-scope="toggle-group"][data-part="item"][data-state="on"] {
-  color: #fff;
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  box-shadow: 0 3px 0 var(--s-brand-deep);
 }

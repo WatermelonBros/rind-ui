@@ -185,9 +185,35 @@
   background: #ffffff14;
   align-items: center;
 }
-.codeTab[aria-pressed="true"] {
-  background: #d4ff3a;
+.codeList {
+  position: relative;
+  display: flex;
+  gap: 4px;
+}
+.codeTab {
+  position: relative;
+  z-index: 1;
+}
+.codeTab[data-selected] {
   color: #0b0b0c;
+}
+/* rind's Tabs.Indicator, sliding behind the selected tab */
+.codeIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: var(--rind-indicator-width);
+  height: var(--rind-indicator-height);
+  translate: var(--rind-indicator-left) var(--rind-indicator-top);
+  border-radius: 99px;
+  background: #d4ff3a;
+  transition:
+    translate 0.45s var(--spring),
+    width 0.45s var(--spring);
+}
+.codeIndicator[data-resizing] {
+  transition: none;
 }
 .copy {
   margin-left: auto;

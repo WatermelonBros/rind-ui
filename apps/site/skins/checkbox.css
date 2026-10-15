@@ -49,8 +49,8 @@
     [data-state="checked"],
     [data-state="indeterminate"]
   ) {
-  background: var(--s-ink);
-  color: var(--s-on);
+  background: var(--s-brand);
+  color: var(--s-brand-text);
 }
 [data-skin="juicy"] [data-scope="checkbox"][data-part="control"] {
   border-radius: 9px;

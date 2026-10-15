@@ -84,7 +84,7 @@ async function exercise(page: Page, url: string) {
     }
     await frame.getByRole("button", { name: /Get code/ }).click()
     if ((await frame.locator("pre").count()) === 0) report(url, "code", `example ${i} has no code`)
-    const css = frame.getByRole("button", { name: "Our skin CSS" })
+    const css = frame.getByRole("tab", { name: "Our skin CSS" })
     if (await css.count()) await css.click()
     // every enabled control of the example, once
     const controls = frame.locator(

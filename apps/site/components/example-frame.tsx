@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Heading, Toggle } from "@rind-ui/react"
+import { Button, Heading, Tabs, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples } from "@/examples"
@@ -170,24 +170,25 @@ export function ExampleFrame({
       )}
 
       {tab !== null && shown && (
-        <div className={styles.code}>
+        <Tabs.Root
+          className={styles.code}
+          value={tab}
+          onValueChange={(v) => {
+            if (v === "react" || v === "css") setTab(v)
+          }}
+        >
           <div className={styles.tabs}>
-            <Toggle.Root
-              className={styles.codeTab}
-              pressed={tab === "react"}
-              onPressedChange={() => setTab("react")}
-            >
-              React
-            </Toggle.Root>
-            {source.css.raw && (
-              <Toggle.Root
-                className={styles.codeTab}
-                pressed={tab === "css"}
-                onPressedChange={() => setTab("css")}
-              >
-                Our skin CSS
-              </Toggle.Root>
-            )}
+            <Tabs.List className={styles.codeList} aria-label={`${label}: code`}>
+              <Tabs.Tab className={styles.codeTab} value="react">
+                React
+              </Tabs.Tab>
+              {source.css.raw && (
+                <Tabs.Tab className={styles.codeTab} value="css">
+                  Our skin CSS
+                </Tabs.Tab>
+              )}
+              <Tabs.Indicator className={styles.codeIndicator} />
+            </Tabs.List>
             <Button
               className={styles.copy}
               onPress={() =>
@@ -200,25 +201,27 @@ export function ExampleFrame({
               {copied ? "Copied" : "Copy"}
             </Button>
           </div>
-          {/* A scrollable block must be reachable by keyboard: the region holds the focus. */}
-          <section
-            className={styles.codeScroll}
-            aria-label={`${label}: ${tab === "css" ? "skin CSS" : "code"}`}
-          >
-            <pre
-              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
-              tabIndex={0}
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
-              dangerouslySetInnerHTML={{ __html: `<code class="hljs">${shown.html}</code>` }}
-            />
-          </section>
-          {tab === "css" && (
-            <p className={styles.cssNote}>
-              Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a start,
-              or write your own on the same attributes.
-            </p>
+          {(["react", "css"] as const).map((t) =>
+            t === "css" && !source.css.raw ? null : (
+              <Tabs.Panel key={t} value={t}>
+                <pre
+                  // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
+                  tabIndex={0}
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
+                  dangerouslySetInnerHTML={{
+                    __html: `<code class="hljs">${(t === "css" ? source.css : source.code[name])?.html ?? ""}</code>`,
+                  }}
+                />
+                {t === "css" && (
+                  <p className={styles.cssNote}>
+                    Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a
+                    start, or write your own on the same attributes.
+                  </p>
+                )}
+              </Tabs.Panel>
+            ),
           )}
-        </div>
+        </Tabs.Root>
       )}
 
       {hero && (

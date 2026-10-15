@@ -23,6 +23,9 @@
   --s-font: var(--font-inter), system-ui, sans-serif;
   --s-ok: #0b0b0c;
   --s-error: #a3003c;
+  --s-brand: var(--s-ink);
+  --s-brand-text: var(--s-on);
+  --s-brand-deep: var(--s-ink);
 }
 [data-skin="juicy"] {
   --s-bg: #e9e2ff;
@@ -42,6 +45,9 @@
   --s-font: var(--font-fredoka), system-ui, sans-serif;
   --s-ok: #6fcfa5;
   --s-error: #b0174f;
+  --s-brand: var(--s-acc);
+  --s-brand-text: var(--s-ink);
+  --s-brand-deep: var(--s-acc-deep);
 }
 [data-skin="bare"] {
   --s-bg: #f4f4f5;
@@ -61,6 +67,9 @@
   --s-font: system-ui, -apple-system, "Segoe UI", sans-serif;
   --s-ok: #18181b;
   --s-error: #b91c1c;
+  --s-brand: var(--s-ink);
+  --s-brand-text: #ffffff;
+  --s-brand-deep: #000000;
 }
 [data-skin] {
   --s-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -121,9 +130,9 @@
     [data-state="checked"],
     [data-state="indeterminate"]
   ) {
-  background: var(--s-ink);
-  border-color: var(--s-ink);
-  color: #fff;
+  background: var(--s-brand);
+  border-color: var(--s-brand);
+  color: var(--s-brand-text);
 }
 [data-skin="bare"] :focus-visible {
   outline: 2px solid var(--s-acc);

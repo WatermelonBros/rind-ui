@@ -43,11 +43,14 @@ export function Tested() {
   const [line, setLine] = useState(-1)
   const [running, setRunning] = useState(false)
   const [run, setRun] = useState(0)
+  const [passed, setPassed] = useState<number | null>(null)
 
   const play = async () => {
     setRunning(true)
+    setPassed(null)
     setRun((n) => n + 1)
     setLine(-1)
+    const started = performance.now()
     await new Promise((r) => setTimeout(r, 300))
     for (let i = 0; i < STEPS.length; i++) {
       setLine(i)
@@ -55,6 +58,8 @@ export function Tested() {
       if (root) STEPS[i]?.act?.(root)
       await new Promise((r) => setTimeout(r, 750))
     }
+    setLine(STEPS.length)
+    setPassed(Math.round(performance.now() - started))
     setRunning(false)
   }
 
@@ -84,12 +89,31 @@ export function Tested() {
                 <li
                   key={s.code}
                   data-state={i < line ? "done" : i === line ? "current" : undefined}
+                  className={passed !== null ? styles.pass : undefined}
+                  style={passed !== null ? { animationDelay: `${i * 0.05}s` } : undefined}
                 >
                   <code>{s.code}</code>
                 </li>
               ))}
             </ol>
           </div>
+          <p
+            className={styles.passBanner}
+            role="status"
+            data-show={passed !== null ? "" : undefined}
+          >
+            {passed !== null && (
+              <>
+                <b>✓ PASS</b> faq.test.ts · 2 tests · 6 steps · {(passed / 1000).toFixed(1)}s
+                <span className={styles.confetti} aria-hidden="true">
+                  {Array.from({ length: 14 }, (_, i) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: fixed decorative set
+                    <i key={i} style={{ "--i": i } as React.CSSProperties} />
+                  ))}
+                </span>
+              </>
+            )}
+          </p>
           <div className={styles.testStage} data-skin={phase} ref={stage} key={run}>
             <div className="stack">
               <Accordion.Root defaultValue={["shipping"]}>
