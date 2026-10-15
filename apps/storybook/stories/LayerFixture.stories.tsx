@@ -58,6 +58,11 @@ export const MenuInDialog: Story = {
   ),
 }
 
+/** A modal menu registers its trigger: it stays exposed and names the menu (RA#9737). */
+export const ModalMenu: Story = {
+  args: { defaultOpen: true, kind: "menu", label: "Actions", title: "Menu" },
+}
+
 function TopLayerToast() {
   // A child of <body>, like a real toast host: the app root is made inert wholesale.
   const [host, setHost] = useState<HTMLElement | null>(null)

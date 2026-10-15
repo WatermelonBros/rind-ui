@@ -235,4 +235,49 @@ describe("modal overlayEffect", () => {
     expect(anyInert()).toBe(false)
     expect(locked()).toBe(false)
   })
+
+  it("attaches focus, containment and inert to content that mounts many frames later", async () => {
+    const ctx = setup()
+    ctx.content.remove()
+    const stop = overlayEffect(ctx.env, {
+      id: layerId("late"),
+      kind: "dialog",
+      modal: true,
+      elements: () => (ctx.content.isConnected ? [ctx.content] : []),
+      container: () => (ctx.content.isConnected ? ctx.content : null),
+      opener: () => ctx.trigger,
+      modality: "keyboard",
+      dismiss: { onRequest: () => {} },
+    })
+    cleanups.push(stop)
+    for (let i = 0; i < 15; i++) await frame()
+    document.body.append(ctx.content)
+    await frame()
+    await frame()
+    expect(document.activeElement).toBe(q("#field"))
+    expect(q("#app").closest("[inert]")).not.toBeNull()
+  })
+
+  it("keeps an autoFocus field the content focused before attach", async () => {
+    const ctx = setup()
+    ctx.content.remove()
+    const stop = overlayEffect(ctx.env, {
+      id: layerId("auto"),
+      kind: "dialog",
+      modal: true,
+      elements: () => (ctx.content.isConnected ? [ctx.content] : []),
+      container: () => (ctx.content.isConnected ? ctx.content : null),
+      opener: () => ctx.trigger,
+      modality: "keyboard",
+      dismiss: { onRequest: () => {} },
+    })
+    cleanups.push(stop)
+    // The framework mounts the content and its autoFocus button, then the effect attaches.
+    document.body.append(ctx.content)
+    q("#btn").focus()
+    await frame()
+    await frame()
+    await frame()
+    expect(document.activeElement).toBe(q("#btn"))
+  })
 })

@@ -168,7 +168,51 @@ describe("inside and topmost", () => {
     expect(tooltip.contains(null)).toBe(false)
     expect(stack().topmost()?.id).toBe(tooltip.id)
     expect(stack().topmostModal()?.id).toBe(dialog.id)
-    expect(stack().layerOf(target)?.id).toBe(tooltip.id)
+  })
+})
+
+describe("declared parents that are not open", () => {
+  it("adopts a child that registered before its parent (child effects run first)", () => {
+    const child = stack().push(opts("inner", div(), { modal: true, parent: layerId("outer") }))
+    const parent = stack().push(opts("outer", div(), { modal: true }))
+    expect(child.parentId).toBe(parent.id)
+    expect(
+      stack()
+        .layers()
+        .map((l) => l.id),
+    ).toEqual([parent.id, child.id])
+    expect(stack().topmostModal()?.id).toBe(child.id)
+    parent.release()
+    expect(stack().layers()).toEqual([])
+  })
+
+  it("hands a child whose declared parent closed to that parent's parent", () => {
+    const dialog = stack().push(opts("dlg", div(), { modal: true }))
+    const menu = stack().push(opts("menu", div(), { kind: "menu", parent: layerId("dlg") }))
+    menu.release() // an item was selected: the menu closes, still animating out
+    const alert = stack().push(
+      opts("alert", div(), {
+        kind: "alertdialog",
+        family: "dialog",
+        modal: true,
+        parent: layerId("menu"),
+      }),
+    )
+    expect(alert.parentId).toBe(dialog.id)
+    expect(alert.meta().nested).toBe(true)
+    menu.dispose()
+    expect(alert.parentId).toBe(dialog.id)
+    dialog.release()
+    expect(stack().layers()).toEqual([])
+  })
+
+  it("resolves a parent that was already disposed through its own parent", () => {
+    const dialog = stack().push(opts("dlg", div(), { modal: true }))
+    const menu = stack().push(opts("menu", div(), { kind: "menu", parent: layerId("dlg") }))
+    menu.release()
+    menu.dispose()
+    const alert = stack().push(opts("alert", div(), { modal: true, parent: layerId("menu") }))
+    expect(alert.parentId).toBe(dialog.id)
   })
 })
 

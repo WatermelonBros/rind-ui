@@ -105,7 +105,17 @@ type Mapping =
 function mappingOf(contract: AnyContract, edge: GraphEdge): Mapping | undefined {
   if (edge.event.startsWith("after:")) return { kind: "delay" }
   // Contract events are typed per machine; read here through their runtime shapes.
-  const m = contract.events[edge.event] as
+  const declared = contract.events[edge.event] as
+    | { readonly from: Readonly<Record<string, unknown>> }
+    | Record<string, unknown>
+    | string
+    | undefined
+  // A per-state mapping resolves to the one for this edge's source state.
+  const picked =
+    typeof declared === "object" && "from" in declared
+      ? (declared.from as Readonly<Record<string, unknown>>)[edge.source]
+      : declared
+  const m = picked as
     | string
     | { readonly skip: string }
     | { readonly props: (target: string) => Props }
@@ -831,119 +841,202 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     }
   }
 
-  try {
-    const baseline = await verify(0, null, null, null, null, null, 0)
-    let before = baseline
-    for (const [i, edge] of path.edges.entries()) {
-      const from = oracle.service.getSnapshot().state
-      const mapping = mappingOf(contract, edge)
-      const announcedBefore = (await base.announcements()).length
-      let stepMod: Modality | null = null
-      if (mapping?.kind === "delay") {
-        const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
-        send(edge.event)
-        await base.advance(ms)
-      } else if (mapping?.kind === "props") {
-        const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }
-        inputs.push({ kind: "props", props: next })
-        oracle.setProps(next)
-        await options.rerender?.(next as MachinePropsOf<C["machine"]>, rendered)
-      } else if (mapping?.kind === "action") {
-        const action =
-          (contract.actions as Record<string, Record<string, unknown> | undefined>)[
-            mapping.action
-          ] ?? {}
-        const actionArgs = mapping.args?.(oracle.service.view()) ?? []
-        stepMod = stepModality(action, modality)
-        // AT 18: the same keys while an IME composes must not commit anything.
-        const keyboardImpl = action["keyboard"]
-        if (stepMod === "keyboard" && typeof keyboardImpl === "function") {
-          await replay(
-            i + 1,
-            edge,
-            "composing",
-            keyboardImpl as ActionImpl,
-            actionArgs,
-            before,
-            from,
-          )
-        }
-        // AT 20: a touch never hovers.
-        const ownImpl = action[stepMod === "virtual" ? "pointer" : stepMod]
-        if (typeof ownImpl === "function") {
-          await replay(i + 1, edge, "touch-hover", ownImpl as ActionImpl, actionArgs, before, from)
-        }
-        send(edge.event, { modality: stepMod })
-        try {
-          await runAction(
-            contract,
-            envFor(stepMod),
-            mapping.action,
-            actionArgs,
-            // A step the oracle does not take: its postcondition cannot hold; the state
-            // check below decides.
-            edge !== notTaken,
-          )
-        } catch (e) {
-          fail(i + 1, edge, e instanceof Error ? e.message : String(e))
-        }
-      } else {
-        fail(i + 1, edge, `no contract mapping for ${edge.event}`)
-      }
-      done.push(`${edge.event}→${oracle.service.getSnapshot().state}`)
-      before = await verify(i + 1, edge, before, from, baseline, stepMod, announcedBefore)
+  /**
+   * Presence, after a closing action: sampled mid-exit (a running exit animation), then
+   * reopened — the exiting element must come back, not a new one — and closed again by the
+   * same action, so the path goes on from the state it reached.
+   */
+  const reopenDuringExit = async (
+    step: number,
+    edge: GraphEdge,
+    close: { readonly action: string; readonly args: readonly unknown[]; readonly mod: Modality },
+  ) => {
+    const content = contract.semantics?.["content"]
+    const exiting = (await base.collect()).parts.find((p) => p.part === content && p.animations > 0)
+    if (!exiting) return
+    if (exiting.attrs["data-state"] !== "closed") {
+      fail(
+        step,
+        edge,
+        `presence: ${exiting.describe} is exiting (running animations: ${exiting.animations}) without data-state="closed"`,
+      )
     }
-    // AT 13: focusing a focusable part with no preceding input commits nothing.
     const state = oracle.service.getSnapshot().state
-    const virtualEnv = envFor("virtual")
-    const counts = new Map<string, number>()
-    for (const p of before.parts) {
-      if (p.part === null) continue
-      const index = counts.get(p.part) ?? 0
-      counts.set(p.part, index + 1)
-      if (!p.focusable || p.hidden) continue
-      if (contract.commitsOnFocus?.some((c) => c.part === p.part && c.state === state)) continue
-      const previous = await observe()
-      await virtualEnv.part(p.part).nth(index).focus()
-      const { ok, seen, changed } = await unchanged(state, previous)
-      // Only a machine that declares FOCUS can be asked what a focus would do.
-      const oracleState = hasFocusEvent
-        ? whatIf("FOCUS", { modality: "virtual", cause: "other" })
-        : state
-      if (!ok || oracleState !== state) {
+    const reopen = graph.edges.find(
+      (e) =>
+        e.source === state &&
+        e.target !== null &&
+        expectations(contract, e.target, null).open &&
+        mappingOf(contract, e)?.kind === "action",
+    )
+    const m = reopen ? mappingOf(contract, reopen) : undefined
+    if (!reopen || m?.kind !== "action") return
+    const action =
+      (contract.actions as Record<string, Record<string, unknown> | undefined>)[m.action] ?? {}
+    // By keyboard when the action has one: a pointer waits until the exiting backdrop that
+    // covers the trigger is gone, which is after the exit.
+    const mod = stepModality(action, "keyboard")
+    const act = async (name: string, args: readonly unknown[], m: Modality) => {
+      try {
+        await runAction(contract, envFor(m), name, args, false)
+      } catch (e) {
         fail(
-          path.edges.length,
-          path.edges.at(-1) ?? null,
-          `focus-does-not-commit: programmatic focus on ${p.describe} in ${state} changed ${oracleState !== state ? `the machine: ${state} → ${oracleState}` : `${changed.length > 0 ? changed.join(", ") : "the state"}: observed ${JSON.stringify(seen)}`}; list it in the contract's commitsOnFocus if that is intended`,
+          step,
+          edge,
+          `presence (reopen during the exit): ${e instanceof Error ? e.message : String(e)}`,
         )
       }
     }
-    // A layer unmounted while open leaves <html> and <body> as they were (radix#3797).
-    const layered = contract.traits.some((t) => t === "layer" || t === "modal")
-    const unmount = (rendered as { unmount?: unknown } | null | undefined)?.unmount
-    if (layered && typeof unmount === "function" && expectations(contract, state, null).open) {
-      ;(unmount as () => void)()
-      await base.advance(16)
-      const page = await base.collectDocument()
-      // Assigned inside verify(): TypeScript cannot see that through the closure.
-      const last = lastFacts as StepFacts | null
-      const problems = last
-        ? (genericInvariants["document-clean"]?.({
-            ...last,
-            after: page,
-            atInitial: true,
-          }) ?? [])
-        : []
-      if (problems.length > 0) {
-        fail(
-          path.edges.length,
-          path.edges.at(-1) ?? null,
-          `unmounted while open:\n${problems.map((p) => `  - ${p}`).join("\n")}`,
-        )
-      }
+    send(reopen.event, { modality: mod })
+    await act(m.action, m.args?.(oracle.service.view()) ?? [], mod)
+    const back = (await base.collect()).parts.find((p) => p.part === content)
+    if (back?.node !== exiting.node) {
+      fail(
+        step,
+        edge,
+        `presence: reopening during the exit (running animations: ${exiting.animations}) ${back ? `mounted a new ${back.describe}` : "left no content"}; the exiting element must be kept`,
+      )
     }
-  } finally {
-    run = undefined
-    if (direction === "rtl") await base.setDirection(null)
+    send(edge.event, { modality: close.mod })
+    await act(close.action, close.args, close.mod)
   }
+
+  const scoped = base.scope ? base.scope.bind(base) : (fn: () => Promise<void>) => fn()
+  await scoped(async () => {
+    try {
+      const baseline = await verify(0, null, null, null, null, null, 0)
+      let before = baseline
+      for (const [i, edge] of path.edges.entries()) {
+        const from = oracle.service.getSnapshot().state
+        const mapping = mappingOf(contract, edge)
+        const announcedBefore = (await base.announcements()).length
+        let stepMod: Modality | null = null
+        if (mapping?.kind === "delay") {
+          const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
+          send(edge.event)
+          await base.advance(ms)
+        } else if (mapping?.kind === "props") {
+          const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }
+          inputs.push({ kind: "props", props: next })
+          oracle.setProps(next)
+          await options.rerender?.(next as MachinePropsOf<C["machine"]>, rendered)
+        } else if (mapping?.kind === "action") {
+          const action =
+            (contract.actions as Record<string, Record<string, unknown> | undefined>)[
+              mapping.action
+            ] ?? {}
+          const actionArgs = mapping.args?.(oracle.service.view()) ?? []
+          stepMod = stepModality(action, modality)
+          // AT 18: the same keys while an IME composes must not commit anything.
+          const keyboardImpl = action["keyboard"]
+          if (stepMod === "keyboard" && typeof keyboardImpl === "function") {
+            await replay(
+              i + 1,
+              edge,
+              "composing",
+              keyboardImpl as ActionImpl,
+              actionArgs,
+              before,
+              from,
+            )
+          }
+          // AT 20: a touch never hovers.
+          const ownImpl = action[stepMod === "virtual" ? "pointer" : stepMod]
+          if (typeof ownImpl === "function") {
+            await replay(
+              i + 1,
+              edge,
+              "touch-hover",
+              ownImpl as ActionImpl,
+              actionArgs,
+              before,
+              from,
+            )
+          }
+          send(edge.event, { modality: stepMod })
+          try {
+            await runAction(
+              contract,
+              envFor(stepMod),
+              mapping.action,
+              actionArgs,
+              // A step the oracle does not take: its postcondition cannot hold; the state
+              // check below decides.
+              edge !== notTaken,
+            )
+          } catch (e) {
+            fail(i + 1, edge, e instanceof Error ? e.message : String(e))
+          }
+          const closes =
+            edge !== notTaken &&
+            edge.target !== null &&
+            expectations(contract, from, null).open &&
+            !expectations(contract, edge.target, null).open
+          if (contract.traits.includes("presence") && closes) {
+            await reopenDuringExit(i + 1, edge, {
+              action: mapping.action,
+              args: actionArgs,
+              mod: stepMod,
+            })
+          }
+        } else {
+          fail(i + 1, edge, `no contract mapping for ${edge.event}`)
+        }
+        done.push(`${edge.event}→${oracle.service.getSnapshot().state}`)
+        before = await verify(i + 1, edge, before, from, baseline, stepMod, announcedBefore)
+      }
+      // AT 13: focusing a focusable part with no preceding input commits nothing.
+      const state = oracle.service.getSnapshot().state
+      const virtualEnv = envFor("virtual")
+      const counts = new Map<string, number>()
+      for (const p of before.parts) {
+        if (p.part === null) continue
+        const index = counts.get(p.part) ?? 0
+        counts.set(p.part, index + 1)
+        if (!p.focusable || p.hidden) continue
+        if (contract.commitsOnFocus?.some((c) => c.part === p.part && c.state === state)) continue
+        const previous = await observe()
+        await virtualEnv.part(p.part).nth(index).focus()
+        const { ok, seen, changed } = await unchanged(state, previous)
+        // Only a machine that declares FOCUS can be asked what a focus would do.
+        const oracleState = hasFocusEvent
+          ? whatIf("FOCUS", { modality: "virtual", cause: "other" })
+          : state
+        if (!ok || oracleState !== state) {
+          fail(
+            path.edges.length,
+            path.edges.at(-1) ?? null,
+            `focus-does-not-commit: programmatic focus on ${p.describe} in ${state} changed ${oracleState !== state ? `the machine: ${state} → ${oracleState}` : `${changed.length > 0 ? changed.join(", ") : "the state"}: observed ${JSON.stringify(seen)}`}; list it in the contract's commitsOnFocus if that is intended`,
+          )
+        }
+      }
+      // A layer unmounted while open leaves <html> and <body> as they were (radix#3797).
+      const layered = contract.traits.some((t) => t === "layer" || t === "modal")
+      const unmount = (rendered as { unmount?: unknown } | null | undefined)?.unmount
+      if (layered && typeof unmount === "function" && expectations(contract, state, null).open) {
+        ;(unmount as () => void)()
+        await base.advance(16)
+        const page = await base.collectDocument()
+        // Assigned inside verify(): TypeScript cannot see that through the closure.
+        const last = lastFacts as StepFacts | null
+        const problems = last
+          ? (genericInvariants["document-clean"]?.({
+              ...last,
+              after: page,
+              atInitial: true,
+            }) ?? [])
+          : []
+        if (problems.length > 0) {
+          fail(
+            path.edges.length,
+            path.edges.at(-1) ?? null,
+            `unmounted while open:\n${problems.map((p) => `  - ${p}`).join("\n")}`,
+          )
+        }
+      }
+    } finally {
+      run = undefined
+      if (direction === "rtl") await base.setDirection(null)
+    }
+  })
 }

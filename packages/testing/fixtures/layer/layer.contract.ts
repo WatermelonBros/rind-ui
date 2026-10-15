@@ -59,7 +59,15 @@ export const layerContract = contract("layer", {
   },
   events: {
     OPEN: "open",
-    TOGGLE: { skip: "the trigger is inert while the modal layer is open; OPEN covers opening" },
+    // The trigger's own event: it opens; a modal layer's trigger is inert while open.
+    TOGGLE: {
+      from: {
+        closed: "open",
+        open: {
+          skip: "the trigger is inert while the modal layer is open (layer.dom tests the non-modal toggle)",
+        },
+      },
+    },
     CLOSE: "close",
     "$sync:open": { props: (target) => ({ open: target === "open" }) },
   },

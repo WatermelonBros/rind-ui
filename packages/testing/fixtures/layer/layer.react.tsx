@@ -4,6 +4,7 @@ import {
   mergeProps,
   normalizeProps,
   Portal as PortalPart,
+  type PresenceOptions,
   useEnvironment,
   useMachine,
   useModality,
@@ -30,6 +31,7 @@ interface Ctx {
   readonly service: Service<LayerMachine>
   readonly root: string
   readonly modal: boolean
+  readonly kind: "dialog" | "menu" | undefined
 }
 const LayerCtx = createContext<Ctx | null>(null)
 const useLayer = (part: string) => {
@@ -59,7 +61,11 @@ function useApi(
 ) {
   const open = useSelector(ctx.service, (view) => view.matches("open"))
   const meta = useMeta(ctx, open)
-  return connect({ open, modal: ctx.modal, meta, ...focus }, ctx.service.send, ctx.root)
+  return connect(
+    { open, modal: ctx.modal, kind: ctx.kind, meta, ...focus },
+    ctx.service.send,
+    ctx.root,
+  )
 }
 
 function Trigger({ children, ...rest }: Own<"button">) {
@@ -88,7 +94,7 @@ export interface RootProps extends Omit<LayerProps, "root" | "parent"> {
   readonly children?: ReactNode
 }
 
-function Root({ open, defaultOpen, onOpenChange, modal, id, children }: RootProps) {
+function Root({ open, defaultOpen, onOpenChange, modal, kind, id, children }: RootProps) {
   const root = useRootId(id)
   const parent = useParentLayer()
   const { service } = useMachine(layerMachine, {
@@ -96,10 +102,14 @@ function Root({ open, defaultOpen, onOpenChange, modal, id, children }: RootProp
     defaultOpen,
     onOpenChange,
     modal,
+    kind,
     root,
     parent,
   })
-  const ctx = useMemo(() => ({ service, root, modal: modal !== false }), [service, root, modal])
+  const ctx = useMemo(
+    () => ({ service, root, modal: modal !== false, kind }),
+    [service, root, modal, kind],
+  )
   return <LayerCtx value={ctx}>{children}</LayerCtx>
 }
 
@@ -126,13 +136,13 @@ function Portal({ children, container }: { children?: ReactNode; container?: Ele
 }
 
 /** A part that stays mounted while its exit animations run. */
-function presencePart<T extends "div">(tag: T, name: LayerPart) {
+function presencePart<T extends "div">(tag: T, name: LayerPart, options: PresenceOptions = {}) {
   return function Part({ children, ...rest }: Own<T>) {
     const ctx = useLayer(name)
     const [focusWithin, setFocusWithin] = useState(false)
     const api = useApi(ctx, { focusWithin })
     const node = useRef<HTMLDivElement | null>(null)
-    const { mounted } = usePresence(api.open, node)
+    const { mounted } = usePresence(api.open, node, options)
     if (!mounted) return null
     const props = mergeProps(
       normalizeProps(api[name]()),
@@ -160,7 +170,8 @@ export const Layer = {
   Root,
   Trigger,
   Portal,
-  Positioner: presencePart("div", "positioner"),
+  // It holds the content: it stays while the content's exit animations run.
+  Positioner: presencePart("div", "positioner", { subtree: true }),
   Backdrop: presencePart("div", "backdrop"),
   Content: presencePart("div", "content"),
   Title: part("h2", "title"),

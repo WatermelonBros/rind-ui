@@ -247,6 +247,41 @@ describe("nodes added while open", () => {
   })
 })
 
+describe("nodes added while open, across nested modals", () => {
+  it("a node added under d1 stays un-inert when d2 opens and after d2 closes", () => {
+    page()
+    const parent = portal("parent")
+    hideOutsideModal(document)
+    open("d1", parent.content)
+
+    const menu = document.createElement("div")
+    document.body.append(menu)
+    const nested = portal("nested")
+    const handle = open("d2", nested.content, { parent: layerId("d1") })
+    expect(isInert(menu)).toBe(false)
+    expect(isInert(parent.wrapper)).toBe(true)
+
+    handle.release()
+    handle.dispose()
+    expect(isInert(menu)).toBe(false)
+  })
+})
+
+describe("kept content in a shadow root", () => {
+  it("marks the host's siblings, not the host", () => {
+    const { app } = page()
+    const host = document.createElement("div")
+    const content = document.createElement("div")
+    host.attachShadow({ mode: "open" }).append(content)
+    document.body.append(host)
+    hideOutsideModal(document)
+    open("d1", content)
+
+    expect(isInert(host)).toBe(false)
+    expect(isInert(app)).toBe(true)
+  })
+})
+
 describe("reference-counted, exact restore", () => {
   it("keeps the author's own inert through open and close", () => {
     const { section } = page()
@@ -338,5 +373,24 @@ describe("closing content is inert while it exits", () => {
     button.focus()
     expect(document.activeElement).not.toBe(button)
     handle.dispose()
+  })
+})
+
+describe("stale layers", () => {
+  it("ignores null elements instead of throwing in the stack's notify", () => {
+    document.body.innerHTML = `<div id="app"></div><div id="m"></div>`
+    const stack = getLayerStack(document)
+    hideOutsideModal(document)
+    let el: Element | null = document.getElementById("m")
+    // The cast models a stale layer whose element lookup now returns null.
+    stack.push({
+      id: layerId("stale"),
+      kind: "dialog",
+      modal: true,
+      elements: () => [el as Element],
+    })
+    document.body.innerHTML = `<div id="app"></div>`
+    el = null
+    expect(() => stack.refresh()).not.toThrow()
   })
 })

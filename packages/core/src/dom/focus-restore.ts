@@ -33,16 +33,18 @@ export function captureFocus(
   opener?: () => Element | null,
 ): FocusReturn {
   const before = deepActiveElement(doc)
-  const parentId = layer.parentId
   return {
     restore(pick) {
+      const parentId = layer.parentId
       const active = deepActiveElement(doc)
       const onBody = !active || active === doc.body
       // Focus the user moved elsewhere (a text field on the page) stays there.
       if (!onBody && !layer.contains(active)) return
       const chosen = pick?.() ?? null
       if (chosen === false) return
-      const parent = parentId ? getLayerStack(doc).options(parentId)?.elements()[0] : undefined
+      const parentOptions = parentId ? getLayerStack(doc).options(parentId) : undefined
+      // Its declared container; the first element only for layers registered without one.
+      const parent = parentOptions?.container?.() ?? parentOptions?.elements()[0]
       // The parent layer's container is the last resort: focusable like any layer container.
       if (parent instanceof HTMLElement && !parent.hasAttribute("tabindex")) {
         parent.setAttribute("tabindex", "-1")

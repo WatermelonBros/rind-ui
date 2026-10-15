@@ -427,10 +427,14 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     for (const c of partNamed(f.after, f.semantics["content"])) {
       if (c.hidden && c.attrs["hidden"] !== undefined) continue
       if (c.attrs["data-state"] !== "closed") {
-        out.push(`${c.describe} is mounted while closed without data-state="closed"`)
+        out.push(
+          `${c.describe} is mounted while closed without data-state="closed" (running animations: ${c.animations})`,
+        )
       }
       if (c.animations === 0) {
-        out.push(`${c.describe} is still mounted after its exit animations finished`)
+        out.push(
+          `${c.describe} is still mounted after its exit animations finished (running animations: 0)`,
+        )
       }
     }
     return out

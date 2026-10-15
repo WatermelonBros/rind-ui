@@ -24,6 +24,8 @@ export interface ElementInfo {
   readonly focusable: boolean
   /** Finite animations running on the element (exit animations a presence waits for). */
   readonly animations: number
+  /** The element's identity across snapshots of one page (same node, same number). */
+  readonly node: number
   /** Items of one set share it (parent element and aria-level), for set metadata. */
   readonly group: string
   /** Ids of its ancestors, nearest first. */
@@ -193,6 +195,7 @@ export function collectDom(arg: {
     el.getAttribute("data-instance") === arg.instance && el.getAttribute("data-scope") === arg.scope
   const info = (el: Element): ElementInfo => ({
     describe: describe(el),
+    node: identity(el),
     part: own(el) ? el.getAttribute("data-part") : null,
     role: roleOf(el),
     name: norm(computeAccessibleName(el)),
@@ -251,24 +254,31 @@ export function collectDom(arg: {
   // Siblings of every ancestor of every part (where hide-others libraries put aria-hidden
   // or inert), keyed by element identity so inserted nodes do not shift the keys.
   const outside: Record<string, Record<string, string>> = {}
+  const record = (sibling: Element) => {
+    const picked: Record<string, string> = {}
+    for (const name of ["aria-hidden", "inert", "style"]) {
+      const v = sibling.getAttribute(name)
+      if (v !== null) picked[name] = v
+    }
+    // The one keep-visible rule (announcer, top layers, live regions): stays exposed.
+    if (isKeptVisible(sibling)) picked["data-rind-kept"] = ""
+    if (["SCRIPT", "STYLE", "TEMPLATE", "LINK"].includes(sibling.tagName)) {
+      picked["data-rind-kept"] = ""
+    }
+    outside[`${identity(sibling)}:${describe(sibling)}`] = picked
+  }
   const holdsInstance = (el: Element) => all.has(el) || el.querySelector(selector) !== null
   for (const p of partEls) {
     for (let n: Element | null = p; n && n !== doc.body && n.parentElement; n = n.parentElement) {
       for (const sibling of Array.from(n.parentElement.children)) {
-        if (sibling === n || holdsInstance(sibling)) continue
-        const picked: Record<string, string> = {}
-        for (const name of ["aria-hidden", "inert", "style"]) {
-          const v = sibling.getAttribute(name)
-          if (v !== null) picked[name] = v
-        }
-        // The one keep-visible rule (announcer, top layers, live regions): stays exposed.
-        if (isKeptVisible(sibling)) picked["data-rind-kept"] = ""
-        if (["SCRIPT", "STYLE", "TEMPLATE", "LINK"].includes(sibling.tagName)) {
-          picked["data-rind-kept"] = ""
-        }
-        outside[`${identity(sibling)}:${describe(sibling)}`] = picked
+        if (sibling !== n && !holdsInstance(sibling)) record(sibling)
       }
     }
+  }
+  // The component is gone (unmounted while open): every element left in the page, so the
+  // ones the baseline recorded are compared (a stuck inert on the app root is caught).
+  if (partEls.length === 0 && doc.body) {
+    for (const el of Array.from(doc.body.querySelectorAll("*"))) record(el)
   }
 
   const active = doc.activeElement

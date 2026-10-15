@@ -6,6 +6,7 @@ import { extname, join, normalize } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { createDriver, playwrightEnv, testMachine } from "../../src/index"
+import { axNodeOf } from "../../src/playwright"
 import { layerContract } from "./layer.contract"
 
 const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
@@ -107,6 +108,22 @@ describe("layer driver through Playwright", () => {
     await page.getByRole("dialog", { name: "Modal with a toast" }).waitFor()
     await page.getByRole("button", { name: "Undo" }).click()
     expect(await dialogs(page).count()).toBe(1)
+  })
+})
+
+describe("modal menu with a registered trigger (RA#9737)", () => {
+  // Pressing the trigger (not an outside press) is covered by layer.dom.test.tsx: here the
+  // fixture's backdrop covers it.
+  it("Chromium names the menu through its exposed trigger", {
+    timeout: 60_000,
+  }, async () => {
+    const page = await open("modal-menu")
+    const content = page.locator('[data-part="content"]')
+    await content.waitFor()
+    const trigger = page.locator('[data-part="trigger"]')
+    expect(await trigger.evaluate((el) => el.closest("[inert]") === null)).toBe(true)
+    const node = await axNodeOf(page, `document.querySelector('[data-part="content"]')`)
+    expect(node && "name" in node ? node.name : null).toBe("Actions")
   })
 })
 

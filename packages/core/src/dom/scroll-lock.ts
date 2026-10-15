@@ -146,7 +146,14 @@ function acquire(doc: Document, store: Store, platform?: PlatformFlags): Lock {
         for (const [el, props] of wanted) {
           for (const [prop, value] of props) {
             const current = el.style.getPropertyValue(prop)
-            if (current === value && el.style.getPropertyPriority(prop) === "important") continue
+            const priority = el.style.getPropertyPriority(prop)
+            if (current === value && priority === "important") continue
+            // Same value, only the priority differs: a foreign lock re-wrote our own value
+            // (base-ui#4640). It is not the author's value, so keep the snapshot and re-apply.
+            if (current === value) {
+              changed = true
+              continue
+            }
             for (const p of prop === "overflow" ? [prop, ...extra(el)] : [prop]) {
               saved.get(el)?.set(p, {
                 value: el.style.getPropertyValue(p),

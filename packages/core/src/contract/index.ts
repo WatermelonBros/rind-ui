@@ -4,6 +4,7 @@ export type {
   ActionImpl,
   Announcements,
   AnyContract,
+  ByState,
   Contract,
   ContractDef,
   Done,

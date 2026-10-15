@@ -11,10 +11,21 @@ const ssr = { resolve: { conditions: ["@rind-ui/source", "node", "import", "defa
 // Chromium locally; CI sets RIND_BROWSERS=chromium,firefox,webkit.
 const browsers = (process.env["RIND_BROWSERS"] ?? "chromium").split(",")
 // Instances are named per project: two projects on the same browser would otherwise clash.
-const browser = (project: string) => ({
+// The DOM tests run with classic (space-taking) scrollbars, so scroll-lock compensation is
+// measured for real (radix#3251): headless Chromium hides them, Firefox overlays them.
+const classicScrollbars = {
+  launchOptions: {
+    ignoreDefaultArgs: ["--hide-scrollbars"],
+    firefoxUserPrefs: {
+      "ui.useOverlayScrollbars": 0,
+      "widget.gtk.overlay-scrollbars.enabled": false,
+    },
+  },
+}
+const browser = (project: string, options?: typeof classicScrollbars) => ({
   enabled: true,
   headless: true,
-  provider: playwright(),
+  provider: playwright(options),
   instances: browsers.map((name) => ({
     browser: name as "chromium" | "firefox" | "webkit",
     name: `${project} (${name})`,
@@ -63,7 +74,7 @@ export default defineConfig({
           name: "browser",
           // `*.browser.test.*`: needs real input (vitest/browser's userEvent), browser only.
           include: [...dom, "packages/*/{src,fixtures}/**/*.browser.test.{ts,tsx}"],
-          browser: browser("browser"),
+          browser: browser("browser", classicScrollbars),
           globals: true,
           // A no-op in real browsers; listed so that is tested.
           setupFiles: ["packages/testing/src/setup.ts"],

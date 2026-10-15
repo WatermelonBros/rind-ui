@@ -34,6 +34,8 @@ export interface LayerOptions {
   readonly opener?: (() => Element | null) | undefined
   /** Content, backdrop, positioner and, optionally, the trigger: all inside the layer. */
   readonly elements: () => readonly Element[]
+  /** The element focus is contained in (the content): where a child layer's focus returns last. */
+  readonly container?: (() => HTMLElement | null) | undefined
   /** Elements whose presses count as outside although they belong to the layer (backdrop). */
   readonly surfaces?: (() => readonly Element[]) | undefined
   /** The parent is being released: the owner closes with reason `parent-dismissed`. */
@@ -84,8 +86,6 @@ export interface LayerStack {
    * layers' openers or elements, are inside `element` (a portalled popup of a Field's control).
    */
   isLogicallyInside(target: EventTarget | null, element: Element): boolean
-  /** The open layer `target` is in (the deepest one), if any. */
-  layerOf(target: EventTarget | null): LayerHandle | undefined
   /** The options a layer was registered with (dismiss and focus modules read them). */
   options(id: LayerId): LayerOptions | undefined
   subscribe(listener: () => void): () => void
@@ -99,7 +99,8 @@ const KEY = Symbol.for(`rind-ui.layer-stack@${VERSION}`)
 interface Entry {
   options: LayerOptions
   state: "open" | "exiting"
-  readonly parent: Entry | undefined
+  /** The declared parent, else the layer holding the opener at push time. */
+  readonly parentKey: LayerId | undefined
   readonly handle: LayerHandle
 }
 
@@ -107,15 +108,31 @@ const isNode = (t: EventTarget | null): t is Node => t !== null && "nodeType" in
 
 function createStack(): LayerStack {
   let entries: Entry[] = []
+  /** Disposed layers' parents: a layer may declare one that already closed (an alert
+   * opened from a menu item). */
+  const lineage = new Map<LayerId, LayerId | undefined>()
   const listeners = new Set<() => void>()
   const notify = () => {
     for (const l of [...listeners]) l()
   }
   const open = () => entries.filter((e) => e.state === "open")
   const family = (e: Entry) => e.options.family ?? e.options.kind
+  /**
+   * Parentage is resolved on every read, not frozen at push: a declared parent that is not
+   * open yet (React runs child effects first) is adopted when it registers, and one that has
+   * closed hands its children to its own parent.
+   */
+  const resolve = (id: LayerId | undefined, seen = new Set<LayerId>()): Entry | undefined => {
+    if (!id || seen.has(id)) return undefined
+    seen.add(id)
+    const e = entries.find((x) => x.options.id === id)
+    if (e?.state === "open") return e
+    return resolve(e ? e.parentKey : lineage.get(id), seen)
+  }
+  const parentOf = (e: Entry) => resolve(e.parentKey, new Set([e.options.id]))
   const ancestors = (e: Entry) => {
     const out: Entry[] = []
-    for (let p = e.parent; p; p = p.parent) out.push(p)
+    for (let p = parentOf(e); p && !out.includes(p); p = parentOf(p)) out.push(p)
     return out
   }
   const descendants = (e: Entry) => open().filter((d) => ancestors(d).includes(e))
@@ -139,17 +156,18 @@ function createStack(): LayerStack {
       }
       // A re-registration (Strict Mode, reopen during exit) replaces the exiting entry.
       if (existing) entries = entries.filter((e) => e !== existing)
-      const declared = options.parent
-        ? open().find((e) => e.options.id === options.parent)
-        : undefined
-      const parent = declared ?? (options.opener ? entryOf(options.opener()) : undefined)
+      lineage.delete(options.id)
+      const parentKey =
+        options.parent ?? (options.opener ? entryOf(options.opener())?.options.id : undefined)
       const entry: Entry = {
         options,
         state: "open",
-        parent,
+        parentKey,
         handle: {
           id: options.id,
-          parentId: parent?.options.id,
+          get parentId() {
+            return parentOf(entry)?.options.id
+          },
           isTopmost: () => entry.state === "open" && open().at(-1) === entry,
           contains: (target) => contains(entry, target),
           meta: () => {
@@ -177,12 +195,19 @@ function createStack(): LayerStack {
           },
           dispose: () => {
             if (!entries.includes(entry)) return
+            lineage.set(entry.options.id, parentOf(entry)?.options.id)
+            // Only recent closes matter (a child opening as its parent closes): stay bounded.
+            // The size check guarantees a first key, so the assertion is sound.
+            if (lineage.size > 64) lineage.delete(lineage.keys().next().value as LayerId)
             entries = entries.filter((e) => e !== entry)
             notify()
           },
         },
       }
       entries.push(entry)
+      // A child that registered first sits below its parent: move the parent under it.
+      const child = entries.findIndex((e) => e !== entry && ancestors(e).includes(entry))
+      if (child !== -1) entries = [...entries.slice(0, child), entry, ...entries.slice(child, -1)]
       notify()
       return entry.handle
     },
@@ -212,7 +237,6 @@ function createStack(): LayerStack {
         return e !== layer && e.options.elements().some((el) => element.contains(el))
       })
     },
-    layerOf: (target) => entryOf(target)?.handle,
     options: (id) => entries.find((e) => e.options.id === id)?.options,
     subscribe(listener) {
       listeners.add(listener)

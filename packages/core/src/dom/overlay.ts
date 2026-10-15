@@ -9,10 +9,18 @@ import type { Modality } from "../contract/env"
 import type { PlatformInfo } from "../env/capabilities"
 import { type DismissOptions, type DismissReason, dismissable, dismissRequest } from "./dismiss"
 import { captureFocus } from "./focus-restore"
-import { containFocus, type FocusEnv, type FocusTarget, focusInitial } from "./focus-scope"
+import {
+  containFocus,
+  deepActiveElement,
+  type FocusEnv,
+  type FocusTarget,
+  focusInitial,
+} from "./focus-scope"
 import { hideOutsideModal } from "./inert-outside"
 import { getLayerStack, type LayerHandle, type LayerOptions } from "./layer-stack"
 import { lockScrollForModals } from "./scroll-lock"
+
+declare const process: { env: { NODE_ENV?: string } }
 
 export interface OverlayEffectOptions extends Omit<LayerOptions, "onParentDismissed"> {
   readonly dismiss: DismissOptions
@@ -30,8 +38,8 @@ export interface OverlayEffectOptions extends Omit<LayerOptions, "onParentDismis
   readonly onExiting?: (dispose: () => void) => void
 }
 
-/** How many frames to wait for the content to mount before giving up on focus. */
-const MOUNT_FRAMES = 10
+/** Frames of waiting for the content after which a dev warning says it never mounted. */
+const SLOW_MOUNT_FRAMES = 120
 
 /** Runs while the overlay is open; returns the cleanup that closes it down. */
 export function overlayEffect(
@@ -47,6 +55,8 @@ export function overlayEffect(
     options.dismiss.onRequest(r)
     if (r.canceled) reason = undefined
   }
+  // Focus at open time: a move after it (autoFocus in the content) is the app's, kept.
+  const focusAtOpen = deepActiveElement(doc)
   const handle: LayerHandle = getLayerStack(doc).push({
     ...options,
     onParentDismissed: () => request(dismissRequest("parent-dismissed", undefined, null)),
@@ -59,24 +69,37 @@ export function overlayEffect(
     modal: options.modal,
     onRequest: request,
   })
-  // The content may mount after the open transition (a framework renders it next): attach
-  // focus once it exists, and let the stack's subscribers recompute with its elements.
+  // The content may mount after the open transition (a framework renders it next, Suspense,
+  // a lazy chunk): keep looking every frame until it exists or the layer closes, never
+  // giving up — a modal that attached nothing would trap nothing. Then let the stack's
+  // subscribers recompute with its elements.
   let offContain = () => {}
   let cancelInitial = () => {}
   let frame: ReturnType<typeof env.scheduler.requestAnimationFrame> | null = null
   let stopped = false
-  const attach = (frames: number) => {
+  const attach = (waited: number) => {
     const container = options.container()
     if (!container) {
-      if (frames > 0) frame = env.scheduler.requestAnimationFrame(() => attach(frames - 1))
+      if (process.env.NODE_ENV !== "production" && waited === SLOW_MOUNT_FRAMES) {
+        console.warn(
+          `[rind-ui] overlay ${options.id}: its content has not mounted after ${SLOW_MOUNT_FRAMES} frames; focus and containment wait for it`,
+        )
+      }
+      frame = env.scheduler.requestAnimationFrame(() => attach(waited + 1))
       return
     }
     frame = null
     if (options.modal) offContain = containFocus(env, handle, container)
-    cancelInitial = focusInitial(env, container, options.initialFocus, options.modality)
+    cancelInitial = focusInitial(
+      env,
+      container,
+      options.initialFocus,
+      options.modality,
+      focusAtOpen,
+    )
     getLayerStack(doc).refresh()
   }
-  attach(MOUNT_FRAMES)
+  attach(0)
   return () => {
     if (stopped) return
     stopped = true

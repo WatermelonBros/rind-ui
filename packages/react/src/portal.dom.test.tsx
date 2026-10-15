@@ -94,4 +94,24 @@ describe("Portal", () => {
     expect(hosts()[0]?.parentElement).toBe(target)
     expect(target.textContent).toBe("content")
   })
+
+  it("keeps syncing the host after the container changes", async () => {
+    const target = document.createElement("div")
+    document.body.append(target)
+    const ui = (container: Element | null) => (
+      <div id="scope" data-theme="dark">
+        <button id="t" type="button" />
+        <Portal container={container} logicalParent={parentOf}>
+          <p>content</p>
+        </Portal>
+      </div>
+    )
+    const { rerender } = render(ui(null))
+    rerender(ui(target))
+    const host = hosts()[0] as HTMLElement
+    expect(host.parentElement).toBe(target)
+    document.getElementById("scope")?.setAttribute("data-theme", "light")
+    await settle()
+    expect(host.getAttribute("data-theme")).toBe("light")
+  })
 })

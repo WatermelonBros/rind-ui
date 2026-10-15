@@ -22,6 +22,12 @@ export interface AdapterEnv extends Env {
    * problems found, or "unavailable" elsewhere.
    */
   chromiumChecks?(): Promise<readonly string[] | "unavailable">
+  /**
+   * Runs a whole test inside the framework's async scope (React: Testing Library's
+   * asyncWrapper), so what a component defers to a later frame — a layer's initial focus and
+   * the state its focus event updates — is not reported as an update outside act.
+   */
+  scope?<T>(fn: () => Promise<T>): Promise<T>
   /** Sets `dir` on the document element (right-to-left runs); null removes it. */
   setDirection(direction: Direction | null): Promise<void>
 }

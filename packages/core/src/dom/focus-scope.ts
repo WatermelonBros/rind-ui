@@ -4,7 +4,13 @@
 // focusSafely (modality kept; cause "layer" for initial focus, "navigation" for wrapping).
 
 import type { Modality } from "../contract/env"
-import type { DomEnv, ModalityEnv, MotionEnv, SchedulerEnv } from "../env/capabilities"
+import type {
+  DomEnv,
+  ModalityEnv,
+  MotionEnv,
+  PlatformInfo,
+  SchedulerEnv,
+} from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
 import { getLayerStack, type LayerHandle, type LayerId } from "./layer-stack"
 import { registerReset } from "./resets"
@@ -12,7 +18,11 @@ import { registerReset } from "./resets"
 /** `false`: do not move focus; `null`: the default target. */
 export type FocusTarget = HTMLElement | null | false
 
-export type FocusEnv = DomEnv & SchedulerEnv & ModalityEnv & Partial<MotionEnv>
+export type FocusEnv = DomEnv &
+  SchedulerEnv &
+  ModalityEnv &
+  Partial<MotionEnv> &
+  Partial<PlatformInfo>
 
 /** The focused element, through open shadow roots. */
 export function deepActiveElement(doc: Document): Element | null {
@@ -57,11 +67,16 @@ function isKeyboardScroller(el: HTMLElement): boolean {
   return (overflowsY || overflowsX) && !el.querySelector(FOCUSABLE)
 }
 
-function isTabStop(el: HTMLElement): boolean {
+function isTabStop(el: HTMLElement, scrollers: boolean): boolean {
   if (el.matches(":disabled")) return false
   if (el.tabIndex >= 0 && (el.matches(FOCUSABLE) || el.isContentEditable)) return true
-  return isKeyboardScroller(el)
+  return scrollers && isKeyboardScroller(el)
 }
+
+/** The engine's tab stops: WebKit does not stop on scroll containers. */
+const stopsOf = (env: FocusEnv, container: HTMLElement) =>
+  // platform-convention: Safari's Tab order has no scroll containers (not a bug to work around)
+  tabbables(container, { scrollers: env.platform?.webkit !== true })
 
 /** Every element under `root`, in document order, through open shadow roots. */
 function* walk(root: Element | ShadowRoot): Generator<HTMLElement> {
@@ -76,10 +91,16 @@ function* walk(root: Element | ShadowRoot): Generator<HTMLElement> {
  * The container's tab stops in the order Tab visits them: positive `tabindex` first
  * (ascending, document order within one value), then document order; one stop per radio
  * group (the checked radio, or the first); keyboard-focusable scroll containers included
- * (react-spectrum#10395); inert, hidden and disabled elements skipped.
+ * (react-spectrum#10395) unless `scrollers` is false (WebKit: Safari's Tab skips them and
+ * they refuse focus); inert, hidden and disabled elements skipped.
  */
-export function tabbables(container: HTMLElement): HTMLElement[] {
-  const stops = [...walk(container)].filter((el) => isTabStop(el) && !unavailable(el, container))
+export function tabbables(
+  container: HTMLElement,
+  { scrollers = true }: { readonly scrollers?: boolean } = {},
+): HTMLElement[] {
+  const stops = [...walk(container)].filter(
+    (el) => isTabStop(el, scrollers) && !unavailable(el, container),
+  )
   const radios = new Map<string, HTMLInputElement[]>()
   for (const el of stops) {
     if (el instanceof HTMLInputElement && el.type === "radio" && el.name) {
@@ -107,29 +128,31 @@ function focusableContainer(container: HTMLElement): HTMLElement {
 /**
  * Moves focus into a layer no later than the next frame: the consumer's choice (`false`:
  * stay), `[data-autofocus]`, the first tab stop, or the container. Opened by touch, the
- * default is the container (no on-screen keyboard). If focus moved in the meantime, it is
- * left alone (ariakit#7033). Returns a cancel for teardown.
+ * default is the container (no on-screen keyboard). If focus moved since `before` (the
+ * focused element when the layer opened; default: now), or is already inside the container
+ * (an autoFocus field), it is left alone (ariakit#7033, reka-ui#2886). Returns a cancel.
  */
 export function focusInitial(
   env: FocusEnv,
   container: HTMLElement,
   pick?: () => FocusTarget,
   modality?: Modality,
+  before: Element | null = deepActiveElement(container.ownerDocument),
 ): () => void {
   const doc = container.ownerDocument
-  const before = deepActiveElement(doc)
   const frame = env.scheduler.requestAnimationFrame(() => {
     const now = deepActiveElement(doc)
     // Moved by the user or the app: leave it. Focus lost to <body> (the trigger became
     // inert and the browser blurred it) is no one's move.
     const lost = !now || now === doc.body
     if (!container.isConnected || (now !== before && !lost)) return
+    if (now && containsDeep(container, now)) return
     const chosen = pick?.() ?? null
     if (chosen === false) return
     const target =
       chosen ??
       container.querySelector<HTMLElement>("[data-autofocus]") ??
-      (modality === "touch" ? null : tabbables(container)[0]) ??
+      (modality === "touch" ? null : stopsOf(env, container)[0]) ??
       focusableContainer(container)
     void focusSafely(target, env, "layer")
   })
@@ -152,7 +175,7 @@ function wrap(env: FocusEnv, container: HTMLElement, e: KeyboardEvent) {
   const active = deepActiveElement(doc)
   // Only Tab presses from inside the layer (or with focus lost to body) are contained.
   if (active && active !== doc.body && !containsDeep(container, active)) return
-  const stops = tabbables(container)
+  const stops = stopsOf(env, container)
   const first = stops[0]
   const last = stops.at(-1)
   const move = (target: HTMLElement) => {
@@ -172,6 +195,8 @@ function wrap(env: FocusEnv, container: HTMLElement, e: KeyboardEvent) {
 
 interface Containment {
   readonly containers: Map<LayerId, HTMLElement>
+  /** Watches a shadow root for removals too (a body observer does not see inside it). */
+  readonly observe: (root: Node) => void
   readonly remove: () => void
 }
 const containments = new WeakMap<Document, Containment>()
@@ -198,6 +223,8 @@ export function containFocus(
     containments.set(doc, c)
   }
   c.containers.set(layer.id, container)
+  const root = container.getRootNode()
+  if (root instanceof ShadowRoot) c.observe(root)
   const own = c
   return () => {
     if (own.containers.get(layer.id) !== container) return
@@ -218,6 +245,7 @@ function install(env: FocusEnv, doc: Document): Containment {
   }
   /** The element last focused inside the current container (recovery is keyed on it). */
   let lastFocused: Element | null = null
+  const watch = { childList: true, subtree: true }
   const onKeyDown = (e: KeyboardEvent) => {
     const container = current()
     if (!container || e.key !== "Tab" || e.defaultPrevented) return
@@ -227,7 +255,11 @@ function install(env: FocusEnv, doc: Document): Containment {
   const onFocusIn = () => {
     const container = current()
     const active = deepActiveElement(doc)
-    if (container && active && containsDeep(container, active)) lastFocused = active
+    if (!container || !active || !containsDeep(container, active)) return
+    lastFocused = active
+    // A removal inside a shadow root is invisible to the body observer.
+    const root = active.getRootNode()
+    if (root instanceof ShadowRoot) observer.observe(root, watch)
   }
   // Only a real removal of the focused element triggers recovery; `body` reported as active
   // while it is still connected (TalkBack swipes, react-spectrum#7471) does not.
@@ -242,6 +274,7 @@ function install(env: FocusEnv, doc: Document): Containment {
   doc.addEventListener("focusin", onFocusIn, true)
   return {
     containers,
+    observe: (root) => observer.observe(root, watch),
     remove: () => {
       observer.disconnect()
       doc.removeEventListener("keydown", onKeyDown, true)

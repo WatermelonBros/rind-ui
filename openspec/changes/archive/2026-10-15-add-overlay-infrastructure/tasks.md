@@ -79,7 +79,7 @@
 
 ## 11. Docs
 
-- [ ] 11.1 Mark `docs/research/overlay-infrastructure.md` done once the specs are archived; add any new bug found during implementation to its Bug history
+- [x] 11.1 Mark `docs/research/overlay-infrastructure.md` done once the specs are archived; add any new bug found during implementation to its Bug history
 - [x] 11.2 Docs page "Overlays" (generated API facts + hand-written guide): layer parentage, `data-rind-top-layer`, rind components inside a native `<dialog>`, scroll-lock compensation variable, presence with JS animation libraries, testing with the `modal`/`presence` traits
 - [x] 11.3 Add the iOS scroll-lock and VO-announcer-under-modal checks to the manual release protocol
 - [x] 11.4 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for `@rind-ui/core`, `@rind-ui/react`, `@rind-ui/testing`, `@rind-ui/theme`

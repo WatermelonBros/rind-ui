@@ -73,6 +73,15 @@ export type EventMapping<A> =
     }[Extract<keyof A, string>]
 
 /**
+ * One event produced differently per source state (`from`): e.g. a trigger's TOGGLE opens a
+ * layer by a click but cannot close a modal one (the trigger is inert then): skip only there.
+ * A state left out is unmapped.
+ */
+export interface ByState<A, S extends string> {
+  readonly from: { readonly [K in S]?: EventMapping<A> }
+}
+
+/**
  * What one part must show: a value, or a function of the oracle's view and the element's
  * attributes (for items whose state depends on which item they are, e.g. the active tab).
  */
@@ -161,7 +170,7 @@ export interface ContractDef<
    * prop edges are reported as uncovered and fail the coverage test.
    */
   readonly events: {
-    readonly [E in EventOf<M>["type"]]?: EventMapping<NoInfer<A>>
+    readonly [E in EventOf<M>["type"]]?: EventMapping<NoInfer<A>> | ByState<NoInfer<A>, StateOf<M>>
   } & {
     readonly [E in `$sync:${string}` | `$props:${string}`]?:
       | Skip

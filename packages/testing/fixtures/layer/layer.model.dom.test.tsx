@@ -8,7 +8,8 @@ import { LayerExample } from "./layer.fixture"
 
 describe("layer model", () => {
   testMachine(layerContract, {
-    test: it,
+    // Each path runs three times: deferred focus made this flaky in WebKit once.
+    test: (name, fn) => it(name, { repeats: 2 }, () => fn()),
     setup: () =>
       render(
         <div id="app">

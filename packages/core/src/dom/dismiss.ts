@@ -95,13 +95,20 @@ registerReset(() => {
 const isElement = (t: EventTarget | null | undefined): t is Element =>
   !!t && "nodeType" in t && (t as Node).nodeType === 1
 
+/**
+ * The real target: document-level listeners see events retargeted to the shadow host, which
+ * would make everything inside an open shadow root look outside its layer.
+ */
+const targetOf = (e: Event): EventTarget | null => e.composedPath()[0] ?? e.target
+
 /** A press on the page's scrollbar, or on a scroll container's (ark#2925). */
 function onScrollbar(doc: Document, e: PointerEvent): boolean {
   const root = doc.documentElement
   if (root.clientWidth > 0 && (e.clientX >= root.clientWidth || e.clientY >= root.clientHeight)) {
     return true
   }
-  const el = isElement(e.target) ? (e.target as HTMLElement) : null
+  const t = targetOf(e)
+  const el = isElement(t) ? (t as HTMLElement) : null
   if (!el || el.clientWidth === 0) return false
   // The scrollbar is what the box has beyond its client area and its borders.
   const style = doc.defaultView?.getComputedStyle(el)
@@ -165,11 +172,14 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key !== "Escape" || e.defaultPrevented) return
     if (e.isComposing || e.keyCode === 229) return
+    // One dismissal per key press: holding Escape must not unwind the whole stack.
+    if (e.repeat) return
     const top = stack.topmost()
     const reg = top && router.registrations.get(top.id)
     if (!reg || reg.options.escape === false) return
     // Acted on: the key is consumed (outer handlers can tell).
-    if (request(reg, "escape-key", e, isElement(e.target) ? e.target : null)) e.preventDefault()
+    if (request(reg, "escape-key", e, isElement(targetOf(e)) ? (targetOf(e) as Element) : null))
+      e.preventDefault()
   }
 
   const onPointerDown = (e: PointerEvent) => {
@@ -184,7 +194,7 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     press = {
       seq: router.seq,
       pointerType: e.pointerType,
-      downTarget: e.target,
+      downTarget: targetOf(e),
       eligible,
       topmostAtStart: stack.topmost()?.id,
     }
@@ -194,7 +204,7 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     pressing = false
     touches.delete(e.pointerId)
     if (!press) return
-    press.upTarget = e.target
+    press.upTarget = targetOf(e)
     press.upPoint = { x: e.clientX, y: e.clientY }
     // Touch and pen wait for the click that follows; mouse decides now.
     if (press.pointerType === "mouse" || press.pointerType === "") outsidePress(e)
@@ -205,7 +215,13 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     press = null
   }
   const onClick = (e: MouseEvent) => {
-    // Only the click that completes a tracked touch or pen press; a bare click never counts.
+    // A bare click (detail 0: assistive technology) is never outside, and it must not consume
+    // or inherit a press left over from a touch that no click followed (long-press).
+    if (e.detail === 0) {
+      press = null
+      return
+    }
+    // Only the click that completes a tracked touch or pen press.
     if (press?.upTarget !== undefined && press.pointerType !== "mouse") outsidePress(e)
   }
 
@@ -233,7 +249,7 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
   }
 
   const onFocusIn = (e: FocusEvent) => {
-    const target = e.target
+    const target = targetOf(e)
     if (!isElement(target) || pressing) return
     for (const reg of fromTop()) {
       if (!reg || reg.modal) return

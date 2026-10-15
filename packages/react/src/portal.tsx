@@ -32,17 +32,18 @@ export function Portal({ container, logicalParent, render, children, ...rest }: 
   const parent = useRef(logicalParent)
   parent.current = logicalParent
   const [attributes, setAttributes] = useState<Record<string, string>>({})
-  const host = useRef<HTMLElement | null>(null)
+  // State, not a ref: a new container remounts the host, and the sync must follow the new element.
+  const [host, setHost] = useState<HTMLElement | null>(null)
   useLayoutEffect(() => {
-    if (!mounted || !host.current) return
-    return syncPortalHost(host.current, () => parent.current?.() ?? null)
-  }, [mounted])
+    if (!host) return
+    return syncPortalHost(host, () => parent.current?.() ?? null)
+  }, [host])
   // The first render after mount already has the right attributes (no flash in the wrong dir).
   useLayoutEffect(() => {
     if (mounted) setAttributes(portalHostAttributes(parent.current?.() ?? null))
   }, [mounted])
   if (!mounted) return null
   const target = resolvePortalTarget(parent.current?.() ?? null, container)
-  const props = mergeProps({ "data-rind-portal": "", ...attributes, ref: host, children }, rest)
+  const props = mergeProps({ "data-rind-portal": "", ...attributes, ref: setHost, children }, rest)
   return createPortal(renderPart("div", props, render, undefined), target)
 }

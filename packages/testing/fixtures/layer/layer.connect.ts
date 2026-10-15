@@ -23,6 +23,8 @@ export function connect(
   state: {
     readonly open: boolean
     readonly modal: boolean
+    /** A "menu" is named by its trigger. */
+    readonly kind?: "dialog" | "menu" | undefined
     /** The stack's metadata while open (data-nested, --layer-index …). */
     readonly meta?: LayerMeta | undefined
     /** Focus is inside the content. */
@@ -74,7 +76,7 @@ export function connect(
       id: id("content"),
       role: "dialog",
       "aria-modal": state.modal ? "true" : undefined,
-      "aria-labelledby": id("title"),
+      "aria-labelledby": state.kind === "menu" ? id("trigger") : id("title"),
       tabIndex: -1,
       "data-focus-within": state.focusWithin ? "" : undefined,
     }),

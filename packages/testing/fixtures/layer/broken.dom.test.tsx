@@ -197,6 +197,70 @@ describe("broken layers fail with the invariant's name", () => {
     expect(errors(results).some((e) => e.includes("<body> style overflow"))).toBe(true)
   })
 
+  it("inert stuck on the page after unmounting while open → document-clean", {
+    timeout: 60_000,
+  }, async () => {
+    function Sticky() {
+      useEffect(() => {
+        document.getElementById("stuck-page")?.remove()
+        const page = document.createElement("div")
+        page.id = "stuck-page"
+        page.textContent = "page"
+        document.body.append(page)
+        // Broken: the unmount leaves the page inert (and the page stays); after the layer's
+        // own cleanup, which runs after this parent's.
+        return () => queueMicrotask(() => page.setAttribute("inert", ""))
+      }, [])
+      return <LayerExample label="Settings" />
+    }
+    const results = await failuresOf(
+      layerContract,
+      () => (
+        <div id="app">
+          <Sticky />
+        </div>
+      ),
+      options,
+    )
+    document.getElementById("stuck-page")?.remove()
+    expect(
+      errors(results).some(
+        (e) => e.includes("unmounted while open") && e.includes("div#stuck-page inert"),
+      ),
+    ).toBe(true)
+  })
+
+  it("scroll lock removed while open → modal", { timeout: 60_000 }, async () => {
+    function Unlocker() {
+      useEffect(() => {
+        const html = document.documentElement
+        // Broken: something drops the lock as soon as it is set.
+        const observer = new MutationObserver(() => {
+          if (html.hasAttribute("data-rind-scroll-locked")) {
+            html.removeAttribute("data-rind-scroll-locked")
+          }
+        })
+        observer.observe(html, { attributes: true, attributeFilter: ["data-rind-scroll-locked"] })
+        return () => observer.disconnect()
+      }, [])
+      return <LayerExample label="Settings" />
+    }
+    const results = await failuresOf(
+      layerContract,
+      () => (
+        <div id="app">
+          <Unlocker />
+        </div>
+      ),
+      options,
+    )
+    expect(
+      errors(results).some((e) =>
+        e.includes("the page is not scroll-locked while the modal layer is open"),
+      ),
+    ).toBe(true)
+  })
+
   it("focus left on body → modal", { timeout: 60_000 }, async () => {
     const results = await failuresOf(
       layerContract,
@@ -241,5 +305,67 @@ describe("broken layers fail with the invariant's name", () => {
     expect(
       errors(results).some((e) => e.includes("still mounted after its exit animations finished")),
     ).toBe(true)
+  })
+})
+
+// jsdom runs no animations: the exit is only observable in a real browser.
+const animates =
+  typeof Element.prototype.getAnimations === "function" && !navigator.userAgent.includes("jsdom")
+
+describe.runIf(animates)("reopening during the exit animation", () => {
+  const exitStyle =
+    "@keyframes rind-test-exit{from{opacity:1}to{opacity:0}}" +
+    '[data-part="content"][data-state="closed"]{animation:rind-test-exit 400ms}'
+  function Styled({ children }: { children: ReactElement }) {
+    return (
+      <div id="app">
+        <style>{exitStyle}</style>
+        {children}
+      </div>
+    )
+  }
+
+  it("keeps the exiting element: passes", { timeout: 60_000 }, async () => {
+    const results = await failuresOf(
+      layerContract,
+      () => (
+        <Styled>
+          <LayerExample label="Settings" />
+        </Styled>
+      ),
+      options,
+    )
+    expect(errors(results).filter((e) => e.includes("presence"))).toEqual([])
+  })
+
+  it("a content remounted on reopen → presence", { timeout: 60_000 }, async () => {
+    function Remounting() {
+      const [opens, setOpens] = useState(0)
+      return (
+        <Layer.Root onOpenChange={(open) => open && setOpens((n) => n + 1)}>
+          <Layer.Trigger>Settings</Layer.Trigger>
+          <Layer.Portal>
+            <Layer.Positioner>
+              {/* Broken: a new element on every open, even while the old one is exiting. */}
+              <Layer.Content key={opens}>
+                <Layer.Title>Settings</Layer.Title>
+                <input aria-label="Name" />
+                <Layer.Close>Close</Layer.Close>
+              </Layer.Content>
+            </Layer.Positioner>
+          </Layer.Portal>
+        </Layer.Root>
+      )
+    }
+    const results = await failuresOf(
+      layerContract,
+      () => (
+        <Styled>
+          <Remounting />
+        </Styled>
+      ),
+      options,
+    )
+    expect(errors(results).some((e) => e.includes("reopening during the exit"))).toBe(true)
   })
 })

@@ -25,6 +25,11 @@ export interface LayerProps {
   readonly onOpenChange?: ((open: boolean, details: ChangeDetails<LayerEvent>) => void) | undefined
   /** Default true. */
   readonly modal?: boolean | undefined
+  /**
+   * Default "dialog". A "menu" registers its trigger among its elements and is named by it,
+   * as a modal menu does: the trigger stays exposed (RA#9737) and pressing it is not outside.
+   */
+  readonly kind?: "dialog" | "menu" | undefined
   /** The instance's root id (part ids derive from it). */
   readonly root: string
   /** The layer this one was opened from (the adapter's layer context). */
@@ -45,13 +50,22 @@ export const layerMachine = setup({
       const byId = (part: string) => env.dom.getById(partId("layer", props.root, part))
       const content = () => byId("content") as HTMLElement | null
       let closed = false
+      const modal = props.modal !== false
+      // A non-modal layer's trigger is part of it too: pressing it toggles, it is not outside.
+      const ownsTrigger = props.kind === "menu" || !modal
       const stop = overlayEffect(env, {
         id: layerIdOf(props.root),
-        kind: "dialog",
-        modal: props.modal !== false,
+        kind: props.kind ?? "dialog",
+        modal,
         parent: props.parent,
         opener: () => byId("trigger"),
-        elements: () => [byId("positioner"), byId("backdrop"), content()].filter((e) => e !== null),
+        elements: () =>
+          [
+            ownsTrigger ? byId("trigger") : null,
+            byId("positioner"),
+            byId("backdrop"),
+            content(),
+          ].filter((e) => e !== null),
         surfaces: () => [byId("positioner"), byId("backdrop")].filter((e) => e !== null),
         container: content,
         modality: env.modality.modality(),

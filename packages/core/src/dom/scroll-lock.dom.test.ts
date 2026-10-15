@@ -39,7 +39,6 @@ const modal = (id: string, el: Element, extra: Partial<LayerOptions> = {}) =>
   })
 
 const locked = () => html.hasAttribute(ATTR) && html.style.overflow === "hidden"
-const barWidth = () => window.innerWidth - html.clientWidth
 
 describe("reference counting by modal layers", () => {
   it("stays locked until the parent of a nested modal closes too", () => {
@@ -113,39 +112,6 @@ describe("the right scroller", () => {
 })
 
 describe("no layout shift", () => {
-  it.runIf(inBrowser)(
-    "pads by the scrollbar width, or adds nothing with overlay scrollbars",
-    () => {
-      tallPage()
-      const content = div()
-      content.style.height = "10px"
-      const before = barWidth()
-      const rect = content.getBoundingClientRect()
-      const release = lockScroll(document)
-      const after = content.getBoundingClientRect()
-      expect(html.style.getPropertyValue(WIDTH_VAR)).toBe(`${before}px`)
-      if (before > 0) expect(html.style.paddingRight).toBe(`${before}px`)
-      else expect(html.style.paddingRight).toBe("")
-      expect(after.left).toBe(rect.left)
-      expect(after.width).toBe(rect.width)
-      release()
-      expect(html.style.paddingRight).toBe("")
-    },
-  )
-
-  it.runIf(inBrowser && CSS.supports("scrollbar-gutter", "stable"))(
-    "adds no padding with scrollbar-gutter: stable, and never sets scrollbar-gutter",
-    () => {
-      tallPage()
-      html.style.setProperty("scrollbar-gutter", "stable")
-      const release = lockScroll(document)
-      expect(html.style.paddingRight).toBe("")
-      expect(html.style.getPropertyValue("scrollbar-gutter")).toBe("stable")
-      release()
-      expect(html.style.getPropertyValue("scrollbar-gutter")).toBe("stable")
-    },
-  )
-
   it("never sets scrollbar-gutter itself", () => {
     tallPage()
     const release = lockScroll(document)
@@ -220,6 +186,33 @@ describe("exact restore", () => {
     expect(html.style.overflow).toBe("hidden")
     release()
     expect(html.style.overflow).toBe("")
+  })
+
+  // base-ui#4640 reversed: a lock opened after ours snapshots our "hidden", writes it without
+  // priority and later restores it. We must not adopt that as the author's value.
+  it("does not adopt a later foreign lock's identical value as the one to restore", async () => {
+    const release = lockScroll(document)
+    const foreignSaved = html.style.overflow
+    html.style.overflow = "hidden"
+    await Promise.resolve()
+    expect(html.style.getPropertyPriority("overflow")).toBe("important")
+    html.style.overflow = foreignSaved
+    await Promise.resolve()
+    release()
+    expect(html.style.overflow).toBe("")
+  })
+
+  // base-ui#979: no frame with the layer gone and the page still locked, or the reverse.
+  it("unlocks synchronously with the layer's removal", () => {
+    lockScrollForModals(document)
+    const el = div()
+    const handle = modal("m1", el)
+    expect(locked()).toBe(true)
+    handle.release()
+    el.remove()
+    expect(el.isConnected).toBe(false)
+    expect(locked()).toBe(false)
+    expect(html.style.getPropertyValue(WIDTH_VAR)).toBe("")
   })
 
   it.runIf(inBrowser)("does not change scrollY with scroll-behavior: smooth", () => {
@@ -336,6 +329,22 @@ describe.runIf(inBrowser && typeof Touch !== "undefined" && canConstructTouch())
     it("allows a move in a dialog region that can still scroll that way", () => {
       const { filler } = setup()
       expect(swipe(filler, -30).defaultPrevented).toBe(false)
+    })
+
+    // headlessui#3890: the policy reads the layers open at touchstart, so a sibling dialog
+    // opened after the lock started is "inside" and one that closed is not.
+    it("decides from the modal layers open at touchstart (sibling dialogs)", () => {
+      const { behind } = setup()
+      const second = div()
+      second.style.cssText =
+        "position:fixed;top:0;left:300px;width:200px;height:100px;overflow-y:auto"
+      const filler2 = div(second, "500px")
+      const handle = modal("m2", second)
+      // m2 is the topmost modal now: its scrollable content may scroll, the first dialog may not.
+      expect(swipe(filler2, -30).defaultPrevented).toBe(false)
+      handle.release()
+      expect(swipe(filler2, -30).defaultPrevented).toBe(true)
+      expect(swipe(behind, -30).defaultPrevented).toBe(true)
     })
 
     it("prevents a move past the end of the dialog's content", () => {

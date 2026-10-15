@@ -56,14 +56,31 @@ function unmark(marks: Marks, el: Element) {
   else el.removeAttribute("inert")
 }
 
-/** Marks the siblings along every path from <body> to the kept elements; returns the undo. */
-export function inertOutside(doc: Document, keep: readonly Element[]): () => void {
+/** The light-DOM element that holds `el` in the document: its outermost shadow host, or itself. */
+function outermostHost(el: Element): Element {
+  let node = el
+  for (let root = node.getRootNode(); root instanceof ShadowRoot; root = node.getRootNode()) {
+    node = root.host
+  }
+  return node
+}
+
+/**
+ * Marks the siblings along every path from <body> to the kept elements; returns the undo.
+ * With `existing`, only nodes in it are marked (nodes added since the snapshot are left alone).
+ */
+export function inertOutside(
+  doc: Document,
+  keep: readonly Element[],
+  existing?: { has(el: Element): boolean },
+): () => void {
   const body = doc.body
   if (!body) return () => {}
   const marks = marksOf(doc)
-  const kept = [...keep, ...Array.from(doc.querySelectorAll(KEEP_VISIBLE_SELECTOR))].filter(
-    (el) => el !== body && body.contains(el),
-  )
+  // Kept elements inside an open shadow root are not in `body.contains`: use their host.
+  const kept = [...keep, ...Array.from(doc.querySelectorAll(KEEP_VISIBLE_SELECTOR))]
+    .map(outermostHost)
+    .filter((el) => el !== body && body.contains(el))
   // Every kept element and its ancestors up to <body>: never marked.
   const onPath = new Set<Element>()
   for (const el of kept) {
@@ -75,7 +92,7 @@ export function inertOutside(doc: Document, keep: readonly Element[]): () => voi
       if (SKIPPED.has(child.tagName)) continue
       if (kept.includes(child)) continue
       if (onPath.has(child)) visit(child)
-      else {
+      else if (!existing || existing.has(child)) {
         mark(marks, child)
         marked.push(child)
       }
@@ -87,15 +104,20 @@ export function inertOutside(doc: Document, keep: readonly Element[]): () => voi
   }
 }
 
+/**
+ * A layer's elements, without nulls: a stale layer (its DOM replaced without a release) may
+ * return them despite its type, and one throw here would stop every stack subscriber.
+ */
+const elementsOf = (stack: LayerStack, layer: LayerHandle): Element[] =>
+  (stack.options(layer.id)?.elements() ?? []).filter((el): el is Element => el != null)
+
 /** The topmost modal layer's elements and its descendant layers' elements. */
 function keptBy(stack: LayerStack, top: LayerHandle): Element[] {
   const descends = (layer: LayerHandle) => {
     for (let id = layer.parentId; id; id = stack.get(id)?.parentId) if (id === top.id) return true
     return false
   }
-  return [top, ...stack.layers().filter(descends)].flatMap(
-    (layer) => stack.options(layer.id)?.elements() ?? [],
-  )
+  return [top, ...stack.layers().filter(descends)].flatMap((layer) => elementsOf(stack, layer))
 }
 
 /**
@@ -110,27 +132,31 @@ export function hideOutsideModal(doc: Document): void {
   let undoOutside: (() => void) | null = null
   let undoExiting: (() => void) | null = null
   let topId: string | undefined
-  /** The last walk had no element to keep (the content was not mounted yet): walk again. */
-  let walkedEmpty = false
+  /** What the last walk kept: a layer's elements can mount after it opened. */
+  let lastKept: readonly Element[] = []
   let exitingIds = ""
+  /** Elements present when the outermost modal opened; later walks mark only these, so nodes
+   * added while it is open (a descendant layer's portal, a password manager) stay exposed. */
+  let existing: WeakSet<Element> | null = null
   const recompute = () => {
-    // Only when the topmost modal changes: re-walking for other changes would mark nodes
-    // added while it was open (a descendant layer's portal is one, and stays exposed).
     const top = stack.topmostModal()
-    if (top?.id !== topId || (top && walkedEmpty)) {
+    const kept = top ? keptBy(stack, top) : []
+    const keptChanged = kept.length !== lastKept.length || kept.some((el, i) => el !== lastKept[i])
+    if (top?.id !== topId || keptChanged) {
       const previous = undoOutside
-      const kept = top ? keptBy(stack, top) : []
+      if (!top) existing = null
+      else if (!existing && kept.length > 0) existing = new WeakSet(doc.body.querySelectorAll("*"))
       // New marks first, then the old ones removed: nothing is exposed in between.
-      undoOutside = top && kept.length > 0 ? inertOutside(doc, kept) : null
-      walkedEmpty = !!top && kept.length === 0
+      undoOutside = top && kept.length > 0 ? inertOutside(doc, kept, existing ?? undefined) : null
       previous?.()
       topId = top?.id
+      lastKept = kept
     }
     const exiting = stack.exiting()
     const ids = exiting.map((l) => l.id).join("|")
     if (ids !== exitingIds) {
       const previous = undoExiting
-      const own = exiting.flatMap((l) => stack.options(l.id)?.elements() ?? [])
+      const own = exiting.flatMap((l) => elementsOf(stack, l))
       for (const el of own) mark(marks, el)
       undoExiting = () => {
         for (const el of own) unmark(marks, el)

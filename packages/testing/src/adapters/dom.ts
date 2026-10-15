@@ -144,6 +144,9 @@ export function domEnv(options: DomAdapterOptions = {}): EnvFactory {
   }
 }
 
+/** React's flag for "updates must be inside act" (Testing Library's asyncWrapper clears it). */
+const ACT_ENV = "IS_REACT_ACT_ENVIRONMENT"
+
 /** The `key` value a native event carries for a contract key. */
 const NATIVE_KEY: Partial<Record<Key, string>> = { Space: " " }
 
@@ -178,11 +181,16 @@ function createDomEnv(
   const act = async (fn: () => Promise<unknown> | unknown) => {
     const { getConfig } = await loadTL()
     await getConfig().asyncWrapper(async () => {
+      const outside = Reflect.get(globalThis, ACT_ENV)
       let result: unknown
       getConfig().eventWrapper(() => {
         result = fn()
       })
       await result
+      // user-event's own asyncWrapper started inside the act above: it saved "act
+      // environment on" and restored that when it ended, out of order. Put back what this
+      // wrapper set, or a later frame's update (a layer's initial focus) warns about act.
+      if (outside === false) Reflect.set(globalThis, ACT_ENV, false)
     })
   }
 
@@ -417,6 +425,7 @@ function createDomEnv(
       return [...installAnnouncementLog()]
     },
     takeErrors: async () => errors().splice(0),
+    scope: async (fn) => (await loadTL()).getConfig().asyncWrapper(fn) as ReturnType<typeof fn>,
     setDirection: async (direction) => {
       if (direction === null) doc().documentElement.removeAttribute("dir")
       else doc().documentElement.dir = direction

@@ -998,3 +998,69 @@ describe("no pointer-events mutation", () => {
     expect(document.querySelectorAll("[style*='pointer-events']")).toHaveLength(0)
   })
 })
+
+describe("review fixes: shadow DOM, key repeat, stale touch press", () => {
+  /** A layer whose content lives inside an open shadow root. */
+  function shadowLayer() {
+    const host = document.body.appendChild(document.createElement("div"))
+    const root = host.attachShadow({ mode: "open" })
+    const content = root.appendChild(document.createElement("div"))
+    const inner = content.appendChild(document.createElement("button"))
+    const requests: DismissRequest[] = []
+    const handle = getLayerStack(document).push({
+      id: layerId("shadow"),
+      kind: "popover",
+      modal: false,
+      elements: () => [content],
+    })
+    offs.push(
+      dismissable(makeEnv(), handle, {
+        modal: false,
+        onRequest: (r) => {
+          requests.push(r)
+          r.cancel()
+        },
+      }),
+    )
+    return { inner, requests }
+  }
+
+  it("a press inside a layer in an open shadow root is not outside", () => {
+    const outsideEl = outside()
+    const s = shadowLayer()
+    press(s.inner)
+    expect(s.requests).toHaveLength(0)
+    press(outsideEl)
+    expect(s.requests.map((r) => r.reason)).toEqual(["outside-press"])
+  })
+
+  it("focus inside a layer in an open shadow root is not outside", () => {
+    const outsideEl = outside()
+    const s = shadowLayer()
+    focusIn(s.inner)
+    expect(s.requests).toHaveLength(0)
+    focusIn(outsideEl)
+    expect(s.requests.map((r) => r.reason)).toEqual(["outside-focus"])
+  })
+
+  it("a repeated Escape keydown closes nothing: holding the key does not unwind the stack", () => {
+    const a = layer("a")
+    const b = layer("b", { parent: "a" })
+    pressEscape()
+    pressEscape(document.body, { repeat: true })
+    expect(b.reasons()).toEqual(["escape-key"])
+    expect(a.requests).toHaveLength(0)
+  })
+
+  it("a bare click inside the layer after a touch press with no click is not outside", () => {
+    const a = layer("a")
+    const o = outside()
+    down(o, { type: "touch" })
+    up(o, { type: "touch" })
+    a.inner.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 0 }))
+    expect(a.requests).toHaveLength(0)
+    // The stale press was dropped: a later bare click outside is not outside either.
+    click(outside())
+    expect(a.requests).toHaveLength(0)
+  })
+})
