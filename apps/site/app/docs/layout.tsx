@@ -35,6 +35,12 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
       <Sidebar groups={groups} />
       <main id="content" className={styles.main}>
         {children}
+        <footer className={styles.footer}>
+          <span>rind · headless components by Watermelon · MIT</span>
+          <a href="https://reado.watermelon-studio.it">
+            Built using <b>Reado</b> ↗
+          </a>
+        </footer>
       </main>
     </div>
   )

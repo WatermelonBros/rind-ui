@@ -230,6 +230,32 @@
   }
 }
 
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 72px;
+  padding-top: 20px;
+  border-top: 2px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  font: 500 13px var(--mono);
+  color: color-mix(in oklab, var(--ink) 75%, transparent);
+}
+.footer a {
+  text-decoration: none;
+  color: var(--ink);
+}
+.footer b {
+  padding: 1px 6px;
+  border-radius: 99px;
+  transition:
+    background 0.3s var(--spring),
+    color 0.3s var(--spring);
+}
+.footer a:hover b {
+  background: var(--ink);
+  color: var(--bg);
+}
 .pager {
   display: grid;
   grid-template-columns: 1fr 1fr;

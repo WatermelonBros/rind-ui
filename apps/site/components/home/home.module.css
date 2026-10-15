@@ -298,12 +298,32 @@
     background 0.35s var(--spring),
     color 0.35s var(--spring);
 }
-.segmentItem[aria-pressed="true"] {
-  background: var(--ink);
+.segment {
+  position: relative;
+}
+.segmentItem {
+  position: relative;
+  z-index: 1;
+}
+.segmentItem[data-state="checked"] {
   color: var(--bg);
 }
-:global([data-phase="juicy"]) .segmentItem[aria-pressed="true"] {
+:global([data-phase="juicy"]) .segmentItem[data-state="checked"] {
   color: #fff;
+}
+.segmentIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: var(--rind-indicator-width);
+  height: var(--rind-indicator-height);
+  translate: var(--rind-indicator-left) var(--rind-indicator-top);
+  border-radius: 99px;
+  background: var(--ink);
+  transition:
+    translate 0.45s var(--spring),
+    width 0.45s var(--spring);
 }
 .tune {
   display: flex;
@@ -606,8 +626,27 @@
 .outroGhost:hover {
   translate: 0 -2px;
 }
+.builtWith {
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1.5px solid color-mix(in oklab, var(--bg) 45%, transparent);
+  transition:
+    background 0.35s var(--spring),
+    color 0.35s var(--spring);
+}
+.builtWith b {
+  font-weight: 700;
+}
+.builtWith:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
 .outroBottom {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
   justify-content: space-between;
   font: 500 13px var(--mono);
   opacity: 0.75;

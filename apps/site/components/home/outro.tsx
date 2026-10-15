@@ -22,6 +22,9 @@ export function Outro() {
       </Reveal>
       <div className={styles.outroBottom}>
         <span>rind · headless components by Watermelon</span>
+        <a className={styles.builtWith} href="https://reado.watermelon-studio.it">
+          Built using <b>Reado</b> ↗
+        </a>
         <span>MIT</span>
       </div>
     </footer>

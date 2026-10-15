@@ -1,0 +1,61 @@
+/* ── Segmented Control: segments on a track; the indicator is the selected thumb ── */
+[data-skin] [data-scope="segmented-control"][data-part="root"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 99px;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift);
+}
+[data-skin] [data-scope="segmented-control"][data-part="label"] {
+  font: 700 13px var(--s-font);
+  padding: 0 8px 0 10px;
+}
+[data-skin] [data-scope="segmented-control"][data-part="item"] {
+  position: relative;
+  z-index: 1;
+  font: 600 14px var(--s-font);
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--s-ink);
+  cursor: pointer;
+  transition:
+    color 0.35s var(--s-ease),
+    scale 0.4s var(--s-pop);
+}
+[data-skin] [data-scope="segmented-control"][data-part="item"][data-pressed] {
+  scale: 0.95;
+  transition-duration: 0.12s;
+}
+[data-skin] [data-scope="segmented-control"][data-part="item"][data-state="checked"] {
+  color: var(--s-brand-text);
+}
+[data-skin] [data-scope="segmented-control"][data-part="indicator"] {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  width: var(--rind-indicator-width);
+  height: var(--rind-indicator-height);
+  translate: var(--rind-indicator-left) var(--rind-indicator-top);
+  border-radius: 99px;
+  background: var(--s-brand);
+  transition:
+    translate 0.5s var(--s-pop),
+    width 0.5s var(--s-pop);
+}
+[data-skin] [data-scope="segmented-control"][data-part="indicator"][data-resizing] {
+  transition: none;
+}
+[data-skin] [data-scope="segmented-control"][data-part="indicator"][data-state="hidden"] {
+  opacity: 0;
+}
+[data-skin="juicy"] [data-scope="segmented-control"][data-part="indicator"] {
+  box-shadow: 0 3px 0 var(--s-brand-deep);
+}

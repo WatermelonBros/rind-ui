@@ -22,6 +22,9 @@
 :global([data-phase="juicy"]) .bar {
   border-bottom: 2px solid var(--muted);
 }
+.views {
+  position: relative;
+}
 .views,
 .tabs {
   display: flex;
@@ -47,10 +50,30 @@
     color 0.35s var(--spring),
     translate 0.35s var(--spring);
 }
-.view[aria-pressed="true"],
-.tab[aria-pressed="true"] {
-  background: var(--ink);
+.view {
+  position: relative;
+  z-index: 1;
+}
+.view[data-state="checked"] {
   color: var(--bg);
+}
+/* rind's SegmentedControl.Indicator: the thumb slides to the chosen view */
+.viewIndicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: var(--rind-indicator-width);
+  height: var(--rind-indicator-height);
+  translate: var(--rind-indicator-left) var(--rind-indicator-top);
+  border-radius: 99px;
+  background: var(--ink);
+  transition:
+    translate 0.45s var(--spring),
+    width 0.45s var(--spring);
+}
+.viewIndicator[data-resizing] {
+  transition: none;
 }
 .getCode {
   border: 2px solid var(--ink);
@@ -63,9 +86,10 @@
   border-color: var(--ink);
   color: var(--bg);
 }
-:global([data-phase="juicy"]) .view[aria-pressed="true"],
-:global([data-phase="juicy"]) .tab[aria-pressed="true"] {
+:global([data-phase="juicy"]) .viewIndicator {
   background: var(--acc);
+}
+:global([data-phase="juicy"]) .view[data-state="checked"] {
   color: var(--ink);
 }
 :global([data-phase="juicy"]) .getCode {

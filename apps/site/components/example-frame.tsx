@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Heading, Tabs, Toggle } from "@rind-ui/react"
+import { Button, Heading, SegmentedControl, Tabs, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples } from "@/examples"
@@ -108,19 +108,21 @@ export function ExampleFrame({
       aria-label={label}
     >
       <div className={styles.bar}>
-        <div className={styles.views}>
+        <SegmentedControl.Root
+          className={styles.views}
+          aria-label={`${label}: view`}
+          value={skin}
+          onValueChange={(v) => {
+            if (v === "crisp" || v === "juicy" || v === "bare" || v === "parts") setPicked(v)
+          }}
+        >
           {(["crisp", "juicy", "bare", "parts"] as const).map((s) => (
-            <Toggle.Root
-              key={s}
-              className={styles.view}
-              pressed={skin === s}
-              onPressedChange={() => setPicked(s)}
-            >
+            <SegmentedControl.Item key={s} className={styles.view} value={s}>
               {s}
-              <span className={styles.visuallyHidden}>{s === "parts" ? " view" : " skin"}</span>
-            </Toggle.Root>
+            </SegmentedControl.Item>
           ))}
-        </div>
+          <SegmentedControl.Indicator className={styles.viewIndicator} />
+        </SegmentedControl.Root>
         <Toggle.Root
           className={styles.getCode}
           pressed={tab !== null}

@@ -1,6 +1,14 @@
 "use client"
 
-import { Accordion, Button, Checkbox, Switch, TextField, Toggle } from "@rind-ui/react"
+import {
+  Accordion,
+  Button,
+  Checkbox,
+  SegmentedControl,
+  Switch,
+  TextField,
+  Toggle,
+} from "@rind-ui/react"
 import { type CSSProperties, useState } from "react"
 import { usePhase } from "../phase"
 import styles from "./home.module.css"
@@ -56,19 +64,21 @@ export function AnyLook() {
       </Reveal>
       <Reveal className={styles.lookPanel}>
         <div className={styles.lookControls}>
-          <div className={styles.segment}>
+          <SegmentedControl.Root
+            className={styles.segment}
+            aria-label="Skin"
+            value={skin}
+            onValueChange={(v) => {
+              if (v === "crisp" || v === "juicy" || v === "bare") setPicked(v)
+            }}
+          >
             {(["crisp", "juicy", "bare"] as const).map((s) => (
-              <Toggle.Root
-                key={s}
-                className={styles.segmentItem}
-                pressed={skin === s}
-                onPressedChange={() => setPicked(s)}
-              >
+              <SegmentedControl.Item key={s} className={styles.segmentItem} value={s}>
                 {s}
-                <span className={styles.visuallyHidden}> skin</span>
-              </Toggle.Root>
+              </SegmentedControl.Item>
             ))}
-          </div>
+            <SegmentedControl.Indicator className={styles.segmentIndicator} />
+          </SegmentedControl.Root>
           <label className={styles.tune}>
             Brand
             <input
