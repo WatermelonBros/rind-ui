@@ -148,12 +148,14 @@ drift. When adding a component, make sure its docs page and stories exist; see
   real bug) or **warning** (weak test, quality, edge case, polish).
 - Only **critical** and **error** findings become Reado tasks to fix. **Warnings** go
   to [docs/review-backlog.md](docs/review-backlog.md) and are picked up later.
-- **One review round per change, by one reviewer, scoped to the change's own diff**
-  (the files the change created or modified, plus its OpenSpec change) — never the
-  whole repository. The implementer's hand-off lists every file it touched; the reviewer uses
-  `git diff HEAD` (everything since the last approved change's commit). After the
-  fixes, the reviewer only checks the gate is green and the review tasks are closed,
-  then approves; whatever is left goes to the backlog.
+- **Two passes per change, by one reviewer, scoped to the change's own diff** (the
+  files the change created or modified, plus its OpenSpec change) — never the whole
+  repository. The implementer's hand-off lists every file it touched; the reviewer
+  uses `git diff HEAD` (everything since the last approved change's commit).
+  1. **Review**: critical and error findings become Reado tasks to fix.
+  2. **Verification** after the fixes: confirms those fixes work. New findings in this
+     pass go to the backlog, unless they are critical for building the rest.
+  Then the change is approved and archived.
 - Feedback from the user (manual testing, product decisions) is outside this limit:
   it becomes new tasks or a new change.
 
