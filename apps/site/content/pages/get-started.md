@@ -65,7 +65,7 @@ Every part renders `data-scope` and `data-part`, and its state as `data-state`, 
 
 You can also pass `className` to any part, as you would to the element it renders.
 
-**About the looks on this site.** The *crisp* and *juicy* skins you see in the examples are rind.dev's own styles, written the same way. No package ships them. Every example has a **bare** view that shows exactly what you install, and its "Get code" panel shows our CSS if you want to start from it.
+**About the looks on this site.** The *crisp* and *juicy* skins you see in the examples are this site's own styles, written the same way. No package ships them. Every example has a **bare** view that shows exactly what you install, and its "Get code" panel shows our CSS if you want to start from it.
 
 **Want a starting point?** `@rind-ui/theme` is an optional, white-label theme built on the same attributes. One brand colour re-skins every component.
 

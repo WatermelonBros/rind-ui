@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Fredoka, Inter_Tight, JetBrains_Mono, Unbounded } from "next/font/google"
+import localFont from "next/font/local"
 import type { ReactNode } from "react"
 import { GooFilters } from "@/components/goo"
 import { Intro } from "@/components/intro"
@@ -8,28 +8,46 @@ import { PhaseProvider } from "@/components/phase"
 import "./globals.css"
 import "@/skins/index.css"
 
-const unbounded = Unbounded({
-  subsets: ["latin"],
-  weight: ["500", "900"],
+// Self-hosted (OFL, licences in fonts/): the build must work with no network.
+const unbounded = localFont({
+  src: [
+    { path: "../fonts/unbounded/unbounded-latin-500.woff2", weight: "500" },
+    { path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" },
+  ],
   variable: "--font-unbounded",
+  display: "swap",
 })
-const inter = Inter_Tight({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const inter = localFont({
+  src: [
+    { path: "../fonts/inter-tight/inter-tight-latin-400.woff2", weight: "400" },
+    { path: "../fonts/inter-tight/inter-tight-latin-500.woff2", weight: "500" },
+    { path: "../fonts/inter-tight/inter-tight-latin-600.woff2", weight: "600" },
+    { path: "../fonts/inter-tight/inter-tight-latin-700.woff2", weight: "700" },
+  ],
   variable: "--font-inter",
+  display: "swap",
 })
-const fredoka = Fredoka({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const fredoka = localFont({
+  src: [
+    { path: "../fonts/fredoka/fredoka-latin-500.woff2", weight: "500" },
+    { path: "../fonts/fredoka/fredoka-latin-600.woff2", weight: "600" },
+    { path: "../fonts/fredoka/fredoka-latin-700.woff2", weight: "700" },
+  ],
   variable: "--font-fredoka",
+  display: "swap",
 })
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const mono = localFont({
+  src: [
+    { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-400.woff2", weight: "400" },
+    { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-500.woff2", weight: "500" },
+    { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-600.woff2", weight: "600" },
+  ],
   variable: "--font-mono",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://rind.watermelon-studio.it"),
   title: { default: "rind — headless components", template: "%s · rind" },
   description: "Behaviour, accessibility and state for React. The look is yours.",
 }

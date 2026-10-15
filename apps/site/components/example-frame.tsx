@@ -20,7 +20,7 @@ export interface ExampleCode {
 
 const SKIN_NOTE = (
   <>
-    <b>Our skin, not yours.</b> This is how rind.dev styles it; no package ships it.{" "}
+    <b>Our skin, not yours.</b> This is how this site styles it; no package ships it.{" "}
     <Link href="/docs/get-started/#styling">How styling works →</Link>
   </>
 )
