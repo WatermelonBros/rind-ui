@@ -1,0 +1,111 @@
+/* ── Accordion & Collapsible: the content animates on the size the machine writes ──── */
+[data-skin] [data-scope="accordion"][data-part="root"] {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+[data-skin]
+  :is([data-scope="accordion"][data-part="item"], [data-scope="collapsible"][data-part="root"]) {
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift);
+  overflow: hidden;
+  transition: box-shadow 0.45s var(--s-ease);
+}
+[data-skin] [data-scope="collapsible"][data-part="root"] {
+  max-width: 420px;
+}
+[data-skin] [data-scope="accordion"][data-part="header"] {
+  margin: 0;
+  font: inherit;
+}
+[data-skin] :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="trigger"] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 600 16px var(--s-font);
+  text-align: start;
+  cursor: pointer;
+  transition: background 0.3s var(--s-ease);
+}
+[data-skin] [data-scope="collapsible"][data-part="trigger"] {
+  justify-content: flex-start;
+}
+[data-skin]
+  :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="trigger"][data-hover] {
+  background: color-mix(in oklab, var(--s-ink) 5%, transparent);
+}
+[data-skin="crisp"] [data-scope="accordion"][data-part="trigger"][data-state="open"] {
+  background: var(--s-bg);
+}
+[data-skin] :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="indicator"] {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font:
+    700 16px / 1 var(--font-mono),
+    monospace;
+  transition:
+    rotate 0.55s var(--s-pop),
+    background 0.3s;
+}
+[data-skin] [data-scope="accordion"][data-part="indicator"][data-state="open"] {
+  rotate: 135deg;
+}
+[data-skin] [data-scope="collapsible"][data-part="indicator"][data-state="open"] {
+  rotate: 90deg;
+}
+[data-skin="juicy"]
+  :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="indicator"] {
+  background: var(--s-muted);
+}
+[data-skin="juicy"]
+  :is(
+    [data-scope="accordion"],
+    [data-scope="collapsible"]
+  )[data-part="indicator"][data-state="open"] {
+  background: var(--s-acc);
+  color: #fff;
+}
+[data-skin] [data-scope="accordion"][data-part="content"] {
+  overflow: hidden;
+  height: var(--rind-accordion-content-height);
+  transition: height 0.5s var(--s-ease);
+}
+[data-skin] [data-scope="collapsible"][data-part="content"] {
+  overflow: hidden;
+  height: var(--rind-collapsible-content-height);
+  transition: height 0.5s var(--s-ease);
+}
+[data-skin]
+  :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="content"][data-reveal] {
+  transition: none;
+}
+[data-skin] :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="content"] > .pad {
+  padding: 2px 16px 16px;
+  opacity: 0.75;
+  font-size: 15px;
+  line-height: 1.5;
+  transition:
+    opacity 0.4s var(--s-ease),
+    translate 0.5s var(--s-ease);
+}
+[data-skin]
+  :is(
+    [data-scope="accordion"],
+    [data-scope="collapsible"]
+  )[data-part="content"][data-state="closed"]
+  > .pad {
+  opacity: 0;
+  translate: 0 -8px;
+}

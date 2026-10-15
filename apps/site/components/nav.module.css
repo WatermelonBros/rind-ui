@@ -1,11 +1,24 @@
 .nav {
   position: fixed;
-  inset: 20px 28px auto;
+  inset: 0 0 auto;
+  height: var(--bar-h);
   z-index: 50;
   display: flex;
   align-items: center;
   gap: 26px;
+  padding: 0 28px;
   font: 600 14px var(--mono);
+  background: var(--bar-bg, var(--bg));
+  border-bottom: var(--bw) solid var(--line);
+}
+:global([data-phase="juicy"]) .nav {
+  background: #ffffffe6;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 0 var(--soft);
+}
+/* on reading pages the bar sits on paper, like the page under it */
+:global(html:has([data-surface="docs"])) .nav {
+  --bar-bg: var(--paper);
 }
 .nav a {
   text-decoration: none;
@@ -80,7 +93,7 @@
 @media (max-width: 760px) {
   .nav {
     gap: 16px;
-    inset: 14px 16px auto;
+    padding: 0 16px;
   }
   .nav > a:not(.mini) {
     display: none;

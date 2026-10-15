@@ -1,0 +1,37 @@
+/* ── Toggle ───────────────────────────────────────────────────────────────────────── */
+[data-skin] [data-scope="toggle"][data-part="root"] {
+  font: 600 15px var(--s-font);
+  padding: 10px 16px;
+  border-radius: var(--s-r-sm);
+  border: var(--s-bw) solid var(--s-line);
+  background: var(--s-card);
+  color: var(--s-ink);
+  cursor: pointer;
+  box-shadow: var(--s-lift);
+  transition:
+    background 0.35s var(--s-ease),
+    color 0.35s var(--s-ease),
+    translate 0.45s var(--s-ease),
+    box-shadow 0.45s var(--s-ease),
+    scale 0.45s var(--s-pop);
+}
+[data-skin] [data-scope="toggle"][data-part="root"][data-hover] {
+  translate: 0 -1px;
+}
+[data-skin] [data-scope="toggle"][data-part="root"][data-pressed] {
+  translate: 0 2px;
+  box-shadow: var(--s-lift-lo);
+  transition-duration: 0.12s;
+}
+[data-skin="crisp"] [data-scope="toggle"][data-part="root"][aria-pressed="true"] {
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+[data-skin="juicy"] [data-scope="toggle"][data-part="root"] {
+  background: var(--s-muted);
+}
+[data-skin="juicy"] [data-scope="toggle"][data-part="root"][aria-pressed="true"] {
+  background: var(--s-acc);
+  color: #fff;
+  box-shadow: 0 5px 0 var(--s-acc-deep);
+}

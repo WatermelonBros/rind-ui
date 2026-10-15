@@ -1,0 +1,15 @@
+/* ── layout helpers used by the examples ──────────────────────────────────────────── */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.stack {
+  display: grid;
+  gap: 14px;
+}
+.note {
+  font-size: 14px;
+  opacity: 0.7;
+}

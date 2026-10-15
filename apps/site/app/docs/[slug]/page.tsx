@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { pageBySlug, pages, render } from "@/lib/docs"
+import { ExampleFrame } from "@/components/example-frame"
+import { ExamplesSection } from "@/components/examples-section"
+import { exampleCode, pageBySlug, pages, render } from "@/lib/docs"
 import styles from "../docs.module.css"
 
 type Props = { params: Promise<{ slug: string }> }
@@ -19,7 +21,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DocPage({ params }: Props) {
   const page = pageBySlug((await params).slug)
   if (!page) notFound()
-  const { html, toc } = render(page)
+  const source = exampleCode(page.slug)
+  const { intro, html, toc: outline } = render(page, { hasExample: Boolean(source) })
+  const toc = source ? [{ id: "examples", text: "Examples" }, ...outline] : outline
   return (
     <div className={styles.page}>
       <article>
@@ -27,6 +31,13 @@ export default async function DocPage({ params }: Props) {
           <p className={styles.kicker}>{page.section === "components" ? "Component" : "Guide"}</p>
           <h1 className={styles.title}>{page.title}</h1>
         </header>
+        {source && <ExampleFrame slug={page.slug} name="Basic" source={source} hero />}
+        <div
+          className={`${styles.prose} ${styles.intro}`}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs
+          dangerouslySetInnerHTML={{ __html: intro }}
+        />
+        {source && <ExamplesSection slug={page.slug} source={source} />}
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs */}
         <div className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
       </article>

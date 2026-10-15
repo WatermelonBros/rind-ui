@@ -1,0 +1,90 @@
+/* ── Fieldset, Heading, Link ──────────────────────────────────────────────────────── */
+[data-skin] [data-scope="fieldset"][data-part="root"] {
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: var(--s-card);
+  box-shadow: var(--s-lift);
+  padding: 16px 18px 18px;
+  margin: 0;
+  max-width: 420px;
+}
+[data-skin] [data-scope="fieldset"][data-part="legend"] {
+  font:
+    900 16px var(--font-unbounded),
+    sans-serif;
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+[data-skin="juicy"] [data-scope="fieldset"][data-part="legend"] {
+  background: var(--s-acc);
+  color: #fff;
+}
+[data-skin] [data-scope="heading"][data-part="root"] {
+  font-family: var(--font-unbounded), sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+/* each heading shows its computed level, so the outline is visible at a glance */
+[data-skin] [data-scope="heading"][data-part="root"]::before {
+  content: "h" attr(data-level);
+  font:
+    600 11px var(--font-mono),
+    monospace;
+  letter-spacing: 0;
+  padding: 2px 6px;
+  border-radius: 99px;
+  background: var(--s-ink);
+  color: var(--s-on);
+  flex: none;
+  translate: 0 -2px;
+}
+[data-skin] [data-scope="heading"][data-level="1"] {
+  font-size: 34px;
+  margin-left: 0px;
+}
+[data-skin] [data-scope="heading"][data-level="2"] {
+  font-size: 28px;
+  margin-left: 0px;
+}
+[data-skin] [data-scope="heading"][data-level="3"] {
+  font-size: 22px;
+  margin-left: 14px;
+}
+[data-skin] [data-scope="heading"][data-level="4"] {
+  font-size: 18px;
+  margin-left: 28px;
+}
+[data-skin] [data-scope="heading"][data-level="5"] {
+  font-size: 15px;
+  margin-left: 42px;
+}
+[data-skin] [data-scope="heading"][data-level="6"] {
+  font-size: 13px;
+  margin-left: 56px;
+}
+[data-skin] [data-scope="link"][data-part="link"] {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  background: linear-gradient(var(--s-acc), var(--s-acc)) 0 100% / 100% 3px no-repeat;
+  transition:
+    background-size 0.45s var(--s-ease),
+    color 0.3s;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+[data-skin] [data-scope="link"][data-part="link"][data-hover] {
+  background-size: 100% 100%;
+  color: #fff;
+}
+[data-skin="crisp"] [data-scope="link"][data-part="link"][data-hover] {
+  color: var(--s-on);
+  background-image: linear-gradient(var(--s-ink), var(--s-ink));
+}

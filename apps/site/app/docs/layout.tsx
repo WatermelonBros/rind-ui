@@ -1,18 +1,38 @@
 import type { ReactNode } from "react"
-import { Sidebar } from "@/components/sidebar"
+import { type NavGroup, Sidebar } from "@/components/sidebar"
 import { pages } from "@/lib/docs"
 import styles from "./docs.module.css"
 
+/** "hidden-until-found" → "Hidden until found": guide titles are sentences, the nav wants names. */
+const shortLabel = (slug: string) => {
+  const words = slug.split("-").join(" ")
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
 export default function DocsLayout({ children }: { children: ReactNode }) {
-  const nav = {
-    components: pages
-      .filter((p) => p.section === "components")
-      .map(({ slug, title }) => ({ slug, title })),
-    guides: pages.filter((p) => p.section === "guides").map(({ slug, title }) => ({ slug, title })),
-  }
+  const groups: NavGroup[] = [
+    {
+      title: "Start",
+      entries: pages
+        .filter((p) => p.section === "start")
+        .map(({ slug, title }) => ({ slug, label: title })),
+    },
+    {
+      title: "Components",
+      entries: pages
+        .filter((p) => p.section === "components")
+        .map(({ slug, title }) => ({ slug, label: title })),
+    },
+    {
+      title: "Guides",
+      entries: pages
+        .filter((p) => p.section === "guides")
+        .map(({ slug }) => ({ slug, label: shortLabel(slug) })),
+    },
+  ]
   return (
-    <div className={styles.shell}>
-      <Sidebar nav={nav} />
+    <div className={styles.shell} data-surface="docs">
+      <Sidebar groups={groups} />
       <div className={styles.main}>{children}</div>
     </div>
   )

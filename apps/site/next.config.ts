@@ -11,6 +11,15 @@ const config: NextConfig = {
   // The repo runs TypeScript 7; Next's checker uses the TS JS API. `pnpm typecheck` runs tsc.
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
+  // Read workspace packages from source (their `@rind-ui/source` export), so the site never
+  // depends on another package's dist being built at that moment.
+  webpack(config: { resolve: { conditionNames?: string[] } }) {
+    config.resolve.conditionNames = [
+      "@rind-ui/source",
+      ...(config.resolve.conditionNames ?? ["..."]),
+    ]
+    return config
+  },
 }
 
 export default config

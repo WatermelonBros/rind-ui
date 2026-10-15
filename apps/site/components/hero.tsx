@@ -1,27 +1,27 @@
 "use client"
 
-import { Accordion, Button, Toggle } from "@rind-ui/react"
+import { Accordion, Button, Checkbox, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { useState } from "react"
 import styles from "./hero.module.css"
+import { usePhase } from "./phase"
 import { Wordmark } from "./wordmark"
 
-const INSTALL = "pnpm add @rind-ui/react"
-
-/** Floating specimens are real rind components, skinned here through their data-* attributes. */
+/**
+ * Floating specimens are real rind components wearing the site skin of the current phase,
+ * the same CSS the docs examples use.
+ */
 function Specimens() {
+  const { phase } = usePhase()
   const [pending, setPending] = useState(false)
   return (
-    <div className={styles.stage}>
-      <div className={styles.card} style={{ left: "4%", top: "2%", rotate: "-3deg" }}>
+    <div className={styles.stage} data-skin={phase}>
+      <div className={styles.card} style={{ left: "2%", top: "0%", rotate: "-3deg" }}>
         <span className={styles.tag}>button · data-pending</span>
         <p className={styles.title}>Delete component?</p>
-        <p className={styles.body}>Pending keeps focus and announces itself. You style the rest.</p>
+        <p className={styles.body}>Pending keeps focus and announces itself.</p>
         <div className={styles.acts}>
-          <Button className={styles.btn}>Cancel</Button>
           <Button
-            className={styles.btn}
-            data-primary=""
             pending={pending}
             onPress={() => {
               setPending(true)
@@ -34,30 +34,46 @@ function Specimens() {
       </div>
 
       <div
-        className={styles.card}
-        style={{ right: "0%", top: "34%", rotate: "4deg", animationDelay: "-2s" }}
+        className={styles.float}
+        style={{ right: "0%", top: "30%", rotate: "3deg", animationDelay: "-2s" }}
       >
         <span className={styles.tag}>toggle · aria-pressed</span>
-        <Toggle.Root className={styles.toggle} defaultPressed>
-          <span className={styles.track} aria-hidden="true">
-            <span className={styles.thumb} />
-          </span>
-          Notifications
-        </Toggle.Root>
+        <div className="row">
+          <Toggle.Root defaultPressed>Bold</Toggle.Root>
+          <Toggle.Root>Italic</Toggle.Root>
+          <Toggle.Root defaultPressed>Mono</Toggle.Root>
+        </div>
       </div>
 
       <div
         className={styles.card}
-        style={{ left: "10%", top: "56%", rotate: "2deg", animationDelay: "-4s" }}
+        style={{ right: "6%", top: "56%", rotate: "-2deg", animationDelay: "-3s" }}
+      >
+        <span className={styles.tag}>checkbox · data-state</span>
+        <div className="stack">
+          {(["Keyboard", "Screen readers", "Your design"] as const).map((label, i) => (
+            <Checkbox.Root key={label} defaultChecked={i < 2}>
+              <Checkbox.Control>
+                <Checkbox.Indicator>✓</Checkbox.Indicator>
+              </Checkbox.Control>
+              <Checkbox.Label>{label}</Checkbox.Label>
+            </Checkbox.Root>
+          ))}
+        </div>
+      </div>
+
+      <div
+        className={styles.float}
+        style={{ left: "6%", top: "40%", width: "300px", rotate: "1.5deg", animationDelay: "-4s" }}
       >
         <span className={styles.tag}>accordion · data-state</span>
-        <Accordion.Root className={styles.acc} defaultValue={["keyboard"]}>
+        <Accordion.Root defaultValue={["keyboard"]}>
           {[
             ["keyboard", "Keyboard", "Tab, Enter, Space, and arrows if you want them."],
             ["readers", "Screen readers", "Regions, labels and announcements, tested."],
             ["design", "Your design", "Nothing. That part is yours."],
-          ].map(([value, title, text]) => (
-            <Accordion.Item key={value} value={value ?? ""}>
+          ].map(([value = "", title, text]) => (
+            <Accordion.Item key={value} value={value}>
               <Accordion.Header>
                 <Accordion.Trigger>
                   {title}
@@ -65,7 +81,7 @@ function Specimens() {
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Content>
-                <p>{text}</p>
+                <div className="pad">{text}</div>
               </Accordion.Content>
             </Accordion.Item>
           ))}
@@ -76,7 +92,6 @@ function Specimens() {
 }
 
 export function Hero() {
-  const [copied, setCopied] = useState(false)
   return (
     <main className={styles.hero}>
       <section className={styles.copy}>
@@ -90,25 +105,16 @@ export function Hero() {
           Behaviour, accessibility and state. <em>The look is yours.</em>
         </p>
         <div className={styles.ctas}>
-          <Link href="/docs/" className={styles.primary}>
+          <Link href="/docs/get-started/" className={styles.primary}>
             Get started →
           </Link>
-          <Button
-            className={styles.install}
-            onPress={() => {
-              navigator.clipboard?.writeText(INSTALL).then(() => {
-                setCopied(true)
-                setTimeout(() => setCopied(false), 1400)
-              })
-            }}
-          >
-            {INSTALL}
-            <span aria-hidden="true">{copied ? "✓" : "⧉"}</span>
-          </Button>
-          <span role="status" className={styles.visuallyHidden}>
-            {copied ? "Copied" : ""}
-          </span>
+          <Link href="/docs/#components" className={styles.install}>
+            Browse components
+          </Link>
         </div>
+        <p className={styles.frameworks}>
+          <b>React</b> today · Vue, Svelte, Solid and Angular on the same core, soon
+        </p>
       </section>
       <Specimens />
     </main>

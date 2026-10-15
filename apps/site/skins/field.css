@@ -1,0 +1,68 @@
+/* ── shared pieces: labels, descriptions, errors, inputs ─────────────────────────────── */
+[data-skin]
+:is([data-part="label"], [data-part="legend"]):is(
+  [data-scope="field"],
+  [data-scope="text-field"],
+  [data-scope="label"],
+  [data-scope="fieldset"]
+),
+[data-skin] [data-scope="label"][data-part="root"] {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+[data-skin] [data-part="description"] {
+  font-size: 13.5px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+[data-skin] [data-part="error-message"] {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--s-acc-deep);
+  margin-top: 6px;
+  animation: s-shake 0.4s var(--s-ease);
+}
+@keyframes s-shake {
+  30% {
+    translate: -3px 0;
+  }
+  60% {
+    translate: 2px 0;
+  }
+}
+
+[data-skin] :is([data-scope="text-field"][data-part="input"], .native) {
+  width: 100%;
+  max-width: 320px;
+  font: 500 15px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  padding: 11px 13px;
+  outline: none;
+  transition:
+    box-shadow 0.4s var(--s-ease),
+    translate 0.4s var(--s-ease),
+    background 0.3s;
+}
+[data-skin="crisp"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+  translate: -2px -2px;
+  box-shadow: 4px 4px 0 var(--s-acc);
+}
+[data-skin="juicy"] :is([data-scope="text-field"][data-part="input"], .native) {
+  background: var(--s-muted);
+  box-shadow: inset 0 2px 0 #e2d9ff;
+}
+[data-skin="juicy"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+  background: #fff;
+  box-shadow:
+    0 0 0 3px var(--s-acc),
+    0 6px 16px #ff8fb133;
+}
+[data-skin] [data-scope="text-field"][data-part="input"][aria-invalid="true"] {
+  border-color: var(--s-acc-deep);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--s-acc) 35%, transparent);
+}

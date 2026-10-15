@@ -1,0 +1,206 @@
+.frame {
+  border: var(--bw) solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin: 8px 0 28px;
+}
+.frame[data-hero] {
+  box-shadow: var(--shadow);
+  margin-bottom: 40px;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: var(--bw) solid var(--line);
+  font: 600 12px var(--mono);
+}
+:global([data-phase="juicy"]) .bar {
+  border-bottom: 2px solid var(--muted);
+}
+.views,
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 99px;
+  background: color-mix(in oklab, var(--ink) 7%, transparent);
+}
+.view,
+.tab,
+.codeTab,
+.getCode,
+.copy {
+  font: 600 12px var(--mono);
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background 0.35s var(--spring),
+    color 0.35s var(--spring),
+    translate 0.35s var(--spring);
+}
+.view[aria-pressed="true"],
+.tab[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.getCode {
+  border: 2px solid var(--ink);
+}
+.getCode[data-hover] {
+  translate: 0 -1px;
+}
+.getCode[aria-pressed="true"] {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: #fff;
+}
+:global([data-phase="juicy"]) .view[aria-pressed="true"],
+:global([data-phase="juicy"]) .tab[aria-pressed="true"] {
+  background: var(--acc);
+  color: #fff;
+}
+:global([data-phase="juicy"]) .getCode {
+  border-color: transparent;
+  background: var(--muted);
+}
+
+.stage {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  padding: 40px 28px;
+  transition: background 0.5s var(--spring);
+}
+.frame[data-hero] .stage {
+  min-height: 300px;
+  padding: 56px 28px;
+}
+.stage > * {
+  max-width: min(100%, 440px);
+}
+.stage[data-view="crisp"] {
+  background: #d4ff3a;
+}
+.stage[data-view="juicy"] {
+  background: #e9e2ff;
+}
+.stage[data-view="bare"] {
+  background: #fafafa;
+  background-image:
+    linear-gradient(#0000000a 1px, transparent 1px),
+    linear-gradient(90deg, #0000000a 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.code {
+  background: #0b0b0c;
+  color: #e8e8e3;
+  animation: open 0.45s var(--spring);
+}
+:global([data-phase="juicy"]) .code {
+  background: #2a1d5c;
+}
+@keyframes open {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+.code .tabs {
+  margin: 10px 10px 0;
+  background: #ffffff14;
+  align-items: center;
+}
+.codeTab[aria-pressed="true"] {
+  background: #d4ff3a;
+  color: #0b0b0c;
+}
+.copy {
+  margin-left: auto;
+}
+.copy[data-hover] {
+  background: #ffffff1f;
+}
+.code pre {
+  margin: 0;
+  padding: 16px 20px 20px;
+  overflow: auto;
+  max-height: 460px;
+  font: 500 13.5px / 1.6 var(--mono);
+}
+.cssNote {
+  padding: 0 20px 16px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+.code :global(.hljs-keyword),
+.code :global(.hljs-built_in),
+.code :global(.hljs-selector-tag) {
+  color: #ff7ab0;
+}
+.code :global(.hljs-string),
+.code :global(.hljs-attr),
+.code :global(.hljs-selector-attr) {
+  color: #d4ff3a;
+}
+.code :global(.hljs-title),
+.code :global(.hljs-name),
+.code :global(.hljs-tag),
+.code :global(.hljs-attribute) {
+  color: #9be7ff;
+}
+.code :global(.hljs-number),
+.code :global(.hljs-literal) {
+  color: #ffd84d;
+}
+.code :global(.hljs-comment) {
+  color: #8a8a80;
+}
+
+.note {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  border-top: var(--bw) solid var(--line);
+}
+:global([data-phase="juicy"]) .note {
+  border-top: 2px solid var(--muted);
+}
+.note a {
+  text-decoration: underline;
+  text-decoration-color: var(--acc);
+  text-underline-offset: 3px;
+}
+.note code,
+.variant p code {
+  font: 500 0.9em var(--mono);
+  background: color-mix(in oklab, var(--ink) 8%, transparent);
+  padding: 0.1em 0.35em;
+  border-radius: 5px;
+}
+
+.examples h2 {
+  font: 900 28px / 1.1 var(--display);
+  letter-spacing: -0.02em;
+  margin: 8px 0 6px;
+  scroll-margin-top: 90px;
+}
+.variant h3 {
+  font: 700 19px / 1.3 var(--text);
+  margin: 26px 0 4px;
+  scroll-margin-top: 90px;
+}
+.variant p {
+  font-size: 15px;
+  opacity: 0.8;
+  margin-bottom: 6px;
+}

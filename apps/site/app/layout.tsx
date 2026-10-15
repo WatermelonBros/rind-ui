@@ -5,6 +5,7 @@ import { GooFilters } from "@/components/goo"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "./globals.css"
+import "@/skins/index.css"
 
 const unbounded = Unbounded({
   subsets: ["latin"],

@@ -1,0 +1,150 @@
+/*
+ * rind.dev skins: the site's own look for every component, written the way any rind user
+ * would write theirs — plain CSS on data-scope / data-part / data-state / aria-*. They are not
+ * part of any package. "bare" is a neutral, minimal skin that only makes structure and states
+ * visible; the packages themselves ship no CSS at all.
+ */
+
+[data-skin="crisp"] {
+  --s-bg: #d4ff3a;
+  --s-ink: #0b0b0c;
+  --s-acc: #ff3d8b;
+  --s-acc-deep: #c8195f;
+  --s-on: #d4ff3a;
+  --s-card: #ffffff;
+  --s-muted: #ecece4;
+  --s-line: #0b0b0c;
+  --s-bw: 3px;
+  --s-r: 14px;
+  --s-r-sm: 8px;
+  --s-lift: 4px 4px 0 var(--s-ink);
+  --s-lift-hi: 6px 6px 0 var(--s-ink);
+  --s-lift-lo: 1px 1px 0 var(--s-ink);
+  --s-font: var(--font-inter), system-ui, sans-serif;
+  --s-ok: #0b0b0c;
+}
+[data-skin="juicy"] {
+  --s-bg: #e9e2ff;
+  --s-ink: #2a1d5c;
+  --s-acc: #ff8fb1;
+  --s-acc-deep: #e0608a;
+  --s-on: #ffffff;
+  --s-card: #ffffff;
+  --s-muted: #f1ecff;
+  --s-line: transparent;
+  --s-bw: 0px;
+  --s-r: 22px;
+  --s-r-sm: 14px;
+  --s-lift: 0 5px 0 #c9bdf2;
+  --s-lift-hi: 0 7px 0 #c9bdf2;
+  --s-lift-lo: 0 2px 0 #c9bdf2;
+  --s-font: var(--font-fredoka), system-ui, sans-serif;
+  --s-ok: #6fcfa5;
+}
+[data-skin="bare"] {
+  --s-bg: #f4f4f5;
+  --s-ink: #18181b;
+  --s-acc: #2563eb;
+  --s-acc-deep: #b91c1c;
+  --s-on: #ffffff;
+  --s-card: #ffffff;
+  --s-muted: #f4f4f5;
+  --s-line: #d4d4d8;
+  --s-bw: 1px;
+  --s-r: 8px;
+  --s-r-sm: 6px;
+  --s-lift: none;
+  --s-lift-hi: none;
+  --s-lift-lo: none;
+  --s-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --s-ok: #18181b;
+}
+[data-skin] {
+  --s-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --s-pop: cubic-bezier(0.34, 1.35, 0.64, 1);
+  color: var(--s-ink);
+  font-family: var(--s-font);
+}
+
+/* Disabled reads as disabled in every skin: dimmed, not-allowed, no hover lift. A locked
+   accordion trigger (data-disabled without a disabled item) is excluded on purpose. */
+[data-skin]
+:is(button, a, input, label, [data-part="root"], [data-part="item"], [data-part="control"]):is(
+  :disabled,
+  [aria-disabled="true"],
+  [data-disabled]
+):not([data-scope="accordion"][data-part="trigger"]) {
+  opacity: 0.42;
+  cursor: not-allowed;
+  translate: 0 0;
+  filter: grayscale(0.4);
+}
+[data-skin] [data-scope="accordion"][data-part="item"][data-disabled] [data-part="trigger"] {
+  cursor: not-allowed;
+}
+[data-skin] [data-scope="fieldset"][data-part="root"]:is(:disabled, [data-disabled]) {
+  opacity: 0.55;
+}
+
+/* bare: neutral controls, so states are visible without any brand */
+[data-skin="bare"] :is([data-scope="button"], [data-scope="toggle"])[data-part="root"] {
+  background: var(--s-card);
+  color: var(--s-ink);
+  border: 1px solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: none;
+}
+[data-skin="bare"] :is([data-scope="button"], [data-scope="toggle"])[data-part="root"][data-hover] {
+  background: #f4f4f5;
+  translate: 0 0;
+}
+[data-skin="bare"]
+  :is([data-scope="button"], [data-scope="toggle"])[data-part="root"][data-pressed] {
+  background: #e4e4e7;
+  translate: 0 0;
+  scale: 0.98;
+}
+[data-skin="bare"] [data-scope="toggle"][data-part="root"][aria-pressed="true"],
+[data-skin="bare"]
+  [data-scope="checkbox"][data-part="control"]:is(
+    [data-state="checked"],
+    [data-state="indeterminate"]
+  ) {
+  background: var(--s-ink);
+  border-color: var(--s-ink);
+  color: #fff;
+}
+[data-skin="bare"] :focus-visible {
+  outline: 2px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-skin="bare"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+  border-color: var(--s-acc);
+  box-shadow: 0 0 0 3px #2563eb33;
+}
+[data-skin="bare"] [data-scope="fieldset"][data-part="legend"] {
+  font: 600 14px var(--s-font);
+  background: none;
+  color: var(--s-ink);
+  padding: 0 4px;
+}
+[data-skin="bare"] [data-scope="heading"][data-part="root"] {
+  font-family: var(--s-font);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+[data-skin="bare"] [data-scope="heading"][data-part="root"]::before {
+  background: #e4e4e7;
+  color: #3f3f46;
+}
+[data-skin="bare"] [data-scope="link"][data-part="link"] {
+  color: var(--s-acc);
+  font-weight: 500;
+  background: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+[data-skin="bare"] [data-scope="link"][data-part="link"][data-hover] {
+  color: #1d4ed8;
+  background: none;
+}

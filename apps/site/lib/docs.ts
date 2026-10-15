@@ -1,6 +1,8 @@
 import hljs from "highlight.js/lib/common"
 import { Marked } from "marked"
+import type { ExampleCode } from "@/components/example-frame"
 import data from "@/content/generated/docs.json"
+import exampleData from "@/content/generated/examples.json"
 import type { DocPage } from "@/scripts/content"
 
 export const pages = data as readonly DocPage[]
@@ -43,17 +45,47 @@ const marked = new Marked({
 })
 
 export interface Rendered {
+  /** the first paragraph, shown under the live example */
+  readonly intro: string
   readonly html: string
   readonly toc: readonly { readonly id: string; readonly text: string }[]
 }
 
-/** Markdown → HTML without the page's own `# Title` (the layout renders it), plus its h2 outline. */
-export function render(page: DocPage): Rendered {
-  const body = page.markdown.replace(/^# .+\n/, "").replace(/<!--[\s\S]*?-->/g, "")
-  const html = marked.parse(body, { async: false })
+/**
+ * Markdown → HTML without the page's own `# Title` (the layout renders it), split into the
+ * intro paragraph and the rest, plus the h2 outline. On a page with a live example the first
+ * code block is dropped: the example's "Get code" shows it.
+ */
+export function render(page: DocPage, { hasExample = false } = {}): Rendered {
+  const body = page.markdown
+    .replace(/^# .+\n/, "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .trim()
+  const [first = "", ...rest] = body.split(/\n\s*\n/)
+  let remainder = rest.join("\n\n")
+  if (hasExample) remainder = remainder.replace(/^```[\s\S]*?\n```\s*/, "")
+  const intro = marked.parse(first, { async: false })
+  const html = marked.parse(remainder, { async: false })
   const toc = [...html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>/g)].map((m) => ({
     id: m[1] ?? "",
     text: (m[2] ?? "").replace(/<[^>]+>/g, ""),
   }))
-  return { html, toc }
+  return { intro, html, toc }
+}
+
+const highlight = (raw: string, language: string) => ({
+  raw,
+  html: hljs.highlight(raw, { language }).value,
+})
+
+/** A component's example sources, highlighted at build time. */
+export function exampleCode(slug: string): ExampleCode | undefined {
+  const entry = (exampleData as Record<string, { code: Record<string, string>; css: string }>)[slug]
+  if (!entry) return undefined
+  return {
+    code: Object.fromEntries(
+      Object.entries(entry.code).map(([name, raw]) => [name, highlight(raw, "tsx")]),
+    ),
+    css: highlight(entry.css, "css"),
+  }
 }

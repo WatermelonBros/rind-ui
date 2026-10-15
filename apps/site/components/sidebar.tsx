@@ -1,45 +1,79 @@
 "use client"
 
+import { TextField, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 import styles from "./sidebar.module.css"
 
-type Entry = { readonly slug: string; readonly title: string }
+export type NavEntry = { readonly slug: string; readonly label: string }
+export type NavGroup = { readonly title: string; readonly entries: readonly NavEntry[] }
 
-export function Sidebar({
-  nav,
-}: {
-  nav: { components: readonly Entry[]; guides: readonly Entry[] }
-}) {
+const FRAMEWORKS = [
+  { name: "React", ready: true },
+  { name: "Vue", ready: false },
+  { name: "Svelte", ready: false },
+  { name: "Solid", ready: false },
+  { name: "Angular", ready: false },
+] as const
+
+export function Sidebar({ groups }: { groups: readonly NavGroup[] }) {
   const path = usePathname()
-  const group = (label: string, entries: readonly Entry[]) => (
-    <div className={styles.group}>
-      <p className={styles.label}>{label}</p>
-      <ul>
-        {entries.map(({ slug, title }) => {
-          const href = `/docs/${slug}/`
-          return (
-            <li key={slug}>
-              <Link href={href} aria-current={path === href ? "page" : undefined}>
-                {title}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
+  const [query, setQuery] = useState("")
+  const q = query.trim().toLowerCase()
+
   return (
     <aside className={styles.side} aria-label="Documentation">
-      <Link
-        href="/docs/"
-        className={styles.overview}
-        aria-current={path === "/docs/" ? "page" : undefined}
-      >
-        Overview
-      </Link>
-      {group("Components", nav.components)}
-      {group("Guides", nav.guides)}
+      <div className={styles.frameworks}>
+        <p className={styles.label}>Framework</p>
+        <div className={styles.fwList}>
+          {FRAMEWORKS.map((f) => (
+            <Toggle.Root
+              key={f.name}
+              className={styles.fw}
+              pressed={f.ready}
+              disabled={!f.ready}
+              focusableWhenDisabled
+              title={f.ready ? undefined : `${f.name} is planned`}
+            >
+              {f.name}
+              {!f.ready && <small>soon</small>}
+            </Toggle.Root>
+          ))}
+        </div>
+      </div>
+
+      <TextField.Root className={styles.filter} value={query} onValueChange={(v) => setQuery(v)}>
+        <TextField.Label className={styles.visuallyHidden}>Filter pages</TextField.Label>
+        <TextField.Input className={styles.filterInput} placeholder="Filter…" />
+      </TextField.Root>
+
+      <nav className={styles.groups}>
+        {groups.map((g) => {
+          const entries = q ? g.entries.filter((e) => e.label.toLowerCase().includes(q)) : g.entries
+          if (entries.length === 0) return null
+          return (
+            <div key={g.title} className={styles.group}>
+              <p className={styles.label}>
+                {g.title}
+                <span>{entries.length}</span>
+              </p>
+              <ul>
+                {entries.map(({ slug, label }) => {
+                  const href = `/docs/${slug}/`
+                  return (
+                    <li key={slug}>
+                      <Link href={href} aria-current={path === href ? "page" : undefined}>
+                        {label}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
+      </nav>
     </aside>
   )
 }

@@ -42,6 +42,7 @@
 
 :root {
   --display: var(--font-unbounded), sans-serif;
+  --bar-h: 64px;
   --mono: var(--font-mono), ui-monospace, monospace;
   /* one soft spring for every interaction: settles without bouncing around */
   --spring: cubic-bezier(0.22, 1, 0.36, 1);
@@ -51,6 +52,7 @@
 
 html {
   background: var(--bg);
+  scroll-padding-top: calc(var(--bar-h) + 16px);
 }
 body {
   background: var(--bg);
