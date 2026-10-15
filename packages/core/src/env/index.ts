@@ -2,6 +2,10 @@ export type {
   Announcement,
   Announcer,
   AnnouncerEnv,
+  Clock,
+  ClockEnv,
+  CollectionLayout,
+  CollectionLayoutEnv,
   DomEnv,
   DomRoot,
   LocaleEnv,
@@ -19,3 +23,20 @@ export type {
   TimerHandle,
 } from "./capabilities"
 export { type DomEnvironment, type DomEnvironmentOptions, domEnvironment } from "./dom-environment"
+export type {
+  Align,
+  AnchorSource,
+  CollisionAvoidance,
+  CollisionPadding,
+  LogicalSide,
+  Placement,
+  PositionEnv,
+  PositionHandle,
+  Positioning,
+  PositioningOptions,
+  PositioningProps,
+  PositionRequest,
+  RectLike,
+  Side,
+  VirtualAnchor,
+} from "./position"

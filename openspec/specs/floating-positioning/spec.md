@@ -1,13 +1,12 @@
-## Purpose
+# floating-positioning Specification
 
+## Purpose
 Places an anchored popup (popover, tooltip, menu, listbox, picker, tour step)
 next to its anchor, keeps it there while the page scrolls, resizes or zooms,
 and keeps it usable in small viewports. Exposes the result as `data-*`
 attributes and CSS custom properties so headless consumers can style and
 animate it.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Placement Options
 
 Positioning SHALL accept the following, all read live on every positioning pass:
@@ -26,7 +25,7 @@ Positioning SHALL accept the following, all read live on every positioning pass:
 - `tracking`: `auto`, `frame` or `none`.
 - `sideLock`: `none` or `open`.
 - `inline`: for anchors that wrap across lines.
-- `anchor`: see Anchors.
+- the anchor, passed as the positioning request's anchor source (the component maps its own `anchor` prop to it), not as a positioning option: see Anchors.
 - `mode`: `auto` or `manual`.
 
 Each consuming component SHALL declare its own defaults for these options. A
@@ -300,9 +299,15 @@ mount.
 
 #### Scenario: Flip does not cause a ResizeObserver loop
 
-- **WHEN** a growing anchor makes an open combobox list flip from bottom to
-  top
+- **WHEN** a growing anchor makes an open popup using the `popup` preset flip from
+  bottom to top
 - **THEN** no window `error` event with "ResizeObserver loop" is dispatched
+
+#### Scenario: Dropdown keeps its side while open
+
+- **WHEN** a growing anchor would make an open list using the `dropdown` preset
+  (sideLock "open") flip
+- **THEN** the list keeps the side it opened on, and only its available size changes
 
 #### Scenario: Anchor inside an animating dialog
 
@@ -572,3 +577,4 @@ SHALL say so.
 
 - **WHEN** the layout invariant runs in jsdom
 - **THEN** it is skipped, and the summary reports it as unexercised
+

@@ -75,6 +75,7 @@ export {
   resolvePortalTarget,
   syncPortalHost,
 } from "./portal"
+export * from "./position"
 export { waitForExit } from "./presence"
 export {
   createPress,

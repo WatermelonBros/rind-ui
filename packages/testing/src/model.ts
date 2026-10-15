@@ -25,6 +25,7 @@ import { type GraphEdge, type MachineGraph, type Path, paths, toGraph } from "./
 import { checkGeneric, genericInvariants, type StepFacts } from "./invariants"
 
 /** Contracts whose jsdom limitation was already reported in this run. */
+const layoutNoted = new Set<string>()
 const simulatedNoted = new Set<string>()
 
 /** VoiceOver in Chrome on macOS: the Apple preset with the Blink engine. */
@@ -656,6 +657,18 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     simulatedNoted.add(contract.scope)
     console.info(
       `[rind-ui] ${contract.scope}: modal checks verified the inert attributes and scroll-lock styles only; inert behaviour (focus and pointer blocking) is verified in a real browser`,
+    )
+  }
+  // Without layout the anchored geometry checks cannot run: say so, once.
+  if (
+    contract.traits.includes("anchored") &&
+    typeof navigator !== "undefined" &&
+    navigator.userAgent.includes("jsdom") &&
+    !layoutNoted.has(contract.scope)
+  ) {
+    layoutNoted.add(contract.scope)
+    console.info(
+      `[rind-ui] ${contract.scope}: anchored layout checks unexercised (no layout in jsdom); placement before focus was checked`,
     )
   }
   const reached = new Set<string>()

@@ -26,6 +26,13 @@ export interface ElementInfo {
   readonly animations: number
   /** The element's identity across snapshots of one page (same node, same number). */
   readonly node: number
+  /** Its border box in viewport coordinates (all zero without layout). */
+  readonly rect: {
+    readonly x: number
+    readonly y: number
+    readonly width: number
+    readonly height: number
+  }
   /** Items of one set share it (parent element and aria-level), for set metadata. */
   readonly group: string
   /** Ids of its ancestors, nearest first. */
@@ -60,6 +67,14 @@ export interface DomSnapshot {
   readonly outside: Readonly<Record<string, Readonly<Record<string, string>>>>
   /** Live regions (explicit `aria-live` other than "off", or by role) inside the parts. */
   readonly liveRegions: readonly string[]
+  /** The visual viewport, and whether the page has real layout (not jsdom). */
+  readonly viewport: {
+    readonly x: number
+    readonly y: number
+    readonly width: number
+    readonly height: number
+    readonly layout: boolean
+  }
 }
 
 const LIVE_ROLES = ["status", "alert", "log", "marquee", "timer"]
@@ -196,6 +211,10 @@ export function collectDom(arg: {
   const info = (el: Element): ElementInfo => ({
     describe: describe(el),
     node: identity(el),
+    rect: (() => {
+      const r = el.getBoundingClientRect()
+      return { x: r.x, y: r.y, width: r.width, height: r.height }
+    })(),
     part: own(el) ? el.getAttribute("data-part") : null,
     role: roleOf(el),
     name: norm(computeAccessibleName(el)),
@@ -297,6 +316,17 @@ export function collectDom(arg: {
     html: attrsOf(doc.documentElement),
     body: attrsOf(doc.body),
     outside,
+    viewport: (() => {
+      const view = doc.defaultView
+      const vv = view?.visualViewport
+      return {
+        x: vv?.offsetLeft ?? 0,
+        y: vv?.offsetTop ?? 0,
+        width: vv?.width ?? view?.innerWidth ?? 0,
+        height: vv?.height ?? view?.innerHeight ?? 0,
+        layout: !navigator.userAgent.includes("jsdom") && (view?.innerWidth ?? 0) > 0,
+      }
+    })(),
     liveRegions: elements.filter(isLive).map(describe),
   }
 }

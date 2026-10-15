@@ -29,7 +29,13 @@ export {
   toGraph,
   uncovered,
 } from "./graph"
-export { checkGeneric, genericInvariants, type StepFacts, traitInvariants } from "./invariants"
+export {
+  checkGeneric,
+  genericInvariants,
+  layoutInvariant,
+  type StepFacts,
+  traitInvariants,
+} from "./invariants"
 export {
   type ConsumerInvariant,
   currentRun,
@@ -39,6 +45,7 @@ export {
   type TestMachineOptions,
   testMachine,
 } from "./model"
+export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
 export { missingStateStories, type StateStories } from "./state-stories"
 export { liveAnnouncements, spokenLog } from "./virtual-sr"

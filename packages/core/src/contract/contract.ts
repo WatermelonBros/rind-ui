@@ -12,6 +12,8 @@ export type Trait =
   | "modal"
   /** Content that animates out: data-state="closed" until removed, removed after its exit. */
   | "presence"
+  /** An anchored popup (positioner part): placed before focus, and laid out next to its anchor. */
+  | "anchored"
   | "composite-roving"
   | "composite-activedescendant"
   | "selectable"

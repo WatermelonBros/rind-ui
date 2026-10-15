@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-floating-positioning (r1) | — | packages/core/src/dom/position/track.ts:~280 | pagehide stops tracking but ignores event.persisted and nothing re-arms on pageshow — a bfcache restore leaves an open popup untracked |
+| add-floating-positioning (r1) | — | positioning tests | Ariakit#7625 keyboard-open test can't scroll anyway (unplaced popup is fixed at origin); keyboard-shrink emulated by pinch-zoom; pinch test uses dropdown (no align flip); iframe-removed test counts only window/document/visualViewport listeners |
+| add-floating-positioning (r1) | — | packages/core/src/dom/inert-outside.ts | opener exclusion `filter(el => !el.contains(opener))` drops a whole element containing the opener — a non-portalled layer registering a root that wraps trigger + exiting content leaves that content non-inert during exit; exclude only the opener's own marking path |
+| add-floating-positioning (r1) | — | packages/theme/src/overlay.css | generic [data-part="positioner"] rule reset by scoped positioner.css; scoping the overlay rule would be cleaner |
 | add-overlay-infrastructure (found during add-collections) | — | packages/core/src/dom/presence.dom.test.ts | **CI risk**: "waits for the animation that replaces a cancelled one (retarget)" flakes in WebKit under full-suite load (passes 5/5 alone) — stabilise (deterministic animation control) before CI runs WebKit on every PR |
 | add-collections (r1) | — | packages/core/src/collection/composite.ts:66 | `tabStop` doesn't map a hidden HIGHLIGHTED node to its nearest visible ancestor (spec: selected or highlighted); transient (repair follows) |
 | add-collections (r1) | — | packages/core/src/collection/typeahead.ts:70 | Repeated-character detection is case-sensitive ("d","D","d" over Dog/Duck/Deer resets); compare case-folded |

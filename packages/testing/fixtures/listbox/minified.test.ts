@@ -4,8 +4,7 @@
 // `dist` is the published (unminified) build; the test minifies a copy of it with tsdown so
 // the published output is never touched.
 import { execFileSync } from "node:child_process"
-import { existsSync, mkdtempSync, rmSync } from "node:fs"
-import { tmpdir } from "node:os"
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs"
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
@@ -13,7 +12,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest"
 type Core = typeof import("@rind-ui/core")
 
 const coreDir = join(import.meta.dirname, "../../../core")
-const out = mkdtempSync(join(tmpdir(), "rind-minified-"))
+// Inside @rind-ui/core, so the bundle's dependencies (@floating-ui/dom) resolve from it.
+const cache = join(coreDir, "node_modules/.cache")
+mkdirSync(cache, { recursive: true })
+const out = mkdtempSync(join(cache, "rind-minified-"))
 let core: Core
 
 beforeAll(async () => {

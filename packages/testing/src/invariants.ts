@@ -468,6 +468,86 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     }
     return out
   },
+  /**
+   * Anchored popups: focus enters the popup only after its first placement; in a real
+   * browser, the placed popup lies inside the visual viewport, on the side `data-side`
+   * reports (not over its anchor on that axis), and a centred arrow points at the anchor.
+   * Without layout (jsdom) only the focus rule runs.
+   */
+  anchored: (f) => {
+    const pos = f.after.parts.find((p) => p.part === "positioner")
+    if (!pos) return []
+    const out: string[] = []
+    const placing = pos.attrs["data-placing"] !== undefined
+    const focused = f.after.focus.element
+    if (
+      placing &&
+      focused &&
+      pos.id &&
+      (focused.id === pos.id || focused.within.includes(pos.id))
+    ) {
+      out.push(`focus entered ${pos.describe} before its first placement`)
+    }
+    if (placing || !f.after.viewport.layout || pos.hidden) return out
+    // The tracker records the effective collision padding and the anchoring element's id.
+    const style = (name: string) =>
+      new RegExp(`${name}:\\s*([^;]*)`).exec(pos.attrs["style"] ?? "")?.[1]?.trim() ?? ""
+    const [pt = 0, pr = pt, pb = pt, pl = pr] = style("--rind-collision-padding")
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => Number.parseFloat(x))
+    const vp = f.after.viewport
+    // Inside the visual viewport minus the padding (a popup capped to it fits exactly).
+    const v = {
+      x: vp.x + pl,
+      y: vp.y + pt,
+      width: vp.width - pl - pr,
+      height: vp.height - pt - pb,
+    }
+    const r = pos.rect
+    // [edge, overflow past the padded boundary, its padding]
+    const edges = [
+      ["top", v.y - r.y, pt],
+      ["left", v.x - r.x, pl],
+      ["bottom", r.y + r.height - (v.y + v.height), pb],
+      ["right", r.x + r.width - (v.x + v.width), pr],
+    ] as const
+    const side = pos.attrs["data-side"] ?? "?"
+    for (const [edge, over, padding] of edges) {
+      if (over <= 0.5) continue
+      const past = over - padding
+      out.push(
+        past > 0.5
+          ? `${pos.describe} (side ${side}) overflows the viewport's ${edge} edge by ${Math.round(past)} px (collision padding ${padding} px)`
+          : `${pos.describe} (side ${side}) is inside the ${edge} collision padding (${padding} px) by ${Math.round(over)} px`,
+      )
+    }
+    // Side and arrow checks against the element that anchors it: none for a point or virtual
+    // anchor (a context menu at the pointer may overlap its trigger).
+    const anchorId = style("--rind-anchor-id").replace(/^"|"$/g, "")
+    if (anchorId === "") return out
+    const anchor = f.after.parts.find((p) => p.id === anchorId && !p.hidden)
+    if (!anchor || pos.attrs["data-anchor-hidden"] !== undefined) return out
+    const a = anchor.rect
+    const wrongSide =
+      (side === "bottom" && r.y < a.y + a.height - 0.5) ||
+      (side === "top" && r.y + r.height > a.y + 0.5) ||
+      (side === "right" && r.x < a.x + a.width - 0.5) ||
+      (side === "left" && r.x + r.width > a.x + 0.5)
+    if (wrongSide) out.push(`${pos.describe} is not on the ${side} of ${anchor.describe}`)
+    const arrow = f.after.parts.find((p) => p.part === "arrow" && !p.hidden)
+    if (arrow && arrow.attrs["data-uncentered"] === undefined) {
+      const vertical = side === "top" || side === "bottom"
+      const tip = vertical
+        ? arrow.rect.x + arrow.rect.width / 2
+        : arrow.rect.y + arrow.rect.height / 2
+      const [from, to] = vertical ? [a.x, a.x + a.width] : [a.y, a.y + a.height]
+      if (tip < from - 0.5 || tip > to + 0.5) {
+        out.push(`${arrow.describe} does not point at ${anchor.describe}`)
+      }
+    }
+    return out
+  },
   /** (8) A roving composite is one Tab stop. */
   "composite-roving": (f) => {
     // Controls inside a row (`item-control`) belong to the row's own tab group.
@@ -749,3 +829,6 @@ export function checkGeneric(facts: StepFacts): readonly string[] {
   }
   return out
 }
+
+/** The anchored layout checks (trait `anchored`), for a single snapshot outside the runner. */
+export const layoutInvariant: GenericInvariant = (f) => traitInvariants.anchored?.(f) ?? []

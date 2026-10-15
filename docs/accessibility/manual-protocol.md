@@ -58,3 +58,16 @@ Add one object per combination to `records` in [tested-with.json](tested-with.js
 
 `result` is `pass` or `issues` (link the issue in `notes`). A component page shows the
 table where it contains `<!-- tested-with:dialog --><!-- /tested-with -->`.
+
+## Device checklist: anchored popups (positioning)
+
+Automated tests cannot reproduce on-screen keyboards or pinch-zoom; run these on real
+devices for every component that positions a popup (Select, Combobox, Menu, Popover …).
+
+- [ ] **iOS Safari, on-screen keyboard**: focus a combobox input near the bottom of the
+      page; the list flips above the input or caps its height, and stays attached and
+      readable while the keyboard is open.
+- [ ] **iOS Safari, pinch-zoom**: open a menu, pinch-zoom and pan; the menu stays attached
+      to its trigger and is not dragged away from it. It remains usable and scrollable.
+- [ ] **Android Chrome, keyboard**: the same combobox check as iOS; the popup follows the
+      visual viewport and does not end up behind the keyboard.

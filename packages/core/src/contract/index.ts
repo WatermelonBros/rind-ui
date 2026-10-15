@@ -38,3 +38,4 @@ export type {
   PartHoverOptions,
 } from "./env"
 export type { GenericInvariantId } from "./invariant-ids"
+export { positioningQueries } from "./positioning"

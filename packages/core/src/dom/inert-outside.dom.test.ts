@@ -394,3 +394,25 @@ describe("stale layers", () => {
     expect(() => stack.refresh()).not.toThrow()
   })
 })
+
+describe("exiting layers and their trigger", () => {
+  it("a registered trigger is not made inert while the layer exits (focus returns to it)", () => {
+    document.body.innerHTML = `<button id="t">t</button><div id="c"></div>`
+    const t = document.getElementById("t") as HTMLElement
+    const c = document.getElementById("c") as HTMLElement
+    const stack = getLayerStack(document)
+    hideOutsideModal(document)
+    const h = stack.push({
+      id: layerId("p"),
+      kind: "popover",
+      modal: false,
+      opener: () => t,
+      elements: () => [t, c],
+    })
+    h.release()
+    expect(t.hasAttribute("inert")).toBe(false)
+    expect(c.hasAttribute("inert")).toBe(true)
+    h.dispose()
+    expect(c.hasAttribute("inert")).toBe(false)
+  })
+})

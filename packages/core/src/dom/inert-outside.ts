@@ -156,7 +156,11 @@ export function hideOutsideModal(doc: Document): void {
     const ids = exiting.map((l) => l.id).join("|")
     if (ids !== exitingIds) {
       const previous = undoExiting
-      const own = exiting.flatMap((l) => elementsOf(stack, l))
+      // The exiting content, never a registered trigger: focus returns to it right now.
+      const own = exiting.flatMap((l) => {
+        const opener = stack.options(l.id)?.opener?.() ?? null
+        return elementsOf(stack, l).filter((el) => !opener || !el.contains(opener))
+      })
       for (const el of own) mark(marks, el)
       undoExiting = () => {
         for (const el of own) unmark(marks, el)

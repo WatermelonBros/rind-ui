@@ -22,6 +22,7 @@ export type GenericInvariantId =
   | "restores-focus"
   | "modal"
   | "presence"
+  | "anchored"
   | "composite-roving"
   | "composite-activedescendant"
   | "selectable"
