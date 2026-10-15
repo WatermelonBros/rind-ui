@@ -1,0 +1,74 @@
+/*
+ * Design tokens. Every component stylesheet reads these and nothing else, so a
+ * consumer re-themes rind-ui by overriding custom properties, never selectors.
+ *
+ * Colours use light-dark(): the OS preference picks the palette unless the page
+ * pins one with `data-theme="light"` or `data-theme="dark"` on any ancestor.
+ */
+:root {
+  color-scheme: light dark;
+
+  --rind-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --rind-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --rind-text-xs: 0.75rem;
+  --rind-text-sm: 0.875rem;
+  --rind-text-md: 1rem;
+  --rind-text-lg: 1.125rem;
+
+  --rind-space-1: 0.25rem;
+  --rind-space-2: 0.5rem;
+  --rind-space-3: 0.75rem;
+  --rind-space-4: 1rem;
+  --rind-space-6: 1.5rem;
+  --rind-space-8: 2rem;
+
+  --rind-radius-sm: 4px;
+  --rind-radius-md: 8px;
+  --rind-radius-lg: 12px;
+  --rind-radius-full: 9999px;
+
+  --rind-color-bg: light-dark(#ffffff, #111113);
+  --rind-color-surface: light-dark(#f7f7f8, #18181b);
+  --rind-color-surface-raised: light-dark(#ffffff, #1f1f23);
+  --rind-color-border: light-dark(#e4e4e7, #2e2e33);
+  --rind-color-border-strong: light-dark(#c9c9cf, #45454d);
+  --rind-color-text: light-dark(#18181b, #ededef);
+  --rind-color-text-muted: light-dark(#5f5f69, #a1a1aa);
+  --rind-color-accent: light-dark(#3b5bdb, #7c94f5);
+  --rind-color-accent-hover: light-dark(#3249c0, #93a7f7);
+  --rind-color-accent-text: light-dark(#ffffff, #0b0b0d);
+  --rind-color-danger: light-dark(#c92a2a, #ff8787);
+  --rind-color-focus: var(--rind-color-accent);
+  --rind-color-overlay: light-dark(rgb(9 9 11 / 0.45), rgb(0 0 0 / 0.6));
+
+  --rind-shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
+  --rind-shadow-lg: 0 12px 32px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5));
+
+  --rind-duration-fast: 120ms;
+  --rind-duration-normal: 200ms;
+  --rind-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Focus is an outline (never box-shadow alone: forced colors drop shadows). */
+  --rind-focus-width: 2px;
+  --rind-focus-offset: 2px;
+  --rind-focus-color: var(--rind-color-focus);
+
+  /* Minimum pointer target (WCAG 2.5.8); smaller parts extend a pseudo-element to it. */
+  --rind-hit-area: 24px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --rind-duration-fast: 0ms;
+    --rind-duration-normal: 0ms;
+  }
+}

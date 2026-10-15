@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  rind-ui is a headless UI component library written from scratch in TypeScript 7.
+  Goal: a superset of every headless library (inventory in docs/components.md),
+  testable by design, with AI-UI primitives, and easy for LLMs to use.
+  Read docs/decisions/ (why) and CLAUDE.md (conventions) before writing artifacts.
+
+  Architecture: every component has four layers — machine (pure TS state machine,
+  declared statically), connect (state -> framework-neutral props, owns aria-* and
+  data-*), parts (thin per-framework adapters; React first), contract (actions and
+  queries consumed by @rind-ui/testing drivers in Testing Library and Playwright).
+  Packages: @rind-ui/core (no framework), @rind-ui/react, @rind-ui/testing,
+  @rind-ui/theme (optional CSS on data-scope/data-part/data-state).
+  Tooling: pnpm 11 workspaces, Turborepo, tsdown, Biome, Vitest browser mode,
+  Storybook 10, Changesets.
+
+  Accessibility follows the WAI-ARIA APG pattern for each component and is
+  specified as behaviour. Each component is preceded by a research note in
+  docs/research/<component>.md comparing Ark UI, Radix, React Aria, Base UI,
+  Headless UI, Ariakit, Reka UI, Bits UI and Kobalte.
+
+rules:
+  proposal:
+    - Link the research note (docs/research/<component>.md) for any component change.
+    - Include a Non-goals section.
+  specs:
+    - Specify keyboard interactions, ARIA roles/attributes and announcements as requirements with scenarios.
+    - Specify the contract (driver actions and queries) as requirements.
+    - Specify the data-* attributes each part exposes.
+  design:
+    - Show the machine's states and events, and which shared core/dom or core/collection modules it uses.
+  tasks:
+    - 'Every component change includes tasks for machine, connect, parts, contract, driver, model-based tests, theme stylesheet (following add-theme-system''s convention: `@layer rind.components`, `:where()` selectors, `--rind-<scope>-*` tokens read with a fallback and never declared, a variant-matrix family, a `data-tone="danger"` state), stories and docs page — in that order: the theme stylesheet comes BEFORE the stories, so stories show the themed component and axe colour-contrast checks run on real styles.'

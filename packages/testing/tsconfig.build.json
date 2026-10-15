@@ -1,0 +1,6 @@
+{
+  "//": "Declarations for the published entries only: fixtures and tests import the Storybook stories, and generating declarations for them wrote .d.ts files next to the stories.",
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.test-d.ts"]
+}

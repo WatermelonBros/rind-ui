@@ -1,0 +1,8 @@
+/*
+ * Entry point. Component stylesheets are added here as components land, each
+ * one selecting on `[data-scope="<component>"][data-part="<part>"]` and
+ * `[data-state]` — the theme never relies on class names.
+ */
+@import "./tokens.css";
+@import "./base.css";
+@import "./overlay.css";

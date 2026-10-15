@@ -1,0 +1,21 @@
+export type {
+  Announcement,
+  Announcer,
+  AnnouncerEnv,
+  DomEnv,
+  DomRoot,
+  LocaleEnv,
+  LocaleSource,
+  ModalityEnv,
+  ModalitySource,
+  MotionEnv,
+  MotionPreference,
+  PlatformFlags,
+  PlatformInfo,
+  Scheduler,
+  SchedulerEnv,
+  StyleEnv,
+  StyleInjection,
+  TimerHandle,
+} from "./capabilities"
+export { type DomEnvironment, type DomEnvironmentOptions, domEnvironment } from "./dom-environment"

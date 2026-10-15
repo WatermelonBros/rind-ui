@@ -1,0 +1,8 @@
+packages:
+  - packages/*
+  - apps/*
+
+# pnpm 11 asks which dependencies may run install scripts. esbuild ships its binary as a
+# per-platform optional dependency, so its postinstall is not needed.
+allowBuilds:
+  esbuild: false

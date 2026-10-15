@@ -1,0 +1,20 @@
+# rind-ui
+
+> Headless React components: behaviour, accessibility and state, styled through data-* attributes.
+
+## Guides
+
+- [Announcements](docs/guides/announcements.md): Some changes have no focus move to carry them — "3 results", "Copied", a streamed answer. Components announce them through the environment's `Announcer`; they never render their own live region.
+- [Focus and input modality](docs/guides/focus-and-modality.md): Every focusable part carries `data-focus` while focused and `data-focus-visible` only when the focus came from the keyboard or from assistive technology, so a theme draws the focus ring for keyboard and screen-reader users and never after a mouse click.
+- [Collapsed content that find-in-page can reach](docs/guides/hidden-until-found.md): Collapsible content can render closed as `hidden="until-found"`: hidden from view and from assistive technology, but the browser's find-in-page (and fragment links) can still match it. When a match is found the browser fires `beforematch`; the component opens with reason `find-in-page` and marks the content `data-reveal="find-in-page"`.
+- [Keyboard, composition and right-to-left](docs/guides/keyboard-and-rtl.md): Components read keys as **logical keys** — `NEXT`, `PREV`, `FIRST`, `LAST`, `PAGE_NEXT`, `PAGE_PREV`, `EXPAND`, `COLLAPSE`, `INCREASE`, `DECREASE`, `ACTIVATE`, `DISMISS`, `CONTEXT_MENU` — so direction, orientation and platform are handled once.
+- [Messages, locale and RindProvider](docs/guides/messages-and-provider.md): Every user-visible string a component owns (labels it generates, hints, announcements) is a typed **message** with an English default, overridable per component or for a whole tree. Numbers, plurals, sorting and sentence splitting use `Intl` with the component's locale (`format.number`, `plural`, `format.collator`, `format.segmenter`; instances are cached).
+- [Overlays](docs/guides/overlays.md): Dialogs, popovers, menus and drawers share one layer stack per document that decides who is on top, what dismisses what, where focus goes, what is inert and whether the page scrolls; a component only registers its layer.
+- [Press, hover and long press](docs/guides/press-and-hover.md): `usePress` (React) / `createPress` (core) turn pointer, mouse, keyboard and screen-reader input into one stream of machine events, so a part activates the same way however it is used: `PRESS.START`, `PRESS.UP`, `PRESS.END`, `PRESS`, `PRESS.CANCEL`, plus `LONG_PRESS` and `CONTEXT_MENU` when enabled.
+- [Testing accessibility](docs/guides/testing-accessibility.md): `@rind-ui/testing` checks accessibility as part of every model-based test, not as a separate suite.
+- [VisuallyHidden](docs/guides/visually-hidden.md): Content read by assistive technology but not shown — never `display: none` or `visibility: hidden`, which also hide it from screen readers.
+
+## Accessibility
+
+- [Support matrix](docs/accessibility/support-matrix.md): which screen reader and browser combinations are supported, and how each is tested.
+- [Quirks](docs/accessibility/quirks.md): every browser and assistive-technology workaround, with its bug links.

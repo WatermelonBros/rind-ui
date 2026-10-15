@@ -1,0 +1,55 @@
+/*
+ * Layer parts (dialog, popover, toast …). Generic on data-part so every overlay
+ * component inherits it. No [hidden] rule: hidden="until-found" must keep working.
+ * The portal host [data-rind-portal] gets no rule: it only carries dir/lang, and
+ * display: contents would drop it from the accessibility tree in some engines.
+ */
+[data-part="backdrop"][data-state] {
+  position: fixed;
+  inset: 0;
+  inset-inline-end: var(--rind-scrollbar-width, 0px);
+  background: light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.6));
+  transition: opacity var(--rind-duration-normal) var(--rind-ease-out);
+}
+
+[data-part="positioner"] {
+  position: fixed;
+  inset: 0;
+  /* Scroll lock removes the scrollbar; this keeps centred content from shifting. */
+  inset-inline-end: var(--rind-scrollbar-width, 0px);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+[data-part="content"][role="dialog"] {
+  pointer-events: auto;
+  background: var(--rind-color-surface-raised);
+  color: var(--rind-color-text, inherit);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid currentcolor;
+  transition:
+    opacity var(--rind-duration-normal) var(--rind-ease-out),
+    transform var(--rind-duration-normal) var(--rind-ease-out);
+}
+
+[data-part="backdrop"][data-state="open"],
+[data-part="content"][role="dialog"][data-state="open"] {
+  opacity: 1;
+  transform: none;
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+[data-part="content"][role="dialog"][data-state="open"] {
+  @starting-style {
+    transform: scale(0.97);
+  }
+}
+
+[data-part="backdrop"][data-state="closed"],
+[data-part="content"][role="dialog"][data-state="closed"] {
+  opacity: 0;
+}

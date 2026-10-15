@@ -1,0 +1,17 @@
+{
+  "name": "@rind-ui/theme",
+  "version": "0.0.0",
+  "description": "A calm default theme for rind-ui, styled through data-scope / data-part attributes.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "src"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.css",
+    "./tokens.css": "./src/tokens.css"
+  }
+}

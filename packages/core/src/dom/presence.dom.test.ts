@@ -1,0 +1,168 @@
+import { afterEach, describe, expect, it } from "vitest"
+import { createService } from "../machine/service"
+import { presenceMachine } from "../presence/presence.machine"
+import { waitForExit } from "./presence"
+
+const inBrowser = !navigator.userAgent.includes("jsdom")
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+
+/** Tracks whether a promise has settled, without awaiting it. */
+function track(p: Promise<unknown>) {
+  const t = { done: false }
+  void p.then(() => {
+    t.done = true
+  })
+  return t
+}
+
+function mount(css = "") {
+  const style = document.createElement("style")
+  style.textContent = `@keyframes fade { from { opacity: 1 } to { opacity: 0 } }
+@keyframes spin { to { transform: rotate(360deg) } } ${css}`
+  const el = document.createElement("div")
+  el.textContent = "x"
+  document.body.append(style, el)
+  return el
+}
+
+afterEach(() => {
+  document.body.innerHTML = ""
+})
+
+describe("waitForExit", () => {
+  it("jsdom: resolves in the same task when getAnimations is absent", async () => {
+    if (inBrowser) return
+    const el = mount()
+    let timer = false
+    setTimeout(() => {
+      timer = true
+    }, 0)
+    await waitForExit(el)
+    expect(timer).toBe(false)
+  })
+
+  it.runIf(inBrowser)("waits for a CSS transition, not less", async () => {
+    const el = mount()
+    el.style.transition = "opacity 200ms linear"
+    el.style.opacity = "1"
+    void el.offsetWidth
+    await frame()
+    el.style.opacity = "0"
+    const t = track(waitForExit(el))
+    await sleep(50)
+    expect(t.done).toBe(false)
+    await sleep(350)
+    expect(t.done).toBe(true)
+  })
+
+  it.runIf(inBrowser)("waits for a finite CSS keyframe animation", async () => {
+    const el = mount()
+    el.style.animation = "fade 200ms linear forwards"
+    const t = track(waitForExit(el))
+    await sleep(50)
+    expect(t.done).toBe(false)
+    await sleep(350)
+    expect(t.done).toBe(true)
+  })
+
+  it.runIf(inBrowser)("waits for a Web Animation", async () => {
+    const el = mount()
+    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150 })
+    const t = track(waitForExit(el))
+    await sleep(40)
+    expect(t.done).toBe(false)
+    await sleep(300)
+    expect(t.done).toBe(true)
+  })
+
+  it.runIf(inBrowser)(
+    "does not wait for an animation that finished before observation",
+    async () => {
+      const el = mount()
+      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 10, fill: "forwards" })
+      await sleep(50)
+      const t = track(waitForExit(el))
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(t.done).toBe(true)
+    },
+  )
+
+  it.runIf(inBrowser)("ignores infinite animations on a child and on the element", async () => {
+    const el = mount()
+    const child = document.createElement("span")
+    el.append(child)
+    child.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, iterations: Infinity })
+    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 100, iterations: Infinity })
+    await waitForExit(el, { subtree: true })
+  })
+
+  it.runIf(inBrowser)("ignores a child's finite animation unless subtree", async () => {
+    const el = mount()
+    const child = document.createElement("span")
+    el.append(child)
+    child.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 })
+    await waitForExit(el)
+    const t = track(waitForExit(el, { subtree: true }))
+    await sleep(50)
+    expect(t.done).toBe(false)
+    await sleep(350)
+    expect(t.done).toBe(true)
+  })
+
+  // A hidden document cannot be emulated reliably in the test browser, so `doc.hidden`
+  // short-circuiting is not covered here.
+
+  it.runIf(inBrowser)("settles after the signal aborts", async () => {
+    const el = mount()
+    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 5000 })
+    const controller = new AbortController()
+    const t = track(waitForExit(el, {}, controller.signal))
+    await sleep(30)
+    controller.abort()
+    // Abort is only observed between animations, so end the pending one too.
+    for (const a of el.getAnimations()) a.cancel()
+    await sleep(30)
+    expect(t.done).toBe(true)
+  })
+
+  it.runIf(inBrowser)(
+    "waits for the animation that replaces a cancelled one (retarget)",
+    async () => {
+      const el = mount()
+      el.style.transition = "opacity 200ms linear"
+      el.style.opacity = "1"
+      void el.offsetWidth
+      await frame()
+      el.style.opacity = "0"
+      const t = track(waitForExit(el))
+      await sleep(100)
+      el.style.opacity = "0.5"
+      await sleep(120)
+      expect(t.done).toBe(false)
+      await sleep(350)
+      expect(t.done).toBe(true)
+    },
+  )
+
+  it.runIf(inBrowser)("reopening mid-exit keeps the node present", async () => {
+    const el = mount()
+    const service = createService(
+      presenceMachine,
+      {},
+      { presence: { waitForExit: (signal) => waitForExit(el, {}, signal) } },
+    )
+    service.start()
+    service.send({ type: "OPEN" })
+    service.send({ type: "CLOSE" })
+    el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 })
+    await sleep(50)
+    service.send({ type: "OPEN" })
+    expect(service.getSnapshot().state).toBe("present")
+    await sleep(400)
+    expect(service.getSnapshot().state).toBe("present")
+    expect(el.isConnected).toBe(true)
+    service.stop()
+  })
+})

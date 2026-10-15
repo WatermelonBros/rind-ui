@@ -1,0 +1,64 @@
+name: a11y nightly (real screen readers)
+
+# Golden flows with VoiceOver + WebKit and NVDA + Chrome, matched by key phrases. Never blocks
+# pull requests: a failure opens (or updates) one issue per platform.
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  screen-reader:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            project: voiceover-webkit
+            sr: VoiceOver
+            # Playwright's WebKit build: Playwright cannot drive Safari itself.
+            browser: WebKit
+          - os: windows-latest
+            project: nvda-chrome
+            sr: NVDA
+            browser: Chrome
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rind-ui/storybook build
+      - uses: guidepup/setup-action@0.17.3
+      - run: pnpm exec playwright install --with-deps webkit chromium
+      - name: Golden flows
+        working-directory: a11y-nightly
+        run: pnpm exec playwright test --project ${{ matrix.project }}
+      # Runs after any failure, including install/build/server failures (no results.json).
+      - name: Open or update the issue
+        if: ${{ failure() }}
+        working-directory: a11y-nightly
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SR: ${{ matrix.sr }}
+          BROWSER: ${{ matrix.browser }}
+        run: |
+          node report.mjs > body.md
+          [ -s body.md ] || exit 0
+          gh label create accessibility --color 5319e7 --force
+          title="a11y nightly: ${{ matrix.sr }} + ${{ matrix.browser }} golden flows failing"
+          existing=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file body.md
+          else
+            gh issue create --title "$title" --label accessibility --body-file body.md
+          fi

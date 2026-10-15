@@ -1,0 +1,75 @@
+{
+  "name": "@rind-ui/testing",
+  "version": "0.0.0",
+  "description": "Test drivers and environment setup for rind-ui components (Testing Library and Playwright).",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "./dist/setup.mjs",
+    "./src/setup.ts"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./dom": {
+      "@rind-ui/source": "./src/dom.ts",
+      "types": "./dist/dom.d.mts",
+      "default": "./dist/dom.mjs"
+    },
+    "./playwright": {
+      "@rind-ui/source": "./src/playwright.ts",
+      "types": "./dist/playwright.d.mts",
+      "default": "./dist/playwright.mjs"
+    },
+    "./setup": {
+      "@rind-ui/source": "./src/setup.ts",
+      "types": "./dist/setup.d.mts",
+      "default": "./dist/setup.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown && node scripts/inpage.mjs",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "inpage": "node scripts/inpage.mjs"
+  },
+  "dependencies": {
+    "@rind-ui/core": "workspace:*",
+    "dom-accessibility-api": "^0.7.1"
+  },
+  "devDependencies": {
+    "@rind-ui/react": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rolldown": "1.2.13"
+  },
+  "peerDependencies": {
+    "@testing-library/dom": ">=10",
+    "@testing-library/user-event": ">=14",
+    "playwright": ">=1.40",
+    "@guidepup/virtual-screen-reader": ">=0.33"
+  },
+  "peerDependenciesMeta": {
+    "@testing-library/dom": {
+      "optional": true
+    },
+    "@testing-library/user-event": {
+      "optional": true
+    },
+    "playwright": {
+      "optional": true
+    },
+    "@guidepup/virtual-screen-reader": {
+      "optional": true
+    }
+  }
+}

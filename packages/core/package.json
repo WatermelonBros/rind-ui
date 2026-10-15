@@ -1,0 +1,28 @@
+{
+  "name": "@rind-ui/core",
+  "version": "0.0.0",
+  "description": "Framework-agnostic state machines, DOM utilities and component contracts for rind-ui.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown && node scripts/size.mjs",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "size": "node scripts/size.mjs"
+  },
+  "devDependencies": {
+    "dom-accessibility-api": "^0.7.1",
+    "rolldown": "1.2.13"
+  }
+}
