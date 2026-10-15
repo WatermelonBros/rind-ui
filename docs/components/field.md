@@ -66,6 +66,7 @@ Every attribute of the rendered element is accepted and forwarded.
 | `root` | `data-touched` | Focus has left the field at least once. |
 | `root` | `data-dirty` | The value differs from the first registered value. |
 | `root` | `data-filled` | The value is not empty. |
+| `root` | `data-name` | The Field's `name` (a Form reads it). |
 | `root` | `data-focus` | The control has focus. |
 | `root` | `data-focus-visible` | The control has keyboard focus. |
 | `label` | `data-scope` | "field" |

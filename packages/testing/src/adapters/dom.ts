@@ -412,6 +412,12 @@ function createDomEnv(
       isInert: async () => (await now()).closest("[inert]") !== null,
       attr: async (name) => (await now()).getAttribute(name),
       tagName: async () => (await now()).tagName.toLowerCase(),
+      scoped: (scope, partName) =>
+        handle(`${scope}.${partName} in ${label}`, async () =>
+          Array.from(
+            (await now()).querySelectorAll(`[data-scope="${scope}"][data-part="${partName}"]`),
+          ),
+        ),
       text: async () => normalize((await now()).textContent),
       value: async () => ((await now()) as HTMLInputElement).value ?? "",
       exists: async () => (await resolve()).some(isVisible),

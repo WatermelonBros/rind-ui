@@ -38,6 +38,8 @@ export interface FieldConnectInput {
   readonly control: { readonly id: string; readonly labelable: boolean } | null
   /** The dirty baseline: the value at the Field's first registration. */
   readonly initial: { readonly value: unknown } | null
+  /** The Field's name (`data-name` on the root: a Form's contract reads it). */
+  readonly name?: string | undefined
 }
 
 export function fieldConnect(input: FieldConnectInput) {
@@ -80,6 +82,7 @@ export function fieldConnect(input: FieldConnectInput) {
     },
     root: (): PartProps => ({
       ...data("root"),
+      "data-name": input.name,
       ...focusAttrs(context.focused, input.modality),
     }),
     /** `htmlFor`: the control's id when it is labelable (control-label rule). */

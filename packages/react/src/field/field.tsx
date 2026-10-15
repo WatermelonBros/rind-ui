@@ -4,6 +4,7 @@ import {
   type FieldMessages,
   type FieldPart,
   fieldConnect,
+  fieldDisplay,
   fieldMachine,
   fieldMessages,
   formValues,
@@ -30,6 +31,7 @@ import {
   useState,
 } from "react"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
+import { type FormBinding, useFormBinding } from "../form/form"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment, useMessages } from "../provider"
@@ -124,8 +126,8 @@ function Root({
   dirty,
   errors,
   validate,
-  validationMode = "submit",
-  validationBehavior = "native",
+  validationMode: ownMode,
+  validationBehavior: ownBehavior,
   validationDebounce,
   errorMessageAttribute = "describedby",
   messages: ownMessages,
@@ -148,13 +150,20 @@ function Root({
   const [version, setVersion] = useState(0)
   /** The control that claimed the binding first; any other gets none (zag#2475). */
   const owner = useRef<string | null>(null)
-  const { view, send } = useMachine(fieldMachine, {
+  // Inside a Form: its defaults, its server errors by name, and it leads an attempt.
+  const form = useFormBinding()
+  const validationMode = ownMode ?? form?.validationMode ?? "submit"
+  const validationBehavior = ownBehavior ?? form?.validationBehavior ?? "native"
+  const latest = useRef({ disabled, invalid })
+  latest.current = { disabled, invalid }
+  const { view, send, service } = useMachine(fieldMachine, {
     name,
     disabled,
     readOnly,
     required,
     invalid,
-    errors,
+    errors: errors ?? form?.errorsFor(name),
+    managed: form !== null,
     validate,
     validationMode,
     validationBehavior,
@@ -183,6 +192,7 @@ function Root({
       ? { id: registered.current.control.id, labelable: registered.current.control.labelable }
       : null,
     initial: baseline.current,
+    name,
   })
   const hasErrorPart = useRef(0)
   const controlId = partId("field", instance, "control")
@@ -272,7 +282,32 @@ function Root({
     ],
   )
   const root = useRef<HTMLElement | null>(null)
-  useFieldListeners(root, send, version, registered, hasErrorPart, name)
+  useFieldListeners(root, send, version, registered, hasErrorPart, name, form)
+  // Registered with the Form: it reads the display synchronously (right after an attempt).
+  useEffect(() => {
+    if (!form) return
+    return form.register({
+      id: instance,
+      name,
+      element: () => root.current,
+      attempt: () => send({ type: "SUBMIT.ATTEMPT" }),
+      status: () => {
+        const snap = service.getSnapshot()
+        return snap.state === "validating"
+          ? "validating"
+          : fieldDisplay(snap.state, snap.context, latest.current)
+      },
+      focus: () => registered.current?.control.focus("keyboard"),
+      value: () => registered.current?.control.value(),
+    })
+  }, [form, instance, name, send, service])
+  // A held submission goes on once this Field's async check settled.
+  const wasValidating = useRef(false)
+  useEffect(() => {
+    const validating = view.state === "validating"
+    if (wasValidating.current && !validating) form?.settled()
+    wasValidating.current = validating
+  }, [view.state, form])
   const parts: PartsCtx = {
     instance,
     registry,
@@ -319,6 +354,7 @@ function useFieldListeners(
   registered: { readonly current: { readonly control: RegisteredControl } | null },
   hasErrorPart: { readonly current: number },
   name: string | undefined,
+  formBinding: FormBinding | null,
 ) {
   const env = useEnvironment()
   useEffect(() => {
@@ -360,14 +396,20 @@ function useFieldListeners(
     }
     const form = input.form
     const onReset = (e: Event) => {
+      // Who asked is known now, while the reset is being dispatched (add-form): a framework
+      // reset after a form action keeps the server errors.
+      const keepExternal = formBinding?.resetOrigin() === "framework"
       // After the control reset itself, and only if nobody cancelled the reset.
       env.scheduler.setTimeout(() => {
-        if (!e.defaultPrevented) send({ type: "RESET" })
+        if (!e.defaultPrevented) send({ type: "RESET", keepExternal })
       }, 0)
     }
     // A submission the browser lets through (aria behaviour, or a valid form) is still an
     // attempt: errors display from then on.
-    const onSubmit = () => send({ type: "SUBMIT.ATTEMPT" })
+    // Inside a Form the Form leads the attempt (one per form, one focus, one summary).
+    const onSubmit = () => {
+      if (!formBinding) send({ type: "SUBMIT.ATTEMPT" })
+    }
     input.addEventListener("invalid", onInvalid)
     form?.addEventListener("reset", onReset)
     form?.addEventListener("submit", onSubmit, true)
@@ -381,7 +423,7 @@ function useFieldListeners(
       form?.removeEventListener("submit", onSubmit, true)
       unregister?.()
     }
-  }, [version, send, env, hasErrorPart, name, registered])
+  }, [version, send, env, hasErrorPart, name, registered, formBinding])
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {

@@ -108,7 +108,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Form |  | ● | ● | ● |  | ● | ● |  |  | 5 | 2 | spec |  |
+| Form |  | ● | ● | ● |  | ● | ● |  |  | 5 | 2 | done |  |
 | Label |  | ● | ● |  | ● |  | ● | ● |  | 5 | 1 | done |  |
 | Field | ● |  |  | ● | ● |  | ● |  |  | 4 | 1 | done |  |
 | Fieldset | ● |  |  | ● | ● |  |  |  |  | 3 | 2 | done |  |

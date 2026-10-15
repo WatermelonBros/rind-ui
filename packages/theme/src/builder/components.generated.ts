@@ -56,6 +56,7 @@ export type ComponentTokens = {
     | "legendFontSize"
     | "legendFontWeight"
     | "legendLineHeight"
+  readonly form: "gap"
   readonly heading:
     | "1FontSize"
     | "1FontWeight"

@@ -371,6 +371,10 @@ function createPlaywrightEnv(
       isInert: async () => (await now()).evaluate((el) => el.closest("[inert]") !== null),
       attr: async (name) => (await now()).getAttribute(name),
       tagName: async () => (await now()).evaluate((el) => el.tagName.toLowerCase()),
+      scoped: (scope, partName) =>
+        handle(`${scope}.${partName} in ${label}`, async () =>
+          (await now()).locator(`[data-scope="${scope}"][data-part="${partName}"]`),
+        ),
       accessibleName: async () => {
         const { root } = await getBase()
         await ensureInPage(root)

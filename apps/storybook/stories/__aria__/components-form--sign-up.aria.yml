@@ -1,0 +1,11 @@
+- form "Sign up":
+  - text: Email
+  - textbox "Email"
+  - text: Password
+  - textbox "Password"
+  - text: Confirm password
+  - textbox "Confirm password"
+  - button "Submit"
+  - button "Reset"
+  - button "Validate"
+  - paragraph: "Submissions: 0"

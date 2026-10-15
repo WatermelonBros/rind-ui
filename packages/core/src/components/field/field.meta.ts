@@ -111,6 +111,7 @@ export const fieldMeta = {
   dataAttributes: {
     root: {
       ...state("root"),
+      "data-name": "The Field's `name` (a Form reads it).",
       "data-focus": "The control has focus.",
       "data-focus-visible": "The control has keyboard focus.",
     },

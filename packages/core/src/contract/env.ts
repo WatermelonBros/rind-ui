@@ -81,6 +81,8 @@ export interface Part {
   /** The part is inside an `inert` subtree (computed from its ancestors). */
   isInert(): Promise<boolean>
   attr(name: string): Promise<string | null>
+  /** Descendant parts of another component, by `data-scope` and `data-part` (any instance). */
+  scoped(scope: string, part: string): Part
   /** The element's tag name, lowercase ("h3", "div"). */
   tagName(): Promise<string>
   /** Its accessible name (accname computation). */

@@ -1,0 +1,10 @@
+/*
+ * Form. In no family: a layout container only. It carries no colour or type of its own, so
+ * a failed form (`data-invalid`) is styled through its Fields, never at the root.
+ */
+@layer rind.components {
+  :where([data-scope="form"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-form-gap, var(--rind-space-4));
+  }
+}

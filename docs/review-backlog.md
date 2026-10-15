@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-form (r1) | — | packages/react/src/form/form.tsx | Field unmounting while Form is validating never sends FIELD.SETTLED → hold stranded, data-validating stuck; send settled() from register cleanup |
+| add-form (r1) | — | packages/react/src/form/form.tsx (byName memo) | inline errors={{...}} re-applies a cleared server error on every parent re-render (identity-keyed) — compare by content or document stable object |
+| add-form (r1) | — | packages/core/src/components/field/field.machine.ts (lastAsync) | cache never expires, not cleared on RESET or validate identity change; File/Blob collide as {}; stringify failure → null key could re-hold loop |
+| add-form (r1) | — | packages/core/src/components/form/form.machine.ts | `name in errors` matches prototype keys (constructor) and empty messages; framework RESET clears form data-invalid while Fields keep server errors; VALIDATE during validating/awaiting-server aborts the hold; quietIfManaged focusMoved not cleared on !displayAllowed; locate only by name |
 | add-field (r1) | — | packages/react/src/field/field.tsx:402 | Field.Label focusTarget passes modality "pointer", so an AT (virtual) label click is re-labelled pointer — pass the current modality |
 | add-field (r1) | — | packages/testing/src/invariants.ts (field-associated) | describedby filter keeps only ids starting with "field-" while expected set is all rendered part ids → false positive when Description/ErrorMessage get a consumer id; filter by field.partIds |
 | add-field (r1) | — | packages/react/src/field/field.tsx (useFieldControl) | claim during render / release in effect cleanup: after a StrictMode-style remount the owner is null until next render (repro still passed) |

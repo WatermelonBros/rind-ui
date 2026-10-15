@@ -226,10 +226,13 @@ Drivers SHALL expose the announcements made since the driver was created.
 
 ### Requirement: Form Invariants
 
-The Form contract SHALL ship invariants, always on: after a failed attempt, focus is inside
-the first invalid Field; a step that is not a submit attempt and does not change `errors`
-never moves focus; each failed attempt produces at most one Form announcement and no Field
-announcement.
+The Form contract SHALL ship, always on, the invariant that after a failed attempt focus is
+inside the first invalid Field. `@rind-ui/testing` SHALL export two more invariants as
+consumer invariants usable with `testMachine(formContract, { invariants })`
+(`formStepInvariants()`), because they need the step that ran and the page's announcement
+log, which the shared invariant API does not carry: a step that is not a submit attempt and
+does not change `errors` never moves focus; each failed attempt produces at most one Form
+announcement and no Field announcement.
 
 #### Scenario: Broken variant focuses by registration order
 

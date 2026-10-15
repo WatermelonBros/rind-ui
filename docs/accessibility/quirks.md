@@ -18,6 +18,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/press.ts` | `webkit-menuitem-double-click`, `macos-meta-keyup` |
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
+| `packages/react/src/form/form.tsx` | `react-action-form-reset` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `talkback-unfocusable-link`
@@ -121,7 +122,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/issues/6830>, <https://github.com/adobe/react-spectrum/issues/7708>
 - Repro test: `packages/react/src/action-form-reset.dom.test.tsx`
-- Checked in: component code (none yet)
+- Checked in: `packages/react/src/form/form.tsx`
 - Last verified: 2026-10-14
 - Remove when: React exposes the reason for a form reset
 

@@ -273,6 +273,20 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### form
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "gap": {
+      "fallback": "var(--rind-space-4)",
+      "file": "form.css"
+    }
+  }
+}
+```
+
 ### heading
 
 ```json

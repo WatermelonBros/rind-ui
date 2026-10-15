@@ -14,6 +14,7 @@ export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
 export { getButton } from "./components/button"
 export { getField } from "./components/field"
 export { getFieldset } from "./components/fieldset"
+export { getForm } from "./components/form"
 export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
@@ -26,6 +27,7 @@ export {
   runAction,
   type Target,
 } from "./driver"
+export { type FormStepInvariants, formStepInvariants } from "./form-invariants"
 export {
   type GraphEdge,
   type GraphNode,

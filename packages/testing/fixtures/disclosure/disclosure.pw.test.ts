@@ -11,6 +11,7 @@ import { states as buttonStates } from "../../../../apps/storybook/stories/Butto
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
 import { states as fieldStates } from "../../../../apps/storybook/stories/Field.stories"
 import { states as fieldsetStates } from "../../../../apps/storybook/stories/Fieldset.stories"
+import { states as formStates } from "../../../../apps/storybook/stories/Form.stories"
 import { states as headingStates } from "../../../../apps/storybook/stories/Heading.stories"
 import { states as labelStates } from "../../../../apps/storybook/stories/Label.stories"
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
@@ -308,6 +309,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Label.stories.tsx": labelStates,
     "./stories/Fieldset.stories.tsx": fieldsetStates,
     "./stories/Field.stories.tsx": fieldStates,
+    "./stories/Form.stories.tsx": formStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

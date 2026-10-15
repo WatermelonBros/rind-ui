@@ -51,7 +51,8 @@ export type FieldEvent =
   | { readonly type: "INVALID.PROP" }
   /** `disabled` or `validationMode` changed: re-evaluate the display. */
   | { readonly type: "PROPS.CHANGE" }
-  | { readonly type: "RESET" }
+  /** `keepExternal`: a framework reset after a form action keeps the server errors. */
+  | { readonly type: "RESET"; readonly keepExternal?: boolean }
   | { readonly type: "DECIDE" }
 
 export interface FieldProps {
@@ -64,6 +65,11 @@ export interface FieldProps {
   /** External errors (server errors from Form): shown at once, cleared by the next change. */
   readonly errors?: readonly string[] | undefined
   readonly validate?: Validate | undefined
+  /**
+   * Inside a Form: the Form focuses the first invalid Field and announces a summary for
+   * an attempt, so the Field does neither itself.
+   */
+  readonly managed?: boolean | undefined
   readonly validationMode: ValidationMode
   readonly validationBehavior: ValidationBehavior
   /** Delays `validate` for non-empty values typed in `change` mode (ms). */
@@ -106,6 +112,10 @@ export interface FieldContext {
   announced: string | null
   /** A failed submission moved focus to the control in this step: no announcement. */
   focusMoved: boolean
+  /** The value and form values the pending async check runs for (its cache key). */
+  pendingKey: string | null
+  /** The last settled async result, reused for the same inputs (a held submission's resubmit). */
+  lastAsync: { readonly key: string; readonly messages: readonly string[] } | null
 }
 
 type Env = AnnouncerEnv & SchedulerEnv & ValidityEnv
@@ -115,6 +125,15 @@ const isEmpty = (v: unknown) =>
 
 const toMessages = (r: ValidationResult): readonly string[] =>
   r === null || r === undefined ? [] : typeof r === "string" ? (r ? [r] : []) : r
+
+/** A cache key for an async check, or null when the inputs cannot be serialised. */
+const cacheKey = (value: unknown, values: unknown): string | null => {
+  try {
+    return JSON.stringify([value, values])
+  } catch {
+    return null
+  }
+}
 
 const isThenable = (v: unknown): v is Promise<ValidationResult> =>
   typeof (v as { then?: unknown } | null)?.then === "function"
@@ -144,6 +163,8 @@ export const fieldMachine = setup({
     invalidReleased: ({ props }) => props.invalid === undefined,
     isStale: ({ context, event }) => event.type === "VALIDATED" && event.token !== context.token,
     hasError: ({ context }) => context.current !== null,
+    keepsExternal: ({ event, context }) =>
+      event.type === "RESET" && event.keepExternal === true && context.external.length > 0,
     displayAllowed: ({ context, props }) => {
       if (props.disabled) return false
       if (props.invalid !== undefined || context.external.length > 0) return true
@@ -231,17 +252,26 @@ export const fieldMachine = setup({
         event.type === "CONTROL.CHANGE" &&
         event.user &&
         !isEmpty(context.value)
+      const values = props.formValues()
+      const key = cacheKey(context.value, values)
+      if (key !== null && context.lastAsync?.key === key) {
+        const cached = context.lastAsync.messages
+        set("current", cached.length ? { source: "validate", messages: cached, key: null } : null)
+        return write(cached)
+      }
+      set("pendingKey", key)
       if (debounce) return set("pending", "debounce")
-      const result = props.validate(context.value, props.formValues())
+      const result = props.validate(context.value, values)
       if (isThenable(result)) return set("pending", result)
       const messages = toMessages(result)
       set("current", messages.length ? { source: "validate", messages, key: null } : null)
       write(messages)
     },
-    applyValidated: ({ event, props, env, set }) => {
+    applyValidated: ({ event, context, props, env, set }) => {
       if (event.type !== "VALIDATED") return
       set("pending", null)
       const messages = toMessages(event.result)
+      if (context.pendingKey !== null) set("lastAsync", { key: context.pendingKey, messages })
       set("current", messages.length ? { source: "validate", messages, key: null } : null)
       const el = props.control()?.validityElement() ?? null
       if (el && props.validationBehavior === "native" && messages.length > 0) {
@@ -250,6 +280,7 @@ export const fieldMachine = setup({
     },
     /** A failed submission focuses only the first invalid control in tree order. */
     focusIfFirst: ({ context, props, env, set }) => {
+      if (props.managed) return
       const control = props.control()
       const el = control?.validityElement()
       if (!control || !el?.form) return
@@ -260,6 +291,10 @@ export const fieldMachine = setup({
       if (!context.focused) set("focusMoved", true)
     },
     decide: ({ send }) => send({ type: "DECIDE" }),
+    /** Inside a Form, an attempt's error is announced by the Form's summary, not here. */
+    quietIfManaged: ({ props, set }) => {
+      if (props.managed) set("focusMoved", true)
+    },
     /** A mount-time check never enters `validating` (an async result is not awaited). */
     dropPending: ({ context, set }) => {
       // Not awaited: a rejection must not surface as an unhandled one.
@@ -278,6 +313,8 @@ export const fieldMachine = setup({
     /** Once per distinct displayed message; never after focus moved, never while composing. */
     announce: ({ context, props, env, set }) => {
       const message = context.current?.messages.join(" ") ?? ""
+      // Conveyed already: by the focus a failed submission moved, or by the Form's summary.
+      if (message && context.focusMoved) set("announced", message)
       const skip =
         !message || context.focusMoved || context.composing || message === context.announced
       set("focusMoved", false)
@@ -290,13 +327,14 @@ export const fieldMachine = setup({
       })
     },
     clearStepFlags: ({ set }) => set("focusMoved", false),
-    reset: ({ context, props, env, set }) => {
+    reset: ({ context, props, env, event, set }) => {
       const el = props.control()?.validityElement() ?? null
       if (el) env.validity.clearOwn(el)
       set("touched", false)
       set("attempted", false)
       set("changed", false)
-      set("external", [])
+      // A framework reset after a form action keeps the server errors it delivered.
+      if (!(event.type === "RESET" && event.keepExternal)) set("external", [])
       set("current", null)
       set("pending", null)
       set("token", context.token + 1)
@@ -360,6 +398,8 @@ export const fieldMachine = setup({
     shown: "none",
     announced: null,
     focusMoved: false,
+    pendingKey: null,
+    lastAsync: null,
   }),
   on: {
     // Evaluated at once (nothing displayed): native validity is right from mount, so an
@@ -370,8 +410,8 @@ export const fieldMachine = setup({
     "CONTROL.COMMIT": { actions: ["evaluate", "decide"] },
     "FOCUS.ENTER": { actions: ["enter"] },
     "FOCUS.LEAVE": { actions: ["leave", "evaluate", "decide"] },
-    INVALID: { actions: ["attempt", "evaluate", "focusIfFirst", "decide"] },
-    "SUBMIT.ATTEMPT": { actions: ["attempt", "evaluate", "decide"] },
+    INVALID: { actions: ["attempt", "quietIfManaged", "evaluate", "focusIfFirst", "decide"] },
+    "SUBMIT.ATTEMPT": { actions: ["attempt", "quietIfManaged", "evaluate", "decide"] },
     "ERRORS.EXTERNAL": { actions: ["takeExternal", "evaluate", "decide"] },
     "INVALID.PROP": [
       { guard: "invalidReleased", target: "idle", actions: ["evaluate", "showNone"] },
@@ -379,7 +419,10 @@ export const fieldMachine = setup({
     ],
     VALIDATED: [{ guard: "isStale" }, { actions: ["applyValidated", "decide"] }],
     "PROPS.CHANGE": { actions: ["evaluate", "decide"] },
-    RESET: { target: "idle", actions: ["reset"] },
+    RESET: [
+      { guard: "keepsExternal", target: "idle", actions: ["reset", "evaluate", "decide"] },
+      { target: "idle", actions: ["reset"] },
+    ],
     DECIDE: [
       { guard: "pendingAsync", target: "validating", reenter: true },
       { guard: { not: "displayAllowed" }, target: "idle", actions: ["showNone"] },

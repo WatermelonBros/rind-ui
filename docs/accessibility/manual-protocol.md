@@ -105,3 +105,13 @@ Stories: Components/Field → WithDescriptionAndError, Blur. Record each pass in
       with the name and description, once (no double reading).
 - [ ] **All**: in Blur, type an invalid email and Tab on; the error announcement
       ("Email: …") is spoken once.
+
+## Device checklist: Form (add-form 10.1)
+
+Story: Components/Form → SignUp. Record each pass in `tested-with.json` with
+`component: "form"`.
+
+- [ ] **NVDA + Chrome, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS, TalkBack**:
+      submit with 1 error: focus lands on the field and its error is read; no summary.
+- [ ] **All**: submit with 3 errors: focus on the first field, its error read, and
+      "3 fields have errors" spoken once.
