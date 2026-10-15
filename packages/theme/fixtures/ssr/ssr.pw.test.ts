@@ -149,11 +149,18 @@ describe.each(engines)("SSR first paint (%s)", (engine: Engine) => {
       return found
     })
     expect(offenders).toEqual([])
-    const durations = await page.evaluate(() =>
-      ["html", "body", "main", "button"].map(
-        (s) => getComputedStyle(document.querySelector(s) as Element).transitionDuration,
-      ),
+    // Whatever does animate (a key's travel) is no colour: a scheme flip cannot fade.
+    const animated = await page.evaluate(() =>
+      ["html", "body", "main", "button"].flatMap((s) => {
+        const style = getComputedStyle(document.querySelector(s) as Element)
+        const durations = style.transitionDuration.split(", ")
+        return style.transitionProperty
+          .split(", ")
+          .filter((_, i) => (durations[i % durations.length] ?? "0s") !== "0s")
+      }),
     )
-    expect(durations.every((d) => /^0s(, 0s)*$/.test(d))).toBe(true)
+    expect(
+      animated.filter((p) => /color|background|border|outline|fill|stroke|all/i.test(p)),
+    ).toEqual([])
   })
 })

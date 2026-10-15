@@ -131,7 +131,13 @@ export const DepthWarning: Story = {
 export const SizeOverride: Story = {
   render: () => (
     <Heading.Level level={2}>
-      <div style={{ "--rind-heading-2-font-size": "var(--rind-text-md)" } as React.CSSProperties}>
+      <div
+        style={
+          {
+            "--rind-heading-2-font-size": "calc(var(--rind-text-sm) * 1.2143)",
+          } as React.CSSProperties
+        }
+      >
         <Heading>Card title</Heading>
       </div>
       <Heading>Normal title</Heading>

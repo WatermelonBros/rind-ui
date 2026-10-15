@@ -10,7 +10,7 @@ const root = new URL("../", import.meta.url)
 const src = new URL("src/", root)
 // Tier-2 categories (--rind-hit-area is tier 2 too), brand inputs and icons; never components.
 const tier2 = new Set(
-  "color space size radius text font leading shadow duration ease focus border brand icon hit".split(
+  "color space size radius text font leading tracking shadow duration ease focus border brand icon hit".split(
     " ",
   ),
 )

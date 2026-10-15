@@ -45,8 +45,8 @@ describe.each(engines)("theme and media preferences (%s)", (engine: Engine) => {
     it("Tenant theme cannot re-enable motion", async () => {
       const html = page$(scopes, `[data-rind-theme="live"] { --rind-brand-motion: 1 }`)
       const motion = await open(html, { reducedMotion: "no-preference" })
-      // Control: without the preference the tenant's motion factor 1 gives 200 ms.
-      expect(await seconds(motion, "#tenant", "--rind-duration-normal")).toBeCloseTo(0.2, 3)
+      // Control: without the preference the tenant's motion factor 1 gives 180 ms.
+      expect(await seconds(motion, "#tenant", "--rind-duration-normal")).toBeCloseTo(0.18, 3)
       const reduced = await open(html, { reducedMotion: "reduce" })
       for (const id of ["#root-probe", "#tenant", "#live", "#crisp"]) {
         for (const d of ["fast", "normal", "slow"]) {

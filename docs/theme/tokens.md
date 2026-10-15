@@ -17,10 +17,11 @@ Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the
 | hit | `--rind-hit-area` |
 | leading | `--rind-leading-normal`, `--rind-leading-tight` |
 | radius | `--rind-radius-control`, `--rind-radius-full`, `--rind-radius-indicator`, `--rind-radius-lg`, `--rind-radius-md`, `--rind-radius-panel`, `--rind-radius-sm` |
-| shadow | `--rind-shadow-lg`, `--rind-shadow-sm` |
+| shadow | `--rind-shadow-key`, `--rind-shadow-key-pressed`, `--rind-shadow-lg`, `--rind-shadow-sm` |
 | size | `--rind-size-lg`, `--rind-size-md`, `--rind-size-sm` |
 | space | `--rind-space-1`, `--rind-space-2`, `--rind-space-3`, `--rind-space-4`, `--rind-space-6`, `--rind-space-8` |
 | text | `--rind-text-lg`, `--rind-text-md`, `--rind-text-sm`, `--rind-text-xs` |
+| tracking | `--rind-tracking-label`, `--rind-tracking-tight` |
 
 ## Runtime tokens
 
@@ -41,7 +42,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "family": "action",
   "tokens": {
     "disabled-bg": {
-      "fallback": "transparent",
+      "fallback": "var(--rind-color-surface)",
       "file": "button.css"
     },
     "disabled-border": {
@@ -57,7 +58,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "button.css"
     },
     "font-weight": {
-      "fallback": "500",
+      "fallback": "560",
       "file": "button.css"
     },
     "gap": {
@@ -76,12 +77,24 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "fallback": "var(--rind-size-control, var(--rind-size-md))",
       "file": "button.css"
     },
+    "letter-spacing": {
+      "fallback": "-0.005em",
+      "file": "button.css"
+    },
+    "outline-bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "button.css"
+    },
     "outline-bg-hover": {
-      "fallback": "var(--rind-color-accent-soft)",
+      "fallback": "var(--rind-color-surface)",
       "file": "button.css"
     },
     "outline-border": {
-      "fallback": "var(--rind-color-accent-border)",
+      "fallback": "var(--rind-color-border)",
+      "file": "button.css"
+    },
+    "outline-border-hover": {
+      "fallback": "var(--rind-color-border-strong)",
       "file": "button.css"
     },
     "outline-fg": {
@@ -92,12 +105,28 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "fallback": "var(--rind-space-control, var(--rind-space-3))",
       "file": "button.css"
     },
-    "pending-opacity": {
-      "fallback": "0.7",
+    "pilot-color": {
+      "fallback": "var(--rind-color-accent-on-solid)",
+      "file": "button.css"
+    },
+    "pilot-inset": {
+      "fallback": "0.3125rem",
+      "file": "button.css"
+    },
+    "pilot-size": {
+      "fallback": "0.375rem",
       "file": "button.css"
     },
     "radius": {
       "fallback": "var(--rind-radius-control)",
+      "file": "button.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-key)",
+      "file": "button.css"
+    },
+    "shadow-pressed": {
+      "fallback": "var(--rind-shadow-key-pressed)",
       "file": "button.css"
     },
     "soft-bg": {
@@ -189,23 +218,31 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "family": null,
   "tokens": {
     "1-font-size": {
-      "fallback": "calc(var(--rind-text-lg) * 1.75)",
+      "fallback": "calc(var(--rind-text-sm) * 2.2857)",
       "file": "heading.css"
     },
     "1-font-weight": {
-      "fallback": "700",
+      "fallback": "640",
+      "file": "heading.css"
+    },
+    "1-letter-spacing": {
+      "fallback": "-0.024em",
       "file": "heading.css"
     },
     "1-line-height": {
-      "fallback": "var(--rind-leading-tight)",
+      "fallback": "1.1",
       "file": "heading.css"
     },
     "2-font-size": {
-      "fallback": "calc(var(--rind-text-lg) * 1.4)",
+      "fallback": "calc(var(--rind-text-sm) * 1.8571)",
       "file": "heading.css"
     },
     "2-font-weight": {
-      "fallback": "700",
+      "fallback": "620",
+      "file": "heading.css"
+    },
+    "2-letter-spacing": {
+      "fallback": "var(--rind-tracking-tight)",
       "file": "heading.css"
     },
     "2-line-height": {
@@ -213,11 +250,15 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "heading.css"
     },
     "3-font-size": {
-      "fallback": "var(--rind-text-lg)",
+      "fallback": "calc(var(--rind-text-sm) * 1.4286)",
       "file": "heading.css"
     },
     "3-font-weight": {
       "fallback": "600",
+      "file": "heading.css"
+    },
+    "3-letter-spacing": {
+      "fallback": "-0.01em",
       "file": "heading.css"
     },
     "3-line-height": {
@@ -225,15 +266,23 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "heading.css"
     },
     "4-font-size": {
-      "fallback": "var(--rind-text-md)",
+      "fallback": "calc(var(--rind-text-sm) * 1.2143)",
       "file": "heading.css"
     },
     "4-font-weight": {
-      "fallback": "600",
+      "fallback": "590",
+      "file": "heading.css"
+    },
+    "4-letter-spacing": {
+      "fallback": "-0.005em",
       "file": "heading.css"
     },
     "4-line-height": {
       "fallback": "var(--rind-leading-tight)",
+      "file": "heading.css"
+    },
+    "5-color": {
+      "fallback": "var(--rind-color-text-muted)",
       "file": "heading.css"
     },
     "5-font-size": {
@@ -241,11 +290,15 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "heading.css"
     },
     "5-font-weight": {
-      "fallback": "600",
+      "fallback": "580",
       "file": "heading.css"
     },
     "5-line-height": {
       "fallback": "var(--rind-leading-normal)",
+      "file": "heading.css"
+    },
+    "6-color": {
+      "fallback": "var(--rind-color-text-muted)",
       "file": "heading.css"
     },
     "6-font-size": {
@@ -253,11 +306,19 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "heading.css"
     },
     "6-font-weight": {
-      "fallback": "600",
+      "fallback": "650",
+      "file": "heading.css"
+    },
+    "6-letter-spacing": {
+      "fallback": "var(--rind-tracking-label)",
       "file": "heading.css"
     },
     "6-line-height": {
       "fallback": "var(--rind-leading-normal)",
+      "file": "heading.css"
+    },
+    "6-text-transform": {
+      "fallback": "uppercase",
       "file": "heading.css"
     },
     "color": {
@@ -317,7 +378,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "link.css"
     },
     "decoration": {
-      "fallback": "0.0625em",
+      "fallback": "0.075em",
       "file": "link.css"
     },
     "disabled-color": {
@@ -325,7 +386,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
       "file": "link.css"
     },
     "underline-offset": {
-      "fallback": "0.2em",
+      "fallback": "0.22em",
       "file": "link.css"
     }
   }

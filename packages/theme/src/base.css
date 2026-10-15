@@ -9,6 +9,20 @@
     font-size: var(--rind-text-sm);
     line-height: var(--rind-leading-normal);
     color: var(--rind-color-text);
+    /* Numbers line up in every component; slashed zero stays off (prose keeps its zero). */
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* The browser's own surfaces wear the brand too: caret, native checks, scrollbars. */
+    caret-color: var(--rind-color-accent-border);
+    accent-color: var(--rind-color-accent-solid);
+    scrollbar-color: var(--rind-color-border-strong) transparent;
+  }
+
+  :where([data-rind-theme]) ::selection {
+    background: var(--rind-color-accent-soft-hover);
+    color: var(--rind-color-text);
   }
 
   :where([data-rind-theme]:not([data-rind-portal])) {

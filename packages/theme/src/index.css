@@ -4,6 +4,7 @@
  * `[data-state]` — the theme never relies on class names.
  */
 @layer rind.tokens, rind.themes, rind.components, rind.preferences;
+@import "./fonts.css";
 @import "./tokens.css";
 @import "./presets/calm.css";
 @import "./base.css";

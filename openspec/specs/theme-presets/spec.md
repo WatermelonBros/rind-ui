@@ -14,18 +14,18 @@ start from a preset with `defineTheme({ name, extends: "crisp", … })`.
 
 | Input | `calm` (default) | `crisp` |
 |---|---|---|
-| accent | `oklch(0.52 0.19 268)` | `oklch(0.55 0.2 255)` |
-| neutral | `oklch(0.5 0.01 270)` | `oklch(0.5 0.005 250)` |
-| danger | `oklch(0.55 0.2 27)` | `oklch(0.55 0.21 27)` |
-| warning | `oklch(0.75 0.15 75)` | `oklch(0.75 0.16 75)` |
-| success | `oklch(0.6 0.14 150)` | `oklch(0.55 0.15 150)` (0.58 cannot reach 4.5:1 with white or black text) |
-| fontSans | system UI stack | system UI stack |
+| accent | `oklch(0.67 0.165 42)` (signal orange) | `oklch(0.55 0.17 262)` (cobalt) |
+| neutral | `oklch(0.4 0.01 250)` | `oklch(0.5 0.012 260)` |
+| danger | `oklch(0.53 0.19 22)` | `oklch(0.53 0.19 22)` |
+| warning | `oklch(0.83 0.16 90)` | `oklch(0.83 0.16 90)` |
+| success | `oklch(0.62 0.14 155)` | `oklch(0.55 0.15 150)` |
+| fontSans | Hanken Grotesk, then the system UI stack | Hanken Grotesk, then the system UI stack |
 | fontMono | system mono stack | system mono stack |
-| fontSize | `0.875rem` | `0.875rem` |
-| radius | `0.5rem` | `0.25rem` |
+| fontSize | `0.875rem` | `0.8125rem` |
+| radius | `0.375rem` | `0.25rem` |
 | density | `1` | `0.875` |
 | motion | `1` | `0.75` |
-| borderStrength | `0.2` | `0.6` |
+| borderStrength | `0.3` | `0.6` |
 
 #### Scenario: Presets pass strict validation
 
@@ -79,4 +79,23 @@ requirement, pass/fail and any adjustment applied.
 - **WHEN** the report is opened for the light-yellow sample brand
 - **THEN** it lists the adjusted tokens with their original and adjusted colours and
   every pair passes
+
+### Requirement: Bundled Default Face
+
+`@rind-ui/theme` SHALL ship the presets' default face, Hanken Grotesk (variable weight,
+SIL Open Font License 1.1), self-hosted as woff2 files declared by `@rind-ui/theme/fonts.css`
+inside the `rind.tokens` layer and imported by the main entry. The licence text SHALL ship
+with the files and the package NOTICE SHALL attribute it. A brand that sets its own
+`fontSans` SHALL download none of the bundled files.
+
+#### Scenario: Brand with its own face
+
+- **WHEN** a theme sets `fontSans` to a stack without Hanken Grotesk and the main entry is
+  loaded
+- **THEN** no Hanken Grotesk file is requested
+
+#### Scenario: Default face
+
+- **WHEN** the main entry is loaded with no brand override
+- **THEN** theme scopes render in Hanken Grotesk with tabular figures
 

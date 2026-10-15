@@ -93,11 +93,11 @@ describe("contrast validation", () => {
     )
     expect(pair?.pass).toBe(false)
     expect(pair?.required).toBe(4.5)
-    expect(pair?.ratio).toBeGreaterThan(2.6)
+    expect(pair?.ratio).toBeGreaterThan(2.4)
     expect(pair?.ratio).toBeLessThan(3)
     expect(pair?.suggestion).toBeDefined()
     const suggested = oklch(pair?.suggestion ?? "")
-    const bg = oklch(checkTheme(sky).pairs.length ? "oklch(0.995 0.0024 250)" : "")
+    const bg = oklch(checkTheme(sky).pairs.length ? "oklch(0.968 0.006 250)" : "")
     expect(contrast(suggested, bg)).toBeGreaterThanOrEqual(4.5)
     const hue = oklch("#0ea5e9").h
     expect(Math.abs(suggested.h - hue)).toBeLessThan(1)
@@ -150,7 +150,7 @@ describe("contrast validation", () => {
 
 describe("nearest passing shade", () => {
   it("suggestion sits just inside the passing bound, same hue, and passes", () => {
-    const bg = oklch("oklch(0.995 0.0024 250)")
+    const bg = oklch("oklch(0.968 0.006 250)")
     const t = { name: "acme", accent: "#0ea5e9", overrides: { accentText: "#0ea5e9" } } as const
     const p = checkTheme(t).pairs.find(
       (x) => x.scheme === "light" && x.foreground === "accent-text" && x.background === "bg",

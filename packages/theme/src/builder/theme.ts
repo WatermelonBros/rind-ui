@@ -304,8 +304,8 @@ function scales(i: BrandInputs): Record<string, string> {
     "space-6": rem(1.5 * d),
     "space-8": rem(2 * d),
     "size-sm": `max(24px, ${rem(1.75 * d)})`,
-    "size-md": `max(24px, ${rem(2.25 * d)})`,
-    "size-lg": `max(24px, ${rem(2.75 * d)})`,
+    "size-md": `max(24px, ${rem(2 * d)})`,
+    "size-lg": `max(24px, ${rem(2.5 * d)})`,
     "text-xs": rem(fs * 0.8571),
     "text-sm": rem(fs),
     "text-md": rem(fs * 1.1429),
@@ -313,9 +313,9 @@ function scales(i: BrandInputs): Record<string, string> {
     "radius-sm": len(r * 0.5),
     "radius-md": len(r),
     "radius-lg": len(r * 1.5),
-    "duration-fast": `${round(120 * i.motion, 2)}ms`,
-    "duration-normal": `${round(200 * i.motion, 2)}ms`,
-    "duration-slow": `${round(320 * i.motion, 2)}ms`,
+    "duration-fast": `${round(90 * i.motion, 2)}ms`,
+    "duration-normal": `${round(180 * i.motion, 2)}ms`,
+    "duration-slow": `${round(280 * i.motion, 2)}ms`,
   }
 }
 

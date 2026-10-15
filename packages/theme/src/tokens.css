@@ -17,19 +17,19 @@
 @layer rind.tokens {
   /* Tier 1: the calm preset's inputs, so this file alone themes everything. */
   :where(:root) {
-    --rind-brand-accent: oklch(0.52 0.19 268);
-    --rind-brand-neutral: oklch(0.5 0.01 270);
-    --rind-brand-danger: oklch(0.55 0.2 27);
-    --rind-brand-warning: oklch(0.75 0.15 75);
-    --rind-brand-success: oklch(0.6 0.14 150);
+    --rind-brand-accent: oklch(0.67 0.165 42);
+    --rind-brand-neutral: oklch(0.4 0.006 250);
+    --rind-brand-danger: oklch(0.53 0.19 22);
+    --rind-brand-warning: oklch(0.83 0.16 90);
+    --rind-brand-success: oklch(0.62 0.14 155);
     --rind-brand-font-sans:
-      ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --rind-brand-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     --rind-brand-font-size: 0.875rem;
-    --rind-brand-radius: 0.5rem;
+    --rind-brand-radius: 0.375rem;
     --rind-brand-density: 1;
     --rind-brand-motion: 1;
-    --rind-brand-border-strength: 0.2;
+    --rind-brand-border-strength: 0.3;
 
     /* Light and dark follow the used color-scheme (an app's own rule works too). */
     color-scheme: light dark;
@@ -54,8 +54,8 @@
 
     /* Never below the 24 px target size (WCAG 2.5.8), whatever the density. */
     --rind-size-sm: max(24px, calc(1.75rem * var(--rind-brand-density)));
-    --rind-size-md: max(24px, calc(2.25rem * var(--rind-brand-density)));
-    --rind-size-lg: max(24px, calc(2.75rem * var(--rind-brand-density)));
+    --rind-size-md: max(24px, calc(2rem * var(--rind-brand-density)));
+    --rind-size-lg: max(24px, calc(2.5rem * var(--rind-brand-density)));
 
     /* In rem through the input: the browser's text size scales them (radix-ui/themes#121). */
     --rind-text-xs: calc(var(--rind-brand-font-size) * 0.8571);
@@ -65,8 +65,11 @@
 
     --rind-font-sans: var(--rind-brand-font-sans);
     --rind-font-mono: var(--rind-brand-font-mono);
-    --rind-leading-tight: 1.25;
+    --rind-leading-tight: 1.2;
     --rind-leading-normal: 1.5;
+    /* Display sizes close up; engraved labels open up (uppercase, small). */
+    --rind-tracking-tight: -0.018em;
+    --rind-tracking-label: 0.07em;
 
     --rind-radius-sm: calc(var(--rind-brand-radius) * 0.5);
     --rind-radius-md: var(--rind-brand-radius);
@@ -76,15 +79,30 @@
     --rind-radius-panel: var(--rind-radius-lg);
     --rind-radius-indicator: var(--rind-radius-sm);
 
-    --rind-duration-fast: calc(120ms * var(--rind-brand-motion));
-    --rind-duration-normal: calc(200ms * var(--rind-brand-motion));
-    --rind-duration-slow: calc(320ms * var(--rind-brand-motion));
+    --rind-duration-fast: calc(90ms * var(--rind-brand-motion));
+    --rind-duration-normal: calc(180ms * var(--rind-brand-motion));
+    --rind-duration-slow: calc(280ms * var(--rind-brand-motion));
     --rind-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --rind-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
     --rind-border-width: 1px;
-    --rind-shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
-    --rind-shadow-lg: 0 12px 32px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5));
+    /*
+     * Depth: every raised thing has a lit top edge, a crisp contact edge and a short soft
+     * shadow; pressing a key turns the light edge into an inset (a key sinks, it never glows).
+     */
+    --rind-shadow-sm:
+      0 1px 1px light-dark(rgb(16 20 28 / 0.07), rgb(0 0 0 / 0.35)),
+      0 1px 3px light-dark(rgb(16 20 28 / 0.06), rgb(0 0 0 / 0.25));
+    --rind-shadow-lg:
+      0 0 0 1px light-dark(rgb(16 20 28 / 0.06), rgb(255 255 255 / 0.06)),
+      0 4px 8px -2px light-dark(rgb(16 20 28 / 0.08), rgb(0 0 0 / 0.4)),
+      0 16px 32px -8px light-dark(rgb(16 20 28 / 0.16), rgb(0 0 0 / 0.55));
+    --rind-shadow-key:
+      inset 0 1px 0 light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.09)),
+      inset 0 -1px 0 light-dark(rgb(16 20 28 / 0.1), rgb(0 0 0 / 0.3)),
+      0 1px 2px light-dark(rgb(16 20 28 / 0.12), rgb(0 0 0 / 0.45));
+    --rind-shadow-key-pressed:
+      inset 0 1px 2px light-dark(rgb(16 20 28 / 0.18), rgb(0 0 0 / 0.5)), 0 0 0 transparent;
   }
 
   /*
@@ -100,31 +118,31 @@
        */
       --rind-color-bg: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.995 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.968 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.16 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.185 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
       --rind-color-surface: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.97 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.94 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.2 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.215 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
       --rind-color-surface-raised: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 1 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.993 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.23 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.25 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
@@ -140,41 +158,41 @@
       );
       --rind-color-text: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.21 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.2 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.95 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.93 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
       --rind-color-text-muted: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.5 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.47 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.72 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.71 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
       --rind-color-text-disabled: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.62 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.64 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.48 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.47 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
       --rind-color-border-strong: light-dark(
         oklch(
-          from var(--rind-brand-neutral) 0.62 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.58 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         ),
         oklch(
-          from var(--rind-brand-neutral) 0.55 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          from var(--rind-brand-neutral) 0.53 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
           1
         )
       );
@@ -209,15 +227,15 @@
         1
       );
       --rind-color-accent-soft: light-dark(
-        oklch(from var(--rind-brand-accent) 0.95 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-accent) 0.27 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-accent) 0.93 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-accent) 0.29 min(c, 0.07) h / 1)
       );
       --rind-color-accent-soft-hover: light-dark(
-        oklch(from var(--rind-brand-accent) 0.92 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-accent) 0.31 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-accent) 0.895 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-accent) 0.33 min(c, 0.07) h / 1)
       );
       --rind-color-accent-text: light-dark(
-        oklch(from var(--rind-brand-accent) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-accent) min(l, 0.46) min(c, 0.2) h / 1),
         oklch(from var(--rind-brand-accent) max(l, 0.78) min(c, 0.2) h / 1)
       );
       --rind-color-accent-border: light-dark(
@@ -238,15 +256,15 @@
         1
       );
       --rind-color-neutral-soft: light-dark(
-        oklch(from var(--rind-color-neutral-solid) 0.95 min(c, 0.05) h / 1),
-        oklch(from var(--rind-color-neutral-solid) 0.27 min(c, 0.05) h / 1)
+        oklch(from var(--rind-color-neutral-solid) 0.93 min(c, 0.045) h / 1),
+        oklch(from var(--rind-color-neutral-solid) 0.29 min(c, 0.07) h / 1)
       );
       --rind-color-neutral-soft-hover: light-dark(
-        oklch(from var(--rind-color-neutral-solid) 0.92 min(c, 0.05) h / 1),
-        oklch(from var(--rind-color-neutral-solid) 0.31 min(c, 0.05) h / 1)
+        oklch(from var(--rind-color-neutral-solid) 0.895 min(c, 0.045) h / 1),
+        oklch(from var(--rind-color-neutral-solid) 0.33 min(c, 0.07) h / 1)
       );
       --rind-color-neutral-text: light-dark(
-        oklch(from var(--rind-color-neutral-solid) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-color-neutral-solid) min(l, 0.46) min(c, 0.2) h / 1),
         oklch(from var(--rind-color-neutral-solid) max(l, 0.78) min(c, 0.2) h / 1)
       );
       --rind-color-neutral-border: light-dark(
@@ -264,15 +282,15 @@
         1
       );
       --rind-color-danger-soft: light-dark(
-        oklch(from var(--rind-brand-danger) 0.95 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-danger) 0.27 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-danger) 0.93 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-danger) 0.29 min(c, 0.07) h / 1)
       );
       --rind-color-danger-soft-hover: light-dark(
-        oklch(from var(--rind-brand-danger) 0.92 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-danger) 0.31 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-danger) 0.895 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-danger) 0.33 min(c, 0.07) h / 1)
       );
       --rind-color-danger-text: light-dark(
-        oklch(from var(--rind-brand-danger) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-danger) min(l, 0.46) min(c, 0.2) h / 1),
         oklch(from var(--rind-brand-danger) max(l, 0.78) min(c, 0.2) h / 1)
       );
       --rind-color-danger-border: light-dark(
@@ -290,15 +308,15 @@
         1
       );
       --rind-color-warning-soft: light-dark(
-        oklch(from var(--rind-brand-warning) 0.95 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-warning) 0.27 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-warning) 0.93 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-warning) 0.29 min(c, 0.07) h / 1)
       );
       --rind-color-warning-soft-hover: light-dark(
-        oklch(from var(--rind-brand-warning) 0.92 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-warning) 0.31 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-warning) 0.895 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-warning) 0.33 min(c, 0.07) h / 1)
       );
       --rind-color-warning-text: light-dark(
-        oklch(from var(--rind-brand-warning) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-warning) min(l, 0.46) min(c, 0.2) h / 1),
         oklch(from var(--rind-brand-warning) max(l, 0.78) min(c, 0.2) h / 1)
       );
       --rind-color-warning-border: light-dark(
@@ -316,15 +334,15 @@
         1
       );
       --rind-color-success-soft: light-dark(
-        oklch(from var(--rind-brand-success) 0.95 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-success) 0.27 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-success) 0.93 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-success) 0.29 min(c, 0.07) h / 1)
       );
       --rind-color-success-soft-hover: light-dark(
-        oklch(from var(--rind-brand-success) 0.92 min(c, 0.05) h / 1),
-        oklch(from var(--rind-brand-success) 0.31 min(c, 0.05) h / 1)
+        oklch(from var(--rind-brand-success) 0.895 min(c, 0.045) h / 1),
+        oklch(from var(--rind-brand-success) 0.33 min(c, 0.07) h / 1)
       );
       --rind-color-success-text: light-dark(
-        oklch(from var(--rind-brand-success) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-success) min(l, 0.46) min(c, 0.2) h / 1),
         oklch(from var(--rind-brand-success) max(l, 0.78) min(c, 0.2) h / 1)
       );
       --rind-color-success-border: light-dark(

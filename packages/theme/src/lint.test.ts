@@ -14,7 +14,7 @@ export interface Violation {
 
 // Tier-2 categories, tier 1 (brand) and the icon category (theme-icons).
 const categories = new Set(
-  "color space size radius text font leading shadow duration ease focus border brand icon hit".split(
+  "color space size radius text font leading tracking shadow duration ease focus border brand icon hit".split(
     " ",
   ),
 )
@@ -194,7 +194,8 @@ describe("theme lint on the stylesheets", () => {
   for (const f of files.filter((f) => f !== "index.css")) {
     it(`${f} obeys the token tiers and the layer`, () => {
       const css = readFileSync(new URL(f, dir), "utf8")
-      const component = f !== "tokens.css"
+      // fonts.css only declares @font-face (in rind.tokens); it styles no part.
+      const component = f !== "tokens.css" && f !== "fonts.css"
       expect(fmt(lint(`src/${f}`, css, { component, tier2: semantic }))).toEqual([])
     })
   }

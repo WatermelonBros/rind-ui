@@ -36,14 +36,14 @@ export type SemanticColorToken = Surface | `${Palette}-${Role}` | "focus-color"
 export type ColorTokens = Record<SemanticColorToken, Oklch>
 
 const NEUTRAL_L: Record<Exclude<Surface, "border">, readonly [number, number]> = {
-  bg: [0.995, 0.16],
-  surface: [0.97, 0.2],
-  "surface-raised": [1, 0.23],
+  bg: [0.968, 0.185],
+  surface: [0.94, 0.215],
+  "surface-raised": [0.993, 0.25],
   overlay: [0.15, 0.05],
-  text: [0.21, 0.95],
-  "text-muted": [0.5, 0.72],
-  "text-disabled": [0.62, 0.48],
-  "border-strong": [0.62, 0.55],
+  text: [0.2, 0.93],
+  "text-muted": [0.47, 0.71],
+  "text-disabled": [0.64, 0.47],
+  "border-strong": [0.58, 0.53],
 }
 
 const at = (scheme: Scheme, pair: readonly [number, number]) =>
@@ -62,9 +62,10 @@ export function paletteRoles(p: Oklch, scheme: Scheme): Record<Role, Oklch> {
     "solid-hover": of(p.l < 0.6 ? p.l - 0.05 : p.l + 0.05, p.c),
     // White below L 0.6, near-black above (the builder then checks real luminance).
     "on-solid": p.l < 0.6 ? of(1, 0) : of(0.18, 0),
-    soft: of(light ? 0.95 : 0.27, Math.min(p.c, 0.05)),
-    "soft-hover": of(light ? 0.92 : 0.31, Math.min(p.c, 0.05)),
-    text: of(light ? Math.min(p.l, 0.5) : Math.max(p.l, 0.78), Math.min(p.c, 0.2)),
+    // Dark tints carry more chroma: at low lightness a capped tint reads as mud.
+    soft: of(light ? 0.93 : 0.29, Math.min(p.c, light ? 0.045 : 0.07)),
+    "soft-hover": of(light ? 0.895 : 0.33, Math.min(p.c, light ? 0.045 : 0.07)),
+    text: of(light ? Math.min(p.l, 0.46) : Math.max(p.l, 0.78), Math.min(p.c, 0.2)),
     border: of(light ? Math.min(p.l, 0.6) : Math.max(p.l, 0.62), p.c),
   }
 }

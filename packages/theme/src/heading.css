@@ -2,53 +2,57 @@
  * Heading. In no family: typography tokens only. The look follows `data-level`, which is the
  * outline level, not the tag; a consumer changes the size per level with
  * `--rind-heading-<n>-font-size` and the level (and the accessibility tree) stays put.
+ * Large levels close up their tracking; level 6 is the console's engraved panel label:
+ * small, uppercase, tracked out, muted.
  */
 @layer rind.components {
-  :where([data-scope="heading"][data-part="root"][data-level="1"]) {
-    font-size: var(--rind-heading-1-font-size, calc(var(--rind-text-lg) * 1.75));
-    line-height: var(--rind-heading-1-line-height, var(--rind-leading-tight));
-    font-weight: var(--rind-heading-1-font-weight, 700);
-    color: var(--rind-heading-color, var(--rind-color-text));
+  :where([data-scope="heading"][data-part="root"]) {
     margin: 0;
+    color: var(--rind-heading-color, var(--rind-color-text));
+    text-wrap: balance;
+  }
+
+  :where([data-scope="heading"][data-part="root"][data-level="1"]) {
+    font-size: var(--rind-heading-1-font-size, calc(var(--rind-text-sm) * 2.2857));
+    line-height: var(--rind-heading-1-line-height, 1.1);
+    font-weight: var(--rind-heading-1-font-weight, 640);
+    letter-spacing: var(--rind-heading-1-letter-spacing, -0.024em);
   }
 
   :where([data-scope="heading"][data-part="root"][data-level="2"]) {
-    font-size: var(--rind-heading-2-font-size, calc(var(--rind-text-lg) * 1.4));
+    font-size: var(--rind-heading-2-font-size, calc(var(--rind-text-sm) * 1.8571));
     line-height: var(--rind-heading-2-line-height, var(--rind-leading-tight));
-    font-weight: var(--rind-heading-2-font-weight, 700);
-    color: var(--rind-heading-color, var(--rind-color-text));
-    margin: 0;
+    font-weight: var(--rind-heading-2-font-weight, 620);
+    letter-spacing: var(--rind-heading-2-letter-spacing, var(--rind-tracking-tight));
   }
 
   :where([data-scope="heading"][data-part="root"][data-level="3"]) {
-    font-size: var(--rind-heading-3-font-size, var(--rind-text-lg));
+    font-size: var(--rind-heading-3-font-size, calc(var(--rind-text-sm) * 1.4286));
     line-height: var(--rind-heading-3-line-height, var(--rind-leading-tight));
     font-weight: var(--rind-heading-3-font-weight, 600);
-    color: var(--rind-heading-color, var(--rind-color-text));
-    margin: 0;
+    letter-spacing: var(--rind-heading-3-letter-spacing, -0.01em);
   }
 
   :where([data-scope="heading"][data-part="root"][data-level="4"]) {
-    font-size: var(--rind-heading-4-font-size, var(--rind-text-md));
+    font-size: var(--rind-heading-4-font-size, calc(var(--rind-text-sm) * 1.2143));
     line-height: var(--rind-heading-4-line-height, var(--rind-leading-tight));
-    font-weight: var(--rind-heading-4-font-weight, 600);
-    color: var(--rind-heading-color, var(--rind-color-text));
-    margin: 0;
+    font-weight: var(--rind-heading-4-font-weight, 590);
+    letter-spacing: var(--rind-heading-4-letter-spacing, -0.005em);
   }
 
   :where([data-scope="heading"][data-part="root"][data-level="5"]) {
     font-size: var(--rind-heading-5-font-size, var(--rind-text-sm));
     line-height: var(--rind-heading-5-line-height, var(--rind-leading-normal));
-    font-weight: var(--rind-heading-5-font-weight, 600);
-    color: var(--rind-heading-color, var(--rind-color-text));
-    margin: 0;
+    font-weight: var(--rind-heading-5-font-weight, 580);
+    color: var(--rind-heading-5-color, var(--rind-color-text-muted));
   }
 
   :where([data-scope="heading"][data-part="root"][data-level="6"]) {
     font-size: var(--rind-heading-6-font-size, var(--rind-text-xs));
     line-height: var(--rind-heading-6-line-height, var(--rind-leading-normal));
-    font-weight: var(--rind-heading-6-font-weight, 600);
-    color: var(--rind-heading-color, var(--rind-color-text));
-    margin: 0;
+    font-weight: var(--rind-heading-6-font-weight, 650);
+    letter-spacing: var(--rind-heading-6-letter-spacing, var(--rind-tracking-label));
+    text-transform: var(--rind-heading-6-text-transform, uppercase);
+    color: var(--rind-heading-6-color, var(--rind-color-text-muted));
   }
 }

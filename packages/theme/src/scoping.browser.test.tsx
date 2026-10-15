@@ -25,10 +25,10 @@ import {
 afterEach(cleanup)
 
 const calmLight = {
-  bg: "oklch(0.995 0.0023 270)",
-  accent: "oklch(0.52 0.19 268)",
+  bg: "oklch(0.968 0.006 250)",
+  accent: "oklch(0.67 0.165 42)",
 }
-const calmDarkBg = "oklch(0.16 0.01 270)"
+const calmDarkBg = "oklch(0.185 0.006 250)"
 
 describe("Default Theme Without Attributes", () => {
   beforeEach(() => {
@@ -99,7 +99,7 @@ describe("Light And Dark Are Orthogonal", () => {
     document.documentElement.classList.add("dark")
     expect(paint(probe, "--rind-color-bg")).toBe(literal(calmDarkBg))
     expect(paint(probe, "--rind-color-bg")).not.toBe(light)
-    expect(paint(probe, "--rind-color-text")).toBe(literal("oklch(0.95 0.01 270)"))
+    expect(paint(probe, "--rind-color-text")).toBe(literal("oklch(0.93 0.006 250)"))
   })
 
   it("Dark island in a light page (radix-ui/themes#418)", () => {
@@ -153,7 +153,7 @@ describe("Named Scopes (presets and builder output)", () => {
     const calm = snapshot()
     el.setAttribute("data-rind-theme", "crisp")
     const crisp = snapshot()
-    expect(calm).toMatchObject({ radius: 8, space: 16 })
+    expect(calm).toMatchObject({ radius: 6, space: 16 })
     expect(crisp).toMatchObject({ radius: 4, space: 14 })
     expect(crisp.size).toBeLessThan(calm.size)
     expect(crisp.border).not.toBe(calm.border)
@@ -353,7 +353,7 @@ describe("Built root preset under another theme attribute", () => {
     inject(order)
     inject(acme.css)
     inject(files.calm)
-    expect(paint(document.documentElement, solid)).toBe(literal("oklch(0.52 0.19 268)"))
+    expect(paint(document.documentElement, solid)).toBe(literal("oklch(0.67 0.165 42)"))
   })
 
   it.each([
@@ -367,7 +367,7 @@ describe("Built root preset under another theme attribute", () => {
     if (!first) inject(acme.css)
     const root = document.documentElement
     expect(paint(root, solid)).toBe(literal(acme.tokens.colors["accent-solid"].light))
-    expect(paint(root, solid)).not.toBe(literal("oklch(0.52 0.19 268)"))
+    expect(paint(root, solid)).not.toBe(literal("oklch(0.67 0.165 42)"))
   })
 })
 

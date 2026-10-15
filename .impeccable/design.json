@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T00:00:00Z",
+  "title": "Design System: rind-ui theme",
+  "extensions": {
+    "colorMeta": {
+      "signal-orange": {
+        "role": "primary",
+        "displayName": "Signal Orange",
+        "canonical": "oklch(0.67 0.165 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.165 42)",
+          "oklch(0.27 0.165 42)",
+          "oklch(0.39 0.165 42)",
+          "oklch(0.51 0.165 42)",
+          "oklch(0.63 0.165 42)",
+          "oklch(0.75 0.165 42)",
+          "oklch(0.86 0.165 42)",
+          "oklch(0.95 0.165 42)"
+        ]
+      },
+      "signal-orange-hover": {
+        "role": "primary",
+        "displayName": "Signal Orange Hover",
+        "canonical": "oklch(0.72 0.165 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.165 42)",
+          "oklch(0.27 0.165 42)",
+          "oklch(0.39 0.165 42)",
+          "oklch(0.51 0.165 42)",
+          "oklch(0.63 0.165 42)",
+          "oklch(0.75 0.165 42)",
+          "oklch(0.86 0.165 42)",
+          "oklch(0.95 0.165 42)"
+        ]
+      },
+      "signal-legend": {
+        "role": "primary",
+        "displayName": "Signal Legend",
+        "canonical": "oklch(0.18 0 42)",
+        "tonalRamp": [
+          "oklch(0.15 0 42)",
+          "oklch(0.27 0 42)",
+          "oklch(0.39 0 42)",
+          "oklch(0.51 0 42)",
+          "oklch(0.63 0 42)",
+          "oklch(0.75 0 42)",
+          "oklch(0.86 0 42)",
+          "oklch(0.95 0 42)"
+        ]
+      },
+      "signal-orange-tint": {
+        "role": "primary",
+        "displayName": "Signal Orange Tint",
+        "canonical": "oklch(0.93 0.0375 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.0375 42)",
+          "oklch(0.27 0.0375 42)",
+          "oklch(0.39 0.0375 42)",
+          "oklch(0.51 0.0375 42)",
+          "oklch(0.63 0.0375 42)",
+          "oklch(0.75 0.0375 42)",
+          "oklch(0.86 0.0375 42)",
+          "oklch(0.95 0.0375 42)"
+        ]
+      },
+      "signal-orange-tint-dark": {
+        "role": "primary",
+        "displayName": "Signal Orange Tint Dark",
+        "canonical": "oklch(0.29 0.07 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.07 42)",
+          "oklch(0.27 0.07 42)",
+          "oklch(0.39 0.07 42)",
+          "oklch(0.51 0.07 42)",
+          "oklch(0.63 0.07 42)",
+          "oklch(0.75 0.07 42)",
+          "oklch(0.86 0.07 42)",
+          "oklch(0.95 0.07 42)"
+        ]
+      },
+      "signal-orange-text": {
+        "role": "primary",
+        "displayName": "Signal Orange Text",
+        "canonical": "oklch(0.46 0.1388 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.1388 42)",
+          "oklch(0.27 0.1388 42)",
+          "oklch(0.39 0.1388 42)",
+          "oklch(0.51 0.1388 42)",
+          "oklch(0.63 0.1388 42)",
+          "oklch(0.75 0.1388 42)",
+          "oklch(0.86 0.1388 42)",
+          "oklch(0.95 0.1388 42)"
+        ]
+      },
+      "signal-orange-text-dark": {
+        "role": "primary",
+        "displayName": "Signal Orange Text Dark",
+        "canonical": "oklch(0.78 0.1346 42)",
+        "tonalRamp": [
+          "oklch(0.15 0.1346 42)",
+          "oklch(0.27 0.1346 42)",
+          "oklch(0.39 0.1346 42)",
+          "oklch(0.51 0.1346 42)",
+          "oklch(0.63 0.1346 42)",
+          "oklch(0.75 0.1346 42)",
+          "oklch(0.86 0.1346 42)",
+          "oklch(0.95 0.1346 42)"
+        ]
+      },
+      "petrol": {
+        "role": "primary",
+        "displayName": "Petrol",
+        "canonical": "oklch(0.5 0.09 215)",
+        "tonalRamp": [
+          "oklch(0.15 0.09 215)",
+          "oklch(0.27 0.09 215)",
+          "oklch(0.39 0.09 215)",
+          "oklch(0.51 0.09 215)",
+          "oklch(0.63 0.09 215)",
+          "oklch(0.75 0.09 215)",
+          "oklch(0.86 0.09 215)",
+          "oklch(0.95 0.09 215)"
+        ]
+      },
+      "satin-ground": {
+        "role": "neutral",
+        "displayName": "Satin Ground",
+        "canonical": "oklch(0.968 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-faceplate": {
+        "role": "neutral",
+        "displayName": "Satin Faceplate",
+        "canonical": "oklch(0.94 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-key": {
+        "role": "neutral",
+        "displayName": "Satin Key",
+        "canonical": "oklch(0.993 0.0034 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.0034 250)",
+          "oklch(0.27 0.0034 250)",
+          "oklch(0.39 0.0034 250)",
+          "oklch(0.51 0.0034 250)",
+          "oklch(0.63 0.0034 250)",
+          "oklch(0.75 0.0034 250)",
+          "oklch(0.86 0.0034 250)",
+          "oklch(0.95 0.0034 250)"
+        ]
+      },
+      "satin-ink": {
+        "role": "neutral",
+        "displayName": "Satin Ink",
+        "canonical": "oklch(0.2 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-ink-muted": {
+        "role": "neutral",
+        "displayName": "Satin Ink Muted",
+        "canonical": "oklch(0.47 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-ink-disabled": {
+        "role": "neutral",
+        "displayName": "Satin Ink Disabled",
+        "canonical": "oklch(0.64 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-edge": {
+        "role": "neutral",
+        "displayName": "Satin Edge",
+        "canonical": "oklch(0.83 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "satin-edge-strong": {
+        "role": "neutral",
+        "displayName": "Satin Edge Strong",
+        "canonical": "oklch(0.58 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-ground": {
+        "role": "neutral",
+        "displayName": "Graphite Ground",
+        "canonical": "oklch(0.185 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-faceplate": {
+        "role": "neutral",
+        "displayName": "Graphite Faceplate",
+        "canonical": "oklch(0.215 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-key": {
+        "role": "neutral",
+        "displayName": "Graphite Key",
+        "canonical": "oklch(0.25 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-ink": {
+        "role": "neutral",
+        "displayName": "Graphite Ink",
+        "canonical": "oklch(0.93 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-ink-muted": {
+        "role": "neutral",
+        "displayName": "Graphite Ink Muted",
+        "canonical": "oklch(0.71 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "graphite-edge": {
+        "role": "neutral",
+        "displayName": "Graphite Edge",
+        "canonical": "oklch(0.375 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "aluminium-neutral": {
+        "role": "neutral",
+        "displayName": "Aluminium Neutral",
+        "canonical": "oklch(0.4 0.006 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.006 250)",
+          "oklch(0.27 0.006 250)",
+          "oklch(0.39 0.006 250)",
+          "oklch(0.51 0.006 250)",
+          "oklch(0.63 0.006 250)",
+          "oklch(0.75 0.006 250)",
+          "oklch(0.86 0.006 250)",
+          "oklch(0.95 0.006 250)"
+        ]
+      },
+      "danger-red": {
+        "role": "tone",
+        "displayName": "Danger Red",
+        "canonical": "oklch(0.53 0.19 22)",
+        "tonalRamp": [
+          "oklch(0.15 0.19 22)",
+          "oklch(0.27 0.19 22)",
+          "oklch(0.39 0.19 22)",
+          "oklch(0.51 0.19 22)",
+          "oklch(0.63 0.19 22)",
+          "oklch(0.75 0.19 22)",
+          "oklch(0.86 0.19 22)",
+          "oklch(0.95 0.19 22)"
+        ]
+      },
+      "warning-amber": {
+        "role": "tone",
+        "displayName": "Warning Amber",
+        "canonical": "oklch(0.83 0.16 90)",
+        "tonalRamp": [
+          "oklch(0.15 0.16 90)",
+          "oklch(0.27 0.16 90)",
+          "oklch(0.39 0.16 90)",
+          "oklch(0.51 0.16 90)",
+          "oklch(0.63 0.16 90)",
+          "oklch(0.75 0.16 90)",
+          "oklch(0.86 0.16 90)",
+          "oklch(0.95 0.16 90)"
+        ]
+      },
+      "success-green": {
+        "role": "tone",
+        "displayName": "Success Green",
+        "canonical": "oklch(0.62 0.14 155)",
+        "tonalRamp": [
+          "oklch(0.15 0.14 155)",
+          "oklch(0.27 0.14 155)",
+          "oklch(0.39 0.14 155)",
+          "oklch(0.51 0.14 155)",
+          "oklch(0.63 0.14 155)",
+          "oklch(0.75 0.14 155)",
+          "oklch(0.86 0.14 155)",
+          "oklch(0.95 0.14 155)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "h1",
+        "purpose": "Page title."
+      },
+      "headline": {
+        "displayName": "h2",
+        "purpose": "Panel and section titles."
+      },
+      "title": {
+        "displayName": "h3",
+        "purpose": "Subsections."
+      },
+      "title-small": {
+        "displayName": "h4",
+        "purpose": "Minor subsections."
+      },
+      "subtitle": {
+        "displayName": "h5",
+        "purpose": "Muted run-in heading."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, tabular figures."
+      },
+      "key-legend": {
+        "displayName": "Key legend",
+        "purpose": "Button labels."
+      },
+      "label": {
+        "displayName": "h6 / engraved label",
+        "purpose": "Names a panel or control group; never a kicker above a heading."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Code."
+      }
+    },
+    "shadows": [
+      {
+        "name": "rind-shadow-key",
+        "value": "inset 0 1px 0 light-dark(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.09)), inset 0 -1px 0 light-dark(rgb(16 20 28 / 0.1), rgb(0 0 0 / 0.3)), 0 1px 2px light-dark(rgb(16 20 28 / 0.12), rgb(0 0 0 / 0.45))",
+        "purpose": "Resting raised key: lit top edge, contact edge, short shadow."
+      },
+      {
+        "name": "rind-shadow-key-pressed",
+        "value": "inset 0 1px 2px light-dark(rgb(16 20 28 / 0.18), rgb(0 0 0 / 0.5)), 0 0 0 transparent",
+        "purpose": "Pressed key, with translate 0 1px."
+      },
+      {
+        "name": "rind-shadow-sm",
+        "value": "0 1px 1px light-dark(rgb(16 20 28 / 0.07), rgb(0 0 0 / 0.35)), 0 1px 3px light-dark(rgb(16 20 28 / 0.06), rgb(0 0 0 / 0.25))",
+        "purpose": "Declared for small floating layers; unused by shipped components."
+      },
+      {
+        "name": "rind-shadow-lg",
+        "value": "0 0 0 1px light-dark(rgb(16 20 28 / 0.06), rgb(255 255 255 / 0.06)), 0 4px 8px -2px light-dark(rgb(16 20 28 / 0.08), rgb(0 0 0 / 0.4)), 0 16px 32px -8px light-dark(rgb(16 20 28 / 0.16), rgb(0 0 0 / 0.55))",
+        "purpose": "Declared for overlays; unused by shipped components."
+      }
+    ],
+    "motion": [
+      {
+        "name": "rind-duration-fast",
+        "value": "calc(90ms * var(--rind-brand-motion))",
+        "purpose": "Key travel (calm 90ms, crisp 67.5ms)."
+      },
+      {
+        "name": "rind-duration-normal",
+        "value": "calc(180ms * var(--rind-brand-motion))",
+        "purpose": "Standard transitions."
+      },
+      {
+        "name": "rind-duration-slow",
+        "value": "calc(280ms * var(--rind-brand-motion))",
+        "purpose": "Large surfaces."
+      },
+      {
+        "name": "rind-ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Key travel and entrances."
+      },
+      {
+        "name": "rind-ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Symmetric moves."
+      },
+      {
+        "name": "pilot-blink",
+        "value": "opacity 1 to 0.4, 1s steps(2, jump-none) infinite",
+        "purpose": "Pending pilot light; static under reduced motion."
+      }
+    ],
+    "presets": {
+      "calm": {
+        "accent": "oklch(0.67 0.165 42)",
+        "neutral": "oklch(0.4 0.006 250)",
+        "danger": "oklch(0.53 0.19 22)",
+        "warning": "oklch(0.83 0.16 90)",
+        "success": "oklch(0.62 0.14 155)",
+        "fontSize": "0.875rem",
+        "radius": "0.375rem",
+        "density": 1,
+        "motion": 1,
+        "borderStrength": 0.3
+      },
+      "crisp": {
+        "accent": "oklch(0.5 0.09 215)",
+        "neutral": "oklch(0.5 0.008 255)",
+        "danger": "oklch(0.53 0.19 22)",
+        "warning": "oklch(0.83 0.16 90)",
+        "success": "oklch(0.55 0.15 150)",
+        "fontSize": "0.8125rem",
+        "radius": "0.25rem",
+        "density": 0.875,
+        "motion": 0.75,
+        "borderStrength": 0.6
+      }
+    },
+    "derivation": {
+      "neutralChroma": "min(c, 0.03), 0 when c < 0.005; neutral lightness ignored",
+      "neutralLightness": {
+        "bg": [
+          0.968,
+          0.185
+        ],
+        "surface": [
+          0.94,
+          0.215
+        ],
+        "surface-raised": [
+          0.993,
+          0.25
+        ],
+        "overlay": [
+          0.15,
+          0.05
+        ],
+        "text": [
+          0.2,
+          0.93
+        ],
+        "text-muted": [
+          0.47,
+          0.71
+        ],
+        "text-disabled": [
+          0.64,
+          0.47
+        ],
+        "border-strong": [
+          0.58,
+          0.53
+        ],
+        "border": [
+          "0.92 - 0.3 * borderStrength",
+          "0.3 + 0.25 * borderStrength"
+        ]
+      },
+      "overlayAlpha": [
+        0.45,
+        0.6
+      ],
+      "paletteRoles": {
+        "solid": "input",
+        "solid-hover": "L - 0.05 if L < 0.6 else L + 0.05",
+        "on-solid": "white if L < 0.6 else oklch(0.18 0 h)",
+        "soft": "L 0.93 / 0.29, chroma min(c, 0.045 / 0.07)",
+        "soft-hover": "L 0.895 / 0.33, same chroma caps",
+        "text": "L min(l, 0.46) / max(l, 0.78), chroma min(c, 0.2)",
+        "border": "L min(l, 0.6) / max(l, 0.62)"
+      },
+      "scales": "space = rem steps * density; size sm/md/lg = max(24px, 1.75/2/2.5rem * density); text xs/sm/md/lg = fontSize * 0.8571/1/1.1429/1.2857; radius sm/md/lg = radius * 0.5/1/1.5; durations * motion",
+      "focus": "2px solid accent-border, offset 2px"
+    }
+  },
+  "components": [
+    {
+      "name": "Solid Key",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "The one lit key: the primary action of a group.",
+      "html": "<button class=\"ds-key-solid\">Save changes</button>",
+      "css": ".ds-key-solid{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.67 0.165 42);color:oklch(0.18 0 42);box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-solid:hover{background:oklch(0.72 0.165 42);} .ds-key-solid:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-solid:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    },
+    {
+      "name": "Soft Key",
+      "kind": "button",
+      "refersTo": "button-soft",
+      "description": "Satin key in the accent tint, for secondary actions.",
+      "html": "<button class=\"ds-key-soft\">Preview</button>",
+      "css": ".ds-key-soft{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.93 0.0375 42);color:oklch(0.46 0.1388 42);box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-soft:hover{background:oklch(0.895 0.045 42);} .ds-key-soft:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-soft:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    },
+    {
+      "name": "Outline Key",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Neutral satin key with an accent legend and a drawn edge.",
+      "html": "<button class=\"ds-key-outline\">Duplicate</button>",
+      "css": ".ds-key-outline{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.993 0.0034 250);color:oklch(0.46 0.1388 42);border-color:oklch(0.83 0.006 250);box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-outline:hover{background:oklch(0.94 0.006 250);border-color:oklch(0.58 0.006 250);} .ds-key-outline:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-outline:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    },
+    {
+      "name": "Ghost Key",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Flush with the panel until touched.",
+      "html": "<button class=\"ds-key-ghost\">Cancel</button>",
+      "css": ".ds-key-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:transparent;color:oklch(0.46 0.1388 42);box-shadow:none;} .ds-key-ghost:hover{background:oklch(0.93 0.0375 42);} .ds-key-ghost:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-ghost:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    },
+    {
+      "name": "Pending Key (pilot light)",
+      "kind": "custom",
+      "refersTo": "button-solid",
+      "description": "Pending: a blinking pilot light in the key's top-end corner; the legend dims to 70%.",
+      "html": "<button class=\"ds-key-pending\" aria-busy=\"true\">Saving</button>",
+      "css": ".ds-key-pending{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);position:relative;background:oklch(0.67 0.165 42);color:color-mix(in oklab,oklch(0.18 0 42) 70%,transparent);cursor:progress;box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-pending::after{content:'';position:absolute;top:0.3125rem;right:0.3125rem;width:0.375rem;height:0.375rem;border-radius:9999px;background:oklch(0.18 0 42);animation:ds-pilot 1s steps(2,jump-none) infinite;} @keyframes ds-pilot{from{opacity:1}to{opacity:0.4}} @media (prefers-reduced-motion:reduce){.ds-key-pending::after{animation:none}}"
+    },
+    {
+      "name": "Disabled Key",
+      "kind": "button",
+      "refersTo": "button-disabled",
+      "description": "An unlit, recessed blank key.",
+      "html": "<button class=\"ds-key-disabled\" disabled>Disabled</button>",
+      "css": ".ds-key-disabled{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.94 0.006 250);color:oklch(0.64 0.006 250);border-color:oklch(0.83 0.006 250);box-shadow:none;cursor:not-allowed;}"
+    },
+    {
+      "name": "Inline Link",
+      "kind": "custom",
+      "refersTo": "link",
+      "description": "Underlined by default; the fine rule firms up on hover.",
+      "html": "<p class=\"ds-prose\">Read the <a class=\"ds-link\" href=\"#\">token reference</a> first.</p>",
+      "css": ".ds-prose{font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;line-height:1.5;color:oklch(0.47 0.006 250);margin:0;} .ds-link{color:oklch(0.46 0.1388 42);text-decoration:underline;text-decoration-thickness:0.075em;text-decoration-color:color-mix(in oklab,currentColor 45%,transparent);text-underline-offset:0.22em;border-radius:0.1875rem;} .ds-link:hover{text-decoration-color:currentColor;} .ds-link:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    },
+    {
+      "name": "Faceplate Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A faceplate set into the page: edge, no lift, engraved group label.",
+      "html": "<section class=\"ds-panel\"><h2 class=\"ds-h2\">Workspace settings</h2><p class=\"ds-label\">Keys</p><div class=\"ds-row\"><button class=\"ds-key-solid\">Save changes</button><button class=\"ds-key-outline\">Duplicate</button></div></section>",
+      "css": ".ds-panel{display:grid;gap:1.5rem;padding:clamp(1.5rem,5vw,2rem);background:oklch(0.94 0.006 250);color:oklch(0.2 0.006 250);border:1px solid oklch(0.83 0.006 250);border-radius:0.5625rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums;} .ds-h2{margin:0;font-size:1.625rem;font-weight:620;line-height:1.2;letter-spacing:-0.018em;} .ds-label{margin:0 0 -0.75rem;font-size:0.75rem;font-weight:650;letter-spacing:0.07em;text-transform:uppercase;color:oklch(0.47 0.006 250);} .ds-row{display:flex;gap:0.5rem;flex-wrap:wrap;} .ds-key-solid{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.67 0.165 42);color:oklch(0.18 0 42);box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-solid:hover{background:oklch(0.72 0.165 42);} .ds-key-solid:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-solid:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;} .ds-key-outline{display:inline-flex;align-items:center;justify-content:center;min-height:2rem;padding:0 0.75rem;border:1px solid transparent;border-radius:0.375rem;font-family:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:0.875rem;font-weight:560;letter-spacing:-0.005em;line-height:1;cursor:pointer;transition:translate 90ms cubic-bezier(0.22,1,0.36,1);background:oklch(0.993 0.0034 250);color:oklch(0.46 0.1388 42);border-color:oklch(0.83 0.006 250);box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 rgb(16 20 28 / 0.1), 0 1px 2px rgb(16 20 28 / 0.12);} .ds-key-outline:hover{background:oklch(0.94 0.006 250);border-color:oklch(0.58 0.006 250);} .ds-key-outline:active{translate: 0 1px; box-shadow: inset 0 1px 2px rgb(16 20 28 / 0.18);} .ds-key-outline:focus-visible{outline:2px solid oklch(0.6 0.165 42);outline-offset:2px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Console Hi-Fi",
+    "overview": "Components are the controls of a functional hi-fi console, in the Braun school: quiet anodised neutrals, keys you can feel, and one signal colour reserved for what is live or primary. A developer drops the theme in and the app looks deliberate on first render: the primary action reads as the one lit key, secondary controls are quiet satin keys, and every state is legible in light, dark and forced colours.\n\nThe system is white-label by construction. Twelve brand inputs (five colours, two font stacks, font size, radius, density, motion, border strength) derive every semantic token in CSS through OKLCH relative colour inside `light-dark()`, and the typed builder (`defineTheme`) runs the same derivation in TypeScript, gamut-maps it and validates WCAG contrast. Everything below is the **calm** preset (the default on `:root`) unless it says **crisp**; the rules hold for any brand, because they live in the derivation, not in the values.\n\nDensity is compact (14px body, 32px default key) because the first consumer is an IDE used for long sessions. The refusal is the category default: flat white cards, 1px grey borders and a blue primary.",
+    "keyCharacteristics": [
+      "Satin aluminium neutrals in light, anodised graphite in dark; both first-class, same derivation.",
+      "One signal key: the accent solid is the only saturated fill on a screen at rest.",
+      "Keys are physical: lit top edge, contact edge, short shadow; pressing sinks them 1px.",
+      "Hanken Grotesk throughout, tabular figures everywhere, an engraved uppercase label at level 6.",
+      "Panels are faceplates set into the page, not cards floating over it."
+    ],
+    "rules": [
+      {
+        "name": "The One Lit Key Rule",
+        "body": "A component reads accent roles only. Recolour it with `data-tone`, never by pointing it at a palette token directly.",
+        "section": "colors"
+      },
+      {
+        "name": "The Derived Neutral Rule",
+        "body": "Neutrals take only hue and chroma from the brand neutral (chroma capped at 0.03, zeroed below 0.005); their lightness is fixed per role and per scheme. A brand never moves the ground or ink lightness, so contrast survives every re-skin.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Lightness Rule",
+        "body": "Soft tints sit at L 0.93 / 0.895 (light) and 0.29 / 0.33 (dark), chroma capped at 0.045 light and 0.07 dark (a capped dark tint reads as mud). Text roles clamp to L 0.46 / 0.78; border roles to 0.6 / 0.62.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every theme scope sets `font-variant-numeric: tabular-nums`; numbers line up in every component. Slashed zero stays off.",
+        "section": "typography"
+      },
+      {
+        "name": "The Engraved Label Rule",
+        "body": "The uppercase tracked label names a panel or a control group, like the engraving above a row of console keys. It never sits above a heading as a kicker.",
+        "section": "typography"
+      },
+      {
+        "name": "The Key Sinks Rule",
+        "body": "Pressing translates the key 0 1px and swaps to the pressed shadow. Only `translate` transitions (90ms × motion, ease-out); colours never transition, so a scheme change never fades.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Faceplate Rule",
+        "body": "Containers sit in the page: surface tone plus a 1px border, no drop shadow. Lift is reserved for things that actually float.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** derive a brand from the twelve inputs (`defineTheme`), and let the builder validate contrast in both schemes.",
+      "**Do** reserve the solid accent key for the one primary action per group; use soft, outline and ghost for the rest.",
+      "**Do** give every new raised control `--rind-shadow-key` and the 1px sink on press.",
+      "**Do** read only tier-2 tokens with a tier-3 `--rind-<scope>-*` fallback in component stylesheets; select only on `data-scope` / `data-part` / state attributes.",
+      "**Do** give every state a non-colour cue in forced colours."
+    ],
+    "donts": [
+      "**Don't** transition colours or shadows; only the key's travel animates.",
+      "**Don't** put a drop shadow on a panel or card that sits in the page.",
+      "**Don't** hard-code a palette colour in a component; tones work by re-pointing accent roles.",
+      "**Don't** set uppercase tracked text above a heading as a kicker.",
+      "**Don't** let a scheme be second-class: every colour token is a `light-dark()` pair from the same derivation."
+    ]
+  }
+}

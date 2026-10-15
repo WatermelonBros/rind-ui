@@ -3,35 +3,38 @@
 
 import type { BrandInputs } from "./theme"
 
+// Hanken Grotesk ships with the theme (fonts.css, OFL); the system stack covers the moment
+// before it loads and a consumer that drops fonts.css.
 const fontSans =
-  'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif'
+  '"Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'
 const fontMono = 'ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace'
 
 export const calm: BrandInputs = {
-  accent: "oklch(0.52 0.19 268)",
-  neutral: "oklch(0.5 0.01 270)",
-  danger: "oklch(0.55 0.2 27)",
-  warning: "oklch(0.75 0.15 75)",
-  success: "oklch(0.6 0.14 150)",
+  // Satin aluminium neutrals and one signal-orange key with near-black legends.
+  accent: "oklch(0.67 0.165 42)",
+  neutral: "oklch(0.4 0.006 250)",
+  danger: "oklch(0.53 0.19 22)",
+  warning: "oklch(0.83 0.16 90)",
+  success: "oklch(0.62 0.14 155)",
   fontSans,
   fontMono,
   fontSize: "0.875rem",
-  radius: "0.5rem",
+  radius: "0.375rem",
   density: 1,
   motion: 1,
-  borderStrength: 0.2,
+  borderStrength: 0.3,
 }
 
 export const crisp: BrandInputs = {
-  accent: "oklch(0.55 0.2 255)",
-  neutral: "oklch(0.5 0.005 250)",
-  danger: "oklch(0.55 0.21 27)",
-  warning: "oklch(0.75 0.16 75)",
-  // 0.58 in the spec table reaches 4.5:1 with neither white nor black text (strict fails).
+  // Studio: graphite neutrals, a petrol signal key, tighter radius and density, firmer edges.
+  accent: "oklch(0.5 0.09 215)",
+  neutral: "oklch(0.5 0.008 255)",
+  danger: "oklch(0.53 0.19 22)",
+  warning: "oklch(0.83 0.16 90)",
   success: "oklch(0.55 0.15 150)",
   fontSans,
   fontMono,
-  fontSize: "0.875rem",
+  fontSize: "0.8125rem",
   radius: "0.25rem",
   density: 0.875,
   motion: 0.75,

@@ -1,9 +1,13 @@
 /*
- * Button (family: action). Reads accent roles only, so `data-tone` recolours it. The border is
- * always present (transparent unless outline) so forced colors can paint it.
+ * Button (family: action): a console key. Reads accent roles only, so `data-tone` recolours it.
+ * Raised keys (solid, soft, outline) carry --rind-shadow-key: a lit top edge, a contact edge and
+ * a short shadow; pressing sinks the key 1px and turns the light into an inset. Ghost keys sit
+ * flush with the panel. The border is always present (transparent unless drawn) so forced
+ * colors can paint it.
  */
 @layer rind.components {
   :where([data-scope="button"][data-part="root"]) {
+    position: relative;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
@@ -19,18 +23,26 @@
     border-radius: var(--rind-button-radius, var(--rind-radius-control));
     font-family: var(--rind-font-sans);
     font-size: var(--rind-button-font-size, var(--rind-text-control, var(--rind-text-sm)));
-    font-weight: var(--rind-button-font-weight, 500);
+    font-weight: var(--rind-button-font-weight, 560);
+    letter-spacing: var(--rind-button-letter-spacing, -0.005em);
     line-height: 1;
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
+    user-select: none;
     background: var(--rind-button-solid-bg, var(--rind-color-accent-solid));
     color: var(--rind-button-solid-fg, var(--rind-color-accent-on-solid));
+    box-shadow: var(--rind-button-shadow, var(--rind-shadow-key));
+    /* Only the key's travel animates: colours never transition (a scheme change would fade). */
+    transition: translate var(--rind-duration-fast) var(--rind-ease-out);
   }
 
-  :where([data-scope="button"][data-part="root"][data-variant="solid"][data-hover]) {
+  :where([data-scope="button"][data-part="root"][data-variant="solid"][data-hover]),
+  :where([data-scope="button"][data-part="root"]:not([data-variant])[data-hover]) {
     background: var(--rind-button-solid-bg-hover, var(--rind-color-accent-solid-hover));
   }
 
+  /* Soft: a satin key in the accent's tint. */
   :where([data-scope="button"][data-part="root"][data-variant="soft"]) {
     background: var(--rind-button-soft-bg, var(--rind-color-accent-soft));
     color: var(--rind-button-soft-fg, var(--rind-color-accent-text));
@@ -40,40 +52,100 @@
     background: var(--rind-button-soft-bg-hover, var(--rind-color-accent-soft-hover));
   }
 
+  /* Outline: a neutral satin key with an engraved accent legend and a drawn edge. */
   :where([data-scope="button"][data-part="root"][data-variant="outline"]) {
-    background: transparent;
+    background: var(--rind-button-outline-bg, var(--rind-color-surface-raised));
     color: var(--rind-button-outline-fg, var(--rind-color-accent-text));
-    border-color: var(--rind-button-outline-border, var(--rind-color-accent-border));
+    border-color: var(--rind-button-outline-border, var(--rind-color-border));
   }
 
   :where([data-scope="button"][data-part="root"][data-variant="outline"][data-hover]) {
-    background: var(--rind-button-outline-bg-hover, var(--rind-color-accent-soft));
+    background: var(--rind-button-outline-bg-hover, var(--rind-color-surface));
+    border-color: var(--rind-button-outline-border-hover, var(--rind-color-border-strong));
   }
 
+  /* Ghost: flush with the panel until touched. */
   :where([data-scope="button"][data-part="root"][data-variant="ghost"]) {
     background: transparent;
     color: var(--rind-button-ghost-fg, var(--rind-color-accent-text));
+    box-shadow: none;
   }
 
   :where([data-scope="button"][data-part="root"][data-variant="ghost"][data-hover]) {
     background: var(--rind-button-ghost-bg-hover, var(--rind-color-accent-soft));
   }
 
+  /* The key sinks: 1px down, its light edge becomes an inset. */
   :where([data-scope="button"][data-part="root"][data-pressed]) {
-    transform: translateY(1px);
+    translate: 0 1px;
+    box-shadow: var(--rind-button-shadow-pressed, var(--rind-shadow-key-pressed));
   }
 
   :where([data-scope="button"][data-part="root"][data-pending]) {
     cursor: progress;
-    opacity: var(--rind-button-pending-opacity, 0.7);
   }
 
-  :where([data-scope="button"][data-part="root"][data-disabled]) {
-    background: var(--rind-button-disabled-bg, transparent);
+  /*
+   * Pending: the key's pilot light blinks in its top corner (::before is the hit area). It is
+   * painted in the key's full legend colour (the legend itself dims), so it keeps the 3:1 of a
+   * state indicator; only opacity steps, reduced motion leaves it lit, forced colours paint it
+   * as Highlight.
+   */
+  :where([data-scope="button"][data-part="root"][data-pending])::after {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--rind-button-pilot-inset, 0.3125rem);
+    inset-inline-end: var(--rind-button-pilot-inset, 0.3125rem);
+    inline-size: var(--rind-button-pilot-size, 0.375rem);
+    block-size: var(--rind-button-pilot-size, 0.375rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-button-pilot-color, var(--rind-color-accent-on-solid));
+    animation: rind-button-pilot 1s steps(2, jump-none) infinite;
+  }
+
+  @keyframes rind-button-pilot {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.4;
+    }
+  }
+
+  :where(
+    [data-scope="button"][data-part="root"][data-pending]:is(
+      [data-variant="soft"],
+      [data-variant="outline"],
+      [data-variant="ghost"]
+    )
+  )::after {
+    background: var(--rind-button-pilot-color, var(--rind-color-accent-text));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="button"][data-part="root"][data-pending])::after {
+      animation: none;
+    }
+  }
+
+  /* Pending keeps its look and dims its legend; the key stays where it is. */
+  :where([data-scope="button"][data-part="root"][data-pending]:not([data-disabled])) {
+    color: color-mix(in oklab, currentColor 70%, transparent);
+  }
+
+  /* Disabled: an unlit, recessed blank key. */
+  :where([data-scope="button"][data-part="root"][data-disabled]:not([data-pending])) {
+    background: var(--rind-button-disabled-bg, var(--rind-color-surface));
     color: var(--rind-button-disabled-fg, var(--rind-color-text-disabled));
     border-color: var(--rind-button-disabled-border, var(--rind-color-border));
+    box-shadow: none;
     cursor: not-allowed;
-    transform: none;
+    translate: none;
+  }
+
+  :where([data-scope="button"][data-part="root"][data-disabled][data-variant="ghost"]) {
+    background: transparent;
+    border-color: transparent;
   }
 
   @media (forced-colors: active) {
@@ -86,6 +158,10 @@
     :where([data-scope="button"][data-part="root"][data-disabled]) {
       color: GrayText;
       border-color: GrayText;
+    }
+
+    :where([data-scope="button"][data-part="root"][data-pending])::after {
+      background: Highlight;
     }
   }
 }
