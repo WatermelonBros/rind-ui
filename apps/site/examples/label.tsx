@@ -41,10 +41,10 @@ export function WithDescription() {
 export function AsDiv() {
   return (
     <div className="stack">
-      <Label render={<div />} htmlFor="example-nick">
+      <Label render={<div />} id="example-nick-label" htmlFor="example-nick">
         Nickname
       </Label>
-      <input id="example-nick" className="native" />
+      <input id="example-nick" className="native" aria-labelledby="example-nick-label" />
     </div>
   )
 }
@@ -61,6 +61,7 @@ export const variants: Variants = {
   },
   AsDiv: {
     title: "Rendered as another element",
-    description: "`render` on a non-`<label>` still forwards focus to the `htmlFor` element.",
+    description:
+      "`render` on a non-`<label>` still forwards focus on click, but cannot name the field: point `aria-labelledby` at it.",
   },
 }

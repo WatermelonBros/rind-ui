@@ -63,6 +63,6 @@
     [data-state="indeterminate"]
   ) {
   background: #9be7c4;
-  color: #fff;
+  color: var(--s-ink);
   box-shadow: 0 3px 0 var(--s-ok);
 }

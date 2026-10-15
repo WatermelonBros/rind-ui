@@ -25,7 +25,7 @@ const marked = new Marked({
     code({ text, lang }) {
       const language = lang && hljs.getLanguage(lang) ? lang : "plaintext"
       const html = hljs.highlight(text, { language }).value
-      return `<pre data-lang="${language}"><code class="hljs">${html}</code></pre>`
+      return `<pre data-lang="${language}" tabindex="0" aria-label="${language} code"><code class="hljs">${html}</code></pre>`
     },
     link({ href, title, tokens }) {
       const text = this.parser.parseInline(tokens)
@@ -43,6 +43,28 @@ const marked = new Marked({
     },
   },
 })
+
+/**
+ * Wide tables scroll inside a focusable box named after the section it sits in; an empty header
+ * cell (the API's notes column) gets a name.
+ */
+function tables(html: string): string {
+  let heading = "Table"
+  const used = new Map<string, number>()
+  return html
+    .replace(/<th>\s*<\/th>/g, "<th>Description</th>")
+    .replace(/<h[23] id="[^"]*">(.*?)<\/h[23]>|<table>/g, (match, text: string | undefined) => {
+      if (text !== undefined) {
+        heading = text.replace(/<[^>]+>/g, "")
+        return match
+      }
+      const n = (used.get(heading) ?? 0) + 1
+      used.set(heading, n)
+      const label = n > 1 ? `${heading} table ${n}` : `${heading} table`
+      return `<div class="table-scroll" tabindex="0" role="region" aria-label="${label}"><table>`
+    })
+    .replace(/<\/table>/g, "</table></div>")
+}
 
 export interface Rendered {
   /** the first paragraph, shown under the live example */
@@ -64,8 +86,8 @@ export function render(page: DocPage, { hasExample = false } = {}): Rendered {
   const [first = "", ...rest] = body.split(/\n\s*\n/)
   let remainder = rest.join("\n\n")
   if (hasExample) remainder = remainder.replace(/^```[\s\S]*?\n```\s*/, "")
-  const intro = marked.parse(first, { async: false })
-  const html = marked.parse(remainder, { async: false })
+  const intro = tables(marked.parse(first, { async: false }))
+  const html = tables(marked.parse(remainder, { async: false }))
   const toc = [...html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>/g)].map((m) => ({
     id: m[1] ?? "",
     text: (m[2] ?? "").replace(/<[^>]+>/g, ""),

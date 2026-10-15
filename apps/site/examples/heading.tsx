@@ -5,7 +5,7 @@ import type { Variants } from "./types"
 
 export function Basic() {
   return (
-    <Heading.Level>
+    <>
       <Heading>Settings</Heading>
       <Heading.Level>
         <Heading>Profile</Heading>
@@ -13,25 +13,25 @@ export function Basic() {
           <Heading>Avatar</Heading>
         </Heading.Level>
       </Heading.Level>
-    </Heading.Level>
+    </>
   )
 }
 
 export function ExplicitLevel() {
   return (
     <div className="stack">
-      <Heading level={2}>Section title</Heading>
       <Heading level={4}>Fourth-level title</Heading>
+      <Heading level={5}>Fifth-level title</Heading>
     </div>
   )
 }
 
 export function LevelOverride() {
   return (
-    <Heading.Level level={2}>
-      <Heading>Starts at level 2</Heading>
+    <Heading.Level level={4}>
+      <Heading>Starts at level 4</Heading>
       <Heading.Level>
-        <Heading>Then level 3</Heading>
+        <Heading>Then level 5</Heading>
       </Heading.Level>
     </Heading.Level>
   )
@@ -39,12 +39,12 @@ export function LevelOverride() {
 
 export function Reusable() {
   return (
-    <Heading.Level>
+    <>
       <Card title="Reusable card" />
       <Heading.Level>
         <Card title="Nested card" />
       </Heading.Level>
-    </Heading.Level>
+    </>
   )
 }
 

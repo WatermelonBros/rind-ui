@@ -33,7 +33,9 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
   return (
     <div className={styles.shell} data-surface="docs">
       <Sidebar groups={groups} />
-      <div className={styles.main}>{children}</div>
+      <main id="content" className={styles.main}>
+        {children}
+      </main>
     </div>
   )
 }

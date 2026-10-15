@@ -1,11 +1,7 @@
 .marquee {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
   overflow: hidden;
   border-top: var(--bw) solid var(--line);
+  border-bottom: var(--bw) solid var(--line);
   background: var(--bg);
   font: 600 14px var(--mono);
   padding: 14px 0;

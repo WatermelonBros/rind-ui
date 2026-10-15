@@ -22,6 +22,7 @@
   --s-lift-lo: 1px 1px 0 var(--s-ink);
   --s-font: var(--font-inter), system-ui, sans-serif;
   --s-ok: #0b0b0c;
+  --s-error: #a3003c;
 }
 [data-skin="juicy"] {
   --s-bg: #e9e2ff;
@@ -40,6 +41,7 @@
   --s-lift-lo: 0 2px 0 #c9bdf2;
   --s-font: var(--font-fredoka), system-ui, sans-serif;
   --s-ok: #6fcfa5;
+  --s-error: #b0174f;
 }
 [data-skin="bare"] {
   --s-bg: #f4f4f5;
@@ -58,6 +60,7 @@
   --s-lift-lo: none;
   --s-font: system-ui, -apple-system, "Segoe UI", sans-serif;
   --s-ok: #18181b;
+  --s-error: #b91c1c;
 }
 [data-skin] {
   --s-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -68,12 +71,20 @@
 
 /* Disabled reads as disabled in every skin: dimmed, not-allowed, no hover lift. A locked
    accordion trigger (data-disabled without a disabled item) is excluded on purpose. */
-[data-skin]
-:is(button, a, input, label, [data-part="root"], [data-part="item"], [data-part="control"]):is(
-  :disabled,
-  [aria-disabled="true"],
-  [data-disabled]
-):not([data-scope="accordion"][data-part="trigger"]) {
+[data-skin] :is(
+  button,
+  a,
+  input,
+  label,
+  [data-part="root"],
+  [data-part="item"],
+  [data-part="control"]
+):is(:disabled, [aria-disabled="true"], [data-disabled]):not(
+  [data-scope="accordion"][data-part="trigger"]
+):not(
+  /* only the outermost disabled element dims: nested dimming would compound */
+  :is(:disabled, [aria-disabled="true"], [data-disabled]) *
+) {
   opacity: 0.42;
   cursor: not-allowed;
   translate: 0 0;

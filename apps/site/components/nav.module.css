@@ -10,11 +10,24 @@
   font: 600 14px var(--mono);
   background: var(--bar-bg, var(--bg));
   border-bottom: var(--bw) solid var(--line);
+  transition:
+    background 0.4s var(--spring),
+    border-color 0.4s var(--spring),
+    box-shadow 0.4s var(--spring),
+    backdrop-filter 0.4s var(--spring);
 }
 :global([data-phase="juicy"]) .nav {
   background: #ffffffe6;
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 0 var(--soft);
+}
+/* over the hero: no surface at all until the page scrolls */
+.nav[data-floating],
+:global([data-phase="juicy"]) .nav[data-floating] {
+  background: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 /* on reading pages the bar sits on paper, like the page under it */
 :global(html:has([data-surface="docs"])) .nav {
@@ -59,8 +72,20 @@
   cursor: pointer;
   padding: 4px;
 }
-.label {
-  text-transform: lowercase;
+.side {
+  opacity: 0.68;
+  transition: opacity 0.4s var(--spring);
+}
+.side[data-on] {
+  opacity: 1;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .track {
   width: 58px;

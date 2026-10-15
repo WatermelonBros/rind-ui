@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Toggle } from "@rind-ui/react"
+import { Button, Heading, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { useState } from "react"
 import { exampleComponent, examples } from "@/examples"
@@ -36,11 +36,17 @@ export function ExampleFrame({
   slug,
   name,
   source,
+  label,
+  headingLevel,
   hero = false,
 }: {
   slug: string
   name: string
   source: ExampleCode
+  /** accessible name of the frame, unique on the page */
+  label: string
+  /** level of the headings the example renders, so they fit the page's outline */
+  headingLevel: 2 | 3 | 4 | 5
   hero?: boolean
 }) {
   const { phase } = usePhase()
@@ -54,7 +60,12 @@ export function ExampleFrame({
   const shown = tab === "css" ? source.css : source.code[name]
 
   return (
-    <section className={styles.frame} data-hero={hero ? "" : undefined} aria-label="Live example">
+    <section
+      className={styles.frame}
+      data-example=""
+      data-hero={hero ? "" : undefined}
+      aria-label={label}
+    >
       <div className={styles.bar}>
         <div className={styles.views}>
           {(["crisp", "juicy", "bare"] as const).map((s) => (
@@ -65,6 +76,7 @@ export function ExampleFrame({
               onPressedChange={() => setPicked(s)}
             >
               {s}
+              <span className={styles.visuallyHidden}> skin</span>
             </Toggle.Root>
           ))}
         </div>
@@ -79,7 +91,9 @@ export function ExampleFrame({
 
       <div className={styles.stage} data-view={skin} data-skin={skin}>
         <div className={styles.canvas}>
-          <Example />
+          <Heading.Level level={headingLevel}>
+            <Example />
+          </Heading.Level>
         </div>
       </div>
 
@@ -114,8 +128,18 @@ export function ExampleFrame({
               {copied ? "Copied" : "Copy"}
             </Button>
           </div>
-          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources */}
-          <pre dangerouslySetInnerHTML={{ __html: `<code class="hljs">${shown.html}</code>` }} />
+          {/* A scrollable block must be reachable by keyboard: the region holds the focus. */}
+          <section
+            className={styles.codeScroll}
+            aria-label={`${label}: ${tab === "css" ? "skin CSS" : "code"}`}
+          >
+            <pre
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
+              tabIndex={0}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
+              dangerouslySetInnerHTML={{ __html: `<code class="hljs">${shown.html}</code>` }}
+            />
+          </section>
           {tab === "css" && (
             <p className={styles.cssNote}>
               Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a start,

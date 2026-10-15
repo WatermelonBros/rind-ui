@@ -19,7 +19,7 @@
 }
 [data-skin="juicy"] [data-scope="fieldset"][data-part="legend"] {
   background: var(--s-acc);
-  color: #fff;
+  color: var(--s-ink);
 }
 [data-skin] [data-scope="heading"][data-part="root"] {
   font-family: var(--font-unbounded), sans-serif;
@@ -82,7 +82,7 @@
 }
 [data-skin] [data-scope="link"][data-part="link"][data-hover] {
   background-size: 100% 100%;
-  color: #fff;
+  color: var(--s-ink);
 }
 [data-skin="crisp"] [data-scope="link"][data-part="link"][data-hover] {
   color: var(--s-on);

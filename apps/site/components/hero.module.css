@@ -68,7 +68,7 @@
 }
 :global([data-phase="juicy"]) .lede em {
   background: var(--acc);
-  color: #fff;
+  color: var(--ink);
   border-radius: 14px;
 }
 
@@ -116,7 +116,7 @@
 }
 .frameworks {
   font: 500 13px var(--mono);
-  opacity: 0.75;
+  color: color-mix(in oklab, var(--ink) 80%, var(--bg));
 }
 .frameworks b {
   background: var(--ink);
@@ -129,7 +129,7 @@
 }
 :global([data-phase="juicy"]) .primary {
   background: var(--acc);
-  color: #fff;
+  color: var(--ink);
   box-shadow:
     0 6px 0 var(--acc-deep),
     0 14px 24px #e0608a40;
@@ -170,8 +170,8 @@
   top: -12px;
   left: 16px;
   font: 600 11px var(--mono);
-  background: var(--acc);
-  color: #fff;
+  background: var(--ink);
+  color: var(--bg);
   padding: 4px 8px;
   border-radius: 99px;
   white-space: nowrap;

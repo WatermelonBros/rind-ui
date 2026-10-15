@@ -62,7 +62,7 @@ body {
 }
 ::selection {
   background: var(--acc);
-  color: #fff;
+  color: var(--ink);
 }
 a {
   color: inherit;
@@ -71,6 +71,25 @@ a {
   outline: 3px solid var(--acc);
   outline-offset: 3px;
   border-radius: 6px;
+}
+
+/* Scroll reveal (components/home/reveal.tsx; not data-reveal, which rind uses): content fades and lifts in once. */
+[data-scroll-reveal] {
+  opacity: 0;
+  translate: 0 28px;
+  transition:
+    opacity 0.9s var(--spring),
+    translate 0.9s var(--spring);
+}
+[data-scroll-reveal][data-in] {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-reveal] {
+    opacity: 1;
+    translate: 0 0;
+  }
 }
 
 /* While the curtain covers the page every transition is off: the new phase must be fully

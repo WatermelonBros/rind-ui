@@ -2,6 +2,7 @@ import type { ComponentType } from "react"
 import * as accordion from "./accordion"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
+import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
@@ -22,6 +23,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   accordion,
   button,
   checkbox,
+  "checkbox-group": checkboxGroup,
   collapsible,
   field,
   fieldset,

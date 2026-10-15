@@ -28,7 +28,7 @@
 }
 [data-skin="juicy"] [data-scope="button"][data-part="root"] {
   background: var(--s-acc);
-  color: #fff;
+  color: var(--s-ink);
   box-shadow: 0 5px 0 var(--s-acc-deep);
 }
 [data-skin="juicy"] [data-scope="button"][data-part="root"][data-hover] {

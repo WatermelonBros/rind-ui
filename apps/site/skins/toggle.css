@@ -32,6 +32,6 @@
 }
 [data-skin="juicy"] [data-scope="toggle"][data-part="root"][aria-pressed="true"] {
   background: var(--s-acc);
-  color: #fff;
+  color: var(--s-ink);
   box-shadow: 0 5px 0 var(--s-acc-deep);
 }

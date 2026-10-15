@@ -28,7 +28,13 @@ export function ExamplesSection({ slug, source }: { slug: string; source: Exampl
         <div key={name} className={styles.variant}>
           <h3 id={`example-${name.toLowerCase()}`}>{title}</h3>
           {description && <p>{withCode(description)}</p>}
-          <ExampleFrame slug={slug} name={name} source={source} />
+          <ExampleFrame
+            slug={slug}
+            name={name}
+            source={source}
+            label={`${title} example`}
+            headingLevel={4}
+          />
         </div>
       ))}
     </section>

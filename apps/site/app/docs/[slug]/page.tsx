@@ -31,7 +31,16 @@ export default async function DocPage({ params }: Props) {
           <p className={styles.kicker}>{page.section === "components" ? "Component" : "Guide"}</p>
           <h1 className={styles.title}>{page.title}</h1>
         </header>
-        {source && <ExampleFrame slug={page.slug} name="Basic" source={source} hero />}
+        {source && (
+          <ExampleFrame
+            slug={page.slug}
+            name="Basic"
+            source={source}
+            label={`${page.title} example`}
+            headingLevel={2}
+            hero
+          />
+        )}
         <div
           className={`${styles.prose} ${styles.intro}`}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs

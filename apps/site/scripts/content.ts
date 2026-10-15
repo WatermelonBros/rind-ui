@@ -135,3 +135,39 @@ for (const f of readdirSync(examplesDir).filter((f) => f.endsWith(".tsx"))) {
   }
 }
 writeFileSync(join(out, "examples.json"), `${JSON.stringify(examples, null, 2)}\n`)
+
+// ── roadmap: every planned component, its wave and status, from docs/components.md ─────────
+type Status = "todo" | "research" | "spec" | "wip" | "done"
+const statuses = new Set<string>(["todo", "research", "spec", "wip", "done"])
+const docSlugs = new Set(pages.filter((p) => p.section === "components").map((p) => p.slug))
+const roadmap: { category: string; name: string; wave: string; status: Status; slug?: string }[] =
+  []
+let category = ""
+for (const line of readFileSync(join(repo, "docs/components.md"), "utf8").split("\n")) {
+  const heading = /^## (.+?)(?: \(\d+\))?$/.exec(line)
+  if (heading) {
+    category = heading[1] ?? ""
+    continue
+  }
+  if (!category || category.startsWith("Utilities") || category.startsWith("Coverage")) continue
+  if (!line.startsWith("| ") || line.startsWith("| Component") || line.startsWith("|---")) continue
+  const cells = line
+    .slice(1, -1)
+    .split("|")
+    .map((c) => c.trim())
+  const at = cells.findIndex((c) => statuses.has(c))
+  if (at < 0 || !cells[0]) continue
+  const before = cells[at - 1] ?? ""
+  const slug = cells[0]
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+  roadmap.push({
+    category,
+    name: cells[0],
+    wave: /^\d$/.test(before) ? before : category.startsWith("AI") ? "AI" : "",
+    status: cells[at] as Status,
+    ...(docSlugs.has(slug) ? { slug } : {}),
+  })
+}
+writeFileSync(join(out, "roadmap.json"), `${JSON.stringify(roadmap, null, 2)}\n`)

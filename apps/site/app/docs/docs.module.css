@@ -25,7 +25,9 @@
   opacity: 0.6;
 }
 .title {
-  font: 900 clamp(44px, 6vw, 84px) / 0.95 var(--display);
+  font: 900 clamp(32px, 6vw, 84px) / 0.95 var(--display);
+  overflow-wrap: anywhere;
+  max-width: 100%;
   letter-spacing: -0.03em;
   margin: 10px 0 16px;
 }
@@ -49,7 +51,7 @@
   font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  opacity: 0.55;
+  opacity: 0.8;
   margin-bottom: 8px;
 }
 .toc a {
@@ -120,9 +122,12 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  margin: 12px 0 24px;
-  display: block;
+  margin: 0;
+}
+.prose :global(.table-scroll) {
   overflow-x: auto;
+  margin: 12px 0 24px;
+  border-radius: 8px;
 }
 .prose :where(th) {
   text-align: left;
@@ -157,7 +162,7 @@
   color: #9be7ff;
 }
 .prose :global(.hljs-comment) {
-  color: #8a8a80;
+  color: #b4b4ac;
   font-style: italic;
 }
 .prose :global(.hljs-number),
@@ -246,7 +251,7 @@
 }
 :global([data-phase="juicy"]) .kicker {
   background: var(--acc);
-  color: #fff;
+  color: var(--ink);
 }
 .prose :where(h2)::before {
   content: "";

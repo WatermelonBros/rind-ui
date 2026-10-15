@@ -7,7 +7,8 @@
     "predev": "node scripts/content.ts",
     "dev": "next dev -p 3300",
     "build": "node scripts/content.ts && next build",
-    "typecheck": "node scripts/content.ts && tsc --noEmit"
+    "typecheck": "node scripts/content.ts && tsc --noEmit",
+    "audit": "node scripts/content.ts && next build && node tests/audit.ts"
   },
   "dependencies": {
     "@rind-ui/core": "workspace:*",
@@ -25,6 +26,8 @@
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "axe-core": "4.14.0",
+    "playwright": "1.64.0",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3"
   }

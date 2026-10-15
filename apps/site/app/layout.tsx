@@ -53,7 +53,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <GooFilters />
         <PhaseProvider>
-          <Nav />
+          <header>
+            <Nav />
+          </header>
           {children}
         </PhaseProvider>
       </body>
