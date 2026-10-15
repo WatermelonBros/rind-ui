@@ -33,3 +33,7 @@
 .readout-host {
   justify-items: start;
 }
+/* a button in a stack keeps its own width instead of spanning the column */
+.stack > [data-scope="button"] {
+  justify-self: start;
+}
