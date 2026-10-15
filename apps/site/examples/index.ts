@@ -1,5 +1,6 @@
 import type { ComponentType } from "react"
 import * as accordion from "./accordion"
+import * as announcements from "./announcements"
 import * as autosize from "./autosize"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
@@ -34,6 +35,7 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,
   labels: labels,

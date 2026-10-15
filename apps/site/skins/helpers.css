@@ -37,3 +37,17 @@
 .stack > [data-scope="button"] {
   justify-self: start;
 }
+ol.readout {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+ol.readout li {
+  font:
+    600 12px var(--font-mono),
+    monospace;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: color-mix(in oklab, currentColor 9%, transparent);
+}
