@@ -1,0 +1,4 @@
+- text: Email
+- textbox "Email" [invalid]: abc
+- paragraph: We never share it.
+- paragraph: Enter a valid email address.

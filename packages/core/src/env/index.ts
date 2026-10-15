@@ -22,7 +22,12 @@ export type {
   StyleInjection,
   TimerHandle,
 } from "./capabilities"
-export { type DomEnvironment, type DomEnvironmentOptions, domEnvironment } from "./dom-environment"
+export {
+  type DomEnvironment,
+  type DomEnvironmentOptions,
+  domEnvironment,
+  type ValidityEnv,
+} from "./dom-environment"
 export type {
   Align,
   AnchorSource,

@@ -110,7 +110,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Form |  | ● | ● | ● |  | ● | ● |  |  | 5 | 2 | spec |  |
 | Label |  | ● | ● |  | ● |  | ● | ● |  | 5 | 1 | done |  |
-| Field | ● |  |  | ● | ● |  | ● |  |  | 4 | 1 | spec |  |
+| Field | ● |  |  | ● | ● |  | ● |  |  | 4 | 1 | done |  |
 | Fieldset | ● |  |  | ● | ● |  |  |  |  | 3 | 2 | done |  |
 
 ## Date & time (10)

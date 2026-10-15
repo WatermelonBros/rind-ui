@@ -1,0 +1,82 @@
+/*
+ * Field. In no family: layout and typography only. The Label names one control, so it is the
+ * subtitle style, not the engraved group label. The ErrorMessage carries an icon in
+ * `currentColor`, so an error is never shown by colour alone and survives forced colors.
+ * `data-tone="danger"` re-points the accent roles: the Label reads them.
+ */
+@layer rind.components {
+  :where([data-scope="field"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-field-gap, var(--rind-space-1));
+    color: var(--rind-field-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="field"][data-part="label"]) {
+    font-size: var(--rind-field-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-field-label-font-weight, 580);
+    line-height: var(--rind-field-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-field-label-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="field"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-field-description-font-size, var(--rind-text-sm));
+    color: var(--rind-field-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="field"][data-part="error-message"]) {
+    display: flex;
+    gap: var(--rind-field-error-gap, var(--rind-space-1));
+    margin: 0;
+    font-size: var(--rind-field-error-font-size, var(--rind-text-sm));
+    color: var(--rind-field-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="field"][data-part="error-message"])::before {
+    content: "";
+    flex: none;
+    inline-size: 1.25em;
+    block-size: 1lh;
+    background-color: currentColor;
+    mask-image: var(--rind-field-error-icon, var(--rind-icon-warning));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 1.25em;
+  }
+
+  /* Several messages render as a list: no bullets, the icon already marks it. */
+  :where([data-scope="field"][data-part="error-message"] ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Only the Label dims: the Description stays readable help text (axe asks 4.5:1 of a <p>). */
+  :where([data-scope="field"][data-part="root"][data-disabled] [data-part="label"]) {
+    color: var(--rind-field-disabled-color, var(--rind-color-text-disabled));
+  }
+
+  :where([data-scope="field"][data-part="root"][data-tone="danger"] [data-part="label"]) {
+    color: var(--rind-field-label-color, var(--rind-color-accent-text));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="field"][data-part="root"]),
+    :where([data-scope="field"][data-part="label"]),
+    :where([data-scope="field"][data-part="description"]),
+    :where([data-scope="field"][data-part="error-message"]) {
+      color: CanvasText;
+    }
+
+    :where([data-scope="field"][data-part="error-message"])::before {
+      background-color: CanvasText;
+    }
+
+    :where(
+        [data-scope="field"][data-part="root"][data-disabled] [data-part="label"],
+        [data-scope="field"][data-part="root"][data-disabled] [data-part="description"]
+      ) {
+      color: GrayText;
+    }
+  }
+}

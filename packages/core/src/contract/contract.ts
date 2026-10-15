@@ -23,6 +23,8 @@ export type Trait =
   | "live-region"
   | "timed"
   | "directional"
+  /** A form control: inside a Field, it follows the Field (field-control trait). */
+  | "field-associated"
 
 /** One modality's implementation of an action. */
 export type ActionImpl<P extends string> = (env: Env<P>, ...args: never) => Promise<unknown>

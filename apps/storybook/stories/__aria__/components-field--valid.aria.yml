@@ -1,0 +1,3 @@
+- text: Email
+- textbox "Email": ada@example.com
+- paragraph: We never share it.

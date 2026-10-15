@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-field (r1) | — | packages/react/src/field/field.tsx:402 | Field.Label focusTarget passes modality "pointer", so an AT (virtual) label click is re-labelled pointer — pass the current modality |
+| add-field (r1) | — | packages/testing/src/invariants.ts (field-associated) | describedby filter keeps only ids starting with "field-" while expected set is all rendered part ids → false positive when Description/ErrorMessage get a consumer id; filter by field.partIds |
+| add-field (r1) | — | packages/react/src/field/field.tsx (useFieldControl) | claim during render / release in effect cleanup: after a StrictMode-style remount the owner is null until next render (repro still passed) |
 | add-fieldset (r1) | — | packages/core/src/dom/fieldset-disabled.ts | watchFieldsetDisabled returns early when the part has no fieldset ancestor at watch time, so moving it into a disabled fieldset later is missed |
 | add-fieldset (r1) | — | packages/core/src/dom/fieldset-disabled.ts | document-level childList observer re-checks every watch on every mutation batch — filter records to fieldset/legend changes |
 | add-fieldset (r1) | — | openspec specs (fieldset) / docs | substituted Legend (render={<div/>}) gets no first-legend exemption (matches native) — state it in spec/docs; reconcile "ErrorMessage listed while rendered" vs forceMount-while-valid not listed |

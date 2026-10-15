@@ -5,6 +5,14 @@ export {
   buttonLikeProps,
 } from "./button-like"
 export {
+  type FieldControlBinding,
+  type FieldControlOwn,
+  type FieldControlProps,
+  type FieldControlReport,
+  type FieldControlState,
+  mergeFieldProps,
+} from "./field-control"
+export {
   checkLabelTarget,
   isLabelable,
   type LabelInteractionOptions,

@@ -19,7 +19,7 @@ interface WindowState {
   /** The element focused when the window lost focus, until it gets focus back. */
   windowBlurred: Element | null
   /** Focus moves rind-ui is about to make, with their cause. */
-  readonly marked: WeakMap<Element, FocusCause>
+  readonly marked: WeakMap<Element, { readonly cause: FocusCause; readonly modality?: Modality }>
   readonly causes: WeakMap<Element, FocusCause>
   /** The last focused elements, oldest first (bounded). */
   readonly recent: WeakRef<Element>[]
@@ -147,9 +147,11 @@ function install(win: Window, platform: PlatformFlags): WindowState {
     const marked = state.marked.get(target)
     let cause: FocusCause
     if (marked) {
-      // rind-ui's own move: keeps the current modality.
+      // rind-ui's own move: keeps the current modality, unless the move names one (a
+      // failed submission focusing the first invalid control shows a ring: keyboard).
       state.marked.delete(target)
-      cause = marked
+      cause = marked.cause
+      if (marked.modality) set(state, marked.modality)
     } else if (state.inputBeforeFocus) {
       cause = state.inputBeforeFocus
     } else if (state.windowBlurred === target) {
@@ -243,7 +245,8 @@ export function modalityTracker(
       }
     },
     focusCause: (el) => stateOf(false)?.causes.get(el) ?? "other",
-    markFocus: (el, cause) => stateOf(true)?.marked.set(el, cause),
+    markFocus: (el, cause, modality) =>
+      stateOf(true)?.marked.set(el, modality ? { cause, modality } : { cause }),
     unmarkFocus: (el) => stateOf(false)?.marked.delete(el),
     recentFocus: () =>
       (stateOf(false)?.recent ?? [])

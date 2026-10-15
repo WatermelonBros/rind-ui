@@ -36,8 +36,11 @@ export interface ModalitySource {
   subscribe(listener: (modality: Modality) => void): () => void
   /** Why `el` last received focus (rind-ui's own cause, or key/pointer/window/other). */
   focusCause(el: Element): FocusCause
-  /** Marks a focus move rind-ui is about to make: it keeps the modality and has `cause`. */
-  markFocus(el: Element, cause: FocusCause): void
+  /**
+   * Marks a focus move rind-ui is about to make: it keeps the modality (or switches to
+   * `modality` when given) and has `cause`.
+   */
+  markFocus(el: Element, cause: FocusCause, modality?: Modality): void
   /** Drops a mark no focus event consumed (the element refused focus). */
   unmarkFocus(el: Element): void
   /**

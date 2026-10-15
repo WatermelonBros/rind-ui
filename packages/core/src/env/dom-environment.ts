@@ -1,4 +1,5 @@
 import { collectionLayout } from "../dom/collection-layout"
+import { type ConstraintValidity, constraintValidity } from "../dom/constraint-validity"
 import { liveAnnouncer } from "../dom/live-announcer"
 import { modalityTracker } from "../dom/modality"
 import { motionPreference } from "../dom/motion"
@@ -36,7 +37,13 @@ export type DomEnvironment = SchedulerEnv &
   AnnouncerEnv &
   ClockEnv &
   CollectionLayoutEnv &
-  RouterCapability
+  RouterCapability &
+  ValidityEnv
+
+/** Native constraint validity, for machines that validate a form control (Field). */
+export interface ValidityEnv {
+  readonly validity: ConstraintValidity
+}
 
 export interface DomEnvironmentOptions {
   /** The document or shadow root the component lives in (default: `document`). */
@@ -111,6 +118,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
     scheduler,
     dom,
     router: options.router,
+    validity: constraintValidity,
     get platform() {
       return getPlatform()
     },

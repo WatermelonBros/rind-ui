@@ -392,6 +392,58 @@ const partNamed = (s: DomSnapshot, name: string | undefined) =>
   name === undefined ? [] : s.parts.filter((p) => p.part === name)
 
 export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>> = {
+  /**
+   * (field-control) Inside a Field, the control is named by the Field's Label, described by
+   * exactly the Field parts that are rendered, aria-invalid exactly when the Field displays
+   * invalid, and disabled / read-only / required as the Field says.
+   */
+  "field-associated": (f) => {
+    const field = f.after.field
+    if (!field) return []
+    const label = field.label
+    // The part the Label names: by `for`, by aria-labelledby, else the focusable part.
+    const control =
+      f.after.parts.find((p) => label?.for != null && p.id === label.for) ??
+      f.after.parts.find(
+        (p) => label && p.attrs["aria-labelledby"]?.split(" ").includes(label.id),
+      ) ??
+      f.after.parts.find((p) => p.focusable)
+    if (!control) return []
+    const out: string[] = []
+    if (label && control.name !== label.text) {
+      out.push(
+        `${control.describe} is named "${control.name}", not by the Field's Label "${label.text}"`,
+      )
+    }
+    const described = (control.attrs["aria-describedby"] ?? "")
+      .split(/\s+/)
+      .filter((id) => id.startsWith("field-"))
+    const expected = [...field.partIds].sort()
+    if (JSON.stringify([...described].sort()) !== JSON.stringify(expected)) {
+      out.push(
+        `${control.describe} aria-describedby lists [${described}], the rendered Field parts are [${expected}]`,
+      )
+    }
+    const invalid = field.attrs["data-invalid"] !== undefined
+    if (control.role !== "button" && isTrue(control.attrs["aria-invalid"]) !== invalid) {
+      out.push(
+        `${control.describe} aria-invalid disagrees with the Field's data-invalid (${invalid})`,
+      )
+    }
+    const has = (name: string, aria: string) =>
+      control.attrs[name] !== undefined || isTrue(control.attrs[aria])
+    const pairs: [string, string, string][] = [
+      ["data-disabled", "disabled", "aria-disabled"],
+      ["data-readonly", "readonly", "aria-readonly"],
+      ["data-required", "required", "aria-required"],
+    ]
+    for (const [data, attr, aria] of pairs) {
+      if ((field.attrs[data] !== undefined) !== has(attr, aria)) {
+        out.push(`${control.describe} ${attr} disagrees with the Field's ${data}`)
+      }
+    }
+    return out
+  },
   /** (30) The trigger mirrors open state; content is gone, hidden or until-found when closed. */
   disclosure: (f) => {
     const out: string[] = []

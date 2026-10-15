@@ -65,6 +65,19 @@ export interface DomSnapshot {
   readonly body: Readonly<Record<string, string>>
   /** aria-hidden, inert and style of the siblings of every part's ancestors, by identity. */
   readonly outside: Readonly<Record<string, Readonly<Record<string, string>>>>
+  /**
+   * The rind-ui Field around the instance (field-associated trait): its root's attributes,
+   * its Label, and the ids of its rendered Description and ErrorMessage parts.
+   */
+  readonly field: {
+    readonly attrs: Readonly<Record<string, string>>
+    readonly label: {
+      readonly id: string
+      readonly text: string
+      readonly for: string | null
+    } | null
+    readonly partIds: readonly string[]
+  } | null
   /** Live regions (explicit `aria-live` other than "off", or by role) inside the parts. */
   readonly liveRegions: readonly string[]
   /** The visual viewport, and whether the page has real layout (not jsdom). */
@@ -302,7 +315,33 @@ export function collectDom(arg: {
 
   const active = doc.activeElement
   const activePart = active?.closest(selector)
+  const fieldRoot = partEls[0]?.closest('[data-scope="field"][data-part="root"]') ?? null
+  const fieldPart = (part: string) =>
+    fieldRoot
+      ? Array.from(
+          doc.querySelectorAll(
+            `[data-scope="field"][data-part="${part}"][data-instance="${fieldRoot.getAttribute("data-instance")}"]`,
+          ),
+        )
+      : []
+  const fieldLabel = fieldPart("label")[0]
+  const field = fieldRoot
+    ? {
+        attrs: attrsOf(fieldRoot),
+        label: fieldLabel
+          ? {
+              id: fieldLabel.id,
+              text: norm(fieldLabel.textContent),
+              for: fieldLabel.getAttribute("for"),
+            }
+          : null,
+        partIds: [...fieldPart("description"), ...fieldPart("error-message")]
+          .map((e) => e.id)
+          .filter(Boolean),
+      }
+    : null
   return {
+    field,
     parts: partEls.map(info),
     elements: elements.map(info),
     refs,

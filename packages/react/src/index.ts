@@ -1,4 +1,5 @@
 export * from "./button"
+export * from "./field"
 export * from "./fieldset"
 export * from "./heading"
 export { type IconName, type RindIcons, useIconChildren } from "./icons"

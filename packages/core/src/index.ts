@@ -1,6 +1,7 @@
 export * from "./a11y"
 export * from "./collection"
 export * from "./components/button"
+export * from "./components/field"
 export * from "./components/fieldset"
 export * from "./components/heading"
 export * from "./components/label"

@@ -210,6 +210,63 @@
         }
       }
     },
+    "field": {
+      "family": null,
+      "tokens": {
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "field.css"
+        },
+        "description-color": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "field.css"
+        },
+        "description-font-size": {
+          "fallback": "var(--rind-text-sm)",
+          "file": "field.css"
+        },
+        "disabled-color": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "field.css"
+        },
+        "error-color": {
+          "fallback": "var(--rind-color-danger-text)",
+          "file": "field.css"
+        },
+        "error-font-size": {
+          "fallback": "var(--rind-text-sm)",
+          "file": "field.css"
+        },
+        "error-gap": {
+          "fallback": "var(--rind-space-1)",
+          "file": "field.css"
+        },
+        "error-icon": {
+          "fallback": "var(--rind-icon-warning)",
+          "file": "field.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-1)",
+          "file": "field.css"
+        },
+        "label-color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "field.css"
+        },
+        "label-font-size": {
+          "fallback": "var(--rind-text-sm)",
+          "file": "field.css"
+        },
+        "label-font-weight": {
+          "fallback": "580",
+          "file": "field.css"
+        },
+        "label-line-height": {
+          "fallback": "var(--rind-leading-normal)",
+          "file": "field.css"
+        }
+      }
+    },
     "fieldset": {
       "family": null,
       "tokens": {

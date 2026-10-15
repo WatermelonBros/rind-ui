@@ -1,4 +1,4 @@
-import type { FocusCause } from "../a11y/events"
+import type { FocusCause, Modality } from "../a11y/events"
 import type { ModalityEnv, MotionEnv } from "../env/capabilities"
 
 /**
@@ -12,6 +12,8 @@ export async function focusSafely(
   el: HTMLElement,
   env: ModalityEnv & Partial<MotionEnv>,
   cause: Extract<FocusCause, "layer" | "navigation" | "programmatic"> = "programmatic",
+  /** The modality this move counts as (default: the current one). */
+  modality?: Modality,
 ): Promise<void> {
   if (env.modality.modality() === "virtual") {
     const running = el.getAnimations?.() ?? []
@@ -20,7 +22,7 @@ export async function focusSafely(
   }
   // Already focused: no focus event would consume the mark.
   if (el.ownerDocument.activeElement !== el) {
-    env.modality.markFocus(el, cause)
+    env.modality.markFocus(el, cause, modality)
     el.focus({ preventScroll: true })
     // Not focusable (or focus refused): drop the mark so the next focus is not misread.
     if (el.ownerDocument.activeElement !== el) env.modality.unmarkFocus(el)

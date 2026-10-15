@@ -1,5 +1,19 @@
 export { collectionLayout } from "./collection-layout"
 export {
+  type ConstraintElement,
+  type ConstraintValidity,
+  clearOwnCustomValidity,
+  constraintValidity,
+  firstInvalidInTreeOrder,
+  hasOwnCustomValidity,
+  readValidity,
+  requiredMessage,
+  setOwnCustomValidity,
+  VALIDITY_KEYS,
+  type ValidityKey,
+  type ValidityReading,
+} from "./constraint-validity"
+export {
   type DismissOptions,
   type DismissReason,
   type DismissRequest,

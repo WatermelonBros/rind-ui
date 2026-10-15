@@ -94,3 +94,14 @@ Stories: Components/Fieldset → AddressGroup, Disabled, Invalid. Record each pa
       the description is read.
 - [ ] **All three**: in Disabled, the controls are announced as dimmed / unavailable.
 - [ ] **All three**: in Invalid, the group's description includes the error text.
+
+## Device checklist: Field (add-field 12.1)
+
+Stories: Components/Field → WithDescriptionAndError, Blur. Record each pass in
+`tested-with.json` with `component: "field"`.
+
+- [ ] **NVDA + Chrome, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS, TalkBack**:
+      submit WithDescriptionAndError empty; focus lands on the field and the error is read
+      with the name and description, once (no double reading).
+- [ ] **All**: in Blur, type an invalid email and Tab on; the error announcement
+      ("Email: …") is spoken once.
