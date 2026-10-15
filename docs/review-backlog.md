@@ -7,6 +7,11 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-accordion (r1) | — | packages/core/src/components/accordion/accordion.contract.ts:62-85 | heading invariant doesn't check "trigger is the header's only element child" nor name the item; triggers matched by name conflate same-label items |
+| add-accordion (r1) | — | accordion.connect.ts:57-60 / accordion.tsx:174 | region rule uses registered item count (0 on server) → SSR of 8-item multiple accordion gives role=region until mount — count Item children or document |
+| add-accordion (r1) | — | accordion.machine.ts:67-77 | single-mode "more than one value" warning keyed by array identity → fires every render with inline arrays |
+| add-accordion (r1) | — | accordion.contract.ts:13 | module-level accordionArgs.current: unsafe under describe.concurrent, silent "" item when unset — let testMachine pass the argument class |
+| add-accordion (r1) | — | packages/react/src/collapsible/collapsible.tsx | decoration rebuilt every render (api in memo deps) — harmless, defeats the memo |
 | add-collapsible (r1) | — | packages/core/src/dom/content-size.ts | switched()/settled(): navigation-menu adapter must snapshot animations after switched() and cancel a pending settle on switch→switch; in-place swap needs px pinned before the swap or switched(from) — decide when speccing add-navigation-menu |
 | add-collapsible (r1) | — | packages/core/src/dom/content-size.ts | measure()/closed() use scrollHeight/Width (exclude borders): bordered/border-box content a few px short |
 | add-collapsible (r1) | — | packages/testing/fixtures/layer/layer.pw.test.ts | "reopenDuringExit" (pointer) failed once under full-suite load, passed uncached — possible new flake |

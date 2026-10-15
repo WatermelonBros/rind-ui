@@ -101,6 +101,24 @@ const items = (s: DomSnapshot) => s.elements.filter((el) => el.part === "item")
 const ids = (v: string | undefined) => (v ?? "").split(/\s+/).filter(Boolean)
 const isOpen = (f: StepFacts) => f.open
 
+/**
+ * The contents that should be closed: with several triggers (an accordion), those whose
+ * trigger (aria-controls) is not expanded; otherwise every content while the state is closed.
+ */
+function closedContents(f: StepFacts) {
+  const contents = partNamed(f.after, f.semantics["content"])
+  const triggers = partNamed(f.after, f.semantics["trigger"])
+  if (triggers.length > 1) {
+    const open = new Set(
+      triggers
+        .filter((t) => t.attrs["aria-expanded"] === "true")
+        .map((t) => t.attrs["aria-controls"]),
+    )
+    return contents.filter((c) => !open.has(c.attrs["id"]))
+  }
+  return isOpen(f) ? [] : contents
+}
+
 /** At most one item is data-highlighted, and it is the oracle's highlighted key. */
 function highlightChecks(f: StepFacts): string[] {
   const lit = items(f.after).filter((el) => el.attrs["data-highlighted"] !== undefined)
@@ -447,7 +465,26 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** (30) The trigger mirrors open state; content is gone, hidden or until-found when closed. */
   disclosure: (f) => {
     const out: string[] = []
-    for (const t of partNamed(f.after, f.semantics["trigger"])) {
+    const triggers = partNamed(f.after, f.semantics["trigger"])
+    if (triggers.length > 1) {
+      // Several disclosures in one instance (an accordion): each trigger–content pair linked
+      // by aria-controls agrees with itself, whatever the machine state.
+      const contents = partNamed(f.after, f.semantics["content"])
+      for (const t of triggers) {
+        const id = t.attrs["aria-controls"]
+        const c = id === undefined ? undefined : contents.find((x) => x.attrs["id"] === id)
+        if (!c) continue
+        const shown = !c.hidden && c.attrs["hidden"] !== "until-found"
+        if (t.attrs["aria-expanded"] === "false" && shown) {
+          out.push(`${c.describe} is still visible while ${t.describe} is collapsed`)
+        }
+        if (t.attrs["aria-expanded"] === "true" && !shown) {
+          out.push(`${c.describe} is hidden while ${t.describe} is expanded`)
+        }
+      }
+      return out
+    }
+    for (const t of triggers) {
       if (t.attrs["aria-expanded"] !== String(isOpen(f))) {
         out.push(
           `${t.describe} aria-expanded="${t.attrs["aria-expanded"]}" but the state is ${f.state}`,
@@ -512,9 +549,8 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
    * animation; once none runs it must be gone (the runner waits for that first).
    */
   presence: (f) => {
-    if (isOpen(f)) return []
     const out: string[] = []
-    for (const c of partNamed(f.after, f.semantics["content"])) {
+    for (const c of closedContents(f)) {
       if (c.hidden && c.attrs["hidden"] !== undefined) continue
       if (c.attrs["data-state"] !== "closed") {
         out.push(

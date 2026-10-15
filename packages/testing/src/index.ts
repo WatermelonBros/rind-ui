@@ -1,6 +1,10 @@
 // Drivers, adapters and model-based tests built on component contracts.
 
 export { platforms, withEngine } from "@rind-ui/core"
+export {
+  type AccordionStepInvariants,
+  accordionStepInvariants,
+} from "./accordion-invariants"
 export type { AdapterEnv, Direction, EnvFactory, EnvOptions } from "./adapter"
 export { type DomAdapterOptions, domEnv, type UserLike } from "./adapters/dom"
 export {
@@ -11,6 +15,7 @@ export {
 export { installAnnouncementLog, recordingAnnouncer } from "./announcements"
 export { missingAriaLines } from "./aria-snapshot"
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
+export { getAccordion } from "./components/accordion"
 export { getButton } from "./components/button"
 export { getCollapsible } from "./components/collapsible"
 export { getField } from "./components/field"

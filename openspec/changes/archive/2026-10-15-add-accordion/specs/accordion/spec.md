@@ -303,15 +303,28 @@ instance by the exact accessible name of any one of its triggers (role
 It SHALL ship per-contract invariants:
 
 - in single mode, at most one trigger is expanded;
-- each trigger's `aria-expanded` equals its item's membership in the value;
-- in non-collapsible single mode, the open trigger carries
-  `aria-disabled="true"`;
-- every trigger is the only element child of an element with role `heading` and
-  an `aria-level`;
+- in non-collapsible single mode, the open trigger carries `aria-disabled="true"`;
+- every trigger is inside an element with role `heading` and an `aria-level` (that it is
+  the heading's only element child is the header's development warning);
 - open contents carry `role="region"` with a resolving `aria-labelledby`
-  exactly when the region rule applies, and closed contents carry no role;
-- without `keyboardNavigation`, arrow keys on a trigger change neither focus nor
-  value.
+  exactly when the region rule applies, and closed contents carry no role.
+
+`@rind-ui/testing` SHALL export two more invariants as consumer invariants usable with
+`testMachine(accordionContract, { invariants })` (`accordionStepInvariants({ value,
+labels })`), because they need what the shared invariant API does not carry: the value the
+consumer tracks through `onValueChange` (the page does not expose it, and the oracle cannot
+see which items are disabled), and the keys the step pressed:
+
+- each trigger's `aria-expanded` equals its item's membership in the value;
+- without `keyboardNavigation`, arrow keys, Home and End on a trigger change neither focus
+  nor the expanded items, and are not prevented.
+
+#### Scenario: Broken variant does not report a close
+
+- **WHEN** the model test runs a `multiple` accordion whose consumer only receives growing
+  values (ark#1656) with `accordionStepInvariants`
+- **THEN** the step that closes an item fails `accordion-expanded-matches-value` naming
+  the item
 
 #### Scenario: Driver usage
 

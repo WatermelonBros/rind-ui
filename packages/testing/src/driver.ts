@@ -9,6 +9,7 @@ import type {
   Observations,
   Part,
   PlatformFlags,
+  QueryArgsOf,
 } from "@rind-ui/core"
 import {
   type AdapterEnv,
@@ -38,7 +39,9 @@ export type ContractModality<C extends AnyContract> = {
 export type Driver<C extends AnyContract> = {
   readonly [K in keyof Actions<C>]: (...args: ActionArgsOf<Actions<C>[K]>) => Promise<void>
 } & {
-  readonly [K in keyof Queries<C>]: () => ReturnType<Queries<C>[K]>
+  readonly [K in keyof Queries<C>]: (
+    ...args: QueryArgsOf<Queries<C>[K]>
+  ) => ReturnType<Queries<C>[K]>
 } & {
   /** The same driver, bound to another modality the contract declares. */
   via(modality: ContractModality<C>): Driver<C>
@@ -89,6 +92,8 @@ type ActionShape = Partial<Record<Modality, (env: Env, ...args: unknown[]) => Pr
 async function observe(contract: AnyContract, env: Env): Promise<Record<string, unknown>> {
   const out: Record<string, unknown> = {}
   for (const [name, query] of Object.entries(contract.queries)) {
+    // A query with arguments has no single reading.
+    if (query.length > 1) continue
     // Queries take the contract's own Env; the adapter env implements it.
     out[name] = await (query as (env: Env) => Promise<unknown>)(env).catch(
       (e: unknown) => `<${e instanceof Error ? e.message : String(e)}>`,
@@ -192,7 +197,8 @@ function make<C extends AnyContract>(
     driver[name] = (...args: unknown[]) => runAction(contract, envFor(modality), name, args)
   }
   for (const [name, query] of Object.entries(contract.queries)) {
-    driver[name] = () => (query as (env: Env) => Promise<unknown>)(base)
+    driver[name] = (...args: unknown[]) =>
+      (query as (env: Env, ...rest: unknown[]) => Promise<unknown>)(base, ...args)
   }
   // Built from the contract's own action and query names, which is what Driver<C> maps.
   return driver as Driver<C>

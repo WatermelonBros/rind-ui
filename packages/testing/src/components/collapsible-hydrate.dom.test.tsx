@@ -81,3 +81,17 @@ describe("Collapsible hydration", () => {
     expect(html).not.toContain("Body text")
   })
 })
+
+describe("review fixes (add-accordion r1)", () => {
+  it("a consumer trigger id is rendered on the server", () => {
+    const html = renderToString(
+      <Collapsible.Root>
+        <Collapsible.Trigger id="my-trigger">Details</Collapsible.Trigger>
+        <Collapsible.Content>Body</Collapsible.Content>
+      </Collapsible.Root>,
+    )
+    const box = document.createElement("div")
+    box.innerHTML = html
+    expect(box.querySelector("button")?.id).toBe("my-trigger")
+  })
+})

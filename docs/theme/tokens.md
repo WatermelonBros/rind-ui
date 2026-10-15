@@ -27,6 +27,8 @@ Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the
 
 Written by rind-ui at run time (positioning, scroll lock, animation); readable, not themeable.
 
+- `--rind-accordion-content-height`
+- `--rind-accordion-content-width`
 - `--rind-available-height`
 - `--rind-available-width`
 - `--rind-collapsible-content-height`
@@ -35,6 +37,56 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 - `--rind-transform-origin`
 
 ## Tier 3: component tokens
+
+### accordion
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "cursor": {
+      "fallback": "pointer",
+      "file": "accordion.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "accordion.css"
+    },
+    "disabled-opacity": {
+      "fallback": "0.5",
+      "file": "accordion.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "accordion.css"
+    },
+    "ease": {
+      "fallback": "var(--rind-ease-out)",
+      "file": "accordion.css"
+    },
+    "indicator-duration": {
+      "fallback": "var(--rind-duration-fast)",
+      "file": "accordion.css"
+    },
+    "separator-color": {
+      "fallback": "var(--rind-color-border)",
+      "file": "accordion.css"
+    },
+    "trigger-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "accordion.css"
+    },
+    "trigger-gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "accordion.css"
+    },
+    "trigger-padding-inline": {
+      "fallback": "var(--rind-space-2)",
+      "file": "accordion.css"
+    }
+  }
+}
+```
 
 ### button
 

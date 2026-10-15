@@ -1,0 +1,101 @@
+/*
+ * Accordion: structural only. Each item is a Collapsible (scope "accordion"), so the Content
+ * animates on the size variables the machine writes, exactly like collapsible.css (same
+ * reasons: real number to real number, `data-reveal` skips the transition, no [hidden] rule
+ * so hidden="until-found" keeps working). Separators are borders, which forced colors keep.
+ * Only an Item dims when disabled: a locked trigger (the open one in a non-collapsible
+ * accordion) also carries data-disabled but is not unavailable-looking.
+ * Same convention as Collapsible: put padding on an inner wrapper of the Content.
+ */
+@layer rind.components {
+  :where([data-scope="accordion"][data-part="root"][data-orientation="horizontal"]) {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  :where([data-scope="accordion"][data-part="item"]) {
+    border-block-end: var(--rind-border-width, 1px) solid
+      var(--rind-accordion-separator-color, var(--rind-color-border));
+  }
+
+  :where([data-scope="accordion"][data-part="item"][data-orientation="horizontal"]) {
+    border-block-end: 0;
+    border-inline-end: var(--rind-border-width, 1px) solid
+      var(--rind-accordion-separator-color, var(--rind-color-border));
+  }
+
+  :where([data-scope="accordion"][data-part="item"][data-disabled]) {
+    opacity: var(--rind-accordion-disabled-opacity, 0.5);
+  }
+
+  :where([data-scope="accordion"][data-part="header"]) {
+    margin: 0;
+    font: inherit;
+  }
+
+  :where([data-scope="accordion"][data-part="trigger"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-accordion-trigger-gap, var(--rind-space-2));
+    inline-size: 100%;
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-accordion-trigger-padding-inline, var(--rind-space-2));
+    border: 0;
+    background: transparent;
+    color: var(--rind-accordion-trigger-color, var(--rind-color-text));
+    font: inherit;
+    text-align: start;
+    cursor: var(--rind-accordion-cursor, pointer);
+  }
+
+  :where([data-scope="accordion"][data-part="trigger"]:is([data-disabled], :disabled)) {
+    cursor: var(--rind-accordion-disabled-cursor, not-allowed);
+  }
+
+  :where([data-scope="accordion"][data-part="content"]) {
+    overflow: hidden;
+    height: var(--rind-accordion-content-height);
+    transition: height var(--rind-accordion-duration, var(--rind-duration-normal))
+      var(--rind-accordion-ease, var(--rind-ease-out));
+  }
+
+  :where([data-scope="accordion"][data-part="content"][data-orientation="horizontal"]) {
+    height: auto;
+    width: var(--rind-accordion-content-width);
+    transition-property: width;
+  }
+
+  :where([data-scope="accordion"][data-part="content"][data-reveal]) {
+    transition: none;
+  }
+
+  /* A right-pointing glyph: down when open, mirrored under RTL. Rotation only. */
+  :where([data-scope="accordion"][data-part="indicator"]) {
+    display: inline-flex;
+    margin-inline-start: auto;
+    transition: transform var(--rind-accordion-indicator-duration, var(--rind-duration-fast))
+      var(--rind-accordion-ease, var(--rind-ease-out));
+  }
+
+  :where([data-scope="accordion"][data-part="indicator"][data-state="open"]) {
+    transform: rotate(90deg);
+  }
+
+  :where([data-scope="accordion"][data-part="indicator"]:dir(rtl)) {
+    transform: scaleX(-1);
+  }
+
+  :where([data-scope="accordion"][data-part="indicator"][data-state="open"]:dir(rtl)) {
+    transform: scaleX(-1) rotate(90deg);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="accordion"][data-part="trigger"]) {
+      color: ButtonText;
+    }
+
+    :where([data-scope="accordion"][data-part="item"][data-disabled] [data-part="trigger"]) {
+      color: GrayText;
+    }
+  }
+}

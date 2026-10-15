@@ -13,6 +13,8 @@ export type CollapsiblePart = "root" | "trigger" | "content" | "indicator"
 export type ClosedContent = "until-found" | "hidden" | "unmount"
 
 export interface CollapsibleConnectInput {
+  /** `data-scope` (an Accordion item's parts are "accordion"); default "collapsible". */
+  readonly scope?: string
   readonly instance: string
   readonly open: boolean
   readonly reveal: CollapsibleReveal
@@ -34,7 +36,7 @@ export interface CollapsibleConnectInput {
 export function collapsibleConnect(input: CollapsibleConnectInput, env: LinkEnv) {
   const state = input.open ? "open" : "closed"
   const base = (part: CollapsiblePart) => ({
-    ...scopeAttrs("collapsible", part, input.instance),
+    ...scopeAttrs(input.scope ?? "collapsible", part, input.instance),
     "data-state": state,
     "data-disabled": dataFlag(input.disabled),
   })

@@ -24,6 +24,7 @@
 
 ## Components
 
+- [Accordion](docs/components/accordion.md): A set of headers, each toggling one panel. Every item is a [Collapsible](collapsible.md), so closed panels stay findable by the browser's search (`closedContent="until-found"`, the default).
 - [Button](docs/components/button.md): A button that reports each activation once, from every input (mouse, touch, Enter, Space, a screen reader's click), with its modality; a pending state that keeps focus and announces itself; and the same behaviour whatever element it renders.
 - [Collapsible](docs/components/collapsible.md): A trigger that shows and hides one region. Closed content stays findable by the browser's search (`closedContent="until-found"`, the default), or is hidden, or is removed.
 - [Field](docs/components/field.md): Gives one form control a label, a description and an error message, carries `disabled`, `readOnly`, `required` and `invalid` to it, validates it, and exposes the result as data attributes, ARIA and a driver.

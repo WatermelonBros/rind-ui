@@ -3,6 +3,7 @@ import {
   type ClosedContent,
   type CollapsibleEvent,
   type CollapsiblePart,
+  type PartProps as CorePartProps,
   collapsibleConnect,
   collapsibleMachine,
   contentSize,
@@ -43,8 +44,30 @@ declare const process: { env: { NODE_ENV?: string } }
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
-interface Ctx {
+/**
+ * What an embedding component (an Accordion item) adds to the Trigger, Content and
+ * Indicator: its connect output, merged over the Collapsible's.
+ */
+export interface CollapsibleDecoration {
+  readonly trigger?: () => CorePartProps
+  /** `triggerId`: the trigger's rendered id (a consumer id included). */
+  readonly content?: (triggerId: string) => CorePartProps
+  readonly indicator?: () => CorePartProps
+  /** Wraps the content's children (an Accordion's deeper Heading.Level). */
+  readonly wrapContent?: (children: ReactNode) => ReactNode
+}
+
+/** The context the Collapsible parts read; an Accordion item provides its own. */
+export interface CollapsibleCtx {
+  /** `data-scope` and the size-variable prefix (`--rind-<scope>-content-*`). */
+  readonly scope: string
+  /** `data-instance`. */
   readonly instance: string
+  /** The base of the part ids (one per disclosure; an accordion item has its own). */
+  readonly idBase: string
+  /** Names the component in errors ("Collapsible", "Accordion"). */
+  readonly label: string
+  readonly decoration: CollapsibleDecoration
   readonly view: ReturnType<typeof useMachine<typeof collapsibleMachine>>["view"]
   readonly send: ReturnType<typeof useMachine<typeof collapsibleMachine>>["send"]
   readonly registry: PartRegistry<CollapsiblePart>
@@ -52,14 +75,100 @@ interface Ctx {
   readonly focusableWhenDisabled: boolean
   readonly closedContent: ClosedContent
   readonly triggerEl: { current: HTMLElement | null }
+  /**
+   * The consumer's trigger id, written while the Trigger renders, so a Content rendered
+   * after it (the usual order) labels itself with it on the server too (base-ui#1531).
+   * Idempotent per render; after commit the registry agrees.
+   */
+  readonly triggerIdRef: { current: string | undefined }
   readonly contentEl: { current: HTMLElement | null }
 }
-const CollapsibleContext = createContext<Ctx | null>(null)
+type Ctx = CollapsibleCtx
+export const CollapsibleContext = createContext<Ctx | null>(null)
 function useCollapsible(part: string): Ctx {
   const ctx = useContext(CollapsibleContext)
-  if (!ctx) throw new Error(`Collapsible.${part} must be inside Collapsible.Root`)
+  if (!ctx)
+    throw new Error(`Collapsible.${part} must be inside Collapsible.Root (or Accordion.Item)`)
   return ctx
 }
+
+export interface CollapsibleServiceOptions {
+  readonly scope: string
+  readonly instance: string
+  readonly idBase: string
+  readonly label: string
+  readonly decoration: CollapsibleDecoration
+  readonly open: boolean | undefined
+  readonly defaultOpen: boolean | undefined
+  readonly onOpenChange:
+    | ((open: boolean, details: ChangeDetails<CollapsibleEvent>) => void)
+    | undefined
+  readonly disabled: boolean
+  readonly focusableWhenDisabled: boolean
+  readonly closedContent: ClosedContent
+}
+
+/** One disclosure's service and context (a Collapsible Root, or an Accordion item). */
+export function useCollapsibleService(o: CollapsibleServiceOptions): Ctx {
+  const env = useEnvironment()
+  const triggerEl = useRef<HTMLElement | null>(null)
+  const triggerIdRef = useRef<string | undefined>(undefined)
+  const contentEl = useRef<HTMLElement | null>(null)
+  const registry = usePartRegistry<CollapsiblePart>({
+    scope: o.scope,
+    root: o.idBase,
+    // Kept-mounted content is rendered on the server too: aria-controls is in the HTML.
+    ...(o.closedContent !== "unmount" ? { expected: ["content"] as const } : {}),
+  })
+  const { view, send } = useMachine(collapsibleMachine, {
+    open: o.open,
+    defaultOpen: o.defaultOpen,
+    onOpenChange: o.onOpenChange,
+    disabled: o.disabled,
+    // Closing with focus inside: the trigger, keeping the modality, before hiding.
+    focusOutOfContent: () => {
+      const content = contentEl.current
+      const trigger = triggerEl.current
+      const active = content?.ownerDocument.activeElement
+      if (content && trigger && active && content.contains(active)) {
+        void focusSafely(trigger, env, "programmatic")
+      }
+    },
+  })
+  return useMemo(
+    () => ({
+      scope: o.scope,
+      instance: o.instance,
+      idBase: o.idBase,
+      label: o.label,
+      decoration: o.decoration,
+      view,
+      send,
+      registry,
+      disabled: o.disabled,
+      focusableWhenDisabled: o.focusableWhenDisabled,
+      closedContent: o.closedContent,
+      triggerEl,
+      triggerIdRef,
+      contentEl,
+    }),
+    [
+      o.scope,
+      o.instance,
+      o.idBase,
+      o.label,
+      o.decoration,
+      view,
+      send,
+      registry,
+      o.disabled,
+      o.focusableWhenDisabled,
+      o.closedContent,
+    ],
+  )
+}
+
+const NO_DECORATION: CollapsibleDecoration = {}
 
 export interface CollapsibleState {
   readonly open: boolean
@@ -92,45 +201,21 @@ function Root({
   children,
   ...rest
 }: CollapsibleRootProps) {
-  const env = useEnvironment()
   const instance = useRootId(id)
-  const triggerEl = useRef<HTMLElement | null>(null)
-  const contentEl = useRef<HTMLElement | null>(null)
-  const registry = usePartRegistry<CollapsiblePart>({
+  const ctx = useCollapsibleService({
     scope: "collapsible",
-    root: instance,
-    // Kept-mounted content is rendered on the server too: aria-controls is in the HTML.
-    ...(closedContent !== "unmount" ? { expected: ["content"] as const } : {}),
-  })
-  const { view, send } = useMachine(collapsibleMachine, {
+    instance,
+    idBase: instance,
+    label: "Collapsible",
+    decoration: NO_DECORATION,
     open,
     defaultOpen,
     onOpenChange,
     disabled,
-    // Closing with focus inside: the trigger, keeping the modality, before hiding.
-    focusOutOfContent: () => {
-      const content = contentEl.current
-      const trigger = triggerEl.current
-      const active = content?.ownerDocument.activeElement
-      if (content && trigger && active && content.contains(active)) {
-        void focusSafely(trigger, env, "programmatic")
-      }
-    },
+    focusableWhenDisabled,
+    closedContent,
   })
-  const ctx: Ctx = useMemo(
-    () => ({
-      instance,
-      view,
-      send,
-      registry,
-      disabled,
-      focusableWhenDisabled,
-      closedContent,
-      triggerEl,
-      contentEl,
-    }),
-    [instance, view, send, registry, disabled, focusableWhenDisabled, closedContent],
-  )
+  const { view } = ctx
   const api = useApi(ctx, false, "keyboard", false, false, "button")
   const props = mergeProps(
     { ...normalizeProps(api.root()), ...(id === undefined ? {} : { id }), ref },
@@ -156,8 +241,10 @@ function useApi(
 ) {
   const env = useEnvironment()
   const content = useRenderedId(ctx.registry, "content")
+  const trigger = useRenderedId(ctx.registry, "trigger") ?? ctx.triggerIdRef.current
   return collapsibleConnect(
     {
+      scope: ctx.scope,
       instance: ctx.instance,
       open: ctx.view.matches("open"),
       reveal: ctx.view.context.reveal,
@@ -169,8 +256,8 @@ function useApi(
       modality,
       pressed,
       hovered,
-      triggerId: partId("collapsible", ctx.instance, "trigger"),
-      contentId: content ?? partId("collapsible", ctx.instance, "content"),
+      triggerId: trigger ?? partId(ctx.scope, ctx.idBase, "trigger"),
+      contentId: content ?? partId(ctx.scope, ctx.idBase, "content"),
       contentRendered: content !== undefined,
     },
     env,
@@ -181,8 +268,12 @@ type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWith
   readonly render?: RenderProp<CollapsibleState>
 }
 
-function Trigger({ render, ref, ...rest }: PartProps<"button">) {
+function Trigger({ render, ref, id, ...rest }: PartProps<"button">) {
   const ctx = useCollapsible("Trigger")
+  // A consumer id is the id the content's aria-labelledby references (an Accordion region).
+  const ownId = id ?? partId(ctx.scope, ctx.idBase, "trigger")
+  ctx.triggerIdRef.current = id
+  useRegisterPart(ctx.registry, "trigger", ownId)
   const env = useEnvironment()
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const el = useRef<HTMLElement | null>(null)
@@ -198,7 +289,7 @@ function Trigger({ render, ref, ...rest }: PartProps<"button">) {
   })
   const hover = useHover({ env, send: () => {}, disabled: () => ctx.disabled })
   const api = useApi(ctx, focused, modality, press.pressed, hover.hovered, tag)
-  const own = normalizeProps(api.trigger())
+  const own = normalizeProps({ ...api.trigger(), ...ctx.decoration.trigger?.(), id: ownId })
   const props = mergeProps(
     {
       ...joinHandlers(own, press.props, hover.props, {
@@ -215,7 +306,7 @@ function Trigger({ render, ref, ...rest }: PartProps<"button">) {
   })
 }
 
-function Content({ render, ref, id, ...rest }: PartProps<"div">) {
+function Content({ render, ref, id, children: content, ...rest }: PartProps<"div">) {
   const ctx = useCollapsible("Content")
   const env = useEnvironment()
   const open = ctx.view.matches("open")
@@ -228,7 +319,7 @@ function Content({ render, ref, id, ...rest }: PartProps<"div">) {
   const exited = presence.state === "absent" || quickExit
   const mounted = ctx.closedContent !== "unmount" || open || !exited
   // A consumer id is the id the trigger references (aria-controls).
-  const own = id ?? partId("collapsible", ctx.instance, "content")
+  const own = id ?? partId(ctx.scope, ctx.idBase, "content")
   useRegisterPart(ctx.registry, "content", mounted ? own : undefined)
   // Hidden once closed and its exit finished; until-found is set by its module.
   const settledClosed = !open && exited
@@ -252,7 +343,7 @@ function Content({ render, ref, id, ...rest }: PartProps<"div">) {
     if (!node) return
     // A remounted content (unmount mode) is a new element.
     if (size.current?.node !== node)
-      size.current = { node, s: contentSize(node, "rind-collapsible") }
+      size.current = { node, s: contentSize(node, `rind-${ctx.scope}`) }
     const s = size.current.s
     if (open) {
       const instant = initial || ctx.view.context.reveal === "find-in-page"
@@ -307,33 +398,42 @@ function Content({ render, ref, id, ...rest }: PartProps<"div">) {
       getComputedStyle(node).display === "none"
     ) {
       console.warn(
-        "[rind-ui] collapsible: the closed content computes display: none, so find-in-page cannot reveal it (a stylesheet sets [hidden] { display: none }?)",
+        `[rind-ui] ${ctx.scope}: the closed content computes display: none, so find-in-page cannot reveal it (a stylesheet sets [hidden] { display: none }?)`,
       )
     }
   })
   const api = useApi(ctx, false, "keyboard", false, false, "button")
+  const triggerId =
+    useRenderedId(ctx.registry, "trigger") ??
+    ctx.triggerIdRef.current ??
+    partId(ctx.scope, ctx.idBase, "trigger")
   // Closed and settled: hidden. until-found is a boolean `hidden` for React (server HTML
   // carries hidden=""), upgraded right after commit by the until-found module (hidden-content).
   const hidden = settledClosed
   const props = mergeProps(
     {
-      ...normalizeProps(api.content(hidden)),
+      ...normalizeProps({ ...api.content(hidden), ...ctx.decoration.content?.(triggerId) }),
       style: {
-        "--rind-collapsible-content-height": initialSize,
-        "--rind-collapsible-content-width": initialSize,
+        [`--rind-${ctx.scope}-content-height`]: initialSize,
+        [`--rind-${ctx.scope}-content-width`]: initialSize,
       } as React.CSSProperties, // custom properties are not in CSSProperties' keys
       ref: composeRefs(composeRefs(el, ctx.contentEl), ref),
     },
     rest,
   )
   if (!mounted) return null
-  return renderPart("div", props, render, { open, disabled: ctx.disabled })
+  const wrap = ctx.decoration.wrapContent
+  const children = wrap ? wrap(content) : content
+  return renderPart("div", { ...props, children }, render, { open, disabled: ctx.disabled })
 }
 
 function Indicator({ render, ...rest }: PartProps<"span">) {
   const ctx = useCollapsible("Indicator")
   const api = useApi(ctx, false, "keyboard", false, false, "button")
-  const props = mergeProps(normalizeProps(api.indicator()), rest)
+  const props = mergeProps(
+    normalizeProps({ ...api.indicator(), ...ctx.decoration.indicator?.() }),
+    rest,
+  )
   return renderPart("span", props, render, {
     open: ctx.view.matches("open"),
     disabled: ctx.disabled,
@@ -341,3 +441,9 @@ function Indicator({ render, ...rest }: PartProps<"span">) {
 }
 
 export const Collapsible = { Root, Trigger, Content, Indicator }
+/** The parts an Accordion item reuses (inside its own CollapsibleContext). */
+export {
+  Content as CollapsibleContent,
+  Indicator as CollapsibleIndicator,
+  Trigger as CollapsibleTrigger,
+}

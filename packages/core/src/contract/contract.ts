@@ -29,11 +29,17 @@ export type Trait =
 /** One modality's implementation of an action. */
 export type ActionImpl<P extends string> = (env: Env<P>, ...args: never) => Promise<unknown>
 
-type QueryFn<P extends string> = (env: Env<P>) => Promise<unknown>
+/** A query; one with arguments (`isDisabled(label)`) is read by drivers, not by snapshots. */
+type QueryFn<P extends string> = (env: Env<P>, ...args: never) => Promise<unknown>
+
+/** The arguments a query takes after `env`. */
+export type QueryArgsOf<Q> = Q extends (env: never, ...args: infer R) => unknown ? R : never
 
 /** Expected query results, by query name. */
 export type Observations<Q> = {
-  readonly [K in keyof Q]?: Q[K] extends (env: never) => Promise<infer R> ? R : never
+  readonly [K in keyof Q]?: Q[K] extends (env: never, ...args: never) => Promise<infer R>
+    ? R
+    : never
 }
 
 /**
@@ -125,6 +131,8 @@ export interface InvariantContext<P extends string = string, S extends string = 
   /** The oracle's state after the step. */
   readonly state: S
   readonly modality: Modality
+  /** The props the instance was rendered with (the oracle's), for mode-dependent rules. */
+  readonly props: Readonly<Record<string, unknown>>
 }
 /** Resolves when the invariant holds; rejects or returns a message when it does not. */
 export type Invariant<P extends string = string, S extends string = string> = {
@@ -242,7 +250,7 @@ export interface AnyContract {
   readonly machine: AnyMachine
   readonly anatomy: readonly string[]
   readonly locate: (...args: never) => By
-  readonly queries: Readonly<Record<string, (env: never) => Promise<unknown>>>
+  readonly queries: Readonly<Record<string, (env: never, ...args: never) => Promise<unknown>>>
   readonly actions: Readonly<Record<string, object>>
   readonly states: Readonly<Record<string, object>>
   readonly dataState?: Readonly<Record<string, string | Readonly<Record<string, unknown>>>>

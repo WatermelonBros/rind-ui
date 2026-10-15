@@ -1,5 +1,6 @@
 export * from "./a11y"
 export * from "./collection"
+export * from "./components/accordion"
 export * from "./components/button"
 export * from "./components/collapsible"
 export * from "./components/field"

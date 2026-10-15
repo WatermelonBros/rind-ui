@@ -29,6 +29,11 @@ export function useHeadingLevel(): HeadingLevel {
   return resolveHeadingLevel(undefined, useContext(HeadingLevelContext))
 }
 
+/** The level the nearest `Heading.Level` gives (unclamped), or undefined outside any. */
+export function useHeadingContextLevel(): number | undefined {
+  return useContext(HeadingLevelContext)
+}
+
 export interface HeadingLevelProps {
   /** The level for the headings below; default: one more than the level around it. */
   readonly level?: HeadingLevel

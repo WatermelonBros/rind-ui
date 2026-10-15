@@ -21,6 +21,7 @@ export type {
   Observations,
   PartExpectation,
   PropStep,
+  QueryArgsOf,
   Semantics,
   Skip,
   Trait,

@@ -38,6 +38,8 @@ export interface ConsumerInvariant<C extends AnyContract> {
     readonly env: Env<C["anatomy"][number]>
     readonly state: string
     readonly modality: Modality
+    /** The props the instance was rendered with (the oracle's). */
+    readonly props: Readonly<Record<string, unknown>>
   }) => Promise<string | undefined>
 }
 
@@ -716,6 +718,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   const observe = async () => {
     const out: Record<string, unknown> = {}
     for (const [name, query] of Object.entries(contract.queries)) {
+      // A query with arguments has no single reading.
+      if (query.length > 1) continue
       out[name] = await (query as (env: Env) => Promise<unknown>)(base).catch(
         (e: unknown) => `<${e instanceof Error ? e.message : String(e)}>`,
       )
@@ -838,11 +842,16 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       ...(options.invariants ?? []),
     ] as unknown as readonly {
       readonly name: string
-      readonly check: (ctx: { env: Env; state: string; modality: Modality }) => Promise<unknown>
+      readonly check: (ctx: {
+        env: Env
+        state: string
+        modality: Modality
+        props: Readonly<Record<string, unknown>>
+      }) => Promise<unknown>
     }[]
     for (const inv of own) {
       const result = await inv
-        .check({ env: base, state, modality })
+        .check({ env: base, state, modality, props: oracle.props as Record<string, unknown> })
         .catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
       if (typeof result === "string" && result !== "") problems.push(`${inv.name}: ${result}`)
     }
