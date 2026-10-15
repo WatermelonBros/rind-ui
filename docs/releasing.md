@@ -27,9 +27,11 @@ every change a consumer would notice adds a file in `.changeset/` (`pnpm changes
    Enable "Bypass 2FA" for automation, or the publish will ask for a one-time code.
 3. **The secret.** GitHub → repository *Settings* → *Secrets and variables* → *Actions* →
    *New repository secret*: name `NPM_TOKEN`, value the token.
-4. **Pull requests from Actions.** GitHub → *Settings* → *Actions* → *General* → *Workflow
-   permissions*: *Read and write*, and tick *Allow GitHub Actions to create and approve pull
-   requests* (the version pull request needs it).
+4. **Pull requests from Actions.** The WatermelonBros organisation blocks it by default, so
+   first at the organisation level: github.com/organizations/WatermelonBros/settings/actions →
+   *Workflow permissions*: *Read and write* and tick *Allow GitHub Actions to create and approve
+   pull requests*. Then the same two settings in the repository (*Settings* → *Actions* →
+   *General*). The version pull request needs it.
 
 ## Later: provenance and trusted publishing
 
