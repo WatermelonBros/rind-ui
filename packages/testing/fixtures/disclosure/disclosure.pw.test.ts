@@ -367,14 +367,27 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
         await page.locator("#storybook-root > *").first().waitFor()
         // The whole body: overlays render in portals outside the story root (matching is
         // partial, so Storybook's own nodes do not matter).
-        const snapshot = await page.locator("body").ariaSnapshot()
         const file = join(ariaDir, `${id}.aria.yml`)
-        if (update && engine === pw.chromium) writeFileSync(file, `${snapshot}\n`)
-        if (!existsSync(file)) {
+        if (!update && !existsSync(file)) {
           failures.push(`${id}: no ARIA snapshot (run with RIND_UPDATE_ARIA=1 and review it)`)
           continue
         }
-        const missing = missingAriaLines(snapshot, readFileSync(file, "utf8"))
+        // Portalled overlays mount after the story root (a layer opened on mount): retake
+        // the snapshot until it matches or 3 s pass (CI WebKit read it before the dialog).
+        let snapshot = await page.locator("body").ariaSnapshot()
+        let missing: string[] = []
+        if (!update) {
+          const want = readFileSync(file, "utf8")
+          const until = Date.now() + 3000
+          missing = missingAriaLines(snapshot, want)
+          while (missing.length > 0 && Date.now() < until) {
+            await page.waitForTimeout(100)
+            snapshot = await page.locator("body").ariaSnapshot()
+            missing = missingAriaLines(snapshot, want)
+          }
+        }
+        if (update && engine === pw.chromium) writeFileSync(file, `${snapshot}\n`)
+        if (update) missing = missingAriaLines(snapshot, readFileSync(file, "utf8"))
         if (missing.length > 0) {
           failures.push(
             `${id} in ${engine.name()}: missing ${JSON.stringify(missing)}\n${snapshot}`,

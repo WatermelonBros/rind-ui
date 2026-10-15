@@ -142,8 +142,13 @@ export function installErrorLog(win: Window | null = globalThis.window ?? null):
     // Every window has a console; the DOM lib only declares it on globalThis.
     const { console } = win as unknown as { console: Console }
     const original = console.error.bind(console)
+    // In a real browser the user's resting cursor fires hover events on whatever renders
+    // under it: React's act() warning for those is noise (act is jsdom's determinism tool),
+    // not a component error. jsdom has no real input, so there it still counts.
+    const realBrowser = !(win.navigator?.userAgent ?? "").includes("jsdom")
     console.error = (...args: unknown[]) => {
-      entries.push(args.map(String).join(" "))
+      const message = args.map(String).join(" ")
+      if (!(realBrowser && message.includes("not wrapped in act("))) entries.push(message)
       original(...args)
     }
     win.addEventListener("error", (e) => entries.push(String(e.error ?? e.message)))
