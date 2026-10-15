@@ -1,17 +1,39 @@
 {
   "name": "@rind-ui/theme",
   "version": "0.0.0",
-  "description": "A calm default theme for rind-ui, styled through data-scope / data-part attributes.",
+  "description": "White-label theme for rind-ui: brand inputs, semantic tokens, variants and a typed theme builder, styled through data-scope / data-part attributes.",
   "license": "MIT",
   "type": "module",
   "files": [
-    "src"
+    "src",
+    "dist",
+    "NOTICE"
   ],
   "sideEffects": [
     "*.css"
   ],
   "exports": {
     ".": "./src/index.css",
-    "./tokens.css": "./src/tokens.css"
+    "./tokens.css": "./src/tokens.css",
+    "./variants.css": "./src/variants.css",
+    "./base.css": "./src/base.css",
+    "./presets/*.css": "./src/presets/*.css",
+    "./*.css": "./src/*.css",
+    "./builder": {
+      "@rind-ui/source": "./src/builder/index.ts",
+      "types": "./dist/builder.d.mts",
+      "default": "./dist/builder.mjs"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/token-manifest.mjs --check && tsdown && node scripts/build-presets.mjs --check",
+    "presets": "node scripts/token-manifest.mjs && tsdown && node scripts/build-presets.mjs",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/build-icons.mjs"
+  },
+  "devDependencies": {
+    "@phosphor-icons/core": "2.1.1",
+    "@types/node": "^24.19.2",
+    "vite": "^8.3.4"
   }
 }

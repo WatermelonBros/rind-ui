@@ -1,0 +1,6 @@
+{
+  "//": "Declarations for the builder entry only: the tests import fixtures from @rind-ui/testing, and generating declarations for them wrote .d.ts files next to those sources.",
+  "extends": "./tsconfig.json",
+  "include": ["src/builder"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test-d.ts", "src/**/*.browser.test.ts"]
+}

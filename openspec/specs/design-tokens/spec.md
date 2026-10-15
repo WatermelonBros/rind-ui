@@ -1,12 +1,11 @@
-## Purpose
+# design-tokens Specification
 
+## Purpose
 Defines the three tiers of `@rind-ui/theme` custom properties — brand inputs, semantic
 tokens and component tokens — their names, how each tier derives from the one below,
 and how user preferences act on them, so a brand can re-skin every component from a
 dozen values.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Three Tiers With Fixed Prefixes
 
 The theme SHALL expose exactly three tiers of custom properties:
@@ -43,7 +42,7 @@ preset:
 | Input | Type | Meaning |
 |---|---|---|
 | `--rind-brand-accent` | colour | primary brand colour, used as the solid accent |
-| `--rind-brand-neutral` | colour | hue and chroma source for greys (its lightness is ignored) |
+| `--rind-brand-neutral` | colour | hue and chroma source for greys; its lightness is ignored for surfaces, text and borders, while the neutral PALETTE roles (`neutral-solid`, `-solid-hover`, `-on-solid`, `-soft`, `-text`, `-border`) follow the input like every other palette |
 | `--rind-brand-danger` | colour | destructive / error colour |
 | `--rind-brand-warning` | colour | warning colour |
 | `--rind-brand-success` | colour | success colour |
@@ -69,7 +68,8 @@ scope, with no other change.
 
 - **WHEN** `--rind-brand-neutral` is set to a dark colour and to a light colour of
   the same hue and chroma
-- **THEN** the derived neutral surfaces and text are identical in both cases
+- **THEN** the derived neutral surfaces, text and borders are identical in both cases,
+  while the neutral palette roles (e.g. `--rind-color-neutral-solid`) follow the input
 
 ### Requirement: Colour Palettes And Role Tokens
 
@@ -80,7 +80,7 @@ tokens `--rind-color-<palette>-<role>`:
 | Role | Use |
 |---|---|
 | `solid` | solid fill (the brand colour itself for `accent`) |
-| `solid-hover` | solid fill while hovered or pressed |
+| `solid-hover` | solid fill while hovered or pressed; it moves AWAY from `on-solid` (darker when the solid's L < 0.6, i.e. white text; lighter from L 0.6 up), so hover never lowers the text contrast |
 | `on-solid` | text and icons on `solid` and `solid-hover` |
 | `soft` | tinted, opaque background |
 | `soft-hover` | tinted background while hovered or pressed |
@@ -203,3 +203,4 @@ equal `--rind-color-text` in every scope. These rules SHALL be in `rind.preferen
 - **WHEN** a `calm` page is viewed with `prefers-contrast: more` emulated
 - **THEN** muted text renders in the full text colour and `--rind-color-border`
   equals `--rind-color-border-strong`
+

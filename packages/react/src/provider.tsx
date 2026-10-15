@@ -9,7 +9,15 @@ import {
   type Messages,
   resolveMessages,
 } from "@rind-ui/core"
-import { createContext, type ReactNode, useContext, useMemo, useSyncExternalStore } from "react"
+import {
+  type ComponentType,
+  createContext,
+  type ReactNode,
+  useContext,
+  useMemo,
+  useSyncExternalStore,
+} from "react"
+import type { IconName, RindIcons } from "./icons"
 
 /**
  * Message types by component scope. Each component declares its own, so provider overrides
@@ -46,6 +54,8 @@ export interface RindProviderProps {
   readonly typeaheadTimeout?: number
   /** Further environment overrides (platform, reduced motion, nonce, …). */
   readonly environment?: DomEnvironmentOptions
+  /** Icon components by name, rendered by indicator parts that got no children. */
+  readonly icons?: RindIcons
   readonly children?: ReactNode
 }
 
@@ -57,6 +67,7 @@ interface RindConfig {
   readonly announcer: RindProviderProps["announcer"]
   readonly typeaheadTimeout: number
   readonly environment: DomEnvironmentOptions
+  readonly icons: RindIcons
   readonly env: DomEnvironment
 }
 
@@ -69,7 +80,7 @@ const RindContext = createContext<RindConfig | null>(null)
  */
 export function RindProvider(props: RindProviderProps) {
   const parent = useContext(RindContext)
-  const { locale, dir, messages, announcer, typeaheadTimeout, environment, children } = props
+  const { locale, dir, messages, announcer, typeaheadTimeout, environment, icons, children } = props
   const value = useMemo((): RindConfig => {
     const merged = {
       locale: locale ?? parent?.locale,
@@ -80,6 +91,7 @@ export function RindProvider(props: RindProviderProps) {
       announcer: announcer ?? parent?.announcer,
       typeaheadTimeout: typeaheadTimeout ?? parent?.typeaheadTimeout ?? DEFAULT_TYPEAHEAD_TIMEOUT,
       environment: { ...parent?.environment, ...environment },
+      icons: { ...parent?.icons, ...icons },
     }
     const options: DomEnvironmentOptions = {
       ...merged.environment,
@@ -88,7 +100,7 @@ export function RindProvider(props: RindProviderProps) {
       ...(merged.announcer === undefined ? {} : { announcer: merged.announcer }),
     }
     return { ...merged, env: domEnvironment(options) }
-  }, [parent, locale, dir, messages, announcer, typeaheadTimeout, environment])
+  }, [parent, locale, dir, messages, announcer, typeaheadTimeout, environment, icons])
   return <RindContext value={value}>{children}</RindContext>
 }
 
@@ -147,4 +159,9 @@ export function useMessages<S extends keyof RindMessageScopes>(
 export function useTypeaheadTimeout(own?: number): number {
   const config = useContext(RindContext)
   return own ?? config?.typeaheadTimeout ?? DEFAULT_TYPEAHEAD_TIMEOUT
+}
+
+/** The provider's icon component for `name`, if any. */
+export function useIcon(name: IconName): ComponentType | undefined {
+  return useContext(RindContext)?.icons[name]
 }

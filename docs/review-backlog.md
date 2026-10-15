@@ -7,6 +7,13 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-theme-system (verification) | — | docs/theme/white-label.md | Document that live CSS picks on-solid by the L 0.6 threshold while the builder picks by luminance: in the L≈0.55–0.62 band they can choose different text colours (each internally consistent; the builder is the validated path) |
+| add-theme-system (r1) | — | packages/theme/package.json | tokens.manifest.json not in `files`/`exports` ("published manifest" SHALL) |
+| add-theme-system (r1) | — | packages/theme/src/builder/theme.ts:377-394 | DTCG: dtcgColor drops alpha (overlay /0.45); brand.radius emitted as string, 2025.10 wants {value, unit}; only structural checks |
+| add-theme-system (r1) | — | docs/theme | data-tone="accent" inside another tone is a no-op (technical limit) — document it |
+| add-theme-system (r1) | — | packages/theme tests | icons.browser.test defines its own RTL/mask rules; no icon forced-colors (CanvasText) test; forced-colors border uses a demo stylesheet — add real tests when the first icon component (Checkbox/Select) lands |
+| add-theme-system (r1) | — | packages/testing/fixtures/disclosure/disclosure.pw.test.ts:363 | stale `class="rind-root"` wrapper |
+| add-theme-system (r1) | — | packages/theme/src/builder/derive.browser.test.ts:107 | stale "BUG" comment about clamp(-1,*1000,1) |
 | add-floating-positioning (r1) | — | packages/core/src/dom/position/track.ts:~280 | pagehide stops tracking but ignores event.persisted and nothing re-arms on pageshow — a bfcache restore leaves an open popup untracked |
 | add-floating-positioning (r1) | — | positioning tests | Ariakit#7625 keyboard-open test can't scroll anyway (unplaced popup is fixed at origin); keyboard-shrink emulated by pinch-zoom; pinch test uses dropdown (no align flip); iframe-removed test counts only window/document/visualViewport listeners |
 | add-floating-positioning (r1) | — | packages/core/src/dom/inert-outside.ts | opener exclusion `filter(el => !el.contains(opener))` drops a whole element containing the opener — a non-portalled layer registering a root that wraps trigger + exiting content leaves that content non-inert during exit; exclude only the opener's own marking path |

@@ -3,7 +3,11 @@
  * one selecting on `[data-scope="<component>"][data-part="<part>"]` and
  * `[data-state]` — the theme never relies on class names.
  */
+@layer rind.tokens, rind.themes, rind.components, rind.preferences;
 @import "./tokens.css";
+@import "./presets/calm.css";
 @import "./base.css";
+@import "./variants.css";
+@import "./icons.css";
 @import "./overlay.css";
 @import "./positioner.css";

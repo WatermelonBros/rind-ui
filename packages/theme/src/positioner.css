@@ -4,88 +4,90 @@
  * the plain layer positioner in overlay.css keeps its centred grid.
  * No [hidden] rule: hidden="until-found" must keep working.
  */
-[data-scope][data-part="positioner"][data-side] {
-  /* Coordinates come from inline style (top/left + translate); undo overlay.css's inset: 0. */
-  inset: auto;
-  display: block;
-  pointer-events: auto;
-  z-index: calc(1000 + var(--layer-index, 0));
-}
-
-/* No animation or transition until the first placement: it would play from the origin. */
-[data-placing] {
-  /* biome-ignore lint/complexity/noImportantStyles: the guard must beat any consumer animation */
-  animation: none !important;
-  /* biome-ignore lint/complexity/noImportantStyles: same guard */
-  transition: none !important;
-}
-
-[data-part="content"][data-side] {
-  box-sizing: border-box;
-  /* Content scrolls when it does not fit (reflow at 320 px, 400 % zoom). */
-  max-width: var(--rind-available-width);
-  max-height: var(--rind-available-height);
-  overflow: auto;
-  pointer-events: auto;
-  background: var(--rind-color-surface-raised);
-  color: var(--rind-color-text, inherit);
-  border: 1px solid var(--rind-color-border-strong);
-  border-radius: var(--rind-radius-md);
-  padding: var(--rind-space-3);
-  transform-origin: var(--rind-transform-origin);
-}
-
-[data-part="content"][data-side][data-state="open"] {
-  animation: rind-pop-in var(--rind-duration-normal) var(--rind-ease-out);
-}
-
-[data-part="content"][data-side="top"] {
-  --rind-pop-from: translateY(4px) scale(0.97);
-}
-[data-part="content"][data-side="bottom"] {
-  --rind-pop-from: translateY(-4px) scale(0.97);
-}
-[data-part="content"][data-side="left"] {
-  --rind-pop-from: translateX(4px) scale(0.97);
-}
-[data-part="content"][data-side="right"] {
-  --rind-pop-from: translateX(-4px) scale(0.97);
-}
-
-@keyframes rind-pop-in {
-  from {
-    opacity: 0;
-    transform: var(--rind-pop-from, scale(0.97));
+@layer rind.components {
+  [data-scope][data-part="positioner"][data-side] {
+    /* Coordinates come from inline style (top/left + translate); undo overlay.css's inset: 0. */
+    inset: auto;
+    display: block;
+    pointer-events: auto;
+    z-index: calc(1000 + var(--layer-index, 0));
   }
-}
 
-/*
- * The arrow is two borders of a rotated square in currentcolor, so it is drawn in forced
- * colors too (backgrounds and shadows are dropped there). The cross-axis offset comes from
- * inline style; physical offsets here because the side is physical.
- */
-[data-part="arrow"][data-side] {
-  box-sizing: border-box;
-  width: 10px;
-  height: 10px;
-  background: var(--rind-color-surface-raised);
-  color: var(--rind-color-border-strong);
-  border: 0 solid currentcolor;
-  transform: rotate(45deg);
-}
-[data-part="arrow"][data-side="top"] {
-  bottom: -6px;
-  border-width: 0 1px 1px 0;
-}
-[data-part="arrow"][data-side="bottom"] {
-  top: -6px;
-  border-width: 1px 0 0 1px;
-}
-[data-part="arrow"][data-side="left"] {
-  right: -6px;
-  border-width: 1px 1px 0 0;
-}
-[data-part="arrow"][data-side="right"] {
-  left: -6px;
-  border-width: 0 0 1px 1px;
+  /* No animation or transition until the first placement: it would play from the origin. */
+  [data-placing] {
+    /* biome-ignore lint/complexity/noImportantStyles: the guard must beat any consumer animation */
+    animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: same guard */
+    transition: none !important;
+  }
+
+  [data-part="content"][data-side] {
+    box-sizing: border-box;
+    /* Content scrolls when it does not fit (reflow at 320 px, 400 % zoom). */
+    max-width: var(--rind-available-width);
+    max-height: var(--rind-available-height);
+    overflow: auto;
+    pointer-events: auto;
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-text, inherit);
+    border: 1px solid var(--rind-color-border-strong);
+    border-radius: var(--rind-radius-md);
+    padding: var(--rind-space-3);
+    transform-origin: var(--rind-transform-origin);
+  }
+
+  [data-part="content"][data-side][data-state="open"] {
+    animation: rind-pop-in var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  [data-part="content"][data-side="top"] {
+    --rind-pop-from: translateY(4px) scale(0.97);
+  }
+  [data-part="content"][data-side="bottom"] {
+    --rind-pop-from: translateY(-4px) scale(0.97);
+  }
+  [data-part="content"][data-side="left"] {
+    --rind-pop-from: translateX(4px) scale(0.97);
+  }
+  [data-part="content"][data-side="right"] {
+    --rind-pop-from: translateX(-4px) scale(0.97);
+  }
+
+  @keyframes rind-pop-in {
+    from {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  /*
+   * The arrow is two borders of a rotated square in currentcolor, so it is drawn in forced
+   * colors too (backgrounds and shadows are dropped there). The cross-axis offset comes from
+   * inline style; physical offsets here because the side is physical.
+   */
+  [data-part="arrow"][data-side] {
+    box-sizing: border-box;
+    width: 10px;
+    height: 10px;
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-border-strong);
+    border: 0 solid currentcolor;
+    transform: rotate(45deg);
+  }
+  [data-part="arrow"][data-side="top"] {
+    bottom: -6px;
+    border-width: 0 1px 1px 0;
+  }
+  [data-part="arrow"][data-side="bottom"] {
+    top: -6px;
+    border-width: 1px 0 0 1px;
+  }
+  [data-part="arrow"][data-side="left"] {
+    right: -6px;
+    border-width: 1px 1px 0 0;
+  }
+  [data-part="arrow"][data-side="right"] {
+    left: -6px;
+    border-width: 0 0 1px 1px;
+  }
 }

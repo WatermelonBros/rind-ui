@@ -121,3 +121,18 @@ default) and focus SHALL follow `theme-accessibility`.
 
 - **WHEN** a `ghost` and a `soft` button are rendered with forced colors emulated
 - **THEN** both buttons show a visible border
+
+### Requirement: Re-Skinning A Built Theme
+
+A theme built by the builder and applied to `:root` (the default `calm` preset in the
+`rind.themes` layer) fixes `:root`'s derived tokens, so changing brand inputs on
+`:root` alone SHALL NOT be expected to re-skin it. Re-skinning SHALL be done through a
+`[data-rind-theme]` scope (where the CSS derivation applies) or by building a new theme
+with the builder. The documentation SHALL state this.
+
+#### Scenario: Brand input on root after a built preset
+
+- **WHEN** the built `calm` preset is loaded and a consumer sets `--rind-brand-accent`
+  on `:root`
+- **THEN** `:root`'s accent tokens are unchanged, and the same input set on a
+  `[data-rind-theme="acme"]` scope re-skins that scope

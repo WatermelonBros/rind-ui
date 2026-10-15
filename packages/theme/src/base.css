@@ -1,86 +1,96 @@
-.rind-root {
-  font-family: var(--rind-font-sans);
-  font-size: var(--rind-text-sm);
-  line-height: 1.5;
-  color: var(--rind-color-text);
-  background: var(--rind-color-bg);
-}
-
-/*
- * Focus: parts carry data-focus-visible only for keyboard and assistive-technology focus,
- * so the browser's own ring (which also fires on some pointer focus) is turned off on them.
- */
-:where([data-scope][data-part]):focus:not([data-focus-visible]) {
-  outline: none;
-}
-
-[data-focus-visible] {
-  outline: var(--rind-focus-width) solid var(--rind-focus-color);
-  outline-offset: var(--rind-focus-offset);
-}
-
-/*
- * Target size: a pressable part smaller than --rind-hit-area keeps its look and gets a
- * centred, invisible hit area of at least that size.
- */
-:where([data-rind-pressable]) {
-  position: relative;
-}
-
-:where([data-rind-pressable])::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max(100%, var(--rind-hit-area));
-  height: max(100%, var(--rind-hit-area));
-  transform: translate(-50%, -50%);
-}
-
-/*
- * Revealed by find-in-page: show the match at once. !important because component
- * stylesheets (more specific) declare the opening animation this must cancel.
- */
-[data-reveal="find-in-page"] {
-  /* biome-ignore lint/complexity/noImportantStyles: must beat component animations (see above) */
-  transition: none !important;
-  /* biome-ignore lint/complexity/noImportantStyles: must beat component animations (see above) */
-  animation: none !important;
-}
-
-/*
- * Forced colors drop backgrounds and shadows: states map to system colours so they stay
- * distinguishable. There is deliberately no [hidden] rule anywhere in the theme:
- * display:none would defeat hidden="until-found".
- */
-@media (forced-colors: active) {
+/* Base rules: theme scopes, focus, target size, forced colors. */
+@layer rind.components {
   /*
-   * Every state also gets a non-colour cue, an outline pattern, so it reads without
-   * relying on the system colours: highlighted dashed, selected/checked/on double, disabled
-   * dotted; keyboard focus (below, last so it wins) stays solid.
+   * Every theme scope gets the base font and text colour; a scope that is not a portal host
+   * also gets the page background (a portal host would paint over the page).
    */
-  :where([data-scope])[data-highlighted] {
-    outline: 2px dashed Highlight;
-    outline-offset: -2px;
+  :where([data-rind-theme]) {
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-sm);
+    line-height: var(--rind-leading-normal);
+    color: var(--rind-color-text);
   }
 
-  :where([data-scope])[data-selected],
-  :where([data-scope])[data-state="checked"],
-  :where([data-scope])[data-state="on"] {
-    background-color: Highlight;
-    color: HighlightText;
-    outline: 3px double CanvasText;
-    outline-offset: -3px;
+  :where([data-rind-theme]:not([data-rind-portal])) {
+    background: var(--rind-color-bg);
   }
 
-  :where([data-scope])[data-disabled] {
-    color: GrayText;
-    outline: 1px dotted GrayText;
-    outline-offset: -1px;
+  /*
+   * Focus: parts carry data-focus-visible only for keyboard and assistive-technology focus,
+   * so the browser's own ring (which also fires on some pointer focus) is turned off on them.
+   */
+  :where([data-scope][data-part]):focus:not([data-focus-visible]) {
+    outline: none;
   }
 
   [data-focus-visible] {
-    outline-style: solid;
-    outline-color: Highlight;
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /*
+   * Target size: a pressable part smaller than --rind-hit-area keeps its look and gets a
+   * centred, invisible hit area of at least that size.
+   */
+  :where([data-rind-pressable]) {
+    position: relative;
+  }
+
+  :where([data-rind-pressable])::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, var(--rind-hit-area));
+    height: max(100%, var(--rind-hit-area));
+    transform: translate(-50%, -50%);
+  }
+
+  /*
+   * Revealed by find-in-page: show the match at once. !important because component
+   * stylesheets (more specific) declare the opening animation this must cancel.
+   */
+  [data-reveal="find-in-page"] {
+    /* biome-ignore lint/complexity/noImportantStyles: must beat component animations (see above) */
+    transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: must beat component animations (see above) */
+    animation: none !important;
+  }
+
+  /*
+   * Forced colors drop backgrounds and shadows: states map to system colours so they stay
+   * distinguishable. There is deliberately no [hidden] rule anywhere in the theme:
+   * display:none would defeat hidden="until-found".
+   */
+  @media (forced-colors: active) {
+    /*
+     * Every state also gets a non-colour cue, an outline pattern, so it reads without
+     * relying on the system colours: highlighted dashed, selected/checked/on double, disabled
+     * dotted; keyboard focus (below, last so it wins) stays solid.
+     */
+    :where([data-scope])[data-highlighted] {
+      outline: 2px dashed Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope])[data-selected],
+    :where([data-scope])[data-state="checked"],
+    :where([data-scope])[data-state="on"] {
+      background-color: Highlight;
+      color: HighlightText;
+      outline: 3px double CanvasText;
+      outline-offset: -3px;
+    }
+
+    :where([data-scope])[data-disabled] {
+      color: GrayText;
+      outline: 1px dotted GrayText;
+      outline-offset: -1px;
+    }
+
+    [data-focus-visible] {
+      outline-style: solid;
+      outline-color: Highlight;
+    }
   }
 }

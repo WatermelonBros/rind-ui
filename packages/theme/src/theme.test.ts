@@ -1,43 +1,30 @@
+/// <reference types="node" />
 // Focus ring contrast (WCAG 1.4.11, 3:1) and the theme's hidden-content rule, read from the CSS.
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
+import { calm, checkTheme, crisp } from "./builder"
 
 // Comments stripped: the checks are about rules, and comments may name what is avoided.
 const css = (file: string) =>
   readFileSync(new URL(`./${file}`, import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "")
 const tokens = css("tokens.css")
 
-/** [light, dark] of a `light-dark(#hex, #hex)` token, following `var()` aliases. */
-function palette(name: string): [string, string] {
-  const value = new RegExp(`--${name}:\\s*([^;]+);`).exec(tokens)?.[1]?.trim()
-  if (!value) throw new Error(`no token --${name}`)
-  const alias = /^var\(--([\w-]+)\)$/.exec(value)?.[1]
-  if (alias) return palette(alias)
-  const pair = /^light-dark\((#[0-9a-f]{6}),\s*(#[0-9a-f]{6})\)$/i.exec(value)
-  if (!pair?.[1] || !pair[2]) throw new Error(`--${name} is not light-dark(#hex, #hex): ${value}`)
-  return [pair[1], pair[2]]
-}
-
-const luminance = (hex: string) => {
-  const [r = 0, g = 0, b = 0] = [1, 3, 5].map((i) => {
-    const c = Number.parseInt(hex.slice(i, i + 2), 16) / 255
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-  })
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-const contrast = (a: string, b: string) => {
-  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number]
-  return (hi + 0.05) / (lo + 0.05)
-}
-
 describe("theme accessibility", () => {
-  it.each(["rind-color-bg", "rind-color-surface", "rind-color-surface-raised"])(
-    "focus ring has 3:1 against %s in light and dark",
-    (background) => {
-      const [ringLight, ringDark] = palette("rind-focus-color")
-      const [bgLight, bgDark] = palette(background)
-      expect(contrast(ringLight, bgLight)).toBeGreaterThanOrEqual(3)
-      expect(contrast(ringDark, bgDark)).toBeGreaterThanOrEqual(3)
+  // The focus colour is the accent border: the builder measures it against every ground.
+  it.each(["calm", "crisp"] as const)(
+    "focus ring has 3:1 against bg, surface and surface-raised (%s)",
+    (name) => {
+      const report = checkTheme({ name, ...(name === "calm" ? calm : crisp) })
+      const focus = report.pairs.filter((p) => p.foreground === "focus-color")
+      expect(focus.map((p) => `${p.scheme} ${p.background}`).sort()).toEqual([
+        "dark bg",
+        "dark surface",
+        "dark surface-raised",
+        "light bg",
+        "light surface",
+        "light surface-raised",
+      ])
+      for (const p of focus) expect(p.ratio).toBeGreaterThanOrEqual(3)
     },
   )
 

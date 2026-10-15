@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- A server-rendered tenant: everything the first paint needs is in the markup and the head. -->
+<html lang="en" data-rind-theme="acme" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <title>ssr</title>
+    <!-- served by the test: index.css (inlined) plus acme's built CSS -->
+    <link rel="stylesheet" href="/theme.css" />
+    <script>document.title = "script ran"</script>
+  </head>
+  <body>
+    <main>
+      <button type="button" data-scope="button" data-part="root">Save</button>
+    </main>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+export { type IconName, type RindIcons, useIconChildren } from "./icons"
 export { LayerProvider, useParentLayer } from "./layer-context"
 export { composeRefs, mergeProps, type RindEventExtension, stripMarker } from "./merge-props"
 export { normalizeProps } from "./normalize-props"
@@ -8,6 +9,7 @@ export {
   type RindProviderProps,
   type ScopedMessages,
   useEnvironment,
+  useIcon,
   useLocale,
   useMessages,
   useTypeaheadTimeout,

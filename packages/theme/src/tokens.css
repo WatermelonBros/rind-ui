@@ -1,74 +1,371 @@
 /*
- * Design tokens. Every component stylesheet reads these and nothing else, so a
- * consumer re-themes rind-ui by overriding custom properties, never selectors.
+ * Design tokens, three tiers (openspec design-tokens):
+ *   tier 1  --rind-brand-*            twelve brand inputs (calm defaults below)
+ *   tier 2  --rind-<category>-<role>  semantic tokens, derived from tier 1 here
+ *   tier 3  --rind-<scope>-<name>     component tokens: never declared by the theme, read by
+ *                                     component stylesheets with a tier-2 fallback
  *
- * Colours use light-dark(): the OS preference picks the palette unless the page
- * pins one with `data-theme="light"` or `data-theme="dark"` on any ancestor.
+ * The derivation is declared on every theme scope (:root and each [data-rind-theme]), so a
+ * scope's own inputs are re-derived inside it: a custom property's var() references resolve
+ * where it is declared, and a token derived only on :root would freeze the root's accent for
+ * every nested scope. Built themes (presets, defineTheme output) declare literal, validated
+ * values in rind.themes, which wins over this layer. No @property: registered colour tokens
+ * would stop inheriting the scope's derivation.
  */
-:root {
-  color-scheme: light dark;
+@layer rind.tokens, rind.themes, rind.components, rind.preferences;
 
-  --rind-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --rind-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+@layer rind.tokens {
+  /* Tier 1: the calm preset's inputs, so this file alone themes everything. */
+  :where(:root) {
+    --rind-brand-accent: oklch(0.52 0.19 268);
+    --rind-brand-neutral: oklch(0.5 0.01 270);
+    --rind-brand-danger: oklch(0.55 0.2 27);
+    --rind-brand-warning: oklch(0.75 0.15 75);
+    --rind-brand-success: oklch(0.6 0.14 150);
+    --rind-brand-font-sans:
+      ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --rind-brand-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --rind-brand-font-size: 0.875rem;
+    --rind-brand-radius: 0.5rem;
+    --rind-brand-density: 1;
+    --rind-brand-motion: 1;
+    --rind-brand-border-strength: 0.2;
 
-  --rind-text-xs: 0.75rem;
-  --rind-text-sm: 0.875rem;
-  --rind-text-md: 1rem;
-  --rind-text-lg: 1.125rem;
+    /* Light and dark follow the used color-scheme (an app's own rule works too). */
+    color-scheme: light dark;
+  }
 
-  --rind-space-1: 0.25rem;
-  --rind-space-2: 0.5rem;
-  --rind-space-3: 0.75rem;
-  --rind-space-4: 1rem;
-  --rind-space-6: 1.5rem;
-  --rind-space-8: 2rem;
+  :where([data-theme="light"]) {
+    color-scheme: light;
+  }
 
-  --rind-radius-sm: 4px;
-  --rind-radius-md: 8px;
-  --rind-radius-lg: 12px;
-  --rind-radius-full: 9999px;
+  :where([data-theme="dark"]) {
+    color-scheme: dark;
+  }
 
-  --rind-color-bg: light-dark(#ffffff, #111113);
-  --rind-color-surface: light-dark(#f7f7f8, #18181b);
-  --rind-color-surface-raised: light-dark(#ffffff, #1f1f23);
-  --rind-color-border: light-dark(#e4e4e7, #2e2e33);
-  --rind-color-border-strong: light-dark(#c9c9cf, #45454d);
-  --rind-color-text: light-dark(#18181b, #ededef);
-  --rind-color-text-muted: light-dark(#5f5f69, #a1a1aa);
-  --rind-color-accent: light-dark(#3b5bdb, #7c94f5);
-  --rind-color-accent-hover: light-dark(#3249c0, #93a7f7);
-  --rind-color-accent-text: light-dark(#ffffff, #0b0b0d);
-  --rind-color-danger: light-dark(#c92a2a, #ff8787);
-  --rind-color-focus: var(--rind-color-accent);
-  --rind-color-overlay: light-dark(rgb(9 9 11 / 0.45), rgb(0 0 0 / 0.6));
+  /* Tier 2, everything but colour: scales of the inputs. */
+  :where(:root, [data-rind-theme]) {
+    --rind-space-1: calc(0.25rem * var(--rind-brand-density));
+    --rind-space-2: calc(0.5rem * var(--rind-brand-density));
+    --rind-space-3: calc(0.75rem * var(--rind-brand-density));
+    --rind-space-4: calc(1rem * var(--rind-brand-density));
+    --rind-space-6: calc(1.5rem * var(--rind-brand-density));
+    --rind-space-8: calc(2rem * var(--rind-brand-density));
 
-  --rind-shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
-  --rind-shadow-lg: 0 12px 32px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5));
+    /* Never below the 24 px target size (WCAG 2.5.8), whatever the density. */
+    --rind-size-sm: max(24px, calc(1.75rem * var(--rind-brand-density)));
+    --rind-size-md: max(24px, calc(2.25rem * var(--rind-brand-density)));
+    --rind-size-lg: max(24px, calc(2.75rem * var(--rind-brand-density)));
 
-  --rind-duration-fast: 120ms;
-  --rind-duration-normal: 200ms;
-  --rind-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    /* In rem through the input: the browser's text size scales them (radix-ui/themes#121). */
+    --rind-text-xs: calc(var(--rind-brand-font-size) * 0.8571);
+    --rind-text-sm: var(--rind-brand-font-size);
+    --rind-text-md: calc(var(--rind-brand-font-size) * 1.1429);
+    --rind-text-lg: calc(var(--rind-brand-font-size) * 1.2857);
 
-  /* Focus is an outline (never box-shadow alone: forced colors drop shadows). */
-  --rind-focus-width: 2px;
-  --rind-focus-offset: 2px;
-  --rind-focus-color: var(--rind-color-focus);
+    --rind-font-sans: var(--rind-brand-font-sans);
+    --rind-font-mono: var(--rind-brand-font-mono);
+    --rind-leading-tight: 1.25;
+    --rind-leading-normal: 1.5;
 
-  /* Minimum pointer target (WCAG 2.5.8); smaller parts extend a pseudo-element to it. */
-  --rind-hit-area: 24px;
+    --rind-radius-sm: calc(var(--rind-brand-radius) * 0.5);
+    --rind-radius-md: var(--rind-brand-radius);
+    --rind-radius-lg: calc(var(--rind-brand-radius) * 1.5);
+    --rind-radius-full: 9999px;
+    --rind-radius-control: var(--rind-radius-md);
+    --rind-radius-panel: var(--rind-radius-lg);
+    --rind-radius-indicator: var(--rind-radius-sm);
+
+    --rind-duration-fast: calc(120ms * var(--rind-brand-motion));
+    --rind-duration-normal: calc(200ms * var(--rind-brand-motion));
+    --rind-duration-slow: calc(320ms * var(--rind-brand-motion));
+    --rind-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --rind-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+    --rind-border-width: 1px;
+    --rind-shadow-sm: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.4));
+    --rind-shadow-lg: 0 12px 32px light-dark(rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.5));
+  }
+
+  /*
+   * Tier 2 colour: OKLCH relative colour syntax inside light-dark() (light first). Only
+   * where relative colour syntax works: elsewhere the nearest built theme's literal values
+   * (calm on :root) are inherited instead of invalid colours.
+   */
+  @supports (color: oklch(from red l c h)) {
+    :where(:root, [data-rind-theme]) {
+      /*
+       * Neutrals take hue and chroma from the input (chroma capped at 0.03); its lightness
+       * is ignored. Below chroma 0.005 the hue is noise: chroma goes to 0 (tailwind#19830).
+       */
+      --rind-color-bg: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.995 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.16 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-surface: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.97 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.2 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-surface-raised: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 1 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.23 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-overlay: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.15 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          0.45
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.05 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          0.6
+        )
+      );
+      --rind-color-text: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.21 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.95 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-text-muted: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.5 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.72 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-text-disabled: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.62 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.48 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      --rind-color-border-strong: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) 0.62 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) 0.55 calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+      /* From the faint border towards border-strong by border-strength. */
+      --rind-color-border: light-dark(
+        oklch(
+          from var(--rind-brand-neutral) calc(0.92 - 0.3 * var(--rind-brand-border-strength))
+            calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        ),
+        oklch(
+          from var(--rind-brand-neutral) calc(0.3 + 0.25 * var(--rind-brand-border-strength))
+            calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+          1
+        )
+      );
+
+      /*
+       * Five palettes, seven roles each: solid = the input; solid-hover a step away from the
+       * on-solid text (darker under white text, below L 0.6; lighter under near-black, from
+       * L 0.6 up: the 1e9 factor turns the comparison into a step), so hover never
+       * loses contrast; on-solid white below L 0.6, near-black above; soft and soft-hover
+       * opaque tints; text and border darkened (light) or lightened (dark) for contrast.
+       */
+      --rind-color-accent-solid: oklch(from var(--rind-brand-accent) l c h / 1);
+      --rind-color-accent-solid-hover: oklch(
+        from var(--rind-brand-accent) calc(l + 0.05 - 0.1 * clamp(0, (0.6 - l) * 1e9, 1)) c h /
+        1
+      );
+      --rind-color-accent-on-solid: oklch(
+        from var(--rind-brand-accent) clamp(0.18, (0.6 - l) * 1e9, 1) 0 h /
+        1
+      );
+      --rind-color-accent-soft: light-dark(
+        oklch(from var(--rind-brand-accent) 0.95 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-accent) 0.27 min(c, 0.05) h / 1)
+      );
+      --rind-color-accent-soft-hover: light-dark(
+        oklch(from var(--rind-brand-accent) 0.92 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-accent) 0.31 min(c, 0.05) h / 1)
+      );
+      --rind-color-accent-text: light-dark(
+        oklch(from var(--rind-brand-accent) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-accent) max(l, 0.78) min(c, 0.2) h / 1)
+      );
+      --rind-color-accent-border: light-dark(
+        oklch(from var(--rind-brand-accent) min(l, 0.6) c h / 1),
+        oklch(from var(--rind-brand-accent) max(l, 0.62) c h / 1)
+      );
+
+      --rind-color-neutral-solid: oklch(
+        from var(--rind-brand-neutral) l calc(min(c, 0.03) * clamp(0, (c - 0.005) * 1e6, 1)) h /
+        1
+      );
+      --rind-color-neutral-solid-hover: oklch(
+        from var(--rind-color-neutral-solid) calc(l + 0.05 - 0.1 * clamp(0, (0.6 - l) * 1e9, 1)) c h /
+        1
+      );
+      --rind-color-neutral-on-solid: oklch(
+        from var(--rind-color-neutral-solid) clamp(0.18, (0.6 - l) * 1e9, 1) 0 h /
+        1
+      );
+      --rind-color-neutral-soft: light-dark(
+        oklch(from var(--rind-color-neutral-solid) 0.95 min(c, 0.05) h / 1),
+        oklch(from var(--rind-color-neutral-solid) 0.27 min(c, 0.05) h / 1)
+      );
+      --rind-color-neutral-soft-hover: light-dark(
+        oklch(from var(--rind-color-neutral-solid) 0.92 min(c, 0.05) h / 1),
+        oklch(from var(--rind-color-neutral-solid) 0.31 min(c, 0.05) h / 1)
+      );
+      --rind-color-neutral-text: light-dark(
+        oklch(from var(--rind-color-neutral-solid) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-color-neutral-solid) max(l, 0.78) min(c, 0.2) h / 1)
+      );
+      --rind-color-neutral-border: light-dark(
+        oklch(from var(--rind-color-neutral-solid) min(l, 0.6) c h / 1),
+        oklch(from var(--rind-color-neutral-solid) max(l, 0.62) c h / 1)
+      );
+
+      --rind-color-danger-solid: oklch(from var(--rind-brand-danger) l c h / 1);
+      --rind-color-danger-solid-hover: oklch(
+        from var(--rind-brand-danger) calc(l + 0.05 - 0.1 * clamp(0, (0.6 - l) * 1e9, 1)) c h /
+        1
+      );
+      --rind-color-danger-on-solid: oklch(
+        from var(--rind-brand-danger) clamp(0.18, (0.6 - l) * 1e9, 1) 0 h /
+        1
+      );
+      --rind-color-danger-soft: light-dark(
+        oklch(from var(--rind-brand-danger) 0.95 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-danger) 0.27 min(c, 0.05) h / 1)
+      );
+      --rind-color-danger-soft-hover: light-dark(
+        oklch(from var(--rind-brand-danger) 0.92 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-danger) 0.31 min(c, 0.05) h / 1)
+      );
+      --rind-color-danger-text: light-dark(
+        oklch(from var(--rind-brand-danger) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-danger) max(l, 0.78) min(c, 0.2) h / 1)
+      );
+      --rind-color-danger-border: light-dark(
+        oklch(from var(--rind-brand-danger) min(l, 0.6) c h / 1),
+        oklch(from var(--rind-brand-danger) max(l, 0.62) c h / 1)
+      );
+
+      --rind-color-warning-solid: oklch(from var(--rind-brand-warning) l c h / 1);
+      --rind-color-warning-solid-hover: oklch(
+        from var(--rind-brand-warning) calc(l + 0.05 - 0.1 * clamp(0, (0.6 - l) * 1e9, 1)) c h /
+        1
+      );
+      --rind-color-warning-on-solid: oklch(
+        from var(--rind-brand-warning) clamp(0.18, (0.6 - l) * 1e9, 1) 0 h /
+        1
+      );
+      --rind-color-warning-soft: light-dark(
+        oklch(from var(--rind-brand-warning) 0.95 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-warning) 0.27 min(c, 0.05) h / 1)
+      );
+      --rind-color-warning-soft-hover: light-dark(
+        oklch(from var(--rind-brand-warning) 0.92 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-warning) 0.31 min(c, 0.05) h / 1)
+      );
+      --rind-color-warning-text: light-dark(
+        oklch(from var(--rind-brand-warning) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-warning) max(l, 0.78) min(c, 0.2) h / 1)
+      );
+      --rind-color-warning-border: light-dark(
+        oklch(from var(--rind-brand-warning) min(l, 0.6) c h / 1),
+        oklch(from var(--rind-brand-warning) max(l, 0.62) c h / 1)
+      );
+
+      --rind-color-success-solid: oklch(from var(--rind-brand-success) l c h / 1);
+      --rind-color-success-solid-hover: oklch(
+        from var(--rind-brand-success) calc(l + 0.05 - 0.1 * clamp(0, (0.6 - l) * 1e9, 1)) c h /
+        1
+      );
+      --rind-color-success-on-solid: oklch(
+        from var(--rind-brand-success) clamp(0.18, (0.6 - l) * 1e9, 1) 0 h /
+        1
+      );
+      --rind-color-success-soft: light-dark(
+        oklch(from var(--rind-brand-success) 0.95 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-success) 0.27 min(c, 0.05) h / 1)
+      );
+      --rind-color-success-soft-hover: light-dark(
+        oklch(from var(--rind-brand-success) 0.92 min(c, 0.05) h / 1),
+        oklch(from var(--rind-brand-success) 0.31 min(c, 0.05) h / 1)
+      );
+      --rind-color-success-text: light-dark(
+        oklch(from var(--rind-brand-success) min(l, 0.5) min(c, 0.2) h / 1),
+        oklch(from var(--rind-brand-success) max(l, 0.78) min(c, 0.2) h / 1)
+      );
+      --rind-color-success-border: light-dark(
+        oklch(from var(--rind-brand-success) min(l, 0.6) c h / 1),
+        oklch(from var(--rind-brand-success) max(l, 0.62) c h / 1)
+      );
+    }
+  }
 }
 
-[data-theme="light"] {
-  color-scheme: light;
-}
+/*
+ * User preferences win over every theme, built or live (this sublayer is last): reduced
+ * motion zeroes durations, more contrast makes muted text full text and borders strong.
+ */
+@layer rind.preferences {
+  /*
+   * Focus and target size (theme-accessibility) on every scope, so no theme can undo them.
+   * Focus is an outline (forced colors drop shadows); its colour is the accent border, which
+   * a tone re-points.
+   */
+  :where(:root, [data-rind-theme]) {
+    --rind-focus-color: var(--rind-color-accent-border);
+    --rind-focus-width: 2px;
+    --rind-focus-offset: 2px;
+    /* Minimum pointer target; smaller pressable parts extend a pseudo-element to it. */
+    --rind-hit-area: 24px;
+  }
 
-[data-theme="dark"] {
-  color-scheme: dark;
-}
+  @media (prefers-reduced-motion: reduce) {
+    :where(:root, [data-rind-theme]) {
+      --rind-duration-fast: 0s;
+      --rind-duration-normal: 0s;
+      --rind-duration-slow: 0s;
+    }
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --rind-duration-fast: 0ms;
-    --rind-duration-normal: 0ms;
+  @media (prefers-contrast: more) {
+    :where(:root, [data-rind-theme]) {
+      --rind-brand-border-strength: 1;
+      --rind-color-text-muted: var(--rind-color-text);
+      --rind-color-border: var(--rind-color-border-strong);
+    }
   }
 }

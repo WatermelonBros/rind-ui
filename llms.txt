@@ -15,6 +15,9 @@
 - [Press, hover and long press](docs/guides/press-and-hover.md): `usePress` (React) / `createPress` (core) turn pointer, mouse, keyboard and screen-reader input into one stream of machine events, so a part activates the same way however it is used: `PRESS.START`, `PRESS.UP`, `PRESS.END`, `PRESS`, `PRESS.CANCEL`, plus `LONG_PRESS` and `CONTEXT_MENU` when enabled.
 - [Testing accessibility](docs/guides/testing-accessibility.md): `@rind-ui/testing` checks accessibility as part of every model-based test, not as a separate suite.
 - [VisuallyHidden](docs/guides/visually-hidden.md): Content read by assistive technology but not shown — never `display: none` or `visibility: hidden`, which also hide it from screen readers.
+- [White-label theming](docs/theme/white-label.md): rind-ui is themed with CSS custom properties in three tiers, scoped by the `data-rind-theme` attribute. One brand colour re-skins every component, light and dark, and a multi-tenant page can show several brands side by side. Token names: [tokens.md](tokens.md). Building validated themes: [builder.md](builder.md).
+- [Theme builder](docs/theme/builder.md): `@rind-ui/theme/builder` turns brand inputs into validated theme CSS. It is pure TypeScript with no DOM and no dependency, so it runs in a build script, a server request or a browser. The same input always gives the same bytes.
+- [Token reference](docs/theme/tokens.md): Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the twelve `--rind-brand-*` inputs; see [white-label.md](white-label.md).
 
 ## Accessibility
 

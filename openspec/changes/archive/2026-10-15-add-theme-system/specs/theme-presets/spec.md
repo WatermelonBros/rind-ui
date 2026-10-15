@@ -19,7 +19,7 @@ start from a preset with `defineTheme({ name, extends: "crisp", … })`.
 | neutral | `oklch(0.5 0.01 270)` | `oklch(0.5 0.005 250)` |
 | danger | `oklch(0.55 0.2 27)` | `oklch(0.55 0.21 27)` |
 | warning | `oklch(0.75 0.15 75)` | `oklch(0.75 0.16 75)` |
-| success | `oklch(0.6 0.14 150)` | `oklch(0.58 0.15 150)` |
+| success | `oklch(0.6 0.14 150)` | `oklch(0.55 0.15 150)` (0.58 cannot reach 4.5:1 with white or black text) |
 | fontSans | system UI stack | system UI stack |
 | fontMono | system mono stack | system mono stack |
 | fontSize | `0.875rem` | `0.875rem` |

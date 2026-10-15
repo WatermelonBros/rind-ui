@@ -1,0 +1,75 @@
+/*
+ * Consumer variant attributes (openspec theme-variants). Only the shared mechanics live here:
+ * data-tone re-points the accent roles to another palette (so every component, reading only
+ * accent roles, follows), and data-size sets the local control tokens that descendants
+ * inherit. Each component stylesheet maps data-variant onto its own tier-3 tokens.
+ */
+@layer rind.components {
+  :where([data-tone="neutral"]) {
+    --rind-color-accent-solid: var(--rind-color-neutral-solid);
+    --rind-color-accent-solid-hover: var(--rind-color-neutral-solid-hover);
+    --rind-color-accent-on-solid: var(--rind-color-neutral-on-solid);
+    --rind-color-accent-soft: var(--rind-color-neutral-soft);
+    --rind-color-accent-soft-hover: var(--rind-color-neutral-soft-hover);
+    --rind-color-accent-text: var(--rind-color-neutral-text);
+    --rind-color-accent-border: var(--rind-color-neutral-border);
+    /* Re-declared here: var() resolves where it is declared, not where it is used. */
+    --rind-focus-color: var(--rind-color-neutral-border);
+  }
+
+  :where([data-tone="danger"]) {
+    --rind-color-accent-solid: var(--rind-color-danger-solid);
+    --rind-color-accent-solid-hover: var(--rind-color-danger-solid-hover);
+    --rind-color-accent-on-solid: var(--rind-color-danger-on-solid);
+    --rind-color-accent-soft: var(--rind-color-danger-soft);
+    --rind-color-accent-soft-hover: var(--rind-color-danger-soft-hover);
+    --rind-color-accent-text: var(--rind-color-danger-text);
+    --rind-color-accent-border: var(--rind-color-danger-border);
+    /* Re-declared here: var() resolves where it is declared, not where it is used. */
+    --rind-focus-color: var(--rind-color-danger-border);
+  }
+
+  :where([data-tone="warning"]) {
+    --rind-color-accent-solid: var(--rind-color-warning-solid);
+    --rind-color-accent-solid-hover: var(--rind-color-warning-solid-hover);
+    --rind-color-accent-on-solid: var(--rind-color-warning-on-solid);
+    --rind-color-accent-soft: var(--rind-color-warning-soft);
+    --rind-color-accent-soft-hover: var(--rind-color-warning-soft-hover);
+    --rind-color-accent-text: var(--rind-color-warning-text);
+    --rind-color-accent-border: var(--rind-color-warning-border);
+    /* Re-declared here: var() resolves where it is declared, not where it is used. */
+    --rind-focus-color: var(--rind-color-warning-border);
+  }
+
+  :where([data-tone="success"]) {
+    --rind-color-accent-solid: var(--rind-color-success-solid);
+    --rind-color-accent-solid-hover: var(--rind-color-success-solid-hover);
+    --rind-color-accent-on-solid: var(--rind-color-success-on-solid);
+    --rind-color-accent-soft: var(--rind-color-success-soft);
+    --rind-color-accent-soft-hover: var(--rind-color-success-soft-hover);
+    --rind-color-accent-text: var(--rind-color-success-text);
+    --rind-color-accent-border: var(--rind-color-success-border);
+    /* Re-declared here: var() resolves where it is declared, not where it is used. */
+    --rind-focus-color: var(--rind-color-success-border);
+  }
+
+  /* data-tone="accent" (the default) re-points nothing: the element keeps the accent roles. */
+
+  :where([data-size="sm"]) {
+    --rind-size-control: var(--rind-size-sm);
+    --rind-text-control: var(--rind-text-xs);
+    --rind-space-control: var(--rind-space-2);
+  }
+
+  :where([data-size="md"]) {
+    --rind-size-control: var(--rind-size-md);
+    --rind-text-control: var(--rind-text-sm);
+    --rind-space-control: var(--rind-space-3);
+  }
+
+  :where([data-size="lg"]) {
+    --rind-size-control: var(--rind-size-lg);
+    --rind-text-control: var(--rind-text-md);
+    --rind-space-control: var(--rind-space-4);
+  }
+}
