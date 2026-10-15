@@ -37,14 +37,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @rind-ui/storybook build
-      - uses: guidepup/setup-action@0.17.3
+      # setup-action is unsupported upstream; the CLI does the same. `install` reads the
+      # project's @guidepup/guidepup version, so it runs from the repo root (NVDA needs it).
+      - name: Screen reader setup
+        shell: bash
+        run: |
+          npx --yes @guidepup/setup@0.29.3 setup --ci --macos-record
+          npx --yes @guidepup/setup@0.29.3 install
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: setup-recordings-${{ matrix.project }}
+          path: recordings
+          if-no-files-found: ignore
       - run: pnpm exec playwright install --with-deps webkit chromium
       - name: Golden flows
         working-directory: a11y-nightly
         run: pnpm exec playwright test --project ${{ matrix.project }}
       # Runs after any failure, including install/build/server failures (no results.json).
       - name: Open or update the issue
-        if: ${{ failure() }}
+        # Scheduled runs only: manual runs on branches must not open issues.
+        if: ${{ failure() && github.event_name == 'schedule' }}
         working-directory: a11y-nightly
         shell: bash
         env:
