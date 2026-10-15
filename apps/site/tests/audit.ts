@@ -75,6 +75,10 @@ async function exercise(page: Page, url: string) {
   const frames = page.locator("section[data-example]")
   for (let i = 0; i < (await frames.count()); i++) {
     const frame = frames.nth(i)
+    // the anatomy view, with its first part inspected
+    await frame.getByRole("button", { name: "parts view", exact: true }).click()
+    const legend = frame.getByRole("list", { name: "Parts" }).getByRole("button")
+    if (await legend.count()) await legend.first().hover()
     for (const skin of ["juicy", "bare", "crisp"]) {
       await frame.getByRole("button", { name: `${skin} skin`, exact: true }).click()
     }

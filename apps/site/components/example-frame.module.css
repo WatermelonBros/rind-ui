@@ -78,6 +78,7 @@
 }
 
 .stage {
+  position: relative;
   min-height: 200px;
   display: grid;
   place-items: center;
@@ -99,6 +100,63 @@
 }
 .stage[data-view="juicy"] {
   background: #e9e2ff;
+}
+/* parts: every rendered part gets a faint outline; the inspected one lights up with its name */
+.stage[data-view="parts"] {
+  background: #fff;
+  background-image: radial-gradient(#0d6bff22 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.stage[data-view="parts"] :global([data-part]:not([data-part="hidden-input"])) {
+  outline: 1px dashed #0d6bff66;
+  outline-offset: 2px;
+  transition:
+    outline-color 0.25s,
+    background 0.25s;
+}
+.stage[data-inspecting] :global([data-part]:not([data-anatomy-on])) {
+  outline-color: #0d6bff22;
+}
+.stage[data-view="parts"] :global([data-anatomy-on]) {
+  outline: 2px solid #0d6bff;
+  background: #0d6bff14;
+}
+.tag {
+  position: absolute;
+  z-index: 3;
+  translate: -2px calc(-100% - 6px);
+  font: 600 10px / 1 var(--mono);
+  white-space: nowrap;
+  color: #fff;
+  background: #0d6bff;
+  padding: 3px 5px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 16px;
+  list-style: none;
+  border-top: 2px solid color-mix(in oklab, var(--ink) 12%, transparent);
+}
+.legendItem {
+  font: 600 11.5px var(--mono);
+  padding: 5px 9px;
+  border-radius: 99px;
+  border: 1.5px solid #0d6bff;
+  background: #fff;
+  color: #0a4fbf;
+  cursor: default;
+  transition:
+    background 0.25s,
+    color 0.25s;
+}
+.legendItem[aria-pressed="true"] {
+  background: #0d6bff;
+  color: #fff;
 }
 .stage[data-view="bare"] {
   background: #fafafa;
