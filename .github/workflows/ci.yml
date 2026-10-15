@@ -34,7 +34,7 @@ jobs:
       matrix:
         include:
           - { slice: node, projects: "--project node", browsers: "" }
-          - { slice: jsdom, projects: "--project jsdom", browsers: "" }
+          - { slice: jsdom, projects: "--project jsdom --project setup-noglobals --project setup-optout", browsers: "" }
           - { slice: browser-chromium, projects: "--project 'browser (chromium)'", browsers: chromium }
           - { slice: browser-firefox, projects: "--project 'browser (firefox)'", browsers: firefox }
           - { slice: browser-webkit, projects: "--project 'browser (webkit)'", browsers: webkit }

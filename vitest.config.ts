@@ -53,7 +53,13 @@ export default defineConfig({
             "scripts/**/*.test.ts",
             "a11y-nightly/**/*.test.ts",
           ],
-          exclude: [...dom, "**/*.pw.test.ts", "**/*.browser.test.{ts,tsx}", "**/node_modules/**"],
+          exclude: [
+            ...dom,
+            "**/*.pw.test.ts",
+            "**/*.browser.test.{ts,tsx}",
+            "**/*.{noglobals,optout}.test.{ts,tsx}",
+            "**/node_modules/**",
+          ],
         },
       },
       {
@@ -66,6 +72,34 @@ export default defineConfig({
           globals: true,
           include: dom,
           setupFiles: ["packages/testing/src/setup.ts"],
+        },
+      },
+      {
+        // @rind-ui/testing/setup without Vitest globals (the consumer default): it must
+        // still clean up after each test.
+        resolve,
+        ssr,
+        test: {
+          name: "setup-noglobals",
+          environment: "jsdom",
+          globals: false,
+          include: ["packages/testing/src/setup-noglobals/*.noglobals.test.{ts,tsx}"],
+          setupFiles: ["packages/testing/src/setup.ts"],
+        },
+      },
+      {
+        // The opt-out: RIND_AUTO_CLEANUP = false before the setup leaves cleanup to the test.
+        resolve,
+        ssr,
+        test: {
+          name: "setup-optout",
+          environment: "jsdom",
+          globals: false,
+          include: ["packages/testing/src/setup-noglobals/*.optout.test.{ts,tsx}"],
+          setupFiles: [
+            "packages/testing/src/setup-noglobals/opt-out.setup.ts",
+            "packages/testing/src/setup.ts",
+          ],
         },
       },
       {

@@ -115,5 +115,36 @@ export function resetRindGlobals(): void {
 installErrorLog()
 installAnnouncementLog()
 
-const afterEachHook = g["afterEach"]
-if (typeof afterEachHook === "function") afterEachHook(resetRindGlobals)
+type Hook = (fn: () => unknown) => void
+
+/** The runner's afterEach: a global (Jest, Vitest with `globals`), else Vitest's export. */
+async function runnerAfterEach(): Promise<Hook | null> {
+  const global = g["afterEach"]
+  if (typeof global === "function") return global as Hook
+  try {
+    const vitest = (await import("vitest")) as { afterEach?: Hook }
+    return vitest.afterEach ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * After each test: rind-ui's document-level state, and (unless opted out) Testing
+ * Library's `cleanup`, so a second `render` in a file does not leave the first tree in the
+ * document (drivers would then find two matches). Vitest without `globals` gets neither
+ * from Testing Library itself. Opt out with `globalThis.RIND_AUTO_CLEANUP = false` set
+ * before this file runs (an earlier setup file).
+ */
+const afterEachHook = await runnerAfterEach()
+if (afterEachHook) {
+  afterEachHook(resetRindGlobals)
+  if (g["RIND_AUTO_CLEANUP"] !== false) {
+    try {
+      const { cleanup } = (await import("@testing-library/react")) as { cleanup: () => void }
+      afterEachHook(cleanup)
+    } catch {
+      // Not a React project (or no Testing Library): nothing to unmount.
+    }
+  }
+}

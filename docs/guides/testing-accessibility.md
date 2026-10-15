@@ -39,3 +39,22 @@ Each state story's ARIA snapshot is generated into the docs page with a
 - text: Body text
 ```
 <!-- /aria -->
+
+## Setup and cleanup
+
+List `@rind-ui/testing/setup` in your runner's `setupFiles`. It fills in the DOM APIs a
+simulated DOM lacks (nothing changes in a real browser), records errors and
+announcements from the first render, and registers two `afterEach` hooks: one resets
+rind-ui's document-level state (layer stack, scroll lock, logs), the other runs Testing
+Library's `cleanup`, so a second `render` in the same file does not leave the first tree
+in the document. Without that cleanup a driver would find two matching components and
+fail ("2 elements match the anchor"). Vitest without `globals` does not run Testing
+Library's own auto-cleanup, so the setup does it for you; `afterEach` is taken from the
+globals when present, else from `vitest`.
+
+To manage cleanup yourself, opt out from an earlier setup file:
+
+```ts
+// vitest.setup-first.ts, listed before @rind-ui/testing/setup
+globalThis.RIND_AUTO_CLEANUP = false
+```
