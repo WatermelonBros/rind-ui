@@ -3,11 +3,14 @@
 Gives one form control a label, a description and an error message, carries `disabled`, `readOnly`, `required` and `invalid` to it, validates it, and exposes the result as data attributes, ARIA and a driver.
 
 ```tsx
-import { Field } from "@rind-ui/react"
+import { Field, TextField } from "@rind-ui/react"
 
 <Field.Root name="email" required>
   <Field.Label>Email</Field.Label>
-  <TextField.Input type="email" />
+  {/* The Text Field's Root joins the enclosing Field (it adds no Field of its own). */}
+  <TextField.Root>
+    <TextField.Input type="email" />
+  </TextField.Root>
   <Field.Description>We never share it.</Field.Description>
   <Field.ErrorMessage />
 </Field.Root>

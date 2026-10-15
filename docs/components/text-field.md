@@ -150,14 +150,17 @@ Enter that commits a composition is never treated as Enter.
 Shortcuts of your own need the same guard:
 
 ```tsx
-<TextField.Textarea
-  onKeyDown={(e) => {
-    // Cmd/Ctrl+Enter submits, but never while an IME is composing.
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.nativeEvent.isComposing && e.keyCode !== 229) {
-      e.currentTarget.form?.requestSubmit()
-    }
-  }}
-/>
+<TextField.Root>
+  <TextField.Label>Message</TextField.Label>
+  <TextField.Textarea
+    onKeyDown={(e) => {
+      // Cmd/Ctrl+Enter submits, but never while an IME is composing.
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+        e.currentTarget.form?.requestSubmit()
+      }
+    }}
+  />
+</TextField.Root>
 ```
 
 ## Clear button

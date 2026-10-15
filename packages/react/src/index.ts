@@ -5,6 +5,7 @@ export * from "./collapsible"
 export * from "./field"
 export * from "./fieldset"
 export * from "./form"
+export * from "./form-toggle"
 export * from "./heading"
 export { type IconName, type RindIcons, useIconChildren } from "./icons"
 export * from "./label"
@@ -25,6 +26,7 @@ export {
   useTypeaheadTimeout,
 } from "./provider"
 export { type RenderProp, renderPart } from "./render"
+export * from "./switch"
 export * from "./text-field"
 export * from "./toggle"
 export {

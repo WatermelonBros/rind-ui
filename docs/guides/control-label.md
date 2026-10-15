@@ -8,4 +8,4 @@ The shared Label and Description of a labelable control (Checkbox, Switch, group
 - **State mirrored.** Label and Description carry the Control's `data-state`, `data-disabled`, `data-readonly`, `data-required` and `data-invalid`.
 - **Inside a Field.** The Field's Label names the control; an own Label there logs a development warning.
 
-Used by: [Checkbox](../components/checkbox.md); Switch and Checkbox Group link here. The pointer rules are those of [Label](../components/label.md).
+Used by: [Checkbox](../components/checkbox.md), [Switch](../components/switch.md); Checkbox Group links here. The pointer rules are those of [Label](../components/label.md).

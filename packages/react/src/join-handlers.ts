@@ -1,4 +1,4 @@
-type Props = Readonly<Record<string, unknown>>
+type Props = Readonly<Record<string | symbol, unknown>>
 
 /**
  * A part's own props from several core modules (connect, press, hover, focus): later
@@ -6,12 +6,17 @@ type Props = Readonly<Record<string, unknown>>
  * part's, so consumer layers still go through `mergeProps`.
  */
 export function joinHandlers(...sources: Props[]): Record<string, unknown> {
-  const out: Record<string, unknown> = {}
+  const out: Record<string | symbol, unknown> = {}
   for (const source of sources) {
-    for (const [key, value] of Object.entries(source)) {
+    // Symbol keys too: the CRITICAL marker must reach mergeProps (override warnings).
+    for (const key of Reflect.ownKeys(source)) {
+      const value = source[key]
       const prev = out[key]
       out[key] =
-        typeof prev === "function" && typeof value === "function" && /^on[A-Z]/.test(key)
+        typeof key === "string" &&
+        /^on[A-Z]/.test(key) &&
+        typeof prev === "function" &&
+        typeof value === "function"
           ? (e: unknown) => {
               prev(e)
               value(e)

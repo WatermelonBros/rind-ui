@@ -1,11 +1,10 @@
-## Purpose
+# switch Specification
 
+## Purpose
 Defines rind-ui's Switch: a two-state on/off control with `role="switch"`, its parts,
 values, keyboard and ARIA behaviour, form participation, styling attributes, contract
 and theme guarantees. Research: `docs/research/switch.md`.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 A Switch SHALL consist of `Root` (provides the machine, renders a `div` by default and
@@ -241,9 +240,13 @@ accessible name, with:
 ### Requirement: Switch Invariants
 
 The contract SHALL ship invariants checked after every model-test step: `aria-checked`
-is `"true"` or `"false"` and matches the machine state; the accessible name is the same
-in every state; the Thumb is `aria-hidden`; exactly one `TOGGLE` happened per activation
-step.
+is `"true"` or `"false"` and matches the machine state; the Thumb is `aria-hidden`. Exactly
+one toggle per activation step SHALL be checked by the `form-associated` trait (one `change`
+per user change) and the generic virtual-parity check. `@rind-ui/testing` SHALL export, as a
+consumer invariant usable with `testMachine(switchContract, { invariants })`
+(`switchStepInvariants()`), the invariant that compares the accessible name across the
+steps of a path, which the shared invariant API does not carry: the name is the same in
+every state.
 
 #### Scenario: Mixed slips in
 
@@ -253,7 +256,7 @@ step.
 #### Scenario: Label that changes (APG)
 
 - **WHEN** a wrapper changes the Label text from "Mute" to "Unmute" when toggled
-- **THEN** the step fails naming both names
+- **THEN** the step fails `switch-name-stable`, naming both names
 
 ### Requirement: Theme
 
@@ -301,3 +304,4 @@ matrix test.
 - **WHEN** a Switch is inside a disabled Field
 - **THEN** it is disabled exactly as its own `disabled` prop makes it, and its hidden input
   is disabled
+

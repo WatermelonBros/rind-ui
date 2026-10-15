@@ -1,0 +1,127 @@
+/*
+ * Switch: structural only. The Control is the track, the Thumb is positioned with
+ * inset-inline-start so RTL mirrors with no extra rule. On is shown by the thumb position, the
+ * fill and the border, never colour alone (WCAG 1.4.1). Under forced colors the track keeps a
+ * CanvasText border (ARK#3421). The focus ring and hit area come from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="switch"][data-part="root"]) {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: var(--rind-switch-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+    color: var(--rind-switch-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="switch"][data-part="control"]) {
+    --_track-h: var(--rind-switch-block-size, 1.5rem);
+    --_inset: var(--rind-switch-thumb-inset, 0.1875rem);
+    --_thumb: calc(var(--_track-h) - 2 * var(--_inset) - 2 * var(--rind-border-width));
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    inline-size: var(--rind-switch-inline-size, 2.5rem);
+    block-size: var(--_track-h);
+    margin-block: calc((var(--rind-hit-area) - var(--_track-h)) / 2);
+    border: var(--rind-border-width) solid
+      var(--rind-switch-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-switch-radius, var(--rind-radius-full));
+    background: var(--rind-switch-bg, transparent);
+    font: inherit;
+    cursor: var(--rind-switch-cursor, pointer);
+    transition:
+      background-color var(--rind-switch-duration, var(--rind-duration-fast)),
+      border-color var(--rind-switch-duration, var(--rind-duration-fast));
+  }
+
+  :where([data-scope="switch"][data-part="control"][data-state="checked"]) {
+    background: var(--rind-switch-checked, var(--rind-color-accent-solid));
+    border-color: var(--rind-switch-border-checked, var(--rind-color-accent-solid));
+  }
+
+  :where([data-scope="switch"][data-part="thumb"]) {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: var(--_inset);
+    translate: 0 -50%;
+    inline-size: var(--_thumb);
+    block-size: var(--_thumb);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-switch-thumb, var(--rind-color-text));
+    pointer-events: none;
+    transition: inset-inline-start var(--rind-switch-duration, var(--rind-duration-fast));
+  }
+
+  :where([data-scope="switch"][data-part="thumb"][data-state="checked"]) {
+    inset-inline-start: calc(100% - var(--_thumb) - var(--_inset));
+    background: var(--rind-switch-thumb-checked, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="switch"][data-part="label"]) {
+    grid-column: 2;
+    min-block-size: var(--rind-hit-area);
+    display: inline-flex;
+    align-items: center;
+    cursor: var(--rind-switch-cursor, pointer);
+  }
+
+  :where([data-scope="switch"][data-part="description"]) {
+    grid-column: 2;
+    color: var(--rind-switch-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="switch"][data-part="control"]:is([data-disabled], :disabled)),
+  :where([data-scope="switch"][data-part="label"][data-disabled]) {
+    cursor: var(--rind-switch-disabled-cursor, not-allowed);
+    opacity: var(--rind-switch-disabled-opacity, 0.6);
+  }
+
+  :where([data-scope="switch"][data-part="control"][data-invalid]) {
+    border-color: var(
+      --rind-switch-border-invalid,
+      var(--rind-color-danger-border, var(--rind-color-border-strong))
+    );
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="switch"][data-part="control"]) {
+      border-color: CanvasText;
+      background: Canvas;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="switch"][data-part="thumb"]) {
+      background: CanvasText;
+    }
+
+    :where([data-scope="switch"][data-part="control"][data-state="checked"]) {
+      background: Highlight;
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="switch"][data-part="thumb"][data-state="checked"]) {
+      background: HighlightText;
+    }
+
+    :where([data-scope="switch"][data-part="control"]:is([data-disabled], :disabled)) {
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    :where([data-scope="switch"][data-part="thumb"][data-disabled]) {
+      background: GrayText;
+    }
+
+    :where([data-scope="switch"][data-part="control"][data-disabled][data-state="checked"]) {
+      background: Canvas;
+    }
+
+    :where([data-scope="switch"][data-part="label"][data-disabled]),
+    :where([data-scope="switch"][data-part="description"][data-disabled]) {
+      color: GrayText;
+      opacity: 1;
+    }
+  }
+}

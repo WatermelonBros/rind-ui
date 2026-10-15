@@ -121,17 +121,20 @@ export type CheckboxMachine = typeof checkboxMachine
  * The machine props with the hidden input already reflecting an uncontrolled change when
  * `onCheckedChange` runs (headlessui#3760: a consumer calling `form.requestSubmit()` there).
  * The runtime calls the callback before the transition, so the input is written first; a
- * cancel reverts it ($reverted).
+ * cancel reverts it ($reverted). Shared by Checkbox and Switch.
  */
-export function checkboxMachineProps(
-  props: CheckboxProps,
-  formInput: FormInputCapability,
-): CheckboxProps {
-  const consumer = props.onCheckedChange
+export function syncInputBeforeChange<
+  V extends CheckedState,
+  P extends {
+    readonly checked?: V | undefined
+    readonly onCheckedChange?: ((checked: V, details: never) => void) | undefined
+  },
+>(props: P, formInput: FormInputCapability): P {
+  const consumer = props.onCheckedChange as ((checked: V, details: unknown) => void) | undefined // the details pass through untouched
   if (props.checked !== undefined) return props
   return {
     ...props,
-    onCheckedChange: (checked, details) => {
+    onCheckedChange: (checked: V, details: unknown) => {
       formInput.sync(
         { checked: checked === true, indeterminate: checked === "indeterminate" },
         { dispatch: false },
@@ -140,3 +143,7 @@ export function checkboxMachineProps(
     },
   }
 }
+
+/** Checkbox's machine props (see `syncInputBeforeChange`). */
+export const checkboxMachineProps = (props: CheckboxProps, formInput: FormInputCapability) =>
+  syncInputBeforeChange<CheckedState, CheckboxProps>(props, formInput)

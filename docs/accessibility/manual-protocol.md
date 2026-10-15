@@ -146,3 +146,22 @@ RenderAsDiv. Record each pass in `tested-with.json` with `component: "checkbox"`
 - [ ] **All**: disabled is announced as unavailable; read-only is announced and does not
       toggle; required and invalid are announced.
 - [ ] **RenderAsDiv**: the name comes from the Label and a Label press toggles once.
+
+## Device checklist: Switch (add-switch)
+
+Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.
+Record each pass in `tested-with.json` with `component: "switch"`. Deferred to devices.
+
+- [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
+      TalkBack + Chrome**: name ("Wi-Fi"), role (switch) and state (on / off) are read on
+      focus. Older NVDA/JAWS may say "toggle button" or "check box": record the wording.
+- [ ] **All**: Space toggles and the new state is announced once; on mobile, double-tap
+      toggles once.
+- [ ] **All**: Enter inside the InForm story submits the form and does not toggle.
+- [ ] **All**: activating the Label toggles once.
+- [ ] **All**: disabled is announced as unavailable; read-only is announced and does not
+      toggle.
+- [ ] **Windows High Contrast / forced colors**: both states are distinguishable (thumb
+      position, fill) and the track border is visible.
+- [ ] **RTL story**: the thumb sits at the inline start when off and moves toward the inline
+      end when on; VoiceOver and TalkBack announce the same state.

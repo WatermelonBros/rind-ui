@@ -3,12 +3,14 @@
 A native `<form>` that validates every Field it contains on a submit attempt, focuses the first invalid one, holds a submission for pending async checks, maps server errors to Fields by name, announces a failed attempt once, and resets with rules that survive React form actions.
 
 ```tsx
-import { Field, Form } from "@rind-ui/react"
+import { Field, Form, TextField } from "@rind-ui/react"
 
 <Form.Root aria-label="Sign up" onFormSubmit={(values) => save(values)}>
   <Field.Root name="email" required>
     <Field.Label>Email</Field.Label>
-    <TextField.Input type="email" />
+    <TextField.Root>
+      <TextField.Input type="email" />
+    </TextField.Root>
     <Field.ErrorMessage />
   </Field.Root>
   <button type="submit">Sign up</button>

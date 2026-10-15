@@ -642,6 +642,88 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### switch
+
+```json
+{
+  "family": "choice",
+  "tokens": {
+    "bg": {
+      "fallback": "transparent",
+      "file": "switch.css"
+    },
+    "block-size": {
+      "fallback": "1.5rem",
+      "file": "switch.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "switch.css"
+    },
+    "border-checked": {
+      "fallback": "var(--rind-color-accent-solid)",
+      "file": "switch.css"
+    },
+    "border-invalid": {
+      "fallback": "var(--rind-color-danger-border, var(--rind-color-border-strong))",
+      "file": "switch.css"
+    },
+    "checked": {
+      "fallback": "var(--rind-color-accent-solid)",
+      "file": "switch.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "switch.css"
+    },
+    "cursor": {
+      "fallback": "pointer",
+      "file": "switch.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "switch.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "switch.css"
+    },
+    "disabled-opacity": {
+      "fallback": "0.6",
+      "file": "switch.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-fast)",
+      "file": "switch.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "switch.css"
+    },
+    "inline-size": {
+      "fallback": "2.5rem",
+      "file": "switch.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "switch.css"
+    },
+    "thumb": {
+      "fallback": "var(--rind-color-text)",
+      "file": "switch.css"
+    },
+    "thumb-checked": {
+      "fallback": "var(--rind-color-accent-on-solid)",
+      "file": "switch.css"
+    },
+    "thumb-inset": {
+      "fallback": "0.1875rem",
+      "file": "switch.css"
+    }
+  }
+}
+```
+
 ### text-field
 
 ```json

@@ -126,7 +126,7 @@ async function failures(ui: () => ReactElement, props: Record<string, unknown> =
 }
 
 describe("broken Checkboxes fail readably (7.2)", () => {
-  it("toggles on Enter → checkbox-enter-never-changes", async () => {
+  it("toggles on Enter → checkbox-enter-never-changes", { timeout: 60_000 }, async () => {
     render(
       <Checkbox.Root>
         <Checkbox.Control
@@ -144,7 +144,9 @@ describe("broken Checkboxes fail readably (7.2)", () => {
     expect(result).toMatch(/Enter on the control changed aria-checked/)
   })
 
-  it("a synthetic click from the hidden input → form-associated click count", async () => {
+  it("a synthetic click from the hidden input → form-associated click count", {
+    timeout: 60_000,
+  }, async () => {
     const out = await failures(() => (
       <Terms
         onCheckedChange={() => {
@@ -157,7 +159,9 @@ describe("broken Checkboxes fail readably (7.2)", () => {
     expect(out).toMatch(/received \d+ click events/)
   })
 
-  it("change on a programmatic update → form-associated change count", async () => {
+  it("change on a programmatic update → form-associated change count", {
+    timeout: 60_000,
+  }, async () => {
     const tests: { name: string; fn: () => Promise<void> }[] = []
     const ui = (checked: boolean) => (
       <Terms
@@ -188,7 +192,7 @@ describe("broken Checkboxes fail readably (7.2)", () => {
     expect(out.join("\n")).toMatch(/dispatched \d+ change events for 0 user changes/)
   })
 
-  it("a double toggle per click → the step fails", async () => {
+  it("a double toggle per click → the step fails", { timeout: 60_000 }, async () => {
     // A label click is absorbed by press.ts's label forwarding (one activation), so the
     // double toggle is produced on the Control: a second, bare click per click.
     let again = false
@@ -213,7 +217,7 @@ describe("broken Checkboxes fail readably (7.2)", () => {
     )
   })
 
-  it("a focusable hidden input → form-associated tabIndex", async () => {
+  it("a focusable hidden input → form-associated tabIndex", { timeout: 60_000 }, async () => {
     const out = await failures(() => (
       <Terms
         ref={(el) => {

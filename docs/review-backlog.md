@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-switch (r1) | — | packages/react/src/index.ts | createFormToggle + FormToggle* types re-exported as public API (internal factory); FormToggleService.checked typed CheckedState lets Switch receive "indeterminate" — drop the re-export unless third-party toggles are a goal |
+| add-switch (r1) | — | scripts/docs-examples.test.ts:~29 | tag regex stops at the `>` of `=>`: a self-closing <X.Root onFoo={() => …} /> counts as open and hides later misplaced parts (false negative) — balanced-brace scan |
+| add-switch (r1) | — | packages/react/src/form-toggle/form-toggle.tsx | Switch.Thumb function children receive indeterminate (always false) — narrow SwitchThumbProps |
+| add-switch (r1) | — | packages/react/src/collapsible + accordion | Accordion decoration spreads into own props before mergeProps, so it can override critical aria-* silently; critical check skips keys absent from base (aria-controls when content unrendered) |
 | add-checkbox (r1) | — | packages/react/src/checkbox/checkbox.tsx (Control onKeyDown) | Enter guard misses keyCode 229 (Safari commit keydown after compositionend) → IME Enter could implicitSubmit; share one isImeKey(e) with press.ts |
 | add-checkbox (r1) | — | packages/core/src/dom/modality.ts (onClick) | pressLabel never cleared when the label wraps the control → later AT click stays "pointer" and a later programmatic focus is cause "pointer" (ring hidden); clear after the first forwarded click |
 | add-checkbox (r1) | — | packages/react/src/checkbox/checkbox.tsx (lastReason) | UNVERIFIED: controlled parent rejecting a toggle leaves lastReason "TOGGLE", so a later programmatic checked change may reach the Field as user: true — write a test |

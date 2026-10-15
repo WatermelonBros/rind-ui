@@ -82,7 +82,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Checkbox | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
 | Radio Group | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec |  |
-| Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | spec |  |
+| Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | done |  |
 | Toggle | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC/Kobalte: Toggle Button |
 | Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | RAC: ToggleButtonGroup |
 | Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | spec | Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |

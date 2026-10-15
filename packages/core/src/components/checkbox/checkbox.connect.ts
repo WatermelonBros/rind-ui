@@ -21,6 +21,11 @@ export type CheckboxPart =
   | "hidden-input"
 
 export interface CheckboxConnectInput {
+  /** The component (Switch reuses this connect with its own scope, role and thumb). */
+  readonly scope?: "checkbox" | "switch"
+  readonly role?: "checkbox" | "switch"
+  /** The decorative part's name ("indicator", or the Switch's "thumb"). */
+  readonly indicatorPart?: "indicator" | "thumb"
   readonly instance: string
   readonly checked: CheckedState
   /** The control's rendered tag (a non-labelable `div` uses aria-labelledby). */
@@ -56,6 +61,8 @@ export const dataStateOf = (c: CheckedState) =>
 
 export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
   const { field } = input
+  const scope = input.scope ?? "checkbox"
+  const role = input.role ?? "checkbox"
   const state = {
     "data-state": dataStateOf(input.checked),
     "data-disabled": dataFlag(field.disabled),
@@ -64,7 +71,7 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
     "data-invalid": dataFlag(field.invalid),
   }
   const labels = controlLabel({
-    scope: "checkbox",
+    scope,
     instance: input.instance,
     controlId: input.ids.control,
     labelId: input.ids.label,
@@ -75,7 +82,7 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
   const focus = focusAttrs(input.focused, input.modality)
   return {
     root: (): PartProps => ({
-      ...scopeAttrs("checkbox", "root", input.instance),
+      ...scopeAttrs(scope, "root", input.instance),
       ...input.fieldData,
       ...state,
       ...focus,
@@ -83,7 +90,7 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
     control: (): PartProps => ({
       ...buttonLikeProps(
         {
-          role: "checkbox",
+          role,
           tag: input.tag,
           disabled: field.disabled,
           focusableWhenDisabled: input.focusableWhenDisabled,
@@ -91,10 +98,10 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
         },
         env,
       ),
-      ...scopeAttrs("checkbox", "control", input.instance),
+      ...scopeAttrs(scope, "control", input.instance),
       id: input.ids.control,
       // Kept on a substituted element too (ariakit#6336).
-      role: "checkbox",
+      role,
       "aria-checked": ariaChecked(input.checked),
       "aria-required": field.required || field["aria-required"] === "true" ? "true" : undefined,
       "aria-invalid": field["aria-invalid"],
@@ -109,10 +116,11 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
       ...focus,
       "data-pressed": dataFlag(input.pressed),
       "data-hover": dataFlag(input.hovered),
-      [CRITICAL]: ["aria-checked", "role"],
+      // `type` too: a submit Switch or Checkbox would submit on every toggle (HUI#2935).
+      [CRITICAL]: ["aria-checked", "role", "type"],
     }),
     indicator: (): PartProps => ({
-      ...scopeAttrs("checkbox", "indicator", input.instance),
+      ...scopeAttrs(scope, input.indicatorPart ?? "indicator", input.instance),
       "aria-hidden": "true",
       ...state,
     }),
@@ -120,7 +128,7 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
     description: labels.description,
     /** The native input: name only here, never on the Control. */
     hiddenInput: (): PartProps => ({
-      ...scopeAttrs("checkbox", "hidden-input", input.instance),
+      ...scopeAttrs(scope, "hidden-input", input.instance),
       type: "checkbox",
       id: input.ids.hiddenInput,
       "aria-hidden": "true",
@@ -145,7 +153,7 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
             name: field.name,
             value: input.uncheckedValue,
             form: input.form,
-            "data-scope": "checkbox",
+            "data-scope": scope,
             "data-part": "unchecked-input",
           }
         : null,
