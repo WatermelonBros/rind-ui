@@ -8,6 +8,7 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { CompositeHostContext } from "./composite-host"
 import { mergeProps } from "./merge-props"
 import { type RenderProp, renderPart } from "./render"
 
@@ -44,6 +45,15 @@ export function Portal({ container, logicalParent, render, children, ...rest }: 
   }, [mounted])
   if (!mounted) return null
   const target = resolvePortalTarget(parent.current?.() ?? null, container)
-  const props = mergeProps({ "data-rind-portal": "", ...attributes, ref: setHost, children }, rest)
+  // A component in a popup is not hosted by the toolbar its trigger sits in.
+  const props = mergeProps(
+    {
+      "data-rind-portal": "",
+      ...attributes,
+      ref: setHost,
+      children: <CompositeHostContext value={null}>{children}</CompositeHostContext>,
+    },
+    rest,
+  )
   return createPortal(renderPart("div", props, render, undefined), target)
 }

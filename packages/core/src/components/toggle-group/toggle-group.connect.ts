@@ -36,6 +36,8 @@ export interface ToggleGroupConnectInput {
   readonly focusableWhenDisabled: boolean
   /** An item has focus (the root's data-focus). */
   readonly focusWithin: boolean
+  /** Hosted by a composite (a Toolbar): the host owns the arrows and the tab stop. */
+  readonly hosted?: boolean | undefined
 }
 
 export interface ToggleGroupItemState {
@@ -76,8 +78,9 @@ export function toggleGroupConnect(
       "data-focus": dataFlag(input.focusWithin),
       "data-disabled": dataFlag(input.disabled),
       // The root is the stop only when no item is navigable.
-      tabindex: inert || input.pending || stop !== null ? undefined : 0,
+      tabindex: inert || input.pending || stop !== null || input.hosted ? undefined : 0,
       onKeyDown: (event: unknown) => {
+        if (input.hosted) return
         const e = event as KeyboardEvent
         const target = e.target as Element | null
         // Only keys on an item of this group (a descendant's keys stay its own).

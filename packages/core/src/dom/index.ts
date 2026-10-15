@@ -155,6 +155,7 @@ export {
   selectionIndicator,
 } from "./selection-indicator"
 export { hasTabbable, observeTabbable } from "./tabbable-content"
+export { isTextField, textFieldCaret } from "./text-field"
 export { injectTouchAction, TOUCH_ACTION_RULE } from "./touch-action"
 export { supportsUntilFound, type UntilFoundOptions, untilFound } from "./until-found"
 export {

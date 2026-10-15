@@ -8,5 +8,5 @@ export {
   separatorProps,
   separatorWarnings,
 } from "./separator.connect"
-export { separatorContract } from "./separator.contract"
+export { separatorContract, separatorContractFor } from "./separator.contract"
 export { separatorMeta } from "./separator.meta"

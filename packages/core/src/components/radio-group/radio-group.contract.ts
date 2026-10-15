@@ -94,6 +94,11 @@ export const radioGroupContract = contract("radio-group", {
         for (let i = 0; i <= all.length; i++) {
           const now = await checkedName(env)
           if (now !== null && (typeof name === "string" ? now === name : name.test(now))) return
+          // Hosted by a toolbar, arrows only move: Space checks the radio once reached.
+          if (await radio(env, name).isFocused()) {
+            await radio(env, name).press("Space")
+            return
+          }
           await env.keyboard("ArrowDown")
         }
       },

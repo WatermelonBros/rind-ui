@@ -75,6 +75,7 @@ export function directed(env: AdapterEnv, direction: Direction): AdapterEnv {
     nth: (i) => wrap(part.nth(i)),
     all: async () => (await part.all()).map(wrap),
     scoped: (scope, inner) => wrap(part.scoped(scope, inner)),
+    withAttr: (name, value) => wrap(part.withAttr(name, value)),
     labelled: () => wrap(part.labelled()),
   })
   return {

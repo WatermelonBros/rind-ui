@@ -6,6 +6,7 @@ export {
   composite,
   tabStop,
 } from "./composite"
+export type { CompositeHost } from "./composite-host"
 export { contains, createFilter, type Filter, startsWith } from "./filter"
 export { type CollectionKey, toKey } from "./key"
 export {

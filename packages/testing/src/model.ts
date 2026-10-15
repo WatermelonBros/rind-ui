@@ -579,6 +579,7 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
     // Parts reached through another part (a group's items) are replayed the same way.
     // (`labelled()` stays the real part: the Field contract's typing replays through it.)
     scoped: (scope, inner) => wrap(part.scoped(scope, inner), null),
+    withAttr: (name, value) => wrap(part.withAttr(name, value), null),
   })
   const env: AdapterEnv = {
     ...base,

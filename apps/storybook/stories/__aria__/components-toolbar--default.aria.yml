@@ -1,0 +1,20 @@
+- button "Before"
+- toolbar "Formatting":
+  - group:
+    - group "Text style":
+      - button "Bold"
+      - button "Italic"
+      - button "Underline"
+  - separator
+  - radiogroup "Alignment":
+    - radio "Left" [checked]
+    - text: Left
+    - radio "Center"
+    - text: Center
+    - radio "Right"
+    - text: Right
+  - separator
+  - link "Help":
+    - /url: "#help"
+  - textbox "Font size": "12"
+- button "After"

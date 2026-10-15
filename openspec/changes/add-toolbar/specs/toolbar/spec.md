@@ -341,10 +341,16 @@ axis arrows, bounded to one cycle; no pointer implementation, with the stated re
 pointer focus is a press), `press(name)` (pointer: click; touch: tap; keyboard: `moveTo`
 then Enter, or Space for links), `tabOut()` and `focus()`, each with a postcondition,
 and the queries `items()`, `focusedItem()`, `tabStop()` (the control with
-`tabIndex=0`), `isDisabled(name)` and `orientation()`. It SHALL declare the traits
-`composite-roving` and `directional`. Programmatic `FOCUS_TOOLBAR` SHALL map to the
-`focus` action; `COLLECTION.CHANGE` SHALL map to a prop step adding or removing a
-control.
+`tabIndex=0`), `isDisabled(name)` and `orientation()`. Controls — the toolbar's own and
+the items of hosted composites — SHALL carry `data-host="toolbar"`, so the contract lists
+them in document order. It SHALL declare the trait `directional` and a
+`toolbar-one-tab-stop` invariant over every control (own and hosted; the generic
+`composite-roving` invariant sees only one part name). Focus SHALL change only the focus
+state and the focused-control query, never activate; the contract declares the control
+parts as committing on focus for that reason. Programmatic `FOCUS_TOOLBAR` is a framework
+API (`actionsRef.focus()`) a driver cannot call, so it SHALL be skipped by the model
+with that reason and covered by DOM tests; `COLLECTION.CHANGE` SHALL be skipped likewise
+(static parts).
 
 #### Scenario: Driver round trip
 
