@@ -3,6 +3,23 @@
   "version": "0.0.0",
   "description": "Test drivers and environment setup for rind-ui components (Testing Library and Playwright).",
   "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/testing"
+  },
+  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "testing",
+    "testing-library",
+    "playwright",
+    "test-driver",
+    "accessibility"
+  ],
   "type": "module",
   "sideEffects": [
     "./dist/setup.mjs",
@@ -71,5 +88,8 @@
     "@guidepup/virtual-screen-reader": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

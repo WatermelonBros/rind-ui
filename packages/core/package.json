@@ -3,6 +3,24 @@
   "version": "0.0.0",
   "description": "Framework-agnostic state machines, DOM utilities and component contracts for rind-ui.",
   "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "headless",
+    "state-machine",
+    "accessibility",
+    "a11y",
+    "ui",
+    "components"
+  ],
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -27,5 +45,8 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

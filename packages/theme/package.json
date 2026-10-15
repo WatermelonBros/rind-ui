@@ -3,9 +3,31 @@
   "version": "0.0.0",
   "description": "White-label theme for rind-ui: brand inputs, semantic tokens, variants and a typed theme builder, styled through data-scope / data-part attributes.",
   "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/theme"
+  },
+  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "theme",
+    "css",
+    "design-tokens",
+    "white-label",
+    "oklch"
+  ],
   "type": "module",
   "files": [
     "src",
+    "!src/**/*.test.*",
+    "!src/**/*.test-d.ts",
+    "!src/test-css.ts",
+    "!src/vite-env.d.ts",
+    "!src/builder/color-fixtures.json",
     "dist",
     "NOTICE"
   ],
@@ -35,5 +57,8 @@
     "@phosphor-icons/core": "2.1.1",
     "@types/node": "^24.19.2",
     "vite": "^8.3.4"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

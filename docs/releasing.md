@@ -1,0 +1,52 @@
+# Releasing
+
+Packages: `@rind-ui/core`, `@rind-ui/react`, `@rind-ui/testing`, `@rind-ui/theme`.
+Storybook and the site are private and never published.
+
+Versions and changelogs come from [Changesets](https://github.com/changesets/changesets):
+every change a consumer would notice adds a file in `.changeset/` (`pnpm changeset`).
+
+## How a release happens
+
+`.github/workflows/release.yml` runs on every push to `main`:
+
+1. If there are pending changesets, it opens (or updates) a **"release: version packages"**
+   pull request that bumps the versions, writes each package's `CHANGELOG.md` and deletes
+   the consumed changesets.
+2. Merging that pull request runs the workflow again with no changesets left: it builds the
+   four packages and runs `changeset publish`, which publishes every package whose version
+   is not on npm yet (with `pnpm publish`, so `workspace:*` becomes a real version), then
+   tags the release and creates GitHub releases.
+
+## One-time setup
+
+1. **The npm scope.** `@rind-ui` is an npm organisation: create it (free for public
+   packages) at npmjs.com → your avatar → *Add Organization*, name `rind-ui`.
+2. **A token.** npmjs.com → *Access Tokens* → *Generate New Token* → *Granular Access
+   Token*: permissions *Read and write*, packages and scopes: the `@rind-ui` organisation.
+   Enable "Bypass 2FA" for automation, or the publish will ask for a one-time code.
+3. **The secret.** GitHub → repository *Settings* → *Secrets and variables* → *Actions* →
+   *New repository secret*: name `NPM_TOKEN`, value the token.
+4. **Pull requests from Actions.** GitHub → *Settings* → *Actions* → *General* → *Workflow
+   permissions*: *Read and write*, and tick *Allow GitHub Actions to create and approve pull
+   requests* (the version pull request needs it).
+
+## Later: provenance and trusted publishing
+
+npm provenance needs a **public** repository. When the repository goes public:
+
+- set `NPM_CONFIG_PROVENANCE: true` in `release.yml`;
+- optionally switch to npm **trusted publishing** (no token): on each package's npm settings
+  page, add a trusted publisher for `WatermelonBros/rind-ui`, workflow `release.yml`; then
+  remove `NPM_TOKEN` (the workflow already requests `id-token: write`).
+
+## Publishing by hand (fallback)
+
+```sh
+npm login                 # an account that owns the @rind-ui org
+pnpm version-packages     # applies changesets: versions + changelogs
+git commit -am "release: version packages" && git push
+pnpm release              # builds the four packages and publishes them
+```
+
+`npm view @rind-ui/react` shows what is live.

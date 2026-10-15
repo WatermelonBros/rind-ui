@@ -3,6 +3,24 @@
   "version": "0.0.0",
   "description": "React adapter for rind-ui headless components.",
   "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "react",
+    "headless",
+    "components",
+    "accessibility",
+    "a11y",
+    "ui"
+  ],
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -32,5 +50,8 @@
   "peerDependencies": {
     "react": ">=19",
     "react-dom": ">=19"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

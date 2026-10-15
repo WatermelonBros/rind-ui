@@ -18,7 +18,9 @@
     "test:vitest": "vitest run",
     "quirks:check": "node scripts/quirks-check.ts",
     "docs:gen": "node scripts/docs-gen.ts",
-    "docs:check": "node scripts/docs-gen.ts --check"
+    "docs:check": "node scripts/docs-gen.ts --check",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "turbo run build --filter='./packages/*' && changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
