@@ -1,0 +1,7 @@
+- tablist "Sections":
+  - tab "Account" [selected]
+  - tab "Billing"
+  - tab "Team"
+- tabpanel "Account":
+  - paragraph: Account settings
+- button "After"

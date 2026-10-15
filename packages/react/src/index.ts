@@ -29,6 +29,7 @@ export {
 export * from "./radio-group"
 export { type RenderProp, renderPart } from "./render"
 export * from "./switch"
+export * from "./tabs"
 export * from "./text-field"
 export * from "./toggle"
 export * from "./toggle-group"

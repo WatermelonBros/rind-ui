@@ -12,16 +12,9 @@ import {
   initialCollectionContext,
 } from "../../collection/machine"
 import type { Modality } from "../../contract/env"
+import type { IndicatorBox } from "../../dom/selection-indicator"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
-
-/** A measured selection indicator (Segmented Control; Radio Group never reads it). */
-export interface IndicatorBox {
-  readonly x: number
-  readonly y: number
-  readonly width: number
-  readonly height: number
-}
 
 export type RadioGroupEvent =
   /** An arrow key on a radio (always keyboard: assistive technology moves by focus). */

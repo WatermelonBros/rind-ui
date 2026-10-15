@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-tabs (r1) | — | packages/core/src/dom/tabbable-content.ts (hasTabbable) | ignores CSS-hidden (display/visibility) and fieldset-disabled descendants: a panel whose only control is hidden or in a disabled fieldset loses its own tab stop |
+| add-tabs (r1) | — | packages/react/src/tabs/tabs.tsx (Panel) | the panel's tabindex=0 renders before the tabbable observer's first report: a one-commit flash on panels with controls (could seed from hasTabbable in a layout effect) |
+| add-tabs (r1) | — | docs/components/tabs.md, tabs.meta.ts | `defaultValue={null}` (uncontrolled, start with nothing selected → still picks the first enabled) is undocumented |
 | add-toggle-group (r1) | — | packages/react/src/declared-items.ts | the server tab stop reads items declared in the Root's JSX children; items rendered inside a consumer wrapper component are not seen, so their server stop falls back to registration (the first client commit) |
 | add-toggle-group (r1) | — | packages/core/src/components/toggle-group/toggle-group.contract.ts (toggle.done) | `|| before === "true"` accepts a pressed item that failed to release in every mode — only valid with disallowEmptySelection (read props) |
 | add-toggle-group (r1) | — | packages/testing/src/components/toggle-group.dom.test.tsx | "modifiers, IME and foreign targets ignored" only tested for Control+ArrowRight — add Alt/Meta/isComposing/nested-instance keydown tests |

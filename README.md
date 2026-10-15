@@ -93,11 +93,11 @@ with status, is in [`docs/components.md`](docs/components.md).
 |---|---|
 | Actions | Button, Link, Toggle, Toggle Group |
 | Forms | Label, Field, Fieldset, Form, Text Field, Checkbox, Switch, Checkbox Group, Radio Group |
-| Disclosure | Collapsible, Accordion |
+| Disclosure | Collapsible, Accordion, Tabs |
 | Typography | Heading |
 
 Next up: Segmented Control, Toolbar,
-Dialog, Popover, Tooltip, Menu, Select, Combobox, Tabs, Slider, and the AI-interface
+Dialog, Popover, Tooltip, Menu, Select, Combobox, Slider, and the AI-interface
 primitives (Prompt Input, Message Thread, Streaming Message, Tool Approval).
 
 ## Packages

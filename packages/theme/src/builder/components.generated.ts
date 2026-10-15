@@ -131,6 +131,7 @@ export type ComponentTokens = {
     | "6LineHeight"
     | "6TextTransform"
     | "color"
+  readonly indicator: "height" | "left" | "top" | "width"
   readonly label: "color" | "cursor" | "disabledCursor" | "fontSize" | "fontWeight"
   readonly link:
     | "color"
@@ -178,6 +179,20 @@ export type ComponentTokens = {
     | "thumb"
     | "thumbChecked"
     | "thumbInset"
+  readonly tabs:
+    | "bg"
+    | "border"
+    | "color"
+    | "colorSelected"
+    | "cursor"
+    | "disabledColor"
+    | "disabledCursor"
+    | "duration"
+    | "gap"
+    | "indicatorBg"
+    | "indicatorSize"
+    | "paddingInline"
+    | "selectedWeight"
   readonly "text-field":
     | "bg"
     | "border"

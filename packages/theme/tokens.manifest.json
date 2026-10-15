@@ -629,6 +629,27 @@
         }
       }
     },
+    "indicator": {
+      "family": null,
+      "tokens": {
+        "height": {
+          "fallback": "0",
+          "file": "tabs.css"
+        },
+        "left": {
+          "fallback": "0",
+          "file": "tabs.css"
+        },
+        "top": {
+          "fallback": "0",
+          "file": "tabs.css"
+        },
+        "width": {
+          "fallback": "0",
+          "file": "tabs.css"
+        }
+      }
+    },
     "label": {
       "family": null,
       "tokens": {
@@ -838,6 +859,63 @@
         "thumb-inset": {
           "fallback": "0.1875rem",
           "file": "switch.css"
+        }
+      }
+    },
+    "tabs": {
+      "family": null,
+      "tokens": {
+        "bg": {
+          "fallback": "transparent",
+          "file": "tabs.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "tabs.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "tabs.css"
+        },
+        "color-selected": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "tabs.css"
+        },
+        "cursor": {
+          "fallback": "pointer",
+          "file": "tabs.css"
+        },
+        "disabled-color": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "tabs.css"
+        },
+        "disabled-cursor": {
+          "fallback": "not-allowed",
+          "file": "tabs.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "tabs.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "tabs.css"
+        },
+        "indicator-bg": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "tabs.css"
+        },
+        "indicator-size": {
+          "fallback": "2px",
+          "file": "tabs.css"
+        },
+        "padding-inline": {
+          "fallback": "var(--rind-space-3)",
+          "file": "tabs.css"
+        },
+        "selected-weight": {
+          "fallback": "600",
+          "file": "tabs.css"
         }
       }
     },

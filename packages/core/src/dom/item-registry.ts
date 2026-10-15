@@ -42,15 +42,21 @@ export function createItemRegistry(
   const items = new Map<Element, ItemRegistration>()
   let scheduled = false
   const warned = new Set<string>()
+  /** The items as last emitted (in document order then). */
+  let emitted: ItemRegistration[] = []
+  const inOrder = (list: readonly ItemRegistration[]) =>
+    list.every(
+      (it, i) => i === 0 || inDocumentOrder(list[i - 1]?.element ?? it.element, it.element) <= 0,
+    )
   const flush = () => {
-    if (!scheduled) return
+    // Nothing registered, but the same elements may have moved (a reorder keeps every key,
+    // text and element: headlessui#2131), so the root's per-commit flush re-checks the order.
+    if (!scheduled && inOrder(emitted)) return
     scheduled = false
     let list = [...items.values()]
     // Fast path: parts usually register in document order already.
-    const sorted = list.every(
-      (it, i) => i === 0 || inDocumentOrder(list[i - 1]?.element ?? it.element, it.element) <= 0,
-    )
-    if (!sorted) list = list.sort((a, b) => inDocumentOrder(a.element, b.element))
+    if (!inOrder(list)) list = list.sort((a, b) => inDocumentOrder(a.element, b.element))
+    emitted = list
     onChange(
       list.map((it) => {
         const text = it.textValue ?? it.element.textContent?.trim() ?? ""

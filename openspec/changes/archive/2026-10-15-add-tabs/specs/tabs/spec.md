@@ -363,8 +363,10 @@ only: arrow keys until the tab is focused; completes when `focusedTab()` equals 
 Queries: `tabs()` (accessible names in order), `selected()` (name of the tab with
 `aria-selected="true"`, or null), `focusedTab()`, `panel()` (accessible name and text of
 the visible panel, or null) and `isDisabled(name)`. Traits: `composite-roving`,
-`selectable` and `directional`. No part SHALL be declared as committing on focus, so the
-`focus-does-not-commit` invariant applies to every tab. A generated driver
+`selectable` and `directional`. Focus SHALL change only the focus state and the
+focused-tab query, never the value; the contract declares the tab as committing on focus
+for that reason (and the panel and the list, which are stops outside the tabs), and the
+value is checked by the `selectable` invariant after every step. A generated driver
 `getTabs(target, { name })` SHALL be exported from `@rind-ui/testing`.
 
 #### Scenario: Same test in both environments

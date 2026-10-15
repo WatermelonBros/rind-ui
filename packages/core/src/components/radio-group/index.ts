@@ -7,7 +7,6 @@ export {
 } from "./radio-group.connect"
 export { radioGroupArgs, radioGroupContract, radioGroupInvariants } from "./radio-group.contract"
 export {
-  type IndicatorBox,
   type RadioGroupContext,
   type RadioGroupEvent,
   type RadioGroupMachine,

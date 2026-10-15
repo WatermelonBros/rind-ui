@@ -234,6 +234,17 @@ const CHECKED: Readonly<Record<string, string>> = {
   mixed: "indeterminate",
 }
 
+/** Roles that support aria-selected (WAI-ARIA 1.2). */
+const SELECTABLE_ROLES = new Set([
+  "tab",
+  "option",
+  "gridcell",
+  "row",
+  "columnheader",
+  "rowheader",
+  "treeitem",
+])
+
 /** (6) State attributes agree with their data-* counterparts. */
 const stateAttrs: GenericInvariant = (f) => {
   const out: string[] = []
@@ -254,6 +265,8 @@ const stateAttrs: GenericInvariant = (f) => {
       // A data-* flag on a part that is not interactive (a Fieldset's legend, an invalid
       // group) is a styling hook: the ARIA state belongs to its controls.
       if (flagged && !on && !el.focusable) continue
+      // data-selected on a role without aria-selected (a visible tab panel) is a styling hook.
+      if (aria === "aria-selected" && !SELECTABLE_ROLES.has(el.role ?? "")) continue
       // An invalid group (a radiogroup) carries aria-invalid itself; its controls mirror it
       // as a styling hook only (role radio does not take aria-invalid on its own).
       if (

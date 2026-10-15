@@ -145,6 +145,14 @@ export {
 } from "./quirks"
 export { registerReset } from "./resets"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"
+export {
+  type IndicatorBox,
+  type IndicatorCause,
+  measureIndicator,
+  type SelectionIndicatorOptions,
+  selectionIndicator,
+} from "./selection-indicator"
+export { hasTabbable, observeTabbable } from "./tabbable-content"
 export { injectTouchAction, TOUCH_ACTION_RULE } from "./touch-action"
 export { supportsUntilFound, type UntilFoundOptions, untilFound } from "./until-found"
 export {

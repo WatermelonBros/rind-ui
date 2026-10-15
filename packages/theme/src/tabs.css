@@ -1,0 +1,126 @@
+/*
+ * Tabs: structural only. The selected tab is marked by weight AND the sliding underline (never
+ * colour alone, WCAG 1.4.1). The indicator is positioned from the measured --rind-indicator-*
+ * variables; it moves with a transition except while `data-resizing` (a layout change, not a
+ * selection) and under reduced motion. There is deliberately no [hidden] rule: display:none
+ * would defeat hidden="until-found" on panels. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="tabs"][data-part="root"]) {
+    display: flex;
+    flex-direction: column;
+    color: var(--rind-tabs-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="tabs"][data-part="root"][data-orientation="vertical"]) {
+    flex-direction: row;
+  }
+
+  :where([data-scope="tabs"][data-part="list"]) {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: var(--rind-tabs-gap, var(--rind-space-2));
+    overflow-x: auto;
+    border-block-end: var(--rind-border-width) solid
+      var(--rind-tabs-border, var(--rind-color-border));
+  }
+
+  :where([data-scope="tabs"][data-part="list"][data-orientation="vertical"]) {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: auto;
+    border-block-end: 0;
+    border-inline-end: var(--rind-border-width) solid
+      var(--rind-tabs-border, var(--rind-color-border));
+  }
+
+  :where([data-scope="tabs"][data-part="tab"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+    padding-inline: var(--rind-tabs-padding-inline, var(--rind-space-3));
+    border: 0;
+    background: var(--rind-tabs-bg, transparent);
+    color: inherit;
+    font: inherit;
+    cursor: var(--rind-tabs-cursor, pointer);
+  }
+
+  :where([data-scope="tabs"][data-part="tab"][data-selected]) {
+    font-weight: var(--rind-tabs-selected-weight, 600);
+    color: var(--rind-tabs-color-selected, var(--rind-color-accent-text));
+  }
+
+  :where(
+    [data-scope="tabs"][data-part="tab"]:is([data-disabled], :disabled, [aria-disabled="true"])
+  ) {
+    color: var(--rind-tabs-disabled-color, var(--rind-color-text-disabled));
+    cursor: var(--rind-tabs-disabled-cursor, not-allowed);
+  }
+
+  /*
+   * Underline: a bar at the list's bottom, spanning the selected tab's measured box. The
+   * measured offsets are physical (left/top), in RTL too: anchor physically.
+   */
+  :where([data-scope="tabs"][data-part="indicator"]) {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    translate: var(--rind-indicator-left, 0) 0;
+    width: var(--rind-indicator-width, 0);
+    height: var(--rind-tabs-indicator-size, 2px);
+    background: var(--rind-tabs-indicator-bg, var(--rind-color-accent-solid));
+    pointer-events: none;
+    transition-property: translate, width, height;
+    transition-duration: var(--rind-tabs-duration, var(--rind-duration-normal));
+    transition-timing-function: var(--rind-ease-out);
+  }
+
+  :where([data-scope="tabs"][data-part="indicator"][data-orientation="vertical"]) {
+    top: 0;
+    bottom: auto;
+    left: auto;
+    inset-inline-end: 0;
+    translate: 0 var(--rind-indicator-top, 0);
+    width: var(--rind-tabs-indicator-size, 2px);
+    height: var(--rind-indicator-height, 0);
+  }
+
+  :where([data-scope="tabs"][data-part="indicator"][data-resizing]) {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="tabs"][data-part="indicator"]) {
+      transition: none;
+    }
+  }
+
+  /* base.css paints [data-selected]-less parts; the selected tab needs its own cue here. */
+  @media (forced-colors: active) {
+    :where([data-scope="tabs"][data-part="tab"]) {
+      color: ButtonText;
+      border-block-end: 2px solid transparent;
+    }
+
+    :where([data-scope="tabs"][data-part="tab"][data-selected]) {
+      color: ButtonText;
+      border-block-end-color: Highlight;
+    }
+
+    :where(
+        [data-scope="tabs"][data-part="tab"]:is([data-disabled], :disabled, [aria-disabled="true"])
+      ) {
+      color: GrayText;
+    }
+
+    :where([data-scope="tabs"][data-part="indicator"]) {
+      background: Highlight;
+    }
+  }
+}

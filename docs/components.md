@@ -42,7 +42,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Radix/Reka/Bits/Kobalte: Dropdown Menu |
-| Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec |  |
+| Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
@@ -140,7 +140,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | todo |  |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
-## Display & feedback (18)
+## Display & feedback (19)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -156,6 +156,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |

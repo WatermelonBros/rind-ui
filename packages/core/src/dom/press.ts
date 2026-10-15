@@ -512,6 +512,9 @@ export function createPress(options: PressOptions): PressHandle {
       if (disabled()) return
       // Keys during an IME composition belong to the composition: they never press.
       if (isImeKey(e)) return
+      // A key bubbling from a descendant (Space typed in an input inside a tab: radix#2915)
+      // belongs to that descendant.
+      if (e.target !== undefined && e.target !== e.currentTarget) return
       const kind = kindOf(e.currentTarget)
       if (!pressesKey(kind, e.key)) {
         if (state.kind === "key" && e.key === "Meta") state.metaHeld = true
