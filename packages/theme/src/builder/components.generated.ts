@@ -30,6 +30,16 @@ export type ComponentTokens = {
     | "solidBg"
     | "solidBgHover"
     | "solidFg"
+  readonly collapsible:
+    | "cursor"
+    | "disabledColor"
+    | "disabledCursor"
+    | "duration"
+    | "ease"
+    | "indicatorDuration"
+    | "triggerColor"
+    | "triggerGap"
+    | "triggerPaddingInline"
   readonly field:
     | "color"
     | "descriptionColor"

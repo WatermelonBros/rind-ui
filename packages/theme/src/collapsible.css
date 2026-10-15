@@ -1,0 +1,72 @@
+/*
+ * Collapsible: structural only. The Content animates its height on the size variable that the
+ * machine writes (0px, then px, then auto at rest), so the transition runs from a real number
+ * to a real number and rest follows the content (WCAG 1.4.12). `data-reveal` (find-in-page, or
+ * a mount) skips the transition. There is deliberately no [hidden] rule: display:none would
+ * defeat hidden="until-found" (same reason as base.css).
+ *
+ * Convention: Content is overflow:hidden to clip while it animates, which would also clip a
+ * focus ring on a child at the edge. Put padding on an inner wrapper, not on the Content, and
+ * leave the ring's offset room inside it:
+ *   <Collapsible.Content><div style={{ padding: "var(--rind-space-1)" }}>...</div></Collapsible.Content>
+ * Colours never transition. Durations are 0s under reduced motion (tokens.css).
+ */
+@layer rind.components {
+  :where([data-scope="collapsible"][data-part="content"]) {
+    overflow: hidden;
+    height: var(--rind-collapsible-content-height);
+    transition: height var(--rind-collapsible-duration, var(--rind-duration-normal))
+      var(--rind-collapsible-ease, var(--rind-ease-out));
+  }
+
+  :where([data-scope="collapsible"][data-part="content"][data-reveal]) {
+    transition: none;
+  }
+
+  :where([data-scope="collapsible"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-collapsible-trigger-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-collapsible-trigger-padding-inline, var(--rind-space-2));
+    border: 0;
+    background: transparent;
+    color: var(--rind-collapsible-trigger-color, var(--rind-color-text));
+    font: inherit;
+    cursor: var(--rind-collapsible-cursor, pointer);
+  }
+
+  :where([data-scope="collapsible"][data-part="trigger"]:is([data-disabled], :disabled)) {
+    color: var(--rind-collapsible-disabled-color, var(--rind-color-text-disabled));
+    cursor: var(--rind-collapsible-disabled-cursor, not-allowed);
+  }
+
+  /* A right-pointing glyph: down when open, mirrored under RTL. Rotation only, no colour. */
+  :where([data-scope="collapsible"][data-part="indicator"]) {
+    display: inline-flex;
+    transition: transform var(--rind-collapsible-indicator-duration, var(--rind-duration-fast))
+      var(--rind-collapsible-ease, var(--rind-ease-out));
+  }
+
+  :where([data-scope="collapsible"][data-part="indicator"][data-state="open"]) {
+    transform: rotate(90deg);
+  }
+
+  :where([data-scope="collapsible"][data-part="indicator"]:dir(rtl)) {
+    transform: scaleX(-1);
+  }
+
+  :where([data-scope="collapsible"][data-part="indicator"][data-state="open"]:dir(rtl)) {
+    transform: scaleX(-1) rotate(90deg);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="collapsible"][data-part="trigger"]) {
+      color: ButtonText;
+    }
+
+    :where([data-scope="collapsible"][data-part="trigger"]:is([data-disabled], :disabled)) {
+      color: GrayText;
+    }
+  }
+}

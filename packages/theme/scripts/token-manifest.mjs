@@ -16,7 +16,7 @@ const tier2 = new Set(
 )
 // Written at runtime by core (positioning, scroll lock, animation): documented, not themeable.
 const runtimeRe =
-  /^(x|y|position|available-.+|anchor-.+|transform-origin|arrow-.+|collision-padding|scrollbar-width|pop-from)$/
+  /^(x|y|position|available-.+|anchor-.+|transform-origin|arrow-.+|collision-padding|scrollbar-width|pop-from|[a-z-]+-content-(?:height|width))$/
 // Not scanned: tokens.css reads only tiers 1-2, the rest is generated.
 const skip = new Set(["index.css", "tokens.css", "icons.css"])
 

@@ -1,12 +1,11 @@
-## Purpose
+# collapsible Specification
 
+## Purpose
 Defines rind-ui's Collapsible: one button that shows and hides one region of
 content, following the WAI-ARIA APG Disclosure pattern. It covers keyboard, ARIA,
 focus, hide modes, find-in-page, the size custom properties used for animation,
 the styling attributes of each part, and the contract its driver is generated from.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 Collapsible SHALL consist of these parts:
@@ -135,8 +134,9 @@ Changes to `disabled` SHALL take effect on the next interaction.
 `Root` SHALL accept `closedContent` with values `"until-found"` (default),
 `"hidden"` and `"unmount"`. When closed and settled:
 
-- `until-found` SHALL keep the content mounted with `hidden="until-found"`,
-  including in server-rendered HTML;
+- `until-found` SHALL keep the content mounted with `hidden="until-found"` (in
+  server-rendered HTML the boolean `hidden`, upgraded after hydration, per the
+  hidden-content capability);
 - `hidden` SHALL keep it mounted with `hidden`;
 - `unmount` SHALL remove it from the document.
 
@@ -165,8 +165,9 @@ form controls in the document, so they take part in form submission.
 #### Scenario: Closed content readable in server HTML (base-ui#5821, kobalte#528)
 
 - **WHEN** a closed collapsible is rendered on the server with the default mode
-- **THEN** the HTML contains the content's text inside an element with
-  `hidden="until-found"`, not a bare `hidden`
+- **THEN** the HTML contains the content's text (it is not unmounted), inside an element
+  carrying `hidden` (React serialises the boolean form, per the hidden-content
+  capability), and after hydration the attribute is `hidden="until-found"`
 
 #### Scenario: Unmounted after exit
 
@@ -415,3 +416,4 @@ both size custom properties are defined on rendered content.
 - **WHEN** a consumer runs `testMachine` with the collapsible contract on a
   wrapper that adds `aria-hidden` to the content
 - **THEN** the per-contract invariant fails naming the content part
+

@@ -29,6 +29,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 
 - `--rind-available-height`
 - `--rind-available-width`
+- `--rind-collapsible-content-height`
 - `--rind-pop-from`
 - `--rind-scrollbar-width`
 - `--rind-transform-origin`
@@ -152,6 +153,52 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "solid-fg": {
       "fallback": "var(--rind-color-accent-on-solid)",
       "file": "button.css"
+    }
+  }
+}
+```
+
+### collapsible
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "cursor": {
+      "fallback": "pointer",
+      "file": "collapsible.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "collapsible.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "collapsible.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "collapsible.css"
+    },
+    "ease": {
+      "fallback": "var(--rind-ease-out)",
+      "file": "collapsible.css"
+    },
+    "indicator-duration": {
+      "fallback": "var(--rind-duration-fast)",
+      "file": "collapsible.css"
+    },
+    "trigger-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "collapsible.css"
+    },
+    "trigger-gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "collapsible.css"
+    },
+    "trigger-padding-inline": {
+      "fallback": "var(--rind-space-2)",
+      "file": "collapsible.css"
     }
   }
 }

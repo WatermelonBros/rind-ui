@@ -112,7 +112,12 @@ export function usePartRegistry<P extends string>(
  * Declares a rendered part with its final id (the consumer's or the derived one), after
  * commit. Nothing is written during render, so a render that never commits leaves nothing.
  */
-export function useRegisterPart<P extends string>(registry: PartRegistry<P>, part: P, id: string) {
+export function useRegisterPart<P extends string>(
+  registry: PartRegistry<P>,
+  part: P,
+  /** `undefined`: the part is not rendered (e.g. unmounted content). */
+  id: string | undefined,
+) {
   useIsoLayoutEffect(() => {
     registry.set(part, id)
     return () => registry.set(part, undefined)

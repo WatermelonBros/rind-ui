@@ -20,7 +20,7 @@ const categories = new Set(
 )
 // Variables written by core at runtime (positioning, scroll lock, animation).
 const runtime =
-  /^(x|y|position|available-.+|anchor-.+|transform-origin|arrow-.+|collision-padding|scrollbar-width|pop-from)$/
+  /^(x|y|position|available-.+|anchor-.+|transform-origin|arrow-.+|collision-padding|scrollbar-width|pop-from|[a-z-]+-content-(?:height|width))$/
 
 const named = new Set(
   `aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet

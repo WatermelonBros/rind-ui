@@ -14,6 +14,7 @@ export {
   type ValidityKey,
   type ValidityReading,
 } from "./constraint-validity"
+export { type ContentSize, contentSize } from "./content-size"
 export {
   type DismissOptions,
   type DismissReason,

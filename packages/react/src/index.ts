@@ -1,4 +1,5 @@
 export * from "./button"
+export * from "./collapsible"
 export * from "./field"
 export * from "./fieldset"
 export * from "./form"

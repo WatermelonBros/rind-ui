@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-collapsible (r1) | — | packages/core/src/dom/content-size.ts | switched()/settled(): navigation-menu adapter must snapshot animations after switched() and cancel a pending settle on switch→switch; in-place swap needs px pinned before the swap or switched(from) — decide when speccing add-navigation-menu |
+| add-collapsible (r1) | — | packages/core/src/dom/content-size.ts | measure()/closed() use scrollHeight/Width (exclude borders): bordered/border-box content a few px short |
+| add-collapsible (r1) | — | packages/testing/fixtures/layer/layer.pw.test.ts | "reopenDuringExit" (pointer) failed once under full-suite load, passed uncached — possible new flake |
 | add-text-field (r1) | — | packages/react/src/text-field/text-field.tsx | soft-max error key is customError, not tooLong as spec/tasks say — map the key or amend the spec (match="tooLong" won't match) |
 | add-text-field (r1) | — | packages/core/src/components/text-field/text-field.contract.ts | ClearTrigger invariant only checks "rendered while not clearable" (spec: exactly when) — add the reverse check |
 | add-text-field (r1) | — | packages/core/src/contract | contract event-mapping `args` type loses action parameters; text-field uses `as never` — widen the args type to the action's parameters |

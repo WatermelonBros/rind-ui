@@ -57,7 +57,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Collapsible | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | RAC/HUI/Ariakit: Disclosure |
+| Collapsible | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC/HUI/Ariakit: Disclosure |
 | Accordion | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | RAC: DisclosureGroup |
 
 ## Selection & collections (11)
