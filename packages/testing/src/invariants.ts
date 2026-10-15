@@ -108,7 +108,13 @@ const NAME_REQUIRED = new Set([
 
 const exposed = (el: ElementInfo) => !el.hidden && !el.inAriaHidden && !el.inInert
 const isTrue = (v: string | undefined) => v === "true"
-const items = (s: DomSnapshot) => s.elements.filter((el) => el.part === "item")
+const items = (s: DomSnapshot, part = "item") => s.elements.filter((el) => el.part === part)
+/** The composite's item part (contract semantics, default `item`). */
+const itemPart = (f: StepFacts) => f.semantics["item"] ?? "item"
+/** An item's selection flag: `data-selected`, or `data-state="checked"` (radios). */
+const selectedFlag = (el: ElementInfo) =>
+  el.attrs["data-selected"] !== undefined ||
+  (el.role === "radio" && el.attrs["data-state"] === "checked")
 const ids = (v: string | undefined) => (v ?? "").split(/\s+/).filter(Boolean)
 const isOpen = (f: StepFacts) => f.open
 
@@ -132,7 +138,7 @@ function closedContents(f: StepFacts) {
 
 /** At most one item is data-highlighted, and it is the oracle's highlighted key. */
 function highlightChecks(f: StepFacts): string[] {
-  const lit = items(f.after).filter((el) => el.attrs["data-highlighted"] !== undefined)
+  const lit = items(f.after, itemPart(f)).filter((el) => el.attrs["data-highlighted"] !== undefined)
   const out =
     lit.length > 1
       ? [`${lit.length} items are data-highlighted: ${lit.map((el) => el.describe).join(", ")}`]
@@ -248,6 +254,23 @@ const stateAttrs: GenericInvariant = (f) => {
       // A data-* flag on a part that is not interactive (a Fieldset's legend, an invalid
       // group) is a styling hook: the ARIA state belongs to its controls.
       if (flagged && !on && !el.focusable) continue
+      // An invalid group (a radiogroup) carries aria-invalid itself; its controls mirror it
+      // as a styling hook only (role radio does not take aria-invalid on its own).
+      if (
+        flagged &&
+        !on &&
+        aria === "aria-invalid" &&
+        el.role === "radio" &&
+        f.after.elements.some(
+          (g) =>
+            g.role === "radiogroup" &&
+            isTrue(g.attrs["aria-invalid"]) &&
+            g.id !== null &&
+            el.within.includes(g.id),
+        )
+      ) {
+        continue
+      }
       if (on !== flagged) {
         out.push(`${el.describe}: ${aria}="${el.attrs[aria] ?? ""}" disagrees with ${data}`)
       }
@@ -706,10 +729,12 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** (8) A roving composite is one Tab stop. */
   "composite-roving": (f) => {
     // Controls inside a row (`item-control`) belong to the row's own tab group.
-    const list = items(f.after).filter(exposed)
+    const list = items(f.after, itemPart(f)).filter(exposed)
     const stops = list.filter((el) => el.attrs["tabindex"] === "0").length
     // No navigable item: the container itself is the one stop.
-    const container = f.after.parts.some((p) => p.part !== "item" && p.attrs["tabindex"] === "0")
+    const container = f.after.parts.some(
+      (p) => p.part !== itemPart(f) && p.attrs["tabindex"] === "0",
+    )
     const out =
       list.length > 0 && stops !== 1 && !(stops === 0 && container)
         ? [`${stops} items have tabindex="0"; expected exactly 1`]
@@ -724,7 +749,7 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   "composite-activedescendant": (f) => {
     const out = [...highlightChecks(f)]
     out.push(
-      ...items(f.after)
+      ...items(f.after, itemPart(f))
         .filter((el) => el.focusable && el.attrs["tabindex"] !== "-1")
         .map((el) => `${el.describe} is tabbable; only the input or container may be`),
     )
@@ -751,13 +776,13 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** Explicit selection state on every item; it follows the machine's value, not highlight. */
   selectable: (f) => {
     const out: string[] = []
-    const list = items(f.after).filter(exposed)
+    const list = items(f.after, itemPart(f)).filter(exposed)
     for (const el of list) {
       const v = el.attrs["aria-selected"] ?? el.attrs["aria-checked"]
       if (v !== "true" && v !== "false") {
         out.push(`${el.describe} has no explicit aria-selected/aria-checked`)
       }
-      if (isTrue(v) !== (el.attrs["data-selected"] !== undefined)) {
+      if (isTrue(v) !== selectedFlag(el)) {
         out.push(`${el.describe}: selection state disagrees with data-selected`)
       }
     }
@@ -770,7 +795,7 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     }
     // A step never adds a disabled item to the selection.
     const wasSelected = new Set(
-      items(f.before ?? f.after)
+      items(f.before ?? f.after, itemPart(f))
         .filter((el) => isTrue(el.attrs["aria-selected"] ?? el.attrs["aria-checked"]))
         .map((el) => el.attrs["data-key"] ?? el.describe),
     )
@@ -804,7 +829,7 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   "set-metadata": (f) => {
     const out: string[] = []
     const groups = new Map<string, ElementInfo[]>()
-    for (const el of items(f.after)) {
+    for (const el of items(f.after, itemPart(f))) {
       if (!exposed(el) || el.attrs["aria-posinset"] === undefined) continue
       groups.set(el.group, [...(groups.get(el.group) ?? []), el])
     }
@@ -827,7 +852,7 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     }
     // Set size is the collection's item count, unrendered (virtualized) items included.
     if (f.collectionSize !== undefined) {
-      for (const el of items(f.after).filter(exposed)) {
+      for (const el of items(f.after, itemPart(f)).filter(exposed)) {
         const size = el.attrs["aria-setsize"]
         if (
           size !== undefined &&
@@ -914,7 +939,7 @@ const announcementParity: GenericInvariant = (f) => {
     highlightChanged && section(f.after) !== null && section(f.after) !== section(f.before)
   const resultsChanged = count(f.after) > 0 && count(f.after) !== count(f.before)
   const itemNames = new Set(
-    items(f.after)
+    items(f.after, itemPart(f))
       .map((e) => e.name)
       .filter((n) => n !== ""),
   )

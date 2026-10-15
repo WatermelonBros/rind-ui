@@ -24,7 +24,7 @@ One Field wraps **one** control. To group several controls under one name, use a
 <!-- api:field -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Field.Root` | `root` | `<div>` | Wraps one form control. No role. |
 | `Field.Label` | `label` | `<label>` | Names the control (`for`, or `aria-labelledby` for a group). |
@@ -33,7 +33,7 @@ One Field wraps **one** control. To group several controls under one name, use a
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `name` | `string` | — | The control's `name` when it has none; the key of `validate`'s values. |
 | `disabled` | `boolean` | `false` | Disables the control; no validity is displayed. |
@@ -55,7 +55,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "field" |
 | `root` | `data-part` | "root" |
@@ -111,7 +111,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### States
 
-| State |  |
+| State | Description |
 |---|---|
 | `idle` | Nothing displayed yet (the mode has not allowed it). |
 | `validating` | An asynchronous `validate` is running; the previous display stays. |

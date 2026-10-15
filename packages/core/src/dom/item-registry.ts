@@ -21,6 +21,12 @@ export type RegisteredItem = ItemRegistration & { readonly textValue: string }
 export interface ItemRegistry {
   /** Adds (or replaces) an item; returns its removal. Call at commit time. */
   register(item: ItemRegistration): () => void
+  /**
+   * Flushes the pending registrations now (the root's layout effect, after its items'
+   * in the same commit), so the collection arrives in that commit instead of a microtask
+   * later; a no-op when nothing is pending.
+   */
+  flush(): void
 }
 
 const inDocumentOrder = (a: Element, b: Element) =>
@@ -37,6 +43,7 @@ export function createItemRegistry(
   let scheduled = false
   const warned = new Set<string>()
   const flush = () => {
+    if (!scheduled) return
     scheduled = false
     let list = [...items.values()]
     // Fast path: parts usually register in document order already.
@@ -65,6 +72,7 @@ export function createItemRegistry(
     queueMicrotask(flush)
   }
   return {
+    flush,
     register(item) {
       items.set(item.element, item)
       schedule()

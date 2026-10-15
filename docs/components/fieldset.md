@@ -20,7 +20,7 @@ The Fieldset is stateless: it has no machine. `disabled` and `invalid` are props
 <!-- api:fieldset -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Fieldset.Root` | `root` | `<fieldset>` | The group; named by its Legend, described by Description and ErrorMessage. |
 | `Fieldset.Legend` | `legend` | `<legend>` | The group's name; render it as the root's first child. |
@@ -29,7 +29,7 @@ The Fieldset is stateless: it has no machine. `disabled` and `invalid` are props
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `disabled` | `boolean` | `false` | On Root: disables every control inside, native and rind-ui, portalled parts included (the first Legend's content is exempt). |
 | `invalid` | `boolean` | `false` | On Root: shows the ErrorMessage. Never passed to the controls inside. |
@@ -40,7 +40,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "fieldset" |
 | `root` | `data-part` | "root" |

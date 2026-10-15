@@ -1,0 +1,11 @@
+- radiogroup "Size" [invalid]:
+  - text: Size
+  - paragraph: Pick one.
+  - radio "Small"
+  - text: Small
+  - radio "Medium"
+  - text: Medium
+  - radio "Large"
+  - text: Large
+  - paragraph: Choose a size to continue.
+- button "After"

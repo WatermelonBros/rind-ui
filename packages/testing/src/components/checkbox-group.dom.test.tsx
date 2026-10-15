@@ -636,3 +636,40 @@ describe("allValues and the rendered items (task 3.2)", () => {
     warn.mockRestore()
   })
 })
+
+describe("review fixes (add-radio-group r1): external Field errors (base-ui#1745)", () => {
+  function InField({ value, errors }: { value?: readonly string[]; errors: readonly string[] }) {
+    return (
+      <form data-testid="ef">
+        <Field.Root errors={errors}>
+          <Field.Label>Extras</Field.Label>
+          <CheckboxGroup.Root {...(value === undefined ? {} : { value })}>
+            {["a", "b"].map((v) => (
+              <Checkbox.Root key={v} value={v}>
+                <Checkbox.Control />
+                <Checkbox.Label>{v.toUpperCase()}</Checkbox.Label>
+              </Checkbox.Root>
+            ))}
+          </CheckboxGroup.Root>
+          <Field.ErrorMessage />
+        </Field.Root>
+      </form>
+    )
+  }
+
+  it("survives a programmatic change", async () => {
+    const { rerender } = render(<InField value={[]} errors={["Pick again"]} />)
+    expect(screen.getByText("Pick again")).toBeTruthy()
+    rerender(<InField value={["a"]} errors={["Pick again"]} />)
+    expect(screen.queryByText("Pick again")).toBeTruthy()
+    // A form reset clears the Field's external errors by the Field's own reset (field
+    // "reset": a user's reset button clears everything); what the group reports for it is
+    // not a user change, which the programmatic case above already exercises.
+  })
+
+  it("a user change clears it", async () => {
+    render(<InField errors={["Pick again"]} />)
+    await getCheckboxGroup(screen, { name: "Extras" }, { platform }).toggle("A")
+    await waitFor(() => expect(screen.queryByText("Pick again")).toBeNull())
+  })
+})

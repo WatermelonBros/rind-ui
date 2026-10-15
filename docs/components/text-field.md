@@ -18,7 +18,7 @@ import { TextField } from "@rind-ui/react"
 <!-- api:text-field -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `TextField.Root` | `root` | `<div>` | A Field when not inside one; else it joins the enclosing Field. |
 | `TextField.Label` | `label` | `<label>` | The Field's Label (not rendered inside a Field). |
@@ -31,7 +31,7 @@ import { TextField } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `value` | `string \| null` | — | Controlled value (`null` renders empty). |
 | `defaultValue` | `string` | — | Uncontrolled: the DOM owns the value. |
@@ -48,7 +48,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "text-field" (or a preset's scope) |
 | `root` | `data-part` | "root" |
@@ -96,14 +96,14 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Keyboard
 
-| Key |  |
+| Key | Action |
 |---|---|
 | Enter | In an Input: commits the value (Field), unless an IME is composing. |
 | ⌘/Ctrl + A, Backspace | Native editing; nothing is overridden. |
 
 ### States
 
-| State |  |
+| State | Description |
 |---|---|
 | `idle` | Not composing: changes validate, count and announce. |
 | `composing` | An IME composition: changes are reported (`isComposing`), never validated, counted or announced. |

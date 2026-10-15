@@ -18,13 +18,13 @@ Navigation Menu links) uses the same rules, from `linkProps` in `@rind-ui/core`.
 <!-- api:link -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Link` | `link` | `<a>` | The link itself. |
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `href` | `Href` | — | Where it goes. Typed by an augmented `RouterConfig`. |
 | `target` | `string` | — | Passed to the anchor; not `_self` opens elsewhere. |
@@ -44,7 +44,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `link` | `data-scope` | "link" |
 | `link` | `data-part` | "link" |
@@ -59,7 +59,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Keyboard
 
-| Key |  |
+| Key | Action |
 |---|---|
 | Enter | Follows the link. |
 | ⌘/Ctrl + Enter | Opens it in a new tab (the router is not called). |

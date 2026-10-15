@@ -69,8 +69,16 @@ export function createService<M extends AnyMachine>(
   }
 
   const eq = (key: string, a: unknown, b: unknown) => (values[key]?.equal ?? Object.is)(a, b)
+  // A controlled `null` is a value (a Radio Group with nothing checked); only `undefined`
+  // means omitted.
   const value = (key: string, p: Props = props) =>
-    fromProps[key] ? (p[key] ?? lastProp[key] ?? values[key]?.fallback) : snap.internal[key]
+    fromProps[key]
+      ? p[key] !== undefined
+        ? p[key]
+        : lastProp[key] !== undefined
+          ? lastProp[key]
+          : values[key]?.fallback
+      : snap.internal[key]
   const stateFor = (key: string, v: unknown) => {
     const bound = values[key]?.states
     for (const s in bound) if (eq(key, bound[s], v)) return s

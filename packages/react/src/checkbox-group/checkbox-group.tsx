@@ -121,10 +121,16 @@ function Root({
   const el = useRef<HTMLElement | null>(null)
   const rootTag = useRenderedTag("div", render, el)
   const labelTag = useRef("span")
+  // The reason of the latest accepted change, for the Field: only a user's clears its
+  // external (server) errors (base-ui#1745); a parent's value or a reset does not.
+  const lastReason = useRef<string | null>(null)
   const { view, send } = useMachine(checkboxGroupMachine, {
     value,
     defaultValue,
-    onValueChange,
+    onValueChange: (next, details) => {
+      lastReason.current = details.reason
+      onValueChange?.(next, details)
+    },
     allValues,
     disabled: field.disabled,
     readOnly: field.readOnly,
@@ -266,7 +272,9 @@ function Root({
   useEffect(() => {
     if (reported.current === current) return
     reported.current = current
-    report?.({ type: "change", value: current, user: true, composing: false })
+    const user = lastReason.current === "ITEM.TOGGLE" || lastReason.current === "PARENT.TOGGLE"
+    lastReason.current = null
+    report?.({ type: "change", value: current, user, composing: false })
     report?.({ type: "commit" })
   }, [current, report])
   const ctx: Ctx = {

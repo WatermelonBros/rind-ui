@@ -683,6 +683,87 @@
         }
       }
     },
+    "radio-group": {
+      "family": null,
+      "tokens": {
+        "bg": {
+          "fallback": "transparent",
+          "file": "radio-group.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "radio-group.css"
+        },
+        "border-invalid": {
+          "fallback": "var(--rind-color-danger-border, var(--rind-color-border-strong))",
+          "file": "radio-group.css"
+        },
+        "border-on": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "radio-group.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "radio-group.css"
+        },
+        "cursor": {
+          "fallback": "pointer",
+          "file": "radio-group.css"
+        },
+        "description-color": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "radio-group.css"
+        },
+        "disabled-cursor": {
+          "fallback": "not-allowed",
+          "file": "radio-group.css"
+        },
+        "disabled-opacity": {
+          "fallback": "0.6",
+          "file": "radio-group.css"
+        },
+        "dot": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "radio-group.css"
+        },
+        "dot-size": {
+          "fallback": "50%",
+          "file": "radio-group.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-fast)",
+          "file": "radio-group.css"
+        },
+        "error-color": {
+          "fallback": "var(--rind-color-danger-text)",
+          "file": "radio-group.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "radio-group.css"
+        },
+        "gap-inline": {
+          "fallback": "var(--rind-space-4)",
+          "file": "radio-group.css"
+        },
+        "item-gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "radio-group.css"
+        },
+        "label-font-weight": {
+          "fallback": "600",
+          "file": "radio-group.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-full)",
+          "file": "radio-group.css"
+        },
+        "size": {
+          "fallback": "1.25rem",
+          "file": "radio-group.css"
+        }
+      }
+    },
     "switch": {
       "family": "choice",
       "tokens": {

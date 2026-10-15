@@ -1,0 +1,9 @@
+- radiogroup "Size":
+  - text: Size
+  - radio "Small"
+  - text: Small
+  - radio "Medium" [checked]
+  - text: Medium
+  - radio "Large"
+  - text: Large
+- button "After"

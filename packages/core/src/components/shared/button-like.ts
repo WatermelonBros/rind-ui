@@ -9,7 +9,7 @@ import type { Href, RouterOptions } from "../../env/router"
 
 export interface ButtonLikeInput {
   /** The role the component declares for a non-native element. */
-  readonly role: "button" | "checkbox" | "switch"
+  readonly role: "button" | "checkbox" | "switch" | "radio"
   /** The rendered tag (lowercase): the default element's on the server. */
   readonly tag: string
   /** The rendered element's `href`, when it is an anchor (`<a href>` takes link rules). */

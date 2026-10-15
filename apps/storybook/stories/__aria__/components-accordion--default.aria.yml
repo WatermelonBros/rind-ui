@@ -1,0 +1,6 @@
+- heading "Shipping" [level=3]:
+  - button "Shipping"
+- heading "Returns" [level=3]:
+  - button "Returns"
+- heading "Payment" [level=3]:
+  - button "Payment"

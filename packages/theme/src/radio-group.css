@@ -1,0 +1,180 @@
+/*
+ * Radio Group: structural only. The Control is a round ring (a border); the Indicator is the dot,
+ * a currentColor circle mounted only while checked, so the state never relies on colour alone
+ * (WCAG 1.4.1). Items stack for data-orientation="vertical" and wrap in a row for "horizontal"
+ * (logical properties, so RTL mirrors with no extra rule). The focus ring and the invisible hit
+ * area (data-rind-pressable, at least --rind-hit-area) come from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="radio-group"][data-part="root"]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-radio-group-gap, var(--rind-space-2));
+    color: var(--rind-radio-group-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="radio-group"][data-part="root"][data-orientation="horizontal"]) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: var(--rind-radio-group-gap-inline, var(--rind-space-4));
+  }
+
+  /* Label, description and error keep their own line above/below a row of items. */
+  :where(
+    [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"]
+      > :is([data-part="label"], [data-part="description"], [data-part="error-message"])
+  ) {
+    flex-basis: 100%;
+  }
+
+  :where([data-scope="radio-group"][data-part="label"]) {
+    font-weight: var(--rind-radio-group-label-font-weight, 600);
+  }
+
+  :where([data-scope="radio-group"]:is([data-part="description"], [data-part="error-message"])) {
+    margin: 0;
+  }
+
+  :where([data-scope="radio-group"][data-part="description"]) {
+    color: var(--rind-radio-group-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="radio-group"][data-part="error-message"]) {
+    color: var(--rind-radio-group-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="radio-group"][data-part="item"]) {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: var(--rind-radio-group-item-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+  }
+
+  :where([data-scope="radio-group"][data-part="item-control"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    inline-size: var(--rind-radio-group-size, 1.25rem);
+    block-size: var(--rind-radio-group-size, 1.25rem);
+    margin-block: calc((var(--rind-hit-area) - var(--rind-radio-group-size, 1.25rem)) / 2);
+    border: var(--rind-border-width) solid
+      var(--rind-radio-group-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-radio-group-radius, var(--rind-radius-full));
+    background: var(--rind-radio-group-bg, transparent);
+    color: var(--rind-radio-group-dot, var(--rind-color-accent-solid));
+    font: inherit;
+    cursor: var(--rind-radio-group-cursor, pointer);
+    transition: border-color var(--rind-radio-group-duration, var(--rind-duration-fast));
+  }
+
+  :where([data-scope="radio-group"][data-part="item-control"][data-state="checked"]) {
+    border-color: var(--rind-radio-group-border-on, var(--rind-color-accent-solid));
+  }
+
+  /* The dot: mounted only while checked, so it needs no visibility rule. */
+  :where([data-scope="radio-group"][data-part="item-indicator"]) {
+    display: block;
+    inline-size: var(--rind-radio-group-dot-size, 50%);
+    block-size: var(--rind-radio-group-dot-size, 50%);
+    border-radius: var(--rind-radio-group-radius, var(--rind-radius-full));
+    background: currentColor;
+    pointer-events: none;
+  }
+
+  :where([data-scope="radio-group"]:is([data-part="item-label"], [data-part="item-description"])) {
+    grid-column: 2;
+  }
+
+  :where([data-scope="radio-group"][data-part="item-label"]) {
+    min-block-size: var(--rind-hit-area);
+    display: inline-flex;
+    align-items: center;
+    cursor: var(--rind-radio-group-cursor, pointer);
+  }
+
+  :where([data-scope="radio-group"][data-part="item-description"]) {
+    margin: 0;
+    color: var(--rind-radio-group-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="radio-group"][data-part="item-control"][data-invalid]) {
+    border-color: var(
+      --rind-radio-group-border-invalid,
+      var(--rind-color-danger-border, var(--rind-color-border-strong))
+    );
+  }
+
+  :where(
+    [data-scope="radio-group"]:is(
+      [data-part="item-control"],
+      [data-part="item-label"]
+    )[data-disabled]
+  ) {
+    cursor: var(--rind-radio-group-disabled-cursor, not-allowed);
+    opacity: var(--rind-radio-group-disabled-opacity, 0.6);
+  }
+
+  /*
+   * base.css paints every [data-state="checked"] part Highlight with a double outline. Here only
+   * the ring and the dot carry the state, so those rules are undone at higher specificity (the
+   * keyboard focus outline stays).
+   */
+  @media (forced-colors: active) {
+    [data-scope="radio-group"]:is(
+        [data-part="item"],
+        [data-part="item-label"],
+        [data-part="item-description"],
+        [data-part="item-control"],
+        [data-part="item-indicator"]
+      ):not([data-focus-visible]) {
+      outline: none;
+    }
+
+    [data-scope="radio-group"]:is(
+        [data-part="item"],
+        [data-part="item-label"],
+        [data-part="item-description"]
+      ) {
+      background-color: transparent;
+      color: CanvasText;
+    }
+
+    [data-scope="radio-group"][data-part="item-control"] {
+      border-color: ButtonText;
+      background-color: Canvas;
+      color: Highlight;
+      forced-color-adjust: none;
+    }
+
+    [data-scope="radio-group"][data-part="item-indicator"] {
+      background-color: Highlight;
+    }
+
+    [data-scope="radio-group"]:is(
+        [data-part="item-control"],
+        [data-part="item-indicator"]
+      )[data-disabled] {
+      color: GrayText;
+    }
+
+    [data-scope="radio-group"][data-part="item-control"][data-disabled] {
+      border-color: GrayText;
+      opacity: 1;
+    }
+
+    [data-scope="radio-group"][data-part="item-indicator"][data-disabled] {
+      background-color: GrayText;
+    }
+
+    [data-scope="radio-group"]:is(
+        [data-part="item-label"],
+        [data-part="item-description"]
+      )[data-disabled] {
+      color: GrayText;
+      opacity: 1;
+    }
+  }
+}

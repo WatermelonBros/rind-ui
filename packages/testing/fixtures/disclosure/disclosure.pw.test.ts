@@ -6,8 +6,12 @@ import { extname, join, normalize } from "node:path"
 import { contract, setup, type } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
+import { states as accordionStates } from "../../../../apps/storybook/stories/Accordion.stories"
 import { states as announceStates } from "../../../../apps/storybook/stories/AnnounceFixture.stories"
 import { states as buttonStates } from "../../../../apps/storybook/stories/Button.stories"
+import { states as checkboxStates } from "../../../../apps/storybook/stories/Checkbox.stories"
+import { states as checkboxGroupStates } from "../../../../apps/storybook/stories/CheckboxGroup.stories"
+import { states as collapsibleStates } from "../../../../apps/storybook/stories/Collapsible.stories"
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
 import { states as fieldStates } from "../../../../apps/storybook/stories/Field.stories"
 import { states as fieldsetStates } from "../../../../apps/storybook/stories/Fieldset.stories"
@@ -17,7 +21,10 @@ import { states as labelStates } from "../../../../apps/storybook/stories/Label.
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
 import { states as linkStates } from "../../../../apps/storybook/stories/Link.stories"
 import { states as pressStates } from "../../../../apps/storybook/stories/PressFixture.stories"
+import { states as radioGroupStates } from "../../../../apps/storybook/stories/RadioGroup.stories"
+import { states as switchStates } from "../../../../apps/storybook/stories/Switch.stories"
 import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
+import { states as toggleStates } from "../../../../apps/storybook/stories/Toggle.stories"
 import { createDriver, missingAriaLines, playwrightEnv, testMachine } from "../../src/index"
 import { chromiumTree } from "../../src/playwright"
 import { streamContract } from "../announce/announce.contract"
@@ -312,6 +319,13 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Field.stories.tsx": fieldStates,
     "./stories/TextField.stories.tsx": textFieldStates,
     "./stories/Form.stories.tsx": formStates,
+    "./stories/Accordion.stories.tsx": accordionStates,
+    "./stories/Checkbox.stories.tsx": checkboxStates,
+    "./stories/CheckboxGroup.stories.tsx": checkboxGroupStates,
+    "./stories/Collapsible.stories.tsx": collapsibleStates,
+    "./stories/RadioGroup.stories.tsx": radioGroupStates,
+    "./stories/Switch.stories.tsx": switchStates,
+    "./stories/Toggle.stories.tsx": toggleStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

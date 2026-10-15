@@ -171,6 +171,28 @@ RequiredWithError, Fieldset. Record each pass in `tested-with.json` with
 - [ ] **Windows High Contrast / forced colors**: unchecked, mixed and checked Parents are
       distinguishable.
 
+## Device checklist: Radio Group (add-radio-group)
+
+Stories: Components/RadioGroup → Default, Horizontal, WithDescriptions, DisabledItem,
+ReadOnly, RequiredInvalid, InForm, RTL. Record each pass in `tested-with.json` with
+`component: "radio-group"`. Deferred to devices.
+
+- [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
+      TalkBack + Chrome**: entering the group announces its name ("Size, radio group"), then
+      the radio name, role (radio button), state and position ("2 of 3").
+- [ ] **All**: arrow keys move and check, and the new radio is announced once; Tab leaves the
+      group after one stop; Space checks; focus alone (screen-reader cursor) does not check.
+- [ ] **All**: a disabled radio is announced as unavailable and skipped by the arrows.
+- [ ] **ReadOnly / RequiredInvalid, VoiceOver and TalkBack (known limit)**: `aria-readonly`
+      and `aria-invalid` on a radiogroup are not announced (react-aria#2580, #2581). Record
+      what is read; the Description and the ErrorMessage (in `aria-describedby`) must carry
+      the information instead.
+- [ ] **NVDA, JAWS**: required and invalid are announced on entering the group.
+- [ ] **InForm**: Enter submits and does not check.
+- [ ] **RTL**: Left and Right arrows swap direction.
+- [ ] **Windows High Contrast / forced colors**: the checked and unchecked rings are both
+      visible and distinguishable (radix#2993).
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

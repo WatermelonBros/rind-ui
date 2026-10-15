@@ -1113,6 +1113,15 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         const index = counts.get(p.part) ?? 0
         counts.set(p.part, index + 1)
         if (!p.focusable || p.hidden) continue
+        // A hidden form input forwards focus to its control by design (hidden-form-input).
+        // (Only contracts whose focus moves state: elsewhere the forwarded focus is checked.)
+        if (
+          contract.traits.includes("form-associated") &&
+          (contract.commitsOnFocus?.length ?? 0) > 0 &&
+          p.part === "hidden-input"
+        ) {
+          continue
+        }
         if (contract.commitsOnFocus?.some((c) => c.part === p.part && c.state === state)) continue
         const previous = await observe()
         await virtualEnv.part(p.part).nth(index).focus()

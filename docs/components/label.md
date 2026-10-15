@@ -17,13 +17,13 @@ rind-ui label; see [Labels](../guides/labels.md).
 <!-- api:label -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Label (Label.Root)` | `root` | `<label>` | A native `<label>`: no role, no ARIA. |
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `htmlFor` | `string` | — | The id of the control it names. Kept on the server; dropped after mount when it names a non-labelable element (focus is forwarded instead, with a development warning). |
 | `id` | `string` | — | Generated when absent, the same on the server and the client. |
@@ -33,7 +33,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "label" |
 | `root` | `data-part` | "root" |

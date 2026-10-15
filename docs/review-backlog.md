@@ -7,6 +7,12 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-radio-group (r1) | — | packages/core/src/components/radio-group/radio-group.connect.ts:202-210 | pending + no value: server HTML has no tab stop (spec: first rendered item tabindex=0 in server render) — needs a first-rendered signal or a spec amendment |
+| add-radio-group (r1) | — | packages/testing/src/invariants.ts:~256-267 | stateAttrs exemption (data-invalid without aria-invalid under any aria-invalid ancestor) too broad — gate on radiogroup/radio |
+| add-radio-group (r1) | — | packages/testing/src/invariants.ts:~113-117 | selectedFlag accepts data-state="checked" for every composite — gate on itemPart === item-control |
+| add-radio-group (r1) | — | packages/testing/src/model.ts:1116 | focus-does-not-commit skips hidden-input for every form-associated contract — scope to contracts declaring commitsOnFocus |
+| add-radio-group (r1) | — | packages/react/src/radio-group/radio-group.tsx:~245 | parent accepting a proposal asynchronously after a later commit loses the input/change dispatch (pending cleared in layout effect) — unverified |
+| site audit (rind-ui-e2) | — | core connect / docs/guides/hidden-until-found | `data-reveal` is generic: a consumer's own [data-reveal] style hid every Accordion/Collapsible panel on the site — namespace it (data-rind-reveal?) or document the collision |
 | add-checkbox-group (r1) | — | packages/testing/src/model.ts:578 (replayEnv) | labelled() not wrapped in touch-hover/composing replays: actions through labelled() run for real (Field contract types for real instead of composing); directed() wraps it → inconsistent. Wrap with a role/name, then fix the Field broken-variant test |
 | add-checkbox-group (r1) | — | layer.pw.test.ts | "layer [touch|pointer|keyboard]: closed —OPEN→ open —CLOSE→ closed" fails under full-suite load (passes alone) — recurring flake, investigate timing |
 | add-switch (r1) | — | packages/react/src/index.ts | createFormToggle + FormToggle* types re-exported as public API (internal factory); FormToggleService.checked typed CheckedState lets Switch receive "indeterminate" — drop the re-export unless third-party toggles are a goal |

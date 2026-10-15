@@ -152,6 +152,12 @@ export interface Semantics<P extends string> {
   readonly label?: P
   /** Where focus goes after closing, when not the trigger (trait `restores-focus`). */
   readonly finalFocus?: P
+  /**
+   * The composite's item: the part that rovingly takes focus and carries the selection
+   * (traits `composite-*`, `selectable`, `set-metadata`). Default `item`; a Radio Group's
+   * is `item-control` (its `item` is a wrapper).
+   */
+  readonly item?: P
 }
 
 export interface ContractDef<

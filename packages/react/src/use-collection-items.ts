@@ -55,6 +55,9 @@ export function useCollectionItems(): {
       setCollection((prev) => (sameItems(prev, items) ? prev : toCollection(items))),
     ),
   )
+  // After the items' layout effects of this commit (a parent's run last): the collection
+  // is known in the same commit (no extra paint, and inside a test's act scope).
+  useLayoutEffect(() => registry.flush())
   return { collection, registry }
 }
 

@@ -24,13 +24,13 @@ A [Field](field.md) works in a plain `<form>` too; Form adds what needs the whol
 <!-- api:form -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Form.Root` | `root` | `<form>` | A native `<form>`; `novalidate` only in `aria` behaviour. |
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `validationMode` | `"submit" \| "blur" \| "change"` | — | Default mode for the Fields inside. |
 | `validationBehavior` | `"native" \| "aria"` | — | Default behaviour for the Fields inside; `aria` adds `novalidate`. |
@@ -44,7 +44,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "form" |
 | `root` | `data-part` | "root" |
@@ -54,7 +54,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### States
 
-| State |  |
+| State | Description |
 |---|---|
 | `idle` | Ready; also after a failed attempt. |
 | `validating` | A submission is held until every async check settles. |

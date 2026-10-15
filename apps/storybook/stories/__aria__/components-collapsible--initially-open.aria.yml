@@ -1,0 +1,2 @@
+- button "Details" [expanded]
+- text: Open from the first render, with no transition.

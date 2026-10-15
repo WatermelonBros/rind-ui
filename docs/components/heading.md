@@ -21,14 +21,14 @@ Heading is stateless: it has no machine.
 <!-- api:heading -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Heading` | `root` | `<h{level}>` | The heading: `h2` outside any section. |
 | `Heading.Level` | `—` | `<none>` | A section: sets the level of the headings below it. |
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `level` | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | — | On `Heading`: overrides the nesting. On `Heading.Level`: the level below it (default: one more than around it). |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: a non-heading gets `role="heading"` and `aria-level`, another `h1`–`h6` gets `aria-level`. |
@@ -37,7 +37,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "heading" |
 | `root` | `data-part` | "root" |

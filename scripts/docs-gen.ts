@@ -153,7 +153,7 @@ export function renderApi(meta: ComponentMeta): string {
     "### Anatomy",
     "",
     table(
-      ["Part", "`data-part`", "Element", ""],
+      ["Part", "`data-part`", "Element", "Description"],
       meta.parts.map((p) => [
         `\`${p.name}\``,
         `\`${p.part}\``,
@@ -165,7 +165,7 @@ export function renderApi(meta: ComponentMeta): string {
     "### Props",
     "",
     table(
-      ["Prop", "Type", "Default", ""],
+      ["Prop", "Type", "Default", "Description"],
       Object.entries(meta.props).map(([name, p]) => [
         `\`${name}\``,
         `\`${p.type}\``,
@@ -179,7 +179,7 @@ export function renderApi(meta: ComponentMeta): string {
     "### Data attributes",
     "",
     table(
-      ["Part", "Attribute", ""],
+      ["Part", "Attribute", "When"],
       Object.entries(meta.dataAttributes).flatMap(([part, attrs]) =>
         Object.entries(attrs).map(([attr, when]) => [`\`${part}\``, `\`${attr}\``, when]),
       ),
@@ -190,7 +190,7 @@ export function renderApi(meta: ComponentMeta): string {
           "### Keyboard",
           "",
           table(
-            ["Key", ""],
+            ["Key", "Action"],
             meta.keyboard.map(([key, what]) => [key, what]),
           ),
           "",
@@ -202,7 +202,7 @@ export function renderApi(meta: ComponentMeta): string {
       ? ["None: the component is stateless (no machine, no `testMachine`).", ""]
       : [
           table(
-            ["State", ""],
+            ["State", "Description"],
             Object.entries(meta.states ?? {}).map(([name, what]) => [`\`${name}\``, what]),
           ),
           "",

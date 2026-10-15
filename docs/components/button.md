@@ -13,13 +13,13 @@ import { Button } from "@rind-ui/react"
 <!-- api:button -->
 ### Anatomy
 
-| Part | `data-part` | Element |  |
+| Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `Button` | `root` | `<button>` | A native `<button type="button">` by default. |
 
 ### Props
 
-| Prop | Type | Default |  |
+| Prop | Type | Default | Description |
 |---|---|---|---|
 | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form by accident; rendered as `button` while pending. |
 | `disabled` | `boolean` | `false` | Native `disabled` on a `<button>`, `aria-disabled` elsewhere. |
@@ -35,7 +35,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Data attributes
 
-| Part | Attribute |  |
+| Part | Attribute | When |
 |---|---|---|
 | `root` | `data-scope` | "button" |
 | `root` | `data-part` | "root" |
@@ -50,7 +50,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### Keyboard
 
-| Key |  |
+| Key | Action |
 |---|---|
 | Enter | Activates it (follows the link when rendered as `<a href>`). |
 | Space | Activates it on release (not when rendered as a link). |
@@ -58,7 +58,7 @@ Every attribute of the rendered element is accepted and forwarded.
 
 ### States
 
-| State |  |
+| State | Description |
 |---|---|
 | `idle` | Ready: presses call `onPress`. |
 | `pending` | The `pending` prop is set: presses are ignored and focus stays. |
