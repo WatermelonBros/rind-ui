@@ -6,10 +6,14 @@ import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
+import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
 import * as heading from "./heading"
+import * as hiddenUntilFound from "./hidden-until-found"
+import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as link from "./link"
+import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
@@ -31,11 +35,15 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "checkbox-group": checkboxGroup,
   collapsible,
   field,
+  "focus-and-modality": focusAndModality,
   fieldset,
   form,
   heading,
+  "hidden-until-found": hiddenUntilFound,
+  "keyboard-and-rtl": keyboardAndRtl,
   label,
   link,
+  "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
   separator,
