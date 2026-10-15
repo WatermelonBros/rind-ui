@@ -73,6 +73,22 @@ a {
   border-radius: 6px;
 }
 
+/* Intro (components/intro.tsx): the page as the browser renders it with no CSS at all. */
+html.unstyled,
+html.unstyled body,
+html.unstyled body *:not([data-intro-drop], svg, svg *) {
+  /* biome-ignore lint/complexity/noImportantStyles: the raw page must beat every stylesheet, skins included */
+  all: revert !important;
+}
+html.unstyled body {
+  margin: 8px;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /* Scroll reveal (components/home/reveal.tsx; not data-reveal, which rind uses): content fades and lifts in once. */
 [data-scroll-reveal] {
   opacity: 0;

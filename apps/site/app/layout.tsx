@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Fredoka, Inter_Tight, JetBrains_Mono, Unbounded } from "next/font/google"
 import type { ReactNode } from "react"
 import { GooFilters } from "@/components/goo"
+import { Intro } from "@/components/intro"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "./globals.css"
@@ -42,16 +43,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
-        {/* Restore the phase before paint, so a juicy visitor never sees a crisp flash. */}
+        {/* Before paint: restore the phase (no crisp flash for a juicy visitor) and, on a first
+            visit of the landing, start unstyled for the intro. */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `try{var p=localStorage.getItem("rind-phase");if(p==="juicy")document.documentElement.dataset.phase=p}catch(e){}`,
+            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("unstyled")}catch(e){}`,
           }}
         />
       </head>
       <body>
         <GooFilters />
+        <Intro />
         <PhaseProvider>
           <header>
             <Nav />

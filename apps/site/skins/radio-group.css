@@ -1,0 +1,81 @@
+/* ── Radio Group: a dot that grows into its ring; items stack, or line up horizontally ── */
+[data-skin] [data-scope="radio-group"][data-part="root"] {
+  display: grid;
+  gap: 10px;
+}
+[data-skin] [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"] {
+  grid-auto-flow: column;
+  justify-content: start;
+  column-gap: 20px;
+}
+[data-skin]
+  [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"]
+  > :is([data-part="label"], [data-part="description"], [data-part="error-message"]) {
+  grid-column: 1 / -1;
+}
+[data-skin] [data-scope="radio-group"][data-part="label"] {
+  font-weight: 700;
+  font-size: 15px;
+}
+[data-skin] [data-scope="radio-group"][data-part="item"] {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 12px;
+}
+[data-skin] [data-scope="radio-group"][data-part="item-label"] {
+  font-weight: 500;
+  cursor: pointer;
+}
+[data-skin] [data-scope="radio-group"][data-part="item-description"] {
+  grid-column: 2;
+  font-size: 13.5px;
+  color: color-mix(in oklab, var(--s-ink) 74%, transparent);
+  margin: 2px 0 0;
+}
+[data-skin] [data-scope="radio-group"][data-part="item-control"] {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: var(--s-bw) solid var(--s-line);
+  background: var(--s-card);
+  cursor: pointer;
+  transition:
+    scale 0.45s var(--s-pop),
+    background 0.3s var(--s-ease);
+}
+[data-skin] [data-scope="radio-group"][data-part="item-control"][data-pressed] {
+  scale: 0.88;
+  transition-duration: 0.12s;
+}
+[data-skin] [data-scope="radio-group"][data-part="item-indicator"] {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--s-ink);
+  animation: s-radio-in 0.45s var(--s-pop);
+}
+@keyframes s-radio-in {
+  from {
+    scale: 0;
+  }
+}
+[data-skin="crisp"] [data-scope="radio-group"][data-part="item-control"][aria-checked="true"] {
+  background: var(--s-on);
+}
+[data-skin="juicy"] [data-scope="radio-group"][data-part="item-control"] {
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 2px #d6ccf7,
+    0 3px 0 #d6ccf7;
+}
+[data-skin="juicy"] [data-scope="radio-group"][data-part="item-control"][aria-checked="true"] {
+  background: var(--s-acc);
+  box-shadow: 0 3px 0 var(--s-acc-deep);
+}
+[data-skin="juicy"] [data-scope="radio-group"][data-part="item-indicator"] {
+  background: #fff;
+}

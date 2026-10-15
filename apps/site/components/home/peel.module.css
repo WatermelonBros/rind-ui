@@ -1,0 +1,185 @@
+.peel {
+  position: relative;
+  height: 320vh;
+  background: var(--paper);
+}
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) 1.2fr;
+  align-items: center;
+  gap: 40px;
+  padding: 0 56px;
+  overflow: hidden;
+}
+.step {
+  font: 600 13px var(--mono);
+  opacity: 0.75;
+}
+.title {
+  font: 900 clamp(40px, 5vw, 76px) / 0.95 var(--display);
+  letter-spacing: -0.035em;
+  margin: 14px 0 16px;
+  animation: in 0.6s var(--spring);
+}
+@keyframes in {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+}
+.text {
+  font: 500 19px / 1.5 var(--text);
+  max-width: 380px;
+}
+
+.scene {
+  position: relative;
+  height: 70vh;
+  display: grid;
+  place-items: center;
+}
+/* the camera starts close on the component and pulls back for the machine */
+.camera {
+  position: relative;
+  display: grid;
+  place-items: center;
+  scale: calc(1.9 - var(--p3) * 0.75);
+  translate: 0 calc(var(--p3) * -70px);
+}
+
+.layers {
+  position: relative;
+}
+.component {
+  padding: 30px 40px;
+  border-radius: 18px;
+}
+.under .component {
+  background: #fff;
+  border: 1px dashed #b4b4bb;
+}
+.skin {
+  position: absolute;
+  inset: 0;
+  /* peel from the bottom-right corner toward the top-left */
+  clip-path: polygon(0 0, calc(200% - var(--p1) * 200%) 0, 0 calc(200% - var(--p1) * 200%));
+}
+.skin .component[data-skin="crisp"] {
+  background: #d4ff3a;
+  border: 3px solid #0b0b0c;
+  box-shadow: 6px 6px 0 #0b0b0c;
+}
+.skin .component[data-skin="juicy"] {
+  background: #e9e2ff;
+  box-shadow: 0 6px 0 #c9bdf2;
+}
+/* the folded-back corner riding the peel line */
+.curl {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent calc(100% - var(--p1) * 100% - 6%),
+    #0002 calc(100% - var(--p1) * 100% - 1%),
+    #fff calc(100% - var(--p1) * 100%),
+    #f0f0f0 calc(100% - var(--p1) * 100% + 7%),
+    transparent calc(100% - var(--p1) * 100% + 7.5%)
+  );
+  opacity: calc(var(--p1) * (1 - var(--p1)) * 4);
+  border-radius: 18px;
+}
+
+.attrs {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+.attrs li {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  white-space: nowrap;
+  font: 600 11px var(--mono);
+  padding: 5px 9px;
+  border-radius: 99px;
+  background: #0b0b0c;
+  color: #f5f5ee;
+  translate: calc(-50% + var(--x) * var(--p2)) calc(-50% + var(--y) * var(--p2));
+  opacity: calc(var(--p2) * 1.4 - var(--p3) * 1.6);
+  scale: calc(0.6 + var(--p2) * 0.4);
+}
+.attrs b {
+  color: #d4ff3a;
+  font-weight: 600;
+}
+:global([data-phase="juicy"]) .attrs li {
+  background: #2a1d5c;
+}
+:global([data-phase="juicy"]) .attrs b {
+  color: #ff8fb1;
+}
+
+.graph {
+  position: absolute;
+  top: 100%;
+  width: 420px;
+  margin-top: 30px;
+  opacity: var(--p3);
+  translate: 0 calc((1 - var(--p3)) * 40px);
+  font: 600 12px var(--mono);
+}
+.graph rect {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 3;
+  transition: fill 0.4s var(--spring);
+}
+.graph g text {
+  fill: var(--ink);
+}
+.graph g[data-on] rect {
+  fill: var(--ink);
+}
+.graph g[data-on] text {
+  fill: var(--bg);
+}
+.edge {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+.graph .event {
+  fill: var(--ink);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 900px) {
+  .peel {
+    height: auto;
+  }
+  .sticky {
+    position: relative;
+    height: auto;
+    grid-template-columns: 1fr;
+    padding: 80px 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .peel {
+    height: auto;
+  }
+  .sticky {
+    position: relative;
+    height: auto;
+    padding: 100px 56px 160px;
+  }
+}

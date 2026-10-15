@@ -28,7 +28,7 @@
   color: var(--s-on);
 }
 [data-skin="juicy"] [data-scope="toggle"][data-part="root"] {
-  background: var(--s-muted);
+  background: #fff;
 }
 [data-skin="juicy"] [data-scope="toggle"][data-part="root"][aria-pressed="true"] {
   background: var(--s-acc);

@@ -126,6 +126,8 @@ async function invisibleText(page: Page, url: string) {
 const browser = await chromium.launch()
 for (const url of urls) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  // the landing intro plays once per session; audit the styled page
+  await page.addInitScript(() => sessionStorage.setItem("rind-intro", "1"))
   page.on("console", (m) => {
     if (m.type() === "error" || m.type() === "warning") report(url, `console.${m.type()}`, m.text())
   })
@@ -151,6 +153,18 @@ for (const url of urls) {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   )
   if (overflow > 1) report(url, "mobile-overflow", `${overflow}px wider than a 390px phone`)
+  await page.close()
+}
+// the intro itself: a first visit starts unstyled and ends styled
+{
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))
+  await page.goto(`${base}/`, { waitUntil: "domcontentloaded" })
+  const started = await page.evaluate(() => document.documentElement.classList.contains("unstyled"))
+  await page.waitForTimeout(3000)
+  const ended = await page.evaluate(() => !document.documentElement.classList.contains("unstyled"))
+  if (!started) report("/ (intro)", "intro", "a first visit did not start unstyled")
+  if (!ended) report("/ (intro)", "intro", "the intro never revealed the styled page")
   await page.close()
 }
 await browser.close()

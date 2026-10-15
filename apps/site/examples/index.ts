@@ -10,6 +10,7 @@ import * as form from "./form"
 import * as heading from "./heading"
 import * as label from "./label"
 import * as link from "./link"
+import * as radioGroup from "./radio-group"
 import * as switchEx from "./switch"
 import * as textField from "./text-field"
 import * as toggle from "./toggle"
@@ -31,6 +32,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   heading,
   label,
   link,
+  "radio-group": radioGroup,
   switch: switchEx,
   "text-field": textField,
   toggle,

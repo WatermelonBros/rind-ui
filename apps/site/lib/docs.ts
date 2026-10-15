@@ -45,14 +45,12 @@ const marked = new Marked({
 })
 
 /**
- * Wide tables scroll inside a focusable box named after the section it sits in; an empty header
- * cell (the API's notes column) gets a name.
+ * Wide tables scroll inside a focusable box named after the section it sits in.
  */
 function tables(html: string): string {
   let heading = "Table"
   const used = new Map<string, number>()
   return html
-    .replace(/<th>\s*<\/th>/g, "<th>Description</th>")
     .replace(/<h[23] id="[^"]*">(.*?)<\/h[23]>|<table>/g, (match, text: string | undefined) => {
       if (text !== undefined) {
         heading = text.replace(/<[^>]+>/g, "")
