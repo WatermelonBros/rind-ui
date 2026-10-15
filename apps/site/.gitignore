@@ -1,0 +1,6 @@
+.next
+out
+content/generated
+next-env.d.ts
+*.tsbuildinfo
+.next-dev

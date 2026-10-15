@@ -1,0 +1,220 @@
+.shell {
+  /* the landing is loud; reading pages sit on paper and keep the phase as accents */
+  background: var(--paper);
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  min-height: 100svh;
+}
+.main {
+  padding: 96px 48px 80px;
+  min-width: 0;
+}
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 760px) 200px;
+  gap: 48px;
+}
+.head {
+  margin-bottom: 28px;
+}
+.kicker {
+  font: 600 12px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+.title {
+  font: 900 clamp(44px, 6vw, 84px) / 0.95 var(--display);
+  letter-spacing: -0.03em;
+  margin: 10px 0 16px;
+}
+.summary {
+  font: 500 19px / 1.5 var(--text);
+  max-width: 640px;
+  opacity: 0.8;
+}
+.toc {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+  font: 500 13px var(--text);
+}
+.toc p {
+  font: 600 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+  margin-bottom: 8px;
+}
+.toc a {
+  display: block;
+  padding: 4px 0;
+  opacity: 0.75;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+.toc a:hover {
+  opacity: 1;
+}
+
+/* the long-form text: calm, readable; the phase only changes colours and corners */
+.prose {
+  font: 400 16.5px / 1.7 var(--text);
+}
+.prose :where(h2) {
+  font: 900 28px / 1.1 var(--display);
+  letter-spacing: -0.02em;
+  margin: 48px 0 14px;
+  scroll-margin-top: 90px;
+}
+.prose :where(h3) {
+  font: 700 19px / 1.3 var(--text);
+  margin: 30px 0 10px;
+  scroll-margin-top: 90px;
+}
+.prose :where(p, ul, ol) {
+  margin: 0 0 14px;
+}
+.prose :where(ul, ol) {
+  padding-left: 1.3em;
+}
+.prose :where(a) {
+  text-decoration: underline;
+  text-decoration-color: var(--acc);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.prose :where(code) {
+  font: 500 0.88em var(--mono);
+  background: color-mix(in oklab, var(--ink) 8%, transparent);
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+}
+.prose :where(pre) {
+  background: #0b0b0c;
+  color: #e8e8e3;
+  border-radius: var(--r);
+  border: var(--bw) solid var(--line);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 20px;
+  overflow-x: auto;
+  margin: 18px 0 22px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.prose :where(pre code) {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+:global([data-phase="juicy"]) .prose :where(pre) {
+  background: #2a1d5c;
+}
+.prose :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin: 12px 0 24px;
+  display: block;
+  overflow-x: auto;
+}
+.prose :where(th) {
+  text-align: left;
+  font: 600 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--ink);
+}
+.prose :where(td) {
+  padding: 9px 10px;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 15%, transparent);
+  vertical-align: top;
+}
+.prose :where(td code) {
+  white-space: nowrap;
+}
+
+/* highlight.js tokens, tuned to the two phases */
+.prose :global(.hljs-keyword),
+.prose :global(.hljs-built_in) {
+  color: #ff7ab0;
+}
+.prose :global(.hljs-string),
+.prose :global(.hljs-attr) {
+  color: #d4ff3a;
+}
+.prose :global(.hljs-title),
+.prose :global(.hljs-name),
+.prose :global(.hljs-tag) {
+  color: #9be7ff;
+}
+.prose :global(.hljs-comment) {
+  color: #8a8a80;
+  font-style: italic;
+}
+.prose :global(.hljs-number),
+.prose :global(.hljs-literal) {
+  color: #ffd84d;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+  margin: 18px 0 40px;
+}
+.card {
+  display: block;
+  text-decoration: none;
+  background: var(--card);
+  border: var(--bw) solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+  transition:
+    translate 0.45s var(--spring),
+    box-shadow 0.45s var(--spring);
+}
+.card:hover {
+  translate: -2px -3px;
+  box-shadow: var(--shadow);
+}
+.card strong {
+  font: 900 20px var(--display);
+  letter-spacing: -0.02em;
+}
+.card span {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  opacity: 0.7;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sectionTitle {
+  font: 900 30px var(--display);
+  letter-spacing: -0.02em;
+  margin-top: 30px;
+  scroll-margin-top: 90px;
+}
+
+@media (max-width: 1100px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .toc {
+    display: none;
+  }
+}
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .main {
+    padding: 32px 16px 64px;
+  }
+}

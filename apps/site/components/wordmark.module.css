@@ -1,0 +1,230 @@
+.word {
+  display: flex;
+  gap: 0.05em;
+  font: 900 clamp(96px, 15.5vw, 250px) / 0.9 var(--display);
+  letter-spacing: -0.03em;
+  margin-left: -0.04em;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.l {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  transition:
+    translate 0.7s var(--spring),
+    text-shadow 0.7s var(--spring),
+    scale 0.7s var(--spring-pop);
+}
+
+/* idle loops: slow and small, so the logo breathes instead of twitching */
+.l[data-letter="r"] {
+  animation: hover 4.8s var(--spring) infinite;
+}
+@keyframes hover {
+  0%,
+  45%,
+  100% {
+    translate: 0 0;
+    text-shadow: 0 0 0 var(--acc);
+  }
+  58%,
+  86% {
+    translate: -0.02em -0.035em;
+    text-shadow: 0.045em 0.045em 0 var(--acc);
+  }
+}
+.l[data-letter="n"]::after {
+  content: "";
+  position: absolute;
+  inset: 0.13em -0.06em -0.02em;
+  border: 0.028em solid var(--acc);
+  border-radius: 0.12em;
+  animation: ring 3.6s ease-in-out infinite;
+  transition: opacity 0.4s;
+}
+@keyframes ring {
+  50% {
+    inset: 0.1em -0.09em -0.05em;
+    opacity: 0.55;
+  }
+}
+.l[data-letter="d"] {
+  animation: press 3s infinite;
+}
+@keyframes press {
+  0%,
+  62%,
+  100% {
+    scale: 1 1;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  70% {
+    scale: 1.035 0.9;
+    animation-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+}
+
+/* pointer: the touched letter eases into a lift; a press is a soft squash */
+.l[data-live] {
+  animation: none;
+  translate: -0.02em -0.035em;
+  text-shadow: 0.045em 0.045em 0 var(--acc);
+}
+.l[data-live][data-down] {
+  scale: 1.03 0.92;
+  transition:
+    translate 0.7s var(--spring),
+    text-shadow 0.7s var(--spring),
+    scale 0.22s var(--spring);
+}
+
+.chip {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  translate: -50% 14px;
+  font: 600 12px / 1 var(--mono);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-shadow: none;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 6px 9px;
+  border-radius: 99px;
+  transition: opacity 0.4s;
+}
+
+/* the i keeps its dot, drawn as an element so it can be dragged */
+.dot {
+  position: absolute;
+  left: 50%;
+  top: 0.022em;
+  width: 0.285em;
+  height: 0.228em;
+  margin-left: -0.1425em;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: grab;
+  touch-action: none;
+  animation: tug 5.2s infinite;
+}
+.dot[data-held] {
+  animation: none;
+  cursor: grabbing;
+}
+.dot[data-spring] {
+  transition: translate 0.9s var(--spring-pop);
+}
+@keyframes tug {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  70% {
+    translate: 0.1em -0.14em;
+    animation-timing-function: cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  74% {
+    translate: 0.1em -0.14em;
+  }
+}
+
+.drop {
+  position: absolute;
+  left: 40%;
+  top: 0.78em;
+  width: 0.09em;
+  height: 0.09em;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+}
+.l[data-letter="r"] .drop {
+  left: 0.12em;
+}
+.l[data-letter="i"] .drop {
+  display: none;
+}
+.l[data-letter="n"] .drop {
+  left: 0.52em;
+  animation-delay: -1.4s;
+}
+.l[data-letter="d"] .drop {
+  left: 0.3em;
+  animation-delay: -2.4s;
+}
+
+/* juicy: goo + puffy depth, letters wobble out of phase, drips fall and rejoin */
+:global([data-phase="juicy"]) .word {
+  filter: url(#goo) drop-shadow(0 0.03em 0 #e0608a) drop-shadow(0 0.08em 0.07em #5a3db033);
+  color: var(--acc);
+}
+:global([data-phase="juicy"]) .chip {
+  opacity: 0;
+}
+:global([data-phase="juicy"]) .l {
+  animation: wobble 4.2s ease-in-out infinite;
+  text-shadow: none;
+}
+:global([data-phase="juicy"]) .l[data-letter="i"] {
+  animation-delay: -1s;
+}
+:global([data-phase="juicy"]) .l[data-letter="n"] {
+  animation-delay: -2s;
+}
+:global([data-phase="juicy"]) .l[data-letter="d"] {
+  animation-delay: -3s;
+}
+@keyframes wobble {
+  0%,
+  100% {
+    scale: 1 1;
+    translate: 0 0;
+  }
+  30% {
+    scale: 1.035 0.95;
+    translate: 0 0;
+  }
+  62% {
+    scale: 0.98 1.035;
+    translate: 0 -0.025em;
+  }
+}
+:global([data-phase="juicy"]) .l[data-letter="n"]::after {
+  opacity: 0;
+}
+:global([data-phase="juicy"]) .l[data-live] {
+  animation: none;
+  translate: 0 -0.03em;
+  scale: 1.06 0.94;
+  text-shadow: none;
+}
+:global([data-phase="juicy"]) .l[data-live][data-down] {
+  scale: 1.12 0.82;
+}
+:global([data-phase="juicy"]) .dot {
+  top: -0.07em;
+  animation-duration: 6s;
+}
+:global([data-phase="juicy"]) .drop {
+  opacity: 1;
+  animation: drip 4s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+}
+@keyframes drip {
+  0%,
+  15% {
+    transform: translateY(0);
+  }
+  55% {
+    transform: translateY(0.16em);
+  }
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+}

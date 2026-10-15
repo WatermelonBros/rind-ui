@@ -1,0 +1,31 @@
+.marquee {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  overflow: hidden;
+  border-top: var(--bw) solid var(--line);
+  background: var(--bg);
+  font: 600 14px var(--mono);
+  padding: 14px 0;
+}
+.track {
+  display: flex;
+  gap: 44px;
+  width: max-content;
+  animation: scroll 60s linear infinite;
+}
+.track span::before {
+  content: "◆ ";
+  color: var(--acc);
+}
+@keyframes scroll {
+  to {
+    translate: -50% 0;
+  }
+}
+:global([data-phase="juicy"]) .marquee {
+  background: #fff;
+  box-shadow: 0 -6px 0 var(--soft);
+}

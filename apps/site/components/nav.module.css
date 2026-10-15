@@ -1,0 +1,88 @@
+.nav {
+  position: fixed;
+  inset: 20px 28px auto;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font: 600 14px var(--mono);
+}
+.nav a {
+  text-decoration: none;
+  position: relative;
+}
+.nav a:not(.mini)::after {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  border: 2px solid var(--acc);
+  border-radius: 99px;
+  opacity: 0;
+  scale: 0.85;
+  transition:
+    opacity 0.35s var(--spring),
+    scale 0.45s var(--spring);
+}
+.nav a:not(.mini):hover::after {
+  opacity: 1;
+  scale: 1;
+}
+.mini {
+  font: 900 26px / 1 var(--display);
+  letter-spacing: -0.02em;
+  margin-right: auto;
+}
+.mini span {
+  color: var(--acc);
+}
+.phase {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 4px;
+}
+.label {
+  text-transform: lowercase;
+}
+.track {
+  width: 58px;
+  height: 32px;
+  border-radius: 99px;
+  background: var(--ink);
+  position: relative;
+  transition: background 0.4s var(--spring);
+}
+.thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--on);
+  transition:
+    translate 0.6s var(--spring),
+    border-radius 0.6s var(--spring);
+}
+.phase[aria-pressed="true"] .track {
+  background: var(--acc);
+}
+.phase[aria-pressed="true"] .thumb {
+  translate: 26px 0;
+  border-radius: 45% 55% 50% 50%;
+}
+
+@media (max-width: 760px) {
+  .nav {
+    gap: 16px;
+    inset: 14px 16px auto;
+  }
+  .nav > a:not(.mini) {
+    display: none;
+  }
+}

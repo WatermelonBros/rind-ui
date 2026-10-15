@@ -1,0 +1,32 @@
+.wipe {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  filter: url(#goo-curtain);
+}
+.curtain {
+  position: absolute;
+  left: -10vw;
+  right: -10vw;
+  top: 0;
+  height: 130vh;
+  translate: 0 -160vh;
+  animation: pour 1.4s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+}
+.curtain i {
+  position: absolute;
+  border-radius: 50%;
+}
+@keyframes pour {
+  0% {
+    translate: 0 -160vh;
+  }
+  40%,
+  60% {
+    translate: 0 -15vh;
+  }
+  100% {
+    translate: 0 150vh;
+  }
+}

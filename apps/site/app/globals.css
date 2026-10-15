@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/* Two phases of the same identity. crisp: acid, hard edges, offset shadows.
+   juicy: pastel, inflated, squishy. Everything reads these tokens. */
+:root,
+[data-phase="crisp"] {
+  --bg: #d4ff3a;
+  --ink: #0b0b0c;
+  --acc: #ff3d8b;
+  --acc-deep: #c8195f;
+  --card: #ffffff;
+  --line: #0b0b0c;
+  --on: #d4ff3a;
+  --soft: #0b0b0c;
+  --muted: #e9e9e2;
+  --paper: #f5f5ee;
+  --r: 18px;
+  --bw: 3px;
+  --shadow: 8px 8px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+  --text: var(--font-inter), system-ui, sans-serif;
+  --btn-r: 99px;
+}
+[data-phase="juicy"] {
+  --bg: #e9e2ff;
+  --ink: #2a1d5c;
+  --acc: #ff8fb1;
+  --acc-deep: #e0608a;
+  --card: #ffffff;
+  --line: transparent;
+  --on: #ffffff;
+  --soft: #c9bdf2;
+  --muted: #f1ecff;
+  --paper: #f8f5ff;
+  --r: 30px;
+  --bw: 0px;
+  --shadow: 0 8px 0 #c9bdf2, 0 28px 48px #5a3db02e;
+  --shadow-sm: 0 5px 0 #c9bdf2;
+  --text: var(--font-fredoka), system-ui, sans-serif;
+  --btn-r: 22px;
+}
+
+:root {
+  --display: var(--font-unbounded), sans-serif;
+  --mono: var(--font-mono), ui-monospace, monospace;
+  /* one soft spring for every interaction: settles without bouncing around */
+  --spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring-pop: cubic-bezier(0.34, 1.35, 0.64, 1);
+  color-scheme: light;
+}
+
+html {
+  background: var(--bg);
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+::selection {
+  background: var(--acc);
+  color: #fff;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* While the curtain covers the page every transition is off: the new phase must be fully
+   painted before the reveal, never still fading from the old one. */
+.flipping *,
+.flipping *::before,
+.flipping *::after {
+  /* biome-ignore lint/complexity/noImportantStyles: must beat every component's own transition */
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every animation */
+    animation: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every transition */
+    transition: none !important;
+  }
+}
