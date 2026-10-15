@@ -1,0 +1,12 @@
+name = "rind-site"
+compatibility_date = "2025-06-01"
+
+# Static export from `next build` (output: "export") served by a Worker, like reado-web.
+# Deployed by Cloudflare Workers Builds (Git integration) on every push to main, from the
+# repository root: build `pnpm --filter @rind-ui/site build`,
+# deploy `npx wrangler deploy --config apps/site/wrangler.toml`.
+routes = [{ pattern = "rind.watermelon-studio.it", custom_domain = true }]
+
+[assets]
+directory = "./out"
+not_found_handling = "404-page"
