@@ -1,3 +1,8 @@
+export {
+  type CollectionContractOptions,
+  type CollectionPart,
+  collectionContract,
+} from "./collection"
 export type {
   ActionArgsOf,
   ActionDef,
@@ -21,5 +26,15 @@ export type {
   Trait,
 } from "./contract"
 export { contract } from "./contract"
-export type { AriaRole, By, Env, Key, KeyOptions, Modality, Part, PartHoverOptions } from "./env"
+export type {
+  AriaRole,
+  By,
+  ClickOptions,
+  Env,
+  Key,
+  KeyOptions,
+  Modality,
+  Part,
+  PartHoverOptions,
+} from "./env"
 export type { GenericInvariantId } from "./invariant-ids"

@@ -1,3 +1,4 @@
+import { collectionLayout } from "../dom/collection-layout"
 import { liveAnnouncer } from "../dom/live-announcer"
 import { modalityTracker } from "../dom/modality"
 import { motionPreference } from "../dom/motion"
@@ -6,6 +7,8 @@ import { documentLocale, fixedLocale } from "../i18n/locale"
 import type {
   Announcer,
   AnnouncerEnv,
+  ClockEnv,
+  CollectionLayoutEnv,
   DomEnv,
   DomRoot,
   Engine,
@@ -29,7 +32,9 @@ export type DomEnvironment = SchedulerEnv &
   MotionEnv &
   StyleEnv &
   LocaleEnv &
-  AnnouncerEnv
+  AnnouncerEnv &
+  ClockEnv &
+  CollectionLayoutEnv
 
 export interface DomEnvironmentOptions {
   /** The document or shadow root the component lives in (default: `document`). */
@@ -112,5 +117,8 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
       typeof options.announcer === "object"
         ? options.announcer
         : liveAnnouncer({ scheduler, dom }, { backend: options.announcer ?? "live-region" }),
+    // Looked up at call time, like the timers, so fake clocks installed later drive it.
+    clock: { now: () => globalThis.performance?.now() ?? Date.now() },
+    layout: collectionLayout(dom),
   }
 }

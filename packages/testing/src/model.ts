@@ -97,6 +97,7 @@ type Mapping =
       readonly kind: "action"
       readonly action: string
       readonly args?: (view: unknown) => readonly unknown[]
+      readonly event?: ((view: unknown) => Readonly<Record<string, unknown>>) | undefined
     }
   | { readonly kind: "props"; readonly props: (target: string) => Props }
   | { readonly kind: "delay" }
@@ -119,13 +120,22 @@ function mappingOf(contract: AnyContract, edge: GraphEdge): Mapping | undefined 
     | string
     | { readonly skip: string }
     | { readonly props: (target: string) => Props }
-    | { readonly action: string; readonly args: (view: unknown) => readonly unknown[] }
+    | {
+        readonly action: string
+        readonly args?: (view: unknown) => readonly unknown[]
+        readonly event?: (view: unknown) => Readonly<Record<string, unknown>>
+      }
     | undefined
   if (m === undefined) return undefined
   if (typeof m === "string") return { kind: "action", action: m }
   if ("skip" in m) return { kind: "skip", reason: m.skip }
   if ("props" in m) return { kind: "props", props: m.props }
-  return { kind: "action", action: m.action, args: m.args }
+  return {
+    kind: "action",
+    action: m.action,
+    ...(m.args ? { args: m.args } : {}),
+    event: m.event,
+  }
 }
 
 const walkable = (contract: AnyContract, canRerender: boolean) => (edge: GraphEdge) => {
@@ -169,6 +179,12 @@ const modalitiesOf = (action: object): Modality[] => {
 }
 
 /** The modality a step runs in: the path's, or the action's keyboard twin, then pointer. */
+/** The item count of a `collection` prop (a rind-ui Collection has a numeric `size`). */
+const collectionSizeOf = (props: unknown): { collectionSize?: number } => {
+  const c = (props as { collection?: { size?: unknown } } | null)?.collection
+  return typeof c?.size === "number" ? { collectionSize: c.size } : {}
+}
+
 const stepModality = (action: object, modality: Modality): Modality => {
   const own = modalitiesOf(action)
   if (own.includes(modality)) return modality
@@ -235,6 +251,37 @@ const taken = (edge: GraphEdge, type: string, log: readonly Step[]) =>
  * no timers; delays are sent as `after:<delay>` events). Guards read props through a proxy
  * that records which ones they read.
  */
+/**
+ * The oracle's environment: a real clock (typeahead timeouts agree with the page's), the
+ * default locale, nothing to measure, focus or announce.
+ */
+const oracleEnv = {
+  clock: { now: () => globalThis.performance?.now() ?? Date.now() },
+  locale: { locale: () => new Intl.Collator().resolvedOptions().locale, dir: () => "ltr" },
+  platform: {
+    engine: "blink",
+    apple: false,
+    mac: false,
+    ios: false,
+    android: false,
+    windows: false,
+    webkit: false,
+    chromium: true,
+    firefox: false,
+  },
+  layout: { pageTarget: () => null },
+  dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
+  announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  modality: {
+    modality: () => "keyboard",
+    subscribe: () => () => {},
+    focusCause: () => "other",
+    markFocus: () => {},
+    unmarkFocus: () => {},
+    recentFocus: () => [],
+  },
+}
+
 function createOracle(contract: AnyContract, initial: Props) {
   const reads = new Set<string>()
   let inGuard = false
@@ -261,8 +308,9 @@ function createOracle(contract: AnyContract, initial: Props) {
       },
     })
   const machine = { ...contract.machine, impl: { ...impl, guards } }
-  // The oracle only needs the erased shape; its env is never read because it never starts.
-  const service = createService(machine as AnyMachine, track(initial) as never, {} as never)
+  // The oracle never starts (no effects); actions that reach the environment (a clock for
+  // typeahead, page layout, focus and announcements) get an inert one.
+  const service = createService(machine as AnyMachine, track(initial) as never, oracleEnv as never)
   const log: Step[] = []
   service.inspect((s) => log.push(s))
   let props = initial
@@ -309,8 +357,10 @@ function plan(
     const action = m?.kind === "action" ? actions[m.action] : undefined
     if (m?.kind === "props")
       oracle.setProps({ ...oracle.props, ...m.props(edge.target ?? edge.source) })
-    else if (action) oracle.send(edge.event, { modality: stepModality(action, modality) })
-    else oracle.send(edge.event)
+    else if (action && m?.kind === "action") {
+      const payload = m.event?.(oracle.service.view()) ?? {}
+      oracle.send(edge.event, { ...payload, modality: stepModality(action, modality) })
+    } else oracle.send(edge.event)
     if (!taken(edge, stepEvent(contract.machine, edge), oracle.log.slice(before))) {
       for (const r of oracle.reads) reads.add(r)
       // Kept as the last step: the runner checks the component stays where the oracle
@@ -738,6 +788,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       traits: contract.traits,
       semantics: { ...contract.semantics },
       values: oracle.service.view().values as Record<string, unknown>,
+      context: oracle.service.getSnapshot().context as Record<string, unknown>,
+      ...collectionSizeOf(oracle.props),
       modality: stepModality,
       platform,
       stepAnnouncements: (await base.announcements()).slice(announcedBefore),
@@ -953,7 +1005,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
               from,
             )
           }
-          send(edge.event, { modality: stepMod })
+          send(edge.event, { ...mapping.event?.(oracle.service.view()), modality: stepMod })
           try {
             await runAction(
               contract,

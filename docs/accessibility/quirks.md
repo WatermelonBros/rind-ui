@@ -10,13 +10,14 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 | Module | Quirks |
 |---|---|
+| `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
 | `packages/core/src/dom/keyboard.ts` | `safari-ime-commit-enter` |
 | `packages/core/src/dom/modality.ts` | `ios-vo-zero-size-pointer`, `chromium-at-click-1x1` |
 | `packages/core/src/dom/press.ts` | `webkit-menuitem-double-click`, `macos-meta-keyup` |
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
-| `packages/testing/src/invariants.ts` | `vo-section-entry`, `vo-activedescendant` |
+| `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `ios-vo-zero-size-pointer`
 
@@ -86,7 +87,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/chakra-ui/zag/issues/2936>, <https://github.com/adobe/react-spectrum/issues/10326>, <https://github.com/mui/base-ui/issues/5721>, <https://github.com/adobe/react-spectrum/pull/10503>
 - Repro test: `packages/core/src/dom/quirks.test.ts`
-- Checked in: `packages/testing/src/invariants.ts`
+- Checked in: `packages/core/src/collection/machine.ts`, `packages/testing/src/invariants.ts`
 - Allowed contract exceptions: `announcement-parity`
 - Last verified: 2026-10-14
 - Remove when: VoiceOver in Safari announces aria-activedescendant changes on macOS and iOS

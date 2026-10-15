@@ -5,6 +5,7 @@
 
 import {
   type By,
+  type ClickOptions,
   KEY_DEBOUNCE_MS,
   type Key,
   type KeyOptions,
@@ -21,7 +22,7 @@ export interface UserLike {
   click(element: Element): Promise<unknown>
   hover(element: Element): Promise<unknown>
   keyboard(text: string): Promise<unknown>
-  type(element: Element, text: string): Promise<unknown>
+  type(element: Element, text: string, options?: { skipClick?: boolean }): Promise<unknown>
   /** user-event only; used for distinct coordinates and touch. */
   pointer?(actions: unknown): Promise<unknown>
 }
@@ -77,6 +78,7 @@ const KEY_NAMES: Record<Key, string> = {
   Delete: "{Delete}",
   F10: "{F10}",
   ContextMenu: "{ContextMenu}",
+  A: "a",
 }
 
 function keyText(key: Key, options: KeyOptions = {}, apple = false): string {
@@ -260,12 +262,37 @@ function createDomEnv(
     const now = async () => single(await resolve())
     const waitFor = async () =>
       single(await until(resolve, (found) => found.length > 0).catch(async () => resolve()))
-    const bareClick = (el: Element) =>
+    const modifiers = (o: ClickOptions = {}) => ({
+      shiftKey: o.shift === true,
+      ctrlKey: o.mod === true && !apple,
+      metaKey: o.mod === true && apple,
+    })
+    const bareClick = (el: Element, o?: ClickOptions) =>
       act(() =>
         el.dispatchEvent(
-          new MouseEvent("click", { bubbles: true, cancelable: true, composed: true, detail: 0 }),
+          new MouseEvent("click", {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            detail: 0,
+            ...modifiers(o),
+          }),
         ),
       )
+    /** Holds the modifiers (user-event keyboard state) around a press. */
+    const held = async (o: ClickOptions | undefined, run: () => Promise<unknown>) => {
+      const keys = [o?.shift ? "Shift" : null, o?.mod ? (apple ? "Meta" : "Control") : null].filter(
+        (k): k is string => k !== null,
+      )
+      if (keys.length === 0) return run()
+      const u = await getUser()
+      await act(() => u.keyboard(keys.map((k) => `{${k}>}`).join("")))
+      try {
+        return await run()
+      } finally {
+        await act(() => u.keyboard(keys.map((k) => `{/${k}}`).join("")))
+      }
+    }
     const press = async (el: Element, touch: boolean) => {
       const u = await getUser()
       if (!u.pointer) return act(() => u.click(el))
@@ -280,9 +307,10 @@ function createDomEnv(
       return act(() => u.pointer?.(steps))
     }
     const part: Part = {
-      async click() {
+      async click(options) {
         const el = await waitFor()
-        return modality === "virtual" ? bareClick(el) : press(el, false)
+        if (modality === "virtual") return bareClick(el, options)
+        await held(options, () => press(el, false))
       },
       async tap() {
         const el = await waitFor()
@@ -323,7 +351,15 @@ function createDomEnv(
       async type(text) {
         const el = await waitFor()
         const u = await getUser()
-        await act(() => u.type(el, text))
+        // A focused part that is not a text field is typed into without a click first (the
+        // click would press it, e.g. select a listbox option). Text fields keep the click,
+        // which puts the caret at the end.
+        const textEntry =
+          el instanceof HTMLInputElement ||
+          el instanceof HTMLTextAreaElement ||
+          (el instanceof HTMLElement && el.isContentEditable)
+        const skipClick = doc().activeElement === el && !textEntry
+        await act(() => u.type(el, text, skipClick ? { skipClick: true } : undefined))
       },
       async compose(updates, commit) {
         const el = await waitFor()

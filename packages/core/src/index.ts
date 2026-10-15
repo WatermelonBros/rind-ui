@@ -1,4 +1,5 @@
 export * from "./a11y"
+export * from "./collection"
 export * from "./connect"
 export * from "./contract"
 export * from "./dom"

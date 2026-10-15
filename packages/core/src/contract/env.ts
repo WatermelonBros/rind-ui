@@ -19,6 +19,8 @@ export type Key =
   | "Delete"
   | "F10"
   | "ContextMenu"
+  /** The letter A, for the select-all shortcut (mod+A). */
+  | "A"
 
 export interface KeyOptions {
   readonly shift?: boolean
@@ -48,9 +50,16 @@ export type By =
   | { readonly role: AriaRole; readonly name?: string | RegExp }
   | { readonly text: string | RegExp }
 
+/** Modifier keys held during a click (Shift+click extends, mod+click toggles a selection). */
+export interface ClickOptions {
+  readonly shift?: boolean
+  /** Ctrl on Windows/Linux, Meta on macOS (per the driver's platform). */
+  readonly mod?: boolean
+}
+
 /** A lazy handle, like a Playwright Locator: resolved on every call, never cached. */
 export interface Part {
-  click(): Promise<void>
+  click(options?: ClickOptions): Promise<void>
   tap(): Promise<void>
   hover(options?: PartHoverOptions): Promise<void>
   focus(): Promise<void>

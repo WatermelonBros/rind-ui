@@ -68,7 +68,13 @@ export type EventMapping<A> =
   | {
       readonly [K in Extract<keyof A, string>]: {
         readonly action: K
-        readonly args: (view: View) => ActionArgsOf<A[K]>
+        /** Default: none (an action without arguments). */
+        readonly args?: (view: View) => ActionArgsOf<A[K]>
+        /**
+         * The event's payload as the oracle receives it (`{ move: "next" }` for NAVIGATE),
+         * from the view before the step; the action produces the same event in the page.
+         */
+        readonly event?: (view: View) => Readonly<Record<string, unknown>>
       }
     }[Extract<keyof A, string>]
 

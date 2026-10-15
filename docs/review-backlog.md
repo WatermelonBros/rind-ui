@@ -7,6 +7,14 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-overlay-infrastructure (found during add-collections) | — | packages/core/src/dom/presence.dom.test.ts | **CI risk**: "waits for the animation that replaces a cancelled one (retarget)" flakes in WebKit under full-suite load (passes 5/5 alone) — stabilise (deterministic animation control) before CI runs WebKit on every PR |
+| add-collections (r1) | — | packages/core/src/collection/composite.ts:66 | `tabStop` doesn't map a hidden HIGHLIGHTED node to its nearest visible ancestor (spec: selected or highlighted); transient (repair follows) |
+| add-collections (r1) | — | packages/core/src/collection/typeahead.ts:70 | Repeated-character detection is case-sensitive ("d","D","d" over Dog/Duck/Deer resets); compare case-folded |
+| add-collections (r1) | — | packages/testing/src/invariants.ts (composite-roving) | Container fallback accepts any non-item part with tabindex=0 and doesn't flag container+item both as stops; restrict to part==="list" and assert exactly one stop |
+| add-collections (r1) | — | packages/testing/src/invariants.ts:268-276 | focus-kept excuses leaving whenever from !== state (any state change excuses focus landing anywhere); new branch untested — narrow it |
+| add-collections (r1) | — | collections tests | Reset-after-blur only at action level; no fast-key-press test; controlled-selection test passes the anchor by hand (not a new array per change); model test runs roving only (activedescendant never against the fixture); set-metadata size check exempts trees |
+| add-collections (r1) | — | packages/react/src/use-collection-items.ts:70-87 | Static item default textValue read once at flush; content change with same key/deps leaves it stale (code read) |
+| add-collections (r1) | — | packages/core/src/dom/pointer-guard.ts | First-ever pointer move treated as real movement: a keyboard-opened popup under a resting pointer can lose its highlight to the first synthetic zero-delta move (code read) |
 | add-overlay-infrastructure (verification) | — | packages/core/src/dom/inert-outside.ts | `existing = new WeakSet(body.querySelectorAll("*"))` is O(DOM size) per outermost modal open; nodes added between open and content mount count as pre-existing; "kept elements changed" re-walk has no jsdom test |
 | add-overlay-infrastructure (r1) | — | packages/core/src/dom/dismiss.ts:177 | `pressing` stays true if pointerup goes to another document (released over an iframe) → outside-focus dismissal disabled until the next pointer event |
 | add-overlay-infrastructure (r1) | — | packages/core/src/dom/modality.ts:248, focus-restore.ts:55 | recentFocus() returns [] unless a tracker subscriber exists and history is wiped when the last subscriber leaves; overlayEffect never subscribes (fixture hides it with a no-op subscribe); contradictory comment in the react-spectrum#2444 test |

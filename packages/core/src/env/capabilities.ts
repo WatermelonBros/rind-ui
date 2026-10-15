@@ -1,4 +1,5 @@
 import type { FocusCause } from "../a11y/events"
+import type { CollectionKey } from "../collection/key"
 import type { Modality } from "../contract/env"
 
 // Small capability interfaces a machine's environment is assembled from (ISP): a machine
@@ -115,4 +116,31 @@ export interface AnnouncerEnv {
 }
 export interface StyleEnv {
   readonly style: StyleInjection
+}
+
+// --- Collection capabilities (add-collections) ---
+
+/** Monotonic time in milliseconds (typeahead timeouts without timers). */
+export interface Clock {
+  now(): number
+}
+export interface ClockEnv {
+  readonly clock: Clock
+}
+
+/** Measured layout of a collection's items, for page moves. */
+export interface CollectionLayout {
+  /**
+   * The key a page move from `key` reaches in the list element `listId` (a visible area
+   * further), or null when layout cannot be measured (jsdom, zero rects): the machine then
+   * moves 10 items.
+   */
+  pageTarget(
+    listId: string,
+    key: CollectionKey,
+    direction: "next" | "previous",
+  ): CollectionKey | null
+}
+export interface CollectionLayoutEnv {
+  readonly layout: CollectionLayout
 }

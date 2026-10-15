@@ -3,7 +3,7 @@
 // Names, visibility and DOM snapshots are computed in the page by the same code the DOM
 // adapter imports (`dist/inpage.iife.js`, injected once per document).
 
-import type { Announcement, By, Key, KeyOptions, Part } from "@rind-ui/core"
+import type { Announcement, By, ClickOptions, Key, KeyOptions, Part } from "@rind-ui/core"
 import type { Frame, FrameLocator, Locator, Page } from "playwright"
 import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
 import type { DomSnapshot } from "../collect"
@@ -37,6 +37,7 @@ const PW_KEYS: Record<Key, string> = {
   Delete: "Delete",
   F10: "F10",
   ContextMenu: "ContextMenu",
+  A: "a",
 }
 const keyName = (key: Key, o: KeyOptions = {}, apple?: boolean) =>
   [
@@ -236,14 +237,31 @@ function createPlaywrightEnv(
       ).catch(() => 0)
       return single(l)
     }
-    const activate = async (touch: boolean) => {
+    const activate = async (touch: boolean, o: ClickOptions = {}) => {
       const l = await waitFor()
+      const mods = [
+        o.shift ? ("Shift" as const) : null,
+        o.mod
+          ? apple === undefined
+            ? ("ControlOrMeta" as const)
+            : apple
+              ? ("Meta" as const)
+              : ("Control" as const)
+          : null,
+      ].filter((m) => m !== null)
       // Assistive technology activates with a bare click: detail 0, nothing before it.
-      if (modality === "virtual") return l.dispatchEvent("click", { detail: 0 })
-      return touch ? l.tap() : l.click()
+      if (modality === "virtual") {
+        return l.dispatchEvent("click", {
+          detail: 0,
+          shiftKey: o.shift === true,
+          ctrlKey: o.mod === true && !apple,
+          metaKey: o.mod === true && apple,
+        })
+      }
+      return touch ? l.tap({ modifiers: mods }) : l.click({ modifiers: mods })
     }
     const part: Part = {
-      click: () => activate(false),
+      click: (options) => activate(false, options),
       tap: () => activate(true),
       hover: async (hoverOptions) => {
         const l = await waitFor()
@@ -261,7 +279,30 @@ function createPlaywrightEnv(
         }
         await l.press(keyName(key, keyOptions, apple))
       },
-      type: async (text) => (await waitFor()).pressSequentially(text),
+      async type(text) {
+        const l = await waitFor()
+        // Like the DOM adapter (and a click on a text field): the caret goes to the end, so
+        // text is appended; a script-focused input otherwise has its caret at 0.
+        await l.evaluate((el) => {
+          if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+            if (el.ownerDocument.activeElement !== el) el.focus()
+            const end = el.value.length
+            try {
+              el.setSelectionRange(end, end)
+            } catch {
+              // Input types without a selection (number, email): the caret cannot be placed.
+            }
+          } else if (el instanceof HTMLElement && el.isContentEditable) {
+            el.focus()
+            const range = el.ownerDocument.createRange()
+            range.selectNodeContents(el)
+            range.collapse(false)
+            el.ownerDocument.getSelection()?.removeAllRanges()
+            el.ownerDocument.getSelection()?.addRange(range)
+          }
+        })
+        await l.pressSequentially(text)
+      },
       async compose(updates, commit) {
         const l = await waitFor()
         if (!(await l.evaluate((el) => el === document.activeElement))) await l.focus()

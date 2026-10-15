@@ -34,6 +34,10 @@ export interface StepFacts {
   readonly semantics: Readonly<Record<string, string | undefined>>
   /** Resolved controllable values of the oracle (`value` for `valued` and `selectable`). */
   readonly values: Readonly<Record<string, unknown>>
+  /** The oracle's context after the step (`highlightedKey` for collection checks). */
+  readonly context?: Readonly<Record<string, unknown>>
+  /** Item count of the oracle's collection prop, when it has one (set metadata). */
+  readonly collectionSize?: number | undefined
   /** The modality the step ran in (null for the initial check, delays and prop steps). */
   readonly modality?: Modality | null
   /** The platform the run emulates. */
@@ -96,6 +100,25 @@ const isTrue = (v: string | undefined) => v === "true"
 const items = (s: DomSnapshot) => s.elements.filter((el) => el.part === "item")
 const ids = (v: string | undefined) => (v ?? "").split(/\s+/).filter(Boolean)
 const isOpen = (f: StepFacts) => f.open
+
+/** At most one item is data-highlighted, and it is the oracle's highlighted key. */
+function highlightChecks(f: StepFacts): string[] {
+  const lit = items(f.after).filter((el) => el.attrs["data-highlighted"] !== undefined)
+  const out =
+    lit.length > 1
+      ? [`${lit.length} items are data-highlighted: ${lit.map((el) => el.describe).join(", ")}`]
+      : []
+  const want = f.context?.["highlightedKey"]
+  if (want !== undefined && lit.length <= 1) {
+    const have = lit[0]?.attrs["data-key"] ?? null
+    if (have !== want) {
+      out.push(
+        `the highlighted item is ${have === null ? "none" : `"${have}"`}, the machine's is ${want === null ? "none" : `"${String(want)}"`}`,
+      )
+    }
+  }
+  return out
+}
 
 const anchor: GenericInvariant = (f) =>
   f.anchorCount === 1 ? [] : [`exactly one element must match the anchor; found ${f.anchorCount}`]
@@ -237,9 +260,15 @@ const hiddenFocus: GenericInvariant = (f) => {
   return out
 }
 
-/** (11) Focus that was inside the component stays inside it — never on body. */
+/**
+ * (11) Focus that was inside the component stays inside it — never on body. Moving to
+ * another element is leaving (Tab out) when the machine took a transition to another state
+ * (focused → idle); without one, the component lost focus.
+ */
 const focusKept: GenericInvariant = (f) =>
-  f.before?.focus.inInstance && !f.after.focus.inInstance
+  f.before?.focus.inInstance &&
+  !f.after.focus.inInstance &&
+  (f.after.focus.onBody || f.from === null || f.from === f.state)
     ? [
         `focus left the component (now ${f.after.focus.onBody ? "<body>" : f.after.focus.element?.describe})`,
       ]
@@ -441,17 +470,29 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   },
   /** (8) A roving composite is one Tab stop. */
   "composite-roving": (f) => {
+    // Controls inside a row (`item-control`) belong to the row's own tab group.
     const list = items(f.after).filter(exposed)
     const stops = list.filter((el) => el.attrs["tabindex"] === "0").length
-    return list.length > 0 && stops !== 1
-      ? [`${stops} items have tabindex="0"; expected exactly 1`]
-      : []
+    // No navigable item: the container itself is the one stop.
+    const container = f.after.parts.some((p) => p.part !== "item" && p.attrs["tabindex"] === "0")
+    const out =
+      list.length > 0 && stops !== 1 && !(stops === 0 && container)
+        ? [`${stops} items have tabindex="0"; expected exactly 1`]
+        : []
+    // A step that removed or filtered out the focused item leaves focus in the composite.
+    if (f.before?.focus.inInstance && f.after.focus.onBody) {
+      out.push("focus fell to <body> after the step (the focused item was removed?)")
+    }
+    return [...out, ...highlightChecks(f)]
   },
   /** (8, 9) Only the input or container is tabbable; activedescendant points into the popup. */
   "composite-activedescendant": (f) => {
-    const out = items(f.after)
-      .filter((el) => el.focusable && el.attrs["tabindex"] !== "-1")
-      .map((el) => `${el.describe} is tabbable; only the input or container may be`)
+    const out = [...highlightChecks(f)]
+    out.push(
+      ...items(f.after)
+        .filter((el) => el.focusable && el.attrs["tabindex"] !== "-1")
+        .map((el) => `${el.describe} is tabbable; only the input or container may be`),
+    )
     for (const el of f.after.elements) {
       const id = el.attrs["aria-activedescendant"]
       if (!id) continue
@@ -492,10 +533,30 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     if (!multi && selected.length > 1) {
       out.push(`${selected.length} items are selected in single selection`)
     }
+    // A step never adds a disabled item to the selection.
+    const wasSelected = new Set(
+      items(f.before ?? f.after)
+        .filter((el) => isTrue(el.attrs["aria-selected"] ?? el.attrs["aria-checked"]))
+        .map((el) => el.attrs["data-key"] ?? el.describe),
+    )
+    for (const el of selected) {
+      if (
+        isTrue(el.attrs["aria-disabled"]) &&
+        !wasSelected.has(el.attrs["data-key"] ?? el.describe)
+      ) {
+        out.push(`${el.describe} is disabled but the step added it to the selection`)
+      }
+    }
+    // Items identify their value by data-value, or (collections) by data-key.
+    const itemValue = (el: ElementInfo) => el.attrs["data-value"] ?? el.attrs["data-key"]
     const value = f.values["value"]
-    if (value !== undefined && list.every((el) => el.attrs["data-value"] !== undefined)) {
-      const want = new Set((Array.isArray(value) ? value : [value]).map(String))
-      const have = new Set(selected.map((el) => el.attrs["data-value"] ?? ""))
+    if (value !== undefined && value !== "all" && list.every((el) => itemValue(el) !== undefined)) {
+      // Only values with a rendered item: a selection survives filtering and virtualization.
+      const rendered = new Set(list.map((el) => itemValue(el)))
+      const want = new Set(
+        (Array.isArray(value) ? value : [value]).map(String).filter((v) => rendered.has(v)),
+      )
+      const have = new Set(selected.map((el) => itemValue(el) ?? ""))
       if (want.size !== have.size || [...want].some((v) => !have.has(v))) {
         out.push(
           `selected items [${[...have].join(", ")}] differ from the machine's value [${[...want].join(", ")}]`,
@@ -527,6 +588,21 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
         }
         seen.add(pos)
         previous = Math.max(previous, pos)
+      }
+    }
+    // Set size is the collection's item count, unrendered (virtualized) items included.
+    if (f.collectionSize !== undefined) {
+      for (const el of items(f.after).filter(exposed)) {
+        const size = el.attrs["aria-setsize"]
+        if (
+          size !== undefined &&
+          el.attrs["aria-level"] === undefined &&
+          Number(size) !== f.collectionSize
+        ) {
+          out.push(
+            `${el.describe} aria-setsize=${size}, the collection has ${f.collectionSize} items`,
+          )
+        }
       }
     }
     return out

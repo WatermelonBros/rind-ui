@@ -14,6 +14,11 @@ export {
 } from "./provider"
 export { type RenderProp, renderPart } from "./render"
 export {
+  useCollectionIdentityWarning,
+  useCollectionItems,
+  useRegisterItem,
+} from "./use-collection-items"
+export {
   type PartRegistry,
   type PartRegistryOptions,
   usePartRegistry,

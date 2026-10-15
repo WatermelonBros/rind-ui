@@ -4,11 +4,13 @@ import { describe, expect, it } from "vitest"
 import * as announceStories from "../../../apps/storybook/stories/AnnounceFixture.stories"
 import * as disclosureStories from "../../../apps/storybook/stories/Disclosure.stories"
 import * as layerStories from "../../../apps/storybook/stories/LayerFixture.stories"
+import * as listboxStories from "../../../apps/storybook/stories/ListboxFixture.stories"
 import * as pressStories from "../../../apps/storybook/stories/PressFixture.stories"
 import { missingStateStories } from "../src/index"
 import { streamContract } from "./announce/announce.contract"
 import { disclosureContract } from "./disclosure/disclosure.contract"
 import { layerContract } from "./layer/layer.contract"
+import { listboxContract } from "./listbox/listbox.contract"
 import { counterContract, toggleContract } from "./press/press.contract"
 
 describe("state stories", () => {
@@ -19,6 +21,7 @@ describe("state stories", () => {
       ...missingStateStories(counterContract, pressStories.states, pressStories),
       ...missingStateStories(streamContract, announceStories.states, announceStories),
       ...missingStateStories(layerContract, layerStories.states, layerStories),
+      ...missingStateStories(listboxContract, listboxStories.states, listboxStories),
     ]).toEqual([])
   })
 

@@ -1,3 +1,4 @@
+export { collectionLayout } from "./collection-layout"
 export {
   type DismissOptions,
   type DismissReason,
@@ -20,6 +21,12 @@ export {
 export { createHover, type HoverOptions, type HoverPointerEvent } from "./hover"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
+export {
+  createItemRegistry,
+  type ItemRegistration,
+  type ItemRegistry,
+  type RegisteredItem,
+} from "./item-registry"
 export { isKeptVisible, KEEP_VISIBLE_SELECTOR } from "./keep-visible"
 export {
   DEFAULT_TYPEAHEAD_TIMEOUT,
@@ -61,6 +68,7 @@ export {
   readPlatform,
   withEngine,
 } from "./platform"
+export { pointerMoved } from "./pointer-guard"
 export {
   PORTAL_HOST_ATTRIBUTES,
   portalHostAttributes,

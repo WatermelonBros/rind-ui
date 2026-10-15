@@ -188,7 +188,7 @@ Shared infrastructure the components are built from. Most libraries expose some 
 these publicly; we decide per utility whether it is public API.
 
 Portal · Presence / Transition · Focus Trap / Focus Scope · Dismissable Layer ·
-Roving Focus / Composite · Collection (list, tree, async) · Slot / asChild / render
+Roving Focus / Composite · Collection (list, tree, async; specified: add-collections) · Slot / asChild / render
 prop · mergeProps · Visually Hidden · Accessible Icon · Live Region / Announcer ·
 Direction / Locale / I18n Provider · Formatters (number, date, bytes, relative
 time) · Hotkeys · Highlight · Download Trigger · Drag and Drop (RAC) · Virtualizer

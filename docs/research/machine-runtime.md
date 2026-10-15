@@ -631,6 +631,10 @@ match wins), and `data-scope` / `data-part` (out of scope here).
 6. **Large collections in context.** Immutable snapshots plus 10k items: store
    collections outside the snapshot (version counter) and let parts select by key?
    Decide in the `collection/` note.
+   **Decided** by add-collections ([collection-model](../../openspec/specs/collection-model/spec.md), design §4): the
+   collection is a prop (`onProps: { collection: "COLLECTION.CHANGE" }`, identity
+   compared), the snapshot holds keys only plus a `lastCollection` pointer for repair, and
+   item parts select by key so a highlight move re-renders two items.
 7. **`$reverted` ergonomics**: is a machine-level event the right tool, or should
    connect expose `pending` so the part re-renders DOM-owned text itself?
 8. **Cancelable changes**: adopt Base UI's `cancel()` / `allowPropagation()` in
