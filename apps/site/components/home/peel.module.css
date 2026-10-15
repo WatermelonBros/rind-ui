@@ -43,10 +43,11 @@
 }
 /* the camera starts close on the component and pulls back for the machine */
 .camera {
+  --zoom: 1.9;
   position: relative;
   display: grid;
   place-items: center;
-  scale: calc(1.9 - var(--p3) * 0.75);
+  scale: calc(var(--zoom) - var(--p3) * (var(--zoom) - 1.15));
   translate: 0 calc(var(--p3) * -70px);
 }
 
@@ -163,14 +164,26 @@
 }
 
 @media (max-width: 900px) {
-  .peel {
-    height: auto;
-  }
   .sticky {
-    position: relative;
-    height: auto;
     grid-template-columns: 1fr;
-    padding: 80px 20px;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: 10px;
+    padding: calc(var(--bar-h) + 24px) 20px 20px;
+  }
+  .scene {
+    height: auto;
+    min-height: 0;
+    align-self: center;
+  }
+  .camera {
+    --zoom: 1.15;
+  }
+  .graph {
+    width: 300px;
+  }
+  .text {
+    font-size: 16px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

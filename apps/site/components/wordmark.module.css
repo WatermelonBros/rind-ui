@@ -228,3 +228,10 @@
     transform: translateY(0);
   }
 }
+
+/* on a phone the state chips would collide under the letters; the letters still play */
+@media (max-width: 640px) {
+  .chip {
+    display: none;
+  }
+}
