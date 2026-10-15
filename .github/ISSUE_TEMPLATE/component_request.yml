@@ -1,0 +1,22 @@
+name: Component request
+description: A component rind-ui does not ship yet.
+labels: [component]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Component
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: Use case
+      description: Where would you use it? Check docs/components.md first, it may already be planned.
+    validations:
+      required: true
+  - type: textarea
+    id: refs
+    attributes:
+      label: References
+      description: WAI-ARIA APG pattern, other libraries' implementations, known accessibility pitfalls.

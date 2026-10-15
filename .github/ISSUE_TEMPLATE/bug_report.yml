@@ -1,0 +1,44 @@
+name: Bug report
+description: A component behaves wrongly, is inaccessible, or breaks in a browser.
+labels: [bug]
+body:
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      placeholder: e.g. Accordion, Checkbox, Field
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: A StackBlitz or CodeSandbox link, a failing test, or the smallest code that shows it.
+      render: tsx
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Browser and OS
+      placeholder: e.g. Safari 18.4 on macOS 15, Chrome 136 on Android 15
+    validations:
+      required: true
+  - type: input
+    id: at
+    attributes:
+      label: Assistive technology (if relevant)
+      placeholder: e.g. VoiceOver, NVDA 2025.1 + Firefox, TalkBack, keyboard only
+  - type: input
+    id: version
+    attributes:
+      label: Package versions
+      placeholder: "@rind-ui/react 0.x, @rind-ui/theme 0.x, react 19.x"
+    validations:
+      required: true
