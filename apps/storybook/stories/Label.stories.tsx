@@ -128,9 +128,9 @@ export const DriverExample: Story = {
     await label.click()
     // The label's activation reaches its control (a forwarded click).
     await waitFor(() => expect(forwarded).toBe(1))
-    // Focus follows only where the window has OS focus: Firefox on Linux (headless CI)
-    // does not move it otherwise (quirk "firefox-label-focus-unfocused-window").
-    if (canvasElement.ownerDocument.hasFocus()) {
+    // Focus follows the forwarded click, except in Firefox on Linux CI, which forwards the
+    // click without moving focus (quirk "firefox-label-focus-unfocused-window").
+    if (!navigator.userAgent.includes("Firefox")) {
       await waitFor(async () => expect(await label.isControlFocused()).toBe(true))
     }
   },
