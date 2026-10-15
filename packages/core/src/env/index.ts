@@ -40,3 +40,4 @@ export type {
   Side,
   VirtualAnchor,
 } from "./position"
+export type { Href, Router, RouterCapability, RouterConfig, RouterOptions } from "./router"

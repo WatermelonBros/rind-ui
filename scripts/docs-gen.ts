@@ -4,6 +4,7 @@
 // Run: pnpm docs:gen   ·   pnpm docs:check fails when a generated file is out of date.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join, relative } from "node:path"
+import type { ComponentMeta } from "../packages/core/src/components/meta.ts"
 import { quirks } from "../packages/core/src/dom/quirks.ts"
 
 const repo = join(import.meta.dirname, "..")
@@ -137,18 +138,107 @@ export function renderAria(storyId: string, read: (id: string) => string | undef
   return ["```yaml", yaml.trimEnd(), "```"].join("\n")
 }
 
+const cell = (text: string) => text.replace(/\|/g, "\\|")
+const table = (head: readonly string[], rows: readonly (readonly string[])[]) =>
+  [
+    `| ${head.join(" | ")} |`,
+    `|${head.map(() => "---").join("|")}|`,
+    ...rows.map((r) => `| ${r.map(cell).join(" | ")} |`),
+  ].join("\n")
+
+/** A component's API facts, from its `<scope>.meta.ts`. */
+export function renderApi(meta: ComponentMeta): string {
+  const { actions, queries, traits } = meta.contract
+  return [
+    "### Anatomy",
+    "",
+    table(
+      ["Part", "`data-part`", "Element", ""],
+      meta.parts.map((p) => [
+        `\`${p.name}\``,
+        `\`${p.part}\``,
+        `\`<${p.element}>\``,
+        p.description,
+      ]),
+    ),
+    "",
+    "### Props",
+    "",
+    table(
+      ["Prop", "Type", "Default", ""],
+      Object.entries(meta.props).map(([name, p]) => [
+        `\`${name}\``,
+        `\`${p.type}\``,
+        p.default === undefined ? "—" : `\`${p.default}\``,
+        p.description,
+      ]),
+    ),
+    "",
+    "Every attribute of the rendered element is accepted and forwarded.",
+    "",
+    "### Data attributes",
+    "",
+    table(
+      ["Part", "Attribute", ""],
+      Object.entries(meta.dataAttributes).flatMap(([part, attrs]) =>
+        Object.entries(attrs).map(([attr, when]) => [`\`${part}\``, `\`${attr}\``, when]),
+      ),
+    ),
+    "",
+    "### Keyboard",
+    "",
+    table(
+      ["Key", ""],
+      meta.keyboard.map(([key, what]) => [key, what]),
+    ),
+    "",
+    ...(meta.stateless
+      ? ["### States", "", "None: the component is stateless (no machine, no `testMachine`).", ""]
+      : []),
+    "### Contract",
+    "",
+    table(
+      ["Action", "Modalities"],
+      Object.entries(actions).map(([name, m]) => [`\`${name}\``, m.join(", ")]),
+    ),
+    "",
+    `Queries: ${queries.map((q) => `\`${q}\``).join(", ")}. Traits: ${
+      traits.length ? traits.map((t) => `\`${t}\``).join(", ") : "none"
+    }.`,
+  ].join("\n")
+}
+
+/** Every component's meta: `packages/core/src/components/<scope>/<scope>.meta.ts`. */
+async function loadMetas(): Promise<Map<string, ComponentMeta>> {
+  const dir = join(repo, "packages/core/src/components")
+  const out = new Map<string, ComponentMeta>()
+  for (const scope of readdirSync(dir)) {
+    const file = join(dir, scope, `${scope}.meta.ts`)
+    if (!existsSync(file)) continue
+    const mod = (await import(file)) as Record<string, ComponentMeta>
+    const meta = Object.values(mod).find((v) => v.scope === scope)
+    if (meta) out.set(scope, meta)
+  }
+  return out
+}
+
 /** llms.txt: one line per guide, from its `# Title` and first paragraph. */
-export function renderLlms(pages: readonly { path: string; markdown: string }[]): string {
-  const lines = pages.map(({ path, markdown }) => {
-    const title = /^# (.+)$/m.exec(markdown)?.[1] ?? path
-    const summary =
-      markdown
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .find((p) => p && !p.startsWith("#") && !p.startsWith("<!--"))
-        ?.replace(/\s+/g, " ") ?? ""
-    return `- [${title}](${path}): ${summary}`
-  })
+type Page = { readonly path: string; readonly markdown: string }
+
+/** One `- [Title](path): summary` line, from the page's `# Title` and first paragraph. */
+function indexLine({ path, markdown }: Page): string {
+  const title = /^# (.+)$/m.exec(markdown)?.[1] ?? path
+  const summary =
+    markdown
+      .split(/\n\s*\n/)
+      .map((p) => p.trim())
+      .find((p) => p && !p.startsWith("#") && !p.startsWith("<!--"))
+      ?.replace(/\s+/g, " ") ?? ""
+  return `- [${title}](${path}): ${summary}`
+}
+
+export function renderLlms(guides: readonly Page[], components: readonly Page[] = []): string {
+  const lines = guides.map(indexLine)
   return [
     "# rind-ui",
     "",
@@ -158,6 +248,7 @@ export function renderLlms(pages: readonly { path: string; markdown: string }[])
     "",
     ...lines,
     "",
+    ...(components.length ? ["## Components", "", ...components.map(indexLine), ""] : []),
     "## Accessibility",
     "",
     "- [Support matrix](docs/accessibility/support-matrix.md): which screen reader and browser combinations are supported, and how each is tested.",
@@ -200,7 +291,8 @@ const readAria = (id: string) => {
 }
 
 /** Every generated file: path → expected content. */
-export function generate(): Map<string, string> {
+export async function generate(): Promise<Map<string, string>> {
+  const metas = await loadMetas()
   const out = new Map<string, string>()
   out.set("docs/accessibility/quirks.md", renderQuirks(quirks, quirkUsage()))
   const records = JSON.parse(
@@ -208,8 +300,14 @@ export function generate(): Map<string, string> {
   ) as { records: TestedWith[] }
   for (const file of markdownFiles(join(repo, "docs"))) {
     const page = readFileSync(file, "utf8")
-    const filled = fillBlocks(fillTestedWith(page, records.records), "aria", (id) =>
-      renderAria(id, readAria),
+    const filled = fillBlocks(
+      fillBlocks(fillTestedWith(page, records.records), "aria", (id) => renderAria(id, readAria)),
+      "api",
+      (scope) => {
+        const meta = metas.get(scope)
+        if (!meta) throw new Error(`no ${scope}.meta.ts for the api block in ${file}`)
+        return renderApi(meta)
+      },
     )
     if (filled !== page) out.set(relative(repo, file), filled)
   }
@@ -221,14 +319,18 @@ export function generate(): Map<string, string> {
     path: relative(repo, file),
     markdown: readFileSync(file, "utf8"),
   }))
-  out.set("llms.txt", renderLlms(guides))
+  const components = markdownFiles(join(repo, "docs/components")).map((file) => ({
+    path: relative(repo, file),
+    markdown: readFileSync(file, "utf8"),
+  }))
+  out.set("llms.txt", renderLlms(guides, components))
   return out
 }
 
 if (import.meta.main) {
   const check = process.argv.includes("--check")
   const stale: string[] = []
-  for (const [path, content] of generate()) {
+  for (const [path, content] of await generate()) {
     const file = join(repo, path)
     const current = existsSync(file) ? readFileSync(file, "utf8") : ""
     if (current === content) continue

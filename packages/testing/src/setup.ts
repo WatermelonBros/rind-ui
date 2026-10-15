@@ -5,6 +5,7 @@
 
 import { installErrorLog } from "./adapters/dom"
 import { installAnnouncementLog } from "./announcements"
+import { navigationLog } from "./navigation"
 
 type Writable = Record<string, unknown>
 
@@ -106,6 +107,7 @@ export function resetRindGlobals(): void {
   const resets: Set<() => void> | undefined = Reflect.get(globalThis, RESETS)
   for (const reset of resets ?? []) reset()
   installAnnouncementLog().length = 0
+  navigationLog().length = 0
 }
 
 // Catch errors from the very first render (before any adapter exists), and record every

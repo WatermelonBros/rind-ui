@@ -13,11 +13,28 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
 | `packages/core/src/dom/keyboard.ts` | `safari-ime-commit-enter` |
+| `packages/core/src/dom/link.ts` | `webkit-synthetic-click-modifiers`, `talkback-unfocusable-link` |
 | `packages/core/src/dom/modality.ts` | `ios-vo-zero-size-pointer`, `chromium-at-click-1x1` |
 | `packages/core/src/dom/press.ts` | `webkit-menuitem-double-click`, `macos-meta-keyup` |
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+
+## `talkback-unfocusable-link`
+
+- Bugs: <https://github.com/adobe/react-spectrum/issues/3998>, <https://issuetracker.google.com/issues/267670776>
+- Repro test: `packages/core/src/dom/link.dom.test.ts`
+- Checked in: `packages/core/src/dom/link.ts`
+- Last verified: 2026-10-15
+- Remove when: TalkBack swipe reaches a role=link without tabindex (yearly re-test)
+
+## `webkit-synthetic-click-modifiers`
+
+- Bugs: <https://github.com/WebKit/WebKit/blob/main/Source/WebCore/html/HTMLAnchorElement.cpp>, <https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/utils/src/openLink.tsx>
+- Repro test: `packages/core/src/dom/link.dom.test.ts`
+- Checked in: `packages/core/src/dom/link.ts`
+- Last verified: 2026-10-15
+- Remove when: WebKit honours modifier keys on a synthetic click on an anchor
 
 ## `ios-vo-zero-size-pointer`
 

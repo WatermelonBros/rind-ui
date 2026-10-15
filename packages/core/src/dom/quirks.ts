@@ -28,6 +28,29 @@ export function defineQuirks<const Q extends readonly Quirk[]>(entries: Q): Q {
 
 export const quirks = defineQuirks([
   {
+    id: "talkback-unfocusable-link",
+    // TalkBack cannot be detected: always on, and harmless elsewhere (Tab still skips it).
+    when: () => true,
+    links: [
+      "https://github.com/adobe/react-spectrum/issues/3998",
+      "https://issuetracker.google.com/issues/267670776",
+    ],
+    test: "packages/core/src/dom/link.dom.test.ts",
+    removeWhen: "TalkBack swipe reaches a role=link without tabindex (yearly re-test)",
+    verified: "2026-10-15",
+  },
+  {
+    id: "webkit-synthetic-click-modifiers",
+    when: (p) => p.webkit && p.mac && !p.ios,
+    links: [
+      "https://github.com/WebKit/WebKit/blob/main/Source/WebCore/html/HTMLAnchorElement.cpp",
+      "https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/utils/src/openLink.tsx",
+    ],
+    test: "packages/core/src/dom/link.dom.test.ts",
+    removeWhen: "WebKit honours modifier keys on a synthetic click on an anchor",
+    verified: "2026-10-15",
+  },
+  {
     id: "ios-vo-zero-size-pointer",
     when: (p) => p.ios,
     links: [

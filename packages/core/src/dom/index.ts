@@ -50,6 +50,20 @@ export {
   layerId,
 } from "./layer-stack"
 export {
+  activateLink,
+  isExternal,
+  type LinkActivation,
+  type LinkCurrent,
+  type LinkDisposition,
+  type LinkEnv,
+  type LinkInput,
+  linkProps,
+  openLink,
+  resolveHref,
+  shouldBrowserHandle,
+  warnInteractiveContent,
+} from "./link"
+export {
   ANNOUNCEMENTS,
   KEY_DEBOUNCE_MS,
   type LiveAnnouncerOptions,

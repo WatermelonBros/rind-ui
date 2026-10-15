@@ -28,6 +28,8 @@ export interface AdapterEnv extends Env {
    * the state its focus event updates — is not reported as an update outside act.
    */
   scope?<T>(fn: () => Promise<T>): Promise<T>
+  /** Marks the start of an action: `navigated()` only counts what happens after it. */
+  markNavigations(): Promise<void>
   /** Sets `dir` on the document element (right-to-left runs); null removes it. */
   setDirection(direction: Direction | null): Promise<void>
 }

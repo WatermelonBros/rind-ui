@@ -15,6 +15,7 @@ import {
 import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
 import { installAnnouncementLog } from "../announcements"
 import { collectDom, isVisible } from "../collect"
+import { interceptNativeNavigation, navigatedSince, navigationLog } from "../navigation"
 import { composeInPage } from "./compose"
 
 /** The overlap of user-event's API and Vitest browser mode's `userEvent`. */
@@ -130,6 +131,8 @@ export function domEnv(options: DomAdapterOptions = {}): EnvFactory {
   const timeout = options.timeout ?? 1000
   const doc = (options.root as Node | undefined)?.ownerDocument ?? globalThis.document
   const errors = installErrorLog(doc?.defaultView ?? null)
+  // Native link navigations are recorded and cancelled: the test page stays.
+  if (doc?.defaultView) interceptNativeNavigation(doc.defaultView as Window & typeof globalThis)
   let user: Promise<UserLike> | undefined
   const getUser = () => {
     user ??= options.user
@@ -160,6 +163,8 @@ function createDomEnv(
 ): AdapterEnv {
   const doc = () => (options.root as Node | undefined)?.ownerDocument ?? document
   const apple = platform?.apple === true
+  /** The navigation log's length when the current action began. */
+  let navigationsFrom = navigationLog().length
   /** A composing key press: keydown and keyup with isComposing and keyCode 229, no input. */
   const composingPress = (el: Element, key: Key, keyOptions: KeyOptions) =>
     act(() => {
@@ -279,6 +284,21 @@ function createDomEnv(
           }),
         ),
       )
+    /** What a middle click sends (user-event and Vitest's userEvent differ on it). */
+    const middleClick = (el: Element, o: ClickOptions) =>
+      act(() => {
+        const init = { bubbles: true, cancelable: true, composed: true, button: 1, buttons: 4 }
+        const mods = modifiers(o)
+        el.dispatchEvent(
+          new PointerEvent("pointerdown", { ...init, ...mods, pointerType: "mouse" }),
+        )
+        el.dispatchEvent(new MouseEvent("mousedown", { ...init, ...mods }))
+        el.dispatchEvent(
+          new PointerEvent("pointerup", { ...init, ...mods, buttons: 0, pointerType: "mouse" }),
+        )
+        el.dispatchEvent(new MouseEvent("mouseup", { ...init, ...mods, buttons: 0 }))
+        el.dispatchEvent(new MouseEvent("auxclick", { ...init, ...mods, buttons: 0, detail: 1 }))
+      })
     /** Holds the modifiers (user-event keyboard state) around a press. */
     const held = async (o: ClickOptions | undefined, run: () => Promise<unknown>) => {
       const keys = [o?.shift ? "Shift" : null, o?.mod ? (apple ? "Meta" : "Control") : null].filter(
@@ -309,6 +329,7 @@ function createDomEnv(
     const part: Part = {
       async click(options) {
         const el = await waitFor()
+        if (options?.button === "middle") return middleClick(el, options)
         if (modality === "virtual") return bareClick(el, options)
         await held(options, () => press(el, false))
       },
@@ -461,6 +482,10 @@ function createDomEnv(
       return [...installAnnouncementLog()]
     },
     takeErrors: async () => errors().splice(0),
+    markNavigations: async () => {
+      navigationsFrom = navigationLog().length
+    },
+    navigated: async (o) => navigatedSince(navigationLog(), navigationsFrom, o),
     scope: async (fn) => (await loadTL()).getConfig().asyncWrapper(fn) as ReturnType<typeof fn>,
     setDirection: async (direction) => {
       if (direction === null) doc().documentElement.removeAttribute("dir")

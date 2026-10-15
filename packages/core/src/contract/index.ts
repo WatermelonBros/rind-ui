@@ -25,7 +25,7 @@ export type {
   Skip,
   Trait,
 } from "./contract"
-export { contract } from "./contract"
+export { contract, STATIC_MACHINE, staticContract } from "./contract"
 export type {
   AriaRole,
   By,

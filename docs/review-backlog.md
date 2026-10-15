@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-link (r1) | — | packages/react/src/link/link.tsx:62-68 | `staticTag` guesses "a" for a FUNCTION render: server output for render={(p)=><div {...p}/>} is <div href> without role/tabindex until hydration — document or dev-warn |
+| add-link (r1) | — | packages/core/src/dom/link.ts:279-290 | onAuxClick fires onActivate without honoring a prevented event, and the consumer's onAuxClick isn't suppressed on a disabled link |
+| add-link (r1) | — | link tests | "innermost provider wins" test cites react-spectrum#6557 (that's the external _blank case) — fix citation |
+| add-link (r1) | — | docs/accessibility/manual-protocol.md | Manual check: real Safari ⌘-Enter on a role=link fallback (temporary-anchor fallback click may lose modifiers → same tab) |
 | add-theme-system (verification) | — | docs/theme/white-label.md | Document that live CSS picks on-solid by the L 0.6 threshold while the builder picks by luminance: in the L≈0.55–0.62 band they can choose different text colours (each internally consistent; the builder is the validated path) |
 | add-theme-system (r1) | — | packages/theme/package.json | tokens.manifest.json not in `files`/`exports` ("published manifest" SHALL) |
 | add-theme-system (r1) | — | packages/theme/src/builder/theme.ts:377-394 | DTCG: dtcgColor drops alpha (overlay /0.45); brand.radius emitted as string, 2025.10 wants {value, unit}; only structural checks |

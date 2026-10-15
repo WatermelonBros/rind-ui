@@ -19,6 +19,10 @@
 - [Theme builder](docs/theme/builder.md): `@rind-ui/theme/builder` turns brand inputs into validated theme CSS. It is pure TypeScript with no DOM and no dependency, so it runs in a build script, a server request or a browser. The same input always gives the same bytes.
 - [Token reference](docs/theme/tokens.md): Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the twelve `--rind-brand-*` inputs; see [white-label.md](white-label.md).
 
+## Components
+
+- [Link](docs/components/link.md): A navigational link that behaves like a native `<a href>` wherever it appears: client routing without double navigation, modifier clicks left to the browser, disabled and current states, and a driver to test it.
+
 ## Accessibility
 
 - [Support matrix](docs/accessibility/support-matrix.md): which screen reader and browser combinations are supported, and how each is tested.

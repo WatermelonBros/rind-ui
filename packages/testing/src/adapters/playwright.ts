@@ -203,6 +203,22 @@ function createPlaywrightEnv(
   const describeAll = (l: Locator) =>
     l.evaluateAll((els) => els.map((el) => el.outerHTML.slice(0, 160)).join("\n"))
 
+  /** What tells a navigation: the URL, the open pages, and the in-page log (fakeRouter). */
+  const navigationState = async () => {
+    const { page, root } = await getBase()
+    const log = await root
+      .evaluate(() =>
+        (
+          (Reflect.get(globalThis, Symbol.for("rind-ui.navigations")) as
+            | { readonly newTab: boolean }[]
+            | undefined) ?? []
+        ).map((n) => n.newTab),
+      )
+      .catch((): boolean[] => [])
+    return { url: page.url(), pages: page.context().pages().length, log }
+  }
+  let navigationsFrom: Awaited<ReturnType<typeof navigationState>> | undefined
+
   const anchorLocator = async () => byLocator((await getBase()).anchorRoot, anchor)
   const instance = async () => {
     const a = await anchorLocator()
@@ -258,7 +274,10 @@ function createPlaywrightEnv(
           metaKey: o.mod === true && apple,
         })
       }
-      return touch ? l.tap({ modifiers: mods }) : l.click({ modifiers: mods })
+      // A user can press an aria-disabled part; Playwright would wait for it to be enabled.
+      const force = (await l.getAttribute("aria-disabled")) === "true"
+      if (o.button === "middle") return l.click({ button: "middle", modifiers: mods, force })
+      return touch ? l.tap({ modifiers: mods, force }) : l.click({ modifiers: mods, force })
     }
     const part: Part = {
       click: (options) => activate(false, options),
@@ -414,6 +433,17 @@ function createPlaywrightEnv(
     },
     instance,
     anchorCount: async () => (await anchorLocator()).count(),
+    markNavigations: async () => {
+      navigationsFrom = await navigationState()
+    },
+    navigated: async (o) => {
+      const now = await navigationState()
+      const from = navigationsFrom ?? { ...now, log: [] }
+      const newTab = o?.newTab === true
+      // A document navigation replaces the page's log: the URL tells it then.
+      if (now.log.slice(from.log.length).some((t) => t === newTab)) return true
+      return newTab ? now.pages > from.pages : now.url !== from.url
+    },
     collectDocument: async () => {
       const { root } = await getBase()
       await ensureInPage(root)

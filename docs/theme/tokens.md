@@ -34,4 +34,36 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 
 ## Tier 3: component tokens
 
-_No component stylesheet declares tokens yet._
+### link
+
+```json
+{
+  "family": "link",
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "link.css"
+    },
+    "color-hover": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "link.css"
+    },
+    "current-weight": {
+      "fallback": "600",
+      "file": "link.css"
+    },
+    "decoration": {
+      "fallback": "0.0625em",
+      "file": "link.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "link.css"
+    },
+    "underline-offset": {
+      "fallback": "0.2em",
+      "file": "link.css"
+    }
+  }
+}
+```

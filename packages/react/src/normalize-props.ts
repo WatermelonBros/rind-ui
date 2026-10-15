@@ -20,6 +20,8 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   datetime: "dateTime",
   crossorigin: "crossOrigin",
   accesskey: "accessKey",
+  referrerpolicy: "referrerPolicy",
+  hreflang: "hrefLang",
   onDblClick: "onDoubleClick",
   // React's onFocus/onBlur bubble: they are focusin/focusout.
   onFocusIn: "onFocus",

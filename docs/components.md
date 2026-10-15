@@ -49,7 +49,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | spec |  |
 | Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | spec |  |
 | Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec | Reado has Breadcrumb |
-| Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec |  |
+| Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Steps | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo | Reka: Stepper |
 | Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 

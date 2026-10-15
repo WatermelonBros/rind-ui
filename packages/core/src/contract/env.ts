@@ -55,6 +55,8 @@ export interface ClickOptions {
   readonly shift?: boolean
   /** Ctrl on Windows/Linux, Meta on macOS (per the driver's platform). */
   readonly mod?: boolean
+  /** Default "primary". A middle click opens a link elsewhere (no keyboard twin). */
+  readonly button?: "primary" | "middle"
 }
 
 /** A lazy handle, like a Playwright Locator: resolved on every call, never cached. */
@@ -106,5 +108,11 @@ export interface Env<P extends string = string> {
   until<T>(read: () => Promise<T>, accept: (value: T) => boolean): Promise<T>
   /** Advances fake timers when the test uses them; otherwise waits a frame. */
   advance(ms: number): Promise<void>
+  /**
+   * A navigation happened since the current action began: a client router call (the
+   * testing `fakeRouter`) or a document navigation, or, with `newTab`, a link the browser
+   * opened elsewhere (another tab or window, a download).
+   */
+  navigated(options?: { readonly newTab?: boolean }): Promise<boolean>
   readonly modality: Modality
 }

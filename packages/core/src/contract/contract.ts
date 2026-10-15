@@ -1,4 +1,5 @@
 import type { QuirksAffecting } from "../dom/quirks"
+import { setup, type } from "../machine/setup"
 import type { AnyMachine, EventOf, MachinePropsOf, StateOf, View } from "../machine/types"
 import type { By, Env, Modality } from "./env"
 import type { GenericInvariantId } from "./invariant-ids"
@@ -306,4 +307,42 @@ export function contract<
         : unknown),
 ): Contract<M, P, L, Q, A> {
   return { scope, ...def }
+}
+
+/** The one-state machine behind every stateless component's contract (Link, Separator). */
+export const STATIC_MACHINE = setup({
+  types: type<{
+    props: Record<never, never>
+    events: { type: "$none" }
+    env: Record<never, never>
+  }>(),
+}).machine({
+  id: "static",
+  initial: "static",
+  states: { static: {} },
+})
+type StaticMachine = typeof STATIC_MACHINE
+
+/**
+ * A stateless component's contract: no machine, no states and no events (design: Link has
+ * no machine). It carries the one-state STATIC_MACHINE, so every tool reading contracts
+ * keeps one shape; there is no model-based test to run on it.
+ */
+export function staticContract<
+  const P extends string,
+  const L extends readonly unknown[],
+  const Q extends Readonly<Record<string, QueryFn<P>>>,
+  const A extends Readonly<Record<string, ActionDef<P, NoInfer<Q>>>>,
+  const T extends readonly Trait[],
+>(
+  scope: string,
+  def: Omit<
+    ContractDef<StaticMachine, P, L, Q, A>,
+    "machine" | "states" | "events" | "dataState" | "attrs" | "commitsOnFocus"
+  > & {
+    readonly actions: { readonly [K in keyof A]: CheckedAction<P, A[K]> }
+    readonly traits: T
+  },
+): Contract<StaticMachine, P, L, Q, A> {
+  return { scope, ...def, machine: STATIC_MACHINE, states: { static: {} }, events: {} }
 }

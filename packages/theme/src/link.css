@@ -1,0 +1,40 @@
+/*
+ * Link. No variant, no size: it inherits the surrounding font. Underlined by default so an
+ * inline link is not told apart by colour alone (WCAG 1.4.1). `data-tone` re-points the
+ * accent roles, so this reads accent roles only.
+ */
+@layer rind.components {
+  :where([data-scope="link"][data-part="link"]) {
+    color: var(--rind-link-color, var(--rind-color-accent-text));
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--rind-link-decoration, 0.0625em);
+    text-underline-offset: var(--rind-link-underline-offset, 0.2em);
+    cursor: pointer;
+    border-radius: var(--rind-radius-control);
+  }
+
+  :where([data-scope="link"][data-part="link"][data-hover]) {
+    color: var(--rind-link-color-hover, var(--rind-color-accent-text));
+    text-decoration-thickness: calc(var(--rind-link-decoration, 0.0625em) * 2);
+  }
+
+  :where([data-scope="link"][data-part="link"][data-current]) {
+    font-weight: var(--rind-link-current-weight, 600);
+  }
+
+  :where([data-scope="link"][data-part="link"][data-disabled]) {
+    color: var(--rind-link-disabled-color, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+    text-decoration-line: none;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="link"][data-part="link"]) {
+      color: LinkText;
+    }
+
+    :where([data-scope="link"][data-part="link"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}

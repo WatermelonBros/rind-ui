@@ -112,6 +112,7 @@ export async function runAction(
   if (!action) throw new Error(`${contract.scope}.${name} is not an action`)
   const impl = action[modality] ?? (modality === "virtual" ? action.pointer : undefined)
   if (!impl) throw new Error(`${contract.scope}.${name} has no "${modality}" implementation`)
+  await env.markNavigations()
   await impl(env, ...args)
   if (!checkDone) return
   const { done } = action

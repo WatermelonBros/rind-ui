@@ -23,6 +23,7 @@ import type {
   SchedulerEnv,
   StyleEnv,
 } from "./capabilities"
+import type { Router, RouterCapability } from "./router"
 
 /** Every capability core defines, implemented on the real DOM. */
 export type DomEnvironment = SchedulerEnv &
@@ -34,7 +35,8 @@ export type DomEnvironment = SchedulerEnv &
   LocaleEnv &
   AnnouncerEnv &
   ClockEnv &
-  CollectionLayoutEnv
+  CollectionLayoutEnv &
+  RouterCapability
 
 export interface DomEnvironmentOptions {
   /** The document or shadow root the component lives in (default: `document`). */
@@ -54,6 +56,8 @@ export interface DomEnvironmentOptions {
   readonly dir?: "ltr" | "rtl"
   /** An announcer, or the built-in backend to use (default: live regions). */
   readonly announcer?: Announcer | "live-region" | "aria-notify"
+  /** Client routing for every link part below (default: none, the browser navigates). */
+  readonly router?: Router
 }
 
 /**
@@ -106,6 +110,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
   return {
     scheduler,
     dom,
+    router: options.router,
     get platform() {
       return getPlatform()
     },

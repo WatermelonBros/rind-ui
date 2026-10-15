@@ -11,6 +11,7 @@ export {
 export { installAnnouncementLog, recordingAnnouncer } from "./announcements"
 export { missingAriaLines } from "./aria-snapshot"
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
+export { getLink } from "./components/link"
 export {
   type ContractModality,
   createDriver,
@@ -45,6 +46,14 @@ export {
   type TestMachineOptions,
   testMachine,
 } from "./model"
+export {
+  type FakeRouter,
+  type FakeRouterCall,
+  fakeRouter,
+  interceptNativeNavigation,
+  type Navigation,
+  navigationLog,
+} from "./navigation"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
 export { missingStateStories, type StateStories } from "./state-stories"
