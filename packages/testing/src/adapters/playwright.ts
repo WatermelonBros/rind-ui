@@ -379,7 +379,9 @@ function createPlaywrightEnv(
         ),
       withAttr: (name, value) =>
         handle(`[${name}] in ${label}`, async () =>
-          (await now()).locator(value === undefined ? `[${name}]` : `[${name}="${value}"]`),
+          (await now()).locator(
+            value === undefined ? `[${name}]` : `[${name}="${value.replace(/["\\]/g, "\\$&")}"]`,
+          ),
         ),
       accessibleName: async () => {
         const { root } = await getBase()

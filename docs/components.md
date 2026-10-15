@@ -46,7 +46,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
-| Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | spec |  |
+| Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
 | Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | spec |  |
 | Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec | Reado has Breadcrumb |
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |

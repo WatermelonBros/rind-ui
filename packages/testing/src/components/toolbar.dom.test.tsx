@@ -9,6 +9,7 @@ import {
   RadioGroup,
   RindProvider,
   RouterProvider,
+  Separator,
   ToggleGroup,
   Toolbar,
 } from "@rind-ui/react"
@@ -1205,5 +1206,25 @@ describe("Text field in an iframe (ariakit#6316)", () => {
     // is the parent window's) is outside the scenario; see the hand-off report.
     await act(async () => root.unmount())
     frame.remove()
+  })
+})
+
+describe("review fixes (add-toolbar r1)", () => {
+  it("a Separator in a popup portalled from a toolbar is standalone (horizontal, own scope)", async () => {
+    render(
+      <Toolbar.Root aria-label="Formatting">
+        <Toolbar.Button>Bold</Toolbar.Button>
+        <Portal>
+          <div role="dialog" aria-label="Popup">
+            <Separator.Root data-testid="popup-separator" />
+          </div>
+        </Portal>
+      </Toolbar.Root>,
+    )
+    const separator = await screen.findByTestId("popup-separator")
+    expect(separator.getAttribute("data-scope")).toBe("separator")
+    expect(separator.getAttribute("data-orientation")).toBe("horizontal")
+    expect(separator.getAttribute("aria-orientation")).toBeNull()
+    expect(separator.getAttribute("role")).toBe("separator")
   })
 })

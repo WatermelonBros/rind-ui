@@ -95,8 +95,9 @@ export const radioGroupContract = contract("radio-group", {
           const now = await checkedName(env)
           if (now !== null && (typeof name === "string" ? now === name : name.test(now))) return
           // Hosted by a toolbar, arrows only move: Space checks the radio once reached.
-          if (await radio(env, name).isFocused()) {
-            await radio(env, name).press("Space")
+          const target = radio(env, name)
+          if ((await target.isFocused()) && !(await inert(target))) {
+            await target.press("Space")
             return
           }
           await env.keyboard("ArrowDown")
