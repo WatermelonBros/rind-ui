@@ -1,0 +1,82 @@
+/*
+ * Toggle Group: structural only. Items are toggles, so "on" reuses the toggle cue: an inset
+ * outline AND a background token, never colour alone (WCAG 1.4.1). Adjacent items share one
+ * border (logical margins, so RTL mirrors). `data-pressed` is a press in progress, not "on":
+ * style `data-state`. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="toggle-group"][data-part="root"]) {
+    display: inline-flex;
+    flex-direction: row;
+    color: var(--rind-toggle-group-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="toggle-group"][data-part="root"][data-orientation="vertical"]) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :where([data-scope="toggle-group"][data-part="item"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-toggle-group-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+    padding-inline: var(--rind-toggle-group-padding-inline, var(--rind-space-2));
+    border: var(--rind-border-width) solid var(--rind-toggle-group-border, var(--rind-color-border));
+    background: var(--rind-toggle-group-bg, transparent);
+    color: inherit;
+    font: inherit;
+    cursor: var(--rind-toggle-group-cursor, pointer);
+  }
+
+  /* Joined: the later item overlaps its neighbour's border by one width. */
+  :where(
+    [data-scope="toggle-group"][data-part="root"][data-orientation="horizontal"]
+      > [data-part="item"]:not(:first-child)
+  ) {
+    margin-inline-start: calc(-1 * var(--rind-border-width));
+  }
+
+  :where(
+    [data-scope="toggle-group"][data-part="root"][data-orientation="vertical"]
+      > [data-part="item"]:not(:first-child)
+  ) {
+    margin-block-start: calc(-1 * var(--rind-border-width));
+  }
+
+  :where([data-scope="toggle-group"][data-part="item"][data-state="on"]) {
+    background: var(--rind-toggle-group-bg-on, var(--rind-color-accent-soft));
+    outline: 2px solid var(--rind-toggle-group-outline-on, var(--rind-color-border-strong));
+    outline-offset: -3px;
+  }
+
+  :where([data-scope="toggle-group"][data-part="item"]:is([data-disabled], :disabled)) {
+    color: var(--rind-toggle-group-disabled-color, var(--rind-color-text-disabled));
+    cursor: var(--rind-toggle-group-disabled-cursor, not-allowed);
+  }
+
+  /*
+   * base.css paints every [data-state="on"] part Highlight. Only the item carries data-state
+   * here, so the mapping just keeps the borders visible and the disabled items GrayText.
+   */
+  @media (forced-colors: active) {
+    :where([data-scope="toggle-group"][data-part="item"]) {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    :where([data-scope="toggle-group"][data-part="item"][data-state="on"]) {
+      background: Highlight;
+      color: HighlightText;
+      outline-color: HighlightText;
+    }
+
+    :where([data-scope="toggle-group"][data-part="item"]:is([data-disabled], :disabled)) {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

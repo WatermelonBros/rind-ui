@@ -49,6 +49,8 @@ export interface RadioGroupConnectInput {
   readonly highlightSource: string | null
   /** Items not registered yet (server render): the tab stop comes from the value. */
   readonly pending: boolean
+  /** The server tab stop (the checked declared item if enabled, else the first enabled). */
+  readonly pendingStop?: string | null | undefined
   readonly orientation: "vertical" | "horizontal"
   readonly disabled: boolean
   readonly focusableWhenDisabled: boolean
@@ -205,7 +207,7 @@ export function radioGroupConnect(
       const tabindex = input.disabled
         ? -1
         : input.pending
-          ? key === input.value
+          ? key === (input.pendingStop ?? input.value)
             ? 0
             : -1
           : key === stop

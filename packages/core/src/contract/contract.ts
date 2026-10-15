@@ -135,6 +135,8 @@ export interface InvariantContext<P extends string = string, S extends string = 
   readonly modality: Modality
   /** The props the instance was rendered with (the oracle's), for mode-dependent rules. */
   readonly props: Readonly<Record<string, unknown>>
+  /** The oracle's resolved values after the step (a selection to compare the page with). */
+  readonly values: Readonly<Record<string, unknown>>
 }
 /** Resolves when the invariant holds; rejects or returns a message when it does not. */
 export type Invariant<P extends string = string, S extends string = string> = {

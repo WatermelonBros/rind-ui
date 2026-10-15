@@ -59,6 +59,7 @@
 
 - [ ] A.1 `Link` part built with add-link's `linkProps` (`link-navigation`): modifier/middle-click, router and disabled rules identical to Link; Space handling and roving props stay in the toolbar; test for the "Toolbar link uses the environment router" scenario
 
-## Amendments (moved from add-radio-group)
+## Amendments (moved from add-radio-group and add-toggle-group)
 
 - [ ] R.1 Radio Group hosted mode via `CompositeHost` (moved here because CompositeHost lands in this change; radio-group shipped standalone only): radios register with the host and take `host.itemProps(key)`; root without keydown navigation or fallback `tabIndex`; host `disabled` / `focusableWhenDisabled` apply; Enter and Space check while hosted, arrow movement never checks; host context ignored inside `Portal` / overlay content; tests for the "Hosted By A Toolbar" scenarios (radix-ui/primitives#2146, kobaltedev/kobalte#579) — requirement in specs/radio-group/spec.md of this change
+- [ ] R.2 Toggle Group hosted mode via `CompositeHost` (moved here from add-toggle-group, which ships standalone): items register with the host and take `host.itemProps(key)`; root without keydown navigation or fallback `tabIndex`; host `disabled` / `focusableWhenDisabled` apply; `role="group"`, `aria-pressed` and values unchanged; host context ignored inside `Portal` / overlay content; tests for the "Hosted By A Toolbar" scenarios (radix-ui/primitives#4119, huntabyte/bits-ui#446) — requirement in specs/toggle-group/spec.md of this change

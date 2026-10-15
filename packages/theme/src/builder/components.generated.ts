@@ -228,4 +228,15 @@ export type ComponentTokens = {
     | "gap"
     | "outlineOn"
     | "paddingInline"
+  readonly "toggle-group":
+    | "bg"
+    | "bgOn"
+    | "border"
+    | "color"
+    | "cursor"
+    | "disabledColor"
+    | "disabledCursor"
+    | "gap"
+    | "outlineOn"
+    | "paddingInline"
 }

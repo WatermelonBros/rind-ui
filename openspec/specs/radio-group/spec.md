@@ -317,8 +317,10 @@ until that radio is checked; completes when `checked()` equals `name`. Queries: 
 (accessible names in order), `checked()` (name of the radio with `aria-checked="true"`, or
 null), `focusedRadio()`, `isDisabled(name)`, `isReadOnly()`, `isRequired()`, `isInvalid()`
 and `formValue()` (the entries the owning form would submit for the group's name).
-Traits: `composite-roving`, `selectable` and `directional`. No part SHALL be declared as
-committing on focus. A generated driver `getRadioGroup(target, { name })` SHALL be exported
+Traits: `composite-roving`, `selectable` and `directional`. Focus SHALL change only the focus
+state and the focused-item query, never the value; the contract declares the item as
+committing on focus for that reason, and the value is checked by the `form-associated` trait
+after every step. A generated driver `getRadioGroup(target, { name })` SHALL be exported
 from `@rind-ui/testing`.
 
 #### Scenario: Same test in both environments

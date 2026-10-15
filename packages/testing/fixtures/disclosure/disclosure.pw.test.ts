@@ -25,6 +25,7 @@ import { states as radioGroupStates } from "../../../../apps/storybook/stories/R
 import { states as switchStates } from "../../../../apps/storybook/stories/Switch.stories"
 import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
 import { states as toggleStates } from "../../../../apps/storybook/stories/Toggle.stories"
+import { states as toggleGroupStates } from "../../../../apps/storybook/stories/ToggleGroup.stories"
 import { createDriver, missingAriaLines, playwrightEnv, testMachine } from "../../src/index"
 import { chromiumTree } from "../../src/playwright"
 import { streamContract } from "../announce/announce.contract"
@@ -326,6 +327,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/RadioGroup.stories.tsx": radioGroupStates,
     "./stories/Switch.stories.tsx": switchStates,
     "./stories/Toggle.stories.tsx": toggleStates,
+    "./stories/ToggleGroup.stories.tsx": toggleGroupStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

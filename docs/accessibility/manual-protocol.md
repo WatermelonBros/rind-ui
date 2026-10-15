@@ -193,6 +193,26 @@ ReadOnly, RequiredInvalid, InForm, RTL. Record each pass in `tested-with.json` w
 - [ ] **Windows High Contrast / forced colors**: the checked and unchecked rings are both
       visible and distinguishable (radix#2993).
 
+## Device checklist: Toggle Group (add-toggle-group)
+
+Stories: Components/ToggleGroup → Single, Multiple, DisallowEmpty, Vertical, DisabledItem,
+FocusableWhenDisabled, IconOnly, RTL. Record each pass in `tested-with.json` with
+`component: "toggle-group"`. Deferred to devices.
+
+- [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
+      TalkBack + Chrome**: entering the group announces its name ("Format, group"), then the
+      item name, role (toggle button) and state (pressed / not pressed).
+- [ ] **All**: arrow keys only move focus and announce the item; Space and Enter press, and
+      the new state is announced once; Tab leaves the group after one stop.
+- [ ] **Single**: pressing another item releases the first; record that nothing announces
+      "1 of N" (documented limit: use a Segmented Control when exclusivity must be heard).
+- [ ] **Vertical**: both Up/Down and Left/Right move; **RTL**: Left and Right swap.
+- [ ] **DisabledItem / FocusableWhenDisabled**: a disabled item is announced as unavailable;
+      it is skipped, or (focusable) takes focus and does not press.
+- [ ] **IconOnly**: each item is read by its `aria-label`, not the glyph.
+- [ ] **Windows High Contrast / forced colors**: pressed and unpressed items are
+      distinguishable (fill and double outline) and the joined borders are visible.
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

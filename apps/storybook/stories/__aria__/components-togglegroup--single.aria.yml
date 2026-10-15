@@ -1,0 +1,5 @@
+- group "Format":
+  - button "Bold"
+  - button "Italic" [pressed]
+  - button "Underline"
+- button "After"

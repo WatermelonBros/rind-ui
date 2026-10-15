@@ -21,6 +21,7 @@
 @import "./text-field.css";
 @import "./collapsible.css";
 @import "./toggle.css";
+@import "./toggle-group.css";
 @import "./checkbox.css";
 @import "./checkbox-group.css";
 @import "./radio-group.css";

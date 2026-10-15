@@ -27,6 +27,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { declaredItems, serverStop } from "../declared-items"
 import { useFieldControl } from "../field/field"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
@@ -205,6 +206,7 @@ function Root({
       highlightedKey: view.context.highlightedKey,
       highlightSource: view.context.highlightSource,
       pending: registered === null,
+      pendingStop: serverStop(declaredItems(children, Item), current === null ? [] : [current]),
       orientation,
       disabled: field.disabled,
       focusableWhenDisabled,

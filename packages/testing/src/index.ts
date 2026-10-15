@@ -31,6 +31,7 @@ export { getRadioGroup } from "./components/radio-group"
 export { getSwitch } from "./components/switch"
 export { getTextField } from "./components/text-field"
 export { getToggle } from "./components/toggle"
+export { getToggleGroup } from "./components/toggle-group"
 export {
   type ContractModality,
   createDriver,

@@ -69,3 +69,33 @@ describe("Radio Group hydration", () => {
     expect(inputs.map((i) => i.checked)).toEqual([false, true, false])
   })
 })
+
+describe("review fixes (add-toggle-group r1): the server tab stop", () => {
+  const stops = (value: string | undefined, disabled: string[] = []) => {
+    const box = document.createElement("div")
+    box.innerHTML = renderToString(
+      <RadioGroup.Root name="size" {...(value === undefined ? {} : { defaultValue: value })}>
+        <RadioGroup.Label>Size</RadioGroup.Label>
+        {["s", "m", "l"].map((v) => (
+          <RadioGroup.Item key={v} value={v} disabled={disabled.includes(v)}>
+            <RadioGroup.ItemControl />
+            <RadioGroup.ItemLabel>{v.toUpperCase()}</RadioGroup.ItemLabel>
+          </RadioGroup.Item>
+        ))}
+      </RadioGroup.Root>,
+    )
+    return [...box.querySelectorAll('[role="radio"]')].map((r) => r.getAttribute("tabindex"))
+  }
+
+  it("nothing checked: the first radio", () => {
+    expect(stops(undefined)).toEqual(["0", "-1", "-1"])
+  })
+
+  it("a stale value: the first radio", () => {
+    expect(stops("gone")).toEqual(["0", "-1", "-1"])
+  })
+
+  it("the checked radio disabled: the first enabled one", () => {
+    expect(stops("s", ["s"])).toEqual(["-1", "0", "-1"])
+  })
+})

@@ -31,6 +31,7 @@ export { type RenderProp, renderPart } from "./render"
 export * from "./switch"
 export * from "./text-field"
 export * from "./toggle"
+export * from "./toggle-group"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

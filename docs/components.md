@@ -84,7 +84,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Radio Group | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | done |  |
 | Toggle | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC/Kobalte: Toggle Button |
-| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | RAC: ToggleButtonGroup |
+| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: ToggleButtonGroup |
 | Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | done | Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |
 
 ## Inputs (12)
