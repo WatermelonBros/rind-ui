@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-toggle (r1) | — | packages/react/src/toggle/toggle.tsx:80-86 | stable-name dev check runs accessibleNameOf in production (and keeps accname.ts in the bundle) — guard the effect with NODE_ENV like text-field |
+| add-toggle (r1) | — | packages/theme/src/toggle.css | forced-colors [data-state=on] rule is dead (base.css :where([data-scope])[data-state=on] wins) — delete or raise specificity |
+| add-toggle (r1) | — | packages/core/src/dom/accname.ts | subset accname (no hidden-labelledby, title, svg title, CSS display/pseudo content) is public API — mark @internal |
+| add-toggle (r1) | — | packages/testing/src/components | Toggle lacks SSR/hydration tests, React-level controlled/cancel/undefined tests, aria-pressed override warning test, Indicator-outside-Root test |
 | add-accordion (r1) | — | packages/core/src/components/accordion/accordion.contract.ts:62-85 | heading invariant doesn't check "trigger is the header's only element child" nor name the item; triggers matched by name conflate same-label items |
 | add-accordion (r1) | — | accordion.connect.ts:57-60 / accordion.tsx:174 | region rule uses registered item count (0 on server) → SSR of 8-item multiple accordion gives role=region until mount — count Item children or document |
 | add-accordion (r1) | — | accordion.machine.ts:67-77 | single-mode "more than one value" warning keyed by array identity → fires every render with inline arrays |

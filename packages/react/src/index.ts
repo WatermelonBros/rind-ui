@@ -25,6 +25,7 @@ export {
 } from "./provider"
 export { type RenderProp, renderPart } from "./render"
 export * from "./text-field"
+export * from "./toggle"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

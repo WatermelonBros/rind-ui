@@ -153,4 +153,15 @@ export type ComponentTokens = {
     | "readonlyBg"
     | "shadow"
     | "softBg"
+  readonly toggle:
+    | "bg"
+    | "bgOn"
+    | "border"
+    | "color"
+    | "cursor"
+    | "disabledColor"
+    | "disabledCursor"
+    | "gap"
+    | "outlineOn"
+    | "paddingInline"
 }

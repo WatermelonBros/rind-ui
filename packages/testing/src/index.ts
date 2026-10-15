@@ -25,6 +25,7 @@ export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
 export { getTextField } from "./components/text-field"
+export { getToggle } from "./components/toggle"
 export {
   type ContractModality,
   createDriver,

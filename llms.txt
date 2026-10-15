@@ -34,6 +34,7 @@
 - [Label](docs/components/label.md): A native `<label>` that names a control through `for` or by wrapping it, and fixes what native labels get wrong: no text selection on double click, focus forwarding for controls a label cannot name, and a development check of what `for` points at.
 - [Link](docs/components/link.md): A navigational link that behaves like a native `<a href>` wherever it appears: client routing without double navigation, modifier clicks left to the browser, disabled and current states, and a driver to test it.
 - [Text Field](docs/components/text-field.md): A native `<input>` or `<textarea>` with a controllable value, correct IME handling, a clear button, a character count and autosize, labelled, described and validated like any Field.
+- [Toggle](docs/components/toggle.md): A two-state button: it is on or off, and says so with `aria-pressed`. Use it for a setting that applies immediately (Bold, Mute, Pin).
 
 ## Accessibility
 

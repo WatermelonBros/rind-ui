@@ -729,3 +729,53 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   }
 }
 ```
+
+### toggle
+
+```json
+{
+  "family": "action",
+  "tokens": {
+    "bg": {
+      "fallback": "transparent",
+      "file": "toggle.css"
+    },
+    "bg-on": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "toggle.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "toggle.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "toggle.css"
+    },
+    "cursor": {
+      "fallback": "pointer",
+      "file": "toggle.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "toggle.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "toggle.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "toggle.css"
+    },
+    "outline-on": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "toggle.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-space-2)",
+      "file": "toggle.css"
+    }
+  }
+}
+```
