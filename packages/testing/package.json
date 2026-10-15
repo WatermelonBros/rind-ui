@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/testing",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Test drivers and environment setup for rind-ui components (Testing Library and Playwright).",
   "license": "MIT",
   "author": "Watermelon Bros",
