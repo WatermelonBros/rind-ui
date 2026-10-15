@@ -7,6 +7,7 @@ import { contract, setup, type } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { states as announceStates } from "../../../../apps/storybook/stories/AnnounceFixture.stories"
+import { states as buttonStates } from "../../../../apps/storybook/stories/Button.stories"
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
 import { states as headingStates } from "../../../../apps/storybook/stories/Heading.stories"
 import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
@@ -300,6 +301,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/LayerFixture.stories.tsx": layerStates,
     "./stories/Link.stories.tsx": linkStates,
     "./stories/Heading.stories.tsx": headingStates,
+    "./stories/Button.stories.tsx": buttonStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

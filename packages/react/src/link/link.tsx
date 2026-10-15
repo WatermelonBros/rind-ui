@@ -19,6 +19,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react"
+import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -61,26 +62,6 @@ export type LinkProps = Omit<ComponentPropsWithRef<"a">, "href" | "download" | "
 const noSubscription = () => () => {}
 const clientOrigin = () => globalThis.location?.origin
 const serverOrigin = () => undefined
-
-type Props = Readonly<Record<string, unknown>>
-
-/** The part's own props from several modules: same-named handlers all run, in order. */
-function joinHandlers(...sources: Props[]): Record<string, unknown> {
-  const out: Record<string, unknown> = {}
-  for (const source of sources) {
-    for (const [key, value] of Object.entries(source)) {
-      const prev = out[key]
-      out[key] =
-        typeof prev === "function" && typeof value === "function" && /^on[A-Z]/.test(key)
-          ? (e: unknown) => {
-              prev(e)
-              value(e)
-            }
-          : value
-    }
-  }
-  return out
-}
 
 /** A navigational link (openspec link, link-navigation). Stateless: no machine. */
 export function Link(props: LinkProps) {
@@ -160,7 +141,7 @@ export function Link(props: LinkProps) {
     onBlur: () => setFocused(false),
   })
   const merged = mergeProps(
-    { ...partProps, ref: composeRefs(el, ref) },
+    { ...partProps, ...(id === undefined ? {} : { id }), ref: composeRefs(el, ref) },
     rest,
     // A disabled link drops the consumer's onClick (link-navigation "Disabled Links").
     disabled ? {} : { onClick },

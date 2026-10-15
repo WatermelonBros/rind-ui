@@ -21,6 +21,8 @@ export interface ComponentMeta {
   /** Per part: attribute → when it is present (or its value). */
   readonly dataAttributes: Readonly<Record<string, Readonly<Record<`data-${string}`, string>>>>
   readonly keyboard: readonly (readonly [key: string, behaviour: string])[]
+  /** Machine states (`data-state` values) and what each means; components with a machine. */
+  readonly states?: Readonly<Record<string, string>>
   readonly contract: {
     /** Action → the modalities it runs in. */
     readonly actions: Readonly<Record<string, readonly string[]>>

@@ -50,8 +50,8 @@ describe("theme builder input types", () => {
   })
 
   it("components with an unknown scope are an error (manifest is empty until generated)", () => {
-    // @ts-expect-error no component scopes exist yet
-    defineTheme({ name: "acme", components: { button: { solidBg: "red" } } })
+    // @ts-expect-error no such component scope
+    defineTheme({ name: "acme", components: { nonexistent: { solidBg: "red" } } })
     defineTheme({ name: "acme", components: {} })
   })
 

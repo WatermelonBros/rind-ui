@@ -89,6 +89,95 @@
     "--rind-transform-origin"
   ],
   "components": {
+    "button": {
+      "family": "action",
+      "tokens": {
+        "disabled-bg": {
+          "fallback": "transparent",
+          "file": "button.css"
+        },
+        "disabled-border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "button.css"
+        },
+        "disabled-fg": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "button.css"
+        },
+        "font-size": {
+          "fallback": "var(--rind-text-control, var(--rind-text-sm))",
+          "file": "button.css"
+        },
+        "font-weight": {
+          "fallback": "500",
+          "file": "button.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "button.css"
+        },
+        "ghost-bg-hover": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "button.css"
+        },
+        "ghost-fg": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "button.css"
+        },
+        "height": {
+          "fallback": "var(--rind-size-control, var(--rind-size-md))",
+          "file": "button.css"
+        },
+        "outline-bg-hover": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "button.css"
+        },
+        "outline-border": {
+          "fallback": "var(--rind-color-accent-border)",
+          "file": "button.css"
+        },
+        "outline-fg": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "button.css"
+        },
+        "padding-inline": {
+          "fallback": "var(--rind-space-control, var(--rind-space-3))",
+          "file": "button.css"
+        },
+        "pending-opacity": {
+          "fallback": "0.7",
+          "file": "button.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-control)",
+          "file": "button.css"
+        },
+        "soft-bg": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "button.css"
+        },
+        "soft-bg-hover": {
+          "fallback": "var(--rind-color-accent-soft-hover)",
+          "file": "button.css"
+        },
+        "soft-fg": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "button.css"
+        },
+        "solid-bg": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "button.css"
+        },
+        "solid-bg-hover": {
+          "fallback": "var(--rind-color-accent-solid-hover)",
+          "file": "button.css"
+        },
+        "solid-fg": {
+          "fallback": "var(--rind-color-accent-on-solid)",
+          "file": "button.css"
+        }
+      }
+    },
     "heading": {
       "family": null,
       "tokens": {

@@ -6,6 +6,8 @@ export {
   dismissable,
   dismissRequest,
 } from "./dismiss"
+export { type ElementInfo, elementInfo } from "./element-info"
+export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
 export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
 export {

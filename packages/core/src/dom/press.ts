@@ -163,6 +163,13 @@ function kindOf(el: EventTarget | null): Kind {
   return "button"
 }
 
+/** Elements whose key activation stays native: links and submit or reset buttons. */
+function keepsNativeKey(el: EventTarget | null): boolean {
+  if (kindOf(el) === "link") return true
+  const b = el as HTMLButtonElement | null
+  return b?.tagName === "BUTTON" && (b.type === "submit" || b.type === "reset")
+}
+
 const pressesKey = (kind: Kind, key: string) =>
   kind === "button"
     ? key === "Enter" || key === " "
@@ -501,8 +508,12 @@ export function createPress(options: PressOptions): PressHandle {
         if (state.kind === "key" && e.key === "Meta") state.metaHeld = true
         return
       }
-      // Links keep their native Enter (navigation); everything else stops the synthetic click.
-      if (kind !== "link") e.preventDefault()
+      // Links keep their native Enter (navigation), submit and reset buttons their native
+      // activation (the form submits or resets once: react-spectrum#10658); everything else
+      // stops the synthetic click.
+      const native = keepsNativeKey(e.currentTarget)
+      // A held key activates once: a submit or reset button's repeats would each click.
+      if (!native || (e.repeat && kind !== "link")) e.preventDefault()
       if (e.repeat || state.kind !== "idle") return
       const target = e.currentTarget as Element
       state = { kind: "key", key: e.key, target, metaHeld: e.metaKey }
@@ -537,7 +548,11 @@ export function createPress(options: PressOptions): PressHandle {
     if (state.kind !== "key") return
     const s = state
     if (e.key === s.key) {
-      if (kindOf(s.target) !== "link") e.preventDefault()
+      if (keepsNativeKey(s.target)) {
+        // A submit or reset button's native click, fired after this keyup for Space,
+        // completes the press.
+        if (kindOf(s.target) !== "link" && e.key === " ") return
+      } else e.preventDefault()
       endKeyPress(e)
       return
     }

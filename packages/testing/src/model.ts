@@ -72,6 +72,13 @@ export interface TestMachineOptions<C extends AnyContract, R, A extends unknown[
   readonly platforms?: readonly PlatformFlags[]
   /** The locale the component renders with (read it in `setup` with `currentRun()`). */
   readonly locale?: string
+  /**
+   * Activation parity for steps that stay in the same state (a Button's PRESS): `action` is
+   * the machine action that calls the consumer's callback, `count` how many times the
+   * test's spy ran. Each action step must call it exactly as often as the oracle's step runs
+   * that action (AT 12: one bare click, one activation).
+   */
+  readonly activations?: { readonly action: string; readonly count: () => number }
 }
 
 /** What the current `testMachine` run emulates, for `setup` to render accordingly. */
@@ -986,6 +993,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           oracle.setProps(next)
           await options.rerender?.(next as MachinePropsOf<C["machine"]>, rendered)
         } else if (mapping?.kind === "action") {
+          const logBefore = oracle.log.length
+          const countBefore = options.activations?.count() ?? 0
           const action =
             (contract.actions as Record<string, Record<string, unknown> | undefined>)[
               mapping.action
@@ -1037,6 +1046,17 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
             edge.target !== null &&
             expectations(contract, from, null).open &&
             !expectations(contract, edge.target, null).open
+          if (options.activations) {
+            const { action: name, count } = options.activations
+            const expected = oracle.log
+              .slice(logBefore)
+              .filter((s) => s.actions.includes(name)).length
+            const actual = count() - countBefore
+            if (actual !== expected) {
+              const prefix = stepMod === "virtual" ? "virtual-parity: " : "activation-parity: "
+              fail(i + 1, edge, `${prefix}"${name}" ran ${actual} times, expected ${expected}`)
+            }
+          }
           if (contract.traits.includes("presence") && closes) {
             await reopenDuringExit(i + 1, edge, {
               action: mapping.action,

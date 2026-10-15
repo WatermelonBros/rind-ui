@@ -1,0 +1,91 @@
+/*
+ * Button (family: action). Reads accent roles only, so `data-tone` recolours it. The border is
+ * always present (transparent unless outline) so forced colors can paint it.
+ */
+@layer rind.components {
+  :where([data-scope="button"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-button-gap, var(--rind-space-2));
+    min-block-size: var(--rind-button-height, var(--rind-size-control, var(--rind-size-md)));
+    min-inline-size: var(--rind-button-height, var(--rind-size-control, var(--rind-size-md)));
+    padding-inline: var(
+      --rind-button-padding-inline,
+      var(--rind-space-control, var(--rind-space-3))
+    );
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-button-radius, var(--rind-radius-control));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-button-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    font-weight: var(--rind-button-font-weight, 500);
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--rind-button-solid-bg, var(--rind-color-accent-solid));
+    color: var(--rind-button-solid-fg, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="solid"][data-hover]) {
+    background: var(--rind-button-solid-bg-hover, var(--rind-color-accent-solid-hover));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="soft"]) {
+    background: var(--rind-button-soft-bg, var(--rind-color-accent-soft));
+    color: var(--rind-button-soft-fg, var(--rind-color-accent-text));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="soft"][data-hover]) {
+    background: var(--rind-button-soft-bg-hover, var(--rind-color-accent-soft-hover));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="outline"]) {
+    background: transparent;
+    color: var(--rind-button-outline-fg, var(--rind-color-accent-text));
+    border-color: var(--rind-button-outline-border, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="outline"][data-hover]) {
+    background: var(--rind-button-outline-bg-hover, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="ghost"]) {
+    background: transparent;
+    color: var(--rind-button-ghost-fg, var(--rind-color-accent-text));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-variant="ghost"][data-hover]) {
+    background: var(--rind-button-ghost-bg-hover, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="button"][data-part="root"][data-pressed]) {
+    transform: translateY(1px);
+  }
+
+  :where([data-scope="button"][data-part="root"][data-pending]) {
+    cursor: progress;
+    opacity: var(--rind-button-pending-opacity, 0.7);
+  }
+
+  :where([data-scope="button"][data-part="root"][data-disabled]) {
+    background: var(--rind-button-disabled-bg, transparent);
+    color: var(--rind-button-disabled-fg, var(--rind-color-text-disabled));
+    border-color: var(--rind-button-disabled-border, var(--rind-color-border));
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="button"][data-part="root"]) {
+      background: ButtonFace;
+      color: ButtonText;
+      border-color: ButtonText;
+    }
+
+    :where([data-scope="button"][data-part="root"][data-disabled]) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+  }
+}

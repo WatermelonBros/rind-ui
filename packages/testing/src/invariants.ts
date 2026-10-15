@@ -210,7 +210,10 @@ const stateAttrs: GenericInvariant = (f) => {
   for (const el of f.after.elements) {
     for (const [aria, data] of pairs) {
       if (el.attrs[aria] === undefined && el.attrs[data] === undefined) continue
-      if (isTrue(el.attrs[aria]) !== (el.attrs[data] !== undefined)) {
+      // A native `disabled` attribute is the element's aria-disabled.
+      const on =
+        isTrue(el.attrs[aria]) || (aria === "aria-disabled" && el.attrs["disabled"] !== undefined)
+      if (on !== (el.attrs[data] !== undefined)) {
         out.push(`${el.describe}: ${aria}="${el.attrs[aria] ?? ""}" disagrees with ${data}`)
       }
     }

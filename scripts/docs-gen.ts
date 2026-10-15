@@ -196,9 +196,17 @@ export function renderApi(meta: ComponentMeta): string {
           "",
         ]
       : []),
+    "### States",
+    "",
     ...(meta.stateless
-      ? ["### States", "", "None: the component is stateless (no machine, no `testMachine`).", ""]
-      : []),
+      ? ["None: the component is stateless (no machine, no `testMachine`).", ""]
+      : [
+          table(
+            ["State", ""],
+            Object.entries(meta.states ?? {}).map(([name, what]) => [`\`${name}\``, what]),
+          ),
+          "",
+        ]),
     "### Contract",
     "",
     ...(Object.keys(actions).length
