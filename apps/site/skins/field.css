@@ -33,7 +33,8 @@
   }
 }
 
-[data-skin] :is([data-scope="text-field"][data-part="input"], .native) {
+[data-skin]
+  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native) {
   width: 100%;
   max-width: 320px;
   font: 500 15px var(--s-font);
@@ -48,17 +49,20 @@
     translate 0.4s var(--s-ease),
     background 0.3s;
 }
-[data-skin="crisp"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+[data-skin="crisp"]
+  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native):focus {
   translate: -2px -2px;
   box-shadow: 4px 4px 0 var(--s-acc);
 }
-[data-skin="juicy"] :is([data-scope="text-field"][data-part="input"], .native) {
+[data-skin="juicy"]
+  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native) {
   background: #fff;
   box-shadow:
     inset 0 0 0 2px #d6ccf7,
     0 3px 0 #d6ccf7;
 }
-[data-skin="juicy"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+[data-skin="juicy"]
+  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native):focus {
   background: #fff;
   box-shadow:
     0 0 0 3px var(--s-acc),
@@ -67,4 +71,11 @@
 [data-skin] [data-scope="text-field"][data-part="input"][aria-invalid="true"] {
   border-color: var(--s-acc-deep);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--s-acc) 35%, transparent);
+}
+
+/* autosize: the textarea grows with its text up to here, then scrolls */
+[data-skin] [data-scope="text-field"][data-part="textarea"] {
+  max-block-size: 9lh;
+  line-height: 1.45;
+  resize: none;
 }

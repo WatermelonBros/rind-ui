@@ -89,7 +89,15 @@ function exampleSources(source: string): Record<string, string> {
   const rind = /import \{([^}]+)\} from "@rind-ui\/react"/.exec(source)?.[1]?.split(",") ?? []
   const out: Record<string, string> = {}
   for (const m of source.matchAll(/^export function (\w+)\(\)[^\n]*\{\n[\s\S]*?\n\}$/gm)) {
-    const body = m[0].replace(/^export /, "")
+    // the guides' AttributeReadout is a site helper around the example: not part of its code
+    const lines: string[] = []
+    let inside = false
+    for (const line of m[0].replace(/^export /, "").split("\n")) {
+      if (/<AttributeReadout>/.test(line)) inside = true
+      else if (/<\/AttributeReadout>/.test(line)) inside = false
+      else lines.push(inside ? line.replace(/^ {2}/, "") : line)
+    }
+    const body = lines.join("\n")
     const used = rind.map((s) => s.trim()).filter((n) => n && new RegExp(`\\b${n}\\b`).test(body))
     const hooks = ["useState", "useRef", "useEffect"].filter((h) =>
       new RegExp(`\\b${h}[(<]`).test(body),

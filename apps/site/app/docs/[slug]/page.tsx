@@ -30,7 +30,11 @@ export default async function DocPage({ params }: Props) {
   const at = order.findIndex((p) => p.slug === page.slug)
   const prev = order[at - 1]
   const next = order[at + 1]
-  const { intro, html, toc: outline } = render(page, { hasExample: Boolean(source) })
+  const {
+    intro,
+    html,
+    toc: outline,
+  } = render(page, { hasExample: Boolean(source) && page.section === "components" })
   const toc = source ? [{ id: "examples", text: "Examples" }, ...outline] : outline
   return (
     <div className={styles.page}>

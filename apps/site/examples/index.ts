@@ -1,15 +1,24 @@
 import type { ComponentType } from "react"
 import * as accordion from "./accordion"
+import * as announcements from "./announcements"
+import * as autosize from "./autosize"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
+import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
 import * as heading from "./heading"
+import * as hiddenFormInput from "./hidden-form-input"
+import * as hiddenUntilFound from "./hidden-until-found"
+import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
+import * as labels from "./labels"
 import * as link from "./link"
+import * as messagesAndProvider from "./messages-and-provider"
+import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
@@ -19,23 +28,34 @@ import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import type { Variants } from "./types"
+import * as visuallyHidden from "./visually-hidden"
 
 /** A component's example module: its live examples as exported functions, titled by `variants`. */
 export type ExampleModule = { readonly variants: Variants } & Readonly<Record<string, unknown>>
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  announcements,
+  autosize: autosize,
+  "hidden-form-input": hiddenFormInput,
+  labels: labels,
+  "visually-hidden": visuallyHidden,
+  "messages-and-provider": messagesAndProvider,
   accordion,
   button,
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
   field,
+  "focus-and-modality": focusAndModality,
   fieldset,
   form,
   heading,
+  "hidden-until-found": hiddenUntilFound,
+  "keyboard-and-rtl": keyboardAndRtl,
   label,
   link,
+  "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
   separator,
