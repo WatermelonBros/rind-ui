@@ -69,8 +69,14 @@ export function useFieldBindingPeek(): FieldControlBinding | null {
 }
 
 /** For control authors: the enclosing Field's binding, or null outside a Field. */
-export function useFieldControl(): FieldControlBinding | null {
-  const binding = useContext(FieldControlContext)
+export function useFieldControl(
+  options: {
+    /** Not a control of the Field (a group's item: the group registers): claims nothing. */
+    readonly skip?: boolean
+  } = {},
+): FieldControlBinding | null {
+  const context = useContext(FieldControlContext)
+  const binding = options.skip ? null : context
   const token = useId()
   // One control per Field: the first to claim the binding gets it, others get none.
   const owns = binding?.claim(token) ?? false

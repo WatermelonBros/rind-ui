@@ -574,6 +574,9 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
     },
     nth: (i) => wrap(part.nth(i), name),
     all: async () => (await part.all()).map((p) => wrap(p, name)),
+    // Parts reached through another part (a group's items) are replayed the same way.
+    // (`labelled()` stays the real part: the Field contract's typing replays through it.)
+    scoped: (scope, inner) => wrap(part.scoped(scope, inner), null),
   })
   const env: AdapterEnv = {
     ...base,
@@ -824,9 +827,12 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       ...(contract.formInput
         ? {
             formInput: {
-              expected: contract.formInput.expected(
-                oracle.service.view().values as Record<string, unknown>,
-              ),
+              ...(contract.formInput.multiple ? { multiple: true } : {}),
+              expected: (input: { readonly value: string }) =>
+                contract.formInput?.expected(
+                  oracle.service.view().values as Record<string, unknown>,
+                  input,
+                ) ?? {},
               userChanges,
             },
           }

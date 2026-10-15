@@ -1,0 +1,10 @@
+- group "Toppings":
+  - text: Toppings
+  - checkbox "All toppings"
+  - text: All toppings
+  - checkbox "Ham"
+  - text: Ham
+  - checkbox "Cheese"
+  - text: Cheese
+  - checkbox "Olives"
+  - text: Olives

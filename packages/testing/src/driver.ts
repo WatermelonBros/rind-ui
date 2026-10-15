@@ -74,6 +74,8 @@ export function directed(env: AdapterEnv, direction: Direction): AdapterEnv {
     press: (key, options) => part.press(mirror(key, direction), options),
     nth: (i) => wrap(part.nth(i)),
     all: async () => (await part.all()).map(wrap),
+    scoped: (scope, inner) => wrap(part.scoped(scope, inner)),
+    labelled: () => wrap(part.labelled()),
   })
   return {
     ...env,

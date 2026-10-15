@@ -58,6 +58,14 @@ export type ComponentTokens = {
     | "glyphOn"
     | "radius"
     | "size"
+  readonly "checkbox-group":
+    | "color"
+    | "descriptionColor"
+    | "disabledColor"
+    | "errorColor"
+    | "gap"
+    | "labelColor"
+    | "labelFontWeight"
   readonly collapsible:
     | "cursor"
     | "disabledColor"

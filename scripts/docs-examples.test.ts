@@ -21,13 +21,18 @@ for (const f of docs) {
   }
 }
 
+/** Parts that are another component's Root (CheckboxGroup.Parent is a Checkbox.Root). */
+const ROOT_ALIASES: Readonly<Record<string, string>> = { "CheckboxGroup.Parent": "Checkbox" }
+
 /** Problems in one example: parts used outside an open Root of their component. */
 function misplacedParts(code: string): string[] {
   const out: string[] = []
   const open = new Map<string, number>()
   for (const m of code.matchAll(/<(\/?)([A-Z]\w*)\.(\w+)([^>]*?)(\/?)>/g)) {
-    const [, closing, name = "", part, , selfClosing] = m
-    if (part === "Root") {
+    const [, closing, tagName = "", part, , selfClosing] = m
+    const alias = ROOT_ALIASES[`${tagName}.${part}`]
+    const name = alias ?? tagName
+    if (part === "Root" || alias) {
       const n = open.get(name) ?? 0
       if (closing) open.set(name, n - 1)
       else if (!selfClosing) open.set(name, n + 1)

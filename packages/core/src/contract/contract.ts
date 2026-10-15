@@ -224,7 +224,13 @@ export interface ContractDef<
  * value without the user (dispatching no `change`, e.g. a form reset).
  */
 export interface FormInputDecl {
-  readonly expected: (values: Readonly<Record<string, unknown>>) => {
+  /** One hidden input per item (a group): each is compared, and their events summed. */
+  readonly multiple?: boolean
+  readonly expected: (
+    values: Readonly<Record<string, unknown>>,
+    /** The input compared (its submitted `value`), for `multiple`. */
+    input?: { readonly value: string },
+  ) => {
     readonly checked?: boolean
     readonly indeterminate?: boolean
     readonly value?: string

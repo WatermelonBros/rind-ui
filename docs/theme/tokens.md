@@ -284,6 +284,44 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### checkbox-group
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "checkbox-group.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "checkbox-group.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "checkbox-group.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-color-danger-text)",
+      "file": "checkbox-group.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "checkbox-group.css"
+    },
+    "label-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "checkbox-group.css"
+    },
+    "label-font-weight": {
+      "fallback": "600",
+      "file": "checkbox-group.css"
+    }
+  }
+}
+```
+
 ### collapsible
 
 ```json

@@ -53,7 +53,9 @@ export const switchMachine = setup({
       const v = values.checked === true
       const dispatch = context.pendingUserValue === v
       env.formInput?.sync({ checked: v, indeterminate: false }, { dispatch })
-      if (dispatch) set("pendingUserValue", null)
+      // Arrived, or superseded by another value (a group applying something else): either
+      // way the proposal is over, so a later parent change stays silent.
+      if (context.pendingUserValue !== null) set("pendingUserValue", null)
     },
     /** A refused or cancelled change: forget it, and put the input back. */
     revert: ({ values, env, set }) => {

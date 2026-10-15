@@ -51,6 +51,8 @@ export interface FormInputInfo {
   readonly changes: number
   readonly inputs: number
   readonly clicks: number
+  /** Inside a group's select-all Parent (`data-parent`): submits nothing. */
+  readonly inParent: boolean
 }
 
 export interface IdRef {
@@ -410,7 +412,8 @@ export function collectDom(arg: {
       }
     })(),
     liveRegions: elements.filter(isLive).map(describe),
-    formInputs: partEls
+    // The instance's own input, or a group's item inputs (inside its parts).
+    formInputs: elements
       .filter((el) => el.getAttribute("data-part") === "hidden-input")
       .map((el) => {
         const input = el as HTMLInputElement
@@ -426,6 +429,7 @@ export function collectDom(arg: {
           changes: c.change,
           inputs: c.input,
           clicks: c.click,
+          inParent: el.closest("[data-parent]") !== null,
         }
       }),
   }

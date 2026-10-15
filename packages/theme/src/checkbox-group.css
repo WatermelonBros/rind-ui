@@ -1,0 +1,53 @@
+/*
+ * Checkbox Group: structural only. The Root is a vertical stack (it also normalises a native
+ * `<fieldset>` the way fieldset.css does, so `render={<fieldset />}` lays out the same);
+ * the items are the Checkbox's own parts. Invalid and disabled are read from data-*.
+ */
+@layer rind.components {
+  :where([data-scope="checkbox-group"][data-part="root"]) {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-inline-size: 0;
+    display: grid;
+    gap: var(--rind-checkbox-group-gap, var(--rind-space-2));
+    color: var(--rind-checkbox-group-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="checkbox-group"][data-part="label"]) {
+    font-weight: var(--rind-checkbox-group-label-font-weight, 600);
+    color: var(--rind-checkbox-group-label-color, var(--rind-color-text));
+  }
+
+  /* A native legend: a plain block, no notch cut into a border. */
+  :where(legend[data-scope="checkbox-group"][data-part="label"]) {
+    float: inline-start;
+    inline-size: 100%;
+    padding: 0;
+  }
+
+  :where(legend[data-scope="checkbox-group"][data-part="label"] + *) {
+    clear: inline-start;
+  }
+
+  :where([data-scope="checkbox-group"][data-part="description"]) {
+    margin: 0;
+    color: var(--rind-checkbox-group-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="checkbox-group"][data-part="error-message"]) {
+    margin: 0;
+    color: var(--rind-checkbox-group-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="checkbox-group"][data-part="root"][data-disabled]) {
+    color: var(--rind-checkbox-group-disabled-color, var(--rind-color-text-disabled));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="checkbox-group"][data-part="root"][data-disabled]),
+    :where([data-scope="checkbox-group"][data-part="root"][data-disabled] [data-part="label"]) {
+      color: GrayText;
+    }
+  }
+}

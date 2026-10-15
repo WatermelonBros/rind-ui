@@ -147,6 +147,30 @@ RenderAsDiv. Record each pass in `tested-with.json` with `component: "checkbox"`
       toggle; required and invalid are announced.
 - [ ] **RenderAsDiv**: the name comes from the Label and a Label press toggles once.
 
+## Device checklist: Checkbox Group (add-checkbox-group)
+
+Stories: Components/CheckboxGroup → Default, WithParent, DisabledItem, ReadOnly,
+RequiredWithError, Fieldset. Record each pass in `tested-with.json` with
+`component: "checkbox-group"`. Deferred to devices.
+
+- [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, TalkBack +
+      Chrome**: entering the first item announces the group ("Toppings, group"), then the
+      item name, role (check box) and state; moving to the next item does not repeat the group.
+- [ ] **VoiceOver iOS (open question)**: whether the group name is announced when swiping onto
+      the first item, and when swiping between items. `role="group"` with `aria-labelledby`
+      is the design; record the actual wording and whether the `Fieldset` story (native
+      `<fieldset>`/`<legend>`) behaves differently. If it does not announce the group, the
+      decision on a per-item `aria-describedby` repeat is taken from this result.
+- [ ] **All**: the select-all Parent is announced as "mixed" (or "partially checked") for a
+      partial selection, and Space moves it as the cycle says (select all, none, restore).
+- [ ] **All**: Tab visits each item once; the arrow keys do nothing.
+- [ ] **All**: a disabled item is announced as unavailable and the Parent skips it; the
+      read-only group is announced and does not toggle.
+- [ ] **RequiredWithError**: the group is announced as required, and the error is read when
+      the group is entered.
+- [ ] **Windows High Contrast / forced colors**: unchecked, mixed and checked Parents are
+      distinguishable.
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

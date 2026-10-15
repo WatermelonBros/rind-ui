@@ -7,6 +7,8 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-checkbox-group (r1) | — | packages/testing/src/model.ts:578 (replayEnv) | labelled() not wrapped in touch-hover/composing replays: actions through labelled() run for real (Field contract types for real instead of composing); directed() wraps it → inconsistent. Wrap with a role/name, then fix the Field broken-variant test |
+| add-checkbox-group (r1) | — | layer.pw.test.ts | "layer [touch|pointer|keyboard]: closed —OPEN→ open —CLOSE→ closed" fails under full-suite load (passes alone) — recurring flake, investigate timing |
 | add-switch (r1) | — | packages/react/src/index.ts | createFormToggle + FormToggle* types re-exported as public API (internal factory); FormToggleService.checked typed CheckedState lets Switch receive "indeterminate" — drop the re-export unless third-party toggles are a goal |
 | add-switch (r1) | — | scripts/docs-examples.test.ts:~29 | tag regex stops at the `>` of `=>`: a self-closing <X.Root onFoo={() => …} /> counts as open and hides later misplaced parts (false negative) — balanced-brace scan |
 | add-switch (r1) | — | packages/react/src/form-toggle/form-toggle.tsx | Switch.Thumb function children receive indeterminate (always false) — narrow SwitchThumbProps |

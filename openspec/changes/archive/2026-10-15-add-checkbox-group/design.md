@@ -146,8 +146,10 @@ export const checkboxGroupContract = contract("checkbox-group", {
 Item lookups are scoped to the group instance (items carry the group's `data-instance` as
 an extra attribute set by the group context, so `part("item", { role, name })` stays
 instance-scoped). Per-contract invariants: Parent's `aria-checked` equals the oracle's
-`parentState`; every item's `aria-checked` equals membership in the oracle value; no item
-carries `aria-required` while the value is non-empty unless individually required.
+`parentState`; every item's `aria-checked` equals membership in the oracle value (checked by
+the form-associated trait on the items' inputs). "No group-derived `aria-required` while the
+value is non-empty" is covered by DOM tests: the DOM cannot tell a group-derived
+`aria-required` from an item's own.
 
 ### Field binding (amendment from add-field)
 

@@ -187,8 +187,10 @@ the Parent.
 A group with `required` SHALL be valid when at least one item is checked. While the value
 is empty, every enabled item SHALL carry `aria-required="true"` on its Control and
 `required` on its hidden input, so native validation fails and focuses the first item;
-once any item is checked, none SHALL carry them unless the item is itself `required`.
-An item's own `required` SHALL always keep its own constraint. `aria-required` SHALL NOT
+once any item is checked, no item SHALL carry a GROUP-DERIVED `aria-required` or
+`required`; an individually required item keeps its own (checked or not). An item's own
+`required` SHALL always keep its own constraint. This rule is checked by DOM tests, not by a
+per-contract invariant: the DOM cannot tell a group-derived `aria-required` from an item's own. `aria-required` SHALL NOT
 be set on the group element. Native validation SHALL focus the first invalid item's
 Control (`hidden-form-input`), not the first item.
 

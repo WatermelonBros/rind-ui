@@ -55,7 +55,9 @@ export interface StepFacts {
   }
   /** form-associated: what the hidden input must hold, and the user changes so far. */
   readonly formInput?: {
-    readonly expected: {
+    readonly multiple?: boolean
+    /** What one hidden input (by its submitted value) must hold. */
+    readonly expected: (input: { readonly value: string }) => {
       readonly checked?: boolean
       readonly indeterminate?: boolean
       readonly value?: string
@@ -293,7 +295,7 @@ const hiddenFocus: GenericInvariant = (f) => {
     // the form-associated invariant checks it never keeps focus and is out of the tab order.
     const formInput =
       f.traits.includes("form-associated") &&
-      el.part === "hidden-input" &&
+      el.attrs["data-part"] === "hidden-input" &&
       el.attrs["tabindex"] === "-1"
     if (el.focusable && el.inAriaHidden && !el.hidden && !formInput) {
       out.push(`${el.describe} is focusable inside aria-hidden`)
@@ -436,30 +438,37 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
    */
   "form-associated": (f) => {
     const out: string[] = []
-    const inputs = f.after.formInputs
-    if (inputs.length !== 1) {
+    if (!f.formInput) return out
+    const multiple = f.formInput.multiple === true
+    // A group's Parent submits nothing: its input is not one of the group's.
+    const inputs = f.after.formInputs.filter((i) => !i.inParent)
+    if (!multiple && inputs.length !== 1) {
       return [`${inputs.length} hidden inputs rendered; expected exactly one`]
     }
-    const [input] = inputs
-    if (!input || !f.formInput) return out
-    const want = f.formInput.expected
-    for (const key of ["checked", "indeterminate", "value"] as const) {
-      if (want[key] !== undefined && input[key] !== want[key]) {
-        out.push(`${input.describe} ${key} is ${String(input[key])}, expected ${String(want[key])}`)
+    for (const input of inputs) {
+      const want = f.formInput.expected(input)
+      for (const key of ["checked", "indeterminate", "value"] as const) {
+        if (want[key] !== undefined && input[key] !== want[key]) {
+          out.push(
+            `${input.describe} ${key} is ${String(input[key])}, expected ${String(want[key])}`,
+          )
+        }
+      }
+      if (input.ariaHidden !== "true") out.push(`${input.describe} is not aria-hidden`)
+      if (input.tabIndex !== -1) out.push(`${input.describe} has tabIndex ${input.tabIndex}`)
+      if (input.focused) out.push(`${input.describe} has focus`)
+      if (input.clicks > 0) {
+        out.push(
+          `${input.describe} received ${input.clicks} click events (a synthetic click reaches ancestors)`,
+        )
       }
     }
-    if (input.ariaHidden !== "true") out.push(`${input.describe} is not aria-hidden`)
-    if (input.tabIndex !== -1) out.push(`${input.describe} has tabIndex ${input.tabIndex}`)
-    if (input.focused) out.push(`${input.describe} has focus`)
-    const changes = input.changes - (f.baseline.formInputs[0]?.changes ?? 0)
+    const sum = (list: readonly { changes: number; inParent: boolean }[]) =>
+      list.filter((i) => !i.inParent).reduce((n, i) => n + i.changes, 0)
+    const changes = sum(f.after.formInputs) - sum(f.baseline.formInputs)
     if (changes !== f.formInput.userChanges) {
       out.push(
-        `${input.describe} dispatched ${changes} change events for ${f.formInput.userChanges} user changes`,
-      )
-    }
-    if (input.clicks > 0) {
-      out.push(
-        `${input.describe} received ${input.clicks} click events (a synthetic click reaches ancestors)`,
+        `the hidden input${multiple ? "s" : ""} dispatched ${changes} change events for ${f.formInput.userChanges} user changes`,
       )
     }
     return out

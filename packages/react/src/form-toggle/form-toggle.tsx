@@ -11,6 +11,7 @@ import {
   type FormInputCapability,
   focusEvent,
   focusSafely,
+  type GroupedCheckbox,
   hiddenFormInput,
   implicitSubmit,
   isImeKey,
@@ -116,7 +117,30 @@ interface Ctx {
   readonly setControlTag: (tag: string) => void
   readonly hidden: { value: string; form: string | undefined; defaultChecked: CheckedState }
   readonly uncheckedValue: string | undefined
+  /** Driven by a group (an item, or the group's select-all Parent). */
+  readonly grouped: FormToggleGrouped | null
 }
+
+/** How a Checkbox Group (or its select-all Parent) drives a Checkbox inside it. */
+export interface FormToggleGrouping {
+  /** The props for the Checkbox with this `value`, or null when it is not grouped. */
+  resolve(
+    value: string,
+    own: { readonly disabled: boolean; readonly readOnly: boolean; readonly required: boolean },
+  ): FormToggleGrouped | null
+}
+
+export interface FormToggleGrouped {
+  readonly props: GroupedCheckbox
+  /** The user's proposal: the group decides. */
+  onChange(checked: CheckedState, modality: Modality): void
+  /** The rendered Control's id and disabled flag; returns the unregistration. */
+  register?(controlId: string, disabled: boolean): () => void
+}
+
+/** Provided by CheckboxGroup.Root and its Parent; only checkboxes read it. */
+export const FormToggleGroupingContext = createContext<FormToggleGrouping | null>(null)
+
 const FormToggleContext = createContext<Ctx | null>(null)
 function useFormToggle(part: string): Ctx {
   const ctx = useContext(FormToggleContext)
@@ -147,7 +171,8 @@ function useApi(
       labelable,
       ...ctx.own,
       describedBy: description,
-      consumerDescribedBy: extra.describedBy,
+      consumerDescribedBy:
+        [extra.describedBy, ctx.grouped?.props.describedBy].filter(Boolean).join(" ") || undefined,
       ariaLabel: extra.ariaLabel,
       ariaLabelledBy: extra.ariaLabelledBy,
     },
@@ -228,7 +253,13 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
   }: FormToggleRootProps<V, D>) {
     const env = useEnvironment()
     const instance = useRootId(id)
-    const binding = useFieldControl()
+    // Inside a Checkbox Group: the group owns the value, the flags and the Field binding.
+    const grouping = useContext(FormToggleGroupingContext)
+    const grouped =
+      config.scope === "checkbox"
+        ? (grouping?.resolve(value, { disabled, readOnly, required }) ?? null)
+        : null
+    const binding = useFieldControl({ skip: grouped !== null })
     const controlEl = useRef<HTMLElement | null>(null)
     const inputEl = useRef<HTMLInputElement | null>(null)
     const [controlTag, setControlTag] = useState("button")
@@ -239,11 +270,11 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
       {
         role: config.role,
         labelable: true,
-        disabled: disabled || fieldsetContext || fieldsetDom,
-        readOnly,
-        required,
-        invalid,
-        name,
+        disabled: (grouped?.props.disabled ?? disabled) || fieldsetContext || fieldsetDom,
+        readOnly: grouped?.props.readOnly ?? readOnly,
+        required: grouped?.props.required ?? required,
+        invalid: grouped?.props.invalid ?? invalid,
+        name: grouped ? grouped.props.name : name,
       },
       binding,
     )
@@ -256,10 +287,16 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
     const lastReason = useRef<string | null>(null)
     const service = config.useService(
       {
-        checked,
+        // A grouped checkbox is controlled by its group (its CheckedState).
+        checked: grouped ? (grouped.props.checked as V) : checked,
         defaultChecked,
         onCheckedChange: (next, details) => {
           lastReason.current = (details as { reason?: string }).reason ?? null // ChangeDetails
+          if (grouped) {
+            // The proposal's TOGGLE carries the modality (a RESET never reaches a grouped one).
+            const event = (details as { event?: { modality?: Modality } }).event
+            grouped.onChange(next, event?.modality ?? "virtual")
+          }
           onCheckedChange?.(next, details)
         },
         disabled: field.disabled,
@@ -270,6 +307,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
     const { send } = service
     const current = service.checked
     // After every commit: the input reflects the value (hydration, re-renders); no events.
+    const isGrouped = grouped !== null
     const latest = useRef(current)
     latest.current = current
     useIsoLayoutEffect(() => {
@@ -280,8 +318,10 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
         formInput.track({
           onReset: () => send({ type: "RESET" }),
           current: () => mirrorOf(latest.current),
+          // A group answers its form's reset once, for every item.
+          resetsWithForm: !isGrouped,
         }),
-      [formInput, send],
+      [formInput, send, isGrouped],
     )
     useEffect(() => {
       const node = controlEl.current
@@ -334,11 +374,11 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
       service,
       binding,
       own: {
-        disabled: disabled || fieldsetContext || fieldsetDom,
-        readOnly,
-        required,
-        invalid,
-        name,
+        disabled: field.disabled,
+        readOnly: field.readOnly,
+        required: grouped?.props.required ?? required,
+        invalid: grouped?.props.invalid ?? invalid,
+        name: field.name,
       },
       focusableWhenDisabled,
       ids,
@@ -347,12 +387,23 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
       inputEl,
       controlTag,
       setControlTag,
-      hidden: { value, form, defaultChecked },
+      hidden: {
+        value,
+        form: grouped ? grouped.props.form : form,
+        // A grouped item's server HTML submits its membership before hydration; its reset
+        // is the group's (which re-syncs every item), so the attribute follows the group.
+        defaultChecked: grouped ? grouped.props.checked : defaultChecked,
+      },
       uncheckedValue,
+      grouped,
     }
     const api = useApi(ctx)
     const props = mergeProps(
-      { ...normalizeProps(api.root()), ...(id === undefined ? {} : { id }), ref },
+      {
+        ...normalizeProps({ ...api.root(), ...grouped?.props.root }),
+        ...(id === undefined ? {} : { id }),
+        ref,
+      },
       rest,
     )
     const unchecked = api.uncheckedInput()
@@ -429,7 +480,15 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
       ariaLabel,
       ariaLabelledBy,
     })
-    const own = normalizeProps(api.control())
+    const own = normalizeProps({ ...api.control(), ...ctx.grouped?.props.control })
+    // Grouped: the group needs the rendered Control's id (aria-controls) and disabled flag.
+    const groupRegister = ctx.grouped?.register
+    const controlDisabled = own["disabled"] === true || own["aria-disabled"] === "true"
+    useIsoLayoutEffect(() => {
+      const node = el.current
+      if (!groupRegister || !node) return
+      return groupRegister(node.id, controlDisabled)
+    }, [groupRegister, controlDisabled])
     const props = mergeProps(
       {
         ...joinHandlers(
