@@ -122,9 +122,16 @@ export const DriverExample: Story = {
       { text: "Email" },
       { platform: domEnvironment().platform },
     )
+    const input = canvasElement.querySelector("input") as HTMLInputElement // rendered above
+    let forwarded = 0
+    input.addEventListener("click", () => forwarded++)
     await label.click()
-    // The label's click action has no postcondition to wait on (CI Firefox flaked reading
-    // focus right after it), so wait for the control's focus.
-    await waitFor(async () => expect(await label.isControlFocused()).toBe(true))
+    // The label's activation reaches its control (a forwarded click).
+    await waitFor(() => expect(forwarded).toBe(1))
+    // Focus follows only where the window has OS focus: Firefox on Linux (headless CI)
+    // does not move it otherwise (quirk "firefox-label-focus-unfocused-window").
+    if (canvasElement.ownerDocument.hasFocus()) {
+      await waitFor(async () => expect(await label.isControlFocused()).toBe(true))
+    }
   },
 }
