@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-checkbox (r1) | — | packages/react/src/checkbox/checkbox.tsx (Control onKeyDown) | Enter guard misses keyCode 229 (Safari commit keydown after compositionend) → IME Enter could implicitSubmit; share one isImeKey(e) with press.ts |
+| add-checkbox (r1) | — | packages/core/src/dom/modality.ts (onClick) | pressLabel never cleared when the label wraps the control → later AT click stays "pointer" and a later programmatic focus is cause "pointer" (ring hidden); clear after the first forwarded click |
+| add-checkbox (r1) | — | packages/react/src/checkbox/checkbox.tsx (lastReason) | UNVERIFIED: controlled parent rejecting a toggle leaves lastReason "TOGGLE", so a later programmatic checked change may reach the Field as user: true — write a test |
 | add-toggle (r1) | — | packages/react/src/toggle/toggle.tsx:80-86 | stable-name dev check runs accessibleNameOf in production (and keeps accname.ts in the bundle) — guard the effect with NODE_ENV like text-field |
 | add-toggle (r1) | — | packages/theme/src/toggle.css | forced-colors [data-state=on] rule is dead (base.css :where([data-scope])[data-state=on] wins) — delete or raise specificity |
 | add-toggle (r1) | — | packages/core/src/dom/accname.ts | subset accname (no hidden-labelledby, title, svg title, CSS display/pseudo content) is public API — mark @internal |

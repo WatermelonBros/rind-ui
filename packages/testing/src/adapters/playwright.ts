@@ -397,6 +397,11 @@ function createPlaywrightEnv(
       doubleClick: async () => (await waitFor()).dblclick(),
       text: async () => ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim(),
       value: async () => (await now()).inputValue(),
+      // Properties, not attributes (the attribute is the default a reset restores).
+      checked: async () =>
+        (await now()).evaluate((el) => (el as HTMLInputElement).checked === true),
+      indeterminate: async () =>
+        (await now()).evaluate((el) => (el as HTMLInputElement).indeterminate === true),
       exists: async () => {
         await ensureInPage((await getBase()).root)
         return (await locate()).evaluateAll((els) =>

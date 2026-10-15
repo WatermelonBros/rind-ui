@@ -53,6 +53,15 @@ export interface StepFacts {
     readonly selectionAnnouncement: (observed: never) => string
     readonly sectionAnnouncement?: (observed: never) => string
   }
+  /** form-associated: what the hidden input must hold, and the user changes so far. */
+  readonly formInput?: {
+    readonly expected: {
+      readonly checked?: boolean
+      readonly indeterminate?: boolean
+      readonly value?: string
+    }
+    readonly userChanges: number
+  }
   /** True when a contract exception (through an active quirk) exempts `part` from `invariant`. */
   readonly exempt?: (invariant: GenericInvariantId, part: string) => boolean
 }
@@ -280,7 +289,13 @@ const hiddenFocus: GenericInvariant = (f) => {
   if (focused?.inAriaHidden) out.push(`focus is on ${focused.describe}, inside aria-hidden`)
   if (focused?.inInert) out.push(`focus is on ${focused.describe}, inside inert`)
   for (const el of f.after.elements) {
-    if (el.focusable && el.inAriaHidden && !el.hidden) {
+    // A form-associated hidden input forwards focus to its control (hidden-form-input);
+    // the form-associated invariant checks it never keeps focus and is out of the tab order.
+    const formInput =
+      f.traits.includes("form-associated") &&
+      el.part === "hidden-input" &&
+      el.attrs["tabindex"] === "-1"
+    if (el.focusable && el.inAriaHidden && !el.hidden && !formInput) {
       out.push(`${el.describe} is focusable inside aria-hidden`)
     }
   }
@@ -415,6 +430,40 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
    * exactly the Field parts that are rendered, aria-invalid exactly when the Field displays
    * invalid, and disabled / read-only / required as the Field says.
    */
+  /**
+   * hidden-form-input: the input mirrors the oracle's value as properties, is hidden from
+   * AT and never focused, and dispatches one `change` per user change, no `click` ever.
+   */
+  "form-associated": (f) => {
+    const out: string[] = []
+    const inputs = f.after.formInputs
+    if (inputs.length !== 1) {
+      return [`${inputs.length} hidden inputs rendered; expected exactly one`]
+    }
+    const [input] = inputs
+    if (!input || !f.formInput) return out
+    const want = f.formInput.expected
+    for (const key of ["checked", "indeterminate", "value"] as const) {
+      if (want[key] !== undefined && input[key] !== want[key]) {
+        out.push(`${input.describe} ${key} is ${String(input[key])}, expected ${String(want[key])}`)
+      }
+    }
+    if (input.ariaHidden !== "true") out.push(`${input.describe} is not aria-hidden`)
+    if (input.tabIndex !== -1) out.push(`${input.describe} has tabIndex ${input.tabIndex}`)
+    if (input.focused) out.push(`${input.describe} has focus`)
+    const changes = input.changes - (f.baseline.formInputs[0]?.changes ?? 0)
+    if (changes !== f.formInput.userChanges) {
+      out.push(
+        `${input.describe} dispatched ${changes} change events for ${f.formInput.userChanges} user changes`,
+      )
+    }
+    if (input.clicks > 0) {
+      out.push(
+        `${input.describe} received ${input.clicks} click events (a synthetic click reaches ancestors)`,
+      )
+    }
+    return out
+  },
   "field-associated": (f) => {
     const field = f.after.field
     if (!field) return []

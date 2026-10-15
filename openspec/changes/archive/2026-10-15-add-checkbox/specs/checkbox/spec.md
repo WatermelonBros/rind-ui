@@ -290,16 +290,20 @@ test step:
 
 - the Control's `aria-checked` corresponds to the oracle's state (`mixed` exactly in
   `indeterminate`);
-- an Enter key step never changes the value;
 - the component renders exactly one element with role `checkbox`;
 - when a Label is rendered, the Control's accessible name equals the Label's text, and it is
   the same in every state.
+
+`@rind-ui/testing` SHALL export, as a consumer invariant usable with
+`testMachine(checkboxContract, { invariants })` (`checkboxStepInvariants()`), the
+invariant that needs the keys a step pressed, which the shared invariant API does not
+carry: an Enter key on the Control never changes the value.
 
 #### Scenario: Broken variant toggles on Enter
 
 - **WHEN** a variant of the Checkbox toggles on Enter and is run through the model-based
   tests
-- **THEN** the keyboard path that presses Enter fails, naming the invariant
+- **THEN** a step that presses Enter on the Control fails `checkbox-enter-never-changes`
 
 ### Requirement: Theme
 

@@ -80,7 +80,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Checkbox | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Used by Reado |
+| Checkbox | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
 | Radio Group | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec |  |
 | Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | spec |  |
 | Toggle | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC/Kobalte: Toggle Button |

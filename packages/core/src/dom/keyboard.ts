@@ -35,6 +35,15 @@ export function trackComposition(doc: Document): void {
   )
 }
 
+/** A key event that belongs to an IME composition (native or a framework's `nativeEvent`). */
+export function isImeKey(e: {
+  readonly isComposing?: boolean | undefined
+  readonly keyCode?: number | undefined
+  readonly nativeEvent?: { readonly isComposing?: boolean | undefined } | undefined
+}): boolean {
+  return e.isComposing === true || e.nativeEvent?.isComposing === true || e.keyCode === 229
+}
+
 /** Describes a native key event; `composing` covers isComposing, keyCode 229 and Safari. */
 export function describeKey(e: NativeKey, env: PlatformInfo): KeyDescription {
   let composing = e.isComposing === true || e.keyCode === 229

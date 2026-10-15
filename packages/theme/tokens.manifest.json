@@ -258,6 +258,75 @@
         }
       }
     },
+    "checkbox": {
+      "family": "choice",
+      "tokens": {
+        "bg": {
+          "fallback": "transparent",
+          "file": "checkbox.css"
+        },
+        "bg-on": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "checkbox.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "checkbox.css"
+        },
+        "border-invalid": {
+          "fallback": "var(--rind-color-danger-border, var(--rind-color-border-strong))",
+          "file": "checkbox.css"
+        },
+        "border-on": {
+          "fallback": "var(--rind-color-accent-solid)",
+          "file": "checkbox.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "checkbox.css"
+        },
+        "cursor": {
+          "fallback": "pointer",
+          "file": "checkbox.css"
+        },
+        "description-color": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "checkbox.css"
+        },
+        "disabled-cursor": {
+          "fallback": "not-allowed",
+          "file": "checkbox.css"
+        },
+        "disabled-opacity": {
+          "fallback": "0.6",
+          "file": "checkbox.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-fast)",
+          "file": "checkbox.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "checkbox.css"
+        },
+        "glyph": {
+          "fallback": "var(--rind-color-text)",
+          "file": "checkbox.css"
+        },
+        "glyph-on": {
+          "fallback": "var(--rind-color-accent-on-solid)",
+          "file": "checkbox.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-indicator)",
+          "file": "checkbox.css"
+        },
+        "size": {
+          "fallback": "1.25rem",
+          "file": "checkbox.css"
+        }
+      }
+    },
     "collapsible": {
       "family": null,
       "tokens": {

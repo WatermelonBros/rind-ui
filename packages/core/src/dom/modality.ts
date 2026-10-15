@@ -14,6 +14,8 @@ interface WindowState {
   subscribers: number
   /** The element the last pointer or key press started on (a bare click elsewhere is AT). */
   pressTarget: EventTarget | null
+  /** The label the last pointer press started in: the click it forwards is not AT. */
+  pressLabel: HTMLLabelElement | null
   /** What happened since the last focus: decides the next focus's cause. */
   inputBeforeFocus: "key" | "pointer" | null
   /** The element focused when the window lost focus, until it gets focus back. */
@@ -105,6 +107,13 @@ function isVirtualPointer(e: PointerEvent, platform: PlatformFlags): boolean {
   )
 }
 
+/** Whether `label` names `target` (its `control`, or the element its `for` names). */
+function labels(label: HTMLLabelElement | null, target: Node | null): boolean {
+  if (!label || !target) return false
+  if (label.control === target) return true
+  return label.htmlFor !== "" && label.ownerDocument.getElementById(label.htmlFor) === target
+}
+
 function install(win: Window, platform: PlatformFlags): WindowState {
   const doc = win.document
   const set = (state: WindowState, modality: Modality) => {
@@ -114,6 +123,7 @@ function install(win: Window, platform: PlatformFlags): WindowState {
   }
   const onKey = (e: KeyboardEvent) => {
     state.inputBeforeFocus = "key"
+    state.pressLabel = null
     if (e.type === "keydown") state.pressTarget = e.target
     if (!isKeyboardInput(e, platform)) return
     // Typing in a text field after a click is not "keyboard navigation": only Tab and
@@ -125,6 +135,7 @@ function install(win: Window, platform: PlatformFlags): WindowState {
   }
   const onPointerDown = (e: PointerEvent) => {
     state.pressTarget = e.target
+    state.pressLabel = (e.target as Element | null)?.closest?.("label") ?? null
     if (isVirtualPointer(e, platform)) {
       set(state, "virtual")
       return
@@ -133,8 +144,18 @@ function install(win: Window, platform: PlatformFlags): WindowState {
     set(state, e.pointerType === "touch" ? "touch" : "pointer")
   }
   const onClick = (e: MouseEvent) => {
-    // AT activation: a click with detail 0 that no press on this element started.
-    if (e.detail === 0 && state.pressTarget !== e.target) set(state, "virtual")
+    // AT activation: a click with detail 0 that no press on this element started, and
+    // not the click a pressed label forwards to its control (a pointer press:
+    // react-spectrum#10299, #3675, kobalte#39).
+    const label = state.pressLabel
+    const target = e.target as Node | null
+    const forwarded = labels(label, target)
+    if (e.detail === 0 && state.pressTarget !== e.target && !forwarded) set(state, "virtual")
+    // The label's own click comes first; keep the label until the click it forwards, then
+    // forget it (a wrapping label would otherwise make a later AT click "pointer").
+    if (forwarded || !(target instanceof Element && target.closest("label") === label)) {
+      state.pressLabel = null
+    }
     state.pressTarget = null
   }
   const onFocus = (e: FocusEvent) => {
@@ -154,6 +175,10 @@ function install(win: Window, platform: PlatformFlags): WindowState {
       if (marked.modality) set(state, marked.modality)
     } else if (state.inputBeforeFocus) {
       cause = state.inputBeforeFocus
+    } else if (labels(state.pressLabel, target)) {
+      // A pressed label focusing its control (after a focusable ancestor took the
+      // mousedown focus): still the pointer's.
+      cause = "pointer"
     } else if (state.windowBlurred === target) {
       // The window regaining focus restores the element that had it. Any other element
       // is someone else's move (e.g. the VoiceOver cursor after an empty refocus).
@@ -188,6 +213,7 @@ function install(win: Window, platform: PlatformFlags): WindowState {
     listeners: new Set(),
     subscribers: 0,
     pressTarget: null,
+    pressLabel: null,
     inputBeforeFocus: null,
     windowBlurred: null,
     marked: new WeakMap(),

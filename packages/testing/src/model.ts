@@ -762,6 +762,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     )
 
   /** The last step's facts: the base of the unmount-while-open check. */
+  /** Steps whose user action changed the value (form-associated: one `change` each). */
+  let userChanges = 0
   let lastFacts: StepFacts | null = null
   const verify = async (
     step: number,
@@ -819,6 +821,16 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       stepAnnouncements: (await base.announcements()).slice(announcedBefore),
       observed: seen,
       ...(contract.announcements ? { announcements: contract.announcements } : {}),
+      ...(contract.formInput
+        ? {
+            formInput: {
+              expected: contract.formInput.expected(
+                oracle.service.view().values as Record<string, unknown>,
+              ),
+              userChanges,
+            },
+          }
+        : {}),
       exempt,
     }
     lastFacts = facts
@@ -1036,7 +1048,14 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
               from,
             )
           }
+          const valuesBefore = JSON.stringify(oracle.service.view().values)
           send(edge.event, { ...mapping.event?.(oracle.service.view()), modality: stepMod })
+          if (
+            JSON.stringify(oracle.service.view().values) !== valuesBefore &&
+            !contract.formInput?.silentEvents?.includes(edge.event)
+          ) {
+            userChanges += 1
+          }
           try {
             await runAction(
               contract,

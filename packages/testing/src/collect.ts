@@ -39,6 +39,20 @@ export interface ElementInfo {
   readonly within: readonly string[]
 }
 
+export interface FormInputInfo {
+  readonly describe: string
+  readonly checked: boolean
+  readonly indeterminate: boolean
+  readonly value: string
+  readonly ariaHidden: string | null
+  readonly tabIndex: number
+  readonly focused: boolean
+  /** `change` / `input` / `click` events whose target was this input. */
+  readonly changes: number
+  readonly inputs: number
+  readonly clicks: number
+}
+
 export interface IdRef {
   readonly from: string
   readonly attr: string
@@ -80,6 +94,12 @@ export interface DomSnapshot {
   } | null
   /** Live regions (explicit `aria-live` other than "off", or by role) inside the parts. */
   readonly liveRegions: readonly string[]
+  /**
+   * The instance's hidden form inputs (`data-part="hidden-input"`, form-associated trait):
+   * DOM properties (never attributes) and the events each dispatched since the page's first
+   * snapshot.
+   */
+  readonly formInputs: readonly FormInputInfo[]
   /** The visual viewport, and whether the page has real layout (not jsdom). */
   readonly viewport: {
     readonly x: number
@@ -208,11 +228,34 @@ const isLive = (el: Element) => {
   return live !== null ? live !== "off" : LIVE_ROLES.includes(roleOf(el) ?? "")
 }
 
+// Page-wide counters of the events hidden form inputs dispatch, installed by the first
+// snapshot (capture, so a consumer's stopPropagation cannot hide one).
+const formEvents = new WeakMap<Element, { change: number; input: number; click: number }>()
+let countingFormEvents = false
+function countFormEvents() {
+  if (countingFormEvents) return
+  countingFormEvents = true
+  for (const type of ["change", "input", "click"] as const) {
+    document.addEventListener(
+      type,
+      (e) => {
+        const t = e.target
+        if (!(t instanceof Element) || t.getAttribute("data-part") !== "hidden-input") return
+        const c = formEvents.get(t) ?? { change: 0, input: 0, click: 0 }
+        c[type] += 1
+        formEvents.set(t, c)
+      },
+      true,
+    )
+  }
+}
+
 export function collectDom(arg: {
   readonly scope: string
   readonly instance: string
 }): DomSnapshot {
   const doc = document
+  countFormEvents()
   const parents = new Map<Element | null, number>()
   const groupOf = (el: Element) => {
     const parent = el.parentElement
@@ -367,5 +410,23 @@ export function collectDom(arg: {
       }
     })(),
     liveRegions: elements.filter(isLive).map(describe),
+    formInputs: partEls
+      .filter((el) => el.getAttribute("data-part") === "hidden-input")
+      .map((el) => {
+        const input = el as HTMLInputElement
+        const c = formEvents.get(el) ?? { change: 0, input: 0, click: 0 }
+        return {
+          describe: describe(el),
+          checked: input.checked === true,
+          indeterminate: input.indeterminate === true,
+          value: input.value ?? "",
+          ariaHidden: el.getAttribute("aria-hidden"),
+          tabIndex: input.tabIndex,
+          focused: doc.activeElement === el,
+          changes: c.change,
+          inputs: c.input,
+          clicks: c.click,
+        }
+      }),
   }
 }

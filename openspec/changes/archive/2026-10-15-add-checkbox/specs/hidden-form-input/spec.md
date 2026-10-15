@@ -31,8 +31,10 @@ root part SHALL render it automatically as its last child, after the visible con
 server render too, whether or not the component has a `name` or is inside a form. The input
 SHALL carry `aria-hidden="true"`, `tabIndex=-1`, a generated id, and
 `data-part="hidden-input"`. It SHALL use the input variant of the visually hidden style
-(`hidden-content`) placed at its static position (absolute positioning with no offsets, 1×1
-CSS px, clipped), so it changes neither the layout nor the scroll size of any ancestor, and
+(`hidden-content`) placed at its static position (fixed positioning with no offsets, 1×1
+CSS px, clipped: an absolutely positioned input whose containing block is the page escapes a
+scroll container's clipping and adds to the document's scroll size), so it changes neither
+the layout nor the scroll size of any ancestor, and
 it SHALL never receive pointer input. It SHALL NOT be exposed to assistive technology or
 matched by role queries.
 

@@ -8,8 +8,10 @@ export {
   constraintValidity,
   firstInvalidInTreeOrder,
   hasOwnCustomValidity,
+  keepControlValidity,
   readValidity,
   requiredMessage,
+  setControlValidity,
   setOwnCustomValidity,
   VALIDITY_KEYS,
   type ValidityKey,
@@ -38,6 +40,17 @@ export {
   tabbables,
   trapTab,
 } from "./focus-scope"
+export {
+  type FormInputCapability,
+  type HiddenInputElements,
+  type HiddenInputValue,
+  hiddenFormInput,
+  hiddenFormInputStyle,
+  implicitSubmit,
+  recordingFormInput,
+  type SyncOptions,
+  type TrackOptions,
+} from "./hidden-input"
 export { createHover, type HoverOptions, type HoverPointerEvent } from "./hover"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
@@ -52,6 +65,7 @@ export {
   DEFAULT_TYPEAHEAD_TIMEOUT,
   describeKey,
   type Hotkey,
+  isImeKey,
   isTypeaheadKey,
   matchHotkey,
   parseHotkey,

@@ -128,3 +128,21 @@ Record each pass in `tested-with.json` with `component: "text-field"`.
 - [ ] **All**: near the limit, the remaining count is announced once after a pause.
 - [ ] **Japanese IME on macOS and Windows**: composing and committing "テスト" works,
       with no stray characters and one validation after the commit.
+
+## Device checklist: Checkbox (add-checkbox 11.1)
+
+Stories: Components/Checkbox → Default, Checked, Indeterminate, RequiredInvalid, InForm,
+RenderAsDiv. Record each pass in `tested-with.json` with `component: "checkbox"`.
+
+- [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
+      TalkBack + Chrome**: name ("Accept the terms"), role (check box), state (checked / not
+      checked) and description are read on focus.
+- [ ] **All**: the indeterminate Checkbox is announced as "mixed" (or "partially checked"),
+      and Space makes it checked.
+- [ ] **All**: Space toggles and the new state is announced once; on mobile, double-tap
+      toggles once.
+- [ ] **All**: Enter inside the InForm story submits the form and does not toggle.
+- [ ] **All**: clicking the Label (and, with a screen reader, activating it) toggles once.
+- [ ] **All**: disabled is announced as unavailable; read-only is announced and does not
+      toggle; required and invalid are announced.
+- [ ] **RenderAsDiv**: the name comes from the Label and a Label press toggles once.

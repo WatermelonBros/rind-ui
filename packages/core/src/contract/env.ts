@@ -97,6 +97,10 @@ export interface Part {
   text(): Promise<string>
   /** The value of a form control. */
   value(): Promise<string>
+  /** A native input's `checked` property (never the attribute). */
+  checked(): Promise<boolean>
+  /** A native input's `indeterminate` property. */
+  indeterminate(): Promise<boolean>
   /** Attached and not hidden. */
   exists(): Promise<boolean>
   /** Also true when the part is the `aria-activedescendant` of the focused element. */

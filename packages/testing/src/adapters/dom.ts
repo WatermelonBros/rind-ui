@@ -420,6 +420,8 @@ function createDomEnv(
         ),
       text: async () => normalize((await now()).textContent),
       value: async () => ((await now()) as HTMLInputElement).value ?? "",
+      checked: async () => ((await now()) as HTMLInputElement).checked === true,
+      indeterminate: async () => ((await now()) as HTMLInputElement).indeterminate === true,
       exists: async () => (await resolve()).some(isVisible),
       isFocused: async () => {
         const el = await now()

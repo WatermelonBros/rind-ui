@@ -72,6 +72,32 @@ export function clearOwnCustomValidity(el: ConstraintElement): void {
   el.setCustomValidity(mine.foreign)
 }
 
+/** A control's own validity message (e.g. a date field's badInput), per element. */
+const control = new WeakMap<ConstraintElement, string>()
+
+/**
+ * Sets (or, with "", clears) the control's own message, composed with the Field's: while
+ * the Field's message is set it stays shown and the control's is what returns when the
+ * Field clears its own; otherwise the control's is shown at once.
+ */
+export function setControlValidity(el: ConstraintElement, message: string): void {
+  if (message === "") control.delete(el)
+  else control.set(el, message)
+  const field = own.get(el)
+  if (field) {
+    own.set(el, { message: field.message, foreign: message })
+    return
+  }
+  el.setCustomValidity(message)
+}
+
+/** A re-sync keeps the control's own message (never clears it, never the Field's). */
+export function keepControlValidity(el: ConstraintElement): void {
+  const message = control.get(el)
+  if (message === undefined || own.has(el) || el.validationMessage === message) return
+  el.setCustomValidity(message)
+}
+
 /** Whether rind-ui's own message is the element's custom validity now. */
 export const hasOwnCustomValidity = (el: ConstraintElement) => own.has(el)
 

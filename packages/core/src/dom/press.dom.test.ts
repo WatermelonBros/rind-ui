@@ -249,6 +249,22 @@ describe("keyboard activation", () => {
     key("keyup", " ")
     expect(events.at(-1)).toBe("PRESS:keyboard")
   })
+
+  it('a <button role="checkbox"> presses on Space, not Enter; Enter is prevented (no native click)', () => {
+    setup('<button type="button" role="checkbox" aria-checked="false">c</button>')
+    const enter = key("keydown", "Enter")
+    key("keyup", "Enter")
+    expect(enter.defaultPrevented).toBe(true)
+    expect(events).toEqual([])
+    key("keydown", " ")
+    key("keyup", " ")
+    expect(events.at(-1)).toBe("PRESS:keyboard")
+  })
+
+  it("Enter on a native <input type=checkbox> is not prevented (implicit submission)", () => {
+    setup('<input type="checkbox">')
+    expect(key("keydown", "Enter").defaultPrevented).toBe(false)
+  })
 })
 
 describe("lost keyup while ⌘ is held (Chromium 1393524, WebKit 55291, Mozilla 1299553)", () => {

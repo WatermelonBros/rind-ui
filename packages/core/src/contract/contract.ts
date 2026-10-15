@@ -25,6 +25,8 @@ export type Trait =
   | "directional"
   /** A form control: inside a Field, it follows the Field (field-control trait). */
   | "field-associated"
+  /** Takes part in forms through a hidden native input (hidden-form-input). */
+  | "form-associated"
 
 /** One modality's implementation of an action. */
 export type ActionImpl<P extends string> = (env: Env<P>, ...args: never) => Promise<unknown>
@@ -212,6 +214,22 @@ export interface ContractDef<
    * skips that invariant for that part while the quirk applies, and reports it.
    */
   readonly exceptions?: readonly Exception<NoInfer<P>>[]
+  /** The `form-associated` trait: what the hidden input must hold, and silent events. */
+  readonly formInput?: FormInputDecl
+}
+
+/**
+ * A form-associated contract's hidden input (hidden-form-input "Form-Associated Trait"):
+ * the DOM properties it must hold for the oracle's values, and the events that change the
+ * value without the user (dispatching no `change`, e.g. a form reset).
+ */
+export interface FormInputDecl {
+  readonly expected: (values: Readonly<Record<string, unknown>>) => {
+    readonly checked?: boolean
+    readonly indeterminate?: boolean
+    readonly value?: string
+  }
+  readonly silentEvents?: readonly string[]
 }
 
 export interface Announcements<Q> {
@@ -269,6 +287,7 @@ export interface AnyContract {
     readonly name: string
     readonly check: (ctx: never) => unknown
   }[]
+  readonly formInput?: FormInputDecl
 }
 
 /**

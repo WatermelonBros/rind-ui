@@ -22,6 +22,7 @@ import type {
   TimerHandle,
 } from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
+import { isImeKey } from "./keyboard"
 import { quirkActive } from "./quirks"
 import { textSelection } from "./text-selection"
 import { injectTouchAction } from "./touch-action"
@@ -55,6 +56,10 @@ export interface PressKeyEvent extends PressBaseEvent {
   readonly key: string
   readonly code: string
   readonly repeat: boolean
+  /** An IME composition (native, or a framework event's `nativeEvent`, or keyCode 229). */
+  readonly isComposing?: boolean
+  readonly keyCode?: number
+  readonly nativeEvent?: { readonly isComposing?: boolean }
 }
 
 export type PressEnv = ModalityEnv &
@@ -160,6 +165,8 @@ function kindOf(el: EventTarget | null): Kind {
     if (!["button", "submit", "reset", "image"].includes(type)) return "text"
   }
   if (role === "link" || (tag === "A" && e.hasAttribute("href"))) return "link"
+  // A checkable role on any element presses with Space only, as a native checkbox does.
+  if (role === "checkbox" || role === "switch" || role === "radio") return "check"
   return "button"
 }
 
@@ -503,9 +510,20 @@ export function createPress(options: PressOptions): PressHandle {
     },
     onKeyDown(e) {
       if (disabled()) return
+      // Keys during an IME composition belong to the composition: they never press.
+      if (isImeKey(e)) return
       const kind = kindOf(e.currentTarget)
       if (!pressesKey(kind, e.key)) {
         if (state.kind === "key" && e.key === "Meta") state.metaHeld = true
+        // Enter on a checkable <button> (role checkbox, switch, radio) must not click it:
+        // the native button would, and a checkbox ignores Enter (react-spectrum#6398).
+        if (
+          kind === "check" &&
+          e.key === "Enter" &&
+          (e.currentTarget as Element).tagName === "BUTTON"
+        ) {
+          e.preventDefault()
+        }
         return
       }
       // Links keep their native Enter (navigation), submit and reset buttons their native
