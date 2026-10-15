@@ -1,0 +1,59 @@
+.page {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  padding: calc(var(--bar-h) + 40px) 20px 60px;
+  text-align: center;
+}
+.code {
+  font: 900 clamp(120px, 26vw, 320px) / 0.85 var(--display);
+  letter-spacing: -0.05em;
+}
+/* the 0 is a dropped i-dot that keeps bobbing */
+.code span {
+  display: inline-block;
+  color: var(--acc);
+  animation: bob 2.6s var(--spring) infinite alternate;
+}
+@keyframes bob {
+  to {
+    translate: 0 -0.08em;
+    scale: 1.04 0.96;
+  }
+}
+.title {
+  font: 900 clamp(28px, 4vw, 48px) / 1 var(--display);
+  letter-spacing: -0.03em;
+}
+.text {
+  font: 500 18px / 1.5 var(--text);
+  color: color-mix(in oklab, var(--ink) 78%, transparent);
+}
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.primary,
+.ghost {
+  font: 600 16px var(--text);
+  padding: 14px 22px;
+  border-radius: var(--btn-r);
+  text-decoration: none;
+  transition: translate 0.4s var(--spring);
+}
+.primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+.ghost {
+  border: 2px solid var(--ink);
+}
+.primary:hover,
+.ghost:hover {
+  translate: 0 -2px;
+}
