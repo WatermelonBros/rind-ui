@@ -150,7 +150,8 @@ drift. When adding a component, make sure its docs page and stories exist; see
   to [docs/review-backlog.md](docs/review-backlog.md) and are picked up later.
 - **One review round per change, by one reviewer, scoped to the change's own diff**
   (the files the change created or modified, plus its OpenSpec change) — never the
-  whole repository. The implementer's hand-off lists every file it touched. After the
+  whole repository. The implementer's hand-off lists every file it touched; the reviewer uses
+  `git diff HEAD` (everything since the last approved change's commit). After the
   fixes, the reviewer only checks the gate is green and the review tasks are closed,
   then approves; whatever is left goes to the backlog.
 - Feedback from the user (manual testing, product decisions) is outside this limit:
@@ -172,6 +173,10 @@ Two sessions work on this repo: one writes specs and reviews, one implements.
   `openspec/specs/` and `openspec/changes/` only holds work still to do. Update the
   component's Status in `docs/components.md` to `done`.
 - Tick `tasks.md` checkboxes as you go; never archive a change with unticked tasks.
+- **Git**: the repo is `github.com/WatermelonBros/rind-ui` (private). After a change is
+  approved and archived, commit it (one commit per change, message naming the change)
+  and push to `main`. The reviewer scopes the next review to `git diff` against the
+  last pushed commit, so never leave unrelated edits uncommitted at a hand-off.
 
 ## Scope guard
 
