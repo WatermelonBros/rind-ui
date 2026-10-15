@@ -38,7 +38,7 @@ const base = `http://localhost:${typeof address === "object" && address ? addres
 const docs = JSON.parse(readFileSync(join(root, "content/generated/docs.json"), "utf8")) as {
   slug: string
 }[]
-const urls = ["/", "/docs/", ...docs.map((p) => `/docs/${p.slug}/`)]
+const urls = ["/", "/docs/", "/404.html", ...docs.map((p) => `/docs/${p.slug}/`)]
 const axeSource = readFileSync(join(root, "node_modules/axe-core/axe.min.js"), "utf8")
 
 type Finding = { url: string; kind: string; message: string }

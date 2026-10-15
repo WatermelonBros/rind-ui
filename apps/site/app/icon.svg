@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>rind</title>
+  <rect width="64" height="64" rx="16" fill="#d4ff3a"/>
+  <g transform="translate(32 32) scale(0.27) translate(-156 -112.2)">
+    <path fill="#0b0b0c" d="M130.60 200L130.60 82.60L156 87.80L181.40 82.60L181.40 200L130.60 200Z"/>
+    <ellipse cx="156" cy="47.2" rx="28.5" ry="22.8" fill="#ff3d8b"/>
+  </g>
+</svg>
