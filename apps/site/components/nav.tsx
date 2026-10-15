@@ -1,6 +1,6 @@
 "use client"
 
-import { Toggle } from "@rind-ui/react"
+import { Switch } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -32,11 +32,11 @@ export function Nav() {
       <Link href="/docs/#components">Components</Link>
       <Link href="/docs/testing-accessibility/">Testing</Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>
-      {/* The site's own phase switch is a rind Toggle: same name in both states, aria-pressed carries it. */}
-      <Toggle.Root
+      {/* The site's phase is an on/off setting that applies at once: a rind Switch. */}
+      <Switch.Root
         className={styles.phase}
-        pressed={phase === "juicy"}
-        onPressedChange={(pressed) => setPhase(pressed ? "juicy" : "crisp")}
+        checked={phase === "juicy"}
+        onCheckedChange={(on) => setPhase(on ? "juicy" : "crisp")}
       >
         <span
           className={styles.side}
@@ -45,13 +45,13 @@ export function Nav() {
         >
           crisp
         </span>
-        <span className={styles.track} aria-hidden="true">
-          <span className={styles.thumb} />
-        </span>
-        <span className={styles.side} data-on={phase === "juicy" ? "" : undefined}>
+        <Switch.Control className={styles.track}>
+          <Switch.Thumb className={styles.thumb} />
+        </Switch.Control>
+        <Switch.Label className={styles.side} data-on={phase === "juicy" ? "" : undefined}>
           juicy<span className={styles.visuallyHidden}> mode</span>
-        </span>
-      </Toggle.Root>
+        </Switch.Label>
+      </Switch.Root>
     </nav>
   )
 }

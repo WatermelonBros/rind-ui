@@ -142,10 +142,10 @@ for (const url of urls) {
   }
   await invisibleText(page, url)
   await axe(page, url, "crisp")
-  await page.getByRole("button", { name: "juicy mode" }).click()
+  await page.getByRole("switch", { name: "juicy mode" }).click()
   await page.waitForTimeout(1600)
   await axe(page, url, "juicy")
-  await page.getByRole("button", { name: "juicy mode" }).click()
+  await page.getByRole("switch", { name: "juicy mode" }).click()
   await page.waitForTimeout(1600)
   await page.setViewportSize({ width: 390, height: 844 })
   await page.waitForTimeout(300)

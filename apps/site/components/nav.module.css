@@ -88,6 +88,9 @@
   white-space: nowrap;
 }
 .track {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
   width: 58px;
   height: 32px;
   border-radius: 99px;
@@ -107,10 +110,10 @@
     translate 0.6s var(--spring),
     border-radius 0.6s var(--spring);
 }
-.phase[aria-pressed="true"] .track {
+.track[data-state="checked"] {
   background: var(--acc);
 }
-.phase[aria-pressed="true"] .thumb {
+.thumb[data-state="checked"] {
   translate: 26px 0;
   border-radius: 45% 55% 50% 50%;
 }
