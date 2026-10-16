@@ -25,27 +25,9 @@ jobs:
             exit 0
           fi
           base="origin/${{ github.base_ref }}"
-          files=$(git diff --name-only "$base"...HEAD)
-          echo "$files"
           echo "base=$base" >> "$GITHUB_OUTPUT"
-          # Anything outside the site and prose touches the components.
-          if echo "$files" | grep -qvE '^(apps/site/|docs/|[^/]+\.md$|\.changeset/)'; then
-            echo "components=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "components=false" >> "$GITHUB_OUTPUT"
-          fi
-          if echo "$files" | grep -qE '^(apps/site/|packages/|docs/|pnpm-lock\.yaml|package\.json|\.github/)'; then
-            echo "site=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "site=false" >> "$GITHUB_OUTPUT"
-          fi
-          # Config, dependencies and the test infrastructure itself: run the whole suite,
-          # since Vitest's --changed only follows imports.
-          if echo "$files" | grep -qE '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github/|\.nvmrc|packages/testing/src/(model|driver|adapter|adapters/|invariants|collect|setup|env)|packages/[^/]+/package\.json|packages/[^/]+/tsdown\.config\.ts|apps/storybook/\.storybook/)'; then
-            echo "full=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "full=false" >> "$GITHUB_OUTPUT"
-          fi
+          # Same rules as `pnpm verify` (scripts/ci-scope.mjs).
+          node scripts/ci-scope.mjs "$base" | tee -a "$GITHUB_OUTPUT"
 
   static:
     needs: changes
