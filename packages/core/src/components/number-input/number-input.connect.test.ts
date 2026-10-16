@@ -206,6 +206,8 @@ describe("parts", () => {
       tabindex: -1,
     })
     expect(numberInputConnect(input(), env).hiddenInput()["step"]).toBe("any")
+    // min without an explicit step: commits do not snap, so no native step constraint.
+    expect(numberInputConnect(input({ min: 0 }), env).hiddenInput()["step"]).toBe("any")
   })
 
   it("Value attributes for a German currency (cause G)", () => {

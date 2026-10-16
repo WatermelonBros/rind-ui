@@ -93,6 +93,8 @@ export interface NumberInputContext {
   text: string
   /** Edited since the last commit. */
   dirty: boolean
+  /** A blur arrived while composing: commit when the composition ends. */
+  commitAfterComposition: boolean
   focused: boolean
   /** The numbering system the user typed (kept when reformatting). */
   numberingSystem: string | undefined
@@ -214,6 +216,31 @@ function resyncAfterWrite(args: Args) {
   else args.set("dirty", false)
 }
 
+/** Blur or Enter: empty → null; garbage restores; else normalised and written. */
+function commitTextNow(args: Args) {
+  const { context, props, set } = args
+  if (!context.dirty) return
+  const typed = context.text
+  if (typed.trim() === "") {
+    write(args, null, { user: true, commit: "INPUT.COMMIT" })
+    resyncAfterWrite(args)
+    return
+  }
+  const parsed = props.parser.parse(typed)
+  if (parsed === null) {
+    // Garbage restores the formatted value (react-spectrum#3862), announced once.
+    resyncText(args)
+    announce(args, props.messages.committed(valueText(args, currentValue(args))))
+    return
+  }
+  set("numberingSystem", props.parser.numberingSystem(typed))
+  const next = normalise(parsed, props)
+  write(args, next, { user: true, commit: "INPUT.COMMIT" })
+  resyncAfterWrite(args)
+  // The typed number was rewritten (clamped, snapped, rounded): say so (react-spectrum#4967).
+  if (next !== parsed) announce(args, props.messages.committed(valueText(args, next)))
+}
+
 const directionOf = (t: Trigger | null): 1 | -1 => (t === "decrement" ? -1 : 1)
 
 export const numberInputMachine = setup({
@@ -256,30 +283,13 @@ export const numberInputMachine = setup({
       set("dirty", true)
       props.onInputValueChange?.(event.text)
     },
-    /** Blur or Enter: empty → null; garbage restores; else normalised and written. */
-    commitText: (args) => {
-      const { context, props, set } = args
-      if (!context.dirty) return
-      const typed = context.text
-      if (typed.trim() === "") {
-        write(args, null, { user: true, commit: "INPUT.COMMIT" })
-        resyncAfterWrite(args)
-        return
-      }
-      const parsed = props.parser.parse(typed)
-      if (parsed === null) {
-        // Garbage restores the formatted value (react-spectrum#3862), announced once.
-        resyncText(args)
-        announce(args, props.messages.committed(valueText(args, currentValue(args))))
-        return
-      }
-      set("numberingSystem", props.parser.numberingSystem(typed))
-      const next = normalise(parsed, props)
-      write(args, next, { user: true, commit: "INPUT.COMMIT" })
-      resyncAfterWrite(args)
-      // The typed number was rewritten (clamped, snapped, rounded): say so (react-spectrum#4967).
-      if (next !== parsed) announce(args, props.messages.committed(valueText(args, next)))
+    deferCommit: ({ set }) => set("commitAfterComposition", true),
+    commitDeferred: (args) => {
+      if (!args.context.commitAfterComposition) return
+      args.set("commitAfterComposition", false)
+      commitTextNow(args)
     },
+    commitText: (args) => commitTextNow(args),
     commitPaste: (args) => {
       if (args.event.type !== "PASTE") return
       const parsed = args.props.parser.parse(args.event.text)
@@ -397,6 +407,7 @@ export const numberInputMachine = setup({
   context: (props) => ({
     text: formatValue(props.value ?? props.defaultValue ?? null, props),
     dirty: false,
+    commitAfterComposition: false,
     focused: false,
     numberingSystem: undefined,
     trigger: null,
@@ -444,7 +455,9 @@ export const numberInputMachine = setup({
     composing: {
       on: {
         INPUT: { actions: ["setText"] },
-        "COMPOSITION.END": { target: "idle", actions: ["setText"] },
+        // A blur mid-composition commits once the composed text is in (no lost input).
+        COMMIT: { actions: ["deferCommit"] },
+        "COMPOSITION.END": { target: "idle", actions: ["setText", "commitDeferred"] },
       },
     },
     pressing: {
@@ -453,6 +466,8 @@ export const numberInputMachine = setup({
         touchSpinDelay: { guard: { and: ["spinsTouch", "canKeepSpinning"] }, target: "spinning" },
       },
       on: {
+        // A blur while a trigger is held still commits typed text (a form submit sees it).
+        COMMIT: { actions: ["commitText"] },
         "PRESS.END": { target: "idle", actions: ["endPress"] },
         "PRESS.CANCEL": { target: "idle", actions: ["endPress"] },
         "PRESS.LEAVE": { target: "idle", actions: ["endPress"] },
@@ -469,6 +484,8 @@ export const numberInputMachine = setup({
         ],
       },
       on: {
+        // A blur while a trigger is held still commits typed text (a form submit sees it).
+        COMMIT: { actions: ["commitText"] },
         "PRESS.END": { target: "idle", actions: ["endPress"] },
         "PRESS.CANCEL": { target: "idle", actions: ["endPress"] },
         "PRESS.LEAVE": { target: "idle", actions: ["endPress"] },

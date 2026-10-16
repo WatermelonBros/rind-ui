@@ -73,6 +73,8 @@ function literals(nf: Intl.NumberFormat, value: number) {
 
 const isPrefixOf = (part: string, whole: string) => part.length > 0 && whole.startsWith(part)
 
+declare const process: { env: { NODE_ENV?: string } }
+
 export function createNumberParser(
   locale: string,
   options: NumberParseOptions = {},
@@ -80,6 +82,25 @@ export function createNumberParser(
   const key = keyOf(locale, options)
   const hit = cache.get(key)
   if (hit) return hit
+  try {
+    const made = build(locale, options)
+    cache.set(key, made)
+    return made
+  } catch (e) {
+    // Invalid options (an unknown unit or currency) must not crash the render: plain decimal.
+    if (!(e instanceof RangeError)) throw e
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(
+        `[rind-ui] number-parsing: invalid formatOptions ${JSON.stringify(options)} for "${locale}" (${e.message}); using a plain decimal format`,
+      )
+    }
+    const fallback = createNumberParser(locale, {})
+    cache.set(key, fallback)
+    return fallback
+  }
+}
+
+function build(locale: string, options: NumberParseOptions): LocaleNumberParser {
   const parser = new NumberParser(locale, options)
   const base = new Intl.NumberFormat(locale, options)
   const resolved = base.resolvedOptions()
@@ -194,7 +215,6 @@ export function createNumberParser(
       }
     },
   }
-  cache.set(key, self)
   return self
 }
 

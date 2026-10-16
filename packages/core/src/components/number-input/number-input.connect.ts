@@ -248,8 +248,9 @@ export function numberInputConnect(input: NumberInputConnectInput, env: LinkEnv)
       form: input.form,
       min: input.min,
       max: input.max,
-      // The native step base is `min`; without one any number is valid.
-      step: input.min === undefined ? "any" : (input.step ?? 1),
+      // Only an explicit step on a `min` base constrains: a commit snaps to an explicit step
+      // only, so the default step must not make a typed 1.5 a native stepMismatch.
+      step: input.min === undefined || input.step === undefined ? "any" : input.step,
       required: field.required || undefined,
       disabled: field.disabled || undefined,
       defaultValue: input.defaultValue === null ? "" : String(input.defaultValue),

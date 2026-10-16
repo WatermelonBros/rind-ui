@@ -49,20 +49,11 @@
   background: var(--s-brand);
   color: #fff;
 }
-[data-skinned]
-  [data-scope="number-input"]:is(
-    [data-part="increment-trigger"],
-    [data-part="decrement-trigger"]
-  )[aria-disabled="true"] {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+/* At a bound and disabled: base.css dims the outermost disabled element only. */
 [data-skinned] [data-scope="number-input"][data-part="input"][aria-invalid="true"] {
   color: var(--s-error);
 }
 [data-skinned] [data-scope="number-input"][data-part="control"][data-invalid] {
   border-color: var(--s-acc-deep);
 }
-[data-skinned] [data-scope="number-input"][data-part="control"][data-disabled] {
-  opacity: 0.5;
-}
+

@@ -98,6 +98,12 @@ describe("Anatomy, names and messages", () => {
     expect(input().getAttribute("aria-valuetext")).toBe("Empty")
   })
 
+  it("an invalid formatOptions renders a plain decimal field instead of crashing", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {})
+    render(<Q defaultValue={14} formatOptions={{ style: "unit", unit: "pixel" }} />)
+    expect(input().value).toBe("14")
+  })
+
   it("the iOS quirk renders a plain textbox", () => {
     render(
       <RindProvider environment={{ platform: platforms.ios }}>
@@ -608,6 +614,23 @@ describe("Forms and Field", () => {
     await user.click(screen.getByRole("button", { name: "Send" }))
     expect(onSubmit).not.toHaveBeenCalled()
     expect(hidden().validity.rangeOverflow).toBe(true)
+  })
+
+  it("min without a step: a committed 1.5 is valid (no native stepMismatch)", async () => {
+    render(
+      <Field.Root validationMode="change">
+        <Field.Label>Level</Field.Label>
+        <NumberInput.Root name="q" min={0}>
+          <NumberInput.Input />
+        </NumberInput.Root>
+        <Field.ErrorMessage />
+      </Field.Root>,
+    )
+    const n = getNumberInput(screen, { name: "Level" }, { platform })
+    await n.fill("1.5")
+    expect(await n.value()).toBe(1.5)
+    expect(hidden().validity.valid).toBe(true)
+    expect(await n.isInvalid()).toBe(false)
   })
 
   it("Field disabled: input, hidden input and both triggers disabled", () => {

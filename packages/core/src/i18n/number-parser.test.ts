@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { createNumberParser, keypadDecimal } from "./number-parser"
 
 const p = createNumberParser
@@ -127,5 +127,16 @@ describe("number-parsing: value text", () => {
     const acc = p("en-US", { style: "currency", currency: "USD", currencySign: "accounting" })
     expect(acc.valueText(-57)).toBe("−$57.00")
     expect(p("en-US").valueText(-3)).toBe("−3")
+  })
+})
+
+describe("number-parsing: invalid options", () => {
+  it("an unknown unit falls back to a plain decimal format with a warning, never a throw", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const p2 = p("en-US", { style: "unit", unit: "pixel" })
+    expect(p2.format(14)).toBe("14")
+    expect(p2.parse("14")).toBe(14)
+    expect(warn.mock.calls.flat().join(" ")).toMatch(/invalid formatOptions/)
+    warn.mockRestore()
   })
 })

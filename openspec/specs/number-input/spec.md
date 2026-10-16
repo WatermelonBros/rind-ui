@@ -344,7 +344,8 @@ every key, press, wheel and paste, and stop any repeat. A read-only field SHALL 
 ### Requirement: Form Participation
 
 The hidden `<input type="number">` SHALL carry `name`, `form`, `min`, `max` and `step` (when
-`min` is set; otherwise `step="any"`), `required`, `disabled`, and SHALL mirror the value as
+`min` and an explicit `step` are both set; otherwise `step="any"`, since a commit snaps only
+to an explicit step), `required`, `disabled`, and SHALL mirror the value as
 its `value` property (`String(value)`, or "" when empty) following `hidden-form-input`. The
 visible input SHALL carry no `name`. A commit SHALL update the hidden input within the same
 task, before an implicit submission or a `requestSubmit()` from a callback runs. A form reset

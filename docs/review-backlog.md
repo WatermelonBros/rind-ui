@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.machine.ts:182 | `push`: the dragged thumb's input value is written before the neighbours' min/max widen, so the browser can clamp it for a frame |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.math.ts:68 | `largeStep` is rounded to the step's decimals (a finer custom largeStep is coarsened) |
 | add-slider (r1) | — | packages/react/src/slider/slider.tsx:240 | `formInput` is a new function every render, so the Thumb's track effect re-subscribes each render |

@@ -14,14 +14,25 @@ export const states: States = { "number-input": { idle: "Basic" } }
 function Field({
   label,
   triggers = true,
+  suffix,
   ...props
-}: NumberInputRootProps & { readonly label: string; readonly triggers?: boolean }) {
+}: NumberInputRootProps & {
+  readonly label: string
+  readonly triggers?: boolean
+  /** Text after the input (a unit `Intl.NumberFormat` has no name for, like "px"). */
+  readonly suffix?: string
+}) {
   return (
     <NumberInput.Root {...props}>
       <NumberInput.Label>{label}</NumberInput.Label>
       <NumberInput.Control>
         {triggers && <NumberInput.DecrementTrigger>−</NumberInput.DecrementTrigger>}
         <NumberInput.Input />
+        {suffix && (
+          <span className="note" aria-hidden="true">
+            {suffix}
+          </span>
+        )}
         {triggers && <NumberInput.IncrementTrigger>+</NumberInput.IncrementTrigger>}
       </NumberInput.Control>
     </NumberInput.Root>
@@ -145,11 +156,11 @@ export function ReadoSettingsRecipe() {
   return (
     <div className="stack">
       <Field
-        label="Editor font size"
+        label="Editor font size (px)"
         defaultValue={14}
         min={8}
         max={32}
-        formatOptions={{ style: "unit", unit: "pixel" }}
+        suffix="px"
         onValueCommit={setCommitted}
       />
       <span className="note">last committed: {committed ?? "empty"}</span>

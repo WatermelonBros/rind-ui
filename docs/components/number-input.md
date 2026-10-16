@@ -102,7 +102,7 @@ expect(await quantity.valueText()).toBe("42")
 await quantity.holdStepper("increase", 580) // pointer holds need layout (a real browser)
 ```
 
-Keyboard actions work in jsdom (`quantity.via("keyboard").step("increase")`); pointer steps and holds need a layout engine. Under the iOS quirk locate it with `{ name, role: "textbox" }`.
+Keyboard actions work in jsdom (use `via("keyboard")` for `step`); pointer steps and holds need a layout engine. Under the iOS quirk locate it with `{ name, role: "textbox" }`.
 
 ## Tested with
 

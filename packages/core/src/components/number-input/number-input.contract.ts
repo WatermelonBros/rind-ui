@@ -272,7 +272,14 @@ export const numberInputContract = contract("number-input", {
         composing: { skip: "typing while composing is the composition's own (composeOpen)" },
       },
     },
-    COMMIT: { action: "commit", event: () => ({ source: "enter" }) },
+    COMMIT: {
+      from: {
+        idle: { action: "commit", event: () => ({ source: "enter" }) },
+        composing: { skip: "a blur mid-composition commits at its end: a scenario test" },
+        pressing: { skip: "a blur while a trigger is held: a scenario test" },
+        spinning: { skip: "a blur while a trigger is held: a scenario test" },
+      },
+    },
     PASTE: { skip: "a clipboard paste is a scenario test (the Part API has no clipboard)" },
     INCREASE: {
       action: "step",

@@ -188,6 +188,28 @@ describe("typing and commit", () => {
     expect(m.value()).toBe(12)
   })
 
+  it("a blur mid-composition commits once the composition ends (no lost input)", () => {
+    const m = make()
+    m.type("4")
+    m.send({ type: "COMPOSITION.START" })
+    m.send({ type: "INPUT", text: "42" })
+    m.blur()
+    expect(m.value()).toBeNull()
+    m.send({ type: "COMPOSITION.END", text: "42" })
+    expect(m.value()).toBe(42)
+    expect(m.onValueCommit).toHaveBeenCalledTimes(1)
+  })
+
+  it("a blur while a trigger is held commits the typed text", () => {
+    const m = make()
+    m.type("7")
+    m.press("PRESS.START", "increment", "touch")
+    expect(m.state()).toBe("pressing")
+    m.blur()
+    expect(m.value()).toBe(7)
+    expect(m.text()).toBe("7")
+  })
+
   it("Paste a formatted amount", () => {
     const m = make({ formatOptions: { style: "currency", currency: "USD" } })
     m.send({ type: "PASTE", text: "$1,234.50" })
