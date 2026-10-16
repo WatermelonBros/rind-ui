@@ -49,6 +49,9 @@ function Card({ wrap = false, statusInside = false, ...props }: Props) {
   )
 }
 
+/** The announcer's count of keyed messages still waiting for their debounce. */
+const PENDING = Symbol.for("rind-ui.announcements.pending")
+
 /** The log grows by one exactly on loading → loaded when announceOnLoad is set. */
 function announcementCount(): ConsumerInvariant<typeof skeletonContract> {
   let seen = installAnnouncementLog().length
@@ -56,7 +59,11 @@ function announcementCount(): ConsumerInvariant<typeof skeletonContract> {
   return {
     name: "skeleton-announces-on-load",
     check: async ({ env, state, props }) => {
-      await env.advance(600)
+      // Waits until no keyed announcement is pending (a condition, not a delay).
+      await env.until(
+        async () => (Reflect.get(globalThis, PENDING) as number | undefined) ?? 0,
+        (n) => n === 0,
+      )
       const now = installAnnouncementLog().length
       const grew = now - seen
       const expected = last === "loading" && state === "loaded" && props["announceOnLoad"] ? 1 : 0

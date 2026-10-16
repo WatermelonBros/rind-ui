@@ -1,0 +1,199 @@
+/*
+ * Number Input (family: field): the Control is the field (border-strong edge, 3:1), holding
+ * the input and the steppers; the ring is drawn on the Control while the input shows
+ * data-focus-visible. Steppers are 24px targets with a plus / minus glyph in currentColor
+ * when they have no content; a stepper at its bound is dimmed and gets a not-allowed cursor
+ * (never colour alone). Numbers are tabular. `data-variant` / `data-size` go on the Root.
+ */
+@layer rind.components {
+  :where([data-scope="number-input"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-number-input-gap, var(--rind-space-1));
+    color: var(--rind-number-input-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="number-input"][data-part="label"]) {
+    font-size: var(--rind-number-input-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-number-input-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  :where([data-scope="number-input"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-number-input-description-font-size, var(--rind-text-sm));
+    color: var(--rind-number-input-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="number-input"][data-part="error-message"]) {
+    margin: 0;
+    font-size: var(--rind-number-input-error-font-size, var(--rind-text-sm));
+    color: var(--rind-number-input-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="number-input"][data-part="root"][data-tone="danger"] [data-part="label"]) {
+    color: var(--rind-color-accent-text);
+  }
+
+  /* The field: the input and the steppers share one edge. */
+  :where([data-scope="number-input"][data-part="control"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    block-size: var(--rind-number-input-height, var(--rind-size-control, var(--rind-size-md)));
+    border: var(--rind-border-width) solid
+      var(--rind-number-input-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-number-input-radius, var(--rind-radius-control));
+    background: var(--rind-number-input-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-number-input-shadow, var(--rind-shadow-key-pressed));
+    overflow: hidden;
+  }
+
+  :where([data-scope="number-input"][data-part="root"][data-variant="soft"] [data-part="control"]) {
+    background: var(--rind-number-input-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  /* The ring is the Control's while the input has keyboard focus. */
+  :where([data-scope="number-input"][data-part="control"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="number-input"][data-part="input"]) {
+    flex: 1;
+    min-inline-size: 0;
+    margin: 0;
+    padding-inline: var(
+      --rind-number-input-padding-inline,
+      var(--rind-space-control, var(--rind-space-3))
+    );
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-number-input-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    font-variant-numeric: tabular-nums;
+    text-align: var(--rind-number-input-text-align, start);
+  }
+
+  /* Drawn on the Control instead (one ring for the whole field). */
+  :where([data-scope="number-input"][data-part="control"] [data-part="input"][data-focus-visible]) {
+    outline: none;
+  }
+
+  :where(
+    [data-scope="number-input"]:is([data-part="increment-trigger"], [data-part="decrement-trigger"])
+  ) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    inline-size: var(--rind-number-input-trigger-size, var(--rind-hit-area));
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    background: var(--rind-number-input-trigger-bg, transparent);
+    color: var(--rind-number-input-trigger-color, var(--rind-color-text-muted));
+    font: inherit;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  :where([data-scope="number-input"][data-part="increment-trigger"]:empty)::after,
+  :where([data-scope="number-input"][data-part="decrement-trigger"]:empty)::after {
+    content: "";
+    inline-size: var(--rind-number-input-icon-size, 1em);
+    block-size: var(--rind-number-input-icon-size, 1em);
+    background-color: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="number-input"][data-part="increment-trigger"]:empty)::after {
+    mask-image: var(--rind-number-input-increment-icon, var(--rind-icon-plus));
+  }
+
+  :where([data-scope="number-input"][data-part="decrement-trigger"]:empty)::after {
+    mask-image: var(--rind-number-input-decrement-icon, var(--rind-icon-minus));
+  }
+
+  :where(
+    [data-scope="number-input"]:is(
+      [data-part="increment-trigger"],
+      [data-part="decrement-trigger"]
+    )[data-pressed]
+  ) {
+    background: var(--rind-number-input-trigger-pressed-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-color-text);
+  }
+
+  /* At the bound: dimmed and not-allowed, not by colour alone. */
+  :where(
+    [data-scope="number-input"]:is(
+      [data-part="increment-trigger"],
+      [data-part="decrement-trigger"]
+    )[data-disabled]
+  ) {
+    opacity: var(--rind-number-input-disabled-opacity, 0.45);
+    cursor: not-allowed;
+  }
+
+  /* Invalid: a doubled danger edge. */
+  :where([data-scope="number-input"][data-part="root"][data-invalid] [data-part="control"]) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-number-input-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="number-input"][data-part="root"][data-disabled] [data-part="control"]) {
+    background: var(--rind-number-input-disabled-bg, var(--rind-color-surface));
+    border-color: var(--rind-color-border);
+    box-shadow: none;
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="number-input"][data-part="root"][data-readonly] [data-part="control"]) {
+    background: var(--rind-number-input-readonly-bg, var(--rind-color-surface));
+    box-shadow: none;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="number-input"][data-part="control"]) {
+      background: Field;
+      color: FieldText;
+      border-color: FieldText;
+    }
+
+    :where([data-scope="number-input"][data-part="control"][data-focus-visible]) {
+      outline-color: Highlight;
+    }
+
+    :where(
+        [data-scope="number-input"]:is(
+          [data-part="increment-trigger"],
+          [data-part="decrement-trigger"]
+        )
+      ) {
+      color: ButtonText;
+      forced-color-adjust: none;
+    }
+
+    :where(
+        [data-scope="number-input"]:is(
+          [data-part="increment-trigger"],
+          [data-part="decrement-trigger"]
+        )[data-disabled]
+      ) {
+      color: GrayText;
+      opacity: 1;
+    }
+
+    :where([data-scope="number-input"][data-part="root"][data-disabled] [data-part="control"]) {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

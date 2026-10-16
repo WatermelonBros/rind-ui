@@ -239,9 +239,20 @@ export interface ContractDef<
  * `aria-valuenow` or a valued role (one per thumb); `null`: no value (indeterminate).
  */
 export interface ValuedDecl {
-  readonly values: (view: View) => readonly (number | null)[]
-  /** Each element's expected `aria-valuetext`; otherwise only a plain `String(value)` is compared. */
-  readonly valueText?: (view: View, index: number) => string
+  /** `props`: the oracle's props (a range or a formatter the view does not carry). */
+  readonly values: (
+    view: View,
+    props: Readonly<Record<string, unknown>>,
+  ) => readonly (number | null)[]
+  /**
+   * Each element's expected `aria-valuetext` (also for a `null` entry, e.g. "Empty");
+   * otherwise only a plain `String(value)` is compared.
+   */
+  readonly valueText?: (
+    view: View,
+    index: number,
+    props: Readonly<Record<string, unknown>>,
+  ) => string
 }
 
 /**

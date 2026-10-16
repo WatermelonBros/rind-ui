@@ -25,13 +25,15 @@ describe("image connect (design §2)", () => {
     }
   })
 
-  it("named: the Img keeps alt in every status, hidden exactly in idle and error", () => {
+  it("named: the Img keeps alt in every status, hidden only on error or idle without a source", () => {
     for (const s of STATUSES) {
-      const img = api(s).img()
+      const img = api(s).img(true)
       expect(img["alt"]).toBe("A red bicycle")
-      expect(img["hidden"]).toBe(s === "idle" || s === "error" ? true : undefined)
+      // idle with a source is the server render: visible, so a lazy image can load.
+      expect(img["hidden"]).toBe(s === "error" ? true : undefined)
       expect(img["data-state"]).toBe(s)
     }
+    expect(api("idle").img(false)["hidden"]).toBe(true)
   })
 
   it('Fallback is aria-hidden="true" in every status, named or decorative', () => {
@@ -47,12 +49,12 @@ describe("image connect (design §2)", () => {
       expect(root["role"]).toBeUndefined()
       expect(root["aria-label"]).toBeUndefined()
       expect(root["data-decorative"]).toBe("")
-      expect(api(s, "").img()["alt"]).toBe("")
+      expect(api(s, "").img(true)["alt"]).toBe("")
     }
   })
 
   it("missing alt: the attribute is omitted, Root is not named, a development error", () => {
-    expect(api("loaded", undefined).img()["alt"]).toBeUndefined()
+    expect(api("loaded", undefined).img(true)["alt"]).toBeUndefined()
     expect(api("error", undefined).root()["role"]).toBeUndefined()
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     checkImageAltGiven(undefined, "i")
@@ -73,7 +75,8 @@ describe("image connect (design §2)", () => {
   it("no inline styles on any part", () => {
     for (const s of STATUSES) {
       const a = api(s)
-      for (const part of [a.root(), a.img(), a.fallback()]) expect(part["style"]).toBeUndefined()
+      for (const part of [a.root(), a.img(true), a.fallback()])
+        expect(part["style"]).toBeUndefined()
     }
   })
 })

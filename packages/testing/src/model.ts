@@ -38,6 +38,8 @@ export interface ConsumerInvariant<C extends AnyContract> {
     readonly env: Env<C["anatomy"][number]>
     readonly state: string
     readonly modality: Modality
+    /** The modality this step's action ran in (null for the initial check, delays, props). */
+    readonly stepModality?: Modality | null
     /** The props the instance was rendered with (the oracle's). */
     readonly props: Readonly<Record<string, unknown>>
     /** The oracle's resolved values after the step. */
@@ -905,11 +907,11 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       ...(contract.valued
         ? {
             valued: {
-              values: contract.valued.values(oracle.service.view()),
+              values: contract.valued.values(oracle.service.view(), oracle.props),
               ...(contract.valued.valueText
                 ? {
                     valueText: (i: number) =>
-                      contract.valued?.valueText?.(oracle.service.view(), i) ?? "",
+                      contract.valued?.valueText?.(oracle.service.view(), i, oracle.props) ?? "",
                   }
                 : {}),
             },
@@ -957,6 +959,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         env: Env
         state: string
         modality: Modality
+        stepModality: Modality | null
         props: Readonly<Record<string, unknown>>
         values: Readonly<Record<string, unknown>>
       }) => Promise<unknown>
@@ -967,6 +970,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           env: base,
           state,
           modality,
+          stepModality,
           props: oracle.props as Record<string, unknown>,
           values: oracle.service.view().values as Record<string, unknown>,
         })
@@ -1125,7 +1129,16 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         let stepMod: Modality | null = null
         if (mapping?.kind === "delay") {
           const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
+          const valuesBefore = JSON.stringify(oracle.service.view().values)
           send(edge.event)
+          // A value changed by a timer of a held gesture (a stepper's repeat) is the user's.
+          if (
+            contract.formInput &&
+            JSON.stringify(oracle.service.view().values) !== valuesBefore &&
+            !contract.formInput.silentEvents?.includes(edge.event)
+          ) {
+            userChanges += 1
+          }
           await base.advance(ms)
         } else if (mapping?.kind === "props") {
           const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }

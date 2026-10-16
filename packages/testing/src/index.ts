@@ -34,6 +34,7 @@ export { getImage } from "./components/image"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
 export { getMeter } from "./components/meter"
+export { getNumberInput } from "./components/number-input"
 export { getPopover } from "./components/popover"
 export { getProgress } from "./components/progress"
 export { getRadioGroup } from "./components/radio-group"
@@ -97,6 +98,10 @@ export {
   type Navigation,
   navigationLog,
 } from "./navigation"
+export {
+  type NumberInputStepInvariants,
+  numberInputStepInvariants,
+} from "./number-input-invariants"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
 export { type SliderStepInvariants, sliderStepInvariants } from "./slider-invariants"

@@ -122,6 +122,11 @@ describe("server rendering and hydration", () => {
   it("server HTML has the <img> with its src and alt (chakra-ui#462)", () => {
     const html = renderToString(<Bike src={FACE} />)
     expect(html).toMatch(new RegExp(`<img[^>]*alt="A red bicycle"[^>]*src="${FACE}"`))
+    // Lazy-safe: an <img> with a source is never hidden in the server HTML.
+    expect(/<img[^>]*>/.exec(html)?.[0]).not.toMatch(/\shidden(=|\s|>|\/)/)
+    expect(/<img[^>]*>/.exec(renderToString(<Bike src={undefined} />))?.[0]).toMatch(
+      /\shidden(=|\s|>|\/)/,
+    )
   })
 
   it("cached image on hydration: first status loaded, no fallback frame, no warning", async () => {

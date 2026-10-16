@@ -191,7 +191,7 @@ capture.
 
 ## Risks / Trade-offs
 
-- [New runtime dependency] → allowed by decision 0009; small, no dependencies of its own (the
+- [New runtime dependency] → allowed by decision 0009; small, depends only on `@swc/helpers` (the
   same family as `@internationalized/date`), used by four libraries; wrapped in one module;
   tree-shaking size check (task 0.2).
 - [Mouse steps on press start, before release] → 2.5.2's undo clause applies (the opposite

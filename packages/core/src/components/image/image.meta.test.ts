@@ -23,7 +23,7 @@ describe("image meta matches the code", () => {
   it("data attributes (decorative included)", () => {
     const api = imageConnect({ instance: "i", status: "idle", alt: "" })
     expect(Object.keys(imageMeta.dataAttributes.root).sort()).toEqual(dataKeys(api.root()))
-    expect(Object.keys(imageMeta.dataAttributes.img).sort()).toEqual(dataKeys(api.img()))
+    expect(Object.keys(imageMeta.dataAttributes.img).sort()).toEqual(dataKeys(api.img(true)))
     expect(Object.keys(imageMeta.dataAttributes.fallback).sort()).toEqual(dataKeys(api.fallback()))
   })
 })

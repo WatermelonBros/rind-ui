@@ -93,7 +93,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done |  |
 | Button |  |  | ● | ● | ● | ● |  | ● | ● | 6 | 1 | done |  |
-| Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | spec | Number Field |
+| Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | done | Number Field |
 | Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | todo | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |

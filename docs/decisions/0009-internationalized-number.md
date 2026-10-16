@@ -17,7 +17,7 @@ signs, and partial input while typing. React Aria, Zag, Reka and Kobalte all use
 Allow `@internationalized/number` as a runtime dependency of `@rind-ui/core`, used only
 by the shared `number-parsing` capability (add-number-input) and anything built on it.
 It comes from the same project as `@internationalized/date` (already allowed), is
-Apache-2.0, has no dependencies of its own, and is tree-shaken out of bundles that do
+Apache-2.0, depends only on `@swc/helpers` (tiny runtime helpers), and is tree-shaken out of bundles that do
 not use numeric fields (size check in add-number-input's tasks).
 
 Alternative considered: porting the parser into core. Rejected — it would duplicate a

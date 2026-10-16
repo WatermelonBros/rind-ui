@@ -20,6 +20,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
 | `packages/react/src/form/form.tsx` | `react-action-form-reset` |
+| `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `firefox-textarea-overflow`
@@ -139,7 +140,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: component code (none yet)
+- Checked in: `packages/react/src/number-input/number-input.tsx`
 - Last verified: 2026-10-14
 - Remove when: a device test shows iOS VoiceOver focusing and editing an <input role="spinbutton">
 
@@ -147,7 +148,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/issues/5731>, <https://github.com/chakra-ui/ark/issues/3500>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: component code (none yet)
+- Checked in: `packages/react/src/number-input/number-input.tsx`
 - Last verified: 2026-10-14
 - Remove when: touch decimal keypads follow the field's lang or inputmode locale
 

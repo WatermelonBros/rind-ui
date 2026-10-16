@@ -26,6 +26,7 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
+import * as numberInput from "./number-input"
 import * as popover from "./popover"
 import * as pressAndHover from "./press-and-hover"
 import * as progress from "./progress"
@@ -71,14 +72,15 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   form,
   heading,
   image,
+  meter,
+  progress,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   popover,
   label,
   link,
-  meter,
+  "number-input": numberInput,
   "press-and-hover": pressAndHover,
-  progress,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
   separator,

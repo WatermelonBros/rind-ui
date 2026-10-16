@@ -67,7 +67,8 @@ const nonEmpty = <T>(v: T | "" | undefined): T | undefined => (v === "" ? undefi
  */
 export function useStatusImage(
   host: ImageHost,
-  own: Readonly<Record<string, unknown>>,
+  /** The part's own props, given whether the element has a source (`hidden` depends on it). */
+  own: (hasSource: boolean) => Readonly<Record<string, unknown>>,
   { src, srcSet, sizes, loading, onLoad, onError, ref, ...rest }: ComponentPropsWithRef<"img">,
   onCount: (count: number) => void,
 ): Record<string, unknown> {
@@ -116,7 +117,7 @@ export function useStatusImage(
   }, [key])
   const merged = mergeProps(
     {
-      ...own,
+      ...own(hasSource),
       ref: composeRefs(el, ref),
       onLoad: () => send({ type: "IMAGE.LOAD", source: source.current }),
       onError: () => send({ type: "IMAGE.ERROR", source: source.current }),

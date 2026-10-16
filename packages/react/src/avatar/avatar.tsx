@@ -106,7 +106,12 @@ export type AvatarImageProps = ComponentPropsWithRef<"img"> & {
 
 function Image({ render, ...rest }: AvatarImageProps) {
   const ctx = useAvatar("Image")
-  const props = useStatusImage(ctx.host, normalizeProps(ctx.api.image()), rest, checkImageCount)
+  const props = useStatusImage(
+    ctx.host,
+    (hasSource) => normalizeProps(ctx.api.image(hasSource)),
+    rest,
+    checkImageCount,
+  )
   useEffect(() => checkImageAlt(rest.alt, ctx.name), [rest.alt, ctx.name])
   // The part's props are `img` props (built above from them), so the typed callback is a
   // RenderProp over the same object.

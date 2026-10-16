@@ -36,14 +36,20 @@ describe("avatar connect", () => {
   })
 
   it('Image: alt="", hidden only in idle and error, never while loading', () => {
-    expect(api("idle").image()).toMatchObject({ alt: "", hidden: true, "data-state": "idle" })
-    expect(api("loading").image()["hidden"]).toBeUndefined()
-    expect(api("loaded").image()["hidden"]).toBeUndefined()
-    expect(api("error").image()).toMatchObject({ hidden: true, "data-state": "error" })
+    expect(api("idle").image(false)).toMatchObject({ alt: "", hidden: true, "data-state": "idle" })
+    // Server render / first client render: idle with a source stays visible (lazy-safe).
+    expect(api("idle").image(true)["hidden"]).toBeUndefined()
+    expect(api("loading").image(true)["hidden"]).toBeUndefined()
+    expect(api("loaded").image(true)["hidden"]).toBeUndefined()
+    expect(api("error").image(true)).toMatchObject({ hidden: true, "data-state": "error" })
   })
 
   it("no inline styles on any part", () => {
-    for (const p of [api("loading").root(), api("loading").image(), api("loading").fallback()]) {
+    for (const p of [
+      api("loading").root(),
+      api("loading").image(true),
+      api("loading").fallback(),
+    ]) {
       expect(p).not.toHaveProperty("style")
     }
   })

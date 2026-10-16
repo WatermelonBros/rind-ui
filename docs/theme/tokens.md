@@ -924,6 +924,128 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### number-input
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "number-input.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "number-input.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "number-input.css"
+    },
+    "decrement-icon": {
+      "fallback": "var(--rind-icon-minus)",
+      "file": "number-input.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "number-input.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "number-input.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "number-input.css"
+    },
+    "disabled-opacity": {
+      "fallback": "0.45",
+      "file": "number-input.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-color-danger-text)",
+      "file": "number-input.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "number-input.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-control, var(--rind-text-sm))",
+      "file": "number-input.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "number-input.css"
+    },
+    "height": {
+      "fallback": "var(--rind-size-control, var(--rind-size-md))",
+      "file": "number-input.css"
+    },
+    "icon-size": {
+      "fallback": "1em",
+      "file": "number-input.css"
+    },
+    "increment-icon": {
+      "fallback": "var(--rind-icon-plus)",
+      "file": "number-input.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "number-input.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "number-input.css"
+    },
+    "label-font-weight": {
+      "fallback": "580",
+      "file": "number-input.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-space-control, var(--rind-space-3))",
+      "file": "number-input.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "number-input.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "number-input.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-key-pressed)",
+      "file": "number-input.css"
+    },
+    "soft-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "number-input.css"
+    },
+    "text-align": {
+      "fallback": "start",
+      "file": "number-input.css"
+    },
+    "trigger-bg": {
+      "fallback": "transparent",
+      "file": "number-input.css"
+    },
+    "trigger-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "number-input.css"
+    },
+    "trigger-pressed-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "number-input.css"
+    },
+    "trigger-size": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "number-input.css"
+    }
+  }
+}
+```
+
 ### popover
 
 ```json

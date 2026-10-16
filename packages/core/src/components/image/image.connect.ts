@@ -30,11 +30,16 @@ export function imageConnect(state: ImageConnectState) {
       "data-decorative": dataFlag(alt === ""),
       "data-state": status,
     }),
-    img: (): PartProps => ({
+    /**
+     * `hasSource`: the element has a `src` or `srcSet`. An `idle` <img> with a source is the
+     * server render and the first client render: it stays visible so a `loading="lazy"` image
+     * can load before hydration (Root's `role="img"` makes it presentational meanwhile).
+     */
+    img: (hasSource: boolean): PartProps => ({
       ...scopeAttrs("image", "img", state.instance),
       // Missing at runtime: omitted, so automated checks report it (never a silent `alt=""`).
       alt,
-      hidden: imageGone(status) ? true : undefined,
+      hidden: status === "error" || (status === "idle" && !hasSource) ? true : undefined,
       "data-state": status,
     }),
     fallback: (): PartProps => ({

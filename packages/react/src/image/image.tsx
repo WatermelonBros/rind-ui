@@ -89,7 +89,12 @@ export type ImageImgProps = ImgElementProps & {
 
 function Img({ render, ...rest }: ImageImgProps) {
   const ctx = useImage("Img")
-  const props = useStatusImage(ctx.host, normalizeProps(ctx.api.img()), rest, checkImgCount)
+  const props = useStatusImage(
+    ctx.host,
+    (has) => normalizeProps(ctx.api.img(has)),
+    rest,
+    checkImgCount,
+  )
   // The part's props are `img` props (built above from them), so the typed callback is a
   // RenderProp over the same object.
   return renderPart("img", props, render as RenderProp<ImageState> | undefined, ctx.state)

@@ -37,10 +37,17 @@ export function avatarConnect(state: AvatarConnectState) {
       role: state.named && !state.hidden ? "img" : undefined,
       "data-state": dataState,
     }),
-    image: (): PartProps => ({
+    /**
+     * `hasSource`: the element has a `src` or `srcSet`. An `idle` image with a source is the
+     * server render and the first client render, before it registers: it must stay visible so
+     * a `loading="lazy"` image can load before hydration. Hidden only without a source or on
+     * error.
+     */
+    image: (hasSource: boolean): PartProps => ({
       ...scopeAttrs("avatar", "image", state.instance),
       alt: "",
-      hidden: state.status === "idle" || state.status === "error" ? true : undefined,
+      hidden:
+        state.status === "error" || (state.status === "idle" && !hasSource) ? true : undefined,
       "data-state": dataState,
     }),
     fallback: (): PartProps => ({

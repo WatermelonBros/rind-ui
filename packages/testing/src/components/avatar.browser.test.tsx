@@ -203,8 +203,27 @@ describe("server rendering and hydration", () => {
 
   it("server HTML has the <img> with its src and the Fallback (delay 0)", () => {
     const html = renderToString(<Ada src={FACE} />)
-    expect(html).toMatch(new RegExp(`<img[^>]*src="${FACE}"`))
+    const img = /<img[^>]*>/.exec(html)?.[0] ?? ""
+    expect(img).toContain(`src="${FACE}"`)
+    // Lazy-safe: an <img> with a source is never hidden in the server HTML, or a
+    // loading="lazy" image could not load before hydration.
+    expect(img).not.toMatch(/\shidden(=|\s|>|\/)/)
     expect(html).toContain("AL")
+  })
+
+  it("server HTML of a lazy image keeps it visible; no source → hidden", () => {
+    const lazy = /<img[^>]*>/.exec(
+      renderToString(
+        <Avatar.Root aria-label="Ada Lovelace">
+          <Avatar.Image src={FACE} loading="lazy" />
+          <Avatar.Fallback>AL</Avatar.Fallback>
+        </Avatar.Root>,
+      ),
+    )?.[0]
+    expect(lazy).toContain('loading="lazy"')
+    expect(lazy).not.toMatch(/\shidden(=|\s|>|\/)/)
+    const none = /<img[^>]*>/.exec(renderToString(<Ada src={undefined} />))?.[0]
+    expect(none).toMatch(/\shidden(=|\s|>|\/)/)
   })
 
   it("fallbackDelay > 0: no Fallback in server HTML", () => {
