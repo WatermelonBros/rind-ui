@@ -1,10 +1,11 @@
-export { inMonth, type MonthGrid, monthGrid } from "./calendar.grid"
 export {
   type CalendarConnectInput,
   calendarConnect,
   calendarKey,
   isoOf,
 } from "./calendar.connect"
+export { calendarContract, calendarInvariants } from "./calendar.contract"
+export { inMonth, type MonthGrid, monthGrid } from "./calendar.grid"
 export {
   type CalendarContext,
   type CalendarEvent,

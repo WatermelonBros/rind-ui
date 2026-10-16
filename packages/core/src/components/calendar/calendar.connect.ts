@@ -186,7 +186,7 @@ export function calendarConnect(input: CalendarConnectInput) {
         tabindex:
           disabled && !(isFocused && input.disabled !== true) ? undefined : isFocused ? 0 : -1,
         "aria-label": input.messages.cellLabel({ date, formatted, today }),
-        "aria-selected": placeholder ? undefined : sel ? "true" : "false",
+        "aria-selected": sel ? "true" : "false",
         "aria-disabled": disabled || unavailable ? "true" : undefined,
         "aria-current": today && !placeholder ? "date" : undefined,
         "aria-invalid": cellInvalid ? "true" : undefined,

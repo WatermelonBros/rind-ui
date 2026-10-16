@@ -249,6 +249,9 @@ importers:
         specifier: '>=1.40'
         version: 1.64.0
     devDependencies:
+      '@internationalized/date':
+        specifier: ^3.12.4
+        version: 3.12.4
       '@rind-ui/react':
         specifier: workspace:*
         version: link:../react
