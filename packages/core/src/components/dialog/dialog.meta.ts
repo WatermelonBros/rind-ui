@@ -92,7 +92,7 @@ export const dialogMeta = {
     onOpenChange: {
       type: "(open: boolean, details: ChangeDetails) => void",
       description:
-        "Every change request, with `details.reason` (`TRIGGER_PRESS`, `CLOSE_TRIGGER_PRESS`, `ESCAPE_KEY`, `OUTSIDE_PRESS`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN`, `CLOSE`) and `details.cancel()`.",
+        "Every change request, with `details.reason` (`trigger`, `close-trigger`, `escape-key`, `outside-press`, `outside-focus`, `parent-dismissed`, `api`) and `details.cancel()`.",
     },
     modal: {
       type: "boolean",
@@ -136,7 +136,7 @@ export const dialogMeta = {
     },
     actionsRef: {
       type: "Ref<{ open(): void; close(): void }>",
-      description: "Programmatic open and close (reasons `OPEN` and `CLOSE`).",
+      description: "Programmatic open and close (reason `api`).",
     },
     level: {
       type: "1 | 2 | 3 | 4 | 5 | 6",

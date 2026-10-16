@@ -48,13 +48,13 @@ const part = (name: string) => {
 }
 
 describe("Alert Dialog in a real browser", () => {
-  it("keeps the content during the exit with data-state closed and data-close-reason action-press", async () => {
+  it("keeps the content during the exit with data-state closed and data-close-reason action", async () => {
     render(<Fixture />)
     await userEvent.click(part("trigger"))
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("open")
     await userEvent.click(part("action"))
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("closed")
-    expect(content()?.getAttribute("data-close-reason")).toBe("action-press")
+    expect(content()?.getAttribute("data-close-reason")).toBe("action")
     await frames()
     expect(content()).not.toBeNull()
     await expect.poll(() => content(), { timeout: 3000 }).toBeNull()
@@ -82,7 +82,7 @@ describe("Alert Dialog in a real browser", () => {
   })
 
   it.each(["pointer", "keyboard", "touch", "virtual"] as const)(
-    "driver round trip in %s: open, confirm Delete, closeReason action-press",
+    "driver round trip in %s: open, confirm Delete, closeReason action",
     async (modality) => {
       render(<Fixture />)
       const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
@@ -90,7 +90,7 @@ describe("Alert Dialog in a real browser", () => {
       expect(await a.isOpen()).toBe(true)
       await a.confirm("Delete")
       expect(await a.isOpen()).toBe(false)
-      expect(await a.closeReason()).toBe("action-press")
+      expect(await a.closeReason()).toBe("action")
     },
   )
 })

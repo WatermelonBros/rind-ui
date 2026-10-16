@@ -31,7 +31,7 @@ Use an Alert Dialog when the user must answer before going on: confirm a deletio
 
 ## Escape policy
 
-Escape closes the topmost alert dialog with reason `ESCAPE_KEY`, and focus returns to the trigger. For a choice that must be explicit, turn it off with `closeOnEscape={false}`, or decide per request with `onEscapeKeyDown` and `event.preventDefault()` (for example while a request is running, or after a programmatic open the user has not seen yet). A vetoed Escape closes no layer beneath either. A press on the backdrop or the positioner does nothing and calls no `onOpenChange`.
+Escape closes the topmost alert dialog with reason `escape-key`, and focus returns to the trigger. For a choice that must be explicit, turn it off with `closeOnEscape={false}`, or decide per request with `onEscapeKeyDown` and `event.preventDefault()` (for example while a request is running, or after a programmatic open the user has not seen yet). A vetoed Escape closes no layer beneath either. A press on the backdrop or the positioner does nothing and calls no `onOpenChange`.
 
 ## Naming and description
 
@@ -57,7 +57,7 @@ const [pending, setPending] = useState(false)
 <AlertDialog.Root
   actionsRef={actions}
   onOpenChange={(open, details) => {
-    if (open || details.reason !== "ACTION_PRESS") return
+    if (open || details.reason !== "action") return
     details.cancel()
     setPending(true)
     remove().finally(() => {
@@ -79,7 +79,7 @@ An `AlertDialog.Action type="submit"` inside a form runs the form's `submit` whi
 
 ## Reasons and styling
 
-`details.reason` is `TRIGGER_PRESS`, `CANCEL_PRESS`, `ACTION_PRESS`, `ESCAPE_KEY`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN` or `CLOSE`, so Cancel, Action and Escape are distinguishable in a controlled `onOpenChange`. After closing, the content and triggers carry `data-close-reason` in kebab case (`action-press`) until the next open, for exit animations.
+`details.reason` is `trigger`, `cancel`, `action`, `escape-key`, `outside-focus`, `parent-dismissed` or `api`, so Cancel, Action and Escape are distinguishable in a controlled `onOpenChange`. After closing, the content and triggers carry `data-close-reason` in kebab case (`action`) until the next open, for exit animations.
 
 Style the `data-*` attributes above, or import `@rind-ui/theme/alert-dialog.css` (included in the theme index): it reuses the Dialog's surface, lays Cancel and Action out as an end-aligned row (render them as direct children of the Content for that default layout), and reads `--rind-alert-dialog-*` tokens that fall back to `--rind-dialog-*`. It turns transitions off under reduced motion and keeps the border and focus ring in forced colors.
 
@@ -98,7 +98,7 @@ render(<Projects />)
 const alert = getAlertDialog(screen, { name: "Delete project?" })
 await alert.open()
 await alert.confirm("Delete")
-expect(await alert.closeReason()).toBe("action-press")
+expect(await alert.closeReason()).toBe("action")
 ```
 
 `confirm()` without a name presses the only action. `testMachine(alertDialogContract, …)` runs the machine graph against your own wrapper.

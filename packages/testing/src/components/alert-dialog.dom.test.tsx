@@ -193,7 +193,7 @@ describe("Dismissal", () => {
     await openByClick(user)
     await user.keyboard("{Escape}")
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("ESCAPE_KEY")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("escape-key")
     expect(active()).toBe(trigger())
   })
 
@@ -240,7 +240,7 @@ describe("Cancel and action", () => {
     await openByClick(user)
     await press(user, button("Cancel"))
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("CANCEL_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("cancel")
     expect(active()).toBe(trigger())
   })
 
@@ -251,7 +251,7 @@ describe("Cancel and action", () => {
     await openByClick(user)
     await press(user, button("Delete"))
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("ACTION_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("action")
   })
 
   it("Async confirm: cancel(), disables itself, stays open and inert, closes through the API (radix#1747)", async () => {
@@ -265,7 +265,7 @@ describe("Cancel and action", () => {
           <AlertDialog.Root
             actionsRef={actions}
             onOpenChange={(open, details) => {
-              if (open || details.reason !== "ACTION_PRESS") return
+              if (open || details.reason !== "action") return
               details.cancel()
               setPending(true)
               new Promise<void>((r) => {
@@ -331,12 +331,12 @@ describe("Cancel and action", () => {
     await press(user, button("Delete"))
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
     expect(connected).toEqual([true])
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("ACTION_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("action")
     const logged = [...error.mock.calls, ...warn.mock.calls].map((c) => String(c[0]))
     expect(logged.filter((m) => m.includes("not connected"))).toEqual([])
   })
 
-  it("Controlled cancel: the parent applies onOpenChange(false) with reason CANCEL_PRESS (react-spectrum#8139)", async () => {
+  it("Controlled cancel: the parent applies onOpenChange(false) with reason cancel (react-spectrum#8139)", async () => {
     const user = userEvent.setup()
     const reasons: string[] = []
     function Controlled() {
@@ -355,7 +355,7 @@ describe("Cancel and action", () => {
     await openByClick(user)
     await press(user, button("Cancel"))
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
-    expect(reasons).toEqual(["TRIGGER_PRESS", "CANCEL_PRESS"])
+    expect(reasons).toEqual(["trigger", "cancel"])
   })
 
   it("Controlled, parent refuses: Cancel leaves it open", async () => {
@@ -366,7 +366,7 @@ describe("Cancel and action", () => {
     await press(user, button("Cancel"))
     await settle()
     expect(onOpenChange).toHaveBeenCalledTimes(1)
-    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("CANCEL_PRESS")
+    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("cancel")
     expect(queryAlert()).not.toBeNull()
   })
 
@@ -606,8 +606,8 @@ describe("Data attributes", () => {
     await vi.waitFor(() => expect(queryAlert()).toBeNull())
     const content = screen.getByRole("alertdialog", { hidden: true })
     expect(content.getAttribute("data-state")).toBe("closed")
-    expect(content.getAttribute("data-close-reason")).toBe("action-press")
-    expect(trigger().getAttribute("data-close-reason")).toBe("action-press")
+    expect(content.getAttribute("data-close-reason")).toBe("action")
+    expect(trigger().getAttribute("data-close-reason")).toBe("action")
   })
 })
 
@@ -657,7 +657,7 @@ describe("Title heading level", () => {
 
 describe("Driver", () => {
   it.each(["pointer", "keyboard", "touch", "virtual"] as const)(
-    "Round trip in %s: open, confirm Delete, closeReason action-press",
+    "Round trip in %s: open, confirm Delete, closeReason action",
     async (modality) => {
       render(<Full />)
       const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
@@ -667,19 +667,19 @@ describe("Driver", () => {
       expect(await a.hasFocus()).toBe(true)
       await a.confirm("Delete")
       expect(await a.isOpen()).toBe(false)
-      expect(await a.closeReason()).toBe("action-press")
+      expect(await a.closeReason()).toBe("action")
     },
   )
 
   it.each(["pointer", "keyboard", "touch", "virtual"] as const)(
-    "Cancel in %s: closeReason cancel-press",
+    "Cancel in %s: closeReason cancel",
     async (modality) => {
       render(<Full />)
       const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
       await a.open()
       await a.cancel()
       expect(await a.isOpen()).toBe(false)
-      expect(await a.closeReason()).toBe("cancel-press")
+      expect(await a.closeReason()).toBe("cancel")
     },
   )
 
