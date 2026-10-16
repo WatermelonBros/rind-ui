@@ -54,6 +54,7 @@ export {
 } from "./hidden-input"
 export { createHover, type HoverOptions, type HoverPointerEvent } from "./hover"
 export { domHoverIntent, gracePolygon, pointInPolygon } from "./hover-intent"
+export { type ImageSettled, imageSettled } from "./image-status"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
 export {

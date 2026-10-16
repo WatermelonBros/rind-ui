@@ -61,3 +61,43 @@ ol.readout li {
   outline: 2px solid #0d6bff;
   background: #0d6bff14;
 }
+
+/* Placement examples: each trigger on the side its popover opens to, so none covers another */
+.compass {
+  display: grid;
+  grid-template-areas: ". top ." "inline-start . inline-end" ". bottom .";
+  gap: 10px;
+  justify-content: center;
+  justify-items: center;
+}
+.compass > :nth-child(1) {
+  grid-area: top;
+}
+.compass > :nth-child(2) {
+  grid-area: inline-end;
+}
+.compass > :nth-child(3) {
+  grid-area: bottom;
+}
+.compass > :nth-child(4) {
+  grid-area: inline-start;
+}
+
+/* positioning guide: room around the anchor, and a scroll box that makes the popup flip */
+.anchor-stage {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+}
+.flip-box {
+  height: 220px;
+  width: min(100%, 360px);
+  overflow: auto;
+  border: 2px dashed color-mix(in oklab, currentColor 30%, transparent);
+  border-radius: 12px;
+}
+.flip-inner {
+  display: grid;
+  place-items: center;
+  height: 640px;
+}

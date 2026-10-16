@@ -2,7 +2,10 @@ import type { ComponentType } from "react"
 import * as accordion from "./accordion"
 import * as alertDialog from "./alert-dialog"
 import * as announcements from "./announcements"
+import * as aspectRatio from "./aspect-ratio"
 import * as autosize from "./autosize"
+import * as avatar from "./avatar"
+import * as badge from "./badge"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
@@ -23,11 +26,13 @@ import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as passwordInput from "./password-input"
 import * as popover from "./popover"
+import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
+import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
@@ -35,6 +40,7 @@ import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
+import * as tooltip from "./tooltip"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -51,6 +57,9 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "messages-and-provider": messagesAndProvider,
   accordion,
   "alert-dialog": alertDialog,
+  "aspect-ratio": aspectRatio,
+  avatar,
+  badge,
   button,
   checkbox,
   "checkbox-group": checkboxGroup,
@@ -65,6 +74,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "keyboard-and-rtl": keyboardAndRtl,
   "password-input": passwordInput,
   popover,
+  positioning,
   label,
   link,
   "number-input": numberInput,
@@ -73,6 +83,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  skeleton,
   slider,
   switch: switchEx,
   tabs,
@@ -80,6 +91,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tooltip,
 }
 
 /** The example function `name` of a module, if it is one. */

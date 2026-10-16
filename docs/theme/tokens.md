@@ -138,6 +138,116 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### avatar
+
+```json
+{
+  "family": "identity",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "avatar.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-accent-border)",
+      "file": "avatar.css"
+    },
+    "font-size": {
+      "fallback": "calc(var(--rind-avatar-size, var(--rind-size-lg)) * 0.4)",
+      "file": "avatar.css"
+    },
+    "font-weight": {
+      "fallback": "600",
+      "file": "avatar.css"
+    },
+    "overflow-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "avatar.css"
+    },
+    "overflow-text": {
+      "fallback": "var(--rind-color-neutral-text)",
+      "file": "avatar.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "avatar.css"
+    },
+    "ring": {
+      "fallback": "var(--rind-color-bg)",
+      "file": "avatar.css"
+    },
+    "ring-width": {
+      "fallback": "2px",
+      "file": "avatar.css"
+    },
+    "size": {
+      "fallback": "var(--rind-size-lg)",
+      "file": "avatar.css"
+    },
+    "text": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "avatar.css"
+    }
+  }
+}
+```
+
+### avatar-group
+
+```json
+{
+  "family": "identity",
+  "tokens": {
+    "overlap": {
+      "fallback": "0.5rem",
+      "file": "avatar.css"
+    }
+  }
+}
+```
+
+### badge
+
+```json
+{
+  "family": "status",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "badge.css"
+    },
+    "border": {
+      "fallback": "transparent",
+      "file": "badge.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-xs)",
+      "file": "badge.css"
+    },
+    "font-weight": {
+      "fallback": "600",
+      "file": "badge.css"
+    },
+    "height": {
+      "fallback": "1.75em",
+      "file": "badge.css"
+    },
+    "padding-inline": {
+      "fallback": "0.5em",
+      "file": "badge.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "badge.css"
+    },
+    "text": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "badge.css"
+    }
+  }
+}
+```
+
 ### button
 
 ```json
@@ -1171,6 +1281,36 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "thickness": {
       "fallback": "1px",
       "file": "separator.css"
+    }
+  }
+}
+```
+
+### skeleton
+
+```json
+{
+  "family": "decoration",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "skeleton.css"
+    },
+    "duration": {
+      "fallback": "1.6s",
+      "file": "skeleton.css"
+    },
+    "highlight": {
+      "fallback": "var(--rind-color-neutral-soft-hover)",
+      "file": "skeleton.css"
+    },
+    "line-height": {
+      "fallback": "1em",
+      "file": "skeleton.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-sm)",
+      "file": "skeleton.css"
     }
   }
 }

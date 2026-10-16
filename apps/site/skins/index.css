@@ -13,6 +13,9 @@
 @import "./tabs.css";
 @import "./segmented-control.css";
 @import "./separator.css";
+@import "./skeleton.css";
+@import "./badge.css";
+@import "./avatar.css";
 @import "./toolbar.css";
 @import "./dialog.css";
 @import "./slider.css";
@@ -20,3 +23,4 @@
 @import "./number-input.css";
 @import "./password-input.css";
 @import "./search-field.css";
+@import "./tooltip.css";
