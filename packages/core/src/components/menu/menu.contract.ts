@@ -21,7 +21,9 @@ type P =
 type E = Env<P>
 
 /** The item an activation acts on in a model run (set by the model test). */
-export const menuArgs: { current: { readonly label: string } } = { current: { label: "" } }
+export const menuArgs: { current: { readonly key: string; readonly label: string } } = {
+  current: { key: "", label: "" },
+}
 
 const ITEM_ROLES = ["menuitem", "menuitemcheckbox", "menuitemradio"] as const
 
@@ -222,12 +224,19 @@ function menuContractWith(modal: boolean) {
       closed: { trigger: "closed" },
     },
     events: {
-      TRIGGER_PRESS: { from: { closed: "open", open: "close" } },
+      TRIGGER_PRESS: {
+        from: {
+          closed: "open",
+          open: "close",
+          opening: { skip: "a submenu level waiting for its hover delay: the browser tests" },
+        },
+      },
       TRIGGER_KEY: { action: "openWithArrowUp", event: () => ({ key: "last" }) },
       ITEM_ACTIVATE: {
         action: "choose",
         // The mapping's args type misses the action's own arguments (text-field's gap).
         args: (() => [menuArgs.current.label]) as never,
+        event: () => ({ key: menuArgs.current.key, kind: "item", closeOnSelect: true }),
       },
       NAVIGATE: { action: "arrowDown", event: () => ({ move: "next" }) },
       ESCAPE_KEY: "pressEscape",

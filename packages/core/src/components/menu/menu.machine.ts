@@ -236,11 +236,29 @@ function reasonOf(event: {
       return "parent-dismissed"
     case "WINDOW_BLUR":
       return "window-blur"
+    case "TAB_KEY":
+      return "tab-key"
     case "CLOSE":
       return "api"
     default:
       return null
   }
+}
+
+const treeClose =
+  (reason: MenuCloseReason) =>
+  ({ event }: { readonly event: { readonly type: string; readonly reason?: unknown } }) =>
+    event.type === "TREE.CLOSE" && event.reason === reason
+
+/** The root closes itself (its submenus follow as child layers); a submenu asks the tree. */
+function closeTree(
+  props: MenuProps,
+  env: MenuEnv,
+  send: (event: MenuEvent) => void,
+  reason: MenuCloseReason,
+) {
+  if (props.level === "root") send({ type: "TREE.CLOSE", reason })
+  else env.menuTree.closeTree(reason)
 }
 
 export const menuMachine = setup({
@@ -255,8 +273,15 @@ export const menuMachine = setup({
     isRoot: ({ props }) => props.level === "root",
     isSubmenu: ({ props }) => props.level === "submenu",
     fromZone: ({ event }) => "zone" in event && event.zone === true,
-    treeItemSelect: ({ event }) => event.type === "TREE.CLOSE" && event.reason === "item-select",
-    treeTabKey: ({ event }) => event.type === "TREE.CLOSE" && event.reason === "tab-key",
+    treeTrigger: treeClose("trigger"),
+    treeItemSelect: treeClose("item-select"),
+    treeEscapeKey: treeClose("escape-key"),
+    treeTabKey: treeClose("tab-key"),
+    treeOutsidePress: treeClose("outside-press"),
+    treeOutsideFocus: treeClose("outside-focus"),
+    treeWindowBlur: treeClose("window-blur"),
+    treeParentDismissed: treeClose("parent-dismissed"),
+    treeApi: treeClose("api"),
     hostedByMenubar: ({ env }) => env.menuTree.parentKind() === "menubar",
     /** A pointer crossing items on its way into an open submenu does not move the highlight. */
     inTransit: ({ env }) => {
@@ -333,7 +358,7 @@ export const menuMachine = setup({
       send({ type: "KEY_ACTIVATE.END" })
     },
     endKeyActivation: ({ set }) => set("keyActivation", null),
-    select: ({ context, env, event, props }) => {
+    select: ({ context, env, event, props, send }) => {
       if (event.type !== "ITEM_ACTIVATE") return
       const via = event.modality === "keyboard" ? context.keyActivation : null
       const kept = props.onActivate?.({
@@ -345,16 +370,17 @@ export const menuMachine = setup({
       // Space on a checkbox or radio item never closes (native menus keep them open).
       const checkable = event.kind === "checkbox-item" || event.kind === "radio-item"
       if (kept === false || !event.closeOnSelect || (checkable && via === "space")) return
-      env.menuTree.closeTree("item-select")
+      closeTree(props, env, send, "item-select")
     },
     /**
      * Tab closes the tree and focuses the root trigger; the key's default then moves on
      * from it (Shift+Tab lands before it).
      */
-    tabOut: ({ env }) => {
-      env.menuTree.closeTree("tab-key")
+    tabOut: ({ env, props, send }) => {
+      closeTree(props, env, send, "tab-key")
       env.menuTree.rootTrigger()?.focus({ preventScroll: true })
     },
+    focusRootTrigger: ({ env }) => env.menuTree.rootTrigger()?.focus({ preventScroll: true }),
     expand: ({ context, env, props }) => {
       const key = context.highlightedKey
       if (key !== null && props.openSubmenu?.(key)) return
@@ -497,7 +523,7 @@ export const menuMachine = setup({
     keyActivation: null,
     hoverOpened: false,
   }),
-  values: { open: { fallback: false, states: { open: true, opening: false, closed: false } } },
+  values: { open: { fallback: false, states: { open: true, closed: false, opening: false } } },
   onProps: { collection: "COLLECTION.CHANGE" },
   effects: ["tree"],
   on: { "COLLECTION.CHANGE": { actions: ["repairCollection"] } },
@@ -546,22 +572,67 @@ export const menuMachine = setup({
           reason: "parent-dismissed",
           actions: ["setCloseReason"],
         },
-        TAB_KEY: { actions: ["tabOut"] },
+        TAB_KEY: [
+          {
+            guard: "isRoot",
+            target: "closed",
+            reason: "tab-key",
+            actions: ["setCloseReason", "focusRootTrigger"],
+          },
+          { actions: ["tabOut"] },
+        ],
         WINDOW_BLUR: {
           guard: "isRoot",
           target: "closed",
           reason: "window-blur",
           actions: ["setCloseReason", "noRestore"],
         },
+        // One arm per reason: `onOpenChange` reports the reason the tree closed with.
         "TREE.CLOSE": [
+          {
+            guard: "treeTrigger",
+            target: "closed",
+            reason: "trigger",
+            actions: ["setCloseReason"],
+          },
           {
             guard: "treeItemSelect",
             target: "closed",
             reason: "item-select",
             actions: ["setCloseReason"],
           },
+          {
+            guard: "treeEscapeKey",
+            target: "closed",
+            reason: "escape-key",
+            actions: ["setCloseReason"],
+          },
           { guard: "treeTabKey", target: "closed", reason: "tab-key", actions: ["setCloseReason"] },
-          { target: "closed", reason: "api", actions: ["setCloseReason"] },
+          {
+            guard: "treeOutsidePress",
+            target: "closed",
+            reason: "outside-press",
+            actions: ["setCloseReason"],
+          },
+          {
+            guard: "treeOutsideFocus",
+            target: "closed",
+            reason: "outside-focus",
+            actions: ["setCloseReason"],
+          },
+          {
+            guard: "treeWindowBlur",
+            target: "closed",
+            reason: "window-blur",
+            actions: ["setCloseReason"],
+          },
+          {
+            guard: "treeParentDismissed",
+            target: "closed",
+            reason: "parent-dismissed",
+            actions: ["setCloseReason"],
+          },
+          { guard: "treeApi", target: "closed", reason: "api", actions: ["setCloseReason"] },
         ],
         "TREE.SIBLING_OPENED": { target: "closed", actions: ["noRestore"] },
         "HOVER.END": { guard: "fromZone", target: "closed" },

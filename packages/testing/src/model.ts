@@ -288,6 +288,19 @@ const oracleEnv = {
   layout: { pageTarget: () => null },
   dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  // A menu tree with one level: the root closes itself, nothing else is open.
+  menuTree: {
+    register: () => () => {},
+    openChild: () => {},
+    childClosed: () => {},
+    closeTree: () => {},
+    openPath: () => [],
+    rootTrigger: () => null,
+    parentKind: () => null,
+    parentElements: () => [],
+    parentNavigate: () => {},
+    parentPress: () => {},
+  },
   // A cold delay group: one instance under test, never warmed by another.
   delayGroup: {
     join: () => () => {},

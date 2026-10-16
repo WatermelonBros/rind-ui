@@ -23,6 +23,7 @@ export {
   menuMachine,
   menuPositioning,
 } from "./menu.machine"
+export { menuMeta } from "./menu.meta"
 export {
   type MenuRadioGroupEvent,
   type MenuRadioGroupMachine,
