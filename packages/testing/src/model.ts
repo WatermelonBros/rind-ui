@@ -286,6 +286,13 @@ const oracleEnv = {
   layout: { pageTarget: () => null },
   dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  // A cold delay group: one instance under test, never warmed by another.
+  delayGroup: {
+    join: () => () => {},
+    isWarm: () => false,
+    opened: () => {},
+    closed: () => {},
+  },
   modality: {
     modality: () => "keyboard",
     subscribe: () => () => {},
@@ -574,6 +581,7 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
     click: async () => {},
     tap: async () => {},
     focus: async () => {},
+    focusWithTab: async () => {},
     // Typed text replays as an IME composition that is then cancelled: while composing,
     // printable characters (typeahead, tag delimiters) must not commit anything.
     type: async (text) => {
@@ -818,6 +826,25 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         edge,
         `${prefix}expected ${state}: ${JSON.stringify(expected)}\n  observed: ${JSON.stringify(seen)}`,
       )
+    }
+    if (contract.traits.includes("timed") && seen["isOpen"] === true) {
+      // WCAG 1.4.13 persistent: while a part is hovered or focused, no pending delay may
+      // hide it. Every delay is waited out, then it must still be open.
+      const parts = (await base.collect()).parts
+      const held = parts.filter(
+        (p) => p.attrs["data-hover"] !== undefined || p.attrs["data-focus"] !== undefined,
+      )
+      if (held.length > 0) {
+        await base.advance(longestDelay() + 16)
+        const after = await observe()
+        if (after["isOpen"] !== true) {
+          fail(
+            step,
+            edge,
+            `timed: closed by a timer while ${held.map((p) => p.describe).join(", ")} ${held.length === 1 ? "is" : "are"} hovered or focused (waited ${longestDelay() + 16} ms)`,
+          )
+        }
+      }
     }
     if (contract.traits.includes("presence")) {
       // Closed content is removed once its exit animations end: wait for that first.

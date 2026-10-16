@@ -18,6 +18,11 @@ export type PortalProps = ComponentPropsWithRef<"div"> & {
   readonly container?: Element | ShadowRoot | null | undefined
   /** The element the content belongs to (its trigger): target resolution and dir/lang/theme. */
   readonly logicalParent?: (() => Element | null) | undefined
+  /**
+   * Follow the logical parent's attributes as they change (default true). An always-mounted
+   * part that is closed passes false: applied once, no observer.
+   */
+  readonly observe?: boolean | undefined
   readonly render?: RenderProp
   readonly children?: ReactNode
 }
@@ -33,7 +38,14 @@ const sameAttributes = (a: Record<string, string>, b: Record<string, string>) =>
  * carries the logical parent's dir, lang, data-rind-theme and data-theme, kept in sync, and
  * follows a changing `container` (radix#3599).
  */
-export function Portal({ container, logicalParent, render, children, ...rest }: PortalProps) {
+export function Portal({
+  container,
+  logicalParent,
+  observe = true,
+  render,
+  children,
+  ...rest
+}: PortalProps) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const parent = useRef(logicalParent)
@@ -43,8 +55,8 @@ export function Portal({ container, logicalParent, render, children, ...rest }: 
   const [host, setHost] = useState<HTMLElement | null>(null)
   useLayoutEffect(() => {
     if (!host) return
-    return syncPortalHost(host, () => parent.current?.() ?? null)
-  }, [host])
+    return syncPortalHost(host, () => parent.current?.() ?? null, observe)
+  }, [host, observe])
   // The first render after mount already has the right attributes (no flash in the wrong dir),
   // and a logical parent that changes (a dialog's opener, set on open) is followed at once:
   // the host's observer only sees attribute mutations, not a different parent element.

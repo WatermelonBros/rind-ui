@@ -1,12 +1,11 @@
-## Purpose
+# tooltip Specification
 
+## Purpose
 Defines the Tooltip component: a short, non-interactive text that describes or
 names a focusable trigger, shown on pointer hover and keyboard focus, always
 hoverable and dismissible (WCAG 1.4.13), never shown on touch, with its parts,
 ARIA wiring, `data-*` attributes, keyboard behaviour and test contract.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 A tooltip SHALL consist of `Root` (no element), `Trigger` (default `button`),
@@ -14,7 +13,22 @@ A tooltip SHALL consist of `Root` (no element), `Trigger` (default `button`),
 (default `div`), and MAY render `Positioner` and its descendants inside the shared
 `Portal`. Every rendered part SHALL carry `data-scope="tooltip"`, its `data-part`
 and the instance's `data-instance`. Parts SHALL accept element substitution
-without changing behaviour.
+without changing behaviour. A rind-ui part (or any component) used as the trigger SHALL keep
+its own `id`, `data-scope`, `data-part` and `data-state`: the tooltip SHALL locate it by
+reference and add only `aria-describedby` (or `aria-labelledby` for `type: "label"`), merged
+with any ids it already has, and its hover, focus and press handlers.
+
+#### Scenario: A switch as the trigger
+
+- **WHEN** a Switch control is rendered as the tooltip trigger, with its own label
+- **THEN** it keeps its id, `data-scope="switch"` and its name from the label, and the
+  tooltip opens on hover and on keyboard focus (regression: mui/base-ui#5305)
+
+#### Scenario: A checkbox as the trigger
+
+- **WHEN** a Checkbox control is rendered as the tooltip trigger, with its own label
+- **THEN** it keeps its id, `data-scope="checkbox"` and its name, and the tooltip opens on
+  hover and on keyboard focus
 
 #### Scenario: Trigger rendered as an icon button component
 
@@ -410,3 +424,4 @@ Library (with fake timers advanced through the adapter) and Playwright.
 - **WHEN** the runner adds a virtual focus step on the trigger
 - **THEN** the tooltip stays closed and the "focus alone does not commit"
   invariant passes without any contract exception
+

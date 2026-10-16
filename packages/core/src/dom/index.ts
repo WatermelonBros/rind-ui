@@ -18,6 +18,7 @@ export {
   type ValidityReading,
 } from "./constraint-validity"
 export { type ContentSize, contentSize } from "./content-size"
+export { domDelayGroup } from "./delay-group"
 export {
   type DismissOptions,
   type DismissReason,
@@ -52,6 +53,7 @@ export {
   type TrackOptions,
 } from "./hidden-input"
 export { createHover, type HoverOptions, type HoverPointerEvent } from "./hover"
+export { domHoverIntent, gracePolygon, pointInPolygon } from "./hover-intent"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
 export {

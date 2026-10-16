@@ -85,6 +85,11 @@ export interface Part {
   tap(): Promise<void>
   hover(options?: PartHoverOptions): Promise<void>
   focus(): Promise<void>
+  /**
+   * Moves focus onto the part with Tab from the tab stop before it: keyboard modality and a
+   * key-caused focus (the keyboard twin of hovering it).
+   */
+  focusWithTab(): Promise<void>
   /** Focuses the part first if it is not focused. */
   press(key: Key, options?: KeyOptions): Promise<void>
   type(text: string): Promise<void>

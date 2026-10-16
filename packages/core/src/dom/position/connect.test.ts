@@ -87,11 +87,10 @@ describe("contentPlacementProps / arrowProps / anchorProps", () => {
     expect(a["id"]).toBe("arr")
     expect(a["aria-hidden"]).toBe("true")
     expect(a["data-side"]).toBe("top")
-    expect(style(a)).toMatchObject({
-      position: "absolute",
-      left: "var(--rind-arrow-x)",
-      top: "var(--rind-arrow-y)",
-    })
+    // Side top: only the cross axis inline; the main-axis offset is the stylesheet's.
+    expect(style(a)).toEqual({ position: "absolute", left: "var(--rind-arrow-x)" })
+    const side = arrowProps({ ...placed, side: "left" }, "arr")
+    expect(style(side)).toEqual({ position: "absolute", top: "var(--rind-arrow-y)" })
   })
 
   it("anchor-name uses the encoded id", () => {

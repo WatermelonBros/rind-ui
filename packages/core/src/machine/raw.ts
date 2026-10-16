@@ -14,6 +14,7 @@ export interface RawTransition {
   readonly guard?: RawGuard
   readonly actions?: readonly string[]
   readonly reenter?: boolean
+  readonly reason?: string
 }
 export type RawTransitions = string | RawTransition | readonly RawTransition[]
 

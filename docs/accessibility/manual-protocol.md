@@ -284,6 +284,24 @@ non-modal "Share" popover with a title, a text field and a close button, and a t
       trigger.
 - [ ] **Windows High Contrast / forced colors**: the content border and the arrow are visible.
 
+## Device checklist: Tooltip (add-tooltip 7.3)
+
+Record each pass in `tested-with.json` with `component: "tooltip"`. Deferred to devices. Use a
+"Save" button with a description tooltip and an icon-only "Bold" button with a `label` tooltip.
+
+- [ ] **VoiceOver macOS + Safari, NVDA + Firefox/Chrome, JAWS + Chrome**: Tab onto "Save" reads
+      the name, the role and then the description ("Save the document"). Record each wording.
+- [ ] **TalkBack + Chrome, VoiceOver iOS + Safari**: focusing "Save" by swipe reads the
+      description (it does not need a hover). Record the wording.
+- [ ] **Browse mode**: the description is reachable with the virtual cursor while the tooltip
+      is closed (hidden content referenced by the trigger); the hidden text is not read as a
+      loose paragraph in the page.
+- [ ] **Label type**: the icon-only button is announced with the tooltip text as its name, once.
+- [ ] **Escape**: with the tooltip shown, Escape closes it and focus stays on the trigger;
+      nothing is announced on close.
+- [ ] **Touch**: a tap on the trigger does not leave a stuck tooltip.
+- [ ] **Windows High Contrast / forced colors**: the content border is visible.
+
 ## Device checklist: Alert Dialog (add-alert-dialog 8.2)
 
 Record each pass in `tested-with.json` with `component: "alert-dialog"`. Deferred to devices.

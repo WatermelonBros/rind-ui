@@ -48,7 +48,12 @@ export function portalHostAttributes(logicalParent: Element | null): Record<stri
  * Keeps `host`'s dir, lang, data-rind-theme and data-theme equal to the logical parent's
  * nearest ones (a scheme switch while open follows within the frame); returns the cleanup.
  */
-export function syncPortalHost(host: Element, logicalParent: () => Element | null): () => void {
+export function syncPortalHost(
+  host: Element,
+  logicalParent: () => Element | null,
+  /** `false`: applied once, not followed (a closed tooltip holds no observer). */
+  observe = true,
+): () => void {
   const apply = () => {
     const values = portalHostAttributes(logicalParent())
     for (const name of PORTAL_HOST_ATTRIBUTES) {
@@ -58,13 +63,36 @@ export function syncPortalHost(host: Element, logicalParent: () => Element | nul
     }
   }
   apply()
-  const view = host.ownerDocument.defaultView
-  if (!view) return () => {}
-  const observer = new view.MutationObserver(apply)
-  observer.observe(host.ownerDocument.documentElement, {
-    attributes: true,
-    subtree: true,
-    attributeFilter: [...PORTAL_HOST_ATTRIBUTES],
-  })
-  return () => observer.disconnect()
+  const doc = host.ownerDocument
+  const view = doc.defaultView
+  if (!view || !observe) return () => {}
+  // One observer per document for every host (two hundred closed tooltips: one observer).
+  let shared = hostSyncs.get(doc)
+  if (!shared) {
+    const applies = new Set<() => void>()
+    const observer = new view.MutationObserver(() => {
+      for (const a of applies) a()
+    })
+    observer.observe(doc.documentElement, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: [...PORTAL_HOST_ATTRIBUTES],
+    })
+    shared = { applies, observer }
+    hostSyncs.set(doc, shared)
+  }
+  const own = shared
+  own.applies.add(apply)
+  return () => {
+    own.applies.delete(apply)
+    if (own.applies.size === 0) {
+      own.observer.disconnect()
+      hostSyncs.delete(doc)
+    }
+  }
 }
+
+const hostSyncs = new WeakMap<
+  Document,
+  { readonly applies: Set<() => void>; readonly observer: MutationObserver }
+>()

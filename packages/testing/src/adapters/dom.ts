@@ -11,6 +11,7 @@ import {
   type KeyOptions,
   type Part,
   PENDING_ANNOUNCEMENTS,
+  tabbables,
 } from "@rind-ui/core"
 import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
 import { installAnnouncementLog } from "../announcements"
@@ -407,6 +408,17 @@ function createDomEnv(
       async focus() {
         const el = await waitFor()
         await act(() => el.focus())
+      },
+      async focusWithTab() {
+        const el = await waitFor()
+        const stops = tabbables(doc().body)
+        const before = stops[stops.indexOf(el as HTMLElement) - 1]
+        await act(() => {
+          if (before) before.focus()
+          else (doc().activeElement as HTMLElement | null)?.blur?.()
+        })
+        const u = await getUser()
+        await act(() => u.keyboard("{Tab}"))
       },
       async press(key, keyOptions) {
         const el = await waitFor()

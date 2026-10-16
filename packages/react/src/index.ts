@@ -41,6 +41,7 @@ export * from "./text-field"
 export * from "./toggle"
 export * from "./toggle-group"
 export * from "./toolbar"
+export * from "./tooltip"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

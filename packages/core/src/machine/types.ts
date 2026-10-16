@@ -137,6 +137,11 @@ export interface TransitionDef<S extends string, A extends string, G extends str
   readonly actions?: readonly A[]
   /** Exit and re-enter when the target is the current state. */
   readonly reenter?: boolean
+  /**
+   * Reported as `details.reason` of the controllable change this transition makes, instead
+   * of the event type (a delayed open is a "hover", not an `after:` event).
+   */
+  readonly reason?: string
 }
 
 /** A target, one transition, or guarded alternatives (the first whose guard passes wins). */

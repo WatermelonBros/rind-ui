@@ -29,6 +29,16 @@ function watchTouches(doc: Document, env: SchedulerEnv) {
   doc.addEventListener("touchend", onTouchEnd, true)
 }
 
+/** A mouse event iOS emulates right after a touch (never a hover). */
+export function isEmulatedMouse(
+  env: ModalityEnv & PlatformInfo & SchedulerEnv & DomEnv,
+  doc: Document | undefined,
+): boolean {
+  if (!doc || !quirkActive("ios-emulated-mouse-after-touch", env)) return false
+  watchTouches(doc, env)
+  return recentTouch.get(doc) === true
+}
+
 export interface HoverOptions {
   readonly env: ModalityEnv & PlatformInfo & SchedulerEnv & DomEnv
   readonly send: (event: HoverEvent) => void

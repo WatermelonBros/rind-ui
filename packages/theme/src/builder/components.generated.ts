@@ -332,4 +332,13 @@ export type ComponentTokens = {
     | "outlineOn"
     | "paddingInline"
   readonly toolbar: "bg" | "border" | "gap" | "groupGap" | "padding" | "radius" | "separatorColor"
+  readonly tooltip:
+    | "arrowSize"
+    | "bg"
+    | "color"
+    | "duration"
+    | "fontSize"
+    | "maxWidth"
+    | "padding"
+    | "radius"
 }
