@@ -23,6 +23,7 @@ import type { DomSnapshot, ElementInfo } from "./collect"
 import { directed, runAction, type Target, toEnvFactory } from "./driver"
 import { type GraphEdge, type MachineGraph, type Path, paths, toGraph } from "./graph"
 import { checkGeneric, genericInvariants, type StepFacts } from "./invariants"
+import type { VirtualClock } from "./virtual-clock"
 
 /** Contracts whose jsdom limitation was already reported in this run. */
 const layoutNoted = new Set<string>()
@@ -85,6 +86,12 @@ export interface TestMachineOptions<C extends AnyContract, R, A extends unknown[
    * that action (AT 12: one bare click, one activation).
    */
   readonly activations?: { readonly action: string; readonly count: () => number }
+  /**
+   * The virtual clock the rendered machines use (`RindProvider environment={{ scheduler:
+   * clock.scheduler }}`): delay edges and the `timed` invariant advance it instead of
+   * waiting real time.
+   */
+  readonly clock?: VirtualClock
 }
 
 /** What the current `testMachine` run emulates, for `setup` to render accordingly. */
@@ -288,6 +295,19 @@ const oracleEnv = {
   layout: { pageTarget: () => null },
   dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  // A menu tree with one level: the root closes itself, nothing else is open.
+  menuTree: {
+    register: () => () => {},
+    openChild: () => {},
+    childClosed: () => {},
+    closeTree: () => {},
+    openPath: () => [],
+    rootTrigger: () => null,
+    parentKind: () => null,
+    parentElements: () => [],
+    parentNavigate: () => {},
+    parentPress: () => {},
+  },
   // A cold delay group: one instance under test, never warmed by another.
   delayGroup: {
     join: () => () => {},
@@ -673,6 +693,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     return env
   }
   const base = envFor(modality)
+  /** The machines' delays: the virtual clock when the test gave one, else the adapter's time. */
+  const elapse = async (ms: number) => {
+    if (!options.clock) return base.advance(ms)
+    options.clock.advance(ms)
+    // Let the page commit what the timers changed (a frame, no elapsed time).
+    await base.advance(0)
+  }
   if (direction === "rtl") await base.setDirection("rtl")
 
   const props = (options.props ?? {}) as Props
@@ -789,7 +816,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
    * delayed reaction (a tooltip's open delay) is seen.
    */
   const unchanged = async (state: string, previous: Record<string, unknown>, wait = 16) => {
-    await base.advance(wait)
+    // Past every delay that could react (virtual when the test gave a clock).
+    await elapse(wait)
     const seen = await observe()
     const changed = Object.keys(seen).filter(
       (k) => JSON.stringify(seen[k]) !== JSON.stringify(previous[k]),
@@ -837,7 +865,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         (p) => p.attrs["data-hover"] !== undefined || p.attrs["data-focus"] !== undefined,
       )
       if (held.length > 0) {
-        await base.advance(longestDelay() + 16)
+        await elapse(longestDelay() + 16)
         const after = await observe()
         if (after["isOpen"] !== true) {
           fail(
@@ -1116,7 +1144,15 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           ) {
             userChanges += 1
           }
-          await base.advance(ms)
+          const firedBefore = options.clock?.fired() ?? 0
+          await elapse(ms)
+          // A delay edge walked on a clock no timer of the page used proves nothing: the
+          // rendered machines run on another scheduler (the provider was not given it).
+          if (options.clock && options.clock.fired() === firedBefore) {
+            throw new Error(
+              `${edge.event}: no timer fired on the virtual clock; pass clock.scheduler as RindProvider environment={{ scheduler }}`,
+            )
+          }
         } else if (mapping?.kind === "props") {
           const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }
           inputs.push({ kind: "props", props: next })

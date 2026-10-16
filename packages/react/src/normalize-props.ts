@@ -10,6 +10,8 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   contenteditable: "contentEditable",
   spellcheck: "spellCheck",
   autocomplete: "autoComplete",
+  autocapitalize: "autoCapitalize",
+  autocorrect: "autoCorrect",
   autofocus: "autoFocus",
   maxlength: "maxLength",
   minlength: "minLength",

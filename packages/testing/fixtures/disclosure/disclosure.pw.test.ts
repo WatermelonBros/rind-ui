@@ -233,6 +233,7 @@ describe("Chromium accessibility tree (RA#9737)", () => {
     const page = await open()
     await page.setContent("<body></body>")
     await page.evaluate(() =>
+      // fake-time: the page's late content under test; the test waits on the tree
       setTimeout(() => document.body.insertAdjacentHTML("beforeend", "<button>Late</button>"), 150),
     )
     const late = (tree: readonly { name: string }[]) => tree.some((n) => n.name === "Late")

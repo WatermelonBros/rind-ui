@@ -16,7 +16,11 @@ export type PlaywrightTarget = Page | Locator | FrameLocator
 export interface PlaywrightAdapterOptions {
   /** `until` timeout in ms (default 5000, Playwright's expect timeout). */
   readonly timeout?: number
-  /** Advances time when the page uses `page.clock`; defaults to waiting. */
+  /**
+   * Advances time when the page uses `page.clock`; defaults to waiting. Pause the clock
+   * (`page.clock.pauseAt`) after installing it: an installed clock also flows with real
+   * time, so polling and load would move the page's time too.
+   */
   readonly advanceTimers?: (ms: number) => Promise<unknown>
 }
 
@@ -208,9 +212,11 @@ function createPlaywrightEnv(
       ? root.getByRole(by.role as Parameters<Page["getByRole"]>[0], {
           ...(by.name === undefined ? {} : { name: by.name, exact: true }),
         })
-      : "part" in by
-        ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
-        : root.getByText(by.text, { exact: true })
+      : "label" in by
+        ? root.getByLabel(by.label, { exact: true })
+        : "part" in by
+          ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
+          : root.getByText(by.text, { exact: true })
 
   const describeAll = (l: Locator) =>
     l.evaluateAll((els) => els.map((el) => el.outerHTML.slice(0, 160)).join("\n"))
@@ -458,6 +464,41 @@ function createPlaywrightEnv(
           input.dispatchEvent(new Event("input", { bubbles: true }))
           input.dispatchEvent(new Event("change", { bubbles: true }))
         }, value)
+      },
+      async paste(text) {
+        const l = await waitFor()
+        await l.evaluate((el, text) => {
+          const input = el as HTMLInputElement
+          const start = input.selectionStart ?? input.value.length
+          const end = input.selectionEnd ?? start
+          // The real order: paste (cancelable, clipboardData) → beforeinput → input.
+          let paste: Event
+          if (typeof DataTransfer === "function" && typeof ClipboardEvent === "function") {
+            const clipboardData = new DataTransfer()
+            clipboardData.setData("text/plain", text)
+            paste = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true })
+            // Firefox ignores the constructor's clipboardData: attach it.
+            if (!(paste as ClipboardEvent).clipboardData?.getData("text/plain")) {
+              Object.defineProperty(paste, "clipboardData", { value: clipboardData })
+            }
+          } else {
+            // jsdom has no DataTransfer: a paste Event carrying a clipboardData reader.
+            paste = new Event("paste", { bubbles: true, cancelable: true })
+            Object.defineProperty(paste, "clipboardData", {
+              value: { getData: (type: string) => (/^text(\/plain)?$/.test(type) ? text : "") },
+            })
+          }
+          if (!input.dispatchEvent(paste)) return
+          const init = { inputType: "insertFromPaste", data: text, bubbles: true }
+          const before = new InputEvent("beforeinput", { ...init, cancelable: true })
+          if (!input.dispatchEvent(before)) return
+          const next = input.value.slice(0, start) + text + input.value.slice(end)
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, next)
+          else input.value = next
+          input.setSelectionRange(start + text.length, start + text.length)
+          input.dispatchEvent(new InputEvent("input", init))
+        }, text)
       },
       waitForDetach: async () => {
         await until(

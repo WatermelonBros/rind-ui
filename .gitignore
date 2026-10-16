@@ -11,3 +11,5 @@ coverage
 # Vitest browser-mode attachments / captures
 .vitest/
 .impeccable/
+# Declarations a build once emitted beside the testing sources (never source).
+packages/testing/src/**/*.d.ts

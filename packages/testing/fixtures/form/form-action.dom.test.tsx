@@ -32,13 +32,17 @@ function Page({ action }: { readonly action: (fd: FormData) => Promise<State> })
 }
 
 const email = () => screen.getByRole("textbox", { name: "Email" }) as HTMLInputElement
-const settle = (ms = 100) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+const settle = () =>
+  act(async () => {
+    for (let i = 0; i < 6; i++) await frame()
+  })
 
 async function submitWithServerError() {
   // A real action awaits the network: it settles in a later task, not in the submit event's
   // microtasks (where `window.event` would still be the submit and the reset look like a user's).
   const action = vi.fn(async () => {
-    await new Promise((r) => setTimeout(r, 20))
+    await frame()
     return { errors: { email: "Already registered" } }
   })
   render(<Page action={action} />)

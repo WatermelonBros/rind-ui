@@ -41,14 +41,14 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | wip | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
-| Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | spec |  |
-| Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec | Reado has Breadcrumb |
+| Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | done |  |
+| Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done | Reado has Breadcrumb |
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Steps | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo | Reka: Stepper |
 | Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
@@ -94,13 +94,13 @@ seen in docs or source but not confirmed as public, stable API.
 | Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done |  |
 | Button |  |  | ● | ● | ● | ● |  | ● | ● | 6 | 1 | done |  |
 | Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | done | Number Field |
-| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Radix/Base: OTP Field |
+| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | todo | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
 | Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Password Input | ● | ● |  |  |  |  |  |  |  | 2 | 2 | spec | Radix: Password Toggle Field |
-| Search Field |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec |  |
+| Password Input | ● | ● |  |  |  |  |  |  |  | 2 | 2 | done | Radix: Password Toggle Field |
+| Search Field |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 

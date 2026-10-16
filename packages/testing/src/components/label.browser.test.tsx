@@ -43,7 +43,14 @@ describe("Label in a real browser", () => {
       </Label>,
     )
     const input = screen.getByRole("textbox") as HTMLInputElement
-    await userEvent.dblClick(input)
+    // Under load the two clicks can land further apart than the OS double-click interval and
+    // count as two single clicks: repeat the gesture until the browser reports a dblclick.
+    let doubled = false
+    input.addEventListener("dblclick", () => {
+      doubled = true
+    })
+    for (let i = 0; i < 5 && !doubled; i++) await userEvent.dblClick(input)
+    expect(doubled).toBe(true)
     expect(input.value.slice(input.selectionStart ?? 0, input.selectionEnd ?? 0)).toBe("hello")
   })
 

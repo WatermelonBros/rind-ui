@@ -1,3 +1,4 @@
+import { PENDING_ANNOUNCEMENTS } from "@rind-ui/core"
 import { Field, Form, type FormActions } from "@rind-ui/react"
 import { act, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
@@ -67,7 +68,17 @@ const box = (label: string) => screen.getByRole("textbox", { name: label }) as H
 const click = (name: string) => userEvent.click(screen.getByRole("button", { name }))
 const rootOf = (label: string) => box(label).closest('[data-scope="field"]') as HTMLElement
 const inJsdom = navigator.userAgent.includes("jsdom")
-const settle = (ms = 60) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+const settle = () =>
+  act(async () => {
+    for (let i = 0; i < 4; i++) await frame()
+  })
+/** Waits until the announcer has nothing queued (debounce or frame), then asserts run. */
+const announcerIdle = () =>
+  vi.waitFor(() =>
+    expect((Reflect.get(globalThis, PENDING_ANNOUNCEMENTS) as number | undefined) ?? 0).toBe(0),
+  )
+
 const messages = () => installAnnouncementLog().map((a) => a.message)
 
 function Item({
@@ -399,6 +410,7 @@ describe("Server errors", () => {
       <Form.Root
         aria-label="F"
         {...(errors ? { errors } : {})}
+        // fake-time: the app's deferred server errors; the test waits on a condition
         onFormSubmit={() => setTimeout(() => setErrors({ email: "Already registered" }), 0)}
       >
         <Item name="city" />
@@ -476,7 +488,7 @@ describe("Failed attempt announcement", () => {
     const form = getForm(screen, { name: "F" })
     await form.submit()
     await vi.waitFor(() => expect(messages()).toEqual(["3 fields have errors"]))
-    await settle(700)
+    await announcerIdle()
     expect(messages()).toEqual(["3 fields have errors"])
     expect(await form.announcements()).toEqual([
       expect.objectContaining({ message: "3 fields have errors" }),
@@ -493,7 +505,7 @@ describe("Failed attempt announcement", () => {
     )
     await getForm(screen, { name: "F" }).submit()
     await vi.waitFor(() => expect(document.activeElement).toBe(box("a")))
-    await settle(700)
+    await announcerIdle()
     expect(messages()).toEqual([])
   })
 })
@@ -505,6 +517,7 @@ describe("Reset", () => {
       <Form.Root
         aria-label="F"
         {...(errors ? { errors } : {})}
+        // fake-time: the app's deferred server errors; the test waits on a condition
         onFormSubmit={() => setTimeout(() => setErrors({ b: "Server says no" }), 0)}
         {...(onReset ? { onReset } : {})}
       >
@@ -615,7 +628,7 @@ describe("Native sequence", () => {
     await vi.waitFor(() => expect(document.activeElement).toBe(box("a")))
     const summaries = () => messages().filter((m) => m.endsWith("fields have errors"))
     await vi.waitFor(() => expect(summaries()).toEqual(["3 fields have errors"]))
-    await settle(700)
+    await announcerIdle()
     expect(summaries()).toEqual(["3 fields have errors"])
     expect(await getForm(screen, { name: "F" }).invalidFields()).toEqual(["a", "b", "c"])
   })
@@ -632,7 +645,7 @@ describe("Native sequence", () => {
     await userEvent.click(box("c"))
     await userEvent.keyboard("{Enter}")
     await vi.waitFor(() => expect(messages()).toContain("3 fields have errors"))
-    await settle(700)
+    await announcerIdle()
     expect(messages()).toEqual(["3 fields have errors"])
   })
 
