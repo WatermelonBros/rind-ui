@@ -7,7 +7,9 @@ behaviour, actions, empty and loading states and the contract its driver and mod
 tests are generated from — and the listbox parts that Select and other popup components
 reuse. Keys, navigation, typeahead, selection rules, repair, set metadata and the
 virtualization contract are those of the `add-collections` capabilities and are not
-restated.
+restated. Follow-up (not yet delivered, tracked in docs/review-backlog.md): the virtual
+screen-reader reading-order test, emulated forced-colors captures, a virtualized site example
+and the manual assistive-technology pass.
 ## Requirements
 ### Requirement: Anatomy
 

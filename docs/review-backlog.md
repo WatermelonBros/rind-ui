@@ -7,7 +7,8 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
-| add-listbox (impl) | — | packages/testing/src/components | Tasks 5.3 (virtualized story: End to item 10,000, typeahead to an unmounted item, set metadata after filter) and 5.4 (virtual screen reader reading order) not done: no virtualizer dependency yet |
+| add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
+| add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
 | add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
 | add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |

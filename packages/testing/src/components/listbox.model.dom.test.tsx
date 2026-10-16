@@ -17,13 +17,34 @@ const FRUITS = ["Apple", "Banana", "Cherry", "Date", "Elderberry"].map((label) =
   key: label.toLowerCase(),
   label,
 }))
-const collection = createListCollection({
-  items: FRUITS,
-  getKey: (i) => i.key,
-  getText: (i) => i.label,
-})
+const itemsOf = (
+  items: readonly {
+    key: string
+    label: string
+    disabled?: boolean
+    section?: { key: string; label: string }
+  }[],
+) =>
+  createListCollection({
+    items,
+    getKey: (i) => i.key,
+    getText: (i) => i.label,
+    isDisabled: (i) => i.disabled === true,
+    getSection: (i) => i.section,
+  })
+const collection = itemsOf(FRUITS)
 
-type Config = Pick<ListboxProps, "selectionMode" | "selectionBehavior" | "orientation">
+type Config = Pick<
+  ListboxProps,
+  "selectionMode" | "selectionBehavior" | "orientation" | "loading"
+> & {
+  readonly items?: readonly {
+    key: string
+    label: string
+    disabled?: boolean
+    section?: { key: string; label: string }
+  }[]
+}
 
 function config(name: string, cfg: Config) {
   // A horizontal list moves with ArrowRight (the runner mirrors it under rtl).
@@ -43,8 +64,9 @@ function config(name: string, cfg: Config) {
         : {}),
     },
   } as unknown as typeof listboxContract
+  const { items: _items, ...props } = cfg
   const root = {
-    ...cfg,
+    ...props,
     ...(cfg.selectionMode === "none" || cfg.selectionBehavior === "replace"
       ? { onAction: () => {} }
       : {}),
@@ -58,7 +80,7 @@ function config(name: string, cfg: Config) {
             environment={{ platform: currentRun()?.platform ?? platforms.linux }}
             dir={currentRun()?.direction === "rtl" ? "rtl" : "ltr"}
           >
-            <Listbox.Root items={FRUITS} {...root}>
+            <Listbox.Root items={cfg.items ?? FRUITS} {...root}>
               <Listbox.Label>Fruit</Listbox.Label>
               <Listbox.List>
                 <Listbox.Items />
@@ -70,7 +92,8 @@ function config(name: string, cfg: Config) {
       target: () => screen,
       anchor: [{ name: "Fruit" }],
       props: {
-        collection,
+        collection: cfg.items ? itemsOf(cfg.items) : collection,
+        loading: cfg.loading,
         ids: listboxIds("listbox", "oracle"),
         strategy: "roving",
         selectionMode: cfg.selectionMode ?? "single",
@@ -89,3 +112,17 @@ config("multiple toggle", { selectionMode: "multiple" })
 config("multiple replace", { selectionMode: "multiple", selectionBehavior: "replace" })
 config("none with onAction", { selectionMode: "none" })
 config("horizontal (ltr and rtl)", { selectionMode: "single", orientation: "horizontal" })
+// Argument classes from collections: sections, a disabled neighbour, empty, loading.
+config("sections", {
+  selectionMode: "multiple",
+  items: FRUITS.map((f, i) => ({
+    ...f,
+    section: i < 2 ? { key: "a", label: "First" } : { key: "b", label: "Second" },
+  })),
+})
+config("disabled neighbour", {
+  selectionMode: "multiple",
+  items: FRUITS.map((f) => (f.key === "banana" ? { ...f, disabled: true } : f)),
+})
+config("empty", { selectionMode: "single", items: [] })
+config("loading more (async)", { selectionMode: "single", loading: "loading-more" })

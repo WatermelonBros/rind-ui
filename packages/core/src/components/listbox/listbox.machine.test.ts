@@ -113,6 +113,31 @@ describe("toggle behaviour", () => {
     expect(m.onValueChange).toHaveBeenCalledTimes(2)
   })
 
+  it("Shift+ArrowDown in replace selects once per press", () => {
+    const m = make({ selectionMode: "multiple", selectionBehavior: "replace" })
+    m.focus()
+    m.space()
+    m.onValueChange.mockClear()
+    m.down({ extend: true })
+    expect(m.onValueChange).toHaveBeenCalledTimes(1)
+    expect(m.value()).toEqual(["a", "b"])
+  })
+
+  it("a disabled item in none mode never acts on a press", () => {
+    const m = make({
+      selectionMode: "none",
+      collection: createListCollection({
+        items: [{ id: "a" }, { id: "b", off: true }],
+        getKey: (r) => r.id,
+        getText: (r) => r.id,
+        isDisabled: (r) => "off" in r,
+      }),
+    })
+    m.focus()
+    m.press("b")
+    expect(m.onAction).not.toHaveBeenCalled()
+  })
+
   it("Shift+ArrowDown extends from the anchor", () => {
     const m = make({ selectionMode: "multiple" })
     m.focus()

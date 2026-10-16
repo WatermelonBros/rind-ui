@@ -106,6 +106,8 @@ export function listboxParts(v: ListboxPartsView, env: CompositeEnv) {
       return {
         ...own,
         ...focusAttrs(v.focused, v.context.highlightSource === "pointer" ? "pointer" : v.modality),
+        // Vertical is the listbox default: the attribute only says horizontal.
+        "aria-orientation": v.orientation === "horizontal" ? "horizontal" : undefined,
         "data-selection-mode": mode,
         "aria-labelledby":
           naming["aria-label"] !== undefined || naming["aria-labelledby"] !== undefined

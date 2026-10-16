@@ -95,14 +95,43 @@ describe("listbox through Playwright", () => {
     await expect.poll(() => selected(page, "Toppings").count()).toBe(5)
   })
 
-  it("navigation keys do not scroll the page", { timeout: 60_000 }, async () => {
+  it("navigation keys do not scroll the page (react-spectrum#10720)", {
+    timeout: 60_000,
+  }, async () => {
     const page = await open()
+    // The page can scroll, and PageDown outside the list does scroll it (the control).
+    expect(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight)).toBe(
+      true,
+    )
+    await page.evaluate(() => {
+      const log: [string, boolean][] = []
+      ;(window as unknown as { keys: typeof log }).keys = log
+      window.addEventListener("keydown", (e) => log.push([e.key, e.defaultPrevented]))
+    })
     await page.keyboard.press("Tab")
-    for (const key of ["Space", "PageDown", "End", "Home"]) {
-      await page.keyboard.press(key)
-      // Scrolling is async: poll that it never moves instead of waiting a fixed time.
-      await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 300 }).toBe(0)
-    }
+    expect(
+      await page.evaluate(
+        () =>
+          document.activeElement?.closest('[role="listbox"]')?.getAttribute("aria-label") ??
+          document.activeElement?.closest('[role="listbox"]')?.id ??
+          null,
+      ),
+    ).not.toBe(null)
+    for (const key of ["Space", "PageDown", "End", "Home"]) await page.keyboard.press(key)
+    // Every key reached the page already prevented by the list: none can scroll it.
+    expect(
+      await page.evaluate(() => (window as unknown as { keys: [string, boolean][] }).keys),
+    ).toEqual([
+      ["Tab", false],
+      [" ", true],
+      ["PageDown", true],
+      ["End", true],
+      ["Home", true],
+    ])
+    expect(await page.evaluate(() => window.scrollY)).toBe(0)
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+    await page.keyboard.press("PageDown")
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
   })
 
   it("Shift+click selects a range and selects no text", { timeout: 60_000 }, async () => {

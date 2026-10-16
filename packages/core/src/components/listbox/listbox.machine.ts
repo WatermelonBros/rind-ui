@@ -148,11 +148,15 @@ export const listboxMachine = setup({
       behaviour(props) === "replace" &&
       mode(props) !== "none" &&
       event.mod !== true &&
+      // Shift+arrows extend the range in `navigate` itself: selecting again would fire twice.
+      event.extend !== true &&
       event.move !== "expand" &&
       event.move !== "collapse",
     /** Typeahead in a single replace list selects the match. */
     typeaheadSelects: ({ props }) => behaviour(props) === "replace" && mode(props) === "single",
     noneMode: ({ props }) => mode(props) === "none",
+    selectEnabled: ({ event, props }) =>
+      event.type === "SELECT" && props.collection.get(event.key)?.disabled !== true,
     canAct: ({ event, props }) => {
       if (event.type !== "ACTION" || !props.onAction) return false
       const node = props.collection.get(event.key)
@@ -201,7 +205,12 @@ export const listboxMachine = setup({
           { actions: ["typeahead", "scrollToHighlighted", "focusHighlighted"] },
         ],
         // With no selection, a press or Enter is an action.
-        SELECT: [{ guard: "noneMode", actions: ["act"] }, { actions: ["select"] }],
+        SELECT: [
+          // A disabled item never acts (a click reaches it through the composite).
+          { guard: { and: ["noneMode", "selectEnabled"] }, actions: ["act"] },
+          { guard: "noneMode" },
+          { actions: ["select"] },
+        ],
         SELECT_ALL: { actions: ["selectAll"] },
         CLEAR_SELECTION: { actions: ["clearSelection"] },
         DESELECT: { actions: ["deselect"] },
