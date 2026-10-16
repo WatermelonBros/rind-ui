@@ -187,42 +187,48 @@ for (const url of urls) {
     if (m.type() === "error" || m.type() === "warning") report(url, `console.${m.type()}`, m.text())
   })
   page.on("pageerror", (e) => report(url, "pageerror", e.message))
-  await page.goto(base + url, { waitUntil: "networkidle" })
-  await exercise(page, url)
-  // every link inside the site resolves to an exported file
-  for (const href of await page.evaluate(() =>
-    [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].map((a) => a.pathname),
-  )) {
-    const file = join(outDir, decodeURIComponent(href))
-    let found = false
-    try {
-      found = statSync(file).isFile() || statSync(join(file, "index.html")).isFile()
-    } catch {}
-    if (!found) report(url, "broken-link", href)
-  }
-  // every section the reader can scroll to must be visible once scrolled into view
-  const height = await page.evaluate(() => document.body.scrollHeight)
-  for (let y = 0; y < height; y += 600) {
-    await page.evaluate((top) => window.scrollTo(0, top), y)
-    await frames(page)
-  }
-  await invisibleText(page, url)
-  await axe(page, url, "crisp")
-  // the theme pages are @rind-ui/theme's own, with no site phase
-  if (!url.startsWith("/theme/")) {
-    await page.getByRole("switch", { name: "juicy mode" }).click()
-    await page.waitForFunction(() => document.documentElement.dataset["phase"] === "juicy")
-    await axe(page, url, "juicy")
-    await page.getByRole("switch", { name: "juicy mode" }).click()
-    await page.waitForFunction(() => document.documentElement.dataset["phase"] === "crisp")
+  // a step that throws (a click that times out, a wait past its deadline) is a finding with
+  // its page, not a crash that hides which page and step failed
+  try {
+    await page.goto(base + url, { waitUntil: "networkidle" })
+    await exercise(page, url)
+    // every link inside the site resolves to an exported file
+    for (const href of await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].map((a) => a.pathname),
+    )) {
+      const file = join(outDir, decodeURIComponent(href))
+      let found = false
+      try {
+        found = statSync(file).isFile() || statSync(join(file, "index.html")).isFile()
+      } catch {}
+      if (!found) report(url, "broken-link", href)
+    }
+    // every section the reader can scroll to must be visible once scrolled into view
+    const height = await page.evaluate(() => document.body.scrollHeight)
+    for (let y = 0; y < height; y += 600) {
+      await page.evaluate((top) => window.scrollTo(0, top), y)
+      await frames(page)
+    }
+    await invisibleText(page, url)
+    await axe(page, url, "crisp")
+    // the theme pages are @rind-ui/theme's own, with no site phase
+    if (!url.startsWith("/theme/")) {
+      await page.getByRole("switch", { name: "juicy mode" }).click()
+      await page.waitForFunction(() => document.documentElement.dataset["phase"] === "juicy")
+      await axe(page, url, "juicy")
+      await page.getByRole("switch", { name: "juicy mode" }).click()
+      await page.waitForFunction(() => document.documentElement.dataset["phase"] === "crisp")
+      await settled(page, url)
+    }
+    await page.setViewportSize({ width: 390, height: 844 })
     await settled(page, url)
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    )
+    if (overflow > 1) report(url, "mobile-overflow", `${overflow}px wider than a 390px phone`)
+  } catch (e) {
+    report(url, "audit", e instanceof Error ? e.message : String(e))
   }
-  await page.setViewportSize({ width: 390, height: 844 })
-  await settled(page, url)
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  )
-  if (overflow > 1) report(url, "mobile-overflow", `${overflow}px wider than a 390px phone`)
   await page.close()
 }
 // the examples harness: every example of index.json is exported in every skin and renders
