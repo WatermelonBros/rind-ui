@@ -21,4 +21,6 @@
 @import "./slider.css";
 @import "./popover.css";
 @import "./number-input.css";
+@import "./password-input.css";
+@import "./search-field.css";
 @import "./tooltip.css";
