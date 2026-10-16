@@ -64,19 +64,13 @@ const report = (url: string, kind: string, message: string) => {
 const frames = (page: Page) =>
   page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
 
-/** Every finite animation and transition has finished (looping ones, like the marquee, are
- * ignored), so contrast and opacity are measured on the final frame. A condition, not a delay. */
+/** No animation or transition is running (finite ones finished, none looping), so contrast and
+ * opacity are measured on the final frame. A condition with a deadline, not a delay. */
 async function settled(page: Page, url: string) {
   await frames(page)
   await page
     .waitForFunction(
-      () =>
-        document
-          .getAnimations()
-          .every(
-            (a) =>
-              a.playState !== "running" || a.effect?.getComputedTiming().iterations === Infinity,
-          ),
+      () => document.getAnimations().every((a) => a.playState !== "running"),
       undefined,
       { timeout: 10_000 },
     )
@@ -181,7 +175,12 @@ async function invisibleText(page: Page, url: string) {
 
 const browser = await chromium.launch()
 for (const url of urls) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+  // reduced motion: every looping animation rests on its final frame, so axe never samples
+  // a label mid-fade
+  const page = await browser.newPage({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "reduce",
+  })
   // the landing intro plays once per session; audit the styled page
   await page.addInitScript(() => sessionStorage.setItem("rind-intro", "1"))
   page.on("console", (m) => {
@@ -238,7 +237,7 @@ for (const url of urls) {
       report(u, "harness", "listed in index.json but not exported")
     }
   }
-  const page = await browser.newPage()
+  const page = await browser.newPage({ reducedMotion: "reduce" })
   let at = ""
   page.on("pageerror", (e) => report(at, "pageerror", e.message))
   page.on("console", (m) => {
