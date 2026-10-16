@@ -21,6 +21,8 @@ export type MenuCloseReason =
   | "window-blur"
   | "parent-dismissed"
   | "api"
+  /** A non-modal context menu: the page scrolled. */
+  | "scroll"
 
 export type MenuTreeEvent =
   | { readonly type: "TREE.CLOSE"; readonly reason: MenuCloseReason }

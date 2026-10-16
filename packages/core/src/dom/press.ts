@@ -76,8 +76,12 @@ export interface PressOptions {
   readonly disabled?: () => boolean
   /** False: pressing does not move focus (e.g. a stepper button next to its input). */
   readonly focusOnPress?: boolean
-  /** Opt into long press (default threshold 500 ms). */
-  readonly longPress?: { readonly threshold?: number }
+  /**
+   * Opt into long press (default threshold 500 ms). `moveTolerance` (px): moving farther
+   * from the press's start cancels it (default: only leaving the part does). A second
+   * pointer going down always cancels it (a pinch is not a long press).
+   */
+  readonly longPress?: { readonly threshold?: number; readonly moveTolerance?: number }
   /**
    * What a click forwarded by an associated label does (default "activate"): it always
    * focuses the part; "activate" then presses it once, "focus" does not (popup triggers
@@ -390,6 +394,19 @@ export function createPress(options: PressOptions): PressHandle {
       endOnInterruption(target, pointerType, e)
       send(event("PRESS.START", pointerType, e, modalityFor(pointerType)))
       if (options.longPress) {
+        const start = { x: e.clientX, y: e.clientY }
+        const tolerance = options.longPress.moveTolerance
+        if (tolerance !== undefined) {
+          listen(doc, "pointermove", (pe) => {
+            if (pe.pointerId !== e.pointerId || longPressTimer === null) return
+            if (Math.hypot(pe.clientX - start.x, pe.clientY - start.y) > tolerance) {
+              cancelLongPress()
+            }
+          })
+        }
+        listen(doc, "pointerdown", (pe) => {
+          if (pe.pointerId !== e.pointerId) cancelLongPress()
+        })
         longPressTimer = env.scheduler.setTimeout(() => {
           longPressTimer = null
           if (state.kind !== "pointer" || !state.inside) return
