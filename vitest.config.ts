@@ -132,6 +132,9 @@ export default defineConfig({
           environment: "node",
           include: ["packages/*/fixtures/**/*.pw.test.ts"],
           retry: ciRetry,
+          // Deadlines, not waits: real browsers launched in parallel start slowly under load.
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
       {
