@@ -5,6 +5,15 @@ import { pinInputMachine } from "./pin-input.machine"
 type P = "root" | "label" | "description" | "error-message" | "control" | "input" | "slot"
 type E = Env<P>
 
+/** End, then one Backspace per character (a synthetic select-all selects nothing). */
+async function clearAll(env: E) {
+  const input = env.part("input")
+  if (!(await input.isFocused())) await input.focus()
+  await input.press("End")
+  const n = (await input.value()).length
+  for (let i = 0; i < n; i++) await input.press("Backspace")
+}
+
 const slotTexts = async (env: E) => Promise.all((await env.part("slot").all()).map((s) => s.text()))
 
 /** Pin Input invariants (spec "Pin Input Invariants"), read from the page after every step. */
@@ -71,10 +80,17 @@ export const pinInputContract = contract("pin-input", {
   actions: {
     type: {
       pointer: async (env: E, text: string) => {
-        await env.part("input").click()
-        await env.part("input").type(text)
+        const input = env.part("input")
+        await input.click()
+        for (const char of text) await input.compose([char], char)
       },
-      keyboard: async (env: E, text: string) => env.part("input").type(text),
+      // At the caret, without a click: one committed single-character composition per
+      // character (the closed key set has no characters; a click would move the caret).
+      keyboard: async (env: E, text: string) => {
+        const input = env.part("input")
+        if (!(await input.isFocused())) await input.focus()
+        for (const char of text) await input.compose([char], char)
+      },
       done: async () => true,
     },
     // Keyboard only: a paste is a keyboard or context-menu action.
@@ -88,10 +104,8 @@ export const pinInputContract = contract("pin-input", {
     },
     fill: {
       keyboard: async (env: E, code: string) => {
-        const input = env.part("input")
-        if (!(await input.isFocused())) await input.focus()
-        await input.press("A", { mod: true })
-        await input.paste(code)
+        await clearAll(env)
+        await env.part("input").paste(code)
       },
       done: async () => true,
     },
@@ -110,12 +124,7 @@ export const pinInputContract = contract("pin-input", {
       done: async () => true,
     },
     clear: {
-      keyboard: async (env: E) => {
-        const input = env.part("input")
-        if (!(await input.isFocused())) await input.focus()
-        await input.press("A", { mod: true })
-        await input.press("Backspace")
-      },
+      keyboard: clearAll,
       done: { value: "" },
     },
     pressSlot: {

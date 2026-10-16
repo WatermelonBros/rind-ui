@@ -340,6 +340,9 @@ function Control({
 function slotAt(input: HTMLInputElement, instance: string, x: number): number | null {
   const control = input.parentElement
   if (!control) return null
+  // A press outside the control (a synthetic click without coordinates) is not on a slot.
+  const box = control.getBoundingClientRect()
+  if (box.width > 0 && (x < box.left || x > box.right)) return null
   let best: { index: number; distance: number } | null = null
   let laidOut = false
   for (const el of control.querySelectorAll<HTMLElement>(
@@ -403,9 +406,12 @@ function Input({
     const el = ctx.inputEl.current
     if (!el) return
     if (el.value !== value) el.value = value
+    // Kept until the input has focus (a press focuses it after the caret was planned).
     const caret = ctx.pendingCaret.current
-    if (caret !== null && el.ownerDocument.activeElement === el) el.setSelectionRange(caret, caret)
-    ctx.pendingCaret.current = null
+    if (caret !== null && el.ownerDocument.activeElement === el) {
+      el.setSelectionRange(caret, caret)
+      ctx.pendingCaret.current = null
+    }
     if (ctx.pendingSubmit.current) {
       ctx.pendingSubmit.current = false
       el.form?.requestSubmit()
@@ -494,7 +500,14 @@ function Input({
     onCompositionStart: (e: { currentTarget: HTMLInputElement }) =>
       send({ type: "COMPOSITION.START", caret: e.currentTarget.selectionStart ?? value.length }),
     onCompositionEnd: (e: { data: string }) => send({ type: "COMPOSITION.END", text: e.data }),
-    onFocus: () => send({ type: "FOCUS", modality: env.modality.modality() }),
+    onFocus: () => {
+      // Focus (Tab selects the text natively) lands on the collapsed caret, unless a press
+      // already planned one.
+      if (ctx.pendingCaret.current === null) {
+        ctx.pendingCaret.current = Math.min(ctx.view.context.caret, value.length)
+      }
+      send({ type: "FOCUS", modality: env.modality.modality() })
+    },
     onBlur: () => send({ type: "BLUR" }),
   }
   const own = normalizeProps({ ...api.input(), id: controlId })

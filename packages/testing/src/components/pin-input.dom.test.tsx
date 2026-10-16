@@ -23,11 +23,12 @@ function Code({
   return (
     <PinInput.Root length={length} {...props}>
       <PinInput.Label>{label}</PinInput.Label>
-      <PinInput.Control>
+      {/* The theme's layout, inline: slots side by side (presses map by geometry). */}
+      <PinInput.Control style={{ display: "flex", gap: 4, width: 6 * 44 }}>
         <PinInput.Input />
         {Array.from({ length: slots ?? length }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: slots are positions
-          <PinInput.Slot key={i} index={i} />
+          <PinInput.Slot key={i} index={i} style={{ width: 40, height: 40 }} />
         ))}
       </PinInput.Control>
     </PinInput.Root>
@@ -215,7 +216,7 @@ describe("PinInput", () => {
         <button type="reset">Reset</button>
       </form>,
     )
-    await pin().type("3")
+    await pin().via("keyboard").type("3")
     expect(await pin().value()).toBe("123")
     await pin().reset()
     await waitFor(async () => expect(await pin().value()).toBe("12"))
