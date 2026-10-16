@@ -653,3 +653,42 @@ describe("shadow DOM", () => {
     expect(root.activeElement).toBe($("#a", root))
   })
 })
+
+describe("initial focus retries a refused move (add-dialog: 1-CPU Linux WebKit)", () => {
+  // A real browser refuses focus on an inert element (jsdom does not): browser only.
+  it.skipIf(!inBrowser)("lands once the target becomes focusable", async () => {
+    html(`<div id="d" inert><input id="field"><button>ok</button></div>`)
+    focusInitial(env, $("#d"))
+    await frame()
+    await frame()
+    expect(document.activeElement).toBe(document.body)
+    $("#d").removeAttribute("inert")
+    await frame()
+    await frame()
+    await settle()
+    expect(document.activeElement).toBe($("#field"))
+  })
+
+  it.skipIf(!inBrowser)("a focus move by the user during the retries wins", async () => {
+    html(`<button id="outside">outside</button><div id="d" inert><input id="field"></div>`)
+    focusInitial(env, $("#d"))
+    await frame()
+    $("#outside").focus()
+    $("#d").removeAttribute("inert")
+    await frame()
+    await frame()
+    await settle()
+    expect(document.activeElement).toBe($("#outside"))
+  })
+
+  it.skipIf(!inBrowser)("stops retrying when the layer closes", async () => {
+    html(`<div id="d" inert><input id="field"></div>`)
+    const stop = focusInitial(env, $("#d"))
+    await frame()
+    stop()
+    $("#d").removeAttribute("inert")
+    await frame()
+    await frame()
+    expect(document.activeElement).toBe(document.body)
+  })
+})
