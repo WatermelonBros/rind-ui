@@ -803,7 +803,8 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
    * delayed reaction (a tooltip's open delay) is seen.
    */
   const unchanged = async (state: string, previous: Record<string, unknown>, wait = 16) => {
-    await base.advance(wait)
+    // Past every delay that could react (virtual when the test gave a clock).
+    await elapse(wait)
     const seen = await observe()
     const changed = Object.keys(seen).filter(
       (k) => JSON.stringify(seen[k]) !== JSON.stringify(previous[k]),
