@@ -996,9 +996,20 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         )
       }
     }
+    // Hold the exit while reopening: a slow run (CI Linux) must not see it end in between
+    // and mount a new element legitimately (the exit was 150 ms, the reopen took longer).
+    const resume = (await base.holdAnimations?.()) ?? (async () => {})
+    // The exit may have ended before the hold (between the read and the hold): then there is
+    // no exit to reopen during in this run, which is not a failure.
+    const still = (await base.collect()).parts.find((p) => p.node === exiting.node)
+    if (!still) {
+      await resume()
+      return
+    }
     send(reopen.event, { modality: mod })
     await act(m.action, m.args?.(oracle.service.view()) ?? [], mod)
     const back = (await base.collect()).parts.find((p) => p.part === content)
+    await resume()
     if (back?.node !== exiting.node) {
       fail(
         step,

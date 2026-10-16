@@ -7,7 +7,6 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
-| ci (PR #5) | — | packages/testing/fixtures/layer (layer.pw keyboard: closed —OPEN→ open —CLOSE→ closed) | presence: reopen during exit can mount a new element instead of keeping the exiting one (layer.pw keyboard, CI Linux) — investigate as a possible real Presence race, then remove the playwright retry (vitest.config.ts) |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx:~66 | warnKey omits aria-value* and tag; tabIndex "0" (string) skips the splitter warning — add VALUE_ATTRS to the key, normalise Number(tabIndex) |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx (tag) | function/component render: first render assumes div (role=separator on an <hr>) until the layout effect — harmless, document |
 | add-separator (r1) | — | packages/testing/src/adapters/dom.ts:232 + driver docs | `part` anchor never matches the container itself and only data-scope=separator root (host-drawn toolbar separators found only by role/name) — document; add-toolbar decides |

@@ -123,9 +123,6 @@ export default defineConfig({
           name: "playwright",
           environment: "node",
           include: ["packages/*/fixtures/**/*.pw.test.ts"],
-          // CI only: layer.pw "reopen during exit" races on Linux (docs/review-backlog.md,
-          // top row "presence: reopen during exit…"); remove once that is investigated.
-          retry: process.env["CI"] ? 1 : 0,
         },
       },
       {

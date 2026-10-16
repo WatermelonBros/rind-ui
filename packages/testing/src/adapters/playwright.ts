@@ -523,6 +523,23 @@ function createPlaywrightEnv(
       ])
     },
     takeErrors: async () => watchPageErrors((await getBase()).page).splice(0),
+    holdAnimations: async () => {
+      const { page } = await getBase()
+      // The held animations stay in the page under a global key until resumed.
+      await page.evaluate(() => {
+        const held = document.getAnimations().filter((a) => a.playState === "running")
+        for (const a of held) a.pause()
+        Reflect.set(globalThis, Symbol.for("rind-ui.held-animations"), held)
+      })
+      return async () => {
+        await page.evaluate(() => {
+          const key = Symbol.for("rind-ui.held-animations")
+          const held = (Reflect.get(globalThis, key) as Animation[] | undefined) ?? []
+          for (const a of held) if (a.playState === "paused") a.play()
+          Reflect.deleteProperty(globalThis, key)
+        })
+      }
+    },
     chromiumChecks: async () => {
       const { page, root } = await getBase()
       /**
