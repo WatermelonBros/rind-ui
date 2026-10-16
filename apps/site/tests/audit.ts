@@ -144,6 +144,17 @@ for (const url of urls) {
   page.on("pageerror", (e) => report(url, "pageerror", e.message))
   await page.goto(base + url, { waitUntil: "networkidle" })
   await exercise(page, url)
+  // every link inside the site resolves to an exported file
+  for (const href of await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].map((a) => a.pathname),
+  )) {
+    const file = join(outDir, decodeURIComponent(href))
+    let found = false
+    try {
+      found = statSync(file).isFile() || statSync(join(file, "index.html")).isFile()
+    } catch {}
+    if (!found) report(url, "broken-link", href)
+  }
   // every section the reader can scroll to must be visible once scrolled into view
   const height = await page.evaluate(() => document.body.scrollHeight)
   for (let y = 0; y < height; y += 600) {

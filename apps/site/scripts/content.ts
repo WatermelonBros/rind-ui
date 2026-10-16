@@ -62,12 +62,40 @@ const fillApi = (md: string) =>
     return meta ? renderApi(meta) : whole
   })
 
+// ── release: the version published on npm (the build also works offline: then the workspace's) ──
+function publishedVersion(): { version: string; source: "npm" | "workspace" } {
+  try {
+    const version = execFileSync("npm", ["view", "@rind-ui/react", "version"], {
+      encoding: "utf8",
+      timeout: 15_000,
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim()
+    if (/^\d+\.\d+\.\d+/.test(version)) return { version, source: "npm" }
+  } catch {}
+  const pkg = readFileSync(
+    join(import.meta.dirname, "../../../packages/react/package.json"),
+    "utf8",
+  )
+  return { version: (JSON.parse(pkg) as { version: string }).version, source: "workspace" }
+}
+const release = publishedVersion()
+console.log(`release: @rind-ui/react ${release.version} (${release.source})`)
+
 // Site-owned pages (get started…) live with the site, not in the repo's docs/.
 const sitePages = join(import.meta.dirname, "../content/pages")
 const pages: DocPage[] = [
   ...readdirSync(sitePages)
     .filter((f) => f.endsWith(".md"))
-    .map((f) => page(f, "start", readFileSync(join(sitePages, f), "utf8"))),
+    .map((f) => {
+      // {{version}} in a site page: the released minor (0.2); ReleaseSync refreshes it from npm
+      const md = readFileSync(join(sitePages, f), "utf8")
+      const v = release.version.replace(/\.\d+$/, "")
+      return page(
+        f,
+        "start",
+        md.replaceAll("{{version}}", `<span data-release="minor">${v}</span>`),
+      )
+    }),
   ...markdownFiles(join(repo, "docs/components")).map((f) =>
     page(f, "components", fillApi(readFileSync(f, "utf8"))),
   ),
@@ -78,6 +106,7 @@ const pages: DocPage[] = [
 
 mkdirSync(out, { recursive: true })
 writeFileSync(join(out, "docs.json"), `${JSON.stringify(pages, null, 2)}\n`)
+writeFileSync(join(out, "release.json"), `${JSON.stringify(release, null, 2)}\n`)
 console.log(`content: ${pages.length} pages`)
 
 // ── examples: each exported function's source is its code sample ──────────────────────────

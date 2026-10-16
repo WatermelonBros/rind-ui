@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
+import { ReleaseSync } from "@/components/release"
 import { Toc } from "@/components/toc"
 import { exampleCode, pageBySlug, pages, render } from "@/lib/docs"
 import styles from "../docs.module.css"
@@ -61,6 +62,7 @@ export default async function DocPage({ params }: Props) {
         {source && <ExamplesSection slug={page.slug} source={source} />}
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs */}
         <div className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
+        <ReleaseSync />
         <nav className={styles.pager} aria-label="Pages">
           {prev ? (
             <Link href={`/docs/${prev.slug}/`} rel="prev">

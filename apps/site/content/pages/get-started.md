@@ -2,7 +2,7 @@
 
 rind is a set of headless components. You get behaviour, keyboard support, accessibility and state. You do not get styles, so the look is entirely yours.
 
-> rind is at 0.1: the packages are on npm, and the API can still change before 1.0.
+> rind is at {{version}}: the packages are on npm, and the API can still change before 1.0.
 
 ## Packages
 
@@ -112,4 +112,4 @@ rind's behaviour lives in `@rind-ui/core`, which has no framework in it. A frame
 
 ## Using rind with an AI assistant
 
-The whole API is generated from source into [`llms.txt`](https://github.com/WatermelonBros/rind-ui/blob/main/llms.txt), so an assistant can learn the library and write against it without guessing. The drivers let it check its own work.
+The whole API is generated from source into [`llms.txt`](/llms.txt), so an assistant can learn the library and write against it without guessing. The drivers let it check its own work.
