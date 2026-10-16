@@ -30,7 +30,8 @@ export type TooltipEvent =
   | { readonly type: "HOVER.END"; readonly zone?: true }
   | { readonly type: "FOCUS"; readonly modality: Modality; readonly cause: FocusCause }
   | { readonly type: "BLUR" }
-  | { readonly type: "PRESS.START" }
+  /** `pointer`: a mouse or pen pressed it (keeps the pointer from reopening it at once). */
+  | { readonly type: "PRESS.START"; readonly pointer?: true }
   | { readonly type: "ESCAPE" }
   | { readonly type: "OUTSIDE_PRESS" }
   /** Another member of the delay group opened. */
@@ -131,12 +132,35 @@ type Env = DomEnvironment & PositionEnv & HoverIntentEnv & DelayGroupEnv
  * state cleans its effects, so the cleanup only hands the session over for a microtask;
  * the next state's effect takes it back, and only a real close tears it down.
  */
-const sessions = new Map<string, { stop: () => void; pending: boolean }>()
-function session(key: string, start: () => () => void): () => void {
-  const live = sessions.get(key)
-  const s = live ?? { stop: start(), pending: false }
+interface Session<A> {
+  stop: () => void
+  pending: boolean
+  /** The activation that owns it now: events and props always go through the current one. */
+  owner: A
+  /** The last placement, replayed to a new owner (positioning reports only changes). */
+  placed: TooltipEvent | null
+}
+const sessions = new Map<string, Session<unknown>>()
+function session<A>(
+  key: string,
+  owner: A,
+  start: (session: Session<A>) => () => void,
+  adopted: (session: Session<A>) => void,
+): () => void {
+  const live = sessions.get(key) as Session<A> | undefined
+  let s: Session<A>
+  if (live) {
+    // A restarted service (StrictMode, a remount) or open ↔ closing: the new activation
+    // takes it over; the previous one's `send` is revoked.
+    live.owner = owner
+    s = live
+    adopted(s)
+  } else {
+    s = { stop: () => {}, pending: false, owner, placed: null }
+    s.stop = start(s)
+  }
   s.pending = false
-  sessions.set(key, s)
+  sessions.set(key, s as Session<unknown>)
   return () => {
     s.pending = true
     queueMicrotask(() => {
@@ -180,14 +204,16 @@ export const tooltipMachine = setup({
     unhovered: ({ set }) => set("pointerInZone", false),
     keyboardFocus: ({ event, set }) => set("keyboardFocused", isKeyboardIntent(event)),
     blurred: ({ set }) => set("keyboardFocused", false),
-    suppress: ({ set }) => set("suppressHover", true),
+    // Only a mouse or pen press: a tap or a key leaves no hovering pointer to suppress.
+    suppress: ({ event, set }) => {
+      if (event.type === "PRESS.START" && event.pointer === true) set("suppressHover", true)
+    },
     unsuppress: ({ set }) => set("suppressHover", false),
     instant: ({ set }) => set("instant", true),
     notInstant: ({ set }) => set("instant", false),
-    enterOpen: ({ env, props, set }) => {
-      set("placement", initialPlacement(props))
-      env.delayGroup.opened(props.root)
-    },
+    enterOpen: ({ env, props }) => env.delayGroup.opened(props.root),
+    // Leaving `closed` only: closing → open keeps the session and its placement.
+    resetPlacement: ({ props, set }) => set("placement", initialPlacement(props)),
     groupClosed: ({ env, props }) => env.delayGroup.closed(props.root, props.skipDelay ?? 300),
     setPlacement: ({ event, set }) => {
       if (event.type === "POSITION.PLACED") set("placement", placementFrom(event))
@@ -205,74 +231,86 @@ export const tooltipMachine = setup({
     },
     /** While open or closing: the layer (Escape, outside press), hover zone, placement. */
     shown: (a) => {
-      const { env, send } = a
+      const { env } = a
       if (typeof document === "undefined") return undefined
       const root = a.props.root
       const ids = tooltipIds(root)
-      return session(`${root}`, () => {
-        const byId = (id: string) => env.dom.getById(id)
-        const trigger = () => a.props.getTrigger?.() ?? byId(ids.trigger)
-        const elements = () =>
-          [byId(ids.positioner), byId(ids.content)].filter((e): e is HTMLElement => e !== null)
-        const id = tooltipLayerId(root)
-        const node = env.dom.getRootNode()
-        const doc = "body" in node ? node : node.ownerDocument
-        const stopLayer = overlayEffect(env, {
-          id,
-          kind: "tooltip",
-          modal: false,
-          parent: a.props.parent,
-          opener: trigger,
-          elements: () => [trigger(), ...elements()].filter((e) => e !== null),
-          container: () => byId(ids.content),
-          // Never focused, never moves focus back.
-          initialFocus: () => false,
-          finalFocus: () => false,
-          modality: env.modality.modality(),
-          dismiss: {
-            escape: true,
-            outsidePress: true,
-            // Focus leaving is the BLUR rule's, not outside-focus dismissal.
-            outsideFocus: false,
-            onRequest: (request) => {
-              if (request.reason === "escape-key") send({ type: "ESCAPE" })
-              else if (request.reason === "outside-press") send({ type: "OUTSIDE_PRESS" })
-              else request.cancel()
+      return session(
+        `${root}`,
+        a,
+        (s) => {
+          const send = (e: TooltipEvent) => s.owner.send(e)
+          const props = () => s.owner.props
+          const byId = (id: string) => env.dom.getById(id)
+          const trigger = () => props().getTrigger?.() ?? byId(ids.trigger)
+          const elements = () =>
+            [byId(ids.positioner), byId(ids.content)].filter((e): e is HTMLElement => e !== null)
+          const id = tooltipLayerId(root)
+          const node = env.dom.getRootNode()
+          const doc = "body" in node ? node : node.ownerDocument
+          const stopLayer = overlayEffect(env, {
+            id,
+            kind: "tooltip",
+            modal: false,
+            parent: props().parent,
+            opener: trigger,
+            elements: () => [trigger(), ...elements()].filter((e) => e !== null),
+            container: () => byId(ids.content),
+            // Never focused, never moves focus back.
+            initialFocus: () => false,
+            finalFocus: () => false,
+            modality: env.modality.modality(),
+            dismiss: {
+              escape: true,
+              outsidePress: true,
+              // Focus leaving is the BLUR rule's, not outside-focus dismissal.
+              outsideFocus: false,
+              onRequest: (request) => {
+                if (request.reason === "escape-key") send({ type: "ESCAPE" })
+                else if (request.reason === "outside-press") send({ type: "OUTSIDE_PRESS" })
+                else request.cancel()
+              },
             },
-          },
-        })
-        const layer = getLayerStack(doc).get(id)
-        const stopHover = layer
-          ? env.hoverIntent.track({
-              trigger,
-              elements,
-              layer,
-              onLeave: () => send({ type: "HOVER.END", zone: true }),
-              onEnter: () => send({ type: "HOVER.START", zone: true }),
-            })
-          : () => {}
-        const track = env.position.track({
-          // By reference: the trigger may carry another part's id.
-          anchor: {
-            kind: "virtual",
-            get: () => {
-              const el = trigger()
-              return el
-                ? { getBoundingClientRect: () => el.getBoundingClientRect(), contextElement: el }
-                : null
+          })
+          const layer = getLayerStack(doc).get(id)
+          const stopHover = layer
+            ? env.hoverIntent.track({
+                trigger,
+                elements,
+                layer,
+                onLeave: () => send({ type: "HOVER.END", zone: true }),
+                onEnter: () => send({ type: "HOVER.START", zone: true }),
+              })
+            : () => {}
+          const track = env.position.track({
+            // By reference: the trigger may carry another part's id.
+            anchor: {
+              kind: "virtual",
+              get: () => {
+                const el = trigger()
+                return el
+                  ? { getBoundingClientRect: () => el.getBoundingClientRect(), contextElement: el }
+                  : null
+              },
             },
-          },
-          positioner: ids.positioner,
-          arrow: ids.arrow,
-          options: () => tooltipPositioning(a.props),
-          onPlacement: (p, first) => send({ type: "POSITION.PLACED", ...p, first }),
-        })
-        return () => {
-          track.stop()
-          stopHover()
-          stopLayer()
-        }
-      })
+            positioner: ids.positioner,
+            arrow: ids.arrow,
+            options: () => tooltipPositioning(props()),
+            onPlacement: (p, first) => {
+              s.placed = { type: "POSITION.PLACED", ...p, first: true }
+              send({ type: "POSITION.PLACED", ...p, first })
+            },
+          })
+          return () => {
+            track.stop()
+            stopHover()
+            stopLayer()
+          }
+        },
+        (s) => {
+          if (s.placed) s.owner.send(s.placed)
+        },
+      )
     },
   },
 }).machine({
@@ -296,6 +334,7 @@ export const tooltipMachine = setup({
   states: {
     closed: {
       entry: ["groupClosed"],
+      exit: ["resetPlacement"],
       on: {
         "HOVER.START": [
           { guard: { or: ["fromZone", { not: "enabled" }, "suppressed"] } },

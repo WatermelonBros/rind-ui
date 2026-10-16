@@ -202,3 +202,46 @@
     padding-top: 16px;
   }
 }
+
+/* the "planned" tooltip on a framework that is not ready yet */
+.tipLayer {
+  z-index: 80;
+}
+.tip {
+  position: relative;
+  padding: 6px 10px;
+  font: 600 12px var(--mono);
+  color: var(--bg);
+  background: var(--ink);
+  border-radius: 8px;
+  transition:
+    opacity 0.15s var(--spring),
+    scale 0.2s var(--spring);
+}
+.tip[data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+.tip[data-state="closed"] {
+  opacity: 0;
+}
+.tipArrow {
+  width: 8px;
+  height: 8px;
+  background: var(--ink);
+  rotate: 45deg;
+}
+.tipArrow[data-side="top"] {
+  bottom: -4px;
+}
+.tipArrow[data-side="bottom"] {
+  top: -4px;
+}
+.tipArrow[data-side="left"] {
+  right: -4px;
+}
+.tipArrow[data-side="right"] {
+  left: -4px;
+}

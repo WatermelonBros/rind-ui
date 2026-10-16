@@ -75,7 +75,33 @@ function sweep(from: [number, number], to: [number, number]) {
 }
 const frame = () =>
   new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())))
-const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+/** Drains the scroll/resize re-check, which the module runs two frames after the event. */
+const drain = async () => {
+  for (let i = 0; i < 4; i++) await frame()
+}
+/** Deterministic timers: nothing fires until advance() passes its delay; frames stay real. */
+function manualTimers() {
+  let now = 0
+  let next = 0
+  const pending = new Map<number, { at: number; cb: () => void }>()
+  const scheduler = {
+    ...env.scheduler,
+    setTimeout: (cb: () => void, ms: number) => {
+      pending.set(++next, { at: now + ms, cb })
+      return next
+    },
+    clearTimeout: (h: unknown) => {
+      pending.delete(h as number)
+    },
+  }
+  const advance = (ms: number) => {
+    now += ms
+    for (const [h, t] of [...pending]) {
+      if (t.at <= now && pending.delete(h)) t.cb()
+    }
+  }
+  return { scheduler, advance, size: () => pending.size }
+}
 
 let seq = 0
 /** A layer plus hover tracking over a trigger and a content box; counts leaves and enters. */
@@ -86,6 +112,7 @@ function open(
     kind?: LayerKind
     elements?: () => Element[]
     restMs?: number
+    hoverIntent?: typeof intent
     target?: () => DOMRect | null
   } = {},
 ) {
@@ -97,7 +124,7 @@ function open(
     elements: () => [trigger, content],
   })
   const events = { leave: 0, enter: 0, log: [] as string[] }
-  const stop = intent.track({
+  const stop = (extra.hoverIntent ?? intent).track({
     trigger: () => trigger,
     elements: extra.elements ?? (() => [content]),
     layer,
@@ -236,30 +263,41 @@ describe("Grace Area", () => {
 
   it("rest timeout: the grace area ends when the pointer stops inside it", async () => {
     const { trigger, content } = pair()
-    const { events } = open(trigger, content, { restMs: 120 })
+    const t = manualTimers()
+    const { events } = open(trigger, content, {
+      restMs: 120,
+      hoverIntent: domHoverIntent({ ...env, scheduler: t.scheduler }),
+    })
     move(120, 210)
     move(120, 197) // in the gap, stops there
     expect(events.leave).toBe(0)
-    await wait(60)
+    t.advance(60)
     expect(events.leave).toBe(0)
-    await wait(120)
+    t.advance(120)
     expect(events.leave).toBe(1)
   })
 
   it("rest timeout restarts with every movement and is off by default", async () => {
     const { trigger, content } = pair()
-    const a = open(trigger, content, { restMs: 120 })
+    const t = manualTimers()
+    const a = open(trigger, content, {
+      restMs: 120,
+      hoverIntent: domHoverIntent({ ...env, scheduler: t.scheduler }),
+    })
     move(120, 210)
     move(120, 198)
-    await wait(80)
+    t.advance(80)
     move(121, 197)
-    await wait(80)
+    t.advance(80)
     expect(a.events.leave).toBe(0)
     a.stop()
-    const b = open(trigger, content)
+    const b = open(trigger, content, {
+      hoverIntent: domHoverIntent({ ...env, scheduler: t.scheduler }),
+    })
     move(120, 210)
     move(120, 197)
-    await wait(300)
+    t.advance(300)
+    await drain()
     expect(b.events.leave).toBe(0)
   })
 })
@@ -462,8 +500,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
     move(100, 210) // resting on row 0 (top 200..230)
     expect(events.leave).toBe(0)
     list.scrollTop = 90 // row 0 moves above the list; row 3 is under the pointer now
-    await frame()
-    await wait(50)
+    await drain()
     expect(events.leave).toBe(1)
   })
 
@@ -474,8 +511,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
     move(100, 215) // on row 4 (top 200..230 after the scroll)
     expect(events.leave).toBe(0)
     list.scrollTop = 0 // row 4 moves down to 320: the pointer is over row 0
-    await frame()
-    await wait(50)
+    await drain()
     expect(events.leave, "the trigger moved away from the resting pointer").toBe(1)
   })
 
@@ -494,8 +530,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
       })
     const { events } = open(rows[0] as HTMLElement, content)
     list.scrollTop = 90
-    await frame()
-    await wait(50)
+    await drain()
     expect(events.leave, "the trigger scrolled away from the resting pointer").toBe(1)
   })
 
@@ -505,8 +540,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
     const { events } = open(rows[0] as HTMLElement, content)
     move(100, 210)
     list.scrollTop = 20
-    await frame()
-    await wait(50)
+    await drain()
     expect(events.leave).toBe(0)
   })
 
@@ -525,8 +559,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
     const { events } = open(trigger, content)
     move(120, 210)
     window.scrollTo(0, 150)
-    await frame()
-    await wait(50)
+    await drain()
     expect(events.leave).toBe(1)
     window.scrollTo(0, 0)
   })
@@ -539,7 +572,7 @@ describe("Scroll And Layout Re-Evaluate The Zone", () => {
     list.scrollTop = 120
     await frame()
     window.scrollBy(0, 1)
-    await wait(50)
+    await drain()
     expect(events.leave).toBe(0)
   })
 
@@ -600,8 +633,7 @@ describe("Opening Delay And Movement (trigger handlers)", () => {
     await userEvent.hover(list)
     const r = list.getBoundingClientRect()
     list.scrollTop = 400 - r.height / 2 + 20 // trigger centred under the list's centre
-    await frame()
-    await wait(300)
+    await drain()
     expect(sent, "no movement: nothing started").toEqual([])
     await userEvent.unhover(list)
   })
@@ -707,23 +739,8 @@ describe("Nothing Left Behind", () => {
       modal: false,
       elements: () => [trigger, content],
     })
-    const timers = new Set<unknown>()
-    const scheduler = {
-      ...env.scheduler,
-      setTimeout: (cb: () => void, ms: number) => {
-        const h = setTimeout(() => {
-          timers.delete(h)
-          cb()
-        }, ms)
-        timers.add(h)
-        return h
-      },
-      clearTimeout: (h: unknown) => {
-        timers.delete(h)
-        clearTimeout(h as never)
-      },
-    }
-    const tracked = domHoverIntent({ ...env, scheduler })
+    const t = manualTimers()
+    const tracked = domHoverIntent({ ...env, scheduler: t.scheduler })
     const stop = tracked.track({
       trigger: () => trigger,
       elements: () => [content],
@@ -734,10 +751,11 @@ describe("Nothing Left Behind", () => {
     })
     move(120, 210)
     move(120, 197)
-    expect(timers.size).toBe(1)
+    expect(t.size()).toBe(1)
     stop()
-    expect(timers.size).toBe(0)
-    await wait(200)
+    expect(t.size()).toBe(0)
+    t.advance(200)
+    await drain()
     expect(events.leave).toBe(0)
     layer.release()
     layer.dispose()
