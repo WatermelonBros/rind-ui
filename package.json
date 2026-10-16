@@ -20,6 +20,7 @@
     "quirks:check": "node scripts/quirks-check.ts",
     "docs:gen": "node scripts/docs-gen.ts",
     "docs:check": "node scripts/docs-gen.ts --check",
+    "regen": "pnpm --filter @rind-ui/theme presets && node scripts/theme-docs.mjs && node scripts/docs-gen.ts",
     "version-packages": "changeset version && pnpm install --lockfile-only",
     "release": "turbo run build --filter='./packages/*' && changeset publish"
   },

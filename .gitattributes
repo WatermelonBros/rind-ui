@@ -1,0 +1,4 @@
+# Append-only lists that every component PR touches: keep both sides on merge.
+docs/review-backlog.md merge=union
+packages/*/src/index.ts merge=union
+apps/site/examples/index.ts merge=union
