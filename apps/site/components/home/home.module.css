@@ -125,12 +125,17 @@
     opacity: 0;
     translate: 0 8px;
   }
+  /* no cross-fade: one label fully opaque at a time, so its contrast always holds */
+  0.5% {
+    opacity: 1;
+    translate: 0 8px;
+  }
   6%,
-  30% {
+  32% {
     opacity: 1;
     translate: 0 0;
   }
-  36%,
+  32.5%,
   100% {
     opacity: 0;
     translate: 0 -8px;

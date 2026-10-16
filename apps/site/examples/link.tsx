@@ -27,7 +27,7 @@ export function Current() {
       <Link href="/docs/" current="page">
         Docs
       </Link>
-      <Link href="/lab/">Lab</Link>
+      <Link href="/docs/get-started/">Get started</Link>
     </nav>
   )
 }
