@@ -48,3 +48,7 @@
   background-color: var(--s-muted);
   border-radius: 999px;
 }
+/* a circle stays a circle in every skin */
+[data-skinned] [data-scope="skeleton"][data-part="item"][data-shape="circle"][data-state] {
+  border-radius: 999px;
+}

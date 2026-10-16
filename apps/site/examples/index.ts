@@ -27,6 +27,7 @@ import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
+import * as overlays from "./overlays"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
@@ -78,6 +79,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   progress,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
+  overlays,
   popover,
   positioning,
   label,
@@ -104,3 +106,7 @@ export const exampleComponent = (mod: ExampleModule, name: string): ComponentTyp
   // Every function export of an example module is a component taking no props.
   return typeof fn === "function" ? (fn as ComponentType) : undefined
 }
+
+/** The example a page opens with: its first visible variant (usually `Basic`). */
+export const heroName = (mod: ExampleModule): string | undefined =>
+  Object.entries(mod.variants).find(([, v]) => !v.hidden)?.[0]

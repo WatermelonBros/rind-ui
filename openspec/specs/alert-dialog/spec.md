@@ -51,7 +51,7 @@ accept a `modal` prop. Its content SHALL have `role="alertdialog"` and
 
 An outside press, including a press on the backdrop or positioner, SHALL NOT close
 the Alert Dialog, and it SHALL NOT accept a `closeOnInteractOutside` prop. Escape
-SHALL close it with reason `ESCAPE_KEY` unless `closeOnEscape={false}` or the
+SHALL close it with reason `escape-key` unless `closeOnEscape={false}` or the
 consumer vetoes the request.
 
 #### Scenario: Backdrop press
@@ -63,7 +63,7 @@ consumer vetoes the request.
 #### Scenario: Escape
 
 - **WHEN** the user presses Escape in an open alert dialog
-- **THEN** it closes with reason `ESCAPE_KEY` and focus returns to its trigger
+- **THEN** it closes with reason `escape-key` and focus returns to its trigger
   (regression: mui/base-ui#1688)
 
 #### Scenario: Escape vetoed without user activation
@@ -75,8 +75,8 @@ consumer vetoes the request.
 
 ### Requirement: Cancel And Action
 
-Pressing `cancel` SHALL request closing with reason `CANCEL_PRESS`. Pressing an
-`action` SHALL request closing with reason `ACTION_PRESS`; the dialog SHALL close
+Pressing `cancel` SHALL request closing with reason `cancel`. Pressing an
+`action` SHALL request closing with reason `action`; the dialog SHALL close
 unless the request is cancelled (`details.cancel()` or, when controlled, the parent
 keeping `open={true}`). While a cancelled action's work is in progress the dialog
 SHALL stay open, focus SHALL stay where it is and the content SHALL stay
@@ -95,14 +95,14 @@ Dialog's rule that the form's `submit` event fires before the content unmounts.
 
 - **WHEN** an action with `type="submit"` inside a form in the alert dialog is pressed
 - **THEN** the form's `submit` handler runs with the form connected, then the dialog
-  closes with reason `ACTION_PRESS` (regression: radix#1779)
+  closes with reason `action` (regression: radix#1779)
 
 #### Scenario: Controlled cancel
 
 - **WHEN** a controlled alert dialog's "Cancel" is pressed and the parent applies
   `onOpenChange(false)`
-- **THEN** the dialog closes and `details.reason` is `CANCEL_PRESS`, distinguishable
-  from `ESCAPE_KEY` and `ACTION_PRESS` (regression: react-spectrum#8139,
+- **THEN** the dialog closes and `details.reason` is `cancel`, distinguishable
+  from `escape-key` and `action` (regression: react-spectrum#8139,
   react-spectrum#1773)
 
 ### Requirement: Initial Focus
@@ -197,7 +197,7 @@ attributes as the corresponding Dialog part. `data-modal` SHALL always be presen
 
 - **WHEN** the dialog closes because "Delete" was pressed
 - **THEN** during its exit animation the content has `data-state="closed"` and
-  `data-close-reason="action-press"`
+  `data-close-reason="action"`
 
 ### Requirement: Alert Dialog Contract
 
@@ -214,7 +214,7 @@ SHALL map `CANCEL_PRESS` to `cancel` and `ACTION_PRESS` to `confirm`.
 
 - **WHEN** a test runs `const a = getAlertDialog(screen, { name: "Delete project?" })`,
   `await a.open()`, `await a.confirm("Delete")`
-- **THEN** both resolve, and `await a.closeReason()` is `"action-press"`
+- **THEN** both resolve, and `await a.closeReason()` is `"action"`
 
 #### Scenario: Model run
 

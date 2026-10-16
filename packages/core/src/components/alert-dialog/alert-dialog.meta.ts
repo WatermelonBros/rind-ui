@@ -81,14 +81,14 @@ export const alertDialogMeta = {
       part: "cancel",
       element: "button",
       description:
-        '`type="button"`; closes it with reason `CANCEL_PRESS`. Takes initial focus by default.',
+        '`type="button"`; closes it with reason `cancel`. Takes initial focus by default.',
     },
     {
       name: "AlertDialog.Action",
       part: "action",
       element: "button",
       description:
-        'The confirming button; any number. `type="button"`; closes it with reason `ACTION_PRESS` unless `details.cancel()` is called. A `type="submit"` one closes on its form\'s submit.',
+        'The confirming button; any number. `type="button"`; closes it with reason `action` unless `details.cancel()` is called. A `type="submit"` one closes on its form\'s submit.',
     },
   ],
   props: {
@@ -97,7 +97,7 @@ export const alertDialogMeta = {
     onOpenChange: {
       type: "(open: boolean, details: ChangeDetails) => void",
       description:
-        "Every change request, with `details.reason` (`TRIGGER_PRESS`, `CANCEL_PRESS`, `ACTION_PRESS`, `ESCAPE_KEY`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN`, `CLOSE`) and `details.cancel()`.",
+        "Every change request, with `details.reason` (`trigger`, `cancel`, `action`, `escape-key`, `outside-focus`, `parent-dismissed`, `api`) and `details.cancel()`.",
     },
     closeOnEscape: { type: "boolean", default: "true", description: "Escape closes it." },
     initialFocus: {
@@ -127,7 +127,7 @@ export const alertDialogMeta = {
     },
     actionsRef: {
       type: "Ref<{ open(): void; close(): void }>",
-      description: "Programmatic open and close (reasons `OPEN` and `CLOSE`).",
+      description: "Programmatic open and close (reason `api`).",
     },
     level: {
       type: "1 | 2 | 3 | 4 | 5 | 6",
@@ -163,8 +163,7 @@ export const alertDialogMeta = {
       ...base("content"),
       "data-state": '"open" or "closed" (while it exits).',
       "data-modal": "Always.",
-      "data-close-reason":
-        "The last close reason in kebab case (`action-press`), until the next open.",
+      "data-close-reason": "The last close reason in kebab case (`action`), until the next open.",
       "data-focus-within": "While focus is inside it.",
       "data-focus": "While the content itself has focus.",
       "data-focus-visible":
@@ -186,7 +185,7 @@ export const alertDialogMeta = {
   },
   keyboard: [
     ["Enter / Space on the trigger", "Opens the alert dialog."],
-    ["Enter / Space on Cancel or an action", "Closes it (reason `CANCEL_PRESS` / `ACTION_PRESS`)."],
+    ["Enter / Space on Cancel or an action", "Closes it (reason `cancel` / `ACTION_PRESS`)."],
     ["Escape", "Closes the topmost alert dialog (`closeOnEscape`)."],
     ["Tab / Shift+Tab", "Moves through the tabbable elements; wraps at the edges."],
   ],
