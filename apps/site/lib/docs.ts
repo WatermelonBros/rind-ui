@@ -72,9 +72,13 @@ function tables(html: string): string {
  * name left in the running text, which has to be reworded in the doc itself.
  */
 export function withoutOtherLibraries(markdown: string): string {
-  return markdown
-    .replace(/^## (?:Migrating|Coming) from [^\n]*\n[\s\S]*?(?=^## |(?![\s\S]))/gm, "")
-    .replace(/ ?\((?:[\w.-]+)?#\d+(?:, ?(?:[\w.-]+)?#\d+)*\)/g, "")
+  return (
+    markdown
+      .replace(/^## (?:Migrating|Coming) from [^\n]*\n[\s\S]*?(?=^## |(?![\s\S]))/gm, "")
+      .replace(/ ?\((?:[\w.-]+)?#\d+(?:, ?(?:[\w.-]+)?#\d+)*\)/g, "")
+      // the same reference at the end of a longer parenthesis: "(never dangling, radix#1703)"
+      .replace(/[,;] ?[\w.-]+#\d+(?:, ?(?:[\w.-]+)?#\d+)*(?=\))/g, "")
+  )
 }
 
 export interface Rendered {

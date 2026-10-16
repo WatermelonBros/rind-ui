@@ -37,7 +37,7 @@ A vertical group accepts both pairs of arrows (as Tabs do). Disabled items are s
 
 ## Why toggle buttons and not radios
 
-Radix's single mode gave items `role="radio"`, which announces "1 of N" but breaks when the selection can be empty (radix#2254) and cannot express multiple. Here every item is a toggle button in both modes, with `aria-pressed` always `"true"` or `"false"`, and focus never changes the value. Consequence: single mode does **not** convey exclusivity to a screen reader. If the choice must read as "one of N", use a [Segmented Control](radio-group.md#radio-group-segmented-control-or-toggle-group) or a Radio Group.
+Items are never `role="radio"`: a radio announces "1 of N" but breaks when the selection can be empty and cannot express multiple. Every item is a toggle button in both modes, with `aria-pressed` always `"true"` or `"false"`, and focus never changes the value. Consequence: single mode does **not** convey exclusivity to a screen reader. If the choice must read as "one of N", use a [Segmented Control](radio-group.md#radio-group-segmented-control-or-toggle-group) or a Radio Group.
 
 ## Toggle Group, Segmented Control, Radio Group or Tabs
 
