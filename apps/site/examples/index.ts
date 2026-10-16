@@ -24,6 +24,7 @@ import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
+import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
@@ -60,6 +61,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-form-input": hiddenFormInput,
   labels: labels,
   "visually-hidden": visuallyHidden,
+  menu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   "alert-dialog": alertDialog,

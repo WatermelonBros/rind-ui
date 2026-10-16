@@ -178,6 +178,9 @@ See CLAUDE.md "Review rules".
 | test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
 | test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
 | add-menu (impl) | 5.1 | packages/testing/src/components/menu-scenarios.dom.test.tsx | no automated test yet for "Thumb resting on the trigger while scrolling" (radix#2418, a real touch scroll in Playwright) and "Exit animation" (radix#4195, needs the themed exit animation) |
+| add-menu (r1) | — | packages/testing/src/components/menu.dom.test.tsx | "Dialog from an item" checks the focus only after a keyboard choose: add a pointer variant |
+| add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |
+| add-menu (r1) | — | openspec/changes/add-menu/specs/menu/spec.md:616 | the content orientation text (`aria-orientation` only for horizontal) needs rewording |
 
 ## Manual AT protocol
 
