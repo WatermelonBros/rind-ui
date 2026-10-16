@@ -60,7 +60,7 @@ describe("transitions", () => {
     expect(m.state()).toBe("closed")
     m.send(trigger)
     expect(m.state()).toBe("open")
-    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("TRIGGER_PRESS")
+    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("trigger")
     const o = make()
     o.send({ type: "OPEN" })
     expect(o.state()).toBe("open")
@@ -68,13 +68,13 @@ describe("transitions", () => {
   })
 
   it.each([
-    ["CANCEL_PRESS", cancelPress],
-    ["ACTION_PRESS", actionPress],
-    ["ESCAPE_KEY", dismissal("ESCAPE_KEY")],
-    ["OUTSIDE_FOCUS", dismissal("OUTSIDE_FOCUS")],
-    ["PARENT_DISMISSED", dismissal("PARENT_DISMISSED")],
-    ["CLOSE", { type: "CLOSE" } as DialogEvent],
-  ])("%s closes an open alert dialog, reporting it as the reason", (reason, event) => {
+    ["CANCEL_PRESS", "cancel", cancelPress],
+    ["ACTION_PRESS", "action", actionPress],
+    ["ESCAPE_KEY", "escape-key", dismissal("ESCAPE_KEY")],
+    ["OUTSIDE_FOCUS", "outside-focus", dismissal("OUTSIDE_FOCUS")],
+    ["PARENT_DISMISSED", "parent-dismissed", dismissal("PARENT_DISMISSED")],
+    ["CLOSE", "api", { type: "CLOSE" } as DialogEvent],
+  ])("%s closes an open alert dialog, reporting reason %s", (_name, reason, event) => {
     const m = make({ defaultOpen: true })
     m.send(event as DialogEvent)
     expect(m.state()).toBe("closed")
@@ -114,7 +114,7 @@ describe("transitions", () => {
     m.send(trigger)
     expect(m.ctx().opener).toBe("t1")
     m.send(cancelPress)
-    expect(m.ctx().closeReason).toBe("CANCEL_PRESS")
+    expect(m.ctx().closeReason).toBe("cancel")
     m.send(trigger)
     expect(m.ctx().closeReason).toBeNull()
   })
@@ -149,9 +149,9 @@ describe("no outside-press transition", () => {
 
 describe("controlled open and cancel()", () => {
   it.each([
-    ["CANCEL_PRESS", cancelPress],
-    ["ACTION_PRESS", actionPress],
-  ])("%s is a proposal: a parent keeping open={true} leaves it open", (reason, event) => {
+    ["CANCEL_PRESS", "cancel", cancelPress],
+    ["ACTION_PRESS", "action", actionPress],
+  ])("%s is a proposal: a parent keeping open={true} leaves it open", (_name, reason, event) => {
     const m = make({ open: true })
     m.send(event)
     expect(m.onOpenChange).toHaveBeenCalledTimes(1)
@@ -171,20 +171,20 @@ describe("controlled open and cancel()", () => {
     const m = make({ open: true })
     m.send(cancelPress)
     m.setProps({ open: false })
-    expect(m.ctx().closeReason).toBe("CANCEL_PRESS")
+    expect(m.ctx().closeReason).toBe("cancel")
   })
 
   it("ACTION_PRESS cancelled with details.cancel() keeps it open; a later CLOSE closes it", () => {
     const onOpenChange = vi.fn((_o: boolean, d: { cancel(): void; reason: string }) => {
-      if (d.reason === "ACTION_PRESS") d.cancel()
+      if (d.reason === "action") d.cancel()
     })
     const m = make({ defaultOpen: true, onOpenChange: onOpenChange as never })
     m.send(actionPress)
     expect(m.state()).toBe("open")
     m.send({ type: "CLOSE" })
     expect(m.state()).toBe("closed")
-    expect(onOpenChange.mock.calls.map((c) => c[1].reason)).toEqual(["ACTION_PRESS", "CLOSE"])
-    expect(m.ctx().closeReason).toBe("CLOSE")
+    expect(onOpenChange.mock.calls.map((c) => c[1].reason)).toEqual(["action", "api"])
+    expect(m.ctx().closeReason).toBe("api")
   })
 
   it("a parent-driven change moves the state without onOpenChange", () => {
@@ -231,7 +231,7 @@ describe("overlay effect wiring", () => {
     const m = make({ defaultOpen: true })
     lastOptions().dismiss.onRequest(dismissRequest("escape-key", undefined, null))
     expect(m.state()).toBe("closed")
-    expect(m.ctx().closeReason).toBe("ESCAPE_KEY")
+    expect(m.ctx().closeReason).toBe("escape-key")
   })
 })
 
