@@ -132,12 +132,12 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | todo | Ark: part of Color Picker |
-| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | todo | Ark: part of Color Picker |
-| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | todo |  |
-| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | todo | Kobalte also: Color Channel Field |
-| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | todo |  |
-| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | todo |  |
+| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec | Ark: part of Color Picker |
+| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec | Ark: part of Color Picker |
+| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec |  |
+| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | spec | Kobalte also: Color Channel Field |
+| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | spec |  |
+| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | spec |  |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
 ## Display & feedback (19)
