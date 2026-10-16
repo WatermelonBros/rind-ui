@@ -169,6 +169,7 @@ type HarnessEntry = {
   states: string[]
   axeDisable: string[]
   viewport?: "mobile"
+  motion: "keep" | "reduce"
 }
 const harness: HarnessEntry[] = []
 const fixturesDir = join(examplesDir, "fixtures")
@@ -208,6 +209,7 @@ for (const [dir, files] of [
         axeDisable: [
           ...(/axeDisable: \[([^\]]*)\]/.exec(body)?.[1] ?? "").matchAll(/"([\w-]+)"/g),
         ].map((r) => r[1] ?? ""),
+        motion: /motion: "keep"/.test(body) ? "keep" : "reduce",
         ...(/viewport: "mobile"/.test(body) ? { viewport: "mobile" as const } : {}),
       })
     })

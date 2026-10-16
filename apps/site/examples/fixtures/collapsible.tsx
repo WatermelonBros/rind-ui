@@ -135,15 +135,15 @@ export function DriverExample() {
 }
 
 export const variants: Variants = {
-  Default: { title: "Default", hidden: true },
-  InitiallyOpen: { title: "Initially open", hidden: true },
-  DisabledStory: { title: "Disabled", hidden: true },
-  ClosedContentUntilFound: { title: "Closed content until found", hidden: true },
-  ClosedContentHidden: { title: "Closed content hidden", hidden: true },
-  ClosedContentUnmount: { title: "Closed content unmount", hidden: true },
-  ControlledStory: { title: "Controlled", hidden: true },
-  Nested: { title: "Nested", hidden: true },
-  ListReorder: { title: "List reorder", hidden: true },
-  FindInPage: { title: "Find in page", hidden: true },
-  DriverExample: { title: "Driver example", hidden: true },
+  Default: { title: "Default", hidden: true, motion: "keep" },
+  InitiallyOpen: { title: "Initially open", hidden: true, motion: "keep" },
+  DisabledStory: { title: "Disabled", hidden: true, motion: "keep" },
+  ClosedContentUntilFound: { title: "Closed content until found", hidden: true, motion: "keep" },
+  ClosedContentHidden: { title: "Closed content hidden", hidden: true, motion: "keep" },
+  ClosedContentUnmount: { title: "Closed content unmount", hidden: true, motion: "keep" },
+  ControlledStory: { title: "Controlled", hidden: true, motion: "keep" },
+  Nested: { title: "Nested", hidden: true, motion: "keep" },
+  ListReorder: { title: "List reorder", hidden: true, motion: "keep" },
+  FindInPage: { title: "Find in page", hidden: true, motion: "keep" },
+  DriverExample: { title: "Driver example", hidden: true, motion: "keep" },
 }

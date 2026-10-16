@@ -8,6 +8,8 @@ export type Variant = {
   readonly axeDisable?: readonly string[]
   /** Viewport the example is meant for; tests open it there. */
   readonly viewport?: "mobile"
+  /** Keep real motion on the harness (exit animations, presence); the default is reduced. */
+  readonly motion?: "keep"
 }
 
 /** A module's live examples, keyed by the exported function's name, in page order. */
