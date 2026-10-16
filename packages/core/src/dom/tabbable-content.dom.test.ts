@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { hasTabbable, observeTabbable } from "./tabbable-content"
 
-const settle = () => new Promise<void>((r) => setTimeout(r, 0))
+// Drain microtasks and two animation frames — no elapsed-time wait.
+const settle = async () => {
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 
 afterEach(() => {
   document.body.innerHTML = ""

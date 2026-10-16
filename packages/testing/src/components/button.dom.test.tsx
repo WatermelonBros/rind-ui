@@ -663,7 +663,11 @@ describe("Anchor-rendered Button routes like a Link (react-spectrum#10603)", () 
 })
 
 describe("disabled fieldset through the component", () => {
-  const flushObserver = () => act(() => new Promise<void>((r) => setTimeout(r, 20)))
+  // MutationObserver callbacks are microtasks: a few frames inside act() are plenty.
+  const flushObserver = () =>
+    act(async () => {
+      for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+    })
   const attr = (name: string) => screen.getByRole("button", { name }).hasAttribute("data-disabled")
 
   it("runtime toggle: data-disabled and no activation, then back", async () => {

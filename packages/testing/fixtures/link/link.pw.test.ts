@@ -10,6 +10,18 @@ import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, createDriverWith, playwrightEnv } from "../../src/index"
 
+/** Drains animation frames in the page (a condition-free "let it settle"). */
+const frames = (page: Page, count = 6) =>
+  page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
+        step(n)
+      }),
+    count,
+  )
+
 const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
 const types: Record<string, string> = {
   ".html": "text/html",
@@ -151,7 +163,7 @@ describe("generic invariants on every Link story", () => {
         const before = await routerCalls(page)
         await el.dispatchEvent("click", { detail: 0 })
         await expect.poll(() => routerCalls(page)).toBe(before + 1)
-        await page.waitForTimeout(50)
+        await frames(page)
         expect(await routerCalls(page)).toBe(before + 1)
       }
     })

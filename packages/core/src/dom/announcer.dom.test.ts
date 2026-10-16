@@ -17,8 +17,10 @@ function env() {
   return {
     ...base,
     scheduler: {
+      // fake-time: the fake scheduler under test (vi.useFakeTimers)
       setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
       clearTimeout: (h: unknown) => clearTimeout(h as number),
+      // fake-time: the fake scheduler under test (vi.useFakeTimers)
       requestAnimationFrame: (fn: () => void) => setTimeout(fn, 16),
       cancelAnimationFrame: (h: unknown) => clearTimeout(h as number),
     },

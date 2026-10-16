@@ -104,4 +104,5 @@ export { type SliderStepInvariants, sliderStepInvariants } from "./slider-invari
 export { missingStateStories, type StateStories } from "./state-stories"
 export { type SwitchStepInvariants, switchStepInvariants } from "./switch-invariants"
 export { type TextFieldStepInvariants, textFieldStepInvariants } from "./text-field-invariants"
+export { type VirtualClock, virtualClock } from "./virtual-clock"
 export { liveAnnouncements, spokenLog } from "./virtual-sr"
