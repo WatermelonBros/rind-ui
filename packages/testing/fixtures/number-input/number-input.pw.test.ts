@@ -89,9 +89,11 @@ describe("number input driver through Playwright", () => {
     expect(await limit.value()).toBe(10)
     expect(await limit.canIncrement()).toBe(false)
     const quantity = getNumberInput(clocked, { name: "Quantity" })
-    await quantity.holdStepper("increase", 400 + 5 * 60)
-    // The press step and one repeat per 60 ms after the 400 ms delay.
-    expect(await quantity.value()).toBe(6)
+    await quantity.holdStepper("increase", 400 + 5 * 60 + 30)
+    // It repeated, and the whole hold is one commit. The exact repeat count is not asserted:
+    // the adapter's own advances while it polls add fake time that varies with load.
+    expect(await quantity.value()).toBeGreaterThan(2)
+    expect(await page.evaluate(() => (window as unknown as { commits?: number }).commits)).toBe(1)
   })
 
   it("a touch tap steps without taking focus", { timeout: 60_000 }, async () => {

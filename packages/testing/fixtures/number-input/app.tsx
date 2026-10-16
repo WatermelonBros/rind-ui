@@ -18,7 +18,16 @@ function N({ label, ...props }: NumberInputRootProps & { label: string }) {
 function App() {
   return (
     <form style={{ display: "grid", gap: 16, width: 280, padding: 24 }}>
-      <N label="Quantity" name="q" defaultValue={0} />
+      <N
+        label="Quantity"
+        name="q"
+        defaultValue={0}
+        // The test counts commits: a held press is one interaction, so one commit.
+        onValueCommit={() => {
+          const w = window as unknown as { commits?: number }
+          w.commits = (w.commits ?? 0) + 1
+        }}
+      />
       <N
         label="Price"
         name="price"
