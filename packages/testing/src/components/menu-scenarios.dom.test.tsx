@@ -244,10 +244,13 @@ describe("Menu scenarios", () => {
   })
 
   it("Rows that arrive after opening: ArrowDown focuses the first row, initial focus does not move again (ariakit#7766)", async () => {
+    // The fetch resolves once the menu is placed and focused (the driver's open waits for both).
+    let arrive: () => void = () => {}
     function Lazy() {
       const [rows, setRows] = useState<string[]>([])
+      arrive = () => setRows(["Row 1", "Row 2"])
       return (
-        <Menu.Root onOpenChange={(open) => open && setRows(["Row 1", "Row 2"])}>
+        <Menu.Root>
           <Menu.Trigger>Lazy</Menu.Trigger>
           <Menu.Portal>
             <Menu.Positioner>
@@ -263,10 +266,19 @@ describe("Menu scenarios", () => {
     }
     render(<Lazy />)
     const m = getMenu(screen, { name: "Lazy" }).via("keyboard")
+    const focused: string[] = []
+    const onFocus = (e: FocusEvent) => {
+      const el = e.target as HTMLElement
+      focused.push(el.getAttribute("role") ?? el.tagName)
+    }
+    document.addEventListener("focusin", onFocus)
     await m.open()
+    act(() => arrive())
     await screen.findByRole("menuitem", { name: "Row 1" })
     await frames()
+    expect(focused.at(-1)).toBe("menu") // no item took focus on arrival
     expect(active()).toBe(screen.getByRole("menu"))
+    document.removeEventListener("focusin", onFocus)
     await userEvent.keyboard("{ArrowDown}")
     await waitFor(() => expect(active()?.textContent).toBe("Row 1"))
   })
@@ -302,13 +314,17 @@ describe("Menu scenarios", () => {
         </Menu.Portal>
       </Menu.Root>,
     )
-    const m = getMenu(screen, { name: /Wrapped/ }).via("pointer")
-    await m.open()
-    await m.choose("Copy")
-    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    // By text, not by driver anchor: a label wrapping its own control leaves the button unnamed.
+    const trigger = screen.getByText("Wrapped")
+    await userEvent.click(trigger)
+    const copy = await screen.findByRole("menuitem", { name: "Copy" })
+    // An unplaced level takes no pointer input yet.
+    await waitFor(() => expect(screen.getByRole("menu").hasAttribute("data-placing")).toBe(false))
+    await userEvent.click(copy)
+    await waitFor(() => expect(trigger.getAttribute("aria-expanded")).toBe("false"))
     await frames()
     expect(onSelect).toHaveBeenCalledTimes(1)
-    expect(await m.isOpen()).toBe(false)
+    expect(trigger.getAttribute("aria-expanded")).toBe("false")
   })
 
   it.runIf(!isJsdom)("Space on an item does not scroll the page (radix#623)", async () => {

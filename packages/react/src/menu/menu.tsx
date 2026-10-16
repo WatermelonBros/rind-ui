@@ -64,6 +64,31 @@ import { useRenderedTag } from "../use-rendered-tag"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
+/**
+ * Runs `fn` and returns the last element it tried to focus while that element was inert (a
+ * refused move), or null. Synchronous: the prototype is restored before returning.
+ */
+function focusCalls(fn: () => void): HTMLElement | null {
+  if (typeof HTMLElement === "undefined") {
+    fn()
+    return null
+  }
+  const proto = HTMLElement.prototype
+  const original = proto.focus
+  let blocked: HTMLElement | null = null
+  proto.focus = function (this: HTMLElement, options?: FocusOptions) {
+    original.call(this, options)
+    blocked =
+      this.ownerDocument.activeElement === this ? null : this.closest("[inert]") ? this : null
+  }
+  try {
+    fn()
+  } finally {
+    proto.focus = original
+  }
+  return blocked
+}
+
 /** Controls keep their own role inside the menu (a search field, a native button). */
 const INTERACTIVE = "input, select, textarea, button, a[href], [tabindex], [contenteditable]"
 
@@ -233,14 +258,23 @@ function useLevelService(input: {
       if (!entry) return true
       entry.activate?.(a)
       let cancelled = false
-      entry.onSelect?.({
-        key: a.key,
-        kind: a.kind,
-        modality: a.modality,
-        cancel: () => {
-          cancelled = true
-        },
-      })
+      const blocked = focusCalls(() =>
+        entry.onSelect?.({
+          key: a.key,
+          kind: a.kind,
+          modality: a.modality,
+          cancel: () => {
+            cancelled = true
+          },
+        }),
+      )
+      // A modal menu keeps the page inert until it closes: a focus move `onSelect` made
+      // outside (an editor) was refused, so it is made again once the menu is gone.
+      if (blocked && !cancelled) {
+        env.scheduler.requestAnimationFrame(() => {
+          if (blocked.isConnected && !blocked.closest("[inert]")) blocked.focus()
+        })
+      }
       return !cancelled
     },
     openSubmenu: (key) => {

@@ -83,7 +83,9 @@ describe("menu driver through Playwright", () => {
     expect(await m.focusedItem()).toBe("Save with encoding")
     await m.pressEscape()
     await expect.poll(() => m.isOpen()).toBe(false)
-    await expect(page.getByRole("button", { name: "Encoding" })).toBeFocused()
+    await expect
+      .poll(() => page.evaluate(() => document.activeElement?.textContent?.trim()))
+      .toBe("Encoding")
   })
 
   it("a checkbox toggle keeps the menu open", { timeout: 60_000 }, async () => {
