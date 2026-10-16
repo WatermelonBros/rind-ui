@@ -99,6 +99,7 @@ export function tooltipConnect(input: TooltipConnectInput, send: (event: Tooltip
     focus: (modality: Modality, cause: Extract<TooltipEvent, { type: "FOCUS" }>["cause"]) =>
       send({ type: "FOCUS", modality, cause }),
     blur: () => send({ type: "BLUR" }),
-    pressStart: () => send({ type: "PRESS.START" }),
+    pressStart: (pointer: boolean) =>
+      send(pointer ? { type: "PRESS.START", pointer: true } : { type: "PRESS.START" }),
   }
 }

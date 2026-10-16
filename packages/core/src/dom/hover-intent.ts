@@ -318,6 +318,8 @@ export function domHoverIntent(env: Env): HoverIntent {
     track,
     isInTransit: (doc) => transitOf(doc).polygon !== null,
     triggerProps(send) {
+      // The touch watcher must see the FIRST tap, before any emulated mouse event follows it.
+      if (typeof document !== "undefined") isEmulatedMouse(env, docOf())
       // One HOVER.START per stay on the trigger, not one per movement.
       let hovering = false
       return {
