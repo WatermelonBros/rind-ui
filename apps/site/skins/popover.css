@@ -1,0 +1,232 @@
+/* Popover: the content is portalled to <body>; the portal host carries the stage's
+   data-rind-theme, so these rules select on that. Coordinates come inline from positioning. */
+[data-rind-theme^="skin-"]
+[data-scope="popover"]:is([data-part="trigger"], [data-part="close-trigger"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease),
+    background 0.25s var(--s-ease);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="popover"]:is([data-part="trigger"], [data-part="close-trigger"])[data-hover] {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="trigger"][data-state="open"] {
+  background: var(--s-muted);
+  translate: 0 1px;
+  box-shadow: none;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="trigger"][data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  translate: none;
+  box-shadow: none;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="popover"]:is([data-part="trigger"], [data-part="close-trigger"]):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+/* the toggletip's round info button */
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="trigger"][aria-label]:not(:has(*)) {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  justify-content: center;
+  border-radius: 50%;
+  font: 800 13px var(--s-font);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="close-trigger"] {
+  justify-self: end;
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  border-color: var(--s-brand-deep);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] .row {
+  justify-content: flex-end;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="popover"][data-part="content"]
+  .row
+  > [data-part="close-trigger"]:first-child {
+  background: var(--s-card);
+  color: var(--s-ink);
+  border-color: var(--s-line);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="indicator"] {
+  display: inline-block;
+  transition: rotate 0.3s var(--s-ease);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="indicator"][data-state="open"] {
+  rotate: 180deg;
+}
+
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="positioner"] {
+  z-index: 62;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  gap: 12px;
+  width: max-content;
+  max-width: min(300px, var(--rind-available-width, 100vw));
+  max-height: var(--rind-available-height, none);
+  overflow: visible;
+  padding: 16px 18px;
+  color: var(--s-ink);
+  font: 500 14px / 1.45 var(--s-font);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-hi);
+  transform-origin: var(--rind-transform-origin, center);
+  outline: none;
+  transition:
+    opacity 0.22s var(--s-ease),
+    scale 0.3s var(--s-pop);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.92;
+  }
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"][data-state="closed"] {
+  opacity: 0;
+  scale: 0.95;
+}
+[data-rind-theme="skin-crisp"] [data-scope="popover"][data-part="content"] {
+  box-shadow: 5px 5px 0 var(--s-ink);
+}
+[data-rind-theme="skin-crisp"] [data-scope="popover"][data-part="content"][data-modal] {
+  box-shadow: 8px 8px 0 var(--s-ink);
+}
+[data-rind-theme="skin-juicy"] [data-scope="popover"][data-part="content"] {
+  box-shadow: 0 8px 0 #c9bdf2;
+  outline: 2px solid #e2d9fb;
+  outline-offset: -2px;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="title"] {
+  margin: 0;
+  font: 800 17px / 1.2 var(--s-font);
+}
+[data-rind-theme="skin-crisp"] [data-scope="popover"][data-part="title"] {
+  font-family: var(--font-unbounded), var(--s-font);
+  font-weight: 900;
+  font-size: 15px;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="description"],
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] p {
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in oklab, var(--s-ink) 78%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] input {
+  font: 500 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-muted);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  padding: 8px 10px;
+  min-width: 0;
+}
+[data-rind-theme="skin-bare"] [data-scope="popover"][data-part="content"] input {
+  background: #fff;
+}
+
+/* the main-axis offset needs !important: core writes top and left inline on every side
+   (top: var(--rind-arrow-y), empty on that axis), which beats any stylesheet rule */
+/* a square turned 45°, its two outer edges drawn, tucked under the content's border */
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"] {
+  --s-arrow: 12px;
+  width: var(--s-arrow);
+  height: var(--s-arrow);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  rotate: 45deg;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="bottom"] {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="top"] {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  border-left-color: transparent;
+  border-top-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="right"] {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  border-right-color: transparent;
+  border-top-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="left"] {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* the WithAnchor example's stand-in field */
+.anchor-box {
+  padding: 10px 14px;
+  border: 2px dashed color-mix(in oklab, currentColor 35%, transparent);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] {
+    transition: none;
+  }
+}
+
+/* the Placement example: each trigger on the side its popover opens to, so none covers another */
+.compass {
+  display: grid;
+  grid-template-areas: ". top ." "inline-start . inline-end" ". bottom .";
+  gap: 10px;
+  justify-content: center;
+  justify-items: center;
+}
+.compass > :nth-child(1) {
+  grid-area: top;
+}
+.compass > :nth-child(2) {
+  grid-area: inline-end;
+}
+.compass > :nth-child(3) {
+  grid-area: bottom;
+}
+.compass > :nth-child(4) {
+  grid-area: inline-start;
+}
+
+/* juicy has no borders: a soft ring keeps the white panel off a white page */
+[data-rind-theme="skin-juicy"] [data-scope="popover"][data-part="arrow"] {
+  --s-arrow: 14px;
+  border: 2px solid #e2d9fb;
+}
+
+/* a trigger inside another surface's grid keeps its own width */
+[data-rind-theme^="skin-"]
+  :is([data-part="content"], .stack)
+  > [data-scope="popover"][data-part="trigger"] {
+  justify-self: start;
+}
