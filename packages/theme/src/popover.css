@@ -1,0 +1,84 @@
+/*
+ * Popover: positioner.css already gives every anchored content its box, scrolling, transform
+ * origin, arrow geometry and a pop-in animation. This sheet adds the --rind-popover-* tokens
+ * (defaulting to the semantic ones), swaps the animation for a transition so entry
+ * (@starting-style) and exit ([data-state="closed"]) use the same properties, the modal
+ * variant, the arrow tokens, reduced motion and the forced-colors border. The transform
+ * origin comes from --rind-transform-origin, written by the positioning capability.
+ */
+@layer rind.components {
+  [data-scope="popover"][data-part="content"][data-side] {
+    background: var(--rind-popover-bg, var(--rind-color-surface-raised));
+    color: var(--rind-popover-color, var(--rind-color-text));
+    padding: var(--rind-popover-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid
+      var(--rind-popover-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-popover-radius, var(--rind-radius-md));
+    box-shadow: var(--rind-popover-shadow, var(--rind-shadow-sm));
+    max-inline-size: min(var(--rind-popover-max-width, 20rem), var(--rind-available-width, 100vw));
+    max-block-size: min(var(--rind-popover-max-height, 100vh), var(--rind-available-height, 100vh));
+    transform-origin: var(--rind-transform-origin);
+    animation: none;
+    transition:
+      opacity var(--rind-popover-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      transform var(--rind-popover-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  [data-scope="popover"][data-part="content"][data-side][data-state="open"] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  [data-scope="popover"][data-part="content"][data-side][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  [data-scope="popover"][data-part="content"][data-side][data-modal] {
+    box-shadow: var(--rind-popover-modal-shadow, var(--rind-shadow-lg));
+  }
+
+  [data-scope="popover"][data-part="arrow"][data-side] {
+    inline-size: var(--rind-popover-arrow-size, 10px);
+    block-size: var(--rind-popover-arrow-size, 10px);
+    background: var(--rind-popover-bg, var(--rind-color-surface-raised));
+    color: var(--rind-popover-border, var(--rind-color-border-strong));
+  }
+  [data-scope="popover"][data-part="arrow"][data-side="top"] {
+    bottom: calc(var(--rind-popover-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="popover"][data-part="arrow"][data-side="bottom"] {
+    top: calc(var(--rind-popover-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="popover"][data-part="arrow"][data-side="left"] {
+    right: calc(var(--rind-popover-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="popover"][data-part="arrow"][data-side="right"] {
+    left: calc(var(--rind-popover-arrow-size, 10px) / -2 - 1px);
+  }
+
+  [data-scope="popover"][data-part="close-trigger"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="popover"][data-part="content"] {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="popover"][data-part="content"] {
+      border-color: CanvasText;
+    }
+  }
+}

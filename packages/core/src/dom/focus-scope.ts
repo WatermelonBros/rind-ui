@@ -74,7 +74,7 @@ function isTabStop(el: HTMLElement, scrollers: boolean): boolean {
 }
 
 /** The engine's tab stops: WebKit does not stop on scroll containers. */
-const stopsOf = (env: FocusEnv, container: HTMLElement) =>
+export const stopsOf = (env: FocusEnv, container: HTMLElement) =>
   // platform-convention: Safari's Tab order has no scroll containers (not a bug to work around)
   tabbables(container, { scrollers: env.platform?.webkit !== true })
 
@@ -277,7 +277,14 @@ function install(env: FocusEnv, doc: Document): Containment {
   const onFocusIn = () => {
     const container = current()
     const active = deepActiveElement(doc)
-    if (!container || !active || !containsDeep(container, active)) return
+    if (!container || !active) return
+    // Focus moved out of the topmost modal (into a child layer, or back to the opener of a
+    // modal that just closed): the element it left is no longer ours to recover from — its
+    // later removal must not pull focus back (zag#2933).
+    if (!containsDeep(container, active)) {
+      lastFocused = null
+      return
+    }
     lastFocused = active
     // A removal inside a shadow root is invisible to the body observer.
     const root = active.getRootNode()

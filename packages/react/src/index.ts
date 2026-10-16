@@ -17,6 +17,7 @@ export { LayerProvider, useParentLayer } from "./layer-context"
 export * from "./link"
 export { composeRefs, mergeProps, type RindEventExtension, stripMarker } from "./merge-props"
 export { normalizeProps } from "./normalize-props"
+export * from "./popover"
 export { Portal, type PortalProps } from "./portal"
 export {
   type RindMessageScopes,

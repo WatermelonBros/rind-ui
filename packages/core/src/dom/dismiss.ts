@@ -251,9 +251,23 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
   const onFocusIn = (e: FocusEvent) => {
     const target = targetOf(e)
     if (!isElement(target) || pressing) return
+    // Past the layer that holds the focus, the walk goes on: a layer beneath that does not
+    // hold it (not an ancestor) lost focus too — a modal dialog opened from the page leaves
+    // a non-modal popover behind it (ark#2610).
+    let below = false
     for (const reg of fromTop()) {
-      if (!reg || reg.modal) return
-      if (inside(reg, target) || exempt(reg, target)) return
+      if (!reg) return
+      if (inside(reg, target)) {
+        below = true
+        continue
+      }
+      // Below the focused layer, a node added after this one opened is that layer's portal,
+      // not a third-party node: only the explicit exemptions apply.
+      const exempted = below
+        ? target.closest("[data-rind-top-layer]") !== null ||
+          reg.options.isInside?.(target) === true
+        : exempt(reg, target)
+      if (reg.modal || exempted) return
       if (reg.options.outsideFocus === false) return
       if (!request(reg, "outside-focus", e, target)) return
     }

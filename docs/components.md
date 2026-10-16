@@ -28,7 +28,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Dialog | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC: Dialog + Modal |
-| Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec |  |
+| Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | HUI: in source, not in public docs |
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | spec | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |

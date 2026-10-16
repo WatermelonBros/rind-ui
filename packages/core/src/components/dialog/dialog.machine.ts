@@ -100,8 +100,16 @@ const CLOSE_REASONS = new Set<string>([
   "CLOSE",
 ])
 
-/** The kinds that can be a dialog's parent layer (spec "Parent Layer"). */
-export const DIALOG_PARENT_KINDS: readonly LayerKind[] = ["dialog", "alertdialog", "drawer"]
+/**
+ * The kinds that can be a dialog's parent layer (spec "Parent Layer"). A popover is one: a
+ * dialog opened from it keeps it open (zag#2933); a menu is not (radix#1836).
+ */
+export const DIALOG_PARENT_KINDS: readonly LayerKind[] = [
+  "dialog",
+  "alertdialog",
+  "drawer",
+  "popover",
+]
 
 /** The parts whose press closes the dialog (each a close event of the graph). */
 type ClosePart = "CLOSE_TRIGGER_PRESS" | "CANCEL_PRESS" | "ACTION_PRESS"

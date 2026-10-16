@@ -164,6 +164,18 @@ export type ComponentTokens = {
     | "decoration"
     | "disabledColor"
     | "underlineOffset"
+  readonly popover:
+    | "arrowSize"
+    | "bg"
+    | "border"
+    | "color"
+    | "duration"
+    | "maxHeight"
+    | "maxWidth"
+    | "modalShadow"
+    | "padding"
+    | "radius"
+    | "shadow"
   readonly "radio-group":
     | "bg"
     | "border"

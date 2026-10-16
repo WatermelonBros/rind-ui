@@ -349,6 +349,11 @@ export function collectDom(arg: {
       const v = sibling.getAttribute(name)
       if (v !== null) picked[name] = v
     }
+    // Inert through an ancestor counts: the modal may have marked a wrapper of this sibling
+    // (a trigger's sibling, when only the trigger is a part on that path).
+    if (picked["inert"] === undefined && sibling.parentElement?.closest("[inert]")) {
+      picked["inert"] = ""
+    }
     // The one keep-visible rule (announcer, top layers, live regions): stays exposed.
     if (isKeptVisible(sibling)) picked["data-rind-kept"] = ""
     if (["SCRIPT", "STYLE", "TEMPLATE", "LINK"].includes(sibling.tagName)) {
