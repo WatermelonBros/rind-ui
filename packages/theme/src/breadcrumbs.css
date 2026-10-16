@@ -1,0 +1,90 @@
+/*
+ * Breadcrumbs: family `link`, no variant or size rules. A wrapping inline trail; links read
+ * the link tokens; the current item stands out by weight, not colour alone; the separator in
+ * the last visible item is hidden; chevron separators mirror in right-to-left text. `data-tone`
+ * re-points the accent roles the links read.
+ */
+@layer rind.components {
+  :where([data-scope="breadcrumbs"][data-part="list"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-breadcrumbs-gap, var(--rind-space-1));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--rind-breadcrumbs-color, var(--rind-color-text-muted));
+  }
+
+  :where(
+    [data-scope="breadcrumbs"][data-part="item"],
+    [data-scope="breadcrumbs"][data-part="ellipsis"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-breadcrumbs-gap, var(--rind-space-1));
+  }
+
+  /* A collapsed Item keeps `hidden`: the display above must not show it again. */
+  :where([data-scope="breadcrumbs"][data-part="item"][hidden]) {
+    display: none;
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="link"]) {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--rind-breadcrumbs-min-target, 24px);
+    color: var(--rind-link-color, var(--rind-color-accent-text));
+    text-decoration-line: underline;
+    text-decoration-thickness: var(--rind-link-decoration, 0.075em);
+    text-decoration-color: color-mix(in oklab, currentColor 45%, transparent);
+    text-underline-offset: var(--rind-link-underline-offset, 0.22em);
+    border-radius: var(--rind-radius-sm);
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="link"][data-hover]) {
+    color: var(--rind-link-color-hover, var(--rind-color-accent-text));
+    text-decoration-color: currentColor;
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="link"][data-current]) {
+    color: var(--rind-breadcrumbs-current-color, var(--rind-color-text));
+    font-weight: var(--rind-breadcrumbs-current-weight, var(--rind-link-current-weight, 600));
+    text-decoration-line: none;
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="link"][data-disabled]) {
+    color: var(--rind-link-disabled-color, var(--rind-color-text-disabled));
+    text-decoration-line: none;
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="separator"]) {
+    display: inline-flex;
+    color: var(--rind-breadcrumbs-separator-color, var(--rind-color-text-muted));
+    font-size: var(--rind-breadcrumbs-separator-size, 1em);
+    user-select: none;
+  }
+
+  :where([data-scope="breadcrumbs"][data-part="separator"][data-last]) {
+    display: none;
+  }
+
+  :where([dir="rtl"] [data-scope="breadcrumbs"][data-part="separator"]) {
+    transform: scaleX(-1);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="breadcrumbs"][data-part="link"]) {
+      color: LinkText;
+      text-decoration-color: LinkText;
+    }
+
+    :where([data-scope="breadcrumbs"][data-part="link"][data-current]) {
+      color: CanvasText;
+    }
+
+    :where([data-scope="breadcrumbs"][data-part="link"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}
