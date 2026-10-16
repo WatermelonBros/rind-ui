@@ -22,6 +22,7 @@ import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as popover from "./popover"
+import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
@@ -33,6 +34,7 @@ import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
+import * as tooltip from "./tooltip"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -62,6 +64,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   popover,
+  positioning,
   label,
   link,
   "number-input": numberInput,
@@ -76,6 +79,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tooltip,
 }
 
 /** The example function `name` of a module, if it is one. */
