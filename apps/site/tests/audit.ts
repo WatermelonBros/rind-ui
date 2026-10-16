@@ -38,7 +38,13 @@ const base = `http://localhost:${typeof address === "object" && address ? addres
 const docs = JSON.parse(readFileSync(join(root, "content/generated/docs.json"), "utf8")) as {
   slug: string
 }[]
-const urls = ["/", "/docs/", "/404.html", ...docs.map((p) => `/docs/${p.slug}/`)]
+const urls = [
+  "/",
+  "/docs/",
+  "/404.html",
+  ...docs.map((p) => `/docs/${p.slug}/`),
+  ...["/theme/", "/theme/tokens/", "/theme/contrast/", "/theme/showcase/"],
+]
 const axeSource = readFileSync(join(root, "node_modules/axe-core/axe.min.js"), "utf8")
 
 type Finding = { url: string; kind: string; message: string }
@@ -146,17 +152,51 @@ for (const url of urls) {
   }
   await invisibleText(page, url)
   await axe(page, url, "crisp")
-  await page.getByRole("switch", { name: "juicy mode" }).click()
-  await page.waitForTimeout(1600)
-  await axe(page, url, "juicy")
-  await page.getByRole("switch", { name: "juicy mode" }).click()
-  await page.waitForTimeout(1600)
+  // the theme pages are @rind-ui/theme's own, with no site phase
+  if (!url.startsWith("/theme/")) {
+    await page.getByRole("switch", { name: "juicy mode" }).click()
+    await page.waitForTimeout(1600)
+    await axe(page, url, "juicy")
+    await page.getByRole("switch", { name: "juicy mode" }).click()
+    await page.waitForTimeout(1600)
+  }
   await page.setViewportSize({ width: 390, height: 844 })
   await page.waitForTimeout(300)
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   )
   if (overflow > 1) report(url, "mobile-overflow", `${overflow}px wider than a 390px phone`)
+  await page.close()
+}
+// the examples harness: every example of index.json is exported in every skin and renders
+// alone, with no site stylesheet on the unstyled skin
+{
+  type Entry = { slug: string; example: string; urls: Record<string, string> }
+  const index = JSON.parse(readFileSync(join(outDir, "examples/index.json"), "utf8")) as Entry[]
+  for (const u of index.flatMap((e) => Object.values(e.urls))) {
+    try {
+      statSync(join(outDir, u, "index.html"))
+    } catch {
+      report(u, "harness", "listed in index.json but not exported")
+    }
+  }
+  const page = await browser.newPage()
+  let at = ""
+  page.on("pageerror", (e) => report(at, "pageerror", e.message))
+  page.on("console", (m) => {
+    if (m.type() === "error") report(at, "console.error", m.text())
+  })
+  for (const e of index) {
+    at = e.urls["none"] ?? ""
+    await page.goto(base + at, { waitUntil: "networkidle" })
+    const { rendered, sheets } = await page.evaluate(() => ({
+      rendered: (document.querySelector("[data-example-root]")?.childElementCount ?? 0) > 0,
+      // the root layout's font faces are the only stylesheet besides the inline reset
+      sheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+    }))
+    if (!rendered) report(at, "harness", "the example rendered nothing")
+    if (sheets > 1) report(at, "harness", `the unstyled skin loads ${sheets} stylesheets`)
+  }
   await page.close()
 }
 // the intro itself: a first visit starts unstyled and ends styled

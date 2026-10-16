@@ -16,7 +16,7 @@ function Specimens() {
   const [pending, setPending] = useState(false)
   return (
     <Heading.Level level={2}>
-      <div className={styles.stage} data-skin={phase}>
+      <div className={styles.stage} data-skinned="" data-skin={phase}>
         <div className={styles.card} style={{ left: "2%", top: "0%", rotate: "-3deg" }}>
           <span className={styles.tag}>button · data-pending</span>
           <p className={styles.title}>Delete component?</p>

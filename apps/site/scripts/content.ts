@@ -144,6 +144,82 @@ for (const f of readdirSync(examplesDir).filter((f) => f.endsWith(".tsx"))) {
 }
 writeFileSync(join(out, "examples.json"), `${JSON.stringify(examples, null, 2)}\n`)
 
+// ── examples harness: every example of every module, for /examples/<slug>/<example>/<skin>/ ──
+const kebab = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
+
+/** The body of a module's `export const <name> … = { … }` object literal, if any. */
+function block(source: string, name: string): string {
+  const at = new RegExp(`^export const ${name}\\b[^=]*= \\{`, "m").exec(source)
+  if (!at) return ""
+  const open = at.index + at[0].length
+  let depth = 1
+  for (let i = open; i < source.length; i++) {
+    if (source[i] === "{") depth++
+    else if (source[i] === "}" && --depth === 0) return `\n${source.slice(open, i)}`
+  }
+  return ""
+}
+
+type HarnessEntry = {
+  slug: string
+  example: string
+  name: string
+  title: string
+  hidden: boolean
+  states: string[]
+  axeDisable: string[]
+  viewport?: "mobile"
+}
+const harness: HarnessEntry[] = []
+const fixturesDir = join(examplesDir, "fixtures")
+for (const [dir, files] of [
+  [examplesDir, readdirSync(examplesDir)],
+  [fixturesDir, readdirSync(fixturesDir)],
+] as const) {
+  for (const f of files.filter((f) => f.endsWith(".tsx") && f !== "attribute-readout.tsx")) {
+    const slug = basename(f, ".tsx")
+    const source = readFileSync(join(dir, f), "utf8")
+    const states = new Map<string, string[]>()
+    for (const [, scope, inner] of block(source, "states").matchAll(
+      /"?([\w-]+)"?\s*:\s*\{([^}]*)\}/g,
+    )) {
+      for (const [, state, example] of (inner ?? "").matchAll(/"?(\w+)"?\s*:\s*"(\w+)"/g)) {
+        states.set(example ?? "", [...(states.get(example ?? "") ?? []), `${scope}:${state}`])
+      }
+    }
+    const variants = block(source, "variants")
+    const keys = [...variants.matchAll(/^ {2}(\w+): \{/gm)]
+    keys.forEach((m, i) => {
+      const name = m[1] ?? ""
+      const body = variants.slice(m.index, keys[i + 1]?.index)
+      if (!new RegExp(`^export function ${name}\\(\\)`, "m").test(source)) {
+        throw new Error(`examples/${f}: variant ${name} has no exported function`)
+      }
+      if (harness.some((e) => e.slug === slug && e.name === name)) {
+        throw new Error(`examples/${f}: ${name} is already an example of "${slug}"`)
+      }
+      harness.push({
+        slug,
+        example: kebab(name),
+        name,
+        title: /title: "([^"]*)"/.exec(body)?.[1] ?? name,
+        hidden: /hidden: true/.test(body),
+        states: states.get(name) ?? [],
+        axeDisable: [
+          ...(/axeDisable: \[([^\]]*)\]/.exec(body)?.[1] ?? "").matchAll(/"([\w-]+)"/g),
+        ].map((r) => r[1] ?? ""),
+        ...(/viewport: "mobile"/.test(body) ? { viewport: "mobile" as const } : {}),
+      })
+    })
+    for (const name of states.keys()) {
+      if (!keys.some((k) => k[1] === name)) {
+        throw new Error(`examples/${f}: state example ${name} is not in variants`)
+      }
+    }
+  }
+}
+writeFileSync(join(out, "harness.json"), `${JSON.stringify(harness, null, 2)}\n`)
+
 // ── roadmap: every planned component, its wave and status, from docs/components.md ─────────
 type Status = "todo" | "research" | "spec" | "wip" | "done"
 const statuses = new Set<string>(["todo", "research", "spec", "wip", "done"])

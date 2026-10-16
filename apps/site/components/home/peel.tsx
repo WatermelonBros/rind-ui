@@ -56,7 +56,7 @@ export function Peel() {
   const vars = { "--p1": p1, "--p2": p2, "--p3": p3 } as CSSProperties
 
   const control = (skin: string) => (
-    <div className={styles.component} data-skin={skin}>
+    <div className={styles.component} data-skinned="" data-skin={skin}>
       <Switch.Root checked={checked} onCheckedChange={setChecked}>
         <Switch.Control>
           <Switch.Thumb />

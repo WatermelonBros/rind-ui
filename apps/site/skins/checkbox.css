@@ -1,14 +1,14 @@
 /* ── Checkbox ─────────────────────────────────────────────────────────────────────── */
-[data-skin] [data-scope="checkbox"][data-part="root"] {
+[data-skinned] [data-scope="checkbox"][data-part="root"] {
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
-[data-skin] [data-scope="checkbox"][data-part="label"] {
+[data-skinned] [data-scope="checkbox"][data-part="label"] {
   font-weight: 500;
   cursor: pointer;
 }
-[data-skin] [data-scope="checkbox"][data-part="control"] {
+[data-skinned] [data-scope="checkbox"][data-part="control"] {
   width: 26px;
   height: 26px;
   display: grid;
@@ -24,11 +24,11 @@
     background 0.3s var(--s-ease),
     scale 0.45s var(--s-pop);
 }
-[data-skin] [data-scope="checkbox"][data-part="control"][data-pressed] {
+[data-skinned] [data-scope="checkbox"][data-part="control"][data-pressed] {
   scale: 0.88;
   transition-duration: 0.12s;
 }
-[data-skin] [data-scope="checkbox"][data-part="indicator"] {
+[data-skinned] [data-scope="checkbox"][data-part="indicator"] {
   display: inline-block;
   scale: 0;
   rotate: -25deg;
@@ -36,7 +36,7 @@
     scale 0.45s var(--s-pop),
     rotate 0.45s var(--s-pop);
 }
-[data-skin]
+[data-skinned]
   [data-scope="checkbox"][data-part="indicator"]:is(
     [data-state="checked"],
     [data-state="indeterminate"]

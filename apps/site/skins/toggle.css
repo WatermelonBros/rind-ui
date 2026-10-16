@@ -1,5 +1,5 @@
 /* ── Toggle ───────────────────────────────────────────────────────────────────────── */
-[data-skin] [data-scope="toggle"][data-part="root"] {
+[data-skinned] [data-scope="toggle"][data-part="root"] {
   font: 600 15px var(--s-font);
   padding: 10px 16px;
   border-radius: var(--s-r-sm);
@@ -15,10 +15,10 @@
     box-shadow 0.45s var(--s-ease),
     scale 0.45s var(--s-pop);
 }
-[data-skin] [data-scope="toggle"][data-part="root"][data-hover] {
+[data-skinned] [data-scope="toggle"][data-part="root"][data-hover] {
   translate: 0 -1px;
 }
-[data-skin] [data-scope="toggle"][data-part="root"][data-pressed] {
+[data-skinned] [data-scope="toggle"][data-part="root"][data-pressed] {
   translate: 0 2px;
   box-shadow: var(--s-lift-lo);
   transition-duration: 0.12s;

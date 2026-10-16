@@ -1,5 +1,5 @@
 /* ── Fieldset, Heading, Link ──────────────────────────────────────────────────────── */
-[data-skin] [data-scope="fieldset"][data-part="root"] {
+[data-skinned] [data-scope="fieldset"][data-part="root"] {
   border: var(--s-bw) solid var(--s-line);
   border-radius: var(--s-r);
   background: var(--s-card);
@@ -8,7 +8,7 @@
   margin: 0;
   max-width: 420px;
 }
-[data-skin] [data-scope="fieldset"][data-part="legend"] {
+[data-skinned] [data-scope="fieldset"][data-part="legend"] {
   font:
     900 16px var(--font-unbounded),
     sans-serif;
@@ -21,7 +21,7 @@
   background: var(--s-acc);
   color: var(--s-ink);
 }
-[data-skin] [data-scope="heading"][data-part="root"] {
+[data-skinned] [data-scope="heading"][data-part="root"] {
   font-family: var(--font-unbounded), sans-serif;
   font-weight: 900;
   letter-spacing: -0.02em;
@@ -32,7 +32,7 @@
   gap: 10px;
 }
 /* each heading shows its computed level, so the outline is visible at a glance */
-[data-skin] [data-scope="heading"][data-part="root"]::before {
+[data-skinned] [data-scope="heading"][data-part="root"]::before {
   content: "h" attr(data-level);
   font:
     600 11px var(--font-mono),
@@ -45,31 +45,31 @@
   flex: none;
   translate: 0 -2px;
 }
-[data-skin] [data-scope="heading"][data-level="1"] {
+[data-skinned] [data-scope="heading"][data-level="1"] {
   font-size: 34px;
   margin-left: 0px;
 }
-[data-skin] [data-scope="heading"][data-level="2"] {
+[data-skinned] [data-scope="heading"][data-level="2"] {
   font-size: 28px;
   margin-left: 0px;
 }
-[data-skin] [data-scope="heading"][data-level="3"] {
+[data-skinned] [data-scope="heading"][data-level="3"] {
   font-size: 22px;
   margin-left: 14px;
 }
-[data-skin] [data-scope="heading"][data-level="4"] {
+[data-skinned] [data-scope="heading"][data-level="4"] {
   font-size: 18px;
   margin-left: 28px;
 }
-[data-skin] [data-scope="heading"][data-level="5"] {
+[data-skinned] [data-scope="heading"][data-level="5"] {
   font-size: 15px;
   margin-left: 42px;
 }
-[data-skin] [data-scope="heading"][data-level="6"] {
+[data-skinned] [data-scope="heading"][data-level="6"] {
   font-size: 13px;
   margin-left: 56px;
 }
-[data-skin] [data-scope="link"][data-part="link"] {
+[data-skinned] [data-scope="link"][data-part="link"] {
   color: inherit;
   font-weight: 600;
   text-decoration: none;
@@ -80,7 +80,7 @@
   padding: 0 2px;
   border-radius: 3px;
 }
-[data-skin] [data-scope="link"][data-part="link"][data-hover] {
+[data-skinned] [data-scope="link"][data-part="link"][data-hover] {
   background-size: 100% 100%;
   color: var(--s-ink);
 }

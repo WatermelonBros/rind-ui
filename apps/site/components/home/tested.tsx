@@ -114,7 +114,7 @@ export function Tested() {
               </>
             )}
           </p>
-          <div className={styles.testStage} data-skin={phase} ref={stage} key={run}>
+          <div className={styles.testStage} data-skinned="" data-skin={phase} ref={stage} key={run}>
             <div className="stack">
               <Accordion.Root defaultValue={["shipping"]}>
                 {["Shipping", "Returns"].map((t) => (

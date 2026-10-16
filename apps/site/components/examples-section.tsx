@@ -19,7 +19,9 @@ const withCode = (text: string) =>
 export function ExamplesSection({ slug, source }: { slug: string; source: ExampleCode }) {
   const mod = examples[slug]
   if (!mod) return null
-  const rest = Object.entries(mod.variants).slice(1)
+  const rest = Object.entries(mod.variants)
+    .slice(1)
+    .filter(([, v]) => !v.hidden)
   if (rest.length === 0) return null
   return (
     <section className={styles.examples} aria-labelledby="examples">

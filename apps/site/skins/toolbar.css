@@ -1,5 +1,5 @@
 /* ── Toolbar: one bar holding buttons, links, fields and hosted groups ── */
-[data-skin] [data-scope="toolbar"][data-part="root"] {
+[data-skinned] [data-scope="toolbar"][data-part="root"] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -9,11 +9,11 @@
   border: var(--s-bw) solid var(--s-line);
   box-shadow: var(--s-lift);
 }
-[data-skin] [data-scope="toolbar"][data-part="root"][data-orientation="vertical"] {
+[data-skinned] [data-scope="toolbar"][data-part="root"][data-orientation="vertical"] {
   flex-direction: column;
   align-items: stretch;
 }
-[data-skin]
+[data-skinned]
   [data-scope="toolbar"]:is([data-part="button"], [data-part="item"], [data-part="link"]) {
   font: 600 14px var(--s-font);
   padding: 8px 12px;
@@ -28,15 +28,15 @@
     background 0.3s var(--s-ease),
     scale 0.35s var(--s-pop);
 }
-[data-skin] [data-scope="toolbar"]:is([data-part="button"], [data-part="link"])[data-hover] {
+[data-skinned] [data-scope="toolbar"]:is([data-part="button"], [data-part="link"])[data-hover] {
   background: color-mix(in oklab, var(--s-ink) 8%, transparent);
   translate: 0 0;
 }
-[data-skin] [data-scope="toolbar"][data-part="button"][data-pressed] {
+[data-skinned] [data-scope="toolbar"][data-part="button"][data-pressed] {
   scale: 0.95;
   transition-duration: 0.12s;
 }
-[data-skin] [data-scope="toolbar"][data-part="item"]:is(input) {
+[data-skinned] [data-scope="toolbar"][data-part="item"]:is(input) {
   width: auto;
   max-width: 64px;
   font: 600 14px var(--s-font);
@@ -50,7 +50,7 @@
   border: 1px solid var(--s-line);
 }
 /* hosted groups sit flush inside the bar instead of drawing their own frame */
-[data-skin]
+[data-skinned]
   [data-scope="toolbar"]
   :is([data-scope="toggle-group"], [data-scope="radio-group"])[data-part="root"] {
   border: 0;
@@ -58,12 +58,12 @@
   padding: 0;
   background: transparent;
 }
-[data-skin] [data-scope="toolbar"] [data-scope="radio-group"][data-part="root"] {
+[data-skinned] [data-scope="toolbar"] [data-scope="radio-group"][data-part="root"] {
   column-gap: 12px;
   padding: 0 6px;
 }
 /* the toolbar's own separator: perpendicular to the bar */
-[data-skin] [data-scope="toolbar"][data-part="separator"] {
+[data-skinned] [data-scope="toolbar"][data-part="separator"] {
   border: 0;
   margin: 2px 4px;
   flex: none;
@@ -86,7 +86,7 @@
   width: 2px;
   background: #a1a1aa;
 }
-[data-skin] [data-scope="toolbar"][data-part="separator"][data-orientation="horizontal"] {
+[data-skinned] [data-scope="toolbar"][data-part="separator"][data-orientation="horizontal"] {
   width: auto;
   min-height: 0;
   height: 3px;
