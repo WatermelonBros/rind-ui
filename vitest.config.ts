@@ -6,7 +6,9 @@ import { defineConfig } from "vitest/config"
 // export condition), so tests never wait for a build.
 const conditions = ["@rind-ui/source", "module", "browser", "default"]
 const resolve = { conditions }
-const ssr = { resolve: { conditions: ["@rind-ui/source", "node", "import", "default"] } }
+// No "import": jsdom's require("decimal.js") would get the ESM build ("Decimal is not a
+// constructor" on a range input's validity).
+const ssr = { resolve: { conditions: ["@rind-ui/source", "node", "default"] } }
 
 // Chromium locally; CI sets RIND_BROWSERS=chromium,firefox,webkit.
 const browsers = (process.env["RIND_BROWSERS"] ?? "chromium").split(",")

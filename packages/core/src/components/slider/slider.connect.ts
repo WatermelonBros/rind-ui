@@ -55,7 +55,8 @@ export function sliderKeyEvent(
   index: number,
   a: SliderAxis & { readonly platform: PlatformFlags; readonly dragging: boolean },
 ): SliderEvent | null {
-  if (k.composing) return null
+  // Alt / Ctrl / Meta + arrow belong to the browser and OS (history Back, word moves).
+  if (k.composing || k.alt || k.ctrl || k.meta) return null
   const e = toLogicalKeyEvent(k, {
     dir: a.dir,
     orientation: a.orientation,

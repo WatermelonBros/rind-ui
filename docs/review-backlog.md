@@ -7,7 +7,11 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
-| add-slider (impl) | — | vitest jsdom project | jsdom 30 under this repo's Vitest config throws "Decimal is not a constructor" when a range input's `validity` is read (decimal.js interop; plain Node is fine): Slider-in-Field and form-submit scenarios run in browser mode only (`validityIt`). Number Input will hit it too; find the condition/interop cause |
+| add-slider (r1) | — | packages/core/src/components/slider/slider.machine.ts:182 | `push`: the dragged thumb's input value is written before the neighbours' min/max widen, so the browser can clamp it for a frame |
+| add-slider (r1) | — | packages/core/src/components/slider/slider.math.ts:68 | `largeStep` is rounded to the step's decimals (a finer custom largeStep is coarsened) |
+| add-slider (r1) | — | packages/react/src/slider/slider.tsx:240 | `formInput` is a new function every render, so the Thumb's track effect re-subscribes each render |
+| add-slider (r1) | — | packages/testing/src/invariants.ts:945 | `valued` no longer flags a non-canonical numeric text such as "3.0" against value 4 |
+| add-slider (r1) | — | packages/core/src/components/slider/slider.contract.ts:89 | Module-level `gesture` state: two drivers dragging concurrently would share it |
 | add-slider (impl) | — | apps/site/examples/slider.tsx | No `dragging` state example or ARIA snapshot (a static page cannot hold a drag); revisit with retire-storybook 2.3 state coverage |
 | add-slider (impl) | — | packages/testing/fixtures/slider/slider.pw.test.ts | Bundles its own page with rolldown; move to `openExample` when retire-storybook 2.1 lands |
 | add-slider (impl) | — | slider.dom.test.tsx (RX#570) | A vertical swipe scrolling the page over a horizontal Slider is asserted only through `touch-action: pan-y pinch-zoom`; the real-touch check belongs to the manual device protocol |

@@ -148,6 +148,10 @@ describe("slider connect", () => {
       type: "DRAG.CANCEL",
     })
     expect(sliderKeyEvent(key("Enter"), 0, a)).toBeNull()
+    // Browser shortcuts (Alt+Arrow: history Back) are never taken.
+    for (const mod of ["alt", "ctrl", "meta"] as const) {
+      expect(sliderKeyEvent({ ...key("ArrowLeft"), [mod]: true }, 0, a)).toBeNull()
+    }
   })
 
   it("disabled thumbs: native disabled, data-disabled, same position (RK#1691)", () => {

@@ -11,12 +11,6 @@ import { getSlider } from "../index"
 const platform = domEnvironment().platform
 const inJsdom = navigator.userAgent.includes("jsdom")
 const browserIt = it.skipIf(inJsdom)
-/**
- * jsdom 30 under this Vitest config throws "Decimal is not a constructor" when a range
- * input's validity is read (decimal.js interop): form submission and Field validation run
- * in browser mode (docs/review-backlog.md).
- */
-const validityIt = it.skipIf(inJsdom)
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
 
 afterEach(() => vi.restoreAllMocks())
@@ -348,6 +342,18 @@ describe("Keyboard", () => {
     await key(input, "ArrowRight", { repeat: true })
     await key(input, "ArrowRight", { repeat: true })
     expect(onValueCommit).toHaveBeenCalledTimes(3)
+    // Alt+Arrow is the browser's (history Back): not prevented, no step.
+    const back = new KeyboardEvent("keydown", {
+      key: "ArrowLeft",
+      altKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    act(() => {
+      input.dispatchEvent(back)
+    })
+    expect(back.defaultPrevented).toBe(false)
+    expect(onValueCommit).toHaveBeenCalledTimes(3)
     expect(onValueCommit.mock.calls.map((c) => c[1].reason)).toEqual([
       "INCREASE",
       "INCREASE",
@@ -404,7 +410,7 @@ describe("Assistive technology, forms and reset", () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  validityIt("Enter submits the form (RX#2541) and the value is unchanged", async () => {
+  it("Enter submits the form (RX#2541) and the value is unchanged", async () => {
     const onSubmit = vi.fn((e: { preventDefault(): void }) => e.preventDefault())
     render(
       <form onSubmit={onSubmit}>
@@ -559,7 +565,7 @@ describe("Field binding (A.1)", () => {
   ] as const
   for (const { prop, check } of matrix) {
     for (const where of ["field", "slider", "neither"] as const) {
-      validityIt(`Field prop × control: ${prop} on ${where}`, () => {
+      it(`Field prop × control: ${prop} on ${where}`, () => {
         const on = { [prop]: true }
         render(
           <Field.Root {...(where === "field" ? on : {})}>

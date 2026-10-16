@@ -1000,6 +1000,100 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### slider
+
+```json
+{
+  "family": "range",
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "slider.css"
+    },
+    "cursor": {
+      "fallback": "pointer",
+      "file": "slider.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "slider.css"
+    },
+    "disabled-cursor": {
+      "fallback": "not-allowed",
+      "file": "slider.css"
+    },
+    "disabled-opacity": {
+      "fallback": "0.6",
+      "file": "slider.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-fast)",
+      "file": "slider.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "slider.css"
+    },
+    "indicator-bg": {
+      "fallback": "var(--_indicator, var(--rind-color-accent-solid))",
+      "file": "slider.css"
+    },
+    "length": {
+      "fallback": "10rem",
+      "file": "slider.css"
+    },
+    "marker-bg": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "slider.css"
+    },
+    "marker-size": {
+      "fallback": "2px",
+      "file": "slider.css"
+    },
+    "marker-under-bg": {
+      "fallback": "var(--rind-color-accent-on-solid)",
+      "file": "slider.css"
+    },
+    "thumb-bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "slider.css"
+    },
+    "thumb-border": {
+      "fallback": "var(--_thumb-border, var(--rind-color-border-strong))",
+      "file": "slider.css"
+    },
+    "thumb-border-invalid": {
+      "fallback": "var(--rind-color-danger-border, var(--rind-color-border-strong))",
+      "file": "slider.css"
+    },
+    "thumb-radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "slider.css"
+    },
+    "thumb-size": {
+      "fallback": "1.25rem",
+      "file": "slider.css"
+    },
+    "track-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "slider.css"
+    },
+    "track-radius": {
+      "fallback": "var(--rind-radius-full)",
+      "file": "slider.css"
+    },
+    "track-size": {
+      "fallback": "0.375rem",
+      "file": "slider.css"
+    },
+    "value-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "slider.css"
+    }
+  }
+}
+```
+
 ### switch
 
 ```json
