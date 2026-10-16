@@ -82,3 +82,22 @@ ol.readout li {
 .compass > :nth-child(4) {
   grid-area: inline-start;
 }
+
+/* positioning guide: room around the anchor, and a scroll box that makes the popup flip */
+.anchor-stage {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+}
+.flip-box {
+  height: 220px;
+  width: min(100%, 360px);
+  overflow: auto;
+  border: 2px dashed color-mix(in oklab, currentColor 30%, transparent);
+  border-radius: 12px;
+}
+.flip-inner {
+  display: grid;
+  place-items: center;
+  height: 640px;
+}

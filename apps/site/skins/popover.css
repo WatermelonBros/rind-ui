@@ -203,3 +203,8 @@
   > [data-scope="popover"][data-part="trigger"] {
   justify-self: start;
 }
+
+/* an anchor scrolled out of view takes its popup with it */
+[data-rind-theme^="skin-"] [data-scope="popover"][data-part="positioner"][data-anchor-hidden] {
+  visibility: hidden;
+}

@@ -22,6 +22,7 @@ import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as popover from "./popover"
+import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
@@ -63,6 +64,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   popover,
+  positioning,
   label,
   link,
   "number-input": numberInput,
