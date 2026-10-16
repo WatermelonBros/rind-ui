@@ -35,7 +35,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | spec | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo | Reado has TourCard/TourScrim |
+| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Reado has TourCard/TourScrim |
 
 ## Menus & navigation (11)
 
@@ -161,7 +161,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo | Used by Reado |
+| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
 
 ## AI-UI primitives (11)
