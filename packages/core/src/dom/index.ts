@@ -52,6 +52,7 @@ export {
   type TrackOptions,
 } from "./hidden-input"
 export { createHover, type HoverOptions, type HoverPointerEvent } from "./hover"
+export { type ImageSettled, imageSettled } from "./image-status"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
 export {

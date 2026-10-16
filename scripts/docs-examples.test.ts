@@ -21,8 +21,14 @@ for (const f of docs) {
   }
 }
 
-/** Parts that are another component's Root (CheckboxGroup.Parent is a Checkbox.Root). */
-const ROOT_ALIASES: Readonly<Record<string, string>> = { "CheckboxGroup.Parent": "Checkbox" }
+/**
+ * Parts that are another component's Root (CheckboxGroup.Parent is a Checkbox.Root), or a
+ * second root of their own (Avatar.Group holds avatars and its GroupOverflow).
+ */
+const ROOT_ALIASES: Readonly<Record<string, string>> = {
+  "CheckboxGroup.Parent": "Checkbox",
+  "Avatar.Group": "Avatar",
+}
 
 /** Problems in one example: parts used outside an open Root of their component. */
 function misplacedParts(code: string): string[] {
