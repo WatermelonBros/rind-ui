@@ -51,7 +51,7 @@ By default focus goes to `data-autofocus`, then the first tabbable element, then
 
 ## Controlled use and reasons
 
-`open` / `defaultOpen` / `onOpenChange(open, details)`. `details.reason` is one of `TRIGGER_PRESS`, `CLOSE_TRIGGER_PRESS`, `ESCAPE_KEY`, `OUTSIDE_PRESS`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN`, `CLOSE`; `details.cancel()` keeps it open. A controlled dialog only proposes: if the parent keeps `open`, nothing changes. Changing `open` yourself never calls `onOpenChange`. Veto a dismissal early with `onEscapeKeyDown` or `onInteractOutside` and `event.preventDefault()`: no other layer closes either. `actionsRef` gives `open()` / `close()`.
+`open` / `defaultOpen` / `onOpenChange(open, details)`. `details.reason` is one of `trigger`, `close-trigger`, `escape-key`, `outside-press`, `outside-focus`, `parent-dismissed`, `api`; `details.cancel()` keeps it open. A controlled dialog only proposes: if the parent keeps `open`, nothing changes. Changing `open` yourself never calls `onOpenChange`. Veto a dismissal early with `onEscapeKeyDown` or `onInteractOutside` and `event.preventDefault()`: no other layer closes either. `actionsRef` gives `open()` / `close()`.
 
 After closing, the content (and triggers) carry `data-close-reason` in kebab case (`escape-key`) until the next open.
 

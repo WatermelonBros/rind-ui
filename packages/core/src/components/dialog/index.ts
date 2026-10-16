@@ -9,11 +9,13 @@ export { dialogContract, nonModalDialogContract } from "./dialog.contract"
 export {
   buildDialogMachine,
   DIALOG_PARENT_KINDS,
+  type DialogChangeDetails,
   type DialogCloseReason,
   type DialogContext,
   type DialogEvent,
   type DialogMachine,
   type DialogMachineConfig,
+  type DialogOpenReason,
   type DialogProps,
   type DismissEvent,
   dialogMachine,

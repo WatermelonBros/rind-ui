@@ -36,9 +36,9 @@ change in behaviour.
 
 The open state SHALL be a controllable value (`open`, `defaultOpen`,
 `onOpenChange`), closed by default. Every change request SHALL carry, as its
-reason, one of: `TRIGGER_PRESS` (a trigger was activated), `CLOSE_TRIGGER_PRESS`,
-`ESCAPE_KEY`, `OUTSIDE_PRESS`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN` or
-`CLOSE` (programmatic). Activating a trigger while the dialog is closed SHALL open
+reason, one of: `trigger` (a trigger was activated), `close-trigger`,
+`escape-key`, `outside-press`, `outside-focus`, `parent-dismissed` or `api`
+(programmatic open or close). Activating a trigger while the dialog is closed SHALL open
 it; activating it while open (possible only when non-modal) SHALL close it. When
 controlled, the dialog SHALL only propose the change and SHALL follow the `open`
 prop; a parent that does not apply the proposal leaves the dialog as it was. A
@@ -50,7 +50,7 @@ Requests made in one task SHALL be processed in order.
 - **WHEN** a controlled dialog is open, the user presses Escape and the parent keeps
   `open={true}`
 - **THEN** `onOpenChange(false, details)` was called with `details.reason ===
-  "ESCAPE_KEY"`, the dialog is still open and focus has not moved
+  "escape-key"`, the dialog is still open and focus has not moved
 
 #### Scenario: Open then close in one task
 
@@ -59,7 +59,7 @@ Requests made in one task SHALL be processed in order.
 
 #### Scenario: Cancelled request
 
-- **WHEN** `onOpenChange` calls `details.cancel()` for a `CLOSE_TRIGGER_PRESS`
+- **WHEN** `onOpenChange` calls `details.cancel()` for a `close-trigger` change
 - **THEN** the dialog stays open
 
 ### Requirement: Modal By Default
@@ -101,7 +101,7 @@ out of it SHALL NOT close it; its triggers SHALL stay operable and toggle it.
 #### Scenario: Trigger toggles
 
 - **WHEN** a non-modal dialog is open and the user presses its trigger
-- **THEN** it closes with reason `TRIGGER_PRESS`, and the press was not treated as an
+- **THEN** it closes with reason `trigger`, and the press was not treated as an
   outside press
 
 ### Requirement: Dismissal Defaults
@@ -118,13 +118,13 @@ press.
 #### Scenario: Backdrop press
 
 - **WHEN** a modal dialog with a backdrop is open and the user clicks the backdrop
-- **THEN** the dialog closes with reason `OUTSIDE_PRESS`
+- **THEN** the dialog closes with reason `outside-press`
 
 #### Scenario: Positioner press
 
 - **WHEN** a modal dialog's positioner fills the viewport and the user clicks it
   beside the content
-- **THEN** the dialog closes with reason `OUTSIDE_PRESS`; a click inside the content
+- **THEN** the dialog closes with reason `outside-press`; a click inside the content
   does not close it
 
 #### Scenario: Mounted open by the opening click
@@ -345,7 +345,7 @@ from inside one of them survives that layer closing (radix#1836).
 
 - **WHEN** a confirmation dialog is opened from a button inside an open drawer
 - **THEN** the dialog is the drawer's child layer: Escape closes only the dialog, and
-  closing the drawer closes the dialog first with reason `PARENT_DISMISSED`; stacking
+  closing the drawer closes the dialog first with reason `parent-dismissed`; stacking
   families stay separate (the drawer is not counted as a nested dialog)
 
 #### Scenario: Dialog rendered inside a menu item
@@ -373,7 +373,7 @@ A dialog opened from inside another dialog SHALL be its child layer. Escape and 
 outside press on the child's backdrop SHALL close only the child. Closing the child
 SHALL return focus to the element in the parent that opened it and SHALL NOT close
 the parent. Closing the parent SHALL close the child first with reason
-`PARENT_DISMISSED`. For stacking metadata, `dialog` and `alertdialog` layers SHALL
+`parent-dismissed`. For stacking metadata, `dialog` and `alertdialog` layers SHALL
 count as the same kind.
 
 #### Scenario: Nested close button
@@ -400,7 +400,7 @@ reset or re-mount a form whose content stays mounted.
 - **WHEN** a close trigger rendered with `type="submit"` inside a form in the dialog is
   pressed, and the dialog has no exit animation
 - **THEN** the form's `submit` handler runs, no "form is not connected" warning is
-  logged, and the dialog closes with reason `CLOSE_TRIGGER_PRESS` (regression:
+  logged, and the dialog closes with reason `close-trigger` (regression:
   radix#1109, radix#1779)
 
 ### Requirement: Mounting
