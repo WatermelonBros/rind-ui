@@ -244,6 +244,10 @@ export const calendarContract = contract("calendar", {
       args: ((view: { values: { focusedValue: { toString(): string } } }) => [
         view.values.focusedValue.toString(),
       ]) as never,
+      event: (view) => ({
+        date: (view as unknown as { values: { focusedValue: unknown } }).values.focusedValue,
+        modality: "pointer",
+      }),
     },
     SELECT_FOCUSED: {
       action: "select",
