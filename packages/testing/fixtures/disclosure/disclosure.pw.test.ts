@@ -37,6 +37,18 @@ import { streamContract } from "../announce/announce.contract"
 import { disclosureContract } from "./disclosure.contract"
 import { disclosureScenario } from "./disclosure.scenario"
 
+/** Drains animation frames in the page (a condition-free "let it settle"). */
+const frames = (page: Page, count = 6) =>
+  page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
+        step(n)
+      }),
+    count,
+  )
+
 const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
 const types: Record<string, string> = {
   ".html": "text/html",
@@ -385,7 +397,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
           const until = Date.now() + 3000
           missing = missingAriaLines(snapshot, want)
           while (missing.length > 0 && Date.now() < until) {
-            await page.waitForTimeout(100)
+            await frames(page, 2)
             snapshot = await page.locator("body").ariaSnapshot()
             missing = missingAriaLines(snapshot, want)
           }

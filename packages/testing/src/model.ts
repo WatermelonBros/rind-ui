@@ -23,6 +23,7 @@ import type { DomSnapshot, ElementInfo } from "./collect"
 import { directed, runAction, type Target, toEnvFactory } from "./driver"
 import { type GraphEdge, type MachineGraph, type Path, paths, toGraph } from "./graph"
 import { checkGeneric, genericInvariants, type StepFacts } from "./invariants"
+import type { VirtualClock } from "./virtual-clock"
 
 /** Contracts whose jsdom limitation was already reported in this run. */
 const layoutNoted = new Set<string>()
@@ -85,6 +86,12 @@ export interface TestMachineOptions<C extends AnyContract, R, A extends unknown[
    * that action (AT 12: one bare click, one activation).
    */
   readonly activations?: { readonly action: string; readonly count: () => number }
+  /**
+   * The virtual clock the rendered machines use (`RindProvider environment={{ scheduler:
+   * clock.scheduler }}`): delay edges and the `timed` invariant advance it instead of
+   * waiting real time.
+   */
+  readonly clock?: VirtualClock
 }
 
 /** What the current `testMachine` run emulates, for `setup` to render accordingly. */
@@ -673,6 +680,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     return env
   }
   const base = envFor(modality)
+  /** The machines' delays: the virtual clock when the test gave one, else the adapter's time. */
+  const elapse = async (ms: number) => {
+    if (!options.clock) return base.advance(ms)
+    options.clock.advance(ms)
+    // Let the page commit what the timers changed (a frame, no elapsed time).
+    await base.advance(0)
+  }
   if (direction === "rtl") await base.setDirection("rtl")
 
   const props = (options.props ?? {}) as Props
@@ -837,7 +851,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         (p) => p.attrs["data-hover"] !== undefined || p.attrs["data-focus"] !== undefined,
       )
       if (held.length > 0) {
-        await base.advance(longestDelay() + 16)
+        await elapse(longestDelay() + 16)
         const after = await observe()
         if (after["isOpen"] !== true) {
           fail(
@@ -1116,7 +1130,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           ) {
             userChanges += 1
           }
-          await base.advance(ms)
+          await elapse(ms)
         } else if (mapping?.kind === "props") {
           const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }
           inputs.push({ kind: "props", props: next })

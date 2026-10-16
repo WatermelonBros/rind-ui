@@ -1,3 +1,4 @@
+import { availableParallelism } from "node:os"
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
@@ -44,10 +45,17 @@ const ciRetry = process.env["CI"] ? 1 : 0
 // unchanged in jsdom (through @rind-ui/testing/setup) and in real browsers.
 const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
 
+// Locally the machine is shared by several sessions: at most half the cores per run unless
+// RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
+const maxWorkers = process.env["CI"]
+  ? undefined
+  : Number(process.env["RIND_MAX_WORKERS"]) || Math.max(1, Math.floor(availableParallelism() / 2))
+
 export default defineConfig({
   resolve,
   ssr,
   test: {
+    ...(maxWorkers === undefined ? {} : { maxWorkers }),
     projects: [
       {
         resolve,

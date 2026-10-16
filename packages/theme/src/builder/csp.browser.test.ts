@@ -4,7 +4,9 @@ import { expect, it } from "vitest"
 import { parseColor } from "./color"
 import { defineTheme } from "./theme"
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const frames = async (count = 6) => {
+  for (let i = 0; i < count; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 
 it("applies the theme under style-src 'nonce-abc' without a violation", async () => {
   const violations: string[] = []
@@ -36,7 +38,7 @@ it("applies the theme under style-src 'nonce-abc' without a violation", async ()
   probe.className = "probe"
   host.append(probe)
 
-  await wait(50)
+  await frames()
   const got = parseColor(getComputedStyle(probe).color)
   const want = parseColor(theme.tokens.colors["accent-solid"].light)
   expect(got, getComputedStyle(probe).color).not.toBeNull()
@@ -51,7 +53,6 @@ it("applies the theme under style-src 'nonce-abc' without a violation", async ()
   const blocked = document.createElement("style")
   blocked.textContent = ".control { color: rgb(1, 2, 3) }"
   document.head.append(blocked)
-  await wait(100)
-  expect(violations.length).toBeGreaterThan(0)
+  await expect.poll(() => violations.length).toBeGreaterThan(0)
   host.remove()
 })

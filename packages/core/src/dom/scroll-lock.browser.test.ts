@@ -93,7 +93,8 @@ describe("strict CSP (bits-ui#1995)", () => {
     expect(html.style.overflow).toBe("hidden")
     expect(document.querySelectorAll("style").length).toBe(styles)
     release()
-    await new Promise((r) => setTimeout(r, 50))
+    // Violation reports are queued tasks: drain a few frames instead of waiting on a clock.
+    for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
     document.removeEventListener("securitypolicyviolation", onViolation)
     expect(violations).toEqual([])
     expect(html.style.overflow).toBe("")

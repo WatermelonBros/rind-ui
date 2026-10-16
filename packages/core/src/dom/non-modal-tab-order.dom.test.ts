@@ -75,7 +75,10 @@ const deepActive = () => {
   while (a?.shadowRoot?.activeElement) a = a.shadowRoot.activeElement
   return a
 }
-const settle = () => new Promise((r) => setTimeout(r, 30))
+// Drain animation frames (the handlers under test defer through rAF) — no elapsed-time wait.
+const settle = async () => {
+  for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 const idOf = (el: Element | null) => el?.id ?? "(none)"
 
 /** Presses Tab, then does what the browser would if nothing handled it. */

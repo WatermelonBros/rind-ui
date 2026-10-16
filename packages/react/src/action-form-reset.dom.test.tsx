@@ -32,7 +32,9 @@ describe("react-action-form-reset", () => {
     await act(async () => {
       screen.getByRole("button", { name: "Save" }).click()
     })
-    await act(() => new Promise((resolve) => setTimeout(resolve, 50)))
+    await act(async () => {
+      for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+    })
     expect(resets).toHaveLength(1)
     expect(["none", "message"]).toContain(resets[0])
   })
