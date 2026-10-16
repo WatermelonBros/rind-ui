@@ -60,9 +60,32 @@ const report = (url: string, kind: string, message: string) => {
   findings.push({ url, kind, message: message.split("\n")[0]?.slice(0, 240) ?? "" })
 }
 
+/** Two animation frames: layout, observers and style changes of the last step have run. */
+const frames = (page: Page) =>
+  page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))))
+
+/** Every finite animation and transition has finished (looping ones, like the marquee, are
+ * ignored), so contrast and opacity are measured on the final frame. A condition, not a delay. */
+async function settled(page: Page, url: string) {
+  await frames(page)
+  await page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every(
+            (a) =>
+              a.playState !== "running" || a.effect?.getComputedTiming().iterations === Infinity,
+          ),
+      undefined,
+      { timeout: 10_000 },
+    )
+    .catch(() => report(url, "animations", "animations still running after 10 s"))
+}
+
 async function axe(page: Page, url: string, phase: string) {
-  // let entrance animations (code panels, toggles) settle before measuring contrast
-  await page.waitForTimeout(800)
+  // entrance animations (code panels, toggles) must end before contrast is measured
+  await settled(page, url)
   await page.addScriptTag({ content: axeSource })
   const violations = await page.evaluate(async () => {
     type Violation = { id: string; impact: string; nodes: { target: string[] }[] }
@@ -113,14 +136,17 @@ async function closeModals(page: Page, url: string) {
     const modal = page.locator('[aria-modal="true"]').last()
     if (!(await modal.isVisible().catch(() => false))) return
     await page.keyboard.press("Escape")
-    await page.waitForTimeout(250)
-    if (await modal.isVisible().catch(() => false)) {
+    const closed = await modal
+      .waitFor({ state: "hidden", timeout: 2000 })
+      .then(() => true)
+      .catch(() => false)
+    if (!closed) {
       await modal
         .getByRole("button")
         .last()
         .click({ timeout: 2000 })
         .catch(() => {})
-      await page.waitForTimeout(250)
+      await modal.waitFor({ state: "hidden", timeout: 2000 }).catch(() => {})
     }
   }
   report(url, "modal", "a modal layer did not close with Escape or its buttons")
@@ -128,7 +154,7 @@ async function closeModals(page: Page, url: string) {
 
 /** Text that is laid out but painted at (near) zero opacity: invisible to sighted users. */
 async function invisibleText(page: Page, url: string) {
-  await page.waitForTimeout(800)
+  await settled(page, url)
   const ghosts = await page.evaluate(() => {
     const out: string[] = []
     for (const el of document.querySelectorAll<HTMLElement>(
@@ -179,20 +205,21 @@ for (const url of urls) {
   const height = await page.evaluate(() => document.body.scrollHeight)
   for (let y = 0; y < height; y += 600) {
     await page.evaluate((top) => window.scrollTo(0, top), y)
-    await page.waitForTimeout(80)
+    await frames(page)
   }
   await invisibleText(page, url)
   await axe(page, url, "crisp")
   // the theme pages are @rind-ui/theme's own, with no site phase
   if (!url.startsWith("/theme/")) {
     await page.getByRole("switch", { name: "juicy mode" }).click()
-    await page.waitForTimeout(1600)
+    await page.waitForFunction(() => document.documentElement.dataset["phase"] === "juicy")
     await axe(page, url, "juicy")
     await page.getByRole("switch", { name: "juicy mode" }).click()
-    await page.waitForTimeout(1600)
+    await page.waitForFunction(() => document.documentElement.dataset["phase"] === "crisp")
+    await settled(page, url)
   }
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.waitForTimeout(300)
+  await settled(page, url)
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   )
@@ -219,7 +246,11 @@ for (const url of urls) {
   })
   for (const e of index) {
     at = e.urls["none"] ?? ""
-    await page.goto(base + at, { waitUntil: "networkidle" })
+    await page.goto(base + at)
+    // the example mounts on the client; the host marks the root once its effects have run
+    await page
+      .waitForSelector("[data-example-root][data-hydrated]", { timeout: 10_000 })
+      .catch(() => report(at, "harness", "never marked data-hydrated"))
     const { rendered, sheets } = await page.evaluate(() => ({
       rendered: (document.querySelector("[data-example-root]")?.childElementCount ?? 0) > 0,
       // the root layout's font faces are the only stylesheet besides the inline reset
@@ -236,8 +267,12 @@ for (const url of urls) {
   page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))
   await page.goto(`${base}/`, { waitUntil: "domcontentloaded" })
   const started = await page.evaluate(() => document.documentElement.classList.contains("unstyled"))
-  await page.waitForTimeout(3000)
-  const ended = await page.evaluate(() => !document.documentElement.classList.contains("unstyled"))
+  const ended = await page
+    .waitForFunction(() => !document.documentElement.classList.contains("unstyled"), undefined, {
+      timeout: 10_000,
+    })
+    .then(() => true)
+    .catch(() => false)
   if (!started) report("/ (intro)", "intro", "a first visit did not start unstyled")
   if (!ended) report("/ (intro)", "intro", "the intro never revealed the styled page")
   await page.close()
