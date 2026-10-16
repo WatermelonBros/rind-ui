@@ -70,6 +70,33 @@ const nextCoords = (el?: Element) => {
 }
 
 /**
+ * A point on the page itself, inside the viewport's client area (dismissal treats a press
+ * past it as a scrollbar press): the step's coordinates when they qualify, else the first
+ * viewport corner that hits only the page. Without layout (jsdom) every point is the page.
+ */
+const outsideCoords = () => {
+  const c = nextCoords()
+  const root = document.documentElement
+  const page = (x: number, y: number) => {
+    if (root.clientWidth > 0 && (x >= root.clientWidth || y >= root.clientHeight)) return false
+    const hit = document.elementFromPoint?.(x, y)
+    return !hit || hit === document.body || hit === root
+  }
+  if (page(c.clientX, c.clientY)) return c
+  const w = root.clientWidth
+  const h = root.clientHeight
+  for (const [x, y] of [
+    [w - 2, h - 2],
+    [w - 2, 2],
+    [2, h - 2],
+  ] as const) {
+    if (page(x, y))
+      return { clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY }
+  }
+  return c
+}
+
+/**
  * Resolves once no finite transition or animation is running in the document (or after `max`
  * ms). A sibling panel opening shifts the target's box for a while, and a press aimed at
  * coordinates read before the shift releases outside it (the press is then not a press).
@@ -532,6 +559,41 @@ function createDomEnv(
           input.dispatchEvent(new Event("change", { bubbles: true }))
         })
       },
+      async paste(text) {
+        const el = await waitFor()
+        await act(() => {
+          const input = el as HTMLInputElement
+          const start = input.selectionStart ?? input.value.length
+          const end = input.selectionEnd ?? start
+          // The real order: paste (cancelable, clipboardData) → beforeinput → input.
+          let paste: Event
+          if (typeof DataTransfer === "function" && typeof ClipboardEvent === "function") {
+            const clipboardData = new DataTransfer()
+            clipboardData.setData("text/plain", text)
+            paste = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true })
+            // Firefox ignores the constructor's clipboardData: attach it.
+            if (!(paste as ClipboardEvent).clipboardData?.getData("text/plain")) {
+              Object.defineProperty(paste, "clipboardData", { value: clipboardData })
+            }
+          } else {
+            // jsdom has no DataTransfer: a paste Event carrying a clipboardData reader.
+            paste = new Event("paste", { bubbles: true, cancelable: true })
+            Object.defineProperty(paste, "clipboardData", {
+              value: { getData: (type: string) => (/^text(\/plain)?$/.test(type) ? text : "") },
+            })
+          }
+          if (!input.dispatchEvent(paste)) return
+          const init = { inputType: "insertFromPaste", data: text, bubbles: true }
+          const before = new InputEvent("beforeinput", { ...init, cancelable: true })
+          if (!input.dispatchEvent(before)) return
+          const next = input.value.slice(0, start) + text + input.value.slice(end)
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, next)
+          else input.value = next
+          input.setSelectionRange(start + text.length, start + text.length)
+          input.dispatchEvent(new InputEvent("input", init))
+        })
+      },
       waitForDetach: async () => {
         await until(
           async () => (await resolve()).length,
@@ -629,8 +691,7 @@ function createDomEnv(
       const u = await getUser()
       const body = doc().body
       if (!u.pointer) return act(() => u.click(body))
-      const coords = nextCoords()
-      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords }]))
+      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords: outsideCoords() }]))
     },
     until,
     advance: async (ms) => {

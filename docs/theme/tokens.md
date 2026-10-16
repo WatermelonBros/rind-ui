@@ -1044,6 +1044,86 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### menu
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "menu.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "menu.css"
+    },
+    "group-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "menu.css"
+    },
+    "indicator-size": {
+      "fallback": "1rem",
+      "file": "menu.css"
+    },
+    "max-height": {
+      "fallback": "100vh",
+      "file": "menu.css"
+    },
+    "min-width": {
+      "fallback": "10rem",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "menu.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "menu.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "menu.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "menu.css"
+    }
+  }
+}
+```
+
+### menu-item
+
+```json
+{
+  "family": "collection item",
+  "tokens": {
+    "disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "menu.css"
+    },
+    "height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "menu.css"
+    },
+    "highlight-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "menu.css"
+    },
+    "highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "menu.css"
+    }
+  }
+}
+```
+
 ### number-input
 
 ```json
@@ -1325,6 +1405,120 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "visible-icon": {
       "fallback": "var(--rind-icon-eye-slash)",
       "file": "password-input.css"
+    }
+  }
+}
+```
+
+### pin-input
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "badge-space": {
+      "fallback": "0px",
+      "file": "pin-input.css"
+    },
+    "caret-width": {
+      "fallback": "1px",
+      "file": "pin-input.css"
+    },
+    "color": {
+      "fallback": "var(--rind-text-field-color, var(--rind-color-text))",
+      "file": "pin-input.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-text-field-description-color, var(--rind-color-text-muted))",
+      "file": "pin-input.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-field-description-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "pin-input.css"
+    },
+    "disabled-border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "pin-input.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))",
+      "file": "pin-input.css"
+    },
+    "disabled-fg": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "pin-input.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-text-field-error-color, var(--rind-color-danger-text))",
+      "file": "pin-input.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-field-error-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))",
+      "file": "pin-input.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-text-field-gap, var(--rind-space-1))",
+      "file": "pin-input.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "pin-input.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-field-label-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "label-font-weight": {
+      "fallback": "var(--rind-text-field-label-font-weight, 580)",
+      "file": "pin-input.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "pin-input.css"
+    },
+    "slot-active-border": {
+      "fallback": "var(--rind-color-accent-border)",
+      "file": "pin-input.css"
+    },
+    "slot-bg": {
+      "fallback": "var(--rind-text-field-bg, var(--rind-color-surface-raised))",
+      "file": "pin-input.css"
+    },
+    "slot-border": {
+      "fallback": "var(--rind-text-field-border, var(--rind-color-border-strong))",
+      "file": "pin-input.css"
+    },
+    "slot-color": {
+      "fallback": "var(--rind-text-field-fg, var(--rind-color-text))",
+      "file": "pin-input.css"
+    },
+    "slot-gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "pin-input.css"
+    },
+    "slot-radius": {
+      "fallback": "var(--rind-text-field-radius, var(--rind-radius-control))",
+      "file": "pin-input.css"
+    },
+    "slot-shadow": {
+      "fallback": "var(--rind-shadow-key-pressed)",
+      "file": "pin-input.css"
+    },
+    "slot-size": {
+      "fallback": "var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))",
+      "file": "pin-input.css"
+    },
+    "slot-soft-bg": {
+      "fallback": "var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))",
+      "file": "pin-input.css"
     }
   }
 }
