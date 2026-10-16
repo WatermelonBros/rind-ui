@@ -6,9 +6,17 @@ import type { Variants } from "./types"
 
 /** Logs every open change of the layers below with its reason, newest first. */
 function useLog() {
-  const [log, setLog] = useState<readonly string[]>([])
+  const [log, setLog] = useState<readonly { id: number; text: string }[]>([])
   const track = (layer: string) => (open: boolean, details: { reason: string }) =>
-    setLog((l) => [`${layer} ${open ? "opened" : "closed"}: ${details.reason}`, ...l].slice(0, 4))
+    setLog((l) =>
+      [
+        {
+          id: (l[0]?.id ?? 0) + 1,
+          text: `${layer} ${open ? "opened" : "closed"}: ${details.reason}`,
+        },
+        ...l,
+      ].slice(0, 4),
+    )
   return [log, track] as const
 }
 
@@ -58,9 +66,9 @@ export function Basic() {
       </Dialog.Root>
       <ol className="readout" aria-label="Layer log">
         {log.length ? (
-          log.map((l, i) => (
-            <li key={`${i}-${l}`}>
-              <code>{l}</code>
+          log.map((l) => (
+            <li key={l.id}>
+              <code>{l.text}</code>
             </li>
           ))
         ) : (
