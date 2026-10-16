@@ -561,6 +561,16 @@ function createDomEnv(
       return [...installAnnouncementLog()]
     },
     takeErrors: async () => errors().splice(0),
+    holdAnimations: async () => {
+      const running =
+        doc()
+          .getAnimations?.()
+          .filter((a) => a.playState === "running") ?? []
+      for (const a of running) a.pause()
+      return async () => {
+        for (const a of running) if (a.playState === "paused") a.play()
+      }
+    },
     selectedText: async () => doc().getSelection()?.toString() ?? "",
     markNavigations: async () => {
       navigationsFrom = navigationLog().length

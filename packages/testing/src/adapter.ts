@@ -18,6 +18,11 @@ export interface AdapterEnv extends Env {
   /** Uncaught errors and `console.error` calls since the last call. */
   takeErrors(): Promise<readonly string[]>
   /**
+   * Pauses every running animation in the document and returns their resume: holds an exit
+   * animation while the runner reopens during it, however slow the run (CI Linux).
+   */
+  holdAnimations?(): Promise<() => Promise<void>>
+  /**
    * Chromium accessibility-tree checks for the instance (Playwright in Chromium only):
    * problems found, or "unavailable" elsewhere.
    */

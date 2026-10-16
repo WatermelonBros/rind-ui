@@ -22,6 +22,7 @@ const el = (part: string | null, id: string, rect: Rect, attrs: Record<string, s
     inInert: false,
     focusable: false,
     animations: 0,
+    motion: false,
     group: "",
     within: [],
   }) satisfies ElementInfo

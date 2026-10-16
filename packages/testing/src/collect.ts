@@ -22,8 +22,10 @@ export interface ElementInfo {
   readonly inAriaHidden: boolean
   readonly inInert: boolean
   readonly focusable: boolean
-  /** Finite animations running on the element (exit animations a presence waits for). */
+  /** Finite animations running (or held) on the element: exit animations presence waits for. */
   readonly animations: number
+  /** Its computed style animates (a transition or animation duration above zero). */
+  readonly motion: boolean
   /** The element's identity across snapshots of one page (same node, same number). */
   readonly node: number
   /** Its border box in viewport coordinates (all zero without layout). */
@@ -130,6 +132,15 @@ const norm = (s: string | null | undefined) => (s ?? "").replace(/\s+/g, " ").tr
  * `hidden` (including `until-found`), `inert` or `display: none`, and it is not
  * `visibility: hidden`. `display: contents` counts as visible: its children render.
  */
+/** Any transition or animation duration above zero in the computed style. */
+function hasMotion(el: Element): boolean {
+  const view = el.ownerDocument.defaultView
+  if (!view) return false
+  const cs = view.getComputedStyle(el)
+  const positive = (list: string) => list.split(",").some((d) => Number.parseFloat(d) > 0)
+  return positive(cs.transitionDuration || "0s") || positive(cs.animationDuration || "0s")
+}
+
 export function isVisible(el: Element): boolean {
   if (!el.isConnected) return false
   const view = el.ownerDocument.defaultView
@@ -290,10 +301,11 @@ export function collectDom(arg: {
             .getAnimations()
             .filter(
               (a) =>
-                a.playState === "running" &&
+                (a.playState === "running" || a.playState === "paused") &&
                 a.effect?.getComputedTiming().endTime !== Number.POSITIVE_INFINITY,
             ).length
         : 0,
+    motion: hasMotion(el),
     group: groupOf(el),
     within: ancestorIds(el),
   })
