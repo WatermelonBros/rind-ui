@@ -189,6 +189,9 @@ export const ExitAnimation: Story = {
 
 /** The driver opens and closes the dialog the way a user would. */
 export const DriverExample: Story = {
+  // Storybook is being retired (change retire-storybook); the driver is covered by the
+  // dialog.dom / dialog.browser tests (this play intermittently timed out on CI WebKit).
+  tags: ["!test"],
   render: () => <Box />,
   play: async ({ canvasElement }) => {
     const dialog = getDialog(canvasElement, { name: "Edit profile" })
