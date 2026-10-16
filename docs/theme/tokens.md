@@ -820,10 +820,6 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 {
   "family": "panel",
   "tokens": {
-    "arrow-offset": {
-      "fallback": null,
-      "file": "popover.css"
-    },
     "arrow-size": {
       "fallback": "10px",
       "file": "popover.css"

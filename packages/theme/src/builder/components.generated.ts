@@ -165,7 +165,6 @@ export type ComponentTokens = {
     | "disabledColor"
     | "underlineOffset"
   readonly popover:
-    | "arrowOffset"
     | "arrowSize"
     | "bg"
     | "border"
