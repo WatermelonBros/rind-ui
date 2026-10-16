@@ -33,6 +33,7 @@ import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
+import * as tooltip from "./tooltip"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -76,6 +77,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tooltip,
 }
 
 /** The example function `name` of a module, if it is one. */

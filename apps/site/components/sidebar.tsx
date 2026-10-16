@@ -1,6 +1,6 @@
 "use client"
 
-import { Collapsible, TextField, Toggle } from "@rind-ui/react"
+import { Collapsible, TextField, Toggle, Tooltip } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -46,17 +46,29 @@ export function Sidebar({ groups }: { groups: readonly NavGroup[] }) {
             <p className={styles.label}>Framework</p>
             <div className={styles.fwList}>
               {FRAMEWORKS.map((f) => (
-                <Toggle.Root
-                  key={f.name}
-                  className={styles.fw}
-                  pressed={f.ready}
-                  disabled={!f.ready}
-                  focusableWhenDisabled
-                  title={f.ready ? undefined : `${f.name} is planned`}
-                >
-                  {f.name}
-                  {!f.ready && <small>soon</small>}
-                </Toggle.Root>
+                <Tooltip.Root key={f.name} disabled={f.ready}>
+                  <Tooltip.Trigger
+                    render={
+                      <Toggle.Root
+                        className={styles.fw}
+                        pressed={f.ready}
+                        disabled={!f.ready}
+                        focusableWhenDisabled
+                      />
+                    }
+                  >
+                    {f.name}
+                    {!f.ready && <small>soon</small>}
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Positioner className={styles.tipLayer}>
+                      <Tooltip.Content className={styles.tip}>
+                        {f.name} is planned
+                        <Tooltip.Arrow className={styles.tipArrow} />
+                      </Tooltip.Content>
+                    </Tooltip.Positioner>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
               ))}
             </div>
           </div>

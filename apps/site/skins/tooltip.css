@@ -1,0 +1,112 @@
+/* Tooltip: an inverted label. The content is portalled to <body> and stays mounted, `hidden`,
+   while closed (never override [hidden]); the portal host carries the stage's data-rind-theme. */
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 40px;
+  min-height: 40px;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 8px 14px;
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"]:has(> svg:only-child) {
+  padding: 0;
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"][data-hover] {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"]:focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"][aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  translate: none;
+  box-shadow: none;
+}
+
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="positioner"] {
+  z-index: 70;
+  pointer-events: none;
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="content"] {
+  --s-tip-bg: var(--s-ink);
+  --s-tip-fg: var(--s-card);
+  position: relative;
+  pointer-events: auto;
+  box-sizing: border-box;
+  max-width: min(240px, var(--rind-available-width, 100vw));
+  padding: 6px 10px;
+  font: 600 13px / 1.35 var(--s-font);
+  color: var(--s-tip-fg);
+  background: var(--s-tip-bg);
+  border-radius: var(--s-r-sm);
+  transform-origin: var(--rind-transform-origin, center);
+  transition:
+    opacity 0.15s var(--s-ease),
+    scale 0.2s var(--s-pop);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="content"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="content"][data-state="closed"] {
+  opacity: 0;
+  scale: 0.95;
+}
+/* opened or closed by the delay group: no animation, so a sweep across a toolbar is instant */
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-instant] {
+  transition: none;
+}
+[data-rind-theme="skin-crisp"] [data-scope="tooltip"][data-part="content"] {
+  --s-tip-bg: #0b0b0c;
+  --s-tip-fg: #d4ff3a;
+  box-shadow: 3px 3px 0 #ff3d8b;
+}
+[data-rind-theme="skin-juicy"] [data-scope="tooltip"][data-part="content"] {
+  --s-tip-bg: #2a1d5c;
+  --s-tip-fg: #fff;
+  border-radius: 12px;
+  padding: 7px 12px;
+  box-shadow: 0 4px 0 #c9bdf2;
+}
+
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"] {
+  --s-arrow: 8px;
+  width: var(--s-arrow);
+  height: var(--s-arrow);
+  background: var(--s-tip-bg);
+  rotate: 45deg;
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"][data-side="top"] {
+  bottom: calc(var(--s-arrow) / -2);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"][data-side="bottom"] {
+  top: calc(var(--s-arrow) / -2);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"][data-side="left"] {
+  right: calc(var(--s-arrow) / -2);
+}
+[data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"][data-side="right"] {
+  left: calc(var(--s-arrow) / -2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="content"] {
+    transition: none;
+  }
+}

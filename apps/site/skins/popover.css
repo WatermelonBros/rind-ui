@@ -147,8 +147,6 @@
   background: #fff;
 }
 
-/* the main-axis offset needs !important: core writes top and left inline on every side
-   (top: var(--rind-arrow-y), empty on that axis), which beats any stylesheet rule */
 /* a square turned 45°, its two outer edges drawn, tucked under the content's border */
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"] {
   --s-arrow: 12px;
@@ -159,26 +157,22 @@
   rotate: 45deg;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="bottom"] {
-  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
-  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
   border-right-color: transparent;
   border-bottom-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="top"] {
-  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
-  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
   border-left-color: transparent;
   border-top-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="right"] {
-  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
-  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
   border-right-color: transparent;
   border-top-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="left"] {
-  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
-  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
+  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
   border-left-color: transparent;
   border-bottom-color: transparent;
 }
@@ -195,27 +189,6 @@
   [data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] {
     transition: none;
   }
-}
-
-/* the Placement example: each trigger on the side its popover opens to, so none covers another */
-.compass {
-  display: grid;
-  grid-template-areas: ". top ." "inline-start . inline-end" ". bottom .";
-  gap: 10px;
-  justify-content: center;
-  justify-items: center;
-}
-.compass > :nth-child(1) {
-  grid-area: top;
-}
-.compass > :nth-child(2) {
-  grid-area: inline-end;
-}
-.compass > :nth-child(3) {
-  grid-area: bottom;
-}
-.compass > :nth-child(4) {
-  grid-area: inline-start;
 }
 
 /* juicy has no borders: a soft ring keeps the white panel off a white page */
