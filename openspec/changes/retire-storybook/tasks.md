@@ -17,5 +17,5 @@
 ## 3. Remove Storybook (implementer, same PR as 2)
 
 - [x] 3.1 Delete apps/storybook, @storybook/* dependencies, the storybook Vitest project, CI slices, turbo outputs/dependsOn, serve-static if unused; a11y-nightly uses the site export
-- [ ] 3.2 CLAUDE.md, openspec/config.yaml, docs (testing guides, decisions README): "stories" → "site examples"; decision 0011 supersedes Storybook half of 0004
+- [x] 3.2 CLAUDE.md, openspec/config.yaml, docs (testing guides, decisions README): "stories" → "site examples"; decision 0011 supersedes Storybook half of 0004
 - [x] 3.3 Every queued change's "Stories" task rewritten to "Site examples (apps/site/examples/<slug>.tsx, state examples for every contract state)"
