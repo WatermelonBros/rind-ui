@@ -132,4 +132,42 @@ describe("password input driver through Playwright", () => {
       expect(await getPasswordInput(page, { name }).value(), name).toBe(value)
     }
   })
+
+  it("Part.paste: paste → beforeinput → input, clipboard text, prevention", async () => {
+    const page = await open()
+    const input = getPasswordInput(page, { name: "Password" }).part("input")
+    const record = (prevent: string) =>
+      page.evaluate((prevent) => {
+        const el = document.querySelector('[data-part="input"]') as HTMLInputElement
+        const log: string[] = []
+        ;(window as unknown as { pasteLog: string[] }).pasteLog = log
+        for (const t of ["paste", "beforeinput", "input"]) {
+          el.addEventListener(t, (e) => {
+            const data =
+              e.type === "paste"
+                ? (e as ClipboardEvent).clipboardData?.getData("text/plain")
+                : (e as InputEvent).inputType
+            log.push(`${e.type}:${data}`)
+            if (e.type === prevent) e.preventDefault()
+          })
+        }
+      }, prevent)
+    const log = () => page.evaluate(() => (window as unknown as { pasteLog: string[] }).pasteLog)
+    await record("")
+    await input.paste("abc")
+    expect(await log()).toEqual([
+      "paste:abc",
+      "beforeinput:insertFromPaste",
+      "input:insertFromPaste",
+    ])
+    expect(await input.value()).toBe("abc")
+    const page2 = await open()
+    const input2 = getPasswordInput(page2, { name: "Password" }).part("input")
+    await page2.evaluate(() => {
+      const el = document.querySelector('[data-part="input"]') as HTMLInputElement
+      el.addEventListener("paste", (e) => e.preventDefault())
+    })
+    await input2.paste("abc")
+    expect(await input2.value()).toBe("")
+  })
 })
