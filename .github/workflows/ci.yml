@@ -123,10 +123,12 @@ jobs:
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
           BROWSERS: ${{ matrix.browsers }}
-      - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests
+      - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests --reporter=default --reporter=json --outputFile.json=vitest-report.json
         env:
           RIND_BROWSERS: ${{ matrix.browsers != '' && matrix.browsers || 'chromium' }}
           CHANGED: ${{ needs.changes.outputs.full == 'false' && format('--changed {0}', needs.changes.outputs.base) || '' }}
+      - if: always()
+        run: node scripts/flaky-report.mjs vitest-report.json
 
   # The required status check: green when every slice above passed or was not needed.
   check:

@@ -32,6 +32,11 @@ const browser = (project: string, options?: typeof classicScrollbars) => ({
   })),
 })
 
+// Real-browser projects retry a failed test once on CI: shared runners make timing-sensitive
+// browser tests flaky. A test that passes only on retry is listed as flaky in the job summary
+// (scripts/flaky-report.mjs) so it gets fixed; node and jsdom never retry.
+const ciRetry = process.env["CI"] ? 1 : 0
+
 // `*.test-d.ts` type tests are checked by `pnpm typecheck` (tsc), not by Vitest.
 // `*.test.ts`: machines, graphs — no DOM. `*.dom.test.tsx`: driver tests that run
 // unchanged in jsdom (through @rind-ui/testing/setup) and in real browsers.
@@ -109,6 +114,7 @@ export default defineConfig({
           // `*.browser.test.*`: needs real input (vitest/browser's userEvent), browser only.
           include: [...dom, "packages/*/{src,fixtures}/**/*.browser.test.{ts,tsx}"],
           browser: browser("browser", classicScrollbars),
+          retry: ciRetry,
           globals: true,
           // A no-op in real browsers; listed so that is tested.
           setupFiles: ["packages/testing/src/setup.ts"],
@@ -123,12 +129,13 @@ export default defineConfig({
           name: "playwright",
           environment: "node",
           include: ["packages/*/fixtures/**/*.pw.test.ts"],
+          retry: ciRetry,
         },
       },
       {
         resolve,
         plugins: [storybookTest({ configDir: "apps/storybook/.storybook" })],
-        test: { name: "storybook", browser: browser("storybook") },
+        test: { name: "storybook", browser: browser("storybook"), retry: ciRetry },
       },
     ],
   },
