@@ -109,7 +109,7 @@ export type PinInputRootProps = Omit<
   /** The number of characters (a positive integer). */
   readonly length: number
   /** Controlled; `null` and `undefined` render empty (ark#3573). */
-  readonly value?: string | null
+  readonly value?: string | null | undefined
   readonly defaultValue?: string
   readonly onValueChange?: (value: string, details: PinInputChangeDetails) => void
   /** An insertion was refused (its text). */
@@ -341,15 +341,18 @@ function slotAt(input: HTMLInputElement, instance: string, x: number): number | 
   const control = input.parentElement
   if (!control) return null
   let best: { index: number; distance: number } | null = null
+  let laidOut = false
   for (const el of control.querySelectorAll<HTMLElement>(
     `[data-scope="pin-input"][data-part="slot"][data-instance="${CSS.escape(instance)}"]`,
   )) {
     const r = el.getBoundingClientRect()
+    if (r.width > 0) laidOut = true
     const distance = x < r.left ? r.left - x : x > r.right ? x - r.right : 0
     const index = Number(el.dataset["index"])
     if (!best || distance < best.distance) best = { index, distance }
   }
-  return best?.index ?? null
+  // No layout (jsdom): the browser's own caret placement stands.
+  return laidOut ? (best?.index ?? null) : null
 }
 
 function Input({

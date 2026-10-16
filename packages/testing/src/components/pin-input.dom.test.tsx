@@ -9,7 +9,8 @@ import { getPinInput } from "../index"
 const platform = domEnvironment().platform
 const inJsdom = navigator.userAgent.includes("jsdom")
 const pin = (name = "Verification code") => getPinInput(screen, { name }, { platform })
-const input = () => screen.getByRole("textbox") as HTMLInputElement
+const input = () =>
+  document.querySelector('[data-scope="pin-input"][data-part="input"]') as HTMLInputElement
 const slot = (i: number) =>
   document.querySelector(`[data-part="slot"][data-index="${i}"]`) as HTMLElement
 

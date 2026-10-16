@@ -13,7 +13,12 @@ export const pinInputInvariants: readonly Invariant<P, string>[] = [
     name: "pin-input-one-textbox",
     check: async ({ env }) => {
       const n = await env.find({ role: "textbox" }).count()
-      return n === 1 ? undefined : `${n} textboxes are rendered (exactly one expected)`
+      // A masked code is a password input, which has no role.
+      const masked = (await env.part("input").attr("type")) === "password"
+      const expected = masked ? 0 : 1
+      return n === expected && (await env.part("input").count()) === 1
+        ? undefined
+        : `${n} textboxes are rendered (exactly ${expected} expected, plus the one input)`
     },
   },
   {
@@ -61,7 +66,8 @@ export const pinInputInvariants: readonly Invariant<P, string>[] = [
 export const pinInputContract = contract("pin-input", {
   machine: pinInputMachine,
   anatomy: ["root", "label", "description", "error-message", "control", "input", "slot"],
-  locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "textbox", name }),
+  // By its label: a masked code is a password input, which has no role.
+  locate: ({ name }: { readonly name: string | RegExp }) => ({ label: name }),
   actions: {
     type: {
       pointer: async (env: E, text: string) => {
