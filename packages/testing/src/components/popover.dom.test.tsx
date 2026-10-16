@@ -29,7 +29,12 @@ afterEach(() => {
 
 const inert = (el: Element | null) => el?.closest("[inert]") != null
 const settle = () => act(async () => {})
-const frames = (ms = 80) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+/** Drains animation frames (and the microtasks between them) instead of waiting on the clock. */
+const frames = (count = 6) =>
+  act(async () => {
+    for (let i = 0; i < count; i++) await nextFrame()
+  })
 const active = () => document.activeElement
 
 interface FullProps extends Partial<PopoverRootProps> {
@@ -388,7 +393,7 @@ describe("Trigger toggles once per press", () => {
     await press(user, trigger("Beta"))
     await vi.waitFor(() => expect(queryPopover("Alpha")).toBeNull())
     await vi.waitFor(() => expect(queryPopover("Beta")).not.toBeNull())
-    await frames(150)
+    await frames()
     expect(queryPopover("Beta")).not.toBeNull()
     expect(a.mock.calls.map((c) => [c[0], c[1].reason])).toEqual([
       [true, "trigger"],
@@ -559,7 +564,7 @@ describe("Nesting", () => {
     await vi.waitFor(() => expect(queryPopover("Filters")).toBeNull())
     expect(onOpenChange).toHaveBeenCalledTimes(1)
     expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("outside-focus")
-    await frames(150)
+    await frames()
     expect(queryPopover("Shortcut dialog")).not.toBeNull()
   })
 
@@ -869,7 +874,7 @@ describe("Non-modal mode", () => {
     window.dispatchEvent(new Event("scroll"))
     document.dispatchEvent(new Event("scroll", { bubbles: true }))
     document.body.dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: 100 }))
-    await frames(150)
+    await frames()
     expect(queryPopover()).not.toBeNull()
     expect(trigger().getAttribute("aria-expanded")).toBe("true")
   })
@@ -902,7 +907,7 @@ describe("Non-modal mode", () => {
     const sub = await screen.findByLabelText("Sub field")
     await settle()
     act(() => sub.focus())
-    await frames(150)
+    await frames()
     expect(queryPopover("Panel")).not.toBeNull()
     expect(active()).toBe(sub)
   })
@@ -981,7 +986,7 @@ describe("Modal mode", () => {
     const user = userEvent.setup()
     render(<Modal close={false} />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     const messages = warn.mock.calls.map((c) => String(c[0]))
     expect(messages.some((m) => m.includes("popover") && m.includes("Popover.CloseTrigger"))).toBe(
       true,
@@ -993,7 +998,7 @@ describe("Modal mode", () => {
     const user = userEvent.setup()
     render(<Modal />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(warn.mock.calls.filter((c) => String(c[0]).includes("CloseTrigger"))).toEqual([])
   })
 
@@ -1025,7 +1030,7 @@ describe("Modal mode", () => {
       </div>,
     )
     await settle()
-    await frames(150)
+    await frames()
     const outer = queryPopover("Outer panel")
     const inner = queryPopover("Inner panel")
     expect(outer).not.toBeNull()
@@ -1084,7 +1089,7 @@ describe("Initial focus", () => {
     await user.tab()
     await user.keyboard("{Enter}")
     await vi.waitFor(() => expect(queryPopover()).not.toBeNull())
-    await frames(150)
+    await frames()
     expect(active()).toBe(trigger())
   })
 
@@ -1346,7 +1351,7 @@ describe("Accessible name and description", () => {
     )
     await press(user, trigger())
     await vi.waitFor(() => expect(queryPopover()).not.toBeNull())
-    await frames(150)
+    await frames()
     expect(popoverEl().hasAttribute("aria-labelledby")).toBe(false)
     expect(error.mock.calls.some((c) => String(c[0]).includes("no accessible name"))).toBe(true)
   })
@@ -1366,7 +1371,7 @@ describe("Accessible name and description", () => {
     )
     await press(user, trigger())
     await vi.waitFor(() => expect(queryPopover()).not.toBeNull())
-    await frames(150)
+    await frames()
     expect(error.mock.calls.filter((c) => String(c[0]).includes("accessible name"))).toEqual([])
   })
 })
@@ -1682,7 +1687,7 @@ describe("Non-modal tab order", () => {
       </Popover.Root>,
     )
     await settle()
-    await frames(150)
+    await frames()
     act(() => screen.getByRole("button", { name: "Inner last" }).focus())
     await user.tab()
     await vi.waitFor(() =>
@@ -1712,7 +1717,7 @@ describe("Non-modal tab order", () => {
     await act(async () => {
       expect(() => popoverEl().dispatchEvent(tab)).not.toThrow()
     })
-    await frames(100)
+    await frames()
     // Left to the browser: nothing moved focus and nothing was dismissed
     expect(tab.defaultPrevented).toBe(false)
     expect(active()).toBe(popoverEl())
@@ -2212,7 +2217,7 @@ describe("Portal host", () => {
       </div>,
     )
     await act(async () => trigger().click())
-    await act(async () => new Promise((r) => setTimeout(r, 50)))
+    await frames()
     const host = document.querySelector("[data-rind-portal]")
     expect(host?.getAttribute("data-rind-theme")).toBe("acme")
     expect(host?.getAttribute("dir")).toBe("rtl")

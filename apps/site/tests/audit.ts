@@ -54,6 +54,9 @@ const ignored: readonly RegExp[] = [
   // not use one within a few seconds. Harmless, and not fixable from the site.
   /was preloaded using link preload but not used within a few seconds/,
 ]
+// other component libraries, by name: case-sensitive, so plain words ("ark", "bits") pass
+const otherLibraries =
+  /\b(?:Radix|Reka|Bits UI|Bits'|Ark UI|Ark|Zag|React Aria|React Spectrum|Base UI|Headless UI|Melt UI|Kobalte|Ariakit|Reach UI|Chakra|MUI|shadcn|Mantine|PrimeReact)\b|\b(?:radix|ariakit|chakra-ui|react-aria|react-spectrum|ark-ui)\b/
 const findings: Finding[] = []
 const report = (url: string, kind: string, message: string) => {
   if (ignored.some((r) => r.test(message))) return
@@ -192,6 +195,12 @@ for (const url of urls) {
   try {
     await page.goto(base + url, { waitUntil: "networkidle" })
     await exercise(page, url)
+    // the site never names another component library (user rule): reword the doc if it does
+    const named = await page.evaluate(
+      (source) => document.body.innerText.match(new RegExp(source, "g")) ?? [],
+      otherLibraries.source,
+    )
+    for (const n of new Set(named)) report(url, "other-library", `names "${n}"`)
     // every link inside the site resolves to an exported file
     for (const href of await page.evaluate(() =>
       [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].map((a) => a.pathname),

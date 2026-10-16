@@ -201,7 +201,7 @@ describe("Tabs.Indicator in a real browser", () => {
     const ind = indicator() as HTMLElement
     expect(ind.hidden).toBe(true)
     expect(ind.getAttribute("data-state")).toBe("hidden")
-    await new Promise((r) => setTimeout(r, 100))
+    for (let i = 0; i < 6; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
     expect(ind.hidden).toBe(true)
     expect(ind.getAttribute("data-state")).toBe("hidden")
   })

@@ -3,11 +3,12 @@ import { afterEach, expect, it } from "vitest"
 import { installAnnouncementLog } from "./announcements"
 import { liveAnnouncements, spokenLog } from "./virtual-sr"
 
+// Frames, not elapsed time: the announcer writes its regions on the next frame.
 const frames = (n: number) =>
   new Promise<void>((resolve) => {
     let left = n
-    const tick = () => (--left <= 0 ? resolve() : setTimeout(tick, 20))
-    setTimeout(tick, 20)
+    const tick = () => (--left <= 0 ? resolve() : requestAnimationFrame(tick))
+    requestAnimationFrame(tick)
   })
 
 afterEach(() => {

@@ -63,7 +63,10 @@ async function renderThenErrors(ui: (errors?: readonly string[]) => ReactNode, e
   await act(async () => view.rerender(ui(errors)))
   return view
 }
-const nextTick = (ms = 30) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const nextTick = () =>
+  act(async () => {
+    for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  })
 
 /** The composition test's control driver: a tiny stand-in until Text Field has its own. */
 function getTextboxDriver(target: Target, anchor: { readonly name: string }) {

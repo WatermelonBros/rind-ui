@@ -22,7 +22,10 @@ function make() {
   return { service, calls, state }
 }
 
-const flush = () => new Promise<void>((r) => setTimeout(r, 0))
+// Drain microtasks: the machine settles through promise callbacks only.
+const flush = async () => {
+  for (let i = 0; i < 10; i++) await Promise.resolve()
+}
 
 describe("presence machine", () => {
   it("starts absent and OPEN makes it present", () => {
