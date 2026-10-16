@@ -7,6 +7,12 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
+| add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
+| add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |
+| add-pagination (r1) | — | packages/testing/fixtures/pagination/pagination.pw.test.ts | Middle-click-opens-new-tab skipped on WebKit (headless WebKit follows it in the same tab even on a bare `<a>`) |
+| add-pagination (r1) | — | packages/testing/src/components/pagination.model.dom.test.tsx | No model class with `disabled` + `getPageHref` (disabled link triggers) |
+| add-breadcrumbs (r1) | — | packages/core/src/components/breadcrumbs/breadcrumbs.test.ts | Development warnings tested only on the positive path (no "does not warn" cases) |
 | add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | One Root context: every Item re-renders on a trail change (task 3.1 asks for per-part selectors) |
 | add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | Static Items register at commit: the server HTML has no `aria-current` (design §6 covers collapse; the `items` form has both) |
 | add-breadcrumbs (impl) | — | packages/core/src/components/breadcrumbs/breadcrumbs.contract.ts | No Menu yet: `openCollapsed`/`followCollapsed` work with a Popover; extra Ellipsis `data-label` locates the trigger |

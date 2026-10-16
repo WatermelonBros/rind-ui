@@ -111,6 +111,8 @@ model("20 pages, middle", 20, { defaultPage: 10 })
 model("20 pages, links", 20, { defaultPage: 10 }, { getPageHref: (p) => `#page-${p}` })
 model("disabled", 5, { defaultPage: 3, disabled: true })
 model("focusableWhenDisabled false", 5, {}, { focusableWhenDisabled: false })
+// Count-based: no totalPages, so the $props:count step (count 11 → 2 pages) clamps page 10.
+model("count, 95 items", 10, { totalPages: undefined, count: 95, defaultPage: 10 })
 
 describe("a broken wrapper fails readably", () => {
   it("dropping aria-current from page buttons fails the current-page invariant", {

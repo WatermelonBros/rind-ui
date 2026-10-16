@@ -5,7 +5,7 @@
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
 import type { PaginationDirection } from "./pagination.connect"
-import { paginationMachine } from "./pagination.machine"
+import { type PaginationMachineProps, paginationMachine, totalPagesOf } from "./pagination.machine"
 import { paginationRange } from "./pagination.range"
 
 type P = "root" | "list" | "item" | "page" | "ellipsis" | "first" | "previous" | "next" | "last"
@@ -60,7 +60,8 @@ export const paginationInvariants: readonly Invariant<P, string>[] = [
         if ((await el.attr("aria-current")) !== null)
           marked.push((await el.attr("data-part")) ?? "?")
       }
-      const total = Number(props["totalPages"] ?? paginationArgs.current.totalPages)
+      // The oracle's props and page size: totalPages, or count / pageSize.
+      const total = totalPagesOf(props as PaginationMachineProps, Number(values["pageSize"] ?? 10))
       const expected = Math.min(Math.max(1, Number(values["page"] ?? 1)), Math.max(1, total))
       if (marked.length !== 1 || marked[0] !== "page") {
         return `expected one page part with aria-current, found ${marked.length} (${marked.join(", ")})`
@@ -74,7 +75,8 @@ export const paginationInvariants: readonly Invariant<P, string>[] = [
   {
     name: "pagination-range-matches-oracle",
     check: async ({ env, values, props }) => {
-      const total = Number(props["totalPages"] ?? paginationArgs.current.totalPages)
+      // The oracle's props and page size: totalPages, or count / pageSize.
+      const total = totalPagesOf(props as PaginationMachineProps, Number(values["pageSize"] ?? 10))
       const expected = paginationRange({
         page: Number(values["page"] ?? 1),
         totalPages: total,

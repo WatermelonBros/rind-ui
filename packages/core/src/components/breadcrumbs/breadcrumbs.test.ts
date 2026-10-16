@@ -32,40 +32,51 @@ describe("deriveTrail: current item", () => {
 })
 
 describe("deriveTrail: collapse table (react-spectrum#2923)", () => {
-  // Reference: the items between `before` and `n - after`, cut at the current item, kept only
-  // when at least two would be hidden and the trail is longer than maxItems.
-  const expected = (n: number, max: number, before: number, after: number, current: number) => {
-    if (n <= max || n - before - after < 2) return []
-    const out: string[] = []
-    for (let i = before; i < n - after; i++) {
-      if (i === current) break
-      out.push(`k${i}`)
-    }
-    return out.length >= 2 ? out : []
-  }
-  for (let n = 0; n <= 8; n++) {
-    for (const max of [1, 2, 3, 4, 6]) {
-      for (const [before, after] of [
-        [1, 1],
-        [0, 1],
-        [2, 1],
-        [1, 2],
-      ] as const) {
-        for (const current of [n - 1, Math.floor(n / 2)]) {
-          it(`n=${n} max=${max} before=${before} after=${after} current=${current}`, () => {
-            const items = trail(n, current >= 0 ? { [current]: { current: true } } : {})
-            const t = deriveTrail({
-              items,
-              maxItems: max,
-              itemsBeforeCollapse: before,
-              itemsAfterCollapse: after,
-            })
-            expect(t.collapsed).toEqual(expected(n, max, before, after, current))
-            if (current >= 0) expect(t.collapsed).not.toContain(`k${current}`)
-          })
-        }
-      }
-    }
+  // Written by hand from the spec rule: past `maxItems`, the items between the first
+  // `before` and the last `after` collapse, except the current one, and only when at least
+  // two would be hidden. `current`: an explicit current index, else the last item.
+  const cases: readonly {
+    readonly n: number
+    readonly max: number
+    readonly before?: number
+    readonly after?: number
+    readonly current?: number
+    readonly lastNotCurrent?: boolean
+    readonly expected: readonly string[]
+  }[] = [
+    { n: 0, max: 2, expected: [] },
+    { n: 1, max: 0, expected: [] },
+    { n: 2, max: 1, expected: [] },
+    { n: 3, max: 1, expected: [] },
+    { n: 3, max: 2, expected: [] },
+    { n: 4, max: 2, expected: ["k1", "k2"] },
+    { n: 4, max: 4, expected: [] },
+    { n: 5, max: 4, expected: ["k1", "k2", "k3"] },
+    { n: 6, max: 4, expected: ["k1", "k2", "k3", "k4"] },
+    { n: 8, max: 5, current: 4, expected: ["k1", "k2", "k3", "k5", "k6"] },
+    { n: 8, max: 5, current: 1, expected: ["k2", "k3", "k4", "k5", "k6"] },
+    { n: 6, max: 3, current: 3, expected: ["k1", "k2", "k4"] },
+    { n: 4, max: 2, current: 1, expected: [] },
+    { n: 5, max: 3, before: 0, after: 1, expected: ["k0", "k1", "k2", "k3"] },
+    { n: 6, max: 4, before: 2, after: 1, expected: ["k2", "k3", "k4"] },
+    { n: 6, max: 4, before: 1, after: 2, expected: ["k1", "k2", "k3"] },
+    { n: 5, max: 4, before: 2, after: 2, expected: [] },
+    { n: 5, max: 3, lastNotCurrent: true, expected: ["k1", "k2", "k3"] },
+  ]
+  for (const c of cases) {
+    it(`n=${c.n} max=${c.max} before=${c.before ?? 1} after=${c.after ?? 1} current=${c.current ?? "last"}`, () => {
+      const items = trail(c.n, {
+        ...(c.current === undefined ? {} : { [c.current]: { current: true } }),
+        ...(c.lastNotCurrent ? { [c.n - 1]: { current: false } } : {}),
+      })
+      const t = deriveTrail({
+        items,
+        maxItems: c.max,
+        ...(c.before === undefined ? {} : { itemsBeforeCollapse: c.before }),
+        ...(c.after === undefined ? {} : { itemsAfterCollapse: c.after }),
+      })
+      expect(t.collapsed).toEqual(c.expected)
+    })
   }
 
   it("six items, maxItems 4: items 2–5 collapse", () => {

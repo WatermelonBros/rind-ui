@@ -41,7 +41,7 @@ export interface BreadcrumbsTrail {
 /**
  * The current key and the collapsed range (design §2). Current: the first `current: true`,
  * else the last item unless it says `current: false`. Collapse: the items between the first
- * `itemsBeforeCollapse` and the last `itemsAfterCollapse`, only past `maxItems`, never the
+ * `itemsBeforeCollapse` and the last `itemsAfterCollapse`, only past `maxItems`, except the
  * current item, and only when at least two items would be hidden.
  */
 export function deriveTrail(input: BreadcrumbsTrailInput): BreadcrumbsTrail {
@@ -56,8 +56,8 @@ export function deriveTrail(input: BreadcrumbsTrailInput): BreadcrumbsTrail {
   if (maxItems !== undefined && n > maxItems && n - before - after >= 2) {
     for (let i = before; i < n - after; i++) {
       const key = items[i]?.key
-      // The range ends before the current item: it is never collapsed.
-      if (key === undefined || key === currentKey) break
+      // The current item is never collapsed: it stays visible inside the range.
+      if (key === undefined || key === currentKey) continue
       collapsed.push(key)
     }
     if (collapsed.length < 2) collapsed = []

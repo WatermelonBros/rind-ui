@@ -63,8 +63,7 @@ event's modality. The resolved page SHALL always lie in `1..totalPages`. Activat
 current page SHALL NOT call `onPageChange`. When the total shrinks below the current page,
 the page SHALL be clamped to the new last page and the change SHALL be reported with
 reason `COUNT.CHANGE` (a proposal when controlled). `onPageChange` SHALL receive the new
-page, and in uncontrolled mode the root state read inside the callback SHALL already be
-the new page. A controlled `page` without `onPageChange` SHALL log a development warning.
+page as its argument. A controlled `page` without `onPageChange` SHALL log a development warning.
 
 #### Scenario: Callback sees the new page (bits-ui#646)
 

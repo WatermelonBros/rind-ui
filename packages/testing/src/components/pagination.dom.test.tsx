@@ -129,10 +129,12 @@ describe("Pagination", () => {
   })
 
   it("controlled refusal: the parent keeps the page", async () => {
-    render(<Pager totalPages={5} page={2} onPageChange={() => {}} />)
-    await driver()
-      .next()
-      .catch(() => {})
+    const onPageChange = vi.fn()
+    render(<Pager totalPages={5} page={2} onPageChange={onPageChange} />)
+    // A plain click: the driver's postcondition (page 3) does not hold when the parent refuses.
+    await act(async () => control("Next page").click())
+    expect(onPageChange).toHaveBeenCalledTimes(1)
+    expect(onPageChange.mock.calls[0]?.[0]).toBe(3)
     expect(control("Page 2").getAttribute("aria-current")).toBe("page")
   })
 
