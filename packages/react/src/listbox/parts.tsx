@@ -128,7 +128,22 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
         )
       }
     }, [host.name, value])
-    const props = mergeProps({ ...normalizeProps(host.parts.item(key)), ref }, rest)
+    const own = host.parts.item(key)
+    // Virtualized: the highlighted item mounts after the scroll. Focus left on the list, or
+    // dropped to the body when the previous item unmounted, moves to it while the list is
+    // the focused composite.
+    const highlighted = own["data-highlighted"] !== undefined
+    const listFocused = host.parts.list()["data-focus"] !== undefined
+    useIsoLayoutEffect(() => {
+      const node = ref.current
+      const doc = node?.ownerDocument
+      const active = doc?.activeElement
+      const onList = active?.getAttribute("role") === "listbox" && active.contains(node ?? null)
+      const dropped = active === doc?.body || active === null
+      if (highlighted && listFocused && node && (onList || dropped))
+        node.focus({ preventScroll: true })
+    }, [highlighted])
+    const props = mergeProps({ ...normalizeProps(own), ref }, rest)
     return (
       <ItemCtx value={key}>{renderPart("div", { ...props, children }, render, undefined)}</ItemCtx>
     )

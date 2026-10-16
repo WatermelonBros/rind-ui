@@ -4,7 +4,7 @@ import { Dialog, Listbox, type ListboxRootProps } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getDialog, getListbox, installAnnouncementLog } from "../index"
+import { getListbox, installAnnouncementLog } from "../index"
 
 const platform = domEnvironment().platform
 const lb = (name = "Fruit") => getListbox(screen, { name }, { platform })
@@ -225,12 +225,13 @@ describe("Listbox", () => {
   })
 
   it("Escape is not handled: an enclosing dialog closes, selection unchanged", async () => {
+    const onValueChange = vi.fn()
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Positioner style={{ position: "fixed", inset: 0 }}>
           <Dialog.Content>
             <Dialog.Title>Pick</Dialog.Title>
-            <Fruit defaultValue="b" />
+            <Fruit defaultValue="b" onValueChange={onValueChange} />
           </Dialog.Content>
         </Dialog.Positioner>
       </Dialog.Root>,
@@ -238,17 +239,72 @@ describe("Listbox", () => {
     await lb().focusIn()
     act(() => {
       document.activeElement?.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }),
       )
     })
     await waitFor(() => expect(screen.queryByRole("dialog")).toBe(null))
-    void getDialog
+    expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  it("Disabled listbox is skipped by Tab and marks every part", () => {
-    render(<Fruit disabled />)
+  it("the listbox itself never prevents Escape", async () => {
+    render(<Fruit defaultValue="b" />)
+    await lb().focusIn()
+    const e = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true })
+    act(() => {
+      document.activeElement?.dispatchEvent(e)
+    })
+    expect(e.defaultPrevented).toBe(false)
+    expect(await lb().selected()).toEqual(["b"])
+  })
+
+  it("Disabled listbox is skipped by Tab (react-spectrum#5837) and marks every part", async () => {
+    render(
+      <>
+        <button type="button">Before</button>
+        <Fruit disabled />
+      </>,
+    )
     expect(screen.getAllByRole("option").every((o) => o.tabIndex < 0)).toBe(true)
     expect(screen.getByRole("listbox").hasAttribute("data-disabled")).toBe(true)
+    const { userEvent } = await import("@testing-library/user-event")
+    const user = userEvent.setup()
+    act(() => screen.getByRole("button", { name: "Before" }).focus())
+    await user.tab()
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "After" }))
+  })
+
+  it("Removing the focused option (headlessui#3856)", async () => {
+    const { rerender } = render(<Fruit keys={["a", "b", "c"]} />)
+    await lb().focusIn()
+    await lb().next()
+    expect(document.activeElement).toBe(option("b"))
+    rerender(<Fruit keys={["a", "c"]} />)
+    await waitFor(() => expect(document.activeElement).toBe(option("c")))
+    await lb().next()
+    expect(document.activeElement).toBe(option("c"))
+  })
+
+  it("a click on a disabled option in none mode does not act", async () => {
+    const onAction = vi.fn()
+    render(
+      <Listbox.Root selectionMode="none" onAction={onAction}>
+        <Listbox.List aria-label="Results">
+          <Listbox.Item value="a">a</Listbox.Item>
+          <Listbox.Item value="b" disabled>
+            b
+          </Listbox.Item>
+        </Listbox.List>
+      </Listbox.Root>,
+    )
+    await getListbox(screen, { name: "Results" }, { platform }).focusIn()
+    act(() => option("b").click())
+    expect(onAction).not.toHaveBeenCalled()
+    expect(option("b").getAttribute("aria-disabled")).toBe("true")
+  })
+
+  it("vertical is the default: no aria-orientation", () => {
+    render(<Fruit />)
+    expect(screen.getByRole("listbox").hasAttribute("aria-orientation")).toBe(false)
   })
 
   it("Horizontal attributes and keys", async () => {
