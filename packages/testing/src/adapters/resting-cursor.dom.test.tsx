@@ -20,7 +20,7 @@ it.skipIf(navigator.userAgent.includes("jsdom"))(
     const log = installErrorLog()
     log.splice(0)
     render(ui())
-    await new Promise((r) => setTimeout(r, 300))
+    for (let i = 0; i < 8; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
     expect(log).toEqual([])
   },
 )

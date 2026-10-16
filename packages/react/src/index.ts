@@ -22,6 +22,7 @@ export { composeRefs, mergeProps, type RindEventExtension, stripMarker } from ".
 export { normalizeProps } from "./normalize-props"
 export * from "./number-input"
 export * from "./pagination"
+export * from "./password-input"
 export * from "./popover"
 export { Portal, type PortalProps } from "./portal"
 export {
@@ -37,6 +38,7 @@ export {
 } from "./provider"
 export * from "./radio-group"
 export { type RenderProp, renderPart } from "./render"
+export * from "./search-field"
 export * from "./segmented-control"
 export * from "./separator"
 export * from "./skeleton"

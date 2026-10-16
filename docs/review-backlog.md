@@ -17,6 +17,11 @@ See CLAUDE.md "Review rules".
 | add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | Static Items register at commit: the server HTML has no `aria-current` (design §6 covers collapse; the `items` form has both) |
 | add-breadcrumbs (impl) | — | packages/core/src/components/breadcrumbs/breadcrumbs.contract.ts | No Menu yet: `openCollapsed`/`followCollapsed` work with a Popover; extra Ellipsis `data-label` locates the trigger |
 | add-pagination (impl) | — | packages/core/src/components/pagination/pagination.contract.ts | `focused()` became `isFocused(control)`: the runner reads every no-argument query after each step and a focus query trips its focus-does-not-commit check |
+| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
+| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:175 | The pointer-clear path should assert focus stays in the input and the change is reported once |
+| add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
+| add-search-field (impl) | — | packages/testing/src/components/search-field.broken.dom.test.tsx | Broken variant "clear bypassing validation (react-spectrum#7265)" not modelled: no invariant observes a stale Field error yet; the scenario test "Clear re-validates" covers the correct path |
+| add-password-input (impl) | — | packages/core/src/components/field (submit on an invalid Field) | A pointer submit of a natively invalid Field focuses the control with `data-focus-visible` (seen in the password model; that config uses `validationBehavior="aria"`) |
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |
 | add-badge (r1) | — | packages/react/src/badge/badge.tsx | The post-mount host check's layout effect has no deps and re-warns on every render; dedupe by key (host + message) |
@@ -152,6 +157,9 @@ See CLAUDE.md "Review rules".
 | add-a11y-foundations (r1) | — | packages/testing/src/broken.dom.test.tsx:157 | No broken fixture for "no ring after arrow" or "double speech on Windows"; the Tab fixture fails pointer runs for the wrong reason (hidden by `some(...)`); RA#9737 fixture doesn't prove Chromium-only; ring contrast checked only against backgrounds |
 | add-tooltip (r1) | — | packages/react/src/tooltip/tooltip.tsx (Trigger) | the render element's own `aria-describedby` / `aria-labelledby` (set on the element passed to `render`) are not merged with the tooltip's reference; only the Trigger's props are |
 | add-tooltip (r1) | — | packages/testing/src/invariants.ts (`layer`) | the "focus already on body before the step" exemption also hides a Dialog/Popover that leaves focus on body after opening from body; scope it to contracts that declare a layer that never takes focus |
+| test-stability (r1) | — | packages/testing/src/components/text-field.dom.test.tsx:325 | the IME debounce test no longer goes through the driver |
+| test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
+| test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
 
 ## Manual AT protocol
 
@@ -159,6 +167,8 @@ Passes that need real assistive technology or devices; automated tests cannot st
 
 | Change | Task | What to check |
 |---|---|---|
+| add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 
 ## Resolved

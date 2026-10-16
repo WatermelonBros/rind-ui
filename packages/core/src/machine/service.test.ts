@@ -16,8 +16,10 @@ interface Props {
 
 /** A scheduler that resolves `setTimeout` on globalThis at call time, like domEnvironment. */
 const scheduler: Scheduler = {
+  // fake-time: the fake scheduler under test (vi.useFakeTimers)
   setTimeout: (fn, ms) => globalThis.setTimeout(fn, ms),
   clearTimeout: (h) => globalThis.clearTimeout(h as number),
+  // fake-time: the fake scheduler under test (vi.useFakeTimers)
   requestAnimationFrame: (fn) => globalThis.setTimeout(fn, 16),
   cancelAnimationFrame: (h) => globalThis.clearTimeout(h as number),
 }

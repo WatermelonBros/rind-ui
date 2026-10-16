@@ -118,8 +118,10 @@ function make(opts: Make = {}) {
       cancel: () => {},
     },
     scheduler: {
+      // fake-time: the fake scheduler under test (vi.useFakeTimers)
       setTimeout: (cb: () => void, ms: number) => setTimeout(cb, ms),
       clearTimeout: (h: unknown) => clearTimeout(h as ReturnType<typeof setTimeout>),
+      // fake-time: the fake scheduler under test (vi.useFakeTimers)
       requestAnimationFrame: (cb: () => void) => setTimeout(cb, 16),
       cancelAnimationFrame: (h: unknown) => clearTimeout(h as ReturnType<typeof setTimeout>),
     },

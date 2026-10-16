@@ -3,11 +3,14 @@
 // invariants, the tooltip's own (closed content hidden and referenced, never focused) and
 // the timed invariant (no delay hides it while hovered or focused).
 import { tooltipContract } from "@rind-ui/core"
-import { Tooltip, type TooltipRootProps } from "@rind-ui/react"
+import { RindProvider, Tooltip, type TooltipRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { describe, it } from "vitest"
-import { testMachine } from "../index"
+import { testMachine, virtualClock } from "../index"
+
+// The delays run on a virtual clock: the runner advances it, no real time passes.
+const clock = virtualClock()
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -18,20 +21,22 @@ const a11y = async () => {
 
 function Example(props: Partial<TooltipRootProps>) {
   return (
-    <div id="app">
-      <button type="button">Before</button>
-      <Tooltip.Root openDelay={200} closeDelay={100} {...props}>
-        <Tooltip.Trigger>Delete</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Positioner>
-            <Tooltip.Content>
-              <Tooltip.Arrow />
-              Delete permanently
-            </Tooltip.Content>
-          </Tooltip.Positioner>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </div>
+    <RindProvider environment={{ scheduler: clock.scheduler }}>
+      <div id="app">
+        <button type="button">Before</button>
+        <Tooltip.Root openDelay={200} closeDelay={100} {...props}>
+          <Tooltip.Trigger>Delete</Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Positioner>
+              <Tooltip.Content>
+                <Tooltip.Arrow />
+                Delete permanently
+              </Tooltip.Content>
+            </Tooltip.Positioner>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </div>
+    </RindProvider>
   )
 }
 
@@ -52,6 +57,7 @@ describe("tooltip model", () => {
       skipDelay: undefined,
     } as never,
     modalities: ["pointer", "keyboard", "touch", "virtual"],
+    clock,
     a11y,
   })
 })

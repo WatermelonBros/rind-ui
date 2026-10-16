@@ -18,6 +18,7 @@ function Slow() {
         {...A}
         data-part="trigger"
         aria-expanded={open}
+        // fake-time: the component's deferred update under test; the driver polls for it
         onClick={() => setTimeout(() => setOpen(!open), 60)}
       >
         Details

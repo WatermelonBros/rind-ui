@@ -5,7 +5,6 @@ import { contentSize } from "./content-size"
 
 const H = "--x-content-height"
 const W = "--x-content-width"
-const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 function box(height: number, width = 100) {
   const d = document.createElement("div")
@@ -184,7 +183,8 @@ describe("content-size switched()", () => {
     cs.opened({ instant: true })
     el.append(incoming(320))
     cs.switched()
-    await wait(300)
+    // Mid-flight = the transition has visibly started; poll the condition, not a clock.
+    await expect.poll(() => rendered(el)).toBeGreaterThan(200)
     const mid = rendered(el)
     expect(mid).toBeGreaterThan(200)
     expect(mid).toBeLessThan(320)
