@@ -16,6 +16,7 @@
 @import "./scroll-area.css";
 @import "./skeleton.css";
 @import "./badge.css";
+@import "./breadcrumbs.css";
 @import "./avatar.css";
 @import "./toolbar.css";
 @import "./dialog.css";
@@ -25,3 +26,4 @@
 @import "./password-input.css";
 @import "./search-field.css";
 @import "./tooltip.css";
+@import "./pagination.css";

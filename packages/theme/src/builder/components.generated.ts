@@ -45,6 +45,14 @@ export type ComponentTokens = {
     | "paddingInline"
     | "radius"
     | "text"
+  readonly breadcrumbs:
+    | "color"
+    | "currentColor"
+    | "currentWeight"
+    | "gap"
+    | "minTarget"
+    | "separatorColor"
+    | "separatorSize"
   readonly button:
     | "disabledBg"
     | "disabledBorder"
@@ -215,6 +223,13 @@ export type ComponentTokens = {
     | "triggerColor"
     | "triggerPressedBg"
     | "triggerSize"
+  readonly pagination:
+    | "currentBg"
+    | "currentFg"
+    | "ellipsisFg"
+    | "gap"
+    | "itemMinSize"
+    | "itemRadius"
   readonly "password-input":
     | "bg"
     | "border"
