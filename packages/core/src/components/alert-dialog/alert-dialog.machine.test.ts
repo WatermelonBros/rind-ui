@@ -239,7 +239,8 @@ describe("initialFocus", () => {
   const contentWith = (cancel: object | null) => ({
     id: "alert-dialog-r-content",
     getAttribute: () => null,
-    querySelector: (sel: string) => (sel === '[data-part="cancel"]' ? cancel : null),
+    // The machine asks for an enabled Cancel (disabled ones cannot take focus).
+    querySelector: (sel: string) => (sel.startsWith('[data-part="cancel"]') ? cancel : null),
   })
   const envWith = (content: () => unknown) => ({
     ...quietEnv,
