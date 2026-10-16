@@ -83,7 +83,10 @@ the element it is heading to (the content, or the trigger). While the pointer st
 inside the polygon the layer SHALL stay open; entering the target SHALL remove the
 grace area; leaving the polygon SHALL count as leaving the hover zone. The grace
 area SHALL NOT be the hull of both rectangles, so a wide content box does not keep
-the layer open while the pointer moves to neighbouring elements.
+the layer open while the pointer moves to neighbouring elements. The exit side is
+the side nearest the exit point; when that side does not face the target, a side
+that does face it SHALL count instead if the pointer's last movement heads towards
+that side (a pointer leaving near a corner, towards a flipped submenu).
 
 #### Scenario: Gap between trigger and content
 
@@ -98,6 +101,14 @@ the layer open while the pointer moves to neighbouring elements.
   the trigger horizontally towards a neighbouring link
 - **THEN** the pointer is outside the grace area and the card starts closing
   (regression: reka-ui#2203)
+
+#### Scenario: Out near a corner towards a flipped submenu
+
+- **WHEN** a submenu is placed on the left of its full-width trigger and the pointer
+  moves down-left from the trigger, leaving it through the bottom edge a few pixels
+  from the corner
+- **THEN** a grace area towards the submenu is created and the submenu stays open
+  (regression: radix#4036)
 
 ### Requirement: Placed Target And Rest Timeout
 
