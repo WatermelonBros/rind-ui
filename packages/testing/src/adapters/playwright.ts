@@ -394,6 +394,26 @@ function createPlaywrightEnv(
           : [box.x + box.width / 2, box.y + box.height / 2]
         await page.mouse.click(x, y)
       },
+      async contextMenu(options) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        if (!box) throw new Error("contextMenu: the part has no box")
+        const position = {
+          x: box.width * (options?.at?.x ?? 0.5),
+          y: box.height * (options?.at?.y ?? 0.5),
+        }
+        if (modality === "virtual") {
+          // Assistive technology's "shortcut menu": the event alone, no press.
+          await l.dispatchEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            clientX: box.x + position.x,
+            clientY: box.y + position.y,
+          })
+          return
+        }
+        await l.click({ button: "right", position })
+      },
       box: async () => {
         const box = await (await now()).boundingBox()
         return box && (box.width > 0 || box.height > 0) ? box : null

@@ -495,6 +495,38 @@ function createDomEnv(
           )
         } else await act(() => u.click(hit))
       },
+      async contextMenu(options) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const fx = options?.at?.x ?? 0.5
+        const fy = options?.at?.y ?? 0.5
+        const clientX = rect.left + rect.width * fx
+        const clientY = rect.top + rect.height * fy
+        const hit = (rect.width > 0 ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const init = { bubbles: true, cancelable: true, composed: true, clientX, clientY }
+        await act(async () => {
+          if (modality !== "virtual") {
+            // A real mouse press (pressure, detail): not the 1×1 AT click it would look like.
+            const button = {
+              ...init,
+              button: 2,
+              buttons: 2,
+              pointerId: 1,
+              pointerType: "mouse",
+              pressure: 0.5,
+              detail: 1,
+            }
+            hit.dispatchEvent(new PointerEvent("pointerdown", button))
+            hit.dispatchEvent(new MouseEvent("mousedown", button))
+            hit.dispatchEvent(new PointerEvent("pointerup", { ...button, buttons: 0 }))
+            hit.dispatchEvent(new MouseEvent("mouseup", { ...button, buttons: 0 }))
+          }
+          // A PointerEvent, as browsers dispatch it (ariakit#7162).
+          hit.dispatchEvent(
+            new PointerEvent("contextmenu", { ...init, button: 2, pointerType: "mouse" }),
+          )
+        })
+      },
       box: async () => {
         const r = (await now()).getBoundingClientRect()
         // jsdom has no layout: every box is 0 × 0.

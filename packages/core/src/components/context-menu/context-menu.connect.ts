@@ -36,7 +36,10 @@ export function contextMenuRegionProps(
   env: ContextMenuConnectEnv,
 ): PartProps {
   return {
-    ...scopeAttrs("context-menu", "trigger", input.instance),
+    // The menu's own scope (one instance, one scope for the driver and the theme); the
+    // attribute says it is a region, not a button.
+    ...scopeAttrs("menu", "trigger", input.instance),
+    "data-context-menu": "",
     "aria-describedby": input.hintId,
     "data-state": input.open ? "open" : "closed",
     "data-disabled": dataFlag(input.disabled),
