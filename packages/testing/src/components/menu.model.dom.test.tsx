@@ -1,5 +1,5 @@
 // Model-based tests (task 5.3): the Menu contract over every transition of a root level in
-// pointer, touch, keyboard and virtual, for modal, non-modal and `loop: false`, with the
+// pointer, touch, keyboard and virtual, ltr and rtl, for modal, non-modal and `loop: false`, with the
 // layer, restores-focus, presence, anchored and (modal) modal invariants and axe per state.
 // Submenu levels are covered by the submenu DOM and browser tests.
 import { createListCollection, menuArgs, menuContract, nonModalMenuContract } from "@rind-ui/core"
@@ -77,6 +77,7 @@ for (const c of classes) {
         getTrigger: () => null,
       } as never,
       modalities: ["pointer", "keyboard", "touch", "virtual"],
+      directions: ["ltr", "rtl"],
       a11y,
     })
   })

@@ -6,7 +6,7 @@
 import { Menu, RindProvider } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import type { ReactNode } from "react"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { getMenu, virtualClock } from "../index"
 
 let clock = virtualClock()
@@ -243,5 +243,97 @@ describe("Menu: pointer highlight", () => {
     sweep(center(search), center(item("Close")))
     await waitFor(() => expect(item("Close").hasAttribute("data-highlighted")).toBe(true))
     expect(document.activeElement).toBe(search)
+  })
+})
+
+describe("Menu: opening press", () => {
+  it("Content placed over the trigger: a click opens it and activates nothing (radix#610, react-spectrum#5350)", async () => {
+    const onSelect = vi.fn()
+    render(
+      <RindProvider environment={{ scheduler: clock.scheduler }}>
+        <Menu.Root>
+          <Menu.Trigger>Over</Menu.Trigger>
+          <Menu.Portal>
+            {/* Placed over its trigger: the opening release lands on the first item. */}
+            <Menu.Positioner positioning={{ side: "top", sideOffset: -24 }}>
+              <Menu.Content style={{ display: "grid", width: 160 }}>
+                <Menu.Item style={{ height: 40 }} onSelect={onSelect}>
+                  First
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </RindProvider>,
+    )
+    const m = getMenu(screen, { name: "Over" }).via("pointer")
+    await m.open()
+    await act(async () => {})
+    expect(await m.isOpen()).toBe(true)
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it("Extended tap area: a click on the trigger's absolutely positioned child opens it (mui/base-ui#3184)", async () => {
+    render(
+      <RindProvider environment={{ scheduler: clock.scheduler }}>
+        <div style={{ padding: 40 }}>
+          <Menu.Root>
+            <Menu.Trigger style={{ position: "relative" }}>
+              More
+              <span data-testid="tap" style={{ position: "absolute", inset: -12 }} />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item>One</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+        </div>
+      </RindProvider>,
+    )
+    const { userEvent } = await import("@testing-library/user-event")
+    await userEvent.click(screen.getByTestId("tap"))
+    await waitFor(() => expect(screen.getByRole("menu")).toBeTruthy())
+    await act(async () => {})
+    expect(screen.getByRole("button", { name: "More" }).getAttribute("aria-expanded")).toBe("true")
+  })
+})
+
+describe("Menu: typeahead and scrolling", () => {
+  it("Typeahead to an off-screen item keeps the match highlighted under a resting pointer (zag#3255)", async () => {
+    const labels = Array.from({ length: 30 }, (_, i) => `Item ${String(i).padStart(2, "0")}`)
+    render(
+      <RindProvider environment={{ scheduler: clock.scheduler }}>
+        <Menu.Root>
+          <Menu.Trigger>Long</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content
+                style={{ display: "grid", maxHeight: 120, overflow: "auto", width: 160 }}
+              >
+                {labels.map((l) => (
+                  <Menu.Item key={l} style={{ height: 24 }}>
+                    {l}
+                  </Menu.Item>
+                ))}
+                <Menu.Item style={{ height: 24 }}>Zebra</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </RindProvider>,
+    )
+    await getMenu(screen, { name: "Long" }).via("keyboard").open()
+    // The pointer rests over the list; then a typeahead scrolls "Zebra" into view.
+    move(...center(item("Item 01")))
+    const { userEvent } = await import("@testing-library/user-event")
+    await userEvent.keyboard("z")
+    await waitFor(() => expect(item("Zebra").hasAttribute("data-highlighted")).toBe(true))
+    // The scroll slid another item under the resting pointer: a zero-delta move is no move.
+    move(...center(item("Item 01")))
+    await act(async () => {})
+    expect(item("Zebra").hasAttribute("data-highlighted")).toBe(true)
   })
 })

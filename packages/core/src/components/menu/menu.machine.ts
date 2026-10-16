@@ -524,6 +524,9 @@ export const menuMachine = setup({
                 loop: false,
                 navigable: navigableWhen(a.props.focusableWhenDisabled === true),
               })
+          // The highlight is the machine's own, not left to the item's focus event: a key
+          // pressed before that event arrives navigates from the right item.
+          if (key !== null) send({ type: "HIGHLIGHT", key, source: "keyboard" })
           const pick = () => (key === null ? el : byId(ids.item(key)))
           cancelFocus = focusInitial(env, el, pick, openModality ?? undefined, focusAtOpen)
         },

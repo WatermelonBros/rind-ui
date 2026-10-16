@@ -39,10 +39,11 @@ a link item. Content SHALL work the same inline or inside the shared `Portal` pa
 ### Requirement: Open State And Reasons
 
 The root menu's open state SHALL be a controllable value (`open`, `defaultOpen`,
-`onOpenChange`), closed by default. Every change SHALL carry one of these reasons:
-`TRIGGER_PRESS`, `TRIGGER_KEY` (Enter, Space, ArrowDown or ArrowUp on the trigger),
-`ITEM_SELECT`, `ESCAPE_KEY`, `TAB_KEY`, `OUTSIDE_PRESS`, `OUTSIDE_FOCUS`,
-`WINDOW_BLUR`, `PARENT_DISMISSED`, `OPEN` or `CLOSE` (programmatic). Controlled menus
+`onOpenChange`), closed by default. Every change SHALL carry one of these reasons
+(`details.reason`, kebab case like every other layer): `trigger` (a press on the
+trigger, Enter or Space included), `trigger-key` (ArrowDown or ArrowUp on the
+trigger), `item-select`, `escape-key`, `tab-key`, `outside-press`, `outside-focus`,
+`window-blur`, `parent-dismissed` or `api` (programmatic). Controlled menus
 SHALL only propose changes. Submenu open state SHALL NOT be controllable; it is owned
 by the menu tree.
 
@@ -50,11 +51,11 @@ by the menu tree.
 
 - **WHEN** a controlled open menu's item is activated
 - **THEN** `onOpenChange(false, details)` is called once with `details.reason ===
-  "ITEM_SELECT"`
+  "item-select"`
 
 #### Scenario: Refused close
 
-- **WHEN** the parent keeps `open={true}` after an `ESCAPE_KEY` proposal
+- **WHEN** the parent keeps `open={true}` after an `escape-key` proposal
 - **THEN** the menu stays open and focus does not move
 
 ### Requirement: Opening From The Trigger
@@ -65,7 +66,7 @@ technology; a pointer press-down alone SHALL NOT open it. ArrowDown and ArrowUp 
 trigger SHALL open a closed menu. A touch press that becomes a scroll SHALL NOT open the
 menu. The release that completes an opening press SHALL NOT activate an item, even when
 the content is placed under the pointer. While a modal menu is open, the trigger SHALL
-count as inside the menu, so pressing it closes the menu with reason `TRIGGER_PRESS`
+count as inside the menu, so pressing it closes the menu with reason `trigger`
 and never closes and re-opens it.
 
 #### Scenario: VoiceOver press
@@ -214,7 +215,7 @@ once per press, calling `onSelect(details)`; for an element substituted with `re
 keyboard activation SHALL dispatch a `click` on the rendered element so its own click
 handler runs. Presses with a secondary mouse button SHALL neither activate an item nor
 close the menu. Unless `details.cancel()` is called or the item's `closeOnSelect` is
-false, activation SHALL close the whole menu tree with reason `ITEM_SELECT`.
+false, activation SHALL close the whole menu tree with reason `item-select`.
 `closeOnSelect` SHALL default to `true` for items and `false` for checkbox and radio
 items. The menu SHALL close only after the activation's `click` has been dispatched, so
 a touch selection never activates an element underneath the menu.
@@ -471,7 +472,7 @@ Escape SHALL close only the innermost open menu and focus its trigger (the root 
 or the parent's submenu trigger), and SHALL call `preventDefault()` on the key it acted
 on. Tab and Shift+Tab inside any level SHALL close the whole tree and move focus to the
 element after, respectively before, the root trigger in sequential focus order. The
-window losing focus SHALL close the whole tree with reason `WINDOW_BLUR` without moving
+window losing focus SHALL close the whole tree with reason `window-blur` without moving
 focus.
 
 #### Scenario: Escape in a submenu
@@ -569,11 +570,11 @@ When a menu root level's parent kind in the `MenuTree` is `menubar`:
 The root menu SHALL be a modal layer of kind `menu` unless `modal={false}`: everything
 outside it, its descendant layers and its trigger SHALL be inert and page scrolling
 locked, as specified by the overlay capabilities; an outside press SHALL close the menu
-with reason `OUTSIDE_PRESS` without activating the element under the pointer. Tab
+with reason `outside-press` without activating the element under the pointer. Tab
 SHALL follow Escape, Tab And Window Blur, not focus containment. With `modal={false}`,
 nothing SHALL be inert, scrolling SHALL NOT be locked, an outside press SHALL close the
 menu and reach the element under the pointer, and focus moving outside SHALL close it
-with reason `OUTSIDE_FOCUS`. Submenus SHALL be non-modal descendant layers.
+with reason `outside-focus`. Submenus SHALL be non-modal descendant layers.
 
 #### Scenario: Dismissing click on the page
 
@@ -709,14 +710,16 @@ attributes.
 The `menu` contract SHALL locate an instance by its trigger's role `button` and exact
 accessible name, include the collection and positioning contract fragments, and declare
 the traits `layer`, `restores-focus`, `presence`, `anchored`, plus `modal` when modal,
-with the `vo-submenu-expanded` exception. It SHALL declare the actions `open` (pointer,
-touch and keyboard Enter), `openWithArrowUp`, `close` (Escape from the root), `choose(name)`,
+with the `vo-submenu-expanded` exception (invariant `state-attrs` on `submenu-trigger`).
+Items of every level are located by role and exact name (`menuitem`,
+`menuitemcheckbox`, `menuitemradio`). It SHALL declare the actions `open` (pointer,
+touch and keyboard Enter), `openWithArrowUp`, `close` (the trigger, or Escape), `choose(name)`,
 `toggle(name)` (checkbox and radio items), `openSubmenu(name)` (pointer hover and the
 expand key), `closeSubmenu()` (collapse key), `pressEscape`, `pressOutside`, `tabOut`
 and `typeahead(text)`, each with a postcondition, and the queries `isOpen`, `items`,
 `highlighted`, `focusedItem`, `isChecked(name)`, `isDisabled(name)`, `openPath`
 (names of the open submenu triggers) and `closeReason`. Programmatic `OPEN`/`CLOSE` and
-`WINDOW_BLUR` SHALL map to `{ skip: reason }`; `$sync:open` SHALL map to a prop step.
+`WINDOW_BLUR` events SHALL map to `{ skip: reason }`; `$sync:open` SHALL map to a prop step.
 
 #### Scenario: Driver round trip
 
@@ -732,10 +735,13 @@ and `typeahead(text)`, each with a postcondition, and the queries `isOpen`, `ite
 
 ### Requirement: Model-Based Coverage
 
-`testMachine` over the menu contract SHALL cover every transition of a menu level in
+`testMachine` over the menu contract SHALL cover every transition of a root menu level in
 every declared modality including `virtual`, with props classes `{ modal: true }`,
-`{ modal: false }` and `{ loop: false }`, and a fixture level opened as a submenu, and
-SHALL pass every generic, accessibility, collection, overlay and layout invariant.
+`{ modal: false }` and `{ loop: false }`, in left-to-right and right-to-left, and SHALL
+pass every generic, accessibility, collection, overlay and layout invariant. Submenu
+levels (whose opening edges come from the parent level and hover intent) SHALL be covered
+by the submenu DOM and browser tests. A close by Tab is exempt from the restores-focus
+invariant: focus was restored to the trigger and the browser's Tab moved on from it.
 
 #### Scenario: Wrapper breaks the trigger name
 

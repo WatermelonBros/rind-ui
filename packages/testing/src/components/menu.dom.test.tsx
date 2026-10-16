@@ -4,7 +4,7 @@
 import { Dialog, Menu, type MenuRootProps, RouterProvider } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
-import { type ReactNode, useState } from "react"
+import { type ComponentPropsWithRef, type ReactNode, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { fakeRouter, getMenu, installAnnouncementLog, interceptNativeNavigation } from "../index"
 
@@ -611,5 +611,103 @@ describe("Menu: menus and dialogs", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBe(null))
     await waitFor(() => expect(name(active())).toBe("File"))
     expect(document.querySelector("[inert]")).toBe(null)
+  })
+})
+
+describe("Menu: rendered elements", () => {
+  /** Mimics a client router's Link: its own onClick navigates unless prevented. */
+  function RouterLikeLink({
+    to,
+    navigate,
+    ...props
+  }: ComponentPropsWithRef<"a"> & { to: string; navigate: (to: string) => void }) {
+    return (
+      <a
+        {...props}
+        href={to}
+        onClick={(e) => {
+          props.onClick?.(e)
+          if (!e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey) {
+            e.preventDefault()
+            navigate(to)
+          }
+        }}
+      />
+    )
+  }
+
+  it("Client router link: the route changes once and the menu closes (radix#2718)", async () => {
+    interceptNativeNavigation(window)
+    const navigate = vi.fn()
+    render(
+      <Menu.Root>
+        <Menu.Trigger>Go</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.Item
+                href="/settings"
+                render={<RouterLikeLink to="/settings" navigate={navigate} />}
+              >
+                Settings
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    )
+    const m = getMenu(screen, { name: "Go" }).via("pointer")
+    await m.open()
+    await m.choose("Settings")
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(navigate).toHaveBeenCalledTimes(1)
+    expect(navigate).toHaveBeenCalledWith("/settings")
+  })
+
+  it("Custom button element: Enter runs its own click handler once (mui/base-ui#2281)", async () => {
+    const log = vi.fn()
+    render(
+      <Menu.Root>
+        <Menu.Trigger>Edit</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              {/* biome-ignore lint/a11y/useButtonType: the rendered element is the part's */}
+              <Menu.Item render={<button onClick={log} />}>Undo</Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    )
+    const m = getMenu(screen, { name: "Edit" }).via("keyboard")
+    await m.open()
+    expect(log).not.toHaveBeenCalled()
+    await userEvent.keyboard("{Enter}")
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(log).toHaveBeenCalledTimes(1)
+  })
+
+  it("Enter does not leak into the first item when it opens the menu (radix#1655)", async () => {
+    const onSelect = vi.fn()
+    render(
+      <Menu.Root>
+        <Menu.Trigger>Edit</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              {/* biome-ignore lint/a11y/useButtonType: the rendered element is the part's */}
+              <Menu.Item render={<button />} onSelect={onSelect}>
+                Undo
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    )
+    const m = getMenu(screen, { name: "Edit" }).via("keyboard")
+    await m.open()
+    expect(await m.focusedItem()).toBe("Undo")
+    expect(onSelect).not.toHaveBeenCalled()
+    expect(await m.isOpen()).toBe(true)
   })
 })
