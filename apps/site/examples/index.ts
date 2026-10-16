@@ -21,9 +21,11 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
+import * as passwordInput from "./password-input"
 import * as popover from "./popover"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
+import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
 import * as slider from "./slider"
@@ -61,12 +63,14 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   heading,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
+  "password-input": passwordInput,
   popover,
   label,
   link,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
+  "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
   slider,

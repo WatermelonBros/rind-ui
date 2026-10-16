@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
+| add-search-field (impl) | — | packages/testing/src/components/search-field.broken.dom.test.tsx | Broken variant "clear bypassing validation (react-spectrum#7265)" not modelled: no invariant observes a stale Field error yet; the scenario test "Clear re-validates" covers the correct path |
+| add-password-input (impl) | — | packages/core/src/components/field (submit on an invalid Field) | A pointer submit of a natively invalid Field focuses the control with `data-focus-visible` (seen in the password model; that config uses `validationBehavior="aria"`) |
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.machine.ts:182 | `push`: the dragged thumb's input value is written before the neighbours' min/max widen, so the browser can clamp it for a frame |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.math.ts:68 | `largeStep` is rounded to the step's decimals (a finer custom largeStep is coarsened) |
@@ -143,6 +146,8 @@ Passes that need real assistive technology or devices; automated tests cannot st
 
 | Change | Task | What to check |
 |---|---|---|
+| add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 
 ## Resolved
