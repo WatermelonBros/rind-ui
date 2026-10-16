@@ -4,6 +4,7 @@ export {
   type ComboboxConnectView,
   comboboxConnect,
 } from "./combobox.connect"
+export { comboboxContract, comboboxTraits } from "./combobox.contract"
 export {
   type ComboboxContext,
   type ComboboxEvent,

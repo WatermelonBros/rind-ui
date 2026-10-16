@@ -2,6 +2,7 @@
 import { Combobox } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
+import { getCombobox } from "../index"
 
 const CITIES = [
   { key: "rome", label: "Rome" },
@@ -134,5 +135,53 @@ describe("Combobox", () => {
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onInputValueChange).toHaveBeenCalledTimes(1)
     expect(document.activeElement).toBe(input())
+  })
+})
+
+describe("Combobox driver", () => {
+  const cb = () => getCombobox(screen, { name: "City" })
+
+  it("pick a city by keyboard: type, choose, value and text", async () => {
+    render(<City />)
+    await cb().type("p")
+    expect(await cb().items()).toEqual(["Paris", "Prague"])
+    await cb().choose("Prague")
+    expect(await cb().inputValue()).toBe("Prague")
+    expect(await cb().value()).toEqual(["Prague"])
+    expect(await cb().isOpen()).toBe(false)
+  })
+
+  it("open by keyboard and pointer; close with Escape", async () => {
+    render(<City />)
+    await cb().open()
+    expect(await cb().isOpen()).toBe(true)
+    await cb().close()
+    expect(await cb().isOpen()).toBe(false)
+  })
+
+  it("composition through the driver: the composing Enter selects nothing", async () => {
+    render(<City autoHighlight />)
+    await cb().type("p")
+    await cb().compose("r", false)
+    await cb().pressEnter()
+    expect(await cb().value()).toEqual([])
+    expect(await cb().isOpen()).toBe(true)
+  })
+
+  it("isEmpty in the empty state", async () => {
+    render(<City />)
+    await cb().type("zz")
+    expect(await cb().isEmpty()).toBe(true)
+  })
+
+  it("clear with the keyboard: select all, Delete, blur", async () => {
+    render(
+      <>
+        <City defaultValue="rome" />
+        <button type="button">After</button>
+      </>,
+    )
+    await cb().clear()
+    expect(await cb().value()).toEqual([])
   })
 })
