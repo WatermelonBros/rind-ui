@@ -1,6 +1,6 @@
 # Aspect Ratio
 
-There is no `AspectRatio` component to import: put the native CSS `aspect-ratio` property on the element itself (`<div style={{ aspectRatio: "16 / 9" }}>`), with no wrapper. This page is the recipe that replaces an `AspectRatio.Root` component.
+There is no `AspectRatio` component to import: put the native CSS `aspect-ratio` property on the element itself (`<div style={{ aspectRatio: "16 / 9" }}>`), with no wrapper. This page is the recipe that replaces an `AspectRatio` component.
 
 ```tsx
 <div style={{ aspectRatio: "16 / 9", inlineSize: "100%" }}>…</div>

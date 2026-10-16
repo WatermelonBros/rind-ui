@@ -30,7 +30,8 @@ function Pinned({
       <Popover.Trigger>{label}</Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner>
-          <Popover.Content aria-label={label}>
+          {/* a two-line note never scrolls: not clamped to the room left in a small box */}
+          <Popover.Content aria-label={label} style={{ maxBlockSize: "none" }}>
             {children}
             <Popover.Arrow />
           </Popover.Content>
