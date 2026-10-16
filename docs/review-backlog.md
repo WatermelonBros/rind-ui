@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | One Root context: every Item re-renders on a trail change (task 3.1 asks for per-part selectors) |
+| add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | Static Items register at commit: the server HTML has no `aria-current` (design §6 covers collapse; the `items` form has both) |
+| add-breadcrumbs (impl) | — | packages/core/src/components/breadcrumbs/breadcrumbs.contract.ts | No Menu yet: `openCollapsed`/`followCollapsed` work with a Popover; extra Ellipsis `data-label` locates the trigger |
+| add-pagination (impl) | — | packages/core/src/components/pagination/pagination.contract.ts | `focused()` became `isFocused(control)`: the runner reads every no-argument query after each step and a focus query trips its focus-does-not-commit check |
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |
 | add-badge (r1) | — | packages/react/src/badge/badge.tsx | The post-mount host check's layout effect has no deps and re-warns on every render; dedupe by key (host + message) |

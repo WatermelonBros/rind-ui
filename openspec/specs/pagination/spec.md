@@ -1,5 +1,8 @@
-## ADDED Requirements
+# pagination Specification
 
+## Purpose
+TBD - created by archiving change add-pagination. Update Purpose after archive.
+## Requirements
 ### Requirement: Anatomy
 
 Pagination SHALL consist of the parts `Root` (default element `nav`), `List` (`ul`),
@@ -66,8 +69,10 @@ the new page. A controlled `page` without `onPageChange` SHALL log a development
 #### Scenario: Callback sees the new page (bits-ui#646)
 
 - **WHEN** an uncontrolled pagination on page 1 receives Next and the `onPageChange`
-  handler reads the root state
-- **THEN** the handler receives 2 and the state's `page` is 2
+  handler reads its argument, then the root state after the callback
+- **THEN** the handler receives 2, and the state's `page` is 2 once the callback has
+  returned (as every controllable: the callback runs before the commit so `cancel()` works;
+  amended 2026-10-16, coordinator)
 
 #### Scenario: Last row deleted (kobaltedev/kobalte#461)
 
@@ -358,3 +363,4 @@ invariant plus the focus-never-on-body rule after each step.
 
 - **WHEN** Next is activated by a bare `click` with `detail: 0`
 - **THEN** the page advances exactly once
+

@@ -1,0 +1,106 @@
+/*
+ * Pagination: family `toggle item` (ghost by default). The list is a wrapping row; every
+ * control is at least the 24x24 hit area. The current page uses the selected look: a soft
+ * fill AND an edge in the `border-strong` role (3:1), never colour alone; under forced
+ * colors it is a Highlight outline. Unavailable controls show no hover. Chevrons mirror in
+ * right-to-left. `data-size` is set on Root and read by the controls. The focus ring comes
+ * from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="pagination"][data-part="list"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-pagination-gap, var(--rind-space-1));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Not `display: contents`: some engines drop the list-item semantics with it. */
+  :where([data-scope="pagination"][data-part="item"]) {
+    display: flex;
+  }
+
+  :where(
+    [data-scope="pagination"]:is(
+      [data-part="page"],
+      [data-part="first"],
+      [data-part="previous"],
+      [data-part="next"],
+      [data-part="last"]
+    )
+  ) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: max(var(--rind-pagination-item-min-size, 2.25em), var(--rind-hit-area));
+    min-inline-size: max(var(--rind-pagination-item-min-size, 2.25em), var(--rind-hit-area));
+    padding-inline: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-pagination-item-radius, var(--rind-radius-control));
+    background: transparent;
+    color: var(--rind-color-text);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  :where([data-scope="pagination"][data-part="root"][data-size="sm"]) {
+    font-size: 0.875em;
+  }
+
+  :where([data-scope="pagination"][data-part="root"][data-size="lg"]) {
+    font-size: 1.125em;
+  }
+
+  :where([data-scope="pagination"][data-hover]:not([data-disabled])) {
+    background: var(--rind-color-neutral-soft);
+  }
+
+  :where([data-scope="pagination"][data-part="page"][data-current]) {
+    background: var(--rind-pagination-current-bg, var(--rind-color-accent-soft));
+    border-color: var(--rind-color-border-strong);
+    color: var(--rind-pagination-current-fg, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="pagination"][data-part="root"][data-tone="danger"])
+    :where([data-part="page"][data-current]) {
+    background: var(--rind-color-danger-soft);
+    border-color: var(--rind-color-danger-border);
+    color: var(--rind-color-danger-text);
+  }
+
+  :where([data-scope="pagination"][data-disabled]:not([data-part="root"])) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  :where([data-scope="pagination"][data-part="ellipsis"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--rind-hit-area);
+    color: var(--rind-pagination-ellipsis-fg, var(--rind-color-text-muted));
+    user-select: none;
+  }
+
+  /* The default chevrons point the reading direction. */
+  :where([data-scope="pagination"]:dir(rtl) svg[data-direction]) {
+    transform: scaleX(-1);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="pagination"][data-part="page"][data-current]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope="pagination"][data-disabled]:not([data-part="root"])) {
+      color: GrayText;
+    }
+  }
+}

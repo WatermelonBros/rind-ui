@@ -248,6 +248,44 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### breadcrumbs
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "breadcrumbs.css"
+    },
+    "current-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "breadcrumbs.css"
+    },
+    "current-weight": {
+      "fallback": "var(--rind-link-current-weight, 600)",
+      "file": "breadcrumbs.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "breadcrumbs.css"
+    },
+    "min-target": {
+      "fallback": "24px",
+      "file": "breadcrumbs.css"
+    },
+    "separator-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "breadcrumbs.css"
+    },
+    "separator-size": {
+      "fallback": "1em",
+      "file": "breadcrumbs.css"
+    }
+  }
+}
+```
+
 ### button
 
 ```json
@@ -898,27 +936,27 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "color": {
       "fallback": "var(--rind-color-accent-text)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "color-hover": {
       "fallback": "var(--rind-color-accent-text)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "current-weight": {
       "fallback": "600",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "decoration": {
       "fallback": "0.075em",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "disabled-color": {
       "fallback": "var(--rind-color-text-disabled)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "underline-offset": {
       "fallback": "0.22em",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     }
   }
 }
@@ -1041,6 +1079,40 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "trigger-size": {
       "fallback": "var(--rind-hit-area)",
       "file": "number-input.css"
+    }
+  }
+}
+```
+
+### pagination
+
+```json
+{
+  "family": "toggle item",
+  "tokens": {
+    "current-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "pagination.css"
+    },
+    "current-fg": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "pagination.css"
+    },
+    "ellipsis-fg": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "pagination.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "pagination.css"
+    },
+    "item-min-size": {
+      "fallback": "2.25em",
+      "file": "pagination.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "pagination.css"
     }
   }
 }
