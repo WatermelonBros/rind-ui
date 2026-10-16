@@ -1,6 +1,7 @@
 // The page password-input.pw.test.ts drives: a themed Password Input in a form.
 import { PasswordInput } from "@rind-ui/react"
 import { createRoot } from "react-dom/client"
+import { LabelledFields } from "./labels"
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       </PasswordInput.Root>
       <button type="submit">Submit</button>
       <button type="reset">Reset</button>
+      <LabelledFields />
     </form>
   )
 }

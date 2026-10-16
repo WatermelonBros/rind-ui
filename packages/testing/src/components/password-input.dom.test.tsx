@@ -155,13 +155,21 @@ describe("PasswordInput", () => {
     await waitFor(() => expect(input().type).toBe("password"))
   })
 
-  it("Prevented reset keeps visibility", async () => {
-    render(<InForm root={{ defaultVisible: true }} onReset={(e) => e.preventDefault()} />)
-    await pw().resetForm()
-    // The reset is read once dispatch ends: wait for the scheduler's turn, then assert.
-    await act(() => Promise.resolve())
-    await waitFor(() => expect(input().type).toBe("text"))
-    expect(await pw().isVisible()).toBe(true)
+  it("Prevented reset keeps visibility", () => {
+    // The reset is read on the scheduler's next turn: fake time runs exactly that turn.
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] })
+    try {
+      const onReset = vi.fn((e: Event) => e.preventDefault())
+      const onVisibleChange = vi.fn()
+      render(<InForm root={{ defaultVisible: true, onVisibleChange }} onReset={onReset} />)
+      act(() => screen.getByRole("button", { name: "Reset" }).click())
+      act(() => vi.runOnlyPendingTimers())
+      expect(onReset).toHaveBeenCalledTimes(1)
+      expect(onVisibleChange).not.toHaveBeenCalled()
+      expect(input().type).toBe("text")
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it("Pointer toggle with focus in the input announces once; keyboard is silent", async () => {

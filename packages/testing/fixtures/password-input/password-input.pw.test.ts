@@ -8,6 +8,7 @@ import { type Browser, chromium, type Page } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { getPasswordInput } from "../../src/index"
+import { labelledValues } from "./labels"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")
@@ -122,5 +123,13 @@ describe("password input driver through Playwright", () => {
     expect(await spellcheck()).toBe(false)
     await pw.toggleVisibility()
     expect(await spellcheck()).toBe(false)
+  })
+
+  it("the label locator matches exact names (label, aria-label, aria-labelledby)", async () => {
+    const page = await open()
+    expect(await getPasswordInput(page, { name: "Password" }).value()).toBe("")
+    for (const [name, value] of Object.entries(labelledValues)) {
+      expect(await getPasswordInput(page, { name }).value(), name).toBe(value)
+    }
   })
 })
