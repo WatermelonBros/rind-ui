@@ -159,7 +159,9 @@ function presencePart<T extends "div">(tag: T, name: LayerPart, options: Presenc
     const inner = createElement(tag, props, children)
     // Layers opened from inside this one are its children (explicit parentage).
     return name === "content" ? (
-      <LayerProvider layer={layerIdOf(ctx.root)}>{inner}</LayerProvider>
+      <LayerProvider layer={layerIdOf(ctx.root)} kind={ctx.kind ?? "dialog"}>
+        {inner}
+      </LayerProvider>
     ) : (
       inner
     )

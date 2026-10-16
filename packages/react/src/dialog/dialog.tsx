@@ -290,6 +290,33 @@ function Content({
     setContentMounted(true)
     return () => setContentMounted(false)
   }, [mounted, setContentMounted])
+  // Focus within, from the DOM itself: native focusin/focusout on the content plus a check
+  // of the active element on attach and at the next frame (the initial focus move), so it
+  // holds where a focus move does not reach React's handlers (WebKit on Linux).
+  useIsoLayoutEffect(() => {
+    const el = node.current
+    if (!mounted || !el) return
+    const sync = () => {
+      const active = el.ownerDocument.activeElement
+      setFocusWithin(active !== null && el.contains(active))
+      setContentFocused(active === el)
+    }
+    const onFocusOut = (e: FocusEvent) => {
+      const next = e.relatedTarget as Node | null
+      if (next && el.contains(next)) return
+      setFocusWithin(false)
+      setContentFocused(false)
+    }
+    sync()
+    const frame = env.scheduler.requestAnimationFrame(sync)
+    el.addEventListener("focusin", sync)
+    el.addEventListener("focusout", onFocusOut)
+    return () => {
+      env.scheduler.cancelAnimationFrame(frame)
+      el.removeEventListener("focusin", sync)
+      el.removeEventListener("focusout", onFocusOut)
+    }
+  }, [mounted, env, node])
   if (!mounted) return null
   const exiting = !open && state === "exiting"
   const props = mergeProps(
@@ -298,15 +325,6 @@ function Content({
       hidden: !open && !exiting && ctx.keepMounted,
       // Closing: presses on the exiting content do nothing (mui/base-ui#3153).
       ...(exiting ? { inert: true } : {}),
-      // React focus events bubble: focus anywhere inside the content.
-      onFocus: (e: { target: EventTarget; currentTarget: Element }) => {
-        setFocusWithin(true)
-        setContentFocused(e.target === e.currentTarget)
-      },
-      onBlur: (e: { relatedTarget: EventTarget | null; currentTarget: Element }) => {
-        setContentFocused(false)
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusWithin(false)
-      },
       ref: composeRefs(node, ref),
     },
     {
