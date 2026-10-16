@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-dialog (#16) | — | packages/core/src/dom/focus-scope.ts (focusInitial) | initial focus can stay on body under heavy load on Linux WebKit even with the bounded retries (1-CPU Playwright container: Dialog Driver Example 1 run in 6) — instrumented diagnosis in progress; fix the named condition in a separate PR with a deterministic regression test |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx:~66 | warnKey omits aria-value* and tag; tabIndex "0" (string) skips the splitter warning — add VALUE_ATTRS to the key, normalise Number(tabIndex) |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx (tag) | function/component render: first render assumes div (role=separator on an <hr>) until the layout effect — harmless, document |
 | add-separator (r1) | — | packages/testing/src/adapters/dom.ts:232 + driver docs | `part` anchor never matches the container itself and only data-scope=separator root (host-drawn toolbar separators found only by role/name) — document; add-toolbar decides |
