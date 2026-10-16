@@ -68,7 +68,10 @@
   list-style: none;
 }
 [data-skin="crisp"] [data-scope="breadcrumbs"][data-part="link"][data-current] {
-  box-shadow: inset 0 -3px 0 var(--s-ink);
+  background: var(--s-ink);
+  color: var(--s-brand-text);
+  border-radius: 99px;
+  padding: 0 10px;
 }
 [data-skin="crisp"] [data-scope="breadcrumbs"] .crumb-button,
 [data-skin="crisp"] [data-scope="breadcrumbs"][data-part="ellipsis"] button {
