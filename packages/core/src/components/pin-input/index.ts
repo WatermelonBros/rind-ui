@@ -29,3 +29,4 @@ export {
   renderedValue,
 } from "./pin-input.machine"
 export { type PinInputMessages, pinInputMessages } from "./pin-input.messages"
+export { pinInputMeta } from "./pin-input.meta"

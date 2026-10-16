@@ -101,7 +101,13 @@ describe("paste", () => {
 
 describe("native edits", () => {
   it("deletions and history pass through unplanned", () => {
-    for (const inputType of ["deleteContentBackward", "deleteSoftLineBackward", "historyUndo"]) {
+    for (const inputType of [
+      "deleteContentBackward",
+      "deleteSoftLineBackward",
+      "historyUndo",
+      // Enter: never prevented, so the form submits implicitly.
+      "insertLineBreak",
+    ]) {
       expect(planEdit("1234", [4, 4], { inputType, data: null }, six)).toEqual({
         accept: true,
         edit: null,

@@ -7,6 +7,8 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-pin-input (impl) | — | packages/testing/src/components/pin-input.broken.dom.test.tsx | Broken variants "Enter prevented", "focus moved after autoSubmit" and "completion missed on paste replacement" are not modelled: no step invariant records Enter, focus after submit or completion counts (scenarios cover the correct paths) |
+| add-pin-input (impl) | — | packages/theme/src/pin-input.browser.test.tsx | Forced-colors and reduced-motion checks read the stylesheet; emulated captures of the six states still to add (tasks 8.2) |
 | add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
 | add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:175 | The pointer-clear path should assert focus stays in the input and the change is reported once |
 | add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
@@ -155,6 +157,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | Change | Task | What to check |
 |---|---|---|
 | add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-pin-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: one field announced with its name, the code read back, iOS "From Messages" fill, 1Password/Bitwarden fill, iOS selection handles over the transparent input |
 | add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 

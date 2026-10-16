@@ -44,6 +44,8 @@ export const pinInputInvariants: readonly Invariant<P, string>[] = [
   {
     name: "pin-input-filled-slots",
     check: async ({ env }) => {
+      // While an IME composes it owns the text; the slots show the value before it.
+      if ((await env.part("input").attr("data-composing")) !== null) return undefined
       const value = await env.part("input").value()
       const slots = await env.part("slot").all()
       for (const [i, slot] of slots.entries()) {
@@ -173,7 +175,9 @@ export const pinInputContract = contract("pin-input", {
   queries: {
     value: async (env: E) => env.part("input").value(),
     slots: slotTexts,
-    activeSlot: async (env: E) => {
+    // A driver reading, not a model snapshot (a query with an argument): it exists only while
+    // the input is focused, so every focus would read as a change.
+    activeSlot: async (env: E, _reading?: "while-focused") => {
       for (const [i, slot] of (await env.part("slot").all()).entries()) {
         if ((await slot.attr("data-active")) !== null) return i
       }
@@ -197,15 +201,38 @@ export const pinInputContract = contract("pin-input", {
       },
     },
     INVALID: { skip: "a refused character is a scenario test" },
-    INPUT: { action: "autofill", args: (() => ["123456"]) as never },
-    "SLOT.PRESS": { action: "pressSlot", args: (() => [1]) as never },
+    INPUT: {
+      action: "autofill",
+      args: (() => ["123456"]) as never,
+      event: () => ({ text: "123456", reason: "AUTOFILL" }),
+    },
+    "SLOT.PRESS": {
+      action: "pressSlot",
+      args: (() => [1]) as never,
+      event: () => ({ index: 1, modality: "pointer" }),
+    },
     CARET: { skip: "covered by pressSlot's keyboard path" },
-    "COMPOSITION.START": { action: "composeOpen", args: (() => ["1"]) as never },
-    "COMPOSITION.END": { action: "composeEnd", args: (() => ["1"]) as never },
+    "COMPOSITION.START": {
+      action: "composeOpen",
+      args: (() => ["1"]) as never,
+      event: (view) => ({
+        caret: (view as { context?: { caret?: number } }).context?.caret ?? 0,
+      }),
+    },
+    "COMPOSITION.END": {
+      action: "composeEnd",
+      args: (() => ["1"]) as never,
+      event: () => ({ text: "1" }),
+    },
     RESET: "reset",
     FOCUS: { skip: "covered by every action" },
     BLUR: { skip: "covered by every action" },
   },
   traits: ["field-associated"],
+  // Focus shows the active slot (data-active exists only while the input is focused).
+  commitsOnFocus: [
+    { part: "input", state: "idle" },
+    { part: "input", state: "composing" },
+  ],
   invariants: pinInputInvariants,
 })

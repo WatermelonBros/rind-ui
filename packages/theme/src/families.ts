@@ -70,6 +70,7 @@ export const familyMatrix = [
       "select",
       "combobox",
       "number-input",
+      "pin-input",
       "date-field",
       "time-field",
       "date-range-field",

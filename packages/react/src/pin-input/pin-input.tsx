@@ -405,7 +405,8 @@ function Input({
   useIsoLayoutEffect(() => {
     const el = ctx.inputEl.current
     if (!el) return
-    if (el.value !== value) el.value = value
+    // The DOM text follows the value between compositions (an IME owns it meanwhile).
+    if (el.value !== value && !ctx.view.matches("composing")) el.value = value
     // Kept until the input has focus (a press focuses it after the caret was planned).
     const caret = ctx.pendingCaret.current
     if (caret !== null && el.ownerDocument.activeElement === el) {
@@ -448,9 +449,20 @@ function Input({
       const native = typeof ie.inputType === "string" && /^(delete|history)/.test(ie.inputType)
       c.send({ type: "INPUT", text: el.value, reason: native ? "INPUT" : "AUTOFILL" })
     }
+    // A key an IME owns (isComposing, keyCode 229) never moves the active slot. Its
+    // selectionchange arrives as a later task, so the flag holds until the next own key,
+    // a press or the composition's end.
+    let imeKey = false
+    const onKeyDown = (e: Event) => {
+      const k = e as globalThis.KeyboardEvent
+      imeKey = k.isComposing || k.keyCode === 229
+    }
+    const onSettled = () => {
+      imeKey = false
+    }
     const onSelection = () => {
       const c = latest.current
-      if (el.ownerDocument.activeElement !== el || el.selectionStart === null) return
+      if (imeKey || el.ownerDocument.activeElement !== el || el.selectionStart === null) return
       if (el.selectionStart !== c.view.context.caret) {
         c.send({ type: "CARET", index: el.selectionStart })
       }
@@ -478,19 +490,23 @@ function Input({
     el.addEventListener("beforeinput", onBeforeInput)
     el.addEventListener("input", onInput)
     el.addEventListener("pointerdown", onPointerDown)
+    el.addEventListener("keydown", onKeyDown, true)
+    el.addEventListener("pointerdown", onSettled, true)
+    el.addEventListener("compositionend", onSettled)
     el.ownerDocument.addEventListener("selectionchange", onSelection)
     formEl?.addEventListener("reset", onReset)
     return () => {
       el.removeEventListener("beforeinput", onBeforeInput)
       el.removeEventListener("input", onInput)
       el.removeEventListener("pointerdown", onPointerDown)
+      el.removeEventListener("keydown", onKeyDown, true)
+      el.removeEventListener("pointerdown", onSettled, true)
+      el.removeEventListener("compositionend", onSettled)
       el.ownerDocument.removeEventListener("selectionchange", onSelection)
       formEl?.removeEventListener("reset", onReset)
     }
   }, [ctx.inputEl, env])
   const handlers = {
-    // React requires a handler on a controlled input; the native listeners do the work.
-    onChange: () => {},
     onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => {
       // Enter is never prevented (zag#3381); outside an IME it commits for the Field.
       if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {

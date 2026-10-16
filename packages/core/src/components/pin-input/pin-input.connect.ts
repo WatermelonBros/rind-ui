@@ -99,7 +99,9 @@ export function pinInputConnect(input: PinInputConnectInput) {
       type: input.mask ? "password" : "text",
       name: field.name,
       form: input.form,
-      value,
+      // Uncontrolled in the framework sense: a re-render must never rewrite the text while
+      // an IME composes (it cancels the composition); the adapter syncs it between them.
+      defaultValue: value,
       autocomplete: input.autoComplete,
       inputmode:
         (input.validationType ?? "numeric") === "numeric" && !input.pattern ? "numeric" : "text",

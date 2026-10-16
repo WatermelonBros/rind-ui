@@ -82,7 +82,14 @@ export function planEdit(
   rules: PinRules,
 ): PinEditPlan {
   const { inputType } = input
-  if (!inputType.startsWith("insert")) return { accept: true, edit: null }
+  // Deletions and history stay native; so do line breaks (Enter: implicit form submission).
+  if (
+    !inputType.startsWith("insert") ||
+    inputType === "insertLineBreak" ||
+    inputType === "insertParagraph"
+  ) {
+    return { accept: true, edit: null }
+  }
   const pasted = PASTED.has(inputType)
   const text = normalise(input.data ?? "", rules, pasted)
   if (text === "")
