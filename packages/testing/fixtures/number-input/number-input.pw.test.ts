@@ -53,6 +53,9 @@ async function open(options: Parameters<Browser["newContext"]>[0] = {}, fakeCloc
   if (fakeClock) await page.clock.install()
   await page.setContent(html)
   await page.getByRole("spinbutton", { name: "Quantity" }).waitFor()
+  // An installed clock still flows with real time: paused, the page's time moves only through
+  // `runFor` (the adapter's advance), never with polling or load.
+  if (fakeClock) await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1)
   return page
 }
 
