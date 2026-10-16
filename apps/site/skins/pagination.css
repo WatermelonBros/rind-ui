@@ -1,0 +1,88 @@
+/* ── Pagination: a row of chips; the current page fills with the brand ── */
+[data-skinned] [data-scope="pagination"][data-part="root"] {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+[data-skinned] [data-scope="pagination"][data-part="list"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-skinned] [data-scope="pagination"][data-part="item"] {
+  display: flex;
+}
+[data-skinned]
+  [data-scope="pagination"]:is(
+    [data-part="page"],
+    [data-part="first"],
+    [data-part="previous"],
+    [data-part="next"],
+    [data-part="last"]
+  ) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0 10px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.3s var(--s-ease),
+    color 0.3s var(--s-ease),
+    scale 0.35s var(--s-pop);
+}
+[data-skinned] [data-scope="pagination"][data-hover]:not([data-disabled], [data-current]) {
+  background: var(--s-muted);
+}
+[data-skinned] [data-scope="pagination"][data-pressed]:not([data-disabled]) {
+  scale: 0.94;
+  transition-duration: 0.12s;
+}
+[data-skinned] [data-scope="pagination"][data-part="page"][data-current] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+[data-skinned] [data-scope="pagination"][data-disabled]:not([data-part="root"]) {
+  cursor: default;
+  color: color-mix(in oklab, var(--s-ink) 45%, var(--s-card));
+}
+[data-skinned] [data-scope="pagination"][data-part="ellipsis"] {
+  min-width: 24px;
+  text-align: center;
+  color: var(--s-ink);
+  font: 700 14px var(--s-font);
+}
+[data-skinned] [data-scope="pagination"] svg[data-direction]:dir(rtl) {
+  transform: scaleX(-1);
+}
+[data-skin="crisp"] [data-scope="pagination"][data-part="page"][data-current] {
+  box-shadow: var(--s-lift-lo);
+}
+[data-skin="juicy"]
+  [data-scope="pagination"]:is(
+    [data-part="page"],
+    [data-part="first"],
+    [data-part="previous"],
+    [data-part="next"],
+    [data-part="last"]
+  ) {
+  border-radius: 99px;
+  box-shadow: var(--s-lift-lo);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-skinned] [data-scope="pagination"] {
+    transition: none;
+  }
+}
