@@ -41,7 +41,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | wip | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
@@ -94,7 +94,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done |  |
 | Button |  |  | ● | ● | ● | ● |  | ● | ● | 6 | 1 | done |  |
 | Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | done | Number Field |
-| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Radix/Base: OTP Field |
+| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | todo | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
