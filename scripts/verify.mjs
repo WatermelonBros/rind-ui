@@ -1,6 +1,7 @@
 // What CI checks, minus the slow slices, so a push is not red on CI for something a laptop
 // can catch: static checks, the whole node project (seconds; some tests read CSS and
-// manifests that `vitest --changed` can't see), and jsdom + Chromium on what changed.
+// manifests that `vitest --changed` can't see), and jsdom + Chromium on what changed, retried once
+// like CI (several sessions share this machine, so browser timing flakes under load).
 import { execSync } from "node:child_process"
 
 const base = execSync("git merge-base HEAD origin/main", { encoding: "utf8" }).trim()
@@ -10,7 +11,7 @@ const steps = [
   "pnpm quirks:check",
   "pnpm docs:check",
   "pnpm exec vitest run --project node",
-  `pnpm exec vitest run --changed ${base} --passWithNoTests --project jsdom --project setup-noglobals --project setup-optout --project "browser (chromium)"`,
+  `pnpm exec vitest run --changed ${base} --passWithNoTests --retry 1 --project jsdom --project setup-noglobals --project setup-optout --project "browser (chromium)"`,
 ]
 for (const step of steps) {
   console.log(`\n▶ ${step}`)
