@@ -6,6 +6,7 @@ import * as aspectRatio from "./aspect-ratio"
 import * as autosize from "./autosize"
 import * as avatar from "./avatar"
 import * as badge from "./badge"
+import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
@@ -25,6 +26,7 @@ import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
+import * as pagination from "./pagination"
 import * as passwordInput from "./password-input"
 import * as pinInput from "./pin-input"
 import * as popover from "./popover"
@@ -62,6 +64,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "aspect-ratio": aspectRatio,
   avatar,
   badge,
+  breadcrumbs,
   button,
   checkbox,
   "checkbox-group": checkboxGroup,
@@ -75,6 +78,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   overlays,
+  pagination,
   "password-input": passwordInput,
   "pin-input": pinInput,
   popover,
