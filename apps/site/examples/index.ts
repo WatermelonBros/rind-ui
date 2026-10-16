@@ -24,6 +24,7 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
+import * as overlays from "./overlays"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
@@ -70,6 +71,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   heading,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
+  overlays,
   popover,
   positioning,
   label,

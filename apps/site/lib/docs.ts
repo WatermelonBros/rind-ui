@@ -88,7 +88,12 @@ export function render(page: DocPage, { hasExample = false } = {}): Rendered {
   const html = tables(marked.parse(remainder, { async: false }))
   const toc = [...html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>/g)].map((m) => ({
     id: m[1] ?? "",
-    text: (m[2] ?? "").replace(/<[^>]+>/g, ""),
+    // plain text for React, which escapes it again: tags dropped, marked's entities decoded
+    text: (m[2] ?? "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&(lt|gt|quot|#39|amp);/g, (_, e: string) =>
+        e === "lt" ? "<" : e === "gt" ? ">" : e === "quot" ? '"' : e === "#39" ? "'" : "&",
+      ),
   }))
   return { intro, html, toc }
 }
