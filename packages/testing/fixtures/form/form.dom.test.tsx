@@ -410,6 +410,7 @@ describe("Server errors", () => {
       <Form.Root
         aria-label="F"
         {...(errors ? { errors } : {})}
+        // fake-time: the app's deferred server errors; the test waits on a condition
         onFormSubmit={() => setTimeout(() => setErrors({ email: "Already registered" }), 0)}
       >
         <Item name="city" />
@@ -516,6 +517,7 @@ describe("Reset", () => {
       <Form.Root
         aria-label="F"
         {...(errors ? { errors } : {})}
+        // fake-time: the app's deferred server errors; the test waits on a condition
         onFormSubmit={() => setTimeout(() => setErrors({ b: "Server says no" }), 0)}
         {...(onReset ? { onReset } : {})}
       >

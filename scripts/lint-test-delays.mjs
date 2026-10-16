@@ -1,6 +1,7 @@
 // Fails when a test waits for elapsed time (user rule: nothing in tests may depend on it).
-// Banned in *.test.* and *.pw.test.* files: `page.waitForTimeout(…)`, and a promise resolved
-// by `setTimeout` (`new Promise((r) => setTimeout(r, …))`, `setTimeout(resolve, …)`).
+// Banned in *.test.* and *.pw.test.* files: `page.waitForTimeout(…)`, `sleep(…)`, `wait(…)`,
+// `env.advance(…)` (the adapter's real-time wait), and any `setTimeout(…)` / `setInterval(…)`
+// with a delay (a promise resolved later, a polling tick).
 // Allowed: waiting on a condition with a deadline, fake timers, and a `setTimeout` that only
 // implements a scheduler under test control — mark that line (or the one above) with
 // `// fake-time: <why>`.
@@ -10,10 +11,12 @@ import { join, relative } from "node:path"
 
 const PATTERNS = [
   /\bwaitForTimeout\s*\(/,
-  // A promise that settles after a delay: `setTimeout(r, …)` / `setTimeout(resolve, …)`.
-  /\bsetTimeout\s*\(\s*(r|res|resolve|done|ok)\s*[,)]/,
-  // `setTimeout(() => r(), …)` and friends.
-  /\bsetTimeout\s*\(\s*\(\)\s*=>\s*(r|res|resolve|done|ok)\s*\(/,
+  // `await sleep(…)`, `wait(20)` and similar helpers (not test names that say "waits").
+  /\bawait\s+(sleep|delay|wait)\s*\(/,
+  /\b(sleep|delay|wait)\s*\(\s*[\d_]/,
+  /\benv\.advance\s*\(/,
+  // Any timer in a test: a settling promise, a polling tick, a deferred assertion.
+  /\b(setTimeout|setInterval)\s*\(/,
 ]
 const ALLOW = /\/\/\s*fake-time:\s*\S/
 const TEST = /\.(test|spec)\.(ts|tsx|mts|js)$/

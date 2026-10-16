@@ -10,6 +10,8 @@ export interface VirtualClock {
   readonly scheduler: Scheduler
   /** Moves time forward by `ms`, running every timer that falls due, in order. */
   advance(ms: number): void
+  /** Timers run so far: proves the page's machines use this clock. */
+  fired(): number
   /** Timers not run yet. */
   pending(): number
 }
@@ -17,6 +19,7 @@ export interface VirtualClock {
 export function virtualClock(): VirtualClock {
   let now = 0
   let seq = 0
+  let fired = 0
   const timers = new Map<number, { at: number; callback: () => void }>()
   return {
     scheduler: {
@@ -43,10 +46,12 @@ export function virtualClock(): VirtualClock {
         if (!next) break
         timers.delete(next[0])
         now = next[1].at
+        fired += 1
         next[1].callback()
       }
       now = end
     },
     pending: () => timers.size,
+    fired: () => fired,
   }
 }

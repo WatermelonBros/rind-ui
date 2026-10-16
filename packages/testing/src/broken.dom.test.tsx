@@ -307,6 +307,7 @@ describe("broken variants fail with the invariant's name", () => {
               // Broken variant: a touch "hover" starts the (delayed) open too.
               if (e.pointerType === "touch" && !touchOpens) return
               if (e.pointerType !== "touch") setHover(true)
+              // fake-time: the broken component's own open delay; the runner's clock drives it
               timer.current = setTimeout(() => setOpen(true), 300)
             }}
             onPointerLeave={(e) => {

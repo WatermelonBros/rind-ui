@@ -104,6 +104,7 @@ function Story({
           actions.current?.validate()
           // Broken: validate() also moves focus to the first invalid control.
           if (cfg.flaw === "focus-on-validate") {
+            // fake-time: the app's deferred focus move under test; checks wait on conditions
             setTimeout(() => document.querySelector<HTMLElement>("input[aria-invalid]")?.focus(), 0)
           }
         }}
@@ -122,6 +123,7 @@ function OrderBreaker() {
     const form = document.querySelector("form")
     if (!form) return
     const onInvalid = () =>
+      // fake-time: the app's deferred focus move under test; checks wait on conditions
       setTimeout(() => {
         // The first mounted Field is the last one in the DOM when another was inserted above.
         const all = [...form.querySelectorAll<HTMLInputElement>("input[aria-invalid]")]

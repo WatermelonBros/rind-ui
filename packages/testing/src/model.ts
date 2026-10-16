@@ -1131,7 +1131,15 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           ) {
             userChanges += 1
           }
+          const firedBefore = options.clock?.fired() ?? 0
           await elapse(ms)
+          // A delay edge walked on a clock no timer of the page used proves nothing: the
+          // rendered machines run on another scheduler (the provider was not given it).
+          if (options.clock && options.clock.fired() === firedBefore) {
+            throw new Error(
+              `${edge.event}: no timer fired on the virtual clock; pass clock.scheduler as RindProvider environment={{ scheduler }}`,
+            )
+          }
         } else if (mapping?.kind === "props") {
           const next = { ...oracle.props, ...mapping.props(edge.target ?? edge.source) }
           inputs.push({ kind: "props", props: next })

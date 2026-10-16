@@ -44,6 +44,7 @@ describe("waitForExit", () => {
     if (inBrowser) return
     const el = mount()
     let timer = false
+    // fake-time: a 0 ms task marks the task boundary under test; never awaited
     setTimeout(() => {
       timer = true
     }, 0)
