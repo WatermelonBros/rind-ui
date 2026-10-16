@@ -23,6 +23,7 @@ import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
+import * as listbox from "./listbox"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
@@ -83,6 +84,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   positioning,
   label,
   link,
+  listbox,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,

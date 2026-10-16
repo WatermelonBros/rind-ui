@@ -12,6 +12,7 @@ export {
   sameValue,
   selectionOf,
 } from "./listbox.machine"
+export { listboxMeta } from "./listbox.meta"
 export {
   type ListboxParts,
   type ListboxPartsView,
