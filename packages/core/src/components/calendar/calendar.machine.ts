@@ -68,7 +68,7 @@ export interface CalendarProps extends NavigationOptions {
   readonly messages: CalendarMessages
   readonly id: string
   /** Moves DOM focus to the focused date's cell once the step is rendered (adapter). */
-  readonly focusCell?: ((date: CalendarDate) => void) | undefined
+  readonly focusCell?: ((date: CalendarDate, modality?: Modality) => void) | undefined
 }
 
 export interface CalendarContext {
@@ -193,7 +193,8 @@ export const calendarMachine = setup({
     },
     pressFocus: (args) => {
       if (args.event.type !== "CELL.PRESS") return
-      requestCellFocus(args.props, args.event.date)
+      // A pointer press focuses the cell without a focus ring.
+      requestCellFocus(args.props, args.event.date, args.event.modality)
     },
     selectPressed: (args) => {
       if (args.event.type === "CELL.PRESS") select(args, args.event.date)

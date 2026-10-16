@@ -163,7 +163,7 @@ function Root({
       initialCalendarFocus(show(valuesOf(current ?? null)[0]), display(today, calendar), nav)
         .focused,
   )
-  const pendingFocus = useRef<CalendarDate | null>(null)
+  const pendingFocus = useRef<{ date: CalendarDate; modality: string | undefined } | null>(null)
   const latest = useRef({ onValueChange, onFocusChange })
   latest.current = { onValueChange, onFocusChange }
   const { view, send } = useMachine(calendarMachine, {
@@ -189,10 +189,12 @@ function Root({
     formatLocale,
     messages,
     id: instance,
-    focusCell: (date) => {
-      pendingFocus.current = date
+    focusCell: (date, modality) => {
+      pendingFocus.current = { date, modality }
     },
   })
+  // The modality is tracked from mount: a pointer press that focuses a cell is seen as one.
+  useEffect(() => env.modality.subscribe(() => {}), [env])
   const gridFocused = view.matches("focused")
   const modality = useModality(env.modality, gridFocused)
   const api = calendarConnect({
@@ -223,13 +225,20 @@ function Root({
   // After the step is rendered: DOM focus to the focused cell (keyboard and props only).
   const root = useRef<HTMLDivElement | null>(null)
   useIsoLayoutEffect(() => {
-    const date = pendingFocus.current
-    if (!date) return
+    const pending = pendingFocus.current
+    if (!pending) return
     pendingFocus.current = null
     const cell = root.current?.querySelector<HTMLElement>(
-      `[data-part="cell"][data-value="${isoOf(date)}"]:not([data-outside-month])`,
+      `[data-part="cell"][data-value="${isoOf(pending.date)}"]:not([data-outside-month])`,
     )
-    if (cell) void focusSafely(cell, env, "navigation")
+    if (cell) {
+      void focusSafely(
+        cell,
+        env,
+        "navigation",
+        pending.modality as Parameters<typeof focusSafely>[3],
+      )
+    }
   })
   // Every change of the visible range is reported.
   const start = view.context.visibleStart

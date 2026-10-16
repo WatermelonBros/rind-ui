@@ -50,7 +50,7 @@ function config(name: string, cfg: Config) {
         render(
           <RindProvider
             environment={{ platform: currentRun()?.platform ?? platforms.linux, dateClock: clock }}
-            {...(currentRun()?.direction ? { dir: currentRun()?.direction } : {})}
+            dir={currentRun()?.direction === "rtl" ? "rtl" : "ltr"}
           >
             <Calendar.Root aria-label="Departure" firstDayOfWeek="sun" {...cfg}>
               <Calendar.Header>

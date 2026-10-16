@@ -269,6 +269,9 @@ export const calendarContract = contract("calendar", {
     "GRID.HOVER_END": { skip: "hover is a scenario test" },
     "FOCUS.SYNC": { skip: "a parent's focusedValue: machine and scenario tests" },
     CONSTRAINTS: { skip: "a changed minimum: machine tests" },
+    "$props:focusedValue": { skip: "a parent's focusedValue: machine and scenario tests" },
+    "$props:minValue": { skip: "a changed minimum: machine tests" },
+    "$props:maxValue": { skip: "a changed maximum: machine tests" },
   },
   semantics: { item: "cell" },
   traits: ["selectable", "composite-roving"],
@@ -276,6 +279,9 @@ export const calendarContract = contract("calendar", {
   commitsOnFocus: [
     { part: "cell", state: "idle" },
     { part: "cell", state: "focused" },
+    // Focus on a trigger leaves the grid (focused → idle): the next paging is announced.
+    { part: "prev-trigger", state: "focused" },
+    { part: "next-trigger", state: "focused" },
   ],
   invariants: calendarInvariants,
 })

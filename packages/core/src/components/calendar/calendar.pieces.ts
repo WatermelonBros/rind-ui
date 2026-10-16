@@ -3,6 +3,7 @@
 // cell-focus request and the announce-on-page action. Exporting them changes no behaviour.
 
 import { type CalendarDate, isSameDay, startOfMonth } from "@internationalized/date"
+import type { Modality } from "../../contract/env"
 import type { AnnouncerEnv } from "../../env/capabilities"
 import { formatVisibleRange } from "../../i18n/date"
 import { lastVisibleMonth, type NavigationOptions } from "./calendar.navigation"
@@ -21,7 +22,7 @@ export interface DateGridPieceProps extends Pick<NavigationOptions, "visibleMont
   readonly calendar: import("@internationalized/date").Calendar
   readonly messages: { readonly visibleRange: (args: { readonly formatted: string }) => string }
   /** Moves DOM focus to the focused cell once the step is rendered (adapter). */
-  readonly focusCell?: ((date: CalendarDate) => void) | undefined
+  readonly focusCell?: ((date: CalendarDate, modality?: Modality) => void) | undefined
 }
 
 /** The visible range text ("October 2026", "October – November 2026"). */
@@ -54,5 +55,8 @@ export function announceVisibleRange(
 export const prepareAnnouncer = ({ env }: { readonly env: AnnouncerEnv }) => env.announcer.prepare()
 
 /** Asks the adapter to focus the focused cell after the step commits. */
-export const requestCellFocus = (props: DateGridPieceProps, date: CalendarDate) =>
-  props.focusCell?.(date)
+export const requestCellFocus = (
+  props: DateGridPieceProps,
+  date: CalendarDate,
+  modality?: Modality,
+) => props.focusCell?.(date, modality)
