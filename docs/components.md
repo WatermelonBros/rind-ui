@@ -147,7 +147,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
-| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
+| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |

@@ -7,6 +7,8 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Not covered yet: Collapsible inside, 30-instance read/write interleaving trace, Trusted Types enforcement, fast drag released outside the window, re-hover without a thumb jump |
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.model.dom.test.tsx | Model walk is browser-only with layout events (`SCROLL`, `DRAG.*`, `METRICS`) skipped; covered by browser tests |
 | add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
 | add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:175 | The pointer-clear path should assert focus stays in the input and the change is reported once |
 | add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |

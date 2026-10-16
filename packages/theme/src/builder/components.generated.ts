@@ -278,6 +278,18 @@ export type ComponentTokens = {
     | "labelFontWeight"
     | "radius"
     | "size"
+  readonly "scroll-area":
+    | "cornerBg"
+    | "fadeDuration"
+    | "scrollbarPadding"
+    | "scrollbarSize"
+    | "thumbActiveBg"
+    | "thumbBg"
+    | "thumbHoverBg"
+    | "thumbMinSize"
+    | "thumbRadius"
+    | "thumbSize"
+    | "trackBg"
   readonly "search-field":
     | "bg"
     | "border"
