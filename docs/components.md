@@ -146,14 +146,14 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
-| Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Reado has PersonAvatar |
+| Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
 | Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
-| Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | spec | Docs recipe (native CSS `aspect-ratio`), no component — see add-aspect-ratio |
+| Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
-| Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
+| Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
@@ -162,7 +162,7 @@ seen in docs or source but not confirmed as public, stable API.
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
-| Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
+| Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 
 ## AI-UI primitives (11)
 

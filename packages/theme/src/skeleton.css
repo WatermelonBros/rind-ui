@@ -1,0 +1,64 @@
+/*
+ * Skeleton: family `decoration` (no variant, size or tone). Only loading Items are drawn; a
+ * loaded Item is left exactly as the consumer styled it. An empty Item is a block line; an
+ * Item wrapping stale text stays inline, its text transparent and one shape per line box
+ * (`box-decoration-break: clone`), so the loaded content does not shift the layout. The
+ * shimmer animates the Item's own background (not a clipped child: mui/material-ui#24050)
+ * with `background-attachment: fixed`, so every Item on the page is in phase without
+ * script; it runs only without a reduced-motion preference and stops on load.
+ */
+@layer rind.components {
+  :where([data-scope="skeleton"][data-part="item"][data-state="loading"]) {
+    box-sizing: border-box;
+    border-radius: var(--rind-skeleton-radius, var(--rind-radius-sm));
+    background-color: var(--rind-skeleton-bg, var(--rind-color-neutral-soft));
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    user-select: none;
+  }
+
+  :where([data-scope="skeleton"][data-part="item"][data-state="loading"]:empty) {
+    display: block;
+    inline-size: 100%;
+    block-size: var(--rind-skeleton-line-height, 1em);
+  }
+
+  /* Wrapped controls, images and icons keep their box but are not drawn. */
+  :where([data-scope="skeleton"][data-part="item"][data-state="loading"]) * {
+    visibility: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where([data-scope="skeleton"][data-part="item"][data-state="loading"][data-animate]) {
+      background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--rind-skeleton-highlight, var(--rind-color-neutral-soft-hover)) 50%,
+        transparent 100%
+      );
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: 100vw 100%;
+      /* One sweep no faster than 1.5 s: never a flash. */
+      animation: rind-skeleton-shimmer var(--rind-skeleton-duration, 1.6s) linear infinite;
+    }
+  }
+
+  @keyframes rind-skeleton-shimmer {
+    from {
+      background-position: -100vw 0;
+    }
+    to {
+      background-position: 100vw 0;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="skeleton"][data-part="item"][data-state="loading"]) {
+      forced-color-adjust: none;
+      background: GrayText;
+    }
+  }
+}
