@@ -79,6 +79,7 @@ describe("alert machine: announcements", () => {
     s.send({ type: "CONTENT.CHANGE", segments: ["Other"] })
     set({ open: false })
     set({ open: true })
+    s.send({ type: "ROOT.SHOW", segments: ["Other"] })
     expect(log).toEqual([])
     expect(prepared()).toBe(0)
   })
@@ -111,21 +112,26 @@ describe("alert machine: announcements", () => {
     expect(log.map((a) => a.message)).toEqual(["Reconnecting…", "Connected.", "Reconnecting…"])
   })
 
-  it("changes while closed are silent; shown again through open announces once", () => {
+  it("changes while closed are silent; shown again announces the fresh text once", () => {
     const { log, mount, s, set } = make({ open: true })
     mount(["Saved"])
     set({ open: false })
     s.send({ type: "CONTENT.CHANGE", segments: ["Saved again"] })
+    s.send({ type: "ROOT.SHOW", segments: ["Ignored while closed"] })
     expect(log).toHaveLength(1)
+    // $sync alone announces nothing: the Root reads the rendered text and sends ROOT.SHOW.
     set({ open: true })
-    expect(log.map((a) => a.message)).toEqual(["Saved.", "Saved again."])
+    expect(log).toHaveLength(1)
+    s.send({ type: "ROOT.SHOW", segments: ["Saved at 10:02"] })
+    expect(log.map((a) => a.message)).toEqual(["Saved.", "Saved at 10:02."])
   })
 
   it("mounted closed then opened announces once", () => {
-    const { log, mount, set } = make({ open: false })
-    mount(["Saved"])
+    const { log, mount, s, set } = make({ open: false })
+    mount([])
     expect(log).toEqual([])
     set({ open: true })
+    s.send({ type: "ROOT.SHOW", segments: ["Saved"] })
     expect(log).toHaveLength(1)
   })
 

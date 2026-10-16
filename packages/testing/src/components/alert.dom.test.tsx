@@ -129,6 +129,22 @@ describe("Alert announcements", () => {
     expect(await a.announcements()).toHaveLength(1)
   })
 
+  it("text changed while closed: reopening announces once, the new text", async () => {
+    const a = getAlert(screen, { within: document.body })
+    expect(await a.announcements()).toEqual([])
+    const tree = (open: boolean, text: string) => (
+      <Alert.Root open={open}>
+        <Alert.Title>{text}</Alert.Title>
+      </Alert.Root>
+    )
+    const { rerender } = render(tree(true, "Saved"))
+    expect(await a.announcements()).toHaveLength(1)
+    rerender(tree(false, "Saved"))
+    rerender(tree(false, "Saved at 10:02"))
+    rerender(tree(true, "Saved at 10:02"))
+    expect((await a.announcements()).map((x) => x.message)).toEqual(["Saved.", "Saved at 10:02."])
+  })
+
   it("the close button is not spoken; a labelled icon is", async () => {
     const a = await driver("Couldn't save")
     render(

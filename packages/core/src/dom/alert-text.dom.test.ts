@@ -1,6 +1,6 @@
 // add-alert 2.2: the announced segments read from the DOM, and the observer that reports
 // only real text changes.
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { announceableText, observeText } from "./alert-text"
 
 const hosts: HTMLElement[] = []
@@ -61,22 +61,43 @@ describe("announceableText", () => {
   })
 })
 
+/**
+ * Resolves once the mutations made after this call have been delivered: a sentinel observer
+ * registered after observeText's own is called after it in the same delivery (registration
+ * order), so the condition to wait on is the delivery event itself, not elapsed time.
+ */
+function delivered(root: Element): Promise<void> {
+  return new Promise((resolve) => {
+    const sentinel = new MutationObserver(() => {
+      sentinel.disconnect()
+      resolve()
+    })
+    sentinel.observe(root, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+      attributes: true,
+    })
+  })
+}
+
 describe("observeText", () => {
-  it("reports a changed text once per batch, never an unchanged one", async () => {
+  it("reports a changed text, never an unchanged one, nothing after stop", async () => {
     const root = mount(p("root", p("title", "Reconnecting…")))
     const seen: string[][] = []
     const stop = observeText(root, (s) => seen.push(s))
     const title = root.querySelector('[data-part="title"]') as HTMLElement
     // A rewrite to the same text is not a change.
+    let done = delivered(root)
     title.textContent = "Reconnecting…"
-    await new Promise<void>((r) => queueMicrotask(r))
+    await done
     expect(seen).toEqual([])
     title.textContent = "Connected"
-    await new Promise<void>((r) => queueMicrotask(r))
-    expect(seen).toEqual([["Connected"]])
+    await vi.waitFor(() => expect(seen).toEqual([["Connected"]]), { timeout: 1000 })
     stop()
+    done = delivered(root)
     title.textContent = "Gone"
-    await new Promise<void>((r) => queueMicrotask(r))
+    await done
     expect(seen).toHaveLength(1)
   })
 
@@ -85,8 +106,7 @@ describe("observeText", () => {
     const seen: string[][] = []
     const stop = observeText(root, (s) => seen.push(s))
     root.querySelector('[data-part="description"]')?.setAttribute("hidden", "")
-    await new Promise<void>((r) => queueMicrotask(r))
-    expect(seen).toEqual([["Saved"]])
+    await vi.waitFor(() => expect(seen).toEqual([["Saved"]]), { timeout: 1000 })
     stop()
   })
 })

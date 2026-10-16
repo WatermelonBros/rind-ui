@@ -17,6 +17,11 @@ export type AlertEvent =
       readonly hydrating: boolean
       readonly segments: readonly string[]
     }
+  /**
+   * Shown again after `open` became true: the Root re-read its text from the DOM it just
+   * rendered (the text may have changed while it was unmounted).
+   */
+  | { readonly type: "ROOT.SHOW"; readonly segments: readonly string[] }
   /** The text it would announce changed (observed on the DOM, whatever caused it). */
   | { readonly type: "CONTENT.CHANGE"; readonly segments: readonly string[] }
   /** The CloseTrigger was activated; `focusInside`: focus was inside the alert. */
@@ -59,15 +64,19 @@ export const alertMachine = setup({
   },
   actions: {
     setText: ({ event, set }) => {
-      if (event.type === "ROOT.MOUNT" || event.type === "CONTENT.CHANGE") {
+      if (
+        event.type === "ROOT.MOUNT" ||
+        event.type === "ROOT.SHOW" ||
+        event.type === "CONTENT.CHANGE"
+      ) {
         set("segments", event.segments)
       }
     },
     /** The first commit only (Strict Mode's second mount effect is the same alert). */
     markMounted: ({ set }) => set("mounted", true),
     announceText: ({ props, context, env, event }) => {
-      // Not on the initial entry (`$start`) nor on a hydrating mount: present at load.
-      if (!context.mounted || !live(props) || event.type === "$start") return
+      // Not before the first commit, nor on a hydrating mount: present at load.
+      if (!context.mounted || !live(props)) return
       if (event.type === "ROOT.MOUNT" && event.hydrating) return
       const message = props.announcement ?? props.messages.announcement(context.segments)
       if (message.trim() === "") return
@@ -96,9 +105,9 @@ export const alertMachine = setup({
   effects: ["prepareAnnouncer"],
   states: {
     open: {
-      // Shown again through `open` ($sync): one announcement.
-      entry: ["announceText"],
       on: {
+        // Shown again through `open`: one announcement, from the freshly rendered text.
+        "ROOT.SHOW": { actions: ["setText", "announceText"] },
         "ROOT.MOUNT": {
           guard: "notMounted",
           actions: ["setText", "markMounted", "announceText"],

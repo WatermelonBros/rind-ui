@@ -51,6 +51,7 @@ export const alertContract = contract("alert", {
     "CLOSE.COMMIT": "dismiss",
     CLOSE: { skip: "the first half of a dismissal; driven through CLOSE.COMMIT's dismiss" },
     "ROOT.MOUNT": { skip: "mount; covered by the machine unit tests (hydrating true/false)" },
+    "ROOT.SHOW": { skip: "sent by the Root after open became true; driven through $sync:open" },
     "CONTENT.CHANGE": {
       skip: "a text change of the rendered content; covered by the DOM and machine tests",
     },

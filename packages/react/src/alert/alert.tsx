@@ -126,12 +126,20 @@ function Root({
       segments: el.current ? announceableText(el.current) : [],
     })
   }, [send, hydrating])
+  // Shown again (`open` became true): the text read from what this commit rendered, so a
+  // change made while it was unmounted is announced once, as it is now.
+  const wasOpen = useRef(isOpen)
+  useEffect(() => {
+    if (isOpen && !wasOpen.current) {
+      send({ type: "ROOT.SHOW", segments: el.current ? announceableText(el.current) : [] })
+    }
+    wasOpen.current = isOpen
+  }, [isOpen, send])
   const live = (announce ?? "polite") !== "off"
-  // The rendered text, whenever the element is (re)mounted and on every change after.
+  // Every change of the rendered text while the element is mounted.
   useEffect(() => {
     const node = el.current
     if (!presence.mounted || !live || !node) return
-    send({ type: "CONTENT.CHANGE", segments: announceableText(node) })
     return observeText(node, (segments) => send({ type: "CONTENT.CHANGE", segments }))
   }, [presence.mounted, live, send])
   const own = rest as Readonly<Record<string, unknown>> // the element's own props, read by name
