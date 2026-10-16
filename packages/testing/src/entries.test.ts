@@ -14,6 +14,6 @@ describe("optional peers", () => {
     const main = await import("./index")
     expect(typeof pw.playwrightEnv).toBe("function")
     expect(typeof main.createDriver).toBe("function")
-    // A deadline, not a wait: cold-importing both entries is slow on a loaded machine.
+    // Deadline, not a delay: transforming both entries' module graphs is slow on a loaded machine.
   }, 30_000)
 })
