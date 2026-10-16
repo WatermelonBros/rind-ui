@@ -22,12 +22,19 @@ export type {
   StyleInjection,
   TimerHandle,
 } from "./capabilities"
+export type { DelayGroup, DelayGroupEnv, DelayGroupMember } from "./delay-group"
 export {
   type DomEnvironment,
   type DomEnvironmentOptions,
   domEnvironment,
   type ValidityEnv,
 } from "./dom-environment"
+export type {
+  HoverIntent,
+  HoverIntentEnv,
+  HoverIntentTrackOptions,
+  HoverTriggerProps,
+} from "./hover-intent"
 export type {
   Align,
   AnchorSource,

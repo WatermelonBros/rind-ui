@@ -93,11 +93,13 @@ export function arrowProps(s: PlacementState, id: string): PartProps {
     "aria-hidden": "true",
     "data-side": s.side,
     "data-anchor-hidden": dataFlag(s.placed && s.anchorHidden),
-    style: {
-      position: "absolute",
-      left: "var(--rind-arrow-x)",
-      top: "var(--rind-arrow-y)",
-    },
+    // Only the cross axis inline: the main-axis offset (the arrow sticking out of the edge)
+    // is the stylesheet's, and an inline `top: var(--rind-arrow-y)` (empty on that axis)
+    // would override it with the static position.
+    style:
+      s.side === "top" || s.side === "bottom"
+        ? { position: "absolute", left: "var(--rind-arrow-x)" }
+        : { position: "absolute", top: "var(--rind-arrow-y)" },
   }
 }
 

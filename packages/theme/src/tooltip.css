@@ -1,0 +1,77 @@
+/*
+ * Tooltip: positioner.css gives the anchored content its box, transform origin and arrow
+ * geometry. This sheet adds the --rind-tooltip-* tokens (defaulting to the semantic ones),
+ * a compact inverted surface, entry (@starting-style) and exit ([data-state="closed"]) as a
+ * transition, no animation at all for [data-instant] (a tooltip opened or closed by the
+ * delay group), reduced motion and the forced-colors border. [hidden] is never overridden:
+ * the closed content stays in the document, hidden, so the trigger can reference it.
+ */
+@layer rind.components {
+  [data-scope="tooltip"][data-part="content"][data-side] {
+    background: var(--rind-tooltip-bg, var(--rind-color-neutral-solid));
+    color: var(--rind-tooltip-color, var(--rind-color-neutral-on-solid));
+    padding: var(--rind-tooltip-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-tooltip-radius, var(--rind-radius-sm));
+    font-size: var(--rind-tooltip-font-size, var(--rind-text-sm));
+    max-inline-size: min(var(--rind-tooltip-max-width, 20rem), var(--rind-available-width, 100vw));
+    overflow-wrap: anywhere;
+    transform-origin: var(--rind-transform-origin);
+    animation: none;
+    transition:
+      opacity var(--rind-tooltip-duration, var(--rind-duration-fast)) var(--rind-ease-out),
+      transform var(--rind-tooltip-duration, var(--rind-duration-fast)) var(--rind-ease-out);
+  }
+
+  [data-scope="tooltip"][data-part="content"][data-side][data-state="open"] {
+    opacity: 1;
+    transform: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  [data-scope="tooltip"][data-part="content"][data-side][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  [data-scope="tooltip"][data-part="content"][data-instant],
+  [data-scope="tooltip"][data-part="positioner"][data-instant] {
+    transition: none;
+    animation: none;
+  }
+
+  [data-scope="tooltip"][data-part="arrow"][data-side] {
+    inline-size: var(--rind-tooltip-arrow-size, 8px);
+    block-size: var(--rind-tooltip-arrow-size, 8px);
+    background: var(--rind-tooltip-bg, var(--rind-color-neutral-solid));
+  }
+  [data-scope="tooltip"][data-part="arrow"][data-side="top"] {
+    bottom: calc(var(--rind-tooltip-arrow-size, 8px) / -2);
+  }
+  [data-scope="tooltip"][data-part="arrow"][data-side="bottom"] {
+    top: calc(var(--rind-tooltip-arrow-size, 8px) / -2);
+  }
+  [data-scope="tooltip"][data-part="arrow"][data-side="left"] {
+    right: calc(var(--rind-tooltip-arrow-size, 8px) / -2);
+  }
+  [data-scope="tooltip"][data-part="arrow"][data-side="right"] {
+    left: calc(var(--rind-tooltip-arrow-size, 8px) / -2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="tooltip"][data-part="content"] {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="tooltip"][data-part="content"] {
+      border: var(--rind-border-width) solid CanvasText;
+    }
+    [data-scope="tooltip"][data-part="arrow"] {
+      background: CanvasText;
+    }
+  }
+}

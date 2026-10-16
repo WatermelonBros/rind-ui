@@ -291,6 +291,27 @@ function createPlaywrightEnv(
         await l.dispatchEvent("pointerenter", { pointerType: "touch" })
       },
       focus: async () => (await waitFor()).focus(),
+      async focusWithTab() {
+        const l = await waitFor()
+        // The tab stop before it (document order; positive tabindex aside), then Tab.
+        await l.evaluate((el) => {
+          const stops = Array.from(
+            el.ownerDocument.querySelectorAll<HTMLElement>(
+              "a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]",
+            ),
+          ).filter(
+            (s) =>
+              s.tabIndex >= 0 &&
+              !s.matches(":disabled") &&
+              !s.closest("[inert]") &&
+              s.getClientRects().length > 0,
+          )
+          const before = stops[stops.indexOf(el as HTMLElement) - 1]
+          if (before) before.focus()
+          else (el.ownerDocument.activeElement as HTMLElement | null)?.blur?.()
+        })
+        await (await getBase()).page.keyboard.press("Tab")
+      },
       async press(key, keyOptions) {
         const l = await waitFor()
         if (!(await l.evaluate((el) => el === document.activeElement))) await l.focus()

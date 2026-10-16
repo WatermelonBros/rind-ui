@@ -50,6 +50,7 @@
 - [Toggle Group](docs/components/toggle-group.md): A set of [Toggles](toggle.md) that share one roving tab stop and one value. Each Item is a real `<button aria-pressed>`; the group is a `role="group"` named by you. `selectionMode` is `single` (pressing an item replaces the selection, the default) or `multiple`. The value is always a `string[]`.
 - [Toggle](docs/components/toggle.md): A two-state button: it is on or off, and says so with `aria-pressed`. Use it for a setting that applies immediately (Bold, Mute, Pin).
 - [Toolbar](docs/components/toolbar.md): A row (or column) of controls with one roving tab stop. Tab enters the toolbar on the last control that had focus, arrows move between controls, Tab leaves. The root is `role="toolbar"` named by you; its controls keep their own roles: buttons, links, the items of a hosted [Toggle Group](toggle-group.md) or [Radio Group](radio-group.md), and any other control through `Toolbar.Item`.
+- [Tooltip](docs/components/tooltip.md): A short text shown when the pointer rests on a trigger or the trigger receives keyboard focus. It supplements the trigger; it is not a place for anything interactive. The content is `role="tooltip"`, never focusable, positioned against the trigger by the shared positioning capability.
 
 ## Accessibility
 

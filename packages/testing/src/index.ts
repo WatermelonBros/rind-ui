@@ -40,6 +40,13 @@ export { getTextField } from "./components/text-field"
 export { getToggle } from "./components/toggle"
 export { getToggleGroup } from "./components/toggle-group"
 export { getToolbar } from "./components/toolbar"
+export { getTooltip } from "./components/tooltip"
+export {
+  type FakeDelayGroup,
+  type FakeHoverIntent,
+  fakeDelayGroup,
+  fakeHoverIntent,
+} from "./delay-group"
 export {
   type ContractModality,
   createDriver,

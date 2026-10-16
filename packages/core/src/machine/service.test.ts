@@ -540,6 +540,28 @@ describe("review follow-ups", () => {
     vi.advanceTimersByTime(10)
     expect(seen).toEqual(["OPEN", "after:d", "exit sees true"])
   })
+
+  it("a transition's declared reason replaces the event type in the change details", () => {
+    vi.useFakeTimers()
+    const seen: unknown[] = []
+    const m = setup({
+      types: type<{ props: Props; events: Event; env: SchedulerEnv; values: "open" }>(),
+      delays: { d: () => 10 },
+    }).machine({
+      id: "reasons",
+      initial: "closed",
+      values: { open: { fallback: false, states: { open: true, closed: false } } },
+      states: {
+        closed: { on: { OPEN: { target: "open", reason: "hover" } } },
+        open: { after: { d: { target: "closed", reason: "pointer-leave" } } },
+      },
+    })
+    const s = createService(m, { onOpenChange: (_, d) => seen.push(d.reason) }, { scheduler })
+    s.start()
+    s.send({ type: "OPEN" })
+    vi.advanceTimersByTime(10)
+    expect(seen).toEqual(["hover", "pointer-leave"])
+  })
 })
 
 describe("read-only prop bindings", () => {

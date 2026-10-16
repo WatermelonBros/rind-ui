@@ -1591,3 +1591,45 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   }
 }
 ```
+
+### tooltip
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "arrow-size": {
+      "fallback": "8px",
+      "file": "tooltip.css"
+    },
+    "bg": {
+      "fallback": "var(--rind-color-neutral-solid)",
+      "file": "tooltip.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-neutral-on-solid)",
+      "file": "tooltip.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-fast)",
+      "file": "tooltip.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-sm)",
+      "file": "tooltip.css"
+    },
+    "max-width": {
+      "fallback": "20rem",
+      "file": "tooltip.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "tooltip.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-sm)",
+      "file": "tooltip.css"
+    }
+  }
+}
+```

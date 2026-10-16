@@ -81,6 +81,9 @@ export function createService<M extends AnyMachine>(
       : snap.internal[key]
   const stateFor = (key: string, v: unknown) => {
     const bound = values[key]?.states
+    // Several states may share a value (a tooltip's `opening` and `closed` are both closed):
+    // the current one already holds it, so nothing moves.
+    if (bound && snap.state in bound && eq(key, bound[snap.state], v)) return snap.state
     for (const s in bound) if (eq(key, bound[s], v)) return s
     return undefined
   }
@@ -144,11 +147,17 @@ export function createService<M extends AnyMachine>(
    * parent that applies it synchronously (setProps inside onChange) finds it satisfied.
    * Uncontrolled: "commit" — the caller stores the value at the right point of the step.
    */
-  const write = (key: string, v: unknown, event: Event): "commit" | "propose" | "cancel" => {
+  const write = (
+    key: string,
+    v: unknown,
+    event: Event,
+    reason: string = event.type,
+  ): "commit" | "propose" | "cancel" => {
     if (fromProps[key]) setProposed(key, v)
     let cancelled = false
     const details: ChangeDetails = {
-      reason: event.type,
+      // Sound: a transition's declared reason is part of the machine's own reason union.
+      reason: reason as ChangeDetails["reason"],
       event,
       cancel: () => {
         cancelled = true
@@ -246,7 +255,7 @@ export function createService<M extends AnyMachine>(
         if (values[key]?.readOnly || !bound || !(target in bound)) continue
         const v = bound[target]
         if (eq(key, v, value(key))) continue
-        const result = write(key, v, event)
+        const result = write(key, v, event, t.reason)
         if (result === "commit") {
           commits.push([key, v])
           continue

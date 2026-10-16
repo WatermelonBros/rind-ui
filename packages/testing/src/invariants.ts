@@ -610,9 +610,14 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     }
     return out
   },
-  /** Focus is never on body while a layer is open. */
+  /**
+   * Focus is never lost to body while a layer is open. A layer that never takes focus (a
+   * tooltip opened by hover while nothing had focus) leaves it where it was.
+   */
   layer: (f) =>
-    isOpen(f) && f.after.focus.onBody ? ["focus is on <body> while the layer is open"] : [],
+    isOpen(f) && f.after.focus.onBody && f.before?.focus.onBody !== true
+      ? ["focus is on <body> while the layer is open"]
+      : [],
   /** (13) After closing, focus is on the trigger or the declared final-focus part. */
   "restores-focus": (f) => {
     const target = f.semantics["finalFocus"] ?? f.semantics["trigger"]
