@@ -7,7 +7,7 @@ import { dirname, join } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { getNumberInput } from "../../src/index"
+import { getNumberInput, playwrightEnv } from "../../src/index"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")
@@ -45,10 +45,12 @@ afterEach(async () => {
   for (const p of pages.splice(0)) await p.context().close()
 })
 
-async function open(options: Parameters<Browser["newContext"]>[0] = {}) {
+async function open(options: Parameters<Browser["newContext"]>[0] = {}, fakeClock = false) {
   const context = await browser.newContext({ hasTouch: true, ...options })
   const page = await context.newPage()
   pages.push(page)
+  // Deterministic time for holds: the page's timers advance only when the test says so.
+  if (fakeClock) await page.clock.install()
   await page.setContent(html)
   await page.getByRole("spinbutton", { name: "Quantity" }).waitFor()
   return page
@@ -80,14 +82,16 @@ describe("number input driver through Playwright", () => {
   it("a real held stepper repeats, then commits once at the bound", {
     timeout: 60_000,
   }, async () => {
-    const page = await open()
-    const limit = getNumberInput(page, { name: "Limit" })
+    const page = await open({}, true)
+    const clocked = playwrightEnv(page, { advanceTimers: (ms) => page.clock.runFor(ms) })
+    const limit = getNumberInput(clocked, { name: "Limit" })
     await limit.holdStepper("increase", 900)
     expect(await limit.value()).toBe(10)
     expect(await limit.canIncrement()).toBe(false)
-    const quantity = getNumberInput(page, { name: "Quantity" })
+    const quantity = getNumberInput(clocked, { name: "Quantity" })
     await quantity.holdStepper("increase", 400 + 5 * 60)
-    expect(await quantity.value()).toBeGreaterThanOrEqual(3)
+    // The press step and one repeat per 60 ms after the 400 ms delay.
+    expect(await quantity.value()).toBe(6)
   })
 
   it("a touch tap steps without taking focus", { timeout: 60_000 }, async () => {

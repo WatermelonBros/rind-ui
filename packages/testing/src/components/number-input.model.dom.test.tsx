@@ -22,7 +22,10 @@ const a11y = async () => {
   if (violations.length > 0) throw new Error(violations.map((v) => `${v.id}: ${v.help}`).join("\n"))
 }
 
-const SPIN = { spinDelay: 1500, spinInterval: 1500 }
+// No press-and-hold: the runner walks `after:*` edges in real time, and tests never wait on
+// elapsed time. Holds are covered by the fake-timer scenario and machine tests. Restore the
+// delay edges when testMachine drives them through the machine's injected Scheduler.
+const SPIN = { spinOnPress: false }
 
 type PartLike = {
   compose(updates: readonly string[], commit?: string): Promise<void>
@@ -180,7 +183,6 @@ for (const cfg of configs) {
         step: rest.step,
         largeStep: undefined,
         commitBehavior: rest.commitBehavior,
-        spinOnPress: rest.spinOnPress,
         ...SPIN,
         disabled: undefined,
         readOnly: rest.readOnly,

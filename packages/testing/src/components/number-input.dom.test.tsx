@@ -6,6 +6,7 @@ import {
   domEnvironment,
   numberInputInvariants,
   numberInputMessages,
+  PENDING_ANNOUNCEMENTS,
   platforms,
 } from "@rind-ui/core"
 import { Field, NumberInput, type NumberInputRootProps, RindProvider } from "@rind-ui/react"
@@ -67,6 +68,12 @@ const pointer = (el: Element, type: string, pointerType = "mouse") =>
       }),
     )
   })
+/** Keyed announcements are debounced: wait (a condition, not a delay) until none is pending. */
+const settledAnnouncements = () =>
+  vi.waitFor(() =>
+    expect((Reflect.get(globalThis, PENDING_ANNOUNCEMENTS) as number | undefined) ?? 0).toBe(0),
+  )
+
 const keydown = (el: Element, init: KeyboardEventInit) => {
   const e = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init })
   act(() => {
@@ -275,7 +282,7 @@ describe("Keys and steps", () => {
     act(() => el.focus())
     for (let i = 0; i < 20; i++) keydown(el, { key: "ArrowUp", repeat: i > 0 })
     expect(el.getAttribute("aria-valuenow")).toBe("20")
-    await new Promise((r) => setTimeout(r, 600))
+    await settledAnnouncements()
     expect(installAnnouncementLog()).toEqual([])
   })
 
@@ -303,7 +310,7 @@ describe("Keys and steps", () => {
     const before = installAnnouncementLog().length
     await drv().fill("42")
     expect(await drv().value()).toBe(42)
-    await new Promise((r) => setTimeout(r, 600))
+    await settledAnnouncements()
     expect(installAnnouncementLog().length).toBe(before)
   })
 })
