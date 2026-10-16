@@ -1,3 +1,9 @@
+> Implementation notes (add-menu): close reasons are kebab case (`item-select`, `tab-key`,
+> …) like every layer; `SUB_CLOSE` became the logical `COLLAPSE`; the rest timeout lives in
+> `hover-intent` (`restMs`) and the parent takes the item under the pointer on
+> `TREE.CHILD_LEFT`; the restore decision is an exit action (it must precede the layer's
+> cleanup).
+
 ## Context
 
 See proposal.md for motivation and specs/menu/spec.md for behaviour. Research and the
@@ -71,7 +77,7 @@ export type MenuTreeEvent = { type: "TREE.CLOSE"; reason: CloseReason } | { type
   closed ───────────────────────────────────────────────────────────────────────────────► open
     ▲                                                                                       │
     └── TRIGGER_PRESS (open, toggle) · ITEM_SELECT · ESCAPE_KEY · TAB_KEY · OUTSIDE_PRESS ·  ┘
-        OUTSIDE_FOCUS · WINDOW_BLUR · PARENT_DISMISSED · SUB_CLOSE · HOVER.END · TREE.CLOSE ·
+        OUTSIDE_FOCUS · WINDOW_BLUR · PARENT_DISMISSED · COLLAPSE · HOVER.END · TREE.CLOSE ·
         TREE.SIBLING_OPENED · CLOSE · $sync(false)
 ```
 
@@ -80,12 +86,12 @@ type MenuEvent =
   | ({ type: "TRIGGER_PRESS" } & PressFields)                 // root: trigger; submenu: its trigger item
   | { type: "TRIGGER_KEY"; key: "FIRST" | "LAST"; modality: "keyboard" }
   | { type: "SUB_OPEN"; modality: Modality }                  // EXPAND / Enter / Space on the submenu trigger
-  | { type: "SUB_CLOSE" }                                      // COLLAPSE inside the submenu
+  | { type: "EXPAND" | "COLLAPSE" }                            // logical keys: open a submenu / close it (or the menubar's)
   | { type: "ITEM_ACTIVATE"; key: CollectionKey; kind: ItemKind; modality: Modality; via: "press" | "enter" | "space" }
   | { type: "ESCAPE_KEY" | "OUTSIDE_PRESS" | "OUTSIDE_FOCUS" | "PARENT_DISMISSED"; request: DismissRequest }
   | { type: "TAB_KEY"; shift: boolean } | { type: "WINDOW_BLUR" }
   | { type: "HOVER.START" | "HOVER.END" }                      // hover-intent, submenu level only
-  | { type: "GRACE.REST" }                                     // menu extension, §4
+  | { type: "TREE.CHILD_LEFT" }                                // a submenu's grace area ended (rest, §4)
   | { type: "TREE.CLOSE"; reason: CloseReason } | { type: "TREE.SIBLING_OPENED" }
   | { type: "POSITION.PLACED"; side: Side; align: Align; anchorHidden: boolean; first: boolean }
   | { type: "OPEN" } | { type: "CLOSE" }
@@ -101,10 +107,10 @@ type MenuEvent =
   content. Context `openingPress` id makes the opening press's own release/click a
   no-op on items (radix#1655, #610, react-spectrum#9686).
 - `ITEM_ACTIVATE` action `select`: calls `onSelect(details)`; unless cancelled and if
-  `closeOnSelect` (per kind default, §3) → `menuTree.closeTree("ITEM_SELECT")`. The
+  `closeOnSelect` (per kind default, §3) → `menuTree.closeTree("item-select")`. The
   close is queued after the item's `click` dispatch (press module order), which keeps
   touch selections from reaching elements below.
-- `TAB_KEY` → `closeTree("TAB_KEY")`, then focus the root trigger without
+- `TAB_KEY` → `closeTree("tab-key")` (the root closes itself), then focus the root trigger without
   `preventDefault`, so the browser's own Tab continues from it (Headless UI's approach;
   Shift+Tab lands before the trigger).
 - `ESCAPE_KEY` closes only this level (overlay routes it to the topmost layer) and

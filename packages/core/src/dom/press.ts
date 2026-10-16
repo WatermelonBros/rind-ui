@@ -327,6 +327,9 @@ export function createPress(options: PressOptions): PressHandle {
 
   /** Contact-area hit test; layout-free environments (0×0 rects) trust enter/leave. */
   const isOver = (target: Element, e: PressPointerEvent) => {
+    // A descendant overflowing the box (an extended tap area) is the part too (mui/base-ui#3184).
+    const at = e.target as Node | null
+    if (at && "nodeType" in at && target.contains(at)) return true
     const rect = target.getBoundingClientRect()
     if (rect.width === 0 && rect.height === 0) return true
     const dx = (e.width || 0) / 2
