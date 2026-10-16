@@ -41,7 +41,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | wip | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
