@@ -251,11 +251,11 @@ describe("Menu: opening press", () => {
     const onSelect = vi.fn()
     render(
       <RindProvider environment={{ scheduler: clock.scheduler }}>
-        <Menu.Root>
+        {/* Placed over its trigger: the opening release lands on the first item. */}
+        <Menu.Root positioning={{ side: "top", sideOffset: -24 }}>
           <Menu.Trigger>Over</Menu.Trigger>
           <Menu.Portal>
-            {/* Placed over its trigger: the opening release lands on the first item. */}
-            <Menu.Positioner positioning={{ side: "top", sideOffset: -24 }}>
+            <Menu.Positioner>
               <Menu.Content style={{ display: "grid", width: 160 }}>
                 <Menu.Item style={{ height: 40 }} onSelect={onSelect}>
                   First
