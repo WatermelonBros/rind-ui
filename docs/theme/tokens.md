@@ -566,6 +566,56 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### context-menu
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-menu-bg, var(--rind-color-surface-raised))",
+      "file": "context-menu.css"
+    },
+    "border": {
+      "fallback": "var(--rind-menu-border, var(--rind-color-border-strong))",
+      "file": "context-menu.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "context-menu.css"
+    },
+    "max-height": {
+      "fallback": "var(--rind-menu-max-height, 100vh)",
+      "file": "context-menu.css"
+    },
+    "min-width": {
+      "fallback": "var(--rind-menu-min-width, 10rem)",
+      "file": "context-menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-menu-padding, var(--rind-space-1))",
+      "file": "context-menu.css"
+    },
+    "pop-from": {
+      "fallback": "scale(0.96)",
+      "file": "context-menu.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-menu-radius, var(--rind-radius-md))",
+      "file": "context-menu.css"
+    },
+    "region-open-bg": {
+      "fallback": "transparent",
+      "file": "context-menu.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-menu-shadow, var(--rind-shadow-sm))",
+      "file": "context-menu.css"
+    }
+  }
+}
+```
+
 ### dialog
 
 ```json
@@ -970,11 +1020,11 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "bg": {
       "fallback": "var(--rind-color-surface-raised)",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "border": {
       "fallback": "var(--rind-color-border-strong)",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "group-label-text": {
       "fallback": "var(--rind-color-text-muted)",
@@ -986,19 +1036,19 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "max-height": {
       "fallback": "100vh",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "min-width": {
       "fallback": "10rem",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "padding": {
       "fallback": "var(--rind-space-1)",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "radius": {
       "fallback": "var(--rind-radius-md)",
-      "file": "menu.css"
+      "file": "context-menu.css"
     },
     "separator": {
       "fallback": "var(--rind-color-border)",
@@ -1006,7 +1056,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "shadow": {
       "fallback": "var(--rind-shadow-sm)",
-      "file": "menu.css"
+      "file": "context-menu.css"
     }
   }
 }

@@ -26,17 +26,14 @@ const focusInMenu = async (env: E) => {
 const opened = async (env: E) =>
   (await isOpen(env)) && (await positioningQueries.isPlaced(env)) && (await focusInMenu(env))
 
-/** A long press: a held touch, the press module's threshold run out, released. */
-async function longPress(env: E, at: At) {
-  const region = env.part("trigger")
-  await region.pointer("down", { at, pointerType: "touch" })
-  // The long press's own delay (500 ms): the environment's time (fake timers when given).
-  await env.advance(520)
-  await region.pointer("up", { at, pointerType: "touch" })
-}
+/** A long press: a touch held for the press module's threshold (environment time). */
+const longPress = (env: E, at: At) => env.part("trigger").longPress({ at })
 
 type At = { readonly x: number; readonly y: number }
 const CENTRE: At = { x: 0.5, y: 0.5 }
+
+/** The oracle's payload for a gesture at a point (its position does not change the graph). */
+const GESTURE = { point: { x: 0, y: 0 }, target: null, virtual: false }
 
 function contextMenuContractWith(modal: boolean) {
   const base = menuContract
@@ -93,19 +90,19 @@ function contextMenuContractWith(modal: boolean) {
       ...(base.events as Record<never, never>),
       "REGION.CONTEXTMENU": {
         from: {
-          closed: "openAt",
+          closed: { action: "openAt", event: () => GESTURE },
           open: modal
             ? { skip: "the region is inert under a modal menu: DOCUMENT.CONTEXTMENU, DOM tests" }
-            : "reanchor",
+            : { action: "reanchor", event: () => GESTURE },
         },
       },
       "REGION.LONG_PRESS": {
         from: {
-          closed: { action: "openAt" },
+          closed: { action: "openAt", event: () => GESTURE },
           open: { skip: "a second long press: the DOM tests" },
         },
       },
-      "REGION.KEY": "openAt",
+      "REGION.KEY": { action: "openAt", event: () => ({ target: null }) },
       "DOCUMENT.CONTEXTMENU": { skip: "a right click elsewhere while open: the DOM tests" },
       TRIGGER_PRESS: { skip: "a region is no button: the opening gestures are REGION.*" },
       TRIGGER_KEY: { skip: "a region is no button: the context-menu key is REGION.KEY" },
@@ -118,7 +115,8 @@ function contextMenuContractWith(modal: boolean) {
     exceptions: base.exceptions ?? [],
     commitsOnFocus: base.commitsOnFocus ?? [],
     // The region is no disclosure trigger (no aria-expanded): only the content and items.
-    semantics: { content: "content", item: "item" },
+    // Focus returns to what had it: the focused element inside the region.
+    semantics: { content: "content", item: "item", finalFocus: "trigger" },
   })
 }
 

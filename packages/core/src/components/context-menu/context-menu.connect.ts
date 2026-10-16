@@ -40,7 +40,8 @@ export function contextMenuRegionProps(
     // attribute says it is a region, not a button.
     ...scopeAttrs("menu", "trigger", input.instance),
     "data-context-menu": "",
-    "aria-describedby": input.hintId,
+    // The hint says how to open it: while open (and inert under a modal menu) it is moot.
+    "aria-describedby": input.open ? undefined : input.hintId,
     "data-state": input.open ? "open" : "closed",
     "data-disabled": dataFlag(input.disabled),
     onContextMenu: (event: unknown) => {

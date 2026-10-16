@@ -394,6 +394,30 @@ function createPlaywrightEnv(
           : [box.x + box.width / 2, box.y + box.height / 2]
         await page.mouse.click(x, y)
       },
+      async longPress(hold) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        const x = (box?.x ?? 0) + (box?.width ?? 0) * (hold?.at?.x ?? 0.5)
+        const y = (box?.y ?? 0) + (box?.height ?? 0) * (hold?.at?.y ?? 0.5)
+        const init = {
+          bubbles: true,
+          cancelable: true,
+          clientX: x,
+          clientY: y,
+          pointerId: 7,
+          pointerType: hold?.pointerType ?? "touch",
+          isPrimary: true,
+          pressure: 0.5,
+          width: 20,
+          height: 20,
+        }
+        await l.dispatchEvent("pointerdown", { ...init, buttons: 1 })
+        // The environment's time, as `advance`: the page clock when the test gave one.
+        const ms = hold?.ms ?? 520
+        if (options.advanceTimers) await options.advanceTimers(ms)
+        else await (await getBase()).page.waitForTimeout(ms)
+        await l.dispatchEvent("pointerup", { ...init, buttons: 0 })
+      },
       async contextMenu(options) {
         const l = await waitFor()
         const box = await l.boundingBox()
