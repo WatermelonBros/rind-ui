@@ -64,6 +64,9 @@ import { useRenderedTag } from "../use-rendered-tag"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
+/** Controls keep their own role inside the menu (a search field, a native button). */
+const INTERACTIVE = "input, select, textarea, button, a[href], [tabindex], [contenteditable]"
+
 const EMPTY = createListCollection<{ key: string }>({
   items: [],
   getKey: (i) => i.key,
@@ -189,12 +192,15 @@ function useLevelService(input: {
   readonly triggerRef: RefObject<HTMLElement | null>
   readonly options: LevelOptions
   readonly controllable?: Pick<MenuProps, "open" | "defaultOpen" | "onOpenChange" | "modal">
+  /** One per tree: a parent level sees its submenu's transit (the grace area). */
+  readonly hoverIntent?: HoverIntent | undefined
 }) {
   const env = useEnvironment()
   const parent = useParentLayer()
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
-  const [hoverIntent] = useState(() => domHoverIntent(env))
+  const [own] = useState(() => (input.hoverIntent ? null : domHoverIntent(env)))
+  const hoverIntent = input.hoverIntent ?? (own as HoverIntent) // one of the two is set
   const menuEnv = useMemo(
     () => ({ ...env, position: domPositioning(env), hoverIntent, menuTree: input.tree }),
     [env, hoverIntent, input.tree],
@@ -433,7 +439,11 @@ function Content({
   // Any other element directly inside the menu is presentational for the menu role.
   useIsoLayoutEffect(() => {
     for (const child of node.current?.children ?? []) {
-      if (!child.hasAttribute("data-scope") && !child.hasAttribute("role")) {
+      if (
+        !child.hasAttribute("data-scope") &&
+        !child.hasAttribute("role") &&
+        !child.matches(INTERACTIVE)
+      ) {
         child.setAttribute("role", "none")
       }
     }
@@ -843,6 +853,7 @@ function Submenu({ children, ...options }: MenuSubmenuProps) {
     tree: parent.tree,
     triggerRef,
     options,
+    hoverIntent: parent.hoverIntent,
   })
   const { submenus } = parent
   const { send } = s

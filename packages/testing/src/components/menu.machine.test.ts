@@ -60,8 +60,8 @@ function make(
   const env = {
     dom: { getById: () => null, activeElement: () => null },
     modality: { modality: () => "keyboard" },
-    // fake-time: the `after` delay (submenu open delay) runs on vi fake timers
     scheduler: {
+      // fake-time: the `after` delay (submenu open delay) runs on vi fake timers
       setTimeout: (cb: () => void, ms: number) => setTimeout(cb, ms),
       clearTimeout: (h: unknown) => clearTimeout(h as never),
       requestAnimationFrame: () => 0,

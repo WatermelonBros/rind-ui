@@ -328,7 +328,10 @@ export const menuMachine = setup({
       if (props.parentLevel) env.menuTree.openChild(props.parentLevel, props.levelId)
     },
     leaveTree: ({ env, event, props }) =>
-      env.menuTree.childClosed(props.levelId, { byHover: event.type === "HOVER.END" }),
+      env.menuTree.childClosed(props.levelId, {
+        // Only an open submenu whose grace area ended, never one still waiting to open.
+        byHover: event.type === "HOVER.END" && "zone" in event && event.zone === true,
+      }),
     rememberPointer: ({ event, set }) => {
       if (event.type === "POINTER_MOVE") set("pendingPointerKey", event.key)
     },
@@ -350,7 +353,23 @@ export const menuMachine = setup({
       const reason = reasonOf(event)
       if (reason) set("closeReason", reason)
     },
-    noRestore: ({ set }) => set("restoreFocus", false),
+    /**
+     * Exit action (it runs before the layer's cleanup reads it): a sibling opening or the
+     * window blurring keeps focus where it goes; the pointer leaving returns focus to the
+     * trigger only from inside the submenu (focus on the trigger stays for the parent, which
+     * highlights the item under the pointer).
+     */
+    decideRestore: ({ env, event, props, set }) => {
+      if (event.type === "TREE.SIBLING_OPENED" || event.type === "WINDOW_BLUR") {
+        set("restoreFocus", false)
+        return
+      }
+      if (event.type === "HOVER.END") {
+        const content = env.dom.getById(menuIds(props.levelId).content)
+        const active = env.dom.activeElement()
+        set("restoreFocus", content !== null && active !== null && content.contains(active))
+      }
+    },
     setPlacement: ({ event, set }) => {
       if (event.type === "POSITION.PLACED") set("placement", placementFrom(event))
     },
@@ -582,7 +601,7 @@ export const menuMachine = setup({
     open: {
       entry: ["openInTree"],
       effects: ["open"],
-      exit: ["resetTypeahead", "resetPlacement"],
+      exit: ["decideRestore", "resetTypeahead", "resetPlacement"],
       on: {
         TRIGGER_PRESS: { target: "closed", reason: "trigger", actions: ["setCloseReason"] },
         ESCAPE_KEY: { target: "closed", reason: "escape-key", actions: ["setCloseReason"] },
@@ -606,7 +625,7 @@ export const menuMachine = setup({
           guard: "isRoot",
           target: "closed",
           reason: "window-blur",
-          actions: ["setCloseReason", "noRestore"],
+          actions: ["setCloseReason"],
         },
         // One arm per reason: `onOpenChange` reports the reason the tree closed with.
         "TREE.CLOSE": [
@@ -655,7 +674,7 @@ export const menuMachine = setup({
           },
           { guard: "treeApi", target: "closed", reason: "api", actions: ["setCloseReason"] },
         ],
-        "TREE.SIBLING_OPENED": { target: "closed", actions: ["noRestore"] },
+        "TREE.SIBLING_OPENED": "closed",
         "HOVER.END": { guard: "fromZone", target: "closed" },
         CLOSE: { target: "closed", reason: "api", actions: ["setCloseReason"] },
         ITEM_ACTIVATE: { actions: ["select"] },
