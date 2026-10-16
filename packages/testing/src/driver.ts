@@ -137,7 +137,7 @@ export async function runAction(
     const seen = await observe(contract, env)
     const expected = typeof done === "function" ? "its postcondition" : JSON.stringify(done)
     throw new Error(
-      `${contract.scope}.${name} [${modality}]: expected ${expected}, observed ${JSON.stringify(seen)}${
+      `${contract.scope}.${name} [${modality}]: expected ${expected}, observed ${JSON.stringify(seen)}; focus on ${await describeFocus(env)}${
         e instanceof UntilTimeout ? "" : ` (${e instanceof Error ? e.message : String(e)})`
       }`,
     )
@@ -155,6 +155,20 @@ export interface DriverOptions {
 }
 
 const PREFERENCE: readonly Modality[] = ["pointer", "keyboard", "touch"]
+
+/** Where focus is, for a failed postcondition: a tag, its rind-ui part and its name. */
+async function describeFocus(env: AdapterEnv): Promise<string> {
+  try {
+    const f = env.focused()
+    if (!(await f.exists())) return "nothing (body)"
+    const scope = await f.attr("data-scope")
+    const part = await f.attr("data-part")
+    const where = scope && part ? ` ${scope}.${part}` : ""
+    return `<${await f.tagName()}>${where} "${await f.accessibleName()}"`
+  } catch {
+    return "unknown"
+  }
+}
 
 function make<C extends AnyContract>(
   contract: C,

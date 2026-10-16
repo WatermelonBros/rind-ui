@@ -158,7 +158,8 @@ describe("Open state and reasons", () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     render(<Full open onOpenChange={onOpenChange} />)
-    await settle()
+    // The initial focus lands in a frame: read "before" only once it is inside (CI timing).
+    await vi.waitFor(() => expect(queryDialog()?.contains(active())).toBe(true))
     const before = active()
     await user.keyboard("{Escape}")
     await settle()
