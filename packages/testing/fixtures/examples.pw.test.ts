@@ -33,7 +33,10 @@ beforeAll(async () => {
 afterAll(() => site?.close())
 
 const index = examplesIndex()
-const engines = [pw.chromium, pw.firefox, pw.webkit] as const
+// All three by default; CI splits the playwright slice per engine with RIND_BROWSERS.
+const engines = [pw.chromium, pw.firefox, pw.webkit].filter((e) =>
+  (process.env["RIND_BROWSERS"] ?? "chromium,firefox,webkit").split(",").includes(e.name()),
+)
 const skins: readonly Skin[] = ["none", "theme-calm", "theme-crisp"]
 const schemes = ["light", "dark"] as const
 /** Waits for `n` animation frames of the page: work it scheduled has run (no elapsed time). */
