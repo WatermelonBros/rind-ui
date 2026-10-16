@@ -290,6 +290,11 @@ const TRANSIENT = new Set([
   "number-input:composing",
   "number-input:pressing",
   "number-input:spinning",
+  "password-input:composing",
+  "pin-input:composing",
+  "search-field:composing",
+  // A submenu level waiting for its hover delay (a root menu never enters it).
+  "menu:opening",
 ])
 
 describe("state examples", () => {
