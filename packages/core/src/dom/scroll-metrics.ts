@@ -61,6 +61,46 @@ const scrolls = (overflow: string) => overflow === "auto" || overflow === "scrol
 
 type Env = DomEnv & SchedulerEnv & Partial<ModalityEnv> & Partial<StyleEnv>
 
+/** A measure split in two: `read` touches layout only and returns the writes to make. */
+type Job = () => (() => void) | null
+
+/**
+ * One animation frame per document for every Scroll Area on it: all reads first, then all
+ * writes, so 30 areas never interleave a layout read after a style write (mui/base-ui#3534).
+ */
+const queues = new WeakMap<
+  Document,
+  { jobs: Set<Job>; frame: unknown; scheduler: Env["scheduler"] }
+>()
+
+function enqueue(doc: Document, scheduler: Env["scheduler"], job: Job): void {
+  let q = queues.get(doc)
+  if (!q) {
+    q = { jobs: new Set(), frame: null, scheduler }
+    queues.set(doc, q)
+  }
+  q.jobs.add(job)
+  if (q.frame !== null) return
+  const queue = q
+  queue.frame = scheduler.requestAnimationFrame(() => {
+    queue.frame = null
+    const jobs = [...queue.jobs]
+    queue.jobs.clear()
+    const writes = jobs.map((read) => read())
+    for (const write of writes) write?.()
+  })
+}
+
+function dequeue(doc: Document, job: Job): void {
+  const q = queues.get(doc)
+  if (!q) return
+  q.jobs.delete(job)
+  if (q.jobs.size === 0 && q.frame !== null) {
+    q.scheduler.cancelAnimationFrame(q.frame)
+    q.frame = null
+  }
+}
+
 interface Measured {
   readonly overflow: AxisFlags
   readonly edges: EdgeFlags
@@ -77,7 +117,6 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
       const doc = "body" in node ? node : node.ownerDocument
       injectStyle(doc, "scroll-area", SCROLL_AREA_RULE, env)
 
-      let frame: unknown = null
       let last: Measured | null = null
       let lastPos = { x: 0, y: 0 }
       // A wheel, touch, pointer or key on the Viewport makes the next scrolls a user's.
@@ -100,14 +139,13 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
         y: range(vp, "y", style),
       })
 
-      // ---- measure: reads, then writes ----
-      const measure = () => {
-        frame = null
+      // ---- measure: reads, then (returned) writes ----
+      const measure: Job = () => {
         const vp = viewport()
-        if (!vp) return
+        if (!vp) return null
         const view = vp.ownerDocument.defaultView
         const style = view?.getComputedStyle(vp)
-        if (!style) return
+        if (!style) return null
         // Reads.
         const r = ranges(vp, style)
         const overflow = {
@@ -145,26 +183,49 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
         })
         const barX = byId(ids.scrollbar("x"))
         const barY = byId(ids.scrollbar("y"))
-        const both = overflow.x && overflow.y
+        // The corner exists only while both bars are shown (a hidden bar reserves nothing).
+        const shown = (bar: HTMLElement | null) => bar?.getAttribute("data-state") === "visible"
+        const both = overflow.x && overflow.y && shown(barX) && shown(barY)
         const cornerW = both && barY ? barY.offsetWidth : 0
         const cornerH = both && barX ? barX.offsetHeight : 0
         const content = byId(ids.content)
         const tabbable = content ? tabbables(content).length > 0 : false
-        // Writes.
+        const rootEl = byId(ids.root)
+        return () => write(vp, rootEl, thumbs, hidden, cornerW, cornerH, overflow, tabbable)
+      }
+      /** Sets an inline custom property only when it changes (no mutation, no re-measure). */
+      const put = (el: HTMLElement | null, name: string, value: string) => {
+        if (el && el.style.getPropertyValue(name) !== value) el.style.setProperty(name, value)
+      }
+      const write = (
+        vp: HTMLElement,
+        rootEl: HTMLElement | null,
+        thumbs: readonly ({
+          axis: ScrollAxis
+          thumb: HTMLElement
+          bar: HTMLElement
+          size: number
+          offset: number
+        } | null)[],
+        hidden: Readonly<Record<"xStart" | "xEnd" | "yStart" | "yEnd", number>>,
+        cornerW: number,
+        cornerH: number,
+        overflow: AxisFlags,
+        tabbable: boolean,
+      ) => {
         for (const t of thumbs) {
           if (!t) continue
-          t.thumb.style.setProperty("--rind-scroll-area-thumb-size", `${t.size}px`)
+          put(t.thumb, "--rind-scroll-area-thumb-size", `${t.size}px`)
           t.thumb.style.transform =
             t.axis === "y" ? `translate3d(0, ${t.offset}px, 0)` : `translate3d(${t.offset}px, 0, 0)`
           bindWheel(t.axis, t.bar)
         }
         for (const [k, v] of Object.entries(hidden)) {
           const name = k.replace(/([A-Z])/, "-$1").toLowerCase()
-          vp.style.setProperty(`--rind-scroll-area-overflow-${name}`, `${v}px`)
+          put(vp, `--rind-scroll-area-overflow-${name}`, `${v}px`)
         }
-        const rootEl = byId(ids.root)
-        rootEl?.style.setProperty("--rind-scroll-area-corner-width", `${cornerW}px`)
-        rootEl?.style.setProperty("--rind-scroll-area-corner-height", `${cornerH}px`)
+        put(rootEl, "--rind-scroll-area-corner-width", `${cornerW}px`)
+        put(rootEl, "--rind-scroll-area-corner-height", `${cornerH}px`)
         // Discrete facts, only when they change.
         const edges = {
           xStart: hidden.xStart > 0.5,
@@ -179,7 +240,7 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
         }
       }
       const schedule = () => {
-        if (frame === null) frame = env.scheduler.requestAnimationFrame(measure)
+        if (doc) enqueue(doc, env.scheduler, measure)
       }
 
       // ---- wheels over the scrollbars (non-passive, on each scrollbar only) ----
@@ -329,6 +390,10 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
             schedule()
           })
         : null
+      // Direction and flex direction are read at each measure: re-measure when they may have
+      // changed (a `dir` anywhere, the Viewport's style or class), and when a Scrollbar shows or
+      // hides (the corner follows visibility). Our own writes change no observed attribute.
+      const layout = view?.MutationObserver ? new view.MutationObserver(() => schedule()) : null
 
       // Parts mount with the Root's commit; bind after it.
       let bound: { vp: HTMLElement; rootEl: HTMLElement | null } | null = null
@@ -355,6 +420,16 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
             attributeFilter: ["tabindex", "disabled", "hidden", "inert", "contenteditable", "href"],
           })
         }
+        if (layout) {
+          if (doc?.documentElement) {
+            layout.observe(doc.documentElement, { subtree: true, attributeFilter: ["dir"] })
+          }
+          layout.observe(vp, { attributeFilter: ["style", "class"] })
+          for (const axis of ["x", "y"] as const) {
+            const bar = byId(ids.scrollbar(axis))
+            if (bar) layout.observe(bar, { attributeFilter: ["data-state"] })
+          }
+        }
         schedule()
       }
       const bindFrame = env.scheduler.requestAnimationFrame(bind)
@@ -363,13 +438,13 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
         measure: schedule,
         stop() {
           env.scheduler.cancelAnimationFrame(bindFrame)
-          if (frame !== null) env.scheduler.cancelAnimationFrame(frame)
-          frame = null
+          if (doc) dequeue(doc, measure)
           if (userTimer !== null) env.scheduler.clearTimeout(userTimer)
           stopDrag?.()
           restoreSnap?.()
           resize?.disconnect()
           mutation?.disconnect()
+          layout?.disconnect()
           for (const { off } of wheelBound.values()) off()
           wheelBound.clear()
           if (bound) {

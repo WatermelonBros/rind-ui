@@ -124,9 +124,9 @@ describe("measuring", () => {
     await vi.waitFor(() => expect(translate(el("thumb-y")).y).toBeCloseTo(80, 0))
   })
 
-  it("corner resets when one axis stops overflowing (radix-ui/primitives#2383)", async () => {
+  it("corner: the bars' size while both are shown, 0px once one axis stops overflowing (radix-ui/primitives#2383)", async () => {
     const { rerender } = render(
-      <Area both>
+      <Area both type="always">
         <div style={{ width: 600 }}>{lines(50)}</div>
       </Area>,
     )
@@ -134,8 +134,9 @@ describe("measuring", () => {
     await vi.waitFor(() =>
       expect(root().style.getPropertyValue("--rind-scroll-area-corner-width")).toBe("10px"),
     )
+    expect(root().style.getPropertyValue("--rind-scroll-area-corner-height")).toBe("10px")
     rerender(
-      <Area both>
+      <Area both type="always">
         <div style={{ width: 100 }}>{lines(50)}</div>
       </Area>,
     )
@@ -143,6 +144,87 @@ describe("measuring", () => {
       expect(root().style.getPropertyValue("--rind-scroll-area-corner-width")).toBe("0px"),
     )
     expect(root().style.getPropertyValue("--rind-scroll-area-corner-height")).toBe("0px")
+  })
+
+  it("corner: hidden bars reserve nothing; shown on hover, the corner follows", async () => {
+    render(
+      <Area both>
+        <div style={{ width: 600 }}>{lines(50)}</div>
+      </Area>,
+    )
+    await measured()
+    expect(el("bar-y").getAttribute("data-state")).toBe("hidden")
+    await vi.waitFor(() =>
+      expect(root().style.getPropertyValue("--rind-scroll-area-corner-width")).toBe("0px"),
+    )
+    root().dispatchEvent(new PointerEvent("pointerover", { pointerType: "mouse", bubbles: true }))
+    await vi.waitFor(() => expect(el("bar-y").getAttribute("data-state")).toBe("visible"))
+    await vi.waitFor(() =>
+      expect(root().style.getPropertyValue("--rind-scroll-area-corner-width")).toBe("10px"),
+    )
+  })
+
+  it("re-measures when an ancestor's dir or the Viewport's flex-direction changes", async () => {
+    render(
+      <div data-testid="wrap" dir="ltr">
+        <Area both>
+          <div style={{ width: 600 }}>{lines(50)}</div>
+        </Area>
+      </div>,
+    )
+    await measured()
+    await vi.waitFor(() => expect(translate(el("thumb-x")).x).toBeLessThan(5))
+    el("wrap").setAttribute("dir", "rtl")
+    await vi.waitFor(() => expect(translate(el("thumb-x")).x).toBeGreaterThan(100))
+    expect(translate(el("thumb-y")).y).toBeLessThan(5)
+    el("vp").style.display = "flex"
+    el("vp").style.flexDirection = "column-reverse"
+    await vi.waitFor(() => expect(translate(el("thumb-y")).y).toBeGreaterThan(100))
+  })
+
+  it("30 areas: one frame reads every layout before any write (mui/base-ui#3534)", async () => {
+    const log: string[] = []
+    // One marker per frame (callbacks of one frame share its timestamp), not per callback.
+    const raf = window.requestAnimationFrame.bind(window)
+    let frame = -1
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) =>
+      raf((t) => {
+        if (t !== frame) log.push("|")
+        frame = t
+        cb(t)
+      }),
+    )
+    const height = Object.getOwnPropertyDescriptor(Element.prototype, "scrollHeight")
+    vi.spyOn(Element.prototype, "scrollHeight", "get").mockImplementation(function (this: Element) {
+      log.push("R")
+      return height?.get?.call(this) as number
+    })
+    const setProperty = CSSStyleDeclaration.prototype.setProperty
+    vi.spyOn(CSSStyleDeclaration.prototype, "setProperty").mockImplementation(function (
+      this: CSSStyleDeclaration,
+      name: string,
+      ...rest: [string | null, string?]
+    ) {
+      if (name.startsWith("--rind-scroll-area")) log.push("W")
+      return setProperty.call(this, name, ...rest)
+    })
+    render(
+      <div>
+        {Array.from({ length: 30 }, (_, i) => `area-${i}`).map((key) => (
+          <Area key={key} height={60}>
+            {lines(10)}
+          </Area>
+        ))}
+      </div>,
+    )
+    await vi.waitFor(() =>
+      expect(document.querySelectorAll('[data-part="viewport"][data-overflow-y]')).toHaveLength(30),
+    )
+    const frames = log.join("").split("|")
+    // Every frame: reads, then writes; never a read after a write.
+    for (const f of frames) expect(f).toMatch(/^R*W*$/)
+    // And the 30 measures shared one frame.
+    expect(frames.some((f) => (f.match(/R/g) ?? []).length >= 30)).toBe(true)
   })
 
   it("RTL without a provider: the horizontal thumb starts at the right (mui/base-ui#5300)", async () => {
@@ -195,7 +277,8 @@ describe("tab stop and names", () => {
 
   it("no overflow, no stop", async () => {
     render(<Area>{lines(2)}</Area>)
-    await vi.waitFor(() => expect(el("vp").hasAttribute("data-tab-stop")).toBe(false))
+    await measured()
+    expect(el("vp").hasAttribute("data-tab-stop")).toBe(false)
     expect(el("vp").hasAttribute("tabindex")).toBe(false)
   })
 
@@ -296,6 +379,7 @@ describe("drag edge cases", () => {
     render(<Area />)
     await measured()
     const b = down(el("thumb-y"), 3)
+    await vi.waitFor(() => expect(el("thumb-y").hasAttribute("data-dragging")).toBe(true))
     const move = { pointerId: 3, pointerType: "mouse", clientX: b.x + 5, bubbles: true }
     document.dispatchEvent(
       new PointerEvent("pointermove", { ...move, clientY: b.y + 85, buttons: 1 }),
@@ -311,6 +395,7 @@ describe("drag edge cases", () => {
     render(<Area />)
     await measured()
     const b = down(el("thumb-y"), 4)
+    await vi.waitFor(() => expect(el("thumb-y").hasAttribute("data-dragging")).toBe(true))
     const move = { pointerId: 4, pointerType: "mouse", clientX: b.x + 5, bubbles: true }
     document.dispatchEvent(
       new PointerEvent("pointermove", { ...move, clientY: b.y + 85, buttons: 0 }),

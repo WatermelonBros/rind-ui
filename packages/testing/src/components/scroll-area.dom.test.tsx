@@ -3,7 +3,7 @@
 // scrollbars hidden from assistive technology and never taking focus. Runs in jsdom (nothing
 // is measured there) and in real browsers.
 import { RindProvider, ScrollArea } from "@rind-ui/react"
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { act, cleanup, render, screen } from "@testing-library/react"
 import { StrictMode } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { renderToString } from "react-dom/server"
@@ -70,7 +70,10 @@ describe("parts", () => {
     const field = screen.getByRole("textbox", { name: "Search" })
     field.focus()
     const thumb = parts("thumb")[0] as HTMLElement
-    fireEvent.mouseDown(thumb)
+    // A press's focus move is the mousedown's default action: prevented on the thumb.
+    const down = new MouseEvent("mousedown", { bubbles: true, cancelable: true })
+    thumb.dispatchEvent(down)
+    expect(down.defaultPrevented).toBe(true)
     expect(document.activeElement).toBe(field)
   })
 
