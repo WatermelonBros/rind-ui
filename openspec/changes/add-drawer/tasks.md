@@ -71,3 +71,7 @@
 ## Amendments (from add-heading)
 
 - [ ] A.1 `Title`/`Content` follow Dialog's heading rules (`h{level}` default `h2` via `headingProps`; content children in `Heading.Level` one deeper); tests for the "Title Heading Level" scenarios
+
+## Amendments (moved from add-dialog)
+
+- [ ] D.1 `buildDialogMachine` extension points (`extend`: guarded close events, values/context, open entry actions, effects/handlers, root handlers, extra parts) with a type test that a preset cannot break the base machine — moved here from add-dialog A.1 so the extension API is designed against its first real user (swipe close events, snap values) instead of in the abstract
