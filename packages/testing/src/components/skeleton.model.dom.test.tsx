@@ -56,7 +56,8 @@ function announcementCount(): ConsumerInvariant<typeof skeletonContract> {
   return {
     name: "skeleton-announces-on-load",
     check: async ({ env, state, props }) => {
-      await env.advance(600)
+      // Waits until no keyed announcement is pending (a condition, not a delay).
+      await env.announcements()
       const now = installAnnouncementLog().length
       const grew = now - seen
       const expected = last === "loading" && state === "loaded" && props["announceOnLoad"] ? 1 : 0
