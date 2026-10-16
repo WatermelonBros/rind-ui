@@ -1,0 +1,242 @@
+/*
+ * Pin Input (family: field, a Text Field preset): the Control lays the slots out in a row; each
+ * slot is a bordered box (border-strong edge, 3:1) showing one character, tabular, in the field
+ * font. The real <input> sits transparent over the Control, so the slots never take focus: the
+ * active slot (the caret slot, while the input is focused) carries the focus ring when the
+ * Control has data-focus-visible and an emphasised border for pointer focus. An empty active slot
+ * draws a fake caret that blinks, and stops under reduced motion. The Control reserves
+ * --rind-pin-input-badge-space at its inline end so password-manager badges stay clear of the
+ * slots. Tokens fall back to the Text Field ones. `data-variant` / `data-size` go on the Root.
+ */
+@layer rind.components {
+  :where([data-scope="pin-input"][data-part="root"]) {
+    display: grid;
+    grid-template-areas: "label" "control" "description" "error";
+    justify-items: start;
+    color: var(--rind-pin-input-color, var(--rind-text-field-color, var(--rind-color-text)));
+  }
+
+  /* Gaps are margins, so an absent description or error leaves no empty row gap. */
+  :where([data-scope="pin-input"][data-part="label"]) {
+    grid-area: label;
+    margin-block-end: var(--rind-pin-input-gap, var(--rind-text-field-gap, var(--rind-space-1)));
+    font-size: var(
+      --rind-pin-input-label-font-size,
+      var(--rind-text-field-label-font-size, var(--rind-text-sm))
+    );
+    font-weight: var(
+      --rind-pin-input-label-font-weight,
+      var(--rind-text-field-label-font-weight, 580)
+    );
+    line-height: var(--rind-leading-normal);
+  }
+
+  :where([data-scope="pin-input"][data-part="description"]) {
+    grid-area: description;
+    margin: var(--rind-pin-input-gap, var(--rind-text-field-gap, var(--rind-space-1))) 0 0;
+    font-size: var(
+      --rind-pin-input-description-font-size,
+      var(--rind-text-field-description-font-size, var(--rind-text-sm))
+    );
+    color: var(
+      --rind-pin-input-description-color,
+      var(--rind-text-field-description-color, var(--rind-color-text-muted))
+    );
+  }
+
+  :where([data-scope="pin-input"][data-part="error-message"]) {
+    grid-area: error;
+    display: flex;
+    gap: var(--rind-text-field-error-gap, var(--rind-space-1));
+    margin: var(--rind-pin-input-gap, var(--rind-text-field-gap, var(--rind-space-1))) 0 0;
+    font-size: var(
+      --rind-pin-input-error-font-size,
+      var(--rind-text-field-error-font-size, var(--rind-text-sm))
+    );
+    color: var(
+      --rind-pin-input-error-color,
+      var(--rind-text-field-error-color, var(--rind-color-danger-text))
+    );
+  }
+
+  /* An icon in currentColor: an error is never shown by colour alone. */
+  :where([data-scope="pin-input"][data-part="error-message"])::before {
+    content: "";
+    flex: none;
+    inline-size: 1.25em;
+    block-size: 1lh;
+    background-color: currentColor;
+    mask-image: var(--rind-text-field-error-icon, var(--rind-icon-warning));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 1.25em;
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-disabled] [data-part="label"]) {
+    color: var(
+      --rind-pin-input-disabled-color,
+      var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))
+    );
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-tone="danger"] [data-part="label"]) {
+    color: var(--rind-color-accent-text);
+  }
+
+  /* The row of slots; the input is absolutely positioned over it (inline styles). */
+  :where([data-scope="pin-input"][data-part="control"]) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-pin-input-slot-gap, var(--rind-space-2));
+    inline-size: max-content;
+    padding-inline-end: var(--rind-pin-input-badge-space, 0px);
+    grid-area: control;
+  }
+
+  :where([data-scope="pin-input"][data-part="slot"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex: none;
+    inline-size: var(
+      --rind-pin-input-slot-size,
+      var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))
+    );
+    block-size: var(
+      --rind-pin-input-slot-size,
+      var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))
+    );
+    border: var(--rind-border-width) solid
+      var(
+        --rind-pin-input-slot-border,
+        var(--rind-text-field-border, var(--rind-color-border-strong))
+      );
+    border-radius: var(
+      --rind-pin-input-slot-radius,
+      var(--rind-text-field-radius, var(--rind-radius-control))
+    );
+    background: var(
+      --rind-pin-input-slot-bg,
+      var(--rind-text-field-bg, var(--rind-color-surface-raised))
+    );
+    box-shadow: var(--rind-pin-input-slot-shadow, var(--rind-shadow-key-pressed));
+    color: var(--rind-pin-input-slot-color, var(--rind-text-field-fg, var(--rind-color-text)));
+    font-family: var(--rind-font-sans);
+    font-size: var(
+      --rind-pin-input-font-size,
+      var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))
+    );
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-variant="soft"] [data-part="slot"]) {
+    background: var(
+      --rind-pin-input-slot-soft-bg,
+      var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))
+    );
+    box-shadow: none;
+  }
+
+  /* Keyboard focus: the base ring on the caret slot. */
+  :where(
+    [data-scope="pin-input"][data-part="control"][data-focus-visible]
+      [data-part="slot"][data-active]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* Pointer focus: an emphasised edge instead of the ring. */
+  :where(
+    [data-scope="pin-input"][data-part="control"][data-focus]:not([data-focus-visible])
+      [data-part="slot"][data-active]
+  ) {
+    border-color: var(--rind-pin-input-slot-active-border, var(--rind-color-accent-border));
+    border-width: calc(var(--rind-border-width) * 2);
+  }
+
+  /* Fake caret: a thin bar in the empty active slot. */
+  :where([data-scope="pin-input"][data-part="slot"][data-caret])::after {
+    content: "";
+    inline-size: var(--rind-pin-input-caret-width, 1px);
+    block-size: 1.2em;
+    background: currentColor;
+    animation: rind-pin-input-caret calc(var(--rind-duration-slow) * 4) steps(1) infinite;
+  }
+
+  @keyframes rind-pin-input-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Decorative separator between slot groups. */
+  :where([data-scope="pin-input"] [data-part="separator"]) {
+    flex: none;
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-invalid] [data-part="slot"]) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-pin-input-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-disabled] [data-part="slot"]),
+  :where([data-scope="pin-input"][data-part="slot"][data-disabled]) {
+    background: var(--rind-pin-input-disabled-bg, var(--rind-color-surface));
+    color: var(--rind-pin-input-disabled-fg, var(--rind-color-text-disabled));
+    border-color: var(--rind-pin-input-disabled-border, var(--rind-color-border));
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="pin-input"][data-part="root"][data-readonly] [data-part="slot"]),
+  :where([data-scope="pin-input"][data-part="slot"][data-readonly]) {
+    background: var(--rind-pin-input-readonly-bg, var(--rind-color-surface));
+    box-shadow: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="pin-input"][data-part="slot"][data-caret])::after {
+      animation: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="pin-input"][data-part="slot"]) {
+      background: Field;
+      color: FieldText;
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+
+    :where(
+        [data-scope="pin-input"][data-part="control"][data-focus-visible]
+          [data-part="slot"][data-active]
+      ) {
+      outline-color: Highlight;
+    }
+
+    :where(
+        [data-scope="pin-input"][data-part="control"][data-focus]:not([data-focus-visible])
+          [data-part="slot"][data-active]
+      ) {
+      border-color: Highlight;
+    }
+
+    :where([data-scope="pin-input"][data-part="slot"][data-caret])::after {
+      background: CanvasText;
+    }
+
+    :where([data-scope="pin-input"][data-part="root"][data-disabled] [data-part="slot"]) {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

@@ -7,6 +7,12 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.connect.ts:59 | `codePattern` drops the consumer pattern's flags (an `i` pattern loses case-insensitivity in the native `pattern`) |
+| add-pin-input (r1) | — | packages/testing/fixtures/pin-input | No trusted Ctrl/⌘+V run (the clipboard paste through the OS shortcut) |
+| add-pin-input (r1) | — | packages/testing/src/components/pin-input.dom.test.tsx | No assertion-level tests for ArrowLeft/Right, Home/End and Backspace moving the active slot |
+| add-pin-input (impl) | — | packages/testing/src/components/pin-input.broken.dom.test.tsx | Broken variants "Enter prevented", "focus moved after autoSubmit" and "completion missed on paste replacement" are not modelled: no step invariant records Enter, focus after submit or completion counts (scenarios cover the correct paths) |
+| add-pin-input (impl) | — | packages/theme/src/pin-input.browser.test.tsx | Forced-colors and reduced-motion checks read the stylesheet; emulated captures of the six states still to add (tasks 8.2) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
 | add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |
@@ -160,6 +166,7 @@ See CLAUDE.md "Review rules".
 | test-stability (r1) | — | packages/testing/src/components/text-field.dom.test.tsx:325 | the IME debounce test no longer goes through the driver |
 | test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
 | test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
+| add-menu (impl) | 5.1 | packages/testing/src/components/menu-scenarios.dom.test.tsx | no automated test yet for "Thumb resting on the trigger while scrolling" (radix#2418, a real touch scroll in Playwright) and "Exit animation" (radix#4195, needs the themed exit animation) |
 
 ## Manual AT protocol
 
@@ -168,12 +175,14 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | Change | Task | What to check |
 |---|---|---|
 | add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-pin-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: one field announced with its name, the code read back, iOS "From Messages" fill, 1Password/Bitwarden fill, iOS selection handles over the transparent input |
 | add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | ci flake (2026-10-16) | — | packages/testing/src/components/accordion.model.dom.test.tsx | "ITEM.TOGGLE[itemEnabled && isOpen && canCollapse], pointer" failed once in a full jsdom run on d9463d0 with three sessions loading the machine; not reproduced: 8 runs of the file and 3 full jsdom runs with 16 threads on 7552c8a all green. The other cited failure (CI 38817142353, broken variants) was the 5 s default timeout, raised to 60 s in #5. Re-open with the failing assertion if it recurs |
 | retire-storybook (r1) | — | packages/testing/src/state-stories.ts, packages/*/tsdown.config.ts / tsconfig, PRODUCT.md, apps/site/examples/fixtures/* ("Ported from" headers) | stale Storybook wording in comments and docs: say site examples |
 | retire-storybook (r1) | — | packages/testing/fixtures/{anchored/viewport,segmented-control,disclosure}.pw.test.ts | pre-existing `waitForTimeout` waits: removed by the test-stability PR, which bans them |
 | retire-storybook (r1) | — | openspec/changes/archive/2026-10-16-retire-storybook/tasks.md (2.1) | the task names `openExample(page, slug, example, skin?)`; the helper is `openExample(page, base, slug, example, { skin, scheme })` |
+| add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 
 ## Resolved
 
