@@ -47,8 +47,8 @@ seen in docs or source but not confirmed as public, stable API.
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
-| Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | spec |  |
-| Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec | Reado has Breadcrumb |
+| Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | done |  |
+| Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done | Reado has Breadcrumb |
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Steps | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo | Reka: Stepper |
 | Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
