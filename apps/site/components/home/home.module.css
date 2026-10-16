@@ -708,3 +708,10 @@
     margin-left: 0;
   }
 }
+
+/* reduced motion stops the cycle: one label stays, fully opaque */
+@media (prefers-reduced-motion: reduce) {
+  .vSkins span[data-v="crisp"] {
+    opacity: 1;
+  }
+}
