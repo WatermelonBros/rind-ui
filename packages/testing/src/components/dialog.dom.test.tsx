@@ -166,7 +166,7 @@ describe("Open state and reasons", () => {
     expect(onOpenChange).toHaveBeenCalledTimes(1)
     const [open, details] = onOpenChange.mock.calls[0] ?? []
     expect(open).toBe(false)
-    expect(details.reason).toBe("ESCAPE_KEY")
+    expect(details.reason).toBe("escape-key")
     expect(queryDialog()).not.toBeNull()
     expect(active()).toBe(before)
   })
@@ -185,13 +185,13 @@ describe("Open state and reasons", () => {
   it("Cancelled request: cancel() on a CLOSE_TRIGGER_PRESS keeps it open", async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn((_open: boolean, details: { reason: string; cancel(): void }) => {
-      if (details.reason === "CLOSE_TRIGGER_PRESS") details.cancel()
+      if (details.reason === "close-trigger") details.cancel()
     })
     render(<Full onOpenChange={onOpenChange} />)
     await openByClick(user)
     await press(user, screen.getByRole("button", { name: "Cancel" }))
     await settle()
-    expect(onOpenChange.mock.calls.map((c) => c[1].reason)).toContain("CLOSE_TRIGGER_PRESS")
+    expect(onOpenChange.mock.calls.map((c) => c[1].reason)).toContain("close-trigger")
     expect(queryDialog()).not.toBeNull()
   })
 })
@@ -261,7 +261,7 @@ describe("Non-modal dialogs", () => {
     expect(queryDialog()).not.toBeNull()
   })
 
-  it("Trigger toggles with reason TRIGGER_PRESS, not an outside press", async () => {
+  it("Trigger toggles with reason trigger, not an outside press", async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     render(<Full modal={false} onOpenChange={onOpenChange} />)
@@ -269,7 +269,7 @@ describe("Non-modal dialogs", () => {
     await press(user, trigger())
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
     const reasons = onOpenChange.mock.calls.map((c) => c[1].reason)
-    expect(reasons).toEqual(["TRIGGER_PRESS", "TRIGGER_PRESS"])
+    expect(reasons).toEqual(["trigger", "trigger"])
   })
 })
 
@@ -283,7 +283,7 @@ describe("Dismissal defaults", () => {
     if (!backdrop) throw new Error("no backdrop")
     await press(user, backdrop)
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("OUTSIDE_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("outside-press")
   })
 
   it("Positioner press beside the content closes; inside the content it does not", async () => {
@@ -298,7 +298,7 @@ describe("Dismissal defaults", () => {
     if (!positioner) throw new Error("no positioner")
     await press(user, positioner)
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("OUTSIDE_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("outside-press")
   })
 
   it("Mounted open by the opening click stays open (ark#2744)", async () => {
@@ -563,7 +563,7 @@ describe("Final focus", () => {
     await user.keyboard("{Escape}")
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
     expect(active()).toBe(screen.getByRole("button", { name: "Elsewhere" }))
-    expect(reasons).toContain("ESCAPE_KEY")
+    expect(reasons).toContain("escape-key")
     cleanup()
 
     render(<Full finalFocus={false} />)
@@ -913,7 +913,7 @@ describe("Parent layer and nested dialogs", () => {
     act(() => parent.current?.close())
     await vi.waitFor(() => expect(named("Child")).toBeNull())
     expect(onOpenChange).toHaveBeenCalledTimes(1)
-    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("PARENT_DISMISSED")
+    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("parent-dismissed")
   })
 
   it("Stacking metadata: data-has-nested, data-nested and --layer-index", async () => {
@@ -963,7 +963,7 @@ describe("Parent layer and nested dialogs", () => {
     onOpenChange.mockClear()
     act(() => drawer.release())
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
-    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("PARENT_DISMISSED")
+    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("parent-dismissed")
     drawerContent.remove()
   })
 
@@ -1068,7 +1068,7 @@ describe("Forms inside dialogs", () => {
     await press(user, screen.getByRole("button", { name: "Save" }))
     await vi.waitFor(() => expect(queryDialog()).toBeNull())
     expect(connected).toEqual([true])
-    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("CLOSE_TRIGGER_PRESS")
+    expect(onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("close-trigger")
     const logged = [...error.mock.calls, ...warn.mock.calls].map((c) => String(c[0]))
     expect(logged.filter((m) => m.includes("not connected"))).toEqual([])
   })

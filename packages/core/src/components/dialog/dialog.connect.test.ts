@@ -102,15 +102,13 @@ describe("trigger", () => {
   })
 
   it("data-close-reason is kebab case after close, on triggers too, absent while open", () => {
-    const closed = api({ open: false, closeReason: "ESCAPE_KEY" })
+    const closed = api({ open: false, closeReason: "escape-key" })
     expect(closed.trigger(btn("t1"))["data-close-reason"]).toBe("escape-key")
     expect(
-      api({ open: false, closeReason: "CLOSE_TRIGGER_PRESS" }).trigger(btn("t1"))[
-        "data-close-reason"
-      ],
-    ).toBe("close-trigger-press")
+      api({ open: false, closeReason: "close-trigger" }).trigger(btn("t1"))["data-close-reason"],
+    ).toBe("close-trigger")
     expect(
-      api({ closeReason: "ESCAPE_KEY" }).trigger(btn("t1"))["data-close-reason"],
+      api({ closeReason: "escape-key" }).trigger(btn("t1"))["data-close-reason"],
     ).toBeUndefined()
     expect(api({ open: false }).trigger(btn("t1"))["data-close-reason"]).toBeUndefined()
   })
@@ -177,13 +175,13 @@ describe("content", () => {
   })
 
   it("data-close-reason from close until the next open, kebab case", () => {
-    expect(content({ open: false, closeReason: "OUTSIDE_PRESS" })["data-close-reason"]).toBe(
+    expect(content({ open: false, closeReason: "outside-press" })["data-close-reason"]).toBe(
       "outside-press",
     )
-    expect(content({ open: false, closeReason: "PARENT_DISMISSED" })["data-close-reason"]).toBe(
+    expect(content({ open: false, closeReason: "parent-dismissed" })["data-close-reason"]).toBe(
       "parent-dismissed",
     )
-    expect(content({ open: true, closeReason: "ESCAPE_KEY" })["data-close-reason"]).toBeUndefined()
+    expect(content({ open: true, closeReason: "escape-key" })["data-close-reason"]).toBeUndefined()
   })
 
   it("non-modal: pointer-events auto on the content, none on the positioner", () => {

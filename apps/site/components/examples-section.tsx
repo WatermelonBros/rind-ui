@@ -1,6 +1,6 @@
 "use client"
 
-import { examples } from "@/examples"
+import { examples, heroName } from "@/examples"
 import { type ExampleCode, ExampleFrame } from "./example-frame"
 import styles from "./example-frame.module.css"
 
@@ -15,13 +15,12 @@ const withCode = (text: string) =>
     ),
   )
 
-/** Every example after the first, Ark-style: a title, one line of why, the live component. */
+/** Every example but the hero (the first visible one), Ark-style: a title, one line of why, the live component. */
 export function ExamplesSection({ slug, source }: { slug: string; source: ExampleCode }) {
   const mod = examples[slug]
   if (!mod) return null
-  const rest = Object.entries(mod.variants)
-    .slice(1)
-    .filter(([, v]) => !v.hidden)
+  const hero = heroName(mod)
+  const rest = Object.entries(mod.variants).filter(([name, v]) => !v.hidden && name !== hero)
   if (rest.length === 0) return null
   return (
     <section className={styles.examples} aria-labelledby="examples">

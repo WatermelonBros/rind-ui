@@ -145,17 +145,17 @@ describe("cancel and action", () => {
 
 describe("close reason attribute", () => {
   it.each([
-    ["CANCEL_PRESS", "cancel-press"],
-    ["ACTION_PRESS", "action-press"],
-    ["ESCAPE_KEY", "escape-key"],
-  ] as const)("%s becomes %s on content, positioner-less parts and trigger after close", (r, k) => {
+    ["cancel", "cancel"],
+    ["action", "action"],
+    ["escape-key", "escape-key"],
+  ] as const)("%s is %s on content, positioner-less parts and trigger after close", (r, k) => {
     const closed = api({ open: false, closeReason: r })
     expect(closed.content({})["data-close-reason"]).toBe(k)
     expect(closed.trigger(btn("t1"))["data-close-reason"]).toBe(k)
   })
 
   it("is absent while open and before any close", () => {
-    expect(api({ closeReason: "ACTION_PRESS" }).content({})["data-close-reason"]).toBeUndefined()
+    expect(api({ closeReason: "action" }).content({})["data-close-reason"]).toBeUndefined()
     expect(api({ open: false }).content({})["data-close-reason"]).toBeUndefined()
   })
 })
