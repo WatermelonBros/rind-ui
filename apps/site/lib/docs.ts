@@ -64,6 +64,19 @@ function tables(html: string): string {
     .replace(/<\/table>/g, "</table></div>")
 }
 
+/**
+ * The site never names other libraries (user rule). The repo docs keep their migration notes
+ * and issue references for readers of the source; here a "Migrating from …" / "Coming from …"
+ * section is dropped up to the next h2, and so is a parenthesised issue reference of another
+ * project, such as "(radix#938)" or "(chakra-ui#5343, #4347)". The site audit fails on any
+ * name left in the running text, which has to be reworded in the doc itself.
+ */
+export function withoutOtherLibraries(markdown: string): string {
+  return markdown
+    .replace(/^## (?:Migrating|Coming) from [^\n]*\n[\s\S]*?(?=^## |(?![\s\S]))/gm, "")
+    .replace(/ ?\((?:[\w.-]+)?#\d+(?:, ?(?:[\w.-]+)?#\d+)*\)/g, "")
+}
+
 export interface Rendered {
   /** the first paragraph, shown under the live example */
   readonly intro: string
@@ -77,10 +90,9 @@ export interface Rendered {
  * code block is dropped: the example's "Get code" shows it.
  */
 export function render(page: DocPage, { hasExample = false } = {}): Rendered {
-  const body = page.markdown
-    .replace(/^# .+\n/, "")
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .trim()
+  const body = withoutOtherLibraries(
+    page.markdown.replace(/^# .+\n/, "").replace(/<!--[\s\S]*?-->/g, ""),
+  ).trim()
   const [first = "", ...rest] = body.split(/\n\s*\n/)
   let remainder = rest.join("\n\n")
   if (hasExample) remainder = remainder.replace(/^```[\s\S]*?\n```\s*/, "")
