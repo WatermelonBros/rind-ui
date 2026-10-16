@@ -159,6 +159,8 @@ export interface MenuContext extends CollectionContext {
   readonly keyActivation: "enter" | "space" | null
   /** Opened by hover intent: focus stays on the trigger item. */
   readonly hoverOpened: boolean
+  /** The item the pointer stopped on while crossing toward a submenu (taken when it ends). */
+  readonly pendingPointerKey: CollectionKey | null
 }
 
 export type MenuEnv = DomEnvironment &
@@ -319,12 +321,30 @@ export const menuMachine = setup({
       set("highlightSource", null)
       set("keyActivation", null)
       set("hoverOpened", event.type.startsWith("after:"))
+      set("pendingPointerKey", null)
     },
     /** Joins the open path (closing an open sibling) and leaves it on close. */
     openInTree: ({ env, props }) => {
       if (props.parentLevel) env.menuTree.openChild(props.parentLevel, props.levelId)
     },
-    leaveTree: ({ env, props }) => env.menuTree.childClosed(props.levelId),
+    leaveTree: ({ env, event, props }) =>
+      env.menuTree.childClosed(props.levelId, { byHover: event.type === "HOVER.END" }),
+    rememberPointer: ({ event, set }) => {
+      if (event.type === "POINTER_MOVE") set("pendingPointerKey", event.key)
+    },
+    forgetPointer: ({ set }) => set("pendingPointerKey", null),
+    /** The grace area ended without reaching the submenu: the item under the pointer. */
+    takePendingPointer: ({ context, env, props, set }) => {
+      const key = context.pendingPointerKey
+      set("pendingPointerKey", null)
+      const node = key === null ? undefined : props.collection.get(key)
+      if (key === null || !node || node.disabled) return
+      set("highlightedKey", key)
+      set("highlightSource", "pointer")
+      set("scrollReason", null)
+      if (isTextEntry(env.dom.activeElement())) return
+      env.dom.getById(menuIds(props.levelId).item(key))?.focus({ preventScroll: true })
+    },
     resetPlacement: ({ props, set }) => set("placement", initialPlacement(props)),
     setCloseReason: ({ event, set }) => {
       const reason = reasonOf(event)
@@ -522,6 +542,7 @@ export const menuMachine = setup({
     restoreFocus: true,
     keyActivation: null,
     hoverOpened: false,
+    pendingPointerKey: null,
   }),
   values: { open: { fallback: false, states: { open: true, closed: false, opening: false } } },
   onProps: { collection: "COLLECTION.CHANGE" },
@@ -650,14 +671,17 @@ export const menuMachine = setup({
           },
           { guard: "hostedByMenubar", actions: ["collapseToParent"] },
         ],
-        NAVIGATE: { actions: ["navigate", "scrollToHighlighted", "focusHighlighted"] },
+        NAVIGATE: {
+          actions: ["forgetPointer", "navigate", "scrollToHighlighted", "focusHighlighted"],
+        },
         TYPEAHEAD: { actions: ["typeahead", "scrollToHighlighted", "focusHighlighted"] },
         HIGHLIGHT: { actions: ["highlight"] },
         POINTER_MOVE: [
-          { guard: "inTransit" },
+          { guard: "inTransit", actions: ["rememberPointer"] },
           { actions: ["pointerMove", "focusPointerHighlight"] },
         ],
-        POINTER_LEAVE: [{ guard: "childOpen" }, { actions: ["leaveContent"] }],
+        POINTER_LEAVE: [{ guard: "childOpen" }, { actions: ["forgetPointer", "leaveContent"] }],
+        "TREE.CHILD_LEFT": { actions: ["takePendingPointer"] },
         "POSITION.PLACED": { actions: ["setPlacement"] },
       },
     },

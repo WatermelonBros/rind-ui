@@ -26,6 +26,8 @@ export type MenuTreeEvent =
   | { readonly type: "TREE.CLOSE"; readonly reason: MenuCloseReason }
   /** A sibling level opened: close without restoring focus (focus moves into the sibling). */
   | { readonly type: "TREE.SIBLING_OPENED" }
+  /** A child submenu closed because the pointer left it (its grace area ended). */
+  | { readonly type: "TREE.CHILD_LEFT" }
 
 export interface MenuTreeLevel {
   readonly id: MenuLevelId
@@ -49,7 +51,8 @@ export interface MenuTree {
   register(level: MenuTreeLevel): () => void
   /** `child` opened under `parent`: an open sibling closes first. */
   openChild(parent: MenuLevelId, child: MenuLevelId): void
-  childClosed(child: MenuLevelId): void
+  /** `byHover`: the pointer left it; its parent then highlights the item under the pointer. */
+  childClosed(child: MenuLevelId, options?: { readonly byHover?: boolean }): void
   /** Closes every level: the root receives TREE.CLOSE (its children follow as layers). */
   closeTree(reason: MenuCloseReason): void
   /** The open levels below the root, outermost first. */
@@ -89,8 +92,11 @@ export function createMenuTree(
         levels.get(previous)?.send({ type: "TREE.SIBLING_OPENED" })
       }
     },
-    childClosed(child) {
+    childClosed(child, options) {
       for (const [parent, c] of open) if (c === child) open.delete(parent)
+      if (!options?.byHover) return
+      const parent = levels.get(child)?.parent
+      if (parent) levels.get(parent)?.send({ type: "TREE.CHILD_LEFT" })
     },
     closeTree(reason) {
       root()?.send({ type: "TREE.CLOSE", reason })

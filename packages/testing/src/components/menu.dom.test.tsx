@@ -1,12 +1,12 @@
 // Menu scenarios (openspec add-menu): the spec's behaviour through the menu driver, in
 // jsdom and in real browsers. Pointer paths and layout-dependent scenarios (grace areas,
 // flipped submenus) live in the browser suite.
-import { Menu, type MenuRootProps } from "@rind-ui/react"
+import { Dialog, Menu, type MenuRootProps, RouterProvider } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { type ReactNode, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
-import { getMenu, installAnnouncementLog } from "../index"
+import { fakeRouter, getMenu, installAnnouncementLog, interceptNativeNavigation } from "../index"
 
 const active = () => document.activeElement
 const name = (el: Element | null) => el?.textContent?.trim() ?? null
@@ -378,5 +378,238 @@ describe("Menu: groups and separators", () => {
     expect(sep.getAttribute("data-orientation")).toBe("horizontal")
     expect(sep.hasAttribute("aria-orientation")).toBe(false)
     await act(async () => {})
+  })
+})
+
+describe("Menu: link items", () => {
+  function Links({
+    onSelect = () => {},
+    onOpenChange,
+  }: {
+    onSelect?: () => void
+    onOpenChange?: MenuRootProps["onOpenChange"]
+  }) {
+    return (
+      <Menu.Root {...(onOpenChange ? { onOpenChange } : {})}>
+        <Menu.Trigger>Help</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.Item href="/docs" onSelect={onSelect}>
+                Docs
+              </Menu.Item>
+              <Menu.Item href="/blog">Blog</Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>
+    )
+  }
+
+  it("Plain anchor link item uses the environment router; a modified click opens a tab and keeps the menu open", async () => {
+    interceptNativeNavigation(window)
+    const router = fakeRouter()
+    const onSelect = vi.fn()
+    const changes = vi.fn()
+    render(
+      <RouterProvider navigate={router.navigate}>
+        <Links onSelect={onSelect} onOpenChange={changes} />
+      </RouterProvider>,
+    )
+    const m = getMenu(screen, { name: "Help" }).via("pointer")
+    await m.open()
+    const link = screen.getByRole("menuitem", { name: "Docs" })
+    expect(link.tagName).toBe("A")
+    await userEvent.click(screen.getByRole("menuitem", { name: "Blog" }))
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(router.calls.map((c) => c.href)).toEqual(["/blog"])
+    await m.open()
+    // user-event has no modifier option on click: hold the key around it (one instance).
+    const mod = navigator.platform.includes("Mac") ? "Meta" : "Control"
+    const u = userEvent.setup()
+    await u.keyboard(`{${mod}>}`)
+    await u.click(screen.getByRole("menuitem", { name: "Docs" }))
+    await u.keyboard(`{/${mod}}`)
+    expect(changes.mock.calls.map((c) => c[1].reason)).toEqual([
+      "trigger",
+      "item-select",
+      "trigger",
+    ])
+    expect(await m.isOpen()).toBe(true)
+    expect(onSelect).not.toHaveBeenCalled()
+    expect(router.calls).toHaveLength(1)
+  })
+
+  it("Enter on a link navigates once through the browser's activation and closes the menu", async () => {
+    interceptNativeNavigation(window)
+    const router = fakeRouter()
+    render(
+      <RouterProvider navigate={router.navigate}>
+        <Links />
+      </RouterProvider>,
+    )
+    const m = getMenu(screen, { name: "Help" }).via("keyboard")
+    await m.open()
+    await userEvent.keyboard("{Enter}")
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(router.calls.map((c) => c.href)).toEqual(["/docs"])
+  })
+
+  it("Space on a link navigates once (no scroll)", async () => {
+    interceptNativeNavigation(window)
+    const router = fakeRouter()
+    render(
+      <RouterProvider navigate={router.navigate}>
+        <Links />
+      </RouterProvider>,
+    )
+    const m = getMenu(screen, { name: "Help" }).via("keyboard")
+    await m.open()
+    await userEvent.keyboard(" ")
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(router.calls.map((c) => c.href)).toEqual(["/docs"])
+  })
+})
+
+describe("Menu: closing rules", () => {
+  it("Switching applications: the window losing focus closes the menu", async () => {
+    render(<Basic />)
+    const m = getMenu(screen, { name: "Actions" }).via("keyboard")
+    await m.open()
+    act(() => {
+      window.dispatchEvent(new FocusEvent("blur"))
+    })
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+  })
+
+  it("Refused close: a controlled menu kept open stays open", async () => {
+    const onOpenChange = vi.fn()
+    render(<Basic open onOpenChange={onOpenChange} />)
+    const m = getMenu(screen, { name: "Actions" }).via("keyboard")
+    await waitFor(() => expect(screen.getByRole("menu")).toBeTruthy())
+    await waitFor(() => expect(name(active())).toBe("Copy"))
+    await userEvent.keyboard("{Escape}")
+    expect(onOpenChange).toHaveBeenCalledWith(
+      false,
+      expect.objectContaining({ reason: "escape-key" }),
+    )
+    expect(await m.isOpen()).toBe(true)
+    expect(name(active())).toBe("Copy")
+  })
+
+  it("Non-modal toolbar menus: one click on the second trigger switches menus", async () => {
+    render(
+      <>
+        {["File", "Edit"].map((label) => (
+          <Menu.Root key={label} modal={false}>
+            <Menu.Trigger>{label}</Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item>{`${label} item`}</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+        ))}
+      </>,
+    )
+    const file = getMenu(screen, { name: "File", modal: false }).via("pointer")
+    const edit = getMenu(screen, { name: "Edit", modal: false }).via("pointer")
+    await file.open()
+    await edit.open()
+    expect(await file.isOpen()).toBe(false)
+    expect(await edit.isOpen()).toBe(true)
+  })
+
+  it("Label click focuses the trigger and does not open it (headlessui#3787)", async () => {
+    render(
+      <>
+        <label htmlFor="enc">Encoding</label>
+        <Menu.Root>
+          <Menu.Trigger id="enc">UTF-8</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item>UTF-16</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </>,
+    )
+    await userEvent.click(screen.getByText("Encoding"))
+    await waitFor(() => expect(name(active())).toBe("UTF-8"))
+    expect(screen.queryByRole("menu")).toBe(null)
+  })
+})
+
+describe("Menu: menus and dialogs", () => {
+  it("Menu in a dialog: Escape closes only the menu", async () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Content>
+            <Dialog.Title>Settings</Dialog.Title>
+            <Menu.Root>
+              <Menu.Trigger>Theme</Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    <Menu.Item>Dark</Menu.Item>
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>,
+    )
+    const m = getMenu(screen, { name: "Theme" }).via("keyboard")
+    await m.open()
+    await userEvent.keyboard("{Escape}")
+    await waitFor(async () => expect(await m.isOpen()).toBe(false))
+    expect(screen.getByRole("dialog", { name: "Settings" })).toBeTruthy()
+    await waitFor(() => expect(name(active())).toBe("Theme"))
+  })
+
+  it("Dialog from an item: it stays open, its input is focused, closing it focuses the trigger", async () => {
+    function App() {
+      const [open, setOpen] = useState(false)
+      return (
+        <>
+          <Menu.Root>
+            <Menu.Trigger>File</Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item onSelect={() => setOpen(true)}>Rename…</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+          <Dialog.Root open={open} onOpenChange={setOpen}>
+            <Dialog.Portal>
+              <Dialog.Content>
+                <Dialog.Title>Rename</Dialog.Title>
+                <input aria-label="Name" />
+                <Dialog.CloseTrigger>Cancel</Dialog.CloseTrigger>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </>
+      )
+    }
+    render(<App />)
+    const m = getMenu(screen, { name: "File" }).via("keyboard")
+    await m.open()
+    await m.choose("Rename…")
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Rename" })).toBeTruthy())
+    await waitFor(() => expect(active()?.getAttribute("aria-label")).toBe("Name"))
+    expect(await m.isOpen()).toBe(false)
+    await userEvent.keyboard("{Escape}")
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBe(null))
+    await waitFor(() => expect(name(active())).toBe("File"))
+    expect(document.querySelector("[inert]")).toBe(null)
   })
 })

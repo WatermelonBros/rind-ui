@@ -180,7 +180,10 @@ function menuContractWith(modal: boolean) {
           const path = await openPath(env)
           if (!path.some((n) => (typeof name === "string" ? n === name : name.test(n))))
             return false
-          if ((await env.find({ role: "menu" }).count()) !== path.length + 1) return false
+          const menus = await env.find({ role: "menu" }).all()
+          if (menus.length !== path.length + 1) return false
+          // Placed: an unplaced level is transparent and takes no pointer input yet.
+          for (const m of menus) if ((await m.attr("data-placing")) !== null) return false
           // The expand key moves focus into the submenu (after its placement); hover does not.
           if (env.modality === "pointer" || env.modality === "touch") return true
           const focused = await focusedItem(env)
@@ -258,6 +261,7 @@ function menuContractWith(modal: boolean) {
       WINDOW_BLUR: { skip: "window focus: covered by the DOM tests" },
       "TREE.CLOSE": { skip: "the menu tree: covered by the tree unit tests" },
       "TREE.SIBLING_OPENED": { skip: "the menu tree: covered by the tree unit tests" },
+      "TREE.CHILD_LEFT": { skip: "submenu pointer intent: covered by the browser tests" },
       OPEN: { skip: "programmatic (actionsRef.open): covered by the machine tests" },
       CLOSE: { skip: "programmatic (actionsRef.close): covered by the machine tests" },
       "POSITION.PLACED": {
