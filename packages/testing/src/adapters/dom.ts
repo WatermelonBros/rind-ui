@@ -544,6 +544,10 @@ function createDomEnv(
             const clipboardData = new DataTransfer()
             clipboardData.setData("text/plain", text)
             paste = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true })
+            // Firefox ignores the constructor's clipboardData: attach it.
+            if (!(paste as ClipboardEvent).clipboardData?.getData("text/plain")) {
+              Object.defineProperty(paste, "clipboardData", { value: clipboardData })
+            }
           } else {
             // jsdom has no DataTransfer: a paste Event carrying a clipboardData reader.
             paste = new Event("paste", { bubbles: true, cancelable: true })
