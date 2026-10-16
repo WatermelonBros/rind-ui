@@ -85,7 +85,7 @@ describe("PinInput", () => {
   it("Full paste replaces and completes again (zag#470, base-ui#4679)", async () => {
     const onValueComplete = vi.fn()
     render(<Code defaultValue="111111" onValueComplete={onValueComplete} />)
-    await pin().fill("222222")
+    await pin().paste("222222")
     expect(await pin().value()).toBe("222222")
     expect(onValueComplete).toHaveBeenCalledWith("222222")
   })
@@ -173,12 +173,13 @@ describe("PinInput", () => {
     expect(document.querySelectorAll("[data-filled]")).toHaveLength(0)
   })
 
-  it("Incomplete code on submit: pattern mismatch shows in the Field", async () => {
+  it("Incomplete code on submit: blocked, the Field shows the pattern message", async () => {
+    const onSubmit = vi.fn((e: { preventDefault(): void }) => e.preventDefault())
     render(
-      <form onSubmit={(e) => e.preventDefault()}>
-        <Field.Root>
+      <form onSubmit={onSubmit}>
+        <Field.Root required>
           <Field.Label>Verification code</Field.Label>
-          <PinInput.Root length={6} required>
+          <PinInput.Root length={6}>
             <PinInput.Control>
               <PinInput.Input />
               {[0, 1, 2, 3, 4, 5].map((i) => (
@@ -192,10 +193,14 @@ describe("PinInput", () => {
       </form>,
     )
     await pin().type("123")
-    expect(
-      input().validity.patternMismatch || input().validity.tooShort || !input().validity.valid,
-    ).toBe(!inJsdom || !input().validity.valid)
     expect(input().getAttribute("pattern")).toBe("(?:[0-9]){6}")
+    expect(input().checkValidity()).toBe(false)
+    expect(input().validity.patternMismatch).toBe(true)
+    act(() => screen.getByRole("button", { name: "Send" }).click())
+    expect(onSubmit).not.toHaveBeenCalled()
+    const error = document.querySelector('[data-part="error-message"]')
+    await waitFor(() => expect(error?.textContent).toBe(input().validationMessage))
+    expect(error?.textContent).not.toBe("")
   })
 
   it("autoSubmit submits once the full code is rendered", async () => {

@@ -71,6 +71,30 @@ type Args = ActionArgs<Types>
 
 const editable = (props: PinInputProps) => props.disabled !== true && props.readOnly !== true
 
+/**
+ * What a fill wrote: the DOM text, or, when it was inserted at the caret into a partial code
+ * ("12" + "534418"), the inserted part alone once it is code-sized (an SMS or password-manager
+ * fill replaces the code, it never mixes with it: WCAG 3.3.8).
+ */
+export function fillOf(
+  previous: string,
+  text: string,
+  rules: Pick<PinInputProps, "length">,
+): string {
+  let start = 0
+  while (start < previous.length && start < text.length && previous[start] === text[start]) start++
+  let end = 0
+  while (
+    end < previous.length - start &&
+    end < text.length - start &&
+    previous[previous.length - 1 - end] === text[text.length - 1 - end]
+  ) {
+    end++
+  }
+  const inserted = text.slice(start, text.length - end)
+  return inserted.replace(/[\s.-]/g, "").length >= rules.length ? inserted : text
+}
+
 /** Writes a user change, then completes when it filled the code (base-ui#4679). */
 function apply(args: Args, next: string, caret: number, replaced: boolean) {
   const previous = args.values.value
@@ -109,7 +133,11 @@ export const pinInputMachine = setup({
     },
     applyWrite: (args) => {
       if (args.event.type !== "INPUT") return
-      const next = normaliseWrite(args.event.text, args.props)
+      const text =
+        args.event.reason === "AUTOFILL"
+          ? fillOf(args.values.value, args.event.text, args.props)
+          : args.event.text
+      const next = normaliseWrite(text, args.props)
       if (next === null) {
         args.props.resync()
         args.props.onValueInvalid?.(args.event.text)

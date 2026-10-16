@@ -76,11 +76,13 @@ shortcuts (Ctrl/⌘ combinations) SHALL never be blocked.
 ### Requirement: Paste And Autofill
 
 A paste, drop, or a value written into the input by the browser or a password manager SHALL
-be normalised: whitespace, `-` and `.` removed, characters filtered, then truncated to
-`length`. When the normalised text is at least `length` characters long it SHALL replace the
+be normalised: whitespace, `-` and `.` removed, then truncated to `length`; a paste that
+still holds a rejected character SHALL be refused as a whole (`onValueInvalid(text)`), so a
+mistyped code is never silently shortened. When the normalised text is at least `length` characters long it SHALL replace the
 whole value; otherwise it SHALL be inserted at the caret, replacing the selection, and the
 result truncated to `length`. A value written by script followed by an `input` event (password
-managers) SHALL be read from the native event and applied. The caret SHALL end after the last
+managers) SHALL be read from the native event and applied; a fill inserted at the caret into
+a partial code SHALL replace the code once the inserted text is `length` characters long. The caret SHALL end after the last
 filled slot.
 
 #### Scenario: Paste with a separator (input-otp#53)

@@ -87,6 +87,18 @@ describe("completion (base-ui#4679)", () => {
     expect(m.onValueComplete).toHaveBeenCalledTimes(1)
   })
 
+  it("a fill inserted into a partial code replaces it (WCAG 3.3.8)", () => {
+    const m = make({ defaultValue: "12" })
+    // The browser inserted the SMS code at the caret: the DOM text mixes both.
+    m.s.send({ type: "INPUT", text: "12534418", reason: "AUTOFILL" })
+    expect(m.value()).toBe("534418")
+    expect(m.onValueComplete).toHaveBeenCalledWith("534418")
+    // Inserted in the middle too.
+    const n = make({ defaultValue: "12" })
+    n.s.send({ type: "INPUT", text: "1534418 2", reason: "AUTOFILL" })
+    expect(n.value()).toBe("534418")
+  })
+
   it("a reset and a parent's change never complete", () => {
     const m = make({ defaultValue: "123456" })
     m.s.send({ type: "INPUT", text: "", reason: "INPUT" })

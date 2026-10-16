@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.connect.ts:59 | `codePattern` drops the consumer pattern's flags (an `i` pattern loses case-insensitivity in the native `pattern`) |
+| add-pin-input (r1) | — | packages/testing/fixtures/pin-input | No trusted Ctrl/⌘+V run (the clipboard paste through the OS shortcut) |
+| add-pin-input (r1) | — | packages/testing/src/components/pin-input.dom.test.tsx | No assertion-level tests for ArrowLeft/Right, Home/End and Backspace moving the active slot |
 | add-pin-input (impl) | — | packages/testing/src/components/pin-input.broken.dom.test.tsx | Broken variants "Enter prevented", "focus moved after autoSubmit" and "completion missed on paste replacement" are not modelled: no step invariant records Enter, focus after submit or completion counts (scenarios cover the correct paths) |
 | add-pin-input (impl) | — | packages/theme/src/pin-input.browser.test.tsx | Forced-colors and reduced-motion checks read the stylesheet; emulated captures of the six states still to add (tasks 8.2) |
 | add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
