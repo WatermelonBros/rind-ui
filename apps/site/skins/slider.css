@@ -2,7 +2,7 @@
    markers inline along the axis; this sheet centres them across it and paints them. ── */
 [data-skinned] [data-scope="slider"][data-part="root"] {
   --s-slider-track: 8px;
-  --s-slider-thumb: 22px;
+  --s-slider-thumb: var(--rind-slider-thumb-size, 22px);
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -156,7 +156,7 @@
 /* crisp: a thick bar, square-shadowed thumbs */
 [data-rind-theme="skin-crisp"] [data-scope="slider"][data-part="root"] {
   --s-slider-track: 12px;
-  --s-slider-thumb: 24px;
+  --s-slider-thumb: var(--rind-slider-thumb-size, 24px);
 }
 [data-rind-theme="skin-crisp"] [data-scope="slider"][data-part="thumb"] {
   box-shadow: 2px 2px 0 var(--s-ink);
@@ -167,7 +167,7 @@
 /* juicy: a soft pill with a puffy thumb */
 [data-rind-theme="skin-juicy"] [data-scope="slider"][data-part="root"] {
   --s-slider-track: 10px;
-  --s-slider-thumb: 26px;
+  --s-slider-thumb: var(--rind-slider-thumb-size, 26px);
 }
 [data-rind-theme="skin-juicy"] [data-scope="slider"][data-part="track"] {
   box-shadow: inset 0 2px 3px color-mix(in oklab, var(--s-ink) 14%, transparent);
