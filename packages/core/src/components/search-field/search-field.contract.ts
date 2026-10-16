@@ -6,6 +6,8 @@ type P = "root" | "label" | "description" | "error-message" | "input" | "clear-t
 type E = Env<P>
 
 const inertKey = { preventDefault() {}, stopPropagation() {} }
+/** A key pressed while the oracle composes is the IME's (the page marks it composing). */
+const composing = (view: unknown) => (view as { readonly state?: string }).state === "composing"
 
 /** Search Field invariants that need no step record (spec "Search Field Invariants"). */
 export const searchFieldInvariants: readonly Invariant<P, string>[] = [
@@ -114,8 +116,14 @@ export const searchFieldContract = contract("search-field", {
     FOCUS: { skip: "covered by every action" },
     BLUR: { skip: "covered by every action" },
     // The oracle's key event: the page's own is the one consumed (or not).
-    ESCAPE: { action: "escape", event: () => ({ event: inertKey, composing: false }) },
-    SUBMIT: { action: "submit", event: () => ({ event: inertKey, composing: false }) },
+    ESCAPE: {
+      action: "escape",
+      event: (view) => ({ event: inertKey, composing: composing(view) }),
+    },
+    SUBMIT: {
+      action: "submit",
+      event: (view) => ({ event: inertKey, composing: composing(view) }),
+    },
   },
   traits: ["field-associated"],
   invariants: searchFieldInvariants,

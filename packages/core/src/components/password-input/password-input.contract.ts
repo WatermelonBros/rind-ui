@@ -15,56 +15,66 @@ type E = Env<P>
 const isVisible = async (env: E) =>
   (await env.part("visibility-trigger").attr("aria-pressed")) === "true"
 
+/** The trigger's first name, per run (a run's env is its own object). */
+const firstName = new WeakMap<object, string>()
+
 /** Password Input invariants (spec "Password Input Invariants"), checked after every step. */
-export const passwordInputInvariants: readonly Invariant<P, string>[] = (() => {
-  let name: string | null = null
-  return [
-    {
-      name: "password-input-type-follows-visible",
-      check: async ({ env, values }) => {
-        const type = await env.part("input").attr("type")
-        const expected = values["visible"] === true ? "text" : "password"
-        return type === expected ? undefined : `the input is type="${type}" (expected ${expected})`
-      },
+export const passwordInputInvariants: readonly Invariant<P, string>[] = [
+  {
+    name: "password-input-type-follows-visible",
+    check: async ({ env, values }) => {
+      const type = await env.part("input").attr("type")
+      const expected = values["visible"] === true ? "text" : "password"
+      return type === expected ? undefined : `the input is type="${type}" (expected ${expected})`
     },
-    {
-      name: "password-input-pressed-follows-visible",
-      check: async ({ env, values }) => {
-        const trigger = env.part("visibility-trigger")
-        if (!(await trigger.exists())) return undefined
-        const pressed = await trigger.attr("aria-pressed")
-        return pressed === String(values["visible"] === true)
-          ? undefined
-          : `the trigger has aria-pressed="${pressed}" while visible is ${values["visible"]}`
-      },
+  },
+  {
+    name: "password-input-pressed-follows-visible",
+    check: async ({ env, values }) => {
+      const trigger = env.part("visibility-trigger")
+      if (!(await trigger.exists())) return undefined
+      const pressed = await trigger.attr("aria-pressed")
+      return pressed === String(values["visible"] === true)
+        ? undefined
+        : `the trigger has aria-pressed="${pressed}" while visible is ${values["visible"]}`
     },
-    {
-      name: "password-input-stable-name",
-      check: async ({ env, state }) => {
-        const trigger = env.part("visibility-trigger")
-        if (!(await trigger.exists())) return undefined
-        const now = await trigger.accessibleName()
-        // A new story (initial state, nothing pressed yet) starts a new name.
-        if (name === null || (state === "idle" && !(await isVisible(env)) && now === name)) {
-          name = now
-          return undefined
-        }
-        const before = name
-        name = now
-        return now === before
-          ? undefined
-          : `the trigger's name changed from "${before}" to "${now}" (aria-pressed carries the state)`
-      },
+  },
+  {
+    name: "password-input-stable-name",
+    check: async ({ env }) => {
+      const trigger = env.part("visibility-trigger")
+      if (!(await trigger.exists())) return undefined
+      const now = await trigger.accessibleName()
+      const first = firstName.get(env)
+      if (first === undefined) {
+        firstName.set(env, now)
+        return undefined
+      }
+      return now === first
+        ? undefined
+        : `the trigger's name changed from "${first}" to "${now}" (aria-pressed carries the state)`
     },
-    {
-      name: "password-input-no-spellcheck",
-      check: async ({ env }) =>
-        (await env.part("input").attr("spellcheck")) === "false"
-          ? undefined
-          : "the input is spell-checked (revealed text would reach spellcheck services)",
+  },
+  {
+    // No keyboard alternative exists (WCAG 2.1.1), unlike Text Field's ClearTrigger.
+    name: "password-input-trigger-in-tab-order",
+    check: async ({ env }) => {
+      const trigger = env.part("visibility-trigger")
+      if (!(await trigger.exists()) || (await trigger.attr("disabled")) !== null) return undefined
+      const tabindex = await trigger.attr("tabindex")
+      return tabindex !== null && Number(tabindex) < 0
+        ? `the trigger has tabindex="${tabindex}" (it must be in the Tab order)`
+        : undefined
     },
-  ]
-})()
+  },
+  {
+    name: "password-input-no-spellcheck",
+    check: async ({ env }) =>
+      (await env.part("input").attr("spellcheck")) === "false"
+        ? undefined
+        : "the input is spell-checked (revealed text would reach spellcheck services)",
+  },
+]
 
 /** The Password Input's contract (spec "Contract"). */
 export const passwordInputContract = contract("password-input", {

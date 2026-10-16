@@ -207,7 +207,11 @@ describe("PasswordInput", () => {
       </Field.Root>,
     )
     expect(input().getAttribute("aria-invalid")).toBe("true")
-    for (const part of parts) expect(el(part)?.hasAttribute("data-invalid"), part).toBe(true)
+    // The trigger is a toggle button: the Field's invalid flag is not one of its states.
+    for (const part of ["input", "indicator"]) {
+      expect(el(part)?.hasAttribute("data-invalid"), part).toBe(true)
+    }
+    expect(el("visibility-trigger")?.hasAttribute("data-invalid")).toBe(false)
     unmount()
     // A disabled Field displays no error (Field: "never while disabled").
     render(

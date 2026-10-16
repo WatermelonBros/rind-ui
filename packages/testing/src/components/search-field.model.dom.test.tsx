@@ -7,7 +7,12 @@ import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
 import { describe, it } from "vitest"
-import { currentRun, installAnnouncementLog, testMachine } from "../index"
+import {
+  currentRun,
+  installAnnouncementLog,
+  searchFieldStepInvariants,
+  testMachine,
+} from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -51,9 +56,16 @@ const announcer = () => {
   }
 }
 
+let submits = 0
+const keyInvariants = searchFieldStepInvariants({ submits: () => submits })
+let stopKeys: () => void = () => {}
+
 function Story({ cfg }: { cfg: Config }) {
   const [value, setValue] = useState(START)
   const root = {
+    onSubmit: () => {
+      submits += 1
+    },
     ...(cfg.readOnly ? { readOnly: true } : {}),
     ...(cfg.disabled ? { disabled: true } : {}),
     ...(cfg.controlled ? { value, onValueChange: setValue } : { defaultValue: START }),
@@ -122,7 +134,13 @@ function config(name: string, cfg: Config) {
   describe(`search-field model: ${name}`, () => {
     testMachine(keyedContract, {
       test: it,
-      setup: () => render(ui(cfg)),
+      invariants: keyInvariants.invariants,
+      setup: () => {
+        stopKeys()
+        stopKeys = keyInvariants.reset()
+        submits = 0
+        return render(ui(cfg))
+      },
       target: () => screen,
       anchor: [{ name: "Search books" }],
       props: {

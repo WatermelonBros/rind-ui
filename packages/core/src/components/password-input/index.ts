@@ -12,3 +12,4 @@ export {
   passwordInputMachine,
 } from "./password-input.machine"
 export { type PasswordInputMessages, passwordInputMessages } from "./password-input.messages"
+export { passwordInputMeta } from "./password-input.meta"

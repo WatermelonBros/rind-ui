@@ -13,3 +13,4 @@ export {
   searchFieldMachine,
 } from "./search-field.machine"
 export { type SearchFieldMessages, searchFieldMessages } from "./search-field.messages"
+export { searchFieldMeta } from "./search-field.meta"

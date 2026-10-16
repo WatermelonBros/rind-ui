@@ -54,7 +54,8 @@ export function passwordInputConnect(input: PasswordInputConnectInput) {
       ...focusAttrs(input.triggerFocused === true, input.modality ?? "keyboard"),
       type: "button",
       "aria-pressed": input.visible ? "true" : "false",
-      "aria-controls": input.controlId,
+      // Known once the Input has rendered (its id can come from the Field or the consumer).
+      "aria-controls": input.controlId || undefined,
       "aria-label": input.toggleLabel,
       disabled: input.disabled || undefined,
     }),
