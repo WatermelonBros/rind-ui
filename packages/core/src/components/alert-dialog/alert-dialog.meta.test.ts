@@ -37,7 +37,7 @@ describe("alert dialog meta matches the code", () => {
         instance: "r",
         open: false,
         opener: "t",
-        closeReason: "ESCAPE_KEY",
+        closeReason: "escape-key",
         rendered: { title: "ti", description: "de" },
         contentMounted: true,
         meta,
