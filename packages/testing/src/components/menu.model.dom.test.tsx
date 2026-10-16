@@ -6,8 +6,8 @@ import { createListCollection, menuArgs, menuContract, nonModalMenuContract } fr
 import { Menu, type MenuRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { describe, it } from "vitest"
-import { testMachine } from "../index"
+import { describe, expect, it } from "vitest"
+import { domEnv, testMachine } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -82,3 +82,54 @@ for (const c of classes) {
     })
   })
 }
+
+describe("menu model: a wrapper that breaks the trigger name", () => {
+  it("the run fails, naming the unnamed button (before the menu it would name opens)", {
+    timeout: 60_000,
+  }, async () => {
+    const tests: { name: string; fn: () => Promise<void> }[] = []
+    testMachine(menuContract, {
+      test: (name, fn) => tests.push({ name, fn }),
+      setup: () =>
+        render(
+          <Menu.Root>
+            {/* An icon-only trigger without a name. */}
+            <Menu.Trigger>
+              <svg aria-hidden="true" width="16" height="16" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner>
+                <Menu.Content>
+                  <Menu.Item value="copy">Copy</Menu.Item>
+                </Menu.Content>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>,
+        ),
+      target: () => domEnv({ timeout: 200 }),
+      anchor: [{ name: /^$/ }] as never,
+      props: {
+        open: undefined,
+        modal: true,
+        level: "root",
+        levelId: "oracle",
+        collection,
+        strategy: "roving",
+        ids: { list: "oracle-content", item: (k: string) => `oracle-${k}` },
+        focusableWhenDisabled: true,
+        getTrigger: () => null,
+      } as never,
+      modalities: ["keyboard"],
+    })
+    const opening = tests.find(
+      (t) => t.name.includes("TRIGGER_PRESS→ open —") || t.name.endsWith("TRIGGER_PRESS→ open"),
+    )
+    expect(opening).toBeDefined()
+    const error = await (opening as (typeof tests)[number]).fn().then(
+      () => "",
+      (e: Error) => e.message,
+    )
+    // Caught before it opens: the closed state already has the unnamed button.
+    expect(error).toMatch(/\(role button\) has no accessible name/)
+  })
+})

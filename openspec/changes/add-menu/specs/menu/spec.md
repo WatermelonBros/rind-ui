@@ -747,7 +747,8 @@ invariant: focus was restored to the trigger and the browser's Tab moved on from
 
 - **WHEN** a consumer wrapper renders an icon-only trigger with no accessible name and
   runs `testMachine`
-- **THEN** the step that opens the menu fails, naming the unnamed `menu` and `button`
+- **THEN** the run fails in the closed state, naming the unnamed `button` (the `menu`
+  it would name never opens unnamed)
 
 ### Requirement: Label Activation Focuses The Trigger
 
