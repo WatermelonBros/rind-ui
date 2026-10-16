@@ -202,8 +202,9 @@ attributes as the corresponding Dialog part. `data-modal` SHALL always be presen
 
 ### Requirement: Alert Dialog Contract
 
-The `alert-dialog` contract SHALL locate an instance by role `alertdialog` and exact
-accessible name, SHALL declare the traits `layer`, `modal`, `restores-focus` and
+The `alert-dialog` contract SHALL locate an instance as the Dialog contract does, through
+its trigger (role `button`, exact name `trigger` defaulting to the dialog's `name`), since
+a closed dialog has no content to locate; it SHALL declare the traits `layer`, `modal`, `restores-focus` and
 `presence`, and SHALL declare the Dialog contract's actions and queries except
 `close`, plus `cancel()` and `confirm(name?)` (press the action with that accessible
 name, or the only action), each with pointer and keyboard implementations. Its

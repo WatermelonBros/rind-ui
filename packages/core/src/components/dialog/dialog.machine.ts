@@ -21,6 +21,9 @@ export type DialogEvent =
   /** A trigger was activated (`trigger`: its element id, the opener). */
   | { readonly type: "TRIGGER_PRESS"; readonly trigger: string; readonly modality: Modality }
   | { readonly type: "CLOSE_TRIGGER_PRESS"; readonly modality: Modality }
+  /** Alert Dialog: its Cancel and Action parts (`action`: the pressed action's id). */
+  | { readonly type: "CANCEL_PRESS"; readonly modality: Modality }
+  | { readonly type: "ACTION_PRESS"; readonly action: string; readonly modality: Modality }
   | Dismissal<"ESCAPE_KEY">
   | Dismissal<"OUTSIDE_PRESS">
   | Dismissal<"OUTSIDE_FOCUS">
@@ -49,7 +52,14 @@ export interface DialogProps {
   /** Default: `modal`. */
   readonly closeOnInteractOutside?: boolean | undefined
   /** `null`: the overlay's rule; `false`: focus does not move; a part name or a function. */
-  readonly initialFocus?: "content" | "title" | (() => FocusTarget) | null | false | undefined
+  readonly initialFocus?:
+    | "content"
+    | "title"
+    | "cancel"
+    | (() => FocusTarget)
+    | null
+    | false
+    | undefined
   /** `null`: back to the opener; `false`: focus does not move. */
   readonly finalFocus?:
     | ((reason: DialogCloseReason | undefined) => FocusTarget)
@@ -81,6 +91,8 @@ const DISMISSALS: Record<DismissReason, Dismissal<string>["type"]> = {
 const CLOSE_REASONS = new Set<string>([
   "TRIGGER_PRESS",
   "CLOSE_TRIGGER_PRESS",
+  "CANCEL_PRESS",
+  "ACTION_PRESS",
   "ESCAPE_KEY",
   "OUTSIDE_PRESS",
   "OUTSIDE_FOCUS",
@@ -91,9 +103,22 @@ const CLOSE_REASONS = new Set<string>([
 /** The kinds that can be a dialog's parent layer (spec "Parent Layer"). */
 export const DIALOG_PARENT_KINDS: readonly LayerKind[] = ["dialog", "alertdialog", "drawer"]
 
+/** The parts whose press closes the dialog (each a close event of the graph). */
+type ClosePart = "CLOSE_TRIGGER_PRESS" | "CANCEL_PRESS" | "ACTION_PRESS"
+
 export interface DialogMachineConfig {
   readonly scope: string
   readonly kind: "dialog" | "alertdialog"
+  /** Default: the Dialog's close trigger. The Alert Dialog: Cancel and Action. */
+  readonly closeParts?: readonly ClosePart[]
+  /** Always modal, whatever the props (the Alert Dialog). */
+  readonly alwaysModal?: boolean
+  /** Default for `closeOnInteractOutside` (else: `modal`). */
+  readonly closeOnInteractOutside?: boolean
+  /** Default for `initialFocus` (else: the overlay's rule). */
+  readonly initialFocus?: DialogProps["initialFocus"]
+  /** A missing description warns too (the Alert Dialog's message). */
+  readonly describe?: boolean
 }
 
 /** The overlay's `initialFocus` option for the prop (none: the overlay's default rule). */
@@ -106,12 +131,25 @@ function initialFocusOf(
   if (initial === false) return { initialFocus: () => false }
   if (initial === "content") return { initialFocus: content }
   if (initial === "title") return { initialFocus: title }
+  // At focus time, from the live content: never a node replaced since (bits-ui#2136).
+  if (initial === "cancel") {
+    return {
+      initialFocus: () =>
+        content()?.querySelector<HTMLElement>('[data-part="cancel"]') ?? content(),
+    }
+  }
   return { initialFocus: initial }
 }
 
 /** Builds a dialog-family machine (Dialog, Alert Dialog): same graph, its own kind. */
 export function buildDialogMachine(config: DialogMachineConfig) {
   const { scope, kind } = config
+  const closeParts = config.closeParts ?? ["CLOSE_TRIGGER_PRESS"]
+  const isModal = (props: DialogProps) => config.alwaysModal === true || props.modal !== false
+  const closeOnOutside = (props: DialogProps) =>
+    config.alwaysModal === true
+      ? (config.closeOnInteractOutside ?? true)
+      : (props.closeOnInteractOutside ?? config.closeOnInteractOutside ?? isModal(props))
   return setup({
     types: type<{
       props: DialogProps
@@ -121,10 +159,10 @@ export function buildDialogMachine(config: DialogMachineConfig) {
       values: "open"
     }>(),
     guards: {
-      isNonModal: ({ props }) => props.modal === false,
+      isNonModal: ({ props }) => !isModal(props),
       // The overlay sends these only when enabled; the guards make the graph say so too.
       closesOnEscape: ({ props }) => props.closeOnEscape !== false,
-      closesOnOutsidePress: ({ props }) => props.closeOnInteractOutside ?? props.modal !== false,
+      closesOnOutsidePress: ({ props }) => closeOnOutside(props),
     },
     actions: {
       /** Entering open: the trigger that opened it, or none (programmatic, `open` prop). */
@@ -143,7 +181,7 @@ export function buildDialogMachine(config: DialogMachineConfig) {
         const { env, send } = a
         const byId = (part: string) => env.dom.getById(partId(scope, a.props.root, part))
         const content = () => byId("content") as HTMLElement | null
-        const modal = a.props.modal !== false
+        const modal = isModal(a.props)
         // A non-modal dialog's triggers belong to it: pressing one toggles, not outside.
         const triggers = () =>
           modal
@@ -176,7 +214,11 @@ export function buildDialogMachine(config: DialogMachineConfig) {
           surfaces: () => [byId("positioner"), byId("backdrop")].filter((e) => e !== null),
           container: content,
           modality: env.modality.modality(),
-          ...(initialFocusOf(initial, content, () => byId("title") as HTMLElement | null) ?? {}),
+          ...(initialFocusOf(
+            initial === undefined ? config.initialFocus : initial,
+            content,
+            () => byId("title") as HTMLElement | null,
+          ) ?? {}),
           ...(final === null || final === undefined
             ? {}
             : {
@@ -185,7 +227,7 @@ export function buildDialogMachine(config: DialogMachineConfig) {
               }),
           dismiss: {
             escape: a.props.closeOnEscape !== false,
-            outsidePress: a.props.closeOnInteractOutside ?? modal,
+            outsidePress: closeOnOutside(a.props),
             // Non-modal dialogs are worked alongside the page (zag#2957): no focus dismissal.
             outsideFocus: false,
             onRequest: (request) => {
@@ -216,11 +258,19 @@ export function buildDialogMachine(config: DialogMachineConfig) {
         if (process.env.NODE_ENV === "production") return undefined
         const frame = env.scheduler.requestAnimationFrame(() => {
           const el = env.dom.getById(partId(scope, props.root, "content"))
+          if (!el) return
+          const name = scope === "dialog" ? "Dialog" : "AlertDialog"
           // The content's own attributes: its title (aria-labelledby) or a label.
-          if (!el || el.getAttribute("aria-label") || el.getAttribute("aria-labelledby")) return
-          console.warn(
-            `[rind-ui] ${scope}: #${el.id} has no accessible name; render ${scope === "dialog" ? "Dialog" : "AlertDialog"}.Title or pass aria-label`,
-          )
+          if (!el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby")) {
+            console.warn(
+              `[rind-ui] ${scope}: #${el.id} has no accessible name; render ${name}.Title or pass aria-label`,
+            )
+          }
+          if (config.describe && !el.getAttribute("aria-describedby")) {
+            console.warn(
+              `[rind-ui] ${scope}: #${el.id} has no description; render ${name}.Description with the alert message`,
+            )
+          }
         })
         return () => env.scheduler.cancelAnimationFrame(frame)
       },
@@ -242,7 +292,9 @@ export function buildDialogMachine(config: DialogMachineConfig) {
         effects: ["overlay", "nameCheck"],
         on: {
           TRIGGER_PRESS: { guard: "isNonModal", target: "closed", actions: ["setCloseReason"] },
-          CLOSE_TRIGGER_PRESS: { target: "closed", actions: ["setCloseReason"] },
+          ...Object.fromEntries(
+            closeParts.map((e) => [e, { target: "closed", actions: ["setCloseReason"] }]),
+          ),
           ESCAPE_KEY: { guard: "closesOnEscape", target: "closed", actions: ["setCloseReason"] },
           OUTSIDE_PRESS: {
             guard: "closesOnOutsidePress",

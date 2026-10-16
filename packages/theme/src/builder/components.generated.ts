@@ -12,6 +12,17 @@ export type ComponentTokens = {
     | "triggerColor"
     | "triggerGap"
     | "triggerPaddingInline"
+  readonly "alert-dialog":
+    | "backdrop"
+    | "bg"
+    | "border"
+    | "color"
+    | "duration"
+    | "gap"
+    | "maxWidth"
+    | "padding"
+    | "radius"
+    | "shadow"
   readonly button:
     | "disabledBg"
     | "disabledBorder"

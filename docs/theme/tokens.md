@@ -88,6 +88,56 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### alert-dialog
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "backdrop": {
+      "fallback": "var(--rind-dialog-backdrop, var(--rind-color-overlay))",
+      "file": "alert-dialog.css"
+    },
+    "bg": {
+      "fallback": "var(--rind-dialog-bg, var(--rind-color-surface-raised))",
+      "file": "alert-dialog.css"
+    },
+    "border": {
+      "fallback": "var(--rind-dialog-border, var(--rind-color-border-strong))",
+      "file": "alert-dialog.css"
+    },
+    "color": {
+      "fallback": "var(--rind-dialog-color, var(--rind-color-text))",
+      "file": "alert-dialog.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-dialog-duration, var(--rind-duration-normal))",
+      "file": "alert-dialog.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-3)",
+      "file": "alert-dialog.css"
+    },
+    "max-width": {
+      "fallback": "var(--rind-dialog-max-width, 28rem)",
+      "file": "alert-dialog.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-dialog-padding, var(--rind-space-6))",
+      "file": "alert-dialog.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-dialog-radius, var(--rind-radius-panel))",
+      "file": "alert-dialog.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-dialog-shadow, var(--rind-shadow-lg))",
+      "file": "alert-dialog.css"
+    }
+  }
+}
+```
+
 ### button
 
 ```json
@@ -376,31 +426,31 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "backdrop": {
       "fallback": "var(--rind-color-overlay)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "bg": {
       "fallback": "var(--rind-color-surface-raised)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "border": {
       "fallback": "var(--rind-color-border-strong)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "color": {
       "fallback": "var(--rind-color-text)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "duration": {
       "fallback": "var(--rind-duration-normal)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "inset": {
       "fallback": "var(--rind-space-4)",
       "file": "dialog.css"
     },
     "max-width": {
-      "fallback": "32rem",
-      "file": "dialog.css"
+      "fallback": "28rem",
+      "file": "alert-dialog.css"
     },
     "nested-backdrop": {
       "fallback": "transparent",
@@ -408,7 +458,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "padding": {
       "fallback": "var(--rind-space-6)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "parent-scale": {
       "fallback": "0.98",
@@ -416,11 +466,11 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "radius": {
       "fallback": "var(--rind-radius-panel)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     },
     "shadow": {
       "fallback": "var(--rind-shadow-lg)",
-      "file": "dialog.css"
+      "file": "alert-dialog.css"
     }
   }
 }

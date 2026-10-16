@@ -21,3 +21,10 @@ export {
 } from "./dialog.machine"
 export { type DialogMessages, dialogMessages } from "./dialog.messages"
 export { dialogMeta } from "./dialog.meta"
+export {
+  dialogFamilyActions,
+  dialogFamilyQueries,
+  dialogHasFocus,
+  dialogIsOpen,
+  dialogLocate,
+} from "./dialog-family.contract"

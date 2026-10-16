@@ -1,6 +1,7 @@
 export * from "./a11y"
 export * from "./collection"
 export * from "./components/accordion"
+export * from "./components/alert-dialog"
 export * from "./components/button"
 export * from "./components/checkbox"
 export * from "./components/checkbox-group"
