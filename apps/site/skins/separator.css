@@ -3,14 +3,14 @@
   border: 0;
   margin: 0;
   flex: none;
-  background: color-mix(in oklab, var(--s-ink) 22%, transparent);
+  background: #a1a1aa;
 }
 [data-skin] [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
-  height: 1px;
+  height: 2px;
   width: 100%;
 }
 [data-skin] [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
-  width: 1px;
+  width: 2px;
   align-self: stretch;
   min-height: 1.2em;
 }
@@ -24,7 +24,7 @@
   width: 3px;
 }
 [data-skin="juicy"] [data-scope="separator"][data-part="root"] {
-  background: #c9bdf2;
+  background: var(--s-acc);
   border-radius: 99px;
 }
 [data-skin="juicy"] [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
