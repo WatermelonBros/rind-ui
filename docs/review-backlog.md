@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.machine.ts:182 | `push`: the dragged thumb's input value is written before the neighbours' min/max widen, so the browser can clamp it for a frame |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.math.ts:68 | `largeStep` is rounded to the step's decimals (a finer custom largeStep is coarsened) |
 | add-slider (r1) | — | packages/react/src/slider/slider.tsx:240 | `formInput` is a new function every render, so the Thumb's track effect re-subscribes each render |
@@ -133,6 +134,14 @@ See CLAUDE.md "Review rules".
 | add-a11y-foundations (r1) | — | packages/react/src/provider.tsx:68 | Inline environment/messages props rebuild domEnvironment every render |
 | add-a11y-foundations (r1) | — | packages/core/src/dom/quirks.ts | Several entries point at test files that don't obviously reproduce their bug; quirks:check only checks the file exists (require the id in the test); defineQuirks accepts duplicate ids; every entry verified "today" incl. WebKit/VO ones jsdom can't verify |
 | add-a11y-foundations (r1) | — | packages/testing/src/broken.dom.test.tsx:157 | No broken fixture for "no ring after arrow" or "double speech on Windows"; the Tab fixture fails pointer runs for the wrong reason (hidden by `some(...)`); RA#9737 fixture doesn't prove Chromium-only; ring contrast checked only against backgrounds |
+
+## Manual AT protocol
+
+Passes that need real assistive technology or devices; automated tests cannot stand in.
+
+| Change | Task | What to check |
+|---|---|---|
+| add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 
 ## Resolved
 

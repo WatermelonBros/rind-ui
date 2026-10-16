@@ -29,6 +29,7 @@ export { getForm } from "./components/form"
 export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
+export { getNumberInput } from "./components/number-input"
 export { getPopover } from "./components/popover"
 export { getRadioGroup } from "./components/radio-group"
 export { getSegmentedControl } from "./components/segmented-control"
@@ -90,6 +91,10 @@ export {
   type Navigation,
   navigationLog,
 } from "./navigation"
+export {
+  type NumberInputStepInvariants,
+  numberInputStepInvariants,
+} from "./number-input-invariants"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
 export { type SliderStepInvariants, sliderStepInvariants } from "./slider-invariants"

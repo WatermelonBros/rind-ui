@@ -134,7 +134,8 @@ SHALL report nothing.
 #### Scenario: Step from edited text (ark#1838)
 
 - **WHEN** a `fr-FR` currency field shows the typed text "10,50" and the increment trigger is pressed
-- **THEN** the value is 11.5 and the text "11,50 €"
+- **THEN** the typed text parses to 10.5, the step moves to the next grid line, 11, and the
+  text is "11,00 €"
 
 #### Scenario: Empty field with a minimum
 
@@ -181,8 +182,9 @@ Each trigger SHALL be a button-like part (`type="button"`) with `tabIndex=-1`, n
 When the value is at the bound in its direction, or the field is disabled or read-only, a
 trigger SHALL carry `aria-disabled="true"` and `data-disabled` and ignore presses, and SHALL
 NOT use the native `disabled` attribute. A press SHALL NOT take focus (`press-interactions`
-press without focus): with a mouse or pen, focus SHALL move to the input if it was elsewhere;
-with touch or assistive technology, focus SHALL stay where it was.
+press without focus): with a mouse, focus SHALL move to the input if it was elsewhere; with
+touch, a pen (a stylus tap must not open a tablet keyboard, base-ui#1528) or assistive
+technology, focus SHALL stay where it was.
 
 #### Scenario: Tap does not open the keyboard (reka-ui#2315, base-ui#1528)
 
