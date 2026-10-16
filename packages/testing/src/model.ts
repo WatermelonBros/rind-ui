@@ -91,6 +91,8 @@ export interface RunContext {
   readonly locale: string
   readonly direction: Direction
   readonly modality: Modality
+  /** Reopen-during-exit checks across this testMachine's paths (presence contracts). */
+  readonly reopen?: { exercised: number; skipped: number } | undefined
 }
 let run: RunContext | undefined
 /** The run `setup` is rendering for (platform, locale, direction, modality). */
@@ -453,6 +455,7 @@ export function testMachine<const C extends AnyContract, R, A extends unknown[] 
     })
   }
 
+  const reopenStats = { exercised: 0, skipped: 0 }
   const covered = new Set<GraphEdge>()
   /** Edges cut as not taken in some modality (reported only if no modality covers them). */
   const notTaken = new Set<GraphEdge>()
@@ -480,7 +483,13 @@ export function testMachine<const C extends AnyContract, R, A extends unknown[] 
             ...(runPlatforms.length > 1 ? [platformName(platform)] : []),
           ]
           const name = `${contract.scope} [${tags.join(", ")}]: ${path.name}`
-          const ctx: RunContext = { platform, locale: options.locale ?? "en", direction, modality }
+          const ctx: RunContext = {
+            platform,
+            locale: options.locale ?? "en",
+            direction,
+            modality,
+            reopen: reopenStats,
+          }
           options.test(name, (...args: A) =>
             runPath(contract, graph, plannedPath, ctx, options, args, name),
           )
@@ -488,6 +497,21 @@ export function testMachine<const C extends AnyContract, R, A extends unknown[] 
       }
     }
   })
+
+  // The reopen-during-exit check must have run at least once when the content animates: an
+  // exit that always ended before the hold would otherwise pass vacuously.
+  if (contract.traits.includes("presence")) {
+    options.test(`${contract.scope}: presence — reopen during exit exercised`, async (..._: A) => {
+      console.info(
+        `[rind-ui] ${contract.scope} presence: reopen during exit exercised ${reopenStats.exercised}, exit over before the hold ${reopenStats.skipped}`,
+      )
+      if (reopenStats.exercised === 0 && reopenStats.skipped > 0) {
+        throw new Error(
+          `${contract.scope}: reopen-during-exit never exercised: exit ended before hold (${reopenStats.skipped} closing steps)`,
+        )
+      }
+    })
+  }
 
   // Reported explicitly, never skipped silently.
   const failing: string[] = []
@@ -959,10 +983,19 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     step: number,
     edge: GraphEdge,
     close: { readonly action: string; readonly args: readonly unknown[]; readonly mod: Modality },
+    held: { readonly resume: () => Promise<void>; readonly animatedBefore: boolean },
   ) => {
+    const { resume } = held
     const content = contract.semantics?.["content"]
     const exiting = (await base.collect()).parts.find((p) => p.part === content && p.animations > 0)
-    if (!exiting) return
+    if (!exiting) {
+      // The content animates (computed style) but its exit was over before the hold: counted,
+      // so a run where this always happens fails instead of passing vacuously.
+      if (held.animatedBefore && ctx.reopen) ctx.reopen.skipped += 1
+      await resume()
+      return
+    }
+    if (ctx.reopen) ctx.reopen.exercised += 1
     if (exiting.attrs["data-state"] !== "closed") {
       fail(
         step,
@@ -979,7 +1012,10 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         mappingOf(contract, e)?.kind === "action",
     )
     const m = reopen ? mappingOf(contract, reopen) : undefined
-    if (!reopen || m?.kind !== "action") return
+    if (!reopen || m?.kind !== "action") {
+      await resume()
+      return
+    }
     const action =
       (contract.actions as Record<string, Record<string, unknown> | undefined>)[m.action] ?? {}
     // By keyboard when the action has one: a pointer waits until the exiting backdrop that
@@ -995,16 +1031,6 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           `presence (reopen during the exit): ${e instanceof Error ? e.message : String(e)}`,
         )
       }
-    }
-    // Hold the exit while reopening: a slow run (CI Linux) must not see it end in between
-    // and mount a new element legitimately (the exit was 150 ms, the reopen took longer).
-    const resume = (await base.holdAnimations?.()) ?? (async () => {})
-    // The exit may have ended before the hold (between the read and the hold): then there is
-    // no exit to reopen during in this run, which is not a failure.
-    const still = (await base.collect()).parts.find((p) => p.node === exiting.node)
-    if (!still) {
-      await resume()
-      return
     }
     send(reopen.event, { modality: mod })
     await act(m.action, m.args?.(oracle.service.view()) ?? [], mod)
@@ -1096,6 +1122,20 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           } catch (e) {
             fail(i + 1, edge, e instanceof Error ? e.message : String(e))
           }
+          // Hold the exit as early as possible: right after a closing step, before anything
+          // reads it, so a slow run cannot see it end first (CI Linux: a 150 ms exit).
+          const closesNow =
+            edge !== notTaken &&
+            edge.target !== null &&
+            expectations(contract, from, null).open &&
+            !expectations(contract, edge.target, null).open
+          const animatedBefore =
+            before?.parts.some((p) => p.part === contract.semantics?.["content"] && p.motion) ===
+            true
+          const held =
+            contract.traits.includes("presence") && closesNow && base.holdAnimations
+              ? { resume: await base.holdAnimations(), animatedBefore }
+              : undefined
           const closes =
             edge !== notTaken &&
             edge.target !== null &&
@@ -1113,12 +1153,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
             }
           }
           if (contract.traits.includes("presence") && closes) {
-            await reopenDuringExit(i + 1, edge, {
-              action: mapping.action,
-              args: actionArgs,
-              mod: stepMod,
-            })
-          }
+            await reopenDuringExit(
+              i + 1,
+              edge,
+              { action: mapping.action, args: actionArgs, mod: stepMod },
+              held ?? { resume: async () => {}, animatedBefore: false },
+            )
+          } else await held?.resume()
         } else {
           fail(i + 1, edge, `no contract mapping for ${edge.event}`)
         }
