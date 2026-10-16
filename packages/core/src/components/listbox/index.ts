@@ -1,4 +1,5 @@
 export { listboxConnect } from "./listbox.connect"
+export { listboxContract, listboxTraits } from "./listbox.contract"
 export {
   type ListboxActionDetails,
   type ListboxActionVia,
