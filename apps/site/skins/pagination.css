@@ -59,8 +59,10 @@
   color: color-mix(in oklab, var(--s-ink) 45%, var(--s-card));
 }
 [data-skinned] [data-scope="pagination"][data-part="ellipsis"] {
+  display: inline-grid;
+  place-items: center;
+  align-self: stretch;
   min-width: 24px;
-  text-align: center;
   color: var(--s-ink);
   font: 700 14px var(--s-font);
 }
