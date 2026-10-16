@@ -5,7 +5,8 @@
  * visible; the packages themselves ship no CSS at all.
  */
 
-[data-skin="crisp"] {
+[data-skin="crisp"],
+[data-rind-theme="skin-crisp"] {
   --s-bg: #d4ff3a;
   --s-ink: #0b0b0c;
   --s-acc: #ff3d8b;
@@ -27,7 +28,8 @@
   --s-brand-text: var(--s-on);
   --s-brand-deep: var(--s-ink);
 }
-[data-skin="juicy"] {
+[data-skin="juicy"],
+[data-rind-theme="skin-juicy"] {
   --s-bg: #e9e2ff;
   --s-ink: #2a1d5c;
   --s-acc: #ff8fb1;
@@ -49,7 +51,8 @@
   --s-brand-text: var(--s-ink);
   --s-brand-deep: var(--s-acc-deep);
 }
-[data-skin="bare"] {
+[data-skin="bare"],
+[data-rind-theme="skin-bare"] {
   --s-bg: #f4f4f5;
   --s-ink: #18181b;
   --s-acc: #2563eb;
@@ -71,7 +74,9 @@
   --s-brand-text: #ffffff;
   --s-brand-deep: #000000;
 }
-[data-skin] {
+/* portalled content (dialogs, popovers) keeps its skin through the portal host's data-rind-theme */
+[data-skinned],
+[data-rind-theme^="skin-"] {
   --s-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --s-pop: cubic-bezier(0.34, 1.35, 0.64, 1);
   color: var(--s-ink);
@@ -80,7 +85,7 @@
 
 /* Disabled reads as disabled in every skin: dimmed, not-allowed, no hover lift. A locked
    accordion trigger (data-disabled without a disabled item) is excluded on purpose. */
-[data-skin] :is(
+[data-skinned] :is(
   button,
   a,
   input,
@@ -99,10 +104,10 @@
   translate: 0 0;
   filter: grayscale(0.4);
 }
-[data-skin] [data-scope="accordion"][data-part="item"][data-disabled] [data-part="trigger"] {
+[data-skinned] [data-scope="accordion"][data-part="item"][data-disabled] [data-part="trigger"] {
   cursor: not-allowed;
 }
-[data-skin] [data-scope="fieldset"][data-part="root"]:is(:disabled, [data-disabled]) {
+[data-skinned] [data-scope="fieldset"][data-part="root"]:is(:disabled, [data-disabled]) {
   opacity: 0.55;
 }
 

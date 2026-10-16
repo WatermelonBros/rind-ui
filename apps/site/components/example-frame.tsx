@@ -136,7 +136,9 @@ export function ExampleFrame({
         ref={stage}
         className={styles.stage}
         data-view={skin}
+        data-skinned=""
         data-skin={skin === "parts" ? "bare" : skin}
+        data-rind-theme={`skin-${skin === "parts" ? "bare" : skin}`}
         data-inspecting={inspect ? "" : undefined}
       >
         {tags.map((t) => (

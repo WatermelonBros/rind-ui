@@ -1,12 +1,6 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 import type { ReactNode } from "react"
-import { GooFilters } from "@/components/goo"
-import { Intro } from "@/components/intro"
-import { Nav } from "@/components/nav"
-import { PhaseProvider } from "@/components/phase"
-import "./globals.css"
-import "@/skins/index.css"
 
 // Self-hosted (OFL, licences in fonts/): the build must work with no network.
 const unbounded = localFont({
@@ -71,14 +65,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <GooFilters />
-        <Intro />
-        <PhaseProvider>
-          <header>
-            <Nav />
-          </header>
-          {children}
-        </PhaseProvider>
+        {/* The site chrome lives in app/(site)/layout.tsx; app/examples has none. */}
+        {children}
       </body>
     </html>
   )

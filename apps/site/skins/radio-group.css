@@ -1,39 +1,39 @@
 /* ── Radio Group: a dot that grows into its ring; items stack, or line up horizontally ── */
-[data-skin] [data-scope="radio-group"][data-part="root"] {
+[data-skinned] [data-scope="radio-group"][data-part="root"] {
   display: grid;
   gap: 10px;
 }
-[data-skin] [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"] {
+[data-skinned] [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"] {
   grid-auto-flow: column;
   justify-content: start;
   column-gap: 20px;
 }
-[data-skin]
+[data-skinned]
   [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"]
   > :is([data-part="label"], [data-part="description"], [data-part="error-message"]) {
   grid-column: 1 / -1;
 }
-[data-skin] [data-scope="radio-group"][data-part="label"] {
+[data-skinned] [data-scope="radio-group"][data-part="label"] {
   font-weight: 700;
   font-size: 15px;
 }
-[data-skin] [data-scope="radio-group"][data-part="item"] {
+[data-skinned] [data-scope="radio-group"][data-part="item"] {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: 12px;
 }
-[data-skin] [data-scope="radio-group"][data-part="item-label"] {
+[data-skinned] [data-scope="radio-group"][data-part="item-label"] {
   font-weight: 500;
   cursor: pointer;
 }
-[data-skin] [data-scope="radio-group"][data-part="item-description"] {
+[data-skinned] [data-scope="radio-group"][data-part="item-description"] {
   grid-column: 2;
   font-size: 13.5px;
   color: color-mix(in oklab, var(--s-ink) 74%, transparent);
   margin: 2px 0 0;
 }
-[data-skin] [data-scope="radio-group"][data-part="item-control"] {
+[data-skinned] [data-scope="radio-group"][data-part="item-control"] {
   width: 26px;
   height: 26px;
   padding: 0;
@@ -47,11 +47,11 @@
     scale 0.45s var(--s-pop),
     background 0.3s var(--s-ease);
 }
-[data-skin] [data-scope="radio-group"][data-part="item-control"][data-pressed] {
+[data-skinned] [data-scope="radio-group"][data-part="item-control"][data-pressed] {
   scale: 0.88;
   transition-duration: 0.12s;
 }
-[data-skin] [data-scope="radio-group"][data-part="item-indicator"] {
+[data-skinned] [data-scope="radio-group"][data-part="item-indicator"] {
   width: 12px;
   height: 12px;
   border-radius: 50%;

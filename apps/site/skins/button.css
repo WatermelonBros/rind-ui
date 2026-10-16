@@ -1,5 +1,5 @@
 /* ── Button ───────────────────────────────────────────────────────────────────────── */
-[data-skin] [data-scope="button"][data-part="root"] {
+[data-skinned] [data-scope="button"][data-part="root"] {
   font: 600 15px var(--s-font);
   padding: 11px 20px;
   border-radius: 99px;
@@ -41,13 +41,13 @@
   box-shadow: 0 1px 0 var(--s-brand-deep);
   transition-duration: 0.12s;
 }
-[data-skin] [data-scope="button"][data-part="root"]:is([data-disabled], [aria-disabled="true"]) {
+[data-skinned] [data-scope="button"][data-part="root"]:is([data-disabled], [aria-disabled="true"]) {
   opacity: 0.45;
   cursor: not-allowed;
   translate: 0 0;
 }
 /* pending: busy stripes slide through the button */
-[data-skin] [data-scope="button"][data-part="root"][data-pending] {
+[data-skinned] [data-scope="button"][data-part="root"][data-pending] {
   opacity: 1;
   cursor: progress;
   background-image: repeating-linear-gradient(

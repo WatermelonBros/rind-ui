@@ -1,19 +1,19 @@
 /* ── Switch: a track and a thumb that slides; the checked side is the start edge under RTL ── */
-[data-skin] [data-scope="switch"][data-part="root"] {
+[data-skinned] [data-scope="switch"][data-part="root"] {
   display: inline-grid;
   grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: 12px;
 }
-[data-skin] [data-scope="switch"][data-part="label"] {
+[data-skinned] [data-scope="switch"][data-part="label"] {
   font-weight: 500;
   cursor: pointer;
 }
-[data-skin] [data-scope="switch"][data-part="description"] {
+[data-skinned] [data-scope="switch"][data-part="description"] {
   grid-column: 2;
   margin-top: 2px;
 }
-[data-skin] [data-scope="switch"][data-part="control"] {
+[data-skinned] [data-scope="switch"][data-part="control"] {
   position: relative;
   width: 52px;
   height: 30px;
@@ -24,7 +24,7 @@
   cursor: pointer;
   transition: background 0.35s var(--s-ease);
 }
-[data-skin] [data-scope="switch"][data-part="thumb"] {
+[data-skinned] [data-scope="switch"][data-part="thumb"] {
   position: absolute;
   top: 50%;
   inset-inline-start: 3px;
@@ -39,13 +39,13 @@
     background 0.3s;
 }
 /* while pressed the thumb stretches toward where it is going */
-[data-skin] [data-scope="switch"][data-part="control"][data-pressed] [data-part="thumb"] {
+[data-skinned] [data-scope="switch"][data-part="control"][data-pressed] [data-part="thumb"] {
   width: 28px;
 }
-[data-skin] [data-scope="switch"][data-part="thumb"][data-state="checked"] {
+[data-skinned] [data-scope="switch"][data-part="thumb"][data-state="checked"] {
   inset-inline-start: calc(100% - 25px);
 }
-[data-skin]
+[data-skinned]
   [data-scope="switch"][data-part="control"][data-pressed]
   [data-part="thumb"][data-state="checked"] {
   inset-inline-start: calc(100% - 31px);

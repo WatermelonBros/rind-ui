@@ -107,7 +107,13 @@ export function AnyLook() {
             Reset
           </Button>
         </div>
-        <div className={styles.lookStage} data-view={skin} data-skin={skin} style={vars}>
+        <div
+          className={styles.lookStage}
+          data-view={skin}
+          data-skinned=""
+          data-skin={skin}
+          style={vars}
+        >
           <div className={styles.lookGrid}>
             <div className="stack">
               <TextField.Root name="handle">

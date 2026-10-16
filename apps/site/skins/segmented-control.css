@@ -1,5 +1,5 @@
 /* ── Segmented Control: segments on a track; the indicator is the selected thumb ── */
-[data-skin] [data-scope="segmented-control"][data-part="root"] {
+[data-skinned] [data-scope="segmented-control"][data-part="root"] {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -11,11 +11,11 @@
   border: var(--s-bw) solid var(--s-line);
   box-shadow: var(--s-lift);
 }
-[data-skin] [data-scope="segmented-control"][data-part="label"] {
+[data-skinned] [data-scope="segmented-control"][data-part="label"] {
   font: 700 13px var(--s-font);
   padding: 0 8px 0 10px;
 }
-[data-skin] [data-scope="segmented-control"][data-part="item"] {
+[data-skinned] [data-scope="segmented-control"][data-part="item"] {
   position: relative;
   z-index: 1;
   font: 600 14px var(--s-font);
@@ -29,14 +29,14 @@
     color 0.35s var(--s-ease),
     scale 0.4s var(--s-pop);
 }
-[data-skin] [data-scope="segmented-control"][data-part="item"][data-pressed] {
+[data-skinned] [data-scope="segmented-control"][data-part="item"][data-pressed] {
   scale: 0.95;
   transition-duration: 0.12s;
 }
-[data-skin] [data-scope="segmented-control"][data-part="item"][data-state="checked"] {
+[data-skinned] [data-scope="segmented-control"][data-part="item"][data-state="checked"] {
   color: var(--s-brand-text);
 }
-[data-skin] [data-scope="segmented-control"][data-part="indicator"] {
+[data-skinned] [data-scope="segmented-control"][data-part="indicator"] {
   position: absolute;
   z-index: 0;
   left: 0;
@@ -50,10 +50,10 @@
     translate 0.5s var(--s-pop),
     width 0.5s var(--s-pop);
 }
-[data-skin] [data-scope="segmented-control"][data-part="indicator"][data-resizing] {
+[data-skinned] [data-scope="segmented-control"][data-part="indicator"][data-resizing] {
   transition: none;
 }
-[data-skin] [data-scope="segmented-control"][data-part="indicator"][data-state="hidden"] {
+[data-skinned] [data-scope="segmented-control"][data-part="indicator"][data-state="hidden"] {
   opacity: 0;
 }
 [data-skin="juicy"] [data-scope="segmented-control"][data-part="indicator"] {
