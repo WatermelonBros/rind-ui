@@ -262,6 +262,28 @@ TwoTriggers, KeepMounted, ExitAnimation. Record each pass in `tested-with.json` 
 - [ ] **Windows High Contrast / forced colors**: the content border is visible without the
       backdrop, and the focus ring is visible.
 
+## Device checklist: Popover (add-popover 7.3)
+
+Record each pass in `tested-with.json` with `component: "popover"`. Deferred to devices. Use a
+non-modal "Share" popover with a title, a text field and a close button, and a toggletip
+(no title, trigger named "About the fee").
+
+- [ ] **VoiceOver iOS + Safari: swipe order to portalled content**: after opening, focus is
+      inside the content and swiping right walks its controls; swiping past the last one leaves
+      the popover without trapping; the page is still reachable. Record where the swipe goes
+      from the trigger before the content is focused (the content is at the end of `body`).
+- [ ] **TalkBack + Chrome**: opening speaks the name and moves the cursor into the content;
+      swipe order inside is correct; the close button is reachable; back gesture closes it.
+- [ ] **NVDA + Firefox/Chrome, JAWS + Chrome, VoiceOver macOS**: the non-modal dialog without
+      a title is read with the trigger's name (toggletip: "About the fee, dialog"); with a
+      title, the title. Record each wording.
+- [ ] **Tab order**: Tab from the trigger enters the content, Tab past its end continues after
+      the trigger, Shift+Tab from its start returns to the trigger; nothing announces a
+      sentinel.
+- [ ] **Modal popover**: the page behind is unreachable and Tab wraps; closing returns to the
+      trigger.
+- [ ] **Windows High Contrast / forced colors**: the content border and the arrow are visible.
+
 ## Device checklist: Alert Dialog (add-alert-dialog 8.2)
 
 Record each pass in `tested-with.json` with `component: "alert-dialog"`. Deferred to devices.

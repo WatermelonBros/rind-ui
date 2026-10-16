@@ -4,7 +4,7 @@
 - [ ] 1.2 Static path variants `/examples/<slug>/<example>/<skin>/` for none, bare, crisp, juicy, theme-calm, theme-crisp; `?scheme`
 - [ ] 1.3 `states` and `hidden` in examples modules; `/examples/index.json` at build
 - [ ] 1.4 Port every Storybook story: component stories as examples, `*Fixture` stories as hidden examples, Tokens / Contrast report / Showcase as site pages under `/theme/`
-- [ ] 1.6 Site examples for components added after the port (Alert Dialog: default, destructive confirm, async confirm with pending UI, alert inside a dialog, form with submit-type action, Escape vetoed, a driver example; state examples `open` / `closed`)
+- [ ] 1.6 Site examples for components added after the port (Alert Dialog: default, destructive confirm, async confirm with pending UI, alert inside a dialog, form with submit-type action, Escape vetoed, a driver example; state examples `open` / `closed`; Popover: default, modal, with title/description, custom anchor, arrow, nested, in a dialog, sibling popovers, long content at 320 px, RTL, exit animation, a driver example; state examples `open` / `closed`)
 - [ ] 1.5 Site audit still green; PR merged before section 2
 
 ## 2. Tests move to the harness (implementer)

@@ -335,10 +335,11 @@ on the description for information the user must hear.
 ### Requirement: Parent Layer
 
 A dialog SHALL be the child of the nearest open dialog-like layer (`dialog`,
-`alertdialog` or `drawer`) among its logical ancestors — the layer whose content contains its
-root, or else its trigger — and SHALL be a root layer otherwise. Menus, popovers,
-selects and tooltips SHALL NOT be the parent of a dialog, so a dialog opened from
-inside one of them survives that layer closing.
+`alertdialog`, `drawer` or `popover`) among its logical ancestors — the layer whose content
+contains its root, or else its trigger — and SHALL be a root layer otherwise. A popover is a
+parent, so a dialog opened from a popover keeps the popover open and focus returns into it
+(zag#2933). Menus, selects and tooltips SHALL NOT be the parent of a dialog, so a dialog opened
+from inside one of them survives that layer closing (radix#1836).
 
 #### Scenario: Dialog opened from a drawer
 
@@ -358,7 +359,13 @@ inside one of them survives that layer closing.
 
 - **WHEN** dialog A opens a popover, the popover opens dialog B, and B is closed with
   its close trigger
-- **THEN** only B closes; A stays open (regression: zag#2933)
+- **THEN** only B closes; A and the popover stay open (regression: zag#2933)
+
+#### Scenario: Dialog opened from a popover
+
+- **WHEN** a dialog is opened from a button inside an open popover and takes focus
+- **THEN** the dialog is the popover's child layer: the popover stays open while the dialog
+  has focus, and after the dialog closes focus returns to the button inside the popover
 
 ### Requirement: Nested Dialogs
 

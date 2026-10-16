@@ -251,9 +251,13 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
   const onFocusIn = (e: FocusEvent) => {
     const target = targetOf(e)
     if (!isElement(target) || pressing) return
+    // Past the layer that holds the focus, the walk goes on: a layer beneath that does not
+    // hold it (not an ancestor) lost focus too — a modal dialog opened from the page leaves
+    // a non-modal popover behind it (ark#2610).
     for (const reg of fromTop()) {
-      if (!reg || reg.modal) return
-      if (inside(reg, target) || exempt(reg, target)) return
+      if (!reg) return
+      if (inside(reg, target)) continue
+      if (reg.modal || exempt(reg, target)) return
       if (reg.options.outsideFocus === false) return
       if (!request(reg, "outside-focus", e, target)) return
     }

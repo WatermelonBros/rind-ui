@@ -251,7 +251,8 @@ that touch screen-reader users have no Escape key.
 
 - **WHEN** a modal popover and a modal popover nested in it open in the same
   render
-- **THEN** only content outside both is inert, and focus is inside the inner one
+- **THEN** the inner one is the topmost modal: it is not inert, everything else (the page and
+  the outer popover, as beneath any nested modal) is, and focus is inside the inner one
   (regression: react-spectrum#10662)
 
 ### Requirement: Initial Focus
@@ -409,7 +410,9 @@ The popover SHALL be positioned through the floating-positioning capability with
 the `popup` preset (side `bottom`, align `center`), `sideOffset` 8 and collision
 padding 8, against the `Anchor` part when rendered, otherwise the trigger;
 consumer `positioning` options SHALL override the defaults. Positioning SHALL run
-only while open. The popover SHALL expose a `reposition()` action.
+only while open. The popover SHALL expose an imperative `reposition()` (on the adapter's
+actions handle) that recomputes the position; it is DOM-tested and has no contract action,
+since the contract environment has no scroll or resize primitive.
 
 #### Scenario: Custom anchor
 
@@ -513,7 +516,7 @@ and `data-instance`, and declare:
 
 - actions `open`, `close` (press the trigger while open), `toggle`,
   `closeWithButton` (press `CloseTrigger`), `pressEscape`, `pressOutside`, `tab`,
-  `shiftTab`, `reposition` and `waitForUnmount`, each with pointer and keyboard
+  `shiftTab` and `waitForUnmount`, each with pointer and keyboard
   implementations or a stated reason, and postconditions (`open`: content placed
   and focus inside unless initial focus is skipped; close actions: trigger
   `aria-expanded="false"`);

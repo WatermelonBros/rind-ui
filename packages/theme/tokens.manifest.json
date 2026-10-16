@@ -802,6 +802,59 @@
         }
       }
     },
+    "popover": {
+      "family": "panel",
+      "tokens": {
+        "arrow-offset": {
+          "fallback": null,
+          "file": "popover.css"
+        },
+        "arrow-size": {
+          "fallback": "10px",
+          "file": "popover.css"
+        },
+        "bg": {
+          "fallback": "var(--rind-color-surface-raised)",
+          "file": "popover.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "popover.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "popover.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "popover.css"
+        },
+        "max-height": {
+          "fallback": "100vh",
+          "file": "popover.css"
+        },
+        "max-width": {
+          "fallback": "20rem",
+          "file": "popover.css"
+        },
+        "modal-shadow": {
+          "fallback": "var(--rind-shadow-lg)",
+          "file": "popover.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-3)",
+          "file": "popover.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-md)",
+          "file": "popover.css"
+        },
+        "shadow": {
+          "fallback": "var(--rind-shadow-sm)",
+          "file": "popover.css"
+        }
+      }
+    },
     "radio-group": {
       "family": null,
       "tokens": {
