@@ -1,5 +1,24 @@
 # @rind-ui/testing
 
+## 0.2.0
+
+### Minor Changes
+
+- 6c01b92: Separator: `Separator.Root` with role by context (`separator`, implicit on `<hr>`, `none` when
+  decorative or in a listbox), `aria-orientation` only when vertical, `SeparatorHostContext` for
+  containers, `separatorProps` in core for every divider, `getSeparator` with `orientation`,
+  `isDecorative` and `isExposed` queries, and `separator.css` (a border, stretching in flex rows,
+  visible in forced colors).
+- b1a9e18: `@rind-ui/testing/setup` registers Testing Library's `cleanup` (and rind-ui's state reset) after each test also when Vitest runs without `globals`, so a second `render` in a file no longer leaves the first tree in the document. Opt out with `globalThis.RIND_AUTO_CLEANUP = false` in an earlier setup file.
+- a135fd4: Add Toolbar: one tab stop with focus memory, arrows and Home / End over its own controls, hosted Toggle Group and Radio Group, text fields that keep their caret keys, `Toolbar.Item` for any other control, `getToolbar` driver and `toolbar.css`.
+
+### Patch Changes
+
+- 3115e7c: In a real browser, React act() warnings caused by the user's resting cursor (a hover on a part rendered under it) no longer count as step errors in `testMachine`.
+- Updated dependencies [6c01b92]
+- Updated dependencies [a135fd4]
+  - @rind-ui/core@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
