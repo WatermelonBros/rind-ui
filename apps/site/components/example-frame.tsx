@@ -8,6 +8,17 @@ import styles from "./example-frame.module.css"
 import { usePhase } from "./phase"
 
 type Skin = "crisp" | "juicy" | "bare" | "parts"
+
+/** The parts an example renders: those in its stage, plus the ones it portalled elsewhere
+ * (same `data-instance`), such as an open popover's content. */
+function anatomy(stage: HTMLElement): HTMLElement[] {
+  const inside = [...stage.querySelectorAll<HTMLElement>("[data-part]")]
+  const ids = new Set(inside.map((el) => el.dataset["instance"]).filter(Boolean))
+  const outside = [
+    ...stage.ownerDocument.querySelectorAll<HTMLElement>("[data-part][data-instance]"),
+  ].filter((el) => !stage.contains(el) && ids.has(el.dataset["instance"]))
+  return [...inside, ...outside]
+}
 type Tab = "react" | "css"
 
 /** Build-time highlighted sources of one component's examples. */
@@ -64,20 +75,42 @@ export function ExampleFrame({
   const stage = useRef<HTMLDivElement>(null)
   const [parts, setParts] = useState<readonly string[]>([])
   const [inspect, setInspect] = useState<string | null>(null)
+  // a closed overlay renders its popup parts only once opened
+  const [closed, setClosed] = useState(false)
   const [tags, setTags] = useState<readonly { x: number; y: number }[]>([])
   useEffect(() => {
-    if (skin !== "parts" || !stage.current) return
-    const found = new Set<string>()
-    for (const el of stage.current.querySelectorAll<HTMLElement>("[data-part]")) {
-      const part = el.dataset["part"]
-      if (part && part !== "hidden-input") found.add(`${el.dataset["scope"]} · ${part}`)
+    const root = stage.current
+    if (skin !== "parts" || !root) return
+    // portalled parts (a popover's content) live outside the stage: re-list them as they mount
+    const list = () => {
+      const found = new Set<string>()
+      for (const el of root.ownerDocument.querySelectorAll("[data-anatomy-part]")) {
+        delete (el as HTMLElement).dataset["anatomyPart"]
+      }
+      for (const el of anatomy(root)) {
+        const part = el.dataset["part"]
+        if (part && part !== "hidden-input") found.add(`${el.dataset["scope"]} · ${part}`)
+        if (!root.contains(el)) el.dataset["anatomyPart"] = ""
+      }
+      setClosed(root.querySelector('[aria-haspopup][aria-expanded="false"]') !== null)
+      setParts((was) =>
+        was.length === found.size && was.every((p) => found.has(p)) ? was : [...found],
+      )
     }
-    setParts([...found])
+    list()
+    const watch = new MutationObserver(list)
+    watch.observe(root.ownerDocument.body, { childList: true, subtree: true })
+    return () => {
+      watch.disconnect()
+      for (const el of root.ownerDocument.querySelectorAll("[data-anatomy-part]")) {
+        delete (el as HTMLElement).dataset["anatomyPart"]
+      }
+    }
   }, [skin])
   useEffect(() => {
     const root = stage.current
     if (!root) return
-    for (const el of root.querySelectorAll<HTMLElement>("[data-anatomy-on]")) {
+    for (const el of root.ownerDocument.querySelectorAll<HTMLElement>("[data-anatomy-on]")) {
       delete el.dataset["anatomyOn"]
     }
     setTags([])
@@ -85,9 +118,8 @@ export function ExampleFrame({
     const [scope, part] = inspect.split(" · ")
     const box = root.getBoundingClientRect()
     const at: { x: number; y: number }[] = []
-    for (const el of root.querySelectorAll<HTMLElement>(
-      `[data-scope="${scope}"][data-part="${part}"]`,
-    )) {
+    for (const el of anatomy(root)) {
+      if (el.dataset["scope"] !== scope || el.dataset["part"] !== part) continue
       el.dataset["anatomyOn"] = ""
       const r = el.getBoundingClientRect()
       at.push({ x: r.left - box.left, y: r.top - box.top })
@@ -170,6 +202,9 @@ export function ExampleFrame({
               </button>
             </li>
           ))}
+          {closed && (
+            <li className={styles.legendHint}>Open it to list the parts it renders open.</li>
+          )}
         </ul>
       )}
 

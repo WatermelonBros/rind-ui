@@ -16,6 +16,7 @@ import * as label from "./label"
 import * as layer from "./layer"
 import * as link from "./link"
 import * as listbox from "./listbox"
+import * as popover from "./popover"
 import * as press from "./press"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
@@ -50,6 +51,7 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   layer,
   link,
   listbox,
+  popover,
   press,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,

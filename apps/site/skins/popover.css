@@ -147,6 +147,8 @@
   background: #fff;
 }
 
+/* the main-axis offset needs !important: core writes top and left inline on every side
+   (top: var(--rind-arrow-y), empty on that axis), which beats any stylesheet rule */
 /* a square turned 45°, its two outer edges drawn, tucked under the content's border */
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"] {
   --s-arrow: 12px;
@@ -157,22 +159,26 @@
   rotate: 45deg;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="bottom"] {
-  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
   border-right-color: transparent;
   border-bottom-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="top"] {
-  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
   border-left-color: transparent;
   border-top-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="right"] {
-  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
   border-right-color: transparent;
   border-top-color: transparent;
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="arrow"][data-side="left"] {
-  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  /* biome-ignore lint/complexity/noImportantStyles: beats the inline offset until core stops writing it */
+  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2) !important;
   border-left-color: transparent;
   border-bottom-color: transparent;
 }
@@ -216,4 +222,11 @@
 [data-rind-theme="skin-juicy"] [data-scope="popover"][data-part="arrow"] {
   --s-arrow: 14px;
   border: 2px solid #e2d9fb;
+}
+
+/* a trigger inside another surface's grid keeps its own width */
+[data-rind-theme^="skin-"]
+  :is([data-part="content"], .stack)
+  > [data-scope="popover"][data-part="trigger"] {
+  justify-self: start;
 }

@@ -51,3 +51,13 @@ ol.readout li {
   border-radius: 8px;
   background: color-mix(in oklab, currentColor 9%, transparent);
 }
+
+/* portalled parts (a popover's content), outlined like the stage's own */
+[data-anatomy-part]:not([data-part="hidden-input"]) {
+  outline: 1px dashed #0d6bff66;
+  outline-offset: 2px;
+}
+[data-anatomy-part][data-anatomy-on] {
+  outline: 2px solid #0d6bff;
+  background: #0d6bff14;
+}
