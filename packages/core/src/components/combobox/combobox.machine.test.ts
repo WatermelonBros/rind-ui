@@ -17,7 +17,16 @@ const items = createListCollection({
   isDisabled: (r) => r.id === "grape",
 })
 const announce = vi.fn()
+// Manual timers: a test runs them when the pause it asserts has passed.
+const timers: (() => void)[] = []
+const runTimers = () => {
+  for (const f of timers.splice(0)) f()
+}
 const env = {
+  scheduler: {
+    setTimeout: (f: () => void) => timers.push(f),
+    clearTimeout: () => {},
+  },
   dom: { getRootNode: () => undefined, getById: () => null, activeElement: () => null },
   clock: { now: () => 0 },
   layout: { pageTarget: () => null },
@@ -95,6 +104,7 @@ function make(over: Over = {}) {
     open: () => s.view().values.open as boolean,
     highlighted: () => s.getSnapshot().context.highlightedKey,
     completion: () => s.getSnapshot().context.completion,
+    lagging: () => s.getSnapshot().context.typingLag !== null,
     focus: () => send({ type: "INPUT.FOCUS", modality: "keyboard", cause: "key" }),
     blur: () => send({ type: "INPUT.BLUR" }),
     down: (alt = false) => send({ type: "ARROW", key: "NEXT", alt, composing: false }),
@@ -317,5 +327,21 @@ describe("Combobox machine", () => {
     expect(m.text()).toBe("Apple")
     m.setProps({ value: "cherry" })
     expect(m.text()).toBe("Cherry")
+  })
+
+  it("a typing highlight reaches the active descendant only after the pause", () => {
+    const m = make({ autoHighlight: true })
+    m.focus()
+    m.type("a")
+    m.type("ap")
+    expect(m.highlighted()).toBe("apple")
+    expect(m.lagging()).toBe(true)
+    runTimers()
+    // The first keystroke's timer is stale; the last one flushes.
+    expect(m.lagging()).toBe(false)
+    m.type("apr")
+    m.down()
+    // A keyboard highlight is exposed at once.
+    expect(m.lagging()).toBe(false)
   })
 })

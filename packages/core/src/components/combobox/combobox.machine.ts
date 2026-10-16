@@ -18,13 +18,15 @@ import {
 import type { DismissRequest } from "../../dom/dismiss"
 import { layerId } from "../../dom/layer-stack"
 import { overlayEffect } from "../../dom/overlay"
+import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
 import { quirkActive } from "../../dom/quirks"
 import type { DomEnvironment } from "../../env/dom-environment"
-import type { PositionEnv, PositioningProps } from "../../env/position"
+import type { Align, PositionEnv, PositioningProps, Side } from "../../env/position"
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
+import { listboxIds } from "../listbox/listbox.parts"
 import type { ComboboxMessages } from "./combobox.messages"
 import { completion, exactMatch, type OpenReason } from "./pattern/pattern"
 
@@ -63,10 +65,12 @@ export type ComboboxEvent =
   | {
       readonly type: "POSITION.PLACED"
       readonly first: boolean
-      readonly side: string
-      readonly align: string
+      readonly side: Side
+      readonly align: Align
       readonly anchorHidden: boolean
     }
+  /** The typing pause ended: the typing highlight reaches aria-activedescendant. */
+  | { readonly type: "ACTIVEDESCENDANT.FLUSH"; readonly token: number }
   /** A parent's value, or new items: the text follows when not dirty. */
   | { readonly type: "VALUE.SYNC" }
   | { readonly type: "LOADING.SYNC" }
@@ -118,6 +122,8 @@ export interface ComboboxProps extends CollectionProps {
   readonly positioning?: PositioningProps | undefined
   /** The results answer an older query (async): no highlight, count or empty state. */
   readonly stale?: boolean | undefined
+  /** How long a typing highlight waits before it reaches `aria-activedescendant` (500 ms). */
+  readonly typingPause?: number | undefined
 }
 
 export interface ComboboxContext extends CollectionContext {
@@ -130,17 +136,19 @@ export interface ComboboxContext extends CollectionContext {
   readonly completable: boolean
   /** The inline completion shown in the input (the typed query plus the option's rest). */
   readonly completion: string | null
+  /** A typing highlight not yet exposed as the active descendant; its flush token. */
+  readonly typingLag: number | null
+  readonly placement: PlacementState
 }
 
 export const comboboxIds = (root: string) => ({
-  label: partId("combobox", root, "label"),
+  ...listboxIds("combobox", root),
   control: partId("combobox", root, "control"),
   input: partId("combobox", root, "input"),
   trigger: partId("combobox", root, "trigger"),
+  clear: partId("combobox", root, "clear-trigger"),
   positioner: partId("combobox", root, "positioner"),
   popup: partId("combobox", root, "popup"),
-  list: partId("combobox", root, "list"),
-  item: (key: CollectionKey) => `${partId("combobox", root, "item")}-${encodeURIComponent(key)}`,
 })
 
 type Types = {
@@ -413,6 +421,13 @@ export const comboboxMachine = setup({
           a.set("highlightedKey", first.key)
           a.set("highlightSource", "typing")
           a.set("scrollReason", null)
+          // The typed character is spoken first: the active descendant waits for the pause.
+          const token = (context.typingLag ?? 0) + 1
+          a.set("typingLag", token)
+          a.env.scheduler.setTimeout(
+            () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token }),
+            props.typingPause ?? 500,
+          )
         }
       }
       announceCount(a)
@@ -430,8 +445,17 @@ export const comboboxMachine = setup({
       }
     },
     placed: (a) => {
-      if (a.event.type === "POSITION.PLACED" && a.event.first) pieces.actions.scrollToHighlighted(a)
+      if (a.event.type !== "POSITION.PLACED") return
+      a.set("placement", placementFrom(a.event))
+      if (a.event.first) pieces.actions.scrollToHighlighted(a)
     },
+    flush: (a) => {
+      if (a.event.type === "ACTIVEDESCENDANT.FLUSH" && a.event.token === a.context.typingLag) {
+        a.set("typingLag", null)
+      }
+    },
+    endLag: ({ set }) => set("typingLag", null),
+    resetPlacement: ({ set }) => set("placement", unplaced("bottom", "start")),
     resetOpen: ({ set }) => {
       set("openReason", null)
     },
@@ -491,6 +515,8 @@ export const comboboxMachine = setup({
     composing: false,
     completable: false,
     completion: null,
+    typingLag: null,
+    placement: unplaced("bottom", "start"),
   }),
   values: {
     value: { fallback: EMPTY },
@@ -513,7 +539,7 @@ export const comboboxMachine = setup({
   },
   states: {
     closed: {
-      entry: ["clearHighlight", "resetOpen", "fillText"],
+      entry: ["clearHighlight", "resetOpen", "fillText", "endLag", "resetPlacement"],
       on: {
         "INPUT.CHANGE": [
           { guard: "opensOnInput", target: "open", actions: ["typed", "setOpenReason"] },
@@ -558,10 +584,10 @@ export const comboboxMachine = setup({
         "COMPOSITION.END": { actions: ["endComposition", "typed"] },
         ARROW: { guard: "notComposing", actions: ["arrow"] },
         NAVIGATE: {
-          actions: ["navigate", "scrollToHighlighted", "announceHighlighted", "complete"],
+          actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlighted", "complete"],
         },
-        HIGHLIGHT: { actions: ["highlight", "complete"] },
-        POINTER_MOVE: { actions: ["pointerMove"] },
+        HIGHLIGHT: { actions: ["endLag", "highlight", "complete"] },
+        POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
         CARET: { actions: ["clearHighlight", "removeCompletion"] },
         "ITEM.CHOOSE": [
           { guard: "closesOnSelect", target: "closed", actions: ["choose"] },
@@ -595,6 +621,7 @@ export const comboboxMachine = setup({
         "COLLECTION.CHANGE": { actions: ["results", "complete"] },
         "LOADING.SYNC": { actions: ["announceLoading"] },
         "POSITION.PLACED": { actions: ["placed"] },
+        "ACTIVEDESCENDANT.FLUSH": { actions: ["flush"] },
       },
     },
   },
