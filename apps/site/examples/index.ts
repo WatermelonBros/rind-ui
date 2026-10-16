@@ -96,3 +96,7 @@ export const exampleComponent = (mod: ExampleModule, name: string): ComponentTyp
   // Every function export of an example module is a component taking no props.
   return typeof fn === "function" ? (fn as ComponentType) : undefined
 }
+
+/** The example a page opens with: its first visible variant (usually `Basic`). */
+export const heroName = (mod: ExampleModule): string | undefined =>
+  Object.entries(mod.variants).find(([, v]) => !v.hidden)?.[0]
