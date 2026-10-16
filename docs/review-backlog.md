@@ -7,6 +7,12 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.connect.ts:59 | `codePattern` drops the consumer pattern's flags (an `i` pattern loses case-insensitivity in the native `pattern`) |
+| add-pin-input (r1) | — | packages/testing/fixtures/pin-input | No trusted Ctrl/⌘+V run (the clipboard paste through the OS shortcut) |
+| add-pin-input (r1) | — | packages/testing/src/components/pin-input.dom.test.tsx | No assertion-level tests for ArrowLeft/Right, Home/End and Backspace moving the active slot |
+| add-pin-input (impl) | — | packages/testing/src/components/pin-input.broken.dom.test.tsx | Broken variants "Enter prevented", "focus moved after autoSubmit" and "completion missed on paste replacement" are not modelled: no step invariant records Enter, focus after submit or completion counts (scenarios cover the correct paths) |
+| add-pin-input (impl) | — | packages/theme/src/pin-input.browser.test.tsx | Forced-colors and reduced-motion checks read the stylesheet; emulated captures of the six states still to add (tasks 8.2) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
 | add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |
@@ -169,6 +175,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | Change | Task | What to check |
 |---|---|---|
 | add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-pin-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: one field announced with its name, the code read back, iOS "From Messages" fill, 1Password/Bitwarden fill, iOS selection handles over the transparent input |
 | add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |

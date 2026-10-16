@@ -1,0 +1,79 @@
+/* ── Pin Input: one real input over a row of presentational slots ── */
+[data-skinned] [data-scope="pin-input"][data-part="label"] {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+[data-skinned] [data-scope="pin-input"][data-part="control"] {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-inline-size: 100%;
+}
+/* The input covers the slots and takes the pointer; its own text is invisible. */
+[data-skinned] [data-scope="pin-input"][data-part="input"] {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  border: 0;
+  outline: none;
+  cursor: text;
+}
+[data-skinned] [data-scope="pin-input"][data-part="slot"] {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 48px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 20px var(--s-font);
+  font-variant-numeric: tabular-nums;
+}
+[data-skinned] [data-scope="pin-input"][data-part="slot"][data-active][data-focus-visible] {
+  outline: 2px solid var(--s-brand);
+  outline-offset: 2px;
+  border-color: var(--s-brand);
+}
+/* The caret of the empty active slot. */
+[data-skinned] [data-scope="pin-input"][data-part="slot"][data-caret]::after {
+  content: "";
+  inline-size: 2px;
+  block-size: 24px;
+  background: var(--s-brand);
+  animation: pin-caret 1s steps(1) infinite;
+}
+@keyframes pin-caret {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-skinned] [data-scope="pin-input"][data-part="slot"][data-caret]::after {
+    animation: none;
+  }
+}
+[data-skinned] [data-scope="pin-input"] [data-part="separator"] {
+  color: var(--s-ink);
+  font-weight: 600;
+}
+/* Disabled: base.css dims the outermost disabled element only. */
+[data-skinned] [data-scope="pin-input"][data-part="slot"][data-invalid] {
+  border-color: var(--s-acc-deep);
+  color: var(--s-error);
+}
+@media (max-width: 420px) {
+  [data-skinned] [data-scope="pin-input"][data-part="control"] {
+    gap: 6px;
+  }
+  [data-skinned] [data-scope="pin-input"][data-part="slot"] {
+    inline-size: 36px;
+    block-size: 44px;
+  }
+}

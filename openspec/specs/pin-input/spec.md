@@ -1,12 +1,11 @@
-## Purpose
+# pin-input Specification
 
+## Purpose
 Defines rind-ui's Pin Input: a fixed-length code (verification code, PIN) entered in one
 native text input rendered over presentational slots, so typing, paste, SMS and
 password-manager autofill, IME and screen readers all work as they do for one native field.
 Introduced by `add-pin-input`.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 The Pin Input SHALL consist of a `root` part (`div`), the Field parts `label`, `description`
@@ -77,11 +76,13 @@ shortcuts (Ctrl/⌘ combinations) SHALL never be blocked.
 ### Requirement: Paste And Autofill
 
 A paste, drop, or a value written into the input by the browser or a password manager SHALL
-be normalised: whitespace, `-` and `.` removed, characters filtered, then truncated to
-`length`. When the normalised text is at least `length` characters long it SHALL replace the
+be normalised: whitespace, `-` and `.` removed, then truncated to `length`; a paste that
+still holds a rejected character SHALL be refused as a whole (`onValueInvalid(text)`), so a
+mistyped code is never silently shortened. When the normalised text is at least `length` characters long it SHALL replace the
 whole value; otherwise it SHALL be inserted at the caret, replacing the selection, and the
 result truncated to `length`. A value written by script followed by an `input` event (password
-managers) SHALL be read from the native event and applied. The caret SHALL end after the last
+managers) SHALL be read from the native event and applied; a fill inserted at the caret into
+a partial code SHALL replace the code once the inserted text is `length` characters long. The caret SHALL end after the last
 filled slot.
 
 #### Scenario: Paste with a separator (input-otp#53)
@@ -177,7 +178,9 @@ reset SHALL NOT complete.
 
 The Pin Input SHALL NOT prevent Enter: in a form, Enter performs implicit submission, so an
 incomplete required code shows the native validation message. Enter, Backspace and
-characters marked `composing` SHALL follow `keyboard-interactions`' IME guard.
+characters marked `composing` SHALL follow `keyboard-interactions`' IME guard: a key an IME
+owns never moves the active slot. Focus SHALL land on the collapsed caret (a Tab focus does
+not leave the native select-all).
 
 #### Scenario: Enter when incomplete (zag#3381)
 
@@ -194,7 +197,9 @@ exactly `length` accepted characters, `autoCapitalize="none"` (unless `sanitize`
 `autoCorrect="off"`, `spellCheck="false"`, `enterKeyHint` as given, and `dir="ltr"` on the Root,
 the control and the input unless the consumer sets `dir`. The overlay input's text, caret and
 selection highlight SHALL be transparent and its autofill paint suppressed (injected style
-with the environment's CSP nonce), so only the slots are visible.
+with the environment's CSP nonce), so only the slots are visible. The framework SHALL never
+rewrite the input's text while an IME composes (it would cancel the composition): the value
+is rendered as the default and synced between compositions.
 
 #### Scenario: Right-to-left page
 
@@ -268,23 +273,27 @@ Field (`valueMissing`, `patternMismatch`).
 ### Requirement: Contract
 
 The Pin Input SHALL ship a contract with scope `pin-input`, anatomy `root`, `label`,
-`description`, `error-message`, `control`, `input`, `slot`, located by role `textbox` and exact
-accessible name, with:
+`description`, `error-message`, `control`, `input`, `slot`, located by the exact accessible name
+of its input (the `{ label }` locator: a masked code is a password input, which has no role),
+with:
 
-- actions: `type(text)`; `paste(text)` (keyboard: clipboard shortcut through the adapter;
-  pointer declared none with the reason "paste is a keyboard or context-menu action");
-  `fill(code)` (select all, then paste); `autofill(code)` (sets the value by script and
-  dispatches `input`, the password-manager path; keyboard declared none with the reason
-  "autofill is not user input"); `backspace(times)`; `clear` (select all + Backspace);
+- actions: `type(text)` (at the caret, one committed single-character composition per
+  character: the closed key set has no characters and a click would move the caret; pointer
+  first presses the input); `paste(text)` (keyboard only: the adapter's `Part.paste`, the real
+  `paste` → `beforeinput` → `input` order); `fill(code)` (clear, then paste); `autofill(code)`
+  (sets the value by script and dispatches `input`, the password-manager path; a script write
+  has no modality, so its keyboard twin is the same write); `backspace(times)`; `clear` (End,
+  then one Backspace per character: a synthetic select-all selects nothing);
   `pressSlot(index)` (pointer: a press on the slot's box; keyboard: Home then ArrowRight
   `index` times); `compose(text, committed)`;
-- queries: `value()`, `slots()` (each slot's text), `activeSlot()`, `isComplete()`,
-  `isDisabled()`, `isReadOnly()`, `isInvalid()`;
+- queries: `value()`, `slots()` (each slot's text), `activeSlot()` (a driver reading, not a
+  model snapshot: it exists only while focused), `isComplete()`, `isDisabled()`,
+  `isReadOnly()`, `isInvalid()`, `isComposing()`;
 - states: `idle`, `composing` (observed through `data-composing`);
 - events: `EDIT` → `type`, `paste` and `backspace`, `INPUT` → `autofill`, `SLOT.PRESS` →
   `pressSlot`, `CARET` → `pressSlot` (keyboard), `COMPOSITION.*` → `compose`, `RESET` → the story's reset
   button, `FOCUS`/`BLUR` `skip` ("covered by every action"), prop steps `$sync:value`;
-- traits: `field-associated`.
+- traits: `field-associated`; `commitsOnFocus` on the input (focus shows the active slot).
 
 Pointer actions SHALL fail with a message saying they need layout when the environment
 reports no geometry.
@@ -297,11 +306,12 @@ reports no geometry.
 
 ### Requirement: Pin Input Invariants
 
-The contract SHALL ship invariants checked after every model step: one textbox and one tab
-stop; the input's value equals the oracle value; exactly the first `value.length` slots carry
-`data-filled`; at most one slot carries `data-active`, and exactly one while focused; every
-slot is `aria-hidden`; the selection is collapsed after every step the component handled;
-`onValueComplete` was called exactly as often as the oracle's completing steps.
+The contract SHALL ship invariants checked after every model step, read from the page (the
+oracle cannot model the code without the props that shape it): exactly one textbox (none when
+masked) and one input; every slot `aria-hidden` and not focusable; exactly the first
+`value.length` slots carry `data-filled` (outside a composition, which owns the text); at
+most one slot carries `data-active`, exactly one while the input is focused and none
+otherwise. Completion counts, the collapsed caret and Enter are covered by scenario tests.
 
 #### Scenario: Broken variant with per-slot inputs
 
@@ -321,3 +331,4 @@ reduced motion, inline-end space reserved for password-manager badges
 
 - **WHEN** a focused Pin Input is rendered under forced colors
 - **THEN** every slot boundary, the characters and the active slot's outline are visible
+

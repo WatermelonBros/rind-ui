@@ -29,6 +29,7 @@ import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
 import * as passwordInput from "./password-input"
+import * as pinInput from "./pin-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
@@ -81,6 +82,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   overlays,
   pagination,
   "password-input": passwordInput,
+  "pin-input": pinInput,
   popover,
   positioning,
   label,
