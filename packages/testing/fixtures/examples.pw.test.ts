@@ -68,6 +68,44 @@ async function pool<T>(
   )
 }
 
+describe("axe on the theme pages", () => {
+  // Storybook's Tokens, Contrast report and Showcase stories, now site pages: every brand
+  // the site ships samples for, both schemes, three engines (full pages: every rule).
+  const brands = [undefined, "calm", "crisp", "sample-yellow", "sample-white"]
+  const pages = ["tokens", "contrast", "showcase"].flatMap((page) =>
+    brands.flatMap((brand) =>
+      schemes.map((scheme) => ({
+        name: `${page} ${brand ?? "default"} ${scheme}`,
+        path: `/theme/${page}/?${brand ? `brand=${brand}&` : ""}scheme=${scheme}`,
+      })),
+    ),
+  )
+  for (const engine of engines) {
+    it(engine.name(), { timeout: 300_000 }, async () => {
+      const browser = await engine.launch()
+      const failures: string[] = []
+      try {
+        await pool(browser, pages, async (page, p) => {
+          await page.goto(site.base + p.path)
+          await page.waitForLoadState("load")
+          await frames(page, 2)
+          await page.addScriptTag({ content: axe.source })
+          const violations = await page.evaluate(async () => {
+            const result = await window.axe.run(document)
+            return result.violations.map(
+              (v) => `${v.id} (${v.nodes.map((n) => n.target.join(" ")).join(", ")})`,
+            )
+          })
+          if (violations.length > 0) failures.push(`${p.name}: ${violations.join("; ")}`)
+        })
+      } finally {
+        await browser.close()
+      }
+      expect(failures).toEqual([])
+    })
+  }
+})
+
 describe("axe on every example", () => {
   // No stylesheet has no dark scheme: the browser's own dark defaults (blue links on a dark
   // canvas) are not the component's colours.

@@ -151,6 +151,9 @@ Passes that need real assistive technology or devices; automated tests cannot st
 |---|---|---|
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | ci flake (2026-10-16) | — | packages/testing/src/components/accordion.model.dom.test.tsx | "ITEM.TOGGLE[itemEnabled && isOpen && canCollapse], pointer" failed once in a full jsdom run on d9463d0 with three sessions loading the machine; not reproduced: 8 runs of the file and 3 full jsdom runs with 16 threads on 7552c8a all green. The other cited failure (CI 38817142353, broken variants) was the 5 s default timeout, raised to 60 s in #5. Re-open with the failing assertion if it recurs |
+| retire-storybook (r1) | — | packages/testing/src/state-stories.ts, packages/*/tsdown.config.ts / tsconfig, PRODUCT.md, apps/site/examples/fixtures/* ("Ported from" headers) | stale Storybook wording in comments and docs: say site examples |
+| retire-storybook (r1) | — | packages/testing/fixtures/{anchored/viewport,segmented-control,disclosure}.pw.test.ts | pre-existing `waitForTimeout` waits: removed by the test-stability PR, which bans them |
+| retire-storybook (r1) | — | openspec/changes/archive/2026-10-16-retire-storybook/tasks.md (2.1) | the task names `openExample(page, slug, example, skin?)`; the helper is `openExample(page, base, slug, example, { skin, scheme })` |
 
 ## Resolved
 
