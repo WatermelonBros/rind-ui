@@ -457,8 +457,17 @@ describe("Initial focus", () => {
         <div style={{ height: 3000 }} />
       </>,
     )
-    if (!isJsdom) window.scrollTo(0, 500)
+    // WebKit (CI, slow) can undo a programmatic scroll on the next frame, with no dialog
+    // involved; establish the precondition, scrolled and settled, before opening.
+    if (!isJsdom) {
+      await vi.waitFor(async () => {
+        window.scrollTo(0, 500)
+        await new Promise((r) => setTimeout(r, 150))
+        expect(window.scrollY).toBe(500)
+      })
+    }
     const y = window.scrollY
+    if (!isJsdom) expect(y).toBe(500)
     await openByClick(user)
     await vi.waitFor(() => expect(active()).toBe(screen.getByLabelText("Target")))
     // The scroll lock may hold the page at a different offset while open; closing restores it.

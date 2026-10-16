@@ -37,7 +37,11 @@ export interface DomAdapterOptions {
   readonly user?: UserLike
   /** Fake-timer advance, e.g. `vi.advanceTimersByTime`. */
   readonly advanceTimers?: (ms: number) => unknown
-  /** `until` timeout in ms (default 1000, Testing Library's waitFor default). */
+  /**
+   * `until` timeout in ms. Default 1000 in jsdom (Testing Library's waitFor default) and
+   * 3000 in a real browser, where a CPU-starved page can deliver its first animation frame
+   * after more than a second (an overlay's initial focus waits for one).
+   */
   readonly timeout?: number
 }
 
@@ -158,9 +162,11 @@ export function installErrorLog(win: Window | null = globalThis.window ?? null):
   return log
 }
 
+const isJsdom = () => (globalThis.navigator?.userAgent ?? "").includes("jsdom")
+
 /** The Testing Library adapter. */
 export function domEnv(options: DomAdapterOptions = {}): EnvFactory {
-  const timeout = options.timeout ?? 1000
+  const timeout = options.timeout ?? (isJsdom() ? 1000 : 3000)
   const doc = (options.root as Node | undefined)?.ownerDocument ?? globalThis.document
   const errors = installErrorLog(doc?.defaultView ?? null)
   // Native link navigations are recorded and cancelled: the test page stays.
