@@ -702,3 +702,28 @@ describe("Driver", () => {
     expect(await a.isOpen()).toBe(false)
   })
 })
+
+describe("review fixes (add-alert-dialog r1)", () => {
+  it("a disabled Cancel at open: focus goes to the content, inside the dialog", async () => {
+    const actions: RefObject<DialogActions | null> = createRef()
+    render(
+      <AlertDialog.Root actionsRef={actions}>
+        <AlertDialog.Trigger>Delete project?</AlertDialog.Trigger>
+        <AlertDialog.Portal>
+          <AlertDialog.Positioner>
+            <AlertDialog.Content>
+              <AlertDialog.Title>Delete project?</AlertDialog.Title>
+              <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
+              <AlertDialog.Cancel disabled>Cancel</AlertDialog.Cancel>
+              <AlertDialog.Action>Delete</AlertDialog.Action>
+            </AlertDialog.Content>
+          </AlertDialog.Positioner>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>,
+    )
+    act(() => actions.current?.open())
+    await frames()
+    const content = screen.getByRole("alertdialog")
+    expect(active()).toBe(content)
+  })
+})

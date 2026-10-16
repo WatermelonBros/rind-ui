@@ -135,7 +135,10 @@ function initialFocusOf(
   if (initial === "cancel") {
     return {
       initialFocus: () =>
-        content()?.querySelector<HTMLElement>('[data-part="cancel"]') ?? content(),
+        // A disabled Cancel cannot take focus: the content then, inside the modal.
+        content()?.querySelector<HTMLElement>(
+          '[data-part="cancel"]:not([disabled]):not([aria-disabled="true"])',
+        ) ?? content(),
     }
   }
   return { initialFocus: initial }

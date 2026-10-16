@@ -81,7 +81,7 @@ An `AlertDialog.Action type="submit"` inside a form runs the form's `submit` whi
 
 `details.reason` is `TRIGGER_PRESS`, `CANCEL_PRESS`, `ACTION_PRESS`, `ESCAPE_KEY`, `OUTSIDE_FOCUS`, `PARENT_DISMISSED`, `OPEN` or `CLOSE`, so Cancel, Action and Escape are distinguishable in a controlled `onOpenChange`. After closing, the content and triggers carry `data-close-reason` in kebab case (`action-press`) until the next open, for exit animations.
 
-Style the `data-*` attributes above, or import `@rind-ui/theme/alert-dialog.css` (included in the theme index): it reuses the Dialog's surface, lays Cancel and Action out as an end-aligned row, and reads `--rind-alert-dialog-*` tokens that fall back to `--rind-dialog-*`. It turns transitions off under reduced motion and keeps the border and focus ring in forced colors.
+Style the `data-*` attributes above, or import `@rind-ui/theme/alert-dialog.css` (included in the theme index): it reuses the Dialog's surface, lays Cancel and Action out as an end-aligned row (render them as direct children of the Content for that default layout), and reads `--rind-alert-dialog-*` tokens that fall back to `--rind-dialog-*`. It turns transitions off under reduced motion and keeps the border and focus ring in forced colors.
 
 ## Nesting
 

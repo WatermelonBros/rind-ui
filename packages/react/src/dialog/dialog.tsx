@@ -469,7 +469,17 @@ function Portal(props: PortalProps) {
   const ctx = useDialog("Portal")
   const env = useEnvironment()
   const opener = useSelector(ctx.service, (v) => v.context.opener)
-  return <PortalPart logicalParent={() => (opener ? env.dom.getById(opener) : null)} {...props} />
+  // The opener once open; before that (and when opened programmatically) the first trigger,
+  // so the host carries the trigger's theme, dir and lang from the first open on.
+  const logicalParent = () =>
+    (opener ? env.dom.getById(opener) : null) ??
+    env.dom
+      .getRootNode()
+      .querySelector?.(
+        `[data-scope="${ctx.scope}"][data-part="trigger"][data-instance="${ctx.root}"]`,
+      ) ??
+    null
+  return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
 export const Dialog = {

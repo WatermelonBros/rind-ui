@@ -6,6 +6,8 @@ import type { Env } from "../../contract/env"
 type E = Env<"trigger" | "backdrop" | "content">
 
 /**
+ * @internal Shared by the dialog-family contracts; exported so their types can be named.
+ *
  * A dialog is located through its trigger (a closed dialog has no content to find):
  * `trigger` names it, defaulting to the dialog's `name` (the opening control usually
  * repeats it). `title()` reads the dialog's own name.
@@ -18,12 +20,15 @@ export const dialogLocate = ({
   readonly trigger?: string | RegExp
 }) => ({ role: "button" as const, name: trigger ?? name })
 
+/** @internal Shared by the dialog-family contracts. */
 export const dialogIsOpen = async (env: E) =>
   (await env.part("content").exists()) && (await env.part("content").attr("data-state")) === "open"
+/** @internal Shared by the dialog-family contracts. */
 export const dialogHasFocus = async (env: E) =>
   (await env.part("content").exists()) &&
   (await env.part("content").attr("data-focus-within")) !== null
 
+/** @internal Shared by the dialog-family contracts. */
 export const dialogFamilyQueries = {
   isOpen: dialogIsOpen,
   isModal: async (env: E) => (await env.part("content").attr("aria-modal")) === "true",
@@ -40,6 +45,7 @@ export const dialogFamilyQueries = {
 }
 
 /** `outsideCloses`: an outside press closes it (a modal Dialog) or leaves it open (Alert). */
+/** @internal Shared by the dialog-family contracts. */
 export const dialogFamilyActions = (outsideCloses: boolean) => ({
   open: {
     pointer: async (env: E) => env.part("trigger").click(),
