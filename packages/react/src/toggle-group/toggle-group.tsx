@@ -18,6 +18,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { useCompositeHost, useHostItem } from "../composite-host"
 import { declaredItems, serverStop } from "../declared-items"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
@@ -46,7 +47,18 @@ interface Ctx {
   readonly registry: ReturnType<typeof useCollectionItems>["registry"]
   readonly value: readonly string[]
   readonly disabled: boolean
+  readonly focusableWhenDisabled: boolean
 }
+/** Enough state to read an item's id (the key the host knows it by). */
+const NO_STATE = {
+  tag: "button",
+  itemDisabled: false,
+  focused: false,
+  modality: "keyboard",
+  pressed: false,
+  hovered: false,
+} as const
+
 const GroupContext = createContext<Ctx | null>(null)
 function useGroup(part: string): Ctx {
   const ctx = useContext(GroupContext)
@@ -91,7 +103,7 @@ function Root({
   orientation = "horizontal",
   loop = true,
   disabled = false,
-  focusableWhenDisabled = false,
+  focusableWhenDisabled: ownFocusable,
   render,
   id,
   ref,
@@ -99,10 +111,13 @@ function Root({
   ...rest
 }: ToggleGroupRootProps) {
   const env = useEnvironment()
+  // Hosted by a Toolbar: its disabled state applies, its focusableWhenDisabled unless ours.
+  const host = useCompositeHost()
+  const focusableWhenDisabled = ownFocusable ?? host?.focusableWhenDisabled ?? false
   const instance = useRootId(id)
   const ids = useMemo(() => toggleGroupIds(instance), [instance])
   const fieldsetDisabled = useFieldsetDisabled()
-  const groupDisabled = disabled || fieldsetDisabled
+  const groupDisabled = disabled || fieldsetDisabled || host?.disabled === true
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
   const { view, send } = useMachine(toggleGroupMachine, {
@@ -132,6 +147,7 @@ function Root({
       disabled: groupDisabled,
       focusableWhenDisabled,
       focusWithin: view.matches("focused"),
+      hosted: host !== null,
     },
     send,
     env,
@@ -147,7 +163,14 @@ function Root({
       )
     }
   })
-  const ctx: Ctx = { api, send, registry, value: current, disabled: groupDisabled }
+  const ctx: Ctx = {
+    api,
+    send,
+    registry,
+    value: current,
+    disabled: groupDisabled,
+    focusableWhenDisabled,
+  }
   const props = mergeProps({ ...normalizeProps(api.root()), ref: composeRefs(el, ref) }, rest)
   return (
     <GroupContext value={ctx}>
@@ -180,6 +203,20 @@ function Item({ value, disabled = false, textValue, render, ref, ...rest }: Togg
   const key: CollectionKey = toKey(value)
   const el = useRef<HTMLElement | null>(null)
   useRegisterItem(ctx.registry, { key: value, textValue, disabled }, el)
+  // Hosted: the item is also one of the host's controls (navigation and tab stop).
+  const host = useCompositeHost()
+  const hostKey = ctx.api.item(key, NO_STATE)["id"] as string // set by the connect
+  const itemDisabled = ctx.disabled || disabled
+  useHostItem(
+    host,
+    { id: hostKey, skip: itemDisabled && !ctx.focusableWhenDisabled, textValue },
+    el,
+  )
+  const hostProps = host
+    ? normalizeProps(
+        host.itemProps({ id: hostKey, disabled: itemDisabled, first: host.claimFirst(hostKey) }),
+      )
+    : {}
   const tag = useRenderedTag("button", render, el)
   const [focused, setFocused] = useState(false)
   const modality = useModality(env.modality, focused)
@@ -204,7 +241,7 @@ function Item({ value, disabled = false, textValue, render, ref, ...rest }: Togg
   )
   const props = mergeProps(
     {
-      ...joinHandlers(own, press.props, hover.props, {
+      ...joinHandlers(own, hostProps, press.props, hover.props, {
         onFocus: () => setFocused(true),
         onBlur: () => setFocused(false),
       }),

@@ -53,6 +53,11 @@ export type ButtonProps = Omit<ComponentPropsWithRef<"button">, "type" | "disabl
   readonly focusableWhenDisabled?: boolean
   /** Ignores activation, keeps focus, announces `messages.pending` when focused. */
   readonly pending?: boolean
+  /**
+   * `false`: a press activates without moving focus (press-interactions "Press Without
+   * Focus": an editor toolbar's Bold keeps the editor focused).
+   */
+  readonly focusOnPress?: boolean
   readonly onPress?: (details: ButtonPressDetails) => void
   readonly onPressStart?: (details: ButtonPressDetails) => void
   readonly onPressEnd?: (details: ButtonPressDetails) => void
@@ -81,6 +86,7 @@ export function Button(props: ButtonProps) {
     disabled = false,
     focusableWhenDisabled = false,
     pending = false,
+    focusOnPress,
     onPress,
     onPressStart,
     onPressEnd,
@@ -127,6 +133,7 @@ export function Button(props: ButtonProps) {
       if (e.type !== "CONTEXT_MENU" && e.type !== "LONG_PRESS") send(e)
     },
     disabled: () => effectiveDisabled || pending,
+    ...(focusOnPress === undefined ? {} : { focusOnPress }),
   })
   const hover = useHover({ env, send: () => {}, disabled: () => effectiveDisabled })
   const focused = view.context.focused

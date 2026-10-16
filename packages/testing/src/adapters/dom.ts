@@ -456,6 +456,14 @@ function createDomEnv(
             (await now()).querySelectorAll(`[data-scope="${scope}"][data-part="${partName}"]`),
           ),
         ),
+      withAttr: (name, value) =>
+        handle(`[${name}] in ${label}`, async () =>
+          Array.from(
+            (await now()).querySelectorAll(
+              value === undefined ? `[${name}]` : `[${name}="${CSS.escape(value)}"]`,
+            ),
+          ),
+        ),
       text: async () => normalize((await now()).textContent),
       value: async () => ((await now()) as HTMLInputElement).value ?? "",
       checked: async () => ((await now()) as HTMLInputElement).checked === true,

@@ -35,6 +35,7 @@ export { getTabs } from "./components/tabs"
 export { getTextField } from "./components/text-field"
 export { getToggle } from "./components/toggle"
 export { getToggleGroup } from "./components/toggle-group"
+export { getToolbar } from "./components/toolbar"
 export {
   type ContractModality,
   createDriver,

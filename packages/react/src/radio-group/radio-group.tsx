@@ -27,6 +27,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { useCompositeHost, useHostItem } from "../composite-host"
 import { declaredItems, serverStop } from "../declared-items"
 import { useFieldControl } from "../field/field"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
@@ -69,6 +70,9 @@ interface Ctx {
   readonly invalid: boolean
   /** A user change waiting for its commit: that item's input dispatches input + change. */
   readonly pending: { current: string | null }
+  readonly focusableWhenDisabled: boolean
+  /** Hosted by a Toolbar: Enter checks (APG toolbar) and never submits. */
+  readonly hosted: boolean
 }
 const GroupContext = createContext<Ctx | null>(null)
 function useGroup(part: string): Ctx {
@@ -129,7 +133,7 @@ function Root({
   onValueChange,
   orientation = "vertical",
   disabled = false,
-  focusableWhenDisabled = false,
+  focusableWhenDisabled: ownFocusable,
   readOnly = false,
   required = false,
   invalid = false,
@@ -148,11 +152,14 @@ function Root({
   const binding = useFieldControl()
   const fieldsetContext = useFieldsetDisabled()
   const [fieldsetDom, setFieldsetDom] = useState(false)
+  // Hosted by a Toolbar: its disabled state applies, its focusableWhenDisabled unless ours.
+  const host = useCompositeHost()
+  const focusableWhenDisabled = ownFocusable ?? host?.focusableWhenDisabled ?? false
   const field = mergeFieldProps(
     {
       role: "radiogroup",
       labelable: false,
-      disabled: disabled || fieldsetContext || fieldsetDom,
+      disabled: disabled || fieldsetContext || fieldsetDom || host?.disabled === true,
       readOnly,
       required,
       invalid,
@@ -218,6 +225,7 @@ function Root({
       rendered,
       ...(binding ? { field: binding.ids } : {}),
       ariaLabel,
+      hosted: host !== null,
     },
     send,
     env,
@@ -314,6 +322,8 @@ function Root({
     inField: binding !== null,
     invalid: field.invalid,
     pending,
+    focusableWhenDisabled,
+    hosted: host !== null,
   }
   const props = mergeProps(
     {
@@ -481,6 +491,20 @@ function ItemControl({ render, ref, ...rest }: PartProps<"button", RadioItemStat
   })
   const hover = useHover({ env, send: () => {}, disabled })
   const labelable = tag === "button" || tag === "input"
+  // Hosted: the radio is also one of the host's controls (navigation and tab stop).
+  const host = useCompositeHost()
+  const hostKey = ctx.ids.item(item.key)
+  useHostItem(
+    host,
+    // The toolbar has no typeahead: the value is enough to name the registration.
+    { id: hostKey, skip: disabled() && !ctx.focusableWhenDisabled, textValue: item.key },
+    el,
+  )
+  const hostProps = host
+    ? normalizeProps(
+        host.itemProps({ id: hostKey, disabled: disabled(), first: host.claimFirst(hostKey) }),
+      )
+    : {}
   const own = normalizeProps(
     ctx.api.itemControl(item.key, {
       tag,
@@ -498,11 +522,20 @@ function ItemControl({ render, ref, ...rest }: PartProps<"button", RadioItemStat
     {
       ...joinHandlers(
         own,
+        hostProps,
         {
-          // Enter submits the form (implicit submission); it never checks.
+          // Enter submits the form (implicit submission) and never checks; hosted by a
+          // toolbar, Enter checks like Space (APG toolbar example) and never submits.
           onKeyDown: (e: KeyboardEvent) => {
             if (e.key !== "Enter" || e.defaultPrevented || isImeKey(e)) return
-            implicitSubmit(item.inputEl.current?.form ?? null)
+            if (!ctx.hosted) {
+              implicitSubmit(item.inputEl.current?.form ?? null)
+              return
+            }
+            e.preventDefault()
+            if (!disabled() && !e.repeat) {
+              ctx.send({ type: "PRESS", key: item.key, modality: "keyboard" })
+            }
           },
         },
         press.props,

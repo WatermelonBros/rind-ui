@@ -8,8 +8,10 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { CompositeHostContext } from "./composite-host"
 import { mergeProps } from "./merge-props"
 import { type RenderProp, renderPart } from "./render"
+import { SeparatorHostContext } from "./separator/separator"
 
 export type PortalProps = ComponentPropsWithRef<"div"> & {
   /** Where to render (default: resolved from the logical parent, then `body`). */
@@ -44,6 +46,20 @@ export function Portal({ container, logicalParent, render, children, ...rest }: 
   }, [mounted])
   if (!mounted) return null
   const target = resolvePortalTarget(parent.current?.() ?? null, container)
-  const props = mergeProps({ "data-rind-portal": "", ...attributes, ref: setHost, children }, rest)
+  // A component in a popup is not hosted by the toolbar its trigger sits in (nor are its
+  // separators drawn in the toolbar's context).
+  const props = mergeProps(
+    {
+      "data-rind-portal": "",
+      ...attributes,
+      ref: setHost,
+      children: (
+        <CompositeHostContext value={null}>
+          <SeparatorHostContext value={null}>{children}</SeparatorHostContext>
+        </CompositeHostContext>
+      ),
+    },
+    rest,
+  )
   return createPortal(renderPart("div", props, render, undefined), target)
 }

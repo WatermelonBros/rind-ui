@@ -88,6 +88,8 @@ export interface Part {
   attr(name: string): Promise<string | null>
   /** Descendant parts of another component, by `data-scope` and `data-part` (any instance). */
   scoped(scope: string, part: string): Part
+  /** Descendants carrying the attribute `name` (`value` when given), in document order. */
+  withAttr(name: `data-${string}`, value?: string): Part
   /** The element's tag name, lowercase ("h3", "div"). */
   tagName(): Promise<string>
   /** Its accessible name (accname computation). */

@@ -1,0 +1,85 @@
+/*
+ * Toolbar: structural only. A flex row (a column for aria-orientation vertical) with a gap,
+ * groups with their own tighter gap, and separators drawn as a border so they survive forced
+ * colors. A separator is perpendicular to the toolbar and stretches across it. The controls
+ * (Button, Link, hosted Toggle Group and Radio Group items, Items) keep their own components'
+ * styles; the toolbar only guarantees the 24x24 target. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="toolbar"][data-part="root"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-toolbar-gap, var(--rind-space-2));
+    padding: var(--rind-toolbar-padding, var(--rind-space-2));
+    border: var(--rind-border-width) solid var(--rind-toolbar-border, var(--rind-color-border));
+    border-radius: var(--rind-toolbar-radius, var(--rind-radius-md));
+    background: var(--rind-toolbar-bg, transparent);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="toolbar"][data-part="root"][data-orientation="vertical"]) {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    inline-size: max-content;
+  }
+
+  :where([data-scope="toolbar"][data-part="group"]) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--rind-toolbar-group-gap, var(--rind-space-1));
+  }
+
+  :where([data-scope="toolbar"][data-part="group"][data-orientation="vertical"]) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Every roving control, whichever component renders it. */
+  :where([data-host="toolbar"]) {
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  :where([data-scope="toolbar"]:is([data-part="link"], [data-part="item"])) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :where([data-scope="toolbar"][data-part="separator"]) {
+    box-sizing: border-box;
+    flex-shrink: 0;
+    align-self: stretch;
+    border: 0;
+    padding: 0;
+    color: var(
+      --rind-toolbar-separator-color,
+      var(--rind-separator-color, var(--rind-color-border))
+    );
+  }
+
+  /* Perpendicular to the toolbar: vertical in a row, horizontal in a column. */
+  :where([data-scope="toolbar"][data-part="separator"][data-orientation="vertical"]) {
+    border-inline-start: var(--rind-separator-thickness, 1px) solid currentColor;
+  }
+
+  :where([data-scope="toolbar"][data-part="separator"][data-orientation="horizontal"]) {
+    border-block-start: var(--rind-separator-thickness, 1px) solid currentColor;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="toolbar"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="toolbar"][data-part="separator"]) {
+      color: CanvasText;
+    }
+  }
+}

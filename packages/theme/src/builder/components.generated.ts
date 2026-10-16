@@ -273,4 +273,5 @@ export type ComponentTokens = {
     | "gap"
     | "outlineOn"
     | "paddingInline"
+  readonly toolbar: "bg" | "border" | "gap" | "groupGap" | "padding" | "radius" | "separatorColor"
 }

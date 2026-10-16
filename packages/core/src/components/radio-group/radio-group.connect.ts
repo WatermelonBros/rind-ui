@@ -88,6 +88,8 @@ export interface RadioGroupConnectInput {
   readonly ariaLabel?: string | undefined
   /** Default Radio Group's. */
   readonly naming?: RadioNaming | undefined
+  /** Hosted by a composite (a Toolbar): the host owns the arrows and the tab stop. */
+  readonly hosted?: boolean | undefined
 }
 
 /** One radio's interaction state (its own press, hover and focus). */
@@ -168,8 +170,9 @@ export function radioGroupConnect(
       ...groupState,
       // The root is the stop only when no radio can be (all disabled, or a focusable
       // disabled group).
-      tabindex: inert || input.pending ? undefined : enabledRadio ? undefined : 0,
+      tabindex: inert || input.pending || input.hosted ? undefined : enabledRadio ? undefined : 0,
       onKeyDown: (event: unknown) => {
+        if (input.hosted) return
         const e = event as KeyboardEvent
         const target = e.target as Element | null
         // Only keys on a radio of this group (a link inside an item keeps its keys).

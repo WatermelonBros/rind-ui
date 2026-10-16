@@ -29,6 +29,7 @@ import { states as tabsStates } from "../../../../apps/storybook/stories/Tabs.st
 import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
 import { states as toggleStates } from "../../../../apps/storybook/stories/Toggle.stories"
 import { states as toggleGroupStates } from "../../../../apps/storybook/stories/ToggleGroup.stories"
+import { states as toolbarStates } from "../../../../apps/storybook/stories/Toolbar.stories"
 import { createDriver, missingAriaLines, playwrightEnv, testMachine } from "../../src/index"
 import { chromiumTree } from "../../src/playwright"
 import { streamContract } from "../announce/announce.contract"
@@ -334,6 +335,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Tabs.stories.tsx": tabsStates,
     "./stories/Toggle.stories.tsx": toggleStates,
     "./stories/ToggleGroup.stories.tsx": toggleGroupStates,
+    "./stories/Toolbar.stories.tsx": toolbarStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

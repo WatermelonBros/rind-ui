@@ -1297,3 +1297,41 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   }
 }
 ```
+
+### toolbar
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "bg": {
+      "fallback": "transparent",
+      "file": "toolbar.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "toolbar.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "toolbar.css"
+    },
+    "group-gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "toolbar.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-2)",
+      "file": "toolbar.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "toolbar.css"
+    },
+    "separator-color": {
+      "fallback": "var(--rind-separator-color, var(--rind-color-border))",
+      "file": "toolbar.css"
+    }
+  }
+}
+```

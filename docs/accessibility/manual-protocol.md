@@ -213,6 +213,35 @@ FocusableWhenDisabled, IconOnly, RTL. Record each pass in `tested-with.json` wit
 - [ ] **Windows High Contrast / forced colors**: pressed and unpressed items are
       distinguishable (fill and double outline) and the joined borders are visible.
 
+## Device checklist: Toolbar (add-toolbar 8.2)
+
+Stories: Components/Toolbar → Default, Vertical, TextFieldLast, TextFieldInTheMiddle,
+DisabledControls, DisabledSkipped, EditorToolbar, RTL. Record each pass in `tested-with.json`
+with `component: "toolbar"`. Deferred to devices.
+
+- [ ] **NVDA + Firefox and Chrome**: entering the toolbar announces its name ("Formatting,
+      toolbar") and the first control; **focus mode stays on** while arrowing between
+      controls (no switch back to browse mode), including onto and off the text field.
+- [ ] **JAWS + Chrome**: the same; the toolbar is entered in forms/application mode and
+      arrows move controls without the virtual cursor taking them.
+- [ ] **VoiceOver macOS + Safari and VoiceOver iOS**: toolbar name and role, then each control
+      with its role and state (pressed, checked, unavailable). A hosted radio is **not checked
+      by the cursor**: moving onto it only focuses; Enter or Space checks it. On iOS, swipe
+      reaches every control and double-tap activates.
+- [ ] **TalkBack + Chrome**: swipe order matches the visual order; toggles read pressed /
+      not pressed, hosted radios checked / not checked; double-tap activates once.
+- [ ] **All**: Tab enters on the remembered control and leaves after one stop; Home / End
+      jump; a disabled control (DisabledControls) is announced as unavailable and does not
+      activate; DisabledSkipped skips it.
+- [ ] **TextField stories**: arrows move the caret inside the text and leave only at its
+      edge; the field is announced with its name and role (edit).
+- [ ] **EditorToolbar**: pressing a button keeps the selection in the document and the
+      action is announced once.
+- [ ] **Vertical / RTL**: Up and Down move in the vertical toolbar and Left / Right do not;
+      in RTL, Left and Right swap.
+- [ ] **Windows High Contrast / forced colors**: the focus ring, the separators and pressed
+      toggles are visible.
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

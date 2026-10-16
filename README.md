@@ -91,14 +91,13 @@ with status, is in [`docs/components.md`](docs/components.md).
 
 | Ready | |
 |---|---|
-| Actions | Button, Link, Toggle, Toggle Group |
+| Actions | Button, Link, Toggle, Toggle Group, Toolbar |
 | Forms | Label, Field, Fieldset, Form, Text Field, Checkbox, Switch, Checkbox Group, Radio Group, Segmented Control |
 | Disclosure | Collapsible, Accordion, Tabs |
 | Typography | Heading |
 | Layout | Separator |
 
-Next up: Toolbar,
-Dialog, Popover, Tooltip, Menu, Select, Combobox, Slider, and the AI-interface
+Next up: Dialog, Popover, Tooltip, Menu, Select, Combobox, Slider, and the AI-interface
 primitives (Prompt Input, Message Thread, Streaming Message, Tool Approval).
 
 ## Packages

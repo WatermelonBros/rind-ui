@@ -3,6 +3,7 @@ export * from "./button"
 export * from "./checkbox"
 export * from "./checkbox-group"
 export * from "./collapsible"
+export { CompositeHostContext, useCompositeHost, useHostItem } from "./composite-host"
 export * from "./field"
 export * from "./fieldset"
 export * from "./form"
@@ -35,6 +36,7 @@ export * from "./tabs"
 export * from "./text-field"
 export * from "./toggle"
 export * from "./toggle-group"
+export * from "./toolbar"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

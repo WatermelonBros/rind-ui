@@ -327,10 +327,11 @@ const hiddenFocus: GenericInvariant = (f) => {
   if (focused?.inAriaHidden) out.push(`focus is on ${focused.describe}, inside aria-hidden`)
   if (focused?.inInert) out.push(`focus is on ${focused.describe}, inside inert`)
   for (const el of f.after.elements) {
-    // A form-associated hidden input forwards focus to its control (hidden-form-input);
+    // A rind-ui hidden input forwards focus to its control (hidden-form-input), also when
+    // its component sits inside another contract's subtree (a radio group in a toolbar);
     // the form-associated invariant checks it never keeps focus and is out of the tab order.
     const formInput =
-      f.traits.includes("form-associated") &&
+      el.attrs["data-scope"] !== undefined &&
       el.attrs["data-part"] === "hidden-input" &&
       el.attrs["tabindex"] === "-1"
     if (el.focusable && el.inAriaHidden && !el.hidden && !formInput) {
