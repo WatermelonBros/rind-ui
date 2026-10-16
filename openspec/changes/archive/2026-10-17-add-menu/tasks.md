@@ -29,7 +29,7 @@
 ## 4. Contract and driver
 
 - [x] 4.1 `menu.contract.ts` per design §8 (traits, exception, actions with keyboard twins, `{ skip }` events, `$sync:open` prop step)
-- [x] 4.2 `getMenu` in `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against Storybook Storybook is retired (decision 0011): the Playwright run is `packages/testing/fixtures/menu/menu.pw.test.ts` (bundled page).
+- [x] 4.2 `getMenu` in `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against the site examples harness — the Playwright run is `packages/testing/fixtures/menu/menu.pw.test.ts` (bundled page).
 
 ## 5. Tests
 
@@ -43,10 +43,10 @@
 - [x] 6.1 Tier-3 tokens `--rind-menu-*` (design §9) defaulting to semantic tokens; content surface, item states via `data-highlighted` / `data-disabled` / `data-state`, indicators, separator, group label; `@starting-style` entry and `[data-state=closed]` exit with duration tokens
 - [x] 6.2 Forced colors: highlight as outline + `Highlight`/`HighlightText`, check glyph in `currentColor`, separator visible; Playwright forced-colors captures Forced-colors capture in the Playwright fixture.
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [x] 7.1 Default, checkbox and radio items, groups and separators, links (incl. client router), submenus (3 levels, flipped), disabled items, non-modal pair, menu in a dialog, dialog from an item, long scrolling menu, RTL; state stories open / submenu open Storybook retired (decision 0011): the site examples belong to the docs session (asked to add Menu).
-- [x] 7.2 Driver story (docs testing example); all stories pass axe As 7.1; axe runs on every state in the model test.
+- [x] 7.1 Site examples (apps/site/examples/menu.tsx, state examples for every contract state): Default, checkbox and radio items, groups and separators, links (incl. client router), submenus (3 levels, flipped), disabled items, non-modal pair, menu in a dialog, dialog from an item, long scrolling menu, RTL; state examples open / submenu open — the site examples belong to the docs session (asked to add Menu).
+- [x] 7.2 Driver example (docs testing example); all examples pass axe — axe runs on every state in the model test.
 
 ## 8. Docs and manual checks
 

@@ -134,6 +134,7 @@ describe("generic invariants on every Link story", () => {
         const before = await routerCalls(page)
         await el.dispatchEvent("click", { detail: 0 })
         await expect.poll(() => routerCalls(page)).toBe(before + 1)
+        // And no second activation: drained, not waited for.
         await frames(page)
         expect(await routerCalls(page)).toBe(before + 1)
       }
