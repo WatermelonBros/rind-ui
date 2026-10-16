@@ -32,8 +32,10 @@ export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
 export { getNumberInput } from "./components/number-input"
+export { getPasswordInput } from "./components/password-input"
 export { getPopover } from "./components/popover"
 export { getRadioGroup } from "./components/radio-group"
+export { getSearchField } from "./components/search-field"
 export { getSegmentedControl } from "./components/segmented-control"
 export { getSeparator } from "./components/separator"
 export { getSkeleton } from "./components/skeleton"
@@ -100,6 +102,10 @@ export {
 } from "./number-input-invariants"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
+export {
+  type SearchFieldStepInvariants,
+  searchFieldStepInvariants,
+} from "./search-field-invariants"
 export { type SliderStepInvariants, sliderStepInvariants } from "./slider-invariants"
 export { missingStateStories, type StateStories } from "./state-stories"
 export { type SwitchStepInvariants, switchStepInvariants } from "./switch-invariants"
