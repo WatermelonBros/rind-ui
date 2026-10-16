@@ -563,6 +563,40 @@ describe("Nesting", () => {
     expect(queryPopover("Shortcut dialog")).not.toBeNull()
   })
 
+  it("A dialog mounted after the popover opened is not exempt: the popover closes with outside-focus (ark#2610)", async () => {
+    const onOpenChange = vi.fn()
+    let show: (on: boolean) => void = () => {}
+    function Late() {
+      const [on, setOn] = useState(false)
+      show = setOn
+      return on ? (
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content aria-label="Late dialog">
+                <input aria-label="Late field" />
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : null
+    }
+    render(
+      <>
+        <Full closeOnInteractOutside={false} onOpenChange={onOpenChange} />
+        <Late />
+      </>,
+    )
+    const user = userEvent.setup()
+    await openByClick(user)
+    onOpenChange.mockClear()
+    act(() => show(true))
+    await vi.waitFor(() => expect(active()).toBe(screen.getByLabelText("Late field")))
+    await vi.waitFor(() => expect(queryPopover("Filters")).toBeNull())
+    expect(onOpenChange).toHaveBeenCalledTimes(1)
+    expect(onOpenChange.mock.calls[0]?.[1].reason).toBe("outside-focus")
+  })
+
   it("Dialog opened from a popover inside a dialog: closing dialog 2 leaves the others open (zag#2933)", async () => {
     const user = userEvent.setup()
     render(
