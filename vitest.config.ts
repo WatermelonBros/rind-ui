@@ -131,6 +131,10 @@ export default defineConfig({
           name: "playwright",
           environment: "node",
           include: ["packages/*/fixtures/**/*.pw.test.ts"],
+          // Each test launches real browsers (Firefox is slow to start under load). A deadline,
+          // not a delay: a passing test still finishes as soon as its conditions hold.
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
           retry: ciRetry,
         },
       },

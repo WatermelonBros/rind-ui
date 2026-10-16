@@ -7,7 +7,9 @@ import { scope } from "./ci-scope.mjs"
 const base = execSync("git merge-base HEAD origin/main", { encoding: "utf8" }).trim()
 const { components, site, full } = scope(base)
 const changed = full ? "" : `--changed ${base} --passWithNoTests`
-const vitest = (projects) => `pnpm exec vitest run ${projects} ${changed} --retry 1`
+// Several sessions share this machine: cap each verify's workers so they don't starve each other.
+const vitest = (projects) =>
+  `pnpm exec vitest run ${projects} ${changed} --retry 1 --maxWorkers=25%`
 
 const steps = [
   // CI `static`
