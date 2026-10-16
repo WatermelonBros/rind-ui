@@ -4,6 +4,8 @@ export type {
   AnnouncerEnv,
   Clock,
   ClockEnv,
+  DateClock,
+  DateClockEnv,
   CollectionLayout,
   CollectionLayoutEnv,
   DomEnv,

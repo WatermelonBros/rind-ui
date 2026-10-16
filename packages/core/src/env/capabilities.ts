@@ -131,6 +131,17 @@ export interface ClockEnv {
   readonly clock: Clock
 }
 
+/** The current instant and the viewer's time zone, for "today" (date-values). Tests fix both. */
+export interface DateClock {
+  /** Epoch milliseconds. */
+  now(): number
+  /** An IANA zone ("Pacific/Auckland"). */
+  timeZone(): string
+}
+export interface DateClockEnv {
+  readonly dateClock: DateClock
+}
+
 /** Measured layout of a collection's items, for page moves. */
 export interface CollectionLayout {
   /**
