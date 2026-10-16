@@ -171,16 +171,16 @@ export function DriverExample() {
 }
 
 export const variants: Variants = {
-  Default: { title: "Default", hidden: true },
-  Single: { title: "Single", hidden: true },
-  MultipleStory: { title: "Multiple", hidden: true },
-  NonCollapsible: { title: "Non collapsible", hidden: true },
-  DisabledItemStory: { title: "Disabled item", hidden: true },
-  HeadingLevels: { title: "Heading levels", hidden: true },
-  HorizontalLtr: { title: "Horizontal ltr", hidden: true },
-  HorizontalRtl: { title: "Horizontal rtl", hidden: true },
-  KeyboardNavigationStory: { title: "Keyboard navigation", hidden: true },
-  FindInPage: { title: "Find in page", hidden: true },
-  Nested: { title: "Nested", hidden: true },
-  DriverExample: { title: "Driver example", hidden: true },
+  Default: { title: "Default", hidden: true, motion: "keep" },
+  Single: { title: "Single", hidden: true, motion: "keep" },
+  MultipleStory: { title: "Multiple", hidden: true, motion: "keep" },
+  NonCollapsible: { title: "Non collapsible", hidden: true, motion: "keep" },
+  DisabledItemStory: { title: "Disabled item", hidden: true, motion: "keep" },
+  HeadingLevels: { title: "Heading levels", hidden: true, motion: "keep" },
+  HorizontalLtr: { title: "Horizontal ltr", hidden: true, motion: "keep" },
+  HorizontalRtl: { title: "Horizontal rtl", hidden: true, motion: "keep" },
+  KeyboardNavigationStory: { title: "Keyboard navigation", hidden: true, motion: "keep" },
+  FindInPage: { title: "Find in page", hidden: true, motion: "keep" },
+  Nested: { title: "Nested", hidden: true, motion: "keep" },
+  DriverExample: { title: "Driver example", hidden: true, motion: "keep" },
 }

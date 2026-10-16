@@ -187,16 +187,16 @@ export function DriverExample() {
 }
 
 export const variants: Variants = {
-  Default: { title: "Default", hidden: true },
-  Closed: { title: "Closed", hidden: true },
-  Open: { title: "Open", hidden: true },
-  ControlledStory: { title: "Controlled", hidden: true },
-  NonModalStory: { title: "Non modal", hidden: true },
-  NestedStory: { title: "Nested", hidden: true },
-  FormInside: { title: "Form inside", hidden: true },
-  LongContentStory: { title: "Long content", hidden: true },
-  TwoTriggers: { title: "Two triggers", hidden: true },
-  KeepMounted: { title: "Keep mounted", hidden: true },
-  ExitAnimation: { title: "Exit animation", hidden: true },
-  DriverExample: { title: "Driver example", hidden: true },
+  Default: { title: "Default", hidden: true, motion: "keep" },
+  Closed: { title: "Closed", hidden: true, motion: "keep" },
+  Open: { title: "Open", hidden: true, motion: "keep" },
+  ControlledStory: { title: "Controlled", hidden: true, motion: "keep" },
+  NonModalStory: { title: "Non modal", hidden: true, motion: "keep" },
+  NestedStory: { title: "Nested", hidden: true, motion: "keep" },
+  FormInside: { title: "Form inside", hidden: true, motion: "keep" },
+  LongContentStory: { title: "Long content", hidden: true, motion: "keep" },
+  TwoTriggers: { title: "Two triggers", hidden: true, motion: "keep" },
+  KeepMounted: { title: "Keep mounted", hidden: true, motion: "keep" },
+  ExitAnimation: { title: "Exit animation", hidden: true, motion: "keep" },
+  DriverExample: { title: "Driver example", hidden: true, motion: "keep" },
 }

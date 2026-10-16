@@ -10,6 +10,12 @@ export const exampleParams = (): Params[] => harness.map(({ slug, example }) => 
 export const exampleUrl = ({ slug, example }: Params, skin: Skin) =>
   skin === "none" ? `/examples/${slug}/${example}/` : `/examples/${slug}/${example}/${skin}/`
 
+/** Whether the example keeps real motion (`motion: "keep"`) or runs reduced. */
+export const exampleMotion = ({ slug, example }: Params): "keep" | "reduce" =>
+  harness.find((e) => e.slug === slug && e.example === example)?.motion === "keep"
+    ? "keep"
+    : "reduce"
+
 export const exampleTitle = ({ slug, example }: Params, skin: Skin) => {
   const entry = harness.find((e) => e.slug === slug && e.example === example)
   return `${entry?.title ?? example} · ${slug} (${skin})`

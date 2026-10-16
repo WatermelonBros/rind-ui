@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { ExampleHost } from "@/components/harness/example-host"
-import { exampleParams, exampleTitle, type Params } from "@/lib/harness"
+import { exampleMotion, exampleParams, exampleTitle, type Params } from "@/lib/harness"
 
 export const dynamicParams = false
 export const generateStaticParams = exampleParams
@@ -14,5 +14,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const p = await params
-  return <ExampleHost slug={p.slug} example={p.example} skin={"none"} />
+  return <ExampleHost slug={p.slug} example={p.example} skin={"none"} motion={exampleMotion(p)} />
 }
