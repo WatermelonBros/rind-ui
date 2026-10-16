@@ -12,6 +12,7 @@ import { states as buttonStates } from "../../../../apps/storybook/stories/Butto
 import { states as checkboxStates } from "../../../../apps/storybook/stories/Checkbox.stories"
 import { states as checkboxGroupStates } from "../../../../apps/storybook/stories/CheckboxGroup.stories"
 import { states as collapsibleStates } from "../../../../apps/storybook/stories/Collapsible.stories"
+import { states as dialogStates } from "../../../../apps/storybook/stories/Dialog.stories"
 import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
 import { states as fieldStates } from "../../../../apps/storybook/stories/Field.stories"
 import { states as fieldsetStates } from "../../../../apps/storybook/stories/Fieldset.stories"
@@ -336,6 +337,7 @@ describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
     "./stories/Toggle.stories.tsx": toggleStates,
     "./stories/ToggleGroup.stories.tsx": toggleGroupStates,
     "./stories/Toolbar.stories.tsx": toolbarStates,
+    "./stories/Dialog.stories.tsx": dialogStates,
   }
   it("each state story matches its ARIA snapshot in every engine", {
     timeout: 180_000,

@@ -401,6 +401,59 @@
         }
       }
     },
+    "dialog": {
+      "family": "panel",
+      "tokens": {
+        "backdrop": {
+          "fallback": "var(--rind-color-overlay)",
+          "file": "dialog.css"
+        },
+        "bg": {
+          "fallback": "var(--rind-color-surface-raised)",
+          "file": "dialog.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "dialog.css"
+        },
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "dialog.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "dialog.css"
+        },
+        "inset": {
+          "fallback": "var(--rind-space-4)",
+          "file": "dialog.css"
+        },
+        "max-width": {
+          "fallback": "32rem",
+          "file": "dialog.css"
+        },
+        "nested-backdrop": {
+          "fallback": "transparent",
+          "file": "dialog.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-6)",
+          "file": "dialog.css"
+        },
+        "parent-scale": {
+          "fallback": "0.98",
+          "file": "dialog.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-panel)",
+          "file": "dialog.css"
+        },
+        "shadow": {
+          "fallback": "var(--rind-shadow-lg)",
+          "file": "dialog.css"
+        }
+      }
+    },
     "field": {
       "family": null,
       "tokens": {

@@ -356,13 +356,16 @@ function createPlaywrightEnv(
         }
         await l.evaluate(composeInPage, commit === undefined ? { updates } : { updates, commit })
       },
-      async pressAtPosition() {
+      async pressAtPosition(at) {
         const l = await waitFor()
         const box = await l.boundingBox()
         if (!box) throw new Error("pressAtPosition: the part has no box")
         // The real mouse at that point: the press reaches whatever is on top there.
         const { page } = await getBase()
-        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2)
+        const [x, y] = at?.corner
+          ? [box.x + 2, box.y + 2]
+          : [box.x + box.width / 2, box.y + box.height / 2]
+        await page.mouse.click(x, y)
       },
       waitForDetach: async () => {
         await until(

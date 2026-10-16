@@ -427,11 +427,11 @@ function createDomEnv(
         if (doc().activeElement !== el) await act(() => el.focus())
         await act(() => composeInPage(el, commit === undefined ? { updates } : { updates, commit }))
       },
-      async pressAtPosition() {
+      async pressAtPosition(at) {
         const el = await waitFor()
         const rect = el.getBoundingClientRect()
-        const x = rect.left + rect.width / 2
-        const y = rect.top + rect.height / 2
+        const x = at?.corner ? rect.left + 2 : rect.left + rect.width / 2
+        const y = at?.corner ? rect.top + 2 : rect.top + rect.height / 2
         // Whatever is on top at that point (no layout in jsdom: the part itself).
         const hit = (rect.width > 0 ? doc().elementFromPoint(x, y) : null) ?? el
         const u = await getUser()

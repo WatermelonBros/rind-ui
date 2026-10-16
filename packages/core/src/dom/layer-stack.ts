@@ -32,6 +32,11 @@ export interface LayerOptions {
   readonly parent?: LayerId | undefined
   /** The opening element: a parent by DOM containment when none is declared. */
   readonly opener?: (() => Element | null) | undefined
+  /**
+   * Which kinds may be a parent found through the opener (a dialog opened from a menu item
+   * is not the menu's child: it survives the menu closing, radix#1836). Default: any.
+   */
+  readonly parentKinds?: readonly LayerKind[] | undefined
   /** Content, backdrop, positioner and, optionally, the trigger: all inside the layer. */
   readonly elements: () => readonly Element[]
   /** The element focus is contained in (the content): where a child layer's focus returns last. */
@@ -157,8 +162,11 @@ function createStack(): LayerStack {
       // A re-registration (Strict Mode, reopen during exit) replaces the exiting entry.
       if (existing) entries = entries.filter((e) => e !== existing)
       lineage.delete(options.id)
-      const parentKey =
-        options.parent ?? (options.opener ? entryOf(options.opener())?.options.id : undefined)
+      // Through the opener: the holding layer, or its nearest ancestor of an allowed kind.
+      const kinds = options.parentKinds
+      let holder = options.opener ? entryOf(options.opener()) : undefined
+      while (holder && kinds && !kinds.includes(holder.options.kind)) holder = parentOf(holder)
+      const parentKey = options.parent ?? holder?.options.id
       const entry: Entry = {
         options,
         state: "open",

@@ -11,13 +11,13 @@ const defaults: { close: string; open: string; results: (n: number) => string } 
 
 declare module "./provider" {
   interface RindMessageScopes {
-    dialog: typeof defaults
+    probe: typeof defaults
   }
 }
 
 function Probe({ messages }: { messages?: { close?: string } }) {
   const { locale, dir } = useLocale()
-  const m = useMessages("dialog", defaults, messages)
+  const m = useMessages("probe", defaults, messages)
   const timeout = useTypeaheadTimeout()
   return <output data-testid="probe">{`${locale}|${dir}|${m.close}|${m.open}|${timeout}`}</output>
 }
@@ -48,7 +48,7 @@ describe("RindProvider", () => {
 
   it("messages by scope: provider overrides defaults, a component prop overrides the provider", () => {
     render(
-      <RindProvider messages={{ dialog: { close: "Chiudi", open: "Apri" } }}>
+      <RindProvider messages={{ probe: { close: "Chiudi", open: "Apri" } }}>
         <Probe messages={{ close: "Fermer" }} />
       </RindProvider>,
     )
@@ -70,16 +70,16 @@ describe("review round 1", () => {
     const typed = (
       <RindProvider
         messages={{
-          dialog: {
+          probe: {
             close: "Chiudi",
-            // @ts-expect-error "clsoe" is not a dialog message
+            // @ts-expect-error "clsoe" is not a probe message
             clsoe: "x",
           },
         }}
       />
     )
     // @ts-expect-error results is a function of a number, not a string
-    const wrongType = <RindProvider messages={{ dialog: { results: "3 risultati" } }} />
+    const wrongType = <RindProvider messages={{ probe: { results: "3 risultati" } }} />
     // @ts-expect-error "nope" is not a component scope
     const unknownScope = <RindProvider messages={{ nope: {} }} />
     expect([typed, wrongType, unknownScope]).toHaveLength(3)

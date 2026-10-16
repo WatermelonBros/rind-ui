@@ -80,7 +80,11 @@ export interface Part {
    */
   compose(updates: readonly string[], commit?: string): Promise<void>
   /** A mouse press at the part's centre that reaches whatever is hit there (a backdrop above). */
-  pressAtPosition(): Promise<void>
+  /**
+   * `corner`: near the part's top-left corner instead of its centre (a full-screen backdrop
+   * whose centre is covered by the dialog content it surrounds).
+   */
+  pressAtPosition(options?: { readonly corner?: boolean }): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */
