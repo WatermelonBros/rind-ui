@@ -73,3 +73,10 @@ assistive technology you used.
 
 By contributing you agree that your contributions are licensed under the
 [MIT License](LICENSE).
+
+## Merging main into your branch
+
+Update a pushed branch with `git merge origin/main` (never rebase and force-push). Append-only
+lists (package barrels, the examples index, the review backlog) merge by union. For conflicts in
+generated files (`llms.txt`, `docs/theme/tokens.md`, `packages/theme/tokens.manifest.json`,
+`components.generated.ts`), take either side and run `pnpm regen`.
