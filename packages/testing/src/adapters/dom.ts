@@ -70,6 +70,33 @@ const nextCoords = (el?: Element) => {
 }
 
 /**
+ * A point on the page itself, inside the viewport's client area (dismissal treats a press
+ * past it as a scrollbar press): the step's coordinates when they qualify, else the first
+ * viewport corner that hits only the page. Without layout (jsdom) every point is the page.
+ */
+const outsideCoords = () => {
+  const c = nextCoords()
+  const root = document.documentElement
+  const page = (x: number, y: number) => {
+    if (root.clientWidth > 0 && (x >= root.clientWidth || y >= root.clientHeight)) return false
+    const hit = document.elementFromPoint?.(x, y)
+    return !hit || hit === document.body || hit === root
+  }
+  if (page(c.clientX, c.clientY)) return c
+  const w = root.clientWidth
+  const h = root.clientHeight
+  for (const [x, y] of [
+    [w - 2, h - 2],
+    [w - 2, 2],
+    [2, h - 2],
+  ] as const) {
+    if (page(x, y))
+      return { clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY }
+  }
+  return c
+}
+
+/**
  * Resolves once no finite transition or animation is running in the document (or after `max`
  * ms). A sibling panel opening shifts the target's box for a while, and a press aimed at
  * coordinates read before the shift releases outside it (the press is then not a press).
@@ -620,8 +647,7 @@ function createDomEnv(
       const u = await getUser()
       const body = doc().body
       if (!u.pointer) return act(() => u.click(body))
-      const coords = nextCoords()
-      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords }]))
+      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords: outsideCoords() }]))
     },
     until,
     advance: async (ms) => {
