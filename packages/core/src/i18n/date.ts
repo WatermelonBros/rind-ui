@@ -7,6 +7,7 @@ import {
   type Calendar,
   CalendarDate,
   CalendarDateTime,
+  type CalendarIdentifier,
   DateFormatter,
   type DateValue,
   fromAbsolute,
@@ -41,7 +42,7 @@ export type DayOfWeek = "sun" | "mon" | "tue" | "wed" | "thu" | "fri" | "sat"
 const DAYS: readonly DayOfWeek[] = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
 
 /** The consumer's calendar factory (`createCalendar` from @internationalized/date, or a subset). */
-export type CreateCalendar = (identifier: string) => Calendar
+export type CreateCalendar = (identifier: CalendarIdentifier) => Calendar
 
 export interface ResolvedCalendar {
   readonly calendar: Calendar
@@ -76,7 +77,9 @@ export function resolveCalendar(locale: string, createCalendar?: CreateCalendar)
   // answers with another system) falls back with a warning.
   let calendar: Calendar | null = null
   try {
-    calendar = createCalendar(identifier)
+    // Sound: an identifier the factory does not know is answered by a throw or another
+    // system, both handled below.
+    calendar = createCalendar(identifier as CalendarIdentifier)
   } catch {}
   if (calendar && calendar.identifier === identifier) return { calendar, formatLocale: locale }
   warnOnce(`the ${identifier} calendar of "${locale}" is not supported; showing gregorian.`)
