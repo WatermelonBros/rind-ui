@@ -6,7 +6,50 @@ on:
   pull_request:
 
 jobs:
+  # What the change touches. Pushes to main always run everything.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      components: ${{ steps.scope.outputs.components }}
+      site: ${{ steps.scope.outputs.site }}
+      full: ${{ steps.scope.outputs.full }}
+      base: ${{ steps.scope.outputs.base }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: scope
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "components=true" "site=true" "full=true" | tr ' ' '\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="origin/${{ github.base_ref }}"
+          files=$(git diff --name-only "$base"...HEAD)
+          echo "$files"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          # Anything outside the site and prose touches the components.
+          if echo "$files" | grep -qvE '^(apps/site/|docs/|[^/]+\.md$|\.changeset/)'; then
+            echo "components=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "components=false" >> "$GITHUB_OUTPUT"
+          fi
+          if echo "$files" | grep -qE '^(apps/site/|packages/|docs/|pnpm-lock\.yaml|package\.json|\.github/)'; then
+            echo "site=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site=false" >> "$GITHUB_OUTPUT"
+          fi
+          # Config, dependencies and the test infrastructure itself: run the whole suite,
+          # since Vitest's --changed only follows imports.
+          if echo "$files" | grep -qE '^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github/|\.nvmrc|packages/testing/src/(model|driver|adapter|adapters/|invariants|collect|setup|env)|packages/[^/]+/package\.json|packages/[^/]+/tsdown\.config\.ts|apps/storybook/\.storybook/)'; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "full=false" >> "$GITHUB_OUTPUT"
+          fi
+
   static:
+    needs: changes
+    if: needs.changes.outputs.components == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,13 +64,24 @@ jobs:
       # Every quirk's repro test exists; stale entries (> 12 months) are reported.
       - run: pnpm quirks:check
       - run: pnpm docs:check
-      # Builds every package and Storybook; @rind-ui/core's build fails over the runtime's
-      # 2.5 kB min+gz budget (packages/core/scripts/size.mjs).
-      - run: pnpm build
+      # Packages and Storybook, built once and shared with the test slices. @rind-ui/core's
+      # build fails over the runtime's 2.5 kB min+gz budget (packages/core/scripts/size.mjs).
+      - run: pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/storybook
       - run: pnpm --filter @rind-ui/core size
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            packages/*/dist
+            apps/storybook/storybook-static
+          retention-days: 1
 
-  # The test suite split by Vitest project and browser, so the slices run in parallel.
+  # The test suite split by Vitest project and browser, so the slices run in parallel. On
+  # pull requests only the tests that import a changed file run (vitest --changed), unless
+  # the change touches config or the test infrastructure.
   test:
+    needs: [changes, static]
+    if: needs.changes.outputs.components == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -46,42 +100,68 @@ jobs:
     name: test (${{ matrix.slice }})
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Packages, Storybook (storybook-static for the Playwright fixtures) and the site.
-      - run: pnpm build
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+      - if: matrix.browsers != ''
+        id: pw
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - if: matrix.browsers != ''
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.browsers }}
       - if: matrix.browsers != ''
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
           BROWSERS: ${{ matrix.browsers }}
-      - run: pnpm exec vitest run ${{ matrix.projects }}
+      - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests
         env:
           RIND_BROWSERS: ${{ matrix.browsers != '' && matrix.browsers || 'chromium' }}
+          CHANGED: ${{ needs.changes.outputs.full == 'false' && format('--changed {0}', needs.changes.outputs.base) || '' }}
 
-  # The required status check: green only when every slice above is.
+  # The required status check: green when every slice above passed or was not needed.
   check:
     if: always()
-    needs: [static, test]
+    needs: [changes, static, test]
     runs-on: ubuntu-latest
     steps:
       - run: |
-          [ "${{ needs.static.result }}" = "success" ] && [ "${{ needs.test.result }}" = "success" ]
+          ok() { [ "$1" = "success" ] || [ "$1" = "skipped" ]; }
+          [ "${{ needs.changes.result }}" = "success" ] && ok "${{ needs.static.result }}" && ok "${{ needs.test.result }}"
 
   site-audit:
     # The docs site, built and walked page by page: every example in every skin, axe in both
-    # phases, invisible text, phone overflow (apps/site/scripts).
+    # phases, invisible text, phone overflow (apps/site/scripts). Skipped (green) when the
+    # change cannot affect the site.
+    needs: changes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - if: needs.changes.outputs.site == 'true'
+        uses: actions/checkout@v4
+      - if: needs.changes.outputs.site == 'true'
+        uses: pnpm/action-setup@v4
+      - if: needs.changes.outputs.site == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm --filter @rind-ui/site run audit
+      - if: needs.changes.outputs.site == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: needs.changes.outputs.site == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-site-${{ hashFiles('pnpm-lock.yaml') }}
+      - if: needs.changes.outputs.site == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - if: needs.changes.outputs.site == 'true'
+        run: pnpm --filter @rind-ui/site run audit
