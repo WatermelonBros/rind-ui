@@ -16,7 +16,11 @@ export type PlaywrightTarget = Page | Locator | FrameLocator
 export interface PlaywrightAdapterOptions {
   /** `until` timeout in ms (default 5000, Playwright's expect timeout). */
   readonly timeout?: number
-  /** Advances time when the page uses `page.clock`; defaults to waiting. */
+  /**
+   * Advances time when the page uses `page.clock`; defaults to waiting. Pause the clock
+   * (`page.clock.pauseAt`) after installing it: an installed clock also flows with real
+   * time, so polling and load would move the page's time too.
+   */
   readonly advanceTimers?: (ms: number) => Promise<unknown>
 }
 
