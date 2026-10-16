@@ -102,8 +102,28 @@ async function exercise(page: Page, url: string) {
         .nth(k)
         .click({ timeout: 2000 })
         .catch((e: Error) => report(url, "click", `example ${i} control ${k}: ${e.message}`))
+      await closeModals(page, url)
     }
   }
+}
+
+/** A control may open a modal layer: close it (Escape, else its last button) before going on. */
+async function closeModals(page: Page, url: string) {
+  for (let n = 0; n < 4; n++) {
+    const modal = page.locator('[aria-modal="true"]').last()
+    if (!(await modal.isVisible().catch(() => false))) return
+    await page.keyboard.press("Escape")
+    await page.waitForTimeout(250)
+    if (await modal.isVisible().catch(() => false)) {
+      await modal
+        .getByRole("button")
+        .last()
+        .click({ timeout: 2000 })
+        .catch(() => {})
+      await page.waitForTimeout(250)
+    }
+  }
+  report(url, "modal", "a modal layer did not close with Escape or its buttons")
 }
 
 /** Text that is laid out but painted at (near) zero opacity: invisible to sighted users. */

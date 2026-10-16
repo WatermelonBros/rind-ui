@@ -1,0 +1,183 @@
+/* Dialog and Alert Dialog (data-scope$="dialog"): the content is portalled to <body>, outside the example stage; the portal host
+   carries the stage's data-rind-theme, so these rules select on that. */
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="trigger"],
+[data-rind-theme^="skin-"]
+  [data-scope$="dialog"]:is(
+    [data-part="close-trigger"],
+    [data-part="cancel"],
+    [data-part="action"]
+  ) {
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease);
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="trigger"][data-hover],
+[data-rind-theme^="skin-"]
+  [data-scope$="dialog"]:is(
+    [data-part="close-trigger"],
+    [data-part="cancel"],
+    [data-part="action"]
+  )[data-hover] {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+[data-rind-theme^="skin-"]
+  [data-scope$="dialog"]:is(
+    [data-part="close-trigger"],
+    [data-part="cancel"],
+    [data-part="action"]
+  ):last-child {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  border-color: var(--s-brand-deep);
+}
+[data-rind-theme^="skin-"]
+  [data-scope$="dialog"]:is([data-part="trigger"], [data-part="close-trigger"]):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="backdrop"] {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in oklab, var(--s-ink) 45%, transparent);
+  animation: s-dialog-fade 0.25s var(--s-ease);
+}
+[data-rind-theme="skin-juicy"] [data-scope$="dialog"][data-part="backdrop"] {
+  background: color-mix(in oklab, #9b87e8 45%, transparent);
+  backdrop-filter: blur(6px);
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="positioner"] {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+/* non-modal: no backdrop, a panel in the corner */
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="positioner"]:not(:has([aria-modal])) {
+  inset: auto 24px 24px auto;
+  padding: 0;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"] {
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  color: var(--s-ink);
+  font-family: var(--s-font);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-hi);
+  animation: s-dialog-in 0.35s var(--s-pop);
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"][data-state="closed"] {
+  animation: s-dialog-out 0.2s var(--s-ease) forwards;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="backdrop"][data-state="closed"] {
+  animation: s-dialog-fade 0.2s var(--s-ease) reverse forwards;
+}
+[data-rind-theme="skin-crisp"] [data-scope$="dialog"][data-part="content"] {
+  box-shadow: 8px 8px 0 var(--s-ink);
+}
+[data-rind-theme="skin-juicy"] [data-scope$="dialog"][data-part="content"] {
+  box-shadow: 0 10px 0 #c9bdf2;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"][data-nested] {
+  translate: 0 12px;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="title"] {
+  margin: 0;
+  font: 800 22px / 1.15 var(--s-font);
+  outline: none;
+}
+[data-rind-theme="skin-crisp"] [data-scope$="dialog"][data-part="title"] {
+  font-family: var(--font-unbounded), var(--s-font);
+  font-weight: 900;
+  font-size: 20px;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="description"] {
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in oklab, var(--s-ink) 75%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"] p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"] input {
+  font: 500 15px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-muted);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  padding: 9px 12px;
+}
+[data-rind-theme="skin-bare"] [data-scope$="dialog"][data-part="content"] input {
+  background: #fff;
+}
+[data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="content"] .row {
+  justify-content: flex-end;
+}
+
+@keyframes s-dialog-in {
+  from {
+    opacity: 0;
+    scale: 0.94;
+    translate: 0 10px;
+  }
+}
+@keyframes s-dialog-out {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes s-dialog-fade {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"]
+    [data-scope$="dialog"]:is([data-part="content"], [data-part="backdrop"]):is([data-state]) {
+    animation-duration: 0.01ms;
+  }
+}
+
+/* Alert Dialog: Cancel and Action on one end-aligned row */
+[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="content"] {
+  grid-template-columns: 1fr auto auto;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="alert-dialog"][data-part="content"]
+  > :not([data-part="cancel"], [data-part="action"]) {
+  grid-column: 1 / -1;
+}
+[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="cancel"] {
+  grid-column: 2;
+}
+[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="action"] {
+  grid-column: 3;
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  border-color: var(--s-brand-deep);
+}
+[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="action"]:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
