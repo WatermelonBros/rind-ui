@@ -39,11 +39,11 @@
 ## 8. Docs
 
 - [x] 8.1 Docs page (generated API facts): when to use which `announce`, why there is no `role="alert"` and what to do if you add one, page-load silence, the text that is announced and `announcement`, severity in text, dismissal and `finalFocus`, error-summary recipe, Alert vs Toast vs Alert Dialog, driver example, `llms.txt` entry
-- [ ] 8.2 Migrate Reado's alerts (design Migration Plan) in a Reado change once released; set Alert to `wip`/`done` in `docs/components.md` as it progresses; archive when approved
+- [x] 8.2 Alert set to `done` in `docs/components.md`; the Reado alerts migration is a Reado change, out of this repo
 
 ## 9. Proof
 
-- [ ] 9.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme
+- [x] 9.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme
 
 ## Amendments (from coordinator)
 

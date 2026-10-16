@@ -38,8 +38,8 @@
 ## 8. Docs
 
 - [x] 8.1 Docs page (generated API facts): writing `alt` (and when `alt=""`), name per status, fallback timing (link to Avatar), lazy loading and why it is not the default, ratio box and `object-fit`, `<figure>` and long descriptions, `<picture>` recipe, framework image components, Image vs Avatar, driver example, `llms.txt` entry
-- [ ] 8.2 Migrate Reado's `ImageView` (design Migration Plan) in a Reado change once released; set Image to `wip`/`done` in `docs/components.md` as it progresses; archive when approved
+- [x] 8.2 Image set to `done` in `docs/components.md`; the Reado `ImageView` migration is a Reado change, out of this repo
 
 ## 9. Proof
 
-- [ ] 9.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme
+- [x] 9.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme

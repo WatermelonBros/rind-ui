@@ -141,6 +141,55 @@
         }
       }
     },
+    "alert": {
+      "family": "status",
+      "tokens": {
+        "bg": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "alert.css"
+        },
+        "border": {
+          "fallback": "transparent",
+          "file": "alert.css"
+        },
+        "close-size": {
+          "fallback": "max(1.5rem, 24px)",
+          "file": "alert.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "alert.css"
+        },
+        "font-size": {
+          "fallback": "var(--rind-text-sm)",
+          "file": "alert.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-3)",
+          "file": "alert.css"
+        },
+        "icon-size": {
+          "fallback": "1.25em",
+          "file": "alert.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-3) var(--rind-space-4)",
+          "file": "alert.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-md)",
+          "file": "alert.css"
+        },
+        "text": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "alert.css"
+        },
+        "title-font-weight": {
+          "fallback": "600",
+          "file": "alert.css"
+        }
+      }
+    },
     "alert-dialog": {
       "family": "panel",
       "tokens": {
@@ -822,6 +871,31 @@
         }
       }
     },
+    "image": {
+      "family": "decoration",
+      "tokens": {
+        "aspect-ratio": {
+          "fallback": "auto",
+          "file": "image.css"
+        },
+        "fallback-bg": {
+          "fallback": "var(--rind-color-neutral-soft)",
+          "file": "image.css"
+        },
+        "fallback-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "image.css"
+        },
+        "fit": {
+          "fallback": "cover",
+          "file": "image.css"
+        },
+        "radius": {
+          "fallback": "0",
+          "file": "image.css"
+        }
+      }
+    },
     "indicator": {
       "family": null,
       "tokens": {
@@ -894,6 +968,55 @@
         "underline-offset": {
           "fallback": "0.22em",
           "file": "link.css"
+        }
+      }
+    },
+    "meter": {
+      "family": "range",
+      "tokens": {
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "meter.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "meter.css"
+        },
+        "even-less-good-bg": {
+          "fallback": "var(--rind-color-danger-solid)",
+          "file": "meter.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "meter.css"
+        },
+        "indicator-bg": {
+          "fallback": "var(--_fill)",
+          "file": "meter.css"
+        },
+        "length": {
+          "fallback": "8rem",
+          "file": "meter.css"
+        },
+        "suboptimum-bg": {
+          "fallback": "var(--rind-color-warning-solid)",
+          "file": "meter.css"
+        },
+        "track-bg": {
+          "fallback": "var(--rind-color-neutral-soft)",
+          "file": "meter.css"
+        },
+        "track-radius": {
+          "fallback": "var(--rind-radius-full)",
+          "file": "meter.css"
+        },
+        "track-size": {
+          "fallback": "0.5rem",
+          "file": "meter.css"
+        },
+        "value-color": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "meter.css"
         }
       }
     },
@@ -1060,6 +1183,63 @@
         "shadow": {
           "fallback": "var(--rind-shadow-sm)",
           "file": "popover.css"
+        }
+      }
+    },
+    "progress": {
+      "family": "range",
+      "tokens": {
+        "color": {
+          "fallback": "var(--rind-color-text)",
+          "file": "progress.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "progress.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "progress.css"
+        },
+        "indeterminate-duration": {
+          "fallback": "1.4s",
+          "file": "progress.css"
+        },
+        "indicator-bg": {
+          "fallback": "var(--_indicator, var(--rind-color-accent-solid))",
+          "file": "progress.css"
+        },
+        "length": {
+          "fallback": "8rem",
+          "file": "progress.css"
+        },
+        "ring-size": {
+          "fallback": "2.5rem",
+          "file": "progress.css"
+        },
+        "ring-thickness": {
+          "fallback": "10",
+          "file": "progress.css"
+        },
+        "stripe": {
+          "fallback": "color-mix(in oklab, var(--rind-color-accent-on-solid) 40%, transparent)",
+          "file": "progress.css"
+        },
+        "track-bg": {
+          "fallback": "var(--rind-color-neutral-soft)",
+          "file": "progress.css"
+        },
+        "track-radius": {
+          "fallback": "var(--rind-radius-full)",
+          "file": "progress.css"
+        },
+        "track-size": {
+          "fallback": "0.5rem",
+          "file": "progress.css"
+        },
+        "value-color": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "progress.css"
         }
       }
     },

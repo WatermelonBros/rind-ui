@@ -45,4 +45,4 @@
 
 ## 10. Proof
 
-- [ ] 10.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green
+- [x] 10.1 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green

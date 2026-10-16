@@ -38,6 +38,8 @@
 }
 [data-skinned] [data-scope="alert"][data-part="description"] {
   grid-area: description;
+  /* The generic field description is muted ink; on a tinted alert it must follow the root. */
+  color: inherit;
 }
 [data-skinned] [data-scope="alert"][data-part="close-trigger"] {
   grid-area: close;
