@@ -35,8 +35,8 @@
 
 ## 7. Stories
 
-- [ ] 7.1 Default, destructive confirm, async confirm (cancel + pending UI + close on resolve), alert inside a dialog, form with submit-type action, Escape vetoed; state stories `open`/`closed` — pending: becomes a site example (change retire-storybook); no Storybook story
-- [ ] 7.2 Driver story; all stories pass axe — pending: becomes a site example (change retire-storybook); no Storybook story
+- [x] 7.1 Default, destructive confirm, async confirm (cancel + pending UI + close on resolve), alert inside a dialog, form with submit-type action, Escape vetoed; state stories `open`/`closed` — moved to retire-storybook (task 1.6: site examples)
+- [x] 7.2 Driver story; all stories pass axe — moved to retire-storybook (task 1.6: site examples)
 
 ## 8. Docs and manual checks
 
