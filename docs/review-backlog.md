@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-slider (impl) | — | vitest jsdom project | jsdom 30 under this repo's Vitest config throws "Decimal is not a constructor" when a range input's `validity` is read (decimal.js interop; plain Node is fine): Slider-in-Field and form-submit scenarios run in browser mode only (`validityIt`). Number Input will hit it too; find the condition/interop cause |
+| add-slider (impl) | — | apps/site/examples/slider.tsx | No `dragging` state example or ARIA snapshot (a static page cannot hold a drag); revisit with retire-storybook 2.3 state coverage |
+| add-slider (impl) | — | packages/testing/fixtures/slider/slider.pw.test.ts | Bundles its own page with rolldown; move to `openExample` when retire-storybook 2.1 lands |
+| add-slider (impl) | — | slider.dom.test.tsx (RX#570) | A vertical swipe scrolling the page over a horizontal Slider is asserted only through `touch-action: pan-y pinch-zoom`; the real-touch check belongs to the manual device protocol |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx:~66 | warnKey omits aria-value* and tag; tabIndex "0" (string) skips the splitter warning — add VALUE_ATTRS to the key, normalise Number(tabIndex) |
 | add-separator (r1) | — | packages/react/src/separator/separator.tsx (tag) | function/component render: first render assumes div (role=separator on an <hr>) until the layout effect — harmless, document |
 | add-separator (r1) | — | packages/testing/src/adapters/dom.ts:232 + driver docs | `part` anchor never matches the container itself and only data-scope=separator root (host-drawn toolbar separators found only by role/name) — document; add-toolbar decides |

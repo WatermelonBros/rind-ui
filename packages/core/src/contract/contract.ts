@@ -224,6 +224,18 @@ export interface ContractDef<
   readonly exceptions?: readonly Exception<NoInfer<P>>[]
   /** The `form-associated` trait: what the hidden input must hold, and silent events. */
   readonly formInput?: FormInputDecl
+  /** The `valued` trait's expectations (model-based-testing "Valued Trait Expectations"). */
+  readonly valued?: ValuedDecl
+}
+
+/**
+ * Expected values of a `valued` contract, matched in DOM order to the elements carrying
+ * `aria-valuenow` or a valued role (one per thumb); `null`: no value (indeterminate).
+ */
+export interface ValuedDecl {
+  readonly values: (view: View) => readonly (number | null)[]
+  /** Each element's expected `aria-valuetext`; otherwise only a plain `String(value)` is compared. */
+  readonly valueText?: (view: View, index: number) => string
 }
 
 /**
@@ -234,16 +246,26 @@ export interface ContractDef<
 export interface FormInputDecl {
   /** One hidden input per item (a group): each is compared, and their events summed. */
   readonly multiple?: boolean
+  /**
+   * The inputs are themselves the accessible controls (hidden-form-input "Accessible Native
+   * Input", Slider thumbs): exempt from the aria-hidden, tabIndex and never-focused checks.
+   */
+  readonly accessible?: boolean
   readonly expected: (
     values: Readonly<Record<string, unknown>>,
-    /** The input compared (its submitted `value`), for `multiple`. */
-    input?: { readonly value: string },
+    /** The input compared (its submitted `value` and its position among the inputs). */
+    input?: { readonly value: string; readonly index: number },
   ) => {
     readonly checked?: boolean
     readonly indeterminate?: boolean
     readonly value?: string
   }
   readonly silentEvents?: readonly string[]
+  /**
+   * Events whose action makes the browser dispatch one `change` itself (assistive technology
+   * adjusting an accessible native input): one change each, whether or not the value changes.
+   */
+  readonly nativeEvents?: readonly string[]
 }
 
 export interface Announcements<Q> {
@@ -302,6 +324,7 @@ export interface AnyContract {
     readonly check: (ctx: never) => unknown
   }[]
   readonly formInput?: FormInputDecl
+  readonly valued?: ValuedDecl
 }
 
 /**

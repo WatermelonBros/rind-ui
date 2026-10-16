@@ -91,7 +91,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec |  |
+| Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done |  |
 | Button |  |  | ● | ● | ● | ● |  | ● | ● | 6 | 1 | done |  |
 | Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | spec | Number Field |
 | Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Radix/Base: OTP Field |

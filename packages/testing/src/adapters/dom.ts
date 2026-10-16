@@ -447,6 +447,70 @@ function createDomEnv(
           )
         } else await act(() => u.click(hit))
       },
+      box: async () => {
+        const r = (await now()).getBoundingClientRect()
+        // jsdom has no layout: every box is 0 × 0.
+        return r.width === 0 && r.height === 0
+          ? null
+          : { x: r.x, y: r.y, width: r.width, height: r.height }
+      },
+      async pointer(phase, pointerOptions) {
+        const el = await waitFor()
+        const r = el.getBoundingClientRect()
+        if (r.width === 0 && r.height === 0) {
+          throw new Error(
+            `${label}: pointer("${phase}") needs layout, which this environment does not have`,
+          )
+        }
+        const clientX = r.left + pointerOptions.at.x * r.width
+        const clientY = r.top + pointerOptions.at.y * r.height
+        const pointerType = pointerOptions.pointerType ?? "mouse"
+        // A press reaches what is on top at that point, as a real pointer's would.
+        const target = (phase === "down" ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const pressing = phase === "down" || phase === "move"
+        const type = {
+          down: "pointerdown",
+          move: "pointermove",
+          up: "pointerup",
+          cancel: "pointercancel",
+        }[phase]
+        await act(() => {
+          const init = {
+            bubbles: true,
+            cancelable: phase !== "cancel",
+            composed: true,
+            pointerId: pointerType === "mouse" ? 1 : 2,
+            pointerType,
+            isPrimary: true,
+            clientX,
+            clientY,
+            button: phase === "move" ? -1 : 0,
+            buttons: pressing ? 1 : 0,
+            pressure: pressing ? 0.5 : 0,
+          }
+          const event = new PointerEvent(type, init)
+          target.dispatchEvent(event)
+          // A mouse's compatibility events (none after a prevented pointerdown, per spec).
+          if (pointerType === "mouse" && phase !== "cancel" && !event.defaultPrevented) {
+            const mouse = { down: "mousedown", move: "mousemove", up: "mouseup" }[phase]
+            target.dispatchEvent(
+              new MouseEvent(mouse, { ...init, detail: phase === "move" ? 0 : 1 }),
+            )
+          }
+        })
+      },
+      async fill(value) {
+        const el = await waitFor()
+        await act(() => {
+          const input = el as HTMLInputElement
+          // The prototype's setter, so a framework's value tracker sees a real change.
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, value)
+          else input.value = value
+          input.dispatchEvent(new Event("input", { bubbles: true }))
+          input.dispatchEvent(new Event("change", { bubbles: true }))
+        })
+      },
       waitForDetach: async () => {
         await until(
           async () => (await resolve()).length,

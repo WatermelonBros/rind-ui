@@ -24,6 +24,7 @@ import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
+import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as textField from "./text-field"
@@ -64,6 +65,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
   separator,
+  slider,
   switch: switchEx,
   tabs,
   "text-field": textField,

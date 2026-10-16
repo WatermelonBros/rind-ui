@@ -28,8 +28,6 @@ A request to `add-theme-system` is listed in design.md.
 - An opt-in completion announcement through the Announcer — Progress is never a live
   region.
 - The NVDA name workaround as a registered quirk entry.
-- `model-based-testing`: the `valued` invariant extended to value lists (multi-thumb),
-  indeterminate values and contract-declared expected text.
 - `getProgress` driver, model tests over prop steps, `progress.css` (bar, ring,
   indeterminate and reduced-motion visuals, forced colors), stories, docs.
 
@@ -42,7 +40,8 @@ A request to `add-theme-system` is listed in design.md.
 
 ### Modified Capabilities
 
-- `model-based-testing`: ADDED requirement extending the `valued` trait.
+None. The `valued` extension (lists, `null`, contract value text) moved to `add-slider`,
+which ships first.
 
 ## Non-goals
 
@@ -56,7 +55,7 @@ A request to `add-theme-system` is listed in design.md.
 
 - New: `packages/core/src/components/progress/`,
   `packages/core/src/components/shared/range-value.ts`, `packages/react/src/progress/`,
-  `getProgress`, `valued` trait extension in `@rind-ui/testing`,
+  `getProgress` in `@rind-ui/testing`,
   `packages/theme/src/progress.css`, stories, docs page; one quirk entry.
 - Reado: `guided/SessionProgress.tsx` migrates to Progress.
 - No new dependency.

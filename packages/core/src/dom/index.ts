@@ -116,6 +116,16 @@ export {
   readPlatform,
   withEngine,
 } from "./platform"
+export {
+  type DragAxis,
+  type DragMessage,
+  isDragPress,
+  type PointerDragCapability,
+  type PointerDragSession,
+  pointerDragSession,
+  pointerFraction,
+  startDrag,
+} from "./pointer-drag"
 export { pointerMoved } from "./pointer-guard"
 export {
   PORTAL_HOST_ATTRIBUTES,
@@ -156,6 +166,7 @@ export {
 } from "./selection-indicator"
 export { hasTabbable, observeTabbable } from "./tabbable-content"
 export { isTextField, textFieldCaret } from "./text-field"
+export { textSelection } from "./text-selection"
 export { injectTouchAction, TOUCH_ACTION_RULE } from "./touch-action"
 export { supportsUntilFound, type UntilFoundOptions, untilFound } from "./until-found"
 export {

@@ -64,6 +64,21 @@ export interface ClickOptions {
   readonly button?: "primary" | "middle"
 }
 
+/** A part's bounding box in CSS pixels. */
+export interface PartBox {
+  readonly x: number
+  readonly y: number
+  readonly width: number
+  readonly height: number
+}
+
+export interface PointerStepOptions {
+  /** Where, as fractions of the part's box (0 to 1). */
+  readonly at: { readonly x: number; readonly y: number }
+  /** Default "mouse". One pointer id is kept across a gesture (down, moves, up). */
+  readonly pointerType?: "mouse" | "pen" | "touch"
+}
+
 /** A lazy handle, like a Playwright Locator: resolved on every call, never cached. */
 export interface Part {
   click(options?: ClickOptions): Promise<void>
@@ -85,6 +100,18 @@ export interface Part {
    * whose centre is covered by the dialog content it surrounds).
    */
   pressAtPosition(options?: { readonly corner?: boolean }): Promise<void>
+  /** The part's bounding box, or `null` when the environment has no layout (jsdom). */
+  box(): Promise<PartBox | null>
+  /**
+   * One pointer step at a position inside the part, so a contract drives each machine step of
+   * a drag (`cancel`: the browser's pointercancel). Rejects without layout.
+   */
+  pointer(phase: "down" | "move" | "up" | "cancel", options: PointerStepOptions): Promise<void>
+  /**
+   * Sets a native input's value through the property setter and dispatches bubbling `input`
+   * and `change`, with no key or pointer event: what assistive technology does.
+   */
+  fill(value: string): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */

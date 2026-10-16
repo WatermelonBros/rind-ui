@@ -23,7 +23,7 @@
 ## 5. Contract and driver
 
 - [ ] 5.1 `progress.contract.ts`: locate, queries, prop steps, announcements, trait `valued` with `values(view)`
-- [ ] 5.2 `valued` extension in `@rind-ui/testing` per `model-based-testing` (lists, `null`, contract value text, locale grouping); broken fixtures prove it fails for a stale thumb, a `aria-valuenow` on an indeterminate bar
+- [ ] 5.2 Use the `valued` extension shipped by `add-slider` (`model-based-testing` "Valued Trait Expectations"); broken fixture proves it fails for an `aria-valuenow` on an indeterminate bar
 - [ ] 5.3 `getProgress` exported; same driver test in `browser`, `jsdom` and Playwright
 
 ## 6. Model-based tests

@@ -15,6 +15,7 @@ export type {
   Done,
   EventMapping,
   Exception,
+  FormInputDecl,
   Invariant,
   InvariantContext,
   ModalitiesOf,
@@ -25,6 +26,7 @@ export type {
   Semantics,
   Skip,
   Trait,
+  ValuedDecl,
 } from "./contract"
 export { contract, STATIC_MACHINE, staticContract } from "./contract"
 export type {
@@ -36,7 +38,9 @@ export type {
   KeyOptions,
   Modality,
   Part,
+  PartBox,
   PartHoverOptions,
+  PointerStepOptions,
 } from "./env"
 export type { GenericInvariantId } from "./invariant-ids"
 export { positioningQueries } from "./positioning"

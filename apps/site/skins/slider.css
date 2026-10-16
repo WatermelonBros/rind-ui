@@ -1,0 +1,81 @@
+/* ── Slider: a bar with a filled span and round thumbs; positions come from core inline ── */
+[data-skinned] [data-scope="slider"][data-part="root"] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  inline-size: min(100%, 22rem);
+}
+[data-skinned] [data-scope="slider"][data-part="root"][data-orientation="vertical"] {
+  grid-template-columns: auto;
+  inline-size: auto;
+  block-size: 100%;
+  justify-items: center;
+}
+[data-skinned] [data-scope="slider"][data-part="label"] {
+  font-weight: 500;
+}
+[data-skinned] [data-scope="slider"][data-part="control"] {
+  grid-column: 1 / -1;
+  block-size: 28px;
+  cursor: pointer;
+}
+[data-skinned] [data-scope="slider"][data-part="control"][data-orientation="vertical"] {
+  inline-size: 28px;
+  block-size: 100%;
+  min-block-size: 8rem;
+}
+[data-skinned] [data-scope="slider"][data-part="track"] {
+  position: absolute;
+  inset-inline: 0;
+  inset-block: 50%;
+  block-size: 8px;
+  translate: 0 -50%;
+  border-radius: 99px;
+  border: var(--s-bw) solid var(--s-line);
+  background: var(--s-muted);
+}
+[data-skinned] [data-scope="slider"][data-part="track"][data-orientation="vertical"] {
+  inset-inline: 50%;
+  inset-block: 0;
+  inline-size: 8px;
+  block-size: auto;
+  translate: -50% 0;
+}
+[data-skinned] [data-scope="slider"][data-part="indicator"] {
+  inset-block: 50%;
+  block-size: 8px;
+  translate: 0 -50%;
+  border-radius: 99px;
+  background: var(--s-brand);
+}
+[data-skinned] [data-scope="slider"][data-part="indicator"][data-orientation="vertical"] {
+  inset-block: auto;
+  inset-inline: 50%;
+  inline-size: 8px;
+  translate: -50% 0;
+}
+[data-skinned] [data-scope="slider"][data-part="thumb"] {
+  inline-size: 22px;
+  block-size: 22px;
+  border-radius: 50%;
+  border: var(--s-bw) solid var(--s-line);
+  background: #fff;
+  box-sizing: border-box;
+}
+[data-skinned] [data-scope="slider"][data-part="thumb"][data-dragging] {
+  background: var(--s-brand);
+}
+[data-skinned] [data-scope="slider"][data-part="thumb"][data-disabled],
+[data-skinned] [data-scope="slider"][data-part="root"][data-disabled] {
+  opacity: 0.5;
+}
+[data-skinned] [data-scope="slider"][data-part="marker"] {
+  inline-size: 2px;
+  block-size: 12px;
+  background: var(--s-line);
+}
+[data-skinned] [data-scope="slider"][data-part="marker"][data-orientation="vertical"] {
+  inline-size: 12px;
+  block-size: 2px;
+}

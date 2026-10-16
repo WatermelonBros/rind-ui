@@ -587,6 +587,8 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
     },
     compose: async () => {},
     pressAtPosition: async () => {},
+    pointer: async () => {},
+    fill: async () => {},
     hover: async () => {
       if (mode !== "touch-hover") return
       state.used = true
@@ -851,11 +853,25 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       stepAnnouncements: (await base.announcements()).slice(announcedBefore),
       observed: seen,
       ...(contract.announcements ? { announcements: contract.announcements } : {}),
+      ...(contract.valued
+        ? {
+            valued: {
+              values: contract.valued.values(oracle.service.view()),
+              ...(contract.valued.valueText
+                ? {
+                    valueText: (i: number) =>
+                      contract.valued?.valueText?.(oracle.service.view(), i) ?? "",
+                  }
+                : {}),
+            },
+          }
+        : {}),
       ...(contract.formInput
         ? {
             formInput: {
               ...(contract.formInput.multiple ? { multiple: true } : {}),
-              expected: (input: { readonly value: string }) =>
+              ...(contract.formInput.accessible ? { accessible: true } : {}),
+              expected: (input: { readonly value: string; readonly index: number }) =>
                 contract.formInput?.expected(
                   oracle.service.view().values as Record<string, unknown>,
                   input,
@@ -1103,7 +1119,10 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           }
           const valuesBefore = JSON.stringify(oracle.service.view().values)
           send(edge.event, { ...mapping.event?.(oracle.service.view()), modality: stepMod })
-          if (
+          if (contract.formInput?.nativeEvents?.includes(edge.event)) {
+            // The browser's own change, dispatched whatever the component does with it.
+            userChanges += 1
+          } else if (
             JSON.stringify(oracle.service.view().values) !== valuesBefore &&
             !contract.formInput?.silentEvents?.includes(edge.event)
           ) {
