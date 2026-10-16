@@ -140,9 +140,12 @@ exact accessible name, with:
 ### Requirement: Search Field Invariants
 
 The contract SHALL ship invariants checked after every model step: exactly one `searchbox`;
-`data-empty` holds exactly when the oracle value is empty; an Escape step on a non-empty
-editable field left focus in the input and called `preventDefault()`; an Escape step on an
-empty field did not; no step marked `composing` called `onSubmit` or cleared the value.
+`data-empty` holds exactly when the input's value is empty (the oracle does not model typed
+text). `@rind-ui/testing` SHALL ship `searchFieldStepInvariants` (they read each step's key
+events): an Escape on a non-empty editable field left focus in the input and called
+`preventDefault()`; an Escape on an empty or non-editable field did not; no key marked
+`composing` (the event's or the component's composition) called `onSubmit` or cleared the
+value.
 
 #### Scenario: Broken variant always consumes Escape
 

@@ -23,6 +23,8 @@
 @import "./fieldset.css";
 @import "./field.css";
 @import "./text-field.css";
+@import "./password-input.css";
+@import "./search-field.css";
 @import "./number-input.css";
 @import "./collapsible.css";
 @import "./toggle.css";

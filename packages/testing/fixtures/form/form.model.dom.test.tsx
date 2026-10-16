@@ -1,11 +1,17 @@
 // Model-based tests: the Form contract over a story-like render with three Fields, one of
 // them async (tasks 5.1), and broken variants that must fail readably (5.2).
-import { type FormErrors, formContract, formMessages, platforms } from "@rind-ui/core"
+import {
+  type FormErrors,
+  formContract,
+  formMessages,
+  PENDING_ANNOUNCEMENTS,
+  platforms,
+} from "@rind-ui/core"
 import { Field, Form, type FormActions, RindProvider } from "@rind-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useEffect, useRef, useState } from "react"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import {
   currentRun,
   domEnv,
@@ -98,6 +104,7 @@ function Story({
           actions.current?.validate()
           // Broken: validate() also moves focus to the first invalid control.
           if (cfg.flaw === "focus-on-validate") {
+            // fake-time: the app's deferred focus move under test; checks wait on conditions
             setTimeout(() => document.querySelector<HTMLElement>("input[aria-invalid]")?.focus(), 0)
           }
         }}
@@ -116,6 +123,7 @@ function OrderBreaker() {
     const form = document.querySelector("form")
     if (!form) return
     const onInvalid = () =>
+      // fake-time: the app's deferred focus move under test; checks wait on conditions
       setTimeout(() => {
         // The first mounted Field is the last one in the DOM when another was inserted above.
         const all = [...form.querySelectorAll<HTMLInputElement>("input[aria-invalid]")]
@@ -263,7 +271,9 @@ async function failuresOf(
   }
   untrack()
   // Announcements are debounced: let the ones this run queued be spoken before the next.
-  await new Promise((r) => setTimeout(r, 800))
+  await vi.waitFor(() =>
+    expect((Reflect.get(globalThis, PENDING_ANNOUNCEMENTS) as number | undefined) ?? 0).toBe(0),
+  )
   return out
 }
 

@@ -8,6 +8,18 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, createDriverWith, playwrightEnv } from "../../src/index"
 import { openExample, type SiteServer, serveSite } from "../harness"
 
+/** Drains animation frames in the page (a condition-free "let it settle"). */
+const frames = (page: Page, count = 6) =>
+  page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
+        step(n)
+      }),
+    count,
+  )
+
 let site: SiteServer
 let browser: Browser
 
@@ -123,10 +135,7 @@ describe("generic invariants on every Link story", () => {
         await el.dispatchEvent("click", { detail: 0 })
         await expect.poll(() => routerCalls(page)).toBe(before + 1)
         // And no second activation: drained, not waited for.
-        await page.evaluate(
-          () =>
-            new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
-        )
+        await frames(page)
         expect(await routerCalls(page)).toBe(before + 1)
       }
     })

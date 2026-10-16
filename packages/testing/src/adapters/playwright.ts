@@ -212,9 +212,11 @@ function createPlaywrightEnv(
       ? root.getByRole(by.role as Parameters<Page["getByRole"]>[0], {
           ...(by.name === undefined ? {} : { name: by.name, exact: true }),
         })
-      : "part" in by
-        ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
-        : root.getByText(by.text, { exact: true })
+      : "label" in by
+        ? root.getByLabel(by.label, { exact: true })
+        : "part" in by
+          ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
+          : root.getByText(by.text, { exact: true })
 
   const describeAll = (l: Locator) =>
     l.evaluateAll((els) => els.map((el) => el.outerHTML.slice(0, 160)).join("\n"))

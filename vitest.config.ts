@@ -1,3 +1,4 @@
+import { availableParallelism } from "node:os"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
 
@@ -43,16 +44,28 @@ const ciRetry = process.env["CI"] ? 1 : 0
 // unchanged in jsdom (through @rind-ui/testing/setup) and in real browsers.
 const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
 
+// Locally the machine is shared by several sessions: at most half the cores per run unless
+// RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
+const maxWorkers = process.env["CI"]
+  ? undefined
+  : Number(process.env["RIND_MAX_WORKERS"]) || Math.max(1, Math.floor(availableParallelism() / 2))
+
+// `expect.poll` waits on a condition; its timeout is only the failure deadline, and a loaded
+// machine (several sessions, CI) needs more than Vitest's 1 s default.
+const patient = { poll: { timeout: 5000 } }
+
 export default defineConfig({
   resolve,
   ssr,
   test: {
+    ...(maxWorkers === undefined ? {} : { maxWorkers }),
     projects: [
       {
         resolve,
         ssr,
         test: {
           name: "node",
+          expect: patient,
           environment: "node",
           include: [
             "packages/*/{src,fixtures}/**/*.test.{ts,tsx}",
@@ -73,6 +86,7 @@ export default defineConfig({
         ssr,
         test: {
           name: "jsdom",
+          expect: patient,
           environment: "jsdom",
           // Globals let Testing Library and @rind-ui/testing/setup register afterEach.
           globals: true,
@@ -87,6 +101,7 @@ export default defineConfig({
         ssr,
         test: {
           name: "setup-noglobals",
+          expect: patient,
           environment: "jsdom",
           globals: false,
           include: ["packages/testing/src/setup-noglobals/*.noglobals.test.{ts,tsx}"],
@@ -99,6 +114,7 @@ export default defineConfig({
         ssr,
         test: {
           name: "setup-optout",
+          expect: patient,
           environment: "jsdom",
           globals: false,
           include: ["packages/testing/src/setup-noglobals/*.optout.test.{ts,tsx}"],
@@ -112,6 +128,7 @@ export default defineConfig({
         resolve,
         test: {
           name: "browser",
+          expect: patient,
           // `*.browser.test.*`: needs real input (vitest/browser's userEvent), browser only.
           include: [...dom, "packages/*/{src,fixtures}/**/*.browser.test.{ts,tsx}"],
           browser: browser("browser", classicScrollbars),
@@ -128,6 +145,7 @@ export default defineConfig({
         ssr,
         test: {
           name: "playwright",
+          expect: patient,
           environment: "node",
           include: ["packages/*/fixtures/**/*.pw.test.ts"],
           // Each test launches real browsers (Firefox is slow to start under load). A deadline,

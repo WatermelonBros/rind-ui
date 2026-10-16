@@ -14,7 +14,7 @@
     },
     "//#test:vitest": {
       "dependsOn": ["@rind-ui/site#build", "@rind-ui/testing#build"],
-      "env": ["RIND_BROWSERS"],
+      "env": ["RIND_BROWSERS", "RIND_MAX_WORKERS"],
       "outputs": []
     }
   }

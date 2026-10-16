@@ -7,6 +7,18 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getSegmentedControl, playwrightEnv } from "../../src/index"
 import { openExample, type SiteServer, serveSite } from "../harness"
 
+/** Drains animation frames in the page (a condition-free "let it settle"). */
+const frames = (page: Page, count = 6) =>
+  page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
+        step(n)
+      }),
+    count,
+  )
+
 let site: SiteServer
 let browser: Browser
 
@@ -118,7 +130,9 @@ describe("segmented control driver through Playwright", () => {
       if (id === "conditional-mount")
         await page.getByRole("button", { name: "Toggle control" }).click()
       await page.locator('[data-part="indicator"][data-state="visible"]').waitFor()
-      await page.waitForTimeout(400) // past the transition
+      // Past the transition: every running animation/transition has finished.
+      await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)))
+      await frames(page)
       const [ind, on] = await Promise.all([
         page.locator('[data-part="indicator"]').boundingBox(),
         page.locator('[role="radio"][aria-checked="true"]').boundingBox(),

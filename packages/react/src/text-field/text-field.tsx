@@ -6,6 +6,7 @@ import {
   focusSafely,
   type MessageOverrides,
   mergeFieldProps,
+  type PartProps,
   type TextFieldDetails,
   type TextFieldMessages,
   type TextFieldReason,
@@ -29,6 +30,7 @@ import {
 import { useFieldBindingPeek, useFieldControl } from "../field/field"
 import { FieldHost, HostDescription, HostErrorMessage, HostLabel } from "../field/use-field-host"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
+import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment, useMessages } from "../provider"
@@ -48,7 +50,48 @@ declare module "../provider" {
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 const { machine: textFieldMachine } = buildTextFieldMachine({})
 
+/**
+ * What a Text Field preset (Password Input, Search Field) adds to the shared host: its scope,
+ * machine and message defaults, its own Root props turned into machine props, and extra
+ * Root / Input attributes. The empty preset is Text Field.
+ */
+export interface TextFieldHostConfig {
+  readonly scope: string
+  /** A machine from `buildTextFieldMachine`. */
+  readonly machine: typeof textFieldMachine
+  /** Message defaults (Text Field's merged with the preset's). */
+  readonly messages: TextFieldMessages
+  /** Names the parts in errors ("PasswordInput"). */
+  readonly label: string
+  /** The preset's own Root props: kept from the Field, passed to `machineProps`. */
+  readonly ownProps?: readonly string[]
+  readonly machineProps?: (
+    own: Readonly<Record<string, unknown>>,
+    host: TextFieldHostRefs,
+  ) => Readonly<Record<string, unknown>>
+  /** Extra Root attributes from the state. */
+  readonly rootData?: (ctx: TextFieldHostContext) => Readonly<Record<string, string | undefined>>
+  /** Extra Input attributes and handlers (joined after Text Field's). */
+  readonly inputProps?: (ctx: TextFieldHostContext) => PartProps
+  /** Runs after every commit, in the same frame (a preset's DOM follow-up). */
+  readonly afterRender?: (ctx: TextFieldHostContext) => void
+}
+
+/** Refs a preset's machine props may close over. */
+export interface TextFieldHostRefs {
+  readonly controlEl: { current: HTMLInputElement | HTMLTextAreaElement | null }
+  readonly env: ReturnType<typeof useEnvironment>
+  /** A selection to restore after the next commit (a preset's `type` change). */
+  readonly pendingSelection: { current: readonly [number, number] | null }
+}
+
 interface Ctx {
+  readonly config: TextFieldHostConfig
+  /** The preset's own Root props. */
+  readonly own: Readonly<Record<string, unknown>>
+  /** Registered parts of a preset (e.g. a mounted ClearTrigger). */
+  readonly mounted: { readonly clearTriggers: number; readonly triggers: number }
+  readonly setMounted: (part: "clearTriggers" | "triggers", delta: 1 | -1) => void
   readonly scope: string
   readonly instance: string
   readonly view: ReturnType<typeof useMachine<typeof textFieldMachine>>["view"]
@@ -67,6 +110,10 @@ interface Ctx {
   readonly setCount: (state: CountState | null) => void
   readonly setMaxLength: (n: number | undefined) => void
   readonly controlEl: { current: HTMLInputElement | HTMLTextAreaElement | null }
+  /** The control's id once rendered (a preset's `aria-controls`). */
+  readonly controlId: string | undefined
+  readonly setControlId: (id: string | undefined) => void
+  readonly pendingSelection: { current: readonly [number, number] | null }
   readonly takeReason: () => TextFieldReason | undefined
   readonly controls: { current: number }
 }
@@ -76,12 +123,18 @@ interface CountState {
   readonly count: ((value: string) => number) | undefined
 }
 
+/** The host's state, for a preset's own parts. */
+export type TextFieldHostContext = Ctx
+
 const TextFieldContext = createContext<Ctx | null>(null)
 function useTextField(part: string): Ctx {
   const ctx = useContext(TextFieldContext)
-  if (!ctx) throw new Error(`TextField.${part} must be inside TextField.Root`)
+  if (!ctx) throw new Error(`${part} must be inside its Root`)
   return ctx
 }
+
+/** A preset part's access to its host (`part` names it in the error). */
+export const useTextFieldHost = (part: string): TextFieldHostContext => useTextField(part)
 
 export type TextFieldRootProps = Omit<ComponentPropsWithRef<"div">, "children" | "defaultValue"> & {
   readonly children?: ReactNode
@@ -107,23 +160,46 @@ export type TextFieldRootProps = Omit<ComponentPropsWithRef<"div">, "children" |
   readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
 
-function Root({
-  value,
-  defaultValue,
-  onValueChange,
-  focusableWhenDisabled = false,
-  countThreshold,
-  messages: ownMessages,
-  fieldMessages: ownFieldMessages,
-  children,
-  id,
-  ...fieldProps
-}: TextFieldRootProps) {
-  const scope = "text-field"
+/** A Root on the shared host: Text Field's, or a preset's (`config`). */
+export function createTextFieldRoot<P extends Omit<TextFieldRootProps, "onSubmit">>(
+  config: TextFieldHostConfig,
+) {
+  return function Root(props: P) {
+    // Sound: a preset's own props (`config.ownProps`) are split off before Text Field's are
+    // read, so the rest is Text Field's Root props.
+    return <HostRoot config={config} props={props as TextFieldRootProps} />
+  }
+}
+
+function HostRoot({
+  config,
+  props: all,
+}: {
+  readonly config: TextFieldHostConfig
+  readonly props: TextFieldRootProps
+}) {
+  const ownKeys = new Set(config.ownProps ?? [])
+  const own: Record<string, unknown> = {}
+  const passed: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(all)) (ownKeys.has(k) ? own : passed)[k] = v
+  const {
+    value,
+    defaultValue,
+    onValueChange,
+    focusableWhenDisabled = false,
+    countThreshold,
+    messages: ownMessages,
+    fieldMessages: ownFieldMessages,
+    children,
+    id,
+    ...fieldProps
+  } = passed as TextFieldRootProps
+  const scope = config.scope
   const env = useEnvironment()
   const generated = useId()
   const instance = id ?? generated
-  const messages = useMessages("text-field", textFieldMessages, ownMessages)
+  // A preset's scope reuses the provider's overrides of its own scope (typed per preset).
+  const messages = useMessages(scope as "text-field", config.messages, ownMessages)
   const enclosing = useFieldBindingPeek()
   const fieldsetDisabled = useFieldsetDisabled()
   const disabled =
@@ -135,9 +211,17 @@ function Root({
   const controlEl = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null)
   const reason = useRef<TextFieldReason | undefined>(undefined)
   const controls = useRef(0)
+  const pendingSelection = useRef<readonly [number, number] | null>(null)
+  const [controlId, setControlId] = useState<string | undefined>(undefined)
   const latestOnChange = useRef(onValueChange)
   latestOnChange.current = onValueChange
-  const { view, send } = useMachine(textFieldMachine, {
+  const [mounted, setMountedState] = useState({ clearTriggers: 0, triggers: 0 })
+  const [setMounted] = useState(
+    () => (part: "clearTriggers" | "triggers", delta: 1 | -1) =>
+      setMountedState((m) => ({ ...m, [part]: m[part] + delta })),
+  )
+  const { view, send } = useMachine(config.machine, {
+    ...config.machineProps?.(own, { controlEl, env, pendingSelection }),
     value: value === undefined ? undefined : (value ?? ""),
     defaultValue: defaultValue ?? "",
     onValueChange: (v, details) => {
@@ -200,6 +284,10 @@ function Root({
     }
   }
   const ctx: Ctx = {
+    config,
+    own,
+    mounted,
+    setMounted,
     scope,
     instance,
     view,
@@ -217,14 +305,19 @@ function Root({
     setCount,
     setMaxLength,
     controlEl,
+    controlId,
+    setControlId,
+    pendingSelection,
     takeReason: () => reason.current,
     controls,
   }
+  useIsoLayoutEffect(() => config.afterRender?.(ctx))
   const rootData = {
     "data-focus": view.context.focused ? "" : undefined,
     "data-focus-visible":
       view.context.focused && modality !== "pointer" && modality !== "touch" ? "" : undefined,
     "data-composing": view.matches("composing") ? "" : undefined,
+    ...config.rootData?.(ctx),
   }
   return (
     <FieldHost
@@ -272,6 +365,7 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
     }
   }, [ctx.controls])
   useIsoLayoutEffect(() => ctx.setMaxLength(maxLength), [maxLength, ctx.setMaxLength])
+  useIsoLayoutEffect(() => ctx.setControlId(controlId), [controlId, ctx.setControlId])
   const register = binding?.register
   useIsoLayoutEffect(() => {
     ctx.controlEl.current = el.current
@@ -361,13 +455,14 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
       takeReason: ctx.takeReason,
     },
   )
-  const merged = mergeProps(
-    {
-      ...normalizeProps({ ...api.control(part), maxlength: maxLength, "aria-label": ariaLabel }),
-      ref: composeRefs(el, ref),
-    },
-    rest,
-  )
+  const own = normalizeProps({
+    ...api.control(part),
+    maxlength: maxLength,
+    "aria-label": ariaLabel,
+  })
+  // A preset's input attributes win; its handlers run after Text Field's.
+  const preset = ctx.config.inputProps ? normalizeProps(ctx.config.inputProps(ctx)) : {}
+  const merged = mergeProps({ ...joinHandlers(own, preset), ref: composeRefs(el, ref) }, rest)
   return { merged, render, el, api, ctx }
 }
 
@@ -409,6 +504,12 @@ function ClearTrigger({
 }) {
   const ctx = useTextField("ClearTrigger")
   const env = useEnvironment()
+  // Mounted, rendered or not: a preset hides the browser's own clear control meanwhile.
+  const { setMounted } = ctx
+  useIsoLayoutEffect(() => {
+    setMounted("clearTriggers", 1)
+    return () => setMounted("clearTriggers", -1)
+  }, [setMounted])
   const press = usePress({
     env,
     // Pressing never moves focus away from the input.
@@ -475,6 +576,15 @@ function CharacterCount({
     undefined,
   )
 }
+
+/** Text Field: the host with the empty preset. */
+const textFieldConfig: TextFieldHostConfig = {
+  scope: "text-field",
+  machine: textFieldMachine,
+  messages: textFieldMessages,
+  label: "TextField",
+}
+const Root = createTextFieldRoot<TextFieldRootProps>(textFieldConfig)
 
 export const TextField = {
   Root,

@@ -9,6 +9,18 @@ import { type Browser, type CDPSession, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { openExample, type SiteServer, serveSite } from "../harness"
 
+/** Drains animation frames in the page (a condition-free "let it settle"). */
+const frames = (page: Page, count = 6) =>
+  page.evaluate(
+    (n) =>
+      new Promise<void>((resolve) => {
+        const step = (left: number) =>
+          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
+        step(n)
+      }),
+    count,
+  )
+
 let site: SiteServer
 let browser: Browser
 
@@ -44,7 +56,7 @@ async function openStory(id: string, top: number) {
     if (t) t.style.cssText = `position:absolute;left:100px;top:${y}px;margin:0`
     window.dispatchEvent(new Event("resize"))
   }, top)
-  await page.waitForTimeout(150)
+  await frames(page)
   return { page, cdp: await context.newCDPSession(page) }
 }
 
@@ -76,7 +88,7 @@ describe("Viewports, Zoom And On-Screen Keyboard (Chromium)", () => {
     const before = await measure(page)
     expect(before.side).toBe("bottom")
     await pinch(cdp, 200, 200)
-    await page.waitForTimeout(300)
+    await frames(page)
     const after = await measure(page)
     expect(after.scale).toBeGreaterThan(1.9)
     // In page (layout) coordinates the menu stays on its trigger.
@@ -91,7 +103,7 @@ describe("Viewports, Zoom And On-Screen Keyboard (Chromium)", () => {
     expect(before.side).toBe("bottom")
     // Zoom around the top edge: the visual viewport is now the top 350 px of the layout.
     await pinch(cdp, 200, 1)
-    await page.waitForTimeout(400)
+    await frames(page)
     const after = await measure(page)
     expect(after.vvBottom).toBeLessThan(400)
     // Either flipped above, or capped to what is left of the visual viewport.

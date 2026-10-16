@@ -124,9 +124,17 @@ describe("SegmentedControl.Indicator in a real browser", () => {
     await expectFollows("week")
     const box = document.querySelector<HTMLElement>('[data-testid="box"]') as HTMLElement
     const before = read(indicator() as HTMLElement).left
+    // Recorded as it happens: under load the attribute can be gone again by the time the
+    // poll below sees the new position.
+    let resizing = false
+    const observer = new MutationObserver(() => {
+      if (indicator()?.hasAttribute("data-resizing")) resizing = true
+    })
+    observer.observe(indicator() as HTMLElement, { attributes: true })
     box.style.width = "450px"
     await expect.poll(() => read(indicator() as HTMLElement).left).toBeLessThan(before - 50)
-    expect(indicator()?.hasAttribute("data-resizing")).toBe(true)
+    observer.disconnect()
+    expect(resizing).toBe(true)
     await expectFollows("week")
   })
 
@@ -135,7 +143,7 @@ describe("SegmentedControl.Indicator in a real browser", () => {
     const ind = indicator() as HTMLElement
     expect(ind.hidden).toBe(true)
     expect(ind.getAttribute("data-state")).toBe("hidden")
-    await new Promise((r) => setTimeout(r, 100))
+    for (let i = 0; i < 6; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
     expect(ind.hidden).toBe(true)
     expect(ind.getAttribute("data-state")).toBe("hidden")
   })
