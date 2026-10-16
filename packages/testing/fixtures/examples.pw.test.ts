@@ -295,6 +295,10 @@ const TRANSIENT = new Set([
   "search-field:composing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
+  // Pointer interactions: scrollbars shown while scrolling or hovered, a thumb dragged.
+  "scroll-area:engaged",
+  "scroll-area:lingering",
+  "scroll-area:dragging",
 ])
 
 describe("state examples", () => {
