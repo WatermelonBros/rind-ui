@@ -16,6 +16,8 @@
     "storybook": "pnpm --filter @rind-ui/storybook dev",
     "changeset": "changeset",
     "test:vitest": "vitest run",
+    "verify": "node scripts/verify.mjs",
+    "prepare": "git config core.hooksPath .githooks || true",
     "quirks:check": "node scripts/quirks-check.ts",
     "docs:gen": "node scripts/docs-gen.ts",
     "docs:check": "node scripts/docs-gen.ts --check",

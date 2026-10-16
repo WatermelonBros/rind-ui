@@ -78,7 +78,8 @@ jobs:
 
   # The test suite split by Vitest project and browser, so the slices run in parallel. On
   # pull requests only the tests that import a changed file run (vitest --changed), unless
-  # the change touches config or the test infrastructure.
+  # the change touches config or the test infrastructure. The node slice always runs in full:
+  # it takes seconds, and some of its tests read files (CSS, manifests) that --changed can't see.
   test:
     needs: [changes, static]
     if: needs.changes.outputs.components == 'true'
@@ -126,7 +127,7 @@ jobs:
       - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests --reporter=default --reporter=json --outputFile.json=vitest-report.json
         env:
           RIND_BROWSERS: ${{ matrix.browsers != '' && matrix.browsers || 'chromium' }}
-          CHANGED: ${{ needs.changes.outputs.full == 'false' && format('--changed {0}', needs.changes.outputs.base) || '' }}
+          CHANGED: ${{ needs.changes.outputs.full == 'false' && matrix.slice != 'node' && format('--changed {0}', needs.changes.outputs.base) || '' }}
       - if: always()
         run: node scripts/flaky-report.mjs vitest-report.json
 
