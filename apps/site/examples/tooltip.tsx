@@ -61,7 +61,7 @@ export function AsLabel() {
 
 export function Group() {
   return (
-    <div className="row" role="group" aria-label="Formatting">
+    <div className="row">
       <Tip trigger={bold} type="label">
         Bold
       </Tip>
