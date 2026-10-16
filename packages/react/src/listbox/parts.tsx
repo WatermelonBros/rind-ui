@@ -46,6 +46,11 @@ export interface ListboxHost {
   readonly service: Service<AnyMachine>
   /** What an item renders from (changes for two items when the highlight moves). */
   readonly itemSignature: (view: unknown, key: CollectionKey) => string
+  /**
+   * The host lists a subset of the registered items (Combobox filtering): the others stay
+   * mounted, hidden and without a role, so they keep their registration and order.
+   */
+  readonly listed?: ((key: CollectionKey) => boolean) | undefined
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
@@ -143,6 +148,15 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
       if (highlighted && listFocused && node && (onList || dropped))
         node.focus({ preventScroll: true })
     }, [highlighted])
+    if (host.listed && !host.listed(key)) {
+      return (
+        <ItemCtx value={key}>
+          <div ref={ref} hidden data-scope={own["data-scope"]} data-part="item">
+            {children}
+          </div>
+        </ItemCtx>
+      )
+    }
     const props = mergeProps({ ...normalizeProps(own), ref }, rest)
     return (
       <ItemCtx value={key}>{renderPart("div", { ...props, children }, render, undefined)}</ItemCtx>
@@ -208,6 +222,14 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     const host = useHost("Section")
     const node: SectionNode = { type: "section", key: toKey(section.key), label: section.label }
     const props = mergeProps(normalizeProps(host.parts.section(node)), rest)
+    // A section the host does not list (all its items filtered out) is hidden, still mounted.
+    if (host.listed && !host.collection.has(node.key)) {
+      return (
+        <div hidden>
+          <SectionCtx value={{ key: section.key, label: section.label }}>{children}</SectionCtx>
+        </div>
+      )
+    }
     return renderPart(
       "div",
       {

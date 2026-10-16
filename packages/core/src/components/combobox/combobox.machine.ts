@@ -60,6 +60,8 @@ export type ComboboxEvent =
   | { readonly type: "CARET" }
   | { readonly type: "ITEM.CHOOSE"; readonly key: CollectionKey; readonly modality: Modality }
   | { readonly type: "COMPOSITION.START" }
+  /** The pointer left the list. */
+  | { readonly type: "LIST.POINTER_LEAVE" }
   | { readonly type: "COMPOSITION.END"; readonly text: string }
   | { readonly type: "OUTSIDE_PRESS"; readonly request: DismissRequest }
   | {
@@ -297,6 +299,8 @@ export const comboboxMachine = setup({
     hasHighlight: ({ context, props }) =>
       context.highlightedKey !== null && props.collection.has(context.highlightedKey),
     isDirty: ({ context }) => context.dirty,
+    leaveClears: ({ context, props }) =>
+      context.highlightSource === "pointer" && props.keepHighlight !== true,
     hasCompletion: ({ context }) => context.completion !== null,
     tabChooses: ({ props, context }) =>
       props.selectOnTab === true &&
@@ -588,6 +592,7 @@ export const comboboxMachine = setup({
         },
         HIGHLIGHT: { actions: ["endLag", "highlight", "complete"] },
         POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
+        "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
         CARET: { actions: ["clearHighlight", "removeCompletion"] },
         "ITEM.CHOOSE": [
           { guard: "closesOnSelect", target: "closed", actions: ["choose"] },
