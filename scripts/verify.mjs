@@ -2,6 +2,7 @@
 // so CI is never red for something a push could have caught. CI retries a failed browser test
 // once; so does this (several sessions share the machine, browser timing flakes under load).
 import { execSync } from "node:child_process"
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { scope } from "./ci-scope.mjs"
 
 const base = execSync("git merge-base HEAD origin/main", { encoding: "utf8" }).trim()
@@ -36,6 +37,37 @@ if (components) {
 }
 // CI `site-audit`
 if (site) steps.push("pnpm --filter @rind-ui/site run audit")
+
+// One verify at a time on this machine: several sessions running full browser suites at once
+// starve the CPU and turn deadlines into failures. Wait for the lock instead.
+const lock = "/tmp/rind-ui-verify.lock"
+const alive = (pid) => {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+for (let waiting = false; ; ) {
+  try {
+    mkdirSync(lock)
+    writeFileSync(`${lock}/pid`, String(process.pid))
+    break
+  } catch {
+    const owner = Number(readFileSync(`${lock}/pid`, "utf8") || 0)
+    if (owner && !alive(owner)) {
+      rmSync(lock, { recursive: true, force: true })
+      continue
+    }
+    if (!waiting) console.log(`\n⏳ another verify (pid ${owner}) is running; waiting for it`)
+    waiting = true
+    execSync("sleep 5")
+  }
+}
+process.on("exit", () => rmSync(lock, { recursive: true, force: true }))
+process.on("SIGINT", () => process.exit(130))
+process.on("SIGTERM", () => process.exit(143))
 
 for (const step of steps) {
   console.log(`\n▶ ${step}`)
