@@ -80,7 +80,7 @@ describe("transitions", () => {
     expect(m.open()).toBe(true)
     expect(m.onOpenChange.mock.calls[0]?.[0]).toBe(true)
     expect(m.onOpenChange.mock.calls[0]?.[1]).toMatchObject({
-      reason: "TRIGGER_PRESS",
+      reason: "trigger",
       event: { type: "TRIGGER_PRESS" },
     })
   })
@@ -89,7 +89,7 @@ describe("transitions", () => {
     const m = make()
     m.send({ type: "OPEN" })
     expect(m.state()).toBe("open")
-    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("OPEN")
+    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("api")
   })
 
   it("defaultOpen starts open", () => {
@@ -97,13 +97,13 @@ describe("transitions", () => {
   })
 
   it.each([
-    ["CLOSE_TRIGGER_PRESS", closePress],
-    ["ESCAPE_KEY", dismissal("ESCAPE_KEY")],
-    ["OUTSIDE_PRESS", dismissal("OUTSIDE_PRESS")],
-    ["OUTSIDE_FOCUS", dismissal("OUTSIDE_FOCUS")],
-    ["PARENT_DISMISSED", dismissal("PARENT_DISMISSED")],
-    ["CLOSE", { type: "CLOSE" } as DialogEvent],
-  ])("%s closes an open dialog, reporting it as the reason", (reason, event) => {
+    ["CLOSE_TRIGGER_PRESS", "close-trigger", closePress],
+    ["ESCAPE_KEY", "escape-key", dismissal("ESCAPE_KEY")],
+    ["OUTSIDE_PRESS", "outside-press", dismissal("OUTSIDE_PRESS")],
+    ["OUTSIDE_FOCUS", "outside-focus", dismissal("OUTSIDE_FOCUS")],
+    ["PARENT_DISMISSED", "parent-dismissed", dismissal("PARENT_DISMISSED")],
+    ["CLOSE", "api", { type: "CLOSE" } as DialogEvent],
+  ])("%s closes an open dialog, reporting reason %s", (_name, reason, event) => {
     const m = make({ defaultOpen: true })
     m.send(event as DialogEvent)
     expect(m.state()).toBe("closed")
@@ -136,7 +136,7 @@ describe("transitions", () => {
     const non = make({ defaultOpen: true, modal: false })
     non.send(trigger())
     expect(non.state()).toBe("closed")
-    expect(non.ctx().closeReason).toBe("TRIGGER_PRESS")
+    expect(non.ctx().closeReason).toBe("trigger")
   })
 })
 
@@ -145,7 +145,7 @@ describe("controlled open", () => {
     const m = make({ open: true })
     m.send(closePress)
     expect(m.onOpenChange).toHaveBeenCalledTimes(1)
-    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("CLOSE_TRIGGER_PRESS")
+    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("close-trigger")
     expect(m.state()).toBe("open")
     expect(m.open()).toBe(true)
   })
@@ -183,7 +183,7 @@ describe("controlled open", () => {
     m.send(dismissal("ESCAPE_KEY"))
     m.setProps({ open: false })
     expect(m.state()).toBe("closed")
-    expect(m.ctx().closeReason).toBe("ESCAPE_KEY")
+    expect(m.ctx().closeReason).toBe("escape-key")
   })
 })
 
@@ -219,7 +219,7 @@ describe("one task", () => {
     m.send({ type: "CLOSE" })
     m.send({ type: "OPEN" })
     expect(m.state()).toBe("open")
-    expect(m.onOpenChange.mock.calls.map((c) => c[1].reason)).toEqual(["OPEN", "CLOSE", "OPEN"])
+    expect(m.onOpenChange.mock.calls.map((c) => c[1].reason)).toEqual(["api", "api", "api"])
   })
 })
 
@@ -248,7 +248,7 @@ describe("closeReason and opener", () => {
     const m = make()
     m.send(trigger())
     m.send(dismissal("OUTSIDE_PRESS"))
-    expect(m.ctx().closeReason).toBe("OUTSIDE_PRESS")
+    expect(m.ctx().closeReason).toBe("outside-press")
     m.send(trigger())
     expect(m.ctx().closeReason).toBeNull()
   })
@@ -335,7 +335,7 @@ describe("overlay effect wiring", () => {
     const m = make({ defaultOpen: true, finalFocus: final })
     m.send(dismissal("ESCAPE_KEY"))
     lastOptions().finalFocus?.("escape-key")
-    expect(final).toHaveBeenCalledWith("ESCAPE_KEY")
+    expect(final).toHaveBeenCalledWith("escape-key")
   })
 
   it("a dismissal request sends the mapped event and closes", () => {
@@ -343,7 +343,7 @@ describe("overlay effect wiring", () => {
     const r = request("outside-press")
     lastOptions().dismiss.onRequest(r)
     expect(m.state()).toBe("closed")
-    expect(m.ctx().closeReason).toBe("OUTSIDE_PRESS")
+    expect(m.ctx().closeReason).toBe("outside-press")
     expect(r.canceled).toBe(false)
   })
 
@@ -373,7 +373,7 @@ describe("overlay effect wiring", () => {
     lastOptions().dismiss.onRequest(request("parent-dismissed"))
     expect(onInteractOutside).not.toHaveBeenCalled()
     expect(m.state()).toBe("closed")
-    expect(m.ctx().closeReason).toBe("PARENT_DISMISSED")
+    expect(m.ctx().closeReason).toBe("parent-dismissed")
   })
 
   it("a controlled parent that keeps it open cancels the dismissal for the layers beneath", () => {
@@ -382,7 +382,7 @@ describe("overlay effect wiring", () => {
     lastOptions().dismiss.onRequest(r)
     expect(m.state()).toBe("open")
     expect(r.canceled).toBe(true)
-    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("ESCAPE_KEY")
+    expect(m.onOpenChange.mock.calls[0]?.[1].reason).toBe("escape-key")
   })
 })
 

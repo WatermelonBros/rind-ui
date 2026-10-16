@@ -33,7 +33,7 @@ describe("dialog meta matches the code", () => {
         open: false,
         modal: true,
         opener: "t",
-        closeReason: "ESCAPE_KEY",
+        closeReason: "escape-key",
         rendered: { title: "ti", description: "de" },
         contentMounted: true,
         meta,

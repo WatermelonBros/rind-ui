@@ -3,7 +3,7 @@
 import { Button, Heading, SegmentedControl, Tabs, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { exampleComponent, examples } from "@/examples"
+import { exampleComponent, examples, heroName } from "@/examples"
 import styles from "./example-frame.module.css"
 import { usePhase } from "./phase"
 
@@ -128,9 +128,11 @@ export function ExampleFrame({
     setTags(at)
   }, [inspect])
   const mod = examples[slug]
-  const Example = mod && exampleComponent(mod, name)
+  // the hero is the module's first visible example, whatever its name
+  const shownName = (hero && mod && heroName(mod)) || name
+  const Example = mod && exampleComponent(mod, shownName)
   if (!Example) return null
-  const shown = tab === "css" ? source.css : source.code[name]
+  const shown = tab === "css" ? source.css : source.code[shownName]
 
   return (
     <section
@@ -248,7 +250,7 @@ export function ExampleFrame({
                   tabIndex={0}
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
                   dangerouslySetInnerHTML={{
-                    __html: `<code class="hljs">${(t === "css" ? source.css : source.code[name])?.html ?? ""}</code>`,
+                    __html: `<code class="hljs">${(t === "css" ? source.css : source.code[shownName])?.html ?? ""}</code>`,
                   }}
                 />
                 {t === "css" && (
