@@ -153,7 +153,19 @@ describe("measuring", () => {
       </Area>,
     )
     await measured()
-    expect(el("bar-y").getAttribute("data-state")).toBe("hidden")
+    // Precondition: the bars are hidden. The real pointer may rest over the area (CI), so
+    // leave it explicitly and wait for the hide (a condition, with a deadline).
+    // React derives onPointerLeave from a bubbling pointerout to an element outside.
+    root().dispatchEvent(
+      new PointerEvent("pointerout", {
+        pointerType: "mouse",
+        bubbles: true,
+        relatedTarget: document.body,
+      }),
+    )
+    await vi.waitFor(() => expect(el("bar-y").getAttribute("data-state")).toBe("hidden"), {
+      timeout: 3000,
+    })
     await vi.waitFor(() =>
       expect(root().style.getPropertyValue("--rind-scroll-area-corner-width")).toBe("0px"),
     )
