@@ -1,0 +1,50 @@
+/* ── Skeleton: soft grey bars; inked blocks in crisp, rounded pastel pills in juicy ── */
+[data-skinned] [data-scope="skeleton"][data-part="item"][data-state="loading"] {
+  border-radius: 6px;
+  background-color: #e4e4e7;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+[data-skinned] [data-scope="skeleton"][data-part="item"][data-state="loading"]:empty {
+  display: block;
+  inline-size: 100%;
+  block-size: 1em;
+}
+[data-skinned] [data-scope="skeleton"][data-part="item"][data-state="loading"] * {
+  visibility: hidden;
+}
+[data-skinned] [data-scope="skeleton"][data-part="item"][data-shape="circle"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 999px;
+}
+[data-skinned] [data-scope="skeleton"][data-part="content"] ul,
+[data-skinned] ul[data-scope="skeleton"][data-part="content"] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-skinned] [data-scope="skeleton"][data-part="item"][data-animate] {
+    animation: s-skeleton-pulse 1.6s ease-in-out infinite;
+  }
+}
+@keyframes s-skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+[data-skin="crisp"] [data-scope="skeleton"][data-part="item"][data-state="loading"] {
+  background-color: var(--s-muted);
+  outline: var(--s-bw) solid var(--s-ink);
+  outline-offset: -1px;
+  border-radius: var(--s-r-sm);
+}
+[data-skin="juicy"] [data-scope="skeleton"][data-part="item"][data-state="loading"] {
+  background-color: var(--s-muted);
+  border-radius: 999px;
+}

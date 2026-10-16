@@ -1,0 +1,59 @@
+/*
+ * Badge (family: status): a small pill of status text. Reads accent roles only, so
+ * `data-tone` recolours it. Sized in `em` of its own font size so longer text ("99+") grows
+ * the pill instead of clipping at zoom (mui/material-ui#49441), and it never stretches in a
+ * flex or grid parent (ariakit#7604). The border is always present (transparent unless
+ * drawn) so forced colors can paint it (ariakit#7591). No corner positioning: that is the
+ * consumer's, with logical properties.
+ */
+@layer rind.components {
+  :where([data-scope="badge"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: start;
+    justify-self: start;
+    flex: none;
+    block-size: var(--rind-badge-height, 1.75em);
+    min-inline-size: var(--rind-badge-height, 1.75em);
+    padding-inline: var(--rind-badge-padding-inline, 0.5em);
+    border: var(--rind-border-width) solid var(--rind-badge-border, transparent);
+    border-radius: var(--rind-badge-radius, var(--rind-radius-full));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-badge-font-size, var(--rind-text-xs));
+    font-weight: var(--rind-badge-font-weight, 600);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+    /* Soft, the default. */
+    background: var(--rind-badge-bg, var(--rind-color-accent-soft));
+    color: var(--rind-badge-text, var(--rind-color-accent-text));
+  }
+
+  :where([data-scope="badge"][data-part="root"][data-variant="solid"]) {
+    background: var(--rind-badge-bg, var(--rind-color-accent-solid));
+    color: var(--rind-badge-text, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="badge"][data-part="root"][data-variant="outline"]) {
+    background: var(--rind-badge-bg, transparent);
+    color: var(--rind-badge-text, var(--rind-color-accent-text));
+    border-color: var(--rind-badge-border, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="badge"][data-part="root"][data-size="sm"]) {
+    font-size: var(--rind-badge-font-size, 0.6875rem);
+  }
+
+  :where([data-scope="badge"][data-part="root"][data-size="lg"]) {
+    font-size: var(--rind-badge-font-size, var(--rind-text-sm));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="badge"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+  }
+}

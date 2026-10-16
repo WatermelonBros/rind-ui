@@ -1,0 +1,45 @@
+/* ── Badge: an inked sticker in crisp, a soft candy pill in juicy ── */
+[data-skinned] [data-scope="badge"][data-part="root"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.5em;
+  box-sizing: border-box;
+  border-radius: 99px;
+  font: 700 12px / 1 var(--s-font);
+  vertical-align: middle;
+  background: var(--s-muted);
+  color: var(--s-ink);
+}
+[data-skinned] [data-scope="badge"][data-part="root"][data-size="sm"] {
+  font-size: 10px;
+}
+[data-skin="crisp"] [data-scope="badge"][data-part="root"] {
+  border: 2px solid var(--s-ink);
+  box-shadow: var(--s-lift-lo);
+}
+[data-skin="crisp"] [data-scope="badge"][data-part="root"][data-variant="solid"],
+[data-skin="crisp"] [data-scope="badge"][data-part="root"][data-tone="danger"] {
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+[data-skin="crisp"] [data-scope="badge"][data-part="root"][data-variant="outline"] {
+  background: transparent;
+  box-shadow: none;
+}
+[data-skin="juicy"] [data-scope="badge"][data-part="root"] {
+  background: var(--s-acc);
+  color: var(--s-ink);
+  box-shadow: var(--s-lift-lo);
+}
+[data-skin="juicy"] [data-scope="badge"][data-part="root"][data-variant="solid"] {
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+[data-skin="juicy"] [data-scope="badge"][data-part="root"][data-variant="outline"] {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--s-acc-deep);
+}

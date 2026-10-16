@@ -2,7 +2,10 @@ import type { ComponentType } from "react"
 import * as accordion from "./accordion"
 import * as alertDialog from "./alert-dialog"
 import * as announcements from "./announcements"
+import * as aspectRatio from "./aspect-ratio"
 import * as autosize from "./autosize"
+import * as avatar from "./avatar"
+import * as badge from "./badge"
 import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
@@ -27,6 +30,7 @@ import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
+import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
@@ -51,6 +55,9 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "messages-and-provider": messagesAndProvider,
   accordion,
   "alert-dialog": alertDialog,
+  "aspect-ratio": aspectRatio,
+  avatar,
+  badge,
   button,
   checkbox,
   "checkbox-group": checkboxGroup,
@@ -72,6 +79,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,
   separator,
+  skeleton,
   slider,
   switch: switchEx,
   tabs,

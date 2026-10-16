@@ -1,0 +1,122 @@
+/*
+ * Avatar (family: identity). Root is a one-cell grid: Image and Fallback share it, Image on
+ * top and always opaque, so a still-loading or server-rendered image paints over the
+ * Fallback as its bytes arrive — no fade that would delay a cached image. The Image's
+ * display is never set: `hidden` (no source, error) must keep hiding it. Initials are sized
+ * relative to the avatar. Group overlap uses logical properties (mirrors in RTL) and an
+ * outline ring, which survives forced colors.
+ */
+@layer rind.components {
+  :where([data-scope="avatar"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-grid;
+    flex: none;
+    inline-size: var(--rind-avatar-size, var(--rind-size-lg));
+    block-size: var(--rind-avatar-size, var(--rind-size-lg));
+    border-radius: var(--rind-avatar-radius, var(--rind-radius-full));
+    overflow: hidden;
+    vertical-align: middle;
+    font-family: var(--rind-font-sans);
+    font-size: var(
+      --rind-avatar-font-size,
+      calc(var(--rind-avatar-size, var(--rind-size-lg)) * 0.4)
+    );
+    font-weight: var(--rind-avatar-font-weight, 600);
+    line-height: 1;
+    user-select: none;
+  }
+
+  :where([data-scope="avatar"][data-part="root"][data-size="sm"]) {
+    inline-size: var(--rind-avatar-size, var(--rind-size-md));
+    block-size: var(--rind-avatar-size, var(--rind-size-md));
+    font-size: var(
+      --rind-avatar-font-size,
+      calc(var(--rind-avatar-size, var(--rind-size-md)) * 0.4)
+    );
+  }
+
+  :where([data-scope="avatar"][data-part="root"][data-size="lg"]) {
+    inline-size: var(--rind-avatar-size, calc(var(--rind-size-lg) * 1.4));
+    block-size: var(--rind-avatar-size, calc(var(--rind-size-lg) * 1.4));
+    font-size: var(
+      --rind-avatar-font-size,
+      calc(var(--rind-avatar-size, calc(var(--rind-size-lg) * 1.4)) * 0.4)
+    );
+  }
+
+  :where([data-scope="avatar"][data-part="image"], [data-scope="avatar"][data-part="fallback"]) {
+    box-sizing: border-box;
+    grid-area: 1 / 1;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: inherit;
+  }
+
+  :where([data-scope="avatar"][data-part="image"]) {
+    z-index: 1;
+    object-fit: cover;
+  }
+
+  /* Soft, the default: a tinted fallback. */
+  :where([data-scope="avatar"][data-part="fallback"]) {
+    display: grid;
+    place-items: center;
+    border: var(--rind-border-width) solid transparent;
+    background: var(--rind-avatar-bg, var(--rind-color-accent-soft));
+    color: var(--rind-avatar-text, var(--rind-color-accent-text));
+  }
+
+  :where([data-scope="avatar"][data-variant="solid"] > [data-part="fallback"]) {
+    background: var(--rind-avatar-bg, var(--rind-color-accent-solid));
+    color: var(--rind-avatar-text, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="avatar"][data-variant="outline"] > [data-part="fallback"]) {
+    background: var(--rind-avatar-bg, transparent);
+    border-color: var(--rind-avatar-border, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="avatar"][data-part="group"]) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  :where([data-scope="avatar"][data-part="group"] > *) {
+    outline: var(--rind-avatar-ring-width, 2px) solid var(--rind-avatar-ring, var(--rind-color-bg));
+  }
+
+  :where([data-scope="avatar"][data-part="group"] > * + *) {
+    margin-inline-start: calc(var(--rind-avatar-group-overlap, 0.5rem) * -1);
+  }
+
+  :where([data-scope="avatar"][data-part="group-overflow"]) {
+    box-sizing: border-box;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    min-inline-size: var(--rind-avatar-size, var(--rind-size-lg));
+    block-size: var(--rind-avatar-size, var(--rind-size-lg));
+    padding-inline: 0.25em;
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-avatar-radius, var(--rind-radius-full));
+    font-family: var(--rind-font-sans);
+    font-size: var(
+      --rind-avatar-font-size,
+      calc(var(--rind-avatar-size, var(--rind-size-lg)) * 0.35)
+    );
+    font-weight: var(--rind-avatar-font-weight, 600);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    background: var(--rind-avatar-overflow-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-avatar-overflow-text, var(--rind-color-neutral-text));
+  }
+
+  @media (forced-colors: active) {
+    :where(
+        [data-scope="avatar"][data-part="fallback"],
+        [data-scope="avatar"][data-part="group-overflow"]
+      ) {
+      border-color: CanvasText;
+    }
+  }
+}
