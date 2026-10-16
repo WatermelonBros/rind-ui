@@ -20,6 +20,7 @@ export * from "./link"
 export { composeRefs, mergeProps, type RindEventExtension, stripMarker } from "./merge-props"
 export { normalizeProps } from "./normalize-props"
 export * from "./number-input"
+export * from "./pin-input"
 export * from "./popover"
 export { Portal, type PortalProps } from "./portal"
 export {

@@ -1,0 +1,538 @@
+// Pin Input parts: wiring only. The machine owns the value and the caret; edit-plan decides
+// every insertion; connect every attribute. Native listeners (not React's synthetic ones):
+// `beforeinput` to plan insertions, `input` so script fills are seen (input-otp#152).
+
+import {
+  type FieldMessages,
+  focusSafely,
+  injectStyle,
+  type MessageOverrides,
+  mergeFieldProps,
+  type PinInputEvent,
+  type PinInputMessages,
+  type PinInputReason,
+  type PinValidationType,
+  pinInputConnect,
+  pinInputMachine,
+  pinInputMessages,
+  pinInputStyle,
+  planEdit,
+  renderedValue,
+  type Validate,
+  type ValidationBehavior,
+  type ValidationMode,
+} from "@rind-ui/core"
+import {
+  type ComponentPropsWithRef,
+  createContext,
+  type KeyboardEvent,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+} from "react"
+import { useFieldBindingPeek, useFieldControl } from "../field/field"
+import { FieldHost, HostDescription, HostErrorMessage, HostLabel } from "../field/use-field-host"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
+import { joinHandlers } from "../join-handlers"
+import { composeRefs, mergeProps } from "../merge-props"
+import { normalizeProps } from "../normalize-props"
+import { useEnvironment, useMessages } from "../provider"
+import { type RenderProp, renderPart } from "../render"
+import { useMachine } from "../use-machine"
+import { useModality } from "../use-modality"
+
+declare const process: { env: { NODE_ENV?: string } }
+
+declare module "../provider" {
+  interface RindMessageScopes {
+    "pin-input": PinInputMessages
+  }
+}
+
+const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
+const dev = () => process.env.NODE_ENV !== "production"
+
+export interface PinInputChangeDetails {
+  readonly reason: PinInputReason
+}
+
+export interface PinInputState {
+  readonly value: string
+  readonly complete: boolean
+  readonly composing: boolean
+  readonly focused: boolean
+}
+
+type Machine = ReturnType<typeof useMachine<typeof pinInputMachine>>
+
+interface Ctx {
+  readonly instance: string
+  readonly view: Machine["view"]
+  readonly send: Machine["send"]
+  readonly length: number
+  readonly rules: {
+    readonly length: number
+    readonly validationType: PinValidationType | undefined
+    readonly pattern: RegExp | undefined
+    readonly sanitize: ((t: string) => string) | undefined
+  }
+  readonly mask: boolean
+  readonly maskChar: string
+  readonly autoComplete: string
+  readonly enterKeyHint: string | undefined
+  readonly form: string | undefined
+  readonly dir: "ltr" | "rtl" | undefined
+  readonly disabled: boolean
+  readonly readOnly: boolean
+  readonly defaultValue: string
+  readonly inputEl: { current: HTMLInputElement | null }
+  readonly pendingCaret: { current: number | null }
+  readonly pendingSubmit: { current: boolean }
+  readonly slots: { current: number }
+}
+
+const PinInputContext = createContext<Ctx | null>(null)
+function usePinInput(part: string): Ctx {
+  const ctx = useContext(PinInputContext)
+  if (!ctx) throw new Error(`PinInput.${part} must be inside PinInput.Root`)
+  return ctx
+}
+
+export type PinInputRootProps = Omit<
+  ComponentPropsWithRef<"div">,
+  "children" | "defaultValue" | "onChange" | "dir"
+> & {
+  readonly children?: ReactNode
+  /** The number of characters (a positive integer). */
+  readonly length: number
+  /** Controlled; `null` and `undefined` render empty (ark#3573). */
+  readonly value?: string | null
+  readonly defaultValue?: string
+  readonly onValueChange?: (value: string, details: PinInputChangeDetails) => void
+  /** An insertion was refused (its text). */
+  readonly onValueInvalid?: (text: string) => void
+  /** A user change completed the code. */
+  readonly onValueComplete?: (value: string) => void
+  /** Default `"numeric"`. */
+  readonly validationType?: PinValidationType
+  /** One accepted character (replaces `validationType`). */
+  readonly pattern?: RegExp
+  /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
+  readonly sanitize?: (text: string) => string
+  readonly mask?: boolean
+  readonly maskChar?: string
+  /** Default `"one-time-code"`. */
+  readonly autoComplete?: string
+  /** Submits the form once a user change completes the code (`requestSubmit`, no focus moves). */
+  readonly autoSubmit?: boolean
+  readonly enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
+  readonly form?: string
+  readonly dir?: "ltr" | "rtl"
+  readonly messages?: MessageOverrides<PinInputMessages>
+  // Field props (the Root is a Field when not inside one).
+  readonly name?: string
+  readonly disabled?: boolean
+  readonly readOnly?: boolean
+  readonly required?: boolean
+  readonly invalid?: boolean
+  readonly errors?: readonly string[]
+  readonly validate?: Validate
+  readonly validationMode?: ValidationMode
+  readonly validationBehavior?: ValidationBehavior
+  readonly validationDebounce?: number
+  readonly fieldMessages?: MessageOverrides<FieldMessages>
+}
+
+/** Machine events → the public reasons. */
+function publicReason(event: PinInputEvent): PinInputReason {
+  if (event.type === "EDIT") return event.edit.reason
+  if (event.type === "INPUT") return event.reason
+  if (event.type === "RESET") return "RESET"
+  return "INPUT"
+}
+
+function Root(all: PinInputRootProps) {
+  const {
+    length,
+    value,
+    defaultValue = "",
+    onValueChange,
+    onValueInvalid,
+    onValueComplete,
+    validationType,
+    pattern,
+    sanitize,
+    mask = false,
+    maskChar = "•",
+    autoComplete = "one-time-code",
+    autoSubmit = false,
+    enterKeyHint,
+    form,
+    dir,
+    messages: ownMessages,
+    fieldMessages: ownFieldMessages,
+    children,
+    id,
+    ...fieldProps
+  } = all
+  const env = useEnvironment()
+  const generated = useId()
+  const instance = id ?? generated
+  const messages = useMessages("pin-input", pinInputMessages, ownMessages)
+  const enclosing = useFieldBindingPeek()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const disabled =
+    fieldProps.disabled === true || enclosing?.state.disabled === true || fieldsetDisabled
+  const readOnly = fieldProps.readOnly === true || enclosing?.state.readOnly === true
+  const rules = { length, validationType, pattern, sanitize }
+  // `value` present but null/undefined is a controlled empty value (ark#3573).
+  const controlled = "value" in all
+  const shown = controlled ? renderedValue(rules, value) : undefined
+  useEffect(() => {
+    if (!dev()) return
+    if (!Number.isInteger(length) || length < 1) {
+      console.warn(`[rind-ui] pin-input: length must be a positive integer (got ${length}).`)
+    }
+  }, [length])
+  useEffect(() => {
+    if (dev() && controlled && typeof value === "string" && value !== shown) {
+      console.warn(
+        `[rind-ui] pin-input: the controlled value "${value}" is rendered as "${shown}" (length ${length}, rejected characters dropped).`,
+      )
+    }
+  }, [controlled, value, shown, length])
+  const inputEl = useRef<HTMLInputElement | null>(null)
+  const pendingCaret = useRef<number | null>(null)
+  const pendingSubmit = useRef(false)
+  const slots = useRef(0)
+  const latest = useRef({ onValueChange, onValueInvalid, onValueComplete })
+  latest.current = { onValueChange, onValueInvalid, onValueComplete }
+  const { view, send } = useMachine(pinInputMachine, {
+    ...rules,
+    value: shown,
+    defaultValue: renderedValue(rules, defaultValue),
+    onValueChange: (v, details) =>
+      latest.current.onValueChange?.(v, {
+        reason: publicReason((details as { event: PinInputEvent }).event),
+      }),
+    onValueInvalid: (t) => latest.current.onValueInvalid?.(t),
+    onValueComplete: (v) => latest.current.onValueComplete?.(v),
+    autoSubmit,
+    disabled,
+    readOnly,
+    messages,
+    id: instance,
+    writeCaret: (index) => {
+      pendingCaret.current = index
+    },
+    resync: () => {
+      // The value React renders is already right; the DOM may hold the browser's write.
+      const el = inputEl.current
+      const current = view.values.value
+      if (el && el.value !== current) el.value = current
+    },
+    // After the completed value is rendered (the form must validate the full code).
+    requestSubmit: () => {
+      pendingSubmit.current = true
+    },
+  })
+  // Every rendered slot counts; the number must match `length`.
+  useEffect(() => {
+    if (dev() && slots.current !== length) {
+      console.warn(
+        `[rind-ui] pin-input: length is ${length} but ${slots.current} Slots are rendered.`,
+      )
+    }
+  }, [length])
+  const modality = useModality(env.modality, view.context.focused)
+  const ctx: Ctx = {
+    instance,
+    view,
+    send,
+    length,
+    rules,
+    mask,
+    maskChar,
+    autoComplete,
+    enterKeyHint,
+    form,
+    dir,
+    disabled,
+    readOnly,
+    defaultValue,
+    inputEl,
+    pendingCaret,
+    pendingSubmit,
+    slots,
+  }
+  const api = useApi(ctx, enclosing, modality)
+  const root = api.root()
+  const rootData = Object.fromEntries(
+    Object.entries(root).filter(
+      ([k]) =>
+        k.startsWith("data-") && k !== "data-scope" && k !== "data-part" && k !== "data-instance",
+    ),
+  )
+  return (
+    <FieldHost
+      scope="pin-input"
+      id={instance}
+      dir={(root["dir"] as string | undefined) ?? "ltr"}
+      {...fieldProps}
+      {...(ownFieldMessages ? { messages: ownFieldMessages } : {})}
+      {...rootData}
+    >
+      <PinInputContext value={ctx}>{children}</PinInputContext>
+    </FieldHost>
+  )
+}
+
+function useApi(
+  ctx: Ctx,
+  binding: ReturnType<typeof useFieldBindingPeek>,
+  modality: ReturnType<typeof useModality>,
+) {
+  const field = mergeFieldProps(
+    { role: "textbox", labelable: true, disabled: ctx.disabled, readOnly: ctx.readOnly },
+    binding,
+  )
+  return pinInputConnect({
+    ...ctx.rules,
+    instance: ctx.instance,
+    value: ctx.view.values.value,
+    caret: ctx.view.context.caret,
+    focused: ctx.view.context.focused,
+    modality,
+    composing: ctx.view.matches("composing"),
+    field,
+    fieldData: binding?.data,
+    mask: ctx.mask,
+    maskChar: ctx.maskChar,
+    autoComplete: ctx.autoComplete,
+    enterKeyHint: ctx.enterKeyHint,
+    form: ctx.form,
+    dir: ctx.dir,
+  })
+}
+
+const stateOf = (ctx: Ctx): PinInputState => ({
+  value: ctx.view.values.value,
+  complete: ctx.view.values.value.length === ctx.length,
+  composing: ctx.view.matches("composing"),
+  focused: ctx.view.context.focused,
+})
+
+function Control({
+  render,
+  ...rest
+}: ComponentPropsWithRef<"div"> & { readonly render?: RenderProp<PinInputState> }) {
+  const ctx = usePinInput("Control")
+  const env = useEnvironment()
+  const modality = useModality(env.modality, ctx.view.context.focused)
+  const api = useApi(ctx, useFieldBindingPeek(), modality)
+  return renderPart("div", mergeProps(normalizeProps(api.control()), rest), render, stateOf(ctx))
+}
+
+/** The slot whose box holds `x` (nearest when between two), by `data-instance`. */
+function slotAt(input: HTMLInputElement, instance: string, x: number): number | null {
+  const control = input.parentElement
+  if (!control) return null
+  let best: { index: number; distance: number } | null = null
+  for (const el of control.querySelectorAll<HTMLElement>(
+    `[data-scope="pin-input"][data-part="slot"][data-instance="${CSS.escape(instance)}"]`,
+  )) {
+    const r = el.getBoundingClientRect()
+    const distance = x < r.left ? r.left - x : x > r.right ? x - r.right : 0
+    const index = Number(el.dataset["index"])
+    if (!best || distance < best.distance) best = { index, distance }
+  }
+  return best?.index ?? null
+}
+
+function Input({
+  render,
+  ref,
+  id,
+  ...rest
+}: Omit<ComponentPropsWithRef<"input">, "value" | "defaultValue" | "type"> & {
+  readonly render?: RenderProp<PinInputState>
+}) {
+  const ctx = usePinInput("Input")
+  const env = useEnvironment()
+  const binding = useFieldControl()
+  const modality = useModality(env.modality, ctx.view.context.focused)
+  const api = useApi(ctx, binding, modality)
+  const controlId = id ?? binding?.controlId ?? `pin-input-${ctx.instance}-input`.replace(/:/g, "")
+  const { send } = ctx
+  const register = binding?.register
+  useIsoLayoutEffect(() => {
+    injectStyle(ctx.inputEl.current?.ownerDocument, "pin-input", pinInputStyle, env)
+    if (!register) return
+    return register(
+      {
+        id: controlId,
+        labelable: true,
+        focus: (m) => {
+          if (ctx.inputEl.current) void focusSafely(ctx.inputEl.current, env, "programmatic", m)
+        },
+        // The input is the form control: its own validity (valueMissing, patternMismatch).
+        validityElement: () => ctx.inputEl.current,
+        value: () => ctx.view.values.value,
+      },
+      controlId,
+    )
+  }, [register, controlId, env])
+  // Each applied change is reported to the Field once.
+  const value = ctx.view.values.value
+  const reported = useRef(value)
+  const report = binding?.report
+  useEffect(() => {
+    if (reported.current === value) return
+    reported.current = value
+    report?.({ type: "change", value, user: true, composing: false })
+  }, [value, report])
+  // After every commit: the DOM shows the value, the planned caret is placed, and a pending
+  // auto-submit runs against the full code.
+  useIsoLayoutEffect(() => {
+    const el = ctx.inputEl.current
+    if (!el) return
+    if (el.value !== value) el.value = value
+    const caret = ctx.pendingCaret.current
+    if (caret !== null && el.ownerDocument.activeElement === el) el.setSelectionRange(caret, caret)
+    ctx.pendingCaret.current = null
+    if (ctx.pendingSubmit.current) {
+      ctx.pendingSubmit.current = false
+      el.form?.requestSubmit()
+    }
+  })
+  const latest = useRef(ctx)
+  latest.current = ctx
+  useEffect(() => {
+    const el = ctx.inputEl.current
+    if (!el) return
+    const onBeforeInput = (e: Event) => {
+      const ie = e as InputEvent
+      const c = latest.current
+      if (c.view.matches("composing") || ie.isComposing) return
+      if (ie.inputType === "insertCompositionText") return
+      const data = ie.data ?? ie.dataTransfer?.getData("text/plain") ?? null
+      const start = el.selectionStart ?? el.value.length
+      const end = el.selectionEnd ?? start
+      const plan = planEdit(
+        c.view.values.value,
+        [start, end],
+        { inputType: ie.inputType, data },
+        c.rules,
+      )
+      if (plan.accept && plan.edit === null) return
+      e.preventDefault()
+      c.send(plan.accept ? { type: "EDIT", edit: plan.edit } : { type: "INVALID", text: plan.text })
+    }
+    const onInput = (e: Event) => {
+      const c = latest.current
+      const ie = e as Partial<InputEvent>
+      if (c.view.matches("composing") || ie.isComposing) return
+      if (el.value === c.view.values.value) return
+      const native = typeof ie.inputType === "string" && /^(delete|history)/.test(ie.inputType)
+      c.send({ type: "INPUT", text: el.value, reason: native ? "INPUT" : "AUTOFILL" })
+    }
+    const onSelection = () => {
+      const c = latest.current
+      if (el.ownerDocument.activeElement !== el || el.selectionStart === null) return
+      if (el.selectionStart !== c.view.context.caret) {
+        c.send({ type: "CARET", index: el.selectionStart })
+      }
+    }
+    const onPointerDown = (e: PointerEvent) => {
+      const c = latest.current
+      if (e.button !== 0 || c.disabled) return
+      const index = slotAt(el, c.instance, e.clientX)
+      if (index === null) return
+      // No native caret placement: the caret goes to the slot under the press.
+      e.preventDefault()
+      if (el.ownerDocument.activeElement !== el) void focusSafely(el, env, "programmatic")
+      c.send({
+        type: "SLOT.PRESS",
+        index,
+        modality: e.pointerType === "touch" ? "touch" : "pointer",
+      })
+    }
+    // A form reset: the current defaultValue comes back (read once dispatch ended).
+    const formEl = el.form
+    const onReset = (e: Event) =>
+      env.scheduler.setTimeout(() => {
+        if (!e.defaultPrevented) latest.current.send({ type: "RESET" })
+      }, 0)
+    el.addEventListener("beforeinput", onBeforeInput)
+    el.addEventListener("input", onInput)
+    el.addEventListener("pointerdown", onPointerDown)
+    el.ownerDocument.addEventListener("selectionchange", onSelection)
+    formEl?.addEventListener("reset", onReset)
+    return () => {
+      el.removeEventListener("beforeinput", onBeforeInput)
+      el.removeEventListener("input", onInput)
+      el.removeEventListener("pointerdown", onPointerDown)
+      el.ownerDocument.removeEventListener("selectionchange", onSelection)
+      formEl?.removeEventListener("reset", onReset)
+    }
+  }, [ctx.inputEl, env])
+  const handlers = {
+    // React requires a handler on a controlled input; the native listeners do the work.
+    onChange: () => {},
+    onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => {
+      // Enter is never prevented (zag#3381); outside an IME it commits for the Field.
+      if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+        report?.({ type: "commit" })
+      }
+    },
+    onCompositionStart: (e: { currentTarget: HTMLInputElement }) =>
+      send({ type: "COMPOSITION.START", caret: e.currentTarget.selectionStart ?? value.length }),
+    onCompositionEnd: (e: { data: string }) => send({ type: "COMPOSITION.END", text: e.data }),
+    onFocus: () => send({ type: "FOCUS", modality: env.modality.modality() }),
+    onBlur: () => send({ type: "BLUR" }),
+  }
+  const own = normalizeProps({ ...api.input(), id: controlId })
+  const props = mergeProps(
+    { ...joinHandlers(own, handlers), ref: composeRefs(ctx.inputEl, ref) },
+    rest,
+  )
+  return renderPart("input", props, render, stateOf(ctx))
+}
+
+function Slot({
+  index,
+  render,
+  ...rest
+}: Omit<ComponentPropsWithRef<"div">, "children"> & {
+  readonly index: number
+  readonly render?: RenderProp<PinInputState & { readonly char: string | undefined }>
+}) {
+  const ctx = usePinInput("Slot")
+  const env = useEnvironment()
+  const modality = useModality(env.modality, ctx.view.context.focused)
+  const api = useApi(ctx, useFieldBindingPeek(), modality)
+  const { slots } = ctx
+  useIsoLayoutEffect(() => {
+    slots.current += 1
+    return () => {
+      slots.current -= 1
+    }
+  }, [slots])
+  return renderPart("div", mergeProps(normalizeProps(api.slot(index)), rest), render, {
+    ...stateOf(ctx),
+    char: ctx.view.values.value[index],
+  })
+}
+
+export const PinInput = {
+  Root,
+  Label: HostLabel,
+  Description: HostDescription,
+  ErrorMessage: HostErrorMessage,
+  Control,
+  Input,
+  Slot,
+}

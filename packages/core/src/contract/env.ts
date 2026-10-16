@@ -117,6 +117,12 @@ export interface Part {
    * and `change`, with no key or pointer event: what assistive technology does.
    */
   fill(value: string): Promise<void>
+  /**
+   * A paste into a text input at its selection, in the real order: a cancelable `paste`
+   * (clipboardData `text/plain`), a cancelable `beforeinput` (`insertFromPaste`), then, unless
+   * either was prevented, the native insertion and its `input` event. No OS clipboard.
+   */
+  paste(text: string): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */
