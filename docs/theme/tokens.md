@@ -962,6 +962,86 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### menu
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "menu.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "menu.css"
+    },
+    "group-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "menu.css"
+    },
+    "indicator-size": {
+      "fallback": "1rem",
+      "file": "menu.css"
+    },
+    "max-height": {
+      "fallback": "100vh",
+      "file": "menu.css"
+    },
+    "min-width": {
+      "fallback": "10rem",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "menu.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "menu.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "menu.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "menu.css"
+    }
+  }
+}
+```
+
+### menu-item
+
+```json
+{
+  "family": "collection item",
+  "tokens": {
+    "disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "menu.css"
+    },
+    "height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "menu.css"
+    },
+    "highlight-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "menu.css"
+    },
+    "highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "menu.css"
+    }
+  }
+}
+```
+
 ### number-input
 
 ```json
