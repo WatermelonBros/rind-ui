@@ -118,7 +118,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.browsers }}
+          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.slice }}
       - if: matrix.browsers != ''
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
