@@ -287,8 +287,9 @@ menu adds only the composite's Space handling on top.
 #### Scenario: Enter on a link
 
 - **WHEN** a link item with `target="_blank"` is focused and the user presses Enter
-- **THEN** exactly one new tab opens and the menu closes (regression: zag#2704,
-  react-spectrum#8697, react-spectrum#9431)
+- **THEN** exactly one new tab opens and the menu stays open: a `target="_blank"`
+  activation is not same-tab (regression: zag#2704, react-spectrum#8697,
+  react-spectrum#9431)
 
 #### Scenario: Space on a link
 

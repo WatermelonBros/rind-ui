@@ -318,6 +318,7 @@ describe("controlled", () => {
     const m = make({ open: true })
     m.setProps({ open: false })
     expect(m.state()).toBe("closed")
+    // fake-time: past the 100 ms submenu delay that `opening` would run (no reopen)
     vi.advanceTimersByTime(1000)
     expect(m.state()).toBe("closed")
   })

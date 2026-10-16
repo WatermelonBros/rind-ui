@@ -358,8 +358,8 @@ export function menuConnect(
       }
     },
     /** A link item's same-tab activation (linkProps' onActivate). */
-    activateLink: (key: CollectionKey, modality: Modality) =>
-      send({ type: "ITEM_ACTIVATE", key, kind: "link-item", closeOnSelect: true, modality }),
+    activateLink: (key: CollectionKey, modality: Modality, closeOnSelect = true) =>
+      send({ type: "ITEM_ACTIVATE", key, kind: "link-item", closeOnSelect, modality }),
     submenuTrigger: (key: CollectionKey, s: MenuSubmenuTriggerState): PartProps => {
       const highlighted = isHighlighted(key) && (!s.open || s.focused)
       // VoiceOver reads the submenu's first item only without the state change.
