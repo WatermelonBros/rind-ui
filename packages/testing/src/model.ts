@@ -672,6 +672,14 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   }
   const base = envFor(modality)
   if (direction === "rtl") await base.setDirection("rtl")
+  /** States the contract declares the component unmounted in (`absentIn`). */
+  const absentIn = new Set<string>(contract.absentIn ?? [])
+  /**
+   * The instance's snapshot. A contract with `absentIn` may have no anchor left (unmounted):
+   * then only the document-wide fields. Without `absentIn`, unchanged (a missing anchor throws).
+   */
+  const collect = async () =>
+    absentIn.size > 0 && (await base.anchorCount()) === 0 ? base.collectDocument() : base.collect()
 
   const props = (options.props ?? {}) as Props
   const oracle = createOracle(contract, props)
@@ -767,7 +775,9 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     return out
   }
   const expectedFor = (state: string) => (contract.states[state] ?? {}) as Record<string, unknown>
+  // An absent state has no parts to read: its queries are not checked.
   const matchesState = (state: string) => (seen: Record<string, unknown>) =>
+    absentIn.has(state) ||
     Object.entries(expectedFor(state)).every(([k, v]) => Object.is(seen[k], v))
   /** The longest delay the machine can schedule under the current props. */
   const longestDelay = () =>
@@ -796,7 +806,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   }
   const hoveredParts = async () =>
     new Set(
-      (await base.collect()).parts
+      (await collect()).parts
         .filter((p) => p.attrs["data-hover"] !== undefined)
         .map((p) => p.describe),
     )
@@ -817,7 +827,19 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     const state = oracle.service.getSnapshot().state
     const expected = expectedFor(state)
     const matches = matchesState(state)
-    const seen = await base.until(observe, matches).catch(async () => observe())
+    const absent = absentIn.has(state)
+    // Absent: wait for the unmount (after any exit animation); the anchor invariant checks it.
+    const seen = absent
+      ? await base
+          .until(
+            () => base.anchorCount(),
+            (n) => n === 0,
+          )
+          .then(
+            (): Record<string, unknown> => ({}),
+            (): Record<string, unknown> => ({}),
+          )
+      : await base.until(observe, matches).catch(async () => observe())
     if (!matches(seen)) {
       // A bare click must reach the oracle's state with exactly one activation (AT 12).
       const prefix = stepModality === "virtual" ? "virtual-parity: " : ""
@@ -830,7 +852,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     if (contract.traits.includes("timed") && seen["isOpen"] === true) {
       // WCAG 1.4.13 persistent: while a part is hovered or focused, no pending delay may
       // hide it. Every delay is waited out, then it must still be open.
-      const parts = (await base.collect()).parts
+      const parts = (await collect()).parts
       const held = parts.filter(
         (p) => p.attrs["data-hover"] !== undefined || p.attrs["data-focus"] !== undefined,
       )
@@ -852,14 +874,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       await base
         .until(
           async () =>
-            (await base.collect()).parts.filter((p) => p.part === content && p.animations > 0)
-              .length,
+            (await collect()).parts.filter((p) => p.part === content && p.animations > 0).length,
           (n) => n === 0,
         )
         .catch(() => {})
       await base.advance(16)
     }
-    const after = await base.collect()
+    const after = await collect()
     const facts: StepFacts = {
       before,
       after,
@@ -869,6 +890,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       ...expectations(contract, state, oracle.service.view()),
       atInitial: state === graph.initial,
       anchorCount: await base.anchorCount(),
+      ...(absent ? { absent: true } : {}),
       errors: await base.takeErrors(),
       traits: contract.traits,
       semantics: { ...contract.semantics },
@@ -925,8 +947,9 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     }
     // Contract invariants are typed on the contract's own parts and states; at runtime they
     // take the same context consumer invariants do.
+    // Absent: the contract's own (part-based) invariants have nothing to read.
     const own = [
-      ...(contract.invariants ?? []),
+      ...(absent ? [] : (contract.invariants ?? [])),
       ...(options.invariants ?? []),
     ] as unknown as readonly {
       readonly name: string
@@ -1030,7 +1053,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   ) => {
     const { resume } = held
     const content = contract.semantics?.["content"]
-    const exiting = (await base.collect()).parts.find((p) => p.part === content && p.animations > 0)
+    const exiting = (await collect()).parts.find((p) => p.part === content && p.animations > 0)
     if (!exiting) {
       // The content animates (computed style) but its exit was over before the hold: counted,
       // so a run where this always happens fails instead of passing vacuously.
@@ -1077,7 +1100,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     }
     send(reopen.event, { modality: mod })
     await act(m.action, m.args?.(oracle.service.view()) ?? [], mod)
-    const back = (await base.collect()).parts.find((p) => p.part === content)
+    const back = (await collect()).parts.find((p) => p.part === content)
     await resume()
     if (back?.node !== exiting.node) {
       fail(

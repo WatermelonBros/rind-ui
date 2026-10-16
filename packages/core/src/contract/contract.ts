@@ -218,6 +218,12 @@ export interface ContractDef<
   /** Parts whose programmatic focus may change state in the given states (e.g. a tooltip opens). */
   readonly commitsOnFocus?: readonly { readonly part: NoInfer<P>; readonly state: StateOf<M> }[]
   /**
+   * States in which the whole component is unmounted (a dismissed Alert, a Toast after it
+   * left): the runner expects no element to match the anchor there and skips the part-based
+   * invariants and the state's queries. Omitted: the component is always mounted.
+   */
+  readonly absentIn?: readonly StateOf<M>[]
+  /**
    * Invariant exceptions, only through a quirk entry that lists the invariant; the runner
    * skips that invariant for that part while the quirk applies, and reports it.
    */
@@ -314,6 +320,7 @@ export interface AnyContract {
   readonly semantics?: Semantics<string>
   readonly announcements?: Announcements<Readonly<Record<string, unknown>>>
   readonly commitsOnFocus?: readonly { readonly part: string; readonly state: string }[]
+  readonly absentIn?: readonly string[]
   readonly exceptions?: readonly {
     readonly part: string
     readonly invariant: GenericInvariantId
@@ -404,7 +411,7 @@ export function staticContract<
   scope: string,
   def: Omit<
     ContractDef<StaticMachine, P, L, Q, A>,
-    "machine" | "states" | "events" | "dataState" | "attrs" | "commitsOnFocus"
+    "machine" | "states" | "events" | "dataState" | "attrs" | "commitsOnFocus" | "absentIn"
   > & {
     readonly actions: { readonly [K in keyof A]: CheckedAction<P, A[K]> }
     readonly traits: T

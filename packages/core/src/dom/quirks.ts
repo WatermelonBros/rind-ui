@@ -221,6 +221,23 @@ export const quirks = defineQuirks([
     removeWhen: "Firefox on Linux focuses a label's control on activation",
     verified: "2026-10-16",
   },
+  {
+    id: "nvda-progressbar-name",
+    // NVDA (and JAWS) drop the name of a progressbar or meter with no text content: Root
+    // ends with one visually hidden, presentational character. NVDA cannot be detected and
+    // the markup must match on the server, so it is always on (Progress, Meter).
+    when: () => true,
+    links: [
+      "https://github.com/mui/base-ui/issues/4184",
+      "https://github.com/nvaccess/nvda/issues/13904",
+      "https://github.com/nvaccess/nvda/issues/16204",
+      "https://github.com/FreedomScientific/standards-support/issues/354",
+    ],
+    test: "packages/core/src/components/progress/progress.connect.test.ts",
+    removeWhen:
+      "NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases",
+    verified: "2026-10-16",
+  },
 ])
 
 export type QuirkId = (typeof quirks)[number]["id"]

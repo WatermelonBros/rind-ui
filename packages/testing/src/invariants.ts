@@ -29,6 +29,8 @@ export interface StepFacts {
   /** True when the oracle state is the machine's initial state. */
   readonly atInitial: boolean
   readonly anchorCount: number
+  /** The contract declares the component unmounted in this state (`absentIn`). */
+  readonly absent?: boolean
   readonly errors: readonly string[]
   readonly traits: readonly Trait[]
   readonly semantics: Readonly<Record<string, string | undefined>>
@@ -169,7 +171,13 @@ function highlightChecks(f: StepFacts): string[] {
 }
 
 const anchor: GenericInvariant = (f) =>
-  f.anchorCount === 1 ? [] : [`exactly one element must match the anchor; found ${f.anchorCount}`]
+  f.absent
+    ? f.anchorCount === 0
+      ? []
+      : [`no element may match the anchor in ${f.state} (absentIn); found ${f.anchorCount}`]
+    : f.anchorCount === 1
+      ? []
+      : [`exactly one element must match the anchor; found ${f.anchorCount}`]
 
 const noErrors: GenericInvariant = (f) => f.errors.map((e) => `error during the step: ${e}`)
 

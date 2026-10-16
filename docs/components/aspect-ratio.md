@@ -65,7 +65,7 @@ A ratio box adds no semantics; its content carries them. An `iframe` needs a `ti
 
 ## Image
 
-The Image component's stylesheet reads its own ratio token,
+The [Image](image.md) component's stylesheet reads its own ratio token,
 `--rind-image-aspect-ratio`: set it on the Image root instead of wrapping the Image in a
 ratio box.
 

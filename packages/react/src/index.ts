@@ -1,4 +1,5 @@
 export * from "./accordion"
+export * from "./alert"
 export * from "./alert-dialog"
 export * from "./avatar"
 export * from "./badge"
@@ -14,13 +15,16 @@ export * from "./form"
 export * from "./form-toggle"
 export * from "./heading"
 export { type IconName, type RindIcons, useIconChildren } from "./icons"
+export * from "./image"
 export * from "./label"
 export { LayerProvider, useParentLayer } from "./layer-context"
 export * from "./link"
 export { composeRefs, mergeProps, type RindEventExtension, stripMarker } from "./merge-props"
+export * from "./meter"
 export { normalizeProps } from "./normalize-props"
 export * from "./popover"
 export { Portal, type PortalProps } from "./portal"
+export * from "./progress"
 export {
   type RindMessageScopes,
   RindProvider,

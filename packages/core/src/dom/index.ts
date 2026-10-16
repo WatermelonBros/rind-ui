@@ -1,4 +1,5 @@
 export { accessibleNameOf } from "./accname"
+export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { collectionLayout } from "./collection-layout"
 export {
@@ -30,6 +31,7 @@ export { type ElementInfo, elementInfo } from "./element-info"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
 export { captureFocus, type FocusReturn } from "./focus-restore"
+export { focusPast } from "./focus-past"
 export { focusSafely } from "./focus-safely"
 export {
   containFocus,
