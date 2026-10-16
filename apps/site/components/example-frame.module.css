@@ -117,7 +117,7 @@
 .canvas {
   width: fit-content;
   min-width: min(100%, 340px);
-  max-width: min(100%, 440px);
+  max-width: min(100%, 600px);
 }
 .stage[data-view="crisp"] {
   background: #d4ff3a;

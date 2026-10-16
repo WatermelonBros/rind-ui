@@ -84,17 +84,12 @@ pnpm add -D @rind-ui/testing
 ```
 
 ```ts
-// vitest.config.ts — polyfills jsdom with what the components rely on
+// vitest.config.ts — polyfills jsdom and cleans up after each test, with or without globals
 export default { test: { environment: "jsdom", setupFiles: ["@rind-ui/testing/setup"] } }
 ```
 
 ```ts
-import { cleanup } from "@testing-library/react"
-import { afterEach } from "vitest"
 import { getAccordion } from "@rind-ui/testing"
-
-// Without `globals: true`, Testing Library does not clean up between tests on its own.
-afterEach(cleanup)
 
 const faq = getAccordion(container, { item: "Shipping" })
 await faq.expand("Shipping")
