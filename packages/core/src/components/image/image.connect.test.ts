@@ -1,6 +1,6 @@
 // add-image 2.2: every cell of design §2, named and decorative; 1.2: Image reuses the shared
 // status machine, so `alt` cannot affect the status and fallback timing is Avatar's.
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, onTestFinished, vi } from "vitest"
 import { createService } from "../../machine/service"
 import { avatarMachine } from "../avatar/avatar.machine"
 import { imageStatusMachine } from "../image-status/image-status.machine"
@@ -89,9 +89,14 @@ describe("Image reuses the status machine (1.1, 1.2)", () => {
 
   it("fallback timing is Avatar's: the delay applies only while loading", () => {
     vi.useFakeTimers()
+    onTestFinished(() => {
+      vi.useRealTimers()
+    })
     const scheduler = {
+      // fake-time: vi.useFakeTimers drives it
       setTimeout: (cb: () => void, ms: number) => setTimeout(cb, ms),
       clearTimeout: (h: unknown) => clearTimeout(h as ReturnType<typeof setTimeout>),
+      // fake-time: vi.useFakeTimers drives it
       requestAnimationFrame: (cb: () => void) => setTimeout(cb, 16),
       cancelAnimationFrame: (h: unknown) => clearTimeout(h as ReturnType<typeof setTimeout>),
     }
@@ -104,6 +109,5 @@ describe("Image reuses the status machine (1.1, 1.2)", () => {
     vi.advanceTimersByTime(300)
     expect(s.getSnapshot().context.fallbackReady).toBe(true)
     s.stop()
-    vi.useRealTimers()
   })
 })

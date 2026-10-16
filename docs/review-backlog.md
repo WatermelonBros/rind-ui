@@ -7,7 +7,6 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
-| add-image (r1) | — | packages/core/src/components/image/image.connect.test.ts:107 | `useRealTimers` runs only on the success path; restore in `afterEach` |
 | add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
 | add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
 | add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |
