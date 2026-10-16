@@ -56,13 +56,23 @@ export interface StepFacts {
   /** form-associated: what the hidden input must hold, and the user changes so far. */
   readonly formInput?: {
     readonly multiple?: boolean
-    /** What one hidden input (by its submitted value) must hold. */
-    readonly expected: (input: { readonly value: string }) => {
+    /** The inputs are the accessible controls: no aria-hidden, tabIndex or focus checks. */
+    readonly accessible?: boolean
+    /** What one hidden input (by its submitted value and position) must hold. */
+    readonly expected: (input: { readonly value: string; readonly index: number }) => {
       readonly checked?: boolean
       readonly indeterminate?: boolean
       readonly value?: string
     }
     readonly userChanges: number
+  }
+  /**
+   * The contract's `valued` expectations: values in DOM order of the valued elements (`null`:
+   * none), and each one's expected aria-valuetext when declared.
+   */
+  readonly valued?: {
+    readonly values: readonly (number | null)[]
+    readonly valueText?: (index: number) => string
   }
   /** True when a contract exception (through an active quirk) exempts `part` from `invariant`. */
   readonly exempt?: (invariant: GenericInvariantId, part: string) => boolean
@@ -75,6 +85,9 @@ export interface PartExpected {
 }
 
 export type GenericInvariant = (facts: StepFacts) => readonly string[]
+
+/** Roles that carry a value (`valued`): one element each. */
+const VALUED_ROLES = new Set(["slider", "progressbar", "meter", "spinbutton"])
 
 const NAME_REQUIRED = new Set([
   "button",
@@ -482,8 +495,8 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     if (!multiple && inputs.length !== 1) {
       return [`${inputs.length} hidden inputs rendered; expected exactly one`]
     }
-    for (const input of inputs) {
-      const want = f.formInput.expected(input)
+    for (const [index, input] of inputs.entries()) {
+      const want = f.formInput.expected({ value: input.value, index })
       for (const key of ["checked", "indeterminate", "value"] as const) {
         if (want[key] !== undefined && input[key] !== want[key]) {
           out.push(
@@ -491,9 +504,11 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
           )
         }
       }
-      if (input.ariaHidden !== "true") out.push(`${input.describe} is not aria-hidden`)
-      if (input.tabIndex !== -1) out.push(`${input.describe} has tabIndex ${input.tabIndex}`)
-      if (input.focused) out.push(`${input.describe} has focus`)
+      if (!f.formInput.accessible) {
+        if (input.ariaHidden !== "true") out.push(`${input.describe} is not aria-hidden`)
+        if (input.tabIndex !== -1) out.push(`${input.describe} has tabIndex ${input.tabIndex}`)
+        if (input.focused) out.push(`${input.describe} has focus`)
+      }
       if (input.clicks > 0) {
         out.push(
           `${input.describe} received ${input.clicks} click events (a synthetic click reaches ancestors)`,
@@ -882,30 +897,62 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     return out
   },
   /**
-   * aria-valuenow equals the machine's value in the same step; a numeric aria-valuetext
-   * equals it too; a `value-text` part shows aria-valuetext (or the value).
+   * aria-valuenow equals the expected value in the same step, element by element in DOM order
+   * (one per thumb); a `null` value carries neither aria-valuenow nor aria-valuetext; the
+   * declared aria-valuetext, or else a plain-number one equals the value (a locale's "1.200"
+   * is never read as 1.2); a single value's `value-text` part shows its aria-valuetext.
    */
   valued: (f) => {
-    const value = f.values["value"]
-    if (typeof value !== "number") return []
+    const raw = f.values["value"]
+    const expected: readonly (number | null)[] | undefined =
+      f.valued?.values ??
+      (typeof raw === "number"
+        ? [raw]
+        : Array.isArray(raw) && raw.every((v) => typeof v === "number" || v === null)
+          ? (raw as readonly (number | null)[])
+          : undefined)
+    if (!expected) return []
     const out: string[] = []
-    let valuetext: string | undefined
-    for (const el of f.after.elements) {
+    const valuedEls = f.after.elements.filter(
+      (el) =>
+        el.attrs["aria-valuenow"] !== undefined || (el.role !== null && VALUED_ROLES.has(el.role)),
+    )
+    if (valuedEls.length !== expected.length) {
+      out.push(`${valuedEls.length} valued elements rendered, expected ${expected.length}`)
+    }
+    const texts: string[] = []
+    for (const [i, el] of valuedEls.entries()) {
+      const want = expected[i]
+      if (want === undefined) continue
       const now = el.attrs["aria-valuenow"]
-      if (now !== undefined && Number(now) !== value) {
-        out.push(`${el.describe} aria-valuenow="${now}", machine value ${value}`)
-      }
       const text = el.attrs["aria-valuetext"]
+      if (want === null) {
+        if (now !== undefined) out.push(`${el.describe} has aria-valuenow="${now}", expected none`)
+        if (text !== undefined)
+          out.push(`${el.describe} has aria-valuetext="${text}", expected none`)
+        continue
+      }
+      if (now !== undefined && Number(now) !== want) {
+        out.push(`${el.describe} aria-valuenow="${now}", machine value ${want}`)
+      }
       if (text === undefined) continue
-      valuetext = text
+      texts.push(text)
+      const declared = f.valued?.valueText?.(i)
       if (text.trim() === "") out.push(`${el.describe} has an empty aria-valuetext`)
-      else if (/^-?\d+(\.\d+)?$/.test(text.trim()) && Number(text) !== value) {
-        out.push(`${el.describe} aria-valuetext="${text}", machine value ${value}`)
+      else if (declared !== undefined) {
+        if (text !== declared)
+          out.push(`${el.describe} aria-valuetext="${text}", expected "${declared}"`)
+      } else if (/^-?\d+(\.\d+)?$/.test(text.trim()) && String(Number(text)) === text.trim()) {
+        if (Number(text) !== want)
+          out.push(`${el.describe} aria-valuetext="${text}", machine value ${want}`)
       }
     }
-    for (const p of f.after.parts.filter((x) => x.part === "value-text" && exposed(x))) {
-      const want = valuetext ?? String(value)
-      if (!p.text.includes(want)) out.push(`${p.describe} shows "${p.text}", expected "${want}"`)
+    const single = expected.length === 1 ? expected[0] : undefined
+    if (typeof single === "number") {
+      for (const p of f.after.parts.filter((x) => x.part === "value-text" && exposed(x))) {
+        const want = texts[0] ?? String(single)
+        if (!p.text.includes(want)) out.push(`${p.describe} shows "${p.text}", expected "${want}"`)
+      }
     }
     return out
   },

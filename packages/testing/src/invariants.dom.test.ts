@@ -389,6 +389,45 @@ describe("trait invariants", () => {
     expect(trait("valued", f)[0]).toMatch(/machine value 4/)
   })
 
+  it("valued: a multi-thumb mismatch names the thumb", () => {
+    const thumb = (v: number) =>
+      `<input type="range" ${part("hidden-input", `aria-label="t" aria-valuenow="${v}"`)}>`
+    const f = facts(`<div ${part("root")}>${thumb(20)}${thumb(79)}</div>`, {
+      valued: { values: [20, 80] },
+    })
+    const out = trait("valued", f)
+    expect(out).toHaveLength(1)
+    expect(out[0]).toMatch(/aria-valuenow="79", machine value 80/)
+    expect(
+      trait(
+        "valued",
+        facts(`<div ${part("root")}>${thumb(20)}${thumb(80)}</div>`, {
+          valued: { values: [20, 80] },
+        }),
+      ),
+    ).toEqual([])
+  })
+
+  it("valued: a null value carries no aria-valuenow", () => {
+    const f = facts(
+      `<div ${part("root", 'role="progressbar" aria-label="p" aria-valuenow="0"')}></div>`,
+      {
+        valued: { values: [null] },
+      },
+    )
+    expect(trait("valued", f)[0]).toMatch(/aria-valuenow="0", expected none/)
+  })
+
+  it("valued: locale grouping is not misread; a declared text is compared", () => {
+    const html = `<div ${part("root", 'role="slider" aria-label="s" aria-valuenow="1200" aria-valuetext="1.200"')}></div>`
+    expect(trait("valued", facts(html, { valued: { values: [1200] } }))).toEqual([])
+    const declared = trait(
+      "valued",
+      facts(html, { valued: { values: [1200], valueText: () => "1,200" } }),
+    )
+    expect(declared[0]).toMatch(/expected "1,200"/)
+  })
+
   it("live-region: exists before the first message, never hidden", () => {
     const baseline = facts(`<div ${part("root")}></div>`).after
     const f = facts(

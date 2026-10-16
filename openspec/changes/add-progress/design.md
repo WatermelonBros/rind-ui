@@ -4,7 +4,7 @@ See proposal.md and [progress.md](../../../docs/research/progress.md). Builds on
 `add-foundations` (machine runtime with `onProps`, contracts, `testMachine` with prop
 steps), `add-a11y-foundations` (`Announcer`, `format.number`, `resolveMessages`, quirks
 registry, `visually-hidden`), `add-theme-system`. `add-meter` and `add-slider` build on
-this change (`range-value`, `valued` extension).
+this change (`range-value`). The `valued` extension moved to `add-slider`, which ships first.
 
 ## Goals / Non-Goals
 
@@ -26,7 +26,6 @@ packages/core/src/components/progress/
 └─ progress.messages.ts    valueText, complete
 packages/core/src/dom/quirks.ts                       + nvda-progressbar-name
 packages/react/src/progress/                          Root, Label, ValueText, Track, Indicator, Circle, CircleTrack, CircleIndicator
-packages/testing/src/invariants.ts                    valued extension
 packages/theme/src/progress.css
 ```
 
@@ -95,7 +94,7 @@ server), links BU#4184, nvda#13904, nvda#16204, FreedomScientific standards-supp
 (nvda#16204 fixed) in the two latest NVDA releases"; test: a Guidepup NVDA golden flow
 plus a unit test that the span exists and is `role="presentation"`. Shared by Meter.
 
-### 6. `valued` extension (`model-based-testing`)
+### 6. `valued` extension (`model-based-testing`, shipped by `add-slider`)
 
 `ContractDef.valued?: { values(view): readonly (number | null)[]; valueText?(view, i) }`;
 the invariant matches elements with a valued role or `aria-valuenow` in DOM order. Fixes

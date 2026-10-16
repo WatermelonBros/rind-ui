@@ -17,8 +17,8 @@ causes G, J, K and §1.4 Slider ·
 Depends on: `add-foundations` (archived), `add-a11y-foundations` (keys with `value`
 context, modality, `focusSafely`, visually hidden input style, i18n messages and
 `format.number`, quirks, iOS text selection), `add-checkbox` (`hidden-form-input`,
-`control-label`'s Description), `add-theme-system`, and `add-progress` (the extended
-`valued` invariant in `model-based-testing`). Requests to `add-checkbox`,
+`control-label`'s Description), and `add-theme-system`. This change ships the extended `valued`
+invariant (`model-based-testing`, moved here from `add-progress`). Requests to `add-checkbox`,
 `add-theme-system` and `add-overlay-infrastructure` are listed in design.md.
 
 ## What Changes
@@ -55,6 +55,8 @@ context, modality, `focusSafely`, visually hidden input style, i18n messages and
 
 - `test-drivers`: ADDED pointer steps at a position, part geometry and native value
   input in both adapters.
+- `model-based-testing`: ADDED the `valued` trait extension (value lists, `null`,
+  contract-declared expectations), moved from `add-progress`.
 
 ## Non-goals
 

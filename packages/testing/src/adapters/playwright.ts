@@ -367,6 +367,66 @@ function createPlaywrightEnv(
           : [box.x + box.width / 2, box.y + box.height / 2]
         await page.mouse.click(x, y)
       },
+      box: async () => {
+        const box = await (await now()).boundingBox()
+        return box && (box.width > 0 || box.height > 0) ? box : null
+      },
+      async pointer(phase, pointerOptions) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        if (!box || (box.width === 0 && box.height === 0)) {
+          throw new Error(
+            `${label}: pointer("${phase}") needs layout, which this environment does not have`,
+          )
+        }
+        const x = box.x + pointerOptions.at.x * box.width
+        const y = box.y + pointerOptions.at.y * box.height
+        const pointerType = pointerOptions.pointerType ?? "mouse"
+        const { page } = await getBase()
+        // The real mouse: capture, hit testing and compatibility events are the browser's.
+        if (pointerType === "mouse" && phase !== "cancel") {
+          await page.mouse.move(x, y)
+          if (phase === "down") await page.mouse.down()
+          if (phase === "up") await page.mouse.up()
+          return
+        }
+        // Touch and pen moves (and every pointercancel) have no Playwright input: dispatched
+        // in the page at the same point, with one pointer id per gesture.
+        await l.evaluate(
+          (el, o) => {
+            const target = (o.phase === "down" ? document.elementFromPoint(o.x, o.y) : null) ?? el
+            const pressing = o.phase === "down" || o.phase === "move"
+            target.dispatchEvent(
+              new PointerEvent(`pointer${o.phase}`, {
+                bubbles: true,
+                cancelable: o.phase !== "cancel",
+                composed: true,
+                pointerId: o.pointerType === "mouse" ? 1 : 2,
+                pointerType: o.pointerType,
+                isPrimary: true,
+                clientX: o.x,
+                clientY: o.y,
+                button: o.phase === "move" ? -1 : 0,
+                buttons: pressing ? 1 : 0,
+                pressure: pressing ? 0.5 : 0,
+              }),
+            )
+          },
+          { phase, x, y, pointerType },
+        )
+      },
+      async fill(value) {
+        const l = await waitFor()
+        // locator.fill refuses range inputs, and types: assistive technology sets the property.
+        await l.evaluate((el, v) => {
+          const input = el as HTMLInputElement
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, v)
+          else input.value = v
+          input.dispatchEvent(new Event("input", { bubbles: true }))
+          input.dispatchEvent(new Event("change", { bubbles: true }))
+        }, value)
+      },
       waitForDetach: async () => {
         await until(
           async () => (await locate()).count(),

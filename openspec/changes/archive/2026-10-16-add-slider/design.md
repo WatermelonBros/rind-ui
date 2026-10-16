@@ -13,8 +13,8 @@ libraries and records the bug history behind each scenario. This change builds o
 - `add-checkbox`: `hidden-form-input` (property sync, user-change events, reset,
   adoption of native input, implicit submission) and `control-label` (Description);
 - `add-theme-system`: tokens, variants, stylesheet convention;
-- `add-progress`: the `valued` extension in `model-based-testing` (arrays, contract
-  expectations).
+- `model-based-testing`: this change ships the `valued` extension (arrays, `null`, contract
+  expectations), moved here from `add-progress` so it lands first.
 
 ## Goals / Non-Goals
 
@@ -167,7 +167,7 @@ absolute fractions per move. They share nothing but listener hygiene.
   ("needs layout"); the jsdom project runs `testMachine` with `modalities: ["keyboard",
   "virtual"]` and `adjustNative` mapped to `INPUT.CHANGE`.
 - `adjustNative(i, v)` uses `Part.fill(String(v))` on the thumb input.
-- `valued` uses `add-progress`'s extension: expected values are the oracle's array in
+- `valued` uses the extension this change ships (`model-based-testing` delta): expected values are the oracle's array in
   thumb order, expected texts from `messages.valueText` with the run's locale.
 - Model configurations: single uncontrolled; `[20, 80]` with gap 2 and each collision
   policy; vertical; `dir="rtl"` (trait `directional`); `readOnly`; per-thumb disabled;
