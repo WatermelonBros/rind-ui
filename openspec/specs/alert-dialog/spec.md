@@ -1,12 +1,11 @@
-## Purpose
+# alert-dialog Specification
 
+## Purpose
 Defines rind-ui's Alert Dialog: a modal dialog that asks the user to confirm or
 cancel a consequential action. It behaves as the `dialog` capability
 (`add-dialog`) specifies, except where this capability says otherwise; layer
 mechanics come from `add-overlay-infrastructure` and are not restated.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Same Behaviour As Dialog Unless Stated
 
 The Alert Dialog SHALL meet every requirement of the `dialog` capability — open state
@@ -202,8 +201,9 @@ attributes as the corresponding Dialog part. `data-modal` SHALL always be presen
 
 ### Requirement: Alert Dialog Contract
 
-The `alert-dialog` contract SHALL locate an instance by role `alertdialog` and exact
-accessible name, SHALL declare the traits `layer`, `modal`, `restores-focus` and
+The `alert-dialog` contract SHALL locate an instance as the Dialog contract does, through
+its trigger (role `button`, exact name `trigger` defaulting to the dialog's `name`), since
+a closed dialog has no content to locate; it SHALL declare the traits `layer`, `modal`, `restores-focus` and
 `presence`, and SHALL declare the Dialog contract's actions and queries except
 `close`, plus `cancel()` and `confirm(name?)` (press the action with that accessible
 name, or the only action), each with pointer and keyboard implementations. Its
@@ -221,3 +221,4 @@ SHALL map `CANCEL_PRESS` to `cancel` and `ACTION_PRESS` to `confirm`.
 - **WHEN** `testMachine(alertDialogContract, …)` runs in every modality
 - **THEN** every transition is covered, outside-press steps expect the dialog to stay
   open, and every generic, accessibility and overlay invariant passes
+

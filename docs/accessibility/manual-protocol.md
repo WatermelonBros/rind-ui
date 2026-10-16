@@ -262,6 +262,27 @@ TwoTriggers, KeepMounted, ExitAnimation. Record each pass in `tested-with.json` 
 - [ ] **Windows High Contrast / forced colors**: the content border is visible without the
       backdrop, and the focus ring is visible.
 
+## Device checklist: Alert Dialog (add-alert-dialog 8.2)
+
+Record each pass in `tested-with.json` with `component: "alert-dialog"`. Deferred to devices.
+Use a "Delete project?" alert dialog with a description, Cancel and Delete.
+
+- [ ] **Name, description and focused Cancel** (radix#1615, react-spectrum#9916): NVDA +
+      Firefox/Chrome, JAWS + Chrome, VoiceOver macOS + Safari and Chrome, VoiceOver iOS +
+      Safari, TalkBack + Chrome: opening speaks "Delete project?, alert dialog", then the
+      description, then the focused "Cancel, button". Record each wording (some pairs say
+      "dialog" or read the description after the button).
+- [ ] **Opened by keyboard from a menu item**: Cancel is focused and the ring is visible.
+- [ ] **Escape and outside press**: Escape closes it and focus returns to the trigger; a tap or
+      click outside does nothing and nothing is announced.
+- [ ] **Async confirm**: while "Deleting" runs the page behind stays unreachable and the pending
+      state is perceivable; after closing, focus is on the trigger.
+- [ ] **Alert inside a dialog**: closing the alert returns to the dialog's button that opened it.
+- [ ] **No description**: only the name and the focused control are spoken; nothing reads as an
+      empty description.
+- [ ] **Windows High Contrast / forced colors**: the content border and Cancel's focus ring are
+      visible.
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

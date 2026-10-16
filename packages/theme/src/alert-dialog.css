@@ -1,0 +1,74 @@
+/*
+ * Alert Dialog: dialog.css already styles the shared parts (it matches both scopes). This sheet
+ * lets --rind-alert-dialog-* override the --rind-dialog-* tokens (each falls back to its
+ * dialog token), lays Cancel and Action out as an end-aligned row under the message, and
+ * restates the reduced-motion and forced-colors rules for its own scope. It loads after
+ * dialog.css.
+ */
+@layer rind.components {
+  [data-scope="alert-dialog"][data-part="backdrop"][data-state] {
+    background: var(
+      --rind-alert-dialog-backdrop,
+      var(--rind-dialog-backdrop, var(--rind-color-overlay))
+    );
+    transition: opacity
+      var(--rind-alert-dialog-duration, var(--rind-dialog-duration, var(--rind-duration-normal)))
+      var(--rind-ease-out);
+  }
+
+  [data-scope="alert-dialog"][data-part="content"] {
+    /* Narrower than a dialog: a question and two buttons. */
+    max-inline-size: var(--rind-alert-dialog-max-width, var(--rind-dialog-max-width, 28rem));
+    background: var(
+      --rind-alert-dialog-bg,
+      var(--rind-dialog-bg, var(--rind-color-surface-raised))
+    );
+    color: var(--rind-alert-dialog-color, var(--rind-dialog-color, var(--rind-color-text)));
+    padding: var(--rind-alert-dialog-padding, var(--rind-dialog-padding, var(--rind-space-6)));
+    border-color: var(
+      --rind-alert-dialog-border,
+      var(--rind-dialog-border, var(--rind-color-border-strong))
+    );
+    border-radius: var(
+      --rind-alert-dialog-radius,
+      var(--rind-dialog-radius, var(--rind-radius-panel))
+    );
+    box-shadow: var(--rind-alert-dialog-shadow, var(--rind-dialog-shadow, var(--rind-shadow-lg)));
+    /* Message first, then the actions row: Cancel and Action sit at the end, wrapping when narrow. */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--rind-alert-dialog-gap, var(--rind-space-3));
+  }
+
+  [data-scope="alert-dialog"][data-part="content"]
+    > :not([data-part="cancel"], [data-part="action"]) {
+    flex: 1 0 100%;
+    margin: 0;
+  }
+
+  [data-scope="alert-dialog"]:is([data-part="cancel"], [data-part="action"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="alert-dialog"]:is([data-part="backdrop"], [data-part="content"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="alert-dialog"][data-part="content"] {
+      border-color: CanvasText;
+    }
+
+    [data-scope="alert-dialog"]:is([data-part="cancel"], [data-part="action"])[data-focus-visible] {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+}

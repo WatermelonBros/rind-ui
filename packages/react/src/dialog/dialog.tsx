@@ -53,9 +53,10 @@ declare module "../provider" {
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
-const SCOPE = "dialog"
-
 interface Ctx {
+  /** The family member: `dialog` or `alert-dialog` (scope, layer kind, names). */
+  readonly scope: string
+  readonly kind: "dialog" | "alertdialog"
   readonly service: Service<typeof dialogMachine>
   readonly root: string
   readonly modal: boolean
@@ -72,40 +73,54 @@ interface Ctx {
 }
 
 type Rendered = { readonly title?: string | undefined; readonly description?: string | undefined }
-const DialogContext = createContext<Ctx | null>(null)
-function useDialog(part: string): Ctx {
+export const DialogContext = createContext<Ctx | null>(null)
+export function useDialog(part: string): Ctx {
   const ctx = useContext(DialogContext)
-  if (!ctx) throw new Error(`Dialog.${part} must be inside Dialog.Root`)
+  if (!ctx) throw new Error(`${part} must be inside its Dialog or AlertDialog Root`)
   return ctx
 }
 
 /** The stack's metadata for this layer, followed while open. */
-function useMeta(root: string, open: boolean): LayerMeta | undefined {
+function useMeta(scope: string, root: string, open: boolean): LayerMeta | undefined {
   const env = useEnvironment()
   const [meta, setMeta] = useState<LayerMeta | undefined>(undefined)
   useEffect(() => {
     if (!open || typeof document === "undefined") return setMeta(undefined)
     const node = env.dom.getRootNode()
     const stack = getLayerStack("body" in node ? node : node.ownerDocument)
-    const read = () => setMeta(stack.get(dialogLayerId(SCOPE, root))?.meta())
+    const read = () => setMeta(stack.get(dialogLayerId(scope, root))?.meta())
     read()
     return stack.subscribe(read)
-  }, [root, env, open])
+  }, [scope, root, env, open])
   return meta
 }
 
-function useApi(
+export function useApi(
   ctx: Ctx,
   focus: { focusWithin?: boolean; contentFocused?: boolean; modality?: Modality } = {},
 ) {
   const view = useSelector(ctx.service, (v) => v)
   const open = view.matches("open")
-  const meta = useMeta(ctx.root, open)
+  const meta = useMeta(ctx.scope, ctx.root, open)
+  const input = {
+    instance: ctx.root,
+    open,
+    opener: view.context.opener,
+    closeReason: view.context.closeReason,
+    rendered: ctx.rendered,
+    contentMounted: ctx.contentMounted,
+    meta,
+    titleFocusTarget: ctx.titleFocusTarget,
+    ...focus,
+    messages: ctx.messages,
+  }
   return {
     open,
+    /** The connect input, for a family member's own parts (Alert Dialog's Cancel, Action). */
+    input,
     api: dialogConnect(
       {
-        scope: SCOPE,
+        scope: ctx.scope,
         instance: ctx.root,
         open,
         modal: ctx.modal,
@@ -138,43 +153,57 @@ export type DialogRootProps = Omit<DialogProps, "root" | "parent"> & {
   readonly children?: ReactNode
 }
 
-function Root({
-  id,
-  keepMounted = false,
-  messages: ownMessages,
-  actionsRef,
-  children,
-  ...props
-}: DialogRootProps) {
-  const root = useRootId(id)
-  const parent = useParentLayer(DIALOG_PARENT_KINDS)
-  const messages = useMessages("dialog", dialogMessages, ownMessages)
-  const { service, send } = useMachine(dialogMachine, { ...props, root, parent })
-  useImperativeHandle(
+/** The Root of a dialog-family member: its machine, scope and layer kind. */
+export function createDialogRoot(family: {
+  readonly scope: string
+  readonly kind: "dialog" | "alertdialog"
+  readonly machine: typeof dialogMachine
+  /** Always modal (the Alert Dialog): the props cannot turn it off. */
+  readonly alwaysModal?: boolean
+}) {
+  return function Root({
+    id,
+    keepMounted = false,
+    messages: ownMessages,
     actionsRef,
-    () => ({ open: () => send({ type: "OPEN" }), close: () => send({ type: "CLOSE" }) }),
-    [send],
-  )
-  const [contentMounted, setContentMounted] = useState(false)
-  const [titleLevel, setTitleLevel] = useState<HeadingLevel>(2)
-  const [rendered, setRendered] = useState<Rendered>({})
-  const modal = props.modal !== false
-  const ctx: Ctx = {
-    service,
-    root,
-    modal,
-    keepMounted,
-    titleFocusTarget: props.initialFocus === "title",
-    messages,
-    contentMounted,
-    setContentMounted,
-    titleLevel,
-    setTitleLevel,
-    rendered,
-    setRendered,
+    children,
+    ...props
+  }: DialogRootProps) {
+    const root = useRootId(id)
+    const parent = useParentLayer(DIALOG_PARENT_KINDS)
+    const messages = useMessages("dialog", dialogMessages, ownMessages)
+    const { service, send } = useMachine(family.machine, { ...props, root, parent })
+    useImperativeHandle(
+      actionsRef,
+      () => ({ open: () => send({ type: "OPEN" }), close: () => send({ type: "CLOSE" }) }),
+      [send],
+    )
+    const [contentMounted, setContentMounted] = useState(false)
+    const [titleLevel, setTitleLevel] = useState<HeadingLevel>(2)
+    const [rendered, setRendered] = useState<Rendered>({})
+    const modal = family.alwaysModal === true || props.modal !== false
+    const initialFocus = props.initialFocus
+    const ctx: Ctx = {
+      scope: family.scope,
+      kind: family.kind,
+      service,
+      root,
+      modal,
+      keepMounted,
+      titleFocusTarget: initialFocus === "title",
+      messages,
+      contentMounted,
+      setContentMounted,
+      titleLevel,
+      setTitleLevel,
+      rendered,
+      setRendered,
+    }
+    return <DialogContext value={ctx}>{children}</DialogContext>
   }
-  return <DialogContext value={ctx}>{children}</DialogContext>
 }
+
+const Root = createDialogRoot({ scope: "dialog", kind: "dialog", machine: dialogMachine })
 
 type Own<T extends keyof React.JSX.IntrinsicElements, S = undefined> = ComponentPropsWithRef<T> & {
   readonly render?: RenderProp<S>
@@ -196,7 +225,7 @@ function Trigger({
   const env = useEnvironment()
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const generated = useId()
-  const triggerId = id ?? partId(SCOPE, ctx.root, `trigger-${generated.replace(/:/g, "")}`)
+  const triggerId = id ?? partId(ctx.scope, ctx.root, `trigger-${generated.replace(/:/g, "")}`)
   const [focused, setFocused] = useState(false)
   const modality = useModality(env.modality, focused)
   const press = usePress({
@@ -331,7 +360,7 @@ function Content({
       ...rest,
       // Headings inside the body are one level below the title.
       children: (
-        <LayerProvider layer={dialogLayerId(SCOPE, ctx.root)} kind="dialog">
+        <LayerProvider layer={dialogLayerId(ctx.scope, ctx.root)} kind={ctx.kind}>
           <Heading.Level level={Math.min(6, ctx.titleLevel + 1) as HeadingLevel}>
             {children}
           </Heading.Level>
@@ -348,7 +377,7 @@ function Content({
  */
 function useRegistered(ctx: Ctx, part: "title" | "description") {
   const { setRendered } = ctx
-  const id = partId(SCOPE, ctx.root, part)
+  const id = partId(ctx.scope, ctx.root, part)
   useIsoLayoutEffect(() => {
     setRendered((r) => ({ ...r, [part]: id }))
     return () => setRendered((r) => ({ ...r, [part]: undefined }))
@@ -389,7 +418,7 @@ function CloseTrigger({ id, render, ref, ...rest }: Own<"button">) {
   const env = useEnvironment()
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const generated = useId()
-  const closeId = id ?? partId(SCOPE, ctx.root, `close-${generated.replace(/:/g, "")}`)
+  const closeId = id ?? partId(ctx.scope, ctx.root, `close-${generated.replace(/:/g, "")}`)
   const [focused, setFocused] = useState(false)
   const modality = useModality(env.modality, focused)
   const el = useRef<HTMLElement | null>(null)
@@ -440,7 +469,17 @@ function Portal(props: PortalProps) {
   const ctx = useDialog("Portal")
   const env = useEnvironment()
   const opener = useSelector(ctx.service, (v) => v.context.opener)
-  return <PortalPart logicalParent={() => (opener ? env.dom.getById(opener) : null)} {...props} />
+  // The opener once open; before that (and when opened programmatically) the first trigger,
+  // so the host carries the trigger's theme, dir and lang from the first open on.
+  const logicalParent = () =>
+    (opener ? env.dom.getById(opener) : null) ??
+    env.dom
+      .getRootNode()
+      .querySelector?.(
+        `[data-scope="${ctx.scope}"][data-part="trigger"][data-instance="${ctx.root}"]`,
+      ) ??
+    null
+  return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
 export const Dialog = {

@@ -22,6 +22,11 @@ export type PortalProps = ComponentPropsWithRef<"div"> & {
   readonly children?: ReactNode
 }
 
+const sameAttributes = (a: Record<string, string>, b: Record<string, string>) => {
+  const keys = Object.keys(a)
+  return keys.length === Object.keys(b).length && keys.every((k) => a[k] === b[k])
+}
+
 /**
  * Renders its children into a host `div[data-rind-portal]` outside the tree. Nothing on the
  * server and nothing during hydration (no mismatch: radix#1386); mounts after. The host
@@ -40,10 +45,14 @@ export function Portal({ container, logicalParent, render, children, ...rest }: 
     if (!host) return
     return syncPortalHost(host, () => parent.current?.() ?? null)
   }, [host])
-  // The first render after mount already has the right attributes (no flash in the wrong dir).
+  // The first render after mount already has the right attributes (no flash in the wrong dir),
+  // and a logical parent that changes (a dialog's opener, set on open) is followed at once:
+  // the host's observer only sees attribute mutations, not a different parent element.
   useLayoutEffect(() => {
-    if (mounted) setAttributes(portalHostAttributes(parent.current?.() ?? null))
-  }, [mounted])
+    if (!mounted) return
+    const next = portalHostAttributes(parent.current?.() ?? null)
+    setAttributes((prev) => (sameAttributes(prev, next) ? prev : next))
+  })
   if (!mounted) return null
   const target = resolvePortalTarget(parent.current?.() ?? null, container)
   // A component in a popup is not hosted by the toolbar its trigger sits in (nor are its

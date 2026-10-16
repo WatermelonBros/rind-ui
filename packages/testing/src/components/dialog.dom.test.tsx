@@ -1198,3 +1198,30 @@ describe("Driver", () => {
     },
   )
 })
+
+describe("portal host follows the trigger's theme (site session report)", () => {
+  it("the portal host carries data-rind-theme, dir and lang from the first open", async () => {
+    render(
+      <div data-rind-theme="acme" dir="rtl" lang="ar">
+        <Dialog.Root>
+          <Dialog.Trigger>Open</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content>
+                <Dialog.Title>T</Dialog.Title>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </div>,
+    )
+    await act(async () => {
+      screen.getByRole("button", { name: "Open" }).click()
+    })
+    await act(async () => new Promise((r) => setTimeout(r, 50)))
+    const host = document.querySelector("[data-rind-portal]")
+    expect(host?.getAttribute("data-rind-theme")).toBe("acme")
+    expect(host?.getAttribute("dir")).toBe("rtl")
+    expect(host?.getAttribute("lang")).toBe("ar")
+  })
+})
