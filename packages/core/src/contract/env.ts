@@ -48,6 +48,8 @@ export type AriaRole = string
 /** How to find an element. Role + exact accessible name first; text as a fallback. */
 export type By =
   | { readonly role: AriaRole; readonly name?: string | RegExp }
+  /** A labelable control by its exact accessible name, for controls with no role (password). */
+  | { readonly label: string | RegExp }
   | { readonly text: string | RegExp }
   /**
    * The contract's own `data-scope` and this `data-part`, inside the driver's target (a

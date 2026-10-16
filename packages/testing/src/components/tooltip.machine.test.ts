@@ -28,6 +28,7 @@ function make(over: Partial<TooltipProps> = {}, group = fakeDelayGroup()) {
     dom: { getById: () => null },
     modality: { modality: () => "keyboard" },
     scheduler: {
+      // fake-time: the fake scheduler under test (vi.useFakeTimers)
       setTimeout: (cb: () => void, ms: number) => setTimeout(cb, ms),
       clearTimeout: (h: unknown) => clearTimeout(h as never),
       requestAnimationFrame: () => 0,
@@ -109,6 +110,7 @@ describe("opening by hover", () => {
     expect(m.group.members.has("t")).toBe(true)
   })
 
+  // fake-time: the fake scheduler under test (vi.useFakeTimers)
   it("HOVER.START waits the open delay (700 ms) and opens with reason hover, not instant", () => {
     const m = make()
     m.send(hover)

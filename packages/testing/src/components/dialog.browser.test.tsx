@@ -12,7 +12,9 @@ const css = (ms: number) => (
 [data-part="content"][data-state="closed"] { animation: ${EXIT} ${ms}ms linear forwards }`}</style>
 )
 const content = () => document.querySelector<HTMLElement>('[data-part="content"]')
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const frames = async (count = 6) => {
+  for (let i = 0; i < count; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 
 function Fixture({
   ms = 400,
@@ -59,7 +61,7 @@ describe("Dialog in a real browser", () => {
     await userEvent.keyboard("{Escape}")
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("closed")
     expect(content()?.getAttribute("data-close-reason")).toBe("escape-key")
-    await wait(100)
+    await frames()
     expect(content()).not.toBeNull()
     await expect.poll(() => content(), { timeout: 3000 }).toBeNull()
   })
@@ -74,7 +76,7 @@ describe("Dialog in a real browser", () => {
     if (!close) throw new Error("no close trigger")
     await userEvent.dblClick(close)
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("closed")
-    await wait(150)
+    await frames()
     expect(onOpenChange).toHaveBeenCalledTimes(1)
     expect(onOpenChange.mock.calls[0]?.[0]).toBe(false)
     await expect.poll(() => content(), { timeout: 3000 }).toBeNull()
@@ -88,7 +90,8 @@ describe("Dialog in a real browser", () => {
     const before = window.scrollY
     await userEvent.click(trigger())
     await expect.poll(() => document.activeElement?.getAttribute("aria-label")).toBe("Name")
-    await wait(100)
+    // Stable across several frames: a late focus-induced scroll would show up here.
+    await frames()
     expect(window.scrollY).toBe(before)
     window.scrollTo(0, 0)
   })

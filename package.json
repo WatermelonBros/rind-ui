@@ -11,7 +11,7 @@
     "dev": "turbo run dev",
     "test": "turbo run test:vitest",
     "typecheck": "turbo run typecheck",
-    "lint": "biome check . && node scripts/lint-platform.mjs",
+    "lint": "biome check . && node scripts/lint-platform.mjs && node scripts/lint-test-delays.mjs",
     "format": "biome check --write .",
     "storybook": "pnpm --filter @rind-ui/storybook dev",
     "changeset": "changeset",

@@ -4,8 +4,17 @@ import { presenceMachine } from "../presence/presence.machine"
 import { waitForExit } from "./presence"
 
 const inBrowser = !navigator.userAgent.includes("jsdom")
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+
+/** Freezes the element's running animations so the test, not the clock, decides when they end. */
+function hold(el: Element) {
+  const held = el.getAnimations({ subtree: true })
+  for (const a of held) a.pause()
+  return held
+}
+const release = (held: Animation[]) => {
+  for (const a of held) a.finish()
+}
 
 /** Tracks whether a promise has settled, without awaiting it. */
 function track(p: Promise<unknown>) {
@@ -35,6 +44,7 @@ describe("waitForExit", () => {
     if (inBrowser) return
     const el = mount()
     let timer = false
+    // fake-time: a 0 ms task marks the task boundary under test; never awaited
     setTimeout(() => {
       timer = true
     }, 0)
@@ -49,31 +59,36 @@ describe("waitForExit", () => {
     void el.offsetWidth
     await frame()
     el.style.opacity = "0"
+    const held = hold(el)
+    expect(held.length).toBeGreaterThan(0)
     const t = track(waitForExit(el))
-    await sleep(50)
+    await frame()
     expect(t.done).toBe(false)
-    await sleep(350)
-    expect(t.done).toBe(true)
+    release(held)
+    await expect.poll(() => t.done).toBe(true)
   })
 
   it.runIf(inBrowser)("waits for a finite CSS keyframe animation", async () => {
     const el = mount()
     el.style.animation = "fade 200ms linear forwards"
+    const held = hold(el)
+    expect(held.length).toBeGreaterThan(0)
     const t = track(waitForExit(el))
-    await sleep(50)
+    await frame()
     expect(t.done).toBe(false)
-    await sleep(350)
-    expect(t.done).toBe(true)
+    release(held)
+    await expect.poll(() => t.done).toBe(true)
   })
 
   it.runIf(inBrowser)("waits for a Web Animation", async () => {
     const el = mount()
     el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150 })
+    const held = hold(el)
     const t = track(waitForExit(el))
-    await sleep(40)
+    await frame()
     expect(t.done).toBe(false)
-    await sleep(300)
-    expect(t.done).toBe(true)
+    release(held)
+    await expect.poll(() => t.done).toBe(true)
   })
 
   it.runIf(inBrowser)(
@@ -81,7 +96,7 @@ describe("waitForExit", () => {
     async () => {
       const el = mount()
       el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 10, fill: "forwards" })
-      await sleep(50)
+      await Promise.all(el.getAnimations().map((a) => a.finished))
       const t = track(waitForExit(el))
       await Promise.resolve()
       await Promise.resolve()
@@ -103,12 +118,13 @@ describe("waitForExit", () => {
     const child = document.createElement("span")
     el.append(child)
     child.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200 })
+    const held = hold(el)
     await waitForExit(el)
     const t = track(waitForExit(el, { subtree: true }))
-    await sleep(50)
+    await frame()
     expect(t.done).toBe(false)
-    await sleep(350)
-    expect(t.done).toBe(true)
+    release(held)
+    await expect.poll(() => t.done).toBe(true)
   })
 
   // A hidden document cannot be emulated reliably in the test browser, so `doc.hidden`
@@ -119,12 +135,11 @@ describe("waitForExit", () => {
     el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 5000 })
     const controller = new AbortController()
     const t = track(waitForExit(el, {}, controller.signal))
-    await sleep(30)
+    await frame()
     controller.abort()
     // Abort is only observed between animations, so end the pending one too.
     for (const a of el.getAnimations()) a.cancel()
-    await sleep(30)
-    expect(t.done).toBe(true)
+    await expect.poll(() => t.done).toBe(true)
   })
 
   it.runIf(inBrowser)(
@@ -138,14 +153,15 @@ describe("waitForExit", () => {
       void el.offsetWidth
       await frame()
       el.style.opacity = "0"
+      hold(el)
       const t = track(waitForExit(el))
-      await sleep(100)
+      await frame()
       el.style.opacity = "0.5"
-      await sleep(300)
+      const held = hold(el)
+      await frame()
       expect(t.done).toBe(false)
-      const deadline = Date.now() + 6000
-      while (!t.done && Date.now() < deadline) await sleep(50)
-      expect(t.done).toBe(true)
+      release(held)
+      await expect.poll(() => t.done).toBe(true)
     },
   )
 
@@ -160,10 +176,13 @@ describe("waitForExit", () => {
     service.send({ type: "OPEN" })
     service.send({ type: "CLOSE" })
     el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 })
-    await sleep(50)
+    const held = hold(el)
+    await frame()
     service.send({ type: "OPEN" })
     expect(service.getSnapshot().state).toBe("present")
-    await sleep(400)
+    release(held)
+    await frame()
+    await frame()
     expect(service.getSnapshot().state).toBe("present")
     expect(el.isConnected).toBe(true)
     service.stop()

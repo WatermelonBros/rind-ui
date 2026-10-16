@@ -293,6 +293,15 @@ function createDomEnv(
           : { name: typeof name === "string" ? (n: string) => normalize(n) === name : name }),
       })
     }
+    if ("label" in by) {
+      const { queryAllByLabelText } = await loadTL()
+      const { label } = by
+      // Exact: a label's own text, aria-label or aria-labelledby equal to the name.
+      return queryAllByLabelText(
+        within as HTMLElement,
+        typeof label === "string" ? (n: string) => normalize(n) === label : label,
+      )
+    }
     if ("part" in by) {
       return Array.from(
         within.querySelectorAll(

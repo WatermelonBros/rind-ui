@@ -12,6 +12,12 @@ function Probe({ open, ...options }: { open: boolean } & PresenceOptions) {
 }
 const node = () => document.getElementById("p")
 
+// Drain animation frames inside act — no elapsed-time wait.
+const settle = () =>
+  act(async () => {
+    for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  })
+
 afterEach(() => {
   for (const s of document.head.querySelectorAll("style[data-test]")) s.remove()
 })
@@ -53,7 +59,9 @@ describe("usePresence", () => {
     expect(node()).toBe(before)
     await act(async () => rerender(<Probe open />))
     expect(node()).toBe(before)
-    await new Promise((r) => setTimeout(r, 600))
+    // End the (reversed) transition ourselves instead of waiting out its duration.
+    for (const a of before?.getAnimations() ?? []) a.finish()
+    await settle()
     expect(node()).toBe(before)
     expect(node()?.getAttribute("data-state")).toBe("open")
   })
@@ -61,7 +69,7 @@ describe("usePresence", () => {
   it("keepMounted never unmounts", async () => {
     const { rerender } = render(<Probe open keepMounted />)
     await act(async () => rerender(<Probe open={false} keepMounted />))
-    await act(() => new Promise<void>((r) => setTimeout(r, 50)))
+    await settle()
     expect(node()?.getAttribute("data-state")).toBe("closed")
   })
 
@@ -70,7 +78,7 @@ describe("usePresence", () => {
     const { rerender } = render(<Probe open onExitComplete={onExitComplete} />)
     await act(async () => rerender(<Probe open={false} onExitComplete={onExitComplete} />))
     await waitFor(() => expect(node()).toBeNull(), { timeout: 2000 })
-    await act(() => new Promise<void>((r) => setTimeout(r, 50)))
+    await settle()
     expect(onExitComplete).toHaveBeenCalledTimes(1)
   })
 })

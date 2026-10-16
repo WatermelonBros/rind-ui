@@ -1,12 +1,11 @@
-## Purpose
+# password-input Specification
 
+## Purpose
 Defines rind-ui's Password Input: a Text Field for secrets with a visibility toggle that every
 input method can operate, that never changes its name, keeps the caret where the user left it,
 and never leaves a password revealed after the form is submitted or reset. Introduced by
 `add-password-input`.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Anatomy
 
 The Password Input SHALL consist of Text Field's `root`, `label`, `description`,
@@ -140,9 +139,12 @@ and `invalid` reach the input and the trigger, and its contract SHALL declare th
 
 #### Scenario: Field state reaches the parts (ark#3930)
 
-- **WHEN** a Password Input inside a Field with `disabled` and `invalid` is rendered
-- **THEN** the input is disabled with `aria-invalid="true"`, the trigger is disabled, and every
-  part carries `data-disabled` and `data-invalid`
+- **WHEN** a Password Input inside a Field with `invalid` is rendered
+- **THEN** the input has `aria-invalid="true"`, and the input and the indicator carry
+  `data-invalid` (the trigger is a toggle button: the Field's invalid flag is not its state)
+- **WHEN** a Password Input inside a Field with `disabled` is rendered
+- **THEN** the input and the trigger are disabled and every part carries `data-disabled` (a
+  disabled Field displays no error, `field` "never while disabled")
 
 ### Requirement: Data Attributes
 
@@ -160,7 +162,8 @@ Text Field's state attributes. Root, Input, VisibilityTrigger and Indicator SHAL
 
 The Password Input SHALL ship a contract with scope `password-input`, anatomy `root`, `label`,
 `description`, `error-message`, `input`, `visibility-trigger`, `indicator`, located by the
-exact accessible name of its `input` part (a password input has no ARIA role), with:
+exact accessible name of its `input` part (a password input has no ARIA role: the contract
+locator `{ label }`), with:
 
 - actions: `type(text)`, `fill(text)`, `clear`, `blur` (as Text Field's);
   `toggleVisibility` (pointer: click the trigger; keyboard: focus the trigger and press Space);
@@ -169,7 +172,7 @@ exact accessible name of its `input` part (a password input has no ARIA role), w
   `toggleName()`, `isInvalid()`, `isDisabled()`;
 - states: Text Field's `idle`, `composing`; visibility observed through `data-state`;
 - events: Text Field's mappings, `VISIBILITY.TOGGLE` → `toggleVisibility`, `VISIBILITY.HIDE` →
-  `submitForm` / `resetForm`, prop steps `$sync:visible`, `$sync:value`;
+  `submitForm`, `RESET` → `resetForm` (no `$sync` prop steps: `visible` is not state-bound);
 - traits: `field-associated`.
 
 #### Scenario: Driver toggles
@@ -180,9 +183,9 @@ exact accessible name of its `input` part (a password input has no ARIA role), w
 ### Requirement: Password Input Invariants
 
 The contract SHALL ship invariants checked after every model step: the input's `type` is
-`text` exactly when the oracle is visible; the trigger's `aria-pressed` equals the oracle's
-`visible`; the trigger's accessible name is the same after every step; `spellcheck` is
-`false` on the input; after a submit step the input is `type="password"`.
+`text` exactly when the oracle is visible (so `type="password"` after a submit step); the
+trigger's `aria-pressed` equals the oracle's `visible`; the trigger's accessible name is the
+same after every step; the trigger is in the Tab order; `spellcheck` is `false` on the input.
 
 #### Scenario: Broken variant swaps the label
 
@@ -203,3 +206,4 @@ ring on the trigger when focus-visible, and visibility under forced colors.
 - **WHEN** a revealed Password Input is rendered under forced colors
 - **THEN** the boundary, the text and the trigger's icon are visible, and the pressed trigger
   is distinguishable from the unpressed one without colour
+

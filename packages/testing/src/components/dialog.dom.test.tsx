@@ -30,7 +30,12 @@ afterEach(() => vi.restoreAllMocks())
 
 const inert = (el: Element | null) => el?.closest("[inert]") != null
 const settle = () => act(async () => {})
-const frames = (ms = 80) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+/** Drains animation frames (and the microtasks between them) instead of waiting on the clock. */
+const frames = (count = 6) =>
+  act(async () => {
+    for (let i = 0; i < count; i++) await nextFrame()
+  })
 const active = () => document.activeElement
 
 interface FullProps extends Partial<DialogRootProps> {
@@ -462,7 +467,7 @@ describe("Initial focus", () => {
     if (!isJsdom) {
       await vi.waitFor(async () => {
         window.scrollTo(0, 500)
-        await new Promise((r) => setTimeout(r, 150))
+        for (let i = 0; i < 6; i++) await nextFrame()
         expect(window.scrollY).toBe(500)
       })
     }
@@ -737,7 +742,7 @@ describe("Accessible name", () => {
     const user = userEvent.setup()
     render(<Full title={null} description={null} />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(nameWarnings(warn)).toHaveLength(1)
   })
 
@@ -746,7 +751,7 @@ describe("Accessible name", () => {
     const user = userEvent.setup()
     render(<Full description={null} />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(nameWarnings(warn)).toHaveLength(0)
     cleanup()
     render(
@@ -754,7 +759,7 @@ describe("Accessible name", () => {
         <Dialog.Content aria-label="Named" />
       </Dialog.Root>,
     )
-    await frames(150)
+    await frames()
     expect(nameWarnings(warn)).toHaveLength(0)
   })
 
@@ -773,7 +778,7 @@ describe("Accessible name", () => {
       </Dialog.Root>,
       { container },
     )
-    await frames(150)
+    await frames()
     const content = shadow.querySelector<HTMLElement>('[role="dialog"]')
     const title = shadow.querySelector<HTMLElement>('[data-part="title"]')
     expect(content?.getAttribute("aria-labelledby")).toBe(title?.id)
@@ -1136,7 +1141,7 @@ describe("Server rendering", () => {
     await act(async () => {
       root = hydrateRoot(container, tree, { onRecoverableError: (e) => error(String(e)) })
     })
-    await frames(150)
+    await frames()
     expect(container.contains(active())).toBe(true)
     expect(error.mock.calls.filter((c) => !String(c[0]).includes("not wrapped in act"))).toEqual([])
     expect(inert(page)).toBe(true)
@@ -1227,7 +1232,7 @@ describe("portal host follows the trigger's theme (site session report)", () => 
     await act(async () => {
       screen.getByRole("button", { name: "Open" }).click()
     })
-    await act(async () => new Promise((r) => setTimeout(r, 50)))
+    await frames()
     const host = document.querySelector("[data-rind-portal]")
     expect(host?.getAttribute("data-rind-theme")).toBe("acme")
     expect(host?.getAttribute("dir")).toBe("rtl")
