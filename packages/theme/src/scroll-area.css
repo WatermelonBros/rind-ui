@@ -1,0 +1,97 @@
+/*
+ * Scroll Area: family `decoration` (no variant or size). The browser scrolls; this sheet
+ * only draws the custom scrollbars. Thumb size and offset come from the component
+ * (`--rind-scroll-area-thumb-size`, a transform); a minimum size keeps a long document's
+ * thumb grabbable. Hidden scrollbars fade with the duration token, which is 0 under reduced
+ * motion. Forced colors paint the thumb in the system text colour.
+ */
+@layer rind.components {
+  :where([data-scope="scroll-area"][data-part="scrollbar"]) {
+    box-sizing: border-box;
+    display: flex;
+    padding: var(--rind-scroll-area-scrollbar-padding, 2px);
+    background: var(--rind-scroll-area-track-bg, transparent);
+    transition:
+      opacity var(--rind-scroll-area-fade-duration, var(--rind-duration-normal)) ease-out,
+      inline-size var(--rind-duration-fast) ease-out,
+      block-size var(--rind-duration-fast) ease-out;
+    touch-action: auto;
+  }
+
+  :where([data-scope="scroll-area"][data-part="scrollbar"][data-orientation="vertical"]) {
+    flex-direction: column;
+    inline-size: var(--rind-scroll-area-scrollbar-size, 10px);
+  }
+
+  :where([data-scope="scroll-area"][data-part="scrollbar"][data-orientation="horizontal"]) {
+    flex-direction: row;
+    block-size: var(--rind-scroll-area-scrollbar-size, 10px);
+  }
+
+  /* Wider while hovered: a bigger target where the pointer already is. */
+  :where(
+    [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="vertical"][data-hovering]
+  ) {
+    inline-size: calc(var(--rind-scroll-area-scrollbar-size, 10px) + 4px);
+  }
+
+  :where(
+    [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="horizontal"][data-hovering]
+  ) {
+    block-size: calc(var(--rind-scroll-area-scrollbar-size, 10px) + 4px);
+  }
+
+  :where([data-scope="scroll-area"][data-part="scrollbar"][data-state="hidden"]) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  :where([data-scope="scroll-area"][data-part="thumb"]) {
+    flex: none;
+    border-radius: var(--rind-scroll-area-thumb-radius, 9999px);
+    background: var(--rind-scroll-area-thumb-bg, var(--rind-color-border-strong));
+  }
+
+  :where([data-scope="scroll-area"][data-part="thumb"][data-orientation="vertical"]) {
+    inline-size: 100%;
+    block-size: var(--rind-scroll-area-thumb-size, 0px);
+    min-block-size: var(--rind-scroll-area-thumb-min-size, 18px);
+  }
+
+  :where([data-scope="scroll-area"][data-part="thumb"][data-orientation="horizontal"]) {
+    block-size: 100%;
+    inline-size: var(--rind-scroll-area-thumb-size, 0px);
+    min-inline-size: var(--rind-scroll-area-thumb-min-size, 18px);
+  }
+
+  :where([data-scope="scroll-area"][data-part="scrollbar"][data-hovering])
+    :where([data-part="thumb"]) {
+    background: var(--rind-scroll-area-thumb-hover-bg, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="scroll-area"][data-part="thumb"][data-dragging]) {
+    background: var(--rind-scroll-area-thumb-active-bg, var(--rind-color-text));
+  }
+
+  :where([data-scope="scroll-area"][data-part="root"][data-tone="danger"])
+    :where([data-scope="scroll-area"][data-part="thumb"]) {
+    background: var(--rind-scroll-area-thumb-bg, var(--rind-color-danger-solid));
+  }
+
+  :where([data-scope="scroll-area"][data-part="corner"]) {
+    background: var(--rind-scroll-area-corner-bg, transparent);
+  }
+
+  :where([data-scope="scroll-area"][data-part="viewport"]) {
+    block-size: 100%;
+    inline-size: 100%;
+    border-radius: inherit;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="scroll-area"][data-part="thumb"]) {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+}
