@@ -8,6 +8,11 @@ See CLAUDE.md "Review rules".
 | Change | Reado id | File | Finding |
 |---|---|---|---|
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
+| add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |
+| add-badge (impl) | — | packages/react/src/badge/badge.tsx | The post-mount host check runs on every commit, so the host warning repeats while it still applies; warn once per host+message |
+| add-skeleton (impl) | — | packages/testing/src/components/skeleton.ts | `announcements()` takes its starting count lazily: an announcement made before the first read is cut from the driver's log (tests await it first) |
+| add-avatar (impl) | — | packages/testing/src/components/avatar.model.dom.test.tsx | `$props:src` is declared but the machine graph has no edge for it (`src` is an Image prop): `testMachine` only reports skips; statuses are covered by browser props-class tests |
+| add-aspect-ratio (impl) | — | scripts/docs-gen.ts | The spec asks for an `llms-full.txt` that includes the recipe page; no `llms-full.txt` pipeline exists yet (decision 0005) |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.machine.ts:182 | `push`: the dragged thumb's input value is written before the neighbours' min/max widen, so the browser can clamp it for a frame |
 | add-slider (r1) | — | packages/core/src/components/slider/slider.math.ts:68 | `largeStep` is rounded to the step's decimals (a finer custom largeStep is coarsened) |
 | add-slider (r1) | — | packages/react/src/slider/slider.tsx:240 | `formInput` is a new function every render, so the Thumb's track effect re-subscribes each render |

@@ -96,7 +96,8 @@ with status, is in [`docs/components.md`](docs/components.md).
 | Disclosure | Collapsible, Accordion, Tabs |
 | Overlays | Dialog, Alert Dialog, Popover, Tooltip |
 | Typography | Heading |
-| Layout | Separator |
+| Display | Badge, Skeleton, Avatar |
+| Layout | Separator, Aspect Ratio (a recipe on the native CSS property) |
 
 Next up: Menu, Drawer, Select, Combobox, Slider, and the AI-interface
 primitives (Prompt Input, Message Thread, Streaming Message, Tool Approval).
