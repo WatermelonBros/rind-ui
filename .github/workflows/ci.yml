@@ -46,16 +46,16 @@ jobs:
       # Every quirk's repro test exists; stale entries (> 12 months) are reported.
       - run: pnpm quirks:check
       - run: pnpm docs:check
-      # Packages and Storybook, built once and shared with the test slices. @rind-ui/core's
+      # Packages and the site (its examples harness), built once and shared with the test slices. @rind-ui/core's
       # build fails over the runtime's 2.5 kB min+gz budget (packages/core/scripts/size.mjs).
-      - run: pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/storybook
+      - run: pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/site
       - run: pnpm --filter @rind-ui/core size
       - uses: actions/upload-artifact@v4
         with:
           name: build
           path: |
             packages/*/dist
-            apps/storybook/storybook-static
+            apps/site/out
           retention-days: 1
 
   # The test suite split by Vitest project and browser, so the slices run in parallel. On
@@ -75,9 +75,6 @@ jobs:
           - { slice: browser-chromium, projects: "--project 'browser (chromium)'", browsers: chromium }
           - { slice: browser-firefox, projects: "--project 'browser (firefox)'", browsers: firefox }
           - { slice: browser-webkit, projects: "--project 'browser (webkit)'", browsers: webkit }
-          - { slice: storybook-chromium, projects: "--project 'storybook (chromium)'", browsers: chromium }
-          - { slice: storybook-firefox, projects: "--project 'storybook (firefox)'", browsers: firefox }
-          - { slice: storybook-webkit, projects: "--project 'storybook (webkit)'", browsers: webkit }
           # Playwright fixtures drive all three engines themselves.
           - { slice: playwright, projects: "--project playwright", browsers: "chromium,firefox,webkit" }
     name: test (${{ matrix.slice }})

@@ -31,9 +31,9 @@
 - [ ] 6.1 `@layer rind.components`, `:where()` selectors, `--rind-avatar-*` tokens read with fallbacks and never declared; stacked, always-opaque Image over Fallback (no fade); Group overlap with logical properties and outline ring; `identity` family variants and sizes; `data-tone="danger"`; forced colors (`CanvasText` border); imported from `index.css`
 - [ ] 6.2 Playwright captures: each status, group LTR/RTL, forced colors
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Themed stories: image, fallback initials, icon fallback per `data-state`, slow image with and without `fallbackDelay`, broken image, decorative beside a name, inside a button, group with overflow, RTL group, driver example; ARIA snapshots per state; axe clean (colour contrast of initials)
+- [ ] 7.1 Site examples (apps/site/examples/avatar.tsx, state examples for every contract state): image, fallback initials, icon fallback per `data-state`, slow image with and without `fallbackDelay`, broken image, decorative beside a name, inside a button, group with overflow, RTL group, driver example; ARIA snapshots per state; axe clean (colour contrast of initials)
 
 ## 8. Docs
 

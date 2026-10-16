@@ -6,9 +6,9 @@
 
 - [ ] 1.1 None: Aspect Ratio is a recipe (design §1). Record `kind: "recipe"` in the docs generator's metadata so the page has no API-facts, states or driver sections, and add a type test that `@rind-ui/react` has no `AspectRatio` export
 
-## 2. Stories (`apps/storybook/stories/recipes/aspect-ratio`)
+## 2. Site examples
 
-- [ ] 2.1 Examples: 16:9 box, square thumbnail grid, image with `cover` and `contain`, `iframe` and `video` embeds with names, image `width`/`height` attributes, Image's `--rind-image-aspect-ratio`, a box in a flex row, a text card at 200 % zoom; all pass axe
+- [ ] 2.1 Site examples (apps/site/examples/aspect-ratio.tsx, state examples for every contract state): 16:9 box, square thumbnail grid, image with `cover` and `contain`, `iframe` and `video` embeds with names, image `width`/`height` attributes, Image's `--rind-image-aspect-ratio`, a box in a flex row, a text card at 200 % zoom; all pass axe
 - [ ] 2.2 Play-function layout checks: height = width / ratio at two container widths, in block flow and in a flex row (chakra-ui#2582); zoomed text grows the box
 
 ## 3. Docs

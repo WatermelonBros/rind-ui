@@ -94,7 +94,7 @@ The same test runs with a Playwright `page`.
 
 A Label for an input (generated from the state story):
 
-<!-- aria:components-label--for-input -->
+<!-- aria:label--for-input -->
 ```yaml
 - text: Email
 - textbox "Email"

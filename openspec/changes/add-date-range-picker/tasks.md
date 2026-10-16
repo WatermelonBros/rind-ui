@@ -40,9 +40,9 @@
 
 - [ ] 8.1 `packages/theme/src/date-range-picker.css` per design §5 (`@layer rind.components`, `:where()`, `--rind-date-range-picker-*` tokens with fallbacks, `field` and `panel` families, forced colors, RTL); imported from `index.css`
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): default, with time, non-contiguous, unavailable weekends, two months, modal, inside a Dialog, clear trigger, required in a form with reset, read-only, disabled, invalid, RTL, driver example; state stories (`closed`, `open`, `anchored`) with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/date-range-picker.tsx, state examples for every contract state): default, with time, non-contiguous, unavailable weekends, two months, modal, inside a Dialog, clear trigger, required in a form with reset, read-only, disabled, invalid, RTL, driver example; state examples (`closed`, `open`, `anchored`) with ARIA snapshots; axe clean
 
 ## 10. Docs
 

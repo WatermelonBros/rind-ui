@@ -1,9 +1,9 @@
-// Serves a built Storybook (or any static dir) for Playwright runs: node scripts/serve-static.mjs <dir> <port>
+// Serves a static export (the site, apps/site/out) for Playwright runs: node scripts/serve-static.mjs <dir> <port>
 import { createReadStream, existsSync, statSync } from "node:fs"
 import { createServer } from "node:http"
 import { extname, join, normalize, resolve } from "node:path"
 
-const root = resolve(process.argv[2] ?? "apps/storybook/storybook-static")
+const root = resolve(process.argv[2] ?? "apps/site/out")
 const port = Number(process.argv[3] ?? 6007)
 const types = {
   ".html": "text/html",

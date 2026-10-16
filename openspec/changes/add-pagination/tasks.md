@@ -37,8 +37,8 @@
 
 - [ ] 6.1 `@layer rind.components`, `:where()` selectors on `data-scope="pagination"` / `data-part`; tier-3 `--rind-pagination-*` tokens (design §6) read with semantic fallbacks and never declared; controls in the `toggle item` family (variant matrix, sizes inherited from `Root`); current page selected look with a 3:1 `border`-role edge; `[data-disabled]` without hover; ≥ 24×24 targets; forced-colors `Highlight` outline on the current page; RTL chevron mirror; reduced motion; a `data-tone="danger"` state; imported from `index.css`
 
-## 7. Stories and docs
+## 7. Site examples and docs
 
-- [ ] 7.1 Stories (themed, axe on): buttons, links with `getPageHref`, client router, 1 / 5 / 20 / 100 pages, `siblingCount` and `boundaryCount` variants, with page-size Select, disabled while loading, icon-only triggers, two paginations around a table (distinct names), RTL, 320 px, driver usage; state stories for first, middle and last page
+- [ ] 7.1 Site examples (apps/site/examples/pagination.tsx, state examples for every contract state): buttons, links with `getPageHref`, client router, 1 / 5 / 20 / 100 pages, `siblingCount` and `boundaryCount` variants, with page-size Select, disabled while loading, icon-only triggers, two paginations around a table (distinct names), RTL, 320 px, driver usage; state examples for first, middle and last page
 - [ ] 7.2 Docs page (generated API facts + guide): range semantics with the three example ranges, buttons vs links, focusable unavailable triggers, announcing or focusing results after a page change, page-size composition, driver example
 - [ ] 7.3 Mark Pagination `done` in `docs/components.md` on archive; changeset; `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green

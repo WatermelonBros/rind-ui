@@ -120,7 +120,7 @@ listing every match. The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-separator--in-toolbar -->
+<!-- aria:separator--in-toolbar -->
 ```yaml
 - toolbar "Format":
   - button "Bold"
@@ -129,7 +129,7 @@ listing every match. The same test runs with a Playwright `page`.
 ```
 <!-- /aria -->
 
-<!-- aria:components-separator--in-listbox -->
+<!-- aria:separator--in-listbox -->
 ```yaml
 - listbox "Fruit":
   - option "Apple"

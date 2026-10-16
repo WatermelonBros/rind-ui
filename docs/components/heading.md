@@ -117,9 +117,9 @@ name, the driver fails and lists both.
 
 ## Accessibility tree
 
-Nested sections, and a heading rendered as a `<div>` (generated from the state stories):
+Nested sections, and a heading rendered as a `<div>` (generated from the state examples):
 
-<!-- aria:components-heading--nested-sections -->
+<!-- aria:heading--nested-sections -->
 ```yaml
 - heading "Settings" [level=2]
 - heading "Profile" [level=3]
@@ -127,7 +127,7 @@ Nested sections, and a heading rendered as a `<div>` (generated from the state s
 ```
 <!-- /aria -->
 
-<!-- aria:components-heading--as-div -->
+<!-- aria:heading--as-div -->
 ```yaml
 - heading "Section title" [level=2]
 ```

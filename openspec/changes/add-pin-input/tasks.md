@@ -46,9 +46,9 @@
 - [ ] 8.1 `packages/theme/src/pin-input.css`: `@layer rind.components`, `:where()` selectors, `--rind-pin-input-*` tokens read with fallbacks (never declared), family `field` (`outline` default, `soft`; `sm`/`md`/`lg`), slot boundary 3:1, active slot ring, fake caret with reduced motion, badge space, a `data-tone="danger"` state capture; imported from `index.css`
 - [ ] 8.2 Forced-colors and reduced-motion captures (empty, focused, partly filled, complete, invalid, disabled)
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories: six-digit OTP, grouped 3+3 with a decorative separator, alphanumeric uppercase, masked 4-digit PIN, `autoSubmit` form, controlled, read-only, disabled, invalid inside a Field, RTL page; state stories per state with ARIA snapshots; a driver story; every story passes axe
+- [ ] 9.1 Site examples (apps/site/examples/pin-input.tsx, state examples for every contract state): six-digit OTP, grouped 3+3 with a decorative separator, alphanumeric uppercase, masked 4-digit PIN, `autoSubmit` form, controlled, read-only, disabled, invalid inside a Field, RTL page; state examples per state with ARIA snapshots; a driver example; every example passes axe
 
 ## 10. Docs
 

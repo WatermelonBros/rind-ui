@@ -38,10 +38,10 @@
 - [ ] 6.1 Tier-3 `--rind-context-menu-*` tokens defaulting to `--rind-menu-*`; region open-state hook; entry animation from `--rind-transform-origin`
 - [ ] 6.2 Forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Default region, table rows (re-anchor), nested regions, submenus, checkbox items, disabled root, document-wide edit menu (`openAt`), touch long press, keyboard open; state story open
-- [ ] 7.2 Driver story; all stories pass axe
+- [ ] 7.1 Site examples (apps/site/examples/context-menu.tsx, state examples for every contract state): Default region, table rows (re-anchor), nested regions, submenus, checkbox items, disabled root, document-wide edit menu (`openAt`), touch long press, keyboard open; state example open
+- [ ] 7.2 Driver example; all examples pass axe
 
 ## 8. Docs and manual checks
 

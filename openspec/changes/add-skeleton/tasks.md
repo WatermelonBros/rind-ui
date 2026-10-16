@@ -31,9 +31,9 @@
 - [ ] 6.1 `@layer rind.components`, `:where()` selectors, `--rind-skeleton-*` tokens read with fallbacks and never declared, light/dark values; wrapping Items keep size with transparent text and per-line shapes; fixed-attachment shimmer only under `prefers-reduced-motion: no-preference` (≥ 1.5 s); forced-colors fill; `decoration` family; imported from `index.css`
 - [ ] 6.2 Playwright captures: light/dark, forced colors, circle in WebKit mid-animation (mui/material-ui#24050, #19429), reduced motion (`getAnimations()` empty), loaded (no animation)
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Themed stories: card placeholder, text lines wrapping stale text, list with Content as `ul`, avatar circle, with `announceOnLoad`, `animate={false}`, Image fallback holding a Skeleton.Item, driver example; ARIA snapshots per state; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/skeleton.tsx, state examples for every contract state): card placeholder, text lines wrapping stale text, list with Content as `ul`, avatar circle, with `announceOnLoad`, `animate={false}`, Image fallback holding a Skeleton.Item, driver example; ARIA snapshots per state; axe clean
 
 ## 8. Docs
 

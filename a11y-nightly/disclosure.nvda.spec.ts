@@ -17,8 +17,8 @@ test("disclosure: trigger state is spoken, content follows when open", async ({
       os: `Windows (${release()})`,
     }),
   })
-  await page.goto(story("foundations-disclosure-fixture--closed"))
-  await page.locator("#storybook-root button").waitFor()
+  await page.goto(story("disclosure", "closed"))
+  await page.locator("[data-example-root] button").waitFor()
   await nvda.navigateToWebContent()
   await nvda.next()
   await nvda.act()

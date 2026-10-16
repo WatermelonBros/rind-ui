@@ -28,9 +28,9 @@
 - [ ] 6.1 `packages/theme/src/meter.css` per design §6: `@layer rind.components`, `:where()` selectors, `--rind-meter-*` tokens read with fallbacks and never declared, `range` family variants and sizes, `data-tone="danger"`, zone cues beyond colour, forced colors; imported from `index.css`
 - [ ] 6.2 Playwright captures: each zone, forced colors
 
-## 7. Stories
+## 7. Site examples
 
-- [ ] 7.1 Stories (themed): default, units, each zone (battery and "lower is better" disk), zone in value text, vertical, driver example; state stories with ARIA snapshots; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/meter.tsx, state examples for every contract state): default, units, each zone (battery and "lower is better" disk), zone in value text, vertical, driver example; state examples with ARIA snapshots; axe clean
 
 ## 8. Docs
 

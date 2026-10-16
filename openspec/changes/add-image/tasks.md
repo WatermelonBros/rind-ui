@@ -31,9 +31,9 @@
 - [ ] 6.1 `@layer rind.components`, `:where()` selectors, `--rind-image-*` tokens read with fallbacks and never declared; one-cell grid stacking, ratio token, fit token, no fade, no `[hidden]` override, forced-colors Fallback border; `decoration` family; imported from `index.css`
 - [ ] 6.2 Playwright captures per status, ratio box kept in `error` (bounding box equal across statuses), forced colors
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Themed stories: loaded, slow with a Skeleton fallback, broken with an icon fallback, no source, decorative, 16:9 ratio box with `contain`, inside a `<figure>` with a caption, inside a link (name = `alt`), `<picture>` art-direction recipe, driver example; ARIA snapshots per status; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/image.tsx, state examples for every contract state): loaded, slow with a Skeleton fallback, broken with an icon fallback, no source, decorative, 16:9 ratio box with `contain`, inside a `<figure>` with a caption, inside a link (name = `alt`), `<picture>` art-direction recipe, driver example; ARIA snapshots per status; axe clean
 
 ## 8. Docs
 

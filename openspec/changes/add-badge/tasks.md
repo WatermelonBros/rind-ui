@@ -32,9 +32,9 @@
 - [ ] 6.1 Tier-3 tokens `--rind-badge-*` read with semantic fallbacks (never declared), `@layer rind.components`, `:where()` selectors; `status` family variants (soft default, solid, outline), sizes, every `data-tone`; inline box that never stretches, centred text, `min-inline-size` = block size, `em` padding; imported from `index.css`
 - [ ] 6.2 Forced-colors, 200 % zoom ("99+") and `data-tone="danger"` Playwright captures; builder contrast check of badge text on every tone × variant (ariakit#7591, #7604, mui/material-ui#49441)
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Themed stories: text badge, count with `label`, "99+", dot with `label`, decorative badge, icon button with name from content, icon button with `aria-label` + `aria-describedby`, badge in a tab and a menu item, every tone × variant, RTL corner-badge recipe; ARIA snapshots; all pass axe
+- [ ] 7.1 Site examples (apps/site/examples/badge.tsx, state examples for every contract state): text badge, count with `label`, "99+", dot with `label`, decorative badge, icon button with name from content, icon button with `aria-label` + `aria-describedby`, badge in a tab and a menu item, every tone × variant, RTL corner-badge recipe; ARIA snapshots; all pass axe
 
 ## 8. Docs
 

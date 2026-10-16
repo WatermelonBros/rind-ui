@@ -35,9 +35,9 @@
 - [ ] 7.1 `packages/theme/src/progress.css` per design §8: `@layer rind.components`, `:where()` selectors, `--rind-progress-*` tokens read with fallbacks and never declared, `range` family variants and sizes, `data-tone="danger"`, reduced-motion indeterminate, ring, forced colors; imported from `index.css`
 - [ ] 7.2 Playwright captures: forced colors (RS#4069), reduced motion, indeterminate bar and ring (ZG#1716)
 
-## 8. Stories
+## 8. Site examples
 
-- [ ] 8.1 Stories (themed): determinate, indeterminate, complete, custom range and units, ring determinate/indeterminate, vertical, announce completion (with the announcer log), driver example; state stories with ARIA snapshots; axe clean
+- [ ] 8.1 Site examples (apps/site/examples/progress.tsx, state examples for every contract state): determinate, indeterminate, complete, custom range and units, ring determinate/indeterminate, vertical, announce completion (with the announcer log), driver example; state examples with ARIA snapshots; axe clean
 
 ## 9. Docs
 

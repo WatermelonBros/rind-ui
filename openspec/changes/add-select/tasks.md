@@ -27,7 +27,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `select.contract.ts` per design §7 (traits, actions with keyboard twins, state-dependent `TYPEAHEAD` mapping, `{ skip }` events, `$sync:open`/`$sync:value` prop steps)
-- [ ] 4.2 `getSelect` in `@rind-ui/testing`; driver tests in `browser`, `jsdom` and **happy-dom**, and through Playwright against Storybook
+- [ ] 4.2 `getSelect` in `@rind-ui/testing`; driver tests in `browser`, `jsdom` and **happy-dom**, and through Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -42,10 +42,10 @@
 - [ ] 6.1 Tier-3 tokens `--rind-select-*` (design §8) defaulting to semantic tokens, item tokens defaulting to `--rind-listbox-item-*`; trigger states (`data-state`, `data-placeholder`, `data-invalid`, `data-disabled`, `data-focus-visible`), content `min-width: var(--rind-anchor-width)` and max height, `@starting-style` entry and `[data-state=closed]` exit with duration tokens; target size ≥ 24px
 - [ ] 6.2 Forced colors: trigger border, highlight as outline, selected via indicator + system colours; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Default, placeholder, icons and descriptions, sections, disabled items, multiple, required + invalid in a form (submit/reset), autofill (`autocomplete="country-name"`), long list (centred selection), async items, virtualized, in a dialog, non-modal, RTL, Reado's atom; state stories open / open with a value
-- [ ] 7.2 Driver story (docs testing example); all stories pass axe on the themed component
+- [ ] 7.1 Site examples (apps/site/examples/select.tsx, state examples for every contract state): Default, placeholder, icons and descriptions, sections, disabled items, multiple, required + invalid in a form (submit/reset), autofill (`autocomplete="country-name"`), long list (centred selection), async items, virtualized, in a dialog, non-modal, RTL, Reado's atom; state examples open / open with a value
+- [ ] 7.2 Driver example (docs testing example); all examples pass axe on the themed component
 
 ## 8. Docs and closing
 

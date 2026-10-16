@@ -32,9 +32,9 @@
 - [ ] 6.1 `packages/theme/src/time-field.css` per design §5: `@layer rind.components`, `:where()` selectors, `--rind-time-field-*` tokens read with fallbacks and never declared, `field` family variants and sizes, `data-tone="danger"`, forced-colors rules; imported from `index.css`
 - [ ] 6.2 Playwright capture: Date Field and Time Field side by side (identical metrics), forced colors
 
-## 7. Stories
+## 7. Site examples
 
-- [ ] 7.1 Stories (themed): 12-hour, 24-hour, seconds, ja-JP day period first, ko-KR, zoned with and without the zone, DST day, min/max, required in a form, read-only, disabled, inside a Field, driver example; state stories with ARIA snapshots; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/time-field.tsx, state examples for every contract state): 12-hour, 24-hour, seconds, ja-JP day period first, ko-KR, zoned with and without the zone, DST day, min/max, required in a form, read-only, disabled, inside a Field, driver example; state examples with ARIA snapshots; axe clean
 
 ## 8. Docs
 

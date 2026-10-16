@@ -1,6 +1,6 @@
 ## 0. Prerequisites
 
-- [ ] 0.1 Confirm `add-foundations`, `add-a11y-foundations`, `add-overlay-infrastructure` and `add-theme-system` are applied (`add-heading` only for the Title recipe story)
+- [ ] 0.1 Confirm `add-foundations`, `add-a11y-foundations`, `add-overlay-infrastructure` and `add-theme-system` are applied (`add-heading` only for the Title recipe example)
 
 ## 1. Machine
 
@@ -32,9 +32,9 @@
 - [ ] 6.1 `@layer rind.components`, `:where()` selectors, `--rind-alert-*` tokens read with fallbacks and never declared; grid layout with logical areas (RTL mirror); `status` family variants and sizes, every `data-tone`; CloseTrigger ≥ 24×24; forced-colors border and `currentColor` icon; exit transition on duration tokens; imported from `index.css`
 - [ ] 6.2 Playwright captures: each tone × variant, RTL, forced colors, reduced motion; builder contrast check of text on every tone × variant
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Themed stories: static banner (announce off), error after an action (assertive), status that updates (polite), dismissible with focus moving to the next control, icon-labelled severity, Title as `Heading`, region recipe, inside a form as an error summary (consumer focus), driver example with `announcements`; ARIA snapshots per state; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/alert.tsx, state examples for every contract state): static banner (announce off), error after an action (assertive), status that updates (polite), dismissible with focus moving to the next control, icon-labelled severity, Title as `Heading`, region recipe, inside a form as an error summary (consumer focus), driver example with `announcements`; ARIA snapshots per state; axe clean
 
 ## 8. Docs
 
@@ -47,4 +47,4 @@
 
 ## Amendments (from coordinator)
 
-- [ ] A.1 `announce` defaults to `"polite"` (not `"off"`): `canAnnounce` and `prepareAnnouncer` treat a missing prop as `"polite"`; client-mounted alerts without `announce` announce once politely, server-rendered ones stay silent; `"off"` and `"assertive"` unchanged; tests for the "Polite by default" and updated "Danger tone without announcement" scenarios; docs and stories say when to set `"off"`
+- [ ] A.1 `announce` defaults to `"polite"` (not `"off"`): `canAnnounce` and `prepareAnnouncer` treat a missing prop as `"polite"`; client-mounted alerts without `announce` announce once politely, server-rendered ones stay silent; `"off"` and `"assertive"` unchanged; tests for the "Polite by default" and updated "Danger tone without announcement" scenarios; docs and examples say when to set `"off"`

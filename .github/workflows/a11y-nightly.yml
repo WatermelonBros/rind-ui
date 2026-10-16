@@ -36,7 +36,7 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @rind-ui/storybook build
+      - run: pnpm turbo run build --filter=@rind-ui/site
       - uses: guidepup/setup-action@0.17.3
       - run: pnpm exec playwright install --with-deps webkit chromium
       - name: Golden flows

@@ -30,11 +30,11 @@
 - [ ] 5.1 Model-based `testMachine(hoverCardContract)` in pointer, keyboard and virtual modalities with `no-touch-hover`, `focus-does-not-commit` (no exceptions), `layer`, `restores-focus`, `presence`, `anchored`, `timed`
 - [ ] 5.2 Browser tests for every `hover-card` scenario, each regression reproducing the cited issue first (radix#2138, reka-ui#802, radix#2692, zag#3224, radix#2502, radix#3175, react-spectrum#10443, mui/base-ui#3129, mui/base-ui#3673, zag#3181, reka-ui#1063, radix#920, bits-ui#1697)
 - [ ] 5.3 Fixtures: card with a Select, a Menu, a Tooltip, a nested card; card inside a dialog; list of preview links for the "tabbing quickly" scenario
-- [ ] 5.4 Partial ARIA snapshots per state story (closed, open, focus inside) in three engines
+- [ ] 5.4 Partial ARIA snapshots per state example (closed, open, focus inside) in three engines
 
-## 6. Theme, stories, docs
+## 6. Theme, site examples, docs
 - [ ] 6.1 `packages/theme/src/hover-card.css` (decision 0007, proposed): tier-3 tokens `--rind-hover-card-*` (bg, border, radius, shadow, padding, width, arrow size) defaulting to semantic tokens; styles read only tier 3, select on `data-*`; `@starting-style` entry, `[data-state=closed]` exit, forced colors, reduced motion
-- [ ] 6.2 Stories (axe on): profile card, link preview list, card with actions, nested, in a dialog, RTL, 320 px, driver usage; state stories for every contract state
+- [ ] 6.2 Site examples (apps/site/examples/hover-card.tsx, state examples for every contract state): profile card, link preview list, card with actions, nested, in a dialog, RTL, 320 px, driver usage; state examples for every contract state
 - [ ] 6.3 Docs page (generated API facts + guide): the usage rule (never the only path), keyboard access, why no touch, Popover vs Hover Card vs Tooltip, testing with fake timers
 - [ ] 6.4 Mark `docs/research/hover-card.md` done on archive; changeset; `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green
 

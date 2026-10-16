@@ -1,4 +1,3 @@
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
 
@@ -123,8 +122,8 @@ export default defineConfig({
         },
       },
       {
-        // The shared driver scenarios through the Playwright adapter, against the built
-        // Storybook (turbo builds it before tests).
+        // The shared driver scenarios through the Playwright adapter, against the site's
+        // examples harness (apps/site/out; turbo builds it before tests).
         resolve,
         ssr,
         test: {
@@ -137,11 +136,6 @@ export default defineConfig({
           hookTimeout: 60_000,
           retry: ciRetry,
         },
-      },
-      {
-        resolve,
-        plugins: [storybookTest({ configDir: "apps/storybook/.storybook" })],
-        test: { name: "storybook", browser: browser("storybook"), retry: ciRetry },
       },
     ],
   },

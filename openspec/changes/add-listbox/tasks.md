@@ -23,13 +23,13 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `listbox.contract.ts` per design §6
-- [ ] 4.2 `getListbox` in `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against Storybook
+- [ ] 4.2 `getListbox` in `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against the site examples harness
 
 ## 5. Tests
 
 - [ ] 5.1 One browser test per spec scenario; regression scenarios reproduce the cited issue first (headlessui#1599, radix#1907, zag#2947, react-spectrum#7947, #10147, mui/base-ui#5443, #5569, webkit 209279 and every issue cited in the spec)
 - [ ] 5.2 `testMachine`: props classes single/multiple × toggle/replace, none + action, horizontal RTL; argument classes from collections; all modalities incl. `virtual`; axe per state
-- [ ] 5.3 Virtualized story test: End to item 10,000, typeahead to an unmounted item, `aria-setsize`/`posinset` after filter
+- [ ] 5.3 Virtualized example test: End to item 10,000, typeahead to an unmounted item, `aria-setsize`/`posinset` after filter
 - [ ] 5.4 Virtual screen reader reading-order test (name, options, description, selection state, empty description)
 
 ## 6. Theme (`packages/theme/src/listbox.css`)
@@ -37,10 +37,10 @@
 - [ ] 6.1 Tier-3 tokens `--rind-listbox-*` (design §7) defaulting to semantic tokens; item states via `data-highlighted` / `data-selected` / `data-disabled` / `data-focus-visible`, indicator, section label, separator, empty; target size ≥ 24px
 - [ ] 6.2 Forced colors: highlight as outline, selected with `SelectedItem`/`Highlight` plus indicator, focus ring as outline; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Single, multiple (toggle and replace), action list (Reado SemanticModal), sections, descriptions and icons, disabled items, horizontal + RTL, empty, async load more, virtualized (TanStack Virtual as a story dev dependency)
-- [ ] 7.2 Driver story (docs testing example); all stories pass axe
+- [ ] 7.1 Site examples (apps/site/examples/listbox.tsx, state examples for every contract state): Single, multiple (toggle and replace), action list (Reado SemanticModal), sections, descriptions and icons, disabled items, horizontal + RTL, empty, async load more, virtualized (TanStack Virtual as a example dev dependency)
+- [ ] 7.2 Driver example (docs testing example); all examples pass axe
 
 ## 8. Docs and closing
 

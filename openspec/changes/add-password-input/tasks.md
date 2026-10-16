@@ -37,9 +37,9 @@
 - [ ] 7.1 `packages/theme/src/password-input.css`: `@layer rind.components`, `:where()` selectors, `--rind-password-input-*` tokens read with fallbacks (never declared), family `field` (`outline` default, `soft`; `sm`/`md`/`lg`), trigger hit area and inline-end space, pressed state not by colour alone, a `data-tone="danger"` state capture; imported from `index.css`
 - [ ] 7.2 Forced-colors and reduced-motion captures (hidden, visible, focused trigger, invalid, disabled)
 
-## 8. Stories
+## 8. Site examples
 
-- [ ] 8.1 Stories: login (`current-password`), sign-up (`new-password` with Description), controlled visibility, read-only, disabled, invalid inside a Field, inside a form showing hide-on-submit, Reado vault unlock recipe; state stories with ARIA snapshots; a driver story; every story passes axe
+- [ ] 8.1 Site examples (apps/site/examples/password-input.tsx, state examples for every contract state): login (`current-password`), sign-up (`new-password` with Description), controlled visibility, read-only, disabled, invalid inside a Field, inside a form showing hide-on-submit, Reado vault unlock recipe; state examples with ARIA snapshots; a driver example; every example passes axe
 
 ## 9. Docs
 

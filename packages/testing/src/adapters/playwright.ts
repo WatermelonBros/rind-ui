@@ -189,6 +189,16 @@ function createPlaywrightEnv(
   })
   const timeout = options.timeout ?? 5000
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+  /**
+   * One frame after a key press: what the press changed is committed before the next read
+   * (a driver arrowing through options reads the selection after every key; under load the
+   * read could beat the commit and overshoot). No person types faster than a frame.
+   */
+  const settle = async () =>
+    (await getBase()).root.evaluate(
+      () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
+    )
+
   const until = <T>(read: () => Promise<T>, accept: (value: T) => boolean) =>
     poll(read, accept, { timeout, wait })
 
@@ -320,6 +330,7 @@ function createPlaywrightEnv(
           return
         }
         await l.press(keyName(key, keyOptions, apple))
+        await settle()
       },
       async type(text) {
         const l = await waitFor()
@@ -543,6 +554,7 @@ function createPlaywrightEnv(
         return
       }
       await (await getBase()).page.keyboard.press(keyName(key, keyOptions, apple))
+      await settle()
     },
     async pointerOutside() {
       // The corner of the target's own document (a frame's body for frame targets).

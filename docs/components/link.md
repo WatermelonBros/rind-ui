@@ -190,9 +190,9 @@ expect(router.calls).toEqual([
 
 ## Accessibility tree
 
-Enabled, current, disabled and the `<div>` fallback (generated from the state stories):
+Enabled, current, disabled and the `<div>` fallback (generated from the state examples):
 
-<!-- aria:components-link--standalone -->
+<!-- aria:link--standalone -->
 ```yaml
 - link "Documentation":
   - /url: "#docs"
@@ -200,7 +200,7 @@ Enabled, current, disabled and the `<div>` fallback (generated from the state st
 ```
 <!-- /aria -->
 
-<!-- aria:components-link--current -->
+<!-- aria:link--current-story -->
 ```yaml
 - link "Documentation":
   - /url: "#docs"
@@ -208,14 +208,14 @@ Enabled, current, disabled and the `<div>` fallback (generated from the state st
 ```
 <!-- /aria -->
 
-<!-- aria:components-link--disabled -->
+<!-- aria:link--disabled-story -->
 ```yaml
 - link "Documentation" [disabled]
 - paragraph: "Router calls: none"
 ```
 <!-- /aria -->
 
-<!-- aria:components-link--as-div -->
+<!-- aria:link--as-div -->
 ```yaml
 - link "Documentation"
 - paragraph: "Router calls: none"

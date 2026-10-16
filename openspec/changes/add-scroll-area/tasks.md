@@ -26,7 +26,7 @@
 ## 5. Contract and driver
 
 - [ ] 5.1 `scroll-area.contract.ts` per design §4: locate by region name or contained text, actions with keyboard twins / declared absences, queries, invariants (tab-stop rule, hidden parts not focusable, one dragging axis — ZG#3418, no presentational viewport — BU#5812), `{ skip }` reasons
-- [ ] 5.2 `getScrollArea` in `@rind-ui/testing`; the same driver test passes in browser mode, jsdom (fake metrics) and Playwright against Storybook; broken-wrapper fixtures prove each invariant fails
+- [ ] 5.2 `getScrollArea` in `@rind-ui/testing`; the same driver test passes in browser mode, jsdom (fake metrics) and Playwright against the site examples harness; broken-wrapper fixtures prove each invariant fails
 
 ## 6. Model-based tests
 
@@ -38,9 +38,9 @@
 - [ ] 7.1 `packages/theme/src/scroll-area.css`: `@layer rind.components`, `:where()` selectors, `--rind-scroll-area-*` tokens read with fallbacks and never declared, `decoration` family (no variant/size), `data-state` fade with duration tokens (reduced motion), thumb min size, hover widening, `data-tone="danger"`, forced-colors thumb (`CanvasText`, `forced-color-adjust: none`), vertical/horizontal/RTL; imported from `index.css`
 - [ ] 7.2 Playwright captures: forced colors, RTL, both axes with corner, reduced motion; documented recipes for native bars under forced colors and on coarse pointers
 
-## 8. Stories
+## 8. Site examples
 
-- [ ] 8.1 Stories (themed): vertical, horizontal, both with corner, each `type`, fade masks from overflow edges, chat log `column-reverse`, RTL, text-only in a Dialog, list of buttons, nested, scroll snap, driver example; state stories (idle, engaged, dragging) with ARIA snapshots; axe clean
+- [ ] 8.1 Site examples (apps/site/examples/scroll-area.tsx, state examples for every contract state): vertical, horizontal, both with corner, each `type`, fade masks from overflow edges, chat log `column-reverse`, RTL, text-only in a Dialog, list of buttons, nested, scroll snap, driver example; state examples (idle, engaged, dragging) with ARIA snapshots; axe clean
 
 ## 9. Docs
 

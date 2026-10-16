@@ -35,13 +35,13 @@
 ## 5. Contract and driver
 
 - [ ] 5.1 `comboboxPatternContract` and `comboboxContract` per design §7 (traits, announcements, `{ skip }`, prop steps)
-- [ ] 5.2 `getCombobox` in `@rind-ui/testing` incl. `type`, `compose`, `announcements`; driver tests in browser mode, jsdom and through Playwright against Storybook
+- [ ] 5.2 `getCombobox` in `@rind-ui/testing` incl. `type`, `compose`, `announcements`; driver tests in browser mode, jsdom and through Playwright against the site examples harness
 
 ## 6. Tests
 
 - [ ] 6.1 One browser test per spec scenario; issue-citing scenarios reproduce the issue first (see the Bug history table in docs/research/combobox.md)
 - [ ] 6.2 `testMachine` over the props classes of design §7, all modalities incl. `virtual`, RTL run, Apple/WebKit, Apple/Blink and Windows platforms, IME replays, axe per state
-- [ ] 6.3 Async story with an out-of-order fake server; virtualized story (10,000 options) with TanStack Virtual recipe
+- [ ] 6.3 Async example with an out-of-order fake server; virtualized example (10,000 options) with TanStack Virtual recipe
 - [ ] 6.4 Virtual screen reader log for open, arrow, choose, empty results
 
 ## 7. Theme (`packages/theme/src/combobox.css`)
@@ -49,10 +49,10 @@
 - [ ] 7.1 Tier-3 `--rind-combobox-*` tokens (design §8) defaulting to semantic tokens; control, popup, items, chips, empty; `data-variant` (solid, soft, outline, ghost) and `data-size` (sm, md, lg); `@starting-style` entry, exit on `[data-state=closed]`, duration tokens
 - [ ] 7.2 Forced colors (outline highlight, check glyph, chip borders) and 24×24 targets with `--rind-hit-area` on chip remove; Playwright forced-colors captures
 
-## 8. Stories (`apps/storybook`)
+## 8. Site examples
 
-- [ ] 8.1 Default, groups, disabled options, custom value, multiple with chips, inline completion, open on focus, async, empty state, virtualized, in a dialog, in a Portal, read-only, invalid, form; state stories open / empty / loading
-- [ ] 8.2 Driver story (docs testing example); all stories render with the theme stylesheet and pass axe (including colour contrast)
+- [ ] 8.1 Site examples (apps/site/examples/combobox.tsx, state examples for every contract state): Default, groups, disabled options, custom value, multiple with chips, inline completion, open on focus, async, empty state, virtualized, in a dialog, in a Portal, read-only, invalid, form; state examples open / empty / loading
+- [ ] 8.2 Driver example (docs testing example); all examples render with the theme stylesheet and pass axe (including colour contrast)
 
 ## 9. Docs and manual checks
 

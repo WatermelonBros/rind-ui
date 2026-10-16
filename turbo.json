@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "storybook-static/**", "out/**"]
+      "outputs": ["dist/**", "out/**"]
     },
     "dev": {
       "cache": false,
@@ -13,7 +13,7 @@
       "dependsOn": ["^build"]
     },
     "//#test:vitest": {
-      "dependsOn": ["@rind-ui/storybook#build", "@rind-ui/testing#build"],
+      "dependsOn": ["@rind-ui/site#build", "@rind-ui/testing#build"],
       "env": ["RIND_BROWSERS"],
       "outputs": []
     }

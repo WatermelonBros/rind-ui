@@ -17,7 +17,6 @@
   <img alt="Biome" src="https://img.shields.io/badge/Biome-60A5FA?style=flat-square&logo=biome&logoColor=white">
   <img alt="Vitest" src="https://img.shields.io/badge/Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white">
   <img alt="Playwright" src="https://img.shields.io/badge/Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white">
-  <img alt="Storybook" src="https://img.shields.io/badge/Storybook-FF4785?style=flat-square&logo=storybook&logoColor=white">
   <img alt="pnpm" src="https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white">
 </p>
 
@@ -72,7 +71,7 @@ import { Accordion } from "@rind-ui/react"
 - **Accessibility researched, not assumed.** Before a component is specified, its
   research note reads how every other headless library implemented it and the bugs
   reported against it over the years. Those issues become test scenarios with their
-  original conditions. Every story passes axe in Chromium, Firefox and WebKit.
+  original conditions. Every site example passes axe in Chromium, Firefox and WebKit.
 - **Native first.** A link is an `<a>`, a button a `<button>`, closed content uses
   `hidden="until-found"` so find-in-page still works. Custom roles appear only where
   the platform has no element.
@@ -116,8 +115,7 @@ primitives (Prompt Input, Message Thread, Streaming Message, Tool Approval).
 
 ```sh
 pnpm install
-pnpm storybook   # component playground on :6006
-pnpm test        # node, jsdom, real browsers, Playwright, Storybook + axe
+pnpm test        # node, jsdom, real browsers, Playwright, site examples + axe
 ```
 
 Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request,

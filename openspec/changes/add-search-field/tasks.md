@@ -36,9 +36,9 @@
 - [ ] 7.1 `packages/theme/src/search-field.css`: `@layer rind.components`, `:where()` selectors, `--rind-search-field-*` tokens read with fallbacks (never declared), family `field` (`outline` default, `soft`; `sm`/`md`/`lg`), native decoration reset, leading icon space, ClearTrigger hit area and transparent background, a `data-tone="danger"` state capture; imported from `index.css`
 - [ ] 7.2 Forced-colors and reduced-motion captures (empty, with text, focused, invalid, disabled)
 
-## 8. Stories
+## 8. Site examples
 
-- [ ] 8.1 Stories: basic with ClearTrigger and leading icon (Reado search box), icon-only with `aria-label`, inside a Dialog (Escape ownership), inside a search form with the `<search>` landmark recipe, controlled with a results count, read-only, disabled, invalid in a Field; state stories with ARIA snapshots; a driver story; every story passes axe
+- [ ] 8.1 Site examples (apps/site/examples/search-field.tsx, state examples for every contract state): basic with ClearTrigger and leading icon (Reado search box), icon-only with `aria-label`, inside a Dialog (Escape ownership), inside a search form with the `<search>` landmark recipe, controlled with a results count, read-only, disabled, invalid in a Field; state examples with ARIA snapshots; a driver example; every example passes axe
 
 ## 9. Docs
 

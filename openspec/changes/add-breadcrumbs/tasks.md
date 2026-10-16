@@ -27,16 +27,16 @@
 ## 5. Tests
 
 - [ ] 5.1 No model-based test (no machine). Browser tests in three engines for every scenario: focus kept when a crumb becomes current (react-spectrum#2592, #5294), current text selectable (react-spectrum#5549), Tab order with a collapsed trail, client routing and ⌘-click through `link-navigation`, ellipsis menu follows a collapsed item
-- [ ] 5.2 Accessibility: axe per story; Chromium AX tree shows no separator nodes and the list size equals the visible crumbs; virtual screen reader: separators not spoken, ellipsis trigger named "Show N more breadcrumbs" (react-spectrum#3967); current item exposed with no `role=link` (react-spectrum#3998)
-- [ ] 5.3 Partial ARIA snapshots per state story (plain, collapsed, current without `href`, current with `href`)
+- [ ] 5.2 Accessibility: axe per example; Chromium AX tree shows no separator nodes and the list size equals the visible crumbs; virtual screen reader: separators not spoken, ellipsis trigger named "Show N more breadcrumbs" (react-spectrum#3967); current item exposed with no `role=link` (react-spectrum#3998)
+- [ ] 5.3 Partial ARIA snapshots per state example (plain, collapsed, current without `href`, current with `href`)
 
 ## 6. Theme (`packages/theme/src/breadcrumbs.css`)
 
 - [ ] 6.1 Tier-3 tokens `--rind-breadcrumbs-*` (gap, color, current-color, current-weight, separator-color, separator-size, min-target) defaulting to `--rind-link-*` and semantic tokens, never declared; `@layer rind.components`, `:where()` selectors; wrapping inline flex list; `[data-last]` separator hidden; RTL chevron mirror; 24 px targets; current by weight; `data-tone="danger"` recolours; forced colors; family `link`; imported from `index.css`
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Default, current with and without `href`, `currentValue="location"`, collapsed with an ellipsis Menu, CSS-drawn separators, client router, the Reado shape (menu trigger per segment, extra controls in the landmark), RTL, 320 px wrapping, driver usage; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/breadcrumbs.tsx, state examples for every contract state): Default, current with and without `href`, `currentValue="location"`, collapsed with an ellipsis Menu, CSS-drawn separators, client router, the Reado shape (menu trigger per segment, extra controls in the landmark), RTL, 320 px wrapping, driver usage; axe clean
 
 ## 8. Docs
 
