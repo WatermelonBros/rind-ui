@@ -10,6 +10,7 @@ beforeEach(() => vi.useFakeTimers())
 afterEach(() => vi.useRealTimers())
 
 const scheduler = {
+  // fake-time: the fake scheduler under test (vi.useFakeTimers)
   setTimeout: (cb: () => void, ms: number) => setTimeout(cb, ms),
   clearTimeout: (h: unknown) => clearTimeout(h as never),
   requestAnimationFrame: () => 0,

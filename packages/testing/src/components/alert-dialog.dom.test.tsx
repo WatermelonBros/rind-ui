@@ -21,7 +21,12 @@ afterEach(() => vi.restoreAllMocks())
 
 const inert = (el: Element | null) => el?.closest("[inert]") != null
 const settle = () => act(async () => {})
-const frames = (ms = 80) => act(() => new Promise<void>((r) => setTimeout(r, ms)))
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+/** Drains animation frames (and the microtasks between them) instead of waiting on the clock. */
+const frames = (count = 6) =>
+  act(async () => {
+    for (let i = 0; i < count; i++) await nextFrame()
+  })
 const active = () => document.activeElement
 
 interface FullProps extends Partial<AlertDialogRootProps> {
@@ -293,7 +298,7 @@ describe("Cancel and action", () => {
     await openByClick(user)
     await press(user, button("Delete"))
     await vi.waitFor(() => expect(button("Deleting").hasAttribute("disabled")).toBe(true))
-    await frames(150)
+    await frames()
     expect(queryAlert()).not.toBeNull()
     expect(inert(document.getElementById("app"))).toBe(true)
     expect(button("Cancel").hasAttribute("disabled")).toBe(false)
@@ -461,7 +466,7 @@ describe("Naming and description", () => {
     const user = userEvent.setup()
     render(<Full description={null} />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(warnings(warn, "no description")).toHaveLength(1)
     expect(warnings(warn, "no accessible name")).toHaveLength(0)
     expect(alertEl().hasAttribute("aria-describedby")).toBe(false)
@@ -472,7 +477,7 @@ describe("Naming and description", () => {
     const user = userEvent.setup()
     render(<Full title={null} />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(warnings(warn, "no accessible name")).toHaveLength(1)
     expect(warnings(warn, "no description")).toHaveLength(0)
   })
@@ -482,7 +487,7 @@ describe("Naming and description", () => {
     const user = userEvent.setup()
     render(<Full />)
     await openByClick(user)
-    await frames(150)
+    await frames()
     expect(warn).not.toHaveBeenCalled()
   })
 
@@ -498,7 +503,7 @@ describe("Naming and description", () => {
         </AlertDialog.Root>
       </>,
     )
-    await frames(150)
+    await frames()
     expect(warn).not.toHaveBeenCalled()
   })
 })

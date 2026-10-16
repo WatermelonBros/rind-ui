@@ -15,7 +15,9 @@ const css = (ms: number) => (
 [data-part="content"][data-state="closed"] { animation: ${EXIT} ${ms}ms linear forwards }`}</style>
 )
 const content = () => document.querySelector<HTMLElement>('[data-part="content"]')
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const frames = async (count = 6) => {
+  for (let i = 0; i < count; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 
 function Fixture({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {
   return (
@@ -53,7 +55,7 @@ describe("Alert Dialog in a real browser", () => {
     await userEvent.click(part("action"))
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("closed")
     expect(content()?.getAttribute("data-close-reason")).toBe("action")
-    await wait(100)
+    await frames()
     expect(content()).not.toBeNull()
     await expect.poll(() => content(), { timeout: 3000 }).toBeNull()
   })
@@ -65,7 +67,7 @@ describe("Alert Dialog in a real browser", () => {
     await expect.poll(() => content()?.getAttribute("data-state")).toBe("open")
     onOpenChange.mockClear()
     await userEvent.click(part("positioner"), { position: { x: 4, y: 4 } })
-    await wait(150)
+    await frames()
     expect(content()?.getAttribute("data-state")).toBe("open")
     expect(onOpenChange).not.toHaveBeenCalled()
   })

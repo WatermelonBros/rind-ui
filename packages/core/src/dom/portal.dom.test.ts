@@ -90,7 +90,7 @@ describe("portalHostAttributes", () => {
 describe("syncPortalHost", () => {
   const settle = async () => {
     await Promise.resolve()
-    await new Promise((r) => setTimeout(r, 0))
+    await new Promise<void>((r) => requestAnimationFrame(() => r()))
   }
 
   it("copies the attributes and follows ancestor changes until cleaned up", async () => {

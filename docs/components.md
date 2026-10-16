@@ -99,8 +99,8 @@ seen in docs or source but not confirmed as public, stable API.
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
 | Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Password Input | ● | ● |  |  |  |  |  |  |  | 2 | 2 | spec | Radix: Password Toggle Field |
-| Search Field |  |  | ● |  |  |  |  |  | ● | 2 | 2 | spec |  |
+| Password Input | ● | ● |  |  |  |  |  |  |  | 2 | 2 | done | Radix: Password Toggle Field |
+| Search Field |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 

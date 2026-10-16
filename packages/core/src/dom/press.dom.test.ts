@@ -472,7 +472,8 @@ describe("R2.1: a press ends on focus loss or a hidden document (react-spectrum#
     setVisibility("visible")
     ptr("pointerup", { pointerType: "touch" })
     click(1)
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     expect(events.filter((e) => e.startsWith("PRESS:"))).toEqual([])
   })
 
@@ -480,7 +481,7 @@ describe("R2.1: a press ends on focus loss or a hidden document (react-spectrum#
     ptr("pointerdown", { pointerType: "touch" })
     setVisibility("hidden")
     setVisibility("visible")
-    await new Promise((resolve) => setTimeout(resolve, 10))
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     events.length = 0
     ptr("pointerdown")
     ptr("pointerup")

@@ -58,6 +58,10 @@ const enter = async () => {
 
 afterEach(() => vi.restoreAllMocks())
 
+const frames = async (count = 6) => {
+  for (let i = 0; i < count; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
+
 describe("page moves", () => {
   it("PageDown in a 300px list of 50 items moves by the visible page, not by 10", async () => {
     render(<Harness data={items(50)} />)
@@ -147,7 +151,7 @@ describe("pointer guard", () => {
         pointerType: "mouse",
       }),
     )
-    await new Promise((r) => setTimeout(r, 50))
+    await frames()
     expect(lit()).toBe("Item 5")
   })
 })
@@ -212,7 +216,7 @@ describe("registration and re-renders", () => {
     await waitFor(() => expect(list().getAttribute("aria-busy")).not.toBe("true"))
     await userEvent.tab()
     await waitFor(() => expect(lit()).toBe("Item 1"))
-    await new Promise((r) => setTimeout(r, 100))
+    await frames()
     expect(document.querySelectorAll('[role="option"]')).toHaveLength(1000)
     expect(option("Item 1000").getAttribute("aria-setsize")).toBe("1000")
     // mount, the one registration flush, and the highlight/focus commits of entering the list.
@@ -249,7 +253,7 @@ describe("registration and re-renders", () => {
     const before = new Map(renders)
     await press("ArrowDown")
     await waitFor(() => expect(lit()).toBe("Item 2"))
-    await new Promise((r) => setTimeout(r, 50))
+    await frames()
     const changed = keys
       .map((k) => k.key)
       .filter((k) => (renders.get(k) ?? 0) !== (before.get(k) ?? 0))

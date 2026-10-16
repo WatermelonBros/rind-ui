@@ -28,11 +28,13 @@ import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
+import * as passwordInput from "./password-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as progress from "./progress"
 import * as radioGroup from "./radio-group"
+import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
@@ -80,6 +82,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   overlays,
+  "password-input": passwordInput,
   popover,
   positioning,
   label,
@@ -87,6 +90,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
+  "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
   skeleton,

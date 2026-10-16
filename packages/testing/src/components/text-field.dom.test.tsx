@@ -7,8 +7,9 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-// The shared host helper is not part of the public barrel (Number/Pin/Password/Search use it).
 import { FieldInput } from "../../fixtures/field/field-input"
+// The shared host helper is not part of the public barrel (Number/Pin/Password/Search use it).
+import { composeInPage } from "../adapters/compose"
 import { getButton, getTextField, installAnnouncementLog } from "../index"
 
 const platform = domEnvironment().platform
@@ -28,7 +29,21 @@ function setNative(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
   })
 }
 
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+})
+
+/** Fake only the timers (the announcer debounce); frames and microtasks stay real. */
+const fakeTimers = () => vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] })
+const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+/** Advances fake time, then lets the announcer's frame run (rAF stays real). */
+const advance = (ms: number) =>
+  act(async () => {
+    vi.advanceTimersByTime(ms)
+    await frame()
+    await frame()
+  })
 
 describe("TextField anatomy", () => {
   it("standalone: label for, value, clear keeps focus, count", async () => {
@@ -301,14 +316,18 @@ describe("IME composition", () => {
         <TextField.ErrorMessage />
       </TextField.Root>,
     )
+    fakeTimers()
     const log = installAnnouncementLog()
     const before = log.length
-    const t = field("Name")
-    await t.part("input").compose(["に", "にほ"])
-    await new Promise((r) => setTimeout(r, 1200))
+    // The driver's waits go through Testing Library's asyncWrapper, which hangs under vitest
+    // fake timers; the composition is synthesised directly instead.
+    control().focus()
+    await act(() => composeInPage(control(), { updates: ["に", "にほ"] }))
+    await advance(1200)
     expect(log.length).toBe(before)
-    await t.part("input").compose([], "日本")
-    await waitFor(() => expect(log.length).toBeGreaterThan(before), { timeout: 4000 })
+    await act(() => composeInPage(control(), { updates: [], commit: "日本" }))
+    await advance(4000)
+    expect(log.length).toBeGreaterThan(before)
   })
 
   it("an open composition is flagged data-composing, and the input value is never overwritten", async () => {
@@ -531,16 +550,16 @@ describe("CharacterCount", () => {
         <TextField.CharacterCount max={100} />
       </TextField.Root>,
     )
+    fakeTimers()
     const log = installAnnouncementLog()
     const mine = () => log.filter((a) => /characters? (remaining|too many)/.test(a.message))
     control().focus()
     setNative(control(), "x".repeat(50))
-    await new Promise((r) => setTimeout(r, 1200))
+    await advance(1200)
     expect(mine()).toEqual([])
     setNative(control(), "x".repeat(85))
-    await waitFor(() => expect(mine().map((a) => a.message)).toContain("15 characters remaining"), {
-      timeout: 4000,
-    })
+    await advance(4000)
+    expect(mine().map((a) => a.message)).toContain("15 characters remaining")
     expect(mine().at(-1)?.priority).toBe("polite")
   })
 
@@ -552,10 +571,11 @@ describe("CharacterCount", () => {
         <TextField.CharacterCount max={100} />
       </TextField.Root>,
     )
+    fakeTimers()
     const log = installAnnouncementLog()
     const before = log.length
     setNative(control(), "x".repeat(95))
-    await new Promise((r) => setTimeout(r, 1200))
+    await advance(1200)
     expect(log.slice(before).filter((a) => /remaining/.test(a.message))).toEqual([])
   })
 

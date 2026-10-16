@@ -28,7 +28,11 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = 
   if (!el) throw new Error(`missing ${sel}`)
   return el
 }
-const settle = () => new Promise((r) => setTimeout(r, 0))
+// Drain microtasks and two animation frames — no elapsed-time wait.
+const settle = async () => {
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 const frame = () => new Promise((r) => requestAnimationFrame(() => r(null)))
 const scrollerStyle = "overflow:auto;height:20px"
 const longText = "text ".repeat(200)
