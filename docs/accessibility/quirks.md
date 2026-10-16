@@ -11,6 +11,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | Module | Quirks |
 |---|---|
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
+| `packages/core/src/components/menu/menu.connect.ts` | `vo-submenu-expanded` |
 | `packages/core/src/dom/autosize.ts` | `firefox-textarea-overflow` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
 | `packages/core/src/dom/keyboard.ts` | `safari-ime-commit-enter` |
@@ -80,6 +81,15 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: `packages/core/src/dom/press.ts`
 - Last verified: 2026-10-14
 - Remove when: VoiceOver dispatches one click for VO+Space on a button with role=menuitem
+
+## `vo-submenu-expanded`
+
+- Bugs: <https://github.com/mui/base-ui/blob/master/packages/react/src/menu/submenu-trigger/MenuSubmenuTrigger.tsx>
+- Repro test: `packages/core/src/components/menu/menu.connect.test.ts`
+- Checked in: `packages/core/src/components/menu/menu.connect.ts`
+- Allowed contract exceptions: `state-attrs`
+- Last verified: 2026-10-16
+- Remove when: VoiceOver reads the focused submenu item after an aria-expanded change
 
 ## `ios-emulated-mouse-after-touch`
 

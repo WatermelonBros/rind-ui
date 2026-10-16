@@ -630,6 +630,8 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   "restores-focus": (f) => {
     const target = f.semantics["finalFocus"] ?? f.semantics["trigger"]
     const closed = f.from !== null && f.from !== f.state && !isOpen(f)
+    // Closed by Tab: focus was restored to the trigger and the browser's Tab moved on from it.
+    if (f.context?.["closeReason"] === "tab-key") return []
     return closed && f.after.focus.part !== target
       ? [
           `after closing, focus is on ${f.after.focus.element?.describe ?? "<body>"}, expected the ${target} part`,

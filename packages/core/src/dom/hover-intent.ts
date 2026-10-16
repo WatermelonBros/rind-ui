@@ -83,27 +83,44 @@ function hull(points: readonly Point[]): Point[] {
  * The grace polygon: the exit point padded on both sides of the direction it left the
  * source by, and the target's corners; empty when that side does not face the target.
  */
-export function gracePolygon(exit: Point, source: RectLike, target: RectLike): Point[] {
+export function gracePolygon(
+  exit: Point,
+  source: RectLike,
+  target: RectLike,
+  /** The pointer's last movement before the exit, when known. */
+  motion?: { readonly dx: number; readonly dy: number },
+): Point[] {
   const distances = {
     top: Math.abs(source.top - exit.y),
     bottom: Math.abs(source.bottom - exit.y),
     left: Math.abs(source.left - exit.x),
     right: Math.abs(source.right - exit.x),
   }
-  const side = (Object.keys(distances) as (keyof typeof distances)[]).reduce((a, b) =>
-    distances[a] <= distances[b] ? a : b,
-  )
-  // Leaving by a side that does not face the target is heading elsewhere: no grace area
-  // (a wide card above must not cover the trigger's neighbours, reka-ui#2203).
-  const faces =
-    side === "top"
+  const facing = (s: keyof typeof distances) =>
+    s === "top"
       ? target.bottom <= source.top + 1
-      : side === "bottom"
+      : s === "bottom"
         ? target.top >= source.bottom - 1
-        : side === "left"
+        : s === "left"
           ? target.right <= source.left + 1
           : target.left >= source.right - 1
-  if (!faces) return []
+  const sides = Object.keys(distances) as (keyof typeof distances)[]
+  const nearest = sides.reduce((a, b) => (distances[a] <= distances[b] ? a : b))
+  const heading = (s: keyof typeof distances) =>
+    motion !== undefined &&
+    (s === "top"
+      ? motion.dy < 0
+      : s === "bottom"
+        ? motion.dy > 0
+        : s === "left"
+          ? motion.dx < 0
+          : motion.dx > 0)
+  // Leaving by a side that does not face the target is heading elsewhere: no grace area
+  // (a wide card above must not cover the trigger's neighbours, reka-ui#2203) — unless the
+  // pointer moves towards a side that does (out near a corner, into a flipped submenu:
+  // radix#4036).
+  const side = facing(nearest) ? nearest : sides.find((s) => facing(s) && heading(s))
+  if (!side) return []
   const p = EXIT_PADDING
   const padded: Point[] =
     side === "top" || side === "bottom"
@@ -231,6 +248,7 @@ export function domHoverIntent(env: Env): HoverIntent {
     ) => {
       const now = regionOf(path, target)
       const was = region
+      const previous = last
       last = p
       region = now
       if (now !== "outside") {
@@ -242,7 +260,8 @@ export function domHoverIntent(env: Env): HoverIntent {
         // Just left the trigger or the layer: a grace area towards the other one.
         const source = sourceRect(was)
         const dest = targetRect(was === "trigger" ? "layer" : "trigger")
-        const area = source && dest ? gracePolygon(p, source, dest) : []
+        const motion = previous ? { dx: p.x - previous.x, dy: p.y - previous.y } : undefined
+        const area = source && dest ? gracePolygon(p, source, dest, motion) : []
         setPolygon(area.length > 0 ? area : null)
       }
       if (polygon && pointInPolygon(p, polygon)) {
