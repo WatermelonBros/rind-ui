@@ -354,7 +354,11 @@ export const comboboxMachine = setup({
       const node = key === null ? undefined : props.collection.get(key)
       a.set("completion", node ? completion(values.inputValue, node.textValue, props.locale) : null)
     },
-    removeCompletion: ({ set }) => set("completion", null),
+    // A rejected completion (Escape, caret keys) does not come back until typing again.
+    removeCompletion: ({ set }) => {
+      set("completion", null)
+      set("completable", false)
+    },
     clearHighlight: ({ set }) => {
       set("highlightedKey", null)
       set("highlightSource", null)
@@ -379,6 +383,13 @@ export const comboboxMachine = setup({
         selectedKeys(a.values.value).length > 0
       ) {
         setText(a, text)
+      }
+    },
+    /** A selection with no text yet (a default value at start) shows its text. */
+    fillText: (a) => {
+      if (a.values.inputValue === "" && !a.context.dirty) {
+        const text = selectionText(a.props, a.values.value)
+        if (text !== "") setText(a, text)
       }
     },
     restoreDefault: (a) => {
@@ -502,7 +513,7 @@ export const comboboxMachine = setup({
   },
   states: {
     closed: {
-      entry: ["clearHighlight", "resetOpen"],
+      entry: ["clearHighlight", "resetOpen", "fillText"],
       on: {
         "INPUT.CHANGE": [
           { guard: "opensOnInput", target: "open", actions: ["typed", "setOpenReason"] },
