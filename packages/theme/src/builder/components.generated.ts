@@ -194,6 +194,18 @@ export type ComponentTokens = {
     | "decoration"
     | "disabledColor"
     | "underlineOffset"
+  readonly menu:
+    | "bg"
+    | "border"
+    | "groupLabelText"
+    | "indicatorSize"
+    | "maxHeight"
+    | "minWidth"
+    | "padding"
+    | "radius"
+    | "separator"
+    | "shadow"
+  readonly "menu-item": "disabledText" | "height" | "highlightBg" | "highlightText" | "padding"
   readonly "number-input":
     | "bg"
     | "border"
