@@ -48,7 +48,7 @@ Progress is for a task that moves towards an end (an upload, an install). A meas
 ## Accessibility notes
 
 - The name comes from the Label (or your `aria-label`), never from the value text. An unnamed Progress logs a development error unless Root is `aria-hidden` (a decorative bar).
-- NVDA drops the name of a progressbar with no text content (BU#4184, nvda#13904), so Root ends with one visually hidden, presentational character (quirk `nvda-progressbar-name`). JAWS still reads only the value in some versions (FreedomScientific standards-support#354).
+- NVDA drops the name of a progressbar with no text content, so Root ends with one visually hidden, presentational character (quirk `nvda-progressbar-name`). JAWS still reads only the value in some versions.
 - `orientation="vertical"` only changes which size the fill takes; a progressbar has no `aria-orientation`.
 
 ## Styling

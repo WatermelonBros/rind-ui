@@ -37,9 +37,8 @@ The tone is styling only: `data-tone="danger"` does not make an alert assertive,
 ## Why there is no `role="alert"`
 
 A live region in the visible tree is spoken when it is inserted, re-spoken when it moves
-(a keyed list reordering, ariakit#7235), spoken at page load for server-rendered content
-(mui/material-ui#49440), missed when the region is created in the same frame as its text
-(chakra-ui#3240), and hidden from assistive technology when a modal hides everything
+(a keyed list reordering), spoken at page load for server-rendered content, missed when the
+region is created in the same frame as its text, and hidden from assistive technology when a modal hides everything
 outside itself. The Announcer avoids all of it: its regions exist before the first message
 and survive hide-outside, and each alert's messages share one key, so Strict Mode's double
 mount and bursts of text changes collapse into one.

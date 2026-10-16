@@ -130,7 +130,7 @@ when there is nothing to show. [Avatar](avatar.md) is a person or entity: Root i
 named `role="img"` (the person's name) and its image is presentational. Both share the same
 loading status machine.
 
-## Coming from Kobalte
+## Coming from another Image component
 
 `Image.Img alt` moves to `Image.Root alt`; `onLoadingStatusChange` becomes `onStatusChange` on
 Root; `fallbackDelay` is on Root.

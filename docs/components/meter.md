@@ -52,7 +52,7 @@ A Meter measures something that is not a task. A task moving towards an end (an 
 ## Accessibility notes
 
 - The name comes from the Label (or your `aria-label`), never from the value text. An unnamed Meter logs a development error unless Root is `aria-hidden`.
-- The role is exactly `meter`. A `"meter progressbar"` fallback makes axe report `aria-allowed-attr` (RS#6627, RS#10737); NVDA may still say "progress bar" for a meter, which is the screen reader's choice.
+- The role is exactly `meter`. A `"meter progressbar"` fallback makes axe report `aria-allowed-attr`; NVDA may still say "progress bar" for a meter, which is the screen reader's choice.
 - NVDA drops the name of a meter with no text content, so Root ends with one visually hidden, presentational character (quirk `nvda-progressbar-name`, shared with Progress).
 - A Meter is never a live region and never announces: a value that changes every second stays silent.
 
