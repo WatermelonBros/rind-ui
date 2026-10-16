@@ -1,3 +1,5 @@
 #!/bin/sh
 # Runs the fast part of CI before every push (pnpm verify). Bypass only in an emergency: --no-verify.
-exec pnpm verify
+# git writes the refs being pushed to stdin; drain it, or git dies of SIGPIPE when verify exits.
+cat > /dev/null
+exec pnpm verify < /dev/null
