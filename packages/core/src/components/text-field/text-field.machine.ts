@@ -7,7 +7,7 @@
 import type { Modality } from "../../contract/env"
 import type { AnnouncerEnv } from "../../env/capabilities"
 import { setup, type } from "../../machine/setup"
-import type { ActionFn, EffectFn, GuardFn, Types } from "../../machine/types"
+import type { ActionFn, EffectFn, GuardFn, Machine } from "../../machine/types"
 import type { TextFieldMessages } from "./text-field.messages"
 
 export type TextFieldReason = "INPUT" | "CLEAR" | "RESET" | (string & {})
@@ -80,32 +80,52 @@ export function countAnnouncement(
   return remaining <= threshold ? props.messages.charactersRemaining(remaining) : null
 }
 
+/** A preset's own types, added to Text Field's (props, events, controllable values). */
+export interface TextFieldPresetTypes {
+  readonly props?: object
+  readonly events?: { readonly type: string }
+  readonly values?: string
+}
+
+/** Text Field's machine types extended by a preset's. */
+export type TextFieldTypes<X extends TextFieldPresetTypes = Record<never, never>> = {
+  props: TextFieldProps & (X extends { readonly props: infer P } ? P : unknown)
+  events: TextFieldEvent | (X extends { readonly events: infer E } ? E : never)
+  env: Env
+  context: TextFieldContext
+  values: "value" | (X extends { readonly values: infer V } ? V : never)
+}
+
+type PresetEventType<X extends TextFieldPresetTypes> = X extends {
+  readonly events: { readonly type: infer K }
+}
+  ? K & string
+  : never
+
 /** What a preset adds: a scope, global events with their guards and actions, effects. */
-export interface TextFieldPreset {
+export interface TextFieldPreset<X extends TextFieldPresetTypes = Record<never, never>> {
   readonly scope?: string
-  /**
-   * Extra controllable values (`visible` → props `visible` / `defaultVisible` /
-   * `onVisibleChange`), not bound to a state.
-   */
-  readonly values?: Readonly<Record<string, { readonly fallback: unknown }>>
+  /** Extra controllable values (`visible` → `visible` / `defaultVisible` / `onVisibleChange`). */
+  readonly values?: {
+    readonly [K in X extends { readonly values: infer V extends string } ? V : never]: {
+      readonly fallback: unknown
+    }
+  }
   /** Global events (accepted in `idle` and `composing`), by type. */
-  readonly events?: Readonly<
-    Record<string, { readonly guard?: string; readonly actions: readonly string[] }>
-  >
-  readonly actions?: Readonly<Record<string, ActionFn<Types>>>
-  readonly guards?: Readonly<Record<string, GuardFn<Types>>>
-  readonly effects?: Readonly<Record<string, EffectFn<Types>>>
+  readonly events?: {
+    readonly [K in PresetEventType<X>]: {
+      readonly guard?: string | { readonly and: readonly string[] }
+      readonly actions: readonly string[]
+    }
+  }
+  readonly actions?: Readonly<Record<string, ActionFn<TextFieldTypes<X>>>>
+  readonly guards?: Readonly<Record<string, GuardFn<TextFieldTypes<X>>>>
+  readonly effects?: Readonly<Record<string, EffectFn<TextFieldTypes<X>>>>
   /** Service effects (active for the service's life). */
   readonly serviceEffects?: readonly string[]
 }
 
-const textFieldTypes = type<{
-  props: TextFieldProps
-  events: TextFieldEvent
-  env: Env
-  context: TextFieldContext
-  values: "value"
-}>()
+const textFieldTypes = type<TextFieldTypes>()
 
 const baseActions = {
   /** Records the value: uncontrolled the DOM already shows it; controlled it is proposed. */
@@ -144,13 +164,18 @@ const baseGuards = {
  * Builds the Text Field machine. The preset's events are global (both states accept them),
  * so a preset never needs to know the composition states. Static: evaluated once.
  */
-export function buildTextFieldMachine(preset: TextFieldPreset = {}) {
+export function buildTextFieldMachine<X extends TextFieldPresetTypes = Record<never, never>>(
+  preset: TextFieldPreset<X> = {},
+) {
+  type PresetEvent = { readonly guard?: unknown; readonly actions: readonly string[] }
+  const events: Readonly<Record<string, PresetEvent>> = preset.events ?? {}
   const extraOn = Object.fromEntries(
-    Object.entries(preset.events ?? {}).map(([type, t]) => [
+    Object.entries(events).map(([type, t]) => [
       type,
       { ...(t.guard ? { guard: t.guard } : {}), actions: t.actions },
     ]),
   )
+  const values: Readonly<Record<string, unknown>> = preset.values ?? {}
   const machine = setup({
     types: textFieldTypes,
     actions: { ...baseActions, ...(preset.actions as Record<string, never>) },
@@ -161,7 +186,7 @@ export function buildTextFieldMachine(preset: TextFieldPreset = {}) {
     initial: "idle",
     context: () => ({ focused: false }),
     // A preset's values are merged by name; the runtime treats them like `value`.
-    values: { value: { fallback: "" }, ...(preset.values as Record<string, never>) },
+    values: { value: { fallback: "" }, ...(values as Record<string, never>) },
     effects: (preset.serviceEffects ?? []) as never[],
     on: {
       FOCUS: { actions: ["setFocused"] },
@@ -188,8 +213,14 @@ export function buildTextFieldMachine(preset: TextFieldPreset = {}) {
       },
     },
   })
-  return { machine, scope: preset.scope ?? "text-field" }
+  return {
+    // Sound: the definition is Text Field's plus the preset's events, actions, guards and
+    // values, all merged by name at runtime; the preset's implementations are typed against
+    // the extended types, which is what a service of this machine is created with.
+    machine: machine as unknown as Machine<"idle" | "composing", TextFieldTypes<X>>,
+    scope: preset.scope ?? "text-field",
+  }
 }
 
-export const { machine: textFieldMachine } = buildTextFieldMachine({})
+export const { machine: textFieldMachine } = buildTextFieldMachine()
 export type TextFieldMachine = typeof textFieldMachine
