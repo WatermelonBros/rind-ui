@@ -72,14 +72,13 @@ const keepFocus = (event: unknown) => {
   if (e.target === e.currentTarget) e.preventDefault()
 }
 
-const kebab = (reason: string) => reason.toLowerCase().replace(/_/g, "-")
 const join = (...ids: (string | undefined)[]) => ids.filter(Boolean).join(" ") || undefined
 
 export function dialogConnect(input: DialogConnectInput, send: (event: DialogEvent) => void) {
   const { scope, instance } = input
   const ids = dialogIds(scope, instance)
   const dataState = input.open ? "open" : "closed"
-  const closeReason = !input.open && input.closeReason ? kebab(input.closeReason) : undefined
+  const closeReason = !input.open && input.closeReason ? input.closeReason : undefined
   const stacking = (): PartProps =>
     input.meta
       ? {

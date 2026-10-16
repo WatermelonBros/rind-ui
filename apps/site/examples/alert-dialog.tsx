@@ -36,7 +36,7 @@ export function AsyncConfirm() {
       <AlertDialog.Root
         actionsRef={actions}
         onOpenChange={(open, details) => {
-          if (open || details.reason !== "ACTION_PRESS") return
+          if (open || details.reason !== "action") return
           details.cancel()
           setPending(true)
           setTimeout(() => {
@@ -142,7 +142,7 @@ export const variants: Variants = {
   },
   Reasons: {
     title: "Close reasons",
-    description: "`CANCEL_PRESS`, `ACTION_PRESS` and `ESCAPE_KEY` tell the three apart.",
+    description: "`cancel`, `action` and `escape-key` tell the three apart.",
   },
   NoEscape: {
     title: "No Escape",

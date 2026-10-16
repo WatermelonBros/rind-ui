@@ -32,7 +32,24 @@ export type DialogEvent =
   | { readonly type: "OPEN" }
   | { readonly type: "CLOSE" }
 
-export type DialogCloseReason = Exclude<DialogEvent["type"], "OPEN">
+/** Why the dialog closed (`onOpenChange`'s `details.reason`, `data-close-reason`). */
+export type DialogCloseReason =
+  | "trigger"
+  | "close-trigger"
+  | "cancel"
+  | "action"
+  | "escape-key"
+  | "outside-press"
+  | "outside-focus"
+  | "parent-dismissed"
+  | "api"
+/** Why it opened: a trigger press, or programmatic (`actionsRef`, the `open` prop). */
+export type DialogOpenReason = "trigger" | "api"
+
+/** `onOpenChange`'s details: `reason` says why it opens or closes. */
+export type DialogChangeDetails = Omit<ChangeDetails<DialogEvent>, "reason"> & {
+  readonly reason: DialogOpenReason | DialogCloseReason
+}
 
 /** A cancellable event passed to `onEscapeKeyDown` / `onInteractOutside`. */
 export interface DismissEvent {
@@ -44,7 +61,7 @@ export interface DismissEvent {
 export interface DialogProps {
   readonly open?: boolean | undefined
   readonly defaultOpen?: boolean | undefined
-  readonly onOpenChange?: ((open: boolean, details: ChangeDetails<DialogEvent>) => void) | undefined
+  readonly onOpenChange?: ((open: boolean, details: DialogChangeDetails) => void) | undefined
   /** Default true. */
   readonly modal?: boolean | undefined
   /** Default true. */
@@ -88,17 +105,18 @@ const DISMISSALS: Record<DismissReason, Dismissal<string>["type"]> = {
   "parent-dismissed": "PARENT_DISMISSED",
 }
 
-const CLOSE_REASONS = new Set<string>([
-  "TRIGGER_PRESS",
-  "CLOSE_TRIGGER_PRESS",
-  "CANCEL_PRESS",
-  "ACTION_PRESS",
-  "ESCAPE_KEY",
-  "OUTSIDE_PRESS",
-  "OUTSIDE_FOCUS",
-  "PARENT_DISMISSED",
-  "CLOSE",
-])
+/** Each closing event's reason. */
+const CLOSE_REASONS: Partial<Record<DialogEvent["type"], DialogCloseReason>> = {
+  TRIGGER_PRESS: "trigger",
+  CLOSE_TRIGGER_PRESS: "close-trigger",
+  CANCEL_PRESS: "cancel",
+  ACTION_PRESS: "action",
+  ESCAPE_KEY: "escape-key",
+  OUTSIDE_PRESS: "outside-press",
+  OUTSIDE_FOCUS: "outside-focus",
+  PARENT_DISMISSED: "parent-dismissed",
+  CLOSE: "api",
+}
 
 /**
  * The kinds that can be a dialog's parent layer (spec "Parent Layer"). A popover is one: a
@@ -184,7 +202,8 @@ export function buildDialogMachine(config: DialogMachineConfig) {
       // On the close transition: a controlled parent that applies the proposal closes
       // through $sync, which keeps the proposal's reason.
       setCloseReason: ({ event, set }) => {
-        if (CLOSE_REASONS.has(event.type)) set("closeReason", event.type as DialogCloseReason)
+        const reason = CLOSE_REASONS[event.type as DialogEvent["type"]] // a runtime event type
+        if (reason) set("closeReason", reason)
       },
     },
     effects: {
@@ -293,7 +312,10 @@ export function buildDialogMachine(config: DialogMachineConfig) {
     values: { open: { fallback: false, states: { open: true, closed: false } } },
     states: {
       closed: {
-        on: { TRIGGER_PRESS: "open", OPEN: "open" },
+        on: {
+          TRIGGER_PRESS: { target: "open", reason: "trigger" },
+          OPEN: { target: "open", reason: "api" },
+        },
       },
       open: {
         entry: ["enterOpen"],
@@ -302,19 +324,37 @@ export function buildDialogMachine(config: DialogMachineConfig) {
         exit: ["setCloseReason"],
         effects: ["overlay", "nameCheck"],
         on: {
-          TRIGGER_PRESS: { guard: "isNonModal", target: "closed", actions: ["setCloseReason"] },
+          TRIGGER_PRESS: {
+            guard: "isNonModal",
+            target: "closed",
+            reason: "trigger",
+            actions: ["setCloseReason"],
+          },
           ...Object.fromEntries(
-            closeParts.map((e) => [e, { target: "closed", actions: ["setCloseReason"] }]),
+            closeParts.map((e) => [
+              e,
+              { target: "closed", reason: CLOSE_REASONS[e], actions: ["setCloseReason"] },
+            ]),
           ),
-          ESCAPE_KEY: { guard: "closesOnEscape", target: "closed", actions: ["setCloseReason"] },
+          ESCAPE_KEY: {
+            guard: "closesOnEscape",
+            target: "closed",
+            reason: "escape-key",
+            actions: ["setCloseReason"],
+          },
           OUTSIDE_PRESS: {
             guard: "closesOnOutsidePress",
             target: "closed",
+            reason: "outside-press",
             actions: ["setCloseReason"],
           },
-          OUTSIDE_FOCUS: { target: "closed", actions: ["setCloseReason"] },
-          PARENT_DISMISSED: { target: "closed", actions: ["setCloseReason"] },
-          CLOSE: { target: "closed", actions: ["setCloseReason"] },
+          OUTSIDE_FOCUS: { target: "closed", reason: "outside-focus", actions: ["setCloseReason"] },
+          PARENT_DISMISSED: {
+            target: "closed",
+            reason: "parent-dismissed",
+            actions: ["setCloseReason"],
+          },
+          CLOSE: { target: "closed", reason: "api", actions: ["setCloseReason"] },
         },
       },
     },
