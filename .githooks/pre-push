@@ -1,0 +1,3 @@
+#!/bin/sh
+# Runs the fast part of CI before every push (pnpm verify). Bypass only in an emergency: --no-verify.
+exec pnpm verify

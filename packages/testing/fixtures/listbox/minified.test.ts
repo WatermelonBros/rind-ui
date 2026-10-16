@@ -17,9 +17,13 @@ const cache = join(coreDir, "node_modules/.cache")
 mkdirSync(cache, { recursive: true })
 const out = mkdtempSync(join(cache, "rind-minified-"))
 let core: Core
+// Locally (pre-push) core is usually not built: skip rather than fail. CI always builds first.
+const built = existsSync(join(coreDir, "dist/index.mjs"))
+const skip = !built && !process.env["CI"]
 
 beforeAll(async () => {
-  if (!existsSync(join(coreDir, "dist/index.mjs"))) {
+  if (skip) return
+  if (!built) {
     throw new Error("build @rind-ui/core first: pnpm --filter @rind-ui/core build")
   }
   execFileSync("pnpm", ["exec", "tsdown", "--minify", "--no-dts", "--no-publint", "-d", out], {
@@ -65,7 +69,7 @@ function type(rows: (string | Row)[], chars: string[], locale = "en") {
   return trail
 }
 
-describe("minified @rind-ui/core", () => {
+describe.skipIf(skip)("minified @rind-ui/core", () => {
   it("repeated letter cycles", () => {
     expect(type(["Dog", "Duck", "Deer"], ["d", "d", "d"])).toEqual(["Dog", "Duck", "Deer"])
   })
