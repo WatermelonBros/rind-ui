@@ -12,3 +12,10 @@ export {
   resolveMessages,
   segmenter,
 } from "./messages"
+export {
+  createNumberParser,
+  type FormatOptions as NumberFormatOptions,
+  keypadDecimal,
+  type LocaleNumberParser,
+  type NumberParseOptions,
+} from "./number-parser"

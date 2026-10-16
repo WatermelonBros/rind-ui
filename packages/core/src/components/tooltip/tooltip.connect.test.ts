@@ -243,11 +243,13 @@ describe("events", () => {
     const a = api({}, send)
     a.focus("keyboard", "key")
     a.blur()
-    a.pressStart()
+    a.pressStart(false)
+    a.pressStart(true)
     expect(send.mock.calls.map((c) => c[0])).toEqual([
       { type: "FOCUS", modality: "keyboard", cause: "key" },
       { type: "BLUR" },
       { type: "PRESS.START" },
+      { type: "PRESS.START", pointer: true },
     ])
   })
 

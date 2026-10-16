@@ -20,6 +20,7 @@ import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
 import * as messagesAndProvider from "./messages-and-provider"
+import * as numberInput from "./number-input"
 import * as popover from "./popover"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
@@ -63,6 +64,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   popover,
   label,
   link,
+  "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
   "segmented-control": segmentedControl,

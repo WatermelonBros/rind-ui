@@ -215,13 +215,14 @@ function Trigger({
           if (e.pointerType === "mouse" || e.pointerType === "pen") setHovered(true)
         },
         onPointerLeave: () => setHovered(false),
-        onPointerDown: () => api.pressStart(),
+        onPointerDown: (e: { pointerType: string }) =>
+          api.pressStart(e.pointerType === "mouse" || e.pointerType === "pen"),
         onKeyDown: (e: { key: string }) => {
-          if (e.key === "Enter" || e.key === " ") api.pressStart()
+          if (e.key === "Enter" || e.key === " ") api.pressStart(false)
         },
         // Assistive technology activates with a bare click (no pointer or key events).
         onClick: (e: { detail: number }) => {
-          if (e.detail === 0) api.pressStart()
+          if (e.detail === 0) api.pressStart(false)
         },
         onFocus: (e: { currentTarget: Element }) => {
           setFocused(true)

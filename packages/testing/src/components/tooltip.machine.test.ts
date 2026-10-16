@@ -3,19 +3,20 @@
 // the `shown` effect (layer, hover tracking, positioning) is a no-op, so the real machine
 // runs unchanged; the zone events it would emit (`HOVER.START/END` with `zone: true`) are
 // sent by hand, and the DOM wiring is covered by the jsdom and browser suites.
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { fakeDelayGroup, fakeHoverIntent } from "../../../../testing/src/delay-group"
-import { fakePositioning } from "../../../../testing/src/positioning"
-import type { Modality } from "../../contract/env"
-import { createService } from "../../machine/service"
+
 import {
+  createService,
+  type Modality,
   type TooltipCloseReason,
   type TooltipEvent,
   type TooltipProps,
   tooltipIds,
   tooltipMachine,
   tooltipPositioning,
-} from "./tooltip.machine"
+} from "@rind-ui/core"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { fakeDelayGroup, fakeHoverIntent } from "../delay-group"
+import { fakePositioning } from "../positioning"
 
 beforeEach(() => vi.useFakeTimers())
 afterEach(() => vi.useRealTimers())
@@ -81,7 +82,7 @@ const focus = (
   cause,
 })
 const blur: TooltipEvent = { type: "BLUR" }
-const press: TooltipEvent = { type: "PRESS.START" }
+const press: TooltipEvent = { type: "PRESS.START", pointer: true }
 const placed = (side: "top" | "bottom", first = true): TooltipEvent => ({
   type: "POSITION.PLACED",
   side,
@@ -918,5 +919,52 @@ describe("ids", () => {
     const ids = tooltipIds("t")
     expect(new Set(Object.values(ids)).size).toBe(4)
     for (const id of Object.values(ids)) expect(id).toContain("t")
+  })
+})
+
+describe("review fixes (add-tooltip r1)", () => {
+  it("closing → open keeps the placement: a brief exit and return is never back to placing", () => {
+    const m = openByHover()
+    m.send(placed("top"))
+    expect(m.ctx().placement.placed).toBe(true)
+    m.send(zoneLeave)
+    expect(m.state()).toBe("closing")
+    m.send(zoneEnter)
+    expect(m.state()).toBe("open")
+    expect(m.ctx().placement.placed).toBe(true)
+  })
+
+  it("a new open from closed starts unplaced again", () => {
+    const m = openByHover()
+    m.send(placed("top"))
+    m.send({ type: "ESCAPE" })
+    m.send(unhover)
+    m.send(hover)
+    m.advance(700)
+    expect(m.state()).toBe("open")
+    expect(m.ctx().placement.placed).toBe(false)
+  })
+
+  it("a tap or a key press closes without suppressing the next mouse hover", () => {
+    const m = openByHover()
+    m.send({ type: "PRESS.START" })
+    expect(m.state()).toBe("closed")
+    expect(m.ctx().suppressHover).toBe(false)
+    m.send(hover)
+    m.advance(700)
+    expect(m.state()).toBe("open")
+  })
+
+  it("a mouse press suppresses hover until the pointer leaves the trigger", () => {
+    const m = openByHover()
+    m.send(press)
+    expect(m.ctx().suppressHover).toBe(true)
+    m.send(hover)
+    m.advance(700)
+    expect(m.state()).toBe("closed")
+    m.send(unhover)
+    m.send(hover)
+    m.advance(700)
+    expect(m.state()).toBe("open")
   })
 })

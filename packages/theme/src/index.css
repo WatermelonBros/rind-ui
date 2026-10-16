@@ -20,6 +20,7 @@
 @import "./fieldset.css";
 @import "./field.css";
 @import "./text-field.css";
+@import "./number-input.css";
 @import "./collapsible.css";
 @import "./toggle.css";
 @import "./toggle-group.css";
