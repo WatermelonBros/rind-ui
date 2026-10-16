@@ -70,8 +70,7 @@ function spy() {
 
 const settle = async () => {
   await act(async () => {
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(null))))
-    await new Promise((r) => setTimeout(r, 50))
+    for (let i = 0; i < 6; i++) await new Promise((r) => requestAnimationFrame(() => r(null)))
   })
 }
 

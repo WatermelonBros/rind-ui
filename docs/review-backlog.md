@@ -133,6 +133,8 @@ See CLAUDE.md "Review rules".
 | add-a11y-foundations (r1) | — | packages/react/src/provider.tsx:68 | Inline environment/messages props rebuild domEnvironment every render |
 | add-a11y-foundations (r1) | — | packages/core/src/dom/quirks.ts | Several entries point at test files that don't obviously reproduce their bug; quirks:check only checks the file exists (require the id in the test); defineQuirks accepts duplicate ids; every entry verified "today" incl. WebKit/VO ones jsdom can't verify |
 | add-a11y-foundations (r1) | — | packages/testing/src/broken.dom.test.tsx:157 | No broken fixture for "no ring after arrow" or "double speech on Windows"; the Tab fixture fails pointer runs for the wrong reason (hidden by `some(...)`); RA#9737 fixture doesn't prove Chromium-only; ring contrast checked only against backgrounds |
+| add-tooltip (r1) | — | packages/react/src/tooltip/tooltip.tsx (Trigger) | the render element's own `aria-describedby` / `aria-labelledby` (set on the element passed to `render`) are not merged with the tooltip's reference; only the Trigger's props are |
+| add-tooltip (r1) | — | packages/testing/src/invariants.ts (`layer`) | the "focus already on body before the step" exemption also hides a Dialog/Popover that leaves focus on body after opening from body; scope it to contracts that declare a layer that never takes focus |
 
 ## Resolved
 

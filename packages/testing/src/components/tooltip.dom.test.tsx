@@ -758,6 +758,9 @@ describe("Closing", () => {
     await advance(5000)
     expect(isOpen()).toBe(true)
     expect(log).toHaveBeenCalledTimes(1)
+    // The same session: still placed, not back to an invisible first frame (review r1).
+    expect(contentOf().hasAttribute("data-placing")).toBe(false)
+    expect(contentOf().closest("[data-placing]")).toBeNull()
   })
 
   it("Press closes and does not reopen until the pointer leaves and enters again", async () => {
@@ -1367,7 +1370,10 @@ describe("Touch (iOS) and scrolling", () => {
       await tab(user) // the trigger, far below the fold
       expect(active()).toBe(trigger())
       await vi.waitFor(() => expect(isOpen()).toBe(true))
-      await act(() => new Promise((r) => setTimeout(r, 400)))
+      // drain frames (smooth scroll, scroll events, hover-intent re-check) instead of waiting
+      await act(async () => {
+        for (let i = 0; i < 12; i++) await new Promise((r) => requestAnimationFrame(() => r(null)))
+      })
       expect(window.scrollY).toBeGreaterThan(0)
       expect(isOpen()).toBe(true)
       window.scrollTo(0, 0)
@@ -1783,5 +1789,25 @@ describe("Providers and StrictMode", () => {
     await key(user, "{Escape}")
     expect(isOpen("Bold")).toBe(false)
     expect(within(document.body).getAllByRole("button")).toHaveLength(3)
+  })
+})
+
+describe("defaultOpen (review: rind-ui-e2)", () => {
+  it.each([false, true])("is placed after mounting open (StrictMode: %s)", async (strict) => {
+    const tip = (
+      <Tooltip.Root defaultOpen>
+        <Tooltip.Trigger>Bold</Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Positioner>
+            <Tooltip.Content>Make bold</Tooltip.Content>
+          </Tooltip.Positioner>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    )
+    render(strict ? <StrictMode>{tip}</StrictMode> : tip)
+    await vi.waitFor(() => {
+      const positioner = document.querySelector('[data-scope="tooltip"][data-part="positioner"]')
+      expect(positioner?.hasAttribute("data-placing")).toBe(false)
+    })
   })
 })
