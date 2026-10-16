@@ -7,6 +7,13 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-scroll-area (r1) | — | packages/core/src/dom/scroll-metrics.ts:152 | The tabbables walk runs per scroll frame; cache it and invalidate on subtree mutation |
+| add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Release outside the window is tested without a pointer move after release |
+| add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.dom.test.tsx | Unmount leak check covers wheel listeners only (pointer, resize and mutation observers unchecked) |
+| add-scroll-area (r1) | — | packages/core/src/components/scroll-area/scroll-area.contract.ts | The tab-stop invariant derives from the component's own `data-tab-stop`, not from an independent oracle |
+| add-scroll-area (r1) | — | packages/theme/src/scroll-area.css | Forced-colors fallback: confirm the spec intent (system scrollbars vs drawn thumb) |
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Not covered yet: Collapsible inside, 30-instance read/write interleaving trace, Trusted Types enforcement, fast drag released outside the window, re-hover without a thumb jump |
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.model.dom.test.tsx | Model walk is browser-only with layout events (`SCROLL`, `DRAG.*`, `METRICS`) skipped; covered by browser tests |
 | add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |
 | add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.connect.ts:59 | `codePattern` drops the consumer pattern's flags (an `i` pattern loses case-insensitivity in the native `pattern`) |
 | add-pin-input (r1) | — | packages/testing/fixtures/pin-input | No trusted Ctrl/⌘+V run (the clipboard paste through the OS shortcut) |
