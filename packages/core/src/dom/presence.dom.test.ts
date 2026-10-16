@@ -131,7 +131,9 @@ describe("waitForExit", () => {
     "waits for the animation that replaces a cancelled one (retarget)",
     async () => {
       const el = mount()
-      el.style.transition = "opacity 200ms linear"
+      // Durations long enough that a loaded CI runner cannot finish the first transition
+      // before the retarget (the 200 ms version raced on shared runners).
+      el.style.transition = "opacity 1500ms linear"
       el.style.opacity = "1"
       void el.offsetWidth
       await frame()
@@ -139,9 +141,10 @@ describe("waitForExit", () => {
       const t = track(waitForExit(el))
       await sleep(100)
       el.style.opacity = "0.5"
-      await sleep(120)
+      await sleep(300)
       expect(t.done).toBe(false)
-      await sleep(350)
+      const deadline = Date.now() + 6000
+      while (!t.done && Date.now() < deadline) await sleep(50)
       expect(t.done).toBe(true)
     },
   )

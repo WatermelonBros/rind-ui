@@ -60,7 +60,11 @@ describe("adapter inputs", () => {
     document.body.innerHTML = "<button>Info</button>"
     const button = document.querySelector("button") as HTMLButtonElement
     const types: string[] = []
-    button.addEventListener("pointerenter", (e) => types.push((e as PointerEvent).pointerType))
+    // Only the adapter's events: a real cursor left over the page by an earlier test makes the
+    // browser send its own trusted pointerenter (mouse) when the button appears.
+    button.addEventListener("pointerenter", (e) => {
+      if (!e.isTrusted) types.push((e as PointerEvent).pointerType)
+    })
     const env = domEnv().create({ scope: "x", anchor: { text: "Info" }, modality: "touch" })
     await env.find({ text: "Info" }).hover({ pointerType: "touch" })
     expect(types).toEqual(["touch"])
