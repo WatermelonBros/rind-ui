@@ -30,8 +30,8 @@ export {
 export { type ElementInfo, elementInfo } from "./element-info"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
-export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusPast } from "./focus-past"
+export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
 export {
   containFocus,
