@@ -1,84 +1,37 @@
-// Runs locally exactly what CI runs for this branch (same scope rules: scripts/ci-scope.mjs),
-// so CI is never red for something a push could have caught. CI retries a failed browser test
-// once; so does this (several sessions share the machine, browser timing flakes under load).
+// Fast pre-push check (the hook runs it). Not a CI mirror: the machine is shared by several
+// sessions, so it runs only what a change can break, in Chromium. CI runs the full matrix.
+// - static checks and the node project (seconds; some node tests read CSS and manifests);
+// - jsdom + Chromium tests related to the changed source files (`vitest related`);
+// - the site build + audit only when apps/site changed.
 import { execSync } from "node:child_process"
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
-import { scope } from "./ci-scope.mjs"
 
 const base = execSync("git merge-base HEAD origin/main", { encoding: "utf8" }).trim()
-const { components, site, full } = scope(base)
-const changed = full ? "" : `--changed ${base} --passWithNoTests`
-// Several sessions share this machine: cap each verify's workers so they don't starve each other.
-const vitest = (projects) =>
-  `pnpm exec vitest run ${projects} ${changed} --retry 1 --maxWorkers=25%`
+const changed = execSync(`git diff --name-only ${base}`, { encoding: "utf8" })
+  .split("\n")
+  .filter((f) => /\.(ts|tsx|css)$/.test(f) && !f.startsWith("apps/site/"))
 
 const steps = [
-  // CI `static`
   "pnpm lint",
   "pnpm typecheck",
-  "pnpm quirks:check",
   "pnpm docs:check",
-  "pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/storybook",
-  "pnpm --filter @rind-ui/core size",
+  "pnpm exec vitest run --project node",
 ]
-if (components) {
-  // CI `test` slices. node always in full: seconds, and some tests read files --changed can't see.
+if (changed.length > 0) {
   steps.push(
-    "pnpm exec vitest run --project node",
-    vitest("--project jsdom --project setup-noglobals --project setup-optout"),
-    vitest(
-      `--project "browser (chromium)" --project "browser (firefox)" --project "browser (webkit)"`,
-    ),
-    vitest(
-      `--project "storybook (chromium)" --project "storybook (firefox)" --project "storybook (webkit)"`,
-    ),
-    vitest("--project playwright"),
+    `pnpm exec vitest related ${changed.join(" ")} --run --passWithNoTests --project jsdom --project "browser (chromium)"`,
   )
 }
-// CI `site-audit`
-if (site) steps.push("pnpm --filter @rind-ui/site run audit")
-
-// One verify at a time on this machine: several sessions running full browser suites at once
-// starve the CPU and turn deadlines into failures. Wait for the lock instead.
-const lock = "/tmp/rind-ui-verify.lock"
-const alive = (pid) => {
-  try {
-    process.kill(pid, 0)
-    return true
-  } catch {
-    return false
-  }
+if (/^apps\/site\//m.test(execSync(`git diff --name-only ${base}`, { encoding: "utf8" }))) {
+  steps.push("pnpm --filter @rind-ui/site run audit")
 }
-for (let waiting = false; ; ) {
-  try {
-    mkdirSync(lock)
-    writeFileSync(`${lock}/pid`, String(process.pid))
-    break
-  } catch {
-    const owner = Number(readFileSync(`${lock}/pid`, "utf8") || 0)
-    if (owner && !alive(owner)) {
-      rmSync(lock, { recursive: true, force: true })
-      continue
-    }
-    if (!waiting) console.log(`\n⏳ another verify (pid ${owner}) is running; waiting for it`)
-    waiting = true
-    execSync("sleep 5")
-  }
-}
-process.on("exit", () => rmSync(lock, { recursive: true, force: true }))
-process.on("SIGINT", () => process.exit(130))
-process.on("SIGTERM", () => process.exit(143))
 
 for (const step of steps) {
   console.log(`\n▶ ${step}`)
   try {
-    execSync(step, {
-      stdio: "inherit",
-      env: { ...process.env, RIND_BROWSERS: "chromium,firefox,webkit" },
-    })
+    execSync(step, { stdio: "inherit", env: { ...process.env, RIND_BROWSERS: "chromium" } })
   } catch {
     console.error(`\n✖ verify failed at: ${step}`)
     process.exit(1)
   }
 }
-console.log("\n✔ verify passed: CI will run the same checks")
+console.log("\n✔ verify passed")
