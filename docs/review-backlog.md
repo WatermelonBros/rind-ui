@@ -9,7 +9,8 @@ See CLAUDE.md "Review rules".
 |---|---|---|---|
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |
-| add-badge (impl) | — | packages/react/src/badge/badge.tsx | The post-mount host check runs on every commit, so the host warning repeats while it still applies; warn once per host+message |
+| add-badge (r1) | — | packages/react/src/badge/badge.tsx | The post-mount host check's layout effect has no deps and re-warns on every render; dedupe by key (host + message) |
+| add-badge (r1) | — | packages/core/src/components/badge/badge.connect.ts | `badgeWarnings` checks live `role` and `aria-live` but misses `aria-atomic` and `aria-relevant` (spec: Never A Live Region) |
 | add-skeleton (impl) | — | packages/testing/src/components/skeleton.ts | `announcements()` takes its starting count lazily: an announcement made before the first read is cut from the driver's log (tests await it first) |
 | add-avatar (impl) | — | packages/testing/src/components/avatar.model.dom.test.tsx | `$props:src` is declared but the machine graph has no edge for it (`src` is an Image prop): `testMachine` only reports skips; statuses are covered by browser props-class tests |
 | add-aspect-ratio (impl) | — | scripts/docs-gen.ts | The spec asks for an `llms-full.txt` that includes the recipe page; no `llms-full.txt` pipeline exists yet (decision 0005) |

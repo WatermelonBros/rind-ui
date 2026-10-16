@@ -199,7 +199,7 @@ function Image({
   useEffect(() => checkImageAlt(rest.alt, ctx.name), [rest.alt, ctx.name])
   const merged = mergeProps(
     {
-      ...normalizeProps(ctx.api.image()),
+      ...normalizeProps(ctx.api.image(hasSource)),
       ref: composeRefs(el, ref),
       onLoad: () => send({ type: "IMAGE.LOAD", source: source.current }),
       onError: () => send({ type: "IMAGE.ERROR", source: source.current }),

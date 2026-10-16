@@ -24,7 +24,7 @@ describe("avatar meta matches the code", () => {
   it("data attributes", () => {
     const api = avatarConnect({ instance: "i", status: "idle", named: true, hidden: false })
     expect(Object.keys(avatarMeta.dataAttributes.root).sort()).toEqual(dataKeys(api.root()))
-    expect(Object.keys(avatarMeta.dataAttributes.image).sort()).toEqual(dataKeys(api.image()))
+    expect(Object.keys(avatarMeta.dataAttributes.image).sort()).toEqual(dataKeys(api.image(true)))
     expect(Object.keys(avatarMeta.dataAttributes.fallback).sort()).toEqual(dataKeys(api.fallback()))
     expect(Object.keys(avatarMeta.dataAttributes.group).sort()).toEqual(
       dataKeys(avatarGroupProps("i")),
