@@ -134,6 +134,14 @@ See CLAUDE.md "Review rules".
 | add-a11y-foundations (r1) | — | packages/core/src/dom/quirks.ts | Several entries point at test files that don't obviously reproduce their bug; quirks:check only checks the file exists (require the id in the test); defineQuirks accepts duplicate ids; every entry verified "today" incl. WebKit/VO ones jsdom can't verify |
 | add-a11y-foundations (r1) | — | packages/testing/src/broken.dom.test.tsx:157 | No broken fixture for "no ring after arrow" or "double speech on Windows"; the Tab fixture fails pointer runs for the wrong reason (hidden by `some(...)`); RA#9737 fixture doesn't prove Chromium-only; ring contrast checked only against backgrounds |
 
+## Manual AT protocol
+
+Passes that need real assistive technology or devices; automated tests cannot stand in.
+
+| Change | Task | What to check |
+|---|---|---|
+| add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
+
 ## Resolved
 
 The six add-foundations warnings first recorded here (10e5b, 10e6c, 1394b, 1394d,

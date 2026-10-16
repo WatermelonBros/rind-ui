@@ -918,9 +918,12 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
           : undefined)
     if (!expected) return []
     const out: string[] = []
+    // Hidden from assistive technology (a Number Input's hidden number input): not a value.
     const valuedEls = f.after.elements.filter(
       (el) =>
-        el.attrs["aria-valuenow"] !== undefined || (el.role !== null && VALUED_ROLES.has(el.role)),
+        !el.inAriaHidden &&
+        (el.attrs["aria-valuenow"] !== undefined ||
+          (el.role !== null && VALUED_ROLES.has(el.role))),
     )
     if (valuedEls.length !== expected.length) {
       out.push(`${valuedEls.length} valued elements rendered, expected ${expected.length}`)
@@ -933,8 +936,13 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
       const text = el.attrs["aria-valuetext"]
       if (want === null) {
         if (now !== undefined) out.push(`${el.describe} has aria-valuenow="${now}", expected none`)
-        if (text !== undefined)
+        // A declared value text for no value ("Empty") is expected; otherwise none.
+        const declared = f.valued?.valueText?.(i)
+        if (declared === undefined && text !== undefined) {
           out.push(`${el.describe} has aria-valuetext="${text}", expected none`)
+        } else if (declared !== undefined && text !== declared) {
+          out.push(`${el.describe} aria-valuetext="${text}", expected "${declared}"`)
+        }
         continue
       }
       if (now !== undefined && Number(now) !== want) {
