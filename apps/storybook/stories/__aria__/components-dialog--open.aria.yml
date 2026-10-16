@@ -1,0 +1,6 @@
+- button "Edit profile"
+- dialog "Edit profile":
+  - heading "Edit profile" [level=2]
+  - paragraph: Make changes to your profile here.
+  - textbox "Display name": Ada
+  - button "Close"

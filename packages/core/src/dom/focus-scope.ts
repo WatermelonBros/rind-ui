@@ -140,7 +140,10 @@ export function focusInitial(
   before: Element | null = deepActiveElement(container.ownerDocument),
 ): () => void {
   const doc = container.ownerDocument
-  const frame = env.scheduler.requestAnimationFrame(() => {
+  let frame: ReturnType<typeof env.scheduler.requestAnimationFrame> | null = null
+  let stopped = false
+  const attempt = async (left: number) => {
+    frame = null
     const now = deepActiveElement(doc)
     // Moved by the user or the app: leave it. Focus lost to <body> (the trigger became
     // inert and the browser blurred it) is no one's move.
@@ -154,10 +157,29 @@ export function focusInitial(
       container.querySelector<HTMLElement>("[data-autofocus]") ??
       (modality === "touch" ? null : stopsOf(env, container)[0]) ??
       focusableContainer(container)
-    void focusSafely(target, env, "layer")
-  })
-  return () => env.scheduler.cancelAnimationFrame(frame)
+    await focusSafely(target, env, "layer")
+    // Refused: on a 1-CPU Linux WebKit run (CI) the first move left focus on <body> with the
+    // dialog open (1 run in 4). The exact condition was not isolated; the candidates are the
+    // content's ancestors still marked inert by the previous outside-hiding pass, or the
+    // portalled content not laid out yet (a box-less target cannot take focus). Any such
+    // refusal is transient, so try again on the next frames while nothing else took focus —
+    // bounded, and never after the layer closed.
+    const after = deepActiveElement(doc)
+    const refused = !after || after === doc.body
+    if (refused && left > 0 && !stopped && container.isConnected) {
+      frame = env.scheduler.requestAnimationFrame(() => void attempt(left - 1))
+    }
+  }
+  frame = env.scheduler.requestAnimationFrame(() => void attempt(INITIAL_FOCUS_RETRIES))
+  return () => {
+    stopped = true
+    if (frame !== null) env.scheduler.cancelAnimationFrame(frame)
+    frame = null
+  }
 }
+
+/** Frames initial focus retries a refused move (a slow first layout, a late inert update). */
+const INITIAL_FOCUS_RETRIES = 30
 
 /** Wraps Tab at the container's edges; returns the cleanup. Used alone or by the singleton. */
 export function trapTab(env: FocusEnv, container: HTMLElement): () => void {

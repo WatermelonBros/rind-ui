@@ -155,7 +155,8 @@ pointer shows no focus ring on its initial target.
 
 - **WHEN** a dialog whose first tabbable element is a "Name" field is opened with
   the keyboard
-- **THEN** "Name" is focused without scrolling the page and has `data-focus-visible`
+- **THEN** "Name" is focused without scrolling the page (its focus ring follows the
+  browser's `:focus-visible`; `data-focus-visible` is set on the dialog's own parts)
 
 #### Scenario: Long content
 
@@ -470,8 +471,10 @@ Every part SHALL carry `data-scope="dialog"`, `data-part` (`trigger`, `backdrop`
   `data-has-nested`; the same CSS variables.
 - `content`: `data-state` (`"closed"` while exiting); `data-modal` when modal;
   `data-nested`, `data-has-nested`; `data-close-reason` (the last close reason in
-  kebab case, such as `escape-key`) from close until the next open; the same CSS
-  variables.
+  kebab case, such as `escape-key`) from close until the next open; `data-focus-within`
+  while focus is inside it; `data-focus` and `data-focus-visible` while the content
+  itself is focused; the same CSS variables.
+- `trigger` also carries `data-close-reason`, so the reason outlives the content.
 - `close-trigger`: `data-focus`, `data-focus-visible`, `data-pressed`.
 
 `title` and `description` SHALL carry only the scoping attributes.
@@ -490,9 +493,12 @@ Every part SHALL carry `data-scope="dialog"`, `data-part` (`trigger`, `backdrop`
 
 ### Requirement: Dialog Contract
 
-The `dialog` contract SHALL locate an instance by role `dialog` and exact accessible
-name, and SHALL declare the traits `layer`, `restores-focus` and `presence`, plus
-`modal` when the instance is modal. It SHALL declare the actions `open` (pointer,
+The `dialog` contract SHALL locate an instance through its trigger (role `button` and
+exact accessible name `trigger`, defaulting to the dialog's `name`), because a closed
+dialog has no content to locate; its `title()` query reads the dialog's own name. It
+SHALL declare the traits `layer`, `restores-focus` and `presence`, plus `modal` when the
+instance is modal (a separate non-modal contract variant, whose outside press is skipped
+with that reason). It SHALL declare the actions `open` (pointer,
 touch and keyboard implementations on a trigger), `close` (close trigger, pointer
 and keyboard), `pressEscape`, `pressOutside` (a press on the backdrop, or outside the
 content when there is none), `tab`, `shiftTab` and `waitForUnmount`, each completing

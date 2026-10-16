@@ -336,3 +336,54 @@ describe("subscribe", () => {
     expect(listener).toHaveBeenCalledTimes(3)
   })
 })
+
+describe("parentKinds (add-dialog: a dialog opened from a menu item, radix#1836)", () => {
+  it("walks up from the layer holding the opener to the nearest allowed kind", () => {
+    const outerContent = div()
+    const menuContent = div(outerContent)
+    const item = div(menuContent)
+    const outer = stack().push(opts("pk-outer", outerContent, { kind: "dialog" }))
+    const menu = stack().push(opts("pk-menu", menuContent, { kind: "menu", parent: outer.id }))
+    const dialog = stack().push(
+      opts("pk-dialog", div(), {
+        opener: () => item,
+        parentKinds: ["dialog", "alertdialog", "drawer"],
+      }),
+    )
+    // The menu's parent, not the menu: closing the menu leaves the dialog open.
+    expect(dialog.parentId).toBe(outer.id)
+    menu.release()
+    menu.dispose()
+    expect(stack().get(dialog.id)).toBeDefined()
+    dialog.release()
+    dialog.dispose()
+    outer.release()
+    outer.dispose()
+  })
+
+  it("with no allowed ancestor the layer is a root", () => {
+    const menuContent = div()
+    const item = div(menuContent)
+    const menu = stack().push(opts("pk-root-menu", menuContent, { kind: "menu" }))
+    const dialog = stack().push(
+      opts("pk-root-dialog", div(), { opener: () => item, parentKinds: ["dialog"] }),
+    )
+    expect(dialog.parentId).toBeUndefined()
+    dialog.release()
+    dialog.dispose()
+    menu.release()
+    menu.dispose()
+  })
+
+  it("without parentKinds the opener's holding layer is the parent, as before", () => {
+    const menuContent = div()
+    const item = div(menuContent)
+    const menu = stack().push(opts("pk-any-menu", menuContent, { kind: "menu" }))
+    const child = stack().push(opts("pk-any-child", div(), { opener: () => item }))
+    expect(child.parentId).toBe(menu.id)
+    child.release()
+    child.dispose()
+    menu.release()
+    menu.dispose()
+  })
+})

@@ -242,6 +242,26 @@ with `component: "toolbar"`. Deferred to devices.
 - [ ] **Windows High Contrast / forced colors**: the focus ring, the separators and pressed
       toggles are visible.
 
+## Device checklist: Dialog (add-dialog 8.2)
+
+Stories: Components/Dialog -> Default, Controlled, NonModal, Nested, FormInside, LongContent,
+TwoTriggers, KeepMounted, ExitAnimation. Record each pass in `tested-with.json` with
+`component: "dialog"`. Deferred to devices.
+
+- [ ] **Name and description on open** (radix#3348, #2038, #3377): NVDA + Firefox/Chrome, JAWS
+      + Chrome, VoiceOver macOS + Safari and Chrome, TalkBack: opening speaks "Edit profile,
+      dialog", then the description, then the focused control.
+- [ ] **VoiceOver iOS + Safari**: focus moves into the dialog (swipe starts inside it); the page
+      behind is not reachable while modal; closing returns to the trigger.
+- [ ] **Announcer under an open `aria-modal` dialog** (VoiceOver + Safari): messages from the
+      shared announcer are still spoken while the dialog is open. Record the result for the
+      overlay decision.
+- [ ] **LongContent**: with `initialFocus="title"` the reading cursor starts at the title.
+- [ ] **NonModal**: the page stays reachable by virtual cursor and Tab; no "modal" announcement.
+- [ ] **Nested**: closing the child returns to "Open nested" in the parent.
+- [ ] **Windows High Contrast / forced colors**: the content border is visible without the
+      backdrop, and the focus ring is visible.
+
 ## Device checklist: Switch (add-switch)
 
 Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.

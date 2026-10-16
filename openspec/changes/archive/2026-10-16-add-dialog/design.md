@@ -41,7 +41,6 @@ type DialogEvent =
   | { type: "CLOSE_TRIGGER_PRESS"; modality: Modality }
   | { type: "ESCAPE_KEY" | "OUTSIDE_PRESS" | "OUTSIDE_FOCUS" | "PARENT_DISMISSED"; request: DismissRequest }
   | { type: "OPEN" } | { type: "CLOSE" }                       // api.open() / api.close()
-  | { type: "PARTS.MOUNT" | "PARTS.UNMOUNT"; part: "title" | "description"; id: string }
 
 dialogMachine = setup({ guards, actions, effects }).machine({
   initial: "closed",
@@ -61,7 +60,6 @@ dialogMachine = setup({ guards, actions, effects }).machine({
       },
     },
   },
-  on: { "PARTS.MOUNT": { actions: "registerPart" }, "PARTS.UNMOUNT": { actions: "unregisterPart" } },
 })
 ```
 
@@ -69,9 +67,10 @@ dialogMachine = setup({ guards, actions, effects }).machine({
   `data-close-reason` as its kebab-case form. One vocabulary, two spellings.
 - Context: `opener: TriggerId | null` (null for `OPEN` and `$sync`, which makes
   restore fall back to the element focused before open — mui/base-ui#4169),
-  `closeReason`, `rendered: { title?: string; description?: string }` (ids of
-  mounted parts — the only source of `aria-labelledby`/`-describedby` and of the
-  name check, so shadow roots work: radix#3484).
+  `closeReason`, and, in the React Root (not the machine: StrictMode re-runs part registration while the
+  service is stopped, which drops events), the ids of the mounted title and description —
+  the only source of `aria-labelledby`/`-describedby`; the name check reads the content's
+  own attributes, so shadow roots work (radix#3484).
 - A vetoed dismissal never reaches the machine: the overlay effect calls the
   consumer's `onEscapeKeyDown` / `onInteractOutside` and only sends the event if
   `request.canceled` is false. `onOpenChange`'s `cancel()` is the runtime's.

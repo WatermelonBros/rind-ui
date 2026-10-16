@@ -1,0 +1,68 @@
+/*
+ * Dialog (and Alert Dialog): structural only. overlay.css and positioner.css already give every
+ * layer its fixed backdrop, centred positioner and surface; this sheet adds the --rind-dialog-*
+ * tokens, the nested toning, the close trigger and the forced-colors border. The non-modal
+ * positioner carries an inline pointer-events: none (the page stays operable), so this sheet
+ * never sets pointer-events on it.
+ */
+@layer rind.components {
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="backdrop"][data-state] {
+    background: var(--rind-dialog-backdrop, var(--rind-color-overlay));
+    transition: opacity var(--rind-dialog-duration, var(--rind-duration-normal))
+      var(--rind-ease-out);
+  }
+
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="positioner"] {
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: var(--rind-dialog-inset, var(--rind-space-4));
+  }
+
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"] {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: var(--rind-dialog-max-width, 32rem);
+    background: var(--rind-dialog-bg, var(--rind-color-surface-raised));
+    color: var(--rind-dialog-color, var(--rind-color-text));
+    padding: var(--rind-dialog-padding, var(--rind-space-6));
+    border: var(--rind-border-width) solid
+      var(--rind-dialog-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-dialog-radius, var(--rind-radius-panel));
+    box-shadow: var(--rind-dialog-shadow, var(--rind-shadow-lg));
+    transition:
+      opacity var(--rind-dialog-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      transform var(--rind-dialog-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  /* A dialog opened over another: the parent dims further only through the nested backdrop. */
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="backdrop"][data-nested] {
+    background: var(--rind-dialog-nested-backdrop, transparent);
+  }
+
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"][data-has-nested] {
+    transform: scale(var(--rind-dialog-parent-scale, 0.98));
+  }
+
+  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="close-trigger"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :is([data-scope="dialog"], [data-scope="alert-dialog"]):is(
+        [data-part="backdrop"],
+        [data-part="content"]
+      ) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"] {
+      border-color: CanvasText;
+    }
+  }
+}
