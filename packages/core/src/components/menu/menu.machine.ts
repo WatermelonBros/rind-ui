@@ -99,8 +99,66 @@ export type MenuEvent =
   /** The pointer left the content. */
   | { readonly type: "POINTER_LEAVE" }
   | { readonly type: "COLLECTION.CHANGE" }
+  /** Context menu (a region root): a `contextmenu` on the region (`virtual`: no press). */
+  | {
+      readonly type: "REGION.CONTEXTMENU"
+      readonly point: MenuPoint
+      readonly target: Element | null
+      readonly virtual: boolean
+      readonly nativeEvent?: Event | undefined
+    }
+  | {
+      readonly type: "REGION.LONG_PRESS"
+      readonly point: MenuPoint
+      readonly target: Element | null
+      readonly nativeEvent?: Event | undefined
+    }
+  /** The context-menu key (Shift+F10, ContextMenu) on a focused element of the region. */
+  | {
+      readonly type: "REGION.KEY"
+      readonly target: Element | null
+      readonly nativeEvent?: Event | undefined
+    }
+  /** While open: a `contextmenu` anywhere but the region's own handlers. */
+  | {
+      readonly type: "DOCUMENT.CONTEXTMENU"
+      readonly point: MenuPoint
+      readonly target: Element | null
+      readonly inRegion: boolean
+    }
+  /** Programmatic `openAt(point, target?)`. */
+  | { readonly type: "OPEN_AT"; readonly point: MenuPoint; readonly target: Element | null }
+  /** A non-modal region root: the page scrolled. */
+  | { readonly type: "SCROLL" }
 
-export type MenuOpenReason = "trigger" | "trigger-key" | "api"
+export type MenuOpenReason =
+  | "trigger"
+  | "trigger-key"
+  | "api"
+  | "context-menu"
+  | "context-menu-key"
+  | "long-press"
+
+export interface MenuPoint {
+  readonly x: number
+  readonly y: number
+}
+
+/** Where a region root is anchored: the gesture's point, or the focused element. */
+export type MenuAnchor =
+  | {
+      readonly kind: "point"
+      readonly x: number
+      readonly y: number
+      readonly target: Element | null
+    }
+  | { readonly kind: "element"; readonly target: Element }
+
+/** `onAnchorChange`'s details: a second gesture in the same region moved the open menu. */
+export interface MenuAnchorDetails {
+  readonly point: MenuPoint | null
+  readonly target: Element | null
+}
 
 /** `onOpenChange`'s details: `reason` says why it opens or closes. */
 export type MenuChangeDetails = Omit<ChangeDetails<MenuEvent>, "reason"> & {
@@ -144,6 +202,9 @@ export interface MenuProps extends CollectionProps {
   readonly onActivate?: ((activation: MenuActivation) => boolean) | undefined
   /** The expand key on `key`: opens its submenu when it is a submenu trigger (true). */
   readonly openSubmenu?: ((key: CollectionKey) => boolean) | undefined
+  /** A context menu: `getTrigger` is the region; it opens at a point (read-only). */
+  readonly region?: boolean | undefined
+  readonly onAnchorChange?: ((details: MenuAnchorDetails) => void) | undefined
 }
 
 export interface MenuContext extends CollectionContext {
@@ -161,6 +222,8 @@ export interface MenuContext extends CollectionContext {
   readonly hoverOpened: boolean
   /** The item the pointer stopped on while crossing toward a submenu (taken when it ends). */
   readonly pendingPointerKey: CollectionKey | null
+  /** A region root's anchor (null: the region's top-left corner). */
+  readonly regionAnchor: MenuAnchor | null
 }
 
 export type MenuEnv = DomEnvironment &
@@ -180,16 +243,24 @@ export const menuIds = (levelId: string) => ({
 
 export const menuLayerId = (levelId: string) => layerId(`menu-${levelId}`)
 
-/** The `dropdown` preset at the root, `submenu` for nested levels, under the consumer's. */
+/**
+ * The `dropdown` preset at the root, `submenu` for nested levels, `pointer` for a region
+ * root at a point (a keyboard open drops down from the focused element), under the consumer's.
+ */
 export const menuPositioning = (
-  props: Pick<MenuProps, "positioning" | "level">,
+  props: Pick<MenuProps, "positioning" | "level" | "region">,
+  anchor: MenuAnchor | null = null,
 ): PositioningOptions =>
   resolvePositioning(
     props.positioning,
-    props.level === "submenu" ? positioningPresets.submenu : positioningPresets.dropdown,
+    props.level === "submenu"
+      ? positioningPresets.submenu
+      : props.region && anchor?.kind !== "element"
+        ? positioningPresets.pointer
+        : positioningPresets.dropdown,
   )
 
-const initialPlacement = (props: Pick<MenuProps, "positioning" | "level">) => {
+const initialPlacement = (props: Pick<MenuProps, "positioning" | "level" | "region">) => {
   const o = menuPositioning(props)
   const side = o.side === "inline-start" ? "left" : o.side === "inline-end" ? "right" : o.side
   return unplaced(side, o.align)
@@ -201,6 +272,22 @@ type Args = Parameters<typeof pieces.actions.navigate>[0]
 const docOf = (env: MenuEnv) => {
   const root = env.dom.getRootNode()
   return "body" in root ? root : root.ownerDocument
+}
+
+/** The anchor an opening or re-anchoring event carries. */
+function anchorOf(event: { readonly type: string }): MenuAnchor | null {
+  const e = event as MenuEvent // a narrowing by type follows
+  switch (e.type) {
+    case "REGION.CONTEXTMENU":
+    case "REGION.LONG_PRESS":
+    case "DOCUMENT.CONTEXTMENU":
+    case "OPEN_AT":
+      return { kind: "point", x: e.point.x, y: e.point.y, target: e.target }
+    case "REGION.KEY":
+      return e.target ? { kind: "element", target: e.target } : null
+    default:
+      return null
+  }
 }
 
 const DISMISS_TYPE = {
@@ -242,6 +329,10 @@ function reasonOf(event: {
       return "tab-key"
     case "CLOSE":
       return "api"
+    case "SCROLL":
+      return "scroll"
+    case "DOCUMENT.CONTEXTMENU":
+      return "outside-press"
     default:
       return null
   }
@@ -263,6 +354,67 @@ function closeTree(
   else env.menuTree.closeTree(reason)
 }
 
+/** A zero-size rectangle at a point (a point anchor through the virtual anchor kind). */
+function pointRect(x: number, y: number) {
+  return { x, y, left: x, top: y, right: x, bottom: y, width: 0, height: 0 } as DOMRect // the fields positioning reads
+}
+
+/** The open context menus of each document (their close functions). */
+const openRegions = new WeakMap<Document, Set<() => void>>()
+
+/**
+ * While a region root is open: a `contextmenu` elsewhere (the region's own handlers see the
+ * ones on it) re-anchors when its point is inside the region's boxes (a modal menu makes
+ * the region inert, so the event targets the page) and closes otherwise; a non-modal one
+ * closes when the page scrolls. Presses inside the menu's own layers are left alone.
+ */
+function watchRegion(
+  a: {
+    readonly props: MenuProps
+    readonly env: MenuEnv
+    send(event: MenuEvent): void
+  },
+  doc: Document,
+  modal: boolean,
+): () => void {
+  const inMenu = (t: EventTarget | null) => {
+    const layer = getLayerStack(doc).get(menuLayerId(a.props.levelId))
+    return layer?.contains(t) === true
+  }
+  const onContextMenu = (e: MouseEvent) => {
+    const region = a.props.getTrigger()
+    const t = e.target as Element | null
+    if (!region || (t && region.contains(t)) || inMenu(t)) return
+    const inRegion = [...region.getClientRects()].some(
+      (r) =>
+        e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom,
+    )
+    if (inRegion) e.preventDefault()
+    a.send({
+      type: "DOCUMENT.CONTEXTMENU",
+      point: { x: e.clientX, y: e.clientY },
+      target: t,
+      inRegion,
+    })
+  }
+  const onScroll = (e: Event) => {
+    if (!inMenu(e.target)) a.send({ type: "SCROLL" })
+  }
+  // At most one context menu per document: this one opening closes the others.
+  const open = openRegions.get(doc) ?? new Set<() => void>()
+  openRegions.set(doc, open)
+  for (const close of [...open]) close()
+  const close = () => a.send({ type: "CLOSE" })
+  open.add(close)
+  doc.addEventListener("contextmenu", onContextMenu, true)
+  if (!modal) doc.addEventListener("scroll", onScroll, { capture: true, passive: true })
+  return () => {
+    open.delete(close)
+    doc.removeEventListener("contextmenu", onContextMenu, true)
+    if (!modal) doc.removeEventListener("scroll", onScroll, { capture: true })
+  }
+}
+
 export const menuMachine = setup({
   types: type<{
     props: MenuProps
@@ -273,6 +425,8 @@ export const menuMachine = setup({
   }>(),
   guards: {
     isRoot: ({ props }) => props.level === "root",
+    isRegion: ({ props }) => props.region === true,
+    inRegion: ({ event }) => event.type === "DOCUMENT.CONTEXTMENU" && event.inRegion,
     isSubmenu: ({ props }) => props.level === "submenu",
     fromZone: ({ event }) => "zone" in event && event.zone === true,
     treeTrigger: treeClose("trigger"),
@@ -310,9 +464,17 @@ export const menuMachine = setup({
       const modality =
         event.type === "TRIGGER_PRESS"
           ? event.modality
-          : event.type === "TRIGGER_KEY" || event.type === "SUB_OPEN"
+          : event.type === "TRIGGER_KEY" || event.type === "SUB_OPEN" || event.type === "REGION.KEY"
             ? "keyboard"
-            : null
+            : event.type === "REGION.CONTEXTMENU"
+              ? event.virtual
+                ? "virtual"
+                : "pointer"
+              : event.type === "REGION.LONG_PRESS"
+                ? "touch"
+                : event.type === "OPEN_AT"
+                  ? "pointer"
+                  : null
       set("openModality", modality)
       set("openToLast", event.type === "TRIGGER_KEY" && event.key === "last")
       set("closeReason", null)
@@ -322,6 +484,31 @@ export const menuMachine = setup({
       set("keyActivation", null)
       set("hoverOpened", event.type.startsWith("after:"))
       set("pendingPointerKey", null)
+      // A new open anchors where its own gesture (setAnchor) says, never at an older point.
+      set("regionAnchor", null)
+    },
+    /** A region root's anchor from the opening gesture (or `openAt`). */
+    setAnchor: ({ event, set }) => {
+      const anchor = anchorOf(event)
+      if (anchor) set("regionAnchor", anchor)
+    },
+    /**
+     * A second gesture in the same region: the open menu moves (no close, no new entry
+     * animation), the highlight goes and the content takes focus.
+     */
+    reanchor: ({ env, event, props, set }) => {
+      const anchor = anchorOf(event)
+      if (!anchor) return
+      set("regionAnchor", anchor)
+      set("highlightedKey", null)
+      set("highlightSource", null)
+      const ids = menuIds(props.levelId)
+      env.position.reposition(ids.positioner)
+      env.dom.getById(ids.content)?.focus({ preventScroll: true })
+      props.onAnchorChange?.({
+        point: anchor.kind === "point" ? { x: anchor.x, y: anchor.y } : null,
+        target: anchor.target,
+      })
     },
     /** Joins the open path (closing an open sibling) and leaves it on close. */
     openInTree: ({ env, props }) => {
@@ -453,14 +640,16 @@ export const menuMachine = setup({
         family: "menu",
         modal,
         parent: a.props.parent,
-        opener: a.props.getTrigger,
+        // A region is no opener: focus returns to what had it when the menu opened.
+        ...(a.props.region ? {} : { opener: a.props.getTrigger }),
         // The trigger is inside: it stays out of the inert set (its name labels the menu)
-        // and pressing it toggles, never dismisses and reopens. A hosting menubar too.
+        // and pressing it toggles, never dismisses and reopens. A hosting menubar too. A
+        // region is the page: inert under a modal menu, a press on it is outside.
         elements: () =>
           [
             byId(ids.positioner),
             content(),
-            a.props.getTrigger(),
+            a.props.region ? null : a.props.getTrigger(),
             ...(root ? env.menuTree.parentElements() : []),
           ].filter((e): e is HTMLElement => e !== null),
         container: content,
@@ -501,14 +690,25 @@ export const menuMachine = setup({
           kind: "virtual",
           get: () => {
             const el = a.props.getTrigger()
-            return el
-              ? { getBoundingClientRect: () => el.getBoundingClientRect(), contextElement: el }
-              : null
+            if (!el) return null
+            if (!a.props.region) {
+              return { getBoundingClientRect: () => el.getBoundingClientRect(), contextElement: el }
+            }
+            const anchor = a.context.regionAnchor
+            if (anchor?.kind === "element") {
+              const t = anchor.target
+              return { getBoundingClientRect: () => t.getBoundingClientRect(), contextElement: t }
+            }
+            // A point (the region's top-left corner when opened without one).
+            const box = el.getBoundingClientRect()
+            const x = anchor?.x ?? box.left
+            const y = anchor?.y ?? box.top
+            return { getBoundingClientRect: () => pointRect(x, y), contextElement: el }
           },
         },
         positioner: ids.positioner,
         arrow: ids.arrow,
-        options: () => menuPositioning(a.props),
+        options: () => menuPositioning(a.props, a.context.regionAnchor),
         onPlacement: (p, first) => {
           send({ type: "POSITION.PLACED", ...p, first })
           const el = content()
@@ -535,7 +735,9 @@ export const menuMachine = setup({
       const view = doc.defaultView
       const onBlur = () => send({ type: "WINDOW_BLUR" })
       if (root) view?.addEventListener("blur", onBlur)
+      const stopRegion = a.props.region ? watchRegion(a, doc, modal) : () => {}
       return () => {
+        stopRegion()
         if (root) view?.removeEventListener("blur", onBlur)
         cancelFocus()
         track.stop()
@@ -566,6 +768,7 @@ export const menuMachine = setup({
     keyActivation: null,
     hoverOpened: false,
     pendingPointerKey: null,
+    regionAnchor: null,
   }),
   values: { open: { fallback: false, states: { open: true, closed: false, opening: false } } },
   onProps: { collection: "COLLECTION.CHANGE" },
@@ -585,6 +788,25 @@ export const menuMachine = setup({
         SUB_OPEN: { guard: "isSubmenu", target: "open", reason: "trigger", actions: ["enterOpen"] },
         "HOVER.START": { guard: "isSubmenu", target: "opening" },
         OPEN: { target: "open", reason: "api", actions: ["enterOpen"] },
+        "REGION.CONTEXTMENU": {
+          guard: "isRegion",
+          target: "open",
+          reason: "context-menu",
+          actions: ["enterOpen", "setAnchor"],
+        },
+        "REGION.LONG_PRESS": {
+          guard: "isRegion",
+          target: "open",
+          reason: "long-press",
+          actions: ["enterOpen", "setAnchor"],
+        },
+        "REGION.KEY": {
+          guard: "isRegion",
+          target: "open",
+          reason: "context-menu-key",
+          actions: ["enterOpen", "setAnchor"],
+        },
+        OPEN_AT: { target: "open", reason: "api", actions: ["enterOpen", "setAnchor"] },
       },
     },
     opening: {
@@ -706,6 +928,14 @@ export const menuMachine = setup({
         POINTER_LEAVE: [{ guard: "childOpen" }, { actions: ["forgetPointer", "leaveContent"] }],
         "TREE.CHILD_LEFT": { actions: ["takePendingPointer"] },
         "POSITION.PLACED": { actions: ["setPlacement"] },
+        "REGION.CONTEXTMENU": { actions: ["reanchor"] },
+        "REGION.LONG_PRESS": { actions: ["reanchor"] },
+        OPEN_AT: { actions: ["reanchor"] },
+        "DOCUMENT.CONTEXTMENU": [
+          { guard: "inRegion", actions: ["reanchor"] },
+          { target: "closed", reason: "outside-press", actions: ["setCloseReason"] },
+        ],
+        SCROLL: { target: "closed", reason: "scroll", actions: ["setCloseReason"] },
       },
     },
   },

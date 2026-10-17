@@ -24,7 +24,7 @@
 <p align="center">
   <a href="docs/components.md"><b>Components</b></a> ·
   <a href="docs/components/"><b>Docs</b></a> ·
-  <a href="llms.txt"><b>llms.txt</b></a> ·
+  <a href="https://rind.watermelon-studio.it/llms.txt"><b>llms.txt</b></a> ·
   <a href="CONTRIBUTING.md"><b>Contribute</b></a>
 </p>
 
@@ -81,7 +81,7 @@ import { Accordion } from "@rind-ui/react"
   min+gzip, enforced in CI.
 - **White-label theme, optional.** `@rind-ui/theme` derives a full, contrast-checked
   palette from a handful of brand inputs, per scope, in light and dark.
-- **Known to LLMs.** [`llms.txt`](llms.txt) and per-component docs are generated from
+- **Known to LLMs.** [`llms.txt`](https://rind.watermelon-studio.it/llms.txt) and per-component docs are generated from
   the source, so they cannot drift from the code.
 
 ## Components
@@ -96,7 +96,7 @@ with status, is in [`docs/components.md`](docs/components.md).
 | Disclosure | Collapsible, Accordion, Tabs |
 | Overlays | Dialog, Alert Dialog, Popover, Tooltip |
 | Typography | Heading |
-| Display | Badge, Skeleton, Avatar |
+| Display | Badge, Skeleton, Avatar, Image, Progress, Meter, Alert |
 | Layout | Separator, Aspect Ratio (a recipe on the native CSS property) |
 
 Next up: Menu, Drawer, Select, Combobox, Slider, and the AI-interface

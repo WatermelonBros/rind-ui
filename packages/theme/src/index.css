@@ -19,7 +19,10 @@
 @import "./scroll-area.css";
 @import "./skeleton.css";
 @import "./badge.css";
+@import "./alert.css";
+@import "./qr-code.css";
 @import "./avatar.css";
+@import "./image.css";
 @import "./button.css";
 @import "./label.css";
 @import "./fieldset.css";
@@ -41,11 +44,15 @@
 @import "./checkbox-group.css";
 @import "./radio-group.css";
 @import "./slider.css";
+@import "./progress.css";
+@import "./meter.css";
 @import "./switch.css";
 @import "./accordion.css";
 @import "./dialog.css";
 @import "./popover.css";
+@import "./hover-card.css";
 @import "./menu.css";
+@import "./context-menu.css";
 @import "./select.css";
 @import "./tooltip.css";
 @import "./alert-dialog.css";

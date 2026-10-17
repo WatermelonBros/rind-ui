@@ -159,7 +159,7 @@ Without the theme, image and fallback sit side by side while loading; stack them
 
 Never hide the loading image with `display: none`: a lazy image would never load.
 
-## Coming from Radix or Base UI
+## Coming from another Avatar component
 
 - `delayMs` / `delay` on Fallback → `fallbackDelay` on Root (and it no longer delays a missing
   or broken image).

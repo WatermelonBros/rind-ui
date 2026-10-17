@@ -1,0 +1,48 @@
+/*
+ * Image (family: decoration; no variant, size or tone rules). Root is a one-cell grid that
+ * keeps its box in every status: Img and Fallback share the cell, so a failed image leaves
+ * the Fallback in the same area and nothing shifts. The ratio comes from
+ * --rind-image-aspect-ratio (default auto: Root follows the image) and the fit from
+ * --rind-image-fit. The Img is never faded in (a cached image paints at once) and its display
+ * is never set, so `hidden` (no source, error) keeps hiding it.
+ */
+@layer rind.components {
+  :where([data-scope="image"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-grid;
+    max-inline-size: 100%;
+    aspect-ratio: var(--rind-image-aspect-ratio, auto);
+    overflow: hidden;
+    border-radius: var(--rind-image-radius, 0);
+    vertical-align: middle;
+  }
+
+  :where([data-scope="image"][data-part="img"], [data-scope="image"][data-part="fallback"]) {
+    box-sizing: border-box;
+    grid-area: 1 / 1;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: inherit;
+  }
+
+  :where([data-scope="image"][data-part="img"]) {
+    z-index: 1;
+    object-fit: var(--rind-image-fit, cover);
+  }
+
+  :where([data-scope="image"][data-part="fallback"]) {
+    display: grid;
+    place-items: center;
+    padding: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    font-family: var(--rind-font-sans);
+    background: var(--rind-image-fallback-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-image-fallback-text, var(--rind-color-text-muted));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="image"][data-part="fallback"]) {
+      border-color: CanvasText;
+    }
+  }
+}

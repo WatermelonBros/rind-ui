@@ -53,7 +53,7 @@ export type ComponentOverrides = [keyof ComponentTokens] extends [never]
   ? // No component stylesheet yet: any scope is unknown.
     Readonly<Record<string, never>>
   : { readonly [S in keyof ComponentTokens]?: { readonly [T in ComponentTokens[S]]?: string } }
-/** Generated from the component stylesheets (scripts/token-manifest.ts). */
+/** Generated from the component stylesheets (scripts/token-manifest.mjs, a build output). */
 export type { ComponentTokens } from "./components.generated"
 
 import type { ComponentTokens } from "./components.generated"

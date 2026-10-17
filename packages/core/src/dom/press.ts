@@ -27,6 +27,9 @@ import { quirkActive } from "./quirks"
 import { textSelection } from "./text-selection"
 import { injectTouchAction } from "./touch-action"
 
+/** Marks a part during a touch long press (the callout is suppressed meanwhile). */
+const CALLOUT_ATTR = "data-rind-long-pressing"
+
 /** Structural event types, so React synthetic events and DOM events both fit. */
 export interface PressBaseEvent {
   readonly currentTarget: EventTarget | null
@@ -76,8 +79,12 @@ export interface PressOptions {
   readonly disabled?: () => boolean
   /** False: pressing does not move focus (e.g. a stepper button next to its input). */
   readonly focusOnPress?: boolean
-  /** Opt into long press (default threshold 500 ms). */
-  readonly longPress?: { readonly threshold?: number }
+  /**
+   * Opt into long press (default threshold 500 ms). `moveTolerance` (px): moving farther
+   * from the press's start cancels it (default: only leaving the part does). A second
+   * pointer going down always cancels it (a pinch is not a long press).
+   */
+  readonly longPress?: { readonly threshold?: number; readonly moveTolerance?: number }
   /**
    * What a click forwarded by an associated label does (default "activate"): it always
    * focuses the part; "activate" then presses it once, "focus" does not (popup triggers
@@ -264,7 +271,11 @@ export function createPress(options: PressOptions): PressHandle {
     if (longPressTimer !== null) env.scheduler.clearTimeout(longPressTimer)
     longPressTimer = null
   }
+  /** Undoes the callout suppression of the current touch long press. */
+  let restoreCallout: (() => void) | null = null
   const reset = () => {
+    restoreCallout?.()
+    restoreCallout = null
     state = { kind: "idle" }
     setPressed(false)
     cancelLongPress()
@@ -367,6 +378,20 @@ export function createPress(options: PressOptions): PressHandle {
       // (e.g. iOS VoiceOver's zero-size touch) activates through the click that follows.
       if (env.modality.modality() === "virtual") return
       const target = e.currentTarget as Element
+      if (pointerType === "touch" && options.longPress) {
+        // A long press is the gesture: the platform's callout (iOS link preview, image menu)
+        // must not answer it first.
+        // Through the CSSOM (allowed by a strict style-src), restored when the press ends.
+        const style = (target as HTMLElement).style
+        const previous = style?.getPropertyValue("-webkit-touch-callout") ?? ""
+        target.setAttribute(CALLOUT_ATTR, "")
+        style?.setProperty("-webkit-touch-callout", "none")
+        restoreCallout = () => {
+          target.removeAttribute(CALLOUT_ATTR)
+          if (previous) style?.setProperty("-webkit-touch-callout", previous)
+          else style?.removeProperty("-webkit-touch-callout")
+        }
+      }
       if (pointerType === "touch") {
         // Implicit capture would keep the pointer "inside" while the finger slides off. It
         // belongs to the touched element (e.target), which may be a child of the part.
@@ -390,6 +415,19 @@ export function createPress(options: PressOptions): PressHandle {
       endOnInterruption(target, pointerType, e)
       send(event("PRESS.START", pointerType, e, modalityFor(pointerType)))
       if (options.longPress) {
+        const start = { x: e.clientX, y: e.clientY }
+        const tolerance = options.longPress.moveTolerance
+        if (tolerance !== undefined) {
+          listen(doc, "pointermove", (pe) => {
+            if (pe.pointerId !== e.pointerId || longPressTimer === null) return
+            if (Math.hypot(pe.clientX - start.x, pe.clientY - start.y) > tolerance) {
+              cancelLongPress()
+            }
+          })
+        }
+        listen(doc, "pointerdown", (pe) => {
+          if (pe.pointerId !== e.pointerId) cancelLongPress()
+        })
         longPressTimer = env.scheduler.setTimeout(() => {
           longPressTimer = null
           if (state.kind !== "pointer" || !state.inside) return

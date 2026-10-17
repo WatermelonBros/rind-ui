@@ -1,4 +1,5 @@
 export { accessibleNameOf } from "./accname"
+export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { collectionLayout } from "./collection-layout"
 export {
@@ -26,9 +27,11 @@ export {
   dismissable,
   dismissRequest,
 } from "./dismiss"
+export { sanitizeFileName, saveBlob } from "./download"
 export { type ElementInfo, elementInfo } from "./element-info"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
+export { focusPast } from "./focus-past"
 export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
 export {
@@ -150,6 +153,12 @@ export {
   type PressOptions,
   type PressPointerEvent,
 } from "./press"
+export {
+  blobToDataUrl,
+  exportQr,
+  type QrExportInput,
+  type QrExportResult,
+} from "./qr-export"
 export {
   defineQuirks,
   type Quirk,

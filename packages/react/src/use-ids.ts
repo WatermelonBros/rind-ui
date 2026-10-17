@@ -38,12 +38,19 @@ export interface PartRegistryOptions<P extends string> {
    * removed after commit and a development warning names it.
    */
   readonly expected?: readonly P[]
+  /**
+   * Like `expected` on the server and during hydration, without the warning when the part
+   * is not rendered: an optional part whose relation must still be in the server HTML
+   * (QR Code's ValueText describes the frame only when rendered).
+   */
+  readonly optional?: readonly P[]
 }
 
 function createRegistry<P extends string>(options: PartRegistryOptions<P>): PartRegistry<P> {
   const ids = new Map<P, string>()
   const listeners = new Set<() => void>()
-  const expected = new Set(options.expected ?? [])
+  const expected = new Set([...(options.expected ?? []), ...(options.optional ?? [])])
+  const required = new Set(options.expected ?? [])
   const warned = new Set<P>()
   let mounted = false
   const notify = () => {
@@ -71,7 +78,7 @@ function createRegistry<P extends string>(options: PartRegistryOptions<P>): Part
     mount() {
       mounted = true
       if (process.env.NODE_ENV !== "production") {
-        for (const part of expected) {
+        for (const part of required) {
           if (ids.has(part) || warned.has(part)) continue
           warned.add(part)
           console.warn(
@@ -94,11 +101,17 @@ function createRegistry<P extends string>(options: PartRegistryOptions<P>): Part
 export function usePartRegistry<P extends string>(
   options: PartRegistryOptions<P>,
 ): PartRegistry<P> {
-  const { scope, root, expected } = options
+  const { scope, root, expected, optional } = options
   // `expected` is the component's static anatomy: it never changes for an instance.
   // biome-ignore lint/correctness/useExhaustiveDependencies: see above
   const registry = useMemo(
-    () => createRegistry<P>(expected ? { scope, root, expected } : { scope, root }),
+    () =>
+      createRegistry<P>({
+        scope,
+        root,
+        ...(expected ? { expected } : {}),
+        ...(optional ? { optional } : {}),
+      }),
     [scope, root],
   )
   useIsoLayoutEffect(() => {

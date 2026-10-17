@@ -1,13 +1,16 @@
 // Builds the docs content the site renders: every component and guide page from docs/, with
 // the generated API tables filled in from each component's `<scope>.meta.ts` (the same
-// renderer as scripts/docs-gen.ts, so the site and llms.txt cannot drift).
-// Run: node scripts/content.ts → content/generated/docs.json
+// renderer as scripts/docs-gen.ts, so the site and llms.txt cannot drift), plus llms.txt and
+// the token reference (tokens.md), which are generated here and not committed.
+// Run: node scripts/content.ts → content/generated/{docs.json,llms.txt,tokens.md,…}
 
 import { execFileSync } from "node:child_process"
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { basename, join } from "node:path"
 import type { ComponentMeta } from "../../../packages/core/src/components/meta.ts"
-import { renderApi } from "../../../scripts/docs-gen.ts"
+import { llms, renderApi } from "../../../scripts/docs-gen.ts"
+// @ts-expect-error plain .mjs script, no types
+import { renderTokens } from "../../../scripts/theme-docs.mjs"
 
 const repo = join(import.meta.dirname, "../../..")
 const out = join(import.meta.dirname, "../content/generated")
@@ -108,6 +111,17 @@ mkdirSync(out, { recursive: true })
 writeFileSync(join(out, "docs.json"), `${JSON.stringify(pages, null, 2)}\n`)
 writeFileSync(join(out, "release.json"), `${JSON.stringify(release, null, 2)}\n`)
 console.log(`content: ${pages.length} pages`)
+
+// ── llms.txt and the token reference: build outputs, never committed ──────────────────────
+// The token manifest is generated first: the tokens page and the reference both read it.
+execFileSync("node", [join(repo, "packages/theme/scripts/token-manifest.mjs")], {
+  stdio: "inherit",
+})
+const tokens: string = renderTokens(
+  JSON.parse(readFileSync(join(repo, "packages/theme/tokens.manifest.json"), "utf8")),
+)
+writeFileSync(join(out, "tokens.md"), tokens)
+writeFileSync(join(out, "llms.txt"), llms(tokens))
 
 // ── examples: each exported function's source is its code sample ──────────────────────────
 const examplesDir = join(import.meta.dirname, "../examples")
