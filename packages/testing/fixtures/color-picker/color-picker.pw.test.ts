@@ -35,7 +35,13 @@ beforeAll(async () => {
   const bundle = await rolldown({
     input: join(here, "app.tsx"),
     platform: "browser",
-    resolve: { conditionNames: ["@rind-ui/source", "browser", "import", "default"] },
+    resolve: {
+      conditionNames: ["@rind-ui/source", "browser", "import", "default"],
+      // The Color Picker's internal parts (not exported by @rind-ui/react).
+      alias: {
+        "@rind-ui/react/color-internals": join(here, "../../../react/src/color-internals.ts"),
+      },
+    },
     transform: { define: { "process.env.NODE_ENV": '"development"' } },
     logLevel: "silent",
   })

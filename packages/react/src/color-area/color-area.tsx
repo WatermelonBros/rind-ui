@@ -3,24 +3,14 @@
 // Root's press is measured once by pointer-drag (2D).
 
 import {
-  areaAxes,
-  areaValueOf,
-  areaWorking,
   blurEvent,
   type Color,
-  type ColorAreaEvent,
-  type ColorAreaMessages,
-  type ColorAreaReason,
   type ColorChangeDetails,
   type ColorChannel,
   type ColorCommitDetails,
   type ColorInput,
   type ColorNameProp,
   type ColorSpace,
-  colorAreaConnect,
-  colorAreaKeyEvent,
-  colorAreaMachine,
-  colorAreaMessages,
   describeKey,
   focusEvent,
   focusSafely,
@@ -32,8 +22,20 @@ import {
   partId,
   pointerDragSession2D,
   textSelection,
-  thumbPoint,
 } from "@rind-ui/core"
+import {
+  areaAxes,
+  areaValueOf,
+  areaWorking,
+  type ColorAreaEvent,
+  type ColorAreaMessages,
+  type ColorAreaReason,
+  colorAreaConnect,
+  colorAreaKeyEvent,
+  colorAreaMachine,
+  colorAreaMessages,
+  thumbPoint,
+} from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,

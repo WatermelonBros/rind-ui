@@ -6,7 +6,7 @@ A colour picker: a trigger and a popover, or an inline panel, holding the parts 
 
 - **Use it for** choosing one colour from a trigger and popover (or an inline panel) that combines a colour area, sliders, channel inputs, swatches, an eye dropper and a format switch.
 - **Over `<input type="color">`**: it owns the colour and display format, lets you pick which controls to show, and binds every part to one value. The native input is enough when the browser's own picker suffices.
-- **Don't use it for** typing a single colour value: use the Color Field part on its own. For a fixed set of choices, use the Swatch Picker part on its own.
+- **For a single hex field or a fixed palette**, keep it small: an `inline` Color Picker with only a `ChannelInput channel="hex"`, or only a `SwatchGroup`, has no trigger and no popover.
 
 ```tsx
 import { ColorPicker } from "@rind-ui/react"

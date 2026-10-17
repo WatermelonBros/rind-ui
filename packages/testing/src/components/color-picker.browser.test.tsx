@@ -9,8 +9,11 @@ import siteBase from "../../../../apps/site/skins/base.css?inline"
 import siteColor from "../../../../apps/site/skins/color.css?inline"
 // The stylesheets that draw a swatch's selected mark: the theme's and the docs site's skin.
 import siteRadio from "../../../../apps/site/skins/radio-group.css?inline"
+import themeBase from "../../../theme/src/base.css?inline"
 import swatchPicker from "../../../theme/src/color-swatch-picker.css?inline"
+import calm from "../../../theme/src/presets/calm.css?inline"
 import radioGroup from "../../../theme/src/radio-group.css?inline"
+import tokens from "../../../theme/src/tokens.css?inline"
 import { getColorPicker } from "../index"
 
 function Picker(props: { readonly onValueCommit?: () => void }) {
@@ -55,7 +58,11 @@ const pointer = (type: string, target: EventTarget, x: number, y: number) =>
 
 describe("color picker in real browsers", () => {
   for (const [sheet, css, skinned] of [
-    ["theme", `${radioGroup}\n${swatchPicker}`, false],
+    [
+      "theme",
+      `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${tokens}\n${calm}\n${themeBase}\n${radioGroup}\n${swatchPicker}`,
+      false,
+    ],
     ["site skin", `${siteBase}\n${siteRadio}\n${siteColor}`, true],
   ] as const) {
     for (const glyph of [undefined, "✓"]) {
@@ -94,9 +101,23 @@ describe("color picker in real browsers", () => {
           expect(marks).toHaveLength(1)
           const mark = marks[0] as HTMLElement
           expect(mark.matches('[data-part="item-indicator"]')).toBe(true)
-          if (glyph) expect(getComputedStyle(mark).backgroundColor).toBe("rgba(0, 0, 0, 0)")
+          const paint = getComputedStyle(mark)
           const a = radio.getBoundingClientRect()
           const b = mark.getBoundingClientRect()
+          const painted =
+            paint.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+            (paint.boxShadow !== "none" && paint.boxShadow !== "")
+          if (glyph) {
+            // The glyph is the mark: no dot is painted behind it.
+            expect(painted).toBe(false)
+            expect(mark.textContent).toBe(glyph)
+          } else {
+            // The dot is really drawn: painted, with a size, smaller than the swatch.
+            expect(painted).toBe(true)
+            expect(b.width).toBeGreaterThan(0)
+            expect(b.height).toBeGreaterThan(0)
+            expect(b.width).toBeLessThan(a.width)
+          }
           expect(Math.abs(b.left + b.width / 2 - (a.left + a.width / 2))).toBeLessThanOrEqual(1)
           expect(Math.abs(b.top + b.height / 2 - (a.top + a.height / 2))).toBeLessThanOrEqual(1)
         } finally {

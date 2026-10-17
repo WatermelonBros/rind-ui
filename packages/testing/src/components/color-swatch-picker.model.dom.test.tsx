@@ -1,12 +1,8 @@
 // Model-based tests (add-color-picker 9.1): the Color Swatch Picker is the Radio Group contract
 // with colour items; every modality, LTR and RTL (directional). The oracle's items are the
 // swatches' keys (`#RRGGBBAA`), named by their colours.
-import {
-  colorSwatchPickerContract,
-  createListCollection,
-  platforms,
-  radioGroupArgs,
-} from "@rind-ui/core"
+import { createListCollection, platforms, radioGroupArgs } from "@rind-ui/core"
+import { colorSwatchPickerContract } from "@rind-ui/core/internal"
 import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"

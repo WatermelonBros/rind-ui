@@ -7,19 +7,21 @@ import {
   type ColorChangeDetails,
   type ColorInput,
   type ColorNameProp,
+  type MessageOverrides,
+  makeColor,
+  resolveColorName,
+  toSpace,
+} from "@rind-ui/core"
+import {
   type ColorSwatchPickerMessages,
   colorSwatchPickerMessages,
   colorVariables,
-  type MessageOverrides,
-  makeColor,
   matchSwatch,
   pickedColor,
-  resolveColorName,
   type SwatchItem,
   swatchColor,
   swatchKey,
-  toSpace,
-} from "@rind-ui/core"
+} from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,

@@ -1,16 +1,13 @@
 // Color Swatch parts: wiring only; connect decides role, name and the inline colour.
 
+import type { Color, ColorInput, ColorNameProp, MessageOverrides } from "@rind-ui/core"
 import {
-  type Color,
-  type ColorInput,
-  type ColorNameProp,
   type ColorSwatchMessages,
   colorSwatchConnect,
   colorSwatchMessages,
-  type MessageOverrides,
   swatchColor,
   transparencyGridProps,
-} from "@rind-ui/core"
+} from "@rind-ui/core/internal"
 import type { ComponentPropsWithRef } from "react"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"

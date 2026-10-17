@@ -1,7 +1,8 @@
 // Model-based tests (add-color-picker 9.1): the Color Area contract over all transitions, with
 // the colour model as oracle (the oracle machine computes with it). Browser mode walks pointer,
 // touch, keyboard and virtual; jsdom (no layout) keyboard only.
-import { areaAxes, type Color, colorAreaContract, makeColor, platforms } from "@rind-ui/core"
+import { type Color, makeColor, platforms } from "@rind-ui/core"
+import { areaAxes, colorAreaContract } from "@rind-ui/core/internal"
 import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"

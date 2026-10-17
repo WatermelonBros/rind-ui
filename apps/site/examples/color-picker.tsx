@@ -375,6 +375,90 @@ export function ChannelFields() {
   )
 }
 
+export function AreaSpaces() {
+  return (
+    <InlinePicker label="Fill" defaultValue="hsl(260, 60%, 50%)">
+      <div className="row">
+        <ColorPicker.Area colorSpace="hsl" aria-label="Saturation and lightness">
+          <ColorPicker.AreaBackground />
+          <ColorPicker.AreaThumb />
+        </ColorPicker.Area>
+        <ColorPicker.Area colorSpace="rgb" aria-label="Red and green">
+          <ColorPicker.AreaBackground />
+          <ColorPicker.AreaThumb />
+        </ColorPicker.Area>
+      </div>
+    </InlinePicker>
+  )
+}
+
+export function RightToLeft() {
+  return (
+    <div dir="rtl">
+      <InlinePicker label="Fill" defaultValue="hsb(200, 60%, 70%)" dir="rtl">
+        <ColorPicker.Area>
+          <ColorPicker.AreaBackground />
+          <ColorPicker.AreaThumb />
+        </ColorPicker.Area>
+        <ColorPicker.ChannelSlider channel="hue">
+          <ColorPicker.ChannelSliderTrack>
+            <ColorPicker.ChannelSliderThumb />
+          </ColorPicker.ChannelSliderTrack>
+        </ColorPicker.ChannelSlider>
+      </InlinePicker>
+    </div>
+  )
+}
+
+export function ReadOnly() {
+  return (
+    <InlinePicker label="Locked colour" defaultValue="hsb(120, 50%, 60%)" readOnly>
+      <ColorPicker.Area>
+        <ColorPicker.AreaBackground />
+        <ColorPicker.AreaThumb />
+      </ColorPicker.Area>
+      <ColorPicker.ChannelInput channel="hex" />
+    </InlinePicker>
+  )
+}
+
+export function TransparentSwatches() {
+  return (
+    <InlinePicker label="Overlay" defaultValue="#FF3D8B80">
+      <div className="row">
+        <ColorPicker.Swatch color="#FF3D8B80" />
+        <ColorPicker.Swatch color="rgba(61, 139, 255, 0.25)" />
+        <ColorPicker.Swatch color="#00000000" />
+      </div>
+      <ColorPicker.ChannelInput channel="hex" alpha />
+    </InlinePicker>
+  )
+}
+
+export function CssField() {
+  return (
+    <InlinePicker label="Any CSS colour" defaultValue="hsl(160, 60%, 40%)">
+      <ColorPicker.ChannelInput channel="css" />
+    </InlinePicker>
+  )
+}
+
+export function NoMatch() {
+  return (
+    <InlinePicker label="Tag colour" defaultValue="#123456">
+      <ColorPicker.SwatchGroup>
+        {SWATCHES.map((c) => (
+          <ColorPicker.SwatchTrigger key={c} color={c}>
+            <ColorPicker.Swatch color={c} aria-hidden="true" />
+            <ColorPicker.SwatchIndicator />
+          </ColorPicker.SwatchTrigger>
+        ))}
+      </ColorPicker.SwatchGroup>
+      <ColorPicker.ValueText />
+    </InlinePicker>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Popover",
@@ -423,4 +507,20 @@ export const variants: Variants = {
     title: "Channel fields",
     description: "Hue, saturation and brightness as numbers.",
   },
+  AreaSpaces: {
+    title: "HSL and RGB areas",
+    description:
+      '`colorSpace="hsl"` (saturation × lightness) and `colorSpace="rgb"` (red × green).',
+  },
+  RightToLeft: { title: "Right to left", description: "The area's x axis and the slider mirror." },
+  ReadOnly: {
+    title: "Read-only",
+    description: "`readOnly`: every part is focusable and changes nothing.",
+  },
+  TransparentSwatches: {
+    title: "Transparent swatches",
+    description: 'Alpha below 1 draws over a checkerboard and is named ("50% transparent").',
+  },
+  CssField: { title: "CSS field", description: '`channel="css"`: any colour a browser accepts.' },
+  NoMatch: { title: "No match", description: "A colour no swatch has checks nothing." },
 }

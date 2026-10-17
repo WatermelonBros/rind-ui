@@ -1,13 +1,8 @@
 // Model-based tests (add-color-picker 9.1): the Color Slider is the Slider contract plus the
 // colour invariants, per channel; LTR and RTL (directional), vertical; browser mode walks the
 // pointer, jsdom the keyboard. The oracle is the Slider machine over the channel's range.
-import {
-  channelRange,
-  colorSliderContract,
-  parseColor,
-  platforms,
-  spaceForChannel,
-} from "@rind-ui/core"
+import { channelRange, parseColor, platforms, spaceForChannel } from "@rind-ui/core"
+import { colorSliderContract } from "@rind-ui/core/internal"
 import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
