@@ -20,6 +20,7 @@ export {
   valuesOf,
 } from "./calendar.machine"
 export { type CalendarMessages, calendarMessages } from "./calendar.messages"
+export { calendarMeta } from "./calendar.meta"
 export {
   align as alignVisibleMonths,
   type CalendarMove,
