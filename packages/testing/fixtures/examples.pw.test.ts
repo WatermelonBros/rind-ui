@@ -299,6 +299,9 @@ const TRANSIENT = new Set([
   "scroll-area:engaged",
   "scroll-area:lingering",
   "scroll-area:dragging",
+  // The open and close delays (a hover or focus in progress).
+  "hover-card:opening",
+  "hover-card:closing",
 ])
 
 describe("state examples", () => {

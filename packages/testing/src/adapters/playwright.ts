@@ -198,10 +198,14 @@ function createPlaywrightEnv(
    * (a driver arrowing through options reads the selection after every key; under load the
    * read could beat the commit and overshoot). No person types faster than a frame.
    */
-  const settle = async () =>
-    (await getBase()).root.evaluate(
+  const settle = async () => {
+    // A test that drives the page clock (paused) moves the frame itself: a frame awaited on
+    // a paused clock never comes.
+    if (options.advanceTimers) return options.advanceTimers(16)
+    await (await getBase()).root.evaluate(
       () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())),
     )
+  }
 
   const until = <T>(read: () => Promise<T>, accept: (value: T) => boolean) =>
     poll(read, accept, { timeout, wait })
