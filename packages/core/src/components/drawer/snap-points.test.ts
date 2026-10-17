@@ -97,15 +97,16 @@ describe("swipeDismisses", () => {
       expect(swipeDismisses(rel({ offset: 150 }), opts, at(1))).toBe(false)
       expect(swipeDismisses(rel({ offset: 350 }), opts, at(1))).toBe(false)
     })
-    it("closes a slow drag only well below the smallest point", () => {
-      expect(swipeDismisses(rel({ offset: 50 }), opts, at(0.25))).toBe(false)
-      expect(swipeDismisses(rel({ offset: 99 }), opts, at(0.25))).toBe(false)
-      expect(swipeDismisses(rel({ offset: 101 }), opts, at(0.25))).toBe(true)
+    it("closes a release projected below the smallest point (spec)", () => {
+      // At 0.25 (200 px), the smallest point: any travel toward the edge goes below it.
+      expect(swipeDismisses(rel({ offset: 0 }), opts, at(0.25))).toBe(false)
+      expect(swipeDismisses(rel({ offset: 1 }), opts, at(0.25))).toBe(true)
     })
     it("projects the velocity 300 ms ahead", () => {
-      // from 0.5 (400): 100 + 0.5 * 300 = 250 -> 150 left, above 100
-      expect(swipeDismisses(rel({ offset: 100, velocity: 0.5 }), opts, at(0.5))).toBe(false)
-      expect(swipeDismisses(rel({ offset: 100, velocity: 1.0 }), opts, at(0.5))).toBe(true)
+      // From 0.5 (400 px): 400 - 100 = 300, above the smallest (200): settles.
+      expect(swipeDismisses(rel({ offset: 100, velocity: 0 }), opts, at(0.5))).toBe(false)
+      // 400 - 100 - 0.5 * 300 = 150, below 200: closes.
+      expect(swipeDismisses(rel({ offset: 100, velocity: 0.5 }), opts, at(0.5))).toBe(true)
     })
     it("a flick down from the top point does not close a three-point drawer when slow", () => {
       expect(swipeDismisses(rel({ offset: 200, velocity: 0.1 }), opts, at(1))).toBe(false)

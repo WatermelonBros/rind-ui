@@ -67,8 +67,8 @@ A swipe of the content (per `swipe-gesture`) toward the dismiss direction SHALL 
 closing with reason `swipe` when the release offset is at least `swipeThreshold` of the
 content's size on that axis (default 0.5) or the release velocity toward the edge is at
 least `swipeVelocityThreshold` (default 0.5 px/ms), and the release reports a direction.
-With snap points, a release projected below the smallest snap point SHALL request
-closing instead of settling. The request SHALL be an ordinary close request: consumers
+With snap points, a release projected (300 ms ahead by its velocity) below the smallest
+snap point SHALL request closing instead of settling. The request SHALL be an ordinary close request: consumers
 SHALL be able to veto it with `onOpenChange`'s `details.cancel()` or by keeping a
 controlled `open`, and a vetoed or refused request SHALL leave the drawer open at its
 current snap point without exit styles. `closeOnSwipe={false}` SHALL keep the gesture

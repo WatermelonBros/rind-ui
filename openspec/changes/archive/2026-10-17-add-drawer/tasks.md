@@ -65,7 +65,7 @@
 
 - [x] 11.1 Docs page (generated API facts + guide: Dialog or Drawer, sides, gesture alternatives (WCAG 2.5.1/2.5.7), snap points and the handle, nested drawers and indent, keyboard inset, Reado migration, testing with `getDrawer`/`testMachine`) The Reado migration lives outside the user docs (no other library names there).
 - [x] 11.2 Manual device pass: iOS Safari and Chrome (scroll vs swipe, rubber band, keyboard inset, dock `pointercancel`), Android Chrome + TalkBack (close paths, back gesture behaviour recorded), VO iOS (handle name and activation); record in "Tested with"; quirk entries only for reproduced failures Manual device pass: needs a person with the devices (backlog).
-- [x] 11.3 Mark `docs/research/drawer.md` done when archived; update Drawer status in `docs/components.md` as work progresses `wip` set; research note and `done` on archive.
+- [x] 11.3 Mark `docs/research/drawer.md` done when archived; update Drawer status in `docs/components.md` as work progresses `done` at archive; research note already done.
 - [x] 11.4 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme Targeted runs per the workflow; full suites in CI. Changeset added.
 
 ## Amendments (from add-heading)

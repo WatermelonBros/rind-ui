@@ -109,7 +109,9 @@ export function swipeDismisses(
   }
   const current = snap.resolved[currentIndex(snap)] ?? smallest
   const projected = current.size - release.offset - release.velocity * SNAP_PROJECTION
-  return projected < smallest.size * (1 - opts.swipeThreshold)
+  // Below the smallest point (spec "Swipe To Dismiss"): a release that would settle there
+  // or above stays open.
+  return projected < smallest.size
 }
 
 /** The point a release that does not close settles on. */

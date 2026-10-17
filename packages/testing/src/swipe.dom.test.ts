@@ -126,6 +126,21 @@ describe("swipe gesture", () => {
     expect(s.starts).toEqual(["touch"])
   })
 
+  it("mouse on the handle button (2+ snap points) starts a swipe; on another button it does not", async () => {
+    document.body.innerHTML = ""
+    const s = setup(
+      `<div data-swiped style="position:fixed;inset:auto 0 0 0;height:300px">
+        <button type="button" data-handle>Grip</button><button type="button">Other</button>
+      </div>`,
+      ["down"],
+      { alwaysFrom: () => [document.querySelector("[data-handle]") as Element] },
+    )
+    await s.drag({ x: 0, y: 120 }, { pointerType: "mouse", on: { text: "Other" } })
+    expect(s.starts).toEqual([])
+    await s.drag({ x: 0, y: 120 }, { pointerType: "mouse", on: { text: "Grip" } })
+    expect(s.starts).toEqual(["pointer"])
+  })
+
   it("a press outside the element's DOM (a portalled popup) is ignored (base-ui#4380)", async () => {
     const s = setup(`${SHEET}<div id="popup">Popup</div>`)
     await s.drag({ x: 0, y: 120 }, { pointerType: "touch", on: { text: "Popup" } })
