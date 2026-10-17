@@ -120,6 +120,14 @@ const keys = async (env: EnvLike, text: string) => {
 }
 const keyedContract = {
   ...textFieldContract,
+  events: {
+    ...textFieldContract.events,
+    "VISIBILITY.TOGGLE": { skip: "the search stories render no VisibilityTrigger" },
+    "VISIBILITY.HIDE": { skip: "a search field has no visibility" },
+    RESET: {
+      skip: "the search stories render no Reset button (a reset is covered by the base stories)",
+    },
+  },
   actions: {
     ...textFieldContract.actions,
     type: {
@@ -145,6 +153,8 @@ function config(name: string, cfg: Config) {
       anchor: [{ name: "Search books" }],
       props: {
         ...base,
+        escapeClears: true,
+        onSubmit: undefined,
         ...(cfg.disabled ? { disabled: true } : {}),
         ...(cfg.readOnly ? { readOnly: true } : {}),
         // Controlled, the story's parent applies every proposal: the oracle starts from START.

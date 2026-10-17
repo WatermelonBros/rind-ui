@@ -123,6 +123,13 @@ const keys = async (env: EnvLike, text: string) => {
 }
 const keyedContract = {
   ...textFieldContract,
+  events: {
+    ...textFieldContract.events,
+    CLEAR: { skip: "the password stories render no ClearTrigger" },
+    // Enter submits the story's form, which hides the password: covered by submitForm.
+    SUBMIT: { skip: "Enter submits the story's form (VISIBILITY.HIDE, submitForm)" },
+    ESCAPE: { skip: "escapeClears is off for a password field" },
+  },
   actions: {
     ...textFieldContract.actions,
     type: {
@@ -142,6 +149,8 @@ function config(name: string, cfg: Config) {
       anchor: [{ name: "Password" }],
       props: {
         ...base,
+        escapeClears: false,
+        onSubmit: undefined,
         ...(cfg.disabled ? { disabled: true } : {}),
         ...(cfg.readOnly ? { readOnly: true } : {}),
         // Controlled, the story's parent applies every proposal: the oracle runs uncontrolled.

@@ -10,6 +10,7 @@ import { domEnv, installAnnouncementLog, testMachine, textFieldKeyStepInvariants
 const base = {
   messages: textFieldMessages,
   id: "sf",
+  escapeClears: true,
   clearInput: () => {},
   onSubmit: undefined,
   disabled: undefined,
@@ -48,7 +49,15 @@ function Frame(props: {
 // Typing is the model test's (it re-expresses keyboard typing for the IME replay).
 const untyped = {
   ...textFieldContract,
-  events: { ...textFieldContract.events, INPUT: { skip: "covered by the model test" } },
+  events: {
+    ...textFieldContract.events,
+    INPUT: { skip: "covered by the model test" },
+    "VISIBILITY.TOGGLE": { skip: "the search stories render no VisibilityTrigger" },
+    "VISIBILITY.HIDE": { skip: "a search field has no visibility" },
+    RESET: {
+      skip: "the search stories render no Reset button (a reset is covered by the base stories)",
+    },
+  },
 } as typeof textFieldContract
 
 async function failuresOf(story: () => React.ReactElement, defaultValue: string) {

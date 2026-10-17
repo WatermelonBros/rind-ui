@@ -10,6 +10,8 @@ import { domEnv, installAnnouncementLog, testMachine } from "../index"
 const base = {
   messages: textFieldMessages,
   id: "pw",
+  escapeClears: false,
+  onSubmit: undefined,
   clearInput: () => {},
   keepSelection: () => {},
   watchForm: undefined,
@@ -61,7 +63,13 @@ function Frame({
 // Typing is the model test's (it re-expresses keyboard typing for the IME replay).
 const untyped = {
   ...textFieldContract,
-  events: { ...textFieldContract.events, INPUT: { skip: "covered by the model test" } },
+  events: {
+    ...textFieldContract.events,
+    INPUT: { skip: "covered by the model test" },
+    CLEAR: { skip: "the password stories render no ClearTrigger" },
+    SUBMIT: { skip: "Enter submits the story's form (VISIBILITY.HIDE, submitForm)" },
+    ESCAPE: { skip: "escapeClears is off for a password field" },
+  },
 } as typeof textFieldContract
 
 /** Runs the model with `test` collecting instead of registering; returns each path's error. */
