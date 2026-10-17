@@ -551,15 +551,18 @@ function Input({ children, render, ref, ...rest }: InputProps) {
       firstId,
     )
   }, [register, firstId, env])
-  // Each applied change is reported to the Field once (date-field "Field Integration").
+  // Each commit that changed the value or the field's own validity is reported to the Field
+  // once (date-field "Field Integration"): an impossible date leaves the value null but must
+  // still be validated when the user leaves.
   const value = ctx.view.values.value ?? null
-  const reported = useRef(value)
+  const reason = api.validity.reason
+  const reported = useRef({ value, reason })
   const report = ctx.embedded ? undefined : binding?.report
   useEffect(() => {
-    if (reported.current === value) return
-    reported.current = value
+    if (reported.current.value === value && reported.current.reason === reason) return
+    reported.current = { value, reason }
     report?.({ type: "change", value, user: true, composing: false })
-  }, [value, report])
+  }, [value, reason, report])
   const handlers = {
     // A press on the group outside a segment: the last filled segment before it (pointer only).
     onPointerDown: (e: PointerEvent<HTMLDivElement>) => {
@@ -569,6 +572,10 @@ function Input({ children, render, ref, ...rest }: InputProps) {
       if (!el) return
       e.preventDefault()
       void focusSafely(el, env, "programmatic", "pointer")
+    },
+    // The press's mousedown would move focus to the body (the group is not focusable).
+    onMouseDown: (e: { target: EventTarget; preventDefault(): void }) => {
+      if (!(e.target as Element).closest("input")) e.preventDefault()
     },
   }
   const content =

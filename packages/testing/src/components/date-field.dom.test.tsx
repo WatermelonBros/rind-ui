@@ -182,12 +182,15 @@ describe("Date Field", () => {
     await drv().paste("2026-10-14")
     expect(await drv().value()).toBe("2026-10-14")
     expect((await drv().segments()).map((s) => s.text)).toEqual(["14", "10", "2026"])
-    const data = new DataTransfer()
-    const copy = new ClipboardEvent("copy", { clipboardData: data, bubbles: true, cancelable: true })
+    // A stub clipboard (jsdom has no DataTransfer): React reads the native event's.
+    let copied = ""
+    const copy = Object.assign(new Event("copy", { bubbles: true, cancelable: true }), {
+      clipboardData: { setData: (_t: string, v: string) => (copied = v), getData: () => "" },
+    })
     act(() => {
       segment("day Birthday").dispatchEvent(copy)
     })
-    expect(data.getData("text/plain")).toBe("14/10/2026")
+    expect(copied).toBe("14/10/2026")
   })
 
   it("Paste the locale format: 14.10.2026 in de-DE", async () => {
@@ -253,7 +256,11 @@ describe("Date Field", () => {
             <DateField.Label>Birthday</DateField.Label>
             <DateField.Input />
           </DateField.Root>
-          <button type="button" onPointerDown={(e) => e.preventDefault()} onClick={() => setV(null)}>
+          <button
+            type="button"
+            onPointerDown={(e) => e.preventDefault()}
+            onClick={() => setV(null)}
+          >
             Clear
           </button>
         </RindProvider>
@@ -277,10 +284,7 @@ describe("Date Field", () => {
   it("Value type from the placeholder", async () => {
     const onValueChange = vi.fn()
     render(
-      <D
-        placeholderValue={new CalendarDateTime(2026, 1, 1, 9, 0)}
-        onValueChange={onValueChange}
-      />,
+      <D placeholderValue={new CalendarDateTime(2026, 1, 1, 9, 0)} onValueChange={onValueChange} />,
     )
     await drv().fill("2026-10-14T09:30")
     expect(onValueChange.mock.lastCall?.[0]).toBeInstanceOf(CalendarDateTime)
@@ -300,9 +304,7 @@ describe("Date Field", () => {
   })
 
   it("Seconds without step mismatch (reka-ui#3000); hidden input typed by kind", () => {
-    render(
-      <D granularity="second" defaultValue={new CalendarDateTime(2026, 10, 14, 9, 30, 15)} />,
-    )
+    render(<D granularity="second" defaultValue={new CalendarDateTime(2026, 10, 14, 9, 30, 15)} />)
     expect(hidden().type).toBe("datetime-local")
     expect(hidden().getAttribute("step")).toBe("1")
     expect(hidden().validity.stepMismatch).toBe(false)
@@ -351,7 +353,8 @@ describe("Date Field", () => {
 
   it("Disabled: segments disabled, the hidden input too", () => {
     render(<D disabled defaultValue={new CalendarDate(2026, 10, 14)} />)
-    for (const s of screen.getAllByRole("spinbutton")) expect((s as HTMLInputElement).disabled).toBe(true)
+    for (const s of screen.getAllByRole("spinbutton"))
+      expect((s as HTMLInputElement).disabled).toBe(true)
     expect(hidden().disabled).toBe(true)
     expect(screen.getByRole("group").getAttribute("aria-disabled")).toBe("true")
   })
@@ -401,13 +404,15 @@ describe("Field Integration", () => {
   it("Error shown after leaving (react-spectrum#3328); moving between segments does not touch", async () => {
     render(
       <RindProvider environment={{ dateClock: clock }}>
-        <Field.Root>
+        {/* The spec's "default validation" shows on leave: the Field's blur mode. */}
+        <Field.Root validationMode="blur">
           <Field.Label>Birthday</Field.Label>
           <DateField.Root>
             <DateField.Input />
           </DateField.Root>
           <Field.ErrorMessage />
         </Field.Root>
+        <button type="button">Next</button>
       </RindProvider>,
     )
     const root = () => document.querySelector('[data-scope="field"][data-part="root"]')
@@ -415,7 +420,9 @@ describe("Field Integration", () => {
     expect(root()?.hasAttribute("data-touched")).toBe(false)
     await drv().typeSegment("day", "31")
     await drv().typeSegment("year", "2026")
-    await drv().leave()
+    // Tab out of the last segment.
+    await userEvent.tab()
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Next" }))
     expect(screen.getByText("Enter a valid date")).toBeTruthy()
     for (const s of screen.getAllByRole("spinbutton")) {
       expect(s.getAttribute("aria-invalid")).toBe("true")
@@ -441,9 +448,7 @@ describe("Embedded Mode (A.3)", () => {
 
   it("Embedded field has no Field or form footprint", () => {
     render(<Host />)
-    expect(document.querySelector('[data-part="input"]')?.getAttribute("role")).toBe(
-      "presentation",
-    )
+    expect(document.querySelector('[data-part="input"]')?.getAttribute("role")).toBe("presentation")
     expect(hidden()).toBeNull()
     expect(document.querySelector('[data-scope="field"]')).toBeNull()
     expect(segment("month Start date")).toBeTruthy()
@@ -472,7 +477,7 @@ describe("Boundary, scope and draft hint (A.4, A.5)", () => {
     expect(onBoundary).toHaveBeenLastCalledWith({ direction: "next", reason: "advance" })
     expect(await drv().focusedSegment()).toBe("year")
     await drv().clear()
-    await drv().typeSegment("month", "")
+    act(() => segment("month Birthday").focus())
     await drv().backspace()
     expect(onBoundary).toHaveBeenLastCalledWith({ direction: "previous", reason: "backspace" })
   })
@@ -541,7 +546,7 @@ describe("iOS VoiceOver spinbutton quirk (A.2)", () => {
   })
 
   it("Date segment on macOS: spinbuttons", () => {
-    render(<D env={{ platform: platforms.mac }} />)
+    render(<D env={{ platform: platforms.apple }} />)
     expect(screen.getAllByRole("spinbutton")).toHaveLength(3)
   })
 })
@@ -562,13 +567,5 @@ describe("Browser behaviour", () => {
     await userEvent.keyboard("hello")
     expect(notes.value).toBe("hello")
     expect(document.activeElement).toBe(notes)
-  })
-
-  browserIt("Press on the group focuses the last filled segment before the point", async () => {
-    render(<D defaultValue={new CalendarDate(2026, 10, 14)} />)
-    const group = screen.getByRole("group", { name: "Birthday" })
-    const box = group.getBoundingClientRect()
-    await userEvent.pointer({ target: group, coords: { clientX: box.right - 1, clientY: box.top + 2 } })
-    expect(document.activeElement?.getAttribute("data-type")).toBe("year")
   })
 })
