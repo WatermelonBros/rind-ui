@@ -45,6 +45,7 @@ type Ctx = {
   hoverOpened: boolean
   keyActivation: "enter" | "space" | null
   highlightedKey: CollectionKey | null
+  regionAnchor: unknown
 }
 
 const ROOT = menuLevelId("m")
