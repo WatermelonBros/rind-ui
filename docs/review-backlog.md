@@ -167,6 +167,7 @@ See CLAUDE.md "Review rules".
 | test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
 | test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
 | add-menu (impl) | 5.1 | packages/testing/src/components/menu-scenarios.dom.test.tsx | no automated test yet for "Thumb resting on the trigger while scrolling" (radix#2418, a real touch scroll in Playwright) and "Exit animation" (radix#4195, needs the themed exit animation) |
+| add-context-menu (impl) | 5.3 | packages/testing/src/components/context-menu-scenarios.dom.test.tsx | Reado parity: only the bottom-right viewport corner is tested; the other corners and the left-click-opened menus are not |
 
 ## Manual AT protocol
 
@@ -179,6 +180,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
+| add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 
 ## Resolved
 

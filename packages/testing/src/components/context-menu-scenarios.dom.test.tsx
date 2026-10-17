@@ -21,7 +21,7 @@ const active = () => document.activeElement
 type Props = Partial<ContextMenuRootProps> & {
   children?: ReactNode
   label?: string
-  menuLabel?: string | undefined
+  menuLabel?: string | null
   onSelect?: (v: string) => void
 }
 
@@ -40,7 +40,7 @@ function Files({
       </ContextMenu.Trigger>
       <Menu.Portal>
         <Menu.Positioner>
-          <Menu.Content {...(menuLabel ? { "aria-label": menuLabel } : {})}>
+          <Menu.Content {...(menuLabel === null ? {} : { "aria-label": menuLabel })}>
             <Menu.Item onSelect={() => onSelect("rename")}>Rename</Menu.Item>
             <Menu.Item onSelect={() => onSelect("delete")}>Delete</Menu.Item>
           </Menu.Content>
@@ -189,12 +189,12 @@ describe("ContextMenu scenarios: several regions", () => {
     render(
       <>
         {["A", "B", "C"].map((n) => (
-          <Files key={n} label={n} menuLabel={`${n} actions`} />
+          <Files key={n} label={n} menuLabel={`${n} actions`} modal={false} />
         ))}
       </>,
     )
     for (const n of ["A", "B", "C"]) {
-      await getContextMenu(screen, { text: n }).via("pointer").openAt()
+      await getContextMenu(screen, { text: n, modal: false }).via("pointer").openAt()
     }
     await waitFor(() => expect(menus()).toHaveLength(1))
     expect(menus()[0]?.getAttribute("aria-label")).toBe("C actions")
@@ -213,8 +213,9 @@ describe("ContextMenu scenarios: several regions", () => {
         </Popover.Portal>
       </Popover.Root>,
     )
-    await waitFor(() => expect(screen.getByText("README.md")).toBeTruthy())
-    await userEvent.click(screen.getByText("README.md"))
+    const row = await screen.findByText("README.md")
+    await waitFor(() => expect(getComputedStyle(row).pointerEvents).not.toBe("none"))
+    await userEvent.click(row)
     expect(screen.queryByLabelText("Filters panel")).not.toBe(null)
     expect(screen.getByText("README.md")).toBeTruthy()
   })
@@ -256,7 +257,7 @@ describe("ContextMenu scenarios: while open", () => {
 describe("ContextMenu scenarios: programmatic and dev warnings", () => {
   it("Unnamed: one warning naming the instance after opening", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
-    render(<Files menuLabel={undefined} />)
+    render(<Files menuLabel={null} />)
     await getContextMenu(screen, { text: "README.md" }).via("pointer").openAt()
     const calls = warn.mock.calls.filter(([m]) => String(m).includes("no accessible name"))
     expect(calls).toHaveLength(1)
