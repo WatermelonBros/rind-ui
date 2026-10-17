@@ -24,6 +24,7 @@ import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as controlLabel from "./control-label"
 import * as dialog from "./dialog"
+import * as drawer from "./drawer"
 import * as field from "./field"
 import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
@@ -109,6 +110,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   collections,
   "context-menu": contextMenu,
   dialog,
+  drawer,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,

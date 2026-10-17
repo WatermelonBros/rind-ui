@@ -310,7 +310,12 @@ export function createPress(options: PressOptions): PressHandle {
       swallowClick = true
       send(event("PRESS.CANCEL", pointerType, modifiers, modalityFor(pointerType)))
     }
-    listen(target, "blur", () => {
+    listen(target, "blur", (e) => {
+      // WebKit/Safari: a mouse press on a button does not focus it; the browser moves focus
+      // to its nearest focusable ancestor (a dialog's content). That move is the press's
+      // own, not an interruption.
+      const to = (e as FocusEvent).relatedTarget
+      if (pointerType !== "keyboard" && to instanceof Node && to.contains(target)) return
       interrupt()
       env.scheduler.setTimeout(() => {
         swallowClick = false

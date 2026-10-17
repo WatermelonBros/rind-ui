@@ -1,0 +1,268 @@
+/*
+ * Drawer: a Dialog docked to an edge. overlay.css and positioner.css already match the drawer's
+ * parts (the positioner and content carry data-side), so this sheet resets what does not apply
+ * (centred grid, popover pop-in, anchored size limits) and adds the --rind-drawer-* tokens, the
+ * per-side placement, the swipe-driven transform, the indent and the handle. The machine writes
+ * --rind-drawer-snap-offset / --rind-drawer-size (measured, inline: not a token, so the size
+ * the consumer sets is --rind-drawer-width / --rind-drawer-max-height) on the content,
+ * --rind-drawer-swipe-x / -y / -progress while dragging, --rind-drawer-keyboard-inset on the
+ * positioner. Movement never goes through a state: styles only read those variables.
+ */
+@layer rind.components {
+  [data-scope="drawer"][data-part="backdrop"][data-state] {
+    background: var(--rind-drawer-backdrop, var(--rind-color-overlay));
+    transition: opacity var(--rind-drawer-duration, var(--rind-duration-normal))
+      var(--rind-ease-out);
+  }
+
+  /* Fades with the drag: progress 0 at rest, 1 at the point of dismissal. */
+  [data-scope="drawer"][data-part="backdrop"][data-state="open"] {
+    opacity: calc(1 - var(--rind-drawer-swipe-progress, 0));
+  }
+
+  [data-scope="drawer"][data-part="positioner"][data-side] {
+    box-sizing: border-box;
+    inset: 0;
+    inset-inline-end: var(--rind-scrollbar-width, 0px);
+    display: grid;
+    pointer-events: none;
+    overflow: hidden;
+    /* The on-screen keyboard (top and bottom drawers): the content stays above it. */
+    padding-block-end: var(--rind-drawer-keyboard-inset, 0px);
+  }
+
+  [data-scope="drawer"][data-part="positioner"][data-side="bottom"] {
+    align-items: end;
+    justify-items: stretch;
+  }
+  [data-scope="drawer"][data-part="positioner"][data-side="top"] {
+    align-items: start;
+    justify-items: stretch;
+  }
+  [data-scope="drawer"][data-part="positioner"][data-side="left"] {
+    align-items: stretch;
+    justify-items: start;
+  }
+  [data-scope="drawer"][data-part="positioner"][data-side="right"] {
+    align-items: stretch;
+    justify-items: end;
+  }
+
+  [data-scope="drawer"][data-part="content"][data-side] {
+    box-sizing: border-box;
+    max-inline-size: none;
+    max-block-size: none;
+    overflow: auto;
+    overscroll-behavior: contain;
+    pointer-events: auto;
+    background: var(--rind-drawer-bg, var(--rind-color-surface-raised));
+    color: var(--rind-drawer-color, var(--rind-color-text));
+    padding: var(--rind-drawer-padding, var(--rind-space-6));
+    border: var(--rind-border-width) solid
+      var(--rind-drawer-border, var(--rind-color-border-strong));
+    box-shadow: var(--rind-drawer-shadow, var(--rind-shadow-lg));
+    /* The pop-in of positioner.css does not apply: the drawer slides. */
+    animation: none;
+    transform-origin: center;
+    transform: none;
+    transition: transform var(--rind-drawer-duration, var(--rind-duration-slow))
+      var(--rind-ease-out);
+  }
+
+  /* Placement, size and the inward corners of each side. */
+  [data-scope="drawer"][data-part="content"][data-side="bottom"] {
+    inline-size: 100%;
+    max-block-size: var(--rind-drawer-max-height, 90dvh);
+    border-radius: var(--rind-drawer-radius, var(--rind-radius-panel))
+      var(--rind-drawer-radius, var(--rind-radius-panel)) 0 0;
+    transform: translateY(var(--rind-drawer-snap-offset, 0px));
+  }
+  [data-scope="drawer"][data-part="content"][data-side="top"] {
+    inline-size: 100%;
+    max-block-size: var(--rind-drawer-max-height, 90dvh);
+    border-radius: 0 0 var(--rind-drawer-radius, var(--rind-radius-panel))
+      var(--rind-drawer-radius, var(--rind-radius-panel));
+    transform: translateY(calc(var(--rind-drawer-snap-offset, 0px) * -1));
+  }
+  [data-scope="drawer"][data-part="content"][data-side="left"] {
+    block-size: 100%;
+    inline-size: var(--rind-drawer-width, 24rem);
+    max-inline-size: 100%;
+    border-radius: 0 var(--rind-drawer-radius, var(--rind-radius-panel))
+      var(--rind-drawer-radius, var(--rind-radius-panel)) 0;
+    transform: translateX(calc(var(--rind-drawer-snap-offset, 0px) * -1));
+  }
+  [data-scope="drawer"][data-part="content"][data-side="right"] {
+    block-size: 100%;
+    inline-size: var(--rind-drawer-width, 24rem);
+    max-inline-size: 100%;
+    border-radius: var(--rind-drawer-radius, var(--rind-radius-panel)) 0 0
+      var(--rind-drawer-radius, var(--rind-radius-panel));
+    transform: translateX(var(--rind-drawer-snap-offset, 0px));
+  }
+
+  /* The drag and the settle after a dismissing release: the pointer's offset on top. */
+  [data-scope="drawer"][data-part="content"][data-side="bottom"]:is(
+    [data-swiping],
+    [data-swipe-dismiss]
+  ) {
+    transform: translateY(
+      calc(var(--rind-drawer-snap-offset, 0px) + var(--rind-drawer-swipe-y, 0px))
+    );
+  }
+  [data-scope="drawer"][data-part="content"][data-side="top"]:is(
+    [data-swiping],
+    [data-swipe-dismiss]
+  ) {
+    transform: translateY(
+      calc(var(--rind-drawer-snap-offset, 0px) * -1 + var(--rind-drawer-swipe-y, 0px))
+    );
+  }
+  [data-scope="drawer"][data-part="content"][data-side="left"]:is(
+    [data-swiping],
+    [data-swipe-dismiss]
+  ) {
+    transform: translateX(
+      calc(var(--rind-drawer-snap-offset, 0px) * -1 + var(--rind-drawer-swipe-x, 0px))
+    );
+  }
+  [data-scope="drawer"][data-part="content"][data-side="right"]:is(
+    [data-swiping],
+    [data-swipe-dismiss]
+  ) {
+    transform: translateX(
+      calc(var(--rind-drawer-snap-offset, 0px) + var(--rind-drawer-swipe-x, 0px))
+    );
+  }
+
+  /* The content follows the pointer one to one while dragging. */
+  [data-scope="drawer"][data-part="content"][data-swiping],
+  [data-scope="drawer"][data-part="backdrop"][data-swiping] {
+    transition: none;
+  }
+
+  /* Entry: from off the edge. */
+  [data-scope="drawer"][data-part="content"][data-side="bottom"][data-state="open"] {
+    @starting-style {
+      transform: translateY(100%);
+    }
+  }
+  [data-scope="drawer"][data-part="content"][data-side="top"][data-state="open"] {
+    @starting-style {
+      transform: translateY(-100%);
+    }
+  }
+  [data-scope="drawer"][data-part="content"][data-side="left"][data-state="open"] {
+    @starting-style {
+      transform: translateX(-100%);
+    }
+  }
+  [data-scope="drawer"][data-part="content"][data-side="right"][data-state="open"] {
+    @starting-style {
+      transform: translateX(100%);
+    }
+  }
+
+  /*
+   * Exit: to off the edge, from wherever it is (the release position after a swipe: the
+   * transform of data-swipe-dismiss above is the starting value of this transition).
+   */
+  [data-scope="drawer"][data-part="content"][data-side="bottom"][data-state="closed"] {
+    transform: translateY(100%);
+  }
+  [data-scope="drawer"][data-part="content"][data-side="top"][data-state="closed"] {
+    transform: translateY(-100%);
+  }
+  [data-scope="drawer"][data-part="content"][data-side="left"][data-state="closed"] {
+    transform: translateX(-100%);
+  }
+  [data-scope="drawer"][data-part="content"][data-side="right"][data-state="closed"] {
+    transform: translateX(100%);
+  }
+
+  [data-scope="drawer"][data-part="close-trigger"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  /* The handle: a grip centred in a hit area of at least 24 x 24 px, a button or not. */
+  [data-scope="drawer"][data-part="handle"] {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline: auto;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    touch-action: none;
+  }
+  [data-scope="drawer"][data-part="handle"]::after {
+    content: "";
+    inline-size: var(--rind-drawer-handle-width, 2.5rem);
+    block-size: var(--rind-drawer-handle-height, 0.25rem);
+    border-radius: 999px;
+    background: var(--rind-drawer-handle-color, var(--rind-color-border-strong));
+  }
+
+  /* Nested drawers: the parent recedes while a child is open. */
+  [data-scope="drawer"][data-part="content"][data-has-nested] {
+    opacity: var(--rind-drawer-parent-opacity, 1);
+  }
+
+  /*
+   * The indent wraps the page: it scales down while a modal drawer is open and back up with
+   * the drag (progress 0 at rest, 1 at dismissal). Its background shows around it.
+   */
+  [data-scope="drawer"][data-part="indent-background"][data-active] {
+    background: var(--rind-drawer-indent-background, var(--rind-color-surface));
+  }
+  [data-scope="drawer"][data-part="indent"] {
+    transition: transform var(--rind-drawer-duration, var(--rind-duration-slow))
+      var(--rind-ease-out);
+  }
+  [data-scope="drawer"][data-part="indent"][data-active] {
+    transform: scale(
+      calc(
+        1 -
+        (1 - var(--rind-drawer-indent-scale, 0.96)) *
+        (1 - var(--rind-drawer-swipe-progress, 0))
+      )
+    );
+    border-radius: var(--rind-drawer-indent-radius, var(--rind-radius-panel));
+    overflow: clip;
+  }
+  /* While any drawer is dragged the indent follows per frame, without easing. */
+  :root:has([data-scope="drawer"][data-part="content"][data-swiping])
+  [data-scope="drawer"][data-part="indent"] {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="drawer"]:is([data-part="backdrop"], [data-part="content"], [data-part="indent"]) {
+      transition: none;
+    }
+    [data-scope="drawer"][data-part="indent"][data-active] {
+      transform: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="drawer"][data-part="content"] {
+      border-color: CanvasText;
+    }
+    /* Backgrounds are dropped: the grip is drawn as a border. */
+    [data-scope="drawer"][data-part="handle"]::after {
+      background: transparent;
+      border: 2px solid CanvasText;
+      border-radius: 999px;
+      block-size: 0;
+    }
+  }
+}

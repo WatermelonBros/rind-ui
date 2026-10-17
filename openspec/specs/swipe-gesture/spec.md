@@ -1,12 +1,11 @@
-## Purpose
+# swipe-gesture Specification
 
+## Purpose
 Defines the swipe gesture rind-ui components share (Drawer, Toast): when a press becomes
 a swipe, how it yields to scrolling and to clicks, how movement is exposed without
 re-rendering, how a release is measured and reported to the component, and the drag
 input test adapters provide so the gesture can be driven in tests.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Discrete Events, Continuous Styles
 
 The gesture SHALL report to its component only discrete events: a start, a release
@@ -134,9 +133,10 @@ first touch move arrives offset from the touch start.
 On release the gesture SHALL report the direction the gesture travelled, or no direction
 when it never locked onto an allowed direction or reversed back toward its start by more
 than a small "change of mind" distance; the offset along the locked axis; the velocity
-computed from event timestamps over the last part of the gesture, ignoring samples older
-than a short age, so that the same physical speed yields the same velocity at any input
-rate; and the element's border-box size on that axis. Components SHALL NOT dismiss on a
+computed from the time each event arrived on the environment's clock (so a fake clock in
+tests makes it deterministic; event timestamps cannot be faked in a real browser) over the
+last part of the gesture, ignoring samples older than a short age, so that the same
+physical speed yields the same velocity at any input rate; and the element's border-box size on that axis. Components SHALL NOT dismiss on a
 release that reports no direction.
 
 #### Scenario: Horizontal flick on a bottom sheet with snap points (base-ui#5471)
@@ -193,3 +193,4 @@ SHALL declare it as its pointer or touch implementation.
 - **WHEN** a drawer driver's `swipe` action runs in the browser project and in
   Playwright
 - **THEN** both reach the same closed state with close reason `swipe`
+
