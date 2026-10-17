@@ -209,7 +209,9 @@ for (const url of urls) {
   // a step that throws (a click that times out, a wait past its deadline) is a finding with
   // its page, not a crash that hides which page and step failed
   try {
-    await page.goto(base + url, { waitUntil: "networkidle" })
+    // deadlines, not delays: a slow CI runner gets 60 s to parse and 60 s to hydrate
+    await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })
+    await page.waitForSelector("html[data-hydrated]", { state: "attached", timeout: 60_000 })
     await exercise(page, url)
     // the site never names another component library (user rule): reword the doc if it does
     const named = await page.evaluate(

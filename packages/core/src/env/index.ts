@@ -16,6 +16,7 @@ export type {
   ModalitySource,
   MotionEnv,
   MotionPreference,
+  PageVisibility,
   PlatformFlags,
   PlatformInfo,
   Scheduler,
@@ -23,6 +24,7 @@ export type {
   StyleEnv,
   StyleInjection,
   TimerHandle,
+  VisibilityEnv,
 } from "./capabilities"
 export type { DelayGroup, DelayGroupEnv, DelayGroupMember } from "./delay-group"
 export {
