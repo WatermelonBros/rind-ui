@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      lang="en"
+      lang="en-US"
       data-phase="crisp"
       className={`${unbounded.variable} ${inter.variable} ${fredoka.variable} ${mono.variable}`}
       suppressHydrationWarning
