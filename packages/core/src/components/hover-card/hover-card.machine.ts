@@ -45,11 +45,13 @@ export type HoverCardEvent =
   /** Focus entered or left the content (or its descendant layers). */
   | { readonly type: "FOCUS_WITHIN.ENTER" }
   | { readonly type: "FOCUS_WITHIN.LEAVE" }
-  /** A dismissal or a programmatic close, with its reason. */
-  | {
-      readonly type: "CLOSE"
-      readonly reason: Exclude<HoverCardCloseReason, "pointer-leave" | "blur">
-    }
+  /** The layer's dismissals (the event is named after the reason). */
+  | { readonly type: "ESCAPE_KEY" }
+  | { readonly type: "OUTSIDE_PRESS" }
+  | { readonly type: "OUTSIDE_FOCUS" }
+  | { readonly type: "PARENT_DISMISSED" }
+  /** Programmatic (`actionsRef.close`). */
+  | { readonly type: "CLOSE" }
   /** Programmatic (`actionsRef`). */
   | { readonly type: "OPEN" }
   /** The `disabled` prop changed (closes when it became true). */
@@ -126,10 +128,20 @@ const initialPlacement = (props: HoverCardProps) => {
 
 type Env = DomEnvironment & PositionEnv & HoverIntentEnv
 
-const closeIs =
-  (reason: HoverCardCloseReason) =>
-  ({ event }: { readonly event: { readonly type: string; readonly reason?: unknown } }) =>
-    event.type === "CLOSE" && event.reason === reason
+const CLOSE_REASON = {
+  ESCAPE_KEY: "escape-key",
+  OUTSIDE_PRESS: "outside-press",
+  OUTSIDE_FOCUS: "outside-focus",
+  PARENT_DISMISSED: "parent-dismissed",
+  CLOSE: "api",
+} as const satisfies Record<string, HoverCardCloseReason>
+
+const DISMISSAL = {
+  "escape-key": "ESCAPE_KEY",
+  "outside-press": "OUTSIDE_PRESS",
+  "outside-focus": "OUTSIDE_FOCUS",
+  "parent-dismissed": "PARENT_DISMISSED",
+} as const
 
 /** Focus from Tab or a key-driven move by rind-ui: never a layer's, the window's or AT's. */
 const isKeyboardIntent = (e: { readonly type: string }) =>
@@ -138,6 +150,13 @@ const isKeyboardIntent = (e: { readonly type: string }) =>
   "cause" in e &&
   e.modality === "keyboard" &&
   (e.cause === "key" || e.cause === "navigation")
+
+/** A layer opened from this card (a select, a nested card) is open. */
+const childOpen = (env: Env, props: HoverCardProps) => {
+  if (typeof document === "undefined") return false
+  const layer = getLayerStack(docOf(env)).get(hoverCardLayerId(props.root))
+  return layer?.meta().hasNested === true
+}
 
 const docOf = (env: Env) => {
   const node = env.dom.getRootNode()
@@ -160,18 +179,11 @@ export const hoverCardMachine = setup({
     pointerInZone: ({ context }) => context.pointerInZone,
     becameDisabled: ({ props }) => props.disabled === true,
     leavingByBlur: ({ context }) => context.leaving === "blur",
-    "close:escape-key": closeIs("escape-key"),
-    "close:outside-press": closeIs("outside-press"),
-    "close:outside-focus": closeIs("outside-focus"),
-    "close:parent-dismissed": closeIs("parent-dismissed"),
-    "close:api": closeIs("api"),
     /** Focus inside, a keyboard-focused trigger or an open descendant layer keep it open. */
-    held: ({ context, env, props }) => {
-      if (context.focusInside || context.keyboardFocused) return true
-      if (typeof document === "undefined") return false
-      const layer = getLayerStack(docOf(env)).get(hoverCardLayerId(props.root))
-      return layer?.meta().hasNested === true
-    },
+    held: ({ context, env, props }) =>
+      context.focusInside || context.keyboardFocused || childOpen(env, props),
+    /** On the trigger's blur: its keyboard focus is what is ending, so it holds nothing. */
+    heldInside: ({ context, env, props }) => context.focusInside || childOpen(env, props),
   },
   actions: {
     hovered: ({ set }) => set("pointerInZone", true),
@@ -181,7 +193,8 @@ export const hoverCardMachine = setup({
     focusEntered: ({ set }) => set("focusInside", true),
     focusLeft: ({ set }) => set("focusInside", false),
     setCloseReason: ({ event, set }) => {
-      if (event.type === "CLOSE") set("closeReason", event.reason)
+      const reason = CLOSE_REASON[event.type as keyof typeof CLOSE_REASON]
+      if (reason) set("closeReason", reason)
     },
     clearCloseReason: ({ set }) => set("closeReason", null),
     leaveByPointer: ({ set }) => set("leaving", "pointer-leave"),
@@ -233,7 +246,7 @@ export const hoverCardMachine = setup({
               escape: true,
               outsidePress: true,
               outsideFocus: true,
-              onRequest: (request) => send({ type: "CLOSE", reason: request.reason }),
+              onRequest: (request) => send({ type: DISMISSAL[request.reason] }),
             },
           })
           const layer = getLayerStack(doc).get(id)
@@ -329,7 +342,14 @@ export const hoverCardMachine = setup({
         ],
       },
       on: {
-        "HOVER.END": [{ guard: { not: "fromZone" }, target: "closed", actions: ["unhovered"] }],
+        // The pointer arriving while a focus open is pending: it is in the zone now.
+        "HOVER.START": { actions: ["hovered"] },
+        // Leaving cancels a hover open, not a keyboard one (design §1).
+        "HOVER.END": [
+          { guard: "fromZone" },
+          { guard: "keyboardFocused", actions: ["unhovered"] },
+          { target: "closed", actions: ["unhovered"] },
+        ],
         FOCUS: { actions: ["keyboardFocus"] },
         BLUR: [
           { guard: "pointerInZone", actions: ["blurred"] },
@@ -353,14 +373,22 @@ export const hoverCardMachine = setup({
         FOCUS: { actions: ["keyboardFocus"] },
         BLUR: [
           { guard: "pointerInZone", actions: ["blurred"] },
-          { guard: "held", actions: ["blurred"] },
+          { guard: "heldInside", actions: ["blurred"] },
           { target: "closing", actions: ["blurred", "leaveByBlur"] },
         ],
         "FOCUS_WITHIN.LEAVE": [
           { guard: { or: ["pointerInZone", "keyboardFocused"] }, actions: ["focusLeft"] },
           { target: "closing", actions: ["focusLeft", "leaveByBlur"] },
         ],
-        CLOSE: closeArms(),
+        ESCAPE_KEY: { target: "closed", reason: "escape-key", actions: ["setCloseReason"] },
+        OUTSIDE_PRESS: { target: "closed", reason: "outside-press", actions: ["setCloseReason"] },
+        OUTSIDE_FOCUS: { target: "closed", reason: "outside-focus", actions: ["setCloseReason"] },
+        PARENT_DISMISSED: {
+          target: "closed",
+          reason: "parent-dismissed",
+          actions: ["setCloseReason"],
+        },
+        CLOSE: { target: "closed", reason: "api", actions: ["setCloseReason"] },
         DISABLED: { guard: "becameDisabled", target: "closed", reason: "disabled" },
         "POSITION.PLACED": { actions: ["setPlacement"] },
       },
@@ -382,24 +410,20 @@ export const hoverCardMachine = setup({
         "FOCUS_WITHIN.ENTER": { target: "open", actions: ["focusEntered"] },
         "FOCUS_WITHIN.LEAVE": { actions: ["focusLeft"] },
         BLUR: { actions: ["blurred"] },
-        CLOSE: closeArms(),
+        ESCAPE_KEY: { target: "closed", reason: "escape-key", actions: ["setCloseReason"] },
+        OUTSIDE_PRESS: { target: "closed", reason: "outside-press", actions: ["setCloseReason"] },
+        OUTSIDE_FOCUS: { target: "closed", reason: "outside-focus", actions: ["setCloseReason"] },
+        PARENT_DISMISSED: {
+          target: "closed",
+          reason: "parent-dismissed",
+          actions: ["setCloseReason"],
+        },
+        CLOSE: { target: "closed", reason: "api", actions: ["setCloseReason"] },
         DISABLED: { guard: "becameDisabled", target: "closed", reason: "disabled" },
         "POSITION.PLACED": { actions: ["setPlacement"] },
       },
     },
   },
 })
-
-/** One arm per dismissal reason: `onOpenChange` reports the reason it closed with. */
-function closeArms() {
-  return (["escape-key", "outside-press", "outside-focus", "parent-dismissed", "api"] as const).map(
-    (reason) => ({
-      guard: `close:${reason}` as const,
-      target: "closed" as const,
-      reason,
-      actions: ["setCloseReason"] as const,
-    }),
-  )
-}
 
 export type HoverCardMachine = typeof hoverCardMachine

@@ -18,3 +18,4 @@ export {
   hoverCardMachine,
   hoverCardPositioning,
 } from "./hover-card.machine"
+export { hoverCardMeta } from "./hover-card.meta"

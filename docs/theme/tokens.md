@@ -872,6 +872,52 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### hover-card
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "arrow-size": {
+      "fallback": "10px",
+      "file": "hover-card.css"
+    },
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "hover-card.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "hover-card.css"
+    },
+    "color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "hover-card.css"
+    },
+    "duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "hover-card.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-3)",
+      "file": "hover-card.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "hover-card.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "hover-card.css"
+    },
+    "width": {
+      "fallback": "18rem",
+      "file": "hover-card.css"
+    }
+  }
+}
+```
+
 ### indicator
 
 ```json

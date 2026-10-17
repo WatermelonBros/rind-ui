@@ -105,18 +105,16 @@ describe("HoverCard: opening", () => {
   it("Tabbing quickly through links: 200 ms on each opens nothing", async () => {
     const { user } = fakeTime()
     render(
-      <>
-        {["Ann", "Bob", "Cy"].map((n) => (
-          <HoverCard.Root key={n}>
-            <HoverCard.Trigger href={`/u/${n}`}>{n}</HoverCard.Trigger>
-            <HoverCard.Portal>
-              <HoverCard.Positioner>
-                <HoverCard.Content>{n}'s card</HoverCard.Content>
-              </HoverCard.Positioner>
-            </HoverCard.Portal>
-          </HoverCard.Root>
-        ))}
-      </>,
+      ["Ann", "Bob", "Cy"].map((n) => (
+        <HoverCard.Root key={n}>
+          <HoverCard.Trigger href={`/u/${n}`}>{n}</HoverCard.Trigger>
+          <HoverCard.Portal>
+            <HoverCard.Positioner>
+              <HoverCard.Content>{n}'s card</HoverCard.Content>
+            </HoverCard.Positioner>
+          </HoverCard.Portal>
+        </HoverCard.Root>
+      )),
     )
     for (let i = 0; i < 3; i++) {
       await user.tab()

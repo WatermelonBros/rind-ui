@@ -126,7 +126,7 @@ function Root({ id, keepMounted = false, actionsRef, children, ...rest }: HoverC
     actionsRef,
     () => ({
       open: () => send({ type: "OPEN" }),
-      close: () => send({ type: "CLOSE", reason: "api" }),
+      close: () => send({ type: "CLOSE" }),
     }),
     [send],
   )

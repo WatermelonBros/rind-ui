@@ -897,6 +897,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       from,
       state,
       ...expectations(contract, state, oracle.service.view()),
+      wasOpen: from !== null && expectations(contract, from, oracle.service.view()).open,
       atInitial: state === graph.initial,
       anchorCount: await base.anchorCount(),
       errors: await base.takeErrors(),

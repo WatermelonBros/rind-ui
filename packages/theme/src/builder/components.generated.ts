@@ -185,6 +185,16 @@ export type ComponentTokens = {
     | "6LineHeight"
     | "6TextTransform"
     | "color"
+  readonly "hover-card":
+    | "arrowSize"
+    | "bg"
+    | "border"
+    | "color"
+    | "duration"
+    | "padding"
+    | "radius"
+    | "shadow"
+    | "width"
   readonly indicator: "height" | "left" | "top" | "width"
   readonly label: "color" | "cursor" | "disabledCursor" | "fontSize" | "fontWeight"
   readonly link:

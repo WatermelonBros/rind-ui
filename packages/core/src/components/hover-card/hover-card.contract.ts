@@ -123,13 +123,11 @@ export const hoverCardContract = contract("hover-card", {
     BLUR: { skip: "Tab away: the keyboard DOM tests" },
     "FOCUS_WITHIN.ENTER": { skip: "Tab into the content: the enter action (DOM tests)" },
     "FOCUS_WITHIN.LEAVE": { skip: "Tab past the content's end: the DOM tests" },
-    CLOSE: {
-      from: {
-        opening: { skip: "a dismissal needs an open layer" },
-        open: "pressEscape",
-        closing: { skip: "a dismissal during the close delay: the DOM tests" },
-      },
-    },
+    ESCAPE_KEY: "pressEscape",
+    OUTSIDE_PRESS: "pressOutside",
+    OUTSIDE_FOCUS: { skip: "focus moving to the page: the DOM tests" },
+    PARENT_DISMISSED: { skip: "closing the parent layer: the nesting DOM tests" },
+    CLOSE: { skip: "programmatic (actionsRef.close): the machine tests" },
     OPEN: { skip: "programmatic (actionsRef.open): the machine tests" },
     DISABLED: { skip: "the disabled prop step ($props:disabled)" },
     "POSITION.PLACED": { skip: "sent by the position capability, not a user step" },
@@ -137,7 +135,12 @@ export const hoverCardContract = contract("hover-card", {
     "$props:disabled": { props: () => ({ disabled: true }) },
   },
   traits: ["layer", "restores-focus", "presence", "anchored", "timed"],
-  // Focusing the trigger by keyboard starts the open delay: that is the point.
-  commitsOnFocus: [{ part: "trigger", state: "closed" }],
+  // Focusing the trigger by keyboard starts the open delay: that is the point; `hasFocus`
+  // observes where focus is, so focusing the content changes it by definition.
+  commitsOnFocus: [
+    { part: "trigger", state: "closed" },
+    { part: "content", state: "open" },
+    { part: "content", state: "closing" },
+  ],
   semantics: { trigger: "trigger", content: "content" },
 })
