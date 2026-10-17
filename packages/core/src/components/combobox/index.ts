@@ -16,6 +16,7 @@ export {
   comboboxMachine,
 } from "./combobox.machine"
 export { type ComboboxMessages, comboboxMessages } from "./combobox.messages"
+export { comboboxMeta } from "./combobox.meta"
 export {
   type ComboboxFilter,
   completion,
