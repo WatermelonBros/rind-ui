@@ -130,7 +130,8 @@ async function exercise(page: Page, url: string) {
 /** A control may open a modal layer: close it (Escape, else its last button) before going on. */
 async function closeModals(page: Page, url: string) {
   for (let n = 0; n < 4; n++) {
-    const modal = page.locator('[aria-modal="true"]').last()
+    // a modal menu makes the page inert without aria-modal: it carries data-modal
+    const modal = page.locator('[aria-modal="true"], [data-modal][data-state="open"]').last()
     if (!(await modal.isVisible().catch(() => false))) return
     await page.keyboard.press("Escape")
     const closed = await modal

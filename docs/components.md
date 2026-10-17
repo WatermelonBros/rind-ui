@@ -41,7 +41,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | wip | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
@@ -147,7 +147,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
-| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
+| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |

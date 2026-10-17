@@ -161,6 +161,14 @@ export {
 export { registerReset } from "./resets"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"
 export {
+  domScrollMetrics,
+  isReversed,
+  physicalFraction,
+  SCROLL_AREA_RULE,
+  scrollAreaIds,
+  wheelTarget,
+} from "./scroll-metrics"
+export {
   type IndicatorBox,
   type IndicatorCause,
   type MeasuredIndicator,

@@ -1632,6 +1632,60 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### scroll-area
+
+```json
+{
+  "family": "decoration",
+  "tokens": {
+    "corner-bg": {
+      "fallback": "transparent",
+      "file": "scroll-area.css"
+    },
+    "fade-duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "scroll-area.css"
+    },
+    "scrollbar-padding": {
+      "fallback": "2px",
+      "file": "scroll-area.css"
+    },
+    "scrollbar-size": {
+      "fallback": "10px",
+      "file": "scroll-area.css"
+    },
+    "thumb-active-bg": {
+      "fallback": "var(--rind-color-text)",
+      "file": "scroll-area.css"
+    },
+    "thumb-bg": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "scroll-area.css"
+    },
+    "thumb-hover-bg": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "scroll-area.css"
+    },
+    "thumb-min-size": {
+      "fallback": "18px",
+      "file": "scroll-area.css"
+    },
+    "thumb-radius": {
+      "fallback": "9999px",
+      "file": "scroll-area.css"
+    },
+    "thumb-size": {
+      "fallback": "0px",
+      "file": "scroll-area.css"
+    },
+    "track-bg": {
+      "fallback": "transparent",
+      "file": "scroll-area.css"
+    }
+  }
+}
+```
+
 ### search-field
 
 ```json

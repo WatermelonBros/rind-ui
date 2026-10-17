@@ -23,6 +23,7 @@ import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
+import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
@@ -33,6 +34,7 @@ import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as radioGroup from "./radio-group"
+import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
@@ -58,6 +60,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-form-input": hiddenFormInput,
   labels: labels,
   "visually-hidden": visuallyHidden,
+  menu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   "alert-dialog": alertDialog,
@@ -91,6 +94,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  "scroll-area": scrollArea,
   skeleton,
   slider,
   switch: switchEx,

@@ -613,7 +613,7 @@ function Item({
           origin,
           tag,
           onActivate: (a) => {
-            if (a.disposition === "same-tab") api.activateLink(key, a.modality)
+            if (a.disposition === "same-tab") api.activateLink(key, a.modality, closeOnSelect)
           },
         },
         linkEnv,
@@ -874,6 +874,8 @@ const SubmenuContext = createContext<{
   readonly parent: Level
   readonly key: CollectionKey
   readonly triggerRef: RefObject<HTMLElement | null>
+  /** The SubmenuTrigger's `disabled`: the expand key never opens a disabled submenu. */
+  readonly disabledRef: RefObject<boolean>
 } | null>(null)
 
 export type MenuSubmenuProps = Omit<LevelOptions, "loop"> & {
@@ -897,8 +899,11 @@ function Submenu({ children, ...options }: MenuSubmenuProps) {
   })
   const { submenus } = parent
   const { send } = s
+  const disabledRef = useRef(false)
   useIsoLayoutEffect(() => {
-    submenus.set(key, () => send({ type: "SUB_OPEN" }))
+    submenus.set(key, () => {
+      if (!disabledRef.current) send({ type: "SUB_OPEN" })
+    })
     return () => {
       submenus.delete(key)
     }
@@ -922,7 +927,7 @@ function Submenu({ children, ...options }: MenuSubmenuProps) {
     inMenubar: false,
   }
   return (
-    <SubmenuContext value={{ parent, key, triggerRef }}>
+    <SubmenuContext value={{ parent, key, triggerRef, disabledRef }}>
       <LevelContext value={ctx}>{children}</LevelContext>
     </SubmenuContext>
   )
@@ -948,6 +953,10 @@ function SubmenuTrigger({
   const childOpen = useSelector(child.service, (v) => v.matches("open"))
   const el = useRef<HTMLElement | null>(null)
   useRegisterItem(sub.parent.registry, { key: sub.key, textValue, disabled }, el)
+  const { disabledRef } = sub
+  useIsoLayoutEffect(() => {
+    disabledRef.current = disabled
+  }, [disabledRef, disabled])
   const [focused, setFocused] = useState(false)
   const hover = useMemo(
     () => child.hoverIntent.triggerProps((e) => child.service.send(e)),
