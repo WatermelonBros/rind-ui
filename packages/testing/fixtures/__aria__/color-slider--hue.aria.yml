@@ -1,0 +1,3 @@
+- group "Hue":
+  - text: Hue 220°, blue
+  - slider "Hue": "220"

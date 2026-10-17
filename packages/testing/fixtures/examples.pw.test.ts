@@ -289,6 +289,8 @@ const TRANSIENT = new Set([
   "form:awaiting-server",
   "text-field:composing",
   "slider:dragging",
+  "color-area:dragging",
+  "color-field:editing",
   "tooltip:opening",
   "tooltip:closing",
   "number-input:composing",
