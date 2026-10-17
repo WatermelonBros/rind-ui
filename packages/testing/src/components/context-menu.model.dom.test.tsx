@@ -8,7 +8,7 @@ import {
   nonModalContextMenuContract,
 } from "@rind-ui/core"
 import { ContextMenu, type ContextMenuRootProps, Menu, RindProvider } from "@rind-ui/react"
-import { render, screen } from "@testing-library/react"
+import { render } from "@testing-library/react"
 import axe from "axe-core"
 import { describe, it } from "vitest"
 import { domEnv, testMachine, virtualClock } from "../index"
