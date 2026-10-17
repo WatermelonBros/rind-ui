@@ -9,20 +9,22 @@ import {
   type ColorCommitDetails,
   type ColorInput,
   type ColorNameProp,
-  type ColorSliderMessages,
   type ColorSpace,
-  colorSliderConnect,
-  colorSliderMessages,
-  colorSliderSpace,
   colorValueMachine,
   colorValueOf,
-  colorVariables,
   getChannel,
   type MessageOverrides,
   makeColor,
   withChannel,
   workingOf,
 } from "@rind-ui/core"
+import {
+  type ColorSliderMessages,
+  colorSliderConnect,
+  colorSliderMessages,
+  colorSliderSpace,
+  colorVariables,
+} from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,

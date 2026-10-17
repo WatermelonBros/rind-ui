@@ -527,7 +527,10 @@ function Content({
 }
 
 /** The picker's Color Area. */
-function Area({ children, ...rest }: Omit<ColorAreaRootProps, "value" | "defaultValue">) {
+/** ColorPicker.Area's props: the area's own props without a value (the picker owns it). */
+export type ColorPickerAreaProps = Omit<ColorAreaRootProps, "value" | "defaultValue">
+
+function Area({ children, ...rest }: ColorPickerAreaProps) {
   const ctx = usePicker("Area")
   if ("value" in rest && process.env.NODE_ENV !== "production") {
     console.error("[rind-ui] color-picker: a bound ColorPicker.Area takes no `value` of its own")
@@ -553,10 +556,10 @@ function Area({ children, ...rest }: Omit<ColorAreaRootProps, "value" | "default
 }
 
 /** The picker's Color Slider for `channel`. */
-function ChannelSlider({
-  children,
-  ...rest
-}: Omit<ColorSliderRootProps, "value" | "defaultValue">) {
+/** ColorPicker.ChannelSlider's props: `channel` and the slider's own props, without a value. */
+export type ColorPickerChannelSliderProps = Omit<ColorSliderRootProps, "value" | "defaultValue">
+
+function ChannelSlider({ children, ...rest }: ColorPickerChannelSliderProps) {
   const ctx = usePicker("ChannelSlider")
   const m = ctx.messages
   return (
@@ -632,11 +635,11 @@ function ChannelInput({
   )
 }
 
+/** ColorPicker.SwatchGroup's props: the swatch group's own props, without a value. */
+export type ColorPickerSwatchGroupProps = Omit<ColorSwatchPickerRootProps, "value" | "defaultValue">
+
 /** The picker's swatches (a Color Swatch Picker bound to its colour). */
-function SwatchGroup({
-  children,
-  ...rest
-}: Omit<ColorSwatchPickerRootProps, "value" | "defaultValue">) {
+function SwatchGroup({ children, ...rest }: ColorPickerSwatchGroupProps) {
   const ctx = usePicker("SwatchGroup")
   return (
     <ColorSwatchPicker.Root
@@ -655,13 +658,19 @@ function SwatchGroup({
   )
 }
 
-function SwatchTrigger(props: ColorSwatchPickerItemProps) {
+/** ColorPicker.SwatchTrigger's props: one swatch of the group (`value`, `disabled`). */
+export type ColorPickerSwatchTriggerProps = ColorSwatchPickerItemProps
+
+function SwatchTrigger(props: ColorPickerSwatchTriggerProps) {
   usePicker("SwatchTrigger")
   return <ColorSwatchPicker.Item {...props} />
 }
 
 /** A Color Swatch. */
-function Swatch(props: ComponentPropsWithRef<typeof ColorSwatch.Root>) {
+/** ColorPicker.Swatch's props: a colour to show (`color`), named by its colour name. */
+export type ColorPickerSwatchProps = ComponentPropsWithRef<typeof ColorSwatch.Root>
+
+function Swatch(props: ColorPickerSwatchProps) {
   const ctx = usePicker("Swatch")
   return <ColorSwatch.Root messages={ctx.messages} {...props} />
 }

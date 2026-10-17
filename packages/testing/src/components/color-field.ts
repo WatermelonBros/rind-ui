@@ -1,4 +1,4 @@
-import { colorChannelFieldContract, colorFieldContract } from "@rind-ui/core"
+import { colorChannelFieldContract, colorFieldContract } from "@rind-ui/core/internal"
 import { createDriverWith, type DriverOptions, type Target } from "../driver"
 
 /** A driver for the Color Field whose text input is named `name`. */

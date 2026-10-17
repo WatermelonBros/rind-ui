@@ -1,4 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@rind-ui/react/color-internals": ["../react/src/color-internals.ts"]
+    }
+  },
   "include": ["src", "fixtures"]
 }

@@ -39,9 +39,33 @@
     outline-offset: calc(var(--rind-focus-offset) + 4px);
   }
 
-  :where([data-scope="radio-group"][data-part="item-indicator"]) {
+  /*
+   * The one selected mark, centred on the swatch (inset 0 + auto margins: an absolutely
+   * positioned child gets no grid alignment). Empty, it is a dot ringed to show on any colour;
+   * with content (a glyph or an icon) that content is the mark, centred, and no dot is drawn.
+   * Either way it replaces Radio Group's dot.
+   */
+  :where([data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker]) {
     position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: auto;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: 0;
+    background: none;
     color: var(--rind-color-swatch-picker-mark, var(--rind-color-text));
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  :where([data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker]:empty) {
+    inline-size: var(--rind-color-swatch-picker-mark-size, 0.75rem);
+    block-size: var(--rind-color-swatch-picker-mark-size, 0.75rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color-surface);
+    box-shadow: 0 0 0 2px var(--rind-color-swatch-picker-mark, var(--rind-color-text));
   }
 
   @media (forced-colors: active) {
