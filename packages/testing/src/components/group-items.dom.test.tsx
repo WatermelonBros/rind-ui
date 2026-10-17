@@ -21,7 +21,7 @@ describe("ToggleGroup.Item", () => {
     await user.click(b)
     expect(b.getAttribute("aria-pressed")).toBe("true")
     expect(b.textContent).toBe("on")
-    expect(b.getAttribute("tabindex")).not.toBe("-1")
+    expect(b.getAttribute("tabindex")).toBe(null)
   })
 
   it("in a Root: part of the group's value; its indicator follows the item", async () => {

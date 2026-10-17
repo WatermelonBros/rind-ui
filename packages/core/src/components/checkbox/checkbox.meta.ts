@@ -20,7 +20,7 @@ const base = (part: string) => ({
 
 export const checkboxMeta = {
   scope: "checkbox",
-  name: "Checkbox",
+  name: "CheckboxGroup.Item",
   stateless: false,
   parts: [
     {

@@ -13,7 +13,7 @@ const base = (part: string) => ({
 
 export const toggleMeta = {
   scope: "toggle",
-  name: "Toggle",
+  name: "ToggleGroup.Item",
   stateless: false,
   parts: [
     {
