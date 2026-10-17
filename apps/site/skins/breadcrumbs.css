@@ -1,5 +1,5 @@
 /* ── Breadcrumbs: an inked trail in crisp, soft candy chips in juicy ── */
-[data-skinned] [data-scope="breadcrumbs"][data-part="list"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"][data-part="list"] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -10,15 +10,17 @@
   font: 500 14px / 1.4 var(--s-font);
   color: var(--s-ink);
 }
-[data-skinned] [data-scope="breadcrumbs"]:is([data-part="item"], [data-part="ellipsis"]) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"]:is([data-part="item"], [data-part="ellipsis"]) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="item"][hidden] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"][data-part="item"][hidden] {
   display: none;
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="link"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"][data-part="link"] {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -31,32 +33,39 @@
   text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
   transition: background 140ms ease-out;
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="link"][data-hover] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"][data-part="link"][data-hover] {
   background: color-mix(in oklab, currentColor 10%, transparent);
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="link"][data-current] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"][data-part="link"][data-current] {
   font-weight: 800;
   text-decoration: none;
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="separator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"][data-part="separator"] {
   font-weight: 700;
   user-select: none;
 }
-[data-skinned] [data-scope="breadcrumbs"][data-part="separator"][data-last] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"][data-part="separator"][data-last] {
   display: none;
 }
 /* Right to left: the separator is flipped here, and only here. Isolated as left-to-right, a
    text chevron (›) is never also mirrored by the font (some fonts mirror it in RTL text,
    some do not), so every skin ends with the same single flip. */
-[data-skinned] [data-scope="breadcrumbs"][data-part="separator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"][data-part="separator"] {
   direction: ltr;
   unicode-bidi: isolate;
 }
-[data-skinned] [dir="rtl"] [data-scope="breadcrumbs"][data-part="separator"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [dir="rtl"]
+  [data-scope="breadcrumbs"][data-part="separator"] {
   transform: scaleX(-1);
 }
-[data-skinned] [data-scope="breadcrumbs"] .crumb-button,
-[data-skinned] [data-scope="breadcrumbs"][data-part="ellipsis"] button {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"] .crumb-button,
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"][data-part="ellipsis"]
+  button {
   min-height: 28px;
   padding: 0 8px;
   border: 0;
@@ -66,37 +75,46 @@
   font: inherit;
   cursor: pointer;
 }
-[data-skinned] [data-scope="breadcrumbs"] .crumb-button[aria-current] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="breadcrumbs"]
+  .crumb-button[aria-current] {
   font-weight: 800;
 }
-[data-skinned] .crumb-menu {
+:is([data-skinned], [data-rind-theme^="skin-"]) .crumb-menu {
   margin: 0;
   padding: 4px;
   list-style: none;
 }
-[data-skin="crisp"] [data-scope="breadcrumbs"][data-part="link"][data-current] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="breadcrumbs"][data-part="link"][data-current] {
   background: var(--s-ink);
   color: var(--s-brand-text);
   border-radius: 99px;
   padding: 0 10px;
 }
-[data-skin="crisp"] [data-scope="breadcrumbs"] .crumb-button,
-[data-skin="crisp"] [data-scope="breadcrumbs"][data-part="ellipsis"] button {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="breadcrumbs"] .crumb-button,
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="breadcrumbs"][data-part="ellipsis"]
+  button {
   border: var(--s-bw) solid var(--s-ink);
 }
-[data-skin="juicy"] [data-scope="breadcrumbs"][data-part="link"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="breadcrumbs"][data-part="link"] {
   border-radius: 99px;
   padding: 0 10px;
 }
-[data-skin="juicy"] [data-scope="breadcrumbs"][data-part="link"][data-current] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="breadcrumbs"][data-part="link"][data-current] {
   background: var(--s-acc);
 }
-[data-skin="juicy"] [data-scope="breadcrumbs"] .crumb-button,
-[data-skin="juicy"] [data-scope="breadcrumbs"][data-part="ellipsis"] button {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="breadcrumbs"] .crumb-button,
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="breadcrumbs"][data-part="ellipsis"]
+  button {
   border-radius: 99px;
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-skinned] [data-scope="breadcrumbs"][data-part="link"] {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="breadcrumbs"][data-part="link"] {
     transition: none;
   }
 }

@@ -2,6 +2,13 @@
 
 A fixed-length code (verification code, PIN) entered in **one native text input** drawn over presentational slots. Typing, paste, SMS and password-manager autofill, IME and screen readers all work as they do for one ordinary field. The Root is a Field, so labelling, description and validation work like any Field.
 
+## When to use
+
+- **Use it for** a fixed-length code: a verification code, a one-time password or a PIN.
+- **Over several `<input>` elements**: it keeps one native text input drawn under presentational slots, so paste, SMS and password-manager autofill (`autocomplete="one-time-code"`), IME and screen readers behave as for one ordinary field.
+- **Over a plain `<input>`**: it adds the slot display, paste normalisation (separators dropped, characters filtered by `validationType`, truncated to `length`) and a `mask` option.
+- **Don't use it for** free-length text: use [Text Field](text-field.md). Don't use it for a number that is stepped: use [Number Input](number-input.md).
+
 ```tsx
 import { PinInput } from "@rind-ui/react"
 

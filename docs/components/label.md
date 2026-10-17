@@ -2,6 +2,12 @@
 
 A native `<label>` that names a control through `for` or by wrapping it, and fixes what native labels get wrong: no text selection on double click, focus forwarding for controls a label cannot name, and a development check of what `for` points at.
 
+## When to use
+
+- **Use it for** naming a control, by `htmlFor` or by wrapping it.
+- **Over a native `<label>`**: it is one, and adds no text selection on double click, focus forwarding for controls a label cannot name, and a development check of what `htmlFor` points at.
+- **Don't use it for** a full field with description and error: use a [Field](field.md). To name a group of controls, use a [Fieldset](fieldset.md).
+
 ```tsx
 import { Label } from "@rind-ui/react"
 

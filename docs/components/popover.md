@@ -2,6 +2,13 @@
 
 A floating panel anchored to a trigger. It is non-modal by default: the page stays usable, a press or focus outside closes it, and Tab continues from the trigger into the content. The content is `role="dialog"`, positioned against the trigger (or an `Anchor`) by the shared positioning capability.
 
+## When to use
+
+- **Use it for** a floating panel anchored to a trigger: extra details, a small form, a toggletip.
+- **Over a plain element**: it adds `role="dialog"` with a name, positioning against the trigger, dismissal by outside press, focus or Escape, focus moved into the content and returned on close, and Tab order that continues from the trigger.
+- **Don't use it for** content that must be dealt with first: use [Dialog](dialog.md). Don't use it for a list of actions: use [Menu](menu.md). Don't use it for a short label on hover or focus: use [Tooltip](tooltip.md).
+- **Don't use it for** content that only needs to show and hide in place: use [Collapsible](collapsible.md).
+
 ```tsx
 import { Popover } from "@rind-ui/react"
 

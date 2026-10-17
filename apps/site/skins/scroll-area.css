@@ -1,5 +1,5 @@
 /* ── Scroll Area: an inked bar in crisp, a candy pill in juicy; the browser still scrolls ── */
-[data-skinned] [data-scope="scroll-area"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="root"] {
   inline-size: min(100%, 320px);
   block-size: 200px;
   border-radius: var(--s-r-sm);
@@ -7,75 +7,89 @@
   color: var(--s-ink);
   overflow: hidden;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="root"][data-shape="small"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="root"][data-shape="small"] {
   inline-size: 160px;
   block-size: 140px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="root"][data-shape="strip"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="root"][data-shape="strip"] {
   block-size: auto;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="viewport"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="viewport"] {
   inline-size: 100%;
   block-size: 100%;
   border-radius: inherit;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="content"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="content"] {
   padding: 10px 14px;
   font: 500 14px / 1.45 var(--s-font);
 }
-[data-skinned] [data-scope="scroll-area"][data-part="content"] p {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="content"] p {
   margin: 0 0 8px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="scrollbar"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="scrollbar"] {
   display: flex;
   padding: 3px;
   transition: opacity 160ms ease-out;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="vertical"] {
   flex-direction: column;
   inline-size: 12px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="horizontal"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="scrollbar"][data-orientation="horizontal"] {
   block-size: 12px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="scrollbar"][data-state="hidden"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="scrollbar"][data-state="hidden"] {
   opacity: 0;
   pointer-events: none;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="thumb"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"][data-part="thumb"] {
   flex: none;
   border-radius: 99px;
   background: var(--s-ink);
 }
-[data-skinned] [data-scope="scroll-area"][data-part="thumb"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="thumb"][data-orientation="vertical"] {
   inline-size: 100%;
   block-size: var(--rind-scroll-area-thumb-size);
   min-block-size: 18px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="thumb"][data-orientation="horizontal"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="thumb"][data-orientation="horizontal"] {
   block-size: 100%;
   inline-size: var(--rind-scroll-area-thumb-size);
   min-inline-size: 18px;
 }
-[data-skinned] [data-scope="scroll-area"][data-part="thumb"][data-dragging] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-part="thumb"][data-dragging] {
   background: var(--s-acc-deep);
 }
-[data-skin="crisp"] [data-scope="scroll-area"][data-part="root"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="scroll-area"][data-part="root"] {
   border: var(--s-bw) solid var(--s-ink);
   box-shadow: var(--s-lift);
 }
-[data-skin="crisp"] [data-scope="scroll-area"][data-part="thumb"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="scroll-area"][data-part="thumb"] {
   border-radius: 2px;
 }
-[data-skin="juicy"] [data-scope="scroll-area"][data-part="root"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="scroll-area"][data-part="root"] {
   border-radius: var(--s-r);
   box-shadow: var(--s-lift-lo);
 }
-[data-skin="juicy"] [data-scope="scroll-area"][data-part="thumb"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="scroll-area"][data-part="thumb"] {
   background: var(--s-acc);
 }
 /* Fade masks from the overflow distances (the FadeMask example). */
-[data-skinned] [data-scope="scroll-area"][data-fade] [data-part="viewport"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="scroll-area"][data-fade]
+  [data-part="viewport"] {
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
@@ -84,13 +98,13 @@
     transparent 100%
   );
 }
-[data-skinned] [data-scope="scroll-area"] .tag {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"] .tag {
   padding: 4px 10px;
   border-radius: 99px;
   background: var(--s-muted);
   white-space: nowrap;
 }
-[data-skinned] [data-scope="scroll-area"] .snap-card {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="scroll-area"] .snap-card {
   scroll-snap-align: start;
   display: grid;
   place-items: center;
@@ -99,7 +113,8 @@
   background: var(--s-muted);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-skinned] [data-scope="scroll-area"][data-part="scrollbar"] {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="scroll-area"][data-part="scrollbar"] {
     transition: none;
   }
 }

@@ -4,6 +4,16 @@ A small piece of static status text: a count, a label, a dot. It is never intera
 never a live region; its meaning reaches assistive technology through the control it sits
 on.
 
+## When to use
+
+- **Use it for** a small static piece of status text: a count, a label such as "Beta", or an unread
+  dot.
+- **Over a plain `<span>`**: with `label` it gives a short visual text (like "99+") a full spoken
+  name, and warns in development when an exposed badge has no text. Without a label, a `<span>` is
+  enough.
+- **Don't use it for** anything interactive or live: use [Button](button.md) or [Toggle](toggle.md)
+  for actions, and [Alert](alert.md) for a message that must be announced.
+
 ```tsx
 import { Badge } from "@rind-ui/react"
 
