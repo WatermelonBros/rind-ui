@@ -40,6 +40,8 @@ const START = "abc"
 const base = {
   messages: textFieldMessages,
   id: "tf",
+  escapeClears: undefined,
+  onSubmit: undefined,
   clearInput: () => {},
   disabled: undefined,
   readOnly: undefined,
@@ -172,6 +174,11 @@ const keys = async (env: EnvLike, text: string) => {
 // `type` as an IME composition that must change nothing, which a Text Field legitimately does.
 const keyedContract = {
   ...textFieldContract,
+  events: {
+    ...textFieldContract.events,
+    "VISIBILITY.TOGGLE": { skip: "a plain field renders no VisibilityTrigger (password tests)" },
+    "VISIBILITY.HIDE": { skip: "a plain field has no visibility (password tests)" },
+  },
   actions: {
     ...textFieldContract.actions,
     type: {

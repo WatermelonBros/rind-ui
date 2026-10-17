@@ -60,7 +60,7 @@ export interface TextFieldHostConfig {
   readonly machine: typeof textFieldMachine
   /** Message defaults (Text Field's merged with the preset's). */
   readonly messages: TextFieldMessages
-  /** Names the parts in errors ("PasswordInput"). */
+  /** Names the parts in errors ("TextField"). */
   readonly label: string
   /** The preset's own Root props: kept from the Field, passed to `machineProps`. */
   readonly ownProps?: readonly string[]

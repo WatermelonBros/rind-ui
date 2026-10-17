@@ -1,23 +1,23 @@
-// add-search-field: the Search Field stylesheet alone, on the markup core renders: native
-// search chrome reset, icon space, ClearTrigger inside the field at 24px, forced colors.
+// merge-text-field-parts: the Text Field stylesheet with type="search", on the markup core
+// renders: native search chrome reset, icon space, ClearTrigger inside the field at 24px.
 import { afterEach, describe, expect, it } from "vitest"
-import searchField from "./search-field.css?inline"
 import { cleanup, files, inject, mount, q } from "./test-css"
+import textField from "./text-field.css?inline"
 
 afterEach(cleanup)
 
 const sheet = () =>
   inject(
-    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.variants}\n${files.icons}\n${searchField}`,
+    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.variants}\n${files.icons}\n${textField}`,
   )
 
-const a = (part: string, extra = "") => `data-scope="search-field" data-part="${part}" ${extra}`
+const a = (part: string, extra = "") => `data-scope="text-field" data-part="${part}" ${extra}`
 
 const markup = (root = "", icon = true) => `<div ${a("root", root)}>
   <label ${a("label")}>Search</label>
   ${icon ? `<span aria-hidden="true" ${a("icon")}></span>` : ""}
-  <input type="search" aria-label="Search" value="x" ${a("input")}>
-  <button type="button" aria-label="Clear" ${a("clear-trigger")}></button>
+  <input type="search" aria-label="Search" value="x" data-custom-clear ${a("input")}>
+  <button type="button" aria-label="Clear search" ${a("clear-trigger")}></button>
 </div>`
 
 const parts = (html: string) => {
@@ -28,7 +28,7 @@ const parts = (html: string) => {
   }
 }
 
-describe("Search Field stylesheet", () => {
+describe("Text Field stylesheet, type=search", () => {
   it("the input is a bordered field with the native search chrome reset", () => {
     sheet()
     const { input } = parts(markup())
@@ -89,7 +89,7 @@ describe("Search Field stylesheet", () => {
   })
 
   it("forced colors: field boundary and the ClearTrigger glyph have system colours", () => {
-    const css = searchField.replace(/\/\*[\s\S]*?\*\//g, "")
+    const css = textField.replace(/\/\*[\s\S]*?\*\//g, "")
     expect(css).toMatch(
       /@media \(forced-colors: active\)[\s\S]*FieldText[\s\S]*ButtonText[\s\S]*GrayText/,
     )

@@ -351,13 +351,13 @@ editable; `data-empty` holds exactly when the value is empty. With `type="passwo
 input's `type` is `text` exactly when the oracle is visible; the VisibilityTrigger's
 `aria-pressed` equals the oracle's `visible`; its accessible name is the same after every
 step; it is in the Tab order; `spellcheck` is `false` on the input. `@rind-ui/testing` SHALL
-export, as consumer invariants (`textFieldStepInvariants({ composedText })`), the invariants
-that need the page's announcement log, the story's text or each step's key events: no
-announcement is made during a composition; no step inside a composition changes the value
-except through the composition itself; an Escape with `escapeClears` on a non-empty
-editable field left focus in the input and called `preventDefault()`, and an Escape on an
-empty or non-editable field did not; no key marked `composing` called `onSubmit` or cleared
-the value.
+export consumer invariants for what needs the page's announcement log, the story's text or
+each step's key events: `textFieldStepInvariants({ composedText })`, no announcement is made
+during a composition and no step inside a composition changes the value except through the
+composition itself; `textFieldKeyStepInvariants()`, an Escape with `escapeClears` on a
+non-empty editable field left focus in the input and called `preventDefault()`, an Escape on
+an empty or non-editable field did not, and no key marked `composing` called `onSubmit` or
+cleared the value.
 
 #### Scenario: Broken variant writes value while composing
 

@@ -1,17 +1,17 @@
-// add-password-input: the Password Input stylesheet alone, on the markup core renders: the
-// trigger inside the field, 24px target, currentColor icon, pressed without colour, forced colors.
+// merge-text-field-parts: the Text Field stylesheet with type="password", on the markup core
+// renders: trigger inside the field, 24px target, currentColor icon, pressed without colour.
 import { afterEach, describe, expect, it } from "vitest"
-import passwordInput from "./password-input.css?inline"
 import { cleanup, files, inject, mount, q } from "./test-css"
+import textField from "./text-field.css?inline"
 
 afterEach(cleanup)
 
 const sheet = () =>
   inject(
-    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.variants}\n${files.icons}\n${passwordInput}`,
+    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.variants}\n${files.icons}\n${textField}`,
   )
 
-const a = (part: string, extra = "") => `data-scope="password-input" data-part="${part}" ${extra}`
+const a = (part: string, extra = "") => `data-scope="text-field" data-part="${part}" ${extra}`
 
 const markup = (
   root = "",
@@ -19,9 +19,9 @@ const markup = (
   state = "hidden",
 ) => `<div ${a("root", root)}>
   <label ${a("label")}>Password</label>
-  <input type="password" aria-label="Password" value="secret" ${a("input")}>
+  <input type="password" aria-label="Password" value="secret" data-custom-reveal ${a("input")}>
   <button type="button" aria-label="Show password" ${trigger} ${a("visibility-trigger")}>
-    <span aria-hidden="true" data-state="${state}" ${a("indicator")}></span>
+    <span aria-hidden="true" data-state="${state}" ${a("visibility-indicator")}></span>
   </button>
 </div>`
 
@@ -30,11 +30,11 @@ const parts = (html: string) => {
   return {
     input: q(host, '[data-part="input"]'),
     trigger: q(host, '[data-part="visibility-trigger"]'),
-    indicator: q(host, '[data-part="indicator"]'),
+    indicator: q(host, '[data-part="visibility-indicator"]'),
   }
 }
 
-describe("Password Input stylesheet", () => {
+describe("Text Field stylesheet, type=password", () => {
   it("the trigger is at least 24x24 and inside the input's box", () => {
     sheet()
     const { input, trigger } = parts(markup())
@@ -95,7 +95,7 @@ describe("Password Input stylesheet", () => {
   })
 
   it("forced colors: field boundary, system colours and an unshadowed-colour pressed rule", () => {
-    const css = passwordInput.replace(/\/\*[\s\S]*?\*\//g, "")
+    const css = textField.replace(/\/\*[\s\S]*?\*\//g, "")
     expect(css).toMatch(
       /@media \(forced-colors: active\)[\s\S]*FieldText[\s\S]*ButtonText[\s\S]*aria-pressed="true"[\s\S]*GrayText/,
     )
