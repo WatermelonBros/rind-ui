@@ -559,7 +559,16 @@ function createDomEnv(
           act(async () => {
             hit.dispatchEvent(dragEvent(type, p, extra, hit))
           })
+        // A real press: pressure, a contact size and a click count (never AT's 1x1 click).
+        const press = { isPrimary: true, pressure: 0.5, width: 20, height: 20, detail: 1 }
         if (type === "touch") {
+          // A finger sends pointerdown before its touch events (the modality follows it).
+          await fire("pointerdown", at(0), {
+            ...press,
+            pointerId: 10,
+            pointerType: "touch",
+            buttons: 1,
+          })
           await fire("touchstart", at(0), { touching: true })
           for (let i = 1; i <= steps; i++) {
             await wait()
@@ -568,7 +577,7 @@ function createDomEnv(
           await fire("touchend", at(steps), { touching: false })
           return
         }
-        const base = { pointerId: 9, pointerType: type, isPrimary: true, button: 0 }
+        const base = { ...press, pointerId: 9, pointerType: type, button: 0 }
         await fire("pointerdown", at(0), { ...base, buttons: 1 })
         for (let i = 1; i <= steps; i++) {
           await wait()

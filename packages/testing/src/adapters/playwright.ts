@@ -456,7 +456,28 @@ function createPlaywrightEnv(
               },
               { kind, p, touching },
             )
-          await fire("touchstart", at(0), true)
+          // A finger sends pointerdown before its touch events (the modality follows it).
+          const start = at(0)
+          await l.evaluate((el, p) => {
+            const target = document.elementFromPoint(p.x, p.y) ?? el
+            target.dispatchEvent(
+              new PointerEvent("pointerdown", {
+                bubbles: true,
+                cancelable: true,
+                composed: true,
+                clientX: p.x,
+                clientY: p.y,
+                pointerId: 10,
+                pointerType: "touch",
+                isPrimary: true,
+                pressure: 0.5,
+                width: 20,
+                height: 20,
+                buttons: 1,
+              }),
+            )
+          }, start)
+          await fire("touchstart", start, true)
           for (let i = 1; i <= steps; i++) {
             await wait()
             await fire("touchmove", at(i), true)
