@@ -287,3 +287,38 @@ describe("Combobox forms", () => {
     await waitFor(() => expect(onChange).toHaveBeenCalled())
   })
 })
+
+describe("Combobox label activation", () => {
+  it("a Label click focuses the input and does not open it, also with openOnInputPress", async () => {
+    render(<City openOnInputPress />)
+    const { userEvent } = await import("@testing-library/user-event")
+    await userEvent.setup().click(screen.getByText("City"))
+    expect(document.activeElement).toBe(input())
+    expect(input().getAttribute("aria-expanded")).toBe("false")
+  })
+
+  it("a direct press on the input opens with openOnInputPress", async () => {
+    render(<City openOnInputPress />)
+    const { userEvent } = await import("@testing-library/user-event")
+    await userEvent.setup().click(input())
+    expect(input().getAttribute("aria-expanded")).toBe("true")
+  })
+
+  it("wrapped in a label: trigger opens, an option is chosen, it does not reopen", async () => {
+    render(
+      // biome-ignore lint/a11y/noLabelWithoutControl: the wrapping-label case under test
+      <label>
+        Wrapper
+        <City />
+      </label>,
+    )
+    const { userEvent } = await import("@testing-library/user-event")
+    const u = userEvent.setup()
+    await u.click(screen.getByRole("button", { name: "Show suggestions" }))
+    await waitFor(() => expect(document.querySelector("[data-placing]")).toBe(null))
+    await u.click(screen.getByRole("option", { name: "Paris" }))
+    expect(input().value).toBe("Paris")
+    await waitFor(() => expect(input().getAttribute("aria-expanded")).toBe("false"))
+    expect(screen.queryByRole("listbox")).toBe(null)
+  })
+})

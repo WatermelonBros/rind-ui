@@ -23,6 +23,7 @@ import {
   isExposed,
   isStale,
   type LoadingStatus,
+  type Modality,
   type PositioningProps,
   patternQuery,
   patternResults,
@@ -43,6 +44,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { joinHandlers } from "../join-handlers"
 import { createListboxParts, type ListboxHost } from "../listbox/parts"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -53,6 +55,7 @@ import { useRootId } from "../use-ids"
 import { useMachine, useSelector } from "../use-machine"
 import { useModality } from "../use-modality"
 import { usePresence } from "../use-presence"
+import { usePress } from "../use-press"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -146,6 +149,7 @@ export type ComboboxRootProps = Common & Selection
 
 interface ComboboxHost extends ListboxHost {
   readonly api: ComboboxApi
+  readonly disabled: boolean
   readonly chips: readonly ChipData[]
   readonly keys: readonly string[]
   readonly formInput: FormInputCapability
@@ -382,6 +386,7 @@ function Root(all: ComboboxRootProps) {
       ].join("|")
     },
     keepMounted: all.keepMounted === true,
+    disabled,
     chips,
     keys,
     formInput,
@@ -461,8 +466,22 @@ function Control({ render, children, ...rest }: Own<"div">) {
   )
 }
 
+/** The part's press, a forwarded label click only focusing it. */
+function useLabelAwarePress(onPress: (modality: Modality) => void, disabled: boolean) {
+  const env = useEnvironment()
+  return usePress({
+    env,
+    send: (e) => {
+      if (e.type === "PRESS") onPress(e.modality)
+    },
+    disabled: () => disabled,
+    labelActivation: "focus",
+  })
+}
+
 function Input({ render, ref, ...rest }: Own<"input">) {
   const host = useLive("Input")
+  const press = useLabelAwarePress(host.api.pressInput, host.disabled)
   const el = useRef<HTMLInputElement | null>(null)
   const range = host.api.completionRange
   // The completed suffix is selected, so the next keystroke replaces it.
@@ -474,7 +493,10 @@ function Input({ render, ref, ...rest }: Own<"input">) {
   }, [range?.[0], range?.[1]])
   return renderPart(
     "input",
-    mergeProps({ ...normalizeProps(host.api.input()), ref: composeRefs(el, ref) }, rest),
+    mergeProps(
+      { ...joinHandlers(normalizeProps(host.api.input()), press.props), ref: composeRefs(el, ref) },
+      rest,
+    ),
     render,
     undefined,
   )
@@ -482,9 +504,10 @@ function Input({ render, ref, ...rest }: Own<"input">) {
 
 function Trigger({ render, ...rest }: Own<"button">) {
   const host = useLive("Trigger")
+  const press = useLabelAwarePress(host.api.pressTrigger, host.disabled)
   return renderPart(
     "button",
-    mergeProps(normalizeProps(host.api.trigger()), rest),
+    mergeProps(joinHandlers(normalizeProps(host.api.trigger()), press.props), rest),
     render,
     undefined,
   )

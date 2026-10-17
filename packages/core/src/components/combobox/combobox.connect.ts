@@ -220,7 +220,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       onBlur: (event: unknown) => {
         if (!insideControl((event as FocusEvent).relatedTarget)) send({ type: "INPUT.BLUR" })
       },
-      onClick: () => send({ type: "INPUT.PRESS", modality: env.modality.modality() }),
+
       onKeyDown: (event: unknown) => {
         const e = event as NativeKey
         const ime = e.isComposing || composing() || e.keyCode === 229
@@ -284,12 +284,17 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       "aria-haspopup": "listbox",
       [CRITICAL]: ["aria-expanded"],
       onMouseDown: keepFocus,
-      onClick: () => {
-        const modality = env.modality.modality()
-        send({ type: "TRIGGER.PRESS", modality })
-        focusInput(modality)
-      },
     }),
+    /**
+     * Presses, through the adapter's press interaction with `labelActivation: "focus"`: a
+     * click a label forwards focuses the input and opens nothing (combobox "Label
+     * Activation Focuses The Input").
+     */
+    pressInput: (modality: Modality) => send({ type: "INPUT.PRESS", modality }),
+    pressTrigger: (modality: Modality) => {
+      send({ type: "TRIGGER.PRESS", modality })
+      focusInput(modality)
+    },
     clearTrigger: (): PartProps => ({
       ...common("clear-trigger"),
       id: ids.clear,
