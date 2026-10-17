@@ -8,9 +8,8 @@ There is no `AspectRatio` component to import: put the native CSS `aspect-ratio`
 
 Aspect Ratio is a recipe: no part, no state, no contract, no driver, no stylesheet. The
 component other libraries ship exists only because CSS once had no ratio property; it wraps
-the content in a `padding-bottom` box and positions it absolutely, which breaks in flex rows
-(chakra-ui#2582), clips text at zoom, restyles its children (chakra-ui#5343, #4347) and
-breaks framework image components (chakra-ui#10290). `aspect-ratio` (Chrome 88, Firefox 89,
+the content in a `padding-bottom` box and positions it absolutely, which breaks in flex rows,
+clips text at zoom, restyles its children and breaks framework image components. `aspect-ratio` (Chrome 88, Firefox 89,
 Safari 15) does the job in one declaration without any of that.
 
 ## A ratio box
@@ -65,7 +64,7 @@ A ratio box adds no semantics; its content carries them. An `iframe` needs a `ti
 
 ## Image
 
-The Image component's stylesheet reads its own ratio token,
+The [Image](image.md) component's stylesheet reads its own ratio token,
 `--rind-image-aspect-ratio`: set it on the Image root instead of wrapping the Image in a
 ratio box.
 
@@ -77,16 +76,16 @@ zoom, a longer translation, captions) the box grows instead of clipping it, whic
 positioned, so text overflows or is cut off. If a box must never grow (a video slot),
 put only media in it.
 
-## Migrating from Radix, Reka and Bits
+## Migrating from an AspectRatio component
 
 | Before | After |
 |---|---|
 | `<AspectRatio.Root ratio={16 / 9}>children</AspectRatio.Root>` | `<div style={{ aspectRatio: "16 / 9" }}>children</div>` |
 | `<AspectRatio.Root ratio={1} asChild><img … /></AspectRatio.Root>` | `<img style={{ aspectRatio: "1" }} … />`: the property on the child element itself |
-| Reka `<AspectRatio :ratio="4 / 3">` | `<div style="aspect-ratio: 4 / 3">` |
-| Bits `<AspectRatio.Root ratio={4 / 3}>` and its `child` snippet | `<div style="aspect-ratio: 4 / 3">`, or the property on the snippet's element |
+| `<AspectRatio :ratio="4 / 3">` (Vue) | `<div style="aspect-ratio: 4 / 3">` |
+| `<AspectRatio.Root ratio={4 / 3}>` with a `child` snippet (Svelte) | `<div style="aspect-ratio: 4 / 3">`, or the property on the snippet's element |
 | `position: absolute; inset: 0` on the children | Remove it: the children are in normal flow |
-| `[data-radix-aspect-ratio-wrapper]` styles | Move them to the element itself; there is no wrapper |
+| Styles on the component's wrapper element | Move them to the element itself; there is no wrapper |
 
 ## Testing
 
