@@ -299,19 +299,22 @@ export const drawerMachine = setup({
       const id = layerIdOf("drawer", props.root)
       const stack = drawerStack(env)
       const content = () => env.dom.getById(partId("drawer", props.root, "content"))
-      return stack.register(id, {
-        modal: props.modal !== false,
-        size: () => {
-          const el = content()
-          if (!el) return 0
-          const r = el.getBoundingClientRect()
-          const s = drawerSide(props)
-          return s === "top" || s === "bottom" ? r.height : r.width
-        },
-        swiping: () => a.context.swipe === "swiping",
-        backdrop: () => env.dom.getById(partId("drawer", props.root, "backdrop")),
-        onNested: (n) => send({ type: "NESTED.CHANGE", ...n }),
-      })
+      // After the content mounts: its size is measured from there on.
+      return whenMounted(env, content, () =>
+        stack.register(id, {
+          modal: props.modal !== false,
+          size: () => {
+            const el = content()
+            if (!el) return 0
+            const r = el.getBoundingClientRect()
+            const s = drawerSide(props)
+            return s === "top" || s === "bottom" ? r.height : r.width
+          },
+          swiping: () => a.context.swipe === "swiping",
+          backdrop: () => env.dom.getById(partId("drawer", props.root, "backdrop")),
+          onNested: (n) => send({ type: "NESTED.CHANGE", ...n }),
+        }),
+      )
     },
     /** The on-screen keyboard's height (top and bottom drawers), on the positioner. */
     keyboardInset: ({ env, props }) => {
@@ -391,12 +394,12 @@ export const drawerMachine = setup({
             reason: "swipe",
             actions: ["releaseToClose", "setCloseReason"],
           },
-          { actions: ["settleSnapPoint", "endSwipe"] },
+          { reason: "swipe", actions: ["settleSnapPoint", "endSwipe"] },
         ],
         "SWIPE.START": { actions: ["startSwipe"] },
         "SWIPE.CANCEL": { actions: ["endSwipe"] },
-        HANDLE_PRESS: { guard: "hasSnapPoints", actions: ["cycleSnapPoint"] },
-        "SNAP_POINT.SET": { actions: ["setSnapPoint"] },
+        HANDLE_PRESS: { guard: "hasSnapPoints", reason: "handle", actions: ["cycleSnapPoint"] },
+        "SNAP_POINT.SET": { reason: "api", actions: ["setSnapPoint"] },
         "SIZE.CHANGE": { actions: ["setSizes"] },
         "NESTED.CHANGE": { actions: ["setNested"] },
       },

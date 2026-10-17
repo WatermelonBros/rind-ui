@@ -74,4 +74,4 @@
 
 ## Amendments (moved from add-dialog)
 
-- [ ] D.1 `buildDialogMachine` extension points (`extend`: guarded close events, values/context, open entry actions, effects/handlers, root handlers, extra parts) with a type test that a preset cannot break the base machine — moved here from add-dialog A.1 so the extension API is designed against its first real user (swipe close events, snap values) instead of in the abstract
+- [ ] D.1 Dialog machine composition: `dialogPieces(config)` exports the Dialog's guards, actions, effects and both states' transitions (typed against the Dialog's types); `buildDialogMachine` assembles them unchanged and the Drawer composes them with its own (the select/listbox `collectionPieces` pattern). Chosen over an `extend` option: the drawer's events, context and values stay its own types, with no generic builder surface

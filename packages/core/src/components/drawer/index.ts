@@ -25,6 +25,7 @@ export {
   resolvedPoints,
 } from "./drawer.machine"
 export { type DrawerMessages, drawerMessages } from "./drawer.messages"
+export { drawerMeta } from "./drawer.meta"
 export {
   type DrawerEntry,
   type DrawerStack,

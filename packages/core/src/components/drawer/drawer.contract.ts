@@ -71,7 +71,9 @@ function drawerContractWith(modal: boolean) {
       /** The physical side (`data-side`). */
       side: async (env: E) =>
         (await env.part("content").exists()) ? env.part("content").attr("data-side") : null,
-      isSwiping: async (env: E) => (await env.part("content").attr("data-swiping")) !== null,
+      isSwiping: async (env: E) =>
+        (await env.part("content").exists()) &&
+        (await env.part("content").attr("data-swiping")) !== null,
     },
     actions: {
       ...dialogFamilyActions(modal),
@@ -86,7 +88,9 @@ function drawerContractWith(modal: boolean) {
         pointer: swipeWith("mouse"),
         touch: swipeWith("touch"),
         none: { keyboard: "keyboard alternatives are close, pressEscape and pressHandle" },
-        done: async (env: E) => !(await dialogIsOpen(env)),
+        // Closed when it dismisses; otherwise settled (no swipe in progress).
+        done: async (env: E) =>
+          !(await dialogIsOpen(env)) || (await env.part("content").attr("data-swiping")) === null,
       },
       /** The handle: the next snap point (two or more points). */
       pressHandle: {

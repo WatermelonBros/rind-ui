@@ -564,6 +564,23 @@ describe("review follow-ups", () => {
     vi.advanceTimersByTime(10)
     expect(seen).toEqual(["hover", "pointer-leave"])
   })
+
+  it("the declared reason also names a change an action of the transition writes", () => {
+    const seen: unknown[] = []
+    const m = setup({
+      types: type<{ props: Props; events: Event; env: SchedulerEnv; values: "open" }>(),
+      actions: { openIt: ({ set }) => set("open", true) },
+    }).machine({
+      id: "action-reasons",
+      initial: "idle",
+      values: { open: { fallback: false } },
+      states: { idle: { on: { OPEN: { reason: "handle", actions: ["openIt"] } } } },
+    })
+    const s = createService(m, { onOpenChange: (_, d) => seen.push(d.reason) }, { scheduler })
+    s.start()
+    s.send({ type: "OPEN" })
+    expect(seen).toEqual(["handle"])
+  })
 })
 
 describe("read-only prop bindings", () => {

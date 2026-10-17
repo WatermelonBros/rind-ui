@@ -16,14 +16,16 @@ reasons, modal by default, non-modal dialogs, dismissal defaults, initial and fi
 focus, keyboard interactions, roles and ARIA attributes, accessible name, close trigger
 name, announcements, nested dialogs, forms, mounting, server rendering — except the
 scope name, the parts it adds, the reasons it adds, nesting metadata and the contract.
-It SHALL be built from the same machine definition as the Dialog, not from a copy.
+It SHALL be built from the same machine definition as the Dialog, not from a copy: the
+Dialog's machine pieces (guards, actions, effects and both states' transitions) composed
+with the drawer's own.
 
 #### Scenario: Reado's settings drawer
 
 - **WHEN** Reado's `Drawer` (a right-side panel with `aria-label="Settings"`, controlled
   `open`) is rewritten with `Drawer` parts and `side="right"`
 - **THEN** nothing is rendered while closed, a `dialog` named "Settings" is shown while
-  open, and Escape calls `onOpenChange(false, details)` with reason `ESCAPE_KEY`
+  open, and Escape calls `onOpenChange(false, details)` with reason `escape-key`
 
 #### Scenario: Shared fix
 
@@ -62,7 +64,7 @@ component's direction. Swiping toward the side's edge SHALL be the dismiss direc
 ### Requirement: Swipe To Dismiss
 
 A swipe of the content (per `swipe-gesture`) toward the dismiss direction SHALL request
-closing with reason `SWIPE` when the release offset is at least `swipeThreshold` of the
+closing with reason `swipe` when the release offset is at least `swipeThreshold` of the
 content's size on that axis (default 0.5) or the release velocity toward the edge is at
 least `swipeVelocityThreshold` (default 0.5 px/ms), and the release reports a direction.
 With snap points, a release projected below the smallest snap point SHALL request
@@ -77,13 +79,13 @@ While the drawer is not open, or while it is closing, no swipe SHALL start.
 #### Scenario: Swipe down far enough
 
 - **WHEN** a bottom drawer 400 px tall is dragged down 250 px slowly and released
-- **THEN** it closes with `details.reason === "SWIPE"` and `data-close-reason="swipe"`,
+- **THEN** it closes with `details.reason === "swipe"` and `data-close-reason="swipe"`,
   and focus returns to the trigger
 
 #### Scenario: Fast flick
 
 - **WHEN** the same drawer is flicked down 60 px at 1 px/ms
-- **THEN** it closes with reason `SWIPE`
+- **THEN** it closes with reason `swipe`
 
 #### Scenario: Short drag settles
 
@@ -92,7 +94,7 @@ While the drawer is not open, or while it is closing, no swipe SHALL start.
 
 #### Scenario: Consumer vetoes the swipe (reka-ui#2933, base-ui#5570)
 
-- **WHEN** a drawer guarding unsaved work calls `details.cancel()` for a `SWIPE` request
+- **WHEN** a drawer guarding unsaved work calls `details.cancel()` for a `swipe` request
 - **THEN** the drawer stays open, returns to its snap point, never carries
   `data-swipe-dismiss` or `data-state="closed"`, and focus has not moved
 
@@ -131,7 +133,7 @@ resolving within 1 px of each other SHALL count once; points SHALL be ordered by
 resolved size regardless of the order given; points SHALL be re-resolved when the
 viewport, the root font size or the content size changes. The active point SHALL be a
 controllable value (`snapPoint`, `defaultSnapPoint` — default the first given point —
-and `onSnapPointChange(value, details)` with the triggering event as reason and
+and `onSnapPointChange(value, details)` with reason `swipe`, `handle` or `api` and
 `cancel()`); each open SHALL start at `defaultSnapPoint` unless controlled. On release,
 the drawer SHALL settle on the point closest to the release offset projected 300 ms
 ahead by the release velocity, or, with `snapToSequentialPoints`, on the adjacent point
@@ -157,7 +159,7 @@ The content SHALL expose the resting offset as `--rind-drawer-snap-offset`.
 
 - **WHEN** a drawer with controlled `snapPoint={0.5}` is dragged to 1 and the parent
   keeps 0.5
-- **THEN** `onSnapPointChange(1, details)` was called with reason `SWIPE` and the drawer
+- **THEN** `onSnapPointChange(1, details)` was called with reason `swipe` and the drawer
   rests at 0.5
 
 ### Requirement: Handle

@@ -28,6 +28,8 @@ export interface DrawerStack {
   progress(id: LayerId, value: number): void
   /** Indent parts: written after mount (hydration-safe); returns the cleanup. */
   registerIndent(el: HTMLElement): () => void
+  /** A drawer's size changed: its ancestors' metrics are recomputed. */
+  refresh(): void
   /** Any modal drawer open (the indent's `data-active`). */
   active(): boolean
   subscribe(listener: () => void): () => void
@@ -115,6 +117,7 @@ function create(doc: Document): DrawerStack {
         el.style.removeProperty(PROGRESS)
       }
     },
+    refresh: notify,
     active: () => [...open.values()].some((e) => e.modal),
     subscribe(listener) {
       listeners.add(listener)
