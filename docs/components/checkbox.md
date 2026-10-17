@@ -73,23 +73,23 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-Unchecked, checked and mixed (generated from the state stories):
+Unchecked, checked and mixed (generated from the state examples):
 
-<!-- aria:components-checkbox--default -->
+<!-- aria:checkbox--default -->
 ```yaml
 - checkbox "Accept the terms"
 - text: Accept the terms
 ```
 <!-- /aria -->
 
-<!-- aria:components-checkbox--checked -->
+<!-- aria:checkbox--checked -->
 ```yaml
 - checkbox "Accept the terms" [checked]
 - text: Accept the terms
 ```
 <!-- /aria -->
 
-<!-- aria:components-checkbox--indeterminate -->
+<!-- aria:checkbox--indeterminate-story -->
 ```yaml
 - checkbox "Select all" [checked=mixed]
 - text: Select all

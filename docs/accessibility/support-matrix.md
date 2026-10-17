@@ -15,8 +15,8 @@ come from; the reasoning is in
 | — | VoiceOver + Firefox, Orca | small user base and known AT/browser bugs | issues accepted; no guarantee |
 
 Automated checks run on every change in Chromium, Firefox and WebKit: axe on every
-story, the generic accessibility invariants in every model-based test, the virtual
-screen reader in jsdom, ARIA snapshots per state story, and Chromium's own
+site example, the generic accessibility invariants in every model-based test, the virtual
+screen reader in jsdom, ARIA snapshots per state example, and Chromium's own
 accessibility tree. They catch regressions; they do not replace a real screen reader.
 
 Each component's docs page shows a **Tested with** table generated from

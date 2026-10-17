@@ -87,5 +87,5 @@ An unsupported `data-variant` renders the family default.
    `components` override type. Both are build outputs (not committed); turbo runs it before
    build and typecheck.
 4. `pnpm vitest run packages/theme` — lint, family and export tests.
-5. Stories render the themed component; state stories also with `data-tone="danger"`.
+5. Site examples (`apps/site/examples/<slug>.tsx`) render the themed component; state examples also with `data-tone="danger"`.
 6. Link this page from the component's docs page.

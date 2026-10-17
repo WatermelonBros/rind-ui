@@ -1,0 +1,19 @@
+- navigation "Pagination":
+  - list:
+    - listitem:
+      - button "Previous page" [disabled]
+    - listitem:
+      - button "Page 1": "1"
+    - listitem:
+      - button "Page 2": "2"
+    - listitem:
+      - button "Page 3": "3"
+    - listitem:
+      - button "Page 4": "4"
+    - listitem:
+      - button "Page 5": "5"
+    - listitem
+    - listitem:
+      - button "Page 10": "10"
+    - listitem:
+      - button "Next page"

@@ -81,8 +81,8 @@ expect(thread.announcements).toEqual(["Hello there"]) // one announcement, not t
 - A smaller **jsdom** suite runs the same driver tests with
   `@rind-ui/testing/setup`, to prove the setup actually works for consumers.
 - Our own tests use our own drivers. We are the first users.
-- Storybook stories double as test fixtures (Storybook's Vitest addon), and every
-  story runs axe (`a11y.test: "error"`).
+- The docs site's examples double as test fixtures (decision [0011](0011-site-examples.md)),
+  and every example runs axe in Chromium, Firefox and WebKit.
 
 ## Prior art to study before building
 

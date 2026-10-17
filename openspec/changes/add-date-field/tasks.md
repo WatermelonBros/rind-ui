@@ -44,9 +44,9 @@
 - [ ] 8.1 `packages/theme/src/date-field.css` per design §7: `@layer rind.components`, `:where()` selectors, `--rind-date-field-*` tokens read with fallbacks and never declared, `field` family variants and sizes, `data-tone="danger"`, focused-segment ring, placeholders, forced-colors rules, RTL; imported from `index.css`
 - [ ] 8.2 Playwright captures: forced colors, RTL `ar-AE`, invalid, placeholder state
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): date, date-time 12/24-hour, zoned with and without the zone, japanese eras, buddhist, `ar-EG` RTL, min/max, unavailable dates, required in a form with reset, read-only, disabled, invalid states (incomplete, impossible), paste, inside a Field, driver example; state stories `idle`/`editing`/`composing` with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/date-field.tsx, state examples for every contract state): date, date-time 12/24-hour, zoned with and without the zone, japanese eras, buddhist, `ar-EG` RTL, min/max, unavailable dates, required in a form with reset, read-only, disabled, invalid states (incomplete, impossible), paste, inside a Field, driver example; state examples `idle`/`editing`/`composing` with ARIA snapshots; axe clean
 
 ## 10. Docs
 

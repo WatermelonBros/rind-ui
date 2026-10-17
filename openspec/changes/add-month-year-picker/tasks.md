@@ -44,9 +44,9 @@
 - [ ] 8.1 `packages/theme/src/month-picker.css` and `year-picker.css` per design §7: `@layer rind.components`, `:where()` selectors, `--rind-month-picker-*` / `--rind-year-picker-*` tokens read with fallbacks and never declared, `panel` / `collection item` families, sizes, `data-tone="danger"`, hit area ≥ 24×24, 4 columns fit 320 px, forced-colors rules per state, RTL; imported from `index.css`
 - [ ] 8.2 Playwright captures: forced colors, RTL, 320 px, reduced motion
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): month single/range, year single/range, `columns` 3, `yearsPerPage` 10, min/max, unavailable months, `th-TH` and hebrew with `createCalendar`, japanese eras, read-only, disabled, controlled `focusedValue` with a header select, Calendar drill-down recipe, driver example; state stories `idle`/`anchored` with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/month-year-picker.tsx, state examples for every contract state): month single/range, year single/range, `columns` 3, `yearsPerPage` 10, min/max, unavailable months, `th-TH` and hebrew with `createCalendar`, japanese eras, read-only, disabled, controlled `focusedValue` with a header select, Calendar drill-down recipe, driver example; state examples `idle`/`anchored` with ARIA snapshots; axe clean
 
 ## 10. Docs
 

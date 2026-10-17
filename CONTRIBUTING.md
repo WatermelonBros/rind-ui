@@ -31,19 +31,20 @@ Prerequisites: [Node.js](https://nodejs.org) 24+ (see [`.nvmrc`](.nvmrc)) and
 ```sh
 pnpm install
 pnpm exec playwright install chromium firefox webkit   # browser tests
-pnpm storybook                                         # playground on :6006
+pnpm --filter @rind-ui/site dev                        # docs site + examples harness
 ```
 
 ## The gate
 
-CI runs exactly this; run it before opening a pull request:
+The pre-push hook runs `pnpm verify` (lint, typecheck, docs check, node tests). Before pushing,
+also run the tests for what you wrote and touched, not the whole suite:
 
 ```sh
-pnpm lint        # Biome (format + lint) and the platform-check script
-pnpm typecheck   # tsc in every package
-pnpm build       # every package, Storybook and the site
-pnpm test        # Vitest: node, jsdom, real browsers, Playwright, Storybook + axe
+pnpm exec vitest run <test files> --project jsdom --project "browser (chromium)"
 ```
+
+CI runs everything: every Vitest project in three engines, the Playwright fixtures against the
+site's examples (axe, ARIA snapshots), the build and the site audit.
 
 `pnpm format` applies Biome's fixes. The repository ships VS Code settings that
 format on save with the [Biome extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome);

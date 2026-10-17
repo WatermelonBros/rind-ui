@@ -1,6 +1,6 @@
 # 0004 — Theme and playground
 
-Status: accepted · 2026-10-14 · Theme section superseded by [0007](0007-white-label-theme.md)
+Status: accepted · 2026-10-14 · Theme section superseded by [0007](0007-white-label-theme.md) · Superseded in part by [0011](0011-site-examples.md) (the Storybook half)
 
 ## Theme
 

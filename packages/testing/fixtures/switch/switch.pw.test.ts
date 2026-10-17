@@ -1,49 +1,22 @@
 /// <reference types="node" />
-// Switch through the Playwright adapter, against the built Storybook: the driver in a real
+// Switch through the Playwright adapter, against the site examples harness: the driver in a real
 // browser, forced colors, reduced motion, RTL thumb position, and the generic invariants on every Switch story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getSwitch, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -51,7 +24,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-switch--${id}&viewMode=story`)
+  await openExample(page, site.base, "switch", id)
   await page.locator('[data-scope="switch"]').first().waitFor()
   return page
 }
@@ -85,7 +58,7 @@ describe("switch driver through Playwright", () => {
   })
 
   it("reads the form value and resets to the default", { timeout: 60_000 }, async () => {
-    const page = await open("in-form")
+    const page = await open("in-form-story")
     const news = getSwitch(page, { name: "Notifications" })
     const sounds = getSwitch(page, { name: "Sounds" })
     expect(await news.formValue()).toBe("yes")
@@ -199,8 +172,8 @@ const STORIES = [
   "disabled",
   "focusable-when-disabled",
   "read-only",
-  "in-form",
-  "with-description",
+  "in-form-story",
+  "with-description-story",
   "rtl",
   "driver-example",
 ]

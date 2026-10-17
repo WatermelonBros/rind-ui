@@ -156,15 +156,15 @@ The same test runs with a Playwright `page`. A Button rendered as a link is loca
 
 ## Accessibility tree
 
-Idle and pending (generated from the state stories):
+Idle and pending (generated from the state examples):
 
-<!-- aria:components-button--default -->
+<!-- aria:button--default -->
 ```yaml
 - button "Save"
 ```
 <!-- /aria -->
 
-<!-- aria:components-button--pending-state -->
+<!-- aria:button--pending-state -->
 ```yaml
 - button "Saving…" [disabled]
 ```

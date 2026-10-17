@@ -1,49 +1,22 @@
 /// <reference types="node" />
-// Collapsible through the Playwright adapter, against the built Storybook: the driver in a real
+// Collapsible through the Playwright adapter, against the site examples harness: the driver in a real
 // browser and the generic invariants on every Collapsible story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getCollapsible, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -51,7 +24,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-collapsible--${id}&viewMode=story`)
+  await openExample(page, site.base, "collapsible", id)
   await page.locator('[data-scope="collapsible"]').first().waitFor()
   return page
 }
@@ -107,11 +80,11 @@ describe("collapsible driver through Playwright", () => {
 const STORIES = [
   "default",
   "initially-open",
-  "disabled",
+  "disabled-story",
   "closed-content-until-found",
   "closed-content-hidden",
   "closed-content-unmount",
-  "controlled",
+  "controlled-story",
   "nested",
   "list-reorder",
   "find-in-page",

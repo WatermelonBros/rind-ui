@@ -26,7 +26,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `tree-view.contract.ts` per design §4, with the own per-item `aria-expanded` invariant (branches only, mirrors expansion) instead of the `disclosure` trait
-- [ ] 4.2 `getTreeView` in `@rind-ui/testing` (name-path addressing); driver tests in browser, jsdom and Playwright against Storybook
+- [ ] 4.2 `getTreeView` in `@rind-ui/testing` (name-path addressing); driver tests in browser, jsdom and Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -40,9 +40,9 @@
 - [ ] 6.1 Tier-3 `--rind-tree-view-*` tokens (design §5), `@layer rind.components`, `:where()` selectors, family `collection item`, `data-size`, `data-tone="danger"`; indentation from `--rind-tree-view-level`; indicator rotation/RTL mirror; ≥ 24px rows and hit areas; no flex on the tree; `fit-content` rows
 - [ ] 6.2 Forced colors: selection and focus cues; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 File explorer (lazy), single/multiple selection, checkbox tree with tri-state, links (navigation), disabled, empty, RTL, virtualized with TanStack Virtual, inline-input item; all render with the theme and pass axe
+- [ ] 7.1 Site examples (apps/site/examples/tree-view.tsx, state examples for every contract state): File explorer (lazy), single/multiple selection, checkbox tree with tri-state, links (navigation), disabled, empty, RTL, virtualized with TanStack Virtual, inline-input item; all render with the theme and pass axe
 
 ## 8. Docs and closing
 

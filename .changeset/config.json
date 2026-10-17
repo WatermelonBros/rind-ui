@@ -5,5 +5,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@rind-ui/storybook", "@rind-ui/site"]
+  "ignore": ["@rind-ui/site"]
 }

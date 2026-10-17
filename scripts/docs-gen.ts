@@ -301,7 +301,7 @@ function quirkUsage(): Record<string, string[]> {
   return usage
 }
 
-const ariaDir = join(repo, "apps/storybook/stories/__aria__")
+const ariaDir = join(repo, "packages/testing/fixtures/__aria__")
 const readAria = (id: string) => {
   const file = join(ariaDir, `${id}.aria.yml`)
   return existsSync(file) ? readFileSync(file, "utf8") : undefined

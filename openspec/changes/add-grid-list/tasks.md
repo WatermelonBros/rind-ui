@@ -30,7 +30,7 @@
 ## 5. Contract and driver
 
 - [ ] 5.1 `grid-list.contract.ts` per design §6; `row-children` trait in `@rind-ui/testing`
-- [ ] 5.2 `getGridList` driver; tests in browser, jsdom and Playwright against Storybook
+- [ ] 5.2 `getGridList` driver; tests in browser, jsdom and Playwright against the site examples harness
 
 ## 6. Tests
 
@@ -44,9 +44,9 @@
 - [ ] 7.1 Tier-3 `--rind-grid-list-*` tokens (design §7), `@layer rind.components`, `:where()`, family `collection item`, `data-size`, `data-tone="danger"`; grid layout via custom properties; never `display: contents` on list or row; ≥ 24px targets
 - [ ] 7.2 Forced colors: selection and focus cues; Playwright captures
 
-## 8. Stories (`apps/storybook`)
+## 8. Site examples
 
-- [ ] 8.1 Checkbox + actions (candidates), cards grid, `tab` mode with a text field, links, disabled rows with buttons, empty, RTL, virtualized, nested Tag Group, in a Popover with `selectOnPressUp`; themed, axe clean
+- [ ] 8.1 Site examples (apps/site/examples/grid-list.tsx, state examples for every contract state): Checkbox + actions (candidates), cards grid, `tab` mode with a text field, links, disabled rows with buttons, empty, RTL, virtualized, nested Tag Group, in a Popover with `selectOnPressUp`; themed, axe clean
 
 ## 9. Docs and closing
 

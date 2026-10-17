@@ -1,12 +1,10 @@
 node_modules
 dist
-storybook-static
 coverage
 .turbo
 *.tsbuildinfo
 .DS_Store
 # Safety net: declarations generated next to stories by a misconfigured build (never source).
-apps/storybook/stories/**/*.d.ts
 
 # Reado local annotations (review state, not source)
 .reado/

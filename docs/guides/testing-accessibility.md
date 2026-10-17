@@ -21,8 +21,9 @@ separate suite.
 - **Chromium's tree** (Playwright): `chromiumTree(page)` and `axNodeOf(page, expr)` from
   `@rind-ui/testing/playwright`; the Playwright runner checks names through `inert`,
   description targets and exposed popups automatically.
-- **State stories**: every contract state has a story (`missingStateStories`), and each
-  story's ARIA snapshot is checked in Chromium, Firefox and WebKit.
+- **State examples**: every contract state has a site example (`states` in
+  `apps/site/examples/<slug>.tsx`, checked by the coverage check), and each example's ARIA
+  snapshot is checked in Chromium, Firefox and WebKit.
 - **Pseudo-locale**: `pseudoMessages(defaults)` and `englishLeaks(container)` find
   untranslated strings.
 - **Real screen readers** run nightly (VoiceOver + Playwright's WebKit, NVDA + Chrome), non-blocking;
@@ -30,10 +31,11 @@ separate suite.
 
 ## What assistive technology sees, per state
 
-Each state story's ARIA snapshot is generated into the docs page with a
-`<!-- aria:<story-id> --><!-- /aria -->` block. The disclosure fixture, open:
+Each state example's ARIA snapshot is generated into the docs page with a
+`<!-- aria:<slug>--<example> --><!-- /aria -->` block (snapshots live in
+`packages/testing/fixtures/__aria__`). The disclosure fixture, open:
 
-<!-- aria:foundations-disclosure-fixture--open -->
+<!-- aria:disclosure--open -->
 ```yaml
 - button "Details" [expanded]
 - text: Body text

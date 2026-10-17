@@ -8,13 +8,18 @@ export function scope(base) {
     .filter(Boolean)
   const any = (re) => files.some((f) => re.test(f))
   return {
-    // Anything outside the site and prose touches the components.
-    components: files.some((f) => !/^(apps\/site\/|docs\/|[^/]+\.md$|\.changeset\/)/.test(f)),
+    // Anything outside the site and prose touches the components; so do the site's examples,
+    // which the component tests (axe, ARIA snapshots, state coverage) open.
+    components: files.some(
+      (f) =>
+        /^apps\/site\/examples\//.test(f) ||
+        !/^(apps\/site\/|docs\/|[^/]+\.md$|\.changeset\/)/.test(f),
+    ),
     site: any(/^(apps\/site\/|packages\/|docs\/|pnpm-lock\.yaml|package\.json|\.github\/)/),
     // Config, dependencies and the test infrastructure itself: run the whole suite, since
     // Vitest's --changed only follows imports.
     full: any(
-      /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github\/|\.nvmrc|scripts\/(ci-scope|verify)\.mjs|packages\/testing\/src\/(model|driver|adapter|adapters\/|invariants|collect|setup|env)|packages\/[^/]+\/package\.json|packages\/[^/]+\/tsdown\.config\.ts|apps\/storybook\/\.storybook\/)/,
+      /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github\/|\.nvmrc|scripts\/(ci-scope|verify)\.mjs|packages\/testing\/src\/(model|driver|adapter|adapters\/|invariants|collect|setup|env)|packages\/[^/]+\/package\.json|packages\/[^/]+\/tsdown\.config\.ts|apps\/site\/examples\/harness\.ts|packages\/testing\/fixtures\/harness\.ts)/,
     ),
   }
 }
