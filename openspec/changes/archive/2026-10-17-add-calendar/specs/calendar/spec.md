@@ -240,7 +240,24 @@ selectable date, `aria-disabled="true"` for disabled and unavailable dates, and
 The previous and next triggers SHALL page as `calendar-navigation` defines and be named by
 `messages.previous` and `messages.next` (default "Previous month" / "Next month"). A trigger
 whose paging would leave the constraints SHALL carry `aria-disabled="true"` and
-`data-disabled`, stay focusable, and do nothing when pressed, so focus is never lost.
+`data-disabled`, stay focusable, and do nothing when pressed, so focus is never lost. A
+press on a trigger with a pointer, by touch or with a key leaves focus on the trigger (the grid
+is left, so the new range is announced); an assistive technology's click (virtual modality),
+which does not move DOM focus, SHALL keep the grid focused and move focus to the cell of the
+paged date. Enter and Space on a cell are the grid's keys (select the focused date) and SHALL
+NOT also act through the cell's press.
+
+#### Scenario: Screen reader click on a trigger
+
+- **WHEN** the grid has focus and a screen reader activates the next trigger with a bare
+  `click`
+- **THEN** the next month is shown and DOM focus is on the cell of the paged date
+
+#### Scenario: Enter selects once in multiple mode
+
+- **WHEN** a multiple-selection Calendar's focused cell is not selected and the user presses
+  Enter
+- **THEN** the date is selected (it is not toggled back by a second activation)
 
 #### Scenario: Trigger at the maximum keeps focus
 

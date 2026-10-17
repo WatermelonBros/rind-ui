@@ -21,8 +21,11 @@ export interface KeyDescription {
 
 export interface KeyContext {
   readonly dir: "ltr" | "rtl"
-  /** The composite's main axis; the other axis expands and collapses. */
-  readonly orientation: "horizontal" | "vertical" | "both"
+  /**
+   * The composite's main axis; the other axis expands and collapses. `"grid"`: both axes
+   * move, along a row (`NEXT`/`PREV`, mirrored in rtl) and across rows (`NEXT_ROW`/`PREV_ROW`).
+   */
+  readonly orientation: "horizontal" | "vertical" | "both" | "grid"
   readonly platform: PlatformFlags
   /** A value control (slider, spinbutton): arrows increase and decrease. */
   readonly value?: boolean
@@ -61,6 +64,12 @@ export function toLogicalKey(k: KeyDescription, c: KeyContext): LogicalKey | und
   }
   const vertical = key === "ArrowUp" || key === "ArrowDown"
   const horizontal = key === "ArrowLeft" || key === "ArrowRight"
+  if (c.orientation === "grid") {
+    // A day along the row, a week across rows (rows never mirror).
+    if (vertical) return key === "ArrowDown" ? "NEXT_ROW" : "PREV_ROW"
+    if (horizontal) return key === forward(c.dir) ? "NEXT" : "PREV"
+    return undefined
+  }
   if (vertical && (c.orientation === "vertical" || c.orientation === "both")) {
     return key === "ArrowDown" ? "NEXT" : "PREV"
   }

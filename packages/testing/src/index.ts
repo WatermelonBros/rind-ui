@@ -24,6 +24,7 @@ export { getAvatar } from "./components/avatar"
 export { getBadge } from "./components/badge"
 export { getBreadcrumbs } from "./components/breadcrumbs"
 export { getButton } from "./components/button"
+export { getCalendar } from "./components/calendar"
 export { getCheckbox } from "./components/checkbox"
 export { getCheckboxGroup } from "./components/checkbox-group"
 export { getCollapsible } from "./components/collapsible"
@@ -66,6 +67,7 @@ export { getToggleGroup } from "./components/toggle-group"
 export { getToolbar } from "./components/toolbar"
 export { getTooltip } from "./components/tooltip"
 export { getTour } from "./components/tour"
+export { fixedDateClock } from "./date-clock"
 export {
   type FakeDelayGroup,
   type FakeHoverIntent,
