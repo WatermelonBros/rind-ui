@@ -86,7 +86,7 @@ export interface ToasterProps {
 export function Toaster({ toaster, id, children, messages: own, portal = true }: ToasterProps) {
   const env = useEnvironment()
   const instance = useRootId(id)
-  const { dir } = useLocale()
+  const { locale, dir } = useLocale()
   const messages: ToastMessages = { ...toastMessages, ...own }
   // Read when the store starts a toast: the latest, without re-attaching.
   const latestMessages = useRef(messages)
@@ -185,6 +185,7 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
       })}
       ref={regionEl}
       dir={dir}
+      lang={locale}
     >
       <ol {...normalizeProps(api.list())}>
         <RegionContext value={ctx}>

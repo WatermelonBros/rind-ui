@@ -48,6 +48,10 @@ export function trackToastRegion(env: Env, options: ToastRegionOptions): ToastRe
   }
 
   const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Tab" && !e.defaultPrevented && !e.isComposing) {
+      if (inside(deepActiveElement(doc))) onTab(e)
+      return
+    }
     const k = describeKey(e, env)
     if (!matchHotkey(hotkey, k, env.platform)) return
     const region = options.region()
@@ -67,9 +71,9 @@ export function trackToastRegion(env: Env, options: ToastRegionOptions): ToastRe
   }
 
   // Tab at the region's edges leaves it: Shift+Tab before the newest toast's first stop,
-  // Tab after the oldest toast's last stop.
-  const onRegionKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== "Tab" || e.defaultPrevented || e.isComposing) return
+  // Tab after the oldest toast's last stop. On the document (the region may mount a commit
+  // after this starts, in a portal).
+  const onTab = (e: KeyboardEvent) => {
     const region = options.region()
     if (!region || before === null) return
     const stops = tabbables(region, { scrollers: false })
@@ -90,14 +94,11 @@ export function trackToastRegion(env: Env, options: ToastRegionOptions): ToastRe
   }
 
   doc.addEventListener("keydown", onKeyDown)
-  const region = options.region()
-  region?.addEventListener("keydown", onRegionKeyDown)
   doc.addEventListener("focusin", onFocusIn, true)
 
   return {
     stop() {
       doc.removeEventListener("keydown", onKeyDown)
-      region?.removeEventListener("keydown", onRegionKeyDown)
       doc.removeEventListener("focusin", onFocusIn, true)
     },
     leaving(el) {

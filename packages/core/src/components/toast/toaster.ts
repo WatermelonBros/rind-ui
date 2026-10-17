@@ -224,7 +224,7 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
     if (visible) {
       // Same id while visible: updated in place, its lifetime restarted.
       visible.data = data
-      visible.service?.send({ type: "UPDATE", data })
+      visible.service?.send({ type: "UPDATE", data, restart: true })
       notify()
       return id
     }
@@ -249,8 +249,10 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
     if (!r) return
     const p = typeof patch === "function" ? patch(r.data) : patch
     const data: ToastData = { ...r.data, ...p, id, type: p.type ?? r.data.type }
+    // The lifetime restarts on a new type or duration only (a title fix keeps its time).
+    const restart = data.type !== r.data.type || data.duration !== r.data.duration
     r.data = data
-    r.service?.send({ type: "UPDATE", data })
+    r.service?.send({ type: "UPDATE", data, restart })
     notify()
   }
 
@@ -352,7 +354,9 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
         if (attached > 0) return
         // No region: every lifetime pauses until one mounts again (sonner#786).
         for (const r of records) pause(r, "unmounted")
-        setRegion("hidden", false)
+        // Every region-level reason ends with its region (a route change under the pointer
+        // must not leave "hover" holding the toasts).
+        for (const reason of [...regionReasons]) setRegion(reason, false)
         notify()
       }
     },

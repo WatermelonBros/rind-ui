@@ -295,3 +295,85 @@ describe("Toast: server rendering", () => {
     expect(await screen.findByRole("listitem", { name: "Welcome back" })).toBeTruthy()
   })
 })
+
+describe("Toast: review r1", () => {
+  it("default portal: Tab off the last stop and Shift+Tab off the first return to the field", async () => {
+    const user = userEvent.setup()
+    const store = createToaster({ duration: Number.POSITIVE_INFINITY })
+    render(<App store={store} />)
+    act(() => {
+      store.show("Older")
+      store.show("Newer")
+    })
+    await screen.findByRole("listitem", { name: "Newer" })
+    const name = screen.getByRole("textbox", { name: "Name" })
+    name.focus()
+    await user.keyboard("{F6}")
+    expect(document.activeElement).toBe(screen.getByRole("listitem", { name: "Newer" }))
+    // Shift+Tab off the first stop (the newest toast).
+    await user.keyboard("{Shift>}{Tab}{/Shift}")
+    expect(document.activeElement).toBe(name)
+    // Back in, then Tab past the oldest toast's last stop.
+    await user.keyboard("{F6}")
+    const older = screen.getByRole("listitem", { name: "Older" })
+    const lastStop = older.querySelector("button") as HTMLButtonElement
+    lastStop.focus()
+    await user.tab()
+    expect(document.activeElement).toBe(name)
+  })
+
+  it("a region unmounted under the pointer leaves no hover reason (route change)", () => {
+    const store = createToaster({ duration: 1000 })
+    let now = 0
+    const timers = new Map<number, { at: number; cb: () => void }>()
+    let seq = 0
+    const env = {
+      scheduler: {
+        setTimeout: (cb: () => void, ms: number) => {
+          timers.set(++seq, { at: now + ms, cb })
+          return seq as never
+        },
+        clearTimeout: (h: unknown) => void timers.delete(h as number),
+        requestAnimationFrame: () => 0 as never,
+        cancelAnimationFrame: () => {},
+      },
+      clock: { now: () => now },
+      announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+      locale: { locale: () => "en", dir: () => "ltr", subscribe: () => () => {} },
+      visibility: { hidden: () => false, subscribe: () => () => {} },
+    } as never
+    // fake-time: a manual clock; due timers run in order
+    const advance = (ms: number) => {
+      const end = now + ms
+      for (;;) {
+        const due = [...timers].filter(([, t]) => t.at <= end).sort((a, b) => a[1].at - b[1].at)[0]
+        if (!due) break
+        timers.delete(due[0])
+        now = due[1].at
+        due[1].cb()
+      }
+      now = end
+    }
+    const detach = store.attach(env)
+    store.show("Hi")
+    store.regionReason("hover", true)
+    detach()
+    store.attach(env)
+    advance(1000)
+    expect(store.toasts()[0]?.state).toBe("dismissed")
+  })
+
+  it("a title-only update keeps the remaining time; a type change restarts it", () => {
+    vi.useFakeTimers()
+    const store = createToaster({ duration: 1000 })
+    render(<App store={store} />)
+    let id = ""
+    act(() => {
+      id = store.show("Saving")
+    })
+    act(() => void vi.advanceTimersByTime(600))
+    act(() => store.update(id as never, { title: "Saving…" }))
+    act(() => void vi.advanceTimersByTime(400))
+    expect(store.get(id as never)?.state).toBe("dismissed")
+  })
+})

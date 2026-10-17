@@ -20,7 +20,8 @@ export type ToastEvent =
   | { readonly type: "START" }
   | { readonly type: "PAUSE"; readonly reason: ToastPauseReason }
   | { readonly type: "RESUME"; readonly reason: ToastPauseReason }
-  | { readonly type: "UPDATE"; readonly data: ToastData }
+  /** New data; `restart`: a new type or duration (or a re-show) restarts the lifetime. */
+  | { readonly type: "UPDATE"; readonly data: ToastData; readonly restart?: boolean }
   | { readonly type: "CLOSE_TRIGGER_PRESS"; readonly modality: Modality }
   | { readonly type: "ACTION_PRESS"; readonly modality: Modality }
   | { readonly type: "ESCAPE_KEY"; readonly modality: Modality }
@@ -148,6 +149,7 @@ export const toastMachine = setup({
     applyUpdate: ({ env, event, props, set }) => {
       if (event.type !== "UPDATE") return
       set("data", event.data)
+      if (event.restart === false) return
       set("remaining", durationOf(event.data, props))
       set("startedAt", env.clock.now())
     },
