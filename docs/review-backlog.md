@@ -11,6 +11,22 @@ See CLAUDE.md "Review rules".
 | add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
 | add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |
 | add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
+| add-qr-code (r2) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | The download postcondition needed a 20 s deadline on CI (page JS export ~1.6 s at 20× CPU throttle); profile the export path |
+| add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
+| add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
+| add-color-picker (impl) | — | packages/react/src/color-picker/color-picker.tsx | Eye dropper handled in the React adapter, not a machine effect; picker root never sets `data-dragging` |
+| add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
+| add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
+| add-combobox (impl) | — | openspec/changes/add-combobox | Task 0.2: design "Requests to other changes" 1–3 not raised with their owners (the Apple-only rule is behind `vo-activedescendant`) |
+| add-combobox (impl) | — | packages/react/src/combobox | Task 0.3: the abort signal is an AbortController in the adapter; no `env.abort()` capability |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.1: no tests for the IME edge cases (Korean mid-syllable, Android composition filtering, pointer choice during a composition), the touch ghost click, VoiceOver iOS double tap |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.3: no virtualized combobox test (10,000 options, End/wrap to index 9999) |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.4: no virtual screen-reader log test (open, arrow, choose, empty results) |
+| add-combobox (impl) | — | packages/theme/src/combobox.css | Task 7.2: no Playwright forced-colors captures |
+| add-combobox (impl) | — | packages/core/src/components/combobox | Task A.5: `patternEffects` / `patternConnect` / `optionsNeverSelected` not extracted (one host); do it with Autocomplete or Command |
+| add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
+| add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
+| add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
 | add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
 | add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
@@ -196,6 +212,10 @@ See CLAUDE.md "Review rules".
 | test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
 | test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
 | add-menu (impl) | 5.1 | packages/testing/src/components/menu-scenarios.dom.test.tsx | no automated test yet for "Thumb resting on the trigger while scrolling" (radix#2418, a real touch scroll in Playwright) and "Exit animation" (radix#4195, needs the themed exit animation) |
+| ci flake (2026-10-16) | — | packages/testing/src/components/accordion.model.dom.test.tsx | "ITEM.TOGGLE[itemEnabled && isOpen && canCollapse], pointer" failed once in a full jsdom run on d9463d0 with three sessions loading the machine; not reproduced: 8 runs of the file and 3 full jsdom runs with 16 threads on 7552c8a all green. The other cited failure (CI 38817142353, broken variants) was the 5 s default timeout, raised to 60 s in #5. Re-open with the failing assertion if it recurs |
+| retire-storybook (r1) | — | packages/testing/src/state-stories.ts, packages/*/tsdown.config.ts / tsconfig, PRODUCT.md, apps/site/examples/fixtures/* ("Ported from" headers) | stale Storybook wording in comments and docs: say site examples |
+| retire-storybook (r1) | — | packages/testing/fixtures/{anchored/viewport,segmented-control,disclosure}.pw.test.ts | pre-existing `waitForTimeout` waits: removed by the test-stability PR, which bans them |
+| retire-storybook (r1) | — | openspec/changes/archive/2026-10-16-retire-storybook/tasks.md (2.1) | the task names `openExample(page, slug, example, skin?)`; the helper is `openExample(page, base, slug, example, { skin, scheme })` |
 | add-context-menu (impl) | 5.3 | packages/testing/src/components/context-menu-scenarios.dom.test.tsx | Reado parity: only the bottom-right viewport corner is tested; the other corners and the left-click-opened menus are not |
 | add-menu (r1) | — | packages/testing/src/components/menu.dom.test.tsx | "Dialog from an item" checks the focus only after a keyboard choose: add a pointer variant |
 | add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |

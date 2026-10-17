@@ -23,7 +23,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `menubar.contract.ts` per design §6 (traits, actions with keyboard twins or stated reasons, `menu(name)` scoped menu driver, event map, prop steps)
-- [ ] 4.2 `getMenubar` exported from `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against Storybook
+- [ ] 4.2 `getMenubar` exported from `@rind-ui/testing`; driver tests in `browser` and `jsdom` and through Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -37,10 +37,10 @@
 - [ ] 6.1 Tier-3 `--rind-menubar-*` tokens (design §8) read with semantic fallbacks, `@layer rind.components`, `:where()` selectors; triggers in the `toggle item` family (request 5), open state as an edge plus background, 24×24 targets, a `data-tone="danger"` state capture; menus use `menu.css`; imported from `index.css`
 - [ ] 6.2 Forced-colors Playwright captures (open trigger, focus ring visible)
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Application menubar (File / Edit / View with submenus, checkbox and radio items, disabled items, shortcut hints), vertical menubar, non-modal menubar, disabled menubar, RTL, Reado title bar; state stories (menu open, submenu open); ARIA snapshots; all pass axe
-- [ ] 7.2 Driver story (docs testing example)
+- [ ] 7.1 Site examples (apps/site/examples/menubar.tsx, state examples for every contract state): Application menubar (File / Edit / View with submenus, checkbox and radio items, disabled items, shortcut hints), vertical menubar, non-modal menubar, disabled menubar, RTL, Reado title bar; state examples (menu open, submenu open); ARIA snapshots; all pass axe
+- [ ] 7.2 Driver example (docs testing example)
 
 ## 8. Docs and manual checks
 

@@ -74,7 +74,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-togglegroup--single -->
+<!-- aria:toggle-group--single -->
 ```yaml
 - group "Format":
   - button "Bold"

@@ -18,8 +18,8 @@ test("disclosure: trigger state is spoken, content follows when open", async ({
       os: `macOS (Darwin ${release()})`,
     }),
   })
-  await page.goto(story("foundations-disclosure-fixture--closed"))
-  await page.locator("#storybook-root button").waitFor()
+  await page.goto(story("disclosure", "closed"))
+  await page.locator("[data-example-root] button").waitFor()
   await voiceOver.navigateToWebContent()
   await voiceOver.next()
   await voiceOver.act()

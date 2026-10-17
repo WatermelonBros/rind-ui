@@ -1,0 +1,3 @@
+- group "Volume":
+  - text: Volume 40
+  - slider "Volume": "40"

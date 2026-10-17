@@ -1,50 +1,23 @@
 /// <reference types="node" />
-// Checkbox through the Playwright adapter, against the built Storybook: the driver in a real
+// Checkbox through the Playwright adapter, against the site examples harness: the driver in a real
 // browser, forced colors, reduced motion, Enter in a form against a native checkbox in all
 // three engines, and the generic invariants on every Checkbox story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { type Browser, type BrowserType, chromium, firefox, type Page, webkit } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getCheckbox, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +25,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-checkbox--${id}&viewMode=story`)
+  await openExample(page, site.base, "checkbox", id)
   await page.locator('[data-scope="checkbox"]').first().waitFor()
   return page
 }
@@ -87,7 +60,7 @@ describe("checkbox driver through Playwright", () => {
   })
 
   it("indeterminate reads mixed and becomes checked", { timeout: 60_000 }, async () => {
-    const page = await open("indeterminate")
+    const page = await open("indeterminate-story")
     const box = getCheckbox(page, { name: "Select all" })
     expect(await box.isIndeterminate()).toBe(true)
     await box.via("keyboard").toggle()
@@ -95,7 +68,7 @@ describe("checkbox driver through Playwright", () => {
   })
 
   it("reads the form value from the hidden input's properties", { timeout: 60_000 }, async () => {
-    const page = await open("in-form")
+    const page = await open("in-form-story")
     const news = getCheckbox(page, { name: "Newsletter" })
     expect(await news.formValue()).toBe("yes")
     await news.uncheck()
@@ -105,7 +78,7 @@ describe("checkbox driver through Playwright", () => {
   })
 
   it("a form reset restores the default", { timeout: 60_000 }, async () => {
-    const page = await open("in-form")
+    const page = await open("in-form-story")
     const news = getCheckbox(page, { name: "Newsletter" })
     const updates = getCheckbox(page, { name: "Updates" })
     await news.uncheck()
@@ -143,7 +116,7 @@ describe("Enter submits the form", () => {
       }
       try {
         const page = await (await own.newContext()).newPage()
-        await page.goto(`${base}/iframe.html?id=components-checkbox--in-form&viewMode=story`)
+        await openExample(page, site.base, "checkbox", "in-form-story")
         await page.locator('[data-scope="checkbox"]').first().waitFor()
         await page.evaluate(() => {
           const form = document.querySelector("form") as HTMLFormElement
@@ -198,7 +171,9 @@ describe("forced colors", () => {
   it("unchecked, checked and indeterminate are all different and visible", {
     timeout: 60_000,
   }, async () => {
-    const [off, on, mixed] = await Promise.all(["default", "checked", "indeterminate"].map(paint))
+    const [off, on, mixed] = await Promise.all(
+      ["default", "checked", "indeterminate-story"].map(paint),
+    )
     for (const state of [off, on, mixed]) expect(state?.style.border).toMatch(/^solid /)
     const images = new Set([off?.image, on?.image, mixed?.image])
     expect(images.size).toBe(3)
@@ -209,7 +184,7 @@ describe("forced colors", () => {
   })
 
   it("checked and mixed use Highlight; disabled is GrayText", { timeout: 60_000 }, async () => {
-    const page = await open("disabled", { forcedColors: "active" })
+    const page = await open("disabled-story", { forcedColors: "active" })
     const [color, gray] = await Promise.all([
       page
         .locator('[data-scope="checkbox"][data-part="control"]')
@@ -251,14 +226,14 @@ describe("forced colors", () => {
 const STORIES = [
   "default",
   "checked",
-  "with-description",
-  "indeterminate",
-  "disabled",
+  "with-description-story",
+  "indeterminate-story",
+  "disabled-story",
   "focusable-disabled",
   "read-only",
   "required-invalid",
-  "in-form",
-  "controlled",
+  "in-form-story",
+  "controlled-story",
   "wrapped-in-label",
   "render-as-div",
   "in-scrollable-container",

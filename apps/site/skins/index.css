@@ -24,12 +24,14 @@
 @import "./toolbar.css";
 @import "./dialog.css";
 @import "./slider.css";
+@import "./color.css";
 @import "./progress.css";
 @import "./meter.css";
 @import "./popover.css";
 @import "./tour.css";
 @import "./number-input.css";
 @import "./listbox.css";
+@import "./combobox.css";
 @import "./pin-input.css";
 @import "./password-input.css";
 @import "./search-field.css";

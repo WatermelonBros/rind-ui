@@ -199,9 +199,9 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-Empty and filled (generated from the state stories):
+Empty and filled (generated from the state examples):
 
-<!-- aria:components-textfield--input -->
+<!-- aria:text-field--input -->
 ```yaml
 - text: Name
 - textbox "Name":
@@ -209,7 +209,7 @@ Empty and filled (generated from the state stories):
 ```
 <!-- /aria -->
 
-<!-- aria:components-textfield--controlled -->
+<!-- aria:text-field--controlled-story -->
 ```yaml
 - text: Greeting
 - textbox "Greeting": Hello

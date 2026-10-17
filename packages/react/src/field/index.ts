@@ -1,5 +1,6 @@
 export {
   Field,
+  FieldControlBoundary,
   type FieldErrorMessageProps,
   type FieldRootProps,
   type FieldState,

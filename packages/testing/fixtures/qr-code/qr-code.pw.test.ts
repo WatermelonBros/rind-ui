@@ -8,7 +8,7 @@ import { dirname, join } from "node:path"
 import { type Browser, type BrowserType, chromium, firefox, type Page, webkit } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { getQrCode } from "../../src/index"
+import { getQrCode, playwrightEnv } from "../../src/index"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")
@@ -67,7 +67,10 @@ describe.each([
     timeout: 60_000,
   }, async () => {
     const page = await open(engine)
-    const q = getQrCode(page)
+    // A download renders, rasterises and saves: on a loaded CI runner it can take longer than
+    // the default 5 s deadline (measured 1.6 s at a 20× CPU slowdown), so this driver waits
+    // on the same conditions with a longer failure deadline.
+    const q = getQrCode(playwrightEnv(page, { timeout: 20_000 }))
     await q.setValue("hello")
     const [download] = await Promise.all([page.waitForEvent("download"), q.download()])
     expect(download.suggestedFilename()).toBe("reado.png")

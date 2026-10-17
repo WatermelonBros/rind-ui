@@ -78,16 +78,16 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-Off and on (generated from the state stories):
+Off and on (generated from the state examples):
 
-<!-- aria:components-switch--default -->
+<!-- aria:switch--default -->
 ```yaml
 - switch "Wi-Fi"
 - text: Wi-Fi
 ```
 <!-- /aria -->
 
-<!-- aria:components-switch--checked -->
+<!-- aria:switch--checked -->
 ```yaml
 - switch "Wi-Fi" [checked]
 - text: Wi-Fi

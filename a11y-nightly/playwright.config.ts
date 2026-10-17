@@ -1,5 +1,5 @@
 // Nightly real screen-reader runs (non-blocking): VoiceOver + WebKit on macOS, NVDA + Chrome
-// on Windows, over the built Storybook. Run by .github/workflows/a11y-nightly.yml.
+// on Windows, over the site's examples harness (apps/site/out). Run by .github/workflows/a11y-nightly.yml.
 import { screenReaderConfig } from "@guidepup/playwright"
 import { defineConfig, devices } from "@playwright/test"
 
@@ -11,8 +11,8 @@ export default defineConfig({
   retries: 1,
   use: { baseURL: "http://localhost:6007" },
   webServer: {
-    command: "node ../scripts/serve-static.mjs ../apps/storybook/storybook-static 6007",
-    url: "http://localhost:6007/index.json",
+    command: "node ../scripts/serve-static.mjs ../apps/site/out 6007",
+    url: "http://localhost:6007/examples/index.json",
     reuseExistingServer: true,
   },
   projects: [

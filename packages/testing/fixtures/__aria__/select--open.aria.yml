@@ -1,0 +1,9 @@
+- text: Fruit
+- combobox "Fruit" [expanded]: Banana
+- listbox "Fruit":
+  - option "Apple"
+  - option "Banana" [selected]
+  - option "Cherry"
+  - option "Grape"
+  - option "Mango"
+  - option "Peach"
