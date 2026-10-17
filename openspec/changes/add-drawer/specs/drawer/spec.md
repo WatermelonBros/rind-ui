@@ -98,13 +98,20 @@ While the drawer is not open, or while it is closing, no swipe SHALL start.
 - **THEN** the drawer stays open, returns to its snap point, never carries
   `data-swipe-dismiss` or `data-state="closed"`, and focus has not moved
 
-#### Scenario: Controlled parent applies the close later (zag#3144, zag#3149)
+#### Scenario: Controlled parent applies the close (zag#3144, zag#3149)
 
-- **WHEN** a controlled drawer is swiped past the threshold and the parent sets
-  `open={false}` 100 ms later
-- **THEN** during those 100 ms the content stays at its release position carrying
-  `data-swipe-dismiss`, and the exit animation starts from there without first
-  returning to the open position
+- **WHEN** a controlled drawer is swiped past the threshold and the parent applies
+  `open={false}` in its `onOpenChange` handler
+- **THEN** the content carries `data-swipe-dismiss` from the release, and the exit
+  animation starts from the release position without first returning to the open
+  position
+
+#### Scenario: Controlled parent keeps it open
+
+- **WHEN** a controlled drawer is swiped past the threshold and the parent re-renders
+  keeping `open={true}` (the runtime reads that render as the refusal of the proposal)
+- **THEN** the drawer settles at its snap point without `data-swipe-dismiss`; a later
+  `open={false}` closes it from there
 
 #### Scenario: Not dismissible by gesture (base-ui#4541)
 

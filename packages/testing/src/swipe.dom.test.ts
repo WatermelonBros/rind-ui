@@ -277,4 +277,36 @@ describe("swipe gesture", () => {
       expect(s.starts).toEqual(["touch"])
     },
   )
+
+  it("a text selection inside the element: no swipe starts", async () => {
+    const s = setup(
+      `<div data-swiped style="position:fixed;inset:auto 0 0 0;height:300px"><p>Selectable words</p></div>`,
+    )
+    const p = s.el.querySelector("p") as HTMLElement
+    const range = document.createRange()
+    range.selectNodeContents(p)
+    const sel = getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(range)
+    await s.drag({ x: 0, y: 120 }, { pointerType: "touch", on: { text: "Selectable words" } })
+    sel?.removeAllRanges()
+    expect(s.starts).toEqual([])
+  })
+
+  it.skipIf(inJsdom)(
+    "a drag starting on an SVG in scrolled content scrolls it (base-ui#5843)",
+    async () => {
+      const s = setup(
+        `<div data-swiped style="position:fixed;inset:auto 0 0 0;height:300px">
+        <div id="list" role="region" aria-label="Icons" style="height:200px;overflow:auto">
+          <div style="height:1000px"><svg role="img" aria-label="Star" width="40" height="40" style="display:block;margin-top:420px"></svg></div>
+        </div>
+      </div>`,
+      )
+      const list = document.getElementById("list") as HTMLElement
+      list.scrollTop = 300
+      await s.drag({ x: 0, y: 80 }, { pointerType: "touch", on: { label: "Star" } })
+      expect(s.starts).toEqual([])
+    },
+  )
 })

@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
+| add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
+| add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |
+| add-drawer (impl) | — | packages/core/src/machine/service.ts | A controlled close applied after a later render (zag#3144 "100 ms later") is read as a refusal at the first render that keeps `open`: the drawer settles before closing. Holding a proposal across renders needs a runtime decision (proposal lifetime) |
 | add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
 | add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
 | add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |

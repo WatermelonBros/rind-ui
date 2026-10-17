@@ -3,6 +3,7 @@
 import { Drawer, type DrawerRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
+import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { getDrawer, installAnnouncementLog } from "../index"
 
@@ -165,5 +166,92 @@ describe("Drawer: swipe", () => {
     await d.open()
     await d.swipe("down", 300).catch(() => {})
     expect(await d.isOpen()).toBe(true)
+  })
+})
+
+describe("Drawer: gesture costs and controlled close", () => {
+  it.skipIf(inJsdom)("no render per pointer move (base-ui#4863)", async () => {
+    let renders = 0
+    function Counted() {
+      renders += 1
+      return <p>Body</p>
+    }
+    render(
+      <Drawer.Root>
+        <Drawer.Trigger>Filters</Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Positioner>
+            <Drawer.Content style={{ position: "fixed", insetInline: 0, bottom: 0, height: 400 }}>
+              <Drawer.Title>Filters</Drawer.Title>
+              <Counted />
+              <Drawer.CloseTrigger>Done</Drawer.CloseTrigger>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Drawer.Portal>
+      </Drawer.Root>,
+    )
+    const d = filters().via("pointer")
+    await d.open()
+    const before = renders
+    // 60 moves short of the threshold: the drawer settles.
+    await d.swipe("down", 120).catch(() => {})
+    // The start and the release may render; the 60 moves never do.
+    expect(renders - before).toBeLessThanOrEqual(4)
+  })
+
+  it.skipIf(inJsdom)(
+    "controlled: a parent applying the close in onOpenChange exits from the release (zag#3144)",
+    async () => {
+      function Applies() {
+        const [open, setOpen] = useState(false)
+        return <Filters open={open} onOpenChange={setOpen} />
+      }
+      render(<Applies />)
+      const d = filters().via("touch")
+      await d.open()
+      await d.swipe("down", 300)
+      expect(await d.closeReason()).toBe("swipe")
+    },
+  )
+
+  it.skipIf(inJsdom)(
+    "controlled: a parent keeping open settles it; a later open={false} closes it",
+    async () => {
+      function Keeps() {
+        const [open, setOpen] = useState(false)
+        const [asked, setAsked] = useState(0)
+        return (
+          <>
+            <Filters
+              open={open}
+              onOpenChange={(o) => (o ? setOpen(true) : setAsked((n) => n + 1))}
+            />
+            <button type="button" onClick={() => setOpen(false)}>
+              Apply close
+            </button>
+            <output>{`asked ${asked}`}</output>
+          </>
+        )
+      }
+      render(<Keeps />)
+      const d = filters().via("touch")
+      await d.open()
+      await d.swipe("down", 300).catch(() => {})
+      await screen.findByText("asked 1")
+      expect(await d.isOpen()).toBe(true)
+      expect(content()?.hasAttribute("data-swipe-dismiss")).toBe(false)
+      await userEvent.click(screen.getByRole("button", { name: "Apply close" }))
+      await vi.waitFor(async () => expect(await d.isOpen()).toBe(false))
+    },
+  )
+
+  it("virtual screen reader: name, description and handle name; nothing announced", async () => {
+    const log = installAnnouncementLog()
+    const start = log.length
+    render(<Filters snapPoints={[0.4, 1]} />)
+    const d = filters().via("virtual")
+    await d.open()
+    expect(await d.title()).toBe("Filters")
+    expect(log.slice(start)).toEqual([])
   })
 })
