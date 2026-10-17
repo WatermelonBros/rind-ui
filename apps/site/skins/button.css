@@ -1,5 +1,5 @@
 /* ── Button ───────────────────────────────────────────────────────────────────────── */
-[data-skinned] [data-scope="button"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="button"][data-part="root"] {
   font: 600 15px var(--s-font);
   padding: 11px 20px;
   border-radius: 99px;
@@ -12,42 +12,48 @@
     background 0.3s,
     opacity 0.3s;
 }
-[data-skin="crisp"] [data-scope="button"][data-part="root"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="button"][data-part="root"] {
   background: var(--s-brand);
   color: var(--s-brand-text);
   box-shadow: 3px 3px 0 var(--s-acc);
 }
-[data-skin="crisp"] [data-scope="button"][data-part="root"][data-hover] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="button"][data-part="root"][data-hover] {
   translate: -1px -1px;
   box-shadow: 5px 5px 0 var(--s-acc);
 }
-[data-skin="crisp"] [data-scope="button"][data-part="root"][data-pressed] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="button"][data-part="root"][data-pressed] {
   translate: 2px 2px;
   box-shadow: 0 0 0 var(--s-acc);
   transition-duration: 0.12s;
 }
-[data-skin="juicy"] [data-scope="button"][data-part="root"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="button"][data-part="root"] {
   background: var(--s-brand);
   color: var(--s-brand-text);
   box-shadow: 0 5px 0 var(--s-brand-deep);
 }
-[data-skin="juicy"] [data-scope="button"][data-part="root"][data-hover] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="button"][data-part="root"][data-hover] {
   translate: 0 -1px;
   box-shadow: 0 6px 0 var(--s-brand-deep);
 }
-[data-skin="juicy"] [data-scope="button"][data-part="root"][data-pressed] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="button"][data-part="root"][data-pressed] {
   translate: 0 4px;
   scale: 1.03 0.96;
   box-shadow: 0 1px 0 var(--s-brand-deep);
   transition-duration: 0.12s;
 }
-[data-skinned] [data-scope="button"][data-part="root"]:is([data-disabled], [aria-disabled="true"]) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="button"][data-part="root"]:is([data-disabled], [aria-disabled="true"]) {
   opacity: 0.45;
   cursor: not-allowed;
   translate: 0 0;
 }
 /* pending: busy stripes slide through the button */
-[data-skinned] [data-scope="button"][data-part="root"][data-pending] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="button"][data-part="root"][data-pending] {
   opacity: 1;
   cursor: progress;
   background-image: repeating-linear-gradient(

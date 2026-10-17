@@ -70,7 +70,12 @@ export function Channels() {
             )
           }
         >
-          <ColorChannelField.Input />
+          <ColorChannelField.Label>
+            {channel[0]?.toUpperCase() + channel.slice(1)}
+          </ColorChannelField.Label>
+          <ColorChannelField.Control>
+            <ColorChannelField.Input />
+          </ColorChannelField.Control>
         </ColorChannelField.Root>
       ))}
     </div>
@@ -81,7 +86,9 @@ export function HueField() {
   return (
     <ColorChannelField.Root channel="hue" defaultValue="hsb(200, 50%, 50%)">
       <ColorChannelField.Label>Hue</ColorChannelField.Label>
-      <ColorChannelField.Input />
+      <ColorChannelField.Control>
+        <ColorChannelField.Input />
+      </ColorChannelField.Control>
     </ColorChannelField.Root>
   )
 }
