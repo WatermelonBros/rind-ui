@@ -70,8 +70,10 @@ async function pool<T>(
           await context.close()
           context = await browser.newContext()
           page = await context.newPage()
+          // Another worker may have taken the last items while this one recycled.
+          if (next >= items.length) break
         }
-        const item = items[next++] as T // bounded by the loop condition
+        const item = items[next++] as T // bounded: checked just above, no await in between
         await job(page, item)
       }
       await context.close()
