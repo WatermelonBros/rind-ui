@@ -1,13 +1,13 @@
-// The Password Input preset in Node: toggle in both Text Field states, controlled proposals,
+// Text Field visibility (type="password") in Node: toggle in both Text Field states, controlled proposals,
 // form submit/reset hiding through live props (radix#4157), announcements only with focus in
 // the input, selection handed back after the toggle.
 import { describe, expect, it, vi } from "vitest"
 import type { Announcement } from "../../env"
 import { createService } from "../../machine/service"
-import { type PasswordInputOwnProps, passwordInputMachine } from "./password-input.machine"
-import { passwordInputMessages } from "./password-input.messages"
+import { type TextFieldOwnProps, textFieldMachine } from "./text-field.machine"
+import { textFieldMessages } from "./text-field.messages"
 
-type Over = Partial<PasswordInputOwnProps> & {
+type Over = Partial<TextFieldOwnProps> & {
   readonly disabled?: boolean
   readonly readOnly?: boolean
   readonly focusableWhenDisabled?: boolean
@@ -27,7 +27,7 @@ function make(over: Over = {}) {
     },
   }
   const props = {
-    messages: passwordInputMessages,
+    messages: textFieldMessages,
     id: "p1",
     clearInput: vi.fn(),
     keepSelection,
@@ -39,7 +39,7 @@ function make(over: Over = {}) {
     },
     ...over,
   }
-  const s = createService(passwordInputMachine, props as never, env as never)
+  const s = createService(textFieldMachine, props as never, env as never)
   s.start()
   return {
     s,

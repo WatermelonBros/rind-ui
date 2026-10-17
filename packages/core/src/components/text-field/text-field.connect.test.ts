@@ -73,8 +73,8 @@ describe("control attributes", () => {
       "data-instance": "i1",
       id: "c1",
     })
-    expect(make({ scope: "search-field" }).api.root()).toMatchObject({
-      "data-scope": "search-field",
+    expect(make({ scope: "other-scope" }).api.root()).toMatchObject({
+      "data-scope": "other-scope",
       "data-part": "root",
     })
   })

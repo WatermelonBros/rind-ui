@@ -1,16 +1,23 @@
-// The Search Field preset in Node: Escape clears only when there is something to clear (and
+// Text Field keys in Node (escapeClears, onSubmit): Escape clears only when there is something to clear (and
 // only then consumes the key), never while composing; Enter searches once, never prevented.
 import { describe, expect, it, vi } from "vitest"
 import { createService } from "../../machine/service"
-import { searchFieldMachine } from "./search-field.machine"
-import { searchFieldMessages } from "./search-field.messages"
+import { textFieldMachine } from "./text-field.machine"
+import { textFieldMessages } from "./text-field.messages"
 
 function make(over: Record<string, unknown> = {}) {
   const clearInput = vi.fn()
   const onSubmit = vi.fn()
   const env = { announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} } }
-  const props = { messages: searchFieldMessages, id: "s1", clearInput, onSubmit, ...over }
-  const s = createService(searchFieldMachine, props as never, env as never)
+  const props = {
+    messages: textFieldMessages,
+    id: "s1",
+    clearInput,
+    onSubmit,
+    escapeClears: true,
+    ...over,
+  }
+  const s = createService(textFieldMachine, props as never, env as never)
   s.start()
   const key = () => ({ preventDefault: vi.fn(), stopPropagation: vi.fn() })
   return {
@@ -82,5 +89,13 @@ describe("Enter", () => {
     m.s.send({ type: "INPUT", value: "被送出", composing: false, reason: "INPUT", event: null })
     m.enter()
     expect(m.onSubmit).toHaveBeenCalledWith("被送出", expect.anything())
+  })
+
+  it("without escapeClears Escape is never handled", () => {
+    const m = make({ escapeClears: false })
+    m.s.send({ type: "INPUT", value: "a", composing: false, reason: "INPUT", event: null })
+    const k = m.escape()
+    expect(m.clearInput).not.toHaveBeenCalled()
+    expect(k.preventDefault).not.toHaveBeenCalled()
   })
 })

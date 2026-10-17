@@ -1,19 +1,21 @@
-// Search Field parts on top of Text Field's (design §2): search semantics on the input, the
-// empty flag, and the keys mapped to machine events after the consumer's own handler.
+// Text Field keys and search semantics: Escape and Enter as machine events (for every
+// type), `type="search"` attributes, and the one-clear-control rule.
 
 import { dataFlag, type PartProps } from "../../connect/props"
-import type { SearchFieldEvent } from "./search-field.machine"
+import type { TextFieldOwnEvent } from "./text-field.machine"
 
-export interface SearchFieldConnectInput {
+export interface TextFieldKeysInput {
   readonly value: string
   readonly composing: boolean
+  /** `type="search"`: the search attributes. */
+  readonly search: boolean
   /** A ClearTrigger is mounted: the browser's own cancel button is hidden. */
   readonly customClear: boolean
 }
 
 /** The injected rule: one clear control while a ClearTrigger is mounted. */
-export const searchCancelStyle =
-  '[data-scope="search-field"][data-part="input"][data-custom-clear]::-webkit-search-cancel-button { appearance: none; display: none }'
+export const textFieldCancelStyle =
+  '[data-scope="text-field"][data-part="input"][data-custom-clear]::-webkit-search-cancel-button { appearance: none; display: none }'
 
 type KeyLike = {
   readonly key: string
@@ -24,19 +26,23 @@ type KeyLike = {
   stopPropagation(): void
 }
 
-export function searchFieldConnect(
-  input: SearchFieldConnectInput,
-  send: (event: SearchFieldEvent) => void,
+export function textFieldKeysConnect(
+  input: TextFieldKeysInput,
+  send: (event: TextFieldOwnEvent) => void,
 ) {
   const empty = dataFlag(input.value === "")
   return {
     root: () => ({ "data-empty": empty }),
     /** Joined to Text Field's input props; `type` and `enterKeyHint` are defaults. */
     input: (): PartProps => ({
-      type: "search",
-      enterkeyhint: "search",
+      ...(input.search
+        ? {
+            type: "search",
+            enterkeyhint: "search",
+            "data-custom-clear": dataFlag(input.customClear),
+          }
+        : {}),
       "data-empty": empty,
-      "data-custom-clear": dataFlag(input.customClear),
       onKeyDown: (e: unknown) => {
         const k = e as KeyLike
         if (k.key !== "Escape" && k.key !== "Enter") return

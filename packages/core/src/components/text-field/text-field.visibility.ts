@@ -1,12 +1,12 @@
-// Password Input parts on top of Text Field's (design §2): the input's privacy attributes
-// and `type`, the visibility trigger (a toggle button whose name never follows the state)
-// and the indicator.
+// Text Field visibility (`type="password"`): the input's privacy attributes and `type`, the
+// VisibilityTrigger (a toggle button whose name never follows the state) and the
+// VisibilityIndicator.
 
 import { focusAttrs } from "../../a11y/focus"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 
-export interface PasswordInputConnectInput {
+export interface TextFieldVisibilityInput {
   readonly scope: string
   readonly instance: string
   readonly visible: boolean
@@ -23,10 +23,10 @@ export interface PasswordInputConnectInput {
 }
 
 /** The injected rule: one reveal control (Edge draws its own on password inputs). */
-export const passwordRevealStyle =
-  '[data-scope="password-input"][data-part="input"][data-custom-reveal]::-ms-reveal { display: none }'
+export const textFieldRevealStyle =
+  '[data-scope="text-field"][data-part="input"][data-custom-reveal]::-ms-reveal { display: none }'
 
-export function passwordInputConnect(input: PasswordInputConnectInput) {
+export function textFieldVisibilityConnect(input: TextFieldVisibilityInput) {
   const state = input.visible ? "visible" : "hidden"
   const data = (part: string) => ({
     ...scopeAttrs(input.scope, part, input.instance),
@@ -59,6 +59,6 @@ export function passwordInputConnect(input: PasswordInputConnectInput) {
       "aria-label": input.toggleLabel,
       disabled: input.disabled || undefined,
     }),
-    indicator: (): PartProps => ({ ...data("indicator"), "aria-hidden": "true" }),
+    indicator: (): PartProps => ({ ...data("visibility-indicator"), "aria-hidden": "true" }),
   }
 }

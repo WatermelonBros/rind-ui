@@ -15,7 +15,7 @@ const fieldState = {
   "data-filled": "The value is not empty (Field).",
 }
 const base = (part: string) => ({
-  "data-scope": '"text-field" (or a preset\'s scope)',
+  "data-scope": '"text-field"',
   "data-part": `"${part}"`,
   "data-instance": "The instance id.",
 })
@@ -74,14 +74,51 @@ export const textFieldMeta = {
       element: "span",
       description: "The count against `maxLength` or a soft `max`; in the control's description.",
     },
+    {
+      name: "TextField.VisibilityTrigger",
+      part: "visibility-trigger",
+      element: "button",
+      description:
+        'With `type="password"`: a toggle button in the Tab order, `aria-pressed`, one name in both states ("Show password").',
+    },
+    {
+      name: "TextField.VisibilityIndicator",
+      part: "visibility-indicator",
+      element: "span",
+      description: "An `aria-hidden` icon slot that follows `data-state`.",
+    },
   ],
   props: {
+    type: {
+      type: "string",
+      default: '"text"',
+      description:
+        'The Input\'s native type. `"password"`: the visibility parts and rules; `"search"`: a searchbox, "Clear search", Escape clears.',
+    },
+    visible: { type: "boolean", description: 'Controlled visibility (`type="password"`).' },
+    defaultVisible: { type: "boolean", default: "false", description: "Uncontrolled visibility." },
+    onVisibleChange: {
+      type: "(visible, { reason }) => void",
+      description:
+        "Reasons `PRESS`, `SUBMIT` (any form submit) and `RESET` (an unprevented reset).",
+    },
+    escapeClears: {
+      type: "boolean",
+      default: 'true with `type="search"`, else false',
+      description:
+        "Escape clears a non-empty editable value (reason `ESCAPE`) and is consumed only then.",
+    },
+    onSubmit: {
+      type: "(value, { event }) => void",
+      description:
+        "Enter, never while composing; the form still submits unless `event.preventDefault()`.",
+    },
     value: { type: "string | null", description: "Controlled value (`null` renders empty)." },
     defaultValue: { type: "string", description: "Uncontrolled: the DOM owns the value." },
     onValueChange: {
       type: "(value, { reason, event, isComposing }) => void",
       description:
-        "Every change, with its reason (`INPUT`, `CLEAR`, `RESET`). Native `onChange` is forwarded untouched.",
+        "Every change, with its reason (`INPUT`, `CLEAR`, `ESCAPE`, `RESET`). Native `onChange` is forwarded untouched.",
     },
     focusableWhenDisabled: {
       type: "boolean",
@@ -93,8 +130,9 @@ export const textFieldMeta = {
       description: "Announce the count at this many remaining (default max(10, 20% of the limit)).",
     },
     messages: {
-      type: "{ clear?, charactersRemaining?, charactersOver? }",
-      description: "The ClearTrigger name and count announcements.",
+      type: "{ clear?, clearSearch?, charactersRemaining?, charactersOver?, toggleLabel?, visibilityAnnouncement? }",
+      description:
+        "The ClearTrigger name (also for search), count announcements, the VisibilityTrigger's name and the shown/hidden announcement.",
     },
     fieldMessages: {
       type: "Field messages",
@@ -118,6 +156,8 @@ export const textFieldMeta = {
       "data-focus": "The control has focus.",
       "data-focus-visible": "The control has keyboard focus.",
       "data-composing": "An IME composition is in progress.",
+      "data-empty": "The value is empty.",
+      "data-state": '`type="password"`: "visible" or "hidden".',
     },
     input: {
       ...base("input"),
@@ -125,6 +165,23 @@ export const textFieldMeta = {
       "data-focus": "Focused.",
       "data-focus-visible": "Keyboard focus.",
       "data-composing": "Composing.",
+      "data-empty": "The value is empty.",
+      "data-state": '`type="password"`: "visible" or "hidden".',
+      "data-custom-reveal": "A VisibilityTrigger is mounted (Edge's `::-ms-reveal` is hidden).",
+      "data-custom-clear":
+        '`type="search"` with a ClearTrigger mounted (the native cancel button is hidden).',
+    },
+    "visibility-trigger": {
+      ...base("visibility-trigger"),
+      "data-disabled": "While disabled.",
+      "data-state": '"visible" or "hidden".',
+      "data-pressed": "A press is in progress.",
+      "data-focus-visible": "Keyboard focus.",
+    },
+    "visibility-indicator": {
+      ...base("visibility-indicator"),
+      ...fieldState,
+      "data-state": '"visible" or "hidden".',
     },
     "character-count": {
       ...base("character-count"),
@@ -133,7 +190,15 @@ export const textFieldMeta = {
     },
   },
   keyboard: [
-    ["Enter", "In an Input: commits the value (Field), unless an IME is composing."],
+    [
+      "Enter",
+      "In an Input: commits the value (Field) and calls `onSubmit`, unless an IME is composing; the form submits natively.",
+    ],
+    [
+      "Escape",
+      "With `escapeClears` and a non-empty editable value: clears it (consumed only then).",
+    ],
+    ["Space / Enter", "On the VisibilityTrigger: toggles visibility (focus stays on it)."],
     ["⌘/Ctrl + A, Backspace", "Native editing; nothing is overridden."],
   ],
   states: {
@@ -151,6 +216,10 @@ export const textFieldMeta = {
       composeEnd: ["keyboard"],
       blur: ["keyboard"],
       reset: ["pointer", "keyboard", "virtual"],
+      escape: ["keyboard"],
+      submit: ["keyboard"],
+      toggleVisibility: ["pointer", "keyboard", "touch", "virtual"],
+      submitForm: ["pointer", "keyboard", "virtual"],
     },
     queries: [
       "value",
@@ -164,6 +233,10 @@ export const textFieldMeta = {
       "characterCount",
       "isClearable",
       "isComposing",
+      "isEmpty",
+      "isVisible",
+      "inputType",
+      "toggleName",
     ],
     traits: ["field-associated"],
   },
