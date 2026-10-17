@@ -99,6 +99,8 @@ export interface InputChipsView {
   readonly dir: "ltr" | "rtl"
   readonly messages: InputChipsMessages
   readonly locale?: string | undefined
+  /** The summary describes the input also with no chips ("No tags"). */
+  readonly describeEmpty?: boolean | undefined
   /** The host's input and control ids (removal focus, inside test). */
   readonly inputId: string
   readonly controlId: string
@@ -150,7 +152,7 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
   return {
     ids,
     /** The input's description: the summary node, while there are chips. */
-    describedBy: v.chips.length > 0 ? ids.summary : undefined,
+    describedBy: v.chips.length > 0 || v.describeEmpty ? ids.summary : undefined,
     /**
      * The input's keys that belong to the chips; true when handled (the host then stops).
      * `atStart`: the caret is at 0 with no selection.
@@ -254,7 +256,7 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
     summary: (): PartProps => ({
       ...scoped("chips-summary"),
       id: ids.summary,
-      hidden: v.chips.length === 0 ? true : undefined,
+      hidden: v.chips.length === 0 && !v.describeEmpty ? true : undefined,
       style: visuallyHiddenStyle,
     }),
     summaryText: v.messages.tagsSummary(

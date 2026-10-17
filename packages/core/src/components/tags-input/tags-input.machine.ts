@@ -140,7 +140,8 @@ export function tagChips(
   value: readonly string[],
 ): readonly Chip[] {
   const keys = tagKeys(value, p.allowDuplicates === true)
-  const locked = p.disabled === true || p.readOnly === true
+  // Read-only chips stay navigable (their text can be read); removal is guarded instead.
+  const locked = p.disabled === true
   return value.map((tag, i) => {
     const key = keys[i] ?? tag
     return {
@@ -456,6 +457,10 @@ export const tagsInputMachine = setup({
     CLEAR: { actions: ["clearAll"] },
     "CHIP.NAVIGATE": { target: "typing", actions: ["setFocused", "focusChip"] },
     "CHIP.BLUR": { actions: ["blurChip"] },
+    // A remove press never moves focus: it applies in every state.
+    "CHIP.REMOVE": { guard: "chipRemovable", actions: ["removeChip"] },
+    "CHIP.TYPE": { guard: "interactive", target: "typing", actions: ["setFocused", "chipType"] },
+    "CLEAR.PRESS": { guard: "interactive", target: "typing", actions: ["setFocused", "clearAll"] },
   },
   states: {
     idle: {
@@ -463,11 +468,6 @@ export const tagsInputMachine = setup({
         "INPUT.FOCUS": { target: "typing", actions: ["setFocused"] },
         "INPUT.CHANGE": { target: "typing", actions: ["setFocused", "typed"] },
         "COMPOSITION.START": { target: "typing", actions: ["setFocused", "startComposition"] },
-        "CLEAR.PRESS": {
-          guard: "interactive",
-          target: "typing",
-          actions: ["setFocused", "clearAll"],
-        },
         PASTE: { guard: "pasteTakenOver", target: "typing", actions: ["setFocused", "paste"] },
       },
     },
@@ -486,9 +486,6 @@ export const tagsInputMachine = setup({
           { guard: { and: ["notComposing", "armedRemovable"] }, actions: ["removeArmed"] },
           { guard: { and: ["notComposing", "armsOnBackspace"] }, actions: ["arm"] },
         ],
-        "CHIP.REMOVE": { guard: "chipRemovable", actions: ["removeChip"] },
-        "CHIP.TYPE": { guard: "interactive", actions: ["chipType"] },
-        "CLEAR.PRESS": { guard: "interactive", actions: ["clearAll"] },
         "TAG.EDIT": { guard: "editable", target: "editing", actions: ["startEdit"] },
         "FOCUS.LEAVE": [
           {
@@ -522,7 +519,6 @@ export const tagsInputMachine = setup({
           { guard: "editRefused", actions: ["commitEdit"] },
           { target: "idle", actions: ["commitEdit", "leave"] },
         ],
-        "CHIP.REMOVE": { guard: "chipRemovable", actions: ["removeChip"] },
       },
     },
   },
