@@ -4,7 +4,7 @@ import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 
-const root = join(import.meta.dirname, "..")
+const root = join(import.meta.dirname, "../packages/core/src")
 
 function sources(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {

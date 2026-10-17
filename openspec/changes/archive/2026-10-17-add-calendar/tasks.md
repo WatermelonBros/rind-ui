@@ -6,7 +6,7 @@
 ## 1. Shared date infrastructure (`date-values`)
 
 - [x] 1.1 `core/i18n/date.ts`: re-exports and parse functions, `resolveCalendar(locale, createCalendar)` with the gregorian default and dev warnings (unsupported, missing), `toEmitted(date, base)` (type, calendar, time of day kept), `firstDayOfWeek(locale, prop)`, `isWeekend`, cached `dateFormatter(locale, options)`, `dayText` (the `day` part), `formatVisibleRange`
-- [x] 1.2 `DateClock` capability in `core/env` and `domEnvironment()`; fake clock helper in `@rind-ui/testing`; lint rule or test that no module reads `Date.now()`/`new Date()` at module scope (`fixedDateClock` in @rind-ui/testing; packages/core/src/i18n/no-module-scope-clock.test.ts)
+- [x] 1.2 `DateClock` capability in `core/env` and `domEnvironment()`; fake clock helper in `@rind-ui/testing`; lint rule or test that no module reads `Date.now()`/`new Date()` at module scope (`fixedDateClock` in @rind-ui/testing; scripts/no-module-scope-clock.test.ts)
 - [x] 1.3 Node tests: every `date-values` scenario (zag#3187 Tokyo, bits-ui#768 grid, bits-ui#1358 time kept, th-TH, fa-IR, zh-CN-u-ca-chinese, ja-JP-u-ca-japanese without createCalendar, Auckland today, zoned today, en-US/en-GB/ar-EG week starts, `firstDayOfWeek="mon"` in cs-CZ, ja-JP day text, de-DE reformat, inclusive max, data-value ISO)
 
 ## 2. Date-grid navigation (`calendar-navigation`)
