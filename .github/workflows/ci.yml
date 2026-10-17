@@ -75,9 +75,14 @@ jobs:
         include:
           - { slice: node, projects: "--project node", browsers: "" }
           - { slice: jsdom, projects: "--project jsdom --project setup-noglobals --project setup-optout", browsers: "" }
-          - { slice: browser-chromium, projects: "--project 'browser (chromium)'", browsers: chromium }
-          - { slice: browser-firefox, projects: "--project 'browser (firefox)'", browsers: firefox }
-          - { slice: browser-webkit, projects: "--project 'browser (webkit)'", browsers: webkit }
+          # Real-browser projects in two shards each: a full run in one Chromium has dropped the
+          # vitest connection mid-run; half the files per browser process keeps it short.
+          - { slice: browser-chromium-1, projects: "--project 'browser (chromium)' --shard=1/2", browsers: chromium }
+          - { slice: browser-chromium-2, projects: "--project 'browser (chromium)' --shard=2/2", browsers: chromium }
+          - { slice: browser-firefox-1, projects: "--project 'browser (firefox)' --shard=1/2", browsers: firefox }
+          - { slice: browser-firefox-2, projects: "--project 'browser (firefox)' --shard=2/2", browsers: firefox }
+          - { slice: browser-webkit-1, projects: "--project 'browser (webkit)' --shard=1/2", browsers: webkit }
+          - { slice: browser-webkit-2, projects: "--project 'browser (webkit)' --shard=2/2", browsers: webkit }
           # Playwright fixtures: one slice per engine (RIND_BROWSERS picks it for the examples
           # axe and the theme fixtures); all three are installed for the few cross-engine tests.
           - { slice: playwright-chromium, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: chromium }
