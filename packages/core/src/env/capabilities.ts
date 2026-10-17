@@ -121,6 +121,21 @@ export interface StyleEnv {
   readonly style: StyleInjection
 }
 
+// --- Page visibility (add-toast) ---
+
+/**
+ * Whether the document is hidden (a background tab, a minimised window), never window focus:
+ * an iframe taking focus is not a hidden page (radix#1362). Machines read it only here.
+ */
+export interface PageVisibility {
+  hidden(): boolean
+  /** Called on each change with the new state; returns the unsubscribe. */
+  subscribe(listener: (hidden: boolean) => void): () => void
+}
+export interface VisibilityEnv {
+  readonly visibility: PageVisibility
+}
+
 // --- Collection capabilities (add-collections) ---
 
 /** Monotonic time in milliseconds (typeahead timeouts without timers). */

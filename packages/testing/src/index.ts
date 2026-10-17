@@ -84,6 +84,7 @@ export {
   runAction,
   type Target,
 } from "./driver"
+export { type FakeVisibility, fakeVisibility } from "./fake-visibility"
 export { type FormStepInvariants, formStepInvariants } from "./form-invariants"
 export {
   type GraphEdge,
