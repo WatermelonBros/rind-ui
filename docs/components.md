@@ -31,7 +31,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | HUI: in source, not in public docs |
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
-| Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |
+| Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | wip |  |
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |

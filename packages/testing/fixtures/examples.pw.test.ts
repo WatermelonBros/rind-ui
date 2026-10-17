@@ -317,6 +317,9 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // A toast not yet started by a region, and one exiting: both last for moments.
+  "toast:idle",
+  "toast:dismissed",
 ])
 
 /**

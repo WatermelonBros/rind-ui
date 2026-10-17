@@ -519,9 +519,13 @@ queries `isShown`, `type`, `title`, `description`, `isPaused`, `isLimited` and
 
 ### Requirement: Model-Based Coverage
 
-`testMachine` over the toast and toaster contracts SHALL cover every transition in
-every declared modality including `virtual`, and SHALL pass every generic,
-accessibility, `timed` and `presence` invariant. Store-only events with no user action
+`testMachine` over the toaster contract SHALL cover every transition in every declared
+modality including `virtual`, and SHALL pass every generic and accessibility invariant.
+A toast's dismissal removes the element its contract is located by, so the runner cannot
+observe the paths after it; the toast contract's transitions SHALL be covered by the
+driver's DOM scenarios (every dismissal reason, the action, swipe, the timeout) and by
+unit tests of the toast machine, and the contract SHALL declare which parts commit on
+focus (focus in the region pauses). Store-only events with no user action
 (`api` dismissal, promise settlement, region mount/unmount, visibility changes) SHALL be
 reported as uncovered by the runner and covered by unit tests of the store and machines.
 

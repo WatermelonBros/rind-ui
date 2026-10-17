@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
+| add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
+| add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |

@@ -60,6 +60,7 @@ export { getSwitch } from "./components/switch"
 export { getTabs } from "./components/tabs"
 export { getTagsInput } from "./components/tags-input"
 export { getTextField } from "./components/text-field"
+export { getToast, getToaster } from "./components/toast"
 export { getToggle } from "./components/toggle"
 export { getToggleGroup } from "./components/toggle-group"
 export { getToolbar } from "./components/toolbar"
@@ -80,6 +81,7 @@ export {
   runAction,
   type Target,
 } from "./driver"
+export { type FakeVisibility, fakeVisibility } from "./fake-visibility"
 export { type FormStepInvariants, formStepInvariants } from "./form-invariants"
 export {
   type GraphEdge,
