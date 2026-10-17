@@ -2,6 +2,7 @@
 import { Dialog, Field, Select, type SelectRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
+import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { getSelect } from "../index"
 
@@ -21,11 +22,13 @@ function Fruit(root: Partial<SelectRootProps>) {
           <Select.Positioner>
             <Select.Content>
               <Select.List>
-                {FRUITS.map((f) => (
-                  <Select.Item key={f} value={f.toLowerCase()}>
-                    <Select.ItemText>{f}</Select.ItemText>
-                  </Select.Item>
-                ))}
+                {(root.items ?? FRUITS.map((f) => ({ key: f.toLowerCase(), label: f }))).map(
+                  (i) => (
+                    <Select.Item key={i.key} value={i.key}>
+                      <Select.ItemText>{i.label}</Select.ItemText>
+                    </Select.Item>
+                  ),
+                )}
               </Select.List>
             </Select.Content>
           </Select.Positioner>
@@ -36,6 +39,7 @@ function Fruit(root: Partial<SelectRootProps>) {
   )
 }
 
+const inJsdom = navigator.userAgent.includes("jsdom")
 const fruit = () => getSelect(screen, { name: "Fruit" })
 
 describe("Select: basics", () => {
@@ -193,10 +197,44 @@ describe("Select: forms", () => {
       </form>,
     )
     const form = screen.getByRole("form") as HTMLFormElement
+    const hidden = document.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
     expect(trigger().getAttribute("aria-required")).toBe("true")
+    expect(hidden?.validity.valueMissing).toBe(true)
     expect(form.checkValidity()).toBe(false)
     await fruit().via("pointer").choose("Apple")
+    expect(hidden?.validity.valueMissing).toBe(false)
     expect(form.checkValidity()).toBe(true)
+  })
+
+  // jsdom's validation focuses nothing: the browser's does.
+  it.skipIf(inJsdom)(
+    "Required: submitting with none focuses the trigger, with the focus ring",
+    async () => {
+      render(
+        <form aria-label="f">
+          <Fruit name="fruit" required items={DATA} />
+        </form>,
+      )
+      const form = screen.getByRole("form") as HTMLFormElement
+      form.requestSubmit()
+      // The browser focuses the invalid hidden input; it forwards focus to the trigger.
+      form.reportValidity()
+      await vi.waitFor(() => expect(document.activeElement).toBe(trigger()))
+      await vi.waitFor(() => expect(trigger().hasAttribute("data-focus-visible")).toBe(true))
+    },
+  )
+
+  it('Required with the "" option chosen: valid, and "" is submitted', async () => {
+    render(
+      <form aria-label="f">
+        <Fruit name="fruit" required items={[{ key: "", label: "Built-in" }, ...DATA]} />
+      </form>,
+    )
+    const form = screen.getByRole("form") as HTMLFormElement
+    expect(form.checkValidity()).toBe(false)
+    await fruit().via("keyboard").choose("Built-in")
+    expect(form.checkValidity()).toBe(true)
+    expect([...new FormData(form).entries()]).toEqual([["fruit", ""]])
   })
 
   it("Autofill: a native input on the hidden input selects by key or text", async () => {
@@ -213,15 +251,30 @@ describe("Select: forms", () => {
     expect(trigger().hasAttribute("data-autofill")).toBe(true)
   })
 
-  it("A user change fires change on the hidden input", async () => {
-    const onChange = vi.fn()
-    render(
-      <form aria-label="f" onChange={onChange}>
-        <Fruit name="fruit" items={DATA} />
-      </form>,
-    )
+  it("A user change: one input and one change from the hidden input; a controlled change: none (radix#4102)", async () => {
+    const events: string[] = []
+    function Controlled() {
+      const [value, setValue] = useState<string | null>(null)
+      return (
+        <>
+          <Fruit name="fruit" items={DATA} value={value} onValueChange={(v) => setValue(v)} />
+          <button type="button" onClick={() => setValue("cherry")}>
+            Set cherry
+          </button>
+        </>
+      )
+    }
+    render(<Controlled />)
+    const hidden = document.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
+    for (const type of ["input", "change"]) {
+      hidden?.addEventListener(type, () => events.push(type))
+    }
     await fruit().via("pointer").choose("Banana")
-    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(events).toEqual(["input", "change"])
+    events.length = 0
+    await userEvent.click(screen.getByRole("button", { name: "Set cherry" }))
+    expect(await fruit().value()).toBe("Cherry")
+    expect(events).toEqual([])
   })
 })
 

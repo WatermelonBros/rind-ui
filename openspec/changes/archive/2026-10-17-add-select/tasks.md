@@ -52,7 +52,7 @@
 - [x] 8.1 Docs page (generated API facts + guide: naming, value text, multiple, forms and autofill, why there is no hidden `<select>`, testing with `getSelect`/`testMachine` incl. happy-dom, "native select on mobile" recipe, Ark/Reado migration)
 - [x] 8.2 Manual tier-1 pass: VO + Safari (macOS/iOS: value change after closed typeahead, touch open/close), NVDA + Firefox, JAWS + Chrome, TalkBack; record in "Tested with" Manual screen-reader pass: needs a person with the devices; recorded as pending in the docs page's "Tested with" (backlog).
 - [x] 8.3 Migrate Reado's `atoms/Select.tsx` and replace the `pick()` workarounds in its tests with `getSelect` (separate Reado change, tracked here) A separate Reado change, tracked outside this repository.
-- [x] 8.4 Set Select to `wip`/`done` in `docs/components.md` as it progresses; archive the change when approved `wip` set; `done` on approval.
+- [x] 8.4 Set Select to `wip`/`done` in `docs/components.md` as it progresses; archive the change when approved `done` on approval.
 - [x] 8.5 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset for core, react, testing, theme Targeted runs per the workflow (node, jsdom, chromium/firefox/webkit, playwright); full suites in CI. Changeset added.
 
 ## Amendments (from add-separator)

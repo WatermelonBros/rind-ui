@@ -155,19 +155,25 @@ describe.each(engines)("select driver through Playwright (%s)", (engine) => {
     expect(await list.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
     const box = await list.boundingBox()
     if (!box) throw new Error("list has no layout")
+    // The visible part of the list (a viewport smaller than the popup clips it): a finger
+    // lands where it can be seen.
+    const vh = page.viewportSize()?.height ?? 0
+    const top = Math.max(box.y, 0)
+    const bottom = Math.min(box.y + box.height, vh)
+    expect(bottom - top).toBeGreaterThan(80)
     const x = box.x + box.width / 2
-    const y = box.y + box.height / 2
+    const y = (top + bottom) / 2
     const scrolled = () => list.evaluate((el) => el.scrollTop)
 
-    // Real gesture where the engine has the input: Chromium's synthesized touch scroll.
+    // Real touch input where the engine has it: Chromium's touch events, which it scrolls.
     if (engine === "chromium") {
       const cdp = await page.context().newCDPSession(page)
-      await cdp.send("Input.synthesizeScrollGesture", {
-        x,
-        y,
-        yDistance: -100,
-        gestureSourceType: "touch",
-      })
+      const at = (dy: number) => [{ x, y: y + dy, id: 1 }]
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: at(30) })
+      for (let dy = 25; dy >= -30; dy -= 5) {
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: at(dy) })
+      }
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] })
       await expect.poll(scrolled).toBeGreaterThan(0)
     } else {
       // The browser scrolls the list under the finger, then cancels or ends the pointer.

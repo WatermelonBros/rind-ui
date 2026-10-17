@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
 | add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
 | add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
 | add-select (impl) | — | packages/testing/fixtures/select | Task 6.2: forced-colors Playwright captures; Task 5.3: scroll-overflow and one-element-per-query tests |

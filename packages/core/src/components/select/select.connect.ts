@@ -323,7 +323,9 @@ export function selectConnect(
         name: input.multiple ? undefined : s.name,
         form: s.form,
         autocomplete: s.autoComplete,
-        required: input.required || undefined,
+        // Required means "a key is selected": the "" key is a value, though the input's
+        // value is empty, so the constraint applies only while nothing is selected.
+        required: (input.required && keys.length === 0) || undefined,
         disabled: input.disabled || undefined,
         style: hiddenFormInputStyle,
         // A pre-filled value for the server render; the capability syncs it after.
