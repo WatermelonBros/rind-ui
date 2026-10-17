@@ -11,6 +11,15 @@ See CLAUDE.md "Review rules".
 | add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
 | add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |
 | add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
+| add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
+| add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
+| add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
+| add-select (impl) | — | packages/testing/fixtures/select | Task 6.2: forced-colors Playwright captures; Task 5.3: scroll-overflow and one-element-per-query tests |
+| add-select (impl) | — | docs/components/select.md | Task 8.2: manual screen-reader pass (VO/Safari macOS+iOS, NVDA/Firefox, JAWS/Chrome, TalkBack, Firefox Android touch) |
+| add-select (impl) | — | packages/core/src/components/select/select.contract.ts | Task A.3: `field-associated` trait and the Field prop × control matrix test |
+| add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
+| add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
+| add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |
 | add-qr-code (r1) | — | packages/react/src/qr-code/qr-code.tsx | `apiRef` finds frame/pattern/overlay with `document.getElementById`: breaks inside a shadow root (use the Root element's root node) |
 | add-qr-code (r1) | — | packages/testing/src/components/qr-code.dom.test.tsx | No Root re-render test with an inline `encoding` object (the compare-by-value claim) |
 | add-qr-code (r1) | — | packages/core/src/qr/qr.test.ts | The auto-mask oracle is circular (it reuses the encoder's own penalty); compare with fixtures' chosen masks instead |

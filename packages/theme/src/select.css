@@ -1,0 +1,256 @@
+/*
+ * Select: the trigger is a button-like combobox; the popup content reuses positioner.css's box
+ * and scrolling, sized to at least the trigger (--rind-anchor-width). Tier-3 tokens
+ * --rind-select-* default to semantic tokens; the item tokens --rind-select-item-* default to
+ * the --rind-listbox-item-* ones, so one Listbox theme covers both. Selected carries a
+ * background, a heavier weight AND the item indicator (WCAG 1.4.1: never colour alone).
+ * Entry uses @starting-style and exit [data-state="closed"] on the same properties. The focus
+ * ring comes from base.css.
+ */
+@layer rind.components {
+  [data-scope="select"][data-part="trigger"] {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-select-trigger-height, var(--rind-hit-area));
+    padding: var(--rind-select-trigger-padding, var(--rind-space-1) var(--rind-space-3));
+    border: var(--rind-border-width) solid
+      var(--rind-select-trigger-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-select-trigger-radius, var(--rind-radius-control));
+    background: var(--rind-select-trigger-bg, var(--rind-color-surface));
+    color: var(--rind-select-trigger-text, var(--rind-color-text));
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  [data-scope="select"][data-part="trigger"][data-state="open"] {
+    border-color: var(--rind-select-trigger-open-border, var(--rind-color-accent-border));
+  }
+
+  [data-scope="select"][data-part="trigger"][data-invalid] {
+    border-color: var(--rind-select-invalid-border, var(--rind-color-danger-border));
+  }
+
+  [data-scope="select"][data-part="trigger"][data-disabled] {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  [data-scope="select"][data-part="value-text"] {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-scope="select"][data-part="value-text"][data-placeholder],
+  [data-scope="select"][data-part="trigger"][data-placeholder] > [data-part="value-text"] {
+    color: var(--rind-select-placeholder-text, var(--rind-color-text-muted));
+  }
+
+  [data-scope="select"][data-part="indicator"] {
+    flex: none;
+    inline-size: var(--rind-select-indicator-size, 1em);
+    block-size: var(--rind-select-indicator-size, 1em);
+    transition: transform var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  [data-scope="select"][data-part="indicator"][data-state="open"] {
+    transform: rotate(180deg);
+  }
+
+  [data-scope="select"][data-part="label"][data-disabled],
+  [data-scope="select"][data-part="description"][data-disabled] {
+    color: var(--rind-color-text-disabled);
+  }
+
+  [data-scope="select"][data-part="description"] {
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-sm);
+  }
+
+  [data-scope="select"][data-part="content"][data-side] {
+    min-inline-size: var(--rind-anchor-width);
+    max-block-size: min(
+      var(--rind-select-content-max-height, 20rem),
+      var(--rind-available-height, 100vh)
+    );
+    padding: var(--rind-select-content-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid
+      var(--rind-select-content-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-select-content-radius, var(--rind-radius-md));
+    background: var(--rind-select-content-bg, var(--rind-color-surface-raised));
+    color: var(--rind-color-text);
+    box-shadow: var(--rind-select-content-shadow, var(--rind-shadow-sm));
+    overflow: auto;
+    transform-origin: var(--rind-transform-origin);
+    animation: none;
+    transition:
+      opacity var(--rind-duration-normal) var(--rind-ease-out),
+      transform var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  [data-scope="select"][data-part="content"][data-side][data-state="open"] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  [data-scope="select"][data-part="content"][data-side][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  [data-scope="select"][data-part="list"] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-space-1);
+    margin: 0;
+    padding: 0;
+    outline: none;
+  }
+
+  [data-scope="select"][data-part="item"] {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(
+      --rind-select-item-height,
+      var(--rind-listbox-item-height, var(--rind-hit-area))
+    );
+    padding: var(
+      --rind-select-item-padding,
+      var(--rind-listbox-item-padding, var(--rind-space-1) var(--rind-space-2))
+    );
+    border-radius: var(
+      --rind-select-item-radius,
+      var(--rind-listbox-item-radius, var(--rind-radius-sm))
+    );
+    cursor: pointer;
+    user-select: none;
+  }
+
+  [data-scope="select"][data-part="item"][data-highlighted] {
+    background: var(
+      --rind-select-item-highlight-bg,
+      var(--rind-listbox-item-highlight-bg, var(--rind-color-neutral-soft))
+    );
+    color: var(
+      --rind-select-item-highlight-text,
+      var(--rind-listbox-item-highlight-text, var(--rind-color-text))
+    );
+  }
+
+  [data-scope="select"][data-part="item"][data-selected] {
+    background: var(
+      --rind-select-item-selected-bg,
+      var(--rind-listbox-item-selected-bg, var(--rind-color-accent-soft))
+    );
+    color: var(
+      --rind-select-item-selected-text,
+      var(--rind-listbox-item-selected-text, var(--rind-color-accent-text))
+    );
+    font-weight: 600;
+  }
+
+  [data-scope="select"][data-part="item"][data-disabled] {
+    color: var(
+      --rind-select-item-disabled-text,
+      var(--rind-listbox-item-disabled-text, var(--rind-color-text-disabled))
+    );
+    cursor: not-allowed;
+  }
+
+  [data-scope="select"][data-part="item-text"] {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  [data-scope="select"][data-part="item-description"] {
+    color: var(--rind-select-description-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  [data-scope="select"][data-part="item-indicator"] {
+    flex: none;
+    inline-size: var(--rind-select-item-indicator-size, 1em);
+    block-size: var(--rind-select-item-indicator-size, 1em);
+  }
+
+  [data-scope="select"][data-part="item-indicator"][data-state="unselected"] {
+    visibility: hidden;
+  }
+
+  [data-scope="select"][data-part="section-label"] {
+    padding: var(--rind-space-1) var(--rind-space-2);
+    color: var(--rind-select-section-label-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    letter-spacing: var(--rind-tracking-label);
+  }
+
+  [data-scope="select"][data-part="separator"] {
+    margin: 0;
+    border: 0;
+    background: var(--rind-select-separator, var(--rind-color-border));
+    block-size: var(--rind-border-width);
+  }
+
+  [data-scope="select"][data-part="empty"] {
+    padding: var(--rind-space-2);
+    color: var(--rind-select-empty-text, var(--rind-color-text-muted));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="select"][data-part="content"],
+    [data-scope="select"][data-part="indicator"] {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="select"][data-part="trigger"],
+    [data-scope="select"][data-part="content"] {
+      border-color: CanvasText;
+    }
+
+    [data-scope="select"][data-part="trigger"][data-disabled] {
+      border-color: GrayText;
+      color: GrayText;
+    }
+
+    [data-scope="select"][data-part="item"][data-highlighted] {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    /* Selected reads by the indicator and system colours, not by a custom background. */
+    [data-scope="select"][data-part="item"][data-selected] {
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    [data-scope="select"][data-part="item"][data-focus-visible] {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    [data-scope="select"][data-part="item"][data-disabled] {
+      color: GrayText;
+    }
+
+    [data-scope="select"][data-part="separator"] {
+      background: CanvasText;
+    }
+  }
+}

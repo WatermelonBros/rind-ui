@@ -58,7 +58,9 @@ browser's sequential order for positive `tabindex` values. Radio buttons SHALL
 count as one tab stop per group (the checked one, or the first when none is
 checked). Wrapping SHALL move focus without scrolling the page. With one tab stop, Tab SHALL keep focus on it;
 with none, Tab SHALL keep focus on the container. Containment SHALL NOT use focus
-sentinel elements. Non-modal layers SHALL NOT contain focus.
+sentinel elements. Non-modal layers SHALL NOT contain focus. A modal layer registered as
+closed by Tab (`tabCloses`: a select, a menu) SHALL NOT have its Tab wrapped or prevented:
+the layer closes and the browser's Tab moves on from its opener.
 
 #### Scenario: Wrap forward
 
@@ -88,6 +90,12 @@ sentinel elements. Non-modal layers SHALL NOT contain focus.
 - **WHEN** a modal dialog is open
 - **THEN** no focusable element exists outside the dialog's own parts that was added
   by the system (no `tabindex="0"` guard spans)
+
+#### Scenario: Tab out of a modal select
+
+- **WHEN** a modal select is open with focus on an option and the user presses Tab
+- **THEN** the keydown is not prevented, the select closes and focus moves to the element
+  after its trigger
 
 ### Requirement: Containment Never Pulls Focus Across Documents
 

@@ -64,7 +64,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Used by Reado |
+| Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
 | Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | spec |  |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
@@ -144,20 +144,20 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
+| Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
 | Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done |  |
-| Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
+| Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | done |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
+| Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
-| Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec | Loading/fallback states |
+| Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |

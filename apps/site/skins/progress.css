@@ -1,0 +1,120 @@
+/* ── Progress: a bar and a ring. Core sizes the fill inline and offsets the ring's arc; this
+   sheet paints them, and slides or spins the indeterminate segment unless motion is reduced. ── */
+[data-skinned] [data-scope="progress"][data-part="root"] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  inline-size: min(100%, 22rem);
+}
+[data-skinned] [data-scope="progress"][data-part="root"][data-orientation="vertical"] {
+  grid-template-columns: auto;
+  inline-size: auto;
+  justify-items: center;
+}
+[data-skinned] [data-scope="progress"][data-part="label"] {
+  font-weight: 600;
+}
+[data-skinned] [data-scope="progress"][data-part="value-text"] {
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  opacity: 0.8;
+}
+[data-skinned] [data-scope="progress"][data-part="track"] {
+  grid-column: 1 / -1;
+  position: relative;
+  block-size: 10px;
+  border-radius: 99px;
+  background: var(--s-muted);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-line);
+  overflow: hidden;
+}
+[data-skinned] [data-scope="progress"][data-part="track"][data-orientation="vertical"] {
+  display: flex;
+  flex-direction: column-reverse;
+  inline-size: 10px;
+  block-size: 8rem;
+}
+[data-skinned] [data-scope="progress"][data-part="indicator"] {
+  block-size: 100%;
+  background: var(--s-brand);
+  transition:
+    inline-size 0.3s var(--s-ease),
+    block-size 0.3s var(--s-ease);
+}
+[data-skinned] [data-scope="progress"][data-part="indicator"][data-orientation="vertical"] {
+  inline-size: 100%;
+}
+[data-skinned] [data-scope="progress"][data-part="indicator"][data-state="indeterminate"] {
+  inline-size: 40%;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 4px,
+    color-mix(in oklab, var(--s-card) 45%, transparent) 4px 8px
+  );
+}
+
+/* the ring */
+[data-skinned] [data-scope="progress"][data-part="circle"] {
+  inline-size: 48px;
+  block-size: 48px;
+  rotate: -90deg;
+}
+[data-skinned]
+  [data-scope="progress"]:is([data-part="circle-track"], [data-part="circle-indicator"]) {
+  fill: none;
+  stroke-width: 12;
+}
+[data-skinned] [data-scope="progress"][data-part="circle-track"] {
+  stroke: var(--s-muted);
+}
+[data-skinned] [data-scope="progress"][data-part="circle-indicator"] {
+  stroke: var(--s-brand);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s var(--s-ease);
+}
+[data-skinned] [data-scope="progress"][data-part="circle-indicator"][data-state="indeterminate"] {
+  stroke-dashoffset: 75;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-skinned] [data-scope="progress"][data-part="indicator"][data-state="indeterminate"] {
+    background-image: none;
+    animation: s-progress-slide 1.4s ease-in-out infinite;
+  }
+  [data-skinned] [data-scope="progress"][data-part="circle"][data-state="indeterminate"] {
+    animation: s-progress-spin 1.2s linear infinite;
+  }
+}
+@keyframes s-progress-slide {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 250% 0;
+  }
+}
+@keyframes s-progress-spin {
+  from {
+    rotate: -90deg;
+  }
+  to {
+    rotate: 270deg;
+  }
+}
+
+[data-skin="crisp"] [data-scope="progress"][data-part="track"] {
+  border-radius: var(--s-r-sm);
+}
+[data-skin="juicy"] [data-scope="progress"][data-part="track"] {
+  block-size: 14px;
+  box-shadow: none;
+}
+[data-skin="juicy"] [data-scope="progress"][data-part="indicator"] {
+  background: var(--s-acc);
+  border-radius: 99px;
+}
+[data-skin="juicy"] [data-scope="progress"][data-part="circle-indicator"] {
+  stroke: var(--s-acc);
+}

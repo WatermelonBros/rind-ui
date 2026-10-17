@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Skeleton } from "@rind-ui/react"
+import { Button, Image, Skeleton } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
@@ -94,6 +94,24 @@ export function NoAnimation() {
   )
 }
 
+export function ImageFallback() {
+  // An Image whose Fallback holds an Item: the Image keeps the name while it loads; the Item
+  // is a silent shape. This image has no source yet, so the shape stays.
+  return (
+    <Image.Root
+      alt="Ada Lovelace's portrait"
+      style={{ inlineSize: 160, ["--rind-image-aspect-ratio" as string]: "1" }}
+    >
+      <Image.Img />
+      <Image.Fallback>
+        <Skeleton.Root>
+          <Skeleton.Item data-shape="block" />
+        </Skeleton.Root>
+      </Image.Fallback>
+    </Image.Root>
+  )
+}
+
 export const variants: Variants = {
   Card: {
     title: "Card",
@@ -110,4 +128,8 @@ export const variants: Variants = {
     description: "`announceOnLoad` makes one polite announcement when loading finishes.",
   },
   NoAnimation: { title: "No animation", description: "`animate={false}`: no shimmer." },
+  ImageFallback: {
+    title: "Image fallback",
+    description: "A Skeleton.Item as an Image's Fallback: the Image keeps the name.",
+  },
 }

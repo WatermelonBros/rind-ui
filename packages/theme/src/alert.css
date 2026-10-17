@@ -1,0 +1,121 @@
+/*
+ * Alert (family: status): an inline message box. A grid with the Icon in the start column,
+ * Title and Description in the middle and the CloseTrigger at the inline end (logical areas,
+ * so RTL mirrors). Reads accent roles only, so `data-tone` recolours it. The exit is an
+ * opacity transition on data-state="closed" (presence waits for it), zero under reduced
+ * motion through the duration tokens.
+ */
+@layer rind.components {
+  :where([data-scope="alert"][data-part="root"]) {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "icon title close"
+      "icon description close";
+    align-items: start;
+    column-gap: var(--rind-alert-gap, var(--rind-space-3));
+    row-gap: var(--rind-space-1);
+    padding: var(--rind-alert-padding, var(--rind-space-3) var(--rind-space-4));
+    border: var(--rind-border-width) solid var(--rind-alert-border, transparent);
+    border-radius: var(--rind-alert-radius, var(--rind-radius-md));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-alert-font-size, var(--rind-text-sm));
+    line-height: 1.45;
+    /* Soft, the default. */
+    background: var(--rind-alert-bg, var(--rind-color-accent-soft));
+    color: var(--rind-alert-text, var(--rind-color-accent-text));
+    transition: opacity var(--rind-alert-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  :where([data-scope="alert"][data-part="root"][data-state="closed"]) {
+    opacity: 0;
+  }
+
+  :where([data-scope="alert"][data-part="root"][data-variant="solid"]) {
+    background: var(--rind-alert-bg, var(--rind-color-accent-solid));
+    color: var(--rind-alert-text, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="alert"][data-part="root"][data-variant="outline"]) {
+    background: var(--rind-alert-bg, transparent);
+    color: var(--rind-alert-text, var(--rind-color-accent-text));
+    border-color: var(--rind-alert-border, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="alert"][data-part="root"][data-size="sm"]) {
+    font-size: var(--rind-alert-font-size, var(--rind-text-xs));
+    padding: var(--rind-alert-padding, var(--rind-space-2) var(--rind-space-3));
+  }
+
+  :where([data-scope="alert"][data-part="root"][data-size="lg"]) {
+    font-size: var(--rind-alert-font-size, var(--rind-text-md));
+    padding: var(--rind-alert-padding, var(--rind-space-4) var(--rind-space-6));
+  }
+
+  :where([data-scope="alert"][data-part="icon"]) {
+    grid-area: icon;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--rind-alert-icon-size, 1.25em);
+    block-size: var(--rind-alert-icon-size, 1.25em);
+    margin-block-start: 0.1em;
+    color: currentColor;
+  }
+
+  :where([data-scope="alert"][data-part="icon"]) > :where(svg) {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: currentColor;
+  }
+
+  :where([data-scope="alert"][data-part="title"]) {
+    grid-area: title;
+    font-weight: var(--rind-alert-title-font-weight, 600);
+  }
+
+  :where([data-scope="alert"][data-part="description"]) {
+    grid-area: description;
+  }
+
+  /* Without a Title, the Description takes the first row. */
+  :where([data-scope="alert"][data-part="root"]):not(:has(> [data-part="title"])) {
+    grid-template-areas: "icon description close";
+  }
+
+  :where([data-scope="alert"][data-part="close-trigger"]) {
+    grid-area: close;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    /* WCAG 2.5.8: a target of at least 24×24 CSS px. */
+    min-inline-size: var(--rind-alert-close-size, max(1.5rem, 24px));
+    min-block-size: var(--rind-alert-close-size, max(1.5rem, 24px));
+    margin-block: -0.15em;
+    margin-inline-end: calc(var(--rind-space-1) * -1);
+    padding: 0 var(--rind-space-1);
+    border: 0;
+    border-radius: var(--rind-radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where([data-scope="alert"][data-part="close-trigger"]):hover {
+    background: color-mix(in oklab, currentColor 12%, transparent);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="alert"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="alert"][data-part="icon"]) {
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+}
