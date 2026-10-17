@@ -962,6 +962,88 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### listbox
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "listbox.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "listbox.css"
+    },
+    "description-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "empty-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "listbox.css"
+    },
+    "indicator-size": {
+      "fallback": "1em",
+      "file": "listbox.css"
+    },
+    "item-disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "listbox.css"
+    },
+    "item-height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "listbox.css"
+    },
+    "item-highlight-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "listbox.css"
+    },
+    "item-highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "listbox.css"
+    },
+    "item-padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "listbox.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-radius-sm)",
+      "file": "listbox.css"
+    },
+    "item-selected-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "listbox.css"
+    },
+    "item-selected-text": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "listbox.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "listbox.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "listbox.css"
+    },
+    "section-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "listbox.css"
+    }
+  }
+}
+```
+
 ### menu
 
 ```json

@@ -388,9 +388,11 @@ The `listbox` contract SHALL locate an instance by its list's role `listbox` and
 accessible name, SHALL include the collection contract fragment with item role `option`,
 strategy `roving` and selection keys Space and Enter, and SHALL declare the traits
 `composite-roving`, `selectable` (except in `none` mode), `set-metadata` when
-virtualized and `directional` when horizontal. Beyond the fragment it SHALL declare the
+virtualized and `directional` when horizontal (a contract is static: it declares all four and
+exports `listboxTraits(props)`, which a run of one props class swaps in). Beyond the fragment it SHALL declare the
 action `act(name)` (pointer press or Enter; postcondition: `onAction` observed through the
-fixture's recorder) and the queries `isEmpty()` and `selectionMode()`. Programmatic
+fixture's recorder; the model maps `ACTION` to a skip, since a replace list's Enter and double
+press are scenario tests) and the queries `isEmpty()` and `selectionMode()`. Programmatic
 selection changes SHALL map to `{ skip: reason }` and `$sync:value` to a prop step.
 
 #### Scenario: Driver round trip
