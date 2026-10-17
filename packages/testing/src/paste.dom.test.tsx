@@ -1,4 +1,4 @@
-// The adapters' `paste(text)` in the DOM adapter (the pw twin is in fixtures/password-input):
+// The adapters' `paste(text)` in the DOM adapter (the pw twin is in fixtures/text-field-password):
 // the browser's order paste → beforeinput → input, the clipboard text, and prevention.
 import { TextField } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
