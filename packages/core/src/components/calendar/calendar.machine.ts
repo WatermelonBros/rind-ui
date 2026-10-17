@@ -238,7 +238,9 @@ export const calendarMachine = setup({
         props.calendar.fromJulianDay(0),
       props.calendar,
     )
-    return { visibleStart: align(focused, focused.set({ day: 1 }), props), hovered: null }
+    // The initial focus is clamped like every later one (a controlled value may be outside).
+    const clamped = clamp(focused, props)
+    return { visibleStart: align(clamped, clamped.set({ day: 1 }), props), hovered: null }
   },
   values: {
     value: { fallback: EMPTY, equal: sameDays },

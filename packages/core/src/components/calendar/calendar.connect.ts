@@ -73,6 +73,8 @@ export function calendarConnect(input: CalendarConnectInput) {
   const selected = valuesOf(input.value)
   const isSelected = (date: CalendarDate) => selected.some((v) => isSameDay(v, date))
   const outOfRange = (date: CalendarDate) => !isSameDay(clamp(date, input), date)
+  // A controlled focusedValue outside min/max (also at mount) focuses the nearest bound.
+  const focusedDate = clamp(input.focused, input)
   const invalid = selected.some(
     (v) =>
       outOfRange(toCalendar(v, input.calendar) as CalendarDate) ||
@@ -182,7 +184,7 @@ export function calendarConnect(input: CalendarConnectInput) {
       const unavailable = !disabled && input.isDateUnavailable?.(date) === true
       const sel = !placeholder && isSelected(date)
       const today = isSameDay(date, input.today)
-      const isFocused = !placeholder && isSameDay(date, input.focused)
+      const isFocused = !placeholder && isSameDay(date, focusedDate)
       const focusHere = isFocused && input.gridFocused
       const cellInvalid = sel && (outOfRange(date) || input.isDateUnavailable?.(date) === true)
       const formatted = fullDate(date, input.formatLocale, input.calendar)
@@ -191,8 +193,7 @@ export function calendarConnect(input: CalendarConnectInput) {
         role: "gridcell",
         "data-value": isoOf(date),
         // One tab stop: the focused date; other enabled cells -1; disabled cells none.
-        tabindex:
-          disabled && !(isFocused && input.disabled !== true) ? undefined : isFocused ? 0 : -1,
+        tabindex: disabled ? undefined : isFocused ? 0 : -1,
         "aria-label": input.messages.cellLabel({ date, formatted, today }),
         "aria-selected": sel ? "true" : "false",
         "aria-disabled": disabled || unavailable ? "true" : undefined,
