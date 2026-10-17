@@ -139,3 +139,4 @@ export { type SwitchStepInvariants, switchStepInvariants } from "./switch-invari
 export { type TextFieldStepInvariants, textFieldStepInvariants } from "./text-field-invariants"
 export { type VirtualClock, virtualClock } from "./virtual-clock"
 export { liveAnnouncements, spokenLog } from "./virtual-sr"
+export { expectRindWarning } from "./warning-guard"
