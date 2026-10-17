@@ -1,6 +1,7 @@
 // Drivers, adapters and model-based tests built on component contracts.
 
 export { platforms, withEngine } from "@rind-ui/core"
+export { parseQrPath } from "@rind-ui/core/qr"
 export {
   type AccordionStepInvariants,
   accordionStepInvariants,
@@ -39,6 +40,7 @@ export { getPagination } from "./components/pagination"
 export { getPasswordInput } from "./components/password-input"
 export { getPinInput } from "./components/pin-input"
 export { getPopover } from "./components/popover"
+export { getQrCode, qrCodeDecodingContract } from "./components/qr-code"
 export { getRadioGroup } from "./components/radio-group"
 export { getScrollArea } from "./components/scroll-area"
 export { getSearchField } from "./components/search-field"
@@ -108,6 +110,13 @@ export {
 } from "./number-input-invariants"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
+export {
+  correctBlock,
+  decodeQr,
+  type QrDecoded,
+  type QrDecodedSegment,
+  QrDecodeError,
+} from "./qr/decode"
 export {
   type SearchFieldStepInvariants,
   searchFieldStepInvariants,

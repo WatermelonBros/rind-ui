@@ -1506,6 +1506,47 @@
         }
       }
     },
+    "qr-code": {
+      "family": "decoration",
+      "tokens": {
+        "bg": {
+          "fallback": "oklch(from var(--rind-color-bg) 1 0 0)",
+          "file": "qr-code.css"
+        },
+        "fg": {
+          "fallback": "oklch(from var(--rind-color-text) 0 0 0)",
+          "file": "qr-code.css"
+        },
+        "overlay-outline-color": {
+          "fallback": "oklch(from var(--rind-color-bg) 1 0 0)",
+          "file": "qr-code.css"
+        },
+        "overlay-outline-width": {
+          "fallback": "0.25rem",
+          "file": "qr-code.css"
+        },
+        "overlay-radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "qr-code.css"
+        },
+        "overlay-size": {
+          "fallback": "25%",
+          "file": "qr-code.css"
+        },
+        "padding": {
+          "fallback": "0",
+          "file": "qr-code.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "qr-code.css"
+        },
+        "size": {
+          "fallback": "11rem",
+          "file": "qr-code.css"
+        }
+      }
+    },
     "radio-group": {
       "family": null,
       "tokens": {

@@ -35,6 +35,7 @@ import * as pinInput from "./pin-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
+import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
@@ -98,6 +99,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  "qr-code": qrCode,
   "scroll-area": scrollArea,
   skeleton,
   slider,

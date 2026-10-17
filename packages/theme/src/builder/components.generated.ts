@@ -331,6 +331,16 @@ export type ComponentTokens = {
     | "padding"
     | "radius"
     | "shadow"
+  readonly "qr-code":
+    | "bg"
+    | "fg"
+    | "overlayOutlineColor"
+    | "overlayOutlineWidth"
+    | "overlayRadius"
+    | "overlaySize"
+    | "padding"
+    | "radius"
+    | "size"
   readonly "radio-group":
     | "bg"
     | "border"
