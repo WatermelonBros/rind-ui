@@ -186,6 +186,8 @@ export interface Env<P extends string = string> {
   keyboard(key: Key, options?: KeyOptions): Promise<void>
   /** Presses on the document outside every layer. */
   pointerOutside(): Promise<void>
+  /** Moves the pointer onto the document outside every layer, with no press (a hover leaves). */
+  pointerAway(): Promise<void>
   /** Polls `read` until `accept` holds or the timeout ends. */
   until<T>(read: () => Promise<T>, accept: (value: T) => boolean): Promise<T>
   /** Advances fake timers when the test uses them; otherwise waits a frame. */
