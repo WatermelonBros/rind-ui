@@ -263,7 +263,8 @@ set `aria-invalid="true"` on the input.
 
 ### Requirement: Combobox Data Attributes
 
-In addition to the pattern's attributes: Root and Control SHALL carry `data-state`,
+In addition to the pattern's attributes: Root and Control SHALL carry `data-state` (the
+machine's open state; the Trigger's follows `aria-expanded`, like the Input's),
 `data-focus` (focus anywhere in the component), `data-disabled`, `data-readonly`,
 `data-invalid`, `data-empty-value` when nothing is selected; Item and ItemIndicator SHALL
 carry `data-state` (`checked` | `unchecked`) and the collection item attributes; Chip

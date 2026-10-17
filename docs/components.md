@@ -65,7 +65,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Used by Reado |
-| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | spec |  |
+| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done |  |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
