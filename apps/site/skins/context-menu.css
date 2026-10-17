@@ -1,0 +1,49 @@
+/* Context Menu: a focusable region (the Menu trigger with data-context-menu); the menu itself is styled by menu.css (scope "menu") */
+[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu] {
+  display: grid;
+  gap: 4px;
+  place-content: center;
+  min-width: min(100%, 280px);
+  min-height: 120px;
+  padding: 16px;
+  font: 700 15px var(--s-font);
+  color: var(--s-ink);
+  text-align: center;
+  background: var(--s-card);
+  border: var(--s-bw) dashed var(--s-line);
+  border-radius: var(--s-r);
+  cursor: context-menu;
+  user-select: none;
+  transition:
+    background 0.2s var(--s-ease),
+    border-color 0.2s var(--s-ease);
+}
+[data-rind-theme="skin-juicy"] [data-scope="menu"][data-part="trigger"][data-context-menu] {
+  border: 2px dashed #c9bdf2;
+}
+[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu] small {
+  font: 500 12px var(--s-font);
+  color: color-mix(in oklab, var(--s-ink) 78%, var(--s-card));
+}
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {
+  background: var(--s-muted);
+  border-style: solid;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu]:focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu][data-disabled] {
+  border-style: dotted;
+  background: var(--s-muted);
+  cursor: default;
+}
+/* not a button: the menu trigger's lift and press motion are off for a region */
+[data-rind-theme^="skin-"]
+[data-scope="menu"][data-part="trigger"][data-context-menu]:is([data-hover], [data-state="open"]) {
+  translate: none;
+  box-shadow: none;
+}
