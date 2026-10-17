@@ -239,11 +239,18 @@ const clearActivations = { action: "clear", count: () => emptyInputs }
 /** The exported invariants; the story's text is "abc", composing "かな" and typing "x" add to it. */
 const composed = textFieldStepInvariants({ composedText: /^[abcかなx]*$/ })
 
+/** Implicit submissions of the story's form (Enter in the input), recorded, never navigating. */
+let submits = 0
 /** A story frame: a form counting empty `input` events, with a Reset button inside the Root. */
 function Frame({ children }: { children: React.ReactNode }) {
   return (
     <RindProvider announcer={announcer()}>
       <form
+        // Enter (the SUBMIT edge) submits implicitly: a real submit would reload the frame.
+        onSubmit={(e) => {
+          e.preventDefault()
+          submits += 1
+        }}
         onInput={(e) => {
           if ((e.target as HTMLInputElement).value === "") emptyInputs += 1
         }}
@@ -329,6 +336,8 @@ describe("a correct Text Field passes the same checks", () => {
       { activations: clearActivations },
     )
     expect(results.filter((r) => r.error !== null)).toEqual([])
+    // Enter reached the form (implicit submission), recorded without navigating the frame.
+    expect(submits).toBeGreaterThan(0)
   })
 })
 
