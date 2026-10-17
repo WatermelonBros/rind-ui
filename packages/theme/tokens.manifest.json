@@ -88,6 +88,7 @@
   "runtime": [
     "--rind-accordion-content-height",
     "--rind-accordion-content-width",
+    "--rind-anchor-width",
     "--rind-available-height",
     "--rind-available-width",
     "--rind-collapsible-content-height",
@@ -1839,6 +1840,127 @@
         "selected-weight": {
           "fallback": "600",
           "file": "segmented-control.css"
+        }
+      }
+    },
+    "select": {
+      "family": "field",
+      "tokens": {
+        "content-bg": {
+          "fallback": "var(--rind-color-surface-raised)",
+          "file": "select.css"
+        },
+        "content-border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "select.css"
+        },
+        "content-max-height": {
+          "fallback": "20rem",
+          "file": "select.css"
+        },
+        "content-padding": {
+          "fallback": "var(--rind-space-1)",
+          "file": "select.css"
+        },
+        "content-radius": {
+          "fallback": "var(--rind-radius-md)",
+          "file": "select.css"
+        },
+        "content-shadow": {
+          "fallback": "var(--rind-shadow-sm)",
+          "file": "select.css"
+        },
+        "description-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "select.css"
+        },
+        "empty-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "select.css"
+        },
+        "indicator-size": {
+          "fallback": "1em",
+          "file": "select.css"
+        },
+        "invalid-border": {
+          "fallback": "var(--rind-color-danger-border)",
+          "file": "select.css"
+        },
+        "item-disabled-text": {
+          "fallback": "var(--rind-listbox-item-disabled-text, var(--rind-color-text-disabled))",
+          "file": "select.css"
+        },
+        "item-height": {
+          "fallback": "var(--rind-listbox-item-height, var(--rind-hit-area))",
+          "file": "select.css"
+        },
+        "item-highlight-bg": {
+          "fallback": "var(--rind-listbox-item-highlight-bg, var(--rind-color-neutral-soft))",
+          "file": "select.css"
+        },
+        "item-highlight-text": {
+          "fallback": "var(--rind-listbox-item-highlight-text, var(--rind-color-text))",
+          "file": "select.css"
+        },
+        "item-indicator-size": {
+          "fallback": "1em",
+          "file": "select.css"
+        },
+        "item-padding": {
+          "fallback": "var(--rind-listbox-item-padding, var(--rind-space-1) var(--rind-space-2))",
+          "file": "select.css"
+        },
+        "item-radius": {
+          "fallback": "var(--rind-listbox-item-radius, var(--rind-radius-sm))",
+          "file": "select.css"
+        },
+        "item-selected-bg": {
+          "fallback": "var(--rind-listbox-item-selected-bg, var(--rind-color-accent-soft))",
+          "file": "select.css"
+        },
+        "item-selected-text": {
+          "fallback": "var(--rind-listbox-item-selected-text, var(--rind-color-accent-text))",
+          "file": "select.css"
+        },
+        "placeholder-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "select.css"
+        },
+        "section-label-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "select.css"
+        },
+        "separator": {
+          "fallback": "var(--rind-color-border)",
+          "file": "select.css"
+        },
+        "trigger-bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "select.css"
+        },
+        "trigger-border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "select.css"
+        },
+        "trigger-height": {
+          "fallback": "var(--rind-hit-area)",
+          "file": "select.css"
+        },
+        "trigger-open-border": {
+          "fallback": "var(--rind-color-accent-border)",
+          "file": "select.css"
+        },
+        "trigger-padding": {
+          "fallback": "var(--rind-space-1) var(--rind-space-3)",
+          "file": "select.css"
+        },
+        "trigger-radius": {
+          "fallback": "var(--rind-radius-control)",
+          "file": "select.css"
+        },
+        "trigger-text": {
+          "fallback": "var(--rind-color-text)",
+          "file": "select.css"
         }
       }
     },

@@ -467,6 +467,7 @@ export const menuMachine = setup({
         initialFocus: () => false,
         finalFocus: () => (a.context.restoreFocus ? null : false),
         modality: env.modality.modality(),
+        tabCloses: true,
         dismiss: {
           escape: true,
           outsidePress: true,

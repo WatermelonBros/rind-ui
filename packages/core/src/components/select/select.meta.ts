@@ -1,0 +1,291 @@
+// The Select's API facts for the generated docs (scripts/docs-gen.ts). Data only; checked
+// against the code in select.meta.test.ts.
+
+import type { ComponentMeta } from "../meta"
+
+const base = (part: string) => ({
+  "data-scope": '"select"',
+  "data-part": `"${part}"`,
+  "data-instance": "The instance id.",
+})
+
+const placement = {
+  "data-side": "The physical side it is placed on (`top`, `right`, `bottom`, `left`).",
+  "data-anchor-hidden": "While the trigger is scrolled out of view.",
+  "data-placing": "Until the first placement of an open.",
+}
+
+export const selectMeta = {
+  scope: "select",
+  name: "Select",
+  stateless: false,
+  parts: [
+    {
+      name: "Select.Root",
+      part: "root",
+      element: "(none)",
+      description:
+        "Holds the state and the hidden form input; renders no element. `actionsRef` exposes `open()` and `close()`.",
+    },
+    {
+      name: "Select.Label",
+      part: "label",
+      element: "span",
+      description: "Names the trigger (`aria-labelledby`); a press focuses the trigger.",
+    },
+    {
+      name: "Select.Trigger",
+      part: "trigger",
+      element: "button",
+      description:
+        '`role="combobox"`, `aria-expanded`, `aria-controls` while the list is mounted; named by the label, never by its value.',
+    },
+    {
+      name: "Select.ValueText",
+      part: "value-text",
+      element: "span",
+      description: "The selected texts, else the placeholder.",
+    },
+    {
+      name: "Select.Indicator",
+      part: "indicator",
+      element: "span",
+      description: "`aria-hidden` chevron.",
+    },
+    {
+      name: "Select.Description",
+      part: "description",
+      element: "span",
+      description: "Referenced by the trigger's `aria-describedby`.",
+    },
+    {
+      name: "Select.Portal",
+      part: "portal",
+      element: "(none)",
+      description: "Optional: renders its children in the shared `Portal`.",
+    },
+    {
+      name: "Select.Positioner",
+      part: "positioner",
+      element: "div",
+      description: "Placed against the trigger by the positioning capability.",
+    },
+    {
+      name: "Select.Content",
+      part: "content",
+      element: "div",
+      description: "The popup surface; mounts on open, unmounts after its exit animation.",
+    },
+    {
+      name: "Select.List",
+      part: "list",
+      element: "div",
+      description: '`role="listbox"`, named by the label; Tab closes the popup.',
+    },
+    {
+      name: "Select.Item",
+      part: "item",
+      element: "div",
+      description: '`role="option"` with explicit `aria-selected`; `value` is its key.',
+    },
+    {
+      name: "Select.ItemText",
+      part: "item-text",
+      element: "span",
+      description: "The option's name and its text in the value text.",
+    },
+    {
+      name: "Select.ItemIndicator",
+      part: "item-indicator",
+      element: "span",
+      description: "`aria-hidden`; rendered while selected unless `keepMounted`.",
+    },
+    {
+      name: "Select.ItemDescription",
+      part: "item-description",
+      element: "span",
+      description: "`aria-hidden`, referenced by the option's `aria-describedby`.",
+    },
+    {
+      name: "Select.Section",
+      part: "section",
+      element: "div",
+      description: '`role="group"` named by its label.',
+    },
+    {
+      name: "Select.SectionLabel",
+      part: "section-label",
+      element: "div",
+      description: "Names its section.",
+    },
+    {
+      name: "Select.Separator",
+      part: "separator",
+      element: "div",
+      description: 'Decorative (`role="none"`).',
+    },
+    {
+      name: "Select.Empty",
+      part: "empty",
+      element: "div",
+      description: "After the list while it has no items.",
+    },
+  ],
+  props: {
+    value: {
+      type: "string | null (multiple: string[])",
+      description: "Controlled selection.",
+    },
+    defaultValue: {
+      type: "string | null (multiple: string[])",
+      description: "Uncontrolled selection.",
+    },
+    onValueChange: {
+      type: "(value, { reason }) => void",
+      description: 'Every change; `reason` is "select", "typeahead", "reset" or "autofill".',
+    },
+    multiple: {
+      type: "boolean",
+      default: "false",
+      description: "Several selected options; the popup stays open on a choice.",
+    },
+    open: { type: "boolean", description: "Controlled open state." },
+    defaultOpen: { type: "boolean", default: "false", description: "Uncontrolled open state." },
+    onOpenChange: {
+      type: "(open, { reason }) => void",
+      description: "Why it opened or closed.",
+    },
+    modal: {
+      type: "boolean",
+      default: "true",
+      description: "The page behind is inert and does not scroll while open.",
+    },
+    items: {
+      type: "{ key, label, disabled?, section? }[]",
+      description: "Data items: the value text needs no mounted option.",
+    },
+    name: { type: "string", description: "The form field name." },
+    form: { type: "string", description: "The id of the form it belongs to." },
+    autoComplete: { type: "string", description: "The hidden input's `autocomplete` token." },
+    placeholder: { type: "string", description: "Shown in the value text with no selection." },
+    required: { type: "boolean", default: "false", description: "A selection is required." },
+    invalid: { type: "boolean", default: "false", description: "Marks the select invalid." },
+    disabled: {
+      type: "boolean",
+      default: "false",
+      description: "No focus, no keys, no presses.",
+    },
+    readOnly: { type: "boolean", default: "false", description: "Focusable; cannot change." },
+    loop: {
+      type: "boolean",
+      default: "false",
+      description: "Wraps the highlight at the ends of the list.",
+    },
+    typeaheadTimeout: {
+      type: "number",
+      default: "1000",
+      description: "Milliseconds before the typed text resets.",
+    },
+    positioning: { type: "PositioningProps", description: "Side, align, offset, collisions." },
+    keepMounted: { type: "boolean", default: "false", description: "Keep the popup in the DOM." },
+  },
+  dataAttributes: {
+    trigger: {
+      ...base("trigger"),
+      "data-state": "open | closed.",
+      "data-placeholder": "No selection: the placeholder shows.",
+      "data-autofill": "The value came from autofill, until the next change.",
+      "data-disabled": "Disabled.",
+      "data-readonly": "Read-only.",
+      "data-required": "Required.",
+      "data-invalid": "Invalid.",
+      "data-pressed": "While pressed.",
+      "data-focus": "While it has focus.",
+      "data-focus-visible": "Keyboard focus.",
+    },
+    label: {
+      ...base("label"),
+      "data-disabled": "Disabled.",
+      "data-readonly": "Read-only.",
+      "data-required": "Required.",
+      "data-invalid": "Invalid.",
+    },
+    "value-text": { ...base("value-text"), "data-placeholder": "No selection." },
+    indicator: { ...base("indicator"), "data-state": "open | closed." },
+    positioner: {
+      ...base("positioner"),
+      ...placement,
+      "data-state": "open | closed.",
+    },
+    content: {
+      ...base("content"),
+      ...placement,
+      "data-state": "open | closed (exit animation).",
+      "data-modal": "Modal.",
+      "data-close-reason": "Why it closed, while closing.",
+    },
+    list: {
+      ...base("list"),
+      "data-selection-mode": "single | multiple.",
+      "data-focus": "Focus is in the list.",
+      "data-focus-visible": "Keyboard focus is in the list.",
+      "data-disabled": "Disabled.",
+      "data-empty": "No items.",
+    },
+    item: {
+      ...base("item"),
+      "data-key": "The item key.",
+      "data-highlighted": "The highlighted (focused) item.",
+      "data-selected": "Selected.",
+      "data-disabled": "Disabled.",
+      "data-focus-visible": "Keyboard focus.",
+      "data-state": "selected | unselected.",
+    },
+    "item-indicator": { ...base("item-indicator"), "data-state": "selected | unselected." },
+  },
+  keyboard: [
+    ["Enter, Space, ArrowDown", "On the trigger: opens on the first (or selected) option."],
+    ["ArrowUp, Alt+ArrowDown", "On the trigger: opens on the last option / the first."],
+    ["Characters", "Closed (single): selects the match. Open: highlights it."],
+    ["Arrow keys, Home, End, PageUp, PageDown", "Move the highlight."],
+    ["Enter, Space", "Select the highlighted option; single closes the popup."],
+    ["Escape", "Close without changing the value; focus returns to the trigger."],
+    ["Tab", "Close without choosing; focus moves on."],
+  ],
+  states: {
+    closed: "Only the trigger is rendered.",
+    open: "The popup is open and focus is in the list.",
+  },
+  contract: {
+    actions: {
+      open: ["pointer", "touch", "keyboard"],
+      openWithArrowDown: ["keyboard"],
+      openWithArrowUp: ["keyboard"],
+      close: ["pointer", "touch", "keyboard"],
+      choose: ["pointer", "touch", "keyboard"],
+      typeahead: ["keyboard"],
+      arrowDown: ["keyboard"],
+      pressEscape: ["keyboard"],
+      pressOutside: ["pointer"],
+      tabOut: ["keyboard"],
+      pressLabel: ["pointer"],
+    },
+    queries: [
+      "isPlaced",
+      "side",
+      "align",
+      "isAnchorHidden",
+      "isOpen",
+      "valueText",
+      "hasPlaceholder",
+      "formValue",
+      "options",
+      "selected",
+      "highlighted",
+      "focusedItem",
+      "isDisabled",
+      "closeReason",
+    ],
+    traits: ["layer", "restores-focus", "presence", "anchored", "modal"],
+  },
+} as const satisfies ComponentMeta
