@@ -250,4 +250,26 @@ describe("Tags Input machine", () => {
     m.send({ type: "FORM.RESET" })
     expect([m.tags(), m.draft()]).toEqual([["a"], ""])
   })
+
+  it("a controlled value longer than max is shown and reported once with reason max", () => {
+    const m = make({ max: 2, value: ["a", "b", "c"] })
+    expect(m.tags()).toEqual(["a", "b", "c"])
+    expect(m.onRefuse).toHaveBeenCalledTimes(1)
+    expect(m.onRefuse).toHaveBeenCalledWith({ reason: "max", text: "c" })
+    m.s.setProps({ ...m.props })
+    m.focus()
+    m.send({ type: "FOCUS.LEAVE" })
+    expect(m.onRefuse).toHaveBeenCalledTimes(1)
+    m.s.setProps({ ...m.props, value: ["a", "b", "c", "d"] })
+    expect(m.onRefuse).toHaveBeenCalledTimes(2)
+  })
+
+  it("several tags from one action announce the count", () => {
+    announce.mockClear()
+    const m = make()
+    m.focus()
+    m.type("a,b,")
+    expect(m.tags()).toEqual(["a", "b"])
+    expect(announce).toHaveBeenLastCalledWith(expect.objectContaining({ message: "2 tags added" }))
+  })
 })

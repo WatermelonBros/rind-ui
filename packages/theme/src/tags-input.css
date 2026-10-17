@@ -114,6 +114,13 @@
     outline: none;
   }
 
+  /* iOS zooms into a focused input under 16px: never smaller on touch screens. */
+  @media (pointer: coarse) {
+    :where([data-scope="tags-input"]:is([data-part="input"], [data-part="chip-input"])) {
+      font-size: max(16px, var(--rind-text-control, var(--rind-text-sm)));
+    }
+  }
+
   :where([data-scope="tags-input"][data-part="input"])::placeholder {
     color: var(--rind-combobox-placeholder, var(--rind-color-text-muted));
     opacity: 1;

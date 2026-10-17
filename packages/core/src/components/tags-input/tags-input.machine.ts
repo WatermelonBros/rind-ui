@@ -50,6 +50,8 @@ export type TagsInputEvent =
   | { readonly type: "ADD"; readonly text: string }
   | { readonly type: "CLEAR" }
   | { readonly type: "FORM.RESET" }
+  /** The controlled `value` changed (onProps). */
+  | { readonly type: "VALUE.SYNC" }
   | { readonly type: "COMPOSITION.START" }
   | { readonly type: "COMPOSITION.END"; readonly text: string; readonly caretAtEnd: boolean }
 
@@ -110,6 +112,8 @@ export interface TagsInputContext extends InputChipsContext {
   readonly editingKey: string | null
   readonly editText: string
   readonly editRefusal: TagRefusal | null
+  /** The over-`max` value last reported to `onRefuse` (once per value). */
+  readonly overMaxReported: string | null
 }
 
 type Types = {
@@ -171,7 +175,7 @@ function refuse(a: Args, refusal: TagRefusal, where: "draft" | "edit") {
  * The one creation path: normalise, drop empty, max, duplicates (within the batch too),
  * validate; one value proposal; the first refusal reported. Returns the refused texts.
  */
-function createTags(a: Args, texts: readonly string[], reason: "one" | "many") {
+function createTags(a: Args, texts: readonly string[]) {
   const { props } = a
   const norm = normalizeOf(props)
   const compare = props.compare ?? ((x: string, y: string) => x === y)
@@ -200,7 +204,7 @@ function createTags(a: Args, texts: readonly string[], reason: "one" | "many") {
     a.set("value", [...value, ...accepted])
     a.env.announcer.announce({
       message:
-        reason === "many" && accepted.length > 1
+        accepted.length > 1
           ? props.messages.addedManyAnnouncement(accepted.length, props.locale)
           : props.messages.addedAnnouncement(textOf(props, accepted[0] ?? "")),
       priority: "polite",
@@ -320,7 +324,7 @@ export const tagsInputMachine = setup({
       if (composing || !e.caretAtEnd || !interactive(a.props)) return setDraft(a, e.text)
       const { complete, rest } = splitDelimited(e.text, delimitersOf(a.props))
       if (complete.length === 0) return setDraft(a, e.text)
-      const { refused } = createTags(a, complete, "one")
+      const { refused } = createTags(a, complete)
       // A refused segment stays in the draft, before the rest.
       setDraft(
         a,
@@ -329,7 +333,7 @@ export const tagsInputMachine = setup({
     },
     enter: (a) => {
       a.set("armedChip", null)
-      const { accepted } = createTags(a, [a.values.inputValue], "one")
+      const { accepted } = createTags(a, [a.values.inputValue])
       if (accepted.length > 0) clearDraft(a)
     },
     paste: (a) => {
@@ -339,12 +343,12 @@ export const tagsInputMachine = setup({
       // The pasted text joins the draft before splitting (it is inserted at the end).
       const { complete, rest } = splitDelimited(a.values.inputValue + a.event.text, delimiters)
       a.set("refusal", null)
-      const { refused } = createTags(a, [...complete, rest], "many")
+      const { refused } = createTags(a, [...complete, rest])
       a.set("clearedDraft", a.values.inputValue)
       setDraft(a, refused.map(normalizeOf(props)).join(joiner(delimitersOf(props))))
     },
     blurAdd: (a) => {
-      const { accepted } = createTags(a, [a.values.inputValue], "one")
+      const { accepted } = createTags(a, [a.values.inputValue])
       if (accepted.length > 0) clearDraft(a)
     },
     blurClear: (a) => setDraft(a, ""),
@@ -378,7 +382,7 @@ export const tagsInputMachine = setup({
       })
     },
     add: (a) => {
-      if (a.event.type === "ADD") createTags(a, [a.event.text], "one")
+      if (a.event.type === "ADD") createTags(a, [a.event.text])
     },
     reset: (a) => {
       a.set("value", a.props.defaultValue ?? EMPTY)
@@ -428,6 +432,16 @@ export const tagsInputMachine = setup({
         key: "tags-input:updated",
       })
     },
+    /** A controlled value longer than `max` is shown as given and reported once (Maximum). */
+    checkMax: (a) => {
+      const { props } = a
+      const value = a.values.value as readonly string[]
+      if (props.max === undefined || value.length <= props.max) return
+      const id = JSON.stringify(value)
+      if (a.context.overMaxReported === id) return
+      a.set("overMaxReported", id)
+      props.onRefuse?.({ reason: "max", text: value[props.max] ?? "" })
+    },
     cancelEdit: ({ set }) => {
       set("editingKey", null)
       set("editRefusal", null)
@@ -445,13 +459,16 @@ export const tagsInputMachine = setup({
     editingKey: null,
     editText: "",
     editRefusal: null,
+    overMaxReported: null,
   }),
   values: {
     value: { fallback: EMPTY as string[] },
     inputValue: { fallback: "" },
   },
+  onProps: { value: "VALUE.SYNC" },
   on: {
     $reverted: { actions: ["revert"] },
+    "VALUE.SYNC": { actions: ["checkMax"] },
     "FORM.RESET": { target: "idle", actions: ["reset"] },
     ADD: { actions: ["add"] },
     CLEAR: { actions: ["clearAll"] },
@@ -464,6 +481,7 @@ export const tagsInputMachine = setup({
   },
   states: {
     idle: {
+      entry: ["checkMax"],
       on: {
         "INPUT.FOCUS": { target: "typing", actions: ["setFocused"] },
         "INPUT.CHANGE": { target: "typing", actions: ["setFocused", "typed"] },
