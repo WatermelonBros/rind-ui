@@ -218,6 +218,19 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
           } else if (e.key === next) {
             e.preventDefault()
             goTo(step(key, 1), "keyboard")
+          } else if (e.key === "Home" || e.key === "End") {
+            // Toolbar keys: the first / last chip; never the page's scroll.
+            e.preventDefault()
+            const to = e.key === "Home" ? enabled[0] : enabled.at(-1)
+            if (to) goTo(to.key, "keyboard")
+          } else if (
+            e.key === "ArrowUp" ||
+            e.key === "ArrowDown" ||
+            e.key === "PageUp" ||
+            e.key === "PageDown"
+          ) {
+            // A horizontal toolbar: vertical keys do nothing (and never scroll the page).
+            e.preventDefault()
           } else if (e.key === "Backspace" || e.key === "Delete") {
             e.preventDefault()
             remove(key)
