@@ -569,3 +569,64 @@ describe("Browser behaviour", () => {
     expect(document.activeElement).toBe(notes)
   })
 })
+
+describe("Field prop × control (5.1)", () => {
+  const matrix = [
+    { prop: "disabled", check: () => segment("month Birthday").disabled },
+    { prop: "readOnly", check: () => segment("month Birthday").readOnly },
+    { prop: "required", check: () => hidden().required },
+    {
+      prop: "invalid",
+      check: () => segment("month Birthday").getAttribute("aria-invalid") === "true",
+    },
+  ] as const
+  for (const { prop, check } of matrix) {
+    for (const where of ["field", "date-field", "neither"] as const) {
+      it(`${prop} on ${where}`, () => {
+        const on = { [prop]: true }
+        render(
+          <RindProvider environment={{ dateClock: clock }}>
+            <Field.Root {...(where === "field" ? on : {})}>
+              <Field.Label>Birthday</Field.Label>
+              <DateField.Root {...(where === "date-field" ? on : {})}>
+                <DateField.Input />
+              </DateField.Root>
+            </Field.Root>
+          </RindProvider>,
+        )
+        expect(check()).toBe(where !== "neither")
+      })
+    }
+  }
+})
+
+describe("IME scenarios (7.2)", () => {
+  it("Japanese full-width digits (react-spectrum#3739): １２ is month 12", async () => {
+    render(<D />)
+    await drv().enter()
+    await drv().composeOpen("１２")
+    await drv().composeEnd("１２")
+    expect(segment("month Birthday").getAttribute("aria-valuenow")).toBe("12")
+    expect(await drv().focusedSegment()).toBe("day")
+  })
+
+  it("Korean day period (react-spectrum#5832): 오후 is PM after the composition", async () => {
+    render(
+      <D
+        locale="ko-KR"
+        label="시간"
+        granularity="minute"
+        hourCycle={12}
+        defaultValue={new CalendarDateTime(2026, 10, 14, 9, 30)}
+      />,
+    )
+    const period = screen
+      .getAllByRole("spinbutton")
+      .find((s) => s.getAttribute("data-type") === "dayPeriod") as HTMLInputElement
+    act(() => period.focus())
+    await drv("시간").composeOpen("오후")
+    expect(document.activeElement).toBe(period)
+    await drv("시간").composeEnd("오후")
+    expect(await drv("시간").value()).toBe("2026-10-14T21:30")
+  })
+})
