@@ -282,7 +282,9 @@ function Heading({ render, ...rest }: PartP<"h2">) {
 function useTrigger(direction: 1 | -1, part: string) {
   const ctx = useCalendar(part)
   const env = useEnvironment()
-  const props = ctx.api.trigger(direction)
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  const props = ctx.api.trigger(direction, { focused, modality })
   const off = props["aria-disabled"] === "true"
   const press = usePress({
     env,
@@ -291,7 +293,10 @@ function useTrigger(direction: 1 | -1, part: string) {
       if (e.type === "PRESS") ctx.send({ type: "PAGE", direction, modality: e.modality })
     },
   })
-  return { ...normalizeProps(props), ...press.props }
+  return joinHandlers(normalizeProps(props), press.props, {
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  })
 }
 
 function PrevTrigger({ render, ...rest }: PartP<"button">) {
@@ -426,7 +431,9 @@ function Cell({
     disabled: () => placeholder || disabled,
     send: (e) => {
       // A placeholder never selects (react-spectrum#3257); release, not press, selects.
-      if (e.type === "PRESS" && !placeholder && !disabled) {
+      // Enter and Space are the grid's keys (SELECT_FOCUSED): a key press here would select
+      // twice (a multiple selection toggles back).
+      if (e.type === "PRESS" && e.pointerType !== "keyboard" && !placeholder && !disabled) {
         ctx.send({ type: "CELL.PRESS", date, modality: e.modality })
       }
     },

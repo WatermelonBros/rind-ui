@@ -171,8 +171,12 @@ export const calendarContract = contract("calendar", {
     },
     nextPage: {
       pointer: async (env: E) => env.part("next-trigger").click(),
-      // The keys of the focused grid (an unfocused calendar pages by its triggers).
-      keyboard: (env: E) => env.keyboard("PageDown"),
+      // The trigger by keyboard (PageDown in the grid moves the focus: NAVIGATE).
+      keyboard: async (env: E) => {
+        const trigger = env.part("next-trigger")
+        await trigger.focus()
+        await trigger.press("Enter")
+      },
       done: async () => true,
     },
     previousPage: {

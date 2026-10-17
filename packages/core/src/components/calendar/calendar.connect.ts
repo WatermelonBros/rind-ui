@@ -120,7 +120,14 @@ export function calendarConnect(input: CalendarConnectInput) {
       id: input.ids.heading,
       children: range,
     }),
-    trigger: (direction: 1 | -1): PartProps => {
+    /** `focus`: the trigger's own focus and the modality it came with (its ring). */
+    trigger: (
+      direction: 1 | -1,
+      focus: { readonly focused: boolean; readonly modality: Modality } = {
+        focused: false,
+        modality: "keyboard",
+      },
+    ): PartProps => {
       const off = input.disabled === true || !canPage(input.visibleStart, direction, input)
       return {
         ...scopeAttrs("calendar", direction > 0 ? "next-trigger" : "prev-trigger", input.instance),
@@ -131,6 +138,7 @@ export function calendarConnect(input: CalendarConnectInput) {
         "data-disabled": dataFlag(off),
         "aria-controls": gridIds,
         disabled: input.disabled === true || undefined,
+        ...focusAttrs(focus.focused, focus.modality),
       }
     },
     grid: (offset: number): PartProps => ({

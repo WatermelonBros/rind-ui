@@ -162,12 +162,22 @@ describe("announcements", () => {
     ])
   })
 
-  it("keyboard paging inside the grid is silent and moves focus to the cell", () => {
+  it("keyboard paging inside the grid (PageDown) is silent and moves focus to the cell", () => {
     const m = make()
     m.focus()
-    m.s.send({ type: "PAGE", direction: 1, modality: "keyboard" })
+    m.key("next-month")
     expect(m.log).toEqual([])
     expect(m.focusCell.mock.lastCall?.[0]).toEqual(d(2026, 11, 14))
+  })
+
+  it("a virtual trigger click keeps the grid focused and repairs focus; a press leaves it", () => {
+    const m = make()
+    m.focus()
+    m.s.send({ type: "PAGE", direction: 1, modality: "virtual" })
+    expect(m.s.getSnapshot().state).toBe("focused")
+    expect(m.focusCell.mock.lastCall?.[0]).toEqual(d(2026, 11, 14))
+    m.s.send({ type: "PAGE", direction: 1, modality: "pointer" })
+    expect(m.s.getSnapshot().state).toBe("idle")
   })
 
   it("paging at the maximum is refused", () => {
