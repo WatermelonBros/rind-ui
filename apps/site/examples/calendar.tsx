@@ -42,7 +42,13 @@ export function Single() {
   const [value, setValue] = useState<CalendarValue>(null)
   return (
     <div className="stack">
-      <Cal label="Departure" value={value} onValueChange={(v) => setValue(v)} />
+      {/* A fixed month: the state example's ARIA snapshot never depends on today. */}
+      <Cal
+        label="Departure"
+        value={value}
+        onValueChange={(v) => setValue(v)}
+        defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+      />
       <span className="note">selected: {value ? String(value) : "none"}</span>
     </div>
   )
