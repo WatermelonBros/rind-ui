@@ -292,6 +292,8 @@ describe("ARIA snapshot per state example", () => {
  * `static` state is the component itself, covered by any of its examples.
  */
 const TRANSIENT = new Set([
+  // Focus in the grid: entered by focusing a cell.
+  "calendar:focused",
   "field:validating",
   "form:validating",
   "form:awaiting-server",

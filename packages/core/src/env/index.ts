@@ -6,6 +6,8 @@ export type {
   ClockEnv,
   CollectionLayout,
   CollectionLayoutEnv,
+  DateClock,
+  DateClockEnv,
   DomEnv,
   DomRoot,
   LocaleEnv,

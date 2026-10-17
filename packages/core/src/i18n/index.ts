@@ -1,3 +1,4 @@
+export * from "./date"
 export { directionOf, isRTL } from "./direction"
 export { canonicalLocale, documentLocale, fixedLocale, localeAttrs } from "./locale"
 export {

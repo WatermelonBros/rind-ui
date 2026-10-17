@@ -1,0 +1,165 @@
+"use client"
+
+import {
+  CalendarDate,
+  createCalendar,
+  getLocalTimeZone,
+  isWeekend,
+  today,
+} from "@internationalized/date"
+import type { CalendarValue } from "@rind-ui/core"
+import { Calendar, type CalendarRootProps } from "@rind-ui/react"
+import { useState } from "react"
+import type { States, Variants } from "./types"
+
+/** `focused` needs real focus inside the grid: it is reached by the driver. */
+export const states: States = { calendar: { idle: "Single" } }
+
+/** Header with both pagers and the heading, then one grid per visible month. */
+function Cal({
+  label,
+  months = 1,
+  ...root
+}: CalendarRootProps & { readonly label: string; readonly months?: number }) {
+  return (
+    <Calendar.Root aria-label={label} visibleMonths={months} {...root}>
+      <Calendar.Header>
+        <Calendar.PrevTrigger />
+        <Calendar.Heading />
+        <Calendar.NextTrigger />
+      </Calendar.Header>
+      {Array.from({ length: months }, (_, m) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: months are positions
+        <Calendar.Grid key={m} month={m} />
+      ))}
+    </Calendar.Root>
+  )
+}
+
+const now = () => today(getLocalTimeZone())
+
+export function Single() {
+  const [value, setValue] = useState<CalendarValue>(null)
+  return (
+    <div className="stack">
+      {/* A fixed month: the state example's ARIA snapshot never depends on today. */}
+      <Cal
+        label="Departure"
+        value={value}
+        onValueChange={(v) => setValue(v)}
+        defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+      />
+      <span className="note">selected: {value ? String(value) : "none"}</span>
+    </div>
+  )
+}
+
+export function Multiple() {
+  return <Cal label="Days off" selectionMode="multiple" />
+}
+
+export function TwoMonths() {
+  return <Cal label="Trip dates" months={2} />
+}
+
+export function ThreeMonthsSinglePaging() {
+  return <Cal label="Quarter" months={3} pageBehavior="single" />
+}
+
+export function MinMax() {
+  const start = now()
+  return (
+    <Cal
+      label="Next two weeks"
+      minValue={start}
+      maxValue={start.add({ days: 14 })}
+      defaultValue={start.add({ days: 3 })}
+    />
+  )
+}
+
+export function UnavailableWeekends() {
+  return <Cal label="Weekdays only" isDateUnavailable={(d) => isWeekend(d, "en-US")} />
+}
+
+export function MondayWeeks() {
+  return <Cal label="Monday first" firstDayOfWeek="mon" />
+}
+
+export function Arabic() {
+  return <Cal label="التاريخ" locale="ar-EG" dir="rtl" />
+}
+
+export function ThaiBuddhist() {
+  return <Cal label="วันที่" locale="th-TH" createCalendar={createCalendar} />
+}
+
+export function ReadOnly() {
+  return <Cal label="Read-only" readOnly defaultValue={now()} />
+}
+
+export function Disabled() {
+  return <Cal label="Disabled" disabled defaultValue={now()} />
+}
+
+export function Invalid() {
+  const start = now()
+  // The selected date is outside the allowed range: the root and the cell turn invalid.
+  return (
+    <Cal
+      label="Out of range"
+      minValue={start.add({ days: 1 })}
+      defaultValue={start.subtract({ days: 3 })}
+    />
+  )
+}
+
+export function ControlledFocus() {
+  const [focused, setFocused] = useState<CalendarDate>(() => new CalendarDate(2026, 10, 14))
+  return (
+    <div className="stack">
+      <Cal label="Controlled focus" focusedValue={focused} onFocusChange={setFocused} />
+      <button type="button" onClick={() => setFocused(new CalendarDate(2027, 1, 1))}>
+        Go to 1 January 2027
+      </button>
+      <span className="note">focused: {String(focused)}</span>
+    </div>
+  )
+}
+
+export const variants: Variants = {
+  Single: { title: "Single date", description: "Click or press Enter or Space to select." },
+  Multiple: {
+    title: "Multiple dates",
+    description: '`selectionMode="multiple"` toggles each date.',
+  },
+  TwoMonths: { title: "Two months", description: "`visibleMonths={2}`; paging moves both." },
+  ThreeMonthsSinglePaging: {
+    title: "Three months, one at a time",
+    description: '`pageBehavior="single"` pages by one month, not by the visible span.',
+  },
+  MinMax: {
+    title: "Minimum and maximum",
+    description: "Dates outside the range are disabled; the pagers stop at the bounds.",
+  },
+  UnavailableWeekends: {
+    title: "Unavailable dates",
+    description: "`isDateUnavailable` strikes weekends: focusable, never selectable.",
+  },
+  MondayWeeks: { title: "Monday first", description: '`firstDayOfWeek="mon"`.' },
+  Arabic: { title: "Arabic (RTL)", description: '`locale="ar-EG" dir="rtl"` mirrors the keys.' },
+  ThaiBuddhist: {
+    title: "Buddhist calendar",
+    description: '`locale="th-TH"` with `createCalendar` from `@internationalized/date`.',
+  },
+  ReadOnly: { title: "Read-only", description: "The value is shown and cannot change." },
+  Disabled: { title: "Disabled", description: "No date is focusable or selectable." },
+  Invalid: {
+    title: "Invalid",
+    description: "A selected date that is out of range or unavailable marks the calendar invalid.",
+  },
+  ControlledFocus: {
+    title: "Controlled focused date",
+    description: "`focusedValue` and `onFocusChange` let the page move the visible month.",
+  },
+}

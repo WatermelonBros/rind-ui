@@ -61,6 +61,7 @@
     "dom-accessibility-api": "^0.7.1"
   },
   "devDependencies": {
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",

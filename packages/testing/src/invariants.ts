@@ -284,7 +284,11 @@ const stateAttrs: GenericInvariant = (f) => {
       // A native `disabled` attribute is the element's aria-disabled.
       const on =
         isTrue(el.attrs[aria]) || (aria === "aria-disabled" && el.attrs["disabled"] !== undefined)
-      const flagged = el.attrs[data] !== undefined
+      // An unavailable date (calendars) is aria-disabled but stays focusable: its own flag,
+      // data-unavailable, is the counterpart (date-values "Constraints": distinct from disabled).
+      const flagged =
+        el.attrs[data] !== undefined ||
+        (aria === "aria-disabled" && el.attrs["data-unavailable"] !== undefined)
       // A data-* flag on a part that is not interactive (a Fieldset's legend, an invalid
       // group) is a styling hook: the ARIA state belongs to its controls.
       if (flagged && !on && !el.focusable) continue
