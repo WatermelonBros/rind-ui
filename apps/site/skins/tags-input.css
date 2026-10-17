@@ -50,8 +50,9 @@
   outline: 3px solid var(--s-acc);
   outline-offset: 1px;
 }
+/* Not a second opacity: inside a disabled Control it would compound below legibility. */
 [data-skinned] [data-scope="tags-input"][data-part="chip"][data-disabled] {
-  opacity: 0.5;
+  border-style: dashed;
 }
 [data-skinned] [data-scope="tags-input"][data-part="chip-input"] {
   field-sizing: content;
