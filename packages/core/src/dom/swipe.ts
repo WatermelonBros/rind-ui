@@ -239,7 +239,10 @@ export function trackSwipe(
     return axis === "x" ? r.width : r.height
   }
 
-  const startAllowed = (target: Element): readonly Element[] | null => {
+  /** The press's path to the element, and whether it began on a part that always starts. */
+  const startAllowed = (
+    target: Element,
+  ): { readonly path: readonly Element[]; readonly fromHandle: boolean } | null => {
     const path = composedPath(target, el)
     if (!path) return null // a portalled popup rendered from it: outside its DOM
     const always = options.alwaysFrom?.() ?? []
@@ -250,7 +253,7 @@ export function trackSwipe(
       if (selecting(el)) return null
     }
     if (options.canStart && !options.canStart(target)) return null
-    return path
+    return { path, fromHandle }
   }
 
   const flush = () => {
@@ -403,9 +406,13 @@ export function trackSwipe(
     if (e.pointerType === "touch" || g || e.button !== 0) return
     const target = e.target instanceof Element ? e.target : null
     if (!target) return
-    // Mouse and pen swipes never start on buttons and links.
-    const path = startAllowed(target)
-    if (!path || path.some((p) => p.closest("button, a[href], [role='button']") === p)) return
+    // Mouse and pen swipes never start on buttons and links, except a part that always
+    // starts one (a drawer's handle, a button with two or more snap points).
+    const start = startAllowed(target)
+    if (!start) return
+    const { path } = start
+    const onButton = path.some((p) => p.closest("button, a[href], [role='button']") === p)
+    if (onButton && !start.fromHandle) return
     g = {
       modality: "pointer",
       pointerId: e.pointerId,
@@ -438,8 +445,9 @@ export function trackSwipe(
     const t = e.touches[0]
     const target = e.target instanceof Element ? e.target : null
     if (!t || !target) return
-    const path = startAllowed(target)
-    if (!path) return
+    const start = startAllowed(target)
+    if (!start) return
+    const { path } = start
     g = {
       modality: "touch",
       pointerId: null,
