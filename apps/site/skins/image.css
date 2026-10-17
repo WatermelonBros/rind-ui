@@ -1,5 +1,5 @@
 /* ── Image: an inked print in crisp, a soft rounded photo in juicy ── */
-[data-skinned] [data-scope="image"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="image"][data-part="root"] {
   display: inline-grid;
   max-width: 100%;
   aspect-ratio: var(--rind-image-aspect-ratio, auto);
@@ -7,44 +7,50 @@
   vertical-align: middle;
 }
 /* Img over Fallback in one cell; the Img's display is never set, so `hidden` hides it. */
-[data-skinned] [data-scope="image"]:is([data-part="img"], [data-part="fallback"]) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="image"]:is([data-part="img"], [data-part="fallback"]) {
   grid-area: 1 / 1;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   border-radius: inherit;
 }
-[data-skinned] [data-scope="image"][data-part="img"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="image"][data-part="img"] {
   z-index: 1;
   object-fit: var(--rind-image-fit, cover);
 }
-[data-skinned] [data-scope="image"][data-part="fallback"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="image"][data-part="fallback"] {
   display: grid;
   place-items: center;
   font: 600 14px / 1.2 var(--s-font);
   background: var(--s-muted);
   color: var(--s-ink);
 }
-[data-skinned] [data-scope="image"][data-part="fallback"] [data-scope="skeleton"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image"][data-part="fallback"]
+  [data-scope="skeleton"] {
   width: 100%;
   height: 100%;
 }
-[data-skinned] [data-scope="image"][data-part="fallback"] [data-shape="block"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image"][data-part="fallback"]
+  [data-shape="block"] {
   display: block;
   width: 100%;
   height: 100%;
 }
-[data-skin="crisp"] [data-scope="image"][data-part="root"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="image"][data-part="root"] {
   border: var(--s-bw) solid var(--s-ink);
   box-shadow: var(--s-lift-lo);
 }
-[data-skin="juicy"] [data-scope="image"][data-part="root"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="image"][data-part="root"] {
   border-radius: 18px;
   box-shadow:
     0 4px 0 var(--s-acc-deep),
     0 0 0 3px #fff;
 }
-[data-skin="juicy"] [data-scope="image"][data-part="fallback"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="image"][data-part="fallback"] {
   background: var(--s-acc);
   color: #fff;
 }

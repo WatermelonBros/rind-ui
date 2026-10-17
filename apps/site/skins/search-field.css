@@ -1,8 +1,8 @@
 /* ── Search Field: the leading icon and the clear trigger (inputs share password-input.css) ── */
-[data-skinned] [data-scope="search-field"][data-part="input"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="search-field"][data-part="input"] {
   padding-inline: 40px 44px;
 }
-[data-skinned] .adorn-start {
+:is([data-skinned], [data-rind-theme^="skin-"]) .adorn-start {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 13px;
@@ -10,7 +10,8 @@
   color: var(--s-ink);
   pointer-events: none;
 }
-[data-skinned] [data-scope="search-field"][data-part="clear-trigger"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="search-field"][data-part="clear-trigger"] {
   position: absolute;
   inset-block: 0;
   inset-inline-end: 6px;

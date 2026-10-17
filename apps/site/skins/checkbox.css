@@ -1,14 +1,14 @@
 /* ── Checkbox ─────────────────────────────────────────────────────────────────────── */
-[data-skinned] [data-scope="checkbox"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox"][data-part="root"] {
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
-[data-skinned] [data-scope="checkbox"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox"][data-part="label"] {
   font-weight: 500;
   cursor: pointer;
 }
-[data-skinned] [data-scope="checkbox"][data-part="control"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox"][data-part="control"] {
   width: 26px;
   height: 26px;
   display: grid;
@@ -24,11 +24,12 @@
     background 0.3s var(--s-ease),
     scale 0.45s var(--s-pop);
 }
-[data-skinned] [data-scope="checkbox"][data-part="control"][data-pressed] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="checkbox"][data-part="control"][data-pressed] {
   scale: 0.88;
   transition-duration: 0.12s;
 }
-[data-skinned] [data-scope="checkbox"][data-part="indicator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox"][data-part="indicator"] {
   display: inline-block;
   scale: 0;
   rotate: -25deg;
@@ -36,7 +37,7 @@
     scale 0.45s var(--s-pop),
     rotate 0.45s var(--s-pop);
 }
-[data-skinned]
+:is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="checkbox"][data-part="indicator"]:is(
     [data-state="checked"],
     [data-state="indeterminate"]
@@ -44,7 +45,7 @@
   scale: 1;
   rotate: 0deg;
 }
-[data-skin="crisp"]
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
   [data-scope="checkbox"][data-part="control"]:is(
     [data-state="checked"],
     [data-state="indeterminate"]
@@ -52,14 +53,15 @@
   background: var(--s-brand);
   color: var(--s-brand-text);
 }
-[data-skin="juicy"] [data-scope="checkbox"][data-part="control"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="checkbox"][data-part="control"] {
   border-radius: 9px;
   background: #fff;
   box-shadow:
     inset 0 0 0 2px #d6ccf7,
     0 3px 0 #d6ccf7;
 }
-[data-skin="juicy"]
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="checkbox"][data-part="control"]:is(
     [data-state="checked"],
     [data-state="indeterminate"]

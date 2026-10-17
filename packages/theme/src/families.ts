@@ -131,6 +131,7 @@ export const familyMatrix = [
       "menu",
       "hover-card",
       "tooltip",
+      "tour",
       "toolbar",
       "menubar",
       "navigation-menu-viewport",

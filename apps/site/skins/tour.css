@@ -1,0 +1,78 @@
+/* Tour: the card, backdrop and spotlight are portalled to <body>; the portal host carries the
+   stage's data-rind-theme, so these rules select on that. The cutout comes inline from the
+   tour (clip-path), the card's coordinates from positioning. */
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="backdrop"] {
+  background: color-mix(in oklab, var(--s-ink) 45%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="spotlight"] {
+  border-radius: var(--s-r-sm);
+  outline: var(--s-bw) solid var(--s-acc);
+  outline-offset: 0;
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="content"] {
+  display: grid;
+  gap: 10px;
+  max-width: min(22rem, calc(100vw - 32px));
+  padding: 16px;
+  font: 500 14px / 1.45 var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="title"] {
+  margin: 0;
+  font: 700 16px / 1.3 var(--s-font);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="description"] {
+  margin: 0;
+  color: var(--s-ink);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="progress-text"] {
+  margin-inline-end: auto;
+  font-size: 13px;
+  color: var(--s-ink);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="tour"]:is(
+    [data-part="trigger"],
+    [data-part="action-trigger"],
+    [data-part="close-trigger"]
+  ) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 14px;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="action-trigger"][data-action="next"] {
+  background: var(--s-acc);
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="action-trigger"][data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="close-trigger"] {
+  justify-self: end;
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="arrow"] {
+  width: 10px;
+  height: 10px;
+  background: var(--s-card);
+  rotate: 45deg;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"] [data-scope="tour"] {
+    transition: none;
+  }
+}

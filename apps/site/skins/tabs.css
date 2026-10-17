@@ -1,14 +1,15 @@
 /* ── Tabs: a row of tabs over a sliding indicator; the panel sits on a card ── */
-[data-skinned] [data-scope="tabs"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="root"] {
   display: grid;
   gap: 10px;
   max-width: 420px;
 }
-[data-skinned] [data-scope="tabs"][data-part="root"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="root"][data-orientation="vertical"] {
   grid-template-columns: auto 1fr;
   align-items: start;
 }
-[data-skinned] [data-scope="tabs"][data-part="list"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="list"] {
   position: relative;
   display: flex;
   gap: 2px;
@@ -18,10 +19,11 @@
   border: var(--s-bw) solid var(--s-line);
   box-shadow: var(--s-lift);
 }
-[data-skinned] [data-scope="tabs"][data-part="list"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="list"][data-orientation="vertical"] {
   flex-direction: column;
 }
-[data-skinned] [data-scope="tabs"][data-part="tab"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="tab"] {
   position: relative;
   z-index: 1;
   font: 600 14px var(--s-font);
@@ -34,11 +36,12 @@
   cursor: pointer;
   transition: color 0.35s var(--s-ease);
 }
-[data-skinned] [data-scope="tabs"][data-part="tab"][data-selected] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="tab"][data-selected] {
   color: var(--s-brand-text);
 }
 /* the indicator is the selected tab's pill, moved by the layout box rind measures */
-[data-skinned] [data-scope="tabs"][data-part="indicator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="indicator"] {
   position: absolute;
   z-index: 0;
   left: 0;
@@ -53,23 +56,26 @@
     width 0.5s var(--s-pop),
     height 0.5s var(--s-pop);
 }
-[data-skinned] [data-scope="tabs"][data-part="indicator"][data-resizing] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="indicator"][data-resizing] {
   transition: none;
 }
-[data-skinned] [data-scope="tabs"][data-part="indicator"][data-state="hidden"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="indicator"][data-state="hidden"] {
   opacity: 0;
 }
-[data-skin="juicy"] [data-scope="tabs"][data-part="indicator"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="tabs"][data-part="indicator"] {
   box-shadow: 0 3px 0 var(--s-brand-deep);
 }
-[data-skinned] [data-scope="tabs"][data-part="panel"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="panel"] {
   background: var(--s-card);
   border: var(--s-bw) solid var(--s-line);
   border-radius: var(--s-r);
   box-shadow: var(--s-lift);
   animation: s-panel-in 0.4s var(--s-ease);
 }
-[data-skinned] [data-scope="tabs"][data-part="panel"] > .pad {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tabs"][data-part="panel"] > .pad {
   padding: 14px 16px;
   margin: 0;
 }

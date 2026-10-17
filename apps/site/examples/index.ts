@@ -65,6 +65,7 @@ import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
+import * as tour from "./tour"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -139,6 +140,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tour,
   tooltip,
 }
 
