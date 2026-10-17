@@ -2,13 +2,12 @@
 // value lacks, alpha keeps the colour, hue at black, steps), names and value text, the
 // gradient, form participation. Runs in jsdom and in real browsers.
 import type { Color } from "@rind-ui/core"
-import { ColorSlider, type ColorSliderRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
 import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getColorSlider } from "../index"
+import { ColorSlider, type ColorSliderRootProps, getColorSlider } from "./color-parts"
 
 afterEach(() => vi.restoreAllMocks())
 

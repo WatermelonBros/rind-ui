@@ -1,4 +1,4 @@
-import { colorSwatchPickerContract, pickSwatch } from "@rind-ui/core"
+import { colorSwatchPickerContract, pickSwatch } from "@rind-ui/core/internal"
 import { createDriverWith, type DriverOptions, type Target } from "../driver"
 
 /**

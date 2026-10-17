@@ -1,11 +1,10 @@
 // Color Swatch through its driver (color-swatch spec): name, consumer name, children, alpha,
 // server render. Runs in jsdom and in real browsers.
-import { ColorSwatch } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { renderToString } from "react-dom/server"
 import { describe, expect, it } from "vitest"
-import { getColorSwatch } from "../index"
+import { ColorSwatch, getColorSwatch } from "./color-parts"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

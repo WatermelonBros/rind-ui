@@ -8,6 +8,8 @@ native range inputs. Research: `docs/research/color-picker.md`.
 ## Requirements
 ### Requirement: Anatomy
 
+The Color Area is a part of the Color Picker (`ColorPicker.Area`, `AreaBackground`, `AreaThumb`), not a standalone component: no package SHALL export it on its own, and it SHALL be rendered only inside a `ColorPicker.Root` (inline or in the content). The requirements of this capability describe that part.
+
 A Color Area SHALL consist of `Root` (a `div` with `role="group"` and the pointer surface), `Background` (a
 decorative element showing the gradient) and `Thumb` (the positioned handle). `Thumb` SHALL render exactly two
 native `<input type="range">` elements, the **x input** and the **y input**, in that DOM order; they are the only

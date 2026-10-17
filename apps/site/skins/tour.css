@@ -2,9 +2,12 @@
    stage's data-rind-theme, so these rules select on that. The cutout comes inline from the
    tour (clip-path), the card's coordinates from positioning. */
 [data-rind-theme^="skin-"] [data-scope="tour"][data-part="backdrop"] {
+  /* above the site header (z-index 50), like the Dialog's layers */
+  z-index: 60;
   background: color-mix(in oklab, var(--s-ink) 45%, transparent);
 }
 [data-rind-theme^="skin-"] [data-scope="tour"][data-part="spotlight"] {
+  z-index: 60;
   border-radius: var(--s-r-sm);
   outline: var(--s-bw) solid var(--s-acc);
   outline-offset: 0;
@@ -75,4 +78,7 @@
   [data-rind-theme^="skin-"] [data-scope="tour"] {
     transition: none;
   }
+}
+[data-rind-theme^="skin-"] [data-scope="tour"][data-part="positioner"] {
+  z-index: 61;
 }

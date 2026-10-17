@@ -1,15 +1,15 @@
 // The page color-picker.pw.test.ts drives: the themed colour components in each configuration,
 // bundled by the test itself (no site build).
+import { ColorPicker } from "@rind-ui/react"
+import { createRoot } from "react-dom/client"
 import {
   ColorArea,
   ColorChannelField,
   ColorField,
-  ColorPicker,
   ColorSlider,
   ColorSwatch,
   ColorSwatchPicker,
-} from "@rind-ui/react"
-import { createRoot } from "react-dom/client"
+} from "../../src/components/color-parts"
 
 const PALETTE = ["#FF0000", "#00FF00", "#0000FF"]
 
@@ -62,7 +62,7 @@ function App() {
         {PALETTE.map((c) => (
           <ColorSwatchPicker.Item key={c} color={c}>
             <ColorSwatchPicker.Swatch />
-            <ColorSwatchPicker.Indicator>✓</ColorSwatchPicker.Indicator>
+            <ColorSwatchPicker.Indicator />
           </ColorSwatchPicker.Item>
         ))}
       </ColorSwatchPicker.Root>

@@ -1,13 +1,18 @@
 // Color Field and Color Channel Field scenarios (color-field spec) through their drivers.
 // Runs in jsdom and in real browsers.
 import type { Color } from "@rind-ui/core"
-import { ColorChannelField, ColorField, type ColorFieldRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import axe from "axe-core"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getColorChannelField, getColorField } from "../index"
+import {
+  ColorChannelField,
+  ColorField,
+  type ColorFieldRootProps,
+  getColorChannelField,
+  getColorField,
+} from "./color-parts"
 
 afterEach(() => vi.restoreAllMocks())
 
