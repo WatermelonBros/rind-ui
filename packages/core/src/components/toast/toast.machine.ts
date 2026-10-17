@@ -65,6 +65,10 @@ export type ToastEnv = SchedulerEnv & ClockEnv & AnnouncerEnv & LocaleEnv
 
 const durationOf = (data: ToastData, props: ToastProps) => data.duration ?? props.duration
 
+/** No timeout: loading, an action without its own duration, or an infinite lifetime. */
+const persistent = (data: ToastData, props: ToastProps) =>
+  isPersistentToast(data) || !Number.isFinite(durationOf(data, props))
+
 const DISMISS: Partial<Record<string, ToastDismissReason>> = {
   CLOSE_TRIGGER_PRESS: "close-trigger",
   ACTION_PRESS: "action",
@@ -105,8 +109,9 @@ const LIVE = {
 export const toastMachine = setup({
   types: type<{ props: ToastProps; events: ToastEvent; env: ToastEnv; context: ToastContext }>(),
   guards: {
-    isPersistent: ({ context }) => isPersistentToast(context.data),
-    updatesToPersistent: ({ event }) => event.type === "UPDATE" && isPersistentToast(event.data),
+    isPersistent: ({ context, props }) => persistent(context.data, props),
+    updatesToPersistent: ({ event, props }) =>
+      event.type === "UPDATE" && persistent(event.data, props),
     hasReasons: ({ context }) => context.reasons.size > 0,
     /** RESUME removes the last reason. */
     lastReason: ({ context, event }) =>
@@ -182,6 +187,8 @@ export const toastMachine = setup({
   effects: {
     /** The remaining time on the injected scheduler; `TIMEOUT` when it elapses. */
     lifetime: ({ context, env, send }) => {
+      // Never a timer for an infinite time (setTimeout would fire at once).
+      if (!Number.isFinite(context.remaining)) return undefined
       const timer = env.scheduler.setTimeout(() => send({ type: "TIMEOUT" }), context.remaining)
       return () => env.scheduler.clearTimeout(timer)
     },

@@ -1,4 +1,13 @@
 export {
+  type ToastButtonState,
+  type ToasterConnectInput,
+  type ToastPart,
+  type ToastPartState,
+  toasterConnect,
+  toastIds,
+} from "./toast.connect"
+export { toastContract, toasterContract } from "./toast.contract"
+export {
   type ToastContext,
   type ToastEnv,
   type ToastEvent,
@@ -21,6 +30,7 @@ export {
 export {
   createToaster,
   type PromiseToastOptions,
+  type ResolvedToasterOptions,
   type Toaster,
   type ToasterEnv,
   type ToasterOptions,

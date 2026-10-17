@@ -68,10 +68,19 @@ export interface PromiseToastOptions<T> {
   readonly error?: ToastInput | string | ((reason: unknown) => ToastInput | string)
 }
 
+/** The store's options with their defaults applied. */
+export interface ResolvedToasterOptions {
+  readonly placement: ToastPlacement
+  readonly limit: number
+  readonly duration: number
+  readonly gap: number
+  readonly expand: boolean
+  readonly hotkey: string
+  readonly swipeDirections: readonly SwipeDirection[] | undefined
+}
+
 export interface Toaster {
-  readonly options: Required<Omit<ToasterOptions, "swipeDirections">> & {
-    readonly swipeDirections: readonly SwipeDirection[] | undefined
-  }
+  readonly options: ResolvedToasterOptions
   show(input: ToastInput | string): ToastId
   info(input: ToastInput | string): ToastId
   success(input: ToastInput | string): ToastId
@@ -121,7 +130,7 @@ const toInput = (input: ToastInput | string): ToastInput =>
 
 /** Creates a store; module-level is fine (`export const toaster = createToaster()`). */
 export function createToaster(options: ToasterOptions = {}): Toaster {
-  const o = {
+  const o: ResolvedToasterOptions = {
     placement: options.placement ?? "bottom-end",
     limit: options.limit ?? 3,
     duration: options.duration ?? 5000,
@@ -129,7 +138,7 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
     expand: options.expand ?? false,
     hotkey: options.hotkey ?? "F6",
     swipeDirections: options.swipeDirections,
-  } as const
+  }
   // Newest first.
   let records: ToastRecord[] = []
   const listeners = new Set<() => void>()
