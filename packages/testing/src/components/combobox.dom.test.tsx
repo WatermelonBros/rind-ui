@@ -185,3 +185,105 @@ describe("Combobox driver", () => {
     expect(await cb().value()).toEqual([])
   })
 })
+
+describe("Combobox forms", () => {
+  const formData = (form: HTMLFormElement) =>
+    [...new FormData(form).entries()].map(([k, v]) => `${k}=${v}`)
+
+  it("the key is submitted, not the text", () => {
+    render(
+      <form data-testid="f">
+        <City name="city" defaultValue="rome" />
+      </form>,
+    )
+    expect(formData(screen.getByTestId("f") as HTMLFormElement)).toEqual(["city=rome"])
+  })
+
+  it("inputName submits the text too", () => {
+    render(
+      <form data-testid="f">
+        <City name="city" inputName="cityText" defaultValue="rome" />
+      </form>,
+    )
+    expect(formData(screen.getByTestId("f") as HTMLFormElement).sort()).toEqual([
+      "city=rome",
+      "cityText=Rome",
+    ])
+  })
+
+  it("multiple values submitted, one entry per key", () => {
+    render(
+      <form data-testid="f">
+        <City name="cities" multiple defaultValue={["rome", "paris"]} />
+      </form>,
+    )
+    expect(formData(screen.getByTestId("f") as HTMLFormElement)).toEqual([
+      "cities=rome",
+      "cities=paris",
+    ])
+  })
+
+  it("required and empty: invalid; focus moves to the visible input", async () => {
+    render(
+      <form data-testid="f">
+        <City name="city" required />
+      </form>,
+    )
+    const form = screen.getByTestId("f") as HTMLFormElement
+    expect(form.checkValidity()).toBe(false)
+    const hidden = form.querySelector('[data-part="hidden-input"]') as HTMLInputElement
+    act(() => hidden.focus())
+    await waitFor(() => expect(document.activeElement).toBe(input()))
+  })
+
+  it("required with a selection is valid", () => {
+    render(
+      <form data-testid="f">
+        <City name="city" required defaultValue="rome" />
+      </form>,
+    )
+    expect((screen.getByTestId("f") as HTMLFormElement).checkValidity()).toBe(true)
+  })
+
+  it("reset restores the default value and its text", async () => {
+    render(
+      <form data-testid="f">
+        <City name="city" defaultValue="paris" />
+      </form>,
+    )
+    const cb = getCombobox(screen, { name: "City" })
+    await cb.choose("Rome")
+    expect(input().value).toBe("Rome")
+    act(() => (screen.getByTestId("f") as HTMLFormElement).reset())
+    await waitFor(() => expect(input().value).toBe("Paris"))
+    expect(formData(screen.getByTestId("f") as HTMLFormElement)).toEqual(["city=paris"])
+  })
+
+  it("browser autofill of the hidden input selects by key, else by text", async () => {
+    render(
+      <form data-testid="f">
+        <City name="city" />
+      </form>,
+    )
+    const hidden = screen
+      .getByTestId("f")
+      .querySelector('[data-part="hidden-input"]') as HTMLInputElement
+    act(() => {
+      hidden.value = "Prague"
+      hidden.dispatchEvent(new Event("input", { bubbles: true }))
+    })
+    await waitFor(() => expect(input().value).toBe("Prague"))
+    expect(formData(screen.getByTestId("f") as HTMLFormElement)).toEqual(["city=prague"])
+  })
+
+  it("a user choice dispatches input and change on the hidden input", async () => {
+    const onChange = vi.fn()
+    render(
+      <form data-testid="f" onChange={onChange}>
+        <City name="city" />
+      </form>,
+    )
+    await getCombobox(screen, { name: "City" }).choose("Paris")
+    await waitFor(() => expect(onChange).toHaveBeenCalled())
+  })
+})

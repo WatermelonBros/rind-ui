@@ -15,6 +15,8 @@ import {
   comboboxMessages,
   createListCollection,
   domPositioning,
+  type FormInputCapability,
+  hiddenFormInput,
   isEmptyState,
   isExposed,
   isStale,
@@ -31,6 +33,7 @@ import {
   type ComponentPropsWithRef,
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -114,6 +117,11 @@ interface Common {
   readonly positioning?: PositioningProps
   readonly keepMounted?: boolean
   readonly typingPause?: number
+  /** The form name of the selected key(s); the visible text is not submitted. */
+  readonly name?: string
+  /** Submits the visible text under this name too. */
+  readonly inputName?: string
+  readonly form?: string
 }
 
 type Selection =
@@ -134,6 +142,13 @@ export type ComboboxRootProps = Common & Selection
 
 interface ComboboxHost extends ListboxHost {
   readonly api: ComboboxApi
+  readonly keys: readonly string[]
+  readonly formInput: FormInputCapability
+  readonly constraint: RefObject<HTMLInputElement | null>
+  /** A user change happened since the last sync (the hidden input dispatches events). */
+  readonly pending: RefObject<boolean>
+  readonly reset: () => void
+  readonly autofill: (text: string) => boolean
   readonly keepMounted: boolean
   readonly open: boolean
   readonly setPresent: (present: boolean) => void
@@ -179,6 +194,8 @@ function Root(all: ComboboxRootProps) {
   const messages = useMemo(() => ({ ...comboboxMessages, ...all.messages }), [all.messages])
   const latest = useRef(all)
   latest.current = all
+  const pending = useRef(false)
+  const constraint = useRef<HTMLInputElement | null>(null)
 
   // The selection's text is the initial text (no change callback for it at mount).
   const [initialText] = useState(() => {
@@ -247,6 +264,7 @@ function Root(all: ComboboxRootProps) {
       ...("open" in all ? { open: all.open } : {}),
       defaultOpen: all.defaultOpen,
       onValueChange: (v, d) => {
+        pending.current = true
         const cb = latest.current.onValueChange as ((v: unknown, d: unknown) => void) | undefined
         cb?.(v, { reason: reasonOf(d.event.type) })
       },
@@ -275,6 +293,19 @@ function Root(all: ComboboxRootProps) {
     loading: all.loading,
   }
   const value = view.values.value as ComboboxValue
+  const keys = value == null ? [] : typeof value === "string" ? [value] : value
+  const formInput = useMemo(
+    () =>
+      hiddenFormInput(
+        {
+          input: () => constraint.current,
+          // Sound: the Input part renders an <input> with this id.
+          control: () => env.dom.getById(ids.input) as HTMLElement | null,
+        },
+        env,
+      ),
+    [env, ids.input],
+  )
   const api = comboboxConnect(
     {
       instance,
@@ -298,6 +329,10 @@ function Root(all: ComboboxRootProps) {
       dir: env.locale.dir(),
       messages,
       mounted,
+      name: all.name,
+      inputName: all.inputName,
+      form: all.form,
+      keys,
       send: service.send,
     },
     env,
@@ -335,6 +370,16 @@ function Root(all: ComboboxRootProps) {
       ].join("|")
     },
     keepMounted: all.keepMounted === true,
+    keys,
+    formInput,
+    constraint,
+    pending,
+    reset: () => service.send({ type: "RESET" }),
+    autofill: (text) => {
+      const before = service.view().values.value
+      service.send({ type: "AUTOFILL", text })
+      return service.view().values.value !== before
+    },
     open,
     setPresent,
   }
@@ -362,9 +407,44 @@ function Label({ render, ...rest }: Own<"label">) {
   return renderPart("label", mergeProps(normalizeProps(host.api.label()), rest), render, undefined)
 }
 
-function Control({ render, ...rest }: Own<"div">) {
+function Control({ render, children, ...rest }: Own<"div">) {
   const host = useLive("Control")
-  return renderPart("div", mergeProps(normalizeProps(host.api.control()), rest), render, undefined)
+  const { formInput, pending, keys, reset, autofill } = host
+  const latest = useRef(keys)
+  latest.current = keys
+  // After every commit the constraint input mirrors the selection; a user change dispatches.
+  useIsoLayoutEffect(() => {
+    formInput.sync({ values: keys }, { dispatch: pending.current })
+    pending.current = false
+  })
+  useEffect(
+    () =>
+      formInput.track({
+        onReset: reset,
+        current: () => ({ values: latest.current }),
+        onNativeInput: (input) => autofill(input.value),
+      }),
+    [formInput, reset, autofill],
+  )
+  const props = mergeProps(normalizeProps(host.api.control()), rest)
+  return renderPart(
+    "div",
+    {
+      ...props,
+      children: (
+        <>
+          {children}
+          {/* Inside the Control: the browser's validation message is anchored near it. */}
+          <input {...normalizeProps(host.api.hiddenInput())} ref={host.constraint} />
+          {host.api.carriers().map((p) => (
+            <input key={String(p["value"])} {...normalizeProps(p)} />
+          ))}
+        </>
+      ),
+    },
+    render,
+    undefined,
+  )
 }
 
 function Input({ render, ref, ...rest }: Own<"input">) {

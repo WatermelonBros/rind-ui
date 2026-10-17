@@ -10,6 +10,7 @@ import type { LoadingStatus } from "../../collection/machine"
 import { isSelected, type SelectionValue } from "../../collection/selection"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
+import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import { contentPlacementProps, positionerProps } from "../../dom/position/connect"
 import type { ListboxEvent } from "../listbox/listbox.machine"
 import { listboxParts } from "../listbox/listbox.parts"
@@ -36,6 +37,13 @@ export interface ComboboxConnectView {
   readonly readOnly: boolean
   readonly invalid: boolean
   readonly required: boolean
+  /** The form name of the selected keys (one hidden entry per key). */
+  readonly name?: string | undefined
+  /** The form name of the visible text. */
+  readonly inputName?: string | undefined
+  readonly form?: string | undefined
+  /** The selected keys, for the hidden inputs. */
+  readonly keys: readonly string[]
   readonly autoComplete: "list" | "both"
   readonly loading?: LoadingStatus | undefined
   readonly modality: Modality
@@ -148,6 +156,8 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       "aria-labelledby": v.mounted.label ? ids.label : undefined,
       "aria-invalid": v.invalid ? "true" : undefined,
       "aria-required": v.required ? "true" : undefined,
+      name: v.inputName,
+      form: v.inputName !== undefined ? v.form : undefined,
       "aria-activedescendant":
         v.exposed && !lagging && c.highlightedKey !== null && v.results.has(c.highlightedKey)
           ? ids.item(c.highlightedKey)
@@ -322,6 +332,34 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       hidden: v.empty ? undefined : true,
     }),
     loadMore: list.loadMore,
+    /**
+     * The constraint input (hidden-form-input): no name, empty exactly when nothing is
+     * selected, so `required` is validated natively next to the Control.
+     */
+    hiddenInput: (): PartProps => ({
+      ...scopeAttrs("combobox", "hidden-input", v.instance),
+      type: "text",
+      "aria-hidden": "true",
+      tabIndex: -1,
+      autoComplete: v.name === undefined ? "off" : undefined,
+      required: v.required || undefined,
+      disabled: v.disabled || undefined,
+      form: v.form,
+      style: hiddenFormInputStyle,
+      // Its value is written as a property by the form capability, never rendered.
+      defaultValue: v.keys.join(","),
+    }),
+    /** One submitted entry per selected key (none without a name). */
+    carriers: (): readonly PartProps[] =>
+      v.name === undefined
+        ? []
+        : v.keys.map((key) => ({
+            type: "hidden",
+            name: v.name,
+            value: key,
+            form: v.form,
+            disabled: v.disabled || undefined,
+          })),
   }
 }
 

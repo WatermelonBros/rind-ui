@@ -190,6 +190,8 @@ export const comboboxContract = contract("combobox", {
     choose: {
       pointer: async (env: E, name: string) => {
         if (!(await isOpen(env))) await env.part("trigger").click()
+        // An unplaced popup takes no pointer input yet.
+        await env.until(() => settled(env), Boolean)
         await env.part("item", { role: "option", name }).click()
       },
       keyboard: async (env: E, name: string) => {

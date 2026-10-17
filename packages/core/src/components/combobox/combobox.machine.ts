@@ -78,6 +78,8 @@ export type ComboboxEvent =
   | { readonly type: "LOADING.SYNC" }
   /** A form reset: the default value and its text come back. */
   | { readonly type: "RESET" }
+  /** The browser filled the hidden input: the option whose key, else whose text, it is. */
+  | { readonly type: "AUTOFILL"; readonly text: string }
   | { readonly type: "OPEN" }
   | { readonly type: "CLOSE" }
   | { readonly type: "CLEAR" }
@@ -437,6 +439,23 @@ export const comboboxMachine = setup({
       a.set("completion", null)
       setText(a, a.props.defaultInputValue ?? selectionText(a.props, v))
     },
+    autofill: (a) => {
+      if (a.event.type !== "AUTOFILL") return
+      const { props } = a
+      const text = a.event.text
+      const key = props.items.has(toKey(text))
+        ? toKey(text)
+        : exactMatch(props.items, text, props.locale)
+      if (key === null) return
+      a.set("dirty", false)
+      if (mode(props) === "multiple") {
+        if (!selectedKeys(a.values.value).includes(key))
+          a.set("value", [...selectedKeys(a.values.value), key])
+        return
+      }
+      a.set("value", key)
+      setText(a, textOf(props, key))
+    },
     setFocused: ({ set }) => set("focused", true),
     clearFocused: ({ set }) => set("focused", false),
     startComposition: ({ set }) => set("composing", true),
@@ -565,6 +584,7 @@ export const comboboxMachine = setup({
     "COMPOSITION.START": { actions: ["startComposition"] },
     "VALUE.SYNC": { actions: ["syncText"] },
     RESET: { actions: ["restoreDefault"] },
+    AUTOFILL: { guard: "editable", actions: ["autofill"] },
     CLEAR: { guard: "editable", actions: ["clear"] },
     "CLEAR.PRESS": { guard: "editable", actions: ["clear"] },
   },
