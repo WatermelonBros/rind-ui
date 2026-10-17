@@ -2,6 +2,12 @@
 
 A tab list with one roving tab stop and one panel per tab. Tabs are real `<button role="tab">` elements with an always explicit `aria-selected`; panels are `role="tabpanel"` labelled by their tab. The value is the selected tab's key (`string | null`).
 
+## When to use
+
+- **Use it for** switching between views of the same page where only one panel is shown at a time, such as account, billing and team settings.
+- **Over plain buttons and `<div>`s**: it adds the tablist, tab and tabpanel roles with their wiring, one roving tab stop with arrow, Home and End keys, automatic or manual activation, optional find-in-page, and indicator variables for a sliding highlight. There is no native element for tabs.
+- **Don't use it for** navigating between pages: use links, or [Breadcrumbs](breadcrumbs.md) and [Pagination](pagination.md). Don't use it for a strip of choices with no panels: use a [Segmented Control](segmented-control.md). For content that expands in place, use an [Accordion](accordion.md).
+
 ```tsx
 import { Tabs } from "@rind-ui/react"
 
@@ -98,7 +104,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-tabs--default -->
+<!-- aria:tabs--default -->
 ```yaml
 - tablist "Sections":
   - tab "Account" [selected]

@@ -1,0 +1,197 @@
+/* ── Colour components: a square area, gradient tracks, chips and a compact picker. Core draws
+   every colour inline (gradients, positions, the thumb's colour); this sheet sizes and rings. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="root"] {
+  inline-size: min(100%, 14rem);
+  aspect-ratio: 1;
+  border-radius: var(--s-r-sm);
+  box-shadow: 0 0 0 var(--s-bw) var(--s-ink);
+  cursor: crosshair;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="background"] {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="thumb"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="slider"][data-channel][data-part="thumb"] {
+  inline-size: 20px;
+  block-size: 20px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--rind-color);
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-area"][data-part="thumb"][data-focus-visible],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="slider"][data-channel][data-part="thumb"][data-focus-visible] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 5px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="slider"][data-channel][data-part="root"] {
+  --s-slider-track: 14px;
+  inline-size: min(100%, 14rem);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="slider"][data-channel][data-part="root"][data-orientation="vertical"] {
+  inline-size: auto;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="slider"][data-channel][data-part="track"] {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-ink);
+  overflow: visible;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-part="transparency-grid"] {
+  border-radius: inherit;
+  background-color: #ffffff;
+  background-image: conic-gradient(#d4d4d8 25%, transparent 0 50%, #d4d4d8 0 75%, transparent 0);
+  background-size: 8px 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-swatch"][data-part="root"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: var(--s-r-sm);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-swatch"][data-part="root"][data-transparent] {
+  background-image:
+    linear-gradient(var(--rind-color), var(--rind-color)),
+    conic-gradient(#d4d4d8 25%, #ffffff 0 50%, #d4d4d8 0 75%, #ffffff 0);
+  background-size:
+    100% 100%,
+    8px 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="radio-group"][data-part="root"][data-color-swatch-picker] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker] {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-state="checked"] {
+  box-shadow:
+    0 0 0 2px var(--s-card),
+    0 0 0 4px var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-focus-visible] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 5px;
+}
+/* the swatch's check replaces the radio dot the Radio Group skin draws */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-color-swatch-picker]
+  [data-scope="radio-group"][data-part="item-indicator"] {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  animation: none;
+  position: absolute;
+  color: #ffffff;
+  font-weight: 800;
+  text-shadow: 0 0 2px #000000;
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-field"][data-part="input"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="format-select"] {
+  box-sizing: border-box;
+  inline-size: 8rem;
+  min-block-size: 36px;
+  padding-inline: 10px;
+  border: var(--s-bw) solid var(--s-ink);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 14px var(--font-mono, monospace);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-field"][data-part="input"][data-invalid] {
+  border-style: dashed;
+  border-color: var(--s-acc-deep);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="number-input"][data-channel] input {
+  inline-size: 5rem;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="control"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="trigger"] {
+  display: inline-grid;
+  place-items: center;
+  padding: 4px;
+  border: var(--s-bw) solid var(--s-ink);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="value-text"] {
+  font: 600 13px var(--font-mono, monospace);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="content"] {
+  display: grid;
+  gap: 12px;
+  inline-size: 16rem;
+  padding: 14px;
+  border: var(--s-bw) solid var(--s-ink);
+  border-radius: var(--s-r);
+  background: var(--s-card);
+  color: var(--s-ink);
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="content"][data-inline] {
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  background: transparent;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="eye-dropper-trigger"] {
+  min-block-size: 36px;
+  padding-inline: 12px;
+  border: var(--s-bw) solid var(--s-ink);
+  border-radius: var(--s-r-sm);
+  background: var(--s-muted);
+  color: var(--s-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="color-area"][data-part="root"],
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="color-picker"][data-part="content"] {
+  border-radius: var(--s-r);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="label"] {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}

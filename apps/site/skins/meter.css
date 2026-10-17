@@ -1,6 +1,6 @@
 /* ── Meter: a bar whose fill changes colour and pattern per zone, so colour is never the only
    cue. Core sizes the fill inline. ── */
-[data-skinned] [data-scope="meter"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="meter"][data-part="root"] {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -8,20 +8,21 @@
   row-gap: 6px;
   inline-size: min(100%, 22rem);
 }
-[data-skinned] [data-scope="meter"][data-part="root"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="meter"][data-part="root"][data-orientation="vertical"] {
   grid-template-columns: auto;
   inline-size: auto;
   justify-items: center;
 }
-[data-skinned] [data-scope="meter"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="meter"][data-part="label"] {
   font-weight: 600;
 }
-[data-skinned] [data-scope="meter"][data-part="value-text"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="meter"][data-part="value-text"] {
   font-variant-numeric: tabular-nums;
   font-size: 14px;
   opacity: 0.8;
 }
-[data-skinned] [data-scope="meter"][data-part="track"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="meter"][data-part="track"] {
   grid-column: 1 / -1;
   position: relative;
   block-size: 10px;
@@ -30,39 +31,44 @@
   box-shadow: inset 0 0 0 var(--s-bw) var(--s-line);
   overflow: hidden;
 }
-[data-skinned] [data-scope="meter"][data-part="track"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="meter"][data-part="track"][data-orientation="vertical"] {
   display: flex;
   flex-direction: column-reverse;
   inline-size: 10px;
   block-size: 8rem;
 }
-[data-skinned] [data-scope="meter"][data-part="indicator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="meter"][data-part="indicator"] {
   block-size: 100%;
   background: var(--s-brand);
   transition:
     inline-size 0.3s var(--s-ease),
     block-size 0.3s var(--s-ease);
 }
-[data-skinned] [data-scope="meter"][data-part="indicator"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="meter"][data-part="indicator"][data-orientation="vertical"] {
   inline-size: 100%;
 }
-[data-skinned] [data-scope="meter"][data-part="indicator"][data-zone="suboptimum"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="meter"][data-part="indicator"][data-zone="suboptimum"] {
   background: repeating-linear-gradient(-45deg, #f5a524 0 6px, #ffd27a 6px 9px);
 }
-[data-skinned] [data-scope="meter"][data-part="indicator"][data-zone="even-less-good"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="meter"][data-part="indicator"][data-zone="even-less-good"] {
   background: repeating-linear-gradient(-45deg, var(--s-error) 0 3px, #ff8fb3 3px 5px);
 }
-[data-skin="crisp"] [data-scope="meter"][data-part="track"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="meter"][data-part="track"] {
   border-radius: var(--s-r-sm);
 }
-[data-skin="juicy"] [data-scope="meter"][data-part="track"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="meter"][data-part="track"] {
   block-size: 14px;
   box-shadow: none;
 }
-[data-skin="juicy"] [data-scope="meter"][data-part="indicator"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="meter"][data-part="indicator"] {
   border-radius: 99px;
 }
-[data-skin="juicy"]
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="meter"][data-part="indicator"]:not(
     [data-zone="suboptimum"],
     [data-zone="even-less-good"]

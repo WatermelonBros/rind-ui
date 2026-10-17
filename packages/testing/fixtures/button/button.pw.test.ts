@@ -1,50 +1,23 @@
 /// <reference types="node" />
-// Button through the Playwright adapter, against the built Storybook: the driver in both
+// Button through the Playwright adapter, against the site examples harness: the driver in both
 // environments, forced colors, and the generic invariants on every Button story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { buttonContract } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, createDriverWith, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +25,7 @@ async function open(id: string) {
   const context = await browser.newContext()
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-button--${id}&viewMode=story`)
+  await openExample(page, site.base, "button", id)
   await page.locator('[data-scope="button"]').first().waitFor()
   return page
 }
@@ -63,13 +36,12 @@ afterEach(async () => {
 describe("button driver through Playwright", () => {
   it("press: pointer and keyboard twin each count once", { timeout: 60_000 }, async () => {
     const page = await open("driver-example")
-    // The story's play function already pressed once.
-    await page.getByText("Pressed: 1").waitFor()
+    await page.getByText("Pressed: 0").waitFor()
     const button = createDriverWith(buttonContract, page, [{ name: "Save" }])
     await button.press()
-    await page.getByText("Pressed: 2").waitFor()
+    await page.getByText("Pressed: 1").waitFor()
     await button.via("keyboard").press()
-    await page.getByText("Pressed: 3").waitFor()
+    await page.getByText("Pressed: 2").waitFor()
   })
 
   it("submits and resets a form", { timeout: 60_000 }, async () => {
@@ -89,7 +61,7 @@ describe("forced colors", () => {
   it("keeps a border and paints disabled as GrayText", { timeout: 60_000 }, async () => {
     for (const [id, disabled] of [
       ["default", false],
-      ["disabled", true],
+      ["disabled-story", true],
     ] as const) {
       const page = await open(id)
       await page.emulateMedia({ forcedColors: "active" })
@@ -113,13 +85,13 @@ describe("forced colors", () => {
 
 const STORIES = [
   "default",
-  "variants",
+  "variants-story",
   "icon-only",
-  "disabled",
+  "disabled-story",
   "focusable-when-disabled",
-  "pending",
+  "pending-story",
   "pending-state",
-  "as-link",
+  "as-link-story",
   "as-div",
   "inside-form",
   "danger",

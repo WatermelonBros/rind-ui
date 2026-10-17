@@ -2,6 +2,12 @@
 
 A native `<fieldset>` that names and describes a group of related controls, shows a group-level error, and disables every control inside it, native and rind-ui alike, portalled parts included.
 
+## When to use
+
+- **Use it for** naming and describing a group of related controls, such as an address or a set of options, and showing one error for the group.
+- **Over a bare `<fieldset>`**: it adds a description and a group error message, and its `disabled` also reaches rind-ui controls, portalled parts included.
+- **Don't use it for** a single control: use a [Field](field.md). If a plain `<fieldset>` and `<legend>` are all you need, the native elements are enough.
+
 ```tsx
 import { Fieldset } from "@rind-ui/react"
 
@@ -122,9 +128,9 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-An address group, and the same group disabled (generated from the state stories):
+An address group, and the same group disabled (generated from the state examples):
 
-<!-- aria:components-fieldset--address-group -->
+<!-- aria:fieldset--address-group -->
 ```yaml
 - group "Shipping address":
   - text: Shipping address
@@ -136,7 +142,7 @@ An address group, and the same group disabled (generated from the state stories)
 ```
 <!-- /aria -->
 
-<!-- aria:components-fieldset--disabled -->
+<!-- aria:fieldset--disabled-story -->
 ```yaml
 - group "Shipping address":
   - text: Shipping address Street

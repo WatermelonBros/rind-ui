@@ -24,7 +24,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `command.contract.ts` per design §5 (pattern fragment without `open`/`close`, traits, announcements, `optionsNeverSelected`, `{ skip }`, prop steps for `inputValue` and `page`)
-- [ ] 4.2 `getCommand` in `@rind-ui/testing` (`run`, `back`, `items`, `highlighted`, `page`); driver tests in browser mode, jsdom and through Playwright against Storybook
+- [ ] 4.2 `getCommand` in `@rind-ui/testing` (`run`, `back`, `items`, `highlighted`, `page`); driver tests in browser mode, jsdom and through Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -36,10 +36,10 @@
 - [ ] 6.1 Tier-3 `--rind-command-*` tokens (design §6) defaulting to semantic tokens, `@layer rind.components`, `:where()` selectors, tokens read with a fallback and never declared; `data-variant` (solid, soft, outline, ghost) and `data-size` (sm, md, lg) family; `data-tone="danger"` items
 - [ ] 6.2 Keyboard-highlight outline, forced colors (`Highlight`), 24×24 targets; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Default palette, groups + separators + keywords, dialog composition (⌘K wired in the story, not the component), nested pages, async loading/empty, consumer-ranked (`filter: null`), link items, virtualized
-- [ ] 7.2 Driver story (docs testing example); all stories render with the theme stylesheet and pass axe (including colour contrast)
+- [ ] 7.1 Site examples (apps/site/examples/command.tsx, state examples for every contract state): Default palette, groups + separators + keywords, dialog composition (⌘K wired in the example, not the component), nested pages, async loading/empty, consumer-ranked (`filter: null`), link items, virtualized
+- [ ] 7.2 Driver example (docs testing example); all examples render with the theme stylesheet and pass axe (including colour contrast)
 
 ## 8. Docs and manual checks
 

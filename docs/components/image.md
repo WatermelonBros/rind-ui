@@ -2,8 +2,27 @@
 
 A content image with a fallback for while it is missing, loading or broken. It keeps one
 accessible name, its `alt`, in every status, makes `alt` a decision you cannot skip, and
-leaves every native image feature (lazy loading, `srcSet`, framework image components) to
-the one `<img>` it renders.
+leaves every native image feature (lazy loading, `srcSet`, framework image components such
+as `next/image`, see below) to the one `<img>` it renders.
+
+## When to use Image
+
+Use a plain `<img>` when the image always loads, or when nothing should change if it does not.
+Use Image when the page must handle the image's states:
+
+- **Loading and error states.** Root, Img and Fallback carry `data-state="idle" | "loading" |
+  "loaded" | "error"`, read from the rendered `<img>` itself, so a theme can show a placeholder
+  while it loads and style a broken one.
+- **A fallback when the image is broken or missing.** `Image.Fallback` (initials, an icon, a
+  Skeleton shape) is shown while there is no picture and removed once it loads; a cached or
+  server-rendered image never flashes it.
+- **One accessible name in every state.** `alt` is required. While the picture shows, the `<img>`
+  is named by it; while it is missing or broken, Root takes the same name, so a broken image never
+  vanishes from the accessibility tree or reads its file name.
+
+What it deliberately does not do: no optimisation, resizing, format negotiation or CDN URLs.
+That is the job of the `<img>` attributes (`srcSet`, `sizes`, `loading`) or of your framework's
+image component, which Image wraps (see [below](#with-next-image-or-another-framework-image)).
 
 ```tsx
 import { Image } from "@rind-ui/react"
@@ -72,10 +91,25 @@ applies, and `loading="lazy"` still shows the Fallback until the image arrives. 
 image already in the cache is `loaded` in the first snapshot after hydration, with no fallback
 frame.
 
-A framework image component goes through `render`; it receives the ref, `alt`, `hidden`, the
-`data-*` attributes and the load handlers:
+To retry a failed image, change its `src` (a query parameter is enough): the status goes back to
+`loading`.
+
+## With `next/image` or another framework image
+
+`Image.Img` can render your framework's image component instead of the plain `<img>`, through
+`render` (rind-ui's `asChild`): pass an element, or a function that gets the props. The
+component keeps its own optimisation (resized URLs, `srcset`, priority hints); Image adds the
+loading status, the Fallback and the stable name around it.
 
 ```tsx
+import NextImage from "next/image"
+
+<Image.Root alt="A red bicycle">
+  <Image.Img render={<NextImage src={photo.url} width={640} height={360} />} />
+  <Image.Fallback>No photo</Image.Fallback>
+</Image.Root>
+
+// or, to place the props yourself
 <Image.Root alt="A red bicycle">
   <Image.Img
     src={photo.url}
@@ -84,8 +118,10 @@ A framework image component goes through `render`; it receives the ref, `alt`, `
 </Image.Root>
 ```
 
-To retry a failed image, change its `src` (a query parameter is enough): the status goes back to
-`loading`.
+The component must forward the ref and the props it receives to the `<img>` it renders
+(`next/image` does): Image reads the status from that element and needs its `alt`, `hidden`,
+`data-*` attributes and its `onLoad` / `onError` handlers. It makes one request, for the URL the
+component chooses, and a component that re-renders on every prop change still settles.
 
 ## Ratio box and `object-fit`
 

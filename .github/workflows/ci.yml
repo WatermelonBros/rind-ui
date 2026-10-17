@@ -46,9 +46,9 @@ jobs:
       # Every quirk's repro test exists; stale entries (> 12 months) are reported.
       - run: pnpm quirks:check
       - run: pnpm docs:check
-      # Packages and Storybook, built once and shared with the test slices. @rind-ui/core's
+      # Packages and the site (its examples harness), built once and shared with the test slices. @rind-ui/core's
       # build fails over the runtime's 2.5 kB min+gz budget (packages/core/scripts/size.mjs).
-      - run: pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/storybook
+      - run: pnpm turbo run build --filter='./packages/*' --filter=@rind-ui/site
       - run: pnpm --filter @rind-ui/core size
       - uses: actions/upload-artifact@v4
         with:
@@ -56,9 +56,9 @@ jobs:
           # The theme's generated token files (not committed) ride along: tests read them.
           path: |
             packages/*/dist
+            apps/site/out
             packages/theme/tokens.manifest.json
             packages/theme/src/builder/components.generated.ts
-            apps/storybook/storybook-static
           retention-days: 1
 
   # The test suite split by Vitest project and browser, so the slices run in parallel. On
@@ -78,11 +78,11 @@ jobs:
           - { slice: browser-chromium, projects: "--project 'browser (chromium)'", browsers: chromium }
           - { slice: browser-firefox, projects: "--project 'browser (firefox)'", browsers: firefox }
           - { slice: browser-webkit, projects: "--project 'browser (webkit)'", browsers: webkit }
-          - { slice: storybook-chromium, projects: "--project 'storybook (chromium)'", browsers: chromium }
-          - { slice: storybook-firefox, projects: "--project 'storybook (firefox)'", browsers: firefox }
-          - { slice: storybook-webkit, projects: "--project 'storybook (webkit)'", browsers: webkit }
-          # Playwright fixtures drive all three engines themselves.
-          - { slice: playwright, projects: "--project playwright", browsers: "chromium,firefox,webkit" }
+          # Playwright fixtures: one slice per engine (RIND_BROWSERS picks it for the examples
+          # axe and the theme fixtures); all three are installed for the few cross-engine tests.
+          - { slice: playwright-chromium, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: chromium }
+          - { slice: playwright-firefox, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: firefox }
+          - { slice: playwright-webkit, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: webkit }
     name: test (${{ matrix.slice }})
     steps:
       - uses: actions/checkout@v4
@@ -111,7 +111,8 @@ jobs:
           BROWSERS: ${{ matrix.browsers }}
       - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests --reporter=default --reporter=json --outputFile.json=vitest-report.json
         env:
-          RIND_BROWSERS: ${{ matrix.browsers != '' && matrix.browsers || 'chromium' }}
+          RIND_BROWSERS: ${{ matrix.engine || (matrix.browsers != '' && matrix.browsers) || 'chromium' }}
+          RIND_MAX_WORKERS: ${{ startsWith(matrix.slice, 'browser-') && '2' || '' }}
           CHANGED: ${{ needs.changes.outputs.full == 'false' && matrix.slice != 'node' && format('--changed {0}', needs.changes.outputs.base) || '' }}
       - if: always()
         run: node scripts/flaky-report.mjs vitest-report.json

@@ -2,6 +2,12 @@
 
 A heading whose level comes from where it is: sections nest, and each `Heading` renders the native `h1`–`h6` for its depth, so the document outline stays right without counting levels by hand.
 
+## When to use
+
+- **Use it for** headings in components that can sit at any depth, so the outline stays right without counting levels by hand.
+- **Over a plain `<h1>`-`<h6>`**: each `Heading` picks its level from the enclosing `Heading.Level`, so a section can move without editing its headings. Use `level` to override.
+- **Don't use it for** a page where the levels are fixed and known: a native `<h2>` is enough. It does not style text; it only chooses the element.
+
 ```tsx
 import { Heading } from "@rind-ui/react"
 
@@ -117,9 +123,9 @@ name, the driver fails and lists both.
 
 ## Accessibility tree
 
-Nested sections, and a heading rendered as a `<div>` (generated from the state stories):
+Nested sections, and a heading rendered as a `<div>` (generated from the state examples):
 
-<!-- aria:components-heading--nested-sections -->
+<!-- aria:heading--nested-sections -->
 ```yaml
 - heading "Settings" [level=2]
 - heading "Profile" [level=3]
@@ -127,7 +133,7 @@ Nested sections, and a heading rendered as a `<div>` (generated from the state s
 ```
 <!-- /aria -->
 
-<!-- aria:components-heading--as-div -->
+<!-- aria:heading--as-div -->
 ```yaml
 - heading "Section title" [level=2]
 ```

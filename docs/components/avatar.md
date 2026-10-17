@@ -4,6 +4,15 @@ A person or an entity shown as an image, with a fallback (initials, an icon) whi
 is missing, loading or broken. The avatar has one accessible name in every status, and the
 rendered `<img>` is the only thing that loads the image.
 
+## When to use
+
+- **Use it for** showing a person or an entity as a picture, with initials or an icon while the
+  image is missing, loading or broken.
+- **Over a bare `<img>`**: it gives the avatar one accessible name in every status, a fallback that
+  appears when the image fails, and `data-*` state attributes to style each status.
+- **Don't use it for** a content image: use [Image](image.md) or a plain `<img>` with `alt`. For a
+  count or status label, use [Badge](badge.md).
+
 ```tsx
 import { Avatar } from "@rind-ui/react"
 

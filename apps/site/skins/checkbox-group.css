@@ -1,21 +1,25 @@
 /* ── Checkbox Group: the items are Checkboxes (checkbox.css); the group adds its frame ── */
-[data-skinned] [data-scope="checkbox-group"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox-group"][data-part="root"] {
   display: grid;
   gap: 10px;
 }
-[data-skinned] [data-scope="checkbox-group"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="checkbox-group"][data-part="label"] {
   font-weight: 700;
   font-size: 15px;
 }
 /* the select-all Parent leads, with a rule between it and the items */
-[data-skinned] [data-scope="checkbox"][data-part="root"][data-parent] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="checkbox"][data-part="root"][data-parent] {
   padding-bottom: 10px;
   margin-bottom: 2px;
   border-bottom: 2px solid color-mix(in oklab, var(--s-ink) 14%, transparent);
 }
-[data-skinned] [data-scope="checkbox"][data-part="root"][data-parent] [data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="checkbox"][data-part="root"][data-parent]
+  [data-part="label"] {
   font-weight: 700;
 }
-[data-skinned] [data-scope="checkbox-group"][data-part="description"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="checkbox-group"][data-part="description"] {
   margin-top: -4px;
 }

@@ -14,6 +14,13 @@ import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
+import * as colorArea from "./color-area"
+import * as colorField from "./color-field"
+import * as colorPicker from "./color-picker"
+import * as colorSlider from "./color-slider"
+import * as colorSwatch from "./color-swatch"
+import * as colorSwatchPicker from "./color-swatch-picker"
+import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
 import * as field from "./field"
@@ -47,6 +54,7 @@ import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
+import * as select from "./select"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
@@ -57,6 +65,7 @@ import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
+import * as tour from "./tour"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -84,6 +93,13 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
+  "color-area": colorArea,
+  "color-field": colorField,
+  "color-picker": colorPicker,
+  "color-slider": colorSlider,
+  "color-swatch": colorSwatch,
+  "color-swatch-picker": colorSwatchPicker,
+  combobox,
   collections,
   "context-menu": contextMenu,
   dialog,
@@ -112,6 +128,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "radio-group": radioGroup,
   "search-field": searchField,
   "segmented-control": segmentedControl,
+  select,
   separator,
   "qr-code": qrCode,
   "scroll-area": scrollArea,
@@ -123,6 +140,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tour,
   tooltip,
 }
 

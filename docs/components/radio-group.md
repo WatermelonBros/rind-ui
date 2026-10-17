@@ -2,6 +2,13 @@
 
 One choice out of several. The Root is a `role="radiogroup"` named by its Label; each Item has a real `<button role="radio">` control and a hidden native `<input type="radio">` that carries the value, validation and reset ([hidden-form-input](../guides/hidden-form-input.md)). Arrow keys move focus **and** check, as the native radio group does.
 
+## When to use
+
+- **Use it for** one choice out of several, in a form or in settings.
+- **Over native `<input type="radio">`**: it adds a named `role="radiogroup"`, arrow keys that move focus and check, a tab stop that follows the checked radio, and full control of the look, while a hidden native input still carries the value, validation and reset.
+- **Don't use it for** a short strip of options that switches a view: use [Segmented Control](segmented-control.md). Don't use it for independent on/off choices: use [Checkbox Group](checkbox-group.md) or [Switch](switch.md).
+- **Don't use it for** a long list or one that needs search: use [Select](select.md) or [Combobox](combobox.md).
+
 ```tsx
 import { RadioGroup } from "@rind-ui/react"
 
@@ -108,7 +115,7 @@ The same test runs with a Playwright `page`.
 
 Default, read-only and required with an error (generated from the stories; read-only and required are not exposed by every browser's tree):
 
-<!-- aria:components-radiogroup--default -->
+<!-- aria:radio-group--default -->
 ```yaml
 - radiogroup "Size":
   - text: Size
@@ -122,7 +129,7 @@ Default, read-only and required with an error (generated from the stories; read-
 ```
 <!-- /aria -->
 
-<!-- aria:components-radiogroup--read-only -->
+<!-- aria:radio-group--read-only -->
 ```yaml
 - radiogroup "Size":
   - text: Size
@@ -136,7 +143,7 @@ Default, read-only and required with an error (generated from the stories; read-
 ```
 <!-- /aria -->
 
-<!-- aria:components-radiogroup--required-invalid -->
+<!-- aria:radio-group--required-invalid -->
 ```yaml
 - radiogroup "Size" [invalid]:
   - text: Size

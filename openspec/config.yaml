@@ -13,7 +13,7 @@ context: |
   Packages: @rind-ui/core (no framework), @rind-ui/react, @rind-ui/testing,
   @rind-ui/theme (optional CSS on data-scope/data-part/data-state).
   Tooling: pnpm 11 workspaces, Turborepo, tsdown, Biome, Vitest browser mode,
-  Storybook 10, Changesets.
+  Changesets.
 
   Accessibility follows the WAI-ARIA APG pattern for each component and is
   specified as behaviour. Each component is preceded by a research note in
@@ -31,4 +31,4 @@ rules:
   design:
     - Show the machine's states and events, and which shared core/dom or core/collection modules it uses.
   tasks:
-    - 'Every component change includes tasks for machine, connect, parts, contract, driver, model-based tests, theme stylesheet (following add-theme-system''s convention: `@layer rind.components`, `:where()` selectors, `--rind-<scope>-*` tokens read with a fallback and never declared, a variant-matrix family, a `data-tone="danger"` state), stories and docs page — in that order: the theme stylesheet comes BEFORE the stories, so stories show the themed component and axe colour-contrast checks run on real styles.'
+    - 'Every component change includes tasks for machine, connect, parts, contract, driver, model-based tests, theme stylesheet (following add-theme-system''s convention: `@layer rind.components`, `:where()` selectors, `--rind-<scope>-*` tokens read with a fallback and never declared, a variant-matrix family, a `data-tone="danger"` state), site examples (apps/site/examples/<slug>.tsx, state examples for every contract state) and docs page — in that order: the theme stylesheet comes BEFORE the examples, so examples show the themed component and axe colour-contrast checks run on real styles.'

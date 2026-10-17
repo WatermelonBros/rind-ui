@@ -125,6 +125,43 @@ describe("run-to-completion", () => {
     expect(listener).toHaveBeenCalledTimes(1)
   })
 
+  it("a send from a callback the action scheduled is processed at once; in-step sends drain in order", () => {
+    let later: (() => void) | undefined
+    const m = setup({
+      types: type<{
+        props: object
+        events: { type: "GO" } | { type: "NEXT" } | { type: "LAST" }
+        env: object
+      }>(),
+      actions: {
+        chain: ({ send }) => {
+          send({ type: "NEXT" })
+          send({ type: "LAST" })
+          later = () => send({ type: "GO" })
+        },
+      },
+    }).machine({
+      id: "late",
+      initial: "a",
+      states: {
+        a: { on: { GO: { target: "b", actions: ["chain"] } } },
+        b: { on: { NEXT: "c" } },
+        c: { on: { LAST: "d" } },
+        d: { on: { GO: "e" } },
+        e: {},
+      },
+    })
+    const s = createService(m, {}, {})
+    const listener = vi.fn()
+    s.subscribe(listener)
+    s.send({ type: "GO" })
+    expect(s.getSnapshot().state).toBe("d")
+    expect(listener).toHaveBeenCalledTimes(1)
+    later?.()
+    expect(s.getSnapshot().state).toBe("e")
+    expect(listener).toHaveBeenCalledTimes(2)
+  })
+
   it("orders exit, transition and entry actions, and cleans effects before entry", () => {
     const { machine, env, log } = make()
     const s = createService(machine, { defaultOpen: true }, env)

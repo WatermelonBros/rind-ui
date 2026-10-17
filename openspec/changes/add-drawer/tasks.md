@@ -42,7 +42,7 @@
 ## 7. Contract and driver
 
 - [ ] 7.1 `drawer.contract.ts` per design §6 (Dialog helpers, `swipe` with `none` keyboard reason, `pressHandle`, queries, event map with skips)
-- [ ] 7.2 `getDrawer` export; driver tests in `browser` and `jsdom` projects and through Playwright against Storybook
+- [ ] 7.2 `getDrawer` export; driver tests in `browser` and `jsdom` projects and through Playwright against the site examples harness
 
 ## 8. Tests
 
@@ -56,10 +56,10 @@
 - [ ] 9.2 Per-side placement and transform from `--rind-drawer-snap-offset` plus swipe vars under `[data-swiping]`/`[data-swipe-dismiss]`, transitions off while swiping, `@starting-style` entry, exit from the release position, backdrop opacity and indent scale from `--rind-drawer-swipe-progress`, keyboard inset padding, `overscroll-behavior: contain`
 - [ ] 9.3 Reduced motion (duration tokens 0, no indent scale), forced colors (content border `CanvasText`, handle grip as border), handle hit area ≥ 24×24 via `--rind-hit-area`; Playwright forced-colors captures
 
-## 10. Stories (`apps/storybook`)
+## 10. Site examples
 
-- [ ] 10.1 Bottom sheet, each side incl. `inline-start` under RTL, snap points (handle, sequential), scrollable content, form with inputs (keyboard inset), non-modal, nested drawers with indent, dialog inside a drawer, toast over a drawer, controlled with async close, `closeOnSwipe={false}`, handle-only; state stories for `open` and `closed` (themed, so axe contrast runs on real styles)
-- [ ] 10.2 A driver story (docs testing example); all stories pass axe
+- [ ] 10.1 Site examples (apps/site/examples/drawer.tsx, state examples for every contract state): Bottom sheet, each side incl. `inline-start` under RTL, snap points (handle, sequential), scrollable content, form with inputs (keyboard inset), non-modal, nested drawers with indent, dialog inside a drawer, toast over a drawer, controlled with async close, `closeOnSwipe={false}`, handle-only; state examples for `open` and `closed` (themed, so axe contrast runs on real styles)
+- [ ] 10.2 A driver example (docs testing example); all examples pass axe
 
 ## 11. Docs and manual checks
 

@@ -6,7 +6,7 @@
     },
     "build": {
       "dependsOn": ["^build", "generate"],
-      "outputs": ["dist/**", "storybook-static/**", "out/**"]
+      "outputs": ["dist/**", "out/**"]
     },
     "dev": {
       "cache": false,
@@ -16,11 +16,7 @@
       "dependsOn": ["^build", "generate"]
     },
     "//#test:vitest": {
-      "dependsOn": [
-        "@rind-ui/storybook#build",
-        "@rind-ui/testing#build",
-        "@rind-ui/theme#generate"
-      ],
+      "dependsOn": ["@rind-ui/site#build", "@rind-ui/testing#build", "@rind-ui/theme#generate"],
       "env": ["RIND_BROWSERS", "RIND_MAX_WORKERS"],
       "outputs": []
     }

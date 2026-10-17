@@ -1,0 +1,6 @@
+- button "Share" [expanded]
+- dialog "Share this page":
+  - heading "Share this page" [level=2]
+  - paragraph: Anyone with the link can view it.
+  - textbox "Link": https://example.com/p/1
+  - button "Done"

@@ -2,6 +2,12 @@
 
 A short text shown when the pointer rests on a trigger or the trigger receives keyboard focus. It supplements the trigger; it is not a place for anything interactive. The content is `role="tooltip"`, never focusable, positioned against the trigger by the shared positioning capability.
 
+## When to use
+
+- **Use it for** a short, non-interactive hint on a control that is already usable without it: a keyboard shortcut, or the name of an icon-only button (`type="label"`).
+- **Over the native `title` attribute**: it opens on keyboard focus as well as hover, closes with Escape, can be hovered without vanishing, is positioned against the trigger, can be styled, and is linked to the trigger with `aria-describedby` or `aria-labelledby`.
+- **Don't use it for** anything touch users need, since a tap does not open it, or for interactive content: use a [Popover](popover.md), or a [Hover Card](hover-card.md) for a richer preview on hover. Don't use it to explain a natively disabled button; it can never be hovered or focused.
+
 ```tsx
 import { Tooltip } from "@rind-ui/react"
 

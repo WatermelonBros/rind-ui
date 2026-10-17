@@ -2,6 +2,12 @@
 
 A native `<input>` or `<textarea>` with a controllable value, correct IME handling, a clear button, a character count and autosize, labelled, described and validated like any Field.
 
+## When to use
+
+- **Use it for** single-line or multi-line text input in a form: names, emails, comments.
+- **Over a bare `<input>` or `<textarea>`**: it is still the native element, and adds a label, description and error message wired through Field, a controllable value with correct IME handling, a clear button, a character count, autosize for the textarea, and `data-*` state attributes. A bare `<input>` is enough when you need none of that.
+- **Don't use it for** a specialised input that has its own component: [Number Input](number-input.md), [Password Input](password-input.md), [Search Field](search-field.md) or [Pin Input](pin-input.md). For a choice from a fixed list, use a [Select](select.md).
+
 ```tsx
 import { TextField } from "@rind-ui/react"
 
@@ -199,9 +205,9 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-Empty and filled (generated from the state stories):
+Empty and filled (generated from the state examples):
 
-<!-- aria:components-textfield--input -->
+<!-- aria:text-field--input -->
 ```yaml
 - text: Name
 - textbox "Name":
@@ -209,7 +215,7 @@ Empty and filled (generated from the state stories):
 ```
 <!-- /aria -->
 
-<!-- aria:components-textfield--controlled -->
+<!-- aria:text-field--controlled-story -->
 ```yaml
 - text: Greeting
 - textbox "Greeting": Hello

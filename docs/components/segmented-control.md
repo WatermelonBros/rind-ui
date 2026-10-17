@@ -2,6 +2,13 @@
 
 One choice out of a joined strip of segments. It is a radio group under its own scope: the root is a `role="radiogroup"`, each segment a real `<button role="radio">` with an explicit `aria-checked`, and one hidden `<input type="radio">` per segment submits the value with a form. The value is the selected segment's key (`string | null`).
 
+## When to use
+
+- **Use it for** exactly one choice out of a few short options drawn as a joined strip, usually to switch a view or a mode.
+- **Over native `<input type="radio">`**: it gives you the strip look, an indicator you can animate with CSS variables, radio semantics ("radio button, 2 of 3, checked"), and arrow keys that move focus and select. A hidden input per segment submits the value with a form.
+- **Don't use it for** independent pressed buttons: use [Toggle Group](toggle-group.md). Don't use it for choices that show a panel: use [Tabs](tabs.md).
+- **Don't use it for** longer options that need a description each: use [Radio Group](radio-group.md).
+
 ```tsx
 import { SegmentedControl } from "@rind-ui/react"
 
@@ -96,7 +103,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-segmentedcontrol--default -->
+<!-- aria:segmented-control--default -->
 ```yaml
 - radiogroup "Range":
   - radio "Day" [checked]

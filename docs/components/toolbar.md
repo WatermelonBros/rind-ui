@@ -2,6 +2,12 @@
 
 A row (or column) of controls with one roving tab stop. Tab enters the toolbar on the last control that had focus, arrows move between controls, Tab leaves. The root is `role="toolbar"` named by you; its controls keep their own roles: buttons, links, the items of a hosted [Toggle Group](toggle-group.md) or [Radio Group](radio-group.md), and any other control through `Toolbar.Item`.
 
+## When to use
+
+- **Use it for** a row or column of related controls that should be one stop in the Tab order, such as an editor's formatting bar.
+- **Over a plain `<div>` of buttons**: it adds `role="toolbar"`, one roving tab stop that remembers the last control, arrow, Home and End keys, correct key handling around text fields, and hosting of [Toggle Group](toggle-group.md) and [Radio Group](radio-group.md) in the same arrow order. Without it, every button is its own tab stop.
+- **Don't use it for** a few unrelated buttons, or for navigation: plain buttons or links in the normal Tab order are simpler. A list of commands that opens on demand is a [Menu](menu.md).
+
 ```tsx
 import { RadioGroup, ToggleGroup, Toolbar } from "@rind-ui/react"
 
@@ -150,7 +156,7 @@ Hosted groups keep their own drivers, located by name anywhere in the document (
 
 ## Accessibility tree
 
-<!-- aria:components-toolbar--default -->
+<!-- aria:toolbar--default -->
 ```yaml
 - button "Before"
 - toolbar "Formatting":

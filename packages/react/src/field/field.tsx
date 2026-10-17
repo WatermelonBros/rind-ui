@@ -58,9 +58,26 @@ declare module "../provider" {
 /** The binding a rind-ui form control reads in its Root (field-control). */
 const FieldControlContext = createContext<FieldControlBinding | null>(null)
 
+/** Under an embedded boundary: controls join no Field and create none (field-control). */
+const EmbeddedContext = createContext(false)
+
+/**
+ * Marks a subtree whose form controls are a component's own (a Color Picker's inputs): they do
+ * not register with the enclosing Field, do not become a Field themselves and get no Field
+ * wiring (design request "Embedded Controls" to field-control).
+ */
+export function FieldControlBoundary({ children }: { readonly children?: ReactNode }) {
+  return (
+    <FieldControlContext value={null}>
+      <EmbeddedContext value>{children}</EmbeddedContext>
+    </FieldControlContext>
+  )
+}
+
 /** Whether an enclosing Field exists (a Field host then joins it instead of creating one). */
 export function useIsInsideField(): boolean {
-  return useContext(FieldControlContext) !== null
+  const embedded = useContext(EmbeddedContext)
+  return useContext(FieldControlContext) !== null || embedded
 }
 
 /** The enclosing Field's binding without claiming it (a host's root reads its state). */

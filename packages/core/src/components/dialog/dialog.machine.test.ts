@@ -301,7 +301,7 @@ describe("overlay effect wiring", () => {
       parentKinds: DIALOG_PARENT_KINDS,
       dismiss: { escape: true, outsidePress: true, outsideFocus: false },
     })
-    expect(DIALOG_PARENT_KINDS).toEqual(["dialog", "alertdialog", "drawer", "popover"])
+    expect(DIALOG_PARENT_KINDS).toEqual(["dialog", "alertdialog", "drawer", "popover", "tour"])
   })
 
   it("stops when the dialog closes", () => {

@@ -23,7 +23,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `tag-group.contract.ts` per design §5 (fragment, traits, `removalAnnouncement`, `{ skip }`, prop steps)
-- [ ] 4.2 `getTagGroup` in `@rind-ui/testing`; driver tests in browser mode, jsdom and through Playwright against Storybook
+- [ ] 4.2 `getTagGroup` in `@rind-ui/testing`; driver tests in browser mode, jsdom and through Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -36,10 +36,10 @@
 - [ ] 6.1 Tier-3 `--rind-tag-group-*` tokens (design §6) with semantic fallbacks, `@layer rind.components`, `:where()` selectors; `status` family `data-variant` (solid, soft, outline) and `data-size` (sm, md, lg); `data-tone="danger"`; states via `data-hover`/`data-selected`/`data-disabled`/`data-focus-visible`; ellipsis; ≥ 24px targets with `--rind-hit-area` on TagRemove; never `display: contents` on the List
 - [ ] 6.2 Forced colors: outline focus ring, selected with `SelectedItem`/`Highlight` plus a border cue; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Display-only, removable, filter chips (multiple selection), single selection, selectable + removable, action tags opening a dialog, link tags, disabled tags, empty state, RTL, long text, sizes and variants
-- [ ] 7.2 Driver story (docs testing example); all stories render with the theme stylesheet and pass axe (including colour contrast)
+- [ ] 7.1 Site examples (apps/site/examples/tag-group.tsx, state examples for every contract state): Display-only, removable, filter chips (multiple selection), single selection, selectable + removable, action tags opening a dialog, link tags, disabled tags, empty state, RTL, long text, sizes and variants
+- [ ] 7.2 Driver example (docs testing example); all examples render with the theme stylesheet and pass axe (including colour contrast)
 
 ## 8. Docs and closing
 

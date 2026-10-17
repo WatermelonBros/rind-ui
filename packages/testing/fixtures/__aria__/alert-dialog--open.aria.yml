@@ -1,0 +1,6 @@
+- button "Delete project"
+- alertdialog "Delete project?":
+  - heading "Delete project?" [level=2]
+  - paragraph: This cannot be undone.
+  - button "Cancel"
+  - button "Delete"

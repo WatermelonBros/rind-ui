@@ -2,6 +2,12 @@
 
 A set of [Toggles](toggle.md) that share one roving tab stop and one value. Each Item is a real `<button aria-pressed>`; the group is a `role="group"` named by you. `selectionMode` is `single` (pressing an item replaces the selection, the default) or `multiple`. The value is always a `string[]`.
 
+## When to use
+
+- **Use it for** a set of related buttons that stay pressed, such as bold, italic and underline, or a view mode where nothing, one or several may be on.
+- **Over a few separate `<button aria-pressed>` elements**: it adds one shared value, a single roving tab stop with arrow, Home and End keys, single or multiple selection, and the group role. Arrows move focus without pressing.
+- **Don't use it for** exactly one choice drawn as a strip, where arrows select: use a [Segmented Control](segmented-control.md). Don't use it for a choice submitted with a form: use a [Radio Group](radio-group.md). For a single button, use a [Toggle](toggle.md); to switch panels, use [Tabs](tabs.md).
+
 ```tsx
 import { ToggleGroup } from "@rind-ui/react"
 
@@ -74,7 +80,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-togglegroup--single -->
+<!-- aria:toggle-group--single -->
 ```yaml
 - group "Format":
   - button "Bold"

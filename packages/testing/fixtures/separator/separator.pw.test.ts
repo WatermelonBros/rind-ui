@@ -1,50 +1,26 @@
 /// <reference types="node" />
-// Separator through the Playwright adapter, against the built Storybook: the driver, the
+// Separator through the Playwright adapter, against the site examples harness: the driver, the
 // browser accessibility tree, forced colors and the no-tone rule.
-import { createReadStream, existsSync, mkdirSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
+
+import { mkdirSync } from "node:fs"
+import { join } from "node:path"
 import { separatorContract } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { createDriverWith } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +28,7 @@ async function open(id: string) {
   const context = await browser.newContext()
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-separator--${id}&viewMode=story`)
+  await openExample(page, site.base, "separator", id)
   await page.locator('[data-scope="separator"]').first().waitFor()
   return page
 }
@@ -80,14 +56,14 @@ describe("separator driver through Playwright", () => {
   })
 
   it("a decorative separator is not exposed", { timeout: 60_000 }, async () => {
-    const page = await open("decorative")
-    const s = createDriverWith(separatorContract, page.locator("#storybook-root"), [{}])
+    const page = await open("decorative-story")
+    const s = createDriverWith(separatorContract, page.locator("[data-example-root]"), [{}])
     expect(await s.isDecorative()).toBe(true)
   })
 
   it("several matches fail naming the count", { timeout: 60_000 }, async () => {
     const page = await open("text-divider")
-    const s = createDriverWith(separatorContract, page.locator("#storybook-root"), [{}])
+    const s = createDriverWith(separatorContract, page.locator("[data-example-root]"), [{}])
     await expect(s.orientation()).rejects.toThrow(/2 elements match/)
   })
 

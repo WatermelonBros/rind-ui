@@ -1,0 +1,50 @@
+/*
+ * Color Field (family: field): reads Text Field's look through its own tokens; monospaced digits
+ * for hex; an invalid draft changes the border's width and colour (not colour alone).
+ */
+@layer rind.components {
+  :where([data-scope="color-field"][data-part="input"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-field-width, 8rem);
+    min-block-size: var(--rind-size-md);
+    padding-inline: var(--rind-color-field-padding-inline, var(--rind-space-2));
+    border: var(--rind-border-width) solid var(--rind-color-field-border, var(--rind-color-border));
+    border-radius: var(--rind-color-field-radius, var(--rind-radius-control));
+    background: var(--rind-color-field-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font-family: var(--rind-font-mono);
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where([data-scope="color-field"][data-part="input"][data-variant="soft"]) {
+    background: var(--rind-color-field-bg, var(--rind-color-neutral-soft));
+    border-color: transparent;
+  }
+
+  :where([data-scope="color-field"][data-part="input"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="color-field"][data-part="input"][data-invalid]),
+  :where([data-scope="color-field"][data-part="input"][data-tone="danger"]) {
+    border-color: var(--rind-color-field-border-invalid, var(--rind-color-danger-border));
+    border-width: calc(var(--rind-border-width) * 2);
+  }
+
+  :where([data-scope="color-field"][data-part="input"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="color-field"][data-part="input"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="color-field"][data-part="input"][data-invalid]) {
+      border-style: dashed;
+    }
+  }
+}

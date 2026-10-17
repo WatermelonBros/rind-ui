@@ -40,9 +40,9 @@
 
 - [ ] 8.1 `packages/theme/src/date-range-field.css` per design §5 (`@layer rind.components`, `:where()` selectors, `--rind-date-range-field-*` tokens read with fallbacks, `field` family variants/sizes, `data-tone="danger"`, forced colors, RTL); imported from `index.css`
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): default, date-time, min/max, unavailable with and without non-contiguous, RTL, required in a form with reset, read-only, disabled, invalid causes, inside a Field, driver example; state stories with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/date-range-field.tsx, state examples for every contract state): default, date-time, min/max, unavailable with and without non-contiguous, RTL, required in a form with reset, read-only, disabled, invalid causes, inside a Field, driver example; state examples with ARIA snapshots; axe clean
 
 ## 10. Docs
 

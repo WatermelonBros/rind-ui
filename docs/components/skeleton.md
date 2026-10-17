@@ -5,6 +5,17 @@ the whole area: the region is busy, the placeholders are hidden from assistive t
 unreachable by Tab, a visually hidden "Loading" text sits outside the region, and the shimmer
 stops for users who prefer reduced motion.
 
+## When to use
+
+- **Use it for** the shape of content that is still loading (a list, a card, a table), so the
+  layout does not jump when the data arrives.
+- **Over plain grey boxes**: the region is marked busy once, the placeholders are hidden from
+  assistive technology and unreachable by Tab, a hidden "Loading" text is provided, and the
+  shimmer respects reduced motion. There is no native element for this.
+- **Don't use it for** a load whose progress you know: use a [Progress](progress.md) bar. Don't
+  use it for content that appears instantly; a placeholder that flashes for a few milliseconds
+  is noise.
+
 ```tsx
 import { Skeleton } from "@rind-ui/react"
 

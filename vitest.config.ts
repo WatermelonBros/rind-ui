@@ -1,5 +1,4 @@
 import { availableParallelism } from "node:os"
-import { storybookTest } from "@storybook/addon-vitest/vitest-plugin"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
 
@@ -47,8 +46,10 @@ const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
 
 // Locally the machine is shared by several sessions: at most half the cores per run unless
 // RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
+// On CI, RIND_MAX_WORKERS (set for the real-browser slices) caps the pages one browser runs at
+// once: Chromium crashed mid-run ("Browser connection was closed") with the default.
 const maxWorkers = process.env["CI"]
-  ? undefined
+  ? Number(process.env["RIND_MAX_WORKERS"]) || undefined
   : Number(process.env["RIND_MAX_WORKERS"]) || Math.max(1, Math.floor(availableParallelism() / 2))
 
 // `expect.poll` waits on a condition; its timeout is only the failure deadline, and a loaded
@@ -140,8 +141,8 @@ export default defineConfig({
         },
       },
       {
-        // The shared driver scenarios through the Playwright adapter, against the built
-        // Storybook (turbo builds it before tests).
+        // The shared driver scenarios through the Playwright adapter, against the site's
+        // examples harness (apps/site/out; turbo builds it before tests).
         resolve,
         ssr,
         test: {
@@ -155,11 +156,6 @@ export default defineConfig({
           hookTimeout: 60_000,
           retry: ciRetry,
         },
-      },
-      {
-        resolve,
-        plugins: [storybookTest({ configDir: "apps/storybook/.storybook" })],
-        test: { name: "storybook", browser: browser("storybook"), retry: ciRetry, expect: patient },
       },
     ],
   },

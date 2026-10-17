@@ -49,30 +49,11 @@ its main entry, and `crisp` as `@rind-ui/theme/presets/crisp.css` scoped to
   `crisp` on a subtree
 - **THEN** components in that subtree switch to crisp radius, density and borders
 
-### Requirement: Storybook Renders Themed Components
-
-The Storybook preview SHALL load `@rind-ui/theme` with `calm` as default and SHALL
-offer toolbar globals for brand (`calm`, `crisp`, and sample brands including a
-light-yellow and a near-white accent built in adjust mode), scheme (system, light,
-dark) and tone, applied as attributes on the story root. Every component story SHALL
-render the themed component.
-
-#### Scenario: Brand switcher
-
-- **WHEN** the brand global is set to `crisp`
-- **THEN** the story root carries `data-rind-theme="crisp"` and every story renders
-  with crisp tokens, including portalled content
-
-#### Scenario: Axe in every brand
-
-- **WHEN** the story test run executes for each preset in light and dark
-- **THEN** every story passes axe colour-contrast
-
 ### Requirement: Contrast Report
 
-Storybook SHALL include a contrast report page that renders, for the selected brand,
-every checked pair from the builder report in light and dark, with ratio,
-requirement, pass/fail and any adjustment applied.
+The docs site SHALL include a contrast report page that renders, for each preset and sample
+brand, every checked pair from the builder report in light and dark, with ratio, requirement,
+pass/fail and any adjustment applied.
 
 #### Scenario: Adjusted sample brand
 
@@ -98,4 +79,15 @@ with the files and the package NOTICE SHALL attribute it. A brand that sets its 
 
 - **WHEN** the main entry is loaded with no brand override
 - **THEN** theme scopes render in Hanken Grotesk with tabular figures
+
+### Requirement: Themed Examples
+
+Every component example SHALL render on the examples harness with `@rind-ui/theme` in the
+`calm` and `crisp` presets (skins `theme-calm`, `theme-crisp`), including portalled content,
+and SHALL pass axe colour-contrast in light and dark in Chromium, Firefox and WebKit.
+
+#### Scenario: Axe in every brand
+
+- **WHEN** the axe run visits every example on `theme-calm` and `theme-crisp` in light and dark
+- **THEN** every example passes colour-contrast in all three engines
 
