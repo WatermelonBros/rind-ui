@@ -12,7 +12,8 @@ export interface InputChipsMessages {
   readonly chipsLabel: string
   /** Same key and default as Tag Group's. */
   readonly removeLabel: (text: string) => string
-  readonly tagsSummary: (texts: readonly string[]) => string
+  /** The input's description; `locale` for plural rules. */
+  readonly tagsSummary: (texts: readonly string[], locale?: string) => string
   /** Same key and default as Tag Group's. */
   readonly removedAnnouncement: (text: string) => string
 }
@@ -97,6 +98,7 @@ export interface InputChipsView {
   readonly context: InputChipsContext
   readonly dir: "ltr" | "rtl"
   readonly messages: InputChipsMessages
+  readonly locale?: string | undefined
   /** The host's input and control ids (removal focus, inside test). */
   readonly inputId: string
   readonly controlId: string
@@ -255,7 +257,10 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
       hidden: v.chips.length === 0 ? true : undefined,
       style: visuallyHiddenStyle,
     }),
-    summaryText: v.messages.tagsSummary(v.chips.map((c) => c.text)),
+    summaryText: v.messages.tagsSummary(
+      v.chips.map((c) => c.text),
+      v.locale,
+    ),
   }
 }
 
