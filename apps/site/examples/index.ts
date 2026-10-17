@@ -19,6 +19,7 @@ import * as colorPicker from "./color-picker"
 import * as colorSlider from "./color-slider"
 import * as colorSwatch from "./color-swatch"
 import * as colorSwatchPicker from "./color-swatch-picker"
+import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
@@ -27,6 +28,7 @@ import * as form from "./form"
 import * as heading from "./heading"
 import * as hiddenFormInput from "./hidden-form-input"
 import * as hiddenUntilFound from "./hidden-until-found"
+import * as hoverCard from "./hover-card"
 import * as image from "./image"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
@@ -93,6 +95,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "color-swatch": colorSwatch,
   "color-swatch-picker": colorSwatchPicker,
   collections,
+  "context-menu": contextMenu,
   dialog,
   field,
   "focus-and-modality": focusAndModality,
@@ -110,6 +113,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "pin-input": pinInput,
   popover,
   positioning,
+  "hover-card": hoverCard,
   label,
   link,
   listbox,
