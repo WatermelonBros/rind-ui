@@ -10,6 +10,8 @@ export {
 export { menuArgs, menuContract, nonModalMenuContract } from "./menu.contract"
 export {
   type MenuActivation,
+  type MenuAnchor,
+  type MenuAnchorDetails,
   type MenuChangeDetails,
   type MenuContext,
   type MenuEnv,
@@ -17,6 +19,7 @@ export {
   type MenuItemKind,
   type MenuMachine,
   type MenuOpenReason,
+  type MenuPoint,
   type MenuProps,
   menuIds,
   menuLayerId,

@@ -36,8 +36,13 @@ export interface DomAdapterOptions {
   readonly root?: ParentNode
   /** user-event by default; pass `userEvent` from "vitest/browser" for real input. */
   readonly user?: UserLike
-  /** Fake-timer advance, e.g. `vi.advanceTimersByTime`. */
+  /** Fake-timer advance, e.g. `vi.advanceTimersByTime` (polling advances it too). */
   readonly advanceTimers?: (ms: number) => unknown
+  /**
+   * A virtual clock's advance (`virtualClock().advance`) for the explicit waits only
+   * (`advance`, `longPress`): polling stays on real time, so frames keep running.
+   */
+  readonly advanceClock?: (ms: number) => unknown
   /**
    * `until` timeout in ms. Default 1000 in jsdom (Testing Library's waitFor default) and
    * 3000 in a real browser, where a CPU-starved page can deliver its first animation frame
@@ -495,6 +500,78 @@ function createDomEnv(
           )
         } else await act(() => u.click(hit))
       },
+      async longPress(hold) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const clientX = rect.left + rect.width * (hold?.at?.x ?? 0.5)
+        const clientY = rect.top + rect.height * (hold?.at?.y ?? 0.5)
+        const hit = (rect.width > 0 ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const init = {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          clientX,
+          clientY,
+          pointerId: 7,
+          pointerType: hold?.pointerType ?? "touch",
+          isPrimary: true,
+          pressure: 0.5,
+          width: 20,
+          height: 20,
+          detail: 1,
+        }
+        await act(async () => {
+          hit.dispatchEvent(new PointerEvent("pointerdown", { ...init, buttons: 1 }))
+        })
+        // The environment's time, as `advance`: fake timers when the test gave them.
+        const ms = hold?.ms ?? 520
+        const advance = options.advanceClock ?? options.advanceTimers
+        if (advance) await act(() => advance(ms))
+        else await act(() => new Promise((resolve) => setTimeout(resolve, ms)))
+        await act(async () => {
+          hit.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0 }))
+        })
+      },
+      async contextMenu(options) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const fx = options?.at?.x ?? 0.5
+        const fy = options?.at?.y ?? 0.5
+        const clientX = rect.left + rect.width * fx
+        const clientY = rect.top + rect.height * fy
+        const hit = (rect.width > 0 ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const init = { bubbles: true, cancelable: true, composed: true, clientX, clientY }
+        await act(async () => {
+          if (modality !== "virtual") {
+            // A real mouse press (pressure, detail): not the 1×1 AT click it would look like.
+            const button = {
+              ...init,
+              button: 2,
+              buttons: 2,
+              pointerId: 1,
+              pointerType: "mouse",
+              pressure: 0.5,
+              detail: 1,
+            }
+            hit.dispatchEvent(new PointerEvent("pointerdown", button))
+            const down = new MouseEvent("mousedown", button)
+            hit.dispatchEvent(down)
+            // The browser's default for any mouse button: focus what was pressed.
+            if (!down.defaultPrevented) {
+              const target = hit.closest<HTMLElement>(
+                "button, a[href], input, select, textarea, [tabindex]",
+              )
+              target?.focus()
+            }
+            hit.dispatchEvent(new PointerEvent("pointerup", { ...button, buttons: 0 }))
+            hit.dispatchEvent(new MouseEvent("mouseup", { ...button, buttons: 0 }))
+          }
+          // A PointerEvent, as browsers dispatch it (ariakit#7162).
+          hit.dispatchEvent(
+            new PointerEvent("contextmenu", { ...init, button: 2, pointerType: "mouse" }),
+          )
+        })
+      },
       box: async () => {
         const r = (await now()).getBoundingClientRect()
         // jsdom has no layout: every box is 0 × 0.
@@ -695,7 +772,8 @@ function createDomEnv(
     },
     until,
     advance: async (ms) => {
-      if (options.advanceTimers) await act(() => options.advanceTimers?.(ms))
+      const advance = options.advanceClock ?? options.advanceTimers
+      if (advance) await act(() => advance(ms))
       else await act(() => new Promise((resolve) => setTimeout(resolve, Math.max(ms, 16))))
     },
     instance,

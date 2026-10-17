@@ -6,7 +6,7 @@ import { dirname, join } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { getMenu } from "../../src/index"
+import { getContextMenu, getMenu } from "../../src/index"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")
@@ -111,6 +111,39 @@ describe("menu driver through Playwright", () => {
         return [s.transitionDuration, s.animationDuration].join(",")
       })
     expect(d.split(",").every((x) => Number.parseFloat(x) === 0)).toBe(true)
+  })
+})
+
+describe("context menu driver through Playwright", () => {
+  for (const modality of ["pointer", "keyboard", "virtual"] as const) {
+    it(`Same test in Playwright: openAt, choose Rename (${modality})`, {
+      timeout: 60_000,
+    }, async () => {
+      const page = await open()
+      const c = getContextMenu(page, { text: "notes.txt" }).via(modality)
+      await c.openAt()
+      await c.choose("Rename")
+      await expect.poll(() => c.isOpen()).toBe(false)
+      await expect.poll(() => last(page).textContent()).toBe("Rename")
+    })
+  }
+
+  it("a real right click prevents the browser's menu and opens at the pointer", {
+    timeout: 60_000,
+  }, async () => {
+    const page = await open()
+    const region = page.getByText("notes.txt")
+    const box = await region.boundingBox()
+    if (!box) throw new Error("no box")
+    await page.mouse.click(box.x + 30, box.y + 20, { button: "right" })
+    const content = page.getByRole("menu", { name: "File actions" })
+    await content.waitFor()
+    await expect
+      .poll(async () => {
+        const b = await content.boundingBox()
+        return b ? [Math.round(b.x), Math.round(b.y)] : null
+      })
+      .toEqual([Math.round(box.x + 30), Math.round(box.y + 20)])
   })
 })
 
