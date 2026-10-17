@@ -1,0 +1,114 @@
+/*
+ * Color Picker (control and trigger: family field; content: family panel). The colour surfaces
+ * are styled by their own stylesheets; this sheet lays out the trigger, the content and the
+ * row of inputs.
+ */
+@layer rind.components {
+  :where([data-scope="color-picker"][data-part="control"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+  }
+
+  :where([data-scope="color-picker"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: var(--rind-space-1);
+    border: var(--rind-border-width) solid var(--rind-color-picker-border, var(--rind-color-border));
+    border-radius: var(--rind-color-picker-radius, var(--rind-radius-control));
+    background: var(--rind-color-picker-trigger-bg, var(--rind-color-surface));
+    cursor: pointer;
+  }
+
+  :where([data-scope="color-picker"][data-part="trigger"][data-variant="soft"]) {
+    background: var(--rind-color-picker-trigger-bg, var(--rind-color-neutral-soft));
+    border-color: transparent;
+  }
+
+  :where([data-scope="color-picker"][data-part="trigger"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="color-picker"][data-part="trigger"][data-tone="danger"]),
+  :where([data-scope="color-picker"][data-part="trigger"][data-invalid]) {
+    border-color: var(--rind-color-danger-border);
+    border-width: calc(var(--rind-border-width) * 2);
+  }
+
+  :where([data-scope="color-picker"][data-part="content"]) {
+    box-sizing: border-box;
+    display: grid;
+    gap: var(--rind-color-picker-gap, var(--rind-space-3));
+    inline-size: var(--rind-color-picker-width, 15rem);
+    max-block-size: var(--rind-available-height, 100vh);
+    overflow: auto;
+    padding: var(--rind-color-picker-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid var(--rind-color-border);
+    border-radius: var(--rind-radius-panel);
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-text);
+    box-shadow: var(--rind-shadow-lg);
+  }
+
+  /* An inline picker is part of its host: no panel surface of its own. */
+  :where([data-scope="color-picker"][data-part="content"][data-inline]) {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+  }
+
+  :where([data-scope="color-picker"][data-part="content"][data-state="open"]) {
+    transition:
+      opacity var(--rind-duration-fast) var(--rind-ease-out),
+      scale var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  @starting-style {
+    :where([data-scope="color-picker"][data-part="content"][data-state="open"]) {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+
+  :where([data-scope="color-picker"][data-part="content"][data-state="closed"]) {
+    opacity: 0;
+    transition: opacity var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="eye-dropper-trigger"], [data-part="format-trigger"])
+  ) {
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    border: 0;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text);
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="color-picker"]:is(
+      [data-part="eye-dropper-trigger"],
+      [data-part="format-trigger"]
+    ):hover
+  ) {
+    background: var(--rind-color-neutral-soft);
+  }
+
+  :where([data-scope="color-picker"][data-part="value-text"]) {
+    font-family: var(--rind-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="color-picker"]:is([data-part="trigger"], [data-part="content"])) {
+      border-color: CanvasText;
+    }
+  }
+}

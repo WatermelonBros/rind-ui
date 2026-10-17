@@ -1,0 +1,24 @@
+/*
+ * The checkerboard under colours with transparency, shared by Color Swatch, the Transparency
+ * Grid part (Color Slider, Color Picker) and the swatch picker. Tokens: --rind-color-checker-size
+ * and the two tones --rind-color-checker-light / -dark (read, never declared).
+ */
+@layer rind.components {
+  :where([data-part="transparency-grid"]) {
+    background-color: var(--rind-color-checker-light, var(--rind-color-surface));
+    background-image: conic-gradient(
+      var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 25%,
+      transparent 0 50%,
+      var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 0 75%,
+      transparent 0
+    );
+    background-size: var(--rind-color-checker-size, 0.5rem) var(--rind-color-checker-size, 0.5rem);
+    border-radius: inherit;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-part="transparency-grid"]) {
+      display: none;
+    }
+  }
+}
