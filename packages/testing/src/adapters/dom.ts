@@ -532,6 +532,50 @@ function createDomEnv(
           hit.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0 }))
         })
       },
+      async drag(vector, dragOptions) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const x0 = rect.left + rect.width / 2
+        const y0 = rect.top + rect.height / 2
+        const hit = (rect.width > 0 ? doc().elementFromPoint(x0, y0) : null) ?? el
+        const type = dragOptions?.pointerType ?? "mouse"
+        const steps = Math.max(1, dragOptions?.steps ?? 10)
+        const stepMs = (dragOptions?.durationMs ?? 300) / steps
+        const advance = options.advanceClock ?? options.advanceTimers
+        const wait = async () => {
+          if (advance) await act(() => advance(stepMs))
+          // fake-time: none given, the drag takes real time (its velocity is the point)
+          else await act(() => new Promise((resolve) => setTimeout(resolve, stepMs)))
+        }
+        const at = (i: number) => ({
+          x: x0 + (vector.x * i) / steps,
+          y: y0 + (vector.y * i) / steps,
+        })
+        const fire = (
+          type: string,
+          p: { x: number; y: number },
+          extra: { readonly touching?: boolean } & Record<string, unknown>,
+        ) =>
+          act(async () => {
+            hit.dispatchEvent(dragEvent(type, p, extra, hit))
+          })
+        if (type === "touch") {
+          await fire("touchstart", at(0), { touching: true })
+          for (let i = 1; i <= steps; i++) {
+            await wait()
+            await fire("touchmove", at(i), { touching: true })
+          }
+          await fire("touchend", at(steps), { touching: false })
+          return
+        }
+        const base = { pointerId: 9, pointerType: type, isPrimary: true, button: 0 }
+        await fire("pointerdown", at(0), { ...base, buttons: 1 })
+        for (let i = 1; i <= steps; i++) {
+          await wait()
+          await fire("pointermove", at(i), { ...base, buttons: 1 })
+        }
+        await fire("pointerup", at(steps), { ...base, buttons: 0 })
+      },
       async contextMenu(options) {
         const el = await waitFor()
         const rect = el.getBoundingClientRect()
@@ -818,4 +862,36 @@ function createDomEnv(
       else doc().documentElement.dir = direction
     },
   }
+}
+
+/**
+ * A drag's event: a PointerEvent, or a touch event carrying one touch point (`touching`:
+ * in `touches`; a touchend has none). Touch points are plain objects with the fields a
+ * gesture reads, so it works where `Touch` cannot be constructed (jsdom).
+ */
+function dragEvent(
+  type: string,
+  p: { readonly x: number; readonly y: number },
+  extra: { readonly touching?: boolean } & Record<string, unknown>,
+  target: Element,
+): Event {
+  if (!type.startsWith("touch")) {
+    return new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      clientX: p.x,
+      clientY: p.y,
+      ...extra,
+    })
+  }
+  const e = new Event(type, { bubbles: true, cancelable: true, composed: true })
+  const point = { identifier: 1, target, clientX: p.x, clientY: p.y, pageX: p.x, pageY: p.y }
+  const touches = extra.touching ? [point] : []
+  Object.defineProperties(e, {
+    touches: { value: touches },
+    targetTouches: { value: touches },
+    changedTouches: { value: [point] },
+  })
+  return e
 }
