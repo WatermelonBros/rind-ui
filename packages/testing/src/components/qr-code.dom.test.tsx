@@ -1,12 +1,12 @@
 // QR Code through its driver (add-qr-code 5.2, 6.2): the same tests in jsdom and in real
 // browsers. jsdom has no canvas and no object URLs, so downloads here are SVG files with
 // `URL.createObjectURL` stubbed; raster exports are in qr-code.browser.test.tsx.
-import { QrCode, type QrCodeRootProps } from "@rind-ui/react"
+import { QrCode, type QrCodeApi, type QrCodeRootProps } from "@rind-ui/react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { useState } from "react"
+import { createRef, useState } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { decodeQr, getQrCode } from "../index"
+import { decodeQr, getQrCode, parseQrPath } from "../index"
 
 const a11y = async (root: Element = document.body) => {
   const { violations } = await axe.run(root, {
@@ -174,6 +174,69 @@ describe("element substitution", () => {
     expect(trigger.className).toContain("mine")
     await getQrCode(screen).download()
     expect(clicked.map((c) => c.download)).toEqual(["qr-code.svg"])
+  })
+})
+
+describe("render state and the imperative API", () => {
+  it("DownloadTrigger's render callback gets the QR code's state", () => {
+    render(
+      <QrCode.Root defaultValue="x">
+        <QrCode.Frame>
+          <QrCode.Pattern />
+        </QrCode.Frame>
+        <QrCode.DownloadTrigger
+          render={(props, state) => (
+            <button
+              {...props}
+              type="button"
+              data-qr-state={state.state}
+              data-qr-downloading={String(state.downloading)}
+            />
+          )}
+        >
+          Save
+        </QrCode.DownloadTrigger>
+      </QrCode.Root>,
+    )
+    const trigger = screen.getByRole("button", { name: "Save" })
+    expect(trigger.getAttribute("data-qr-state")).toBe("ready")
+    expect(trigger.getAttribute("data-qr-downloading")).toBe("false")
+  })
+
+  it("getDataUrl resolves to the image, drawn like a download (SVG here)", async () => {
+    vi.mocked(URL.createObjectURL).mockRestore()
+    const api = createRef<QrCodeApi>()
+    render(
+      <QrCode.Root defaultValue="data url" apiRef={api}>
+        <QrCode.Frame>
+          <QrCode.Pattern />
+        </QrCode.Frame>
+      </QrCode.Root>,
+    )
+    const url = (await api.current?.getDataUrl("image/svg+xml")) ?? ""
+    expect(url.startsWith("data:image/svg+xml")).toBe(true)
+    const text = await (await fetch(url)).text()
+    const d = /<path d="([^"]*)"/.exec(text)?.[1] ?? ""
+    expect(decodeQr(parseQrPath(d, "0 0 29 29", 21).modules).text).toBe("data url")
+    // No file is saved by getDataUrl.
+    expect(clicked).toEqual([])
+  })
+
+  it("getDataUrl without a symbol rejects; download and setValue go through the machine", async () => {
+    const api = createRef<QrCodeApi>()
+    const onValueChange = vi.fn()
+    render(
+      <QrCode.Root value="" onValueChange={onValueChange} apiRef={api}>
+        <QrCode.Frame>
+          <QrCode.Pattern />
+        </QrCode.Frame>
+      </QrCode.Root>,
+    )
+    await expect(api.current?.getDataUrl()).rejects.toThrow(/no symbol/)
+    await act(async () => api.current?.setValue("next"))
+    expect(onValueChange).toHaveBeenCalledWith("next")
+    await act(async () => api.current?.download())
+    expect(clicked).toEqual([])
   })
 })
 

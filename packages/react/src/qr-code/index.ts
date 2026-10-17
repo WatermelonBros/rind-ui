@@ -1,5 +1,6 @@
 export {
   QrCode,
+  type QrCodeApi,
   type QrCodeDownloadTriggerProps,
   type QrCodeFrameProps,
   type QrCodeOverlayProps,

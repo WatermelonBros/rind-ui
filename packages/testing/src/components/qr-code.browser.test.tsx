@@ -1,8 +1,9 @@
 // QR Code in real browsers (add-qr-code 2.3, 6.2): raster exports decoded back from their
 // pixels, the overlay composited (or omitted when it taints the canvas), integer scaling,
 // the overlay coverage measured from layout, and `BarcodeDetector` as a second oracle.
-import { QrCode } from "@rind-ui/react"
+import { QrCode, type QrCodeApi } from "@rind-ui/react"
 import { act, render, screen } from "@testing-library/react"
+import { createRef } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { decodeQr, getQrCode } from "../index"
 
@@ -192,6 +193,25 @@ describe("raster download", () => {
     } finally {
       document.documentElement.style.zoom = ""
     }
+  })
+})
+
+describe("getDataUrl", () => {
+  it("resolves to a PNG at an integer scale that decodes to the value", async () => {
+    const api = createRef<QrCodeApi>()
+    render(
+      <QrCode.Root defaultValue="png data url" apiRef={api}>
+        <QrCode.Frame width={290} height={290} style={{ display: "block", background: "#fff" }}>
+          <QrCode.Pattern style={{ fill: "#000" }} />
+        </QrCode.Frame>
+      </QrCode.Root>,
+    )
+    const url = (await api.current?.getDataUrl("image/png", { size: 300 })) ?? ""
+    expect(url.startsWith("data:image/png;base64,")).toBe(true)
+    const read = await pixelsToModules(await (await fetch(url)).blob(), 29)
+    expect(read.width % 29).toBe(0)
+    expect(decodeQr(read.modules).text).toBe("png data url")
+    expect(clicked).toEqual([])
   })
 })
 

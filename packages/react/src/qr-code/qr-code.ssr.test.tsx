@@ -48,6 +48,27 @@ describe("QR Code server rendering", () => {
     expect(out).toContain(">hello</span>")
   })
 
+  it("without a ValueText the server HTML has no aria-describedby (no dangling id)", () => {
+    const out = html(qr("hello"))
+    expect(out).not.toContain("aria-describedby")
+  })
+
+  it("a ValueText nested in elements is still found; every describedby id exists", () => {
+    const out = html(
+      qr(
+        "nested",
+        <div>
+          <p>
+            <QrCode.ValueText />
+          </p>
+        </div>,
+      ),
+    )
+    const ref = /aria-describedby="([^"]+)"/.exec(out)?.[1] ?? ""
+    expect(ref).not.toBe("")
+    for (const id of ref.split(" ")) expect(out).toContain(`id="${id}"`)
+  })
+
   it("empty and invalid values render a hidden, unnamed frame without throwing", () => {
     for (const value of ["", "x".repeat(4000)]) {
       const out = html(qr(value))

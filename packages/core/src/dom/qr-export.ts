@@ -201,3 +201,13 @@ function dataUrlOf(doc: Document, img: HTMLImageElement): string | undefined {
     return undefined
   }
 }
+
+/** A Blob as a `data:` URL (getDataUrl). */
+export function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error ?? new Error("unreadable blob"))
+    reader.readAsDataURL(blob)
+  })
+}

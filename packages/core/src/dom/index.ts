@@ -151,7 +151,12 @@ export {
   type PressOptions,
   type PressPointerEvent,
 } from "./press"
-export { exportQr, type QrExportInput, type QrExportResult } from "./qr-export"
+export {
+  blobToDataUrl,
+  exportQr,
+  type QrExportInput,
+  type QrExportResult,
+} from "./qr-export"
 export {
   defineQuirks,
   type Quirk,

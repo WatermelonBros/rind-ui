@@ -42,4 +42,30 @@ describe("QR Code hydration", () => {
     await act(async () => root?.unmount())
     container.remove()
   })
+
+  it("a ValueText inside another component: no describedby on the server, added after mount", async () => {
+    const Inner = () => <QrCode.ValueText />
+    const nested = (
+      <QrCode.Root defaultValue="inner">
+        <QrCode.Frame>
+          <QrCode.Pattern />
+        </QrCode.Frame>
+        <Inner />
+      </QrCode.Root>
+    )
+    const container = document.createElement("div")
+    container.innerHTML = renderToString(nested)
+    expect(container.querySelector("svg")?.hasAttribute("aria-describedby")).toBe(false)
+    document.body.append(container)
+    const error = vi.spyOn(console, "error").mockImplementation(() => {})
+    let root: ReturnType<typeof hydrateRoot> | undefined
+    await act(async () => {
+      root = hydrateRoot(container, nested, { onRecoverableError: (e) => error(String(e)) })
+    })
+    expect(error.mock.calls).toEqual([])
+    const vt = container.querySelector('[data-part="value-text"]')
+    expect(container.querySelector("svg")?.getAttribute("aria-describedby")).toBe(vt?.id)
+    await act(async () => root?.unmount())
+    container.remove()
+  })
 })

@@ -92,6 +92,11 @@ export const qrCodeMeta = {
         "DownloadTrigger: the image width in CSS pixels, rounded up to whole pixels per module.",
     },
     quality: { type: "number", description: "DownloadTrigger: 0–1 for JPEG and WebP." },
+    apiRef: {
+      type: "Ref<{ getDataUrl(mimeType?, { size?, quality? }?), download(options?), setValue(value) }>",
+      description:
+        "Root: the imperative API. `getDataUrl` resolves to the image as a data URL, drawn like a download.",
+    },
     messages: {
       type: "{ label?: string; download?: string }",
       description:

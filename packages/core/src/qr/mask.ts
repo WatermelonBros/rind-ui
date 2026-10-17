@@ -106,9 +106,13 @@ export function penalty(m: Matrix): number {
   }
   let dark = 0
   for (const v of d) dark += v
-  const total = s * s
+  return result + darkProportionPenalty(dark, s * s)
+}
+
+/** Rule 4: 10 × the smallest k ≥ 0 with the dark share within (45 − 5k) % … (55 + 5k) %. */
+export function darkProportionPenalty(dark: number, total: number): number {
   const k = Math.ceil(Math.abs(dark * 20 - total * 10) / total) - 1
-  return result + Math.max(0, k) * N4
+  return Math.max(0, k) * N4
 }
 
 /** Applies the forced mask, or the lowest-penalty one, with its format word. Returns it. */

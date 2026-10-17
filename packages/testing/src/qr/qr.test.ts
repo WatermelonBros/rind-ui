@@ -72,25 +72,26 @@ describe("Decodability: round trip over all versions", () => {
     }
   })
 
-  it("random text in every mode, at every level and with every forced mask", () => {
+  it("random text in every mode, at every level with every forced mask", () => {
     const random = rng(42)
     const alphabet = [
       "0123456789",
       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:",
       "abcxyz-_?=&é世😀",
     ]
-    for (let i = 0; i < 96; i++) {
-      const chars = [...(alphabet[i % 3] ?? "")]
-      const length = 1 + Math.floor(random() * 120)
-      const value = Array.from({ length }, () => chars[Math.floor(random() * chars.length)]).join(
-        "",
-      )
-      const ecc = LEVELS[i % 4] ?? "M"
-      const mask = i % 8
-      const r = ok(encodeQr(value, { ecc, mask }))
-      const d = decodeQr(r.modules)
-      expect(d.text).toBe(value)
-      expect(d.mask).toBe(mask)
+    for (const ecc of LEVELS) {
+      for (let mask = 0; mask < 8; mask++) {
+        for (const set of alphabet) {
+          const chars = [...set]
+          const length = 1 + Math.floor(random() * 120)
+          const value = Array.from(
+            { length },
+            () => chars[Math.floor(random() * chars.length)],
+          ).join("")
+          const d = decodeQr(ok(encodeQr(value, { ecc, mask })).modules)
+          expect([d.text, d.ecc, d.mask]).toEqual([value, ecc, mask])
+        }
+      }
     }
   })
 

@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-qr-code (r1) | — | packages/react/src/qr-code/qr-code.tsx | `apiRef` finds frame/pattern/overlay with `document.getElementById`: breaks inside a shadow root (use the Root element's root node) |
+| add-qr-code (r1) | — | packages/testing/src/components/qr-code.dom.test.tsx | No Root re-render test with an inline `encoding` object (the compare-by-value claim) |
+| add-qr-code (r1) | — | packages/core/src/qr/qr.test.ts | The auto-mask oracle is circular (it reuses the encoder's own penalty); compare with fixtures' chosen masks instead |
 | add-qr-code (impl) | — | packages/core/src/components/qr-code/qr-code.contract.ts | Contract is `qrCodeContractWith(decode)` (core cannot import the testing decoder); `setValue` types into the page's "Value" control |
 | add-qr-code (impl) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | ARIA snapshots and axe run inline in the Playwright fixture until the site-examples snapshot harness exists |
 | add-scroll-area (r1) | — | packages/core/src/dom/scroll-metrics.ts:152 | The tabbables walk runs per scroll frame; cache it and invalidate on subtree mutation |

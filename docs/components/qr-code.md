@@ -102,6 +102,18 @@ H 15 %) or reaches a finder pattern. With a logo, use `ecc: "H"` and keep the lo
 - The file name loses path separators and control characters; the object URL is revoked
   right after the download starts. A second press while a download runs is ignored.
 
+The same is available without a trigger through Root's `apiRef`: `getDataUrl(mimeType,
+options)` resolves to the image as a `data:` URL (for an `<img>`, a share sheet or an upload),
+drawn exactly like a download; `download(options)` starts a download.
+
+```tsx
+const qr = useRef<QrCodeApi>(null)
+
+<QrCode.Root value={url} apiRef={qr}>…</QrCode.Root>
+
+const png = await qr.current?.getDataUrl("image/png", { size: 512 })
+```
+
 `onDownload({ fileName, mimeType, overlay })` is called once per download, with `overlay`
 `"included"`, `"omitted"` or `"none"`.
 
@@ -156,7 +168,7 @@ real codes with the cameras your users have.
 | A pixel size on the frame | `width`/`height` on `QrCode.Frame` or `--rind-qr-code-size` |
 | Padding around the symbol | the built-in quiet zone (`quietZone: 0` to keep yours) |
 | `aria-label` on the frame | the same; `messages.label` is the default |
-| `getDataUrl()` / `download()` on the API | `QrCode.DownloadTrigger` with `mimeType`, `fileName`, `size` |
+| `getDataUrl()` / `download()` on the API | the same, on Root's `apiRef`; or `QrCode.DownloadTrigger` |
 
 ## Testing
 

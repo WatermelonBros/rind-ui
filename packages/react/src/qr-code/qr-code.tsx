@@ -1,24 +1,32 @@
 import {
+  blobToDataUrl,
   createQrEncoder,
+  exportQr,
   type MessageOverrides,
   type QrCodeMessages,
   type QrDownloadDetails,
   type QrDownloadOptions,
   type QrEncodeFailure,
   type QrEncodingOptions,
+  type QrMime,
   qrCodeConnect,
+  qrCodeIds,
   qrCodeMachine,
   qrCodeMessages,
   qrEncodingKey,
   warnEncodeError,
 } from "@rind-ui/core"
 import {
+  Children,
   type ComponentPropsWithRef,
   createContext,
+  isValidElement,
   type ReactNode,
+  type Ref,
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -52,6 +60,19 @@ export interface QrCodeState {
   readonly downloading: boolean
 }
 
+/** The Root's imperative API (`apiRef`). */
+export interface QrCodeApi {
+  /** The symbol as a `data:` URL (PNG by default), overlay composited like a download. */
+  readonly getDataUrl: (
+    mimeType?: QrMime,
+    options?: Omit<QrDownloadOptions, "mimeType" | "fileName">,
+  ) => Promise<string>
+  /** Starts a download, as pressing the trigger does (ignored while one runs). */
+  readonly download: (options?: QrDownloadOptions) => void
+  /** Proposes a new value (only `onValueChange` when controlled). */
+  readonly setValue: (value: string) => void
+}
+
 type Part = "value-text"
 
 interface Ctx {
@@ -82,6 +103,8 @@ export type QrCodeRootProps = Omit<ComponentPropsWithRef<"div">, "defaultValue">
   readonly onEncodeError?: (error: QrEncodeFailure) => void
   readonly onDownload?: (details: QrDownloadDetails) => void
   readonly messages?: MessageOverrides<QrCodeMessages>
+  /** Receives the imperative API: `getDataUrl`, `download`, `setValue`. */
+  readonly apiRef?: Ref<QrCodeApi>
   readonly render?: RenderProp<QrCodeState>
 }
 
@@ -93,6 +116,7 @@ function Root({
   onEncodeError,
   onDownload,
   messages: ownMessages,
+  apiRef,
   render,
   id,
   children,
@@ -117,10 +141,12 @@ function Root({
   })
   const current = view.values.value
   const encoded = encode(current)
+  // A ValueText in the element tree is known at render, on the server too: only then does
+  // the frame reference it before mount. One inside another component registers after mount.
   const registry = usePartRegistry<Part>({
     scope: "qr-code",
     root: instance,
-    optional: ["value-text"],
+    optional: containsElement(children, ValueText) ? ["value-text"] : [],
   })
 
   // Once per distinct failing value (and its options), after commit: never during render.
@@ -163,6 +189,33 @@ function Root({
     lastDownload: view.context.lastDownload?.fileName,
     messages,
   })
+  const latestEncoded = useRef(encoded)
+  latestEncoded.current = encoded
+  useImperativeHandle(
+    apiRef,
+    (): QrCodeApi => ({
+      getDataUrl: async (mimeType = "image/png", o = {}) => {
+        const e = latestEncoded.current
+        if (e.status !== "ready") throw new Error("[rind-ui] qr-code: there is no symbol to export")
+        const ids = qrCodeIds(instance)
+        const byId = (i: string) => document.getElementById(i)
+        const { blob } = await exportQr({
+          modules: e.result.modules,
+          quietZone: e.quietZone,
+          mimeType,
+          quality: o.quality,
+          size: o.size ?? 1024,
+          frame: byId(ids.frame),
+          pattern: byId(ids.pattern),
+          overlay: byId(ids.overlay),
+        })
+        return blobToDataUrl(blob)
+      },
+      download: (o = {}) => send({ type: "DOWNLOAD", modality: "virtual", ...o }),
+      setValue: (v) => send({ type: "VALUE.SET", value: v }),
+    }),
+    [instance, send],
+  )
   const ctx: Ctx = {
     connect,
     registry,
@@ -180,6 +233,17 @@ function Root({
     rest,
   )
   return <QrCodeContext value={ctx}>{renderPart("div", props, render, state)}</QrCodeContext>
+}
+
+/** Whether `type` is rendered directly in the element tree (not inside another component). */
+function containsElement(node: ReactNode, type: unknown): boolean {
+  let found = false
+  Children.forEach(node, (child) => {
+    if (found || !isValidElement(child)) return
+    if (child.type === type) found = true
+    else found = containsElement((child.props as { children?: ReactNode }).children, type)
+  })
+  return found
 }
 
 /** A value computed once per component instance. */
@@ -295,11 +359,13 @@ function DownloadTrigger({
   const own = normalizeProps(ctx.connect.downloadTrigger(hasContent))
   // The trigger's props are Button props: the merged own and consumer props.
   const merged = mergeProps(own, rest) as ButtonProps
+  // A render callback gets the QR code's state, not the inner Button's.
   const asButton =
     render === undefined
       ? {}
-      : // The trigger's state has every field the render callback reads.
-        { render: render as unknown as NonNullable<ButtonProps["render"]> }
+      : typeof render === "function"
+        ? { render: (props: Record<string, unknown>) => render(props, ctx.state) }
+        : { render }
   return (
     <Button
       {...merged}

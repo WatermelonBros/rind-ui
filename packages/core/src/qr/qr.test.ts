@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest"
 import pkg from "../../package.json" with { type: "json" }
 import { dataBytes, encodeQr } from "./encode"
-import { applyMask, penalty } from "./mask"
+import { applyMask, darkProportionPenalty, penalty } from "./mask"
 import { formatBits, functionPatterns, placeCodewords, versionBits } from "./matrix"
 import { qrPath } from "./path"
 import { addEccAndInterleave, rsRemainder } from "./reed-solomon"
@@ -301,6 +301,15 @@ describe("Mask Selection", () => {
       const min = Math.min(...scores)
       expect(scores.indexOf(min)).toBe(auto.mask)
     }
+  })
+
+  it("rule 4: 10 points per 5 % step away from a balanced dark share", () => {
+    expect(darkProportionPenalty(50, 100)).toBe(0)
+    expect(darkProportionPenalty(54, 100)).toBe(0)
+    expect(darkProportionPenalty(56, 100)).toBe(10)
+    expect(darkProportionPenalty(40, 100)).toBe(10)
+    expect(darkProportionPenalty(39, 100)).toBe(20)
+    expect(darkProportionPenalty(0, 100)).toBe(90)
   })
 
   it("forced mask", () => {
