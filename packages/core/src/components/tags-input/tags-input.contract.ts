@@ -210,6 +210,8 @@ export const tagsInputContract = contract("tags-input", {
     ADD: { skip: "programmatic" },
     CLEAR: { skip: "programmatic" },
     "FORM.RESET": { skip: "a form reset: form scenario tests" },
+    "VALUE.SYNC": { skip: "sent by the $props:value edge" },
+    "$props:value": { skip: "a controlled value: the over-max scenario tests" },
   },
   traits: ["form-associated", "field-associated", "composite-roving"],
   formInput: {
