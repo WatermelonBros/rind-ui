@@ -15,6 +15,7 @@ import { formatColor } from "../shared/color/format"
 import { channelGradient, type GradientDirection } from "../shared/color/gradient"
 import { type ColorMessages, colorMessages } from "../shared/color/messages"
 import { type ColorNameProp, hueName, resolveColorName } from "../shared/color/name"
+import { clamp, gridMax, snap } from "../shared/step-math"
 
 export interface ColorSliderValueTextArgs {
   readonly channel: string
@@ -83,7 +84,15 @@ export function colorSliderConnect(input: ColorSliderInput) {
     })
   const data = { "data-channel": channel, "data-space": color.space }
   return {
-    slider: { min: r.min, max: r.max, step: r.step, largeStep: r.pageStep, value },
+    // The Slider gets the channel on its own step grid (a hex colour's hue is 215.88; the
+    // Slider would warn and round it): the colour itself keeps full precision.
+    slider: {
+      min: r.min,
+      max: r.max,
+      step: r.step,
+      largeStep: r.pageStep,
+      value: clamp(snap(value, r.step, r.min), r.min, gridMax(r.min, r.max, r.step)),
+    },
     valueText,
     channelName: messages.channelName(channel),
     data,

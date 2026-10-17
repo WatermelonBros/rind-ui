@@ -48,6 +48,32 @@ const pointer = (type: string, target: EventTarget, x: number, y: number) =>
   )
 
 describe("color picker in real browsers", () => {
+  it("the content is positioned next to the control, not at the page origin", async () => {
+    render(
+      <div style={{ margin: "200px 0 0 300px" }}>
+        <Picker />
+      </div>,
+    )
+    const picker = getColorPicker(screen, { name: "Fill" })
+    await picker.open()
+    const control = document.querySelector(
+      '[data-scope="color-picker"][data-part="control"]',
+    ) as HTMLElement
+    const positioner = document.querySelector(
+      '[data-scope="color-picker"][data-part="positioner"]',
+    ) as HTMLElement
+    // The Popover found its anchor: coordinates were computed and the anchor is not hidden.
+    await vi.waitFor(() => expect(positioner.style.getPropertyValue("--rind-x")).not.toBe(""))
+    expect(positioner.hasAttribute("data-anchor-hidden")).toBe(false)
+    const anchor = control.getBoundingClientRect()
+    const x = Number.parseFloat(positioner.style.getPropertyValue("--rind-x"))
+    const y = Number.parseFloat(positioner.style.getPropertyValue("--rind-y"))
+    // Default placement: below the control, starting near its inline start.
+    expect(y).toBeGreaterThanOrEqual(anchor.bottom - 1)
+    expect(Math.abs(x - anchor.left)).toBeLessThan(anchor.width + 300)
+    expect(x).toBeGreaterThan(100)
+  })
+
   it("in a Dialog: open, dismiss, open again, press inside (zag#3043, ark#3414)", async () => {
     render(
       <Dialog.Root defaultOpen>
@@ -55,8 +81,9 @@ describe("color picker in real browsers", () => {
           <Dialog.Positioner>
             <Dialog.Content style={{ padding: 40 }}>
               <Dialog.Title>Theme</Dialog.Title>
-              <Picker />
+              {/* Above the picker: the content opens below the control and would cover it. */}
               <p data-testid="inside-dialog">Elsewhere in the dialog</p>
+              <Picker />
             </Dialog.Content>
           </Dialog.Positioner>
         </Dialog.Portal>
