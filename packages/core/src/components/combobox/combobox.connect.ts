@@ -55,6 +55,8 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
   const ids = comboboxIds(v.instance)
   const { send, context: c } = v
   const dataState = v.open ? "open" : "closed"
+  // The input and trigger say what aria-expanded says: closed in the empty state.
+  const exposedState = v.exposed ? "open" : "closed"
   const composing = () => c.composing
   // Composite events become the combobox's: a press is a choice, nothing else selects.
   const list = listboxParts(
@@ -128,6 +130,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     }),
     input: (): PartProps => ({
       ...common("input"),
+      "data-state": exposedState,
       ...focusAttrs(c.focused, v.modality),
       id: ids.input,
       role: "combobox",
@@ -222,6 +225,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     }),
     trigger: (): PartProps => ({
       ...common("trigger"),
+      "data-state": exposedState,
       id: ids.trigger,
       type: "button",
       tabindex: -1,

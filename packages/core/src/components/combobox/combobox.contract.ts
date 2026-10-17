@@ -41,7 +41,8 @@ const optionNames = async (
 }
 const highlighted = async (env: E) =>
   (await optionNames(env, async (a) => (await a("data-highlighted")) !== null))[0] ?? null
-const isOpen = async (env: E) => (await env.part("input").attr("data-state")) === "open"
+/** The machine's state is the control's (the input's follows aria-expanded). */
+const isOpen = async (env: E) => (await env.part("control").attr("data-state")) === "open"
 const input = (env: E) => env.part("input")
 /** Settled for pointer input: closed, empty (nothing to press), or open and placed. */
 const settled = async (env: E) =>
@@ -117,7 +118,12 @@ export const comboboxContract = contract("combobox", {
     hasFocus: (env: E) => input(env).isFocused(),
   },
   actions: {
-    focusIn: { keyboard: (env: E) => input(env).focusWithTab(), done: { hasFocus: true } },
+    focusIn: {
+      keyboard: async (env: E) => {
+        if (!(await input(env).isFocused())) await input(env).focusWithTab()
+      },
+      done: { hasFocus: true },
+    },
     type: {
       keyboard: async (env: E, text: string) => {
         await focusInput(env)
@@ -145,28 +151,32 @@ export const comboboxContract = contract("combobox", {
       done: async (env: E) => (await isOpen(env)) && (await settled(env)),
     },
     close: { keyboard: (env: E) => input(env).press("Escape"), done: { isOpen: false } },
-    arrowDown: { keyboard: (env: E) => input(env).press("ArrowDown"), done: async () => true },
+    // The model's keys go to whatever is focused (a key in an unfocused input is not real).
+    arrowDown: { keyboard: (env: E) => env.keyboard("ArrowDown"), done: async () => true },
     arrowUp: { keyboard: (env: E) => input(env).press("ArrowUp"), done: async () => true },
     altArrowDown: {
       keyboard: (env: E) => input(env).press("ArrowDown", { alt: true }),
       done: async () => true,
     },
-    caret: { keyboard: (env: E) => input(env).press("ArrowRight"), done: async () => true },
-    pressEnter: { keyboard: (env: E) => input(env).press("Enter"), done: async () => true },
-    pressEscape: { keyboard: (env: E) => input(env).press("Escape"), done: async () => true },
+    caret: { keyboard: (env: E) => env.keyboard("ArrowRight"), done: async () => true },
+    pressEnter: { keyboard: (env: E) => env.keyboard("Enter"), done: async () => true },
+    pressEscape: { keyboard: (env: E) => env.keyboard("Escape"), done: async () => true },
     tabOut: { keyboard: (env: E) => env.keyboard("Tab"), done: { hasFocus: false } },
     blur: {
       pointer: (env: E) => env.pointerOutside(),
       none: { keyboard: "the keyboard blur is tabOut" },
       done: { hasFocus: false },
     },
-    /** One letter typed (the model's text change). */
+    /**
+     * One letter typed (the model's text change), as a committed composition: a composing
+     * replay of plain typing would legitimately change the query (IME Composition).
+     */
     typeR: {
       keyboard: async (env: E) => {
         await focusInput(env)
-        await input(env).type("r")
+        await input(env).compose(["r"], "r")
       },
-      done: async () => true,
+      done: settled,
     },
     clearText: {
       keyboard: async (env: E) => {
@@ -261,11 +271,17 @@ export const comboboxContract = contract("combobox", {
     "$props:collection": { skip: "results are a derivation of the typed text (INPUT.CHANGE)" },
     "$props:items": { skip: "collection changes: scenario tests (async label)" },
     "$props:value": { skip: "controlled value: scenario tests" },
+    "$sync:open": { skip: "a controlled open: scenario tests" },
     "$props:loading": { skip: "async: scenario tests" },
   },
   traits: ["composite-activedescendant", "layer", "presence", "anchored", "selectable"],
+  // Focus on the input is a focus event; programmatic focus on a button leaves the input.
   commitsOnFocus: [
     { part: "input", state: "closed" },
     { part: "input", state: "open" },
+    { part: "trigger", state: "closed" },
+    { part: "trigger", state: "open" },
+    { part: "clear-trigger", state: "closed" },
+    { part: "clear-trigger", state: "open" },
   ],
 })

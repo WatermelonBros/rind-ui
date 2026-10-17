@@ -265,6 +265,27 @@ function highlightEntry(a: Args, edge: "first" | "last") {
   a.set("scrollReason", "open")
 }
 
+/** VoiceOver in Safari ignores activedescendant: keyboard highlights are announced. */
+function announceHighlight(a: Args) {
+  const { context, props } = a
+  if (context.highlightSource !== "keyboard" || !quirkActive("vo-activedescendant", a.env)) return
+  const key = context.highlightedKey
+  const node = key === null ? undefined : props.collection.get(key)
+  if (!node || key === null) return
+  const section = props.collection.sectionOf(key)
+  const entered = section && section.key !== context.announcedSection ? section.label : undefined
+  a.set("announcedSection", section?.key ?? null)
+  a.env.announcer.announce({
+    message: props.messages.focusAnnouncement(
+      node.textValue,
+      selectedKeys(a.values.value).includes(key),
+      entered,
+    ),
+    key: `combobox-${props.root}:highlight`,
+    lang: a.env.locale.locale(),
+  })
+}
+
 function announceCount(a: Args) {
   const { props } = a
   if (props.stale || props.loading === "loading" || props.loading === "loading-more") return
@@ -281,15 +302,18 @@ export const comboboxMachine = setup({
   guards: {
     enabled: ({ props }) => props.disabled !== true,
     editable: ({ props }) => editable(props),
-    notComposing: ({ event, context }) =>
-      !context.composing && !("composing" in event && event.composing === true),
+    /** A key reaches the input: it is focused and no composition is in progress. */
+    keyable: ({ event, context }) =>
+      context.focused && !context.composing && !("composing" in event && event.composing === true),
+    isFocused: ({ context }) => context.focused,
     opensOnInput: ({ props, event }) =>
       props.openOnInput !== false &&
       editable(props) &&
       !(event.type === "INPUT.CHANGE" && event.composing),
     opensOnArrow: ({ props }) => props.openOnArrow !== false && props.disabled !== true,
     opensOnPress: ({ props }) => props.openOnInputPress === true && props.disabled !== true,
-    opensOnFocus: ({ props, event }) =>
+    opensOnFocus: ({ props, event, context }) =>
+      !context.focused &&
       props.openOnFocus === true &&
       props.disabled !== true &&
       props.readOnly !== true &&
@@ -315,6 +339,8 @@ export const comboboxMachine = setup({
       if (a.event.type !== "INPUT.CHANGE" && a.event.type !== "COMPOSITION.END") return
       const text = a.event.type === "INPUT.CHANGE" ? a.event.text : a.event.text
       setText(a, text)
+      // The user types into a focused input (its focus event may come after, as in a test).
+      a.set("focused", true)
       a.set("dirty", true)
       a.set("completion", null)
       // A text change clears the highlight (auto highlight re-applies on the new results).
@@ -436,6 +462,7 @@ export const comboboxMachine = setup({
       }
       announceCount(a)
     },
+    announceHighlight,
     announceOpen: (a) => {
       if (a.context.highlightedKey === null) announceCount(a)
     },
@@ -534,7 +561,7 @@ export const comboboxMachine = setup({
     loading: "LOADING.SYNC",
   },
   on: {
-    "INPUT.FOCUS": { actions: ["setFocused"] },
+    "INPUT.FOCUS": { guard: { not: "isFocused" }, actions: ["setFocused"] },
     "COMPOSITION.START": { actions: ["startComposition"] },
     "VALUE.SYNC": { actions: ["syncText"] },
     RESET: { actions: ["restoreDefault"] },
@@ -558,25 +585,25 @@ export const comboboxMachine = setup({
           { actions: ["endComposition", "typed"] },
         ],
         ARROW: {
-          guard: { and: ["notComposing", "opensOnArrow"] },
+          guard: { and: ["keyable", "opensOnArrow"] },
           target: "open",
-          actions: ["setOpenReason", "highlightOnOpen"],
+          actions: ["setOpenReason", "highlightOnOpen", "announceHighlight"],
         },
         "TRIGGER.PRESS": {
           guard: "enabled",
           target: "open",
-          actions: ["setOpenReason", "highlightOnOpen"],
+          actions: ["setOpenReason", "highlightOnOpen", "announceHighlight"],
         },
         "INPUT.PRESS": { guard: "opensOnPress", target: "open", actions: ["setOpenReason"] },
         "INPUT.FOCUS": [
           { guard: "opensOnFocus", target: "open", actions: ["setFocused", "setOpenReason"] },
-          { actions: ["setFocused"] },
+          { guard: { not: "isFocused" }, actions: ["setFocused"] },
         ],
         OPEN: { guard: "enabled", target: "open", actions: ["setOpenReason"] },
-        ENTER: { guard: "notComposing", actions: ["commit"] },
-        ESCAPE: { guard: { and: ["notComposing", "isDirty"] }, actions: ["commit"] },
-        TAB: { guard: "notComposing", actions: ["commit"] },
-        "INPUT.BLUR": { actions: ["clearFocused", "commit"] },
+        ENTER: { guard: "keyable", actions: ["commit"] },
+        ESCAPE: { guard: { and: ["keyable", "isDirty"] }, actions: ["commit"] },
+        TAB: { guard: "keyable", actions: ["commit"] },
+        "INPUT.BLUR": { guard: "isFocused", actions: ["clearFocused", "commit"] },
         "COLLECTION.CHANGE": { actions: ["repairCollection", "syncText"] },
       },
     },
@@ -586,42 +613,42 @@ export const comboboxMachine = setup({
       on: {
         "INPUT.CHANGE": { actions: ["typed"] },
         "COMPOSITION.END": { actions: ["endComposition", "typed"] },
-        ARROW: { guard: "notComposing", actions: ["arrow"] },
+        ARROW: { guard: "keyable", actions: ["arrow"] },
         NAVIGATE: {
-          actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlighted", "complete"],
+          actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlight", "complete"],
         },
         HIGHLIGHT: { actions: ["endLag", "highlight", "complete"] },
         POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
         "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
-        CARET: { actions: ["clearHighlight", "removeCompletion"] },
+        CARET: { guard: "keyable", actions: ["clearHighlight", "removeCompletion"] },
         "ITEM.CHOOSE": [
           { guard: "closesOnSelect", target: "closed", actions: ["choose"] },
           { actions: ["choose"] },
         ],
         ENTER: [
           {
-            guard: { and: ["notComposing", "hasHighlight", "closesOnSelect"] },
+            guard: { and: ["keyable", "hasHighlight", "closesOnSelect"] },
             target: "closed",
             actions: ["choose"],
           },
-          { guard: { and: ["notComposing", "hasHighlight"] }, actions: ["choose"] },
-          { guard: "notComposing", target: "closed", actions: ["commit"] },
+          { guard: { and: ["keyable", "hasHighlight"] }, actions: ["choose"] },
+          { guard: "keyable", target: "closed", actions: ["commit"] },
         ],
         ESCAPE: [
-          { guard: { and: ["notComposing", "hasCompletion"] }, actions: ["removeCompletion"] },
-          { guard: "notComposing", target: "closed", actions: ["commit"] },
+          { guard: { and: ["keyable", "hasCompletion"] }, actions: ["removeCompletion"] },
+          { guard: "keyable", target: "closed", actions: ["commit"] },
         ],
         TAB: [
           {
-            guard: { and: ["notComposing", "tabChooses"] },
+            guard: { and: ["keyable", "tabChooses"] },
             target: "closed",
             actions: ["choose", "commit"],
           },
-          { guard: "notComposing", target: "closed", actions: ["commit"] },
+          { guard: "keyable", target: "closed", actions: ["commit"] },
         ],
         "TRIGGER.PRESS": { target: "closed", actions: ["commit"] },
         OUTSIDE_PRESS: { target: "closed", actions: ["commit"] },
-        "INPUT.BLUR": { target: "closed", actions: ["clearFocused", "commit"] },
+        "INPUT.BLUR": { guard: "isFocused", target: "closed", actions: ["clearFocused", "commit"] },
         CLOSE: { target: "closed", actions: ["commit"] },
         "COLLECTION.CHANGE": { actions: ["results", "complete"] },
         "LOADING.SYNC": { actions: ["announceLoading"] },
