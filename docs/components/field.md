@@ -2,6 +2,12 @@
 
 Gives one form control a label, a description and an error message, carries `disabled`, `readOnly`, `required` and `invalid` to it, validates it, and exposes the result as data attributes, ARIA and a driver.
 
+## When to use
+
+- **Use it for** giving one form control a label, a description and an error message, and carrying `disabled`, `readOnly`, `required` and `invalid` to it.
+- **Over a bare `<label>` and `<p>`**: it wires `for`, `aria-describedby` and the error message for you, validates the control, and exposes the result as data attributes and ARIA.
+- **Don't use it for** a group of controls under one name: use a [Fieldset](fieldset.md). To validate a whole form on submit, wrap Fields in a [Form](form.md). For a label alone, use a [Label](label.md).
+
 ```tsx
 import { Field, TextField } from "@rind-ui/react"
 

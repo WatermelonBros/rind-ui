@@ -2,6 +2,12 @@
 
 A trigger that shows and hides one region. Closed content stays findable by the browser's search (`closedContent="until-found"`, the default), or is hidden, or is removed.
 
+## When to use
+
+- **Use it for** one trigger that shows and hides one region: "Show details", an advanced-options block, an expandable note.
+- **Over `<details>`**: it animates height through a published CSS variable, lets you control the open state, and chooses how closed content is kept (findable by the browser's search, hidden, or removed). `<details>` is enough when you need no animation or control.
+- **Don't use it for** a list of sections: use [Accordion](accordion.md). For floating content anchored to a trigger, use [Popover](popover.md).
+
 ```tsx
 import { Collapsible } from "@rind-ui/react"
 

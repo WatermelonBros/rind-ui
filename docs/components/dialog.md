@@ -2,6 +2,12 @@
 
 A window layered over the page. It is modal by default: everything outside is inert, the page does not scroll and Tab stays inside. Focus moves in on open and returns to the opener on close. The content is `role="dialog"`, named by its title.
 
+## When to use
+
+- **Use it for** a window over the page that needs the user's attention: an edit form, a confirmation of details, a short task.
+- **Over a native `<dialog>`**: it adds inert content behind, scroll lock, Tab kept inside, focus moved in on open and returned to the opener on close, a name from its title, and exit animations through `data-*` state.
+- **Don't use it for** a decision that must be answered before anything else: use an [Alert Dialog](alert-dialog.md). For a small non-modal panel anchored to a button, use a [Popover](popover.md). For a hint on hover, use a [Tooltip](tooltip.md).
+
 ```tsx
 import { Dialog } from "@rind-ui/react"
 
