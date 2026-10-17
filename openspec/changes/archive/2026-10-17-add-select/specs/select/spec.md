@@ -61,9 +61,9 @@ The selection SHALL be a controllable value (`value`, `defaultValue`,
 in multiple mode; the empty string SHALL be a valid key distinct from no value. The open
 state SHALL be a controllable value (`open`, `defaultOpen`, `onOpenChange(open,
 details)`), closed by default. Every open change SHALL carry one of these reasons:
-`TRIGGER_PRESS`, `TRIGGER_KEY`, `ITEM_SELECT`, `ESCAPE_KEY`, `TAB_KEY`,
-`OUTSIDE_PRESS`, `OUTSIDE_FOCUS`, `WINDOW_BLUR`, `OPEN` or `CLOSE`; every value change
-one of `SELECT`, `TYPEAHEAD`, `RESET`, `AUTOFILL`. Controlled values SHALL only propose
+`trigger`, `trigger-key`, `item-select`, `escape-key`, `tab-key`, `outside-press`,
+`outside-focus`, `parent-dismissed`, `window-blur` or `api` (programmatic open and
+close); every value change one of `select`, `typeahead`, `reset`, `autofill`. Controlled values SHALL only propose
 changes.
 
 #### Scenario: No value means no value (regression: ariakit#2516)
@@ -155,7 +155,7 @@ press-down alone SHALL NOT open it, and a press moved off the trigger before rel
 SHALL NOT open it. A touch that turns into a scroll SHALL NOT open it. Enter, Space,
 ArrowDown, ArrowUp and Alt+ArrowDown on the focused trigger SHALL open a closed popup.
 While the popup is open the trigger SHALL count as inside it, so pressing it closes the
-popup with reason `TRIGGER_PRESS` and never closes and re-opens it. A disabled or
+popup with reason `trigger` and never closes and re-opens it. A disabled or
 read-only select SHALL NOT open.
 
 #### Scenario: VoiceOver press
@@ -221,10 +221,12 @@ that receives focus.
 
 In single mode, a printable character typed on the focused, closed trigger SHALL run the
 shared typeahead over the whole collection, starting after the selected option, and
-SHALL select the match without opening the popup (reason `TYPEAHEAD`), skipping disabled
+SHALL select the match without opening the popup (reason `typeahead`), skipping disabled
 options. Space SHALL join a search in progress instead of opening the popup. No match
 SHALL leave the value unchanged. In multiple mode, typing on the closed trigger SHALL do
-nothing. The search buffer SHALL be reset when the popup opens or closes, on blur and when
+nothing. A closed select mounts no option, so the collection searched before the first
+open is the data collection (`items` or `collection`); options declared only as mounted
+parts register while the popup is open. The search buffer SHALL be reset when the popup opens or closes, on blur and when
 the value is reset.
 
 #### Scenario: Pick by typing (native select behaviour; regression: reka-ui#2292)
@@ -321,7 +323,7 @@ nothing and keep the popup open. A closing popup SHALL NOT react to pointer move
 ### Requirement: Closing Rules
 
 The popup SHALL close, keeping the value unless a selection caused it, on: a single-mode
-selection (`ITEM_SELECT`), Escape, Tab, a press outside every layer of the select
+selection (`item-select`), Escape, Tab, a press outside every layer of the select
 (`OUTSIDE_PRESS`), focus moving outside when not modal (`OUTSIDE_FOCUS`), the window
 losing focus (`WINDOW_BLUR`) and a trigger press. On close, focus SHALL return to the
 trigger by the overlay's restore rule, except after Tab and window blur. The highlight
@@ -335,7 +337,7 @@ SHALL be cleared on close.
 #### Scenario: Switching applications
 
 - **WHEN** the window loses focus while the popup is open
-- **THEN** the popup closes with reason `WINDOW_BLUR` and focus is not moved
+- **THEN** the popup closes with reason `window-blur` and focus is not moved
 
 ### Requirement: Modal By Default
 
@@ -427,7 +429,7 @@ mirror the props, and in multiple mode one additional `<input type="hidden" name
 selected key SHALL carry the values while the visually hidden input carries the
 constraint. User selections SHALL dispatch one bubbling `input` and one `change` from the
 hidden input; programmatic changes SHALL dispatch none; form reset SHALL restore the
-default value with reason `RESET`; native validation focus SHALL land on the trigger.
+default value with reason `reset`; native validation focus SHALL land on the trigger.
 The component SHALL render no element that duplicates the trigger's role, its name, the
 label's text or any option's text.
 
@@ -456,7 +458,7 @@ label's text or any option's text.
 - **WHEN** an uncontrolled select with `defaultValue="a"` is changed to "c" and its form
   is reset
 - **THEN** the value text is the label of "a" and `onValueChange` was called with
-  `details.reason === "RESET"`
+  `details.reason === "reset"`
 
 #### Scenario: Change events for user changes only (regression: radix#4102)
 
@@ -481,7 +483,7 @@ label's text or any option's text.
 ### Requirement: Browser Autofill
 
 When the browser or a password manager writes a value into the hidden input, the Select
-SHALL adopt it as a user change with reason `AUTOFILL`: the key equal to the written value
+SHALL adopt it as a user change with reason `autofill`: the key equal to the written value
 or, failing that, the option whose text value equals it under the locale's search
 collator; in multiple mode autofill SHALL be ignored. An unmatched value SHALL leave the
 selection unchanged and the hidden input re-synced. After an autofill the trigger SHALL
@@ -493,7 +495,7 @@ extension SHALL be forwarded to the trigger.
 - **WHEN** a select with `autocomplete="country-name"` and an option "it" / "Italy" is
   autofilled with "italy"
 - **THEN** `onValueChange("it", details)` is called once with `details.reason ===
-  "AUTOFILL"` and the trigger carries `data-autofill`
+  "autofill"` and the trigger carries `data-autofill`
 
 ### Requirement: Positioning
 
@@ -566,11 +568,16 @@ declare the actions `open` (pointer, touch, keyboard Enter), `openWithArrowUp`, 
 (Escape), `choose(name)` (opening first when closed; pointer press or arrows and Enter),
 `toggle(name)` (multiple), `typeahead(text)` (in the open list), `typeaheadClosed(text)`
 (on the closed trigger; postcondition: value changed, popup closed), `pressOutside`,
-`tabOut` and `resetForm`, each with a postcondition, and the queries `isOpen`, `value`
+`tabOut`, `pressEscape`, `pressLabel` and `openWithArrowDown`, each with a postcondition
+(a form reset is exercised by the form tests: the environment abstraction has no form
+operation), and the queries `isOpen`, `value`
 (the value text), `selected`, `items`, `highlighted`, `focusedItem`, `isPlaceholder`,
 `isDisabled`, `isInvalid`, `isRequired`, `formValue` (the hidden inputs' values) and
 `closeReason`. Programmatic `OPEN`/`CLOSE`, `WINDOW_BLUR` and autofill SHALL map to
-`{ skip: reason }`; `$sync:open` and `$sync:value` SHALL map to prop steps.
+`{ skip: reason }`; `$sync:open` SHALL map to a prop step and `$sync:value` to a skip (a
+controlled value moves no state of the graph). The contract SHALL declare which
+controllable values the form carries (`value`), so a step changing only `open` is not a
+user change of the form's value.
 
 #### Scenario: Driver round trip
 

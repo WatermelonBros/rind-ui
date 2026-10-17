@@ -19,6 +19,12 @@ See CLAUDE.md "Review rules".
 | add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
 | add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
 | add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
+| add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
+| add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
+| add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
+| add-select (impl) | — | packages/testing/fixtures/select | Task 6.2: forced-colors Playwright captures; Task 5.3: scroll-overflow and one-element-per-query tests |
+| add-select (impl) | — | docs/components/select.md | Task 8.2: manual screen-reader pass (VO/Safari macOS+iOS, NVDA/Firefox, JAWS/Chrome, TalkBack, Firefox Android touch) |
+| add-select (impl) | — | packages/core/src/components/select/select.contract.ts | Task A.3: `field-associated` trait and the Field prop × control matrix test |
 | add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
 | add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
 | add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |
