@@ -5,7 +5,14 @@ import { defineConfig } from "vitest/config"
 // Workspace packages resolve to their TypeScript sources (see the `@rind-ui/source`
 // export condition), so tests never wait for a build.
 const conditions = ["@rind-ui/source", "module", "browser", "default"]
-const resolve = { conditions }
+// The Color Picker's internal parts (not exported by @rind-ui/react) for their behaviour tests.
+const alias = {
+  "@rind-ui/react/color-internals": new URL(
+    "./packages/react/src/color-internals.ts",
+    import.meta.url,
+  ).pathname,
+}
+const resolve = { conditions, alias }
 // No "import": jsdom's require("decimal.js") would get the ESM build ("Decimal is not a
 // constructor" on a range input's validity).
 const ssr = { resolve: { conditions: ["@rind-ui/source", "node", "default"] } }
@@ -46,8 +53,10 @@ const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
 
 // Locally the machine is shared by several sessions: at most half the cores per run unless
 // RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
+// On CI, RIND_MAX_WORKERS (set for the real-browser slices) caps the pages one browser runs at
+// once: Chromium crashed mid-run ("Browser connection was closed") with the default.
 const maxWorkers = process.env["CI"]
-  ? undefined
+  ? Number(process.env["RIND_MAX_WORKERS"]) || undefined
   : Number(process.env["RIND_MAX_WORKERS"]) || Math.max(1, Math.floor(availableParallelism() / 2))
 
 // `expect.poll` waits on a condition; its timeout is only the failure deadline, and a loaded

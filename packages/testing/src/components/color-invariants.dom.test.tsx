@@ -1,19 +1,13 @@
 // Broken wrappers (add-color-picker 8.2): each colour invariant fails, readably, on a wrapper
 // that breaks exactly what it checks. Keyboard runs in jsdom.
-import {
-  areaAxes,
-  type Contract,
-  colorAreaContract,
-  colorPickerContract,
-  colorSliderContract,
-  makeColor,
-  parseColor,
-} from "@rind-ui/core"
-import { ColorArea, ColorPicker, ColorSlider } from "@rind-ui/react"
+import { type Contract, colorPickerContract, makeColor, parseColor } from "@rind-ui/core"
+import { areaAxes, colorAreaContract, colorSliderContract } from "@rind-ui/core/internal"
+import { ColorPicker } from "@rind-ui/react"
 import { cleanup, render } from "@testing-library/react"
 import { type ReactElement, type ReactNode, useEffect, useRef } from "react"
 import { describe, expect, it } from "vitest"
 import { domEnv, testMachine } from "../index"
+import { ColorArea, ColorSlider } from "./color-parts"
 
 /** Re-applies a breakage after every DOM change under it (React re-renders undo it). */
 function Break({

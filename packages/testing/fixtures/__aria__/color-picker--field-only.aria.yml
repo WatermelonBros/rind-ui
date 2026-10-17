@@ -1,0 +1,3 @@
+- text: Brand colour
+- group "Brand colour":
+  - textbox "HEX": "#FF3D8B"

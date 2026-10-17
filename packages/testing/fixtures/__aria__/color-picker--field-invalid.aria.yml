@@ -1,0 +1,3 @@
+- text: Accent
+- group "Accent":
+  - textbox "HEX" [invalid]: "12345"

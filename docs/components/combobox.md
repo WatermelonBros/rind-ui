@@ -144,7 +144,7 @@ Render `Combobox.Empty` inside the Popup: it shows while no option is listed and
 - **Roles.** `combobox` on the input, with `aria-expanded`, `aria-controls` and `aria-activedescendant`; `listbox` with `option` children in the popup; groups are `group` named by their label.
 - **Focus.** DOM focus stays on the input. The highlight is virtual, so the popup, the Trigger and the Clear button never take focus by arrow keys; the two buttons are out of the tab order and reachable by pointer and touch.
 - **Announcements.** Result counts, the empty state and a selection are announced through a live region; the highlighted option is announced by the browser from `aria-activedescendant`.
-- **Portal trade-off.** The Positioner renders in place by default, so the popup follows the input in reading order. If you portal it (to escape a clipping ancestor), a touch screen reader's swipe order reaches the popup only after the rest of the page, so the options are far from the input. Portal only when a clipping ancestor leaves no other choice.
+- **Portal trade-off.** The Positioner renders in place by default, so the popup follows the input in reading order. Where the browser has the Popover API it is shown in the top layer, so no sibling, `z-index` or `overflow` on the page covers or clips it. If you portal it (to escape a clipping ancestor), a touch screen reader's swipe order reaches the popup only after the rest of the page, so the options are far from the input. Portal only when a clipping ancestor leaves no other choice.
 - **Target size.** The Trigger, the Clear button and the options are at least 24 by 24 CSS pixels in the theme.
 
 ## Styling

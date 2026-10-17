@@ -164,6 +164,39 @@ describe("pointer press", () => {
   })
 })
 
+describe("blur during a pointer press", () => {
+  it("focus moving to an ancestor (WebKit's mousedown on a focused button) does not cancel it", () => {
+    setup('<div tabindex="-1" id="box"><button type="button">Done</button></div>')
+    const box = el
+    const button = box.querySelector("button") as HTMLButtonElement
+    detach()
+    el = button
+    detach = attach(el, handle.props)
+    button.focus()
+    ptr("pointerdown")
+    box.focus()
+    ptr("pointerup")
+    click(1)
+    expect(events).toContain("PRESS:mouse")
+  })
+
+  it("focus leaving elsewhere cancels it", () => {
+    setup('<div><button type="button">Done</button><input aria-label="Other" /></div>')
+    const button = el.querySelector("button") as HTMLButtonElement
+    const other = el.querySelector("input") as HTMLInputElement
+    detach()
+    el = button
+    detach = attach(el, handle.props)
+    button.focus()
+    ptr("pointerdown")
+    other.focus()
+    ptr("pointerup")
+    click(1)
+    expect(events).toContain("PRESS.CANCEL:mouse")
+    expect(events).not.toContain("PRESS:mouse")
+  })
+})
+
 describe("activation bound to click", () => {
   it("a bare click (ZG#1664, BITS#2185): START, END, one PRESS, all virtual, synchronously", () => {
     click(0)

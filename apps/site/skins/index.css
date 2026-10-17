@@ -28,9 +28,11 @@
 @import "./progress.css";
 @import "./meter.css";
 @import "./popover.css";
+@import "./tour.css";
 @import "./number-input.css";
 @import "./listbox.css";
 @import "./combobox.css";
+@import "./tags-input.css";
 @import "./pin-input.css";
 @import "./text-field.css";
 @import "./tooltip.css";

@@ -139,7 +139,10 @@ for a part that had focus) or when the document becomes hidden (`visibilitychang
 `document.visibilityState === "hidden"`: a tab or app switch during the press). The press
 SHALL end with `PRESS.CANCEL`, no `PRESS` SHALL be delivered for it (neither from a later
 keyup, `pointerup` or `click` nor from the click fallback), and `data-pressed` SHALL be
-removed. This applies to pointer and keyboard presses alike. Without it a link that opens a
+removed. This applies to pointer and keyboard presses alike, except that a pointer press SHALL NOT
+end when focus moves from the part to one of its ancestors: WebKit and Safari do not focus
+a button on mousedown and move focus to its nearest focusable ancestor (a dialog's
+content), which is the press's own focus change, not an interruption. Without it a link that opens a
 new tab with Enter, or a button whose keyup is lost to a tab switch, stays `data-pressed`
 (react-spectrum#6094).
 
@@ -162,6 +165,12 @@ new tab with Enter, or a button whose keyup is lost to a tab switch, stays `data
 - **WHEN** a touch press is in progress on a button and the document becomes hidden
 - **THEN** the machine receives `PRESS.CANCEL` and no `PRESS`, even if a `pointerup` or
   `click` arrives when the document is shown again
+
+#### Scenario: Mouse press on a focused close trigger in WebKit
+
+- **WHEN** a dialog's close trigger has focus and the user clicks it in WebKit, which
+  moves focus to the dialog's content on mousedown
+- **THEN** the press is not cancelled and the click delivers one `PRESS`
 
 ### Requirement: Touch Context Menu Suppression Without Long Press
 

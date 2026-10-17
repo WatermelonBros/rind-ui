@@ -7,6 +7,14 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
+| add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
+| add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |
+| add-drawer (impl) | — | packages/core/src/machine/service.ts | A controlled close applied after a later render (zag#3144 "100 ms later") is read as a refusal at the first render that keeps `open`: the drawer settles before closing. Holding a proposal across renders needs a runtime decision (proposal lifetime) |
+| add-tour (impl) | — | packages/core/src/components/tour/tour.contract.ts | No `modal` trait on the modal variant (an anchored modal step keeps its target exposed); inert and Tab wrap are covered in the DOM suite. No `target` query (no attribute locator in the contract env) |
+| add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
+| add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |
+| add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
 | add-qr-code (r2) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | The download postcondition needed a 20 s deadline on CI (page JS export ~1.6 s at 20× CPU throttle); profile the export path |
 | add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
 | add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
@@ -21,6 +29,12 @@ See CLAUDE.md "Review rules".
 | add-combobox (impl) | — | packages/theme/src/combobox.css | Task 7.2: no Playwright forced-colors captures |
 | add-combobox (impl) | — | packages/core/src/components/combobox | Task A.5: `patternEffects` / `patternConnect` / `optionsNeverSelected` not extracted (one host); do it with Autocomplete or Command |
 | add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
+| add-tags-input (impl) | — | packages/core/src/components/tags-input | Task 1.6 / "Suggestions": not implemented; with the combobox-pattern extraction (Autocomplete is the third host) |
+| add-tags-input (impl) | — | packages/testing/src/components | Tasks 5.1/5.2: no browser IME replays (Japanese, Pinyin, Korean, Safari commit Enter), no Android keyCode 229 delimiter test, no modal dialog host test |
+| add-tags-input (impl) | — | packages/theme/src/tags-input.css | Task 6.2: no Playwright forced-colors captures |
+| add-tags-input (impl) | — | packages/testing/src/components | Task 5.3: no RTL model run |
+| add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
+| add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
 | add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |

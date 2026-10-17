@@ -36,6 +36,7 @@
 @import "./tabs.css";
 @import "./listbox.css";
 @import "./combobox.css";
+@import "./tags-input.css";
 @import "./toolbar.css";
 @import "./pagination.css";
 @import "./segmented-control.css";
@@ -55,7 +56,9 @@
 @import "./switch.css";
 @import "./accordion.css";
 @import "./dialog.css";
+@import "./drawer.css";
 @import "./popover.css";
+@import "./tour.css";
 @import "./hover-card.css";
 @import "./menu.css";
 @import "./context-menu.css";

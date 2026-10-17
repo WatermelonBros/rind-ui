@@ -3,13 +3,14 @@ import { createDriverWith, type DriverOptions, type Target } from "../driver"
 import { getColorArea } from "./color-area"
 import { getColorChannelField, getColorField } from "./color-field"
 import { getColorSlider } from "./color-slider"
+import { getColorSwatch } from "./color-swatch"
 import { getColorSwatchPicker } from "./color-swatch-picker"
 
 type FakeResult = string | "abort"
 
 /**
  * A driver for the Color Picker named `name` (its Control, or its content when inline), with
- * its children's drivers (`area()`, `slider(channel)`, `input(channel)`, `swatches()`) and
+ * its parts' drivers (`area()`, `slider(channel)`, `input(channel)`, `swatches()`, `swatch(name)`) and
  * `eyeDropper(result | "abort")`, which installs a fake `EyeDropper` on the page's window.
  */
 export function getColorPicker(
@@ -33,6 +34,8 @@ export function getColorPicker(
         : getColorChannelField(target, { name: names(channel) }, options),
     swatches: (name: string | RegExp = "Color swatches") =>
       getColorSwatchPicker(target, { name }, options),
+    /** A `ColorPicker.Swatch`, by its colour name (or label). */
+    swatch: (name: string | RegExp) => getColorSwatch(target, { name }, options),
     /** Installs a fake EyeDropper that resolves `result` (or rejects as dismissed). */
     eyeDropper: (result: FakeResult, win: unknown = globalThis.window) => {
       class FakeEyeDropper {

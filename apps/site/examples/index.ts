@@ -13,16 +13,15 @@ import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
-import * as colorArea from "./color-area"
-import * as colorField from "./color-field"
+import * as colorModel from "./color-model"
 import * as colorPicker from "./color-picker"
-import * as colorSlider from "./color-slider"
-import * as colorSwatch from "./color-swatch"
-import * as colorSwatchPicker from "./color-swatch-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
+import * as controlLabel from "./control-label"
 import * as dialog from "./dialog"
+import * as drawer from "./drawer"
 import * as field from "./field"
+import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
@@ -40,6 +39,7 @@ import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
+import * as numberParsing from "./number-parsing"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
 import * as pinInput from "./pin-input"
@@ -57,11 +57,13 @@ import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
+import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
+import * as tour from "./tour"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -73,6 +75,10 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,
+  "color-model": colorModel,
+  "control-label": controlLabel,
+  "number-parsing": numberParsing,
+  "field-control": fieldControl,
   labels: labels,
   "visually-hidden": visuallyHidden,
   menu,
@@ -88,16 +94,12 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
-  "color-area": colorArea,
-  "color-field": colorField,
   "color-picker": colorPicker,
-  "color-slider": colorSlider,
-  "color-swatch": colorSwatch,
-  "color-swatch-picker": colorSwatchPicker,
   combobox,
   collections,
   "context-menu": contextMenu,
   dialog,
+  drawer,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,
@@ -129,10 +131,12 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   switch: switchEx,
   tabs,
+  "tags-input": tagsInput,
   "text-field": textField,
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  tour,
   tooltip,
 }
 

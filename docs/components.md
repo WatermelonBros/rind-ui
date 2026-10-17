@@ -33,9 +33,9 @@ seen in docs or source but not confirmed as public, stable API.
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
-| Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | spec | Used by Reado |
+| Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Reado has TourCard/TourScrim |
+| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Reado has TourCard/TourScrim |
 
 ## Menus & navigation (11)
 
@@ -69,7 +69,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
-| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | spec | RAC: TokenField (unverified) |
+| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | spec | RAC/Reka: Tree |
 | Command |  |  |  |  |  |  |  | ● |  | 1 | 2 | spec | Missing in Ark |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
@@ -126,16 +126,11 @@ seen in docs or source but not confirmed as public, stable API.
 | Month / Year Picker |  |  |  |  |  |  | ● |  |  | 1 | 3 | spec | Reka: Month/MonthRange/Year/YearRange Picker |
 | Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
-## Color (7)
+## Color (2)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
-| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
-| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done |  |
-| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | done | Kobalte also: Color Channel Field |
-| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | done |  |
-| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | done |  |
+| Color Picker | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | One component: area, channel sliders, hex and channel inputs (field), swatch group and swatches are its parts |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
 ## Display & feedback (19)

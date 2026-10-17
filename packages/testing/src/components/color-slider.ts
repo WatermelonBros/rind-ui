@@ -1,4 +1,4 @@
-import { colorSliderContract } from "@rind-ui/core"
+import { colorSliderContract } from "@rind-ui/core/internal"
 import { createDriverWith, type DriverOptions, type Target } from "../driver"
 
 /**

@@ -305,6 +305,9 @@ const TRANSIENT = new Set([
   "number-input:pressing",
   "number-input:spinning",
   "pin-input:composing",
+  // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
+  "tags-input:typing",
+  "tags-input:editing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
   // Pointer interactions: scrollbars shown while scrolling or hovered, a thumb dragged.

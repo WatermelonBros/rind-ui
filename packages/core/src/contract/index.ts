@@ -33,6 +33,7 @@ export type {
   AriaRole,
   By,
   ClickOptions,
+  DragOptions,
   Env,
   Key,
   KeyOptions,

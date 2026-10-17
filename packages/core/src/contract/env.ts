@@ -81,6 +81,15 @@ export interface PointerStepOptions {
   readonly pointerType?: "mouse" | "pen" | "touch"
 }
 
+export interface DragOptions {
+  /** Default "mouse". */
+  readonly pointerType?: "mouse" | "pen" | "touch"
+  /** Default 300. */
+  readonly durationMs?: number
+  /** Default 10. */
+  readonly steps?: number
+}
+
 /** A lazy handle, like a Playwright Locator: resolved on every call, never cached. */
 export interface Part {
   click(options?: ClickOptions): Promise<void>
@@ -122,6 +131,12 @@ export interface Part {
     readonly at?: { readonly x: number; readonly y: number }
     readonly pointerType?: "touch" | "pen"
   }): Promise<void>
+  /**
+   * A drag of `vector` (CSS px) from the part's centre: `steps` moves over `durationMs` of the
+   * environment's time (fake timers when given, so a swipe's velocity is deterministic), by
+   * mouse/pen (pointer events) or touch (touch events), then a release.
+   */
+  drag(vector: { readonly x: number; readonly y: number }, options?: DragOptions): Promise<void>
   /** The part's bounding box, or `null` when the environment has no layout (jsdom). */
   box(): Promise<PartBox | null>
   /**

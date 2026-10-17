@@ -2,13 +2,12 @@
 // value lacks, alpha keeps the colour, hue at black, steps), names and value text, the
 // gradient, form participation. Runs in jsdom and in real browsers.
 import type { Color } from "@rind-ui/core"
-import { ColorSlider, type ColorSliderRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
 import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getColorSlider } from "../index"
+import { ColorSlider, type ColorSliderRootProps, getColorSlider } from "./color-parts"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -65,6 +64,14 @@ describe("anatomy and names", () => {
 })
 
 describe("binding", () => {
+  it("a channel off the step grid (a hex colour's hue) is snapped for the Slider, silently", () => {
+    const warn = vi.spyOn(console, "warn")
+    // #3D8BFF has hue 215.88; the hue Slider's step is 1.
+    render(<Hue label="Hue" defaultValue="#3D8BFF" />)
+    expect(screen.getByRole("slider", { name: /Hue/ }).getAttribute("aria-valuenow")).toBe("216")
+    expect(warn.mock.calls.flat().join(" ")).not.toMatch(/slider: value/)
+  })
+
   it("a channel the value lacks: hue on rgb red, emitted as rgb (ark#1649)", async () => {
     const onValueChange = vi.fn()
     render(<Hue value="rgb(255, 0, 0)" onValueChange={onValueChange} />)
