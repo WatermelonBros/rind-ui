@@ -7,7 +7,6 @@ import {
   ColorChannelField,
   ColorField,
   ColorSlider,
-  ColorSwatch,
   ColorSwatchPicker,
 } from "../../src/components/color-parts"
 
@@ -47,10 +46,15 @@ function App() {
           </ColorSlider.Track>
         </ColorSlider.Control>
       </ColorSlider.Root>
-      <div style={{ display: "flex", gap: 8 }}>
-        <ColorSwatch.Root color="#FF3D8B" />
-        <ColorSwatch.Root color="#FF3D8B80" />
-      </div>
+      <ColorPicker.Root inline defaultValue="#FF3D8B">
+        <ColorPicker.Label>Chips</ColorPicker.Label>
+        <ColorPicker.Content>
+          <div style={{ display: "flex", gap: 8 }}>
+            <ColorPicker.Swatch color="#FF3D8B" data-testid="chip" />
+            <ColorPicker.Swatch color="#FF3D8B80" data-testid="chip-alpha" />
+          </div>
+        </ColorPicker.Content>
+      </ColorPicker.Root>
       <ColorField.Root name="hex" defaultValue="#336699">
         <ColorField.Label>Hex</ColorField.Label>
         <ColorField.Input />

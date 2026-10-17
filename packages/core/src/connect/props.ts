@@ -21,5 +21,14 @@ export function scopeAttrs(scope: string, part: string, instance: string) {
   return { "data-scope": scope, "data-part": part, "data-instance": instance } as const
 }
 
+/**
+ * A component rendered as another component's part (a Slider inside a Color Picker): the host's
+ * `data-scope` and the host's name for each of its parts. Absent, a component keeps its own.
+ */
+export interface PartNaming<P extends string = string> {
+  readonly scope: string
+  readonly part: (name: P) => string
+}
+
 /** `data-*` boolean: present and empty when true, absent when false. */
 export const dataFlag = (value: boolean): "" | undefined => (value ? "" : undefined)

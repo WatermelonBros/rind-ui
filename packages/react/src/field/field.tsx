@@ -152,6 +152,8 @@ export type FieldRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
    * is `data-scope="text-field"`. Default `field`.
    */
   readonly scope?: string
+  /** For a Field host that is another component's part: its root's part name. Default `root`. */
+  readonly rootPart?: string
 }
 
 function Root({
@@ -171,6 +173,7 @@ function Root({
   messages: ownMessages,
   render,
   scope,
+  rootPart,
   id,
   ref,
   children,
@@ -233,6 +236,7 @@ function Root({
     initial: baseline.current,
     name,
     scope,
+    ...(rootPart === undefined ? {} : { rootPart }),
   })
   const hasErrorPart = useRef(0)
   const controlId = partId("field", instance, "control")

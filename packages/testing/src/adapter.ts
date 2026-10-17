@@ -39,8 +39,53 @@ export interface AdapterEnv extends Env {
   setDirection(direction: Direction | null): Promise<void>
 }
 
+/**
+ * A contract's `partName` for the adapters: applied to its anatomy names only, so a name read
+ * back from the DOM (already the host's) is used as it is.
+ */
+export function hostedPartName(contract: {
+  readonly anatomy: readonly string[]
+  readonly partName?: ((part: never) => string) | undefined
+}): {
+  readonly partName?: (part: string) => string
+  readonly anatomyName?: (part: string) => string
+} {
+  const map = contract.partName as ((part: string) => string) | undefined // called with anatomy names only
+  if (!map) return {}
+  const anatomy = new Set(contract.anatomy)
+  const back = new Map(contract.anatomy.map((part) => [map(part), part]))
+  return {
+    partName: (part) => (anatomy.has(part) ? map(part) : part),
+    anatomyName: (part) => back.get(part) ?? part,
+  }
+}
+
+/** A snapshot with its parts named as the contract names them (a hosted component's parts). */
+export function renamedSnapshot(
+  snapshot: DomSnapshot,
+  anatomyName: ((part: string) => string) | undefined,
+): DomSnapshot {
+  if (!anatomyName) return snapshot
+  const rename = <T extends { readonly part: string | null }>(el: T): T =>
+    el.part === null ? el : { ...el, part: anatomyName(el.part) }
+  return {
+    ...snapshot,
+    parts: snapshot.parts.map(rename),
+    elements: snapshot.elements.map(rename),
+    focus: {
+      ...snapshot.focus,
+      part: snapshot.focus.part === null ? null : anatomyName(snapshot.focus.part),
+      element: snapshot.focus.element === null ? null : rename(snapshot.focus.element),
+    },
+  }
+}
+
 export interface EnvOptions {
   readonly scope: string
+  /** A hosted component's part names (the contract's `partName`): a part's `data-part`. */
+  readonly partName?: ((part: string) => string) | undefined
+  /** The inverse: a hosted `data-part` read from the DOM, as the contract names the part. */
+  readonly anatomyName?: ((part: string) => string) | undefined
   readonly anchor: By
   readonly modality: Modality
   /** The platform the test runs as: decides the `mod` key (Meta on Apple, Control elsewhere). */

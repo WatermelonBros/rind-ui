@@ -19,7 +19,9 @@ import {
   workingOf,
 } from "@rind-ui/core"
 import {
+  COLOR_PICKER_SCOPE,
   type ColorSliderMessages,
+  channelSliderNaming,
   colorSliderConnect,
   colorSliderMessages,
   colorSliderSpace,
@@ -41,6 +43,7 @@ import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
 import {
   Slider,
+  SliderNaming,
   type SliderRootProps,
   SliderRootSurface,
   type SliderThumbProps,
@@ -163,45 +166,47 @@ function Root({
   return (
     <ColorSliderContext value={ctx}>
       <SliderRootSurface value={true}>
-        <Slider.Root
-          {...rest}
-          {...api.data}
-          value={api.slider.value}
-          // What the hidden input's value attribute and a form reset show.
-          {...(defaultValue ? { defaultValue: getChannel(defaultValue, channel) } : {})}
-          min={api.slider.min}
-          max={api.slider.max}
-          step={api.slider.step}
-          largeStep={api.slider.largeStep}
-          orientation={orientation}
-          dir={dir}
-          locale={locale}
-          style={{ ...style(api.surfaceStyle), ...style(colorVariables(color)), ...ownStyle }}
-          // Unlabelled: the group is named by the channel too, so it can be found by name.
-          aria-label={
-            labelled || rest["aria-labelledby"] !== undefined
-              ? rest["aria-label"]
-              : (rest["aria-label"] ?? api.channelName)
-          }
-          messages={{
-            valueText: ({ value: v }) => api.valueText(v),
-            // Unlabelled: the thumb is named by the channel (Reado's sliders had no name).
-            thumbLabel: () => (labelled ? "" : api.channelName),
-          }}
-          onValueChange={(n, d) =>
-            // The Slider's form reset is the colour's: every channel back to the default.
-            d.event.type === "RESET"
-              ? send({ type: "RESET" })
-              : send({
-                  type: "SET",
-                  color: withChannel(latest.current.color, channel, n, latest.current.memory),
-                  reason: "SLIDER",
-                })
-          }
-          onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
-        >
-          {children}
-        </Slider.Root>
+        <SliderNaming value={channelSliderNaming}>
+          <Slider.Root
+            {...rest}
+            {...api.data}
+            value={api.slider.value}
+            // What the hidden input's value attribute and a form reset show.
+            {...(defaultValue ? { defaultValue: getChannel(defaultValue, channel) } : {})}
+            min={api.slider.min}
+            max={api.slider.max}
+            step={api.slider.step}
+            largeStep={api.slider.largeStep}
+            orientation={orientation}
+            dir={dir}
+            locale={locale}
+            style={{ ...style(api.surfaceStyle), ...style(colorVariables(color)), ...ownStyle }}
+            // Unlabelled: the group is named by the channel too, so it can be found by name.
+            aria-label={
+              labelled || rest["aria-labelledby"] !== undefined
+                ? rest["aria-label"]
+                : (rest["aria-label"] ?? api.channelName)
+            }
+            messages={{
+              valueText: ({ value: v }) => api.valueText(v),
+              // Unlabelled: the thumb is named by the channel (Reado's sliders had no name).
+              thumbLabel: () => (labelled ? "" : api.channelName),
+            }}
+            onValueChange={(n, d) =>
+              // The Slider's form reset is the colour's: every channel back to the default.
+              d.event.type === "RESET"
+                ? send({ type: "RESET" })
+                : send({
+                    type: "SET",
+                    color: withChannel(latest.current.color, channel, n, latest.current.memory),
+                    reason: "SLIDER",
+                  })
+            }
+            onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
+          >
+            {children}
+          </Slider.Root>
+        </SliderNaming>
       </SliderRootSurface>
     </ColorSliderContext>
   )
@@ -242,7 +247,7 @@ function Description(props: ComponentPropsWithRef<typeof Slider.Description>) {
 }
 
 function TransparencyGrid(props: ComponentPropsWithRef<typeof Grid>) {
-  return <Grid scope="slider" {...useColorSlider("TransparencyGrid").data} {...props} />
+  return <Grid scope={COLOR_PICKER_SCOPE} {...useColorSlider("TransparencyGrid").data} {...props} />
 }
 
 export const ColorSlider = {

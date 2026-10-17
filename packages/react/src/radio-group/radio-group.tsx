@@ -9,9 +9,11 @@ import {
   isImeKey,
   mergeFieldProps,
   type RadioGroupEvent,
+  type RadioNaming,
   radioGroupConnect,
   radioGroupIds,
   radioGroupMachine,
+  radioPartName,
   toKey,
   watchFieldsetDisabled,
 } from "@rind-ui/core"
@@ -75,6 +77,11 @@ interface Ctx {
   readonly hosted: boolean
 }
 const GroupContext = createContext<Ctx | null>(null)
+/**
+ * Internal (not exported from the package): set by a component that renders a Radio Group as
+ * its part (Color Picker's swatch group): the host's scope and part names.
+ */
+export const RadioGroupNaming = createContext<RadioNaming | null>(null)
 function useGroup(part: string): Ctx {
   const ctx = useContext(GroupContext)
   if (!ctx) throw new Error(`RadioGroup.${part} must be inside RadioGroup.Root`)
@@ -148,7 +155,14 @@ function Root({
 }: RadioGroupRootProps) {
   const env = useEnvironment()
   const instance = useRootId(id)
-  const ids = useMemo(() => radioGroupIds(instance), [instance])
+  const naming = useContext(RadioGroupNaming)
+  const ids = useMemo(
+    () => (naming ? radioGroupIds(instance, naming) : radioGroupIds(instance)),
+    [instance, naming],
+  )
+  // The parts the effects below look up, under a host's names when the group is its part.
+  const hiddenPart = naming ? radioPartName(naming, "hidden-input") : "hidden-input"
+  const controlPart = naming?.control ?? "item-control"
   const binding = useFieldControl()
   const fieldsetContext = useFieldsetDisabled()
   const [fieldsetDom, setFieldsetDom] = useState(false)
@@ -208,6 +222,7 @@ function Root({
   const api = radioGroupConnect(
     {
       instance,
+      ...(naming ? { naming } : {}),
       collection,
       value: current,
       highlightedKey: view.context.highlightedKey,
@@ -245,12 +260,12 @@ function Root({
     const doc = node.ownerDocument
     const onReset = (e: Event) => {
       if (e.defaultPrevented) return
-      const input = node.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
+      const input = node.querySelector<HTMLInputElement>(`[data-part="${hiddenPart}"]`)
       if (input && e.target === input.form) send({ type: "RESET" })
     }
     doc.addEventListener("reset", onReset)
     return () => doc.removeEventListener("reset", onReset)
-  }, [send])
+  }, [send, hiddenPart])
   // After the items' effects: a proposal the parent refused never dispatches later.
   useIsoLayoutEffect(() => {
     if (pending.current !== null && pending.current !== current) pending.current = null
@@ -274,7 +289,7 @@ function Root({
     const radios = () =>
       Array.from(
         el.current?.querySelectorAll<HTMLElement>(
-          `[data-part="item-control"][data-instance="${instance}"]`,
+          `[data-part="${controlPart}"][data-instance="${instance}"]`,
         ) ?? [],
       )
     return register(
@@ -292,12 +307,12 @@ function Root({
           if (target) void focusSafely(target, env, "programmatic", modality)
         },
         validityElement: () =>
-          el.current?.querySelector<HTMLInputElement>('[data-part="hidden-input"]') ?? null,
+          el.current?.querySelector<HTMLInputElement>(`[data-part="${hiddenPart}"]`) ?? null,
         value: () => latest.current,
       },
       instance,
     )
-  }, [register, instance, env])
+  }, [register, instance, env, hiddenPart, controlPart])
   const reported = useRef(current)
   const report = binding?.report
   useEffect(() => {

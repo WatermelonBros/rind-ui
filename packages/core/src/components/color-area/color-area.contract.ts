@@ -4,6 +4,7 @@
 
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
+import { areaPart, COLOR_PICKER_SCOPE } from "../color-picker/color-picker.naming"
 import { cssColorOf } from "../color-swatch/color-swatch.contract"
 import type { ColorFormat } from "../shared/color/color"
 import { formatColor } from "../shared/color/format"
@@ -162,7 +163,8 @@ const DRAG_ONLY = "dragging is pointer-only; `step` is the 2.5.7 alternative"
 type Point = { readonly x: number; readonly y: number }
 
 /** The Color Area's contract (spec "Contract"). */
-export const colorAreaContract = contract("color-area", {
+export const colorAreaContract = contract(COLOR_PICKER_SCOPE, {
+  partName: areaPart,
   machine: colorAreaMachine,
   anatomy: ["root", "background", "thumb", "input"],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
