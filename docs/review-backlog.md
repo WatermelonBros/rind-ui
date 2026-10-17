@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
+| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
+| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
 | add-tour (impl) | — | packages/core/src/components/tour/tour.contract.ts | No `modal` trait on the modal variant (an anchored modal step keeps its target exposed); inert and Tab wrap are covered in the DOM suite. No `target` query (no attribute locator in the contract env) |
 | add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
 | add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |

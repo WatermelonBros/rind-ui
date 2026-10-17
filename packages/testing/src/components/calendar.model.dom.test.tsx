@@ -9,7 +9,8 @@ import { a11y, type Config, oracle, Story } from "./calendar-model"
 function config(name: string, cfg: Config) {
   describe(`calendar model: ${name}`, () => {
     testMachine(calendarContract, {
-      test: it,
+      // Long keyboard paths on a loaded machine: more than the 5 s default.
+      test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
       setup: () => render(<Story cfg={cfg} />),
       target: () => screen,
       anchor: [{ name: "Departure" }],

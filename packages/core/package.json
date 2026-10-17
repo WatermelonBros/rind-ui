@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
-    "@internationalized/date": "^3.12.4",
+    "@internationalized/date": "3.12.4",
     "@internationalized/number": "^3.6.8"
   },
   "publishConfig": {
