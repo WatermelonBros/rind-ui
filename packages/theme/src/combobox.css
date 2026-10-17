@@ -298,6 +298,72 @@
     min-block-size: 1px;
   }
 
+  /* Chips (multiple): the toolbar wraps before the Input; a chip is a pill with its remove. */
+  :where([data-scope="combobox"][data-part="control"]):has([data-part="chips"]) {
+    flex-wrap: wrap;
+    padding-block: var(--rind-space-1);
+  }
+
+  :where([data-scope="combobox"][data-part="chips"]) {
+    display: contents;
+  }
+
+  :where([data-scope="combobox"][data-part="chip"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    padding-inline: var(--rind-space-2) 0;
+    border: var(--rind-border-width) solid
+      var(--rind-combobox-chip-border, var(--rind-color-border));
+    border-radius: var(--rind-combobox-chip-radius, var(--rind-radius-full, 999px));
+    background: var(--rind-combobox-chip-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-sm);
+    line-height: 1.5;
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-highlighted]) {
+    border-color: var(--rind-combobox-chip-highlight-border, var(--rind-color-accent));
+    background: var(--rind-combobox-chip-highlight-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-disabled]) {
+    color: var(--rind-color-text-muted);
+  }
+
+  /* 24x24 target (WCAG 2.5.8) with a small glyph. */
+  :where([data-scope="combobox"][data-part="chip-remove"]) {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    cursor: default;
+  }
+
+  :where([data-scope="combobox"][data-part="chip-remove"]):hover {
+    background: var(--rind-combobox-chip-remove-hover-bg, var(--rind-color-neutral-soft-hover));
+  }
+
+  :where([data-scope="combobox"][data-part="chip-remove"][disabled]) {
+    display: none;
+  }
+
+  :where([data-scope="combobox"][data-part="control"]):has([data-part="chips"])
+    :where([data-part="input"]) {
+    flex: 1 1 6ch;
+    min-inline-size: 6ch;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     :where([data-scope="combobox"][data-part="popup"]) {
       transition: none;
@@ -327,6 +393,15 @@
     :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]))::after,
     :where([data-scope="combobox"][data-part="item-indicator"]) {
       background-color: CanvasText;
+    }
+
+    :where([data-scope="combobox"][data-part="chip"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="combobox"][data-part="chip"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: 1px;
     }
 
     :where([data-scope="combobox"][data-part="item"][data-highlighted]) {

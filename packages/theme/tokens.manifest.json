@@ -590,6 +590,30 @@
           "fallback": "var(--rind-radius-indicator)",
           "file": "combobox.css"
         },
+        "chip-bg": {
+          "fallback": "var(--rind-color-neutral-soft)",
+          "file": "combobox.css"
+        },
+        "chip-border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "combobox.css"
+        },
+        "chip-highlight-bg": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "combobox.css"
+        },
+        "chip-highlight-border": {
+          "fallback": "var(--rind-color-accent)",
+          "file": "combobox.css"
+        },
+        "chip-radius": {
+          "fallback": "var(--rind-radius-full, 999px)",
+          "file": "combobox.css"
+        },
+        "chip-remove-hover-bg": {
+          "fallback": "var(--rind-color-neutral-soft-hover)",
+          "file": "combobox.css"
+        },
         "clear-icon": {
           "fallback": "var(--rind-icon-x)",
           "file": "combobox.css"
