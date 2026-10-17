@@ -154,7 +154,11 @@ export const calendarMachine = setup({
     notComposing: ({ event }) =>
       !((event.type === "NAVIGATE" || event.type === "SELECT_FOCUSED") && event.composing),
     focusedSelectable: (args) => isSelectable(focusedOf(args), args.props),
-    pagedByPress: ({ event }) => event.type === "PAGE" && event.modality !== "keyboard",
+    notKeyPage: ({ event }) => event.type === "PAGE" && event.modality !== "keyboard",
+    // A mouse, pen or finger press moves focus to the trigger; a screen reader's click
+    // (virtual) does not, so the grid keeps focus and repairs it after paging.
+    pagedByPress: ({ event }) =>
+      event.type === "PAGE" && (event.modality === "pointer" || event.modality === "touch"),
     canPage: ({ event, context, props }) =>
       event.type === "PAGE" &&
       props.disabled !== true &&
@@ -254,7 +258,7 @@ export const calendarMachine = setup({
       on: {
         "GRID.FOCUS": { target: "focused", guard: "interactive" },
         // Keys page only from inside the grid: an unfocused calendar pages by its triggers.
-        PAGE: { guard: { and: ["canPage", "pagedByPress"] }, actions: ["page", "announceRange"] },
+        PAGE: { guard: { and: ["canPage", "notKeyPage"] }, actions: ["page", "announceRange"] },
         // A pointer press focuses the cell too; it selects only a selectable date.
         "CELL.PRESS": {
           guard: "interactive",
