@@ -1,5 +1,5 @@
 /* ── Alert: an inked notice card in crisp, a soft candy banner in juicy ── */
-[data-skinned] [data-scope="alert"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="root"] {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas:
@@ -15,13 +15,15 @@
   color: var(--s-ink);
   transition: opacity 180ms ease-out;
 }
-[data-skinned] [data-scope="alert"][data-part="root"][data-state="closed"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="root"][data-state="closed"] {
   opacity: 0;
 }
-[data-skinned] [data-scope="alert"][data-part="root"]:not(:has(> [data-part="title"])) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="root"]:not(:has(> [data-part="title"])) {
   grid-template-areas: "icon description close";
 }
-[data-skinned] [data-scope="alert"][data-part="icon"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="icon"] {
   grid-area: icon;
   display: inline-grid;
   place-items: center;
@@ -32,16 +34,16 @@
   background: var(--s-ink);
   color: var(--s-card);
 }
-[data-skinned] [data-scope="alert"][data-part="title"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="title"] {
   grid-area: title;
   font-weight: 700;
 }
-[data-skinned] [data-scope="alert"][data-part="description"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="description"] {
   grid-area: description;
   /* The generic field description is muted ink; on a tinted alert it must follow the root. */
   color: inherit;
 }
-[data-skinned] [data-scope="alert"][data-part="close-trigger"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="close-trigger"] {
   grid-area: close;
   display: inline-grid;
   place-items: center;
@@ -56,39 +58,47 @@
   cursor: pointer;
   transition: background 140ms ease-out;
 }
-[data-skinned] [data-scope="alert"][data-part="close-trigger"]:hover {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="close-trigger"]:hover {
   background: color-mix(in oklab, currentColor 12%, transparent);
 }
-[data-skinned] [data-scope="alert"][data-part="root"][data-tone="danger"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="root"][data-tone="danger"] {
   background: var(--s-error);
   color: #fff;
 }
-[data-skinned] [data-scope="alert"][data-part="root"][data-tone="danger"] [data-part="icon"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="root"][data-tone="danger"]
+  [data-part="icon"] {
   background: #fff;
   color: var(--s-error);
 }
-[data-skinned] [data-scope="alert"][data-part="root"][data-variant="outline"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="alert"][data-part="root"][data-variant="outline"] {
   background: transparent;
   box-shadow: inset 0 0 0 2px currentColor;
 }
-[data-skin="crisp"] [data-scope="alert"][data-part="root"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="alert"][data-part="root"] {
   border: var(--s-bw) solid var(--s-ink);
   box-shadow: var(--s-lift);
   border-radius: var(--s-r-sm);
 }
-[data-skin="crisp"] [data-scope="alert"][data-part="root"][data-variant="outline"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="alert"][data-part="root"][data-variant="outline"] {
   box-shadow: none;
 }
-[data-skin="juicy"] [data-scope="alert"][data-part="root"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="alert"][data-part="root"] {
   border-radius: var(--s-r);
   box-shadow: var(--s-lift-lo);
 }
-[data-skin="juicy"] [data-scope="alert"][data-part="root"]:not([data-tone]),
-[data-skin="juicy"] [data-scope="alert"][data-part="root"][data-tone="warning"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="alert"][data-part="root"]:not([data-tone]),
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="alert"][data-part="root"][data-tone="warning"] {
   background: var(--s-acc);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-skinned] [data-scope="alert"][data-part="root"] {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="alert"][data-part="root"] {
     transition: none;
   }
 }
