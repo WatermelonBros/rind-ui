@@ -5,7 +5,14 @@
 
 import type { Announcement, By, ClickOptions, Key, KeyOptions, Part } from "@rind-ui/core"
 import type { Frame, FrameLocator, Locator, Page } from "playwright"
-import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
+import {
+  type AdapterEnv,
+  describeBy,
+  type EnvFactory,
+  type EnvOptions,
+  poll,
+  renamedSnapshot,
+} from "../adapter"
 import type { DomSnapshot } from "../collect"
 import type { InPage } from "../inpage"
 import { type AxNode, axNodeOf } from "./chromium-tree"
@@ -181,7 +188,7 @@ export function playwrightEnv(
 
 function createPlaywrightEnv(
   getBase: () => Promise<Base>,
-  { scope, anchor, modality, platform }: EnvOptions,
+  { scope, anchor, modality, platform, partName, anatomyName }: EnvOptions,
   options: PlaywrightAdapterOptions,
 ): AdapterEnv {
   const apple = platform?.apple
@@ -220,7 +227,7 @@ function createPlaywrightEnv(
       : "label" in by
         ? root.getByLabel(by.label, { exact: true })
         : "part" in by
-          ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
+          ? root.locator(`[data-scope="${scope}"][data-part="${partName?.(by.part) ?? by.part}"]`)
           : root.getByText(by.text, { exact: true })
 
   const describeAll = (l: Locator) =>
@@ -700,7 +707,7 @@ function createPlaywrightEnv(
     const { root } = await getBase()
     const id = await instance()
     const parts = root.locator(
-      `[data-scope="${scope}"][data-part="${name}"][data-instance="${id}"]`,
+      `[data-scope="${scope}"][data-part="${partName?.(name) ?? name}"][data-instance="${id}"]`,
     )
     return by ? parts.and(byLocator(root, by)) : parts
   }
@@ -763,9 +770,12 @@ function createPlaywrightEnv(
       const { root } = await getBase()
       await ensureInPage(root)
       const arg = { scope, instance: await instance() }
-      return root.evaluate(
-        (a) => (globalThis as InPageWindow).__rindTesting?.collectDom(a) as DomSnapshot,
-        arg,
+      return renamedSnapshot(
+        await root.evaluate(
+          (a) => (globalThis as InPageWindow).__rindTesting?.collectDom(a) as DomSnapshot,
+          arg,
+        ),
+        anatomyName,
       )
     },
     announcements: async () => {

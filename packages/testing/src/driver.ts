@@ -15,6 +15,7 @@ import {
   type AdapterEnv,
   type Direction,
   type EnvFactory,
+  hostedPartName,
   isEnvFactory,
   mirror,
   UntilTimeout,
@@ -184,6 +185,7 @@ function make<C extends AnyContract>(
       env = directed(
         factory.create({
           scope: contract.scope,
+          ...hostedPartName(contract),
           anchor,
           modality,
           ...(options.platform ? { platform: options.platform } : {}),

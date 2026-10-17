@@ -181,7 +181,7 @@ describe("pointer without layout", () => {
   it("pressAt rejects naming the missing layout in jsdom", async () => {
     render(<Area />)
     const area = getColorArea(screen, { name: "Fill" }, { modality: "pointer" })
-    const box = screen.getAllByRole("slider")[0]?.closest('[data-part="root"]')
+    const box = screen.getAllByRole("slider")[0]?.closest('[data-part="area"]')
     if (box && box.getBoundingClientRect().width > 0) return // real browser: covered elsewhere
     await expect(area.pressAt({ x: 0.5, y: 0.5 })).rejects.toThrow(/pressAt|pointerDown.*layout/)
     fireEvent.blur(document.body)

@@ -16,7 +16,7 @@ import {
   type Step,
   withEngine,
 } from "@rind-ui/core"
-import type { AdapterEnv, Direction } from "./adapter"
+import { type AdapterEnv, type Direction, hostedPartName } from "./adapter"
 import { installErrorLog } from "./adapters/dom"
 import { isPage, watchPageErrors } from "./adapters/playwright"
 import type { DomSnapshot, ElementInfo } from "./collect"
@@ -690,7 +690,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     let env = envs.get(m)
     if (!env) {
       env = directed(
-        factory.create({ scope: contract.scope, anchor, modality: m, platform }),
+        factory.create({
+          scope: contract.scope,
+          ...hostedPartName(contract),
+          anchor,
+          modality: m,
+          platform,
+        }),
         direction,
       )
       envs.set(m, env)

@@ -40,33 +40,39 @@ export const colorPickerMeta = {
     },
     {
       name: "ColorPicker.Area / AreaBackground / AreaThumb",
-      part: "root",
+      part: "area / area-background / area-thumb (its inputs: area-input)",
       element: "div",
       description: "The colour area: two channels as a 2D surface.",
     },
     {
       name: "ColorPicker.ChannelSlider (+ Label, ValueText, Track, Thumb)",
-      part: "root",
+      part: "channel-slider (+ -label, -value-text, -control, -track, -thumb)",
       element: "div",
       description: "One channel on a slider, its track painted with the channel's gradient.",
     },
     {
       name: "ColorPicker.ChannelInput",
-      part: "input",
+      part: "channel-input (its wrapper: channel-input-root)",
       element: "input",
       description: "`hex` / `css`: a colour text field; a channel: a number field for it.",
     },
     {
       name: "ColorPicker.SwatchGroup / SwatchTrigger / SwatchIndicator",
-      part: "root",
+      part: "swatch-group / swatch-trigger / swatch-indicator",
       element: "div",
       description: "A palette (a radio group of colours); the indicator is the one selected mark.",
     },
     {
       name: "ColorPicker.Swatch / ValueSwatch",
-      part: "root",
+      part: "swatch / value-swatch",
       element: "div",
       description: "A colour chip named by its colour; ValueSwatch shows the picker's colour.",
+    },
+    {
+      name: "ColorPicker.TransparencyGrid",
+      part: "transparency-grid",
+      element: "div",
+      description: "A checkerboard under a colour with transparency (decorative).",
     },
     {
       name: "ColorPicker.EyeDropperTrigger",
@@ -163,6 +169,13 @@ export const colorPickerMeta = {
       "data-dragging": "Present while a child drags.",
       "data-inline": "Present in inline mode.",
       "data-format": "The current format.",
+    },
+    "every part": {
+      "data-scope":
+        '"color-picker": the area, the channel sliders, the inputs and the swatches too',
+      "data-part":
+        "The part's name (the anatomy table): `area-thumb`, `channel-slider-track`, `swatch-trigger`, …",
+      "data-channel": "On `channel-slider` and `channel-input-root`: the channel it edits.",
     },
   },
   keyboard: [

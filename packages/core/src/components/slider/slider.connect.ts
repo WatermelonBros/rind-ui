@@ -4,7 +4,13 @@
 
 import { focusAttrs } from "../../a11y/focus"
 import { type KeyDescription, toLogicalKeyEvent } from "../../a11y/keys"
-import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
+import {
+  CRITICAL,
+  dataFlag,
+  type PartNaming,
+  type PartProps,
+  scopeAttrs,
+} from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import type { DragAxis } from "../../dom/pointer-drag"
 import { visuallyHiddenInputStyle } from "../../dom/visually-hidden"
@@ -71,6 +77,8 @@ export function sliderKeyEvent(
 
 export interface SliderConnectInput extends SliderAxis {
   readonly instance: string
+  /** Rendered as another component's part: the host's scope and part names (default Slider's). */
+  readonly naming?: PartNaming<SliderPart> | undefined
   readonly values: readonly number[]
   readonly range: SliderRange
   readonly alignment: ThumbAlignment
@@ -134,7 +142,11 @@ export function sliderConnect(input: SliderConnectInput) {
     "data-dragging": dataFlag(input.dragging),
     ...focusAttrs(anyFocused, input.modality),
   }
-  const part = (name: SliderPart) => scopeAttrs("slider", name, input.instance)
+  const naming = input.naming
+  const part = (name: SliderPart) =>
+    naming
+      ? scopeAttrs(naming.scope, naming.part(name), input.instance)
+      : scopeAttrs("slider", name, input.instance)
   /** The position of a point at `percent`: logical start (or bottom), centred on it. */
   const at = (percent: number) =>
     vertical

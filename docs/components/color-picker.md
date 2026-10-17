@@ -49,11 +49,12 @@ import { ColorPicker } from "@rind-ui/react"
 | `ColorPicker.Control` | `control` | `<div>` | `role="group"`: the Popover's anchor. |
 | `ColorPicker.Trigger` | `trigger` | `<button>` | Opens the content; named with the colour. |
 | `ColorPicker.Portal / Positioner / Content` | `content` | `<div>` | The Popover's (inline: `role="group"`, in place). |
-| `ColorPicker.Area / AreaBackground / AreaThumb` | `root` | `<div>` | The colour area: two channels as a 2D surface. |
-| `ColorPicker.ChannelSlider (+ Label, ValueText, Track, Thumb)` | `root` | `<div>` | One channel on a slider, its track painted with the channel's gradient. |
-| `ColorPicker.ChannelInput` | `input` | `<input>` | `hex` / `css`: a colour text field; a channel: a number field for it. |
-| `ColorPicker.SwatchGroup / SwatchTrigger / SwatchIndicator` | `root` | `<div>` | A palette (a radio group of colours); the indicator is the one selected mark. |
-| `ColorPicker.Swatch / ValueSwatch` | `root` | `<div>` | A colour chip named by its colour; ValueSwatch shows the picker's colour. |
+| `ColorPicker.Area / AreaBackground / AreaThumb` | `area / area-background / area-thumb (its inputs: area-input)` | `<div>` | The colour area: two channels as a 2D surface. |
+| `ColorPicker.ChannelSlider (+ Label, ValueText, Track, Thumb)` | `channel-slider (+ -label, -value-text, -control, -track, -thumb)` | `<div>` | One channel on a slider, its track painted with the channel's gradient. |
+| `ColorPicker.ChannelInput` | `channel-input (its wrapper: channel-input-root)` | `<input>` | `hex` / `css`: a colour text field; a channel: a number field for it. |
+| `ColorPicker.SwatchGroup / SwatchTrigger / SwatchIndicator` | `swatch-group / swatch-trigger / swatch-indicator` | `<div>` | A palette (a radio group of colours); the indicator is the one selected mark. |
+| `ColorPicker.Swatch / ValueSwatch` | `swatch / value-swatch` | `<div>` | A colour chip named by its colour; ValueSwatch shows the picker's colour. |
+| `ColorPicker.TransparencyGrid` | `transparency-grid` | `<div>` | A checkerboard under a colour with transparency (decorative). |
 | `ColorPicker.EyeDropperTrigger` | `eye-dropper-trigger` | `<button>` | Hidden where the browser has no EyeDropper. |
 | `ColorPicker.FormatSelect / FormatTrigger` | `format-select` | `<select / button>` | Set or cycle the format. |
 | `ColorPicker.View` | `view` | `<div>` | Renders its children only for its `format`. |
@@ -98,6 +99,9 @@ Every attribute of the rendered element is accepted and forwarded.
 | `root` | `data-dragging` | Present while a child drags. |
 | `root` | `data-inline` | Present in inline mode. |
 | `root` | `data-format` | The current format. |
+| `every part` | `data-scope` | "color-picker": the area, the channel sliders, the inputs and the swatches too |
+| `every part` | `data-part` | The part's name (the anatomy table): `area-thumb`, `channel-slider-track`, `swatch-trigger`, … |
+| `every part` | `data-channel` | On `channel-slider` and `channel-input-root`: the channel it edits. |
 
 ### Keyboard
 
@@ -138,6 +142,10 @@ Compose only the parts a picker needs. With `inline` the parts sit on the page a
 - **SwatchGroup** (`SwatchGroup`, `SwatchTrigger`, `SwatchIndicator`): a palette that is a [Radio Group](radio-group.md) of colours: arrows move and pick, the group is one tab stop, at most one swatch matches the colour (a colour no swatch has checks nothing). `SwatchIndicator` is the one selected mark: empty, the theme draws a centred dot; given a glyph or icon, that is the mark instead.
 - **Swatch** and **ValueSwatch**: a colour chip with `role="img"`, named by its colour ("vibrant blue", "50% transparent"), drawn over a checkerboard when it is transparent; `ValueSwatch` shows the picker's colour and is decorative inside the Trigger.
 - **EyeDropperTrigger**, **FormatSelect** / **FormatTrigger** and **View**, **ValueText**, **HiddenInput**: see the sections below.
+
+## Styling
+
+Every part carries `data-scope="color-picker"`, the parts built on other components included: style the picker with `[data-scope="color-picker"][data-part="…"]` and the part names of the anatomy table (`area`, `area-thumb`, `channel-slider-track`, `channel-slider-thumb`, `channel-input`, `swatch-group`, `swatch-trigger`, `swatch-indicator`, `swatch`, `value-swatch`, `transparency-grid`). A Slider, Number Input or Radio Group stylesheet never reaches the picker's parts, and the picker's sheet never reaches them. `data-channel` on a channel slider and a channel input's root names its channel.
 
 ## Value and format
 

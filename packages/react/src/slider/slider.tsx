@@ -17,6 +17,7 @@ import {
   type Modality,
   mergeFieldProps,
   normalizeValues,
+  type PartNaming,
   partId,
   pointerDragSession,
   resolveSlider,
@@ -24,6 +25,7 @@ import {
   type SliderEvent,
   type SliderMessages,
   type SliderOrientation,
+  type SliderPart,
   type SliderReason,
   sameNumbers,
   sliderConnect,
@@ -121,6 +123,11 @@ const SliderContext = createContext<Ctx | null>(null)
  * surface when there is no Control. A plain Slider's Root never starts a drag.
  */
 export const SliderRootSurface = createContext(false)
+/**
+ * Internal (not exported from the package): set by a component that renders a Slider as its
+ * part (Color Picker's channel slider): the host's scope and part names.
+ */
+export const SliderNaming = createContext<PartNaming<SliderPart> | null>(null)
 function useSlider(part: string): Ctx {
   const ctx = useContext(SliderContext)
   if (!ctx) throw new Error(`Slider.${part} must be inside Slider.Root`)
@@ -217,6 +224,10 @@ function Root<V extends SliderValue>({
   const thumbs = useRef<(HTMLElement | null)[]>([])
   const control = useRef<HTMLElement | null>(null)
   const rootSurface = useContext(SliderRootSurface)
+  const naming = useContext(SliderNaming)
+  // Its parts under a host's names when the Slider is another component's part.
+  const scopeName = naming?.scope ?? "slider"
+  const partNamed = (part: SliderPart) => naming?.part(part) ?? part
   const latest = useRef<readonly number[]>(creationDefault)
   const [thumbDisabled, setThumbDisabledState] = useState<readonly boolean[]>([])
   // Stable: Thumbs report their `disabled` from an effect keyed on it.
@@ -326,6 +337,7 @@ function Root<V extends SliderValue>({
   }
   const api = sliderConnect({
     instance,
+    ...(naming ? { naming } : {}),
     values,
     range,
     orientation,
@@ -418,7 +430,9 @@ function Root<V extends SliderValue>({
     setThumbDisabled,
     press: (e) => {
       if (!isDragPress(e) || drag.active || field.disabled || field.readOnly) return
-      const thumb = (e.target as Element).closest?.('[data-scope="slider"][data-part="thumb"]')
+      const thumb = (e.target as Element).closest?.(
+        `[data-scope="${scopeName}"][data-part="${partNamed("thumb")}"]`,
+      )
       // A disabled thumb is no target: the press is a track press there.
       const index =
         thumb &&
@@ -443,9 +457,14 @@ function Root<V extends SliderValue>({
   // start on the Label or the ValueText do not start a drag.
   const rootPress = (e: PointerEvent<HTMLElement>) => {
     if (!rootSurface || control.current) return
-    const from = (e.target as Element).closest?.('[data-scope="slider"][data-part]')
+    const from = (e.target as Element).closest?.(`[data-scope="${scopeName}"][data-part]`)
     const partName = from?.getAttribute("data-part")
-    if (partName === "label" || partName === "value-text" || partName === "description") return
+    if (
+      partName === partNamed("label") ||
+      partName === partNamed("value-text") ||
+      partName === partNamed("description")
+    )
+      return
     ctx.press(e)
   }
   const props = mergeProps(

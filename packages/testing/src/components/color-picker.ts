@@ -1,12 +1,19 @@
 import { colorPickerContract } from "@rind-ui/core"
+import { colorSwatchContract } from "@rind-ui/core/internal"
 import { createDriverWith, type DriverOptions, type Target } from "../driver"
 import { getColorArea } from "./color-area"
 import { getColorChannelField, getColorField } from "./color-field"
 import { getColorSlider } from "./color-slider"
-import { getColorSwatch } from "./color-swatch"
 import { getColorSwatchPicker } from "./color-swatch-picker"
 
 type FakeResult = string | "abort"
+
+/** A swatch inside the picker: the swatch's contract under the picker's scope (`swatch`). */
+const pickerSwatch = {
+  ...colorSwatchContract,
+  scope: "color-picker",
+  partName: (part: string) => (part === "root" ? "swatch" : part),
+}
 
 /**
  * A driver for the Color Picker named `name` (its Control, or its content when inline), with
@@ -35,7 +42,7 @@ export function getColorPicker(
     swatches: (name: string | RegExp = "Color swatches") =>
       getColorSwatchPicker(target, { name }, options),
     /** A `ColorPicker.Swatch`, by its colour name (or label). */
-    swatch: (name: string | RegExp) => getColorSwatch(target, { name }, options),
+    swatch: (name: string | RegExp) => createDriverWith(pickerSwatch, target, [{ name }], options),
     /** Installs a fake EyeDropper that resolves `result` (or rejects as dismissed). */
     eyeDropper: (result: FakeResult, win: unknown = globalThis.window) => {
       class FakeEyeDropper {
