@@ -19,6 +19,7 @@ import * as colorPicker from "./color-picker"
 import * as colorSlider from "./color-slider"
 import * as colorSwatch from "./color-swatch"
 import * as colorSwatchPicker from "./color-swatch-picker"
+import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
 import * as field from "./field"
@@ -52,6 +53,7 @@ import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
+import * as select from "./select"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
@@ -94,6 +96,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "color-slider": colorSlider,
   "color-swatch": colorSwatch,
   "color-swatch-picker": colorSwatchPicker,
+  combobox,
   collections,
   "context-menu": contextMenu,
   dialog,
@@ -122,6 +125,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "radio-group": radioGroup,
   "search-field": searchField,
   "segmented-control": segmentedControl,
+  select,
   separator,
   "qr-code": qrCode,
   "scroll-area": scrollArea,

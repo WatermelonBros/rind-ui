@@ -1,13 +1,12 @@
-## Purpose
+# combobox-pattern Specification
 
+## Purpose
 Defines, once, the behaviour of a text input that drives a listbox (in a popup, or shown
 in place) through `aria-activedescendant` — opening, highlighting while typing, inline completion, IME,
 async and stale results, the empty state, set metadata, announcements, virtualization
 and the popup's place in the DOM — shared by Combobox, Autocomplete and, later,
 Command, Tags Input and Mentions.
-
-## ADDED Requirements
-
+## Requirements
 ### Requirement: Roles And Relations
 
 The input SHALL be a native text `<input>` (or an element substituted for it that keeps
@@ -504,13 +503,21 @@ SHALL navigate natively; modifier and middle clicks SHALL NOT choose it.
 
 ### Requirement: Pattern Data Attributes
 
-The input SHALL carry `data-state` (`open` | `closed`), `data-focus`,
+The input SHALL carry `data-state` (`open` | `closed`), equal to its `aria-expanded` (so
+`closed` in the empty state, where the component is open but the listbox is not exposed;
+the generic state-attribute invariant requires the two to agree), `data-focus`,
 `data-focus-visible`, `data-disabled`, `data-readonly`, `data-invalid`. The popup and
 positioner SHALL carry `data-state`, the placement attributes of `floating-positioning`,
 `data-empty` and `data-loading`. The list SHALL carry the `collection-model` list
 attributes. Options SHALL carry the `collection-model` item attributes, with
 `data-focus-visible` on the highlighted option after keyboard highlight. The Empty part
 SHALL carry `data-part="empty"`.
+
+#### Scenario: Input state in the empty state
+
+- **WHEN** the open popup's results become empty
+- **THEN** the input carries `data-state="closed"` and `aria-expanded="false"`, while the
+  popup and positioner keep `data-state="open"`
 
 #### Scenario: Keyboard highlight ring
 
@@ -588,3 +595,4 @@ IME sequence), `open()` (pointer: trigger press; keyboard: ArrowDown), `close()`
 
 - **WHEN** a test runs `compose("東京", true)` followed by `pressEnter()`
 - **THEN** the composing Enter selects nothing and the second Enter acts on the highlight
+
