@@ -1,0 +1,85 @@
+/*
+ * Color Area (family: range): the gradient and the thumb's position are inline from core;
+ * this sheet sizes the surface and draws the thumb with a double ring (surface inside, text
+ * outside) that keeps 3:1 against any point of the gradient. The hit area is at least
+ * --rind-hit-area; nothing moves with a transition while dragging.
+ */
+@layer rind.components {
+  :where([data-scope="color-area"][data-part="root"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-area-size, 12rem);
+    aspect-ratio: var(--rind-color-area-aspect-ratio, 1);
+    border-radius: var(--rind-color-area-radius, var(--rind-radius-md));
+    cursor: var(--rind-color-area-cursor, crosshair);
+  }
+
+  :where([data-scope="color-area"][data-part="background"]) {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  :where([data-scope="color-area"][data-part="root"][data-variant="solid"]) {
+    box-shadow: 0 0 0 var(--rind-border-width)
+      var(--rind-color-area-border, var(--rind-color-border-strong));
+  }
+
+  :where([data-scope="color-area"][data-part="root"][data-tone="danger"]) {
+    box-shadow: 0 0 0 var(--rind-border-width) var(--rind-color-danger-border);
+  }
+
+  :where([data-scope="color-area"][data-part="thumb"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-area-thumb-size, 1.25rem);
+    block-size: var(--rind-color-area-thumb-size, 1.25rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color);
+    box-shadow:
+      0 0 0 2px var(--rind-color-area-thumb-inner, var(--rind-color-surface)),
+      0 0 0 3px var(--rind-color-area-thumb-outer, var(--rind-color-text));
+    transition:
+      left var(--rind-duration-fast),
+      bottom var(--rind-duration-fast);
+  }
+
+  :where([data-scope="color-area"][data-part="thumb"])::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((100% - var(--rind-hit-area)) / 2));
+  }
+
+  :where([data-scope="color-area"][data-part="thumb"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) + 3px);
+  }
+
+  :where([data-scope="color-area"][data-dragging]) {
+    transition: none;
+    cursor: grabbing;
+  }
+
+  :where([data-scope="color-area"][data-part="root"][data-size="sm"]) {
+    inline-size: var(--rind-color-area-size, 9rem);
+  }
+
+  :where([data-scope="color-area"][data-part="root"][data-size="lg"]) {
+    inline-size: var(--rind-color-area-size, 16rem);
+  }
+
+  :where([data-scope="color-area"][data-disabled]) {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="color-area"][data-part="thumb"]) {
+      box-shadow:
+        0 0 0 2px Canvas,
+        0 0 0 3px CanvasText;
+    }
+
+    :where([data-scope="color-area"][data-part="thumb"][data-focus-visible]) {
+      outline-color: Highlight;
+    }
+  }
+}
