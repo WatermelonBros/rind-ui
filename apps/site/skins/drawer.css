@@ -1,0 +1,256 @@
+/* Drawer: a Dialog docked to an edge, portalled to <body>; the portal host carries the stage's
+   data-rind-theme, so these rules select on that. The machine writes the swipe and snap
+   variables (--rind-drawer-*); the slide only reads them. Layers sit with the Dialog's, above
+   the site header. */
+[data-rind-theme^="skin-"]
+[data-scope="drawer"]:is([data-part="trigger"], [data-part="close-trigger"]) {
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 9px 16px;
+  cursor: pointer;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="close-trigger"] {
+  justify-self: end;
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  border-color: var(--s-brand-deep);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"]:is(
+    [data-part="trigger"],
+    [data-part="close-trigger"],
+    [data-part="handle"]
+  ):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="backdrop"] {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in oklab, var(--s-ink) 45%, transparent);
+  opacity: calc(1 - var(--rind-drawer-swipe-progress, 0));
+  transition: opacity 0.3s var(--s-ease);
+}
+[data-rind-theme="skin-juicy"] [data-scope="drawer"][data-part="backdrop"] {
+  background: color-mix(in oklab, #9b87e8 45%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="backdrop"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+  }
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="backdrop"][data-state="closed"] {
+  opacity: 0;
+}
+
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="positioner"] {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  pointer-events: none;
+  overflow: hidden;
+  padding-block-end: var(--rind-drawer-keyboard-inset, 0px);
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="positioner"][data-side="bottom"] {
+  align-items: end;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="positioner"][data-side="top"] {
+  align-items: start;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="positioner"][data-side="left"] {
+  justify-items: start;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="positioner"][data-side="right"] {
+  justify-items: end;
+}
+
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] {
+  box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 12px 24px 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  color: var(--s-ink);
+  font-family: var(--s-font);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift-hi);
+  transition: transform 0.35s var(--s-ease);
+}
+[data-rind-theme="skin-crisp"] [data-scope="drawer"][data-part="content"] {
+  box-shadow: 0 -6px 0 var(--s-ink);
+}
+[data-rind-theme="skin-juicy"] [data-scope="drawer"][data-part="content"] {
+  box-shadow: 0 -8px 0 #c9bdf2;
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"]:is([data-side="left"], [data-side="right"]) {
+  padding-block-start: 24px;
+  box-shadow: var(--s-lift-hi);
+}
+
+/* placement, size and the inward corners of each side */
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"][data-side="bottom"] {
+  width: min(100%, 640px);
+  justify-self: center;
+  max-height: 90dvh;
+  border-radius: var(--s-r) var(--s-r) 0 0;
+  border-bottom: 0;
+  transform: translateY(
+    calc(var(--rind-drawer-snap-offset, 0px) + var(--rind-drawer-swipe-y, 0px))
+  );
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"][data-side="top"] {
+  width: min(100%, 640px);
+  justify-self: center;
+  max-height: 90dvh;
+  border-radius: 0 0 var(--s-r) var(--s-r);
+  border-top: 0;
+  transform: translateY(
+    calc(var(--rind-drawer-snap-offset, 0px) * -1 + var(--rind-drawer-swipe-y, 0px))
+  );
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"][data-side="left"] {
+  height: 100%;
+  width: min(100%, 380px);
+  border-radius: 0 var(--s-r) var(--s-r) 0;
+  border-left: 0;
+  transform: translateX(
+    calc(var(--rind-drawer-snap-offset, 0px) * -1 + var(--rind-drawer-swipe-x, 0px))
+  );
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"][data-side="right"] {
+  height: 100%;
+  width: min(100%, 380px);
+  border-radius: var(--s-r) 0 0 var(--s-r);
+  border-right: 0;
+  transform: translateX(
+    calc(var(--rind-drawer-snap-offset, 0px) + var(--rind-drawer-swipe-x, 0px))
+  );
+}
+/* the content follows the pointer one to one while dragging */
+[data-rind-theme^="skin-"]
+[data-scope="drawer"]:is([data-part="content"], [data-part="backdrop"])[data-swiping] {
+  transition: none;
+}
+/* in from off the edge, out to it (from the release position after a swipe) */
+[data-rind-theme^="skin-"]
+[data-scope="drawer"][data-part="content"][data-side="bottom"][data-state="open"] {
+  @starting-style {
+    transform: translateY(100%);
+  }
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="top"][data-state="open"] {
+  @starting-style {
+    transform: translateY(-100%);
+  }
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="left"][data-state="open"] {
+  @starting-style {
+    transform: translateX(-100%);
+  }
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="right"][data-state="open"] {
+  @starting-style {
+    transform: translateX(100%);
+  }
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="bottom"][data-state="closed"] {
+  transform: translateY(100%);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="top"][data-state="closed"] {
+  transform: translateY(-100%);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="left"][data-state="closed"] {
+  transform: translateX(-100%);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="drawer"][data-part="content"][data-side="right"][data-state="closed"] {
+  transform: translateX(100%);
+}
+
+/* the grip, centred in a hit area of at least 24 by 24 px, a button or not */
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="handle"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  min-width: 48px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  touch-action: none;
+  cursor: grab;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="handle"]::after {
+  content: "";
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--s-ink) 35%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="title"] {
+  margin: 0;
+  font: 800 22px / 1.15 var(--s-font);
+  outline: none;
+}
+[data-rind-theme="skin-crisp"] [data-scope="drawer"][data-part="title"] {
+  font-family: var(--font-unbounded), var(--s-font);
+  font-weight: 900;
+  font-size: 20px;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="description"] {
+  margin: 0;
+  font-size: 14px;
+  color: color-mix(in oklab, var(--s-ink) 75%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] input:not([type="checkbox"]) {
+  font: 500 15px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-muted);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  padding: 9px 12px;
+}
+[data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] input[type="checkbox"] {
+  accent-color: var(--s-brand);
+  width: 18px;
+  height: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"]
+    [data-scope="drawer"]:is([data-part="backdrop"], [data-part="content"]) {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  [data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] {
+    border: 1px solid CanvasText;
+  }
+  [data-rind-theme^="skin-"] [data-scope="drawer"][data-part="handle"]::after {
+    background: CanvasText;
+  }
+}
