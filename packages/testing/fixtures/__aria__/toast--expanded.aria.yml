@@ -1,6 +1,4 @@
-- log
-- log
-- region "Notifications (F6)":
+- region "Expanded notifications (F6)":
   - list:
     - listitem "Third":
       - text: Third Newest.
@@ -11,3 +9,5 @@
     - listitem "First":
       - text: First Oldest.
       - button "Dismiss notification"
+- log
+- log

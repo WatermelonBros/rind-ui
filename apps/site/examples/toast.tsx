@@ -19,9 +19,23 @@ export const states: States = {
 }
 
 /** One store per example: two regions on the same store would show every toast twice. */
-function View({ store }: { store: ToasterStore }) {
+function View({
+  store,
+  name,
+  inline = false,
+}: {
+  store: ToasterStore
+  /** A distinct region name per example: one page shows several (landmark-unique). */
+  name: string
+  /** In the example itself (state examples), not the page's corner. */
+  inline?: boolean
+}) {
   return (
-    <Toaster toaster={store}>
+    <Toaster
+      toaster={store}
+      portal={!inline}
+      messages={{ regionLabel: (key) => `${name} notifications (${key})` }}
+    >
       {(t) => (
         <Toast.Root>
           <Toast.Title />
@@ -46,7 +60,7 @@ export function Basic() {
       <button type="button" onClick={() => basic.show("Changes saved")}>
         Save
       </button>
-      <View store={basic} />
+      <View store={basic} name="Basic" />
     </>
   )
 }
@@ -70,7 +84,7 @@ export function Types() {
           Error
         </button>
       </div>
-      <View store={typed} />
+      <View store={typed} name="Types" />
     </>
   )
 }
@@ -92,7 +106,7 @@ export function Action() {
       >
         Archive
       </button>
-      <View store={withAction} />
+      <View store={withAction} name="Action" />
     </>
   )
 }
@@ -117,7 +131,7 @@ export function Promised() {
       >
         Export
       </button>
-      <View store={promised} />
+      <View store={promised} name="Promise" />
     </>
   )
 }
@@ -144,7 +158,7 @@ export function Limit() {
       <button type="button" onClick={() => limited.dismiss()}>
         Clear
       </button>
-      <View store={limited} />
+      <View store={limited} name="Limit" />
     </>
   )
 }
@@ -163,7 +177,7 @@ export function Open() {
     })
     open.pause(open.show({ id: "open-paused", title: "Upload held", duration: 3_600_000 }))
   }, [])
-  return <View store={open} />
+  return <View store={open} name="Open" inline />
 }
 
 const expanded = createToaster({ expand: true, duration: Number.POSITIVE_INFINITY })
@@ -174,7 +188,7 @@ export function Expanded() {
     expanded.show({ id: "expanded-2", title: "Second" })
     expanded.show({ id: "expanded-3", title: "Third", description: "Newest." })
   }, [])
-  return <View store={expanded} />
+  return <View store={expanded} name="Expanded" inline />
 }
 
 export const variants: Variants = {

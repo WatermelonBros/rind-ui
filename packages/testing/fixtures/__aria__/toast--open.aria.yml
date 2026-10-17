@@ -1,6 +1,4 @@
-- log
-- log
-- region "Notifications (F6)":
+- region "Open notifications (F6)":
   - list:
     - listitem "Upload held":
       - text: Upload held
@@ -12,3 +10,5 @@
     - listitem "Sync finished":
       - text: Sync finished
       - button "Dismiss notification"
+- log
+- log
