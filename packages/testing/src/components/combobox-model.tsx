@@ -1,5 +1,5 @@
-// Model-based tests: the Combobox contract over props classes (task 6.2). `filter={null}`
-// keeps the listed options equal to the oracle's collection whatever the typed text.
+// The Combobox model-test helper (task 6.2): one file per props class registers its paths.
+// `filter={null}` keeps the listed options equal to the oracle's collection.
 import {
   type ComboboxProps,
   comboboxContract,
@@ -14,8 +14,8 @@ import { render, screen } from "@testing-library/react"
 import { describe, it } from "vitest"
 import { currentRun, testMachine } from "../index"
 
-type Item = { key: string; label: string; disabled?: boolean }
-const CITIES: readonly Item[] = ["Rome", "Paris", "Prague", "Oslo"].map((label) => ({
+export type Item = { key: string; label: string; disabled?: boolean }
+export const CITIES: readonly Item[] = ["Rome", "Paris", "Prague", "Oslo"].map((label) => ({
   key: label.toLowerCase(),
   label,
 }))
@@ -32,7 +32,8 @@ type Config = Pick<
   "autoHighlight" | "allowCustomValue" | "selectOnTab" | "readOnly" | "autoComplete"
 > & { readonly multiple?: boolean; readonly items?: readonly Item[] }
 
-function config(name: string, cfg: Config) {
+/** Registers the model test of one props class (one file per class: smaller browser runs). */
+export function config(name: string, cfg: Config) {
   const { items = CITIES, multiple, ...rest } = cfg
   const contract = {
     ...comboboxContract,
@@ -97,14 +98,3 @@ function config(name: string, cfg: Config) {
     } as never)
   })
 }
-
-config("single", {})
-config("single, auto highlight", { autoHighlight: true })
-config("custom value", { allowCustomValue: true })
-config("select on Tab", { selectOnTab: true, autoHighlight: true })
-config("read-only", { readOnly: true })
-config("multiple", { multiple: true })
-config("disabled neighbour", {
-  items: CITIES.map((c) => (c.key === "paris" ? { ...c, disabled: true } : c)),
-})
-config("empty", { items: [] })
