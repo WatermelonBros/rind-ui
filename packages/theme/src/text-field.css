@@ -4,6 +4,8 @@
  * edge in border-strong, so the boundary keeps 3:1 against the background. `data-variant` and
  * `data-size` go on the Root (or the control itself). Focus is the base ring. Invalid adds a
  * non-colour cue (a doubled border) beside the danger border. Colours never transition.
+ * Password (type="password") and search (type="search") are options of the same field: their
+ * triggers sit inside the control's inline end.
  */
 @layer rind.components {
   :where([data-scope="text-field"][data-part="root"]) {
@@ -185,6 +187,192 @@
     font-weight: var(--rind-text-field-count-over-weight, 650);
   }
 
+  /*
+   * Password (VisibilityTrigger) and search (type="search") roots: the trigger sits over the
+   * control's inline end (same grid cell) so it stays inside the visible boundary, and the
+   * input reserves that space so text and password-manager badges never run under it. Gaps
+   * become margins, so an absent description or error leaves no empty row gap.
+   */
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+      [data-part="visibility-trigger"],
+      [data-part="input"][type="search"]
+    )
+  ) {
+    grid-template-areas: "label" "control" "description" "error";
+    gap: 0;
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+        [data-part="visibility-trigger"],
+        [data-part="input"][type="search"]
+      )
+      > [data-part="label"]
+  ) {
+    grid-area: label;
+    margin-block-end: var(--rind-text-field-gap, var(--rind-space-1));
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+        [data-part="visibility-trigger"],
+        [data-part="input"][type="search"]
+      )
+      > :is([data-part="description"], [data-part="error-message"])
+  ) {
+    margin-block-start: var(--rind-text-field-gap, var(--rind-space-1));
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+        [data-part="visibility-trigger"],
+        [data-part="input"][type="search"]
+      )
+      > [data-part="description"]
+  ) {
+    grid-area: description;
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+        [data-part="visibility-trigger"],
+        [data-part="input"][type="search"]
+      )
+      > [data-part="error-message"]
+  ) {
+    grid-area: error;
+  }
+
+  :where(
+    [data-scope="text-field"][data-part="root"]:has(
+        [data-part="visibility-trigger"],
+        [data-part="input"][type="search"]
+      )
+      > [data-part="input"]
+  ) {
+    grid-area: control;
+  }
+
+  /* The trigger's space, only while a trigger is mounted (data-custom-* on the input). */
+  :where([data-scope="text-field"][data-part="input"][data-custom-reveal]),
+  :where([data-scope="text-field"][data-part="input"][type="search"][data-custom-clear]) {
+    padding-inline-end: var(
+      --rind-text-field-trigger-space,
+      calc(var(--rind-hit-area) + var(--rind-space-3))
+    );
+  }
+
+  :where([data-scope="text-field"][data-part="visibility-trigger"]),
+  :where(
+    [data-scope="text-field"][data-part="root"]:has([data-part="input"][type="search"])
+      > [data-part="clear-trigger"]
+  ) {
+    grid-area: control;
+    justify-self: end;
+    align-self: center;
+    margin-inline-end: var(--rind-space-1);
+    z-index: 1;
+  }
+
+  :where([data-scope="text-field"][data-part="visibility-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-text-field-trigger-radius, var(--rind-radius-indicator));
+    background: transparent;
+    color: var(--rind-text-field-trigger-color, var(--rind-color-text-muted));
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* Pressed is never colour alone: an inset underline appears with aria-pressed. */
+  :where([data-scope="text-field"][data-part="visibility-trigger"][aria-pressed="true"]) {
+    color: var(--rind-color-text);
+    box-shadow: inset 0 calc(var(--rind-border-width) * -2) 0 currentColor;
+  }
+
+  :where([data-scope="text-field"][data-part="visibility-trigger"][data-disabled]) {
+    color: var(--rind-text-field-disabled-fg, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  /* Icon slot: empty indicators draw the eye (hidden) or the slashed eye (visible). */
+  :where([data-scope="text-field"][data-part="visibility-indicator"]:empty) {
+    inline-size: var(--rind-text-field-icon-size, 1em);
+    block-size: var(--rind-text-field-icon-size, 1em);
+    background-color: currentColor;
+    mask-image: var(--rind-text-field-hidden-icon, var(--rind-icon-eye));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="text-field"][data-part="visibility-indicator"][data-state="visible"]:empty) {
+    mask-image: var(--rind-text-field-visible-icon, var(--rind-icon-eye-slash));
+  }
+
+  /* Search: the native chrome is ours to draw (appearance, magnifier, results button). */
+  :where([data-scope="text-field"][data-part="input"][type="search"]) {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  :where([data-scope="text-field"][data-part="input"][type="search"])::-webkit-search-decoration,
+  :where(
+    [data-scope="text-field"][data-part="input"][type="search"]
+  )::-webkit-search-results-button,
+  :where(
+    [data-scope="text-field"][data-part="input"][type="search"]
+  )::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+
+  /* The built-in cancel button goes only while our ClearTrigger replaces it. */
+  :where(
+    [data-scope="text-field"][data-part="input"][type="search"][data-custom-clear]
+  )::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+
+  /* Room for a leading icon only when one is there. */
+  :where(
+    [data-scope="text-field"][data-part="root"]:has([data-part="icon"])
+      [data-part="input"][type="search"]
+  ) {
+    padding-inline-start: var(--rind-text-field-icon-space, calc(1em + var(--rind-space-3) * 2));
+  }
+
+  :where([data-scope="text-field"][data-part="icon"]) {
+    grid-area: control;
+    justify-self: start;
+    align-self: center;
+    margin-inline-start: var(--rind-space-3);
+    z-index: 1;
+    display: inline-flex;
+    inline-size: 1em;
+    block-size: 1em;
+    color: var(--rind-text-field-icon-color, var(--rind-color-text-muted));
+    pointer-events: none;
+  }
+
+  :where([data-scope="text-field"][data-part="icon"]:empty) {
+    background-color: currentColor;
+    mask-image: var(--rind-text-field-search-icon, var(--rind-icon-magnifying-glass));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
   @media (forced-colors: active) {
     :where(
         [data-scope="text-field"][data-part="input"],
@@ -235,6 +423,30 @@
         [data-scope="text-field"][data-part="root"][data-disabled] [data-part="description"]
       ) {
       color: GrayText;
+    }
+
+    :where([data-scope="text-field"][data-part="visibility-trigger"]) {
+      color: ButtonText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="text-field"][data-part="visibility-indicator"]:empty),
+    :where([data-scope="text-field"][data-part="icon"]:empty) {
+      background-color: ButtonText;
+    }
+
+    /* Pressed without colour: the underline is drawn in a system colour. */
+    :where([data-scope="text-field"][data-part="visibility-trigger"][aria-pressed="true"]) {
+      box-shadow: inset 0 -2px 0 ButtonText;
+    }
+
+    :where([data-scope="text-field"][data-part="visibility-trigger"][data-disabled]) {
+      color: GrayText;
+    }
+
+    :where([data-scope="text-field"][data-part="visibility-trigger"][data-disabled])
+      :where([data-part="visibility-indicator"]:empty) {
+      background-color: GrayText;
     }
   }
 }

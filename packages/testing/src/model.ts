@@ -819,7 +819,9 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       0,
       ...Object.values(impl.delays ?? {}).map((d) => {
         try {
-          return Number(d({ props: oracle.props })) || 0
+          return (
+            Number(d({ props: oracle.props, context: oracle.service.getSnapshot().context })) || 0
+          )
         } catch {
           return 0
         }
@@ -1168,7 +1170,11 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         const announcedBefore = (await base.announcements()).length
         let stepMod: Modality | null = null
         if (mapping?.kind === "delay") {
-          const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
+          const ms =
+            impl.delays?.[edge.event.slice(6)]?.({
+              props: oracle.props,
+              context: oracle.service.getSnapshot().context,
+            }) ?? 0
           const valuesBefore = formValues()
           send(edge.event)
           // A value changed by a timer of a held gesture (a stepper's repeat) is the user's.

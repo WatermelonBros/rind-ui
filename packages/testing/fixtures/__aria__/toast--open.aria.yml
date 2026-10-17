@@ -1,0 +1,14 @@
+- region "Open notifications (F6)":
+  - list:
+    - listitem "Upload held":
+      - text: Upload held
+      - button "Dismiss notification"
+    - listitem "Message archived":
+      - text: Message archived
+      - button "Undo"
+      - button "Dismiss notification"
+    - listitem "Sync finished":
+      - text: Sync finished
+      - button "Dismiss notification"
+- log
+- log
