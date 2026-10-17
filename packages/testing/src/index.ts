@@ -71,6 +71,7 @@ export { getToggleGroup } from "./components/toggle-group"
 export { getToolbar } from "./components/toolbar"
 export { getTooltip } from "./components/tooltip"
 export { getTour } from "./components/tour"
+export { fixedDateClock } from "./date-clock"
 export {
   type FakeDelayGroup,
   type FakeHoverIntent,
