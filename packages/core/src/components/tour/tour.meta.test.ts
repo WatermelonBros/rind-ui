@@ -36,6 +36,7 @@ describe("tour meta matches the code", () => {
         placement: placementFrom({ side: "bottom", align: "start", anchorHidden: true }),
         closeReason: "escape-key",
         shownOnce: true,
+        stepChanging: true,
         preventTargetInteraction: true,
         rendered: { title: "ti", description: "de" },
         contentMounted: true,

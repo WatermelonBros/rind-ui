@@ -88,6 +88,8 @@ export type TourEvent =
       readonly first: boolean
     }
   | { readonly type: "POSITION.REPOSITION" }
+  /** The spotlight's step-change transition ended, or a scroll or resize came after it. */
+  | { readonly type: "SPOTLIGHT.SETTLED" }
 
 /** Spotlight geometry options (tour-wide). */
 export interface TourSpotlightOptions {
@@ -172,6 +174,11 @@ export interface TourContext {
   readonly startFocus: Element | null
   /** The tour ran since it was created (idle's entry restores focus only after a run). */
   readonly ran: boolean
+  /**
+   * The shown step replaced another one of the same run: the spotlight may animate
+   * (`data-step-changing`) until its transition ends or a later scroll or resize settles it.
+   */
+  readonly stepChanging: boolean
 }
 
 export const tourIds = (root: string) => ({
@@ -359,6 +366,7 @@ export const tourMachine = setup({
       set("closeReason", null)
       set("shownOnce", false)
       set("ran", true)
+      set("stepChanging", false)
       set("patches", {})
       set("visit", null)
       set("keepVisit", false)
@@ -427,11 +435,13 @@ export const tourMachine = setup({
         event.visit.handedOff = true
       }
     },
-    adoptVisit: ({ event, set }) => {
+    adoptVisit: ({ event, context, set }) => {
       if (event.type !== "STEP.READY" && event.type !== "STEP.MISSING") return
       set("visit", event.visit)
       set("keepVisit", false)
       set("targetMissing", event.type === "STEP.MISSING")
+      // Not on a run's first step: there is nothing to animate from.
+      set("stepChanging", context.shownOnce)
       set("stepId", event.visit.stepId)
     },
     reportMissing: ({ props, context }) => {
@@ -464,6 +474,7 @@ export const tourMachine = setup({
       if (event.first) set("shownOnce", true)
     },
     reposition: ({ env, props }) => env.position.reposition(tourIds(props.root).positioner),
+    settleSpotlight: ({ set }) => set("stepChanging", false),
     applyPatch: ({ event, context, set }) => {
       if (event.type !== "STEP.UPDATE") return
       set("patches", {
@@ -663,9 +674,7 @@ export const tourMachine = setup({
       const id = tourLayerId(props.root)
       const stop = overlayEffect(env, {
         id,
-        // Fallback for request #1 (no "tour" layer kind yet): a popover of family "tour".
-        kind: "popover",
-        family: "tour",
+        kind: "tour",
         modal,
         parent: props.parent,
         opener: () => byId(ids.trigger),
@@ -767,6 +776,7 @@ export const tourMachine = setup({
       const radius = props.spotlight?.radius ?? 8
       const cardCutout = contentCutout(props.spotlight)
       let paintQueued = false
+      let markerWaits = 3
       const paint = () => {
         paintQueued = false
         const vv = view?.visualViewport
@@ -795,6 +805,15 @@ export const tourMachine = setup({
           backdrop.style.setProperty("--rind-tour-viewport-height", `${viewport.height}px`)
         }
         const spot = byId(ids.spotlight)
+        // A step change animates only once connect's `data-step-changing` is in the DOM:
+        // until the framework commits it, keep the old geometry (a frame or two at most).
+        if (spot && a.context.stepChanging && !spot.hasAttribute("data-step-changing")) {
+          if (markerWaits-- > 0) {
+            const f = env.scheduler.requestAnimationFrame(paint)
+            cleanups.push(() => env.scheduler.cancelAnimationFrame(f))
+            return
+          }
+        }
         if (spot && t) {
           spot.style.setProperty("--rind-tour-spotlight-x", `${t.x - padding.x}px`)
           spot.style.setProperty("--rind-tour-spotlight-y", `${t.y - padding.y}px`)
@@ -867,11 +886,13 @@ export const tourMachine = setup({
       if (centered) {
         // Placed by CSS: the first placement is the content's mount.
         let frame: ReturnType<typeof env.scheduler.requestAnimationFrame> | null = null
+        // Bounded: a tour rendered without Content stops looking after about two seconds.
+        let left = 120
         const wait = () => {
           frame = null
           if (stopped) return
           if (!byId(ids.content)) {
-            frame = env.scheduler.requestAnimationFrame(wait)
+            if (left-- > 0) frame = env.scheduler.requestAnimationFrame(wait)
             return
           }
           schedulePaint()
@@ -1028,6 +1049,7 @@ export const tourMachine = setup({
       focusWasInside: false,
       startFocus: null,
       ran: false,
+      stepChanging: false,
     }
   },
   values: {
@@ -1150,6 +1172,7 @@ export const tourMachine = setup({
         "TARGET.LOST": { target: "preparing", actions: ["setPendingSame"] },
         "POSITION.PLACED": { actions: ["setPlacement"] },
         "POSITION.REPOSITION": { actions: ["reposition"] },
+        "SPOTLIGHT.SETTLED": { actions: ["settleSpotlight"] },
         "STEP.UPDATE": { actions: ["applyPatch"] },
         "STEPS.SET": [
           {

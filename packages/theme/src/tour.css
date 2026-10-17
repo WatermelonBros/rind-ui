@@ -6,6 +6,7 @@
  * its transition is off while the tour is placing a step (data-placing on the positioner is
  * not visible from here, so the transition is limited to left/top/width/height changes of a
  * new step and disabled under reduced motion). Forced colors: no scrim, a visible ring.
+ * The spotlight transitions only while the tour marks a step change (data-step-changing).
  */
 @layer rind.components {
   [data-scope="tour"][data-part="backdrop"] {
@@ -29,6 +30,9 @@
     outline: var(--rind-tour-ring-width, 2px) solid
       var(--rind-tour-ring-color, var(--rind-focus-color));
     z-index: calc(1000 + var(--layer-index, 0));
+  }
+  /* Between steps only (set by the tour for one step change): never on scroll or resize. */
+  [data-scope="tour"][data-part="spotlight"][data-step-changing] {
     transition:
       left var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),
       top var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),

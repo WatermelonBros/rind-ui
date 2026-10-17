@@ -219,6 +219,9 @@ function tourContractWith(_modal: boolean) {
       "TARGET.LOST": { skip: "DOM driven: covered by the browser tests" },
       "POSITION.PLACED": { skip: "emitted by positioning (fakePositioning in the node tests)" },
       "POSITION.REPOSITION": { skip: "an API call (reposition()): covered by the DOM tests" },
+      "SPOTLIGHT.SETTLED": {
+        skip: "the spotlight's transition end or a scroll: covered by the browser tests",
+      },
       "$sync:open": { props: (target) => ({ open: target !== "idle" }) },
       "$props:steps": { skip: "a new steps array: covered by the machine tests" },
       "$props:stepId": { skip: "a controlled stepId: covered by the machine tests" },

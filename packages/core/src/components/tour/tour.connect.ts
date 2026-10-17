@@ -61,6 +61,8 @@ export interface TourConnectInput {
   readonly closeReason: TourCloseReason | null
   /** A step was placed since the start: the backdrop may paint. */
   readonly shownOnce: boolean
+  /** The shown step replaced another: the spotlight may animate (`data-step-changing`). */
+  readonly stepChanging?: boolean | undefined
   readonly preventTargetInteraction: boolean
   /** Ids of the mounted title and description: the only source of the ARIA references. */
   readonly rendered: {
@@ -162,6 +164,8 @@ export function tourConnect(input: TourConnectInput, send: (event: TourEvent) =>
     backdrop: (): PartProps => ({
       ...scopeAttrs("tour", "backdrop", instance),
       id: ids.backdrop,
+      // A step with `backdrop: false` dims nothing (the node stays: no flash on the next step).
+      hidden: step?.backdrop === false ? true : undefined,
       "aria-hidden": "true",
       "data-state": running ? "open" : "closed",
       "data-phase": phase,
@@ -170,8 +174,9 @@ export function tourConnect(input: TourConnectInput, send: (event: TourEvent) =>
         position: "fixed",
         inset: "0",
         "pointer-events": "none",
-        // Not painted before the first placement of the run (no stale or origin frame).
-        ...(input.shownOnce ? {} : { visibility: "hidden" }),
+        // Not painted before the first placement of the run (no stale or origin frame); a
+        // run that starts on a wait step dims at once (no cutout yet).
+        ...(input.shownOnce || input.state === "waiting" ? {} : { visibility: "hidden" }),
         ...layerIndex(0),
       },
     }),
@@ -181,8 +186,11 @@ export function tourConnect(input: TourConnectInput, send: (event: TourEvent) =>
       "aria-hidden": "true",
       "data-state": shown ? "open" : "closed",
       "data-shield": dataFlag(shield),
-      hidden: centered || !input.placement.placed ? true : undefined,
+      "data-step-changing": dataFlag(shown && input.stepChanging === true),
+      hidden: centered ? true : undefined,
       style: {
+        // Invisible until placed, but not display: none: a step change keeps transitioning.
+        ...(input.placement.placed ? {} : { visibility: "hidden" }),
         position: "fixed",
         left: "var(--rind-tour-spotlight-x, 0px)",
         top: "var(--rind-tour-spotlight-y, 0px)",
@@ -325,6 +333,8 @@ export function tourConnect(input: TourConnectInput, send: (event: TourEvent) =>
     },
     pressClose: () => send({ type: "dismiss", close: true }),
     reposition: () => send({ type: "POSITION.REPOSITION" }),
+    /** The spotlight's step-change transition ended, or a scroll or resize came after it. */
+    settleSpotlight: () => send({ type: "SPOTLIGHT.SETTLED" }),
   }
 }
 

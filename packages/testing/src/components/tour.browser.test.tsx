@@ -251,3 +251,77 @@ describe("target interaction and tracking", () => {
     })
   })
 })
+
+describe("spotlight motion and timing", () => {
+  it("transitions on a step change only, never on scroll or resize", async () => {
+    // The theme's rule, scoped to the marker the tour sets for one step change.
+    const style = document.createElement("style")
+    style.textContent =
+      '[data-part="spotlight"][data-step-changing]{transition:left 80ms linear,top 80ms linear}'
+    document.head.append(style)
+    try {
+      const steps: TourStepDef[] = [
+        { id: "a", title: "A", target: byId("t1"), actions: nav },
+        { id: "b", title: "B", target: byId("t2"), actions: nav },
+      ]
+      render(
+        <App steps={steps}>
+          <div style={{ height: 3000 }}>
+            {box("t1", { left: 20, top: 20, width: 40, height: 40 })}
+            {box("t2", { left: 300, top: 200, width: 40, height: 40 })}
+          </div>
+        </App>,
+      )
+      const t = getTour(screen, { name: "Take the tour" })
+      await t.start()
+      await placed()
+      const spot = () => part("spotlight") as HTMLElement
+      // The first step of a run does not animate in.
+      expect(spot().hasAttribute("data-step-changing")).toBe(false)
+      await t.next()
+      await shownStep("b")
+      await vi.waitFor(() => expect(spot().getAnimations().length).toBeGreaterThan(0))
+      expect(spot().hasAttribute("data-step-changing")).toBe(true)
+      // The step change runs to its end (a condition, with a deadline), which ends the marker.
+      await vi.waitFor(() => expect(spot().hasAttribute("data-step-changing")).toBe(false))
+      expect(spot().getAnimations()).toHaveLength(0)
+      // A scroll after it: the spotlight follows its target without animating.
+      const target = document.getElementById("t2") as HTMLElement
+      target.style.top = "260px"
+      window.dispatchEvent(new Event("scroll"))
+      await vi.waitFor(() => expect(px(spot(), "--rind-tour-spotlight-y")).toBe(252))
+      expect(spot().getAnimations()).toHaveLength(0)
+      target.style.top = "300px"
+      window.dispatchEvent(new Event("resize"))
+      await vi.waitFor(() => expect(px(spot(), "--rind-tour-spotlight-y")).toBe(292))
+      expect(spot().getAnimations()).toHaveLength(0)
+    } finally {
+      style.remove()
+    }
+  })
+
+  it("prepareTimeout defaults to 5000 ms (fake timers, no real time)", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] })
+    try {
+      const onMissingTarget = vi.fn()
+      render(
+        <App
+          onMissingTarget={onMissingTarget}
+          steps={[
+            { id: "gone", title: "Gone", target: () => document.getElementById("nope") },
+            { id: "next", title: "Next" },
+          ]}
+        />,
+      )
+      // No vi.waitFor before the advance: it moves fake timers by itself.
+      await userEvent.click(screen.getByRole("button", { name: "Take the tour" }))
+      vi.advanceTimersByTime(4999)
+      expect(onMissingTarget).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(1)
+      expect(onMissingTarget).toHaveBeenCalledWith({ stepId: "gone", policy: "skip" })
+      await shownStep("next")
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})

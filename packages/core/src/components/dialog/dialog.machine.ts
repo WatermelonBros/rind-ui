@@ -127,6 +127,8 @@ export const DIALOG_PARENT_KINDS: readonly LayerKind[] = [
   "alertdialog",
   "drawer",
   "popover",
+  // A dialog opened from a tour's card or target keeps the tour on its step.
+  "tour",
 ]
 
 /** The parts whose press closes the dialog (each a close event of the graph). */

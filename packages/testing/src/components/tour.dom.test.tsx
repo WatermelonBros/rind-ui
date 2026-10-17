@@ -621,3 +621,42 @@ describe("presence", () => {
     expect(handle?.stepIndex).toBe(1)
   })
 })
+
+describe("backdrop", () => {
+  const backdrop = () =>
+    document.querySelector<HTMLElement>('[data-scope="tour"][data-part="backdrop"]')
+
+  it("a step with backdrop: false dims nothing; the next step dims again (same node)", async () => {
+    render(
+      <App
+        steps={[
+          { id: "a", title: "A", target: byId("search"), backdrop: false, actions: nav },
+          { id: "b", title: "B", target: byId("toolbar"), actions: nav },
+        ]}
+      />,
+    )
+    const t = getTour(screen, { name: "Take the tour" })
+    await t.start()
+    const node = backdrop()
+    expect(node?.hidden).toBe(true)
+    await t.next()
+    await shownStep("b")
+    expect(backdrop()).toBe(node)
+    expect(backdrop()?.hidden).toBe(false)
+  })
+
+  it("a run that starts on a wait step dims at once", async () => {
+    render(
+      <App
+        steps={[
+          { id: "w", type: "wait", effect: () => new Promise(() => {}) },
+          { id: "b", title: "B" },
+        ]}
+      />,
+    )
+    await userEvent.setup().click(screen.getByRole("button", { name: "Take the tour" }))
+    await vi.waitFor(() => expect(backdrop()?.getAttribute("data-phase")).toBe("waiting"))
+    expect(backdrop()?.hidden).toBe(false)
+    expect(backdrop()?.style.visibility).toBe("")
+  })
+})

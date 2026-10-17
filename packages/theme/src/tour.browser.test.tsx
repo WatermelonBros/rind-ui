@@ -49,6 +49,16 @@ describe("Tour stylesheet", () => {
     expect(getComputedStyle(el).paddingTop).toBe("21px")
   })
 
+  it("the spotlight transitions only while a step change is marked", () => {
+    sheet()
+    const host = mount(`<div data-scope="tour" data-part="spotlight" style="position:fixed"></div>`)
+    const el = q(host, '[data-part="spotlight"]')
+    expect(getComputedStyle(el).transitionProperty).toBe("all")
+    expect(getComputedStyle(el).transitionDuration).toBe("0s")
+    el.setAttribute("data-step-changing", "")
+    expect(getComputedStyle(el).transitionProperty).toContain("left")
+  })
+
   it("has forced-colors and reduced-motion rules", () => {
     expect(tour).toMatch(/@media \(forced-colors: active\)[\s\S]*background: transparent/)
     expect(tour).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*transition: none/)

@@ -310,6 +310,7 @@ function useApi(
         placement: context.placement,
         closeReason: context.closeReason,
         shownOnce: context.shownOnce,
+        stepChanging: context.stepChanging,
         preventTargetInteraction: tour.props.preventTargetInteraction === true,
         rendered: ctx.rendered,
         contentMounted: ctx.contentMounted,
@@ -424,6 +425,32 @@ function Spotlight({ render, ref, ...rest }: Own<"div">) {
   const { api, state } = useApi(ctx)
   const node = useRef<HTMLElement | null>(null)
   const { mounted } = usePresence(state === "active" && !api.centered, node)
+  const changing = useSelector(ctx.tour.service, (v) => (v.context as TourContext).stepChanging)
+  // The step change ends with the spotlight's own transition, or with the first scroll or
+  // resize once nothing animates any more (the step's own scrollIntoView does not end it).
+  const { send } = ctx.tour.service
+  useEffect(() => {
+    const el = node.current
+    if (!changing || !mounted || !el) return
+    const settle = () => send({ type: "SPOTLIGHT.SETTLED" })
+    const view = el.ownerDocument.defaultView
+    const onTransition = (e: Event) => {
+      if (e.target === el) settle()
+    }
+    const onMove = () => {
+      if (!el.getAnimations?.().length) settle()
+    }
+    el.addEventListener("transitionend", onTransition)
+    el.addEventListener("transitioncancel", onTransition)
+    view?.addEventListener("scroll", onMove, { capture: true, passive: true })
+    view?.addEventListener("resize", onMove)
+    return () => {
+      el.removeEventListener("transitionend", onTransition)
+      el.removeEventListener("transitioncancel", onTransition)
+      view?.removeEventListener("scroll", onMove, { capture: true })
+      view?.removeEventListener("resize", onMove)
+    }
+  }, [changing, mounted, send])
   if (!mounted) return null
   const props = mergeProps(
     { ...normalizeProps(api.spotlight()), ref: composeRefs(node, ref) },
@@ -529,7 +556,7 @@ function Content({
       // Headings inside the card are one level below the title; layers opened from here
       // are the tour's children.
       children: (
-        <LayerProvider layer={tourLayerId(ctx.tour.root)} kind="popover">
+        <LayerProvider layer={tourLayerId(ctx.tour.root)} kind="tour">
           <Heading.Level level={Math.min(6, ctx.titleLevel + 1) as HeadingLevel}>
             {children}
           </Heading.Level>

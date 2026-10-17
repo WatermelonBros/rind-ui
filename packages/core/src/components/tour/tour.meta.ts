@@ -237,6 +237,8 @@ export const tourMeta = {
       ...base("spotlight"),
       "data-state": '"open" while a step is shown.',
       "data-shield": "While it swallows presses on the target.",
+      "data-step-changing":
+        "For one step change, until its transition ends or a later scroll or resize: animate the spotlight only under it.",
     },
     positioner: {
       ...base("positioner"),
