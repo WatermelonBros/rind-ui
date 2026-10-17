@@ -1,0 +1,4 @@
+- text: City
+- combobox "City": Paris
+- button "Clear"
+- button "Show suggestions"

@@ -312,10 +312,7 @@ const TRANSIENT = new Set([
  * Components merged before their site examples: the docs session's PR adds the examples and
  * removes the entry. Every component PR brings its own state examples, so this stays empty.
  */
-const EXAMPLES_PENDING = new Set([
-  // Select (#73): examples in the docs session's Select PR.
-  "select",
-])
+const EXAMPLES_PENDING = new Set<string>()
 
 describe("state examples", () => {
   it("every state of every component contract has a state example", () => {

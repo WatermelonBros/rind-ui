@@ -1,0 +1,435 @@
+/*
+ * Combobox (family: field): the Control is the recessed field that wraps the Input and the
+ * buttons and is the popup anchor; the Input inside it is borderless. The popup is a raised
+ * panel as wide as the Control (--rind-anchor-width, written by core) and never taller than the
+ * space left (--rind-available-height). Selected options carry a background, a heavier weight
+ * AND the item indicator (WCAG 1.4.1: never colour alone). Highlight is the cursor
+ * (aria-activedescendant), not the selection. Entry uses @starting-style, exit [data-state=closed].
+ * Colours never transition.
+ */
+@layer rind.components {
+  :where([data-scope="combobox"][data-part="label"]) {
+    display: block;
+    font-size: var(--rind-text-sm);
+    font-weight: 580;
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="combobox"][data-part="control"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    inline-size: 100%;
+    min-block-size: var(
+      --rind-combobox-control-height,
+      var(--rind-size-control, var(--rind-size-md))
+    );
+    padding-inline: var(
+      --rind-combobox-control-padding,
+      var(--rind-space-control, var(--rind-space-3))
+    );
+    border: var(--rind-border-width) solid
+      var(--rind-combobox-control-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-combobox-control-radius, var(--rind-radius-control));
+    background: var(--rind-combobox-control-bg, var(--rind-color-surface-raised));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+  }
+
+  :where([data-scope="combobox"][data-part="control"][data-variant="soft"]) {
+    background: var(--rind-combobox-control-soft-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="combobox"][data-part="control"][data-variant="ghost"]) {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  /* Focus anywhere in the component rings the Control; the Input draws no ring of its own. */
+  :where([data-scope="combobox"][data-part="control"][data-focus]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* Invalid: danger edge plus a doubled border, so the cue survives without colour. */
+  :where([data-scope="combobox"][data-part="control"][data-invalid]) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-combobox-control-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="combobox"][data-part="control"][data-readonly]) {
+    background: var(--rind-combobox-control-readonly-bg, var(--rind-color-surface));
+  }
+
+  :where([data-scope="combobox"][data-part="control"][data-disabled]) {
+    background: var(--rind-combobox-control-disabled-bg, var(--rind-color-surface));
+    border-color: var(--rind-combobox-control-disabled-border, var(--rind-color-border));
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="combobox"][data-part="input"]) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: var(--rind-leading-normal);
+    outline: none;
+  }
+
+  /* iOS zooms into a focused input under 16px: never smaller on touch screens. */
+  @media (pointer: coarse) {
+    :where([data-scope="combobox"][data-part="input"]) {
+      font-size: max(16px, var(--rind-text-control, var(--rind-text-sm)));
+    }
+  }
+
+  :where([data-scope="combobox"][data-part="input"])::placeholder {
+    color: var(--rind-combobox-placeholder, var(--rind-color-text-muted));
+    opacity: 1;
+  }
+
+  :where([data-scope="combobox"][data-part="input"][disabled]) {
+    cursor: not-allowed;
+  }
+
+  /* Trigger and ClearTrigger: 24px keys (WCAG 2.5.8) drawing a glyph in currentColor. */
+  :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"])) {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-combobox-button-radius, var(--rind-radius-indicator));
+    background: transparent;
+    color: var(--rind-combobox-button-color, var(--rind-color-text-muted));
+    cursor: pointer;
+  }
+
+  :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"])):hover {
+    color: var(--rind-combobox-button-color-hover, var(--rind-color-text));
+  }
+
+  :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"])[disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]))::after {
+    content: "";
+    inline-size: var(--rind-combobox-icon-size, 1em);
+    block-size: var(--rind-combobox-icon-size, 1em);
+    background-color: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="combobox"][data-part="trigger"])::after {
+    mask-image: var(--rind-combobox-trigger-icon, var(--rind-icon-caret-down));
+  }
+
+  :where([data-scope="combobox"][data-part="trigger"][data-state="open"])::after {
+    mask-image: var(--rind-combobox-trigger-icon-open, var(--rind-icon-caret-up));
+  }
+
+  :where([data-scope="combobox"][data-part="clear-trigger"])::after {
+    mask-image: var(--rind-combobox-clear-icon, var(--rind-icon-x));
+  }
+
+  /* Nothing to clear: the button is not shown (it also leaves the tab order in core). */
+  :where([data-scope="combobox"][data-part="clear-trigger"]:not([data-visible])) {
+    display: none;
+  }
+
+  /* The popup. */
+  :where([data-scope="combobox"][data-part="popup"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-anchor-width, auto);
+    min-inline-size: var(--rind-combobox-popup-min-width, 0);
+    max-inline-size: var(--rind-available-width, 100vw);
+    max-block-size: min(
+      var(--rind-combobox-popup-max-height, 20rem),
+      var(--rind-available-height, 100vh)
+    );
+    overflow: auto;
+    padding: var(--rind-combobox-popup-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid
+      var(--rind-combobox-popup-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-combobox-popup-radius, var(--rind-radius-md));
+    background: var(--rind-combobox-popup-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-combobox-popup-shadow, var(--rind-shadow-sm));
+    color: var(--rind-color-text);
+    transform-origin: var(--rind-transform-origin);
+    transition:
+      opacity var(--rind-duration-normal) var(--rind-ease-out),
+      transform var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  :where([data-scope="combobox"][data-part="popup"][data-variant="soft"]) {
+    background: var(--rind-combobox-popup-soft-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="combobox"][data-part="popup"][data-state="open"]) {
+    opacity: 1;
+    transform: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  :where([data-scope="combobox"][data-part="popup"][data-state="closed"]) {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  :where([data-scope="combobox"][data-part="popup"][data-side="top"]) {
+    --rind-pop-from: translateY(4px) scale(0.97);
+  }
+
+  :where([data-scope="combobox"][data-part="popup"][data-side="bottom"]) {
+    --rind-pop-from: translateY(-4px) scale(0.97);
+  }
+
+  :where([data-scope="combobox"][data-part="list"]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-combobox-gap, var(--rind-space-1));
+    margin: 0;
+    padding: 0;
+  }
+
+  :where([data-scope="combobox"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-combobox-item-height, var(--rind-hit-area));
+    padding: var(--rind-combobox-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-radius-sm);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-highlighted]) {
+    background: var(--rind-combobox-item-highlight-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-combobox-item-highlight-text, var(--rind-color-text));
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-state="checked"]) {
+    background: var(--rind-combobox-item-selected-bg, var(--rind-color-accent-soft));
+    color: var(--rind-combobox-item-selected-text, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-state="checked"][data-highlighted]) {
+    background: var(--rind-combobox-item-selected-bg, var(--rind-color-accent-soft-hover));
+  }
+
+  /* Item variants: how the highlight reads. soft is the default above. */
+  :where([data-scope="combobox"][data-part="item"][data-variant="solid"][data-highlighted]) {
+    background: var(--rind-combobox-item-solid-bg, var(--rind-color-accent-solid));
+    color: var(--rind-combobox-item-solid-text, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-variant="outline"][data-highlighted]) {
+    background: transparent;
+    box-shadow: inset 0 0 0 var(--rind-border-width)
+      var(--rind-combobox-item-outline, var(--rind-color-border-strong));
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-variant="ghost"][data-highlighted]) {
+    background: transparent;
+    text-decoration: underline;
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-disabled]) {
+    color: var(--rind-combobox-item-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="combobox"][data-part="item-text"]) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  /* The check: a mask in currentColor, so forced colors keep it. */
+  :where([data-scope="combobox"][data-part="item-indicator"]) {
+    flex: none;
+    inline-size: var(--rind-combobox-indicator-size, 1em);
+    block-size: var(--rind-combobox-indicator-size, 1em);
+    background-color: currentColor;
+    mask-image: var(--rind-combobox-indicator-icon, var(--rind-icon-check));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="combobox"][data-part="item-indicator"][data-state="unchecked"]) {
+    visibility: hidden;
+  }
+
+  :where([data-scope="combobox"][data-part="section-label"]) {
+    padding: var(--rind-space-1) var(--rind-space-2);
+    color: var(--rind-combobox-group-label-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    letter-spacing: var(--rind-tracking-label);
+  }
+
+  :where([data-scope="combobox"][data-part="separator"]) {
+    margin: var(--rind-space-1) 0;
+    border: 0;
+    background: var(--rind-combobox-separator, var(--rind-color-border));
+    block-size: var(--rind-border-width);
+  }
+
+  :where([data-scope="combobox"][data-part="empty"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-combobox-empty-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="combobox"][data-part="load-more"]) {
+    min-block-size: 1px;
+  }
+
+  /* Chips (multiple): the toolbar wraps before the Input; a chip is a pill with its remove. */
+  :where([data-scope="combobox"][data-part="control"]):has([data-part="chips"]) {
+    flex-wrap: wrap;
+    padding-block: var(--rind-space-1);
+  }
+
+  :where([data-scope="combobox"][data-part="chips"]) {
+    display: contents;
+  }
+
+  :where([data-scope="combobox"][data-part="chip"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    padding-inline: var(--rind-space-2) 0;
+    border: var(--rind-border-width) solid
+      var(--rind-combobox-chip-border, var(--rind-color-border));
+    border-radius: var(--rind-combobox-chip-radius, var(--rind-radius-full, 999px));
+    background: var(--rind-combobox-chip-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-sm);
+    line-height: 1.5;
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-highlighted]) {
+    border-color: var(--rind-combobox-chip-highlight-border, var(--rind-color-accent-border));
+    background: var(--rind-combobox-chip-highlight-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="combobox"][data-part="chip"][data-disabled]) {
+    color: var(--rind-color-text-muted);
+  }
+
+  /* 24x24 target (WCAG 2.5.8) with a small glyph. */
+  :where([data-scope="combobox"][data-part="chip-remove"]) {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    cursor: default;
+  }
+
+  :where([data-scope="combobox"][data-part="chip-remove"]):hover {
+    background: var(--rind-combobox-chip-remove-hover-bg, var(--rind-color-neutral-soft-hover));
+  }
+
+  :where([data-scope="combobox"][data-part="chip-remove"][disabled]) {
+    display: none;
+  }
+
+  :where([data-scope="combobox"][data-part="control"]):has([data-part="chips"])
+    :where([data-part="input"]) {
+    flex: 1 1 6ch;
+    min-inline-size: 6ch;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="combobox"][data-part="popup"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="combobox"][data-part="control"]) {
+      background: Field;
+      color: FieldText;
+      border-color: FieldText;
+    }
+
+    :where([data-scope="combobox"][data-part="control"][data-disabled]) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    :where([data-scope="combobox"][data-part="control"][data-focus]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="combobox"][data-part="popup"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]))::after,
+    :where([data-scope="combobox"][data-part="item-indicator"]) {
+      background-color: CanvasText;
+    }
+
+    :where([data-scope="combobox"][data-part="chip"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="combobox"][data-part="chip"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: 1px;
+    }
+
+    :where([data-scope="combobox"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope="combobox"][data-part="item"][data-state="checked"]) {
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    :where(
+        [data-scope="combobox"][data-part="item"][data-state="checked"] [data-part="item-indicator"]
+      ) {
+      background-color: SelectedItemText;
+    }
+
+    :where([data-scope="combobox"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}
