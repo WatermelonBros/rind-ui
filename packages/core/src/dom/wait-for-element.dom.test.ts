@@ -86,9 +86,9 @@ describe("waitForElement", () => {
     const p = waitForElement(() => document.getElementById("never"), { signal: controller.signal })
     controller.abort()
     await expect(p).rejects.toBeInstanceOf(WaitAbortedError)
-    await expect(
-      waitForElement(() => null, { signal: controller.signal }),
-    ).rejects.toBeInstanceOf(WaitAbortedError)
+    await expect(waitForElement(() => null, { signal: controller.signal })).rejects.toBeInstanceOf(
+      WaitAbortedError,
+    )
   })
 
   it("rejects after the timeout through the given scheduler (fake time)", async () => {
