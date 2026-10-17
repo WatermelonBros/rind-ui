@@ -127,8 +127,23 @@ async function exercise(page: Page, url: string) {
   }
 }
 
+/**
+ * A layer that is still preparing (`data-phase="preparing"`: a step waiting for its target, a
+ * popup loading its content) may turn into a modal a moment after the click. Wait for every
+ * such layer to settle (a condition, with a deadline) so the modal check below sees it.
+ */
+async function settleLayers(page: Page) {
+  await page
+    .locator('[data-phase="preparing"]')
+    .first()
+    // Detached: no element matches any more (its phase moved on, or it unmounted).
+    .waitFor({ state: "detached", timeout: 2000 })
+    .catch(() => {})
+}
+
 /** A control may open a modal layer: close it (Escape, else its last button) before going on. */
 async function closeModals(page: Page, url: string) {
+  await settleLayers(page)
   for (let n = 0; n < 4; n++) {
     // a modal menu makes the page inert without aria-modal: it carries data-modal
     const modal = page.locator('[aria-modal="true"], [data-modal][data-state="open"]').last()

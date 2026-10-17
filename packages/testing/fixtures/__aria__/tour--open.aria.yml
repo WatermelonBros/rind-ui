@@ -1,0 +1,15 @@
+- text: Search
+- textbox "Search"
+- toolbar "Formatting":
+  - button "Bold"
+  - button "Italic"
+- button "Take the tour" [expanded]
+- log
+- log
+- dialog "Search":
+  - heading "Search" [level=2]
+  - paragraph: Find any file by name.
+  - text: 2 of 3
+  - button "Back"
+  - button "Next"
+  - button "Close"
