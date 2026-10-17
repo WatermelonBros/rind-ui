@@ -61,7 +61,6 @@ import * as tabs from "./tabs"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as toast from "./toast"
-import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
@@ -136,7 +135,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   tabs,
   "tags-input": tagsInput,
   "text-field": textField,
-  toggle,
   "toggle-group": toggleGroup,
   toolbar,
   toast,

@@ -13,18 +13,18 @@ const base = (part: string) => ({
 
 export const toggleMeta = {
   scope: "toggle",
-  name: "Toggle",
+  name: "ToggleGroup.Item",
   stateless: false,
   parts: [
     {
-      name: "Toggle.Root",
+      name: "ToggleGroup.Item",
       part: "root",
       element: "button",
       description:
         'The two-state button (`type="button"`, `aria-pressed` always explicit); a substituted non-button gets `role="button"` and `tabIndex=0`.',
     },
     {
-      name: "Toggle.Indicator",
+      name: "ToggleGroup.ItemIndicator",
       part: "indicator",
       element: "span",
       description:
@@ -55,7 +55,7 @@ export const toggleMeta = {
     },
     fallback: {
       type: "ReactNode",
-      description: "Toggle.Indicator only: rendered while the toggle is off.",
+      description: "ToggleGroup.ItemIndicator only: rendered while the toggle is off.",
     },
   },
   dataAttributes: {
