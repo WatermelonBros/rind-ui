@@ -1,0 +1,313 @@
+/*
+ * Toast: a stack of notifications pinned to a viewport corner or edge. The region is a fixed,
+ * pointer-transparent box as tall as the front toast; every toast is absolutely placed in it
+ * from the variables the connect writes (--rind-toast-index, --rind-toast-offset,
+ * --rind-toast-height on the toast; --rind-toast-front-height, --rind-toast-gap on the region)
+ * and the swipe offset (--rind-toast-swipe-x / -y). Movement never goes through a state.
+ *
+ * Collapsed: the front toast at full size, the next two peeking behind it (scale and a small
+ * shift), the rest hidden. Expanded (hover, focus, or the `expand` option): each toast at its
+ * own --rind-toast-offset. The shift away from the pinned edge is --_dir (-1 at the bottom,
+ * 1 at the top).
+ *
+ * --rind-toast-offset is the viewport margin as a token on the region; on a toast the machine
+ * writes it inline as the stack offset, which shadows the token there.
+ */
+@layer rind.components {
+  [data-scope="toast"][data-part="region"] {
+    --_dir: -1;
+    --_inset-x: calc(
+      var(--rind-toast-offset, 1rem) +
+      max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+    );
+    --_inset-y: calc(var(--rind-toast-offset, 1rem) + env(safe-area-inset-top, 0px));
+    --_inset-b: calc(var(--rind-toast-offset, 1rem) + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+    position: fixed;
+    z-index: var(--rind-toast-z-index, 2147483000);
+    inline-size: var(--rind-toast-width, 22rem);
+    max-inline-size: calc(100vw - 2 * var(--_inset-x));
+    block-size: var(--rind-toast-front-height, 0px);
+    margin: 0;
+    padding: 0;
+    /* Only the toasts (and the gap filler while expanded) take the pointer. */
+    pointer-events: none;
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-sm);
+    line-height: 1.4;
+    /* The region is focused by the hotkey: the ring would frame an empty box. */
+    outline: none;
+  }
+
+  [data-scope="toast"][data-part="region"][data-side="top"] {
+    --_dir: 1;
+    inset-block-start: var(--_inset-y);
+  }
+  [data-scope="toast"][data-part="region"][data-side="bottom"] {
+    inset-block-end: var(--_inset-b);
+  }
+  [data-scope="toast"][data-part="region"][data-align="start"] {
+    inset-inline-start: var(--_inset-x);
+  }
+  [data-scope="toast"][data-part="region"][data-align="end"] {
+    inset-inline-end: var(--_inset-x);
+  }
+  [data-scope="toast"][data-part="region"][data-align="center"] {
+    inset-inline: 0;
+    margin-inline: auto;
+  }
+
+  /*
+   * Fills the gaps between expanded toasts (and the space they grow into) so the pointer
+   * never leaves the region between two toasts and the stack does not collapse under it.
+   */
+  [data-scope="toast"][data-part="region"][data-expanded]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    block-size: calc(
+      (var(--rind-toast-front-height, 0px) + var(--rind-toast-gap, 14px)) *
+      var(--rind-toast-fill, 6)
+    );
+    pointer-events: auto;
+  }
+  [data-scope="toast"][data-part="region"][data-side="bottom"][data-expanded]::after {
+    inset-block-end: 0;
+  }
+  [data-scope="toast"][data-part="region"][data-side="top"][data-expanded]::after {
+    inset-block-start: 0;
+  }
+
+  [data-scope="toast"][data-part="list"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  [data-scope="toast"][data-part="root"] {
+    --_accent: var(--rind-toast-info-accent, var(--rind-color-accent-solid));
+    --_peek: var(--rind-toast-peek, 0.75rem);
+    --_enter: calc(var(--_dir) * -100%);
+    box-sizing: border-box;
+    position: absolute;
+    inset-inline: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "glyph title action close"
+      "glyph description action close";
+    align-items: center;
+    column-gap: var(--rind-toast-gap-inner, var(--rind-space-3));
+    row-gap: var(--rind-space-1);
+    padding: var(--rind-toast-padding, var(--rind-space-3) var(--rind-space-4));
+    background: var(--rind-toast-bg, var(--rind-color-surface-raised));
+    color: var(--rind-toast-fg, var(--rind-color-text));
+    border: var(--rind-border-width) solid var(--rind-toast-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-toast-radius, var(--rind-radius-panel));
+    box-shadow: var(--rind-toast-shadow, var(--rind-shadow-lg));
+    pointer-events: auto;
+    touch-action: pan-y;
+    user-select: none;
+    z-index: calc(100 - var(--rind-toast-index, 0));
+    transform-origin: center;
+    transition-property: transform, translate, opacity, block-size;
+    transition-duration: var(--rind-toast-duration, var(--rind-duration-normal));
+    transition-timing-function: var(--rind-ease-out);
+    /* Swipe: the drag offset on top of the stack transform. */
+    translate: var(--rind-toast-swipe-x, 0px) var(--rind-toast-swipe-y, 0px);
+  }
+
+  [data-scope="toast"][data-part="region"][data-side="bottom"]
+    [data-scope="toast"][data-part="root"] {
+    inset-block-end: 0;
+    transform-origin: bottom center;
+  }
+  [data-scope="toast"][data-part="region"][data-side="top"] [data-scope="toast"][data-part="root"] {
+    inset-block-start: 0;
+    transform-origin: top center;
+  }
+
+  /* Collapsed: peeking behind the front toast. */
+  [data-scope="toast"][data-part="root"]:not([data-expanded]) {
+    transform: translateY(calc(var(--_dir) * var(--_peek) * var(--rind-toast-index, 0)))
+      scale(calc(1 - 0.05 * var(--rind-toast-index, 0)));
+  }
+  [data-scope="toast"][data-part="root"]:not([data-expanded], [data-front]) {
+    block-size: var(--rind-toast-front-height, auto);
+    overflow: hidden;
+  }
+  [data-scope="toast"][data-part="root"]:not([data-expanded], [data-front]) > * {
+    opacity: 0;
+  }
+  /* Beyond the third: out of sight, out of reach. */
+  [data-scope="toast"][data-part="root"][data-index]:not(
+    [data-expanded],
+    :is([data-index="0"], [data-index="1"], [data-index="2"])
+  ) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Expanded: each toast at its own offset, full size. */
+  [data-scope="toast"][data-part="root"][data-expanded] {
+    transform: translateY(calc(var(--_dir) * var(--rind-toast-offset, 0px)));
+  }
+
+  /* Held beyond the limit: inert already, and not shown. */
+  [data-scope="toast"][data-part="root"][data-limited] {
+    display: none;
+  }
+
+  /* Entry: from the pinned edge. */
+  [data-scope="toast"][data-part="root"][data-state="open"] {
+    @starting-style {
+      opacity: 0;
+      translate: 0 var(--_enter);
+    }
+  }
+
+  /* The toast follows the pointer one to one while dragged. */
+  [data-scope="toast"][data-part="root"][data-swiping] {
+    transition-property: none;
+  }
+
+  /* Exit: fades; after a swipe, it leaves the way it was thrown. */
+  [data-scope="toast"][data-part="root"][data-state="closed"] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  [data-scope="toast"][data-part="root"][data-swipe-out][data-swipe-direction="left"] {
+    translate: -150% 0;
+  }
+  [data-scope="toast"][data-part="root"][data-swipe-out][data-swipe-direction="right"] {
+    translate: 150% 0;
+  }
+  [data-scope="toast"][data-part="root"][data-swipe-out][data-swipe-direction="up"] {
+    translate: 0 -150%;
+  }
+  [data-scope="toast"][data-part="root"][data-swipe-out][data-swipe-direction="down"] {
+    translate: 0 150%;
+  }
+
+  /* Types: the accent colours the glyph. */
+  [data-scope="toast"][data-part="root"][data-type="success"] {
+    --_accent: var(--rind-toast-success-accent, var(--rind-color-success-solid));
+  }
+  [data-scope="toast"][data-part="root"][data-type="warning"] {
+    --_accent: var(--rind-toast-warning-accent, var(--rind-color-warning-solid));
+  }
+  [data-scope="toast"][data-part="root"][data-type="error"] {
+    --_accent: var(--rind-toast-error-accent, var(--rind-color-danger-solid));
+  }
+
+  /* The glyph is text, so forced colors keep it. Its alternative text is empty: the type is not spoken. */
+  [data-scope="toast"][data-part="root"]::before {
+    grid-area: glyph;
+    content: "i" / "";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    border-radius: 50%;
+    border: 2px solid var(--_accent);
+    color: var(--_accent);
+    font-size: var(--rind-text-xs);
+    font-weight: 700;
+    line-height: 1;
+  }
+  [data-scope="toast"][data-part="root"][data-type="success"]::before {
+    content: "✓" / "";
+  }
+  [data-scope="toast"][data-part="root"][data-type="warning"]::before {
+    content: "!" / "";
+  }
+  [data-scope="toast"][data-part="root"][data-type="error"]::before {
+    content: "×" / "";
+  }
+  [data-scope="toast"][data-part="root"][data-type="loading"]::before {
+    content: "" / "";
+    border-color: var(--rind-color-border-strong);
+    border-block-start-color: var(--rind-color-text);
+    animation: rind-toast-spin 0.8s linear infinite;
+  }
+  @keyframes rind-toast-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  [data-scope="toast"][data-part="title"] {
+    grid-area: title;
+    font-weight: 600;
+  }
+  [data-scope="toast"][data-part="description"] {
+    grid-area: description;
+    color: var(--rind-toast-description, var(--rind-color-text-muted));
+  }
+  /* Alone, the title centres on the glyph; with a description both columns pair up. */
+  [data-scope="toast"][data-part="title"]:not(:has(+ [data-part="description"])) {
+    grid-row: 1 / span 2;
+  }
+
+  [data-scope="toast"]:is([data-part="action-trigger"], [data-part="close-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: var(--rind-radius-md);
+    cursor: pointer;
+  }
+  [data-scope="toast"][data-part="action-trigger"] {
+    grid-area: action;
+    padding-inline: var(--rind-space-2);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  [data-scope="toast"][data-part="close-trigger"] {
+    grid-area: close;
+  }
+  [data-scope="toast"][data-part="close-trigger"][data-disabled] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* No slide: only a fade, and the stack settles at once. */
+    [data-scope="toast"][data-part="root"] {
+      transition-property: opacity;
+    }
+    [data-scope="toast"][data-part="root"][data-state="open"] {
+      @starting-style {
+        translate: 0 0;
+      }
+    }
+    [data-scope="toast"][data-part="root"][data-swipe-out] {
+      translate: var(--rind-toast-swipe-x, 0px) var(--rind-toast-swipe-y, 0px);
+    }
+    [data-scope="toast"][data-part="root"][data-type="loading"]::before {
+      animation: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="toast"][data-part="root"] {
+      border-color: CanvasText;
+      box-shadow: none;
+    }
+    /* The glyph stays: drawn in system colours, so the type is still told by its shape. */
+    [data-scope="toast"][data-part="root"]::before {
+      border-color: CanvasText;
+      color: CanvasText;
+      forced-color-adjust: none;
+    }
+    [data-scope="toast"][data-part="root"][data-type="loading"]::before {
+      border-color: GrayText;
+      border-block-start-color: CanvasText;
+    }
+  }
+}

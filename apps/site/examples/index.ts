@@ -61,6 +61,7 @@ import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as textField from "./text-field"
+import * as toast from "./toast"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
@@ -139,6 +140,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  toast,
   tooltip,
 }
 

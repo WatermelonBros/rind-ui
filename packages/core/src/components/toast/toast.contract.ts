@@ -118,6 +118,12 @@ export const toastContract = contract("toast", {
       (await env.part("root").exists()) ? env.part("root").attr("data-dismiss-reason") : null,
   },
   actions: {
+    /** The toast appears: the store starts it when its region mounts (nothing to do). */
+    appear: {
+      keyboard: async () => {},
+      pointer: async () => {},
+      done: async (env: Env<ToastP>) => !(await gone(env)),
+    },
     /** The close trigger (pointer, touch); Escape on the focused toast (keyboard). */
     dismiss: {
       pointer: async (env: Env<ToastP>) => closeTrigger(env).click(),
@@ -179,7 +185,7 @@ export const toastContract = contract("toast", {
       event: () => ({ direction: "right", offset: 120, velocity: 0.4, size: 300 }),
     },
     TIMEOUT: "waitForTimeout",
-    START: { skip: "the store starts it when a region mounts" },
+    START: "appear",
     PAUSE: { skip: "region-level and api reasons: the store tests" },
     RESUME: { skip: "region-level and api reasons: the store tests" },
     UPDATE: { skip: "api (toaster.update): the store tests" },
