@@ -25,6 +25,8 @@ import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
+import * as listbox from "./listbox"
+import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
@@ -63,6 +65,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-form-input": hiddenFormInput,
   labels: labels,
   "visually-hidden": visuallyHidden,
+  menu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
@@ -94,6 +97,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   positioning,
   label,
   link,
+  listbox,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
