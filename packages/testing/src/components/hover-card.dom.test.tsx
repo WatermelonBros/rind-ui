@@ -257,7 +257,7 @@ describe("HoverCard: layers", () => {
   })
 
   it("Nested hover card: the inner one is nested, the outer has a nested child (mui/base-ui#3673)", async () => {
-    const { env } = fakeTime()
+    const { env, user } = fakeTime()
     render(
       <Card>
         <HoverCard.Root>
@@ -271,8 +271,11 @@ describe("HoverCard: layers", () => {
       </Card>,
     )
     await getHoverCard(env(), { name: "Jane Doe" }).via("keyboard").show()
-    const inner = getHoverCard(env(), { name: "Design team" }).via("keyboard")
-    await inner.show()
+    // Tab from the trigger into the card, onto the inner preview link, then its delay.
+    await user.tab()
+    expect(active()).toBe(trigger("Design team"))
+    await advance(700)
+    expect(trigger("Design team").getAttribute("aria-expanded")).toBe("true")
     const [outer, nested] = screen.getAllByRole("dialog")
     expect(nested?.hasAttribute("data-nested")).toBe(true)
     expect(outer?.hasAttribute("data-has-nested")).toBe(true)
