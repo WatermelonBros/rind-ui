@@ -5,7 +5,14 @@
 // the adapter, which applies them after the step is rendered (react-spectrum#10683).
 
 import type { Calendar, DateValue } from "@internationalized/date"
-import { CalendarDateTime, ZonedDateTime } from "@internationalized/date"
+import {
+  type CalendarDate,
+  CalendarDateTime,
+  toCalendarDate,
+  toCalendarDateTime,
+  toZoned,
+  ZonedDateTime,
+} from "@internationalized/date"
 import type { Modality } from "../../contract/env"
 import type { FormInputCapability } from "../../dom/hidden-input"
 import { setup, type } from "../../machine/setup"
@@ -622,3 +629,22 @@ export const dateFieldMachine = setup({
 })
 
 export type DateFieldMachine = typeof dateFieldMachine
+
+/**
+ * The default `placeholderValue` (spec "Placeholders"): today, inside the bounds, at 00:00,
+ * of the field's kind — a date-time when the granularity shows a time, zoned in `timeZone`.
+ */
+export function defaultPlaceholderValue(o: {
+  readonly today: CalendarDate
+  readonly granularity?: DateGranularity | undefined
+  readonly timeZone?: string | undefined
+  readonly minValue?: DateValue | null | undefined
+  readonly maxValue?: DateValue | null | undefined
+}): DateValue {
+  let day = o.today
+  if (o.minValue && day.compare(toCalendarDate(o.minValue)) < 0) day = toCalendarDate(o.minValue)
+  if (o.maxValue && day.compare(toCalendarDate(o.maxValue)) > 0) day = toCalendarDate(o.maxValue)
+  if (o.timeZone) return toZoned(toCalendarDateTime(day), o.timeZone)
+  if (o.granularity && o.granularity !== "day") return toCalendarDateTime(day)
+  return day
+}
