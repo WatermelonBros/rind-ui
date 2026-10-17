@@ -55,13 +55,10 @@ describe("decoder", () => {
 describe("Decodability: round trip over all versions", () => {
   it.each(LEVELS)(
     "level %s: a maximum-length value for each of the 40 versions",
-    { timeout: 30_000 },
     (ecc) => {
       const random = rng(ecc.charCodeAt(0))
       for (let version = 1; version <= 40; version++) {
-        // A forced mask (cycling through all eight) skips the 8-way mask search on every probe
-        // of the binary search; the automatic choice is covered by the mask tests.
-        const opts = { ecc, minVersion: version, maxVersion: version, mask: version % 8 }
+        const opts = { ecc, minVersion: version, maxVersion: version }
         // The longest byte value that fits this version (binary search on the encoder's verdict).
         let n = 0
         for (let hi = 3000; n < hi; ) {
@@ -76,7 +73,8 @@ describe("Decodability: round trip over all versions", () => {
         expect(d.bytes).toEqual(value)
       }
     },
-  )
+    30_000,
+  ) // a deadline for 40 versions of round trips under a loaded machine, not a delay
 
   it("random text in every mode, at every level with every forced mask", () => {
     const random = rng(42)
