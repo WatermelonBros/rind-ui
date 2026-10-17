@@ -6,7 +6,7 @@ function fakeEnv() {
   let now = 0
   const timers = new Map<number, { at: number; cb: () => void }>()
   let seq = 0
-  const said: { message: string; priority?: string }[] = []
+  const said: { message: string; priority?: string | undefined }[] = []
   let hidden = false
   const subs = new Set<(h: boolean) => void>()
   const env: ToasterEnv = {

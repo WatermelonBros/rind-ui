@@ -27,3 +27,10 @@ export {
   type ToastPlacement,
   type ToastSnapshot,
 } from "./toaster"
+export {
+  type ToasterContext,
+  type ToasterEvent,
+  type ToasterMachine,
+  type ToasterProps,
+  toasterMachine,
+} from "./toaster.machine"
