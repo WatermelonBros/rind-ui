@@ -194,6 +194,25 @@ export {
   type SelectionIndicatorOptions,
   selectionIndicator,
 } from "./selection-indicator"
+export {
+  damp,
+  lockAxis,
+  measureRelease,
+  releaseVelocity,
+  SWIPE_AXIS_BIAS,
+  SWIPE_CHANGE_OF_MIND,
+  SWIPE_SLOP,
+  SWIPE_VELOCITY_MAX_AGE,
+  SWIPE_VELOCITY_WINDOW,
+  type SwipeAxis,
+  type SwipeDirection,
+  type SwipeOptions,
+  type SwipeRelease,
+  type SwipeSample,
+  type SwipeTracker,
+  swipeDirectionOf,
+  trackSwipe,
+} from "./swipe"
 export { hasTabbable, observeTabbable } from "./tabbable-content"
 export { isTextField, textFieldCaret } from "./text-field"
 export { textSelection } from "./text-selection"

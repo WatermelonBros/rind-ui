@@ -22,6 +22,7 @@ import * as colorSwatchPicker from "./color-swatch-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
+import * as drawer from "./drawer"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
 import * as focusAndModality from "./focus-and-modality"
@@ -100,6 +101,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   collections,
   "context-menu": contextMenu,
   dialog,
+  drawer,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,

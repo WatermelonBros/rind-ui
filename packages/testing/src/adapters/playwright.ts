@@ -433,6 +433,83 @@ function createPlaywrightEnv(
         else await (await getBase()).page.waitForTimeout(ms)
         await l.dispatchEvent("pointerup", { ...init, buttons: 0 })
       },
+      async drag(vector, dragOptions) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        if (!box) throw new Error(`${label}: drag needs layout`)
+        const { page } = await getBase()
+        const x0 = box.x + box.width / 2
+        const y0 = box.y + box.height / 2
+        const type = dragOptions?.pointerType ?? "mouse"
+        const steps = Math.max(1, dragOptions?.steps ?? 10)
+        const stepMs = (dragOptions?.durationMs ?? 300) / steps
+        const wait = async () => {
+          if (options.advanceTimers) await options.advanceTimers(stepMs)
+          // fake-time: no page clock given, the drag takes real time (its velocity is the point)
+          else await page.waitForTimeout(stepMs)
+        }
+        const at = (i: number) => ({
+          x: x0 + (vector.x * i) / steps,
+          y: y0 + (vector.y * i) / steps,
+        })
+        if (type === "touch") {
+          // Touch events with one touch point, dispatched where the finger is (as the DOM
+          // adapter: a plain touch point, so every engine accepts it).
+          const fire = (kind: string, p: { x: number; y: number }, touching: boolean) =>
+            l.evaluate(
+              (el, a) => {
+                const target = document.elementFromPoint(a.p.x, a.p.y) ?? el
+                const e = new Event(a.kind, { bubbles: true, cancelable: true, composed: true })
+                const point = { identifier: 1, target, clientX: a.p.x, clientY: a.p.y }
+                const touches = a.touching ? [point] : []
+                Object.defineProperties(e, {
+                  touches: { value: touches },
+                  targetTouches: { value: touches },
+                  changedTouches: { value: [point] },
+                })
+                target.dispatchEvent(e)
+              },
+              { kind, p, touching },
+            )
+          // A finger sends pointerdown before its touch events (the modality follows it).
+          const start = at(0)
+          await l.evaluate((el, p) => {
+            const target = document.elementFromPoint(p.x, p.y) ?? el
+            target.dispatchEvent(
+              new PointerEvent("pointerdown", {
+                bubbles: true,
+                cancelable: true,
+                composed: true,
+                clientX: p.x,
+                clientY: p.y,
+                pointerId: 10,
+                pointerType: "touch",
+                isPrimary: true,
+                pressure: 0.5,
+                width: 20,
+                height: 20,
+                buttons: 1,
+              }),
+            )
+          }, start)
+          await fire("touchstart", start, true)
+          for (let i = 1; i <= steps; i++) {
+            await wait()
+            await fire("touchmove", at(i), true)
+          }
+          await fire("touchend", at(steps), false)
+          return
+        }
+        const start = at(0)
+        await page.mouse.move(start.x, start.y)
+        await page.mouse.down()
+        for (let i = 1; i <= steps; i++) {
+          await wait()
+          const p = at(i)
+          await page.mouse.move(p.x, p.y)
+        }
+        await page.mouse.up()
+      },
       async contextMenu(options) {
         const l = await waitFor()
         const box = await l.boundingBox()

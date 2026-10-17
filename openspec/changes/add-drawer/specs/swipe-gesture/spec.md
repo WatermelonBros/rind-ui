@@ -134,9 +134,10 @@ first touch move arrives offset from the touch start.
 On release the gesture SHALL report the direction the gesture travelled, or no direction
 when it never locked onto an allowed direction or reversed back toward its start by more
 than a small "change of mind" distance; the offset along the locked axis; the velocity
-computed from event timestamps over the last part of the gesture, ignoring samples older
-than a short age, so that the same physical speed yields the same velocity at any input
-rate; and the element's border-box size on that axis. Components SHALL NOT dismiss on a
+computed from the time each event arrived on the environment's clock (so a fake clock in
+tests makes it deterministic; event timestamps cannot be faked in a real browser) over the
+last part of the gesture, ignoring samples older than a short age, so that the same
+physical speed yields the same velocity at any input rate; and the element's border-box size on that axis. Components SHALL NOT dismiss on a
 release that reports no direction.
 
 #### Scenario: Horizontal flick on a bottom sheet with snap points (base-ui#5471)
