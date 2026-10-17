@@ -1,7 +1,7 @@
 # Releasing
 
 Packages: `@rind-ui/core`, `@rind-ui/react`, `@rind-ui/testing`, `@rind-ui/theme`.
-Storybook and the site are private and never published.
+The site is private and never published.
 
 Versions and changelogs come from [Changesets](https://github.com/changesets/changesets):
 every change a consumer would notice adds a file in `.changeset/` (`pnpm changeset`).

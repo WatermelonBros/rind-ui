@@ -141,7 +141,7 @@ expect((await form.announcements()).map((a) => a.message)).toEqual(["2 fields ha
 
 A sign-up form (generated from the state story):
 
-<!-- aria:components-form--sign-up -->
+<!-- aria:form--sign-up -->
 ```yaml
 - form "Sign up":
   - text: Email

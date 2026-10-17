@@ -108,7 +108,7 @@ The same test runs with a Playwright `page`.
 
 Default, read-only and required with an error (generated from the stories; read-only and required are not exposed by every browser's tree):
 
-<!-- aria:components-radiogroup--default -->
+<!-- aria:radio-group--default -->
 ```yaml
 - radiogroup "Size":
   - text: Size
@@ -122,7 +122,7 @@ Default, read-only and required with an error (generated from the stories; read-
 ```
 <!-- /aria -->
 
-<!-- aria:components-radiogroup--read-only -->
+<!-- aria:radio-group--read-only -->
 ```yaml
 - radiogroup "Size":
   - text: Size
@@ -136,7 +136,7 @@ Default, read-only and required with an error (generated from the stories; read-
 ```
 <!-- /aria -->
 
-<!-- aria:components-radiogroup--required-invalid -->
+<!-- aria:radio-group--required-invalid -->
 ```yaml
 - radiogroup "Size" [invalid]:
   - text: Size

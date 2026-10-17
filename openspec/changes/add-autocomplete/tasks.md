@@ -21,7 +21,7 @@
 ## 4. Contract and driver
 
 - [ ] 4.1 `autocomplete.contract.ts` per design §3 (traits, announcements, `optionsNeverSelected` invariant, `{ skip }`, prop steps)
-- [ ] 4.2 `getAutocomplete` in `@rind-ui/testing`; driver tests in browser mode, jsdom and through Playwright against Storybook
+- [ ] 4.2 `getAutocomplete` in `@rind-ui/testing`; driver tests in browser mode, jsdom and through Playwright against the site examples harness
 
 ## 5. Tests
 
@@ -33,10 +33,10 @@
 - [ ] 6.1 Tier-3 `--rind-autocomplete-*` tokens defaulting to the `--rind-combobox-*` tokens; `data-variant` (solid, soft, outline, ghost) and `data-size` (sm, md, lg); entry/exit with duration tokens
 - [ ] 6.2 Forced colors (outline highlight) and 24×24 targets; Playwright forced-colors captures
 
-## 7. Stories (`apps/storybook`)
+## 7. Site examples
 
-- [ ] 7.1 Default (list), both, inline, none, search form with Enter submit, `submitOnChoose`, async, empty state, in a dialog; state stories open / empty / loading
-- [ ] 7.2 Driver story (docs testing example); all stories render with the theme stylesheet and pass axe (including colour contrast)
+- [ ] 7.1 Site examples (apps/site/examples/autocomplete.tsx, state examples for every contract state): Default (list), both, inline, none, search form with Enter submit, `submitOnChoose`, async, empty state, in a dialog; state examples open / empty / loading
+- [ ] 7.2 Driver example (docs testing example); all examples render with the theme stylesheet and pass axe (including colour contrast)
 
 ## 8. Docs and manual checks
 

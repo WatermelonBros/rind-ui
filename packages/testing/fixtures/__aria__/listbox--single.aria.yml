@@ -1,0 +1,7 @@
+- text: Fruit
+- listbox "Fruit":
+  - option "Apple"
+  - option "Banana" [selected]
+  - option "Cherry"
+  - option "Date"
+  - option "Elderberry"

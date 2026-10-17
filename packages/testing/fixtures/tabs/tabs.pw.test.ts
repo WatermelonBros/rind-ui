@@ -1,50 +1,23 @@
 /// <reference types="node" />
-// Tabs through the Playwright adapter, against the built Storybook: the driver in a
+// Tabs through the Playwright adapter, against the site examples harness: the driver in a
 // real browser, forced colors on the selected tab, RTL, and the generic invariants on every
 // Tabs story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getTabs, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +25,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-tabs--${id}&viewMode=story`)
+  await openExample(page, site.base, "tabs", id)
   await page.locator('[data-scope="tabs"]').first().waitFor()
   return page
 }
@@ -75,7 +48,13 @@ describe("tabs driver through Playwright", () => {
     const page = await open("driver-example")
     const tabs = getTabs(page, { name: "Sections" })
     expect(await tabs.tabs()).toEqual(["Account", "Billing", "Team"])
-    // The story's own play function has run: it ends on Team.
+    expect(await tabs.selected()).toBe("Account")
+    // Walk to Team the way the story's former play function did.
+    await tabs.select("Billing")
+    expect(await tabs.panel()).toMatchObject({ text: "Billing settings" })
+    await tabs.focusTab("Team")
+    expect(await tabs.selected()).toBe("Billing")
+    await tabs.via("keyboard").select("Team")
     expect(await tabs.selected()).toBe("Team")
     await tabs.select("Account")
     expect(await tabs.selected()).toBe("Account")
@@ -155,16 +134,16 @@ describe("reduced motion", () => {
 
 const STORIES = [
   "default",
-  "vertical",
+  "vertical-story",
   "manual-activation",
-  "disabled-tab",
+  "disabled-tab-story",
   "focusable-when-disabled",
   "inactive-panels-hidden",
   "inactive-panels-until-found",
   "with-indicator",
   "scrollable-list",
   "rtl",
-  "controlled",
+  "controlled-story",
   "driver-example",
 ]
 

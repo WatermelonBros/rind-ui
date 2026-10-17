@@ -29,9 +29,9 @@
 
 - [ ] 6.1 `packages/theme/src/time-range-field.css` per design §5 (`@layer rind.components`, `:where()`, `--rind-time-range-field-*` tokens with fallbacks, `field` family, `data-tone="danger"`, forced colors); imported from `index.css`
 
-## 7. Stories
+## 7. Site examples
 
-- [ ] 7.1 Stories (themed): 12/24-hour, seconds, overnight, zoned, min/max, required in a form, read-only, disabled, invalid, inside a Field, RTL; state stories with ARIA snapshots; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/time-range-field.tsx, state examples for every contract state): 12/24-hour, seconds, overnight, zoned, min/max, required in a form, read-only, disabled, invalid, inside a Field, RTL; state examples with ARIA snapshots; axe clean
 
 ## 8. Docs
 

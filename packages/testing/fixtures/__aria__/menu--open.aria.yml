@@ -1,0 +1,7 @@
+- button "Actions" [expanded]
+- menu "Actions":
+  - menuitem "New file"
+  - menuitem "Duplicate"
+  - menuitem "Open the docs"
+  - separator
+  - menuitem "Delete" [disabled]

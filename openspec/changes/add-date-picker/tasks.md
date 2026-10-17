@@ -40,9 +40,9 @@
 
 - [ ] 8.1 `packages/theme/src/date-picker.css` per design §5 (`@layer rind.components`, `:where()`, `--rind-date-picker-*` tokens read with fallbacks, `field` and `panel` families, icon mask on the trigger, `data-tone="danger"`, forced colors, reduced motion, RTL); imported from `index.css`
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): default, with time (minute), zoned, min/max, unavailable weekends, modal, inside a Dialog, two visible months, clear trigger, required in a form with reset, read-only, disabled, invalid, RTL, driver example; state stories (`closed`, `open`) with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/date-picker.tsx, state examples for every contract state): default, with time (minute), zoned, min/max, unavailable weekends, modal, inside a Dialog, two visible months, clear trigger, required in a form with reset, read-only, disabled, invalid, RTL, driver example; state examples (`closed`, `open`) with ARIA snapshots; axe clean
 
 ## 10. Docs
 

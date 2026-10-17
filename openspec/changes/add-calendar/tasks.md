@@ -45,9 +45,9 @@
 - [ ] 8.1 `packages/theme/src/calendar.css` per design §6: `@layer rind.components`, `:where()` selectors, `--rind-calendar-*` tokens read with fallbacks and never declared, `panel`/`collection item` families, sizes, `data-tone="danger"` invalid, hit area ≥ 24×24, forced-colors rules per state, RTL; imported from `index.css`
 - [ ] 8.2 Playwright captures: forced colors (react-spectrum#3260), RTL, two months, reduced motion
 
-## 9. Stories
+## 9. Site examples
 
-- [ ] 9.1 Stories (themed): single, multiple, two and three months with `pageBehavior`, min/max, unavailable weekends, today marker, Monday weeks, `ar-EG` RTL, `th-TH` and `fa-IR` with `createCalendar`, japanese eras, read-only, disabled, invalid value, header with a repeated next trigger after the grid, controlled `focusedValue`, driver example; state stories `idle`/`focused` with ARIA snapshots; axe clean
+- [ ] 9.1 Site examples (apps/site/examples/calendar.tsx, state examples for every contract state): single, multiple, two and three months with `pageBehavior`, min/max, unavailable weekends, today marker, Monday weeks, `ar-EG` RTL, `th-TH` and `fa-IR` with `createCalendar`, japanese eras, read-only, disabled, invalid value, header with a repeated next trigger after the grid, controlled `focusedValue`, driver example; state examples `idle`/`focused` with ARIA snapshots; axe clean
 
 ## 10. Docs
 

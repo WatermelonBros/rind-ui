@@ -1,0 +1,4 @@
+- text: Quantity
+- button "Decrease Quantity": −
+- spinbutton "Quantity": "2"
+- button "Increase Quantity": +
