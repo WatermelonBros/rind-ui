@@ -26,7 +26,10 @@ for (const f of docs) {
  * second root of their own (Avatar.Group holds avatars and its GroupOverflow).
  */
 const ROOT_ALIASES: Readonly<Record<string, string | readonly string[]>> = {
-  "CheckboxGroup.Parent": "Checkbox",
+  // An Item is a root of its own parts, alone or in a group (one component per control).
+  "CheckboxGroup.Parent": "CheckboxGroup",
+  "CheckboxGroup.Item": "CheckboxGroup",
+  "ToggleGroup.Item": "ToggleGroup",
   "Avatar.Group": "Avatar",
   // A context menu's root is the Menu's root level: Menu parts go inside it.
   "ContextMenu.Root": ["ContextMenu", "Menu"],
