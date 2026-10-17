@@ -138,6 +138,7 @@ describe("axe on every example", () => {
                   "page-has-heading-one",
                   "region",
                   "landmark-main-is-top-level",
+                  "landmark-one-main",
                   "landmark-no-duplicate-main",
                   "landmark-unique",
                 ]
