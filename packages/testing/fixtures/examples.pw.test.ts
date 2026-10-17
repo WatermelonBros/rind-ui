@@ -198,6 +198,9 @@ function withoutMain(snapshot: string): string {
   for (const line of snapshot.split("\n")) {
     if (/^- main( \[|:|$)/.test(line)) {
       inMain = true
+      // Text only, inline ("- main: Saving is paused"): the example's text, kept.
+      const inline = /^- main: (.+)$/.exec(line)
+      if (inline) out.push(`- text: ${inline[1]}`)
       continue
     }
     if (inMain && line.startsWith("  ")) out.push(line.slice(2))
