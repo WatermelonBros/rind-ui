@@ -159,6 +159,8 @@ export const toastMeta = {
       "data-swipe-direction": "The direction of the last swipe release.",
       "data-swipe-out": "While it exits after a swipe.",
       "data-dismiss-reason": "The dismissal reason, while it exits.",
+      "data-focus": "The toast itself has focus.",
+      "data-focus-visible": "Focus came by keyboard (the hotkey, Tab).",
     },
     title: base("title"),
     description: base("description"),
