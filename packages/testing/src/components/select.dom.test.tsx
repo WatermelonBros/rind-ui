@@ -257,7 +257,12 @@ describe("Select: forms", () => {
       const [value, setValue] = useState<string | null>(null)
       return (
         <>
-          <Fruit name="fruit" items={DATA} value={value} onValueChange={(v) => setValue(v)} />
+          <Fruit
+            name="fruit"
+            items={DATA}
+            value={value}
+            onValueChange={(v: string | null) => setValue(v)}
+          />
           <button type="button" onClick={() => setValue("cherry")}>
             Set cherry
           </button>
