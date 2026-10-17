@@ -223,7 +223,7 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     const node: SectionNode = { type: "section", key: toKey(section.key), label: section.label }
     const props = mergeProps(normalizeProps(host.parts.section(node)), rest)
     // A section the host does not list (all its items filtered out) is hidden, still mounted.
-    if (host.listed && !host.collection.has(node.key)) {
+    if (host.listed && !host.collection.sections().some((x) => x.key === node.key)) {
       return (
         <div hidden>
           <SectionCtx value={{ key: section.key, label: section.label }}>{children}</SectionCtx>

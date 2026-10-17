@@ -469,6 +469,8 @@ export const comboboxMachine = setup({
       const text = selectionText(a.props, a.values.value)
       if (
         mode(a.props) === "single" &&
+        // An unknown key (its option not registered yet) keeps the text it has.
+        text !== "" &&
         text !== a.values.inputValue &&
         selectedKeys(a.values.value).length > 0
       ) {
