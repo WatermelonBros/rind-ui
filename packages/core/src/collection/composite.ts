@@ -158,7 +158,12 @@ export function composite(
           PAGE_NEXT: "page-next",
           PAGE_PREV: "page-previous",
         } as const
-        send({ type: "NAVIGATE", move: move[logical.type], extend: logical.shift })
+        send({
+          type: "NAVIGATE",
+          move: move[logical.type],
+          extend: logical.shift,
+          mod: logical.mod,
+        })
         handled()
         return
       }

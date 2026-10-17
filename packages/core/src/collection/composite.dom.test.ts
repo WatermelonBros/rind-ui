@@ -409,7 +409,7 @@ describe("sections", () => {
 })
 
 describe("keyboard handler", () => {
-  const move = (m: string, extend = false) => [{ type: "NAVIGATE", move: m, extend }]
+  const move = (m: string, extend = false) => [{ type: "NAVIGATE", move: m, extend, mod: false }]
 
   it("ArrowDown/ArrowUp navigate on a vertical list and prevent default", () => {
     const s = setup()
