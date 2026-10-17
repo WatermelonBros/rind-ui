@@ -131,7 +131,7 @@ Record each pass in `tested-with.json` with `component: "text-field"`.
 
 ## Device checklist: Checkbox (add-checkbox 11.1)
 
-Examples (/examples/checkbox/…): default, checked, indeterminate, required-invalid, in-form, render-as-div. Record each pass in `tested-with.json` with `component: "checkbox"`.
+Examples (/examples/checkbox-group/…): alone-default, alone-checked, alone-indeterminate-story, alone-required-invalid, alone-in-form-story, alone-render-as-div. Record each pass in `tested-with.json` with `component: "checkbox-group"`.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
       TalkBack + Chrome**: name ("Accept the terms"), role (check box), state (checked / not

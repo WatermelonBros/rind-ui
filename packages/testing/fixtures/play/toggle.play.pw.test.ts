@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest"
 import { getToggle } from "../../src/index"
 import { playHarness } from "./play-harness"
 
-const open = playHarness("toggle")
+const open = playHarness("toggle-group")
 
 describe("toggle stories (ported play functions)", () => {
   it("DriverExample", { timeout: 60_000 }, async () => {
-    const page = await open("driver-example")
+    const page = await open("alone-driver-example")
     const toggle = getToggle(page, { name: "Driven" })
     expect(await toggle.isPressed()).toBe(false)
     await toggle.setPressed(true)

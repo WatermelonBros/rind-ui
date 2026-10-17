@@ -159,5 +159,19 @@ export function toggleGroupConnect(
         onFocus: () => send({ type: "FOCUS", key, modality: env.modality.modality() }),
       }
     },
+    /** An item's indicator: decorative, its state the item's (as a lone toggle's). */
+    itemIndicator: (
+      key: CollectionKey,
+      s: Pick<ToggleGroupItemState, "itemDisabled">,
+    ): PartProps => {
+      const node = c.get(key)
+      const disabled = input.disabled || s.itemDisabled || node?.disabled === true
+      return {
+        ...scopeAttrs("toggle-group", "item-indicator", input.instance),
+        "aria-hidden": "true",
+        "data-state": selection.has(key) ? "on" : "off",
+        "data-disabled": dataFlag(disabled),
+      }
+    },
   }
 }

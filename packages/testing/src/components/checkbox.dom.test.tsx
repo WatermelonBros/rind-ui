@@ -1,22 +1,22 @@
 // biome-ignore-all lint/a11y: fixtures deliberately wrap, label and click arbitrary elements
 import { domEnvironment } from "@rind-ui/core"
-import { Checkbox } from "@rind-ui/react"
+import { CheckboxGroup } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { getCheckbox } from "../index"
 
 const platform = domEnvironment().platform
 
-function Terms(props: Partial<Parameters<typeof Checkbox.Root>[0]>) {
+function Terms(props: Partial<Parameters<typeof CheckboxGroup.Item>[0]>) {
   return (
-    <Checkbox.Root name="tos" {...props}>
-      <Checkbox.Control>
-        <Checkbox.Indicator>
+    <CheckboxGroup.Item name="tos" {...props}>
+      <CheckboxGroup.ItemControl>
+        <CheckboxGroup.ItemIndicator>
           {({ indeterminate }) => (indeterminate ? "–" : "✓")}
-        </Checkbox.Indicator>
-      </Checkbox.Control>
-      <Checkbox.Label>Accept terms</Checkbox.Label>
-    </Checkbox.Root>
+        </CheckboxGroup.ItemIndicator>
+      </CheckboxGroup.ItemControl>
+      <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+    </CheckboxGroup.Item>
   )
 }
 
@@ -143,7 +143,7 @@ function Controlled({
   refuse?: boolean
   initial?: CheckedState
   onChange?: (v: CheckedState, d: { reason: string; cancel: () => void }) => void
-} & Partial<Parameters<typeof Checkbox.Root>[0]>) {
+} & Partial<Parameters<typeof CheckboxGroup.Item>[0]>) {
   const [checked, setChecked] = useState<CheckedState>(initial)
   setExternally = setChecked
   return (
@@ -185,12 +185,12 @@ describe("Anatomy", () => {
 
   it("every part carries scope, part and instance", () => {
     render(
-      <Checkbox.Root>
-        <Checkbox.Control />
-        <Checkbox.Indicator />
-        <Checkbox.Label>Accept terms</Checkbox.Label>
-        <Checkbox.Description>Hint</Checkbox.Description>
-      </Checkbox.Root>,
+      <CheckboxGroup.Item>
+        <CheckboxGroup.ItemControl />
+        <CheckboxGroup.ItemIndicator />
+        <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+        <CheckboxGroup.ItemDescription>Hint</CheckboxGroup.ItemDescription>
+      </CheckboxGroup.Item>,
     )
     const parts = ["root", "control", "indicator", "label", "description", "hidden-input"]
     for (const part of parts) {
@@ -365,10 +365,10 @@ describe("Keyboard", () => {
     const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault())
     render(
       <form onSubmit={onSubmit}>
-        <Checkbox.Root name="tos">
-          <Checkbox.Control onKeyDown={(e) => e.key === "Enter" && e.preventDefault()} />
-          <Checkbox.Label>{NAME}</Checkbox.Label>
-        </Checkbox.Root>
+        <CheckboxGroup.Item name="tos">
+          <CheckboxGroup.ItemControl onKeyDown={(e) => e.key === "Enter" && e.preventDefault()} />
+          <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
         <button type="submit">Send</button>
       </form>,
     )
@@ -543,9 +543,9 @@ describe("Disabled and read-only", () => {
 describe("Hidden input: structure", () => {
   it("an unnamed input has an id (base-ui#2114)", () => {
     render(
-      <Checkbox.Root>
-        <Checkbox.Control aria-label="x" />
-      </Checkbox.Root>,
+      <CheckboxGroup.Item>
+        <CheckboxGroup.ItemControl aria-label="x" />
+      </CheckboxGroup.Item>,
     )
     expect(hidden().id).not.toBe("")
     expect(hidden().hasAttribute("name")).toBe(false)
@@ -697,10 +697,10 @@ describe("Hidden input: events for user changes only", () => {
       setExternally = setChecked
       return (
         <div onClick={row}>
-          <Checkbox.Root checked={checked} onCheckedChange={setChecked} name="tos">
-            <Checkbox.Control onClick={stop ? (e) => e.stopPropagation() : undefined} />
-            <Checkbox.Label>{NAME}</Checkbox.Label>
-          </Checkbox.Root>
+          <CheckboxGroup.Item checked={checked} onCheckedChange={setChecked} name="tos">
+            <CheckboxGroup.ItemControl onClick={stop ? (e) => e.stopPropagation() : undefined} />
+            <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+          </CheckboxGroup.Item>
         </div>
       )
     }
@@ -892,9 +892,9 @@ describe("Form data", () => {
     render(
       <form data-testid="f">
         <Terms name="a" value="42" defaultChecked />
-        <Checkbox.Root name="a" value="69">
-          <Checkbox.Control aria-label="other" />
-        </Checkbox.Root>
+        <CheckboxGroup.Item name="a" value="69">
+          <CheckboxGroup.ItemControl aria-label="other" />
+        </CheckboxGroup.Item>
       </form>,
     )
     expect([...new FormData(screen.getByTestId("f") as HTMLFormElement)]).toEqual([["a", "42"]])
@@ -956,11 +956,11 @@ describe("Labels: naming", () => {
   it("wrapped in a consumer label (base-ui#4122)", () => {
     render(
       <label>
-        <Checkbox.Root>
-          <Checkbox.Control>
-            <Checkbox.Indicator>✓</Checkbox.Indicator>
-          </Checkbox.Control>
-        </Checkbox.Root>{" "}
+        <CheckboxGroup.Item>
+          <CheckboxGroup.ItemControl>
+            <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+          </CheckboxGroup.ItemControl>
+        </CheckboxGroup.Item>{" "}
         Accept terms
       </label>,
     )
@@ -970,9 +970,9 @@ describe("Labels: naming", () => {
   it("aria-label is not doubled by a wrapping label (base-ui#5786)", () => {
     render(
       <label>
-        <Checkbox.Root>
-          <Checkbox.Control aria-label="lease.pdf" />
-        </Checkbox.Root>
+        <CheckboxGroup.Item>
+          <CheckboxGroup.ItemControl aria-label="lease.pdf" />
+        </CheckboxGroup.Item>
         lease.pdf
       </label>,
     )
@@ -982,9 +982,9 @@ describe("Labels: naming", () => {
 
   it("no Label: no dangling idref (ark#3824)", () => {
     const { container } = render(
-      <Checkbox.Root>
-        <Checkbox.Control aria-label="Solo" />
-      </Checkbox.Root>,
+      <CheckboxGroup.Item>
+        <CheckboxGroup.ItemControl aria-label="Solo" />
+      </CheckboxGroup.Item>,
     )
     expect(ctrl("Solo").hasAttribute("aria-labelledby")).toBe(false)
     expect(container.querySelector("[for]")).toBeNull()
@@ -1080,9 +1080,9 @@ describe("Labels: activation", () => {
         <label htmlFor="c1" data-testid="l">
           Consumer label
         </label>
-        <Checkbox.Root onCheckedChange={onCheckedChange}>
-          <Checkbox.Control id="c1" />
-        </Checkbox.Root>
+        <CheckboxGroup.Item onCheckedChange={onCheckedChange}>
+          <CheckboxGroup.ItemControl id="c1" />
+        </CheckboxGroup.Item>
       </>,
     )
     await click(screen.getByTestId("l"))
@@ -1093,10 +1093,10 @@ describe("Labels: activation", () => {
   it("a div Control: label click toggles once, no for, named by the label (headlessui#3876)", async () => {
     const onCheckedChange = vi.fn()
     render(
-      <Checkbox.Root onCheckedChange={onCheckedChange}>
-        <Checkbox.Control render={<div />} />
-        <Checkbox.Label>{NAME}</Checkbox.Label>
-      </Checkbox.Root>,
+      <CheckboxGroup.Item onCheckedChange={onCheckedChange}>
+        <CheckboxGroup.ItemControl render={<div />} />
+        <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+      </CheckboxGroup.Item>,
     )
     const label = document.querySelector('[data-part="label"]') as HTMLElement
     expect(label.hasAttribute("for")).toBe(false)
@@ -1128,12 +1128,12 @@ describe("Labels: activation", () => {
   it("a link inside the label navigates and does not toggle (headlessui#3658)", async () => {
     const onCheckedChange = vi.fn()
     render(
-      <Checkbox.Root onCheckedChange={onCheckedChange}>
-        <Checkbox.Control />
-        <Checkbox.Label>
+      <CheckboxGroup.Item onCheckedChange={onCheckedChange}>
+        <CheckboxGroup.ItemControl />
+        <CheckboxGroup.ItemLabel>
           I accept the <a href="#terms-x">terms</a>
-        </Checkbox.Label>
-      </Checkbox.Root>,
+        </CheckboxGroup.ItemLabel>
+      </CheckboxGroup.Item>,
     )
     // The link keeps its default action: nothing on the way cancels the click.
     const prevented: boolean[] = []
@@ -1152,11 +1152,11 @@ describe("Description and state mirroring", () => {
     function App() {
       const [shown, setShown] = useState(false)
       return (
-        <Checkbox.Root onCheckedChange={() => setShown(true)}>
-          <Checkbox.Control />
-          <Checkbox.Label>{NAME}</Checkbox.Label>
-          {shown && <Checkbox.Description>Read it first</Checkbox.Description>}
-        </Checkbox.Root>
+        <CheckboxGroup.Item onCheckedChange={() => setShown(true)}>
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+          {shown && <CheckboxGroup.ItemDescription>Read it first</CheckboxGroup.ItemDescription>}
+        </CheckboxGroup.Item>
       )
     }
     render(<App />)
@@ -1169,11 +1169,11 @@ describe("Description and state mirroring", () => {
     render(
       <>
         <span id="hint">Hint</span>
-        <Checkbox.Root>
-          <Checkbox.Control aria-describedby="hint" />
-          <Checkbox.Label>{NAME}</Checkbox.Label>
-          <Checkbox.Description>Own</Checkbox.Description>
-        </Checkbox.Root>
+        <CheckboxGroup.Item>
+          <CheckboxGroup.ItemControl aria-describedby="hint" />
+          <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+          <CheckboxGroup.ItemDescription>Own</CheckboxGroup.ItemDescription>
+        </CheckboxGroup.Item>
       </>,
     )
     const ids = (ctrl().getAttribute("aria-describedby") ?? "").split(/\s+/)
@@ -1184,11 +1184,11 @@ describe("Description and state mirroring", () => {
 
   it("Label and Description mirror the state attributes", async () => {
     render(
-      <Checkbox.Root disabled required invalid defaultChecked>
-        <Checkbox.Control />
-        <Checkbox.Label>{NAME}</Checkbox.Label>
-        <Checkbox.Description>Hint</Checkbox.Description>
-      </Checkbox.Root>,
+      <CheckboxGroup.Item disabled required invalid defaultChecked>
+        <CheckboxGroup.ItemControl />
+        <CheckboxGroup.ItemLabel>{NAME}</CheckboxGroup.ItemLabel>
+        <CheckboxGroup.ItemDescription>Hint</CheckboxGroup.ItemDescription>
+      </CheckboxGroup.Item>,
     )
     for (const part of ["label", "description"]) {
       const el = document.querySelector(`[data-part="${part}"]`) as HTMLElement
@@ -1206,9 +1206,9 @@ describe("Field binding", () => {
     render(
       <Field.Root>
         <Field.Label>{NAME}</Field.Label>
-        <Checkbox.Root name="tos" onCheckedChange={onCheckedChange}>
-          <Checkbox.Control />
-        </Checkbox.Root>
+        <CheckboxGroup.Item name="tos" onCheckedChange={onCheckedChange}>
+          <CheckboxGroup.ItemControl />
+        </CheckboxGroup.Item>
         <Field.Description>Required to continue</Field.Description>
       </Field.Root>,
     )
@@ -1223,10 +1223,10 @@ describe("Field binding", () => {
     render(
       <Field.Root>
         <Field.Label>{NAME}</Field.Label>
-        <Checkbox.Root>
-          <Checkbox.Control />
-          <Checkbox.Label>Own</Checkbox.Label>
-        </Checkbox.Root>
+        <CheckboxGroup.Item>
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>Own</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
       </Field.Root>,
     )
     expect(warn.mock.calls.some((c) => /Label/.test(String(c[0])))).toBe(true)
@@ -1238,9 +1238,9 @@ describe("Field binding", () => {
     render(
       <Field.Root required invalid>
         <Field.Label>{NAME}</Field.Label>
-        <Checkbox.Root name="tos">
-          <Checkbox.Control />
-        </Checkbox.Root>
+        <CheckboxGroup.Item name="tos">
+          <CheckboxGroup.ItemControl />
+        </CheckboxGroup.Item>
         <Field.ErrorMessage>Must accept</Field.ErrorMessage>
       </Field.Root>,
     )
@@ -1262,9 +1262,9 @@ describe("Field binding", () => {
         <Fieldset.Legend>Group</Fieldset.Legend>
         <Field.Root>
           <Field.Label>{NAME}</Field.Label>
-          <Checkbox.Root name="tos" defaultChecked>
-            <Checkbox.Control />
-          </Checkbox.Root>
+          <CheckboxGroup.Item name="tos" defaultChecked>
+            <CheckboxGroup.ItemControl />
+          </CheckboxGroup.Item>
         </Field.Root>
       </Fieldset.Root>,
     )

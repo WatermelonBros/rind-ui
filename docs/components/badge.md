@@ -11,7 +11,7 @@ on.
 - **Over a plain `<span>`**: with `label` it gives a short visual text (like "99+") a full spoken
   name, and warns in development when an exposed badge has no text. Without a label, a `<span>` is
   enough.
-- **Don't use it for** anything interactive or live: use [Button](button.md) or [Toggle](toggle.md)
+- **Don't use it for** anything interactive or live: use [Button](button.md) or [Toggle Group](toggle-group.md)
   for actions, and [Alert](alert.md) for a message that must be announced.
 
 ```tsx
