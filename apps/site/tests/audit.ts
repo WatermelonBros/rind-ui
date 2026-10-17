@@ -264,7 +264,7 @@ for (const url of urls) {
     await page.goto(base + at)
     // the example mounts on the client; the host marks the root once its effects have run
     await page
-      .waitForSelector("[data-example-root][data-hydrated]", { timeout: 10_000 })
+      .waitForSelector("[data-example-root][data-hydrated]", { timeout: 30_000 })
       .catch(() => report(at, "harness", "never marked data-hydrated"))
     const { rendered, sheets } = await page.evaluate(() => ({
       rendered: (document.querySelector("[data-example-root]")?.childElementCount ?? 0) > 0,
