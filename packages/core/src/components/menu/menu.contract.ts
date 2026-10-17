@@ -269,6 +269,12 @@ function menuContractWith(modal: boolean) {
       },
       "COLLECTION.CHANGE": { skip: "static item parts: covered by the DOM tests" },
       "$props:collection": { skip: "static item parts: covered by the DOM tests" },
+      "REGION.CONTEXTMENU": { skip: "a context menu's region: the context-menu contract" },
+      "REGION.LONG_PRESS": { skip: "a context menu's region: the context-menu contract" },
+      "REGION.KEY": { skip: "a context menu's region: the context-menu contract" },
+      "DOCUMENT.CONTEXTMENU": { skip: "a context menu's region: the context-menu contract" },
+      OPEN_AT: { skip: "programmatic (openAt): the context-menu contract" },
+      SCROLL: { skip: "a non-modal context menu: the context-menu DOM tests" },
       "$sync:open": { props: (target) => ({ open: target === "open" }) },
     },
     traits: modal

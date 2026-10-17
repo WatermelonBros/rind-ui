@@ -295,6 +295,8 @@ const oracleEnv = {
   layout: { pageTarget: () => null },
   dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  // Nothing to position (the oracle never starts effects; actions may ask to reposition).
+  position: { track: () => ({ stop: () => {} }), reposition: () => {} },
   // A menu tree with one level: the root closes itself, nothing else is open.
   menuTree: {
     register: () => () => {},
@@ -654,6 +656,7 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
       await base.keyboard(key, { ...o, composing: true })
     },
     pointerOutside: async () => {},
+    pointerAway: async () => {},
   }
   return { env, state }
 }
@@ -897,6 +900,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       from,
       state,
       ...expectations(contract, state, oracle.service.view()),
+      fromInitial: from === graph.initial,
       atInitial: state === graph.initial,
       anchorCount: await base.anchorCount(),
       errors: await base.takeErrors(),

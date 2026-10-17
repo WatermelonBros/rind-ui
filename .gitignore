@@ -15,3 +15,8 @@ apps/storybook/stories/**/*.d.ts
 .impeccable/
 # Declarations a build once emitted beside the testing sources (never source).
 packages/testing/src/**/*.d.ts
+# Build outputs, generated where they're needed (never committed: every component PR would
+# conflict on them). Theme: `pnpm --filter @rind-ui/theme generate`, run by turbo before build
+# and typecheck. llms.txt and the token reference are written by the site build.
+packages/theme/tokens.manifest.json
+packages/theme/src/builder/components.generated.ts

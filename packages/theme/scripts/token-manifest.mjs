@@ -1,9 +1,8 @@
 // Scans src/*.css for component-token reads var(--rind-<scope>-<name>, <fallback>) and writes
 // tokens.manifest.json (tier-2 list + component tokens with fallback and family) and
 // src/builder/components.generated.ts (the `components` override type of defineTheme).
-// `--check` fails on a diff instead of writing. Run: node packages/theme/scripts/token-manifest.mjs
-import { execFileSync } from "node:child_process"
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+// Run: node packages/theme/scripts/token-manifest.mjs (pnpm --filter @rind-ui/theme generate)
+import { readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
 import { allComponents, familyOf, noFamily } from "../src/families.ts"
 
 const root = new URL("../", import.meta.url)
@@ -117,40 +116,15 @@ export type ComponentTokens = ${
 }
 `
 
-const repo = new URL("../../../", import.meta.url).pathname
-const biome = new URL("node_modules/.bin/biome", `file://${repo}`).pathname
-// Formatted by Biome so the committed files are byte-identical to what `biome check` accepts.
-function format(text, path) {
-  if (!existsSync(biome)) return text
-  return execFileSync(biome, ["format", `--stdin-file-path=${path}`], {
-    input: text,
-    cwd: repo,
-    encoding: "utf8",
-  })
+const repo = new URL("../../../", import.meta.url)
+// Build outputs, not committed (.gitignore): the theme's `generate` task writes them before
+// build and typecheck; the site writes them before reading the manifest. Written through a
+// rename so a concurrent run (turbo's typecheck beside the site's) never reads half a file.
+function put(path, text) {
+  const url = new URL(path, repo)
+  const tmp = new URL(`${path}.${process.pid}.tmp`, repo)
+  writeFileSync(tmp, text)
+  renameSync(tmp, url)
 }
-const outputs = {
-  "packages/theme/tokens.manifest.json": format(
-    `${JSON.stringify(manifest, null, 2)}\n`,
-    "packages/theme/tokens.manifest.json",
-  ),
-  "packages/theme/src/builder/components.generated.ts": format(
-    ts,
-    "packages/theme/src/builder/components.generated.ts",
-  ),
-}
-const check = process.argv.includes("--check")
-let stale = false
-for (const [path, text] of Object.entries(outputs)) {
-  const url = new URL(path, `file://${repo}`)
-  if (check) {
-    const current = existsSync(url) ? readFileSync(url, "utf8") : ""
-    if (current !== text) {
-      console.error(
-        `${path} differs from a fresh scan: run node packages/theme/scripts/token-manifest.mjs`,
-      )
-      stale = true
-    }
-  } else writeFileSync(url, text)
-}
-if (stale) process.exit(1)
-console.log(check ? "token manifest up to date" : "token manifest written")
+put("packages/theme/tokens.manifest.json", `${JSON.stringify(manifest, null, 2)}\n`)
+put("packages/theme/src/builder/components.generated.ts", ts)
