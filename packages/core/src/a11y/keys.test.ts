@@ -76,6 +76,23 @@ describe("toLogicalKey", () => {
     expect(toLogicalKey(k("Home"), value("rtl"))).toBe("FIRST")
   })
 
+  it('value: "vertical" steps with Up/Down and moves with Left/Right, mirrored in RTL', () => {
+    const seg = (dir: "ltr" | "rtl") => ctx({ orientation: "horizontal", value: "vertical", dir })
+    expect(toLogicalKey(k("ArrowUp"), seg("ltr"))).toBe("INCREASE")
+    expect(toLogicalKey(k("ArrowDown"), seg("ltr"))).toBe("DECREASE")
+    expect(toLogicalKey(k("ArrowRight"), seg("ltr"))).toBe("NEXT")
+    expect(toLogicalKey(k("ArrowLeft"), seg("ltr"))).toBe("PREV")
+    expect(toLogicalKey(k("ArrowLeft"), seg("rtl"))).toBe("NEXT")
+    expect(toLogicalKey(k("ArrowRight"), seg("rtl"))).toBe("PREV")
+    expect(toLogicalKey(k("ArrowUp"), seg("rtl"))).toBe("INCREASE")
+    expect(toLogicalKey(k("Home"), seg("rtl"))).toBe("FIRST")
+    expect(toLogicalKey(k("PageUp"), seg("ltr"))).toBe("PAGE_PREV")
+    // Plain value mode unchanged.
+    expect(toLogicalKey(k("ArrowRight"), ctx({ orientation: "horizontal", value: true }))).toBe(
+      "INCREASE",
+    )
+  })
+
   it("runs in Node with no DOM", () => {
     expect(typeof document).toBe("undefined")
     expect(toLogicalKey(k("ArrowLeft"), ctx({ orientation: "horizontal", dir: "rtl" }))).toBe(
