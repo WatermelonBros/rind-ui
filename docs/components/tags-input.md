@@ -18,15 +18,21 @@ import { TagsInput } from "@rind-ui/react"
 `Chips` renders one `Chip` per tag, each with `ChipText`, `ChipInput` (only while that tag is edited) and `ChipRemove`. Pass a render function to change a chip: it receives `{ key, text, disabled }`.
 
 ```tsx
-<TagsInput.Chips>
-  {(chip) => (
-    <TagsInput.Chip disabled={chip.text === "rome"}>
-      <TagsInput.ChipText />
-      <TagsInput.ChipInput />
-      <TagsInput.ChipRemove />
-    </TagsInput.Chip>
-  )}
-</TagsInput.Chips>
+<TagsInput.Root defaultValue={["rome", "paris"]}>
+  <TagsInput.Label>Cities</TagsInput.Label>
+  <TagsInput.Control>
+    <TagsInput.Chips>
+      {(chip) => (
+        <TagsInput.Chip disabled={chip.text === "rome"}>
+          <TagsInput.ChipText />
+          <TagsInput.ChipInput />
+          <TagsInput.ChipRemove />
+        </TagsInput.Chip>
+      )}
+    </TagsInput.Chips>
+    <TagsInput.Input />
+  </TagsInput.Control>
+</TagsInput.Root>
 ```
 
 The input needs an accessible name: render a `TagsInput.Label`, or pass `aria-label` to `TagsInput.Input`.
