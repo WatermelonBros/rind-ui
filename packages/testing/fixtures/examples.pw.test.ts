@@ -306,6 +306,9 @@ const TRANSIENT = new Set([
   "number-input:spinning",
   "password-input:composing",
   "pin-input:composing",
+  // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
+  "tags-input:typing",
+  "tags-input:editing",
   "search-field:composing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
