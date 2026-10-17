@@ -847,11 +847,11 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   /** The last step's facts: the base of the unmount-while-open check. */
   /** Steps whose user action changed the value (form-associated: one `change` each). */
   let userChanges = 0
-  /** The values the hidden input mirrors, serialised (a change of them is a form change). */
+  /** The values the form carries, serialised (a user change compares them). */
   const formValues = () => {
-    const all = oracle.service.view().values as Record<string, unknown>
+    const values = oracle.service.view().values as Record<string, unknown>
     const keys = contract.formInput?.values
-    return JSON.stringify(keys ? keys.map((k) => all[k]) : all)
+    return JSON.stringify(keys ? keys.map((k) => values[k]) : values)
   }
   let lastFacts: StepFacts | null = null
   const verify = async (

@@ -261,6 +261,11 @@ export interface ValuedDecl {
  * value without the user (dispatching no `change`, e.g. a form reset).
  */
 export interface FormInputDecl {
+  /**
+   * The controllable values the form carries (default: all of them). A step changing only
+   * another value (a select's `open`) is no user change of the form's value.
+   */
+  readonly values?: readonly string[]
   /** One hidden input per item (a group): each is compared, and their events summed. */
   readonly multiple?: boolean
   /**
@@ -278,11 +283,6 @@ export interface FormInputDecl {
     readonly value?: string
   }
   readonly silentEvents?: readonly string[]
-  /**
-   * The values the hidden input mirrors (default: all): a change of another value (a
-   * combobox's text or open state) is not a form change.
-   */
-  readonly values?: readonly string[]
   /**
    * Events whose action makes the browser dispatch one `change` itself (assistive technology
    * adjusting an accessible native input): one change each, whether or not the value changes.

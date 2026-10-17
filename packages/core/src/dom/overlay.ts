@@ -30,6 +30,8 @@ export interface OverlayEffectOptions extends Omit<LayerOptions, "onParentDismis
   /** Where focus returns; receives the dismiss reason (undefined for a programmatic close). */
   readonly finalFocus?: (reason: DismissReason | undefined) => FocusTarget
   /** How the layer was opened (touch focuses the container: no on-screen keyboard). */
+  /** Tab closes the layer and moves on from its opener (a select, a menu): never wrapped. */
+  readonly tabCloses?: boolean | undefined
   readonly modality: Modality
   /**
    * The content animates out: receives the layer's dispose, to call when presence is absent
@@ -89,7 +91,9 @@ export function overlayEffect(
       return
     }
     frame = null
-    if (options.modal) offContain = containFocus(env, handle, container)
+    if (options.modal) {
+      offContain = containFocus(env, handle, container, { tabCloses: options.tabCloses })
+    }
     cancelInitial = focusInitial(
       env,
       container,
