@@ -58,6 +58,8 @@ export interface ComboboxConnectView {
   readonly dir: "ltr" | "rtl"
   readonly messages: ComboboxMessages
   readonly mounted: { readonly label: boolean; readonly empty: boolean }
+  /** The engine has the Popover API (known after mount): the positioner joins the top layer. */
+  readonly topLayer?: boolean | undefined
   readonly send: (event: ComboboxEvent) => void
 }
 
@@ -323,18 +325,40 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
         focusInput(modality)
       },
     }),
-    positioner: (): PartProps => ({
-      ...common("positioner"),
-      ...positionerProps(
+    positioner: (): PartProps => {
+      const placed = positionerProps(
         c.placement,
         { positioner: ids.positioner, anchor: ids.control },
         { dir: v.dir },
-      ),
-      "data-empty": dataFlag(v.empty),
-      "data-loading": dataFlag(v.loading === "loading" || v.loading === "loading-more"),
-      // Without an Empty part the whole surface hides in the empty state.
-      hidden: v.empty && !v.mounted.empty ? true : undefined,
-    }),
+      )
+      return {
+        ...common("positioner"),
+        ...placed,
+        // The top layer (the adapter calls showPopover): above every page stacking context,
+        // while staying in place in the DOM (reading and swipe order). The UA's popover box
+        // rules are reset; positioning resolves a fixed strategy for an open popover.
+        ...(v.topLayer
+          ? {
+              popover: "manual",
+              // The reset first: the placement's own top / left / position come after it.
+              style: {
+                inset: "auto",
+                margin: "0",
+                border: "0",
+                padding: "0",
+                background: "transparent",
+                color: "inherit",
+                overflow: "visible",
+                ...(placed["style"] as Record<string, string>),
+              },
+            }
+          : {}),
+        "data-empty": dataFlag(v.empty),
+        "data-loading": dataFlag(v.loading === "loading" || v.loading === "loading-more"),
+        // Without an Empty part the whole surface hides in the empty state.
+        hidden: v.empty && !v.mounted.empty ? true : undefined,
+      }
+    },
     popup: (): PartProps => ({
       ...common("popup"),
       ...contentPlacementProps(c.placement),
