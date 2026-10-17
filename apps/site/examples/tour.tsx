@@ -215,8 +215,6 @@ export function Shielded() {
           description:
             "Presses on the highlighted toolbar are swallowed; the keyboard still works.",
           target: byId(ids.toolbar),
-          // Modal: the rest of the page is inert too, and Escape ends the tour.
-          modal: true,
           actions: [{ action: "dismiss", label: "Got it" }],
         },
       ]}
