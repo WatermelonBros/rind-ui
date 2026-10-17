@@ -122,7 +122,7 @@ describe("focus and visible range", () => {
     m.key("next-day")
     expect(m.focused()).toBe("2026-11-01")
     expect(m.visible()).toBe("2026-11-01")
-    expect(m.focusCell).toHaveBeenLastCalledWith(d(2026, 11, 1))
+    expect(m.focusCell.mock.lastCall?.[0]).toEqual(d(2026, 11, 1))
   })
 
   it("a parent's focusedValue pages and announces from outside the grid", () => {
@@ -167,7 +167,7 @@ describe("announcements", () => {
     m.focus()
     m.s.send({ type: "PAGE", direction: 1, modality: "keyboard" })
     expect(m.log).toEqual([])
-    expect(m.focusCell).toHaveBeenLastCalledWith(d(2026, 11, 14))
+    expect(m.focusCell.mock.lastCall?.[0]).toEqual(d(2026, 11, 14))
   })
 
   it("paging at the maximum is refused", () => {

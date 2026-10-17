@@ -153,9 +153,8 @@ export const calendarMachine = setup({
     interactive: ({ props }) => props.disabled !== true,
     notComposing: ({ event }) =>
       !((event.type === "NAVIGATE" || event.type === "SELECT_FOCUSED") && event.composing),
-    pressSelectable: ({ event, props }) =>
-      event.type === "CELL.PRESS" && isSelectable(event.date, props),
     focusedSelectable: (args) => isSelectable(focusedOf(args), args.props),
+    pagedByPress: ({ event }) => event.type === "PAGE" && event.modality !== "keyboard",
     canPage: ({ event, context, props }) =>
       event.type === "PAGE" &&
       props.disabled !== true &&
@@ -197,7 +196,9 @@ export const calendarMachine = setup({
       requestCellFocus(args.props, args.event.date, args.event.modality)
     },
     selectPressed: (args) => {
-      if (args.event.type === "CELL.PRESS") select(args, args.event.date)
+      if (args.event.type === "CELL.PRESS" && isSelectable(args.event.date, args.props)) {
+        select(args, args.event.date)
+      }
     },
     selectFocused: (args) => select(args, focusedOf(args)),
     setHovered: ({ event, set }) => {
@@ -252,16 +253,14 @@ export const calendarMachine = setup({
     idle: {
       on: {
         "GRID.FOCUS": { target: "focused", guard: "interactive" },
-        PAGE: { guard: "canPage", actions: ["page", "announceRange"] },
-        // A pointer press focuses the cell too.
-        "CELL.PRESS": [
-          {
-            guard: "pressSelectable",
-            target: "focused",
-            actions: ["setFocused", "pressFocus", "selectPressed"],
-          },
-          { guard: "interactive", target: "focused", actions: ["setFocused", "pressFocus"] },
-        ],
+        // Keys page only from inside the grid: an unfocused calendar pages by its triggers.
+        PAGE: { guard: { and: ["canPage", "pagedByPress"] }, actions: ["page", "announceRange"] },
+        // A pointer press focuses the cell too; it selects only a selectable date.
+        "CELL.PRESS": {
+          guard: "interactive",
+          target: "focused",
+          actions: ["setFocused", "pressFocus", "selectPressed"],
+        },
       },
     },
     focused: {
@@ -270,16 +269,21 @@ export const calendarMachine = setup({
         NAVIGATE: { guard: "notComposing", actions: ["move"] },
         // Focus alone never selects (cause C).
         "CELL.FOCUS": { actions: ["setFocused"] },
-        "CELL.PRESS": [
-          { guard: "pressSelectable", actions: ["setFocused", "selectPressed"] },
-          { actions: ["setFocused"] },
-        ],
+        "CELL.PRESS": { actions: ["setFocused", "selectPressed"] },
         SELECT_FOCUSED: {
           guard: { and: ["notComposing", "focusedSelectable"] },
           actions: ["selectFocused"],
         },
         // No announcement: the focused cell's name carries the month.
-        PAGE: { guard: "canPage", actions: ["page", "focusAfterPage"] },
+        // A trigger press moves focus to the trigger: the grid is left.
+        PAGE: [
+          {
+            guard: { and: ["canPage", "pagedByPress"] },
+            target: "idle",
+            actions: ["page", "announceRange"],
+          },
+          { guard: "canPage", actions: ["page", "focusAfterPage"] },
+        ],
       },
     },
   },

@@ -171,18 +171,13 @@ export const calendarContract = contract("calendar", {
     },
     nextPage: {
       pointer: async (env: E) => env.part("next-trigger").click(),
-      keyboard: async (env: E) => {
-        await enterGrid(env)
-        await env.keyboard("PageDown")
-      },
+      // The keys of the focused grid (an unfocused calendar pages by its triggers).
+      keyboard: (env: E) => env.keyboard("PageDown"),
       done: async () => true,
     },
     previousPage: {
       pointer: async (env: E) => env.part("prev-trigger").click(),
-      keyboard: async (env: E) => {
-        await enterGrid(env)
-        await env.keyboard("PageUp")
-      },
+      keyboard: (env: E) => env.keyboard("PageUp"),
       done: async () => true,
     },
     press: {
