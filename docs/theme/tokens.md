@@ -29,6 +29,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 
 - `--rind-accordion-content-height`
 - `--rind-accordion-content-width`
+- `--rind-anchor-width`
 - `--rind-available-height`
 - `--rind-available-width`
 - `--rind-collapsible-content-height`
@@ -561,6 +562,184 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "trigger-padding-inline": {
       "fallback": "var(--rind-space-2)",
       "file": "collapsible.css"
+    }
+  }
+}
+```
+
+### combobox
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "button-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "combobox.css"
+    },
+    "button-color-hover": {
+      "fallback": "var(--rind-color-text)",
+      "file": "combobox.css"
+    },
+    "button-radius": {
+      "fallback": "var(--rind-radius-indicator)",
+      "file": "combobox.css"
+    },
+    "clear-icon": {
+      "fallback": "var(--rind-icon-x)",
+      "file": "combobox.css"
+    },
+    "control-bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "combobox.css"
+    },
+    "control-border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "combobox.css"
+    },
+    "control-disabled-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "combobox.css"
+    },
+    "control-disabled-border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "combobox.css"
+    },
+    "control-height": {
+      "fallback": "var(--rind-size-control, var(--rind-size-md))",
+      "file": "combobox.css"
+    },
+    "control-invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "combobox.css"
+    },
+    "control-padding": {
+      "fallback": "var(--rind-space-control, var(--rind-space-3))",
+      "file": "combobox.css"
+    },
+    "control-radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "combobox.css"
+    },
+    "control-readonly-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "combobox.css"
+    },
+    "control-soft-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "combobox.css"
+    },
+    "empty-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "combobox.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "combobox.css"
+    },
+    "group-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "combobox.css"
+    },
+    "icon-size": {
+      "fallback": "1em",
+      "file": "combobox.css"
+    },
+    "indicator-icon": {
+      "fallback": "var(--rind-icon-check)",
+      "file": "combobox.css"
+    },
+    "indicator-size": {
+      "fallback": "1em",
+      "file": "combobox.css"
+    },
+    "item-disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "combobox.css"
+    },
+    "item-height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "combobox.css"
+    },
+    "item-highlight-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "combobox.css"
+    },
+    "item-highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "combobox.css"
+    },
+    "item-outline": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "combobox.css"
+    },
+    "item-padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "combobox.css"
+    },
+    "item-selected-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "combobox.css"
+    },
+    "item-selected-text": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "combobox.css"
+    },
+    "item-solid-bg": {
+      "fallback": "var(--rind-color-accent-solid)",
+      "file": "combobox.css"
+    },
+    "item-solid-text": {
+      "fallback": "var(--rind-color-accent-on-solid)",
+      "file": "combobox.css"
+    },
+    "placeholder": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "combobox.css"
+    },
+    "popup-bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "combobox.css"
+    },
+    "popup-border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "combobox.css"
+    },
+    "popup-max-height": {
+      "fallback": "20rem",
+      "file": "combobox.css"
+    },
+    "popup-min-width": {
+      "fallback": "0",
+      "file": "combobox.css"
+    },
+    "popup-padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "combobox.css"
+    },
+    "popup-radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "combobox.css"
+    },
+    "popup-shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "combobox.css"
+    },
+    "popup-soft-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "combobox.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "combobox.css"
+    },
+    "trigger-icon": {
+      "fallback": "var(--rind-icon-caret-down)",
+      "file": "combobox.css"
+    },
+    "trigger-icon-open": {
+      "fallback": "var(--rind-icon-caret-up)",
+      "file": "combobox.css"
     }
   }
 }

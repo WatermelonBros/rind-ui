@@ -11,6 +11,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | Module | Quirks |
 |---|---|
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
+| `packages/core/src/components/combobox/combobox.machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/menu/menu.connect.ts` | `vo-submenu-expanded` |
 | `packages/core/src/dom/autosize.ts` | `firefox-textarea-overflow` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
@@ -125,7 +126,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/chakra-ui/zag/issues/2936>, <https://github.com/adobe/react-spectrum/issues/10326>, <https://github.com/mui/base-ui/issues/5721>, <https://github.com/adobe/react-spectrum/pull/10503>
 - Repro test: `packages/core/src/dom/quirks.test.ts`
-- Checked in: `packages/core/src/collection/machine.ts`, `packages/testing/src/invariants.ts`
+- Checked in: `packages/core/src/collection/machine.ts`, `packages/core/src/components/combobox/combobox.machine.ts`, `packages/testing/src/invariants.ts`
 - Allowed contract exceptions: `announcement-parity`
 - Last verified: 2026-10-14
 - Remove when: VoiceOver in Safari announces aria-activedescendant changes on macOS and iOS
