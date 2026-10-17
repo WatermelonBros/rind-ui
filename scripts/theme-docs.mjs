@@ -1,12 +1,5 @@
-// Generates docs/theme/tokens.md from packages/theme/tokens.manifest.json.
-// Run: node scripts/theme-docs.mjs   ·   --check fails when the page is out of date.
-import { existsSync, readFileSync, writeFileSync } from "node:fs"
-
-const root = new URL("../", import.meta.url)
-const manifest = JSON.parse(
-  readFileSync(new URL("packages/theme/tokens.manifest.json", root), "utf8"),
-)
-const out = new URL("docs/theme/tokens.md", root)
+// Renders the token reference (tokens.md) from packages/theme/tokens.manifest.json. Not
+// committed: the site build writes it into its own output (apps/site/scripts/content.ts).
 
 const category = (t) => /^--rind-([a-z]+)/.exec(t)?.[1] ?? "other"
 
@@ -20,7 +13,7 @@ export function renderTokens(m) {
     "",
     "# Token reference",
     "",
-    "Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the twelve `--rind-brand-*` inputs; see [white-label.md](white-label.md).",
+    "Every tier 2 (semantic) token and every component's tier 3 token. Tier 1 are the twelve `--rind-brand-*` inputs; see [white-label.md](https://raw.githubusercontent.com/WatermelonBros/rind-ui/main/docs/theme/white-label.md).",
     "",
     "## Tier 2: semantic tokens",
     "",
@@ -47,14 +40,4 @@ export function renderTokens(m) {
           "",
         ])),
   ].join("\n")
-}
-
-if (import.meta.main) {
-  const text = renderTokens(manifest)
-  if (process.argv.includes("--check")) {
-    if (!existsSync(out) || readFileSync(out, "utf8") !== text) {
-      console.error("docs/theme/tokens.md is out of date (run node scripts/theme-docs.mjs)")
-      process.exit(1)
-    }
-  } else writeFileSync(out, text)
 }

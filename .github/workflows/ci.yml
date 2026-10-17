@@ -53,9 +53,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: build
+          # The theme's generated token files (not committed) ride along: tests read them.
           path: |
             packages/*/dist
             apps/site/out
+            packages/theme/tokens.manifest.json
+            packages/theme/src/builder/components.generated.ts
           retention-days: 1
 
   # The test suite split by Vitest project and browser, so the slices run in parallel. On

@@ -21,6 +21,7 @@ import type {
   Side,
 } from "../../env/position"
 import { partId } from "../../ids"
+import { session } from "../../machine/session"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
 
@@ -127,50 +128,6 @@ const initialPlacement = (props: TooltipProps) => {
 
 type Env = DomEnvironment & PositionEnv & HoverIntentEnv & DelayGroupEnv
 
-/**
- * Keeps one session (layer, hover tracking, positioning) across open ↔ closing: leaving a
- * state cleans its effects, so the cleanup only hands the session over for a microtask;
- * the next state's effect takes it back, and only a real close tears it down.
- */
-interface Session<A> {
-  stop: () => void
-  pending: boolean
-  /** The activation that owns it now: events and props always go through the current one. */
-  owner: A
-  /** The last placement, replayed to a new owner (positioning reports only changes). */
-  placed: TooltipEvent | null
-}
-const sessions = new Map<string, Session<unknown>>()
-function session<A>(
-  key: string,
-  owner: A,
-  start: (session: Session<A>) => () => void,
-  adopted: (session: Session<A>) => void,
-): () => void {
-  const live = sessions.get(key) as Session<A> | undefined
-  let s: Session<A>
-  if (live) {
-    // A restarted service (StrictMode, a remount) or open ↔ closing: the new activation
-    // takes it over; the previous one's `send` is revoked.
-    live.owner = owner
-    s = live
-    adopted(s)
-  } else {
-    s = { stop: () => {}, pending: false, owner, placed: null }
-    s.stop = start(s)
-  }
-  s.pending = false
-  sessions.set(key, s as Session<unknown>)
-  return () => {
-    s.pending = true
-    queueMicrotask(() => {
-      if (!s.pending || sessions.get(key) !== s) return
-      sessions.delete(key)
-      s.stop()
-    })
-  }
-}
-
 const isKeyboardIntent = (e: { readonly type: string }) =>
   e.type === "FOCUS" &&
   "modality" in e &&
@@ -235,8 +192,8 @@ export const tooltipMachine = setup({
       if (typeof document === "undefined") return undefined
       const root = a.props.root
       const ids = tooltipIds(root)
-      return session(
-        `${root}`,
+      return session<typeof a, TooltipEvent>(
+        `tooltip:${root}`,
         a,
         (s) => {
           const send = (e: TooltipEvent) => s.owner.send(e)

@@ -83,8 +83,9 @@ An unsupported `data-variant` renders the family default.
 1. Add the scope to one row of `families.ts` (or to `noFamily`); a new family or value is a
    change to `theme-variants`.
 2. Write `src/<scope>.css` as above; add it to `index.css` imports.
-3. `node packages/theme/scripts/token-manifest.mjs` — regenerates `tokens.manifest.json` and
-   the `components` override type; commit both. `pnpm build` runs it with `--check`.
+3. `pnpm --filter @rind-ui/theme generate` — regenerates `tokens.manifest.json` and the
+   `components` override type. Both are build outputs (not committed); turbo runs it before
+   build and typecheck.
 4. `pnpm vitest run packages/theme` — lint, family and export tests.
 5. Site examples (`apps/site/examples/<slug>.tsx`) render the themed component; state examples also with `data-tone="danger"`.
 6. Link this page from the component's docs page.
