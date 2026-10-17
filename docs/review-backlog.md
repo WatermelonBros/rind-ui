@@ -7,6 +7,52 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
+| add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
+| add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
+| add-select (impl) | — | packages/testing/fixtures/select | Task 6.2: forced-colors Playwright captures; Task 5.3: scroll-overflow and one-element-per-query tests |
+| add-select (impl) | — | docs/components/select.md | Task 8.2: manual screen-reader pass (VO/Safari macOS+iOS, NVDA/Firefox, JAWS/Chrome, TalkBack, Firefox Android touch) |
+| add-select (impl) | — | packages/core/src/components/select/select.contract.ts | Task A.3: `field-associated` trait and the Field prop × control matrix test |
+| add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
+| add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
+| add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |
+| add-qr-code (r1) | — | packages/react/src/qr-code/qr-code.tsx | `apiRef` finds frame/pattern/overlay with `document.getElementById`: breaks inside a shadow root (use the Root element's root node) |
+| add-qr-code (r1) | — | packages/testing/src/components/qr-code.dom.test.tsx | No Root re-render test with an inline `encoding` object (the compare-by-value claim) |
+| add-qr-code (r1) | — | packages/core/src/qr/qr.test.ts | The auto-mask oracle is circular (it reuses the encoder's own penalty); compare with fixtures' chosen masks instead |
+| add-qr-code (impl) | — | packages/core/src/components/qr-code/qr-code.contract.ts | Contract is `qrCodeContractWith(decode)` (core cannot import the testing decoder); `setValue` types into the page's "Value" control |
+| add-qr-code (impl) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | ARIA snapshots and axe run inline in the Playwright fixture until the site-examples snapshot harness exists |
+| add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
+| add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
+| add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
+| add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
+| add-scroll-area (r1) | — | packages/core/src/dom/scroll-metrics.ts:152 | The tabbables walk runs per scroll frame; cache it and invalidate on subtree mutation |
+| add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Release outside the window is tested without a pointer move after release |
+| add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.dom.test.tsx | Unmount leak check covers wheel listeners only (pointer, resize and mutation observers unchecked) |
+| add-scroll-area (r1) | — | packages/core/src/components/scroll-area/scroll-area.contract.ts | The tab-stop invariant derives from the component's own `data-tab-stop`, not from an independent oracle |
+| add-scroll-area (r1) | — | packages/theme/src/scroll-area.css | Forced-colors fallback: confirm the spec intent (system scrollbars vs drawn thumb) |
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Not covered yet: Collapsible inside, 30-instance read/write interleaving trace, Trusted Types enforcement, fast drag released outside the window, re-hover without a thumb jump |
+| add-scroll-area (impl) | — | packages/testing/src/components/scroll-area.model.dom.test.tsx | Model walk is browser-only with layout events (`SCROLL`, `DRAG.*`, `METRICS`) skipped; covered by browser tests |
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.machine.ts:81 | A paste of a code identical to the complete value never completes again (`next !== previous`) |
+| add-pin-input (r1) | — | packages/core/src/components/pin-input/pin-input.connect.ts:59 | `codePattern` drops the consumer pattern's flags (an `i` pattern loses case-insensitivity in the native `pattern`) |
+| add-pin-input (r1) | — | packages/testing/fixtures/pin-input | No trusted Ctrl/⌘+V run (the clipboard paste through the OS shortcut) |
+| add-pin-input (r1) | — | packages/testing/src/components/pin-input.dom.test.tsx | No assertion-level tests for ArrowLeft/Right, Home/End and Backspace moving the active slot |
+| add-pin-input (impl) | — | packages/testing/src/components/pin-input.broken.dom.test.tsx | Broken variants "Enter prevented", "focus moved after autoSubmit" and "completion missed on paste replacement" are not modelled: no step invariant records Enter, focus after submit or completion counts (scenarios cover the correct paths) |
+| add-pin-input (impl) | — | packages/theme/src/pin-input.browser.test.tsx | Forced-colors and reduced-motion checks read the stylesheet; emulated captures of the six states still to add (tasks 8.2) |
+| add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
+| add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
+| add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |
+| add-pagination (r1) | — | packages/testing/fixtures/pagination/pagination.pw.test.ts | Middle-click-opens-new-tab skipped on WebKit (headless WebKit follows it in the same tab even on a bare `<a>`) |
+| add-pagination (r1) | — | packages/testing/src/components/pagination.model.dom.test.tsx | No model class with `disabled` + `getPageHref` (disabled link triggers) |
+| add-breadcrumbs (r1) | — | packages/core/src/components/breadcrumbs/breadcrumbs.test.ts | Development warnings tested only on the positive path (no "does not warn" cases) |
+| add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | One Root context: every Item re-renders on a trail change (task 3.1 asks for per-part selectors) |
+| add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | Static Items register at commit: the server HTML has no `aria-current` (design §6 covers collapse; the `items` form has both) |
+| add-breadcrumbs (impl) | — | packages/core/src/components/breadcrumbs/breadcrumbs.contract.ts | No Menu yet: `openCollapsed`/`followCollapsed` work with a Popover; extra Ellipsis `data-label` locates the trigger |
+| add-pagination (impl) | — | packages/core/src/components/pagination/pagination.contract.ts | `focused()` became `isFocused(control)`: the runner reads every no-argument query after each step and a focus query trips its focus-does-not-commit check |
+| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
+| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:175 | The pointer-clear path should assert focus stays in the input and the change is reported once |
+| add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
+| add-search-field (impl) | — | packages/testing/src/components/search-field.broken.dom.test.tsx | Broken variant "clear bypassing validation (react-spectrum#7265)" not modelled: no invariant observes a stale Field error yet; the scenario test "Clear re-validates" covers the correct path |
+| add-password-input (impl) | — | packages/core/src/components/field (submit on an invalid Field) | A pointer submit of a natively invalid Field focuses the control with `data-focus-visible` (seen in the password model; that config uses `validationBehavior="aria"`) |
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |
 | add-badge (r1) | — | packages/react/src/badge/badge.tsx | The post-mount host check's layout effect has no deps and re-warns on every render; dedupe by key (host + message) |
@@ -142,6 +188,14 @@ See CLAUDE.md "Review rules".
 | add-a11y-foundations (r1) | — | packages/testing/src/broken.dom.test.tsx:157 | No broken fixture for "no ring after arrow" or "double speech on Windows"; the Tab fixture fails pointer runs for the wrong reason (hidden by `some(...)`); RA#9737 fixture doesn't prove Chromium-only; ring contrast checked only against backgrounds |
 | add-tooltip (r1) | — | packages/react/src/tooltip/tooltip.tsx (Trigger) | the render element's own `aria-describedby` / `aria-labelledby` (set on the element passed to `render`) are not merged with the tooltip's reference; only the Trigger's props are |
 | add-tooltip (r1) | — | packages/testing/src/invariants.ts (`layer`) | the "focus already on body before the step" exemption also hides a Dialog/Popover that leaves focus on body after opening from body; scope it to contracts that declare a layer that never takes focus |
+| test-stability (r1) | — | packages/testing/src/components/text-field.dom.test.tsx:325 | the IME debounce test no longer goes through the driver |
+| test-stability (r1) | — | packages/testing (resting-cursor test) | the negative window shrank to 8 animation frames |
+| test-stability (r1) | — | packages/testing/src/virtual-clock.ts | module-level clocks have no reset; `advance` has no loop guard for a timer that reschedules itself at 0 ms |
+| add-menu (impl) | 5.1 | packages/testing/src/components/menu-scenarios.dom.test.tsx | no automated test yet for "Thumb resting on the trigger while scrolling" (radix#2418, a real touch scroll in Playwright) and "Exit animation" (radix#4195, needs the themed exit animation) |
+| add-context-menu (impl) | 5.3 | packages/testing/src/components/context-menu-scenarios.dom.test.tsx | Reado parity: only the bottom-right viewport corner is tested; the other corners and the left-click-opened menus are not |
+| add-menu (r1) | — | packages/testing/src/components/menu.dom.test.tsx | "Dialog from an item" checks the focus only after a keyboard choose: add a pointer variant |
+| add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |
+| add-menu (r1) | — | openspec/changes/add-menu/specs/menu/spec.md:616 | the content orientation text (`aria-orientation` only for horizontal) needs rewording |
 
 ## Manual AT protocol
 
@@ -149,7 +203,12 @@ Passes that need real assistive technology or devices; automated tests cannot st
 
 | Change | Task | What to check |
 |---|---|---|
+| add-password-input | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: trigger read as a toggle button with its pressed state, the "Password shown/hidden" announcement on a pointer toggle, 1Password/Bitwarden badges not covering the trigger, Edge shows one reveal control |
+| add-pin-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: one field announced with its name, the code read back, iOS "From Messages" fill, 1Password/Bitwarden fill, iOS selection handles over the transparent input |
+| add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
+| add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
+| add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 
 ## Resolved
 

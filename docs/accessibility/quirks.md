@@ -11,6 +11,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | Module | Quirks |
 |---|---|
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
+| `packages/core/src/components/menu/menu.connect.ts` | `vo-submenu-expanded` |
 | `packages/core/src/dom/autosize.ts` | `firefox-textarea-overflow` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
 | `packages/core/src/dom/keyboard.ts` | `safari-ime-commit-enter` |
@@ -20,7 +21,9 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
 | `packages/react/src/form/form.tsx` | `react-action-form-reset` |
+| `packages/react/src/meter/meter.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
+| `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `firefox-textarea-overflow`
@@ -78,6 +81,15 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: `packages/core/src/dom/press.ts`
 - Last verified: 2026-10-14
 - Remove when: VoiceOver dispatches one click for VO+Space on a button with role=menuitem
+
+## `vo-submenu-expanded`
+
+- Bugs: <https://github.com/mui/base-ui/blob/master/packages/react/src/menu/submenu-trigger/MenuSubmenuTrigger.tsx>
+- Repro test: `packages/core/src/components/menu/menu.connect.test.ts`
+- Checked in: `packages/core/src/components/menu/menu.connect.ts`
+- Allowed contract exceptions: `state-attrs`
+- Last verified: 2026-10-16
+- Remove when: VoiceOver reads the focused submenu item after an aria-expanded change
 
 ## `ios-emulated-mouse-after-touch`
 
@@ -167,3 +179,11 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: component code (none yet)
 - Last verified: 2026-10-16
 - Remove when: Firefox on Linux focuses a label's control on activation
+
+## `nvda-progressbar-name`
+
+- Bugs: <https://github.com/mui/base-ui/issues/4184>, <https://github.com/nvaccess/nvda/issues/13904>, <https://github.com/nvaccess/nvda/issues/16204>, <https://github.com/FreedomScientific/standards-support/issues/354>
+- Repro test: `packages/core/src/components/progress/progress.connect.test.ts`
+- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`
+- Last verified: 2026-10-16
+- Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases

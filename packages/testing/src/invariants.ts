@@ -26,9 +26,13 @@ export interface StepFacts {
   readonly expected: (el: ElementInfo) => PartExpected
   /** Whether the instance is open in this state (per the contract's data-state). */
   readonly open: boolean
+  /** The step leaves the machine's initial (resting closed) state: an opening, never a close. */
+  readonly fromInitial?: boolean
   /** True when the oracle state is the machine's initial state. */
   readonly atInitial: boolean
   readonly anchorCount: number
+  /** The contract declares the component unmounted in this state (`absentIn`). */
+  readonly absent?: boolean
   readonly errors: readonly string[]
   readonly traits: readonly Trait[]
   readonly semantics: Readonly<Record<string, string | undefined>>
@@ -169,7 +173,13 @@ function highlightChecks(f: StepFacts): string[] {
 }
 
 const anchor: GenericInvariant = (f) =>
-  f.anchorCount === 1 ? [] : [`exactly one element must match the anchor; found ${f.anchorCount}`]
+  f.absent
+    ? f.anchorCount === 0
+      ? []
+      : [`no element may match the anchor in ${f.state} (absentIn); found ${f.anchorCount}`]
+    : f.anchorCount === 1
+      ? []
+      : [`exactly one element must match the anchor; found ${f.anchorCount}`]
 
 const noErrors: GenericInvariant = (f) => f.errors.map((e) => `error during the step: ${e}`)
 
@@ -363,7 +373,14 @@ const hiddenFocus: GenericInvariant = (f) => {
  * another element is leaving (Tab out) when the machine took a transition to another state
  * (focused → idle); without one, the component lost focus.
  */
+/** A layer with no restore target part: focus returns to what had it when it opened. */
+const restoresToPrevious = (f: StepFacts) =>
+  f.semantics["finalFocus"] === undefined && f.semantics["trigger"] === undefined
+
 const focusKept: GenericInvariant = (f) =>
+  // A layer that returns focus to what had it before (no restore target declared): back in
+  // its initial state with nothing focused at the start, <body> is where focus belongs.
+  !(restoresToPrevious(f) && f.atInitial && f.baseline.focus.onBody && f.after.focus.onBody) &&
   f.before?.focus.inInstance &&
   !f.after.focus.inInstance &&
   (f.after.focus.onBody || f.from === null || f.from === f.state)
@@ -625,7 +642,18 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** (13) After closing, focus is on the trigger or the declared final-focus part. */
   "restores-focus": (f) => {
     const target = f.semantics["finalFocus"] ?? f.semantics["trigger"]
-    const closed = f.from !== null && f.from !== f.state && !isOpen(f)
+    // closed → opening (a hover delay starting) leaves the resting state: no close. An
+    // opening → closed cancel is still checked.
+    const closed = f.from !== null && f.from !== f.state && !isOpen(f) && f.fromInitial !== true
+    // No target: focus returns to the element focused before it opened (a context menu),
+    // which only <body> when nothing was focused.
+    if (restoresToPrevious(f)) {
+      return closed && f.after.focus.onBody && !f.baseline.focus.onBody
+        ? ["after closing, focus is on <body>, though something had focus when it opened"]
+        : []
+    }
+    // Closed by Tab: focus was restored to the trigger and the browser's Tab moved on from it.
+    if (f.context?.["closeReason"] === "tab-key") return []
     return closed && f.after.focus.part !== target
       ? [
           `after closing, focus is on ${f.after.focus.element?.describe ?? "<body>"}, expected the ${target} part`,

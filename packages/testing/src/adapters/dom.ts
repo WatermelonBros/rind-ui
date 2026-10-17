@@ -36,8 +36,13 @@ export interface DomAdapterOptions {
   readonly root?: ParentNode
   /** user-event by default; pass `userEvent` from "vitest/browser" for real input. */
   readonly user?: UserLike
-  /** Fake-timer advance, e.g. `vi.advanceTimersByTime`. */
+  /** Fake-timer advance, e.g. `vi.advanceTimersByTime` (polling advances it too). */
   readonly advanceTimers?: (ms: number) => unknown
+  /**
+   * A virtual clock's advance (`virtualClock().advance`) for the explicit waits only
+   * (`advance`, `longPress`): polling stays on real time, so frames keep running.
+   */
+  readonly advanceClock?: (ms: number) => unknown
   /**
    * `until` timeout in ms. Default 1000 in jsdom (Testing Library's waitFor default) and
    * 3000 in a real browser, where a CPU-starved page can deliver its first animation frame
@@ -67,6 +72,33 @@ const nextCoords = (el?: Element) => {
   const x = rect.left + 1 + (step % Math.max(1, Math.floor(rect.width - 2)))
   const y = rect.top + 1 + (step % Math.max(1, Math.floor(rect.height - 2)))
   return { clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY }
+}
+
+/**
+ * A point on the page itself, inside the viewport's client area (dismissal treats a press
+ * past it as a scrollbar press): the step's coordinates when they qualify, else the first
+ * viewport corner that hits only the page. Without layout (jsdom) every point is the page.
+ */
+const outsideCoords = () => {
+  const c = nextCoords()
+  const root = document.documentElement
+  const page = (x: number, y: number) => {
+    if (root.clientWidth > 0 && (x >= root.clientWidth || y >= root.clientHeight)) return false
+    const hit = document.elementFromPoint?.(x, y)
+    return !hit || hit === document.body || hit === root
+  }
+  if (page(c.clientX, c.clientY)) return c
+  const w = root.clientWidth
+  const h = root.clientHeight
+  for (const [x, y] of [
+    [w - 2, h - 2],
+    [w - 2, 2],
+    [2, h - 2],
+  ] as const) {
+    if (page(x, y))
+      return { clientX: x, clientY: y, pageX: x + window.scrollX, pageY: y + window.scrollY }
+  }
+  return c
 }
 
 /**
@@ -266,6 +298,15 @@ function createDomEnv(
           : { name: typeof name === "string" ? (n: string) => normalize(n) === name : name }),
       })
     }
+    if ("label" in by) {
+      const { queryAllByLabelText } = await loadTL()
+      const { label } = by
+      // Exact: a label's own text, aria-label or aria-labelledby equal to the name.
+      return queryAllByLabelText(
+        within as HTMLElement,
+        typeof label === "string" ? (n: string) => normalize(n) === label : label,
+      )
+    }
     if ("part" in by) {
       return Array.from(
         within.querySelectorAll(
@@ -459,6 +500,78 @@ function createDomEnv(
           )
         } else await act(() => u.click(hit))
       },
+      async longPress(hold) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const clientX = rect.left + rect.width * (hold?.at?.x ?? 0.5)
+        const clientY = rect.top + rect.height * (hold?.at?.y ?? 0.5)
+        const hit = (rect.width > 0 ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const init = {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          clientX,
+          clientY,
+          pointerId: 7,
+          pointerType: hold?.pointerType ?? "touch",
+          isPrimary: true,
+          pressure: 0.5,
+          width: 20,
+          height: 20,
+          detail: 1,
+        }
+        await act(async () => {
+          hit.dispatchEvent(new PointerEvent("pointerdown", { ...init, buttons: 1 }))
+        })
+        // The environment's time, as `advance`: fake timers when the test gave them.
+        const ms = hold?.ms ?? 520
+        const advance = options.advanceClock ?? options.advanceTimers
+        if (advance) await act(() => advance(ms))
+        else await act(() => new Promise((resolve) => setTimeout(resolve, ms)))
+        await act(async () => {
+          hit.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0 }))
+        })
+      },
+      async contextMenu(options) {
+        const el = await waitFor()
+        const rect = el.getBoundingClientRect()
+        const fx = options?.at?.x ?? 0.5
+        const fy = options?.at?.y ?? 0.5
+        const clientX = rect.left + rect.width * fx
+        const clientY = rect.top + rect.height * fy
+        const hit = (rect.width > 0 ? doc().elementFromPoint(clientX, clientY) : null) ?? el
+        const init = { bubbles: true, cancelable: true, composed: true, clientX, clientY }
+        await act(async () => {
+          if (modality !== "virtual") {
+            // A real mouse press (pressure, detail): not the 1×1 AT click it would look like.
+            const button = {
+              ...init,
+              button: 2,
+              buttons: 2,
+              pointerId: 1,
+              pointerType: "mouse",
+              pressure: 0.5,
+              detail: 1,
+            }
+            hit.dispatchEvent(new PointerEvent("pointerdown", button))
+            const down = new MouseEvent("mousedown", button)
+            hit.dispatchEvent(down)
+            // The browser's default for any mouse button: focus what was pressed.
+            if (!down.defaultPrevented) {
+              const target = hit.closest<HTMLElement>(
+                "button, a[href], input, select, textarea, [tabindex]",
+              )
+              target?.focus()
+            }
+            hit.dispatchEvent(new PointerEvent("pointerup", { ...button, buttons: 0 }))
+            hit.dispatchEvent(new MouseEvent("mouseup", { ...button, buttons: 0 }))
+          }
+          // A PointerEvent, as browsers dispatch it (ariakit#7162).
+          hit.dispatchEvent(
+            new PointerEvent("contextmenu", { ...init, button: 2, pointerType: "mouse" }),
+          )
+        })
+      },
       box: async () => {
         const r = (await now()).getBoundingClientRect()
         // jsdom has no layout: every box is 0 × 0.
@@ -521,6 +634,41 @@ function createDomEnv(
           else input.value = value
           input.dispatchEvent(new Event("input", { bubbles: true }))
           input.dispatchEvent(new Event("change", { bubbles: true }))
+        })
+      },
+      async paste(text) {
+        const el = await waitFor()
+        await act(() => {
+          const input = el as HTMLInputElement
+          const start = input.selectionStart ?? input.value.length
+          const end = input.selectionEnd ?? start
+          // The real order: paste (cancelable, clipboardData) → beforeinput → input.
+          let paste: Event
+          if (typeof DataTransfer === "function" && typeof ClipboardEvent === "function") {
+            const clipboardData = new DataTransfer()
+            clipboardData.setData("text/plain", text)
+            paste = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true })
+            // Firefox ignores the constructor's clipboardData: attach it.
+            if (!(paste as ClipboardEvent).clipboardData?.getData("text/plain")) {
+              Object.defineProperty(paste, "clipboardData", { value: clipboardData })
+            }
+          } else {
+            // jsdom has no DataTransfer: a paste Event carrying a clipboardData reader.
+            paste = new Event("paste", { bubbles: true, cancelable: true })
+            Object.defineProperty(paste, "clipboardData", {
+              value: { getData: (type: string) => (/^text(\/plain)?$/.test(type) ? text : "") },
+            })
+          }
+          if (!input.dispatchEvent(paste)) return
+          const init = { inputType: "insertFromPaste", data: text, bubbles: true }
+          const before = new InputEvent("beforeinput", { ...init, cancelable: true })
+          if (!input.dispatchEvent(before)) return
+          const next = input.value.slice(0, start) + text + input.value.slice(end)
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, next)
+          else input.value = next
+          input.setSelectionRange(start + text.length, start + text.length)
+          input.dispatchEvent(new InputEvent("input", init))
         })
       },
       waitForDetach: async () => {
@@ -620,12 +768,18 @@ function createDomEnv(
       const u = await getUser()
       const body = doc().body
       if (!u.pointer) return act(() => u.click(body))
-      const coords = nextCoords()
-      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords }]))
+      await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords: outsideCoords() }]))
+    },
+    async pointerAway() {
+      const u = await getUser()
+      const body = doc().body
+      if (!u.pointer) return act(() => u.hover(body))
+      await act(() => u.pointer?.({ target: body, coords: outsideCoords() }))
     },
     until,
     advance: async (ms) => {
-      if (options.advanceTimers) await act(() => options.advanceTimers?.(ms))
+      const advance = options.advanceClock ?? options.advanceTimers
+      if (advance) await act(() => advance(ms))
       else await act(() => new Promise((resolve) => setTimeout(resolve, Math.max(ms, 16))))
     },
     instance,

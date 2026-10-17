@@ -38,7 +38,7 @@ An open panel is `role="region"` labelled by its trigger when the accordion has 
 
 ## `collapsible` defaults to true
 
-In single mode the open item can be closed again. Ark and Radix default to `false`; here the default is the APG behaviour. `collapsible={false}` locks the open trigger: it stays focusable, is `aria-disabled`, and ignores activation. `collapsible` is ignored with `multiple`.
+In single mode the open item can be closed again: the default follows the APG behaviour. `collapsible={false}` locks the open trigger: it stays focusable, is `aria-disabled`, and ignores activation. `collapsible` is ignored with `multiple`.
 
 ## Driver
 

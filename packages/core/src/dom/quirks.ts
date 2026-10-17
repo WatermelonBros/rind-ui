@@ -100,6 +100,19 @@ export const quirks = defineQuirks([
     verified: "2026-10-14",
   },
   {
+    // VoiceOver announces the expanded-state change of a submenu trigger instead of the
+    // submenu's first item; without aria-expanded it reads the item focus moved to.
+    id: "vo-submenu-expanded",
+    when: (p) => p.apple,
+    links: [
+      "https://github.com/mui/base-ui/blob/master/packages/react/src/menu/submenu-trigger/MenuSubmenuTrigger.tsx",
+    ],
+    test: "packages/core/src/components/menu/menu.connect.test.ts",
+    removeWhen: "VoiceOver reads the focused submenu item after an aria-expanded change",
+    verified: "2026-10-16",
+    invariants: ["state-attrs"],
+  },
+  {
     id: "ios-emulated-mouse-after-touch",
     when: (p) => p.ios,
     links: ["https://bugs.webkit.org/show_bug.cgi?id=214609"],
@@ -219,6 +232,23 @@ export const quirks = defineQuirks([
     links: ["https://github.com/WatermelonBros/rind-ui/pull/5"],
     test: "packages/testing/src/components/label-activation.browser.test.tsx",
     removeWhen: "Firefox on Linux focuses a label's control on activation",
+    verified: "2026-10-16",
+  },
+  {
+    id: "nvda-progressbar-name",
+    // NVDA (and JAWS) drop the name of a progressbar or meter with no text content: Root
+    // ends with one visually hidden, presentational character. NVDA cannot be detected and
+    // the markup must match on the server, so it is always on (Progress, Meter).
+    when: () => true,
+    links: [
+      "https://github.com/mui/base-ui/issues/4184",
+      "https://github.com/nvaccess/nvda/issues/13904",
+      "https://github.com/nvaccess/nvda/issues/16204",
+      "https://github.com/FreedomScientific/standards-support/issues/354",
+    ],
+    test: "packages/core/src/components/progress/progress.connect.test.ts",
+    removeWhen:
+      "NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases",
     verified: "2026-10-16",
   },
 ])

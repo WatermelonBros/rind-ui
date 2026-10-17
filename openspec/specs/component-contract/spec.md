@@ -28,9 +28,11 @@ an unknown state, event or part name SHALL be a compile error.
 ### Requirement: Environment Interface
 
 Contracts SHALL be written only against an environment interface that offers:
-resolving a part of the current instance (optionally refined by role and name, or
-by text); finding an element anywhere in the document; the focused element; keyboard
-input to the focused element; a pointer press outside every layer; polling until a
+resolving a part of the current instance (optionally refined by role and name, by the
+exact accessible name of a labelable control that has no role, or by text); finding an
+element anywhere in the document; the focused element; keyboard input to the focused element;
+a paste into a text input in the browser's order (`paste`, `beforeinput`, `input`, each
+stopping the rest when prevented); a pointer press outside every layer; polling until a
 condition holds; advancing time; and the active input modality. Part handles SHALL
 be lazy (resolved on every use), and every operation SHALL be asynchronous. Keys
 SHALL be a closed, typed set.

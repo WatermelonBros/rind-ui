@@ -159,6 +159,20 @@ describe("gracePolygon", () => {
     expect(inside(poly, 160, 110)).toBe(false)
   })
 
+  it("an exit near a corner, moving towards the target, counts the side facing it (radix#4036)", () => {
+    // A flick from a full-width trigger down-left into a submenu flipped to its left: the
+    // exit point is at the bottom-left corner, nearer the bottom side than the left one.
+    const flipped = rect(20, 100, 80, 60)
+    const left = { dx: -2, dy: 0.3 }
+    // Out through the bottom, 5 px from the corner, moving left: the left side counts.
+    const poly = gracePolygon({ x: 105, y: 120 }, trigger, flipped, left)
+    expect(poly.length).toBeGreaterThan(0)
+    expect(inside(poly, 103, 121)).toBe(true)
+    // Moving right (away from the card), or with no motion known: no grace area.
+    expect(gracePolygon({ x: 105, y: 120 }, trigger, flipped, { dx: 2, dy: 0.3 })).toEqual([])
+    expect(gracePolygon({ x: 105, y: 120 }, trigger, flipped)).toEqual([])
+  })
+
   it("a pointer jumping far past the polygon is outside it", () => {
     const poly = gracePolygon({ x: 120, y: 100 }, trigger, card)
     expect(inside(poly, 500, 500)).toBe(false)

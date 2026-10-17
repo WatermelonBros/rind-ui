@@ -29,6 +29,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 
 - `--rind-accordion-content-height`
 - `--rind-accordion-content-width`
+- `--rind-anchor-width`
 - `--rind-available-height`
 - `--rind-available-width`
 - `--rind-collapsible-content-height`
@@ -243,6 +244,44 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "text": {
       "fallback": "var(--rind-color-accent-text)",
       "file": "badge.css"
+    }
+  }
+}
+```
+
+### breadcrumbs
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "breadcrumbs.css"
+    },
+    "current-color": {
+      "fallback": "var(--rind-color-text)",
+      "file": "breadcrumbs.css"
+    },
+    "current-weight": {
+      "fallback": "var(--rind-link-current-weight, 600)",
+      "file": "breadcrumbs.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "breadcrumbs.css"
+    },
+    "min-target": {
+      "fallback": "24px",
+      "file": "breadcrumbs.css"
+    },
+    "separator-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "breadcrumbs.css"
+    },
+    "separator-size": {
+      "fallback": "1em",
+      "file": "breadcrumbs.css"
     }
   }
 }
@@ -898,27 +937,189 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "color": {
       "fallback": "var(--rind-color-accent-text)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "color-hover": {
       "fallback": "var(--rind-color-accent-text)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "current-weight": {
       "fallback": "600",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "decoration": {
       "fallback": "0.075em",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "disabled-color": {
       "fallback": "var(--rind-color-text-disabled)",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
     },
     "underline-offset": {
       "fallback": "0.22em",
-      "file": "link.css"
+      "file": "breadcrumbs.css"
+    }
+  }
+}
+```
+
+### listbox
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "listbox.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "listbox.css"
+    },
+    "description-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "empty-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "listbox.css"
+    },
+    "indicator-size": {
+      "fallback": "1em",
+      "file": "listbox.css"
+    },
+    "item-disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "listbox.css"
+    },
+    "item-height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "listbox.css"
+    },
+    "item-highlight-bg": {
+      "fallback": "var(--rind-color-neutral-soft)",
+      "file": "listbox.css"
+    },
+    "item-highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "listbox.css"
+    },
+    "item-padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "listbox.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-radius-sm)",
+      "file": "listbox.css"
+    },
+    "item-selected-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "listbox.css"
+    },
+    "item-selected-text": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "listbox.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "listbox.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "listbox.css"
+    },
+    "section-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "listbox.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "listbox.css"
+    }
+  }
+}
+```
+
+### menu
+
+```json
+{
+  "family": "panel",
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "menu.css"
+    },
+    "border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "menu.css"
+    },
+    "group-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "menu.css"
+    },
+    "indicator-size": {
+      "fallback": "1rem",
+      "file": "menu.css"
+    },
+    "max-height": {
+      "fallback": "100vh",
+      "file": "menu.css"
+    },
+    "min-width": {
+      "fallback": "10rem",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "menu.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "menu.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "menu.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "menu.css"
+    }
+  }
+}
+```
+
+### menu-item
+
+```json
+{
+  "family": "collection item",
+  "tokens": {
+    "disabled-text": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "menu.css"
+    },
+    "height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "menu.css"
+    },
+    "highlight-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "menu.css"
+    },
+    "highlight-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "menu.css"
+    },
+    "padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-2)",
+      "file": "menu.css"
     }
   }
 }
@@ -1041,6 +1242,284 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "trigger-size": {
       "fallback": "var(--rind-hit-area)",
       "file": "number-input.css"
+    }
+  }
+}
+```
+
+### pagination
+
+```json
+{
+  "family": "toggle item",
+  "tokens": {
+    "current-bg": {
+      "fallback": "var(--rind-color-accent-soft)",
+      "file": "pagination.css"
+    },
+    "current-fg": {
+      "fallback": "var(--rind-color-accent-text)",
+      "file": "pagination.css"
+    },
+    "ellipsis-fg": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "pagination.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-space-1)",
+      "file": "pagination.css"
+    },
+    "item-min-size": {
+      "fallback": "2.25em",
+      "file": "pagination.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "pagination.css"
+    }
+  }
+}
+```
+
+### password-input
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-text-field-bg, var(--rind-color-surface-raised))",
+      "file": "password-input.css"
+    },
+    "border": {
+      "fallback": "var(--rind-text-field-border, var(--rind-color-border-strong))",
+      "file": "password-input.css"
+    },
+    "color": {
+      "fallback": "var(--rind-text-field-color, var(--rind-color-text))",
+      "file": "password-input.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-text-field-description-color, var(--rind-color-text-muted))",
+      "file": "password-input.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-field-description-font-size, var(--rind-text-sm))",
+      "file": "password-input.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-text-field-disabled-bg, var(--rind-color-surface))",
+      "file": "password-input.css"
+    },
+    "disabled-border": {
+      "fallback": "var(--rind-text-field-disabled-border, var(--rind-color-border))",
+      "file": "password-input.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))",
+      "file": "password-input.css"
+    },
+    "disabled-fg": {
+      "fallback": "var(--rind-text-field-disabled-fg, var(--rind-color-text-disabled))",
+      "file": "password-input.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-text-field-error-color, var(--rind-color-danger-text))",
+      "file": "password-input.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-field-error-font-size, var(--rind-text-sm))",
+      "file": "password-input.css"
+    },
+    "fg": {
+      "fallback": "var(--rind-text-field-fg, var(--rind-color-text))",
+      "file": "password-input.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))",
+      "file": "password-input.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-text-field-gap, var(--rind-space-1))",
+      "file": "password-input.css"
+    },
+    "height": {
+      "fallback": "var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))",
+      "file": "password-input.css"
+    },
+    "hidden-icon": {
+      "fallback": "var(--rind-icon-eye)",
+      "file": "password-input.css"
+    },
+    "icon-size": {
+      "fallback": "1em",
+      "file": "password-input.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-text-field-invalid-border, var(--rind-color-danger-border))",
+      "file": "password-input.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-field-label-font-size, var(--rind-text-sm))",
+      "file": "password-input.css"
+    },
+    "label-font-weight": {
+      "fallback": "var(--rind-text-field-label-font-weight, 580)",
+      "file": "password-input.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-text-field-padding-inline, var(--rind-space-control, var(--rind-space-3)))",
+      "file": "password-input.css"
+    },
+    "placeholder": {
+      "fallback": "var(--rind-text-field-placeholder, var(--rind-color-text-muted))",
+      "file": "password-input.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-text-field-radius, var(--rind-radius-control))",
+      "file": "password-input.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-text-field-readonly-bg, var(--rind-color-surface))",
+      "file": "password-input.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-text-field-shadow, var(--rind-shadow-key-pressed))",
+      "file": "password-input.css"
+    },
+    "soft-bg": {
+      "fallback": "var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))",
+      "file": "password-input.css"
+    },
+    "trigger-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "password-input.css"
+    },
+    "trigger-radius": {
+      "fallback": "var(--rind-radius-indicator)",
+      "file": "password-input.css"
+    },
+    "trigger-space": {
+      "fallback": "calc(var(--rind-hit-area) + var(--rind-space-3))",
+      "file": "password-input.css"
+    },
+    "visible-icon": {
+      "fallback": "var(--rind-icon-eye-slash)",
+      "file": "password-input.css"
+    }
+  }
+}
+```
+
+### pin-input
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "badge-space": {
+      "fallback": "0px",
+      "file": "pin-input.css"
+    },
+    "caret-width": {
+      "fallback": "1px",
+      "file": "pin-input.css"
+    },
+    "color": {
+      "fallback": "var(--rind-text-field-color, var(--rind-color-text))",
+      "file": "pin-input.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-text-field-description-color, var(--rind-color-text-muted))",
+      "file": "pin-input.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-field-description-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "pin-input.css"
+    },
+    "disabled-border": {
+      "fallback": "var(--rind-color-border)",
+      "file": "pin-input.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))",
+      "file": "pin-input.css"
+    },
+    "disabled-fg": {
+      "fallback": "var(--rind-color-text-disabled)",
+      "file": "pin-input.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-text-field-error-color, var(--rind-color-danger-text))",
+      "file": "pin-input.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-field-error-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))",
+      "file": "pin-input.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-text-field-gap, var(--rind-space-1))",
+      "file": "pin-input.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "pin-input.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-field-label-font-size, var(--rind-text-sm))",
+      "file": "pin-input.css"
+    },
+    "label-font-weight": {
+      "fallback": "var(--rind-text-field-label-font-weight, 580)",
+      "file": "pin-input.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "pin-input.css"
+    },
+    "slot-active-border": {
+      "fallback": "var(--rind-color-accent-border)",
+      "file": "pin-input.css"
+    },
+    "slot-bg": {
+      "fallback": "var(--rind-text-field-bg, var(--rind-color-surface-raised))",
+      "file": "pin-input.css"
+    },
+    "slot-border": {
+      "fallback": "var(--rind-text-field-border, var(--rind-color-border-strong))",
+      "file": "pin-input.css"
+    },
+    "slot-color": {
+      "fallback": "var(--rind-text-field-fg, var(--rind-color-text))",
+      "file": "pin-input.css"
+    },
+    "slot-gap": {
+      "fallback": "var(--rind-space-2)",
+      "file": "pin-input.css"
+    },
+    "slot-radius": {
+      "fallback": "var(--rind-text-field-radius, var(--rind-radius-control))",
+      "file": "pin-input.css"
+    },
+    "slot-shadow": {
+      "fallback": "var(--rind-shadow-key-pressed)",
+      "file": "pin-input.css"
+    },
+    "slot-size": {
+      "fallback": "var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))",
+      "file": "pin-input.css"
+    },
+    "slot-soft-bg": {
+      "fallback": "var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))",
+      "file": "pin-input.css"
     }
   }
 }
@@ -1186,6 +1665,198 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
 }
 ```
 
+### scroll-area
+
+```json
+{
+  "family": "decoration",
+  "tokens": {
+    "corner-bg": {
+      "fallback": "transparent",
+      "file": "scroll-area.css"
+    },
+    "fade-duration": {
+      "fallback": "var(--rind-duration-normal)",
+      "file": "scroll-area.css"
+    },
+    "scrollbar-padding": {
+      "fallback": "2px",
+      "file": "scroll-area.css"
+    },
+    "scrollbar-size": {
+      "fallback": "10px",
+      "file": "scroll-area.css"
+    },
+    "thumb-active-bg": {
+      "fallback": "var(--rind-color-text)",
+      "file": "scroll-area.css"
+    },
+    "thumb-bg": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "scroll-area.css"
+    },
+    "thumb-hover-bg": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "scroll-area.css"
+    },
+    "thumb-min-size": {
+      "fallback": "18px",
+      "file": "scroll-area.css"
+    },
+    "thumb-radius": {
+      "fallback": "9999px",
+      "file": "scroll-area.css"
+    },
+    "thumb-size": {
+      "fallback": "0px",
+      "file": "scroll-area.css"
+    },
+    "track-bg": {
+      "fallback": "transparent",
+      "file": "scroll-area.css"
+    }
+  }
+}
+```
+
+### search-field
+
+```json
+{
+  "family": null,
+  "tokens": {
+    "bg": {
+      "fallback": "var(--rind-text-field-bg, var(--rind-color-surface-raised))",
+      "file": "search-field.css"
+    },
+    "border": {
+      "fallback": "var(--rind-text-field-border, var(--rind-color-border-strong))",
+      "file": "search-field.css"
+    },
+    "clear-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "search-field.css"
+    },
+    "clear-icon": {
+      "fallback": "var(--rind-icon-x)",
+      "file": "search-field.css"
+    },
+    "clear-icon-size": {
+      "fallback": "1em",
+      "file": "search-field.css"
+    },
+    "clear-radius": {
+      "fallback": "var(--rind-radius-indicator)",
+      "file": "search-field.css"
+    },
+    "clear-space": {
+      "fallback": "calc(var(--rind-hit-area) + var(--rind-space-3))",
+      "file": "search-field.css"
+    },
+    "color": {
+      "fallback": "var(--rind-text-field-color, var(--rind-color-text))",
+      "file": "search-field.css"
+    },
+    "description-color": {
+      "fallback": "var(--rind-text-field-description-color, var(--rind-color-text-muted))",
+      "file": "search-field.css"
+    },
+    "description-font-size": {
+      "fallback": "var(--rind-text-field-description-font-size, var(--rind-text-sm))",
+      "file": "search-field.css"
+    },
+    "disabled-bg": {
+      "fallback": "var(--rind-text-field-disabled-bg, var(--rind-color-surface))",
+      "file": "search-field.css"
+    },
+    "disabled-border": {
+      "fallback": "var(--rind-text-field-disabled-border, var(--rind-color-border))",
+      "file": "search-field.css"
+    },
+    "disabled-color": {
+      "fallback": "var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))",
+      "file": "search-field.css"
+    },
+    "disabled-fg": {
+      "fallback": "var(--rind-text-field-disabled-fg, var(--rind-color-text-disabled))",
+      "file": "search-field.css"
+    },
+    "error-color": {
+      "fallback": "var(--rind-text-field-error-color, var(--rind-color-danger-text))",
+      "file": "search-field.css"
+    },
+    "error-font-size": {
+      "fallback": "var(--rind-text-field-error-font-size, var(--rind-text-sm))",
+      "file": "search-field.css"
+    },
+    "fg": {
+      "fallback": "var(--rind-text-field-fg, var(--rind-color-text))",
+      "file": "search-field.css"
+    },
+    "font-size": {
+      "fallback": "var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))",
+      "file": "search-field.css"
+    },
+    "gap": {
+      "fallback": "var(--rind-text-field-gap, var(--rind-space-1))",
+      "file": "search-field.css"
+    },
+    "height": {
+      "fallback": "var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))",
+      "file": "search-field.css"
+    },
+    "icon": {
+      "fallback": "var(--rind-icon-magnifying-glass)",
+      "file": "search-field.css"
+    },
+    "icon-color": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "search-field.css"
+    },
+    "icon-space": {
+      "fallback": "calc(1em + var(--rind-space-3) * 2)",
+      "file": "search-field.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-text-field-invalid-border, var(--rind-color-danger-border))",
+      "file": "search-field.css"
+    },
+    "label-font-size": {
+      "fallback": "var(--rind-text-field-label-font-size, var(--rind-text-sm))",
+      "file": "search-field.css"
+    },
+    "label-font-weight": {
+      "fallback": "var(--rind-text-field-label-font-weight, 580)",
+      "file": "search-field.css"
+    },
+    "padding-inline": {
+      "fallback": "var(--rind-text-field-padding-inline, var(--rind-space-control, var(--rind-space-3)))",
+      "file": "search-field.css"
+    },
+    "placeholder": {
+      "fallback": "var(--rind-text-field-placeholder, var(--rind-color-text-muted))",
+      "file": "search-field.css"
+    },
+    "radius": {
+      "fallback": "var(--rind-text-field-radius, var(--rind-radius-control))",
+      "file": "search-field.css"
+    },
+    "readonly-bg": {
+      "fallback": "var(--rind-text-field-readonly-bg, var(--rind-color-surface))",
+      "file": "search-field.css"
+    },
+    "shadow": {
+      "fallback": "var(--rind-text-field-shadow, var(--rind-shadow-key-pressed))",
+      "file": "search-field.css"
+    },
+    "soft-bg": {
+      "fallback": "var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))",
+      "file": "search-field.css"
+    }
+  }
+}
+```
+
 ### segmented-control
 
 ```json
@@ -1259,6 +1930,132 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     "selected-weight": {
       "fallback": "600",
       "file": "segmented-control.css"
+    }
+  }
+}
+```
+
+### select
+
+```json
+{
+  "family": "field",
+  "tokens": {
+    "content-bg": {
+      "fallback": "var(--rind-color-surface-raised)",
+      "file": "select.css"
+    },
+    "content-border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "select.css"
+    },
+    "content-max-height": {
+      "fallback": "20rem",
+      "file": "select.css"
+    },
+    "content-padding": {
+      "fallback": "var(--rind-space-1)",
+      "file": "select.css"
+    },
+    "content-radius": {
+      "fallback": "var(--rind-radius-md)",
+      "file": "select.css"
+    },
+    "content-shadow": {
+      "fallback": "var(--rind-shadow-sm)",
+      "file": "select.css"
+    },
+    "description-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "select.css"
+    },
+    "empty-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "select.css"
+    },
+    "indicator-size": {
+      "fallback": "1em",
+      "file": "select.css"
+    },
+    "invalid-border": {
+      "fallback": "var(--rind-color-danger-border)",
+      "file": "select.css"
+    },
+    "item-disabled-text": {
+      "fallback": "var(--rind-listbox-item-disabled-text, var(--rind-color-text-disabled))",
+      "file": "select.css"
+    },
+    "item-height": {
+      "fallback": "var(--rind-listbox-item-height, var(--rind-hit-area))",
+      "file": "select.css"
+    },
+    "item-highlight-bg": {
+      "fallback": "var(--rind-listbox-item-highlight-bg, var(--rind-color-neutral-soft))",
+      "file": "select.css"
+    },
+    "item-highlight-text": {
+      "fallback": "var(--rind-listbox-item-highlight-text, var(--rind-color-text))",
+      "file": "select.css"
+    },
+    "item-indicator-size": {
+      "fallback": "1em",
+      "file": "select.css"
+    },
+    "item-padding": {
+      "fallback": "var(--rind-listbox-item-padding, var(--rind-space-1) var(--rind-space-2))",
+      "file": "select.css"
+    },
+    "item-radius": {
+      "fallback": "var(--rind-listbox-item-radius, var(--rind-radius-sm))",
+      "file": "select.css"
+    },
+    "item-selected-bg": {
+      "fallback": "var(--rind-listbox-item-selected-bg, var(--rind-color-accent-soft))",
+      "file": "select.css"
+    },
+    "item-selected-text": {
+      "fallback": "var(--rind-listbox-item-selected-text, var(--rind-color-accent-text))",
+      "file": "select.css"
+    },
+    "placeholder-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "select.css"
+    },
+    "section-label-text": {
+      "fallback": "var(--rind-color-text-muted)",
+      "file": "select.css"
+    },
+    "separator": {
+      "fallback": "var(--rind-color-border)",
+      "file": "select.css"
+    },
+    "trigger-bg": {
+      "fallback": "var(--rind-color-surface)",
+      "file": "select.css"
+    },
+    "trigger-border": {
+      "fallback": "var(--rind-color-border-strong)",
+      "file": "select.css"
+    },
+    "trigger-height": {
+      "fallback": "var(--rind-hit-area)",
+      "file": "select.css"
+    },
+    "trigger-open-border": {
+      "fallback": "var(--rind-color-accent-border)",
+      "file": "select.css"
+    },
+    "trigger-padding": {
+      "fallback": "var(--rind-space-1) var(--rind-space-3)",
+      "file": "select.css"
+    },
+    "trigger-radius": {
+      "fallback": "var(--rind-radius-control)",
+      "file": "select.css"
+    },
+    "trigger-text": {
+      "fallback": "var(--rind-color-text)",
+      "file": "select.css"
     }
   }
 }
@@ -1562,11 +2359,11 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
   "tokens": {
     "bg": {
       "fallback": "var(--rind-color-surface-raised)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "border": {
       "fallback": "var(--rind-color-border-strong)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "clear-color": {
       "fallback": "var(--rind-color-text-muted)",
@@ -1590,7 +2387,7 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "color": {
       "fallback": "var(--rind-color-text)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "count-color": {
       "fallback": "var(--rind-color-text-muted)",
@@ -1610,63 +2407,63 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "description-color": {
       "fallback": "var(--rind-color-text-muted)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "description-font-size": {
       "fallback": "var(--rind-text-sm)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "disabled-bg": {
       "fallback": "var(--rind-color-surface)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "disabled-border": {
       "fallback": "var(--rind-color-border)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "disabled-color": {
       "fallback": "var(--rind-color-text-disabled)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "disabled-fg": {
       "fallback": "var(--rind-color-text-disabled)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "error-color": {
       "fallback": "var(--rind-color-danger-text)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "error-font-size": {
       "fallback": "var(--rind-text-sm)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "error-gap": {
       "fallback": "var(--rind-space-1)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "error-icon": {
       "fallback": "var(--rind-icon-warning)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "fg": {
       "fallback": "var(--rind-color-text)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "font-size": {
       "fallback": "var(--rind-text-control, var(--rind-text-sm))",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "gap": {
       "fallback": "var(--rind-space-1)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "height": {
       "fallback": "var(--rind-size-control, var(--rind-size-md))",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "invalid-border": {
       "fallback": "var(--rind-color-danger-border)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "label-color": {
       "fallback": "var(--rind-color-text)",
@@ -1674,11 +2471,11 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "label-font-size": {
       "fallback": "var(--rind-text-sm)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "label-font-weight": {
       "fallback": "580",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "label-line-height": {
       "fallback": "var(--rind-leading-normal)",
@@ -1690,27 +2487,27 @@ Written by rind-ui at run time (positioning, scroll lock, animation); readable, 
     },
     "padding-inline": {
       "fallback": "var(--rind-space-control, var(--rind-space-3))",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "placeholder": {
       "fallback": "var(--rind-color-text-muted)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "radius": {
       "fallback": "var(--rind-radius-control)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "readonly-bg": {
       "fallback": "var(--rind-color-surface)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "shadow": {
       "fallback": "var(--rind-shadow-key-pressed)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     },
     "soft-bg": {
       "fallback": "var(--rind-color-accent-soft)",
-      "file": "text-field.css"
+      "file": "password-input.css"
     }
   }
 }

@@ -1,4 +1,5 @@
 export { accessibleNameOf } from "./accname"
+export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { collectionLayout } from "./collection-layout"
 export {
@@ -26,9 +27,11 @@ export {
   dismissable,
   dismissRequest,
 } from "./dismiss"
+export { sanitizeFileName, saveBlob } from "./download"
 export { type ElementInfo, elementInfo } from "./element-info"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
+export { focusPast } from "./focus-past"
 export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
 export {
@@ -113,6 +116,7 @@ export { modalityTracker } from "./modality"
 export { motionPreference } from "./motion"
 export { type NonModalTabOrderOptions, trackNonModalTabOrder } from "./non-modal-tab-order"
 export { type OverlayEffectOptions, overlayEffect } from "./overlay"
+export { warnDuplicateLandmark } from "./pagination-landmark"
 export {
   detectPlatform,
   type PlatformSignals,
@@ -150,6 +154,12 @@ export {
   type PressPointerEvent,
 } from "./press"
 export {
+  blobToDataUrl,
+  exportQr,
+  type QrExportInput,
+  type QrExportResult,
+} from "./qr-export"
+export {
   defineQuirks,
   type Quirk,
   type QuirkId,
@@ -159,6 +169,14 @@ export {
 } from "./quirks"
 export { registerReset } from "./resets"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"
+export {
+  domScrollMetrics,
+  isReversed,
+  physicalFraction,
+  SCROLL_AREA_RULE,
+  scrollAreaIds,
+  wheelTarget,
+} from "./scroll-metrics"
 export {
   type IndicatorBox,
   type IndicatorCause,

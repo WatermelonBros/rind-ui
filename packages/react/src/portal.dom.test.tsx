@@ -9,7 +9,11 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-const settle = () => act(() => new Promise<void>((r) => setTimeout(r, 0)))
+// Drain animation frames inside act — no elapsed-time wait.
+const settle = () =>
+  act(async () => {
+    for (let i = 0; i < 3; i++) await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  })
 const parentOf = () => document.getElementById("t")
 const hosts = () => document.querySelectorAll("[data-rind-portal]")
 

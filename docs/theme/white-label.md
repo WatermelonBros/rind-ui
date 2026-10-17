@@ -1,6 +1,6 @@
 # White-label theming
 
-rind-ui is themed with CSS custom properties in three tiers, scoped by the `data-rind-theme` attribute. One brand colour re-skins every component, light and dark, and a multi-tenant page can show several brands side by side. Token names: [tokens.md](tokens.md). Building validated themes: [builder.md](builder.md).
+rind-ui is themed with CSS custom properties in three tiers, scoped by the `data-rind-theme` attribute. One brand colour re-skins every component, light and dark, and a multi-tenant page can show several brands side by side. Token names: [token reference](https://rind.watermelon-studio.it/theme/tokens.md). Building validated themes: [builder.md](builder.md).
 
 ## Tiers
 

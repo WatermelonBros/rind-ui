@@ -61,6 +61,8 @@ export interface DomEnvironmentOptions {
   readonly modality?: ModalitySource
   /** CSP nonce for the style rules rind-ui injects. */
   readonly nonce?: string
+  /** Timers and frames (default: the window's). Tests pass a virtual clock. */
+  readonly scheduler?: Scheduler
   /** A locale (and optional direction), or a locale source (default: the document's). */
   readonly locale?: string | LocaleSource
   readonly dir?: "ltr" | "rtl"
@@ -99,7 +101,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
     platform ??= options.engine ? withEngine(base, options.engine) : base
     return platform
   }
-  const scheduler: Scheduler = {
+  const scheduler: Scheduler = options.scheduler ?? {
     setTimeout: (callback, ms) => globalThis.setTimeout(callback, ms),
     // The handle came from `setTimeout` above; the cast only restores its type.
     clearTimeout: (handle) => globalThis.clearTimeout(handle as number),

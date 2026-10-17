@@ -11,7 +11,11 @@ function mount(html: string) {
   document.body.innerHTML = html
   return (id: string) => document.getElementById(id) as HTMLElement
 }
-const flush = () => new Promise((r) => setTimeout(r, 0))
+// Drain microtasks and two animation frames — no elapsed-time wait.
+const flush = async () => {
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+  await new Promise<void>((r) => requestAnimationFrame(() => r()))
+}
 
 describe("isFieldsetDisabled", () => {
   it("is false with no fieldset or an enabled one", () => {

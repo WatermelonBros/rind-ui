@@ -1,0 +1,129 @@
+/*
+ * Listbox: tier-3 tokens are read with semantic fallbacks, never declared. Selected carries
+ * a background, a heavier weight AND the item indicator (WCAG 1.4.1: never colour alone).
+ * Highlight is the roving cursor (aria-activedescendant), not the selection. Select reuses
+ * these rules through `--rind-select-item-*`. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="listbox"][data-part="list"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-listbox-gap, var(--rind-space-1));
+    margin: 0;
+    padding: var(--rind-listbox-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid var(--rind-listbox-border, var(--rind-color-border));
+    border-radius: var(--rind-listbox-radius, var(--rind-radius-control));
+    background: var(--rind-listbox-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font: inherit;
+    overflow: auto;
+  }
+
+  :where([data-scope="listbox"][data-part="list"][data-orientation="horizontal"]) {
+    flex-direction: row;
+  }
+
+  :where([data-scope="listbox"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-listbox-item-height, var(--rind-hit-area));
+    padding: var(--rind-listbox-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-listbox-item-radius, var(--rind-radius-sm));
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where([data-scope="listbox"][data-part="item"][data-highlighted]) {
+    background: var(--rind-listbox-item-highlight-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-listbox-item-highlight-text, var(--rind-color-text));
+  }
+
+  :where([data-scope="listbox"][data-part="item"][data-selected]) {
+    background: var(--rind-listbox-item-selected-bg, var(--rind-color-accent-soft));
+    color: var(--rind-listbox-item-selected-text, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="listbox"][data-part="item"][data-selected][data-highlighted]) {
+    background: var(--rind-listbox-item-selected-bg, var(--rind-color-accent-soft-hover));
+  }
+
+  :where([data-scope="listbox"][data-part="item"][data-disabled]) {
+    color: var(--rind-listbox-item-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="listbox"][data-part="item-text"]) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  :where([data-scope="listbox"][data-part="item-description"]) {
+    color: var(--rind-listbox-description-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="listbox"][data-part="item-indicator"]) {
+    flex: none;
+    inline-size: var(--rind-listbox-indicator-size, 1em);
+    block-size: var(--rind-listbox-indicator-size, 1em);
+  }
+
+  :where([data-scope="listbox"][data-part="item-indicator"][data-state="unselected"]) {
+    visibility: hidden;
+  }
+
+  :where([data-scope="listbox"][data-part="section-label"]) {
+    padding: var(--rind-space-1) var(--rind-space-2);
+    color: var(--rind-listbox-section-label-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    letter-spacing: var(--rind-tracking-label);
+  }
+
+  :where([data-scope="listbox"][data-part="separator"]) {
+    margin: 0;
+    border: 0;
+    background: var(--rind-listbox-separator, var(--rind-color-border));
+    block-size: var(--rind-border-width);
+  }
+
+  :where([data-scope="listbox"][data-part="separator"][data-orientation="vertical"]) {
+    block-size: auto;
+    inline-size: var(--rind-border-width);
+  }
+
+  :where([data-scope="listbox"][data-part="empty"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-listbox-empty-text, var(--rind-color-text-muted));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="listbox"][data-part="list"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="listbox"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope="listbox"][data-part="item"][data-selected]) {
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="listbox"][data-part="item"][data-focus-visible]) {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    :where([data-scope="listbox"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}

@@ -43,8 +43,9 @@ The Text Field SHALL have a controllable `value` (`value` / `defaultValue` /
 `onValueChange(value, details)`), where `details.reason` is `INPUT`, `CLEAR`, `RESET`, or
 the reason a preset passes to the clear action (see Machine Builder),
 `details.event` is the native event, and `details.isComposing` tells whether a composition
-is in progress. Uncontrolled, the input SHALL be rendered with `defaultValue` and the DOM
-SHALL own its value: the component SHALL never write the value except for a Clear, and
+is in progress. Uncontrolled, the input SHALL be rendered with `defaultValue` (as a native
+input, it becomes the `value` attribute of the server HTML; a typed value is never reflected
+into the attribute) and the DOM SHALL own its value: the component SHALL never write the value except for a Clear, and
 SHALL read it from `input` events and after a form `reset`. Controlled, the input SHALL
 show the `value` prop, with `null` and `undefined` rendered as an empty string.
 `onValueChange` SHALL be distinct from the native `onChange`, which is forwarded untouched.

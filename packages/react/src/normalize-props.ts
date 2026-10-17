@@ -10,6 +10,8 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   contenteditable: "contentEditable",
   spellcheck: "spellCheck",
   autocomplete: "autoComplete",
+  autocapitalize: "autoCapitalize",
+  autocorrect: "autoCorrect",
   autofocus: "autoFocus",
   maxlength: "maxLength",
   minlength: "minLength",
@@ -23,6 +25,10 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   referrerpolicy: "referrerPolicy",
   hreflang: "hrefLang",
   novalidate: "noValidate",
+  // SVG presentation attributes (Progress's ring).
+  "stroke-dasharray": "strokeDasharray",
+  "stroke-dashoffset": "strokeDashoffset",
+  "shape-rendering": "shapeRendering",
   onDblClick: "onDoubleClick",
   // React's onFocus/onBlur bubble: they are focusin/focusout.
   onFocusIn: "onFocus",

@@ -54,6 +54,9 @@ const ignored: readonly RegExp[] = [
   // not use one within a few seconds. Harmless, and not fixable from the site.
   /was preloaded using link preload but not used within a few seconds/,
 ]
+// other component libraries, by name: case-sensitive, so plain words ("ark", "bits") pass
+const otherLibraries =
+  /\b(?:Radix|Reka|Bits UI|Bits'|Ark UI|Ark|Zag|React Aria|React Spectrum|Base UI|Headless UI|Melt UI|Kobalte|Ariakit|Reach UI|Chakra|MUI|shadcn|Mantine|PrimeReact)\b|\b(?:radix|ariakit|chakra-ui|react-aria|react-spectrum|ark-ui)\b/
 const findings: Finding[] = []
 const report = (url: string, kind: string, message: string) => {
   if (ignored.some((r) => r.test(message))) return
@@ -127,7 +130,8 @@ async function exercise(page: Page, url: string) {
 /** A control may open a modal layer: close it (Escape, else its last button) before going on. */
 async function closeModals(page: Page, url: string) {
   for (let n = 0; n < 4; n++) {
-    const modal = page.locator('[aria-modal="true"]').last()
+    // a modal menu makes the page inert without aria-modal: it carries data-modal
+    const modal = page.locator('[aria-modal="true"], [data-modal][data-state="open"]').last()
     if (!(await modal.isVisible().catch(() => false))) return
     await page.keyboard.press("Escape")
     const closed = await modal
@@ -192,6 +196,12 @@ for (const url of urls) {
   try {
     await page.goto(base + url, { waitUntil: "networkidle" })
     await exercise(page, url)
+    // the site never names another component library (user rule): reword the doc if it does
+    const named = await page.evaluate(
+      (source) => document.body.innerText.match(new RegExp(source, "g")) ?? [],
+      otherLibraries.source,
+    )
+    for (const n of new Set(named)) report(url, "other-library", `names "${n}"`)
     // every link inside the site resolves to an exported file
     for (const href of await page.evaluate(() =>
       [...document.querySelectorAll<HTMLAnchorElement>("a[href^='/']")].map((a) => a.pathname),
@@ -254,7 +264,7 @@ for (const url of urls) {
     await page.goto(base + at)
     // the example mounts on the client; the host marks the root once its effects have run
     await page
-      .waitForSelector("[data-example-root][data-hydrated]", { timeout: 10_000 })
+      .waitForSelector("[data-example-root][data-hydrated]", { timeout: 30_000 })
       .catch(() => report(at, "harness", "never marked data-hydrated"))
     const { rendered, sheets } = await page.evaluate(() => ({
       rendered: (document.querySelector("[data-example-root]")?.childElementCount ?? 0) > 0,

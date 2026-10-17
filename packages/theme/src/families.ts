@@ -58,6 +58,7 @@ export const familyMatrix = [
       "menubar-trigger",
       "navigation-menu-trigger",
       "navigation-menu-link",
+      "pagination",
     ],
     variants: ["ghost", "soft", "outline"],
     size: "own",
@@ -70,6 +71,7 @@ export const familyMatrix = [
       "select",
       "combobox",
       "number-input",
+      "pin-input",
       "date-field",
       "time-field",
       "date-range-field",
@@ -171,9 +173,10 @@ export const familyMatrix = [
     sizes,
   },
   {
-    // Look via each component's own tokens: --rind-separator-*, --rind-skeleton-*, --rind-image-*.
+    // Look via each component's own tokens: --rind-separator-*, --rind-skeleton-*,
+    // --rind-image-*, --rind-scroll-area-*, --rind-qr-code-*.
     family: "decoration",
-    components: ["separator", "skeleton", "image"],
+    components: ["separator", "skeleton", "image", "scroll-area", "qr-code"],
     variants: [],
     size: "none",
     sizes: [],
