@@ -4,6 +4,18 @@ A value rendered as a scannable QR Code symbol: a named image whose description 
 an optional logo, and a download trigger. Encoding is done by rind-ui's own encoder, with no
 dependency; the symbol is identical on the server and in the browser.
 
+## When to use
+
+- **Use it for** showing a value, such as a URL or a token, as a scannable QR Code symbol,
+  with an optional logo and a download trigger.
+- **Over an image file or a hand-made `<svg>`**: it encodes in the page, so the symbol is the
+  same on the server and in the browser, needs no dependency, and stays in sync with the
+  value.
+- **Over a plain `<img>`**: it exposes the frame as a named image whose description is the
+  value, so assistive technology users get the text behind the code.
+- **Don't use it for** reading a QR Code: it only renders one. Don't use it for a short
+  value the user can read and copy: show it as text.
+
 ```tsx
 import { QrCode } from "@rind-ui/react"
 

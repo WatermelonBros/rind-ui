@@ -2,6 +2,12 @@
 
 A trigger and a popover (or an inline panel) holding a colour area, channel sliders, channel and hex inputs, swatches, an eye dropper and a format switch, all bound to one colour. The picker owns the colour, the display format and the open state; every part inside is the component of its own ([Color Area](color-area.md), [Color Slider](color-slider.md), [Color Field](color-field.md), [Color Swatch Picker](color-swatch-picker.md), [Color Swatch](color-swatch.md)), bound to the picker.
 
+## When to use
+
+- **Use it for** choosing one colour from a trigger and popover (or an inline panel) that combines a colour area, sliders, channel inputs, swatches, an eye dropper and a format switch.
+- **Over `<input type="color">`**: it owns the colour and display format, lets you pick which controls to show, and binds every part to one value. The native input is enough when the browser's own picker suffices.
+- **Don't use it for** typing a single colour value: use the Color Field part on its own. For a fixed set of choices, use the Swatch Picker part on its own.
+
 ```tsx
 import { ColorPicker } from "@rind-ui/react"
 

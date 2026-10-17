@@ -5,6 +5,18 @@ scrolling: wheel, touch, momentum, keyboard, zoom, find-in-page, right-to-left a
 colors work as in any `overflow: auto` element. The component hides the native bars, measures,
 and draws a thumb you can drag.
 
+## When to use
+
+- **Use it for** a scroll container whose scrollbars you want to style, such as a panel, a
+  list or a code block.
+- **Over `overflow: auto`**: it draws the scrollbars as parts you style (track and draggable
+  thumb, with `type` setting when they show), while the browser still does all the
+  scrolling. It also adds a tab stop for text-only content that overflows.
+- **Don't use it for** the page itself, or when the native scrollbar is fine: a plain
+  `overflow: auto` element is enough.
+- **Don't use it for** a long list that must keep only some rows in the DOM: the component
+  scrolls its content but does not virtualise it.
+
 ```tsx
 import { ScrollArea } from "@rind-ui/react"
 

@@ -5,6 +5,16 @@ tonight"). It never takes focus and is never a live region of its own: it announ
 rind-ui's Announcer, once when it appears after the page has loaded and once each time its
 text changes while shown. A dismissal keeps focus on the page, never on `body`.
 
+## When to use
+
+- **Use it for** an inline message in the page layout that must be announced to assistive
+  technology: "Couldn't save", "Connection lost", a form error summary.
+- **Over a plain `<div>`**: it announces once when it appears and again when its text changes,
+  without a live region of its own, and it keeps focus on the page when dismissed. A static banner
+  present at load can use `announce="off"`.
+- **Don't use it for** a modal question that needs an answer: use [Alert Dialog](alert-dialog.md).
+  For a label or count on another control, use [Badge](badge.md).
+
 ```tsx
 import { Alert } from "@rind-ui/react"
 

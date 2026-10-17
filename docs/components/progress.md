@@ -2,6 +2,12 @@
 
 Shows how far a task has advanced, as a bar or a ring, determinate or indeterminate. It is `role="progressbar"` named by its Label, with the value in `aria-valuenow` and the same formatted text in `aria-valuetext` and the visible ValueText. It is never a live region; it can announce completion once.
 
+## When to use
+
+- **Use it for** how far a task has advanced, as a bar or a ring: an upload, an install, a multi-step process. It also covers the indeterminate case, when the amount is unknown.
+- **Over `<progress>`**: it gives you a named `role="progressbar"` with a Label, formatted value text, a ring variant, `data-*` state for styling and an optional one-time "Complete" announcement (`announceCompletion`). The native `<progress>` is enough when its default look and no announcement are fine.
+- **Don't use it for** a measurement that is not a task, such as disk usage or battery: use [Meter](meter.md).
+
 ```tsx
 import { Progress } from "@rind-ui/react"
 

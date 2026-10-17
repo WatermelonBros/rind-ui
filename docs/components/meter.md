@@ -2,6 +2,12 @@
 
 Shows a measurement within a known range: storage used, battery level, password strength. It is `role="meter"` (exactly, with no fallback role) named by its Label, with the value in `aria-valuenow` and the same formatted text in `aria-valuetext` and the visible ValueText. Optional `low`, `high` and `optimum` split the range into regions the way HTML `<meter>` does.
 
+## When to use
+
+- **Use it for** a measurement within a known range that is not a task: storage used, battery level, password strength.
+- **Over `<meter>`**: it gives you a named `role="meter"`, a Label, a formatted value text shared with `aria-valuetext`, and `data-*` regions for styling. The native `<meter>` is enough when the browser's own look and no formatted text are fine.
+- **Don't use it for** a task moving towards an end, such as an upload or an install: use [Progress](progress.md).
+
 ```tsx
 import { Meter } from "@rind-ui/react"
 

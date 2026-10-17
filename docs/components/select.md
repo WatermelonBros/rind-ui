@@ -2,6 +2,12 @@
 
 A button that opens a list of options and shows the chosen one. Single or multiple selection, sections, descriptions, typeahead on the closed trigger, and form submission. The trigger is a `combobox` named by the label; the popup is a `listbox` built from the same parts as the [Listbox](listbox.md), positioned against the trigger and modal by default (the page behind is inert and does not scroll).
 
+## When to use
+
+- **Use it for** picking one option (or several, with `multiple`) from a list too long to show inline, in a form or a settings panel.
+- **Over a native `<select>`**: the same keyboard and form behaviour, plus options with descriptions and sections, custom value text, positioning against the trigger, and `data-*` state attributes you can style. A native `<select>` is enough when you need no styling or rich options.
+- **Don't use it for** a list that stays visible: use a [Listbox](listbox.md). Don't use it when the user types to filter or enter free text: use a [Combobox](combobox.md). For two or three options, a [Radio Group](radio-group.md) shows them all at once.
+
 ```tsx
 import { Select } from "@rind-ui/react"
 
