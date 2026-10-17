@@ -2,6 +2,12 @@
 
 There is no `AspectRatio` component to import: put the native CSS `aspect-ratio` property on the element itself (`<div style={{ aspectRatio: "16 / 9" }}>`), with no wrapper. This page is the recipe that replaces an `AspectRatio` component.
 
+## When to use
+
+- **Use it for** keeping a box at a fixed ratio (video, map, image placeholder, card thumbnail) while its width changes.
+- **Over a wrapper component**: the native CSS `aspect-ratio` property on the element itself does the job with no extra element, so there is nothing to import.
+- **Don't use it for** content that should grow with its text: leave the height to the content. For an image that needs a loading or error state, see [Image](image.md).
+
 ```tsx
 <div style={{ aspectRatio: "16 / 9", inlineSize: "100%" }}>…</div>
 ```

@@ -4,6 +4,16 @@ A navigation landmark with the trail of links to the ancestors of the current lo
 current item is explicit, separators are hidden glyphs, and long trails can collapse their
 middle items into a menu you render.
 
+## When to use
+
+- **Use it for** showing the path from the site root to the current page, so users can jump to an
+  ancestor.
+- **Over a hand-written `<nav>` and `<ol>`**: it sets the navigation landmark, marks the current
+  item with `aria-current`, hides separators from screen readers, and can collapse long trails into
+  a menu you render.
+- **Don't use it for** moving between sibling pages: use [Pagination](pagination.md) or
+  [Tabs](tabs.md). A single link back needs only a [Link](link.md).
+
 ```tsx
 import { Breadcrumbs } from "@rind-ui/react"
 

@@ -1,19 +1,19 @@
 /* ── Switch: a track and a thumb that slides; the checked side is the start edge under RTL ── */
-[data-skinned] [data-scope="switch"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="switch"][data-part="root"] {
   display: inline-grid;
   grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: 12px;
 }
-[data-skinned] [data-scope="switch"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="switch"][data-part="label"] {
   font-weight: 500;
   cursor: pointer;
 }
-[data-skinned] [data-scope="switch"][data-part="description"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="switch"][data-part="description"] {
   grid-column: 2;
   margin-top: 2px;
 }
-[data-skinned] [data-scope="switch"][data-part="control"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="switch"][data-part="control"] {
   position: relative;
   width: 52px;
   height: 30px;
@@ -24,7 +24,7 @@
   cursor: pointer;
   transition: background 0.35s var(--s-ease);
 }
-[data-skinned] [data-scope="switch"][data-part="thumb"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="switch"][data-part="thumb"] {
   position: absolute;
   top: 50%;
   inset-inline-start: 3px;
@@ -39,49 +39,58 @@
     background 0.3s;
 }
 /* while pressed the thumb stretches toward where it is going */
-[data-skinned] [data-scope="switch"][data-part="control"][data-pressed] [data-part="thumb"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="switch"][data-part="control"][data-pressed]
+  [data-part="thumb"] {
   width: 28px;
 }
-[data-skinned] [data-scope="switch"][data-part="thumb"][data-state="checked"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="switch"][data-part="thumb"][data-state="checked"] {
   inset-inline-start: calc(100% - 25px);
 }
-[data-skinned]
+:is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="switch"][data-part="control"][data-pressed]
   [data-part="thumb"][data-state="checked"] {
   inset-inline-start: calc(100% - 31px);
 }
-[data-skin="crisp"] [data-scope="switch"][data-part="control"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="switch"][data-part="control"] {
   width: 56px;
   height: 32px;
   background: #fff;
 }
-[data-skin="crisp"] [data-scope="switch"][data-part="thumb"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="switch"][data-part="thumb"] {
   background: var(--s-ink);
 }
-[data-skin="crisp"] [data-scope="switch"][data-part="control"][data-state="checked"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="switch"][data-part="control"][data-state="checked"] {
   background: var(--s-brand);
 }
-[data-skin="crisp"] [data-scope="switch"][data-part="thumb"][data-state="checked"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="switch"][data-part="thumb"][data-state="checked"] {
   background: var(--s-brand-text);
 }
-[data-skin="juicy"] [data-scope="switch"][data-part="control"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="switch"][data-part="control"] {
   background: #d6ccf7;
   box-shadow: inset 0 2px 0 #c4b7f0;
 }
-[data-skin="juicy"] [data-scope="switch"][data-part="thumb"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 3px 0 #d8d0f5;
 }
-[data-skin="juicy"] [data-scope="switch"][data-part="control"][data-state="checked"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="switch"][data-part="control"][data-state="checked"] {
   background: var(--s-brand);
   box-shadow: inset 0 2px 0 var(--s-brand-deep);
 }
-[data-skin="bare"] [data-scope="switch"][data-part="control"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="switch"][data-part="control"] {
   background: #e4e4e7;
   border-color: #d4d4d8;
 }
-[data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 1px 2px #0003;
 }
-[data-skin="bare"] [data-scope="switch"][data-part="control"][data-state="checked"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="switch"][data-part="control"][data-state="checked"] {
   background: var(--s-brand);
 }

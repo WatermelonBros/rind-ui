@@ -2,6 +2,12 @@
 
 A preview of a link's destination, shown when the pointer rests on the link or when keyboard focus stays on it. The content is a non-modal `role="dialog"` positioned against the link by the shared positioning capability. The trigger is a real link: it keeps its role and `href`, and activating it follows the link.
 
+## When to use
+
+- **Use it for** a preview of a link's destination, shown when the pointer rests on the link or keyboard focus stays on it, such as a profile summary.
+- **Over a `title` attribute**: it shows rich content in a positioned non-modal `role="dialog"`, opens on focus as well as hover, and closes with Escape.
+- **Don't use it for** anything the user must be able to reach: touch users never see it, so everything in it must also be reachable by following the link. For a button that opens something, use a [Popover](popover.md). For a short text label, use a [Tooltip](tooltip.md).
+
 ```tsx
 import { HoverCard } from "@rind-ui/react"
 

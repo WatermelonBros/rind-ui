@@ -1,11 +1,11 @@
 /* ── Pin Input: one real input over a row of presentational slots ── */
-[data-skinned] [data-scope="pin-input"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="label"] {
   display: block;
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 6px;
 }
-[data-skinned] [data-scope="pin-input"][data-part="control"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="control"] {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -13,7 +13,7 @@
   max-inline-size: 100%;
 }
 /* The input covers the slots and takes the pointer; its own text is invisible. */
-[data-skinned] [data-scope="pin-input"][data-part="input"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="input"] {
   position: absolute;
   inset: 0;
   inline-size: 100%;
@@ -23,7 +23,7 @@
   outline: none;
   cursor: text;
 }
-[data-skinned] [data-scope="pin-input"][data-part="slot"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="slot"] {
   position: relative;
   display: grid;
   place-items: center;
@@ -36,13 +36,15 @@
   font: 600 20px var(--s-font);
   font-variant-numeric: tabular-nums;
 }
-[data-skinned] [data-scope="pin-input"][data-part="slot"][data-active][data-focus-visible] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="pin-input"][data-part="slot"][data-active][data-focus-visible] {
   outline: 2px solid var(--s-brand);
   outline-offset: 2px;
   border-color: var(--s-brand);
 }
 /* The caret of the empty active slot. */
-[data-skinned] [data-scope="pin-input"][data-part="slot"][data-caret]::after {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="pin-input"][data-part="slot"][data-caret]::after {
   content: "";
   inline-size: 2px;
   block-size: 24px;
@@ -55,24 +57,26 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-skinned] [data-scope="pin-input"][data-part="slot"][data-caret]::after {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="pin-input"][data-part="slot"][data-caret]::after {
     animation: none;
   }
 }
-[data-skinned] [data-scope="pin-input"] [data-part="separator"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"] [data-part="separator"] {
   color: var(--s-ink);
   font-weight: 600;
 }
 /* Disabled: base.css dims the outermost disabled element only. */
-[data-skinned] [data-scope="pin-input"][data-part="slot"][data-invalid] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="pin-input"][data-part="slot"][data-invalid] {
   border-color: var(--s-acc-deep);
   color: var(--s-error);
 }
 @media (max-width: 420px) {
-  [data-skinned] [data-scope="pin-input"][data-part="control"] {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="control"] {
     gap: 6px;
   }
-  [data-skinned] [data-scope="pin-input"][data-part="slot"] {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="pin-input"][data-part="slot"] {
     inline-size: 36px;
     block-size: 44px;
   }

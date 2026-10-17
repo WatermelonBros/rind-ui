@@ -85,7 +85,7 @@
 
 /* Disabled reads as disabled in every skin: dimmed, not-allowed, no hover lift. A locked
    accordion trigger (data-disabled without a disabled item) is excluded on purpose. */
-[data-skinned] :is(
+:is([data-skinned], [data-rind-theme^="skin-"]) :is(
   button,
   a,
   input,
@@ -104,33 +104,39 @@
   translate: 0 0;
   filter: grayscale(0.4);
 }
-[data-skinned] [data-scope="accordion"][data-part="item"][data-disabled] [data-part="trigger"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="accordion"][data-part="item"][data-disabled]
+  [data-part="trigger"] {
   cursor: not-allowed;
 }
-[data-skinned] [data-scope="fieldset"][data-part="root"]:is(:disabled, [data-disabled]) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="fieldset"][data-part="root"]:is(:disabled, [data-disabled]) {
   opacity: 0.55;
 }
 
 /* bare: neutral controls, so states are visible without any brand */
-[data-skin="bare"] :is([data-scope="button"], [data-scope="toggle"])[data-part="root"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+:is([data-scope="button"], [data-scope="toggle"])[data-part="root"] {
   background: var(--s-card);
   color: var(--s-ink);
   border: 1px solid var(--s-line);
   border-radius: var(--s-r-sm);
   box-shadow: none;
 }
-[data-skin="bare"] :is([data-scope="button"], [data-scope="toggle"])[data-part="root"][data-hover] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  :is([data-scope="button"], [data-scope="toggle"])[data-part="root"][data-hover] {
   background: #f4f4f5;
   translate: 0 0;
 }
-[data-skin="bare"]
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
   :is([data-scope="button"], [data-scope="toggle"])[data-part="root"][data-pressed] {
   background: #e4e4e7;
   translate: 0 0;
   scale: 0.98;
 }
-[data-skin="bare"] [data-scope="toggle"][data-part="root"][aria-pressed="true"],
-[data-skin="bare"]
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="toggle"][data-part="root"][aria-pressed="true"],
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
   [data-scope="checkbox"][data-part="control"]:is(
     [data-state="checked"],
     [data-state="indeterminate"]
@@ -139,37 +145,40 @@
   border-color: var(--s-brand);
   color: var(--s-brand-text);
 }
-[data-skin="bare"] :focus-visible {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) :focus-visible {
   outline: 2px solid var(--s-acc);
   outline-offset: 2px;
 }
-[data-skin="bare"] :is([data-scope="text-field"][data-part="input"], .native):focus {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  :is([data-scope="text-field"][data-part="input"], .native):focus {
   border-color: var(--s-acc);
   box-shadow: 0 0 0 3px #2563eb33;
 }
-[data-skin="bare"] [data-scope="fieldset"][data-part="legend"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="fieldset"][data-part="legend"] {
   font: 600 14px var(--s-font);
   background: none;
   color: var(--s-ink);
   padding: 0 4px;
 }
-[data-skin="bare"] [data-scope="heading"][data-part="root"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="heading"][data-part="root"] {
   font-family: var(--s-font);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
-[data-skin="bare"] [data-scope="heading"][data-part="root"]::before {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="heading"][data-part="root"]::before {
   background: #e4e4e7;
   color: #3f3f46;
 }
-[data-skin="bare"] [data-scope="link"][data-part="link"] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="link"][data-part="link"] {
   color: var(--s-acc);
   font-weight: 500;
   background: none;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-[data-skin="bare"] [data-scope="link"][data-part="link"][data-hover] {
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="link"][data-part="link"][data-hover] {
   color: #1d4ed8;
   background: none;
 }

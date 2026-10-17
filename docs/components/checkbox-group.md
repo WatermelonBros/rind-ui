@@ -2,6 +2,12 @@
 
 A set of [Checkboxes](checkbox.md) that share one array value, with an optional select-all `Parent`. The Root is a `role="group"` named by its Label (a native `<fieldset>`/`<legend>` through `render` needs no role); each item is a Checkbox with its own hidden native input ([hidden-form-input](../guides/hidden-form-input.md)).
 
+## When to use
+
+- **Use it for** a set of related options where the user may pick any number, submitted as one array, with an optional select-all `Parent`.
+- **Over several `<input type="checkbox">` in a `<fieldset>`**: it shares one array value, adds the select-all mixed state, and applies one `required` rule (at least one checked). Native checkboxes are enough when the options are independent.
+- **Don't use it for** a single yes/no: use [Checkbox](checkbox.md). For exactly one choice, use [Radio Group](radio-group.md).
+
 ```tsx
 import { Checkbox, CheckboxGroup } from "@rind-ui/react"
 
