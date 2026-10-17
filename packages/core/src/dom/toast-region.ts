@@ -38,7 +38,7 @@ export function trackToastRegion(env: Env, options: ToastRegionOptions): ToastRe
 
   const inside = (el: Element | null) => {
     const region = options.region()
-    return el !== null && region !== null && region.contains(el)
+    return el !== null && region?.contains(el) === true
   }
   const goBack = () => {
     const candidates = [before, ...env.modality.recentFocus().filter((el) => !inside(el))]
