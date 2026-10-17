@@ -620,15 +620,7 @@ function Segment({ segment, render, ref, ...rest }: SegmentProps) {
   const api = useApi(ctx)
   const own = normalizeProps(api.segment(segment))
   if (segment.type === "literal") {
-    const { children: _c, ...spanRest } = rest as Record<string, unknown>
-    void _c
-    // The server's formatter may differ in a literal only (date-segments "Server Rendering").
-    return renderPart(
-      "span",
-      mergeProps({ ...own, suppressHydrationWarning: true, children: segment.text }, spanRest),
-      render,
-      ctx.state,
-    )
+    return <Literal segment={segment} own={own} rest={rest} render={render} />
   }
   if (segment.type === "timeZoneName") {
     return renderPart("input", mergeProps({ ...own, ref }, rest), render, ctx.state)
@@ -642,6 +634,39 @@ function Segment({ segment, render, ref, ...rest }: SegmentProps) {
       rest={rest}
       render={render}
     />
+  )
+}
+
+/**
+ * A literal: the server's formatter may differ from the browser's in a literal only (a
+ * space before AM/PM): hydrated without a warning, then corrected to the browser's text.
+ */
+function Literal({
+  segment,
+  own,
+  rest,
+  render,
+}: {
+  readonly segment: SegmentPart
+  readonly own: Record<string, unknown>
+  readonly rest: Record<string, unknown>
+  readonly render: RenderProp<DateFieldState> | undefined
+}) {
+  const ctx = useDateField("Segment")
+  const el = useRef<HTMLSpanElement | null>(null)
+  useIsoLayoutEffect(() => {
+    if (el.current && el.current.textContent !== segment.text) el.current.textContent = segment.text
+  })
+  const { children: _c, ...spanRest } = rest
+  void _c
+  return renderPart(
+    "span",
+    mergeProps(
+      { ...own, ref: el, suppressHydrationWarning: true, children: segment.text },
+      spanRest,
+    ),
+    render,
+    ctx.state,
   )
 }
 

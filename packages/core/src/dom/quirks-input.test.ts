@@ -1,4 +1,10 @@
+import { CalendarDate, GregorianCalendar } from "@internationalized/date"
 import { describe, expect, it } from "vitest"
+import { dateFieldConnect } from "../components/date-field/date-field.connect"
+import { formatFor } from "../components/date-field/date-field.machine"
+import { dateFieldMessages } from "../components/date-field/date-field.messages"
+import { draftOf } from "../components/date-segments"
+import { mergeFieldProps } from "../components/shared/field-control"
 import { platforms } from "./platform"
 import { quirkActive } from "./quirks"
 
@@ -10,6 +16,62 @@ describe("ios-vo-spinbutton-input", () => {
     ["Android", platforms.android, false],
   ] as const)("%s: %s", (_name, platform, active) => {
     expect(quirkActive("ios-vo-spinbutton-input", { platform })).toBe(active)
+  })
+})
+
+// The Date Field's segments are the same element (add-date-field A.2): gated by the entry.
+describe("ios-vo-spinbutton-input: date segments", () => {
+  const segments = (platform: (typeof platforms)[keyof typeof platforms]) => {
+    const value = new CalendarDate(2026, 10, 14)
+    const props = {
+      placeholderValue: value,
+      locale: "en-US",
+      calendar: new GregorianCalendar(),
+      id: "d",
+    }
+    const format = formatFor(props, value)
+    const api = dateFieldConnect({
+      instance: "d",
+      format,
+      draft: draftOf(value, format),
+      value,
+      defaultValue: value,
+      kind: "date",
+      granularity: "day",
+      active: null,
+      modality: "keyboard",
+      composing: false,
+      field: mergeFieldProps({ role: "group", labelable: false }, null),
+      labelledBy: "label",
+      required: false,
+      messages: dateFieldMessages,
+      plainTextbox: quirkActive("ios-vo-spinbutton-input", { platform }),
+      embedded: false,
+      dir: "ltr",
+    })
+    return api
+      .segments()
+      .filter((s) => s.editable)
+      .map((s) => api.segment(s))
+  }
+
+  it("Date segment on iPhone: no spinbutton role or value attributes", () => {
+    for (const s of segments(platforms.ios)) {
+      expect([s["role"], s["aria-valuenow"], s["aria-valuemin"], s["aria-valuemax"]]).toEqual([
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ])
+    }
+  })
+
+  it("Date segment on macOS: spinbuttons", () => {
+    expect(segments(platforms.apple).map((s) => s["role"])).toEqual([
+      "spinbutton",
+      "spinbutton",
+      "spinbutton",
+    ])
   })
 })
 

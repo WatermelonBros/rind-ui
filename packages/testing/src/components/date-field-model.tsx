@@ -1,7 +1,7 @@
 // The Date Field model-test helper (task 7.1): the oracle props and the story, shared by
 // date-field.model.dom.test.tsx and date-field.broken.dom.test.tsx.
 import { CalendarDate, type DateValue, GregorianCalendar } from "@internationalized/date"
-import { type DateFieldProps, platforms } from "@rind-ui/core"
+import { type DateFieldProps, dateFieldContract, platforms } from "@rind-ui/core"
 import { DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
@@ -81,4 +81,31 @@ export function Story({
       {children}
     </RindProvider>
   )
+}
+
+type EnvLike = {
+  focused(): { compose(updates: readonly string[], commit?: string): Promise<void> }
+}
+
+/**
+ * As in the Number Input and Text Field models: the DOM adapter's `type` clicks a text input
+ * first (a pointer step, no ring by design), so typing into the focused segment is a
+ * committed composition of the text there.
+ */
+const typed = async (env: EnvLike, text: string) =>
+  env.focused().compose(
+    [...text].map((_, i) => text.slice(0, i + 1)),
+    text,
+  )
+
+/** The contract the model tests walk (iOS: no `valued`, the quirk drops the value attributes). */
+export function modelContract(ios = false): typeof dateFieldContract {
+  const base = dateFieldContract
+  const contract = {
+    ...base,
+    actions: { ...base.actions, typeFocused: { ...base.actions.typeFocused, keyboard: typed } },
+    ...(ios ? { traits: base.traits.filter((t) => t !== "valued") } : {}),
+  }
+  // Sound: the same contract with one action's keyboard implementation replaced.
+  return contract as unknown as typeof dateFieldContract
 }
