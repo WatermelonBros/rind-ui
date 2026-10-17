@@ -138,9 +138,12 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     },
     env,
   )
-  // Focus moving to a chip, a chip remove button or the trigger stays inside (input-chips).
+  // Focus moving to a chip, a chip remove button, the trigger or the popup stays inside.
   const insideControl = (target: unknown) =>
-    env.dom.getById(ids.control)?.contains(target as Node | null) === true && target !== null
+    target !== null &&
+    [ids.control, ids.positioner].some(
+      (id) => env.dom.getById(id)?.contains(target as Node | null) === true,
+    )
 
   return {
     ids,
@@ -336,6 +339,12 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       ...common("popup"),
       ...contentPlacementProps(c.placement),
       id: ids.popup,
+      // A scrolling region must be focusable (axe scrollable-region-focusable): by script
+      // only, never in the tab order; a mouse press never focuses it (keepFocus).
+      tabindex: -1,
+      onBlur: (event: unknown) => {
+        if (!insideControl((event as FocusEvent).relatedTarget)) send({ type: "INPUT.BLUR" })
+      },
       "data-empty": dataFlag(v.empty),
       "data-loading": dataFlag(v.loading === "loading" || v.loading === "loading-more"),
       onMouseDown: keepFocus,
@@ -354,6 +363,8 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
         "aria-label": v.mounted.label ? undefined : v.messages.listboxLabel,
         "aria-labelledby": v.mounted.label ? ids.label : undefined,
         "aria-describedby": undefined,
+        // Focusable by script only, should a skin make the list the scrolling region.
+        tabindex: -1,
         onPointerLeave: (event: unknown) => {
           if ((event as PointerEvent).pointerType !== "touch") send({ type: "LIST.POINTER_LEAVE" })
         },

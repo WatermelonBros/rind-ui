@@ -5,12 +5,13 @@ import {
   comboboxIds,
   comboboxMessages,
   createListCollection,
+  platforms,
 } from "@rind-ui/core"
-import { Combobox } from "@rind-ui/react"
+import { Combobox, RindProvider } from "@rind-ui/react"
 import { render } from "@testing-library/react"
 import { useLayoutEffect } from "react"
 import { describe, expect, it } from "vitest"
-import { domEnv, testMachine } from "../index"
+import { currentRun, domEnv, testMachine } from "../index"
 
 const ITEMS = ["Rome", "Paris"].map((label) => ({ key: label.toLowerCase(), label }))
 const collection = createListCollection({
@@ -41,7 +42,8 @@ async function failuresOf(broken: boolean) {
     test: (name: string, fn: () => Promise<void>) => tests.push({ name, fn }),
     setup: () =>
       render(
-        <>
+        // The run's platform: the announcement gate and the invariant must agree on it.
+        <RindProvider environment={{ platform: currentRun()?.platform ?? platforms.linux }}>
           <Combobox.Root items={ITEMS} filter={null}>
             <Combobox.Label>City</Combobox.Label>
             <Combobox.Control>
@@ -58,7 +60,7 @@ async function failuresOf(broken: boolean) {
           </Combobox.Root>
           <button type="button">After</button>
           {broken ? <DropUnselected /> : null}
-        </>,
+        </RindProvider>,
       ),
     target: () => domEnv({ timeout: 300 }),
     anchor: [{ name: "City" }],
@@ -99,7 +101,9 @@ async function failuresOf(broken: boolean) {
 
 describe("combobox broken variant", () => {
   it("the correct component passes", { timeout: 120_000 }, async () => {
-    expect((await failuresOf(false)).filter(Boolean)).toEqual([])
+    const f = (await failuresOf(false)).filter(Boolean)
+    console.log("DBG", f.slice(0, 2).join("\n----\n"))
+    expect(f).toEqual([])
   })
 
   it("dropping aria-selected fails, naming the option and the attribute", {
