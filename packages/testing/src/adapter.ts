@@ -23,6 +23,12 @@ export interface AdapterEnv extends Env {
    */
   holdAnimations?(): Promise<() => Promise<void>>
   /**
+   * Called before a step that closes a presence layer, so its exit cannot end before
+   * `holdAnimations` runs (a slow round trip outlasts a 150 ms exit): animations starting
+   * now stay at their start until the hold, which ends this.
+   */
+  armHold?(): Promise<void>
+  /**
    * Chromium accessibility-tree checks for the instance (Playwright in Chromium only):
    * problems found, or "unavailable" elsewhere.
    */

@@ -1251,6 +1251,14 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           ) {
             userChanges += 1
           }
+          // A closing step's exit is armed before the action: it cannot end before the hold
+          // below however slow the round trip (Playwright on a loaded CI runner).
+          const willClose =
+            edge !== notTaken &&
+            edge.target !== null &&
+            expectations(contract, from, null).open &&
+            !expectations(contract, edge.target, null).open
+          if (contract.traits.includes("presence") && willClose) await base.armHold?.()
           try {
             await runAction(
               contract,
