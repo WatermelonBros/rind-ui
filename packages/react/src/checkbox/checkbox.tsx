@@ -23,6 +23,13 @@ export const Checkbox = createFormToggle<CheckedState, ChangeDetails<CheckboxEve
   role: "checkbox",
   indicatorPart: "indicator",
   label: "Checkbox",
+  partNames: {
+    Root: "CheckboxGroup.Item",
+    Control: "CheckboxGroup.ItemControl",
+    Indicator: "CheckboxGroup.ItemIndicator",
+    Label: "CheckboxGroup.ItemLabel",
+    Description: "CheckboxGroup.ItemDescription",
+  },
   useService: (props, formInput) => {
     const { view, send } = useMachine(checkboxMachine, checkboxMachineProps(props, formInput), {
       formInput,

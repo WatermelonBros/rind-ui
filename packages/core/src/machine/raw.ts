@@ -52,5 +52,5 @@ export interface RawImplementations {
   readonly actions?: Readonly<Record<string, (args: Args) => void>>
   readonly guards?: Readonly<Record<string, (args: Args) => boolean>>
   readonly effects?: Readonly<Record<string, (args: Args) => unknown>>
-  readonly delays?: Readonly<Record<string, (args: { props: unknown }) => number>>
+  readonly delays?: Readonly<Record<string, (args: { props: unknown; context: unknown }) => number>>
 }

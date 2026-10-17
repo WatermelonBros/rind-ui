@@ -3,11 +3,11 @@
 import {
   Accordion,
   Button,
-  Checkbox,
+  CheckboxGroup,
   SegmentedControl,
   Switch,
   TextField,
-  Toggle,
+  ToggleGroup,
 } from "@rind-ui/react"
 import { type CSSProperties, useState } from "react"
 import { usePhase } from "../phase"
@@ -126,15 +126,15 @@ export function AnyLook() {
                 </Switch.Control>
                 <Switch.Label>Notifications</Switch.Label>
               </Switch.Root>
-              <Checkbox.Root defaultChecked>
-                <Checkbox.Control>
-                  <Checkbox.Indicator>✓</Checkbox.Indicator>
-                </Checkbox.Control>
-                <Checkbox.Label>Keyboard support</Checkbox.Label>
-              </Checkbox.Root>
+              <CheckboxGroup.Item defaultChecked>
+                <CheckboxGroup.ItemControl>
+                  <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                </CheckboxGroup.ItemControl>
+                <CheckboxGroup.ItemLabel>Keyboard support</CheckboxGroup.ItemLabel>
+              </CheckboxGroup.Item>
               <div className="row">
                 <Button>Save</Button>
-                <Toggle.Root defaultPressed>Bold</Toggle.Root>
+                <ToggleGroup.Item defaultPressed>Bold</ToggleGroup.Item>
               </div>
             </div>
             <Accordion.Root defaultValue={["what"]}>

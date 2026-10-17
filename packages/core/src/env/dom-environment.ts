@@ -18,11 +18,13 @@ import type {
   ModalityEnv,
   ModalitySource,
   MotionEnv,
+  PageVisibility,
   PlatformFlags,
   PlatformInfo,
   Scheduler,
   SchedulerEnv,
   StyleEnv,
+  VisibilityEnv,
 } from "./capabilities"
 import type { Router, RouterCapability } from "./router"
 
@@ -38,7 +40,8 @@ export type DomEnvironment = SchedulerEnv &
   ClockEnv &
   CollectionLayoutEnv &
   RouterCapability &
-  ValidityEnv
+  ValidityEnv &
+  VisibilityEnv
 
 /** Native constraint validity, for machines that validate a form control (Field). */
 export interface ValidityEnv {
@@ -65,6 +68,8 @@ export interface DomEnvironmentOptions {
   readonly dir?: "ltr" | "rtl"
   /** An announcer, or the built-in backend to use (default: live regions). */
   readonly announcer?: Announcer | "live-region" | "aria-notify"
+  /** Page visibility (default: the document's `visibilityState`). Tests pass a fake. */
+  readonly visibility?: PageVisibility
   /** Client routing for every link part below (default: none, the browser navigates). */
   readonly router?: Router
 }
@@ -135,5 +140,20 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
     // Looked up at call time, like the timers, so fake clocks installed later drive it.
     clock: { now: () => globalThis.performance?.now() ?? Date.now() },
     layout: collectionLayout(dom),
+    visibility: options.visibility ?? documentVisibility(documentOf),
+  }
+}
+
+/** The document's visibility state; `visibilitychange` only (never focus or blur). */
+function documentVisibility(documentOf: () => Document | undefined): PageVisibility {
+  return {
+    hidden: () => documentOf()?.visibilityState === "hidden",
+    subscribe(listener) {
+      const doc = documentOf()
+      if (!doc) return () => {}
+      const onChange = () => listener(doc.visibilityState === "hidden")
+      doc.addEventListener("visibilitychange", onChange)
+      return () => doc.removeEventListener("visibilitychange", onChange)
+    },
   }
 }

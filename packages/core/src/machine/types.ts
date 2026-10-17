@@ -109,7 +109,11 @@ export type EffectArgs<T extends Types> = ReadArgs<T> & {
 export type ActionFn<T extends Types> = (args: ActionArgs<T>) => void
 export type GuardFn<T extends Types> = (args: GuardArgs<T>) => boolean
 export type EffectFn<T extends Types> = (args: EffectArgs<T>) => undefined | (() => void)
-export type DelayFn<T extends Types> = (args: { readonly props: Readonly<T["props"]> }) => number
+/** A delay's duration, from the props and the context at the state's entry. */
+export type DelayFn<T extends Types> = (args: {
+  readonly props: Readonly<T["props"]>
+  readonly context: Readonly<T["context"]>
+}) => number
 
 export interface Implementations<T extends Types> {
   readonly actions?: Readonly<Record<string, ActionFn<T>>>
