@@ -22,6 +22,7 @@ import * as heading from "./heading"
 import * as hiddenFormInput from "./hidden-form-input"
 import * as hiddenUntilFound from "./hidden-until-found"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
+import * as hoverCard from "./hover-card"
 import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
@@ -92,6 +93,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "pin-input": pinInput,
   popover,
   positioning,
+  "hover-card": hoverCard,
   label,
   link,
   listbox,
