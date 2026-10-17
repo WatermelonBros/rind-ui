@@ -7,7 +7,7 @@ import { dirname, join } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { getPasswordInput } from "../../src/index"
+import { getTextField } from "../../src/index"
 import { labelledValues } from "./labels"
 
 const here = import.meta.dirname
@@ -61,7 +61,7 @@ const typeOf = (page: Page) => input(page).evaluate((el) => (el as HTMLInputElem
 describe("password input driver through Playwright", () => {
   it("Same test in both environments: toggle reveals", async () => {
     const page = await open()
-    const pw = getPasswordInput(page, { name: "Password" })
+    const pw = getTextField(page, { name: "Password" })
     await pw.toggleVisibility()
     expect(await pw.isVisible()).toBe(true)
     expect(await pw.inputType()).toBe("text")
@@ -69,7 +69,7 @@ describe("password input driver through Playwright", () => {
 
   it("a keyboard toggle keeps focus on the trigger", async () => {
     const page = await open()
-    await getPasswordInput(page, { name: "Password" }).via("keyboard").toggleVisibility()
+    await getTextField(page, { name: "Password" }).via("keyboard").toggleVisibility()
     expect(await typeOf(page)).toBe("text")
     const trigger = page.getByRole("button", { name: "Show password" })
     await expect.poll(() => trigger.evaluate((el) => el === document.activeElement)).toBe(true)
@@ -77,7 +77,7 @@ describe("password input driver through Playwright", () => {
 
   it("a mouse toggle keeps focus and the caret in the input", async () => {
     const page = await open()
-    const pw = getPasswordInput(page, { name: "Password" })
+    const pw = getTextField(page, { name: "Password" })
     await pw.type("hunter2")
     await input(page).evaluate((el) => (el as HTMLInputElement).setSelectionRange(4, 4))
     await pw.toggleVisibility()
@@ -91,14 +91,14 @@ describe("password input driver through Playwright", () => {
 
   it("a touch tap toggles and moves no focus", async () => {
     const page = await open()
-    await getPasswordInput(page, { name: "Password" }).via("touch").toggleVisibility()
+    await getTextField(page, { name: "Password" }).via("touch").toggleVisibility()
     expect(await typeOf(page)).toBe("text")
     expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
   })
 
   it("submit hides, and the type is password when the form is submitted", async () => {
     const page = await open()
-    const pw = getPasswordInput(page, { name: "Password" })
+    const pw = getTextField(page, { name: "Password" })
     await pw.toggleVisibility()
     expect(await typeOf(page)).toBe("text")
     await pw.submitForm()
@@ -110,15 +110,15 @@ describe("password input driver through Playwright", () => {
 
   it("reset hides", async () => {
     const page = await open()
-    const pw = getPasswordInput(page, { name: "Password" })
+    const pw = getTextField(page, { name: "Password" })
     await pw.toggleVisibility()
-    await pw.resetForm()
+    await pw.reset()
     await expect.poll(() => typeOf(page)).toBe("password")
   })
 
   it("spellcheck is off in both states", async () => {
     const page = await open()
-    const pw = getPasswordInput(page, { name: "Password" })
+    const pw = getTextField(page, { name: "Password" })
     const spellcheck = () => input(page).evaluate((el) => (el as HTMLInputElement).spellcheck)
     expect(await spellcheck()).toBe(false)
     await pw.toggleVisibility()
@@ -127,15 +127,15 @@ describe("password input driver through Playwright", () => {
 
   it("the label locator matches exact names (label, aria-label, aria-labelledby)", async () => {
     const page = await open()
-    expect(await getPasswordInput(page, { name: "Password" }).value()).toBe("")
+    expect(await getTextField(page, { name: "Password" }).value()).toBe("")
     for (const [name, value] of Object.entries(labelledValues)) {
-      expect(await getPasswordInput(page, { name }).value(), name).toBe(value)
+      expect(await getTextField(page, { name }).value(), name).toBe(value)
     }
   })
 
   it("Part.paste: paste → beforeinput → input, clipboard text, prevention", async () => {
     const page = await open()
-    const input = getPasswordInput(page, { name: "Password" }).part("input")
+    const input = getTextField(page, { name: "Password" }).part("input")
     const record = (prevent: string) =>
       page.evaluate((prevent) => {
         const el = document.querySelector('[data-part="input"]') as HTMLInputElement
@@ -162,7 +162,7 @@ describe("password input driver through Playwright", () => {
     ])
     expect(await input.value()).toBe("abc")
     const page2 = await open()
-    const input2 = getPasswordInput(page2, { name: "Password" }).part("input")
+    const input2 = getTextField(page2, { name: "Password" }).part("input")
     await page2.evaluate(() => {
       const el = document.querySelector('[data-part="input"]') as HTMLInputElement
       el.addEventListener("paste", (e) => e.preventDefault())

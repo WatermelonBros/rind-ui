@@ -1,8 +1,8 @@
-// The Search Field's key invariants (add-search-field "Search Field Invariants"), exported as
-// consumer invariants for `testMachine(searchFieldContract, { invariants })`: they read the
+// The Text Field's key invariants (text-field "Text Field Invariants": Escape and Enter), as
+// consumer invariants for `testMachine(textFieldContract, { invariants })`: they read the
 // Escape and Enter key events of each step, which the shared Invariant API does not carry.
 // DOM adapter (a capture listener on the window records the events).
-import type { searchFieldContract } from "@rind-ui/core"
+import type { textFieldContract } from "@rind-ui/core"
 import type { ConsumerInvariant } from "./model"
 
 interface KeyRecord {
@@ -17,22 +17,22 @@ interface KeyRecord {
   after?: { readonly value: string; readonly submits: number }
 }
 
-export interface SearchFieldStepInvariants {
-  readonly invariants: readonly ConsumerInvariant<typeof searchFieldContract>[]
+export interface TextFieldKeyStepInvariants {
+  readonly invariants: readonly ConsumerInvariant<typeof textFieldContract>[]
   /** Starts recording for a new story (call in `setup`); returns the cleanup. */
   reset(): () => void
 }
 
 /**
- * - `search-field-escape-consumed`: an Escape on a non-empty editable field left focus in the
+ * - `text-field-escape-consumed`: an Escape on a non-empty editable field left focus in the
  *   input and was prevented; on an empty one (or read-only, disabled) it was not, so an
  *   enclosing layer gets it (react-spectrum#5480);
- * - `search-field-ime-keys`: an Escape or Enter marked composing neither cleared the value nor
+ * - `text-field-ime-keys`: an Escape or Enter marked composing neither cleared the value nor
  *   searched (react-spectrum#10249, #6421). `submits` counts the story's `onSubmit` calls.
  */
-export function searchFieldStepInvariants(
+export function textFieldKeyStepInvariants(
   options: { readonly submits?: () => number } = {},
-): SearchFieldStepInvariants {
+): TextFieldKeyStepInvariants {
   let keys: KeyRecord[] = []
   const submits = options.submits ?? (() => 0)
   const close = (k: KeyRecord | undefined) => {
@@ -47,7 +47,7 @@ export function searchFieldStepInvariants(
   return {
     invariants: [
       {
-        name: "search-field-escape-consumed",
+        name: "text-field-escape-consumed",
         check: async () => {
           // Read without taking: the IME invariant below runs next and consumes the records.
           for (const k of keys) {
@@ -67,7 +67,7 @@ export function searchFieldStepInvariants(
         },
       },
       {
-        name: "search-field-ime-keys",
+        name: "text-field-ime-keys",
         check: async () => {
           for (const k of take()) {
             if (!k.composing) continue

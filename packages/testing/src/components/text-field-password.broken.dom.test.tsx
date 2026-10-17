@@ -1,14 +1,14 @@
 // Broken Password Input variants (task 5.2): each must fail the model with a readable report
 // naming the invariant it breaks; the correct component passes the same run.
-import { passwordInputContract, passwordInputMessages } from "@rind-ui/core"
-import { PasswordInput, RindProvider } from "@rind-ui/react"
+import { textFieldContract, textFieldMessages } from "@rind-ui/core"
+import { RindProvider, TextField } from "@rind-ui/react"
 import { render } from "@testing-library/react"
 import { type ReactNode, useState } from "react"
 import { describe, expect, it } from "vitest"
 import { domEnv, installAnnouncementLog, testMachine } from "../index"
 
 const base = {
-  messages: passwordInputMessages,
+  messages: textFieldMessages,
   id: "pw",
   clearInput: () => {},
   keepSelection: () => {},
@@ -37,7 +37,8 @@ function Frame({
   return (
     <RindProvider>
       <form onSubmit={(e) => e.preventDefault()}>
-        <PasswordInput.Root
+        <TextField.Root
+          type="password"
           defaultValue="abc"
           visible={visible}
           onVisibleChange={(v, d) => {
@@ -46,12 +47,12 @@ function Frame({
             setVisible(v)
           }}
         >
-          <PasswordInput.Label>Password</PasswordInput.Label>
-          <PasswordInput.Input />
+          <TextField.Label>Password</TextField.Label>
+          <TextField.Input />
           {children(visible)}
           <button type="submit">Submit</button>
           <button type="reset">Reset</button>
-        </PasswordInput.Root>
+        </TextField.Root>
       </form>
     </RindProvider>
   )
@@ -59,9 +60,9 @@ function Frame({
 
 // Typing is the model test's (it re-expresses keyboard typing for the IME replay).
 const untyped = {
-  ...passwordInputContract,
-  events: { ...passwordInputContract.events, INPUT: { skip: "covered by the model test" } },
-} as typeof passwordInputContract
+  ...textFieldContract,
+  events: { ...textFieldContract.events, INPUT: { skip: "covered by the model test" } },
+} as typeof textFieldContract
 
 /** Runs the model with `test` collecting instead of registering; returns each path's error. */
 async function failuresOf(
@@ -94,10 +95,10 @@ async function failuresOf(
 const named = (errors: (string | null)[], invariant: string) =>
   errors.filter((e) => e?.includes(invariant))
 
-describe("password-input broken variants fail readably", () => {
+describe("text-field password broken variants fail readably", () => {
   it("the correct component passes", { timeout: 60_000 }, async () => {
     const errors = await failuresOf(
-      () => <Frame>{() => <PasswordInput.VisibilityTrigger />}</Frame>,
+      () => <Frame>{() => <TextField.VisibilityTrigger />}</Frame>,
       ["pointer", "keyboard", "virtual"],
     )
     expect(errors.filter(Boolean)).toEqual([])
@@ -108,15 +109,13 @@ describe("password-input broken variants fail readably", () => {
       () => (
         <Frame>
           {(visible) => (
-            <PasswordInput.VisibilityTrigger
-              aria-label={visible ? "Hide password" : "Show password"}
-            />
+            <TextField.VisibilityTrigger aria-label={visible ? "Hide password" : "Show password"} />
           )}
         </Frame>
       ),
       ["keyboard"],
     )
-    expect(named(errors, "password-input-stable-name").length).toBeGreaterThan(0)
+    expect(named(errors, "text-field-stable-toggle-name").length).toBeGreaterThan(0)
   })
 
   it("a toggle on pointer presses only (a bare AT click does nothing: Zag)", {
@@ -126,7 +125,7 @@ describe("password-input broken variants fail readably", () => {
       () => (
         <Frame>
           {() => (
-            <PasswordInput.VisibilityTrigger
+            <TextField.VisibilityTrigger
               onClick={(e) => (e as unknown as { preventRindHandler(): void }).preventRindHandler()}
             />
           )}
@@ -134,22 +133,22 @@ describe("password-input broken variants fail readably", () => {
       ),
       ["virtual"],
     )
-    expect(named(errors, "password-input-type-follows-visible").length).toBeGreaterThan(0)
+    expect(named(errors, "text-field-type-follows-visible").length).toBeGreaterThan(0)
   })
 
   it("a trigger out of the Tab order", { timeout: 60_000 }, async () => {
     const errors = await failuresOf(
-      () => <Frame>{() => <PasswordInput.VisibilityTrigger tabIndex={-1} />}</Frame>,
+      () => <Frame>{() => <TextField.VisibilityTrigger tabIndex={-1} />}</Frame>,
       ["pointer"],
     )
-    expect(named(errors, "password-input-trigger-in-tab-order").length).toBeGreaterThan(0)
+    expect(named(errors, "text-field-toggle-in-tab-order").length).toBeGreaterThan(0)
   })
 
   it("visibility kept after submit", { timeout: 60_000 }, async () => {
     const errors = await failuresOf(
       () => (
         <div data-keep="">
-          <Frame revealed>{() => <PasswordInput.VisibilityTrigger />}</Frame>
+          <Frame revealed>{() => <TextField.VisibilityTrigger />}</Frame>
         </div>
       ),
       ["pointer"],

@@ -1,18 +1,12 @@
-// Model-based tests: the Search Field contract over the configurations of design §3
-// (task 5.1), in every modality. Escape inside a Dialog is a scenario test (an empty
-// field's Escape closes the Dialog, which ends the story).
-import { platforms, searchFieldContract, searchFieldMessages } from "@rind-ui/core"
-import { Field, RindProvider, SearchField } from "@rind-ui/react"
+// Model-based tests: the Password Input contract over the configurations of design §4
+// (task 5.1), in every modality.
+import { platforms, textFieldContract, textFieldMessages } from "@rind-ui/core"
+import { Field, RindProvider, TextField } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
 import { describe, it } from "vitest"
-import {
-  currentRun,
-  installAnnouncementLog,
-  searchFieldStepInvariants,
-  testMachine,
-} from "../index"
+import { currentRun, installAnnouncementLog, testMachine } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -26,15 +20,17 @@ type Config = {
   readonly readOnly?: boolean
   readonly disabled?: boolean
   readonly inField?: boolean
+  readonly newPassword?: boolean
 }
 
 const START = "abc"
 // The oracle runs the real machine, so it needs every prop the machine reads.
 const base = {
-  messages: searchFieldMessages,
-  id: "sf",
+  messages: textFieldMessages,
+  id: "pw",
   clearInput: () => {},
-  onSubmit: undefined,
+  keepSelection: () => {},
+  watchForm: undefined,
   disabled: undefined,
   readOnly: undefined,
   focusableWhenDisabled: undefined,
@@ -43,6 +39,9 @@ const base = {
   count: undefined,
   value: undefined,
   onValueChange: undefined,
+  visible: undefined,
+  defaultVisible: undefined,
+  onVisibleChange: undefined,
 } as const
 
 const announcer = () => {
@@ -56,37 +55,41 @@ const announcer = () => {
   }
 }
 
-let submits = 0
-const keyInvariants = searchFieldStepInvariants({ submits: () => submits })
-let stopKeys: () => void = () => {}
-
 function Story({ cfg }: { cfg: Config }) {
-  const [value, setValue] = useState(START)
+  const [visible, setVisible] = useState(false)
   const root = {
-    onSubmit: () => {
-      submits += 1
-    },
+    defaultValue: START,
     ...(cfg.readOnly ? { readOnly: true } : {}),
     ...(cfg.disabled ? { disabled: true } : {}),
-    ...(cfg.controlled ? { value, onValueChange: setValue } : { defaultValue: START }),
+    ...(cfg.controlled ? { visible, onVisibleChange: setVisible } : {}),
   }
+  const parts = (
+    <>
+      <TextField.Input {...(cfg.newPassword ? { autoComplete: "new-password" } : {})} />
+      <TextField.VisibilityTrigger>
+        <TextField.VisibilityIndicator />
+      </TextField.VisibilityTrigger>
+      {/* Inside the Root: the runner's "focus stays in the component" sees them as inside. */}
+      <button type="submit">Submit</button>
+      <button type="reset">Reset</button>
+    </>
+  )
   return (
     <form onSubmit={(e) => e.preventDefault()}>
       {cfg.inField ? (
-        <Field.Root validationMode="change" validationBehavior="aria">
-          <Field.Label>Search books</Field.Label>
-          <SearchField.Root {...root}>
-            <SearchField.Input minLength={3} />
-            <SearchField.ClearTrigger />
-          </SearchField.Root>
-          <Field.ErrorMessage />
+        // aria validation: the form still submits (the hide-on-submit path), the error shows.
+        <Field.Root invalid validationBehavior="aria">
+          <Field.Label>Password</Field.Label>
+          <TextField.Root type="password" {...root}>
+            {parts}
+          </TextField.Root>
+          <Field.ErrorMessage>Wrong password</Field.ErrorMessage>
         </Field.Root>
       ) : (
-        <SearchField.Root {...root}>
-          <SearchField.Label>Search books</SearchField.Label>
-          <SearchField.Input />
-          <SearchField.ClearTrigger />
-        </SearchField.Root>
+        <TextField.Root type="password" {...root}>
+          <TextField.Label>Password</TextField.Label>
+          {parts}
+        </TextField.Root>
       )}
     </form>
   )
@@ -107,8 +110,8 @@ type PartLike = {
   compose(updates: readonly string[], commit?: string): Promise<void>
   type(text: string): Promise<void>
 }
-type EnvLike = { find(by: { role: string; name: string }): PartLike }
-const field = (env: EnvLike) => env.find({ role: "searchbox", name: "Search books" })
+type EnvLike = { find(by: { label: string }): PartLike }
+const field = (env: EnvLike) => env.find({ label: "Password" })
 // As Text Field's model: keyboard typing is a committed one-character composition on a part
 // the runner's IME replay does not rewrite (see text-field.model.dom.test.tsx).
 const keys = async (env: EnvLike, text: string) => {
@@ -119,44 +122,38 @@ const keys = async (env: EnvLike, text: string) => {
   else await c.compose(updates, text)
 }
 const keyedContract = {
-  ...searchFieldContract,
+  ...textFieldContract,
   actions: {
-    ...searchFieldContract.actions,
+    ...textFieldContract.actions,
     type: {
-      ...searchFieldContract.actions.type,
+      ...textFieldContract.actions.type,
       pointer: async (env: EnvLike, text: string) => field(env).type(text),
       keyboard: keys,
     },
   },
-} as unknown as typeof searchFieldContract
+} as unknown as typeof textFieldContract
 
 function config(name: string, cfg: Config) {
-  describe(`search-field model: ${name}`, () => {
+  describe(`text-field password model: ${name}`, () => {
     testMachine(keyedContract, {
       test: it,
-      invariants: keyInvariants.invariants,
-      setup: () => {
-        stopKeys()
-        stopKeys = keyInvariants.reset()
-        submits = 0
-        return render(ui(cfg))
-      },
+      setup: () => render(ui(cfg)),
       target: () => screen,
-      anchor: [{ name: "Search books" }],
+      anchor: [{ name: "Password" }],
       props: {
         ...base,
         ...(cfg.disabled ? { disabled: true } : {}),
         ...(cfg.readOnly ? { readOnly: true } : {}),
-        // Controlled, the story's parent applies every proposal: the oracle starts from START.
-        defaultValue: START,
+        // Controlled, the story's parent applies every proposal: the oracle runs uncontrolled.
       } as never,
       a11y,
     })
   })
 }
 
-config("standalone with a ClearTrigger", {})
+config("uncontrolled", {})
 config("controlled, applying every proposal", { controlled: true })
-config("read-only", { readOnly: true })
-config("disabled", { disabled: true })
-config("inside a Field with minLength", { inField: true })
+config("new-password", { newPassword: true })
+config("read-only (toggle allowed)", { readOnly: true })
+config("disabled (toggle refused)", { disabled: true })
+config("inside an invalid Field, in a form with submit and reset", { inField: true })

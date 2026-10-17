@@ -1,5 +1,5 @@
 // Server markup hydrates with no mismatch warning, for Password Input and Search Field.
-import { PasswordInput, SearchField } from "@rind-ui/react"
+import { TextField } from "@rind-ui/react"
 import { act } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { hydrateRoot } from "react-dom/client"
@@ -36,13 +36,13 @@ async function hydrate(tree: ReactNode) {
 describe("hydration", () => {
   it("Password Input with defaultVisible and a trigger", async () => {
     const r = await hydrate(
-      <PasswordInput.Root defaultVisible>
-        <PasswordInput.Label>Password</PasswordInput.Label>
-        <PasswordInput.Input />
-        <PasswordInput.VisibilityTrigger>
-          <PasswordInput.Indicator />
-        </PasswordInput.VisibilityTrigger>
-      </PasswordInput.Root>,
+      <TextField.Root type="password" defaultVisible>
+        <TextField.Label>Password</TextField.Label>
+        <TextField.Input />
+        <TextField.VisibilityTrigger>
+          <TextField.VisibilityIndicator />
+        </TextField.VisibilityTrigger>
+      </TextField.Root>,
     )
     expect(r.calls).toEqual([])
     expect(r.type).toBe("text")
@@ -52,11 +52,11 @@ describe("hydration", () => {
 
   it("Search Field with defaultValue and a ClearTrigger", async () => {
     const r = await hydrate(
-      <SearchField.Root defaultValue="dune">
-        <SearchField.Label>Search books</SearchField.Label>
-        <SearchField.Input />
-        <SearchField.ClearTrigger />
-      </SearchField.Root>,
+      <TextField.Root type="search" defaultValue="dune">
+        <TextField.Label>Search books</TextField.Label>
+        <TextField.Input />
+        <TextField.ClearTrigger />
+      </TextField.Root>,
     )
     expect(r.calls).toEqual([])
     expect(r.value).toBe("dune")

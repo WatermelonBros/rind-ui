@@ -1,27 +1,27 @@
 // Search Field through its driver: runs unchanged in jsdom and in real browsers.
 import { domEnvironment } from "@rind-ui/core"
-import { Dialog, Field, SearchField } from "@rind-ui/react"
+import { Dialog, Field, TextField } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getDialog, getSearchField } from "../index"
+import { getDialog, getTextField } from "../index"
 
 const platform = domEnvironment().platform
 const opts = { platform }
-const search = (name = "Search books") => getSearchField(screen, { name }, opts)
+const search = (name = "Search books") => getTextField(screen, { name }, opts)
 const input = () => screen.getByRole("searchbox") as HTMLInputElement
 
-function Books(props: Parameters<typeof SearchField.Root>[0] & { readonly clear?: boolean }) {
+function Books(props: Parameters<typeof TextField.Root>[0] & { readonly clear?: boolean }) {
   const { clear = true, ...root } = props
   return (
-    <SearchField.Root {...root}>
-      <SearchField.Label>Search books</SearchField.Label>
-      <SearchField.Input />
-      {clear ? <SearchField.ClearTrigger /> : null}
-    </SearchField.Root>
+    <TextField.Root type="search" {...root}>
+      <TextField.Label>Search books</TextField.Label>
+      <TextField.Input />
+      {clear ? <TextField.ClearTrigger /> : null}
+    </TextField.Root>
   )
 }
 
-function InDialog(props: Parameters<typeof SearchField.Root>[0]) {
+function InDialog(props: Parameters<typeof TextField.Root>[0]) {
   return (
     <Dialog.Root defaultOpen>
       <Dialog.Trigger>Find</Dialog.Trigger>
@@ -37,7 +37,7 @@ function InDialog(props: Parameters<typeof SearchField.Root>[0]) {
 
 afterEach(() => vi.restoreAllMocks())
 
-describe("SearchField", () => {
+describe('TextField type="search"', () => {
   it("Searchbox: one searchbox named by the label, search semantics", () => {
     render(<Books />)
     expect(screen.getAllByRole("searchbox")).toHaveLength(1)
@@ -48,9 +48,9 @@ describe("SearchField", () => {
   it("Icon-only search box: aria-label names it, no warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
-      <SearchField.Root>
-        <SearchField.Input aria-label="Search" />
-      </SearchField.Root>,
+      <TextField.Root type="search">
+        <TextField.Input aria-label="Search" />
+      </TextField.Root>,
     )
     expect(screen.getByRole("searchbox", { name: "Search" })).toBeTruthy()
     expect(warn).not.toHaveBeenCalled()
@@ -77,9 +77,9 @@ describe("SearchField", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBe(null))
   })
 
-  it("Keyboard twin of clear: via keyboard, clear presses Escape", async () => {
+  it("Keyboard twin of clear: Escape clears a search field", async () => {
     render(<Books defaultValue="a" />)
-    await search().via("keyboard").clear()
+    await search().via("keyboard").escape()
     expect(await search().value()).toBe("")
   })
 
@@ -131,10 +131,10 @@ describe("SearchField", () => {
         validate={(v) => (String(v).length > 0 && String(v).length < 3 ? "Too short" : null)}
       >
         <Field.Label>Search books</Field.Label>
-        <SearchField.Root>
-          <SearchField.Input minLength={3} />
-          <SearchField.ClearTrigger />
-        </SearchField.Root>
+        <TextField.Root type="search">
+          <TextField.Input minLength={3} />
+          <TextField.ClearTrigger />
+        </TextField.Root>
         <Field.ErrorMessage />
       </Field.Root>,
     )
@@ -149,16 +149,14 @@ describe("SearchField", () => {
   it("One clear control: the native cancel button is hidden only with a ClearTrigger", async () => {
     const { unmount } = render(<Books defaultValue="x" />)
     expect(input().hasAttribute("data-custom-clear")).toBe(true)
-    expect(document.head.querySelector('style[data-rind-style="search-field-cancel"]')).not.toBe(
-      null,
-    )
+    expect(document.head.querySelector('style[data-rind-style="text-field-cancel"]')).not.toBe(null)
     unmount()
     render(<Books defaultValue="x" clear={false} />)
     expect(input().hasAttribute("data-custom-clear")).toBe(false)
   })
 
   it("Localised clear", () => {
-    render(<Books defaultValue="x" messages={{ clear: "Cancella ricerca" }} />)
+    render(<Books defaultValue="x" messages={{ clearSearch: "Cancella ricerca" }} />)
     expect(screen.getByRole("button", { name: "Cancella ricerca", hidden: true })).toBeTruthy()
   })
 
@@ -170,7 +168,7 @@ describe("SearchField", () => {
 
   it("Empty attribute on root and input", async () => {
     render(<Books defaultValue="x" />)
-    const root = document.querySelector('[data-scope="search-field"][data-part="root"]')
+    const root = document.querySelector('[data-scope="text-field"][data-part="root"]')
     expect(root?.hasAttribute("data-empty")).toBe(false)
     await search().clear()
     expect(await search().isEmpty()).toBe(true)
@@ -192,14 +190,14 @@ describe("SearchField", () => {
   it("a consumer onKeyDown sees Escape first (react-spectrum#2253)", async () => {
     const seen: boolean[] = []
     render(
-      <SearchField.Root defaultValue="a">
-        <SearchField.Label>Search books</SearchField.Label>
-        <SearchField.Input
+      <TextField.Root type="search" defaultValue="a">
+        <TextField.Label>Search books</TextField.Label>
+        <TextField.Input
           onKeyDown={(e) => {
             if (e.key === "Escape") seen.push(e.defaultPrevented)
           }}
         />
-      </SearchField.Root>,
+      </TextField.Root>,
     )
     await search().escape()
     expect(seen).toEqual([false])

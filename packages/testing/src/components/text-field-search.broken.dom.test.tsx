@@ -1,14 +1,14 @@
 // Broken Search Field variants (task 5.2): each must fail the model with a readable report
 // naming the invariant it breaks; the correct component passes the same run.
-import { searchFieldContract, searchFieldMessages } from "@rind-ui/core"
-import { RindProvider, SearchField } from "@rind-ui/react"
+import { textFieldContract, textFieldMessages } from "@rind-ui/core"
+import { RindProvider, TextField } from "@rind-ui/react"
 import { render } from "@testing-library/react"
 import type { KeyboardEvent } from "react"
 import { describe, expect, it } from "vitest"
-import { domEnv, installAnnouncementLog, searchFieldStepInvariants, testMachine } from "../index"
+import { domEnv, installAnnouncementLog, testMachine, textFieldKeyStepInvariants } from "../index"
 
 const base = {
-  messages: searchFieldMessages,
+  messages: textFieldMessages,
   id: "sf",
   clearInput: () => {},
   onSubmit: undefined,
@@ -23,7 +23,7 @@ const base = {
 }
 
 let submits = 0
-const keys = searchFieldStepInvariants({ submits: () => submits })
+const keys = textFieldKeyStepInvariants({ submits: () => submits })
 
 function Frame(props: {
   readonly defaultValue: string
@@ -31,24 +31,25 @@ function Frame(props: {
 }) {
   return (
     <RindProvider>
-      <SearchField.Root
+      <TextField.Root
+        type="search"
         defaultValue={props.defaultValue}
         onSubmit={() => {
           submits += 1
         }}
       >
-        <SearchField.Label>Search books</SearchField.Label>
-        <SearchField.Input {...(props.onKeyDown ? { onKeyDown: props.onKeyDown } : {})} />
-      </SearchField.Root>
+        <TextField.Label>Search books</TextField.Label>
+        <TextField.Input {...(props.onKeyDown ? { onKeyDown: props.onKeyDown } : {})} />
+      </TextField.Root>
     </RindProvider>
   )
 }
 
 // Typing is the model test's (it re-expresses keyboard typing for the IME replay).
 const untyped = {
-  ...searchFieldContract,
-  events: { ...searchFieldContract.events, INPUT: { skip: "covered by the model test" } },
-} as typeof searchFieldContract
+  ...textFieldContract,
+  events: { ...textFieldContract.events, INPUT: { skip: "covered by the model test" } },
+} as typeof textFieldContract
 
 async function failuresOf(story: () => React.ReactElement, defaultValue: string) {
   const tests: { name: string; fn: () => Promise<void> }[] = []
@@ -84,7 +85,7 @@ async function failuresOf(story: () => React.ReactElement, defaultValue: string)
 const named = (errors: (string | null)[], invariant: string) =>
   errors.filter((e) => e?.includes(invariant))
 
-describe("search-field broken variants fail readably", () => {
+describe("text-field search broken variants fail readably", () => {
   it("the correct component passes, empty and not", { timeout: 60_000 }, async () => {
     for (const v of ["", "abc"]) {
       const errors = await failuresOf(() => <Frame defaultValue={v} />, v)
@@ -104,7 +105,7 @@ describe("search-field broken variants fail readably", () => {
       ),
       "",
     )
-    expect(named(errors, "search-field-escape-consumed").length).toBeGreaterThan(0)
+    expect(named(errors, "text-field-escape-consumed").length).toBeGreaterThan(0)
   })
 
   it("Enter not IME-guarded (react-spectrum#6421)", { timeout: 60_000 }, async () => {
@@ -119,6 +120,6 @@ describe("search-field broken variants fail readably", () => {
       ),
       "abc",
     )
-    expect(named(errors, "search-field-ime-keys").length).toBeGreaterThan(0)
+    expect(named(errors, "text-field-ime-keys").length).toBeGreaterThan(0)
   })
 })

@@ -1,14 +1,14 @@
 // Password Input through its driver: runs unchanged in jsdom and in real browsers.
 import { domEnvironment, PENDING_ANNOUNCEMENTS } from "@rind-ui/core"
-import { Field, PasswordInput } from "@rind-ui/react"
+import { Field, TextField } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getPasswordInput, installAnnouncementLog } from "../index"
+import { getTextField, installAnnouncementLog } from "../index"
 
 const platform = domEnvironment().platform
 const inJsdom = navigator.userAgent.includes("jsdom")
-const pw = (name = "Password") => getPasswordInput(screen, { name }, { platform })
+const pw = (name = "Password") => getTextField(screen, { name }, { platform })
 const input = () => screen.getByLabelText("Password") as HTMLInputElement
 const trigger = () => screen.getByRole("button", { name: "Show password" })
 
@@ -18,22 +18,22 @@ const settled = () =>
     expect((Reflect.get(globalThis, PENDING_ANNOUNCEMENTS) as number | undefined) ?? 0).toBe(0),
   )
 
-function Login(props: Parameters<typeof PasswordInput.Root>[0]) {
+function Login(props: Parameters<typeof TextField.Root>[0]) {
   return (
-    <PasswordInput.Root {...props}>
-      <PasswordInput.Label>Password</PasswordInput.Label>
-      <PasswordInput.Input />
-      <PasswordInput.VisibilityTrigger>
-        <PasswordInput.Indicator />
-      </PasswordInput.VisibilityTrigger>
-    </PasswordInput.Root>
+    <TextField.Root type="password" {...props}>
+      <TextField.Label>Password</TextField.Label>
+      <TextField.Input />
+      <TextField.VisibilityTrigger>
+        <TextField.VisibilityIndicator />
+      </TextField.VisibilityTrigger>
+    </TextField.Root>
   )
 }
 
 function InForm(props: {
   readonly onSubmit?: (e: SubmitEvent) => void
   readonly onReset?: (e: Event) => void
-  readonly root?: Parameters<typeof PasswordInput.Root>[0]
+  readonly root?: Parameters<typeof TextField.Root>[0]
 }) {
   return (
     <form
@@ -52,7 +52,7 @@ function InForm(props: {
 
 afterEach(() => vi.restoreAllMocks())
 
-describe("PasswordInput", () => {
+describe('TextField type="password"', () => {
   it("Named input: type password, trigger named Show password", async () => {
     render(<Login />)
     expect(input().type).toBe("password")
@@ -106,10 +106,10 @@ describe("PasswordInput", () => {
 
   it("autoComplete is a default: new-password passes through", () => {
     render(
-      <PasswordInput.Root>
-        <PasswordInput.Label>Password</PasswordInput.Label>
-        <PasswordInput.Input autoComplete="new-password" />
-      </PasswordInput.Root>,
+      <TextField.Root type="password">
+        <TextField.Label>Password</TextField.Label>
+        <TextField.Input autoComplete="new-password" />
+      </TextField.Root>,
     )
     expect(input().getAttribute("autocomplete")).toBe("new-password")
   })
@@ -150,7 +150,7 @@ describe("PasswordInput", () => {
     }
     render(<Controlled />)
     expect(input().type).toBe("text")
-    await pw().resetForm()
+    await pw().reset()
     await waitFor(() => expect(onVisibleChange).toHaveBeenCalledWith(false, { reason: "RESET" }))
     await waitFor(() => expect(input().type).toBe("password"))
   })
@@ -201,22 +201,22 @@ describe("PasswordInput", () => {
   })
 
   it("Field state reaches the parts (ark#3930)", () => {
-    const parts = ["input", "visibility-trigger", "indicator"]
+    const parts = ["input", "visibility-trigger", "visibility-indicator"]
     const el = (part: string) =>
-      document.querySelector(`[data-scope="password-input"][data-part="${part}"]`)
+      document.querySelector(`[data-scope="text-field"][data-part="${part}"]`)
     const { unmount } = render(
       <Field.Root invalid>
         <Field.Label>Password</Field.Label>
-        <PasswordInput.Root>
-          <PasswordInput.Input />
-          <PasswordInput.VisibilityTrigger />
-          <PasswordInput.Indicator />
-        </PasswordInput.Root>
+        <TextField.Root type="password">
+          <TextField.Input />
+          <TextField.VisibilityTrigger />
+          <TextField.VisibilityIndicator />
+        </TextField.Root>
       </Field.Root>,
     )
     expect(input().getAttribute("aria-invalid")).toBe("true")
     // The trigger is a toggle button: the Field's invalid flag is not one of its states.
-    for (const part of ["input", "indicator"]) {
+    for (const part of ["input", "visibility-indicator"]) {
       expect(el(part)?.hasAttribute("data-invalid"), part).toBe(true)
     }
     expect(el("visibility-trigger")?.hasAttribute("data-invalid")).toBe(false)
@@ -225,11 +225,11 @@ describe("PasswordInput", () => {
     render(
       <Field.Root disabled invalid>
         <Field.Label>Password</Field.Label>
-        <PasswordInput.Root>
-          <PasswordInput.Input />
-          <PasswordInput.VisibilityTrigger />
-          <PasswordInput.Indicator />
-        </PasswordInput.Root>
+        <TextField.Root type="password">
+          <TextField.Input />
+          <TextField.VisibilityTrigger />
+          <TextField.VisibilityIndicator />
+        </TextField.Root>
       </Field.Root>,
     )
     expect(input().disabled).toBe(true)
@@ -251,7 +251,7 @@ describe("PasswordInput", () => {
   it("Indicator state", async () => {
     render(<Login />)
     await pw().toggleVisibility()
-    const ind = document.querySelector('[data-part="indicator"]')
+    const ind = document.querySelector('[data-part="visibility-indicator"]')
     expect(ind?.getAttribute("data-state")).toBe("visible")
     expect(ind?.getAttribute("aria-hidden")).toBe("true")
   })
@@ -259,9 +259,7 @@ describe("PasswordInput", () => {
   it("Edge's reveal control is hidden while a trigger is mounted", () => {
     render(<Login />)
     expect(input().hasAttribute("data-custom-reveal")).toBe(true)
-    expect(document.head.querySelector('style[data-rind-style="password-input-reveal"]')).not.toBe(
-      null,
-    )
+    expect(document.head.querySelector('style[data-rind-style="text-field-reveal"]')).not.toBe(null)
   })
 
   it("Development warning when the consumer's name follows the state", async () => {
@@ -269,13 +267,11 @@ describe("PasswordInput", () => {
     function Broken() {
       const [visible, setVisible] = useState(false)
       return (
-        <PasswordInput.Root visible={visible} onVisibleChange={setVisible}>
-          <PasswordInput.Label>Password</PasswordInput.Label>
-          <PasswordInput.Input />
-          <PasswordInput.VisibilityTrigger
-            aria-label={visible ? "Hide password" : "Show password"}
-          />
-        </PasswordInput.Root>
+        <TextField.Root type="password" visible={visible} onVisibleChange={setVisible}>
+          <TextField.Label>Password</TextField.Label>
+          <TextField.Input />
+          <TextField.VisibilityTrigger aria-label={visible ? "Hide password" : "Show password"} />
+        </TextField.Root>
       )
     }
     render(<Broken />)

@@ -1,5 +1,5 @@
-// The page password-input.pw.test.ts drives: a themed Password Input in a form.
-import { PasswordInput } from "@rind-ui/react"
+// The page text-field-password.pw.test.ts drives: a themed password Text Field in a form.
+import { TextField } from "@rind-ui/react"
 import { createRoot } from "react-dom/client"
 import { LabelledFields } from "./labels"
 
@@ -14,13 +14,13 @@ function App() {
         document.body.dataset["typeAtSubmit"] = input.type
       }}
     >
-      <PasswordInput.Root name="password">
-        <PasswordInput.Label>Password</PasswordInput.Label>
-        <PasswordInput.Input />
-        <PasswordInput.VisibilityTrigger>
-          <PasswordInput.Indicator />
-        </PasswordInput.VisibilityTrigger>
-      </PasswordInput.Root>
+      <TextField.Root type="password" name="password">
+        <TextField.Label>Password</TextField.Label>
+        <TextField.Input />
+        <TextField.VisibilityTrigger>
+          <TextField.VisibilityIndicator />
+        </TextField.VisibilityTrigger>
+      </TextField.Root>
       <button type="submit">Submit</button>
       <button type="reset">Reset</button>
       <LabelledFields />

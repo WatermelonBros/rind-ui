@@ -7,7 +7,7 @@ import { dirname, join } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { rolldown } from "rolldown"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { getSearchField } from "../../src/index"
+import { getTextField } from "../../src/index"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")
@@ -66,7 +66,7 @@ const focused = (page: Page, name: string) =>
 describe("search field driver through Playwright", () => {
   it("Escape clears and keeps focus", async () => {
     const page = await open()
-    const s = getSearchField(page, { name: "Search books" })
+    const s = getTextField(page, { name: "Search books" })
     await s.type("tolkien")
     await s.escape()
     expect(await s.value()).toBe("")
@@ -78,7 +78,7 @@ describe("search field driver through Playwright", () => {
     await page.getByRole("button", { name: "Find" }).click()
     const dialog = page.getByRole("dialog", { name: "Find" })
     await dialog.waitFor()
-    const s = getSearchField(page, { name: "Search shelf" })
+    const s = getTextField(page, { name: "Search shelf" })
     await s.type("dune")
     await s.escape()
     expect(await s.value()).toBe("")
@@ -89,7 +89,7 @@ describe("search field driver through Playwright", () => {
 
   it("Enter calls onSubmit once and the form submits with q", async () => {
     const page = await open()
-    const s = getSearchField(page, { name: "Search books" })
+    const s = getTextField(page, { name: "Search books" })
     await s.type("dune")
     await s.submit()
     await expect.poll(async () => (await readLog(page)).form).toBe("dune")
@@ -98,7 +98,7 @@ describe("search field driver through Playwright", () => {
 
   it("the native cancel button is hidden with a ClearTrigger", async () => {
     const page = await open(bareHtml)
-    await getSearchField(page, { name: "Search books" }).type("x")
+    await getTextField(page, { name: "Search books" }).type("x")
     const box = page.getByRole("searchbox", { name: "Search books" })
     // Chromium's getComputedStyle ignores author rules on this UA pseudo, so compare pixels:
     // the opted-in input must differ from the same input with the opt-in removed.
@@ -112,7 +112,7 @@ describe("search field driver through Playwright", () => {
 
   it("Enter while composing is not a search", async () => {
     const page = await open()
-    const s = getSearchField(page, { name: "Search books" })
+    const s = getTextField(page, { name: "Search books" })
     await s.part("input").compose(["被", "被送"])
     await s.part("input").press("Enter")
     expect((await readLog(page)).submits).toEqual([])
