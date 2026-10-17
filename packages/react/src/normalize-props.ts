@@ -25,6 +25,8 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   referrerpolicy: "referrerPolicy",
   hreflang: "hrefLang",
   novalidate: "noValidate",
+  // SVG presentation attributes (QR Code's frame).
+  "shape-rendering": "shapeRendering",
   onDblClick: "onDoubleClick",
   // React's onFocus/onBlur bubble: they are focusin/focusout.
   onFocusIn: "onFocus",

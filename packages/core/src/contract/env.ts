@@ -107,6 +107,21 @@ export interface Part {
    * whose centre is covered by the dialog content it surrounds).
    */
   pressAtPosition(options?: { readonly corner?: boolean }): Promise<void>
+  /**
+   * The secondary action on the part at `at` (fractions of its box; default its centre),
+   * dispatched as a PointerEvent `contextmenu`: a right click (pointer, touch, keyboard
+   * runs), or a bare `contextmenu` with no press before it (virtual: AT's "shortcut menu").
+   */
+  contextMenu(options?: { readonly at?: { readonly x: number; readonly y: number } }): Promise<void>
+  /**
+   * A touch (or `pointerType`) held on the part for `ms` (the environment's time: fake
+   * timers when given), then released. Works without layout (at the part's origin).
+   */
+  longPress(options?: {
+    readonly ms?: number
+    readonly at?: { readonly x: number; readonly y: number }
+    readonly pointerType?: "touch" | "pen"
+  }): Promise<void>
   /** The part's bounding box, or `null` when the environment has no layout (jsdom). */
   box(): Promise<PartBox | null>
   /**

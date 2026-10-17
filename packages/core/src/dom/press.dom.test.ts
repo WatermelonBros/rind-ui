@@ -45,7 +45,7 @@ function setup(
   platform: PlatformFlags = platforms.windows,
   extra: {
     disabled?: boolean
-    longPress?: boolean
+    longPress?: boolean | { moveTolerance: number }
     nonce?: string
     suppressTouchContextMenu?: boolean
   } = {},
@@ -64,7 +64,7 @@ function setup(
     send: (e) =>
       events.push(`${e.type}:${e.pointerType}${"metaKey" in e && e.metaKey ? ":meta" : ""}`),
     disabled: () => extra.disabled === true,
-    ...(extra.longPress ? { longPress: {} } : {}),
+    ...(extra.longPress ? { longPress: extra.longPress === true ? {} : extra.longPress } : {}),
     ...(extra.suppressTouchContextMenu ? { suppressTouchContextMenu: true } : {}),
   })
   detach = attach(el, handle.props)
@@ -347,6 +347,44 @@ describe("long press", () => {
     click(1)
     vi.advanceTimersByTime(100)
     expect(events).not.toContain("PRESS:touch")
+  })
+
+  it("moving past the tolerance cancels it; jitter within it does not", () => {
+    vi.useFakeTimers()
+    setup(undefined, platforms.android, { longPress: { moveTolerance: 10 } })
+    ptr("pointerdown", { pointerType: "touch", clientX: 10, clientY: 10 })
+    ptr("pointermove", { pointerType: "touch", clientX: 14, clientY: 10 }, document.body)
+    vi.advanceTimersByTime(500)
+    expect(events).toContain("LONG_PRESS:touch")
+    ptr("pointerup", { pointerType: "touch" })
+    events = []
+    ptr("pointerdown", { pointerType: "touch", clientX: 10, clientY: 10 })
+    ptr("pointermove", { pointerType: "touch", clientX: 25, clientY: 10 }, document.body)
+    vi.advanceTimersByTime(500)
+    expect(events).not.toContain("LONG_PRESS:touch")
+  })
+
+  it("the platform callout is suppressed during the touch press only", () => {
+    vi.useFakeTimers()
+    setup(undefined, platforms.ios, { longPress: true })
+    ptr("pointerdown", { pointerType: "touch" })
+    expect(el.hasAttribute("data-rind-long-pressing")).toBe(true)
+    // An inline style (CSSOM, CSP-safe), never an injected rule.
+    expect(document.head.innerHTML).not.toContain("touch-callout")
+    const supported = CSS.supports?.("-webkit-touch-callout", "none") === true
+    if (supported) expect(el.style.getPropertyValue("-webkit-touch-callout")).toBe("none")
+    ptr("pointerup", { pointerType: "touch" })
+    expect(el.hasAttribute("data-rind-long-pressing")).toBe(false)
+    expect(el.style.getPropertyValue("-webkit-touch-callout")).toBe("")
+  })
+
+  it("a second pointer going down cancels it (a pinch)", () => {
+    vi.useFakeTimers()
+    setup(undefined, platforms.android, { longPress: true })
+    ptr("pointerdown", { pointerType: "touch" })
+    ptr("pointerdown", { pointerType: "touch", pointerId: 2 }, document.body)
+    vi.advanceTimersByTime(500)
+    expect(events).not.toContain("LONG_PRESS:touch")
   })
 
   it("released before the threshold: an ordinary PRESS", () => {

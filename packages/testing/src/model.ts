@@ -295,6 +295,8 @@ const oracleEnv = {
   layout: { pageTarget: () => null },
   dom: { getById: () => null, activeElement: () => null, getRootNode: () => undefined },
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
+  // Nothing to position (the oracle never starts effects; actions may ask to reposition).
+  position: { track: () => ({ stop: () => {} }), reposition: () => {} },
   // A menu tree with one level: the root closes itself, nothing else is open.
   menuTree: {
     register: () => () => {},
