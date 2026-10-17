@@ -30,7 +30,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Dialog | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC: Dialog + Modal |
 | Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | HUI: in source, not in public docs |
-| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | spec | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
+| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | spec | Used by Reado |

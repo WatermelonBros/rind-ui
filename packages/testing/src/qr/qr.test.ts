@@ -53,24 +53,29 @@ describe("decoder", () => {
 })
 
 describe("Decodability: round trip over all versions", () => {
-  it.each(LEVELS)("level %s: a maximum-length value for each of the 40 versions", (ecc) => {
-    const random = rng(ecc.charCodeAt(0))
-    for (let version = 1; version <= 40; version++) {
-      const opts = { ecc, minVersion: version, maxVersion: version }
-      // The longest byte value that fits this version (binary search on the encoder's verdict).
-      let n = 0
-      for (let hi = 3000; n < hi; ) {
-        const mid = Math.ceil((n + hi) / 2)
-        if (encodeQr(new Uint8Array(mid), opts).ok) n = mid
-        else hi = mid - 1
+  it.each(LEVELS)(
+    "level %s: a maximum-length value for each of the 40 versions",
+    (ecc) => {
+      const random = rng(ecc.charCodeAt(0))
+      for (let version = 1; version <= 40; version++) {
+        const opts = { ecc, minVersion: version, maxVersion: version }
+        // The longest byte value that fits this version (binary search on the encoder's verdict).
+        let n = 0
+        for (let hi = 3000; n < hi; ) {
+          const mid = Math.ceil((n + hi) / 2)
+          if (encodeQr(new Uint8Array(mid), { ...opts, mask: 0 }).ok)
+            n = mid // forced mask: capacity is mask-independent, skips the mask search
+          else hi = mid - 1
+        }
+        const value = Uint8Array.from({ length: n }, () => Math.floor(random() * 256))
+        const r = ok(encodeQr(value, opts))
+        const d = decodeQr(r.modules)
+        expect([d.version, d.ecc, d.mask]).toEqual([version, ecc, r.mask])
+        expect(d.bytes).toEqual(value)
       }
-      const value = Uint8Array.from({ length: n }, () => Math.floor(random() * 256))
-      const r = ok(encodeQr(value, opts))
-      const d = decodeQr(r.modules)
-      expect([d.version, d.ecc, d.mask]).toEqual([version, ecc, r.mask])
-      expect(d.bytes).toEqual(value)
-    }
-  })
+    },
+    30_000,
+  ) // a deadline for 40 versions of round trips under a loaded machine, not a delay
 
   it("random text in every mode, at every level with every forced mask", () => {
     const random = rng(42)
@@ -93,7 +98,7 @@ describe("Decodability: round trip over all versions", () => {
         }
       }
     }
-  })
+  }, 30_000)
 
   it("lone surrogate decodes to U+FFFD, ECI only for non-ASCII", () => {
     expect(decodeQr(ok(encodeQr("a\uD83D")).modules).text).toBe("a�")

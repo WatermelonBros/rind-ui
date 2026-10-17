@@ -53,8 +53,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: build
+          # The theme's generated token files (not committed) ride along: tests read them.
           path: |
             packages/*/dist
+            packages/theme/tokens.manifest.json
+            packages/theme/src/builder/components.generated.ts
             apps/storybook/storybook-static
           retention-days: 1
 

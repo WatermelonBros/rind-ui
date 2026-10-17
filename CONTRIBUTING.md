@@ -77,6 +77,9 @@ By contributing you agree that your contributions are licensed under the
 ## Merging main into your branch
 
 Update a pushed branch with `git merge origin/main` (never rebase and force-push). Append-only
-lists (package barrels, the examples index, the review backlog) merge by union. For conflicts in
-generated files (`llms.txt`, `docs/theme/tokens.md`, `packages/theme/tokens.manifest.json`,
-`components.generated.ts`), take either side and run `pnpm regen`.
+lists (package barrels, the examples index, the review backlog) merge by union. Files derived
+from many components are build outputs, not committed, so they never conflict: the token
+manifest and `components.generated.ts` are written by `@rind-ui/theme`'s `generate` task (turbo
+runs it before build and typecheck), `llms.txt` and the token reference by the site build. The
+API, ARIA and "Tested with" blocks in a component's own docs page stay committed; after a
+conflict there, take either side and run `pnpm docs:gen`.
