@@ -61,9 +61,12 @@ describe('TextField type="search"', () => {
     render(<InDialog onValueChange={onValueChange} />)
     const s = search()
     await s.type("tolkien")
+    onValueChange.mockClear()
     await s.escape()
     expect(await s.value()).toBe("")
     expect(document.activeElement).toBe(input())
+    // One change for one Escape.
+    expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onValueChange).toHaveBeenLastCalledWith(
       "",
       expect.objectContaining({ reason: "ESCAPE" }),
@@ -164,6 +167,17 @@ describe('TextField type="search"', () => {
     render(<Books defaultValue="x" />)
     const t = screen.getByRole("button", { name: "Clear search", hidden: true })
     expect(t.tabIndex).toBe(-1)
+  })
+
+  it("pointer clear: one change, focus stays in the input", async () => {
+    const onValueChange = vi.fn()
+    render(<Books defaultValue="x" onValueChange={onValueChange} />)
+    input().focus()
+    await search().via("pointer").clear()
+    expect(await search().value()).toBe("")
+    expect(document.activeElement).toBe(input())
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    expect(onValueChange).toHaveBeenLastCalledWith("", expect.objectContaining({ reason: "CLEAR" }))
   })
 
   it("Empty attribute on root and input", async () => {

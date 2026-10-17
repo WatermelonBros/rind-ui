@@ -2,7 +2,10 @@
 
 import { Button, Dialog, TextField, type TextFieldRootProps } from "@rind-ui/react"
 import { type FormEvent, useState } from "react"
-import type { Variants } from "./types"
+import type { States, Variants } from "./types"
+
+// The password and search examples carry the idle state (the plain idle is the fixture's).
+export const states: States = { "text-field": { idle: "Password" } }
 
 /** `composing` needs an IME session: the driver reaches it. */
 
