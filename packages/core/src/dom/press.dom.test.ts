@@ -369,9 +369,13 @@ describe("long press", () => {
     setup(undefined, platforms.ios, { longPress: true })
     ptr("pointerdown", { pointerType: "touch" })
     expect(el.hasAttribute("data-rind-long-pressing")).toBe(true)
-    expect(document.head.innerHTML).toContain("-webkit-touch-callout: none")
+    // An inline style (CSSOM, CSP-safe), never an injected rule.
+    expect(document.head.innerHTML).not.toContain("touch-callout")
+    const supported = CSS.supports?.("-webkit-touch-callout", "none") === true
+    if (supported) expect(el.style.getPropertyValue("-webkit-touch-callout")).toBe("none")
     ptr("pointerup", { pointerType: "touch" })
     expect(el.hasAttribute("data-rind-long-pressing")).toBe(false)
+    expect(el.style.getPropertyValue("-webkit-touch-callout")).toBe("")
   })
 
   it("a second pointer going down cancels it (a pinch)", () => {

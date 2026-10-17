@@ -377,7 +377,7 @@ describe("ContextMenu: review r1", () => {
     expect(region.hasAttribute("data-rind-long-pressing")).toBe(true)
     // WebKit is the engine with a callout; elsewhere the property is unknown.
     if (CSS.supports("-webkit-touch-callout", "none")) {
-      expect(getComputedStyle(region).getPropertyValue("-webkit-touch-callout")).toBe("none")
+      expect(region.style.getPropertyValue("-webkit-touch-callout")).toBe("none")
     }
     act(() => {
       region.dispatchEvent(new PointerEvent("pointerup", init))

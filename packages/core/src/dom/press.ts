@@ -22,15 +22,13 @@ import type {
   TimerHandle,
 } from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
-import { injectStyle } from "./inject-style"
 import { isImeKey } from "./keyboard"
 import { quirkActive } from "./quirks"
 import { textSelection } from "./text-selection"
 import { injectTouchAction } from "./touch-action"
 
+/** Marks a part during a touch long press (the callout is suppressed meanwhile). */
 const CALLOUT_ATTR = "data-rind-long-pressing"
-/** During a touch long press only (the attribute's lifetime). */
-export const CALLOUT_RULE = `[${CALLOUT_ATTR}] { -webkit-touch-callout: none }`
 
 /** Structural event types, so React synthetic events and DOM events both fit. */
 export interface PressBaseEvent {
@@ -273,8 +271,11 @@ export function createPress(options: PressOptions): PressHandle {
     if (longPressTimer !== null) env.scheduler.clearTimeout(longPressTimer)
     longPressTimer = null
   }
+  /** Undoes the callout suppression of the current touch long press. */
+  let restoreCallout: (() => void) | null = null
   const reset = () => {
-    if (state.kind === "pointer") state.target.removeAttribute(CALLOUT_ATTR)
+    restoreCallout?.()
+    restoreCallout = null
     state = { kind: "idle" }
     setPressed(false)
     cancelLongPress()
@@ -380,8 +381,16 @@ export function createPress(options: PressOptions): PressHandle {
       if (pointerType === "touch" && options.longPress) {
         // A long press is the gesture: the platform's callout (iOS link preview, image menu)
         // must not answer it first.
+        // Through the CSSOM (allowed by a strict style-src), restored when the press ends.
+        const style = (target as HTMLElement).style
+        const previous = style?.getPropertyValue("-webkit-touch-callout") ?? ""
         target.setAttribute(CALLOUT_ATTR, "")
-        injectStyle(target.ownerDocument, "long-press-callout", CALLOUT_RULE, env)
+        style?.setProperty("-webkit-touch-callout", "none")
+        restoreCallout = () => {
+          target.removeAttribute(CALLOUT_ATTR)
+          if (previous) style?.setProperty("-webkit-touch-callout", previous)
+          else style?.removeProperty("-webkit-touch-callout")
+        }
       }
       if (pointerType === "touch") {
         // Implicit capture would keep the pointer "inside" while the finger slides off. It
