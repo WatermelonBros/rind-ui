@@ -332,6 +332,12 @@
   font-size: 12px;
   opacity: 0.7;
 }
+/* a popup rendered in place (a combobox's) is clipped by the frame: start at the top and leave
+   room below, so it opens downwards inside the stage instead of flipping over the tabs */
+.stage:has([data-scope="combobox"][data-part="control"]) {
+  place-items: start center;
+  min-height: 360px;
+}
 /* an open popup in the parts view: the trigger moves up so the popup stays clear of the legend */
 .stage[data-view="parts"]:has([aria-haspopup][aria-expanded="true"]) {
   place-items: start center;

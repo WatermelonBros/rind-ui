@@ -1,0 +1,20 @@
+- text: Background
+- group "Background":
+  - button "Choose color, vibrant blue Background" [expanded]
+  - text: "#3D8BFF"
+- dialog "Choose color, vibrant blue Background":
+  - group "Color area":
+    - slider "Saturation": "76"
+    - slider "Brightness": "100"
+  - group "Hue":
+    - slider "Hue": "216"
+  - group "Alpha":
+    - slider "Alpha": "1"
+  - textbox "HEX": "#3D8BFF"
+  - radiogroup "Color swatches":
+    - radio "vibrant pink"
+    - radio "vibrant orange"
+    - radio "vibrant orange yellow"
+    - radio "vibrant green"
+    - radio "vibrant blue" [checked]
+    - radio "vibrant purple"
