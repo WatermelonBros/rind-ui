@@ -52,15 +52,9 @@ function contractFor(role: "spinbutton" | "textbox") {
   const c = {
     ...base,
     actions: { ...base.actions, type: { ...base.actions.type, keyboard: keyed(role) } },
-    events: {
-      ...base.events,
-      ...(inJsdom ? { "PRESS.START": { skip: "no layout in jsdom: walked in browser mode" } } : {}),
-      // Walking the 600 ms touch hold also passes the 400 ms pointer hold in the page, which
-      // the oracle does not see: the touch twin is covered by the machine tests.
-      "after:touchSpinDelay": {
-        skip: "the touch hold: machine tests (the pointer hold is walked)",
-      },
-    },
+    events: inJsdom
+      ? { ...base.events, "PRESS.START": { skip: "no layout in jsdom: walked in browser mode" } }
+      : base.events,
     // The iOS quirk drops the spinbutton role and value attributes by design.
     ...(role === "textbox" ? { traits: base.traits.filter((t) => t !== "valued") } : {}),
   }
