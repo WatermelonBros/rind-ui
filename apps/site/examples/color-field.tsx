@@ -1,16 +1,35 @@
 "use client"
 
 import { Button, ColorChannelField, ColorField } from "@rind-ui/react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = { "color-field": { idle: "Hex" } }
+export const states: States = { "color-field": { idle: "Hex", invalid: "Invalid" } }
 
 export function Hex() {
   return (
     <ColorField.Root defaultValue="#FF3D8B">
       <ColorField.Label>Brand colour</ColorField.Label>
       <ColorField.Input />
+    </ColorField.Root>
+  )
+}
+
+export function Invalid() {
+  const input = useRef<HTMLInputElement>(null)
+  // A draft that does not parse, committed on mount (typing then Enter), so the page holds it.
+  useEffect(() => {
+    const el = input.current
+    if (!el) return
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(el, "12345")
+    el.dispatchEvent(new Event("input", { bubbles: true }))
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }))
+  }, [])
+  return (
+    <ColorField.Root defaultValue="#FF3D8B">
+      <ColorField.Label>Accent</ColorField.Label>
+      <ColorField.Input ref={input} />
+      <ColorField.ErrorMessage>Not a colour: 3 or 6 hex digits.</ColorField.ErrorMessage>
     </ColorField.Root>
   )
 }
@@ -92,6 +111,11 @@ export function InAForm() {
 
 export const variants: Variants = {
   Hex: { title: "Hex", description: "Free text until Enter or blur; `#` optional, any case." },
+  Invalid: {
+    title: "Invalid",
+    description: "A draft that does not parse stays, marked invalid (state example).",
+    hidden: true,
+  },
   Alpha: { title: "Alpha", description: "`alpha` accepts and shows 8-digit hex." },
   Css: { title: "CSS", description: '`format="css"`: any colour a browser accepts.' },
   Channels: {

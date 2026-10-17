@@ -11,7 +11,6 @@
   - group "Alpha":
     - slider "Alpha": "1"
   - textbox "HEX": "#3D8BFF"
-  - button "Pick a color from the screen": Pick
   - radiogroup "Color swatches":
     - radio "vibrant pink"
     - radio "vibrant orange"
