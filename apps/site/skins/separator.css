@@ -1,35 +1,43 @@
 /* ── Separator: one rule; thick and inked in crisp, soft and rounded in juicy ── */
-[data-skinned] [data-scope="separator"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="separator"][data-part="root"] {
   border: 0;
   margin: 0;
   flex: none;
   background: #a1a1aa;
 }
-[data-skinned] [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
   height: 2px;
   width: 100%;
 }
-[data-skinned] [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
   width: 2px;
   align-self: stretch;
   min-height: 1.2em;
 }
-[data-skin="crisp"] [data-scope="separator"][data-part="root"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="separator"][data-part="root"] {
   background: var(--s-ink);
 }
-[data-skin="crisp"] [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
   height: 3px;
 }
-[data-skin="crisp"] [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
   width: 3px;
 }
-[data-skin="juicy"] [data-scope="separator"][data-part="root"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="separator"][data-part="root"] {
   background: var(--s-acc);
   border-radius: 99px;
 }
-[data-skin="juicy"] [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="separator"][data-part="root"][data-orientation="horizontal"] {
   height: 4px;
 }
-[data-skin="juicy"] [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="separator"][data-part="root"][data-orientation="vertical"] {
   width: 4px;
 }

@@ -1,5 +1,5 @@
 /* ── Avatar: an inked sticker in crisp, a soft squishy disc in juicy ── */
-[data-skinned] [data-scope="avatar"][data-part="root"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="root"] {
   display: inline-grid;
   flex: none;
   width: 44px;
@@ -10,50 +10,57 @@
   font: 700 16px / 1 var(--s-font);
   user-select: none;
 }
-[data-skinned] [data-scope="avatar"][data-part="root"][data-size="sm"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="avatar"][data-part="root"][data-size="sm"] {
   width: 32px;
   height: 32px;
   font-size: 12px;
 }
-[data-skinned] [data-scope="avatar"][data-part="root"][data-size="lg"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="avatar"][data-part="root"][data-size="lg"] {
   width: 60px;
   height: 60px;
   font-size: 22px;
 }
 /* Image over Fallback in one cell; the image's display is never set, so `hidden` hides it. */
-[data-skinned] [data-scope="avatar"]:is([data-part="image"], [data-part="fallback"]) {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="avatar"]:is([data-part="image"], [data-part="fallback"]) {
   grid-area: 1 / 1;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   border-radius: inherit;
 }
-[data-skinned] [data-scope="avatar"][data-part="image"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="image"] {
   z-index: 1;
   object-fit: cover;
 }
-[data-skinned] [data-scope="avatar"][data-part="fallback"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="fallback"] {
   display: grid;
   place-items: center;
   background: var(--s-muted);
   color: var(--s-ink);
 }
-[data-skinned] [data-scope="avatar"][data-variant="solid"] > [data-part="fallback"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="avatar"][data-variant="solid"]
+  > [data-part="fallback"] {
   background: var(--s-brand);
   color: var(--s-brand-text);
 }
-[data-skinned] [data-scope="avatar"][data-variant="outline"] > [data-part="fallback"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="avatar"][data-variant="outline"]
+  > [data-part="fallback"] {
   background: transparent;
   border: 2px solid currentColor;
 }
-[data-skinned] [data-scope="avatar"][data-part="group"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="group"] {
   display: inline-flex;
   align-items: center;
 }
-[data-skinned] [data-scope="avatar"][data-part="group"] > * + * {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="group"] > * + * {
   margin-inline-start: -12px;
 }
-[data-skinned] [data-scope="avatar"][data-part="group-overflow"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="avatar"][data-part="group-overflow"] {
   display: inline-grid;
   place-items: center;
   min-width: 44px;
@@ -65,16 +72,19 @@
   background: var(--s-card);
   color: var(--s-ink);
 }
-[data-skin="crisp"] [data-scope="avatar"]:is([data-part="root"], [data-part="group-overflow"]) {
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="avatar"]:is([data-part="root"], [data-part="group-overflow"]) {
   border: var(--s-bw) solid var(--s-ink);
   box-shadow: var(--s-lift-lo);
 }
-[data-skin="juicy"] [data-scope="avatar"]:is([data-part="root"], [data-part="group-overflow"]) {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="avatar"]:is([data-part="root"], [data-part="group-overflow"]) {
   box-shadow:
     0 4px 0 var(--s-acc-deep),
     0 0 0 3px #fff;
 }
-[data-skin="juicy"] [data-scope="avatar"][data-part="fallback"] {
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="avatar"][data-part="fallback"] {
   background: var(--s-acc);
   color: #fff;
 }

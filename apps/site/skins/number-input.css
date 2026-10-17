@@ -1,11 +1,11 @@
 /* ── Number Input: a text field with a stepper on each side ── */
-[data-skinned] [data-scope="number-input"][data-part="label"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="number-input"][data-part="label"] {
   display: block;
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 6px;
 }
-[data-skinned] [data-scope="number-input"][data-part="control"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="number-input"][data-part="control"] {
   display: inline-flex;
   align-items: stretch;
   inline-size: min(100%, 14rem);
@@ -14,11 +14,12 @@
   background: var(--s-card);
   overflow: hidden;
 }
-[data-skinned] [data-scope="number-input"][data-part="control"][data-focus-visible] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="number-input"][data-part="control"][data-focus-visible] {
   outline: 2px solid var(--s-brand);
   outline-offset: 2px;
 }
-[data-skinned] [data-scope="number-input"][data-part="input"] {
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="number-input"][data-part="input"] {
   flex: 1;
   min-inline-size: 0;
   text-align: center;
@@ -30,7 +31,7 @@
   outline: none;
   font-variant-numeric: tabular-nums;
 }
-[data-skinned]
+:is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="number-input"]:is([data-part="increment-trigger"], [data-part="decrement-trigger"]) {
   inline-size: 40px;
   border: 0;
@@ -41,7 +42,7 @@
   user-select: none;
   touch-action: manipulation;
 }
-[data-skinned]
+:is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="number-input"]:is(
     [data-part="increment-trigger"],
     [data-part="decrement-trigger"]
@@ -50,9 +51,11 @@
   color: #fff;
 }
 /* At a bound and disabled: base.css dims the outermost disabled element only. */
-[data-skinned] [data-scope="number-input"][data-part="input"][aria-invalid="true"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="number-input"][data-part="input"][aria-invalid="true"] {
   color: var(--s-error);
 }
-[data-skinned] [data-scope="number-input"][data-part="control"][data-invalid] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="number-input"][data-part="control"][data-invalid] {
   border-color: var(--s-acc-deep);
 }
