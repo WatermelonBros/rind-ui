@@ -142,6 +142,8 @@ interface Level {
   /** A submenu's content is named by its trigger item. */
   readonly labelledBy?: string | undefined
   readonly inMenubar: boolean
+  /** A context menu: the trigger is a region. */
+  readonly region?: boolean | undefined
 }
 
 const LevelContext = createContext<Level | null>(null)
@@ -191,6 +193,7 @@ function useApi(ctx: Level, extra: { dir?: "ltr" | "rtl" } = {}) {
       meta,
       manual: menuPositioning(ctx.props).mode === "manual",
       inMenubar: ctx.inMenubar,
+      region: ctx.region,
       ...extra,
     },
     ctx.service.send,
@@ -219,6 +222,8 @@ function useLevelService(input: {
   readonly controllable?: Pick<MenuProps, "open" | "defaultOpen" | "onOpenChange" | "modal">
   /** One per tree: a parent level sees its submenu's transit (the grace area). */
   readonly hoverIntent?: HoverIntent | undefined
+  /** A context menu's root level. */
+  readonly region?: Pick<MenuProps, "onAnchorChange"> | undefined
 }) {
   const env = useEnvironment()
   const parent = useParentLayer()
@@ -238,6 +243,7 @@ function useLevelService(input: {
   }, [input.levelId])
   const o = input.options
   const props: MenuProps = {
+    ...(input.region ? { region: true, onAnchorChange: input.region.onAnchorChange } : {}),
     ...input.controllable,
     collection,
     strategy: "roving",
@@ -1018,4 +1024,13 @@ export const Menu = {
   Separator,
   Submenu,
   SubmenuTrigger,
+}
+
+// Internal: a context menu builds its root level from these (not public API).
+export {
+  type Level as MenuLevel,
+  LevelContext as MenuLevelContext,
+  type LevelOptions as MenuLevelOptions,
+  useApi as useMenuApi,
+  useLevelService as useMenuLevelService,
 }

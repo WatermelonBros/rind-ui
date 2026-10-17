@@ -20,6 +20,7 @@
 @import "./skeleton.css";
 @import "./badge.css";
 @import "./alert.css";
+@import "./qr-code.css";
 @import "./avatar.css";
 @import "./image.css";
 @import "./button.css";
@@ -50,6 +51,7 @@
 @import "./dialog.css";
 @import "./popover.css";
 @import "./menu.css";
+@import "./context-menu.css";
 @import "./tooltip.css";
 @import "./alert-dialog.css";
 @import "./form.css";

@@ -43,7 +43,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
-| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
+| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
@@ -161,7 +161,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
+| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 
 ## AI-UI primitives (11)

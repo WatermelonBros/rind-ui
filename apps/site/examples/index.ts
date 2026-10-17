@@ -12,6 +12,7 @@ import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
+import * as collections from "./collections"
 import * as dialog from "./dialog"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
@@ -38,6 +39,7 @@ import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as progress from "./progress"
+import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
@@ -78,6 +80,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
+  collections,
   dialog,
   field,
   "focus-and-modality": focusAndModality,
@@ -104,6 +107,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  "qr-code": qrCode,
   "scroll-area": scrollArea,
   skeleton,
   slider,

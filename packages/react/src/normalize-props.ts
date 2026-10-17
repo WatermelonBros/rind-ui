@@ -28,6 +28,7 @@ const REACT_NAMES: Readonly<Record<string, string>> = {
   // SVG presentation attributes (Progress's ring).
   "stroke-dasharray": "strokeDasharray",
   "stroke-dashoffset": "strokeDashoffset",
+  "shape-rendering": "shapeRendering",
   onDblClick: "onDoubleClick",
   // React's onFocus/onBlur bubble: they are focusin/focusout.
   onFocusIn: "onFocus",

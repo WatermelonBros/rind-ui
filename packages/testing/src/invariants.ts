@@ -367,7 +367,14 @@ const hiddenFocus: GenericInvariant = (f) => {
  * another element is leaving (Tab out) when the machine took a transition to another state
  * (focused → idle); without one, the component lost focus.
  */
+/** A layer with no restore target part: focus returns to what had it when it opened. */
+const restoresToPrevious = (f: StepFacts) =>
+  f.semantics["finalFocus"] === undefined && f.semantics["trigger"] === undefined
+
 const focusKept: GenericInvariant = (f) =>
+  // A layer that returns focus to what had it before (no restore target declared): back in
+  // its initial state with nothing focused at the start, <body> is where focus belongs.
+  !(restoresToPrevious(f) && f.atInitial && f.baseline.focus.onBody && f.after.focus.onBody) &&
   f.before?.focus.inInstance &&
   !f.after.focus.inInstance &&
   (f.after.focus.onBody || f.from === null || f.from === f.state)
@@ -629,6 +636,14 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** (13) After closing, focus is on the trigger or the declared final-focus part. */
   "restores-focus": (f) => {
     const target = f.semantics["finalFocus"] ?? f.semantics["trigger"]
+    // No target: focus returns to the element focused before it opened (a context menu),
+    // which only <body> when nothing was focused.
+    if (restoresToPrevious(f)) {
+      const closed = f.from !== null && f.from !== f.state && !isOpen(f)
+      return closed && f.after.focus.onBody && !f.baseline.focus.onBody
+        ? ["after closing, focus is on <body>, though something had focus when it opened"]
+        : []
+    }
     const closed = f.from !== null && f.from !== f.state && !isOpen(f)
     // Closed by Tab: focus was restored to the trigger and the browser's Tab moved on from it.
     if (f.context?.["closeReason"] === "tab-key") return []

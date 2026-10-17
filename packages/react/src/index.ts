@@ -9,6 +9,7 @@ export * from "./checkbox"
 export * from "./checkbox-group"
 export * from "./collapsible"
 export { CompositeHostContext, useCompositeHost, useHostItem } from "./composite-host"
+export * from "./context-menu"
 export * from "./dialog"
 export * from "./field"
 export * from "./fieldset"
@@ -43,6 +44,7 @@ export {
   useMessages,
   useTypeaheadTimeout,
 } from "./provider"
+export * from "./qr-code"
 export * from "./radio-group"
 export { type RenderProp, renderPart } from "./render"
 export * from "./scroll-area"

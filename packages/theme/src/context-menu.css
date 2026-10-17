@@ -1,0 +1,60 @@
+/*
+ * Context Menu: a Menu opened from a region, so menu.css styles the items and the content;
+ * this sheet adds the --rind-context-menu-* tokens (each defaulting to its --rind-menu-*
+ * twin) on the content of a context menu, an open-state hook for the region, and an entry
+ * that grows from the anchor point (--rind-transform-origin) instead of sliding from a side.
+ */
+@layer rind.components {
+  [data-scope="menu"][data-part="content"][data-context-menu][data-side] {
+    background: var(--rind-context-menu-bg, var(--rind-menu-bg, var(--rind-color-surface-raised)));
+    padding: var(--rind-context-menu-padding, var(--rind-menu-padding, var(--rind-space-1)));
+    border-color: var(
+      --rind-context-menu-border,
+      var(--rind-menu-border, var(--rind-color-border-strong))
+    );
+    border-radius: var(--rind-context-menu-radius, var(--rind-menu-radius, var(--rind-radius-md)));
+    box-shadow: var(--rind-context-menu-shadow, var(--rind-menu-shadow, var(--rind-shadow-sm)));
+    min-inline-size: var(--rind-context-menu-min-width, var(--rind-menu-min-width, 10rem));
+    max-block-size: min(
+      var(--rind-context-menu-max-height, var(--rind-menu-max-height, 100vh)),
+      var(--rind-available-height, 100vh)
+    );
+    transform-origin: var(--rind-transform-origin);
+    transition:
+      opacity var(--rind-context-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      transform var(--rind-context-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  [data-scope="menu"][data-part="content"][data-context-menu][data-side][data-state="open"] {
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-context-menu-pop-from, scale(0.96));
+    }
+  }
+
+  [data-scope="menu"][data-part="content"][data-context-menu][data-side][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-context-menu-pop-from, scale(0.96));
+  }
+
+  /* Off by default: the region is the consumer's surface. */
+  [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {
+    background: var(--rind-context-menu-region-open-bg, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="menu"][data-part="content"][data-context-menu] {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="menu"][data-part="content"][data-context-menu] {
+      border-color: CanvasText;
+    }
+
+    [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {
+      background: transparent;
+    }
+  }
+}
