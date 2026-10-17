@@ -1,5 +1,5 @@
 // Select scenarios (openspec add-select) through the select driver, in jsdom and real browsers.
-import { Select, type SelectRootProps } from "@rind-ui/react"
+import { Dialog, Field, Select, type SelectRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
@@ -43,8 +43,8 @@ describe("Select: basics", () => {
     render(<Fruit />)
     const t = screen.getByRole("combobox", { name: "Fruit" })
     expect(t.getAttribute("aria-expanded")).toBe("false")
-    expect(await fruit().valueText()).toBe("Pick one")
-    expect(await fruit().hasPlaceholder()).toBe(true)
+    expect(await fruit().value()).toBe("Pick one")
+    expect(await fruit().isPlaceholder()).toBe(true)
   })
 
   for (const modality of ["pointer", "keyboard"] as const) {
@@ -54,7 +54,7 @@ describe("Select: basics", () => {
       const s = fruit().via(modality)
       await s.choose("Banana")
       expect(await s.isOpen()).toBe(false)
-      expect(await s.valueText()).toBe("Banana")
+      expect(await s.value()).toBe("Banana")
       expect(await s.formValue()).toBe("banana")
       expect(onValueChange).toHaveBeenLastCalledWith("banana", { reason: "select" })
       expect(document.activeElement).toBe(screen.getByRole("combobox", { name: "Fruit" }))
@@ -79,7 +79,7 @@ describe("Select: basics", () => {
     await user.tab()
     await user.keyboard("c")
     expect(await fruit().isOpen()).toBe(false)
-    expect(await fruit().valueText()).toBe("Cherry")
+    expect(await fruit().value()).toBe("Cherry")
   })
 
   it("Label press focuses the trigger and does not open", async () => {
@@ -130,7 +130,7 @@ describe("Select: closing rules", () => {
     trigger().focus()
     await user.keyboard("{Enter}c")
     expect(trigger().getAttribute("aria-expanded")).toBe("false")
-    expect(await fruit().valueText()).toBe("Pick one")
+    expect(await fruit().value()).toBe("Pick one")
   })
 
   it("Controlled open: a refused close keeps it open", async () => {
@@ -152,7 +152,7 @@ describe("Select: multiple", () => {
     await user.click(screen.getByRole("option", { name: "Apple" }))
     expect(trigger().getAttribute("aria-expanded")).toBe("true")
     expect(onValueChange).toHaveBeenLastCalledWith(["apple", "cherry"], { reason: "select" })
-    expect(await fruit().valueText()).toBe("Apple and Cherry")
+    expect(await fruit().value()).toBe("Apple and Cherry")
   })
 })
 
@@ -170,7 +170,7 @@ describe("Select: forms", () => {
     await fruit().via("keyboard").choose("Banana")
     expect(submitted(form)).toEqual([["fruit", "banana"]])
     form.reset()
-    await vi.waitFor(async () => expect(await fruit().valueText()).toBe("Apple"))
+    await vi.waitFor(async () => expect(await fruit().value()).toBe("Apple"))
     expect(submitted(form)).toEqual([["fruit", "apple"]])
   })
 
@@ -208,7 +208,7 @@ describe("Select: forms", () => {
     if (!hidden) throw new Error("no hidden input")
     hidden.value = "Cherry"
     hidden.dispatchEvent(new Event("input", { bubbles: true }))
-    await vi.waitFor(async () => expect(await fruit().valueText()).toBe("Cherry"))
+    await vi.waitFor(async () => expect(await fruit().value()).toBe("Cherry"))
     expect(onValueChange).toHaveBeenLastCalledWith("cherry", { reason: "autofill" })
     expect(trigger().hasAttribute("data-autofill")).toBe(true)
   })
@@ -222,5 +222,215 @@ describe("Select: forms", () => {
     )
     await fruit().via("pointer").choose("Banana")
     expect(onChange).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("Select: hidden input focus", () => {
+  it("Focusing the hidden input while open keeps it open, focus in the select", async () => {
+    const onOpenChange = vi.fn()
+    render(<Fruit name="fruit" onOpenChange={onOpenChange} />)
+    const s = fruit().via("keyboard")
+    await s.open()
+    const hidden = document.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
+    hidden?.focus()
+    await vi.waitFor(() =>
+      expect(
+        trigger() === document.activeElement ||
+          screen.getByRole("listbox").contains(document.activeElement),
+      ).toBe(true),
+    )
+    expect(onOpenChange).toHaveBeenCalledTimes(1)
+    expect(await s.isOpen()).toBe(true)
+  })
+})
+
+/** The select's parts without a Select.Label (the name comes from elsewhere). */
+function Bare(root: Partial<SelectRootProps>) {
+  return (
+    <Select.Root {...(root as SelectRootProps)} items={DATA} placeholder="Pick one">
+      <Select.Trigger>
+        <Select.ValueText />
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner>
+          <Select.Content>
+            <Select.List>
+              {DATA.map((i) => (
+                <Select.Item key={i.key} value={i.key}>
+                  <Select.ItemText>{i.label}</Select.ItemText>
+                </Select.Item>
+              ))}
+              <Select.Separator />
+            </Select.List>
+          </Select.Content>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
+  )
+}
+
+describe("Select: naming, Field and nesting", () => {
+  it("Field: its label names the trigger and the list; a label click focuses and does not open (headlessui#3787)", async () => {
+    const user = userEvent.setup()
+    render(
+      <Field.Root>
+        <Field.Label>Fruit</Field.Label>
+        <Bare name="fruit" />
+        <Field.Description>Your favourite</Field.Description>
+      </Field.Root>,
+    )
+    const t = trigger()
+    expect(t.getAttribute("aria-describedby")).toContain(screen.getByText("Your favourite").id)
+    await user.click(screen.getByText("Fruit"))
+    expect(document.activeElement).toBe(t)
+    expect(t.getAttribute("aria-expanded")).toBe("false")
+    await fruit().via("keyboard").open()
+    expect(screen.getByRole("listbox", { name: "Fruit" })).toBeTruthy()
+  })
+
+  it("Field disabled: the trigger and the hidden input are disabled", () => {
+    render(
+      <Field.Root disabled>
+        <Field.Label>Fruit</Field.Label>
+        <Bare name="fruit" />
+      </Field.Root>,
+    )
+    expect(trigger().hasAttribute("data-disabled")).toBe(true)
+    const hidden = document.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
+    expect(hidden?.disabled).toBe(true)
+  })
+
+  it("Wrapping label: names the trigger; a press on its text focuses without opening (radix#3679)", async () => {
+    const user = userEvent.setup()
+    render(
+      // biome-ignore lint/a11y/noLabelWithoutControl: the trigger inside is the control
+      <label>
+        <span>Fruit</span>
+        <Bare />
+      </label>,
+    )
+    await user.click(screen.getByText("Fruit"))
+    expect(document.activeElement).toBe(trigger())
+    expect(trigger().getAttribute("aria-expanded")).toBe("false")
+  })
+
+  it("aria-label on the trigger is copied to the list (never named by its value)", async () => {
+    render(
+      <Select.Root items={DATA} defaultValue="apple">
+        <Select.Trigger aria-label="Fruit">
+          <Select.ValueText />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Content>
+              <Select.List>
+                {DATA.map((i) => (
+                  <Select.Item key={i.key} value={i.key}>
+                    {i.label}
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Content>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>,
+    )
+    await fruit().via("keyboard").open()
+    expect(screen.getByRole("listbox").getAttribute("aria-label")).toBe("Fruit")
+    expect(screen.getByRole("listbox").getAttribute("aria-labelledby")).toBe(null)
+  })
+
+  it("Unnamed trigger: a development warning", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    render(<Bare />)
+    expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/)
+    warn.mockRestore()
+  })
+
+  it("In a dialog: Escape closes only the select", async () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Content>
+            <Dialog.Title>Settings</Dialog.Title>
+            <Fruit />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>,
+    )
+    const s = fruit().via("keyboard")
+    await s.open()
+    await s.pressEscape()
+    expect(screen.getByRole("dialog", { name: "Settings" })).toBeTruthy()
+    expect(document.activeElement).toBe(trigger())
+  })
+
+  it("render: a custom trigger element keeps the behaviour", async () => {
+    render(
+      <Select.Root items={DATA}>
+        <Select.Label>Fruit</Select.Label>
+        <Select.Trigger render={<div />}>
+          <Select.ValueText />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Content>
+              <Select.List>
+                {DATA.map((i) => (
+                  <Select.Item key={i.key} value={i.key}>
+                    {i.label}
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Content>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>,
+    )
+    expect(trigger().tagName).toBe("DIV")
+    expect(trigger().getAttribute("tabindex")).toBe("0")
+    await fruit().via("keyboard").choose("Banana")
+    expect(await fruit().value()).toBe("Banana")
+  })
+
+  it("Separator: role none inside the listbox (mui/base-ui#5398)", async () => {
+    render(
+      <Field.Root>
+        <Field.Label>Fruit</Field.Label>
+        <Bare />
+      </Field.Root>,
+    )
+    await fruit().via("pointer").open()
+    const sep = document.querySelector('[data-scope="select"][data-part="separator"]')
+    expect(sep?.getAttribute("role")).toBe("none")
+  })
+})
+
+describe("Select: mounting and empty-string keys", () => {
+  it("Lazy: no content before the first open; keepMounted keeps it hidden after closing", async () => {
+    const { unmount } = render(<Fruit />)
+    expect(document.querySelector('[data-scope="select"][data-part="content"]')).toBe(null)
+    unmount()
+    render(<Fruit keepMounted />)
+    const s = fruit().via("keyboard")
+    await s.open()
+    await s.pressEscape()
+    const content = document.querySelector<HTMLElement>(
+      '[data-scope="select"][data-part="content"]',
+    )
+    expect(content?.hidden).toBe(true)
+  })
+
+  it('"" is a key distinct from none: selected, shown and submitted (radix#2706)', async () => {
+    render(
+      <form aria-label="f">
+        <Fruit name="fruit" defaultValue="" items={[{ key: "", label: "Built-in" }, ...DATA]} />
+      </form>,
+    )
+    expect(await fruit().value()).toBe("Built-in")
+    expect(await fruit().isPlaceholder()).toBe(false)
+    expect([...new FormData(screen.getByRole("form") as HTMLFormElement).entries()]).toEqual([
+      ["fruit", ""],
+    ])
   })
 })

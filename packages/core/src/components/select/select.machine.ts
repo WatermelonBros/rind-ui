@@ -161,6 +161,13 @@ const pieces = collectionPieces({
 })
 type Args = Parameters<typeof pieces.actions.navigate>[0]
 
+/** The collection pieces' arguments: a Select is single unless it says multiple. */
+const args = (a: unknown): Args => {
+  // Sound: the same args object, the event union wider than the pieces' own.
+  const x = a as Args
+  return { ...x, props: { ...x.props, selectionMode: mode(x.props as SelectProps) } } as Args
+}
+
 /** null as the runtime's fallback: no selection (a controlled null is a value). */
 const NONE = null as unknown as string
 
@@ -198,6 +205,19 @@ function firstSelected(props: SelectProps, s: SelectionValue): CollectionKey | n
   return null
 }
 
+/** The selected option (first in order), else the last for ArrowUp, else the first. */
+function initialKey(
+  props: SelectProps,
+  value: SelectValue | undefined,
+  toLast: boolean,
+): CollectionKey | null {
+  const navigable = navigableWhen(props.focusableWhenDisabled === true)
+  return (
+    firstSelected(props, selectionOf(value)) ??
+    move(props.collection, null, toLast ? "last" : "first", { loop: false, navigable })
+  )
+}
+
 export const selectMachine = setup({
   types: type<{
     props: SelectProps
@@ -213,32 +233,42 @@ export const selectMachine = setup({
     isSingle: ({ props }) => mode(props) === "single",
     isMultiple: ({ props }) => mode(props) === "multiple",
     /** A selection that applies: an enabled option. */
-    selectable: (a) => pieces.guards.canSelect(a as unknown as Args), // same args, wider event
+    selectable: (a) => pieces.guards.canSelect(args(a)),
   },
   actions: {
-    navigate: (a) => pieces.actions.navigate(a as unknown as Args), // same args, wider event union
-    highlight: (a) => pieces.actions.highlight(a as unknown as Args), // as above
-    pointerMove: (a) => pieces.actions.pointerMove(a as unknown as Args), // as above
-    typeahead: (a) => pieces.actions.typeahead(a as unknown as Args), // as above
-    resetTypeahead: (a) => pieces.actions.resetTypeahead(a as unknown as Args), // as above
-    repairCollection: (a) => pieces.actions.repairCollection(a as unknown as Args), // as above
-    scrollToHighlighted: (a) => pieces.actions.scrollToHighlighted(a as unknown as Args), // as above
-    focusHighlighted: (a) => pieces.actions.focusHighlighted(a as unknown as Args), // as above
-    select: (a) => pieces.actions.select(a as unknown as Args), // as above
-    enterOpen: ({ event, props, set }) => {
-      set(
-        "openModality",
+    navigate: (a) => pieces.actions.navigate(args(a)),
+    highlight: (a) => pieces.actions.highlight(args(a)),
+    pointerMove: (a) => pieces.actions.pointerMove(args(a)),
+    typeahead: (a) => pieces.actions.typeahead(args(a)),
+    resetTypeahead: (a) => pieces.actions.resetTypeahead(args(a)),
+    repairCollection: (a) => pieces.actions.repairCollection(args(a)),
+    scrollToHighlighted: (a) => pieces.actions.scrollToHighlighted(args(a)),
+    focusHighlighted: (a) => pieces.actions.focusHighlighted(args(a)),
+    select: (a) => pieces.actions.select(args(a)),
+    enterOpen: ({ event, props, set, values }) => {
+      const modality =
         event.type === "TRIGGER_PRESS"
           ? event.modality
           : event.type === "TRIGGER_KEY"
             ? "keyboard"
-            : null,
-      )
-      set("openToLast", event.type === "TRIGGER_KEY" && event.key === "last")
+            : null
+      const toLast = event.type === "TRIGGER_KEY" && event.key === "last"
+      set("openModality", modality)
+      set("openToLast", toLast)
       set("closeReason", null)
       set("restoreFocus", true)
-      set("highlightedKey", null)
-      set("highlightSource", null)
+      // The option initial focus lands on, highlighted from the start (the effect scrolls to
+      // it and focuses it once placed).
+      const key = initialKey(props, values.value, toLast)
+      set("highlightedKey", key)
+      set(
+        "highlightSource",
+        key === null
+          ? null
+          : modality === "keyboard" || modality === "virtual"
+            ? "keyboard"
+            : "pointer",
+      )
       set("placement", initialPlacement(props))
     },
     /** Exit (before the layer's cleanup reads it): Tab and a window blur keep focus. */
@@ -246,6 +276,13 @@ export const selectMachine = setup({
       set("restoreFocus", event.type !== "TAB_KEY" && event.type !== "WINDOW_BLUR")
       const reason = CLOSE_REASON[event.type]
       if (reason) set("closeReason", reason)
+    },
+    /** A chosen option is the highlighted one (the press or Enter landed on it). */
+    highlightChosen: ({ event, props, set }) => {
+      if (event.type !== "SELECT") return
+      const node = props.collection.get(event.key)
+      if (!node || !navigableWhen(props.focusableWhenDisabled === true)(node)) return
+      set("highlightedKey", event.key)
     },
     clearHighlight: ({ set }) => {
       set("highlightedKey", null)
@@ -371,14 +408,7 @@ export const selectMachine = setup({
           if (!first) return
           // The selected option (first in order), else the last for ArrowUp, else the first;
           // centred before focus so the page never scrolls (react-spectrum#3910).
-          const props = a.props
-          const navigable = navigableWhen(props.focusableWhenDisabled === true)
-          const key =
-            firstSelected(props, selectionOf(a.values.value)) ??
-            move(props.collection, null, a.context.openToLast ? "last" : "first", {
-              loop: false,
-              navigable,
-            })
+          const key = initialKey(a.props, a.values.value, a.context.openToLast)
           const m = a.context.openModality
           const keyboard = m === "keyboard" || m === "virtual"
           if (key !== null) {
@@ -462,14 +492,14 @@ export const selectMachine = setup({
         WINDOW_BLUR: { target: "closed", reason: "window-blur" },
         CLOSE: { target: "closed", reason: "api" },
         SELECT: [
-          { guard: { not: "selectable" } },
+          { guard: { not: "selectable" }, actions: ["highlightChosen"] },
           {
             guard: "isSingle",
             target: "closed",
             reason: "item-select",
             actions: ["select", "userChange"],
           },
-          { actions: ["select", "userChange"] },
+          { actions: ["select", "userChange", "highlightChosen"] },
         ],
         NAVIGATE: { actions: ["navigate", "scrollToHighlighted", "focusHighlighted"] },
         TYPEAHEAD: { actions: ["typeahead", "scrollToHighlighted", "focusHighlighted"] },

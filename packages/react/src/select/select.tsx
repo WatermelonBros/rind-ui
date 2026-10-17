@@ -449,7 +449,12 @@ function HiddenInputs({
     <>
       <input {...normalizeProps(props)} ref={ctx.hiddenRef} />
       {ctx.multiple && ctx.name
-        ? list.map((k) => <input key={k} type="hidden" name={ctx.name} value={k} form={ctx.form} />)
+        ? list.map((k) => (
+            <input
+              key={k}
+              {...normalizeProps(api.hiddenValue(k, { name: ctx.name, form: ctx.form }))}
+            />
+          ))
         : null}
     </>
   )
@@ -685,6 +690,8 @@ function Portal(props: PortalProps) {
 /** The listbox parts, bound to this select (the list named as the trigger says). */
 function useSelectHost(part: string): ListboxHost {
   const ctx = useSelect(part)
+  // A Field's label names the list when the select renders no label of its own.
+  const fieldLabel = useFieldBindingPeek()?.ids?.label
   const [listFocused, setListFocused] = useState(false)
   const { api } = useApi(ctx, { listFocused })
   const { setMounted, mountDescription } = ctx
@@ -693,7 +700,10 @@ function useSelectHost(part: string): ListboxHost {
     parts: {
       ...api.listbox,
       list: () => ({
-        ...api.list(ctx.triggerNaming.current),
+        ...api.list({
+          ...ctx.triggerNaming.current,
+          labelledBy: ctx.triggerNaming.current.labelledBy ?? fieldLabel,
+        }),
         onFocus: () => setListFocused(true),
         onBlur: () => setListFocused(false),
       }),

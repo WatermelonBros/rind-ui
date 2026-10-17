@@ -11,6 +11,7 @@ import { isSelected, type SelectionValue, selectedKeys } from "../../collection/
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
+import { describeKey } from "../../dom/keyboard"
 import type { LayerMeta } from "../../dom/layer-stack"
 import type { LinkEnv } from "../../dom/link"
 import {
@@ -32,6 +33,7 @@ export type SelectPart =
   | "positioner"
   | "content"
   | "hidden-input"
+  | "hidden-value"
 
 export interface SelectConnectInput {
   readonly instance: string
@@ -167,6 +169,10 @@ export function selectConnect(
         e.preventDefault()
         send({ type: "LABEL_PRESS" })
       },
+      // Assistive technology activates with a bare click (no pointer down before it).
+      onClick: (event: unknown) => {
+        if ((event as MouseEvent).detail === 0) send({ type: "LABEL_PRESS" })
+      },
     }),
     trigger: (s: SelectTriggerState): PartProps => {
       const named = s.label !== undefined || s.labelledBy !== undefined
@@ -202,7 +208,9 @@ export function selectConnect(
         [CRITICAL]: ["aria-expanded", "role"],
         onKeyDown: (event: unknown) => {
           const e = event as KeyboardEvent
-          if (e.target !== e.currentTarget || e.isComposing || input.open) return
+          // An IME composition (also keyCode 229 and a composition in progress) owns its keys.
+          if (describeKey(e, env).composing) return
+          if (e.target !== e.currentTarget || input.open) return
           if (input.disabled || input.readOnly) return
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
             if (e.ctrlKey || e.metaKey) return
@@ -291,7 +299,7 @@ export function selectConnect(
         tabindex: -1,
         onKeyDown: (event: unknown) => {
           const e = event as KeyboardEvent
-          if (e.key === "Tab" && !e.isComposing) {
+          if (e.key === "Tab" && !describeKey(e, env).composing) {
             send({ type: "TAB_KEY", shift: e.shiftKey })
             return
           }
@@ -322,6 +330,17 @@ export function selectConnect(
         defaultValue: input.multiple ? (keys.length > 0 ? "x" : "") : (keys[0] ?? ""),
       }
     },
+    /** Multiple: one hidden carrier per selected key (the form's values). */
+    hiddenValue: (
+      key: CollectionKey,
+      s: { name?: string | undefined; form?: string | undefined },
+    ): PartProps => ({
+      ...scope("hidden-value"),
+      type: "hidden",
+      name: s.name,
+      form: s.form,
+      value: key,
+    }),
     pressTrigger: (modality: Modality) => send({ type: "TRIGGER_PRESS", modality }),
   }
 }

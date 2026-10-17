@@ -22,6 +22,7 @@ type P =
   | "separator"
   | "empty"
   | "hidden-input"
+  | "hidden-value"
 type E = Env<P>
 
 /** The option a model run chooses (set by the model test). */
@@ -52,11 +53,20 @@ async function arrowTo(env: E, target: Part) {
 const openedDone = async (env: E) =>
   (await isOpen(env)) && (await positioningQueries.isPlaced(env)) && (await focusInList(env))
 
+const BASE_TRAITS = [
+  "disclosure",
+  "layer",
+  "restores-focus",
+  "presence",
+  "anchored",
+  "composite-roving",
+  "selectable",
+  "form-associated",
+] as const satisfies readonly Trait[]
+
 /** The traits of a props class: a non-modal select is not modal. */
 export function selectTraits(props: Pick<SelectProps, "modal">): readonly Trait[] {
-  return props.modal === false
-    ? ["layer", "restores-focus", "presence", "anchored"]
-    : ["layer", "restores-focus", "presence", "anchored", "modal"]
+  return props.modal === false ? [...BASE_TRAITS] : [...BASE_TRAITS, "modal"]
 }
 
 /** The Select contract: open and close, choose by gesture or typing, form queries. */
@@ -80,6 +90,7 @@ export const selectContract = contract("select", {
     "separator",
     "empty",
     "hidden-input",
+    "hidden-value",
   ],
   // Located through its trigger: a closed select renders no list.
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "combobox" as const, name }),
@@ -87,11 +98,19 @@ export const selectContract = contract("select", {
     ...positioningQueries,
     isOpen,
     /** What the trigger shows: the selected texts, else the placeholder. */
-    valueText: async (env: E) => (await env.part("value-text").text()).trim(),
-    hasPlaceholder: async (env: E) => (await env.part("trigger").attr("data-placeholder")) !== null,
-    /** The submitted value of a single select ("" with none). */
-    formValue: async (env: E) => env.part("hidden-input").value(),
-    options: async (env: E) => {
+    value: async (env: E) => (await env.part("value-text").text()).trim(),
+    isPlaceholder: async (env: E) => (await env.part("trigger").attr("data-placeholder")) !== null,
+    isInvalid: async (env: E) => (await env.part("trigger").attr("aria-invalid")) === "true",
+    isRequired: async (env: E) => (await env.part("trigger").attr("aria-required")) === "true",
+    /** What the form submits: the key (single, "" with none), or every key (multiple). */
+    formValue: async (env: E) => {
+      const carriers = await env.part("hidden-value").all()
+      if (carriers.length === 0) return env.part("hidden-input").value()
+      const out: string[] = []
+      for (const c of carriers) out.push(await c.value())
+      return out
+    },
+    items: async (env: E) => {
       if (!(await env.part("list").exists())) return []
       const out: string[] = []
       for (const p of await env.find({ role: "option" }).all()) out.push(await p.accessibleName())
@@ -160,7 +179,32 @@ export const selectContract = contract("select", {
       },
       done: async () => true,
     },
-    /** Types on the focused trigger or list (closed: selects the match; open: highlights). */
+    /** Toggles the option named `name` in a multiple select; the popup stays open. */
+    toggle: {
+      pointer: async (env: E, name: string | RegExp) => {
+        if (!(await isOpen(env))) await env.part("trigger").click()
+        await env.until(() => openedDone(env), Boolean)
+        await option(env, name).click()
+      },
+      touch: async (env: E, name: string | RegExp) => {
+        if (!(await isOpen(env))) await env.part("trigger").tap()
+        await env.until(() => openedDone(env), Boolean)
+        await option(env, name).tap()
+      },
+      keyboard: async (env: E, name: string | RegExp) => {
+        if (!(await isOpen(env))) await env.part("trigger").press("Enter")
+        await env.until(() => openedDone(env), Boolean)
+        await arrowTo(env, option(env, name))
+        await env.keyboard("Space")
+      },
+      done: isOpen,
+    },
+    /** Types on the closed trigger: the match becomes the value, the popup stays closed. */
+    typeaheadClosed: {
+      keyboard: async (env: E, text: string) => env.part("trigger").type(text),
+      done: closed,
+    },
+    /** Types in the open list: the highlight moves. */
     typeahead: {
       keyboard: async (env: E, text: string) => {
         await env.focused().type(text)
@@ -193,7 +237,9 @@ export const selectContract = contract("select", {
   events: {
     TRIGGER_PRESS: { from: { closed: "open", open: "close" } },
     TRIGGER_KEY: { action: "openWithArrowUp", event: () => ({ key: "last" }) },
-    LABEL_PRESS: "pressLabel",
+    LABEL_PRESS: {
+      from: { closed: "pressLabel", open: { skip: "a label press while open: the DOM tests" } },
+    },
     SELECT: {
       action: "choose",
       // The mapping's args type misses the action's own arguments (text-field's gap).
@@ -230,8 +276,20 @@ export const selectContract = contract("select", {
     "COLLECTION.CHANGE": { skip: "sent by the $props:collection edge (a prop step)" },
     "$props:collection": { skip: "collection changes: covered by the DOM tests" },
     "$sync:open": { props: (target) => ({ open: target === "open" }) },
+    "$sync:value": { skip: "a controlled value changes no state: the DOM and machine tests" },
   },
-  traits: ["layer", "restores-focus", "presence", "anchored", "modal"],
+  traits: [...BASE_TRAITS, "modal"],
+  // Single: the key ("" with none); multiple: the constraint input, non-empty when any is
+  // selected (the keys ride on per-key hidden inputs).
+  formInput: {
+    values: ["value"],
+    expected: (values) => {
+      const v = values["value"] as string | null | readonly string[] | undefined
+      if (Array.isArray(v)) return { value: v.length > 0 ? "x" : "" }
+      return { value: typeof v === "string" ? v : "" }
+    },
+    silentEvents: ["FORM.RESET"],
+  },
   // Focus moving inside the open popup is navigation by definition.
   commitsOnFocus: [
     { part: "trigger", state: "open" },
