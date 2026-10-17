@@ -398,10 +398,11 @@ describe("Select: naming, Field and nesting", () => {
     expect(screen.getByRole("listbox").getAttribute("aria-labelledby")).toBe(null)
   })
 
-  it("Unnamed trigger: a development warning", () => {
+  it("Unnamed trigger: a development warning", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(<Bare />)
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/)
+    // checked after the Label's mount re-render (a microtask)
+    await vi.waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/))
     warn.mockRestore()
   })
 

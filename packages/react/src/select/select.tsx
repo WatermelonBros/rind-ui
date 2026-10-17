@@ -543,18 +543,22 @@ function Trigger({
     labelActivation: "focus",
   })
   const el = useRef<HTMLElement | null>(null)
-  // Development: a trigger needs a name (it is never named by its value).
+  // Development: a trigger needs a name (it is never named by its value). Checked after the
+  // re-render a Label's mount causes (its layout effect), not on the first commit.
   useEffect(() => {
     const node = el.current
     if (process.env.NODE_ENV === "production" || !node) return
-    const named =
-      node.hasAttribute("aria-label") ||
-      node.hasAttribute("aria-labelledby") ||
-      node.closest("label") !== null
-    if (!named)
-      console.warn(
-        `[rind-ui] select #${node.id}: the trigger has no accessible name; render Select.Label or pass aria-label`,
-      )
+    queueMicrotask(() => {
+      if (!node.isConnected) return
+      const named =
+        node.hasAttribute("aria-label") ||
+        node.hasAttribute("aria-labelledby") ||
+        node.closest("label") !== null
+      if (!named)
+        console.warn(
+          `[rind-ui] select #${node.id}: the trigger has no accessible name; render Select.Label or pass aria-label`,
+        )
+    })
   })
   const tag = useRenderedTag("button", render, el)
   const own = normalizeProps(
