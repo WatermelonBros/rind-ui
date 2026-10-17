@@ -427,7 +427,10 @@ function Control({ render, ...rest }: Own<"div">) {
   const ctx = usePicker("Control")
   const props = mergeProps(normalizeProps(ctx.api.control()), rest)
   if (ctx.inline) return renderPart("div", props, render, ctx.state)
-  return <Popover.Anchor {...(props as object)} />
+  // The Popover finds its anchor by the anchor's own id: an `id` here would replace it and the
+  // content would never be positioned.
+  const { id: _anchorOwnsTheId, ...anchorProps } = props
+  return <Popover.Anchor {...(anchorProps as object)} />
 }
 
 /** Opens the content; named "Choose color, <colour>" and by the Label. */
