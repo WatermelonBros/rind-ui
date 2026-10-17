@@ -67,6 +67,7 @@ export * from "./text-field"
 export * from "./toggle-group"
 export * from "./toolbar"
 export * from "./tooltip"
+export * from "./tour"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

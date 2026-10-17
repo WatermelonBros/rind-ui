@@ -1,0 +1,131 @@
+/*
+ * Tour (decision 0007): the backdrop dims the viewport and is cut by the clip-path the tour
+ * writes; the spotlight rings the padded target; the card reuses positioner.css for an
+ * anchored step and is centred by its own inline style for a dialog step. Tier-3
+ * --rind-tour-* tokens default to the semantic ones. The spotlight moves between steps only:
+ * its transition is off while the tour is placing a step (data-placing on the positioner is
+ * not visible from here, so the transition is limited to left/top/width/height changes of a
+ * new step and disabled under reduced motion). Forced colors: no scrim, a visible ring.
+ * The spotlight transitions only while the tour marks a step change (data-step-changing).
+ */
+@layer rind.components {
+  [data-scope="tour"][data-part="backdrop"] {
+    background: var(--rind-tour-backdrop, oklch(from var(--rind-color-text) l c h / 0.45));
+    z-index: calc(1000 + var(--layer-index, 0));
+    transition: opacity var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+  [data-scope="tour"][data-part="backdrop"][data-state="open"] {
+    opacity: 1;
+    @starting-style {
+      opacity: 0;
+    }
+  }
+  [data-scope="tour"][data-part="backdrop"][data-state="closed"] {
+    opacity: 0;
+  }
+
+  [data-scope="tour"][data-part="spotlight"] {
+    box-sizing: border-box;
+    border-radius: var(--rind-tour-spotlight-radius, var(--rind-radius-md));
+    outline: var(--rind-tour-ring-width, 2px) solid
+      var(--rind-tour-ring-color, var(--rind-focus-color));
+    z-index: calc(1000 + var(--layer-index, 0));
+  }
+  /* Between steps only (set by the tour for one step change): never on scroll or resize. */
+  [data-scope="tour"][data-part="spotlight"][data-step-changing] {
+    transition:
+      left var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      top var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      width var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      height var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  [data-scope="tour"][data-part="positioner"] {
+    z-index: calc(1000 + var(--layer-index, 0));
+    pointer-events: auto;
+  }
+
+  [data-scope="tour"][data-part="content"] {
+    box-sizing: border-box;
+    background: var(--rind-tour-bg, var(--rind-color-surface-raised));
+    color: var(--rind-tour-color, var(--rind-color-text));
+    padding: var(--rind-tour-padding, var(--rind-space-4));
+    border: var(--rind-border-width) solid var(--rind-tour-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-tour-radius, var(--rind-radius-md));
+    box-shadow: var(--rind-tour-shadow, var(--rind-shadow-lg));
+    inline-size: max-content;
+    max-inline-size: min(var(--rind-tour-max-width, 22rem), var(--rind-available-width, 100vw));
+    max-block-size: min(var(--rind-tour-max-height, 80vh), var(--rind-available-height, 100vh));
+    overflow: auto;
+    transition:
+      opacity var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      transform var(--rind-tour-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+  [data-scope="tour"][data-part="content"][data-state="open"] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+  [data-scope="tour"][data-part="content"][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  [data-scope="tour"][data-part="arrow"][data-side] {
+    inline-size: var(--rind-tour-arrow-size, 10px);
+    block-size: var(--rind-tour-arrow-size, 10px);
+    background: var(--rind-tour-bg, var(--rind-color-surface-raised));
+    color: var(--rind-tour-border, var(--rind-color-border-strong));
+  }
+  [data-scope="tour"][data-part="arrow"][data-side="top"] {
+    bottom: calc(var(--rind-tour-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="tour"][data-part="arrow"][data-side="bottom"] {
+    top: calc(var(--rind-tour-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="tour"][data-part="arrow"][data-side="left"] {
+    right: calc(var(--rind-tour-arrow-size, 10px) / -2 - 1px);
+  }
+  [data-scope="tour"][data-part="arrow"][data-side="right"] {
+    left: calc(var(--rind-tour-arrow-size, 10px) / -2 - 1px);
+  }
+
+  [data-scope="tour"][data-part="progress-text"] {
+    color: var(--rind-tour-muted, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  [data-scope="tour"]:is([data-part="action-trigger"], [data-part="close-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+  [data-scope="tour"][data-part="action-trigger"][data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="tour"]:is([data-part="backdrop"], [data-part="spotlight"], [data-part="content"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="tour"][data-part="backdrop"] {
+      background: transparent;
+    }
+    [data-scope="tour"][data-part="spotlight"] {
+      outline-color: Highlight;
+    }
+    [data-scope="tour"][data-part="content"] {
+      border-color: CanvasText;
+    }
+  }
+}

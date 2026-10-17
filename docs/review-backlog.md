@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-tour (impl) | — | packages/core/src/components/tour/tour.contract.ts | No `modal` trait on the modal variant (an anchored modal step keeps its target exposed); inert and Tab wrap are covered in the DOM suite. No `target` query (no attribute locator in the contract env) |
+| add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
+| add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |
+| add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
 | add-qr-code (r2) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | The download postcondition needed a 20 s deadline on CI (page JS export ~1.6 s at 20× CPU throttle); profile the export path |
 | add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
 | add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
