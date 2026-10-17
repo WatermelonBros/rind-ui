@@ -36,6 +36,7 @@ export {
   useMessages,
   useTypeaheadTimeout,
 } from "./provider"
+export * from "./qr-code"
 export * from "./radio-group"
 export { type RenderProp, renderPart } from "./render"
 export * from "./search-field"

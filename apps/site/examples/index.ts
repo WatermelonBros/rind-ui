@@ -31,6 +31,7 @@ import * as passwordInput from "./password-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
+import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
@@ -89,6 +90,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  "qr-code": qrCode,
   skeleton,
   slider,
   switch: switchEx,

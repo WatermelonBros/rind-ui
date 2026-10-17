@@ -172,9 +172,10 @@ export const familyMatrix = [
     sizes,
   },
   {
-    // Look via each component's own tokens: --rind-separator-*, --rind-skeleton-*, --rind-image-*.
+    // Look via each component's own tokens: --rind-separator-*, --rind-skeleton-*, --rind-image-*,
+    // --rind-qr-code-*.
     family: "decoration",
-    components: ["separator", "skeleton", "image"],
+    components: ["separator", "skeleton", "image", "qr-code"],
     variants: [],
     size: "none",
     sizes: [],

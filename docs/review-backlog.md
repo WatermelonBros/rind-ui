@@ -7,6 +7,8 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-qr-code (impl) | — | packages/core/src/components/qr-code/qr-code.contract.ts | Contract is `qrCodeContractWith(decode)` (core cannot import the testing decoder); `setValue` types into the page's "Value" control |
+| add-qr-code (impl) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | ARIA snapshots and axe run inline in the Playwright fixture until the site-examples snapshot harness exists |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
 | add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |

@@ -161,7 +161,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
+| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 
 ## AI-UI primitives (11)

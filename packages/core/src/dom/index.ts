@@ -26,6 +26,7 @@ export {
   dismissable,
   dismissRequest,
 } from "./dismiss"
+export { sanitizeFileName, saveBlob } from "./download"
 export { type ElementInfo, elementInfo } from "./element-info"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
@@ -150,6 +151,7 @@ export {
   type PressOptions,
   type PressPointerEvent,
 } from "./press"
+export { exportQr, type QrExportInput, type QrExportResult } from "./qr-export"
 export {
   defineQuirks,
   type Quirk,

@@ -226,6 +226,13 @@ Nothing is edited in another change.
 
 ## Open questions
 
+**Decided (owner, through the coordinator, 2026-10-16):** own encoder in `@rind-ui/core`, no
+runtime dependency; the differential fixtures are generated once offline from `uqr` 0.1.3 and
+Nayuki's generator v1.8.0 in a scratch directory outside the repository and committed as JSON
+with a README saying how (`packages/testing/src/qr/fixtures/`), so no reference package is a
+dependency of any manifest; the ECI default is `"auto"`. The remaining questions below are
+kept for the record.
+
 - **Own encoder vs `uqr` / Nayuki as a dependency.** The brief says write it; the
   conservative engineering answer is a ≈27 kB, dependency-free, bit-identical library. The
   tests in this change (published vectors, a round-trip decoder as oracle over all versions,
