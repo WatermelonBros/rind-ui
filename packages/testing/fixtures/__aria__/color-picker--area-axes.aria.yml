@@ -1,0 +1,7 @@
+- text: Highlight
+- group "Highlight":
+  - group "Color area":
+    - slider "Hue": "30"
+    - slider "Saturation": "80"
+  - group "Brightness":
+    - slider "Brightness": "90"

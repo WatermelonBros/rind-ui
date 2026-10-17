@@ -2,10 +2,15 @@
 
 import { type Color, formatColor } from "@rind-ui/core"
 import { Button, ColorPicker, type ColorPickerRootProps, Dialog } from "@rind-ui/react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = { "color-picker": { closed: "Basic", open: "Open" } }
+export const states: States = {
+  "color-picker": { closed: "Basic", open: "Open" },
+  // Its parts' own states: the area, the colour field (a draft that does not parse).
+  "color-area": { idle: "AreaAxes" },
+  "color-field": { idle: "FieldOnly", invalid: "FieldInvalid" },
+}
 
 const SWATCHES = ["#FF3D8B", "#FF8F3D", "#F5D90A", "#2EC27E", "#3D8BFF", "#8B3DFF"]
 
@@ -36,7 +41,7 @@ function Body({ swatches = true }: { readonly swatches?: boolean }) {
           {SWATCHES.map((c) => (
             <ColorPicker.SwatchTrigger key={c} color={c}>
               <ColorPicker.Swatch color={c} aria-hidden="true" />
-              <ColorPicker.SwatchIndicator>✓</ColorPicker.SwatchIndicator>
+              <ColorPicker.SwatchIndicator />
             </ColorPicker.SwatchTrigger>
           ))}
         </ColorPicker.SwatchGroup>
@@ -97,7 +102,7 @@ export function CloseOnSelect() {
         {SWATCHES.map((c) => (
           <ColorPicker.SwatchTrigger key={c} color={c}>
             <ColorPicker.Swatch color={c} aria-hidden="true" />
-            <ColorPicker.SwatchIndicator>✓</ColorPicker.SwatchIndicator>
+            <ColorPicker.SwatchIndicator />
           </ColorPicker.SwatchTrigger>
         ))}
       </ColorPicker.SwatchGroup>
@@ -258,6 +263,118 @@ export function InAForm() {
   )
 }
 
+/** An inline picker: the parts laid out on the page, no Popover. */
+function InlinePicker(
+  props: ColorPickerRootProps & { readonly label: string; readonly children: React.ReactNode },
+) {
+  const { label, children, ...rest } = props
+  return (
+    <ColorPicker.Root inline {...rest}>
+      <ColorPicker.Label>{label}</ColorPicker.Label>
+      <ColorPicker.Content>{children}</ColorPicker.Content>
+    </ColorPicker.Root>
+  )
+}
+
+export function AreaAxes() {
+  return (
+    <InlinePicker label="Highlight" defaultValue="hsb(30, 80%, 90%)">
+      <ColorPicker.Area xChannel="hue" yChannel="saturation">
+        <ColorPicker.AreaBackground />
+        <ColorPicker.AreaThumb />
+      </ColorPicker.Area>
+      <ColorPicker.ChannelSlider channel="brightness">
+        <ColorPicker.ChannelSliderTrack>
+          <ColorPicker.ChannelSliderThumb />
+        </ColorPicker.ChannelSliderTrack>
+      </ColorPicker.ChannelSlider>
+    </InlinePicker>
+  )
+}
+
+export function ChannelSliders() {
+  return (
+    <InlinePicker label="Text colour" defaultValue="rgb(51, 102, 153)">
+      {(
+        [
+          ["red", "Red"],
+          ["green", "Green"],
+          ["blue", "Blue"],
+        ] as const
+      ).map(([channel, label]) => (
+        <ColorPicker.ChannelSlider key={channel} channel={channel}>
+          <ColorPicker.ChannelSliderLabel>{label}</ColorPicker.ChannelSliderLabel>
+          <ColorPicker.ChannelSliderValueText />
+          <ColorPicker.ChannelSliderTrack>
+            <ColorPicker.ChannelSliderThumb />
+          </ColorPicker.ChannelSliderTrack>
+        </ColorPicker.ChannelSlider>
+      ))}
+      <ColorPicker.ChannelSlider channel="hue" orientation="vertical">
+        <ColorPicker.ChannelSliderTrack>
+          <ColorPicker.ChannelSliderThumb />
+        </ColorPicker.ChannelSliderTrack>
+      </ColorPicker.ChannelSlider>
+    </InlinePicker>
+  )
+}
+
+export function Swatches() {
+  return (
+    <InlinePicker label="Tag colour" defaultValue="#2EC27E">
+      <ColorPicker.SwatchGroup>
+        {SWATCHES.map((c) => (
+          <ColorPicker.SwatchTrigger key={c} color={c}>
+            <ColorPicker.Swatch color={c} aria-hidden="true" />
+            <ColorPicker.SwatchIndicator />
+          </ColorPicker.SwatchTrigger>
+        ))}
+      </ColorPicker.SwatchGroup>
+      <div className="row">
+        <ColorPicker.ValueSwatch />
+        <ColorPicker.ValueText />
+      </div>
+    </InlinePicker>
+  )
+}
+
+export function FieldOnly() {
+  return (
+    <InlinePicker label="Brand colour" defaultValue="#FF3D8B">
+      <ColorPicker.ChannelInput channel="hex" />
+    </InlinePicker>
+  )
+}
+
+export function FieldInvalid() {
+  const input = useRef<HTMLInputElement>(null)
+  // A draft that does not parse, committed on mount (typing then Enter), so the page holds it.
+  useEffect(() => {
+    const el = input.current
+    if (!el) return
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(el, "12345")
+    el.dispatchEvent(new Event("input", { bubbles: true }))
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }))
+  }, [])
+  return (
+    <InlinePicker label="Accent" defaultValue="#FF3D8B">
+      <ColorPicker.ChannelInput channel="hex" ref={input} />
+    </InlinePicker>
+  )
+}
+
+export function ChannelFields() {
+  return (
+    <InlinePicker label="Stroke" defaultValue="hsb(200, 60%, 70%)">
+      <div className="row">
+        {(["hue", "saturation", "brightness"] as const).map((channel) => (
+          <ColorPicker.ChannelInput key={channel} channel={channel} />
+        ))}
+      </div>
+    </InlinePicker>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Popover",
@@ -281,4 +398,29 @@ export const variants: Variants = {
     description: "Outside presses close the picker, not the dialog.",
   },
   InAForm: { title: "In a form", description: "Submits the canonical `#RRGGBB`; reset restores." },
+  AreaAxes: {
+    title: "Area axes",
+    description:
+      'An inline picker; `xChannel="hue"`, `yChannel="saturation"` and a brightness slider.',
+  },
+  ChannelSliders: {
+    title: "Channel sliders",
+    description: "Red, green and blue on one colour, each labelled; a vertical hue slider.",
+  },
+  Swatches: {
+    title: "Swatches",
+    description: "A swatch group: arrows move and pick; one tab stop.",
+  },
+  FieldOnly: {
+    title: "Field only",
+    description: "A hex field: free text until Enter or blur; `#` optional, any case.",
+  },
+  FieldInvalid: {
+    title: "Invalid entry",
+    description: "A draft that is not a colour keeps the last colour and marks the field invalid.",
+  },
+  ChannelFields: {
+    title: "Channel fields",
+    description: "Hue, saturation and brightness as numbers.",
+  },
 }

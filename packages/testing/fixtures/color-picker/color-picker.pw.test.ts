@@ -12,11 +12,11 @@ import {
   getColorArea,
   getColorChannelField,
   getColorField,
-  getColorPicker,
   getColorSlider,
   getColorSwatch,
   getColorSwatchPicker,
-} from "../../src/index"
+} from "../../src/components/color-parts"
+import { getColorPicker } from "../../src/index"
 
 const here = import.meta.dirname
 const themeSrc = join(here, "../../../theme/src")

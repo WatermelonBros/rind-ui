@@ -1,6 +1,6 @@
 # Colour model
 
-Every colour component shares one model, in `@rind-ui/core`: a colour is plain data — `{ space, channels, alpha }` in `rgb`, `hsl` or `hsb` — and every operation is a function, so a colour survives `structuredClone`, JSON and a server render.
+The [Color Picker](../components/color-picker.md) and every one of its parts share one model, in `@rind-ui/core`: a colour is plain data — `{ space, channels, alpha }` in `rgb`, `hsl` or `hsb` — and every operation is a function, so a colour survives `structuredClone`, JSON and a server render.
 
 ```ts
 import { formatColor, getChannel, parseColor, withChannel } from "@rind-ui/core"
@@ -12,7 +12,7 @@ getChannel(blue, "hue") // a channel the space lacks is reached by converting
 
 ## Parsing and formatting
 
-`parseColor` reads hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, any case), `rgb()`/`hsl()` in the comma and the space-and-slash forms, `hsb()` and `transparent`; out-of-range channels clamp, hue wraps except exactly 360. Anything else throws `ColorParseError`; `tryParseColor` returns `null`. `formatColor(color, "hex" | "rgb" | "hsl" | "hsb" | "css")` is locale-independent and never uses exponent notation. Every component prop accepts a string or a colour.
+`parseColor` reads hex (`#rgb`, `#rgba`, `#rrggbb`, `#rrggbbaa`, any case), `rgb()`/`hsl()` in the comma and the space-and-slash forms, `hsb()` and `transparent`; out-of-range channels clamp, hue wraps except exactly 360. Anything else throws `ColorParseError`; `tryParseColor` returns `null`. `formatColor(color, "hex" | "rgb" | "hsl" | "hsb" | "css")` is locale-independent and never uses exponent notation. Every colour prop accepts a string or a colour.
 
 ## Channels
 
@@ -33,7 +33,7 @@ Components emit in the space of the colour you passed (the Color Picker emits in
 
 ## Colour names
 
-`colorName(color, messages)` describes a colour from its OKLCH lightness, chroma and hue: "vibrant red", "very dark grayish blue", "white", "50% transparent". The description is locale-free; only the words come from `messages` (`colorMessages`), so translating the words translates every name. A `colorName` prop replaces the computation on any colour component.
+`colorName(color, messages)` describes a colour from its OKLCH lightness, chroma and hue: "vibrant red", "very dark grayish blue", "white", "50% transparent". The description is locale-free; only the words come from `messages` (`colorMessages`), so translating the words translates every name. A `colorName` prop on the picker replaces the computation.
 
 ## Equality
 

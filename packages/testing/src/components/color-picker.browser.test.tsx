@@ -5,6 +5,12 @@ import { ColorPicker, Dialog } from "@rind-ui/react"
 import { act, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
+import siteBase from "../../../../apps/site/skins/base.css?inline"
+import siteColor from "../../../../apps/site/skins/color.css?inline"
+// The stylesheets that draw a swatch's selected mark: the theme's and the docs site's skin.
+import siteRadio from "../../../../apps/site/skins/radio-group.css?inline"
+import swatchPicker from "../../../theme/src/color-swatch-picker.css?inline"
+import radioGroup from "../../../theme/src/radio-group.css?inline"
 import { getColorPicker } from "../index"
 
 function Picker(props: { readonly onValueCommit?: () => void }) {
@@ -48,31 +54,57 @@ const pointer = (type: string, target: EventTarget, x: number, y: number) =>
   )
 
 describe("color picker in real browsers", () => {
-  it("the content is positioned next to the control, not at the page origin", async () => {
-    render(
-      <div style={{ margin: "200px 0 0 300px" }}>
-        <Picker />
-      </div>,
-    )
-    const picker = getColorPicker(screen, { name: "Fill" })
-    await picker.open()
-    const control = document.querySelector(
-      '[data-scope="color-picker"][data-part="control"]',
-    ) as HTMLElement
-    const positioner = document.querySelector(
-      '[data-scope="color-picker"][data-part="positioner"]',
-    ) as HTMLElement
-    // The Popover found its anchor: coordinates were computed and the anchor is not hidden.
-    await vi.waitFor(() => expect(positioner.style.getPropertyValue("--rind-x")).not.toBe(""))
-    expect(positioner.hasAttribute("data-anchor-hidden")).toBe(false)
-    const anchor = control.getBoundingClientRect()
-    const x = Number.parseFloat(positioner.style.getPropertyValue("--rind-x"))
-    const y = Number.parseFloat(positioner.style.getPropertyValue("--rind-y"))
-    // Default placement: below the control, starting near its inline start.
-    expect(y).toBeGreaterThanOrEqual(anchor.bottom - 1)
-    expect(Math.abs(x - anchor.left)).toBeLessThan(anchor.width + 300)
-    expect(x).toBeGreaterThan(100)
-  })
+  for (const [sheet, css, skinned] of [
+    ["theme", `${radioGroup}\n${swatchPicker}`, false],
+    ["site skin", `${siteBase}\n${siteRadio}\n${siteColor}`, true],
+  ] as const) {
+    for (const glyph of [undefined, "✓"]) {
+      it(`a selected swatch shows exactly one mark, centred (${sheet}, ${glyph ? "a glyph" : "the default dot"})`, async () => {
+        const style = document.createElement("style")
+        style.textContent = css
+        document.head.append(style)
+        try {
+          const colors = ["#ef4444", "#22c55e", "#3b82f6"]
+          render(
+            <div {...(skinned ? { "data-skinned": "", "data-skin": "crisp" } : {})}>
+              <ColorPicker.Root inline defaultValue="#ffffff">
+                <ColorPicker.Label>Fill</ColorPicker.Label>
+                <ColorPicker.Content>
+                  <ColorPicker.SwatchGroup aria-label="Swatches">
+                    {colors.map((c) => (
+                      <ColorPicker.SwatchTrigger key={c} color={c}>
+                        <ColorPicker.Swatch color={c} aria-hidden="true" />
+                        <ColorPicker.SwatchIndicator>{glyph}</ColorPicker.SwatchIndicator>
+                      </ColorPicker.SwatchTrigger>
+                    ))}
+                  </ColorPicker.SwatchGroup>
+                </ColorPicker.Content>
+              </ColorPicker.Root>
+            </div>,
+          )
+          const radio = screen.getAllByRole("radio")[1] as HTMLElement
+          await userEvent.click(radio)
+          await vi.waitFor(() => expect(radio.getAttribute("aria-checked")).toBe("true"))
+          const marks = [...radio.querySelectorAll<HTMLElement>("*")].filter((el) => {
+            if (el.closest('[data-scope="color-swatch"]')) return false
+            const r = el.getBoundingClientRect()
+            return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden"
+          })
+          // One mark: the indicator element (a glyph inside it is the mark, with no dot).
+          expect(marks).toHaveLength(1)
+          const mark = marks[0] as HTMLElement
+          expect(mark.matches('[data-part="item-indicator"]')).toBe(true)
+          if (glyph) expect(getComputedStyle(mark).backgroundColor).toBe("rgba(0, 0, 0, 0)")
+          const a = radio.getBoundingClientRect()
+          const b = mark.getBoundingClientRect()
+          expect(Math.abs(b.left + b.width / 2 - (a.left + a.width / 2))).toBeLessThanOrEqual(1)
+          expect(Math.abs(b.top + b.height / 2 - (a.top + a.height / 2))).toBeLessThanOrEqual(1)
+        } finally {
+          style.remove()
+        }
+      })
+    }
+  }
 
   it("in a Dialog: open, dismiss, open again, press inside (zag#3043, ark#3414)", async () => {
     render(

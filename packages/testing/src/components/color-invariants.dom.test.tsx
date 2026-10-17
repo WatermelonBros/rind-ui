@@ -9,11 +9,12 @@ import {
   makeColor,
   parseColor,
 } from "@rind-ui/core"
-import { ColorArea, ColorPicker, ColorSlider } from "@rind-ui/react"
+import { ColorPicker } from "@rind-ui/react"
 import { cleanup, render } from "@testing-library/react"
 import { type ReactElement, type ReactNode, useEffect, useRef } from "react"
 import { describe, expect, it } from "vitest"
 import { domEnv, testMachine } from "../index"
+import { ColorArea, ColorSlider } from "./color-parts"
 
 /** Re-applies a breakage after every DOM change under it (React re-renders undo it). */
 function Break({

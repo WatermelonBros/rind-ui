@@ -2,12 +2,13 @@
 // the colour model as oracle (the oracle machine computes with it). Browser mode walks pointer,
 // touch, keyboard and virtual; jsdom (no layout) keyboard only.
 import { areaAxes, type Color, colorAreaContract, makeColor, platforms } from "@rind-ui/core"
-import { ColorArea, type ColorAreaRootProps, RindProvider } from "@rind-ui/react"
+import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactElement } from "react"
 import { describe, it } from "vitest"
 import { currentRun, testMachine } from "../index"
+import { ColorArea, type ColorAreaRootProps } from "./color-parts"
 
 const inJsdom = navigator.userAgent.includes("jsdom")
 const a11y = async () => {

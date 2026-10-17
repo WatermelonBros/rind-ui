@@ -91,12 +91,31 @@
   outline: 3px solid var(--s-acc);
   outline-offset: 5px;
 }
-[data-skinned] [data-scope="radio-group"][data-part="item-indicator"] {
+/* The one selected mark, centred: a ringed dot, or the Indicator's own glyph (no dot). */
+[data-skinned] [data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker] {
   position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: 0;
+  background: none;
   color: #ffffff;
   font-weight: 800;
+  line-height: 1;
   text-shadow: 0 0 2px #000000;
   pointer-events: none;
+  animation: none;
+}
+[data-skinned]
+  [data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker]:empty {
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #000000;
 }
 [data-skinned] [data-scope="color-field"][data-part="input"],
 [data-skinned] [data-scope="color-picker"][data-part="format-select"] {

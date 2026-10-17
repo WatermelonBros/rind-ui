@@ -7,11 +7,12 @@ import {
   platforms,
   radioGroupArgs,
 } from "@rind-ui/core"
-import { ColorSwatchPicker, RindProvider } from "@rind-ui/react"
+import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { describe, it } from "vitest"
 import { currentRun, testMachine } from "../index"
+import { ColorSwatchPicker } from "./color-parts"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

@@ -1,6 +1,6 @@
 # Color Picker
 
-A trigger and a popover (or an inline panel) holding a colour area, channel sliders, channel and hex inputs, swatches, an eye dropper and a format switch, all bound to one colour. The picker owns the colour, the display format and the open state; every part inside is the component of its own ([Color Area](color-area.md), [Color Slider](color-slider.md), [Color Field](color-field.md), [Color Swatch Picker](color-swatch-picker.md), [Color Swatch](color-swatch.md)), bound to the picker.
+A colour picker: a trigger and a popover, or an inline panel, holding the parts you choose (a colour area, channel sliders, hex and channel inputs, swatches, an eye dropper, a format switch), all bound to one colour. It is one component: the parts compose any picker, from a full panel to a single hex field or a row of swatches. The picker owns the colour, the display format and the open state.
 
 ```tsx
 import { ColorPicker } from "@rind-ui/react"
@@ -43,11 +43,11 @@ import { ColorPicker } from "@rind-ui/react"
 | `ColorPicker.Control` | `control` | `<div>` | `role="group"`: the Popover's anchor. |
 | `ColorPicker.Trigger` | `trigger` | `<button>` | Opens the content; named with the colour. |
 | `ColorPicker.Portal / Positioner / Content` | `content` | `<div>` | The Popover's (inline: `role="group"`, in place). |
-| `ColorPicker.Area / AreaBackground / AreaThumb` | `root` | `<div>` | A Color Area bound to the picker. |
-| `ColorPicker.ChannelSlider (+ Label, ValueText, Track, Thumb)` | `root` | `<div>` | A Color Slider bound to the picker. |
-| `ColorPicker.ChannelInput` | `input` | `<input>` | `hex` / `css`: a Color Field; a channel: a Color Channel Field. |
-| `ColorPicker.SwatchGroup / SwatchTrigger / SwatchIndicator` | `root` | `<div>` | A Color Swatch Picker bound to the picker. |
-| `ColorPicker.Swatch / ValueSwatch` | `root` | `<div>` | A Color Swatch; ValueSwatch shows the picker's colour. |
+| `ColorPicker.Area / AreaBackground / AreaThumb` | `root` | `<div>` | The colour area: two channels as a 2D surface. |
+| `ColorPicker.ChannelSlider (+ Label, ValueText, Track, Thumb)` | `root` | `<div>` | One channel on a slider, its track painted with the channel's gradient. |
+| `ColorPicker.ChannelInput` | `input` | `<input>` | `hex` / `css`: a colour text field; a channel: a number field for it. |
+| `ColorPicker.SwatchGroup / SwatchTrigger / SwatchIndicator` | `root` | `<div>` | A palette (a radio group of colours); the indicator is the one selected mark. |
+| `ColorPicker.Swatch / ValueSwatch` | `root` | `<div>` | A colour chip named by its colour; ValueSwatch shows the picker's colour. |
 | `ColorPicker.EyeDropperTrigger` | `eye-dropper-trigger` | `<button>` | Hidden where the browser has no EyeDropper. |
 | `ColorPicker.FormatSelect / FormatTrigger` | `format-select` | `<select / button>` | Set or cycle the format. |
 | `ColorPicker.View` | `view` | `<div>` | Renders its children only for its `format`. |
@@ -122,6 +122,17 @@ Every attribute of the rendered element is accepted and forwarded.
 Queries: `color`, `format`, `valueText`, `colorName`, `isOpen`, `isInline`, `formValue`, `closeReason`, `isEyeDropperAvailable`. Traits: `form-associated`, `field-associated`.
 <!-- /api -->
 
+## Parts
+
+Compose only the parts a picker needs. With `inline` the parts sit on the page and no Popover is involved, which is how a field-only or swatch-only picker is built.
+
+- **Area** (`Area`, `AreaBackground`, `AreaThumb`): two channels as a 2D surface (`xChannel`, `yChannel`; saturation × brightness by default). Arrow keys step one channel each (Page Up/Down and Shift for large steps, Home/End to the edges); a press moves the thumb there; the x axis mirrors right to left. Each axis is a slider for assistive technology, named and valued.
+- **ChannelSlider** (`ChannelSlider`, `ChannelSliderLabel`, `ChannelSliderValueText`, `ChannelSliderTrack`, `ChannelSliderThumb`, `TransparencyGrid`): one channel on a [Slider](slider.md), its track painted with the channel's gradient; `orientation="vertical"` runs it to the top. Unlabelled, the thumb is named by the channel. A channel value the colour model computes off the slider's step (a hex colour's hue) is shown on the step grid; the colour keeps its precision.
+- **ChannelInput** (`channel="hex" | "css"` or a channel name): a hex or CSS text field, or a number field for one channel. A text field holds free text until Enter or blur (`#` optional, any case); a draft that is not a colour keeps the last colour and marks the field invalid (`aria-invalid`, `data-invalid`). Channel fields clamp what is typed (999 commits 360° for hue).
+- **SwatchGroup** (`SwatchGroup`, `SwatchTrigger`, `SwatchIndicator`): a palette that is a [Radio Group](radio-group.md) of colours: arrows move and pick, the group is one tab stop, at most one swatch matches the colour (a colour no swatch has checks nothing). `SwatchIndicator` is the one selected mark: empty, the theme draws a centred dot; given a glyph or icon, that is the mark instead.
+- **Swatch** and **ValueSwatch**: a colour chip with `role="img"`, named by its colour ("vibrant blue", "50% transparent"), drawn over a checkerboard when it is transparent; `ValueSwatch` shows the picker's colour and is decorative inside the Trigger.
+- **EyeDropperTrigger**, **FormatSelect** / **FormatTrigger** and **View**, **ValueText**, **HiddenInput**: see the sections below.
+
 ## Value and format
 
 `value` and `defaultValue` accept a colour or any string `parseColor` reads. The **format** (`hex`, `rgb`, `hsl`, `hsb`) is the display and emission format: `ValueText` shows the colour in it and `onValueChange` receives colours in its space (`hex` and `rgb` emit `rgb`), whatever you passed. Changing the format calls `onFormatChange` and no `onValueChange`. The default format follows the first colour (a hex string gives `hex`).
@@ -148,7 +159,7 @@ The automatic hidden input submits the canonical `#RRGGBB` (`#RRGGBBAA` with alp
 
 ## Testing
 
-`getColorPicker` has the actions `open`, `close`, `pressOutside`, `tab`, `shiftTab`, `setFormat`, `resetForm`, the queries `color`, `format`, `valueText`, `colorName`, `isOpen`, `isInline`, `formValue`, `closeReason`, `isEyeDropperAvailable`, and its children's drivers: `area()`, `slider(channel)`, `input(channel)`, `swatches()`. `eyeDropper(result | "abort")` installs a fake eye dropper.
+`getColorPicker` has the actions `open`, `close`, `pressOutside`, `tab`, `shiftTab`, `setFormat`, `resetForm`, the queries `color`, `format`, `valueText`, `colorName`, `isOpen`, `isInline`, `formValue`, `closeReason`, `isEyeDropperAvailable`, and its parts' drivers: `area()`, `slider(channel)`, `input(channel)`, `swatches()`, `swatch(name)`. `eyeDropper(result | "abort")` installs a fake eye dropper.
 
 ```tsx
 import { getColorPicker } from "@rind-ui/testing"
