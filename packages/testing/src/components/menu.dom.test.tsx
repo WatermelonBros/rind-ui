@@ -499,20 +499,18 @@ describe("Menu: closing rules", () => {
 
   it("Non-modal toolbar menus: one click on the second trigger switches menus", async () => {
     render(
-      <>
-        {["File", "Edit"].map((label) => (
-          <Menu.Root key={label} modal={false}>
-            <Menu.Trigger>{label}</Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner>
-                <Menu.Content>
-                  <Menu.Item>{`${label} item`}</Menu.Item>
-                </Menu.Content>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
-        ))}
-      </>,
+      ["File", "Edit"].map((label) => (
+        <Menu.Root key={label} modal={false}>
+          <Menu.Trigger>{label}</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item>{`${label} item`}</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      )),
     )
     const file = getMenu(screen, { name: "File", modal: false }).via("pointer")
     const edit = getMenu(screen, { name: "Edit", modal: false }).via("pointer")

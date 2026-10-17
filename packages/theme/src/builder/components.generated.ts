@@ -117,6 +117,17 @@ export type ComponentTokens = {
     | "triggerColor"
     | "triggerGap"
     | "triggerPaddingInline"
+  readonly "context-menu":
+    | "bg"
+    | "border"
+    | "duration"
+    | "maxHeight"
+    | "minWidth"
+    | "padding"
+    | "popFrom"
+    | "radius"
+    | "regionOpenBg"
+    | "shadow"
   readonly dialog:
     | "backdrop"
     | "bg"
