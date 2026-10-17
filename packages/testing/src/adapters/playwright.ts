@@ -589,6 +589,9 @@ function createPlaywrightEnv(
       // The corner of the target's own document (a frame's body for frame targets).
       await (await getBase()).root.locator("body").click({ position: { x: 1, y: 1 }, force: true })
     },
+    async pointerAway() {
+      await (await getBase()).root.locator("body").hover({ position: { x: 1, y: 1 }, force: true })
+    },
     until,
     advance: async (ms) => {
       if (options.advanceTimers) await options.advanceTimers(ms)

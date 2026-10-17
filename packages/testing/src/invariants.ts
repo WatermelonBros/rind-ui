@@ -26,8 +26,8 @@ export interface StepFacts {
   readonly expected: (el: ElementInfo) => PartExpected
   /** Whether the instance is open in this state (per the contract's data-state). */
   readonly open: boolean
-  /** Whether the step's source state was open (a closing step leaves an open state). */
-  readonly wasOpen?: boolean
+  /** The step leaves the machine's initial (resting closed) state: an opening, never a close. */
+  readonly fromInitial?: boolean
   /** True when the oracle state is the machine's initial state. */
   readonly atInitial: boolean
   readonly anchorCount: number
@@ -623,8 +623,9 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
   /** (13) After closing, focus is on the trigger or the declared final-focus part. */
   "restores-focus": (f) => {
     const target = f.semantics["finalFocus"] ?? f.semantics["trigger"]
-    // Closing leaves an open state (closed → opening is no close).
-    const closed = f.from !== null && f.from !== f.state && !isOpen(f) && f.wasOpen !== false
+    // closed → opening (a hover delay starting) leaves the resting state: no close. An
+    // opening → closed cancel is still checked.
+    const closed = f.from !== null && f.from !== f.state && !isOpen(f) && f.fromInitial !== true
     // Closed by Tab: focus was restored to the trigger and the browser's Tab moved on from it.
     if (f.context?.["closeReason"] === "tab-key") return []
     return closed && f.after.focus.part !== target

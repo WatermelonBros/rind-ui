@@ -64,9 +64,12 @@ export const hoverCardContract = contract("hover-card", {
       keyboard: async (env: E) => env.part("trigger").focusWithTab(),
       done: async () => true,
     },
-    /** Leaves (pointer: a press outside; keyboard: Escape). */
+    /** Leaves (pointer: moves off the trigger and content, then the close delay; keyboard: Escape). */
     hide: {
-      pointer: async (env: E) => env.pointerOutside(),
+      pointer: async (env: E) => {
+        await env.pointerAway()
+        await waitOut(env, () => closed(env))
+      },
       keyboard: async (env: E) => env.keyboard("Escape"),
       done: closed,
     },

@@ -2,7 +2,7 @@
 // hover card driver where possible. Delays run on vi fake timers advanced through the adapter
 // and user-event (`advanceTimers`), so a 700 ms open delay costs no real time.
 import { getLayerStack, type HoverCardChangeDetails } from "@rind-ui/core"
-import { Dialog, HoverCard, type HoverCardRootProps } from "@rind-ui/react"
+import { Dialog, HoverCard, type HoverCardRootProps, Popover } from "@rind-ui/react"
 import { act, cleanup, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import type { ReactNode } from "react"
@@ -141,16 +141,22 @@ describe("HoverCard: opening", () => {
   })
 
   it("Tap follows the link: nothing prevents the touch and nothing opens (reka-ui#802)", async () => {
-    fakeTime()
+    const { env } = fakeTime()
     render(<Card />)
     const down = new PointerEvent("pointerdown", {
       bubbles: true,
       cancelable: true,
       pointerType: "touch",
     })
+    // A finger lands: over/enter and a move before the press, as a touch screen sends them.
+    await getHoverCard(env(), { name: "Jane Doe" }).part("trigger").hover({ pointerType: "touch" })
     act(() => {
+      trigger().dispatchEvent(
+        new PointerEvent("pointermove", { bubbles: true, pointerType: "touch" }),
+      )
       trigger().dispatchEvent(down)
     })
+    // fake-time: past the open delay, where a hover would have opened it
     await advance(1000)
     expect(down.defaultPrevented).toBe(false)
     expect(trigger().getAttribute("aria-expanded")).toBe("false")
@@ -198,14 +204,44 @@ describe("HoverCard: keyboard access and closing", () => {
   })
 
   it("Pointer leaves while the trigger has keyboard focus: it stays open (zag#3224)", async () => {
-    const { env } = fakeTime()
+    const { env, user } = fakeTime()
     render(<Card />)
     const h = getHoverCard(env(), { name: "Jane Doe" }).via("keyboard")
     await h.show()
-    // The pointer comes and goes on the trigger.
-    act(() => {
-      trigger().dispatchEvent(new PointerEvent("pointerleave", { pointerType: "mouse" }))
-    })
+    // The pointer comes and goes on the trigger: it enters the zone, then leaves it.
+    await user.hover(trigger())
+    await user.unhover(trigger())
+    // fake-time: past the close delay, where a pointer-only card would have closed
+    await advance(1000)
+    expect(await h.isOpen()).toBe(true)
+  })
+
+  it("A popover opened by keyboard from the card keeps it open while focus is in the popover", async () => {
+    const { env, user } = fakeTime()
+    render(
+      <Card>
+        <Popover.Root>
+          <Popover.Trigger>More</Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner>
+              <Popover.Content aria-label="More actions">
+                <button type="button">Mute</button>
+              </Popover.Content>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
+      </Card>,
+    )
+    const h = getHoverCard(env(), { name: "Jane Doe" }).via("keyboard")
+    await h.show()
+    await h.enter()
+    expect(active()?.textContent).toBe("More")
+    await user.keyboard("{Enter}")
+    // The popover's placement and initial focus run on frames: wait for focus to move in.
+    await vi.waitFor(() =>
+      expect(screen.getByRole("dialog", { name: "More actions" }).contains(active())).toBe(true),
+    )
+    // fake-time: past the close delay, where focus leaving the card would close it
     await advance(1000)
     expect(await h.isOpen()).toBe(true)
   })

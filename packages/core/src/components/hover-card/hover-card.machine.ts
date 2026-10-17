@@ -151,11 +151,20 @@ const isKeyboardIntent = (e: { readonly type: string }) =>
   e.modality === "keyboard" &&
   (e.cause === "key" || e.cause === "navigation")
 
-/** A layer opened from this card (a select, a nested card) is open. */
+/**
+ * A layer opened from this card (a popover, a select, a nested card) is open. Any family:
+ * the stack's `hasNested` counts only the card's own family.
+ */
 const childOpen = (env: Env, props: HoverCardProps) => {
   if (typeof document === "undefined") return false
-  const layer = getLayerStack(docOf(env)).get(hoverCardLayerId(props.root))
-  return layer?.meta().hasNested === true
+  const stack = getLayerStack(docOf(env))
+  const id = hoverCardLayerId(props.root)
+  return stack.layers().some((layer) => {
+    for (let p = layer.parentId; p !== undefined; p = stack.get(p)?.parentId) {
+      if (p === id) return true
+    }
+    return false
+  })
 }
 
 const docOf = (env: Env) => {
@@ -184,6 +193,8 @@ export const hoverCardMachine = setup({
       context.focusInside || context.keyboardFocused || childOpen(env, props),
     /** On the trigger's blur: its keyboard focus is what is ending, so it holds nothing. */
     heldInside: ({ context, env, props }) => context.focusInside || childOpen(env, props),
+    /** Focus moved into a portalled child layer (a popover opened from the card). */
+    childLayerOpen: ({ env, props }) => childOpen(env, props),
   },
   actions: {
     hovered: ({ set }) => set("pointerInZone", true),
@@ -377,7 +388,10 @@ export const hoverCardMachine = setup({
           { target: "closing", actions: ["blurred", "leaveByBlur"] },
         ],
         "FOCUS_WITHIN.LEAVE": [
-          { guard: { or: ["pointerInZone", "keyboardFocused"] }, actions: ["focusLeft"] },
+          {
+            guard: { or: ["pointerInZone", "keyboardFocused", "childLayerOpen"] },
+            actions: ["focusLeft"],
+          },
           { target: "closing", actions: ["focusLeft", "leaveByBlur"] },
         ],
         ESCAPE_KEY: { target: "closed", reason: "escape-key", actions: ["setCloseReason"] },

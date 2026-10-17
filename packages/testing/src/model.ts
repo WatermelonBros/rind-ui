@@ -654,6 +654,7 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
       await base.keyboard(key, { ...o, composing: true })
     },
     pointerOutside: async () => {},
+    pointerAway: async () => {},
   }
   return { env, state }
 }
@@ -897,7 +898,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       from,
       state,
       ...expectations(contract, state, oracle.service.view()),
-      wasOpen: from !== null && expectations(contract, from, oracle.service.view()).open,
+      fromInitial: from === graph.initial,
       atInitial: state === graph.initial,
       anchorCount: await base.anchorCount(),
       errors: await base.takeErrors(),

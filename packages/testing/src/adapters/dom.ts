@@ -693,6 +693,12 @@ function createDomEnv(
       if (!u.pointer) return act(() => u.click(body))
       await act(() => u.pointer?.([{ keys: "[MouseLeft]", target: body, coords: outsideCoords() }]))
     },
+    async pointerAway() {
+      const u = await getUser()
+      const body = doc().body
+      if (!u.pointer) return act(() => u.hover(body))
+      await act(() => u.pointer?.({ target: body, coords: outsideCoords() }))
+    },
     until,
     advance: async (ms) => {
       if (options.advanceTimers) await act(() => options.advanceTimers?.(ms))
