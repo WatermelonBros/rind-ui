@@ -28,3 +28,4 @@ export {
   type TagsInputMessages,
   tagsInputMessages,
 } from "./tags-input.messages"
+export { tagsInputMeta } from "./tags-input.meta"
