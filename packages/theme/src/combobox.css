@@ -82,6 +82,13 @@
     outline: none;
   }
 
+  /* iOS zooms into a focused input under 16px: never smaller on touch screens. */
+  @media (pointer: coarse) {
+    :where([data-scope="combobox"][data-part="input"]) {
+      font-size: max(16px, var(--rind-text-control, var(--rind-text-sm)));
+    }
+  }
+
   :where([data-scope="combobox"][data-part="input"])::placeholder {
     color: var(--rind-combobox-placeholder, var(--rind-color-text-muted));
     opacity: 1;
@@ -323,7 +330,7 @@
   }
 
   :where([data-scope="combobox"][data-part="chip"][data-highlighted]) {
-    border-color: var(--rind-combobox-chip-highlight-border, var(--rind-color-accent));
+    border-color: var(--rind-combobox-chip-highlight-border, var(--rind-color-accent-border));
     background: var(--rind-combobox-chip-highlight-bg, var(--rind-color-accent-soft));
   }
 

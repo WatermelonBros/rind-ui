@@ -350,6 +350,10 @@ export const comboboxContract = contract("combobox", {
     { part: "trigger", state: "open" },
     { part: "clear-trigger", state: "closed" },
     { part: "clear-trigger", state: "open" },
+    // The scrolling popup and list are focusable by script (scrollable-region-focusable):
+    // a programmatic focus there leaves the input, inside the component.
+    { part: "popup", state: "open" },
+    { part: "list", state: "open" },
     // hidden-form-input: a focus on the constraint input moves to the visible input.
     { part: "hidden-input", state: "closed" },
     { part: "hidden-input", state: "open" },
