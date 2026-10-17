@@ -45,6 +45,13 @@
 [data-skinned] [data-scope="breadcrumbs"][data-part="separator"][data-last] {
   display: none;
 }
+/* Right to left: the separator is flipped here, and only here. Isolated as left-to-right, a
+   text chevron (›) is never also mirrored by the font (some fonts mirror it in RTL text,
+   some do not), so every skin ends with the same single flip. */
+[data-skinned] [data-scope="breadcrumbs"][data-part="separator"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
 [data-skinned] [dir="rtl"] [data-scope="breadcrumbs"][data-part="separator"] {
   transform: scaleX(-1);
 }
@@ -68,7 +75,10 @@
   list-style: none;
 }
 [data-skin="crisp"] [data-scope="breadcrumbs"][data-part="link"][data-current] {
-  box-shadow: inset 0 -3px 0 var(--s-ink);
+  background: var(--s-ink);
+  color: var(--s-brand-text);
+  border-radius: 99px;
+  padding: 0 10px;
 }
 [data-skin="crisp"] [data-scope="breadcrumbs"] .crumb-button,
 [data-skin="crisp"] [data-scope="breadcrumbs"][data-part="ellipsis"] button {

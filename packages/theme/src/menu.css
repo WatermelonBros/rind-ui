@@ -1,0 +1,153 @@
+/*
+ * Menu: positioner.css gives the anchored content its box and scrolling; this sheet adds the
+ * --rind-menu-* tokens (defaulting to semantic ones), the item states, and swaps the pop-in
+ * animation for a transition so entry (@starting-style) and exit ([data-state="closed"]) use
+ * the same properties. A submenu trigger whose submenu is open reads as highlighted.
+ */
+@layer rind.components {
+  [data-scope="menu"][data-part="content"][data-side] {
+    background: var(--rind-menu-bg, var(--rind-color-surface-raised));
+    color: var(--rind-color-text);
+    padding: var(--rind-menu-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid var(--rind-menu-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-menu-radius, var(--rind-radius-md));
+    box-shadow: var(--rind-menu-shadow, var(--rind-shadow-sm));
+    min-inline-size: var(--rind-menu-min-width, 10rem);
+    max-block-size: min(var(--rind-menu-max-height, 100vh), var(--rind-available-height, 100vh));
+    overflow: auto;
+    transform-origin: var(--rind-transform-origin);
+    animation: none;
+    transition:
+      opacity var(--rind-duration-normal) var(--rind-ease-out),
+      transform var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  [data-scope="menu"][data-part="content"][data-side][data-state="open"] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    @starting-style {
+      opacity: 0;
+      transform: var(--rind-pop-from, scale(0.97));
+    }
+  }
+
+  [data-scope="menu"][data-part="content"][data-side][data-state="closed"] {
+    opacity: 0;
+    transform: var(--rind-pop-from, scale(0.97));
+  }
+
+  [data-scope="menu"][data-part="item"],
+  [data-scope="menu"][data-part="checkbox-item"],
+  [data-scope="menu"][data-part="radio-item"],
+  [data-scope="menu"][data-part="submenu-trigger"] {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    box-sizing: border-box;
+    min-block-size: var(--rind-menu-item-height, var(--rind-hit-area));
+    padding: var(--rind-menu-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-radius-sm);
+    font-size: var(--rind-text-sm);
+    color: inherit;
+    cursor: default;
+    user-select: none;
+    outline: none;
+  }
+
+  [data-scope="menu"][data-part="item"][data-highlighted],
+  [data-scope="menu"][data-part="checkbox-item"][data-highlighted],
+  [data-scope="menu"][data-part="radio-item"][data-highlighted],
+  [data-scope="menu"][data-part="submenu-trigger"][data-highlighted],
+  [data-scope="menu"][data-part="submenu-trigger"][data-state="open"] {
+    background: var(--rind-menu-item-highlight-bg, var(--rind-color-accent-soft));
+    color: var(--rind-menu-item-highlight-text, var(--rind-color-text));
+  }
+
+  [data-scope="menu"][data-part="item"][data-disabled],
+  [data-scope="menu"][data-part="checkbox-item"][data-disabled],
+  [data-scope="menu"][data-part="radio-item"][data-disabled],
+  [data-scope="menu"][data-part="submenu-trigger"][data-disabled] {
+    color: var(--rind-menu-item-disabled-text, var(--rind-color-text-disabled));
+  }
+
+  [data-scope="menu"][data-part="item-indicator"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    inline-size: var(--rind-menu-indicator-size, 1rem);
+    block-size: var(--rind-menu-indicator-size, 1rem);
+  }
+
+  [data-scope="menu"][data-part="item-text"] {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  [data-scope="menu"][data-part="separator"] {
+    margin-block: var(--rind-space-1);
+    margin-inline: 0;
+    block-size: var(--rind-border-width);
+    inline-size: auto;
+    border: 0;
+    background: var(--rind-menu-separator, var(--rind-color-border));
+  }
+
+  [data-scope="menu"][data-part="separator"][data-orientation="vertical"] {
+    margin-block: 0;
+    margin-inline: var(--rind-space-1);
+    block-size: auto;
+    inline-size: var(--rind-border-width);
+  }
+
+  [data-scope="menu"][data-part="group-label"] {
+    padding: var(--rind-menu-item-padding, var(--rind-space-1) var(--rind-space-2));
+    font-size: var(--rind-text-xs);
+    color: var(--rind-menu-group-label-text, var(--rind-color-text-muted));
+  }
+
+  [data-scope="menu"][data-part="arrow"][data-side] {
+    background: var(--rind-menu-bg, var(--rind-color-surface-raised));
+    color: var(--rind-menu-border, var(--rind-color-border-strong));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-scope="menu"][data-part="content"] {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="menu"][data-part="content"] {
+      border-color: CanvasText;
+    }
+
+    /* base.css paints every checked element Highlight; only the indicator carries it here. */
+    [data-scope="menu"][data-part="checkbox-item"][data-state="checked"],
+    [data-scope="menu"][data-part="radio-item"][data-state="checked"] {
+      background: transparent;
+      color: inherit;
+      outline: none;
+    }
+
+    [data-scope="menu"][data-part="item"][data-highlighted],
+    [data-scope="menu"][data-part="checkbox-item"][data-highlighted],
+    [data-scope="menu"][data-part="radio-item"][data-highlighted],
+    [data-scope="menu"][data-part="submenu-trigger"][data-highlighted],
+    [data-scope="menu"][data-part="submenu-trigger"][data-state="open"] {
+      background: Highlight;
+      color: HighlightText;
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    [data-scope="menu"][data-part="item-indicator"] {
+      color: currentColor;
+    }
+
+    [data-scope="menu"][data-part="separator"] {
+      background: CanvasText;
+    }
+  }
+}
