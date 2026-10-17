@@ -261,6 +261,11 @@ export interface ValuedDecl {
  * value without the user (dispatching no `change`, e.g. a form reset).
  */
 export interface FormInputDecl {
+  /**
+   * The controllable values the form carries (default: all of them). A step changing only
+   * another value (a select's `open`) is no user change of the form's value.
+   */
+  readonly values?: readonly string[]
   /** One hidden input per item (a group): each is compared, and their events summed. */
   readonly multiple?: boolean
   /**

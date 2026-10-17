@@ -304,7 +304,8 @@ model-based runner SHALL check after every step that:
   input the component renders for that value (plus the `uncheckedValue` input when
   applicable);
 - the number of `change` events dispatched by the hidden input since the path started
-  equals the number of steps whose action changed the value;
+  equals the number of steps whose action changed the value — the controllable values
+  the contract declares the form carries (default: all; Select: `value`, not `open`);
 - the number of `click` events an ancestor of the component received equals the number of
   clicks the driver produced.
 
@@ -326,6 +327,11 @@ state as DOM properties.
 - **WHEN** a contract query reads the hidden input's checkedness through the Playwright
   adapter and through the DOM adapter
 - **THEN** both return the `checked` property, not the `checked` attribute
+
+#### Scenario: Opening is no change of the form's value
+
+- **WHEN** a select's contract declares the form carries `value` and a step opens it
+- **THEN** the step counts no user change and expects no `change` event
 
 ### Requirement: Validity Element For Field
 
