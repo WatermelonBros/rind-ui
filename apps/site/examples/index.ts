@@ -14,6 +14,7 @@ import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
 import * as combobox from "./combobox"
+import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
@@ -22,6 +23,7 @@ import * as form from "./form"
 import * as heading from "./heading"
 import * as hiddenFormInput from "./hidden-form-input"
 import * as hiddenUntilFound from "./hidden-until-found"
+import * as hoverCard from "./hover-card"
 import * as image from "./image"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
@@ -83,6 +85,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   collapsible,
   combobox,
   collections,
+  "context-menu": contextMenu,
   dialog,
   field,
   "focus-and-modality": focusAndModality,
@@ -100,6 +103,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "pin-input": pinInput,
   popover,
   positioning,
+  "hover-card": hoverCard,
   label,
   link,
   listbox,

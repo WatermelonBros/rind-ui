@@ -1,0 +1,115 @@
+/* Hover Card: a link and a portalled preview; the portal host carries the stage's
+   data-rind-theme, so these rules select on that. */
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="trigger"] {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--s-acc);
+  border-radius: 4px;
+  transition: background 0.15s var(--s-ease);
+}
+[data-rind-theme^="skin-"]
+  [data-scope="hover-card"][data-part="trigger"]:is([data-hover], [data-state="open"]) {
+  background: color-mix(in oklab, var(--s-acc) 22%, transparent);
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="trigger"]:focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="positioner"] {
+  z-index: 62;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="content"] {
+  position: relative;
+  box-sizing: border-box;
+  width: min(300px, var(--rind-available-width, 100vw));
+  padding: 14px 16px;
+  color: var(--s-ink);
+  font: 500 14px / 1.45 var(--s-font);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-hi);
+  transform-origin: var(--rind-transform-origin, center);
+  transition:
+    opacity 0.2s var(--s-ease),
+    scale 0.25s var(--s-pop);
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="content"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="content"][data-state="closed"] {
+  opacity: 0;
+  scale: 0.97;
+}
+[data-rind-theme="skin-crisp"] [data-scope="hover-card"][data-part="content"] {
+  box-shadow: 5px 5px 0 var(--s-ink);
+}
+[data-rind-theme="skin-juicy"] [data-scope="hover-card"][data-part="content"] {
+  box-shadow: 0 8px 0 #c9bdf2;
+  outline: 2px solid #e2d9fb;
+  outline-offset: -2px;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="content"] p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: color-mix(in oklab, var(--s-ink) 78%, var(--s-card));
+}
+[data-rind-theme^="skin-"] .profile-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+[data-rind-theme^="skin-"] .profile-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font: 800 14px var(--s-font);
+  color: var(--s-brand-text);
+  background: var(--s-brand);
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="arrow"] {
+  --s-arrow: 12px;
+  width: var(--s-arrow);
+  height: var(--s-arrow);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  rotate: 45deg;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="arrow"][data-side="bottom"] {
+  top: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="arrow"][data-side="top"] {
+  bottom: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  border-left-color: transparent;
+  border-top-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="arrow"][data-side="right"] {
+  left: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  border-right-color: transparent;
+  border-top-color: transparent;
+}
+[data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="arrow"][data-side="left"] {
+  right: calc(var(--s-arrow) / -2 - var(--s-bw) / 2);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="content"] {
+    transition: none;
+  }
+}
+[data-rind-theme="skin-juicy"] [data-scope="hover-card"][data-part="arrow"] {
+  --s-arrow: 14px;
+  border: 2px solid #e2d9fb;
+}
