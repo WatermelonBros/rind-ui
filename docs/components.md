@@ -30,7 +30,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Dialog | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC: Dialog + Modal |
 | Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | HUI: in source, not in public docs |
-| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | spec | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
+| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | spec | Used by Reado |
@@ -41,9 +41,9 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | wip | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
-| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
+| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
@@ -144,24 +144,24 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
+| Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
-| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
-| Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
+| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done |  |
+| Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | done |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec |  |
+| Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
-| Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | spec | Loading/fallback states |
+| Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
+| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 
 ## AI-UI primitives (11)

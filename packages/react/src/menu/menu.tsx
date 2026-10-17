@@ -142,6 +142,8 @@ interface Level {
   /** A submenu's content is named by its trigger item. */
   readonly labelledBy?: string | undefined
   readonly inMenubar: boolean
+  /** A context menu: the trigger is a region. */
+  readonly region?: boolean | undefined
 }
 
 const LevelContext = createContext<Level | null>(null)
@@ -191,6 +193,7 @@ function useApi(ctx: Level, extra: { dir?: "ltr" | "rtl" } = {}) {
       meta,
       manual: menuPositioning(ctx.props).mode === "manual",
       inMenubar: ctx.inMenubar,
+      region: ctx.region,
       ...extra,
     },
     ctx.service.send,
@@ -219,6 +222,8 @@ function useLevelService(input: {
   readonly controllable?: Pick<MenuProps, "open" | "defaultOpen" | "onOpenChange" | "modal">
   /** One per tree: a parent level sees its submenu's transit (the grace area). */
   readonly hoverIntent?: HoverIntent | undefined
+  /** A context menu's root level. */
+  readonly region?: Pick<MenuProps, "onAnchorChange"> | undefined
 }) {
   const env = useEnvironment()
   const parent = useParentLayer()
@@ -238,6 +243,7 @@ function useLevelService(input: {
   }, [input.levelId])
   const o = input.options
   const props: MenuProps = {
+    ...(input.region ? { region: true, onAnchorChange: input.region.onAnchorChange } : {}),
     ...input.controllable,
     collection,
     strategy: "roving",
@@ -607,7 +613,7 @@ function Item({
           origin,
           tag,
           onActivate: (a) => {
-            if (a.disposition === "same-tab") api.activateLink(key, a.modality)
+            if (a.disposition === "same-tab") api.activateLink(key, a.modality, closeOnSelect)
           },
         },
         linkEnv,
@@ -868,6 +874,8 @@ const SubmenuContext = createContext<{
   readonly parent: Level
   readonly key: CollectionKey
   readonly triggerRef: RefObject<HTMLElement | null>
+  /** The SubmenuTrigger's `disabled`: the expand key never opens a disabled submenu. */
+  readonly disabledRef: RefObject<boolean>
 } | null>(null)
 
 export type MenuSubmenuProps = Omit<LevelOptions, "loop"> & {
@@ -891,8 +899,11 @@ function Submenu({ children, ...options }: MenuSubmenuProps) {
   })
   const { submenus } = parent
   const { send } = s
+  const disabledRef = useRef(false)
   useIsoLayoutEffect(() => {
-    submenus.set(key, () => send({ type: "SUB_OPEN" }))
+    submenus.set(key, () => {
+      if (!disabledRef.current) send({ type: "SUB_OPEN" })
+    })
     return () => {
       submenus.delete(key)
     }
@@ -916,7 +927,7 @@ function Submenu({ children, ...options }: MenuSubmenuProps) {
     inMenubar: false,
   }
   return (
-    <SubmenuContext value={{ parent, key, triggerRef }}>
+    <SubmenuContext value={{ parent, key, triggerRef, disabledRef }}>
       <LevelContext value={ctx}>{children}</LevelContext>
     </SubmenuContext>
   )
@@ -942,6 +953,10 @@ function SubmenuTrigger({
   const childOpen = useSelector(child.service, (v) => v.matches("open"))
   const el = useRef<HTMLElement | null>(null)
   useRegisterItem(sub.parent.registry, { key: sub.key, textValue, disabled }, el)
+  const { disabledRef } = sub
+  useIsoLayoutEffect(() => {
+    disabledRef.current = disabled
+  }, [disabledRef, disabled])
   const [focused, setFocused] = useState(false)
   const hover = useMemo(
     () => child.hoverIntent.triggerProps((e) => child.service.send(e)),
@@ -1009,4 +1024,13 @@ export const Menu = {
   Separator,
   Submenu,
   SubmenuTrigger,
+}
+
+// Internal: a context menu builds its root level from these (not public API).
+export {
+  type Level as MenuLevel,
+  LevelContext as MenuLevelContext,
+  type LevelOptions as MenuLevelOptions,
+  useApi as useMenuApi,
+  useLevelService as useMenuLevelService,
 }

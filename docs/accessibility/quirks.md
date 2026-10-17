@@ -22,7 +22,9 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
 | `packages/react/src/form/form.tsx` | `react-action-form-reset` |
+| `packages/react/src/meter/meter.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
+| `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `firefox-textarea-overflow`
@@ -178,3 +180,11 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: component code (none yet)
 - Last verified: 2026-10-16
 - Remove when: Firefox on Linux focuses a label's control on activation
+
+## `nvda-progressbar-name`
+
+- Bugs: <https://github.com/mui/base-ui/issues/4184>, <https://github.com/nvaccess/nvda/issues/13904>, <https://github.com/nvaccess/nvda/issues/16204>, <https://github.com/FreedomScientific/standards-support/issues/354>
+- Repro test: `packages/core/src/components/progress/progress.connect.test.ts`
+- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`
+- Last verified: 2026-10-16
+- Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases

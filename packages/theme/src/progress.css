@@ -1,0 +1,178 @@
+/*
+ * Progress (family: range): a bar and a ring on data attributes only. Core sizes the
+ * Indicator inline from --rind-progress-percent and offsets the ring's arc on a pathLength of
+ * 100, so nothing here computes geometry. Indeterminate: a 40 % segment that slides (bar) or
+ * a quarter arc that spins (ring), only under prefers-reduced-motion: no-preference; under
+ * reduced motion the segment stays still and striped, so it never reads as a determinate
+ * fill (ZG#1716). Forced colors: Highlight fill and stroke, a CanvasText track edge (RS#4069).
+ * data-tone re-points the accent roles (variants.css).
+ */
+@layer rind.components {
+  :where([data-scope="progress"][data-part="root"]) {
+    --_track: var(--rind-progress-track-size, 0.5rem);
+    --_ring: var(--rind-progress-ring-size, 2.5rem);
+    --_ring-thickness: var(--rind-progress-ring-thickness, 10);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--rind-progress-gap, var(--rind-space-2));
+    color: var(--rind-progress-color, var(--rind-color-text));
+  }
+  :where([data-scope="progress"][data-part="root"][data-size="sm"]) {
+    --_track: var(--rind-progress-track-size, 0.25rem);
+    --_ring: var(--rind-progress-ring-size, 1.5rem);
+  }
+  :where([data-scope="progress"][data-part="root"][data-size="lg"]) {
+    --_track: var(--rind-progress-track-size, 0.75rem);
+    --_ring: var(--rind-progress-ring-size, 4rem);
+  }
+  :where([data-scope="progress"][data-part="root"][data-orientation="vertical"]) {
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+  :where([data-scope="progress"][data-part="value-text"]) {
+    color: var(--rind-progress-value-color, var(--rind-color-text-muted));
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Bar ── */
+  :where([data-scope="progress"][data-part="track"]) {
+    grid-column: 1 / -1;
+    position: relative;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--_track);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-progress-track-radius, var(--rind-radius-full));
+    background: var(--rind-progress-track-bg, var(--rind-color-neutral-soft));
+    overflow: hidden;
+  }
+  :where([data-scope="progress"][data-part="track"][data-orientation="vertical"]) {
+    display: flex;
+    flex-direction: column-reverse;
+    inline-size: var(--_track);
+    block-size: var(--rind-progress-length, 8rem);
+  }
+  :where([data-scope="progress"][data-part="indicator"]) {
+    block-size: 100%;
+    border-radius: inherit;
+    background: var(
+      --rind-progress-indicator-bg,
+      var(--_indicator, var(--rind-color-accent-solid))
+    );
+    transition:
+      inline-size var(--rind-progress-duration, var(--rind-duration-normal)),
+      block-size var(--rind-progress-duration, var(--rind-duration-normal));
+  }
+  :where([data-scope="progress"][data-part="indicator"][data-orientation="vertical"]) {
+    inline-size: 100%;
+  }
+  :where([data-scope="progress"][data-part="root"][data-variant="soft"]) {
+    --_indicator: var(--rind-color-accent-soft-hover);
+  }
+  /* Indeterminate, reduced motion (the default): a still, striped 40 % segment. */
+  :where([data-scope="progress"][data-part="indicator"][data-state="indeterminate"]) {
+    inline-size: 40%;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0 0.25rem,
+      var(
+          --rind-progress-stripe,
+          color-mix(in oklab, var(--rind-color-accent-on-solid) 40%, transparent)
+        )
+        0.25rem 0.5rem
+    );
+  }
+  :where(
+    [data-scope="progress"][data-part="indicator"][data-state="indeterminate"][data-orientation="vertical"]
+  ) {
+    inline-size: 100%;
+    block-size: 40%;
+  }
+
+  /* ── Ring ── */
+  :where([data-scope="progress"][data-part="circle"]) {
+    inline-size: var(--_ring);
+    block-size: var(--_ring);
+    rotate: -90deg;
+    overflow: visible;
+  }
+  :where([data-scope="progress"]:is([data-part="circle-track"], [data-part="circle-indicator"])) {
+    fill: none;
+    stroke-width: var(--_ring-thickness);
+  }
+  :where([data-scope="progress"][data-part="circle-track"]) {
+    stroke: var(--rind-progress-track-bg, var(--rind-color-neutral-soft));
+  }
+  :where([data-scope="progress"][data-part="circle-indicator"]) {
+    stroke: var(--rind-progress-indicator-bg, var(--_indicator, var(--rind-color-accent-solid)));
+    stroke-linecap: round;
+    transition: stroke-dashoffset var(--rind-progress-duration, var(--rind-duration-normal));
+  }
+  /* A round cap would draw a dot at 0: hide the arc until there is one (Zag's trick). */
+  :where([data-scope="progress"][data-part="circle-indicator"][stroke-dashoffset="100"]) {
+    opacity: 0;
+  }
+  /* Indeterminate ring: a quarter arc, never a full ring. */
+  :where([data-scope="progress"][data-part="circle-indicator"][data-state="indeterminate"]) {
+    stroke-dashoffset: 75;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where([data-scope="progress"][data-part="indicator"][data-state="indeterminate"]) {
+      background-image: none;
+      animation: rind-progress-slide var(--rind-progress-indeterminate-duration, 1.4s) ease-in-out
+        infinite;
+    }
+    :where(
+        [data-scope="progress"][data-part="indicator"][data-state="indeterminate"][data-orientation="vertical"]
+      ) {
+      animation-name: rind-progress-slide-vertical;
+    }
+    :where([data-scope="progress"][data-part="circle"][data-state="indeterminate"]) {
+      animation: rind-progress-spin var(--rind-progress-indeterminate-duration, 1.4s) linear
+        infinite;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="progress"][data-part="track"]) {
+      border-color: CanvasText;
+    }
+    :where([data-scope="progress"][data-part="indicator"]) {
+      forced-color-adjust: none;
+      background-color: Highlight;
+    }
+    :where([data-scope="progress"][data-part="circle-track"]) {
+      stroke: CanvasText;
+    }
+    :where([data-scope="progress"][data-part="circle-indicator"]) {
+      stroke: Highlight;
+    }
+  }
+
+  @keyframes rind-progress-slide {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 250% 0;
+    }
+  }
+  @keyframes rind-progress-slide-vertical {
+    from {
+      translate: 0 100%;
+    }
+    to {
+      translate: 0 -250%;
+    }
+  }
+  @keyframes rind-progress-spin {
+    from {
+      rotate: -90deg;
+    }
+    to {
+      rotate: 270deg;
+    }
+  }
+}

@@ -1,0 +1,108 @@
+/*
+ * QR Code (family: decoration): dark modules on a light ground in every colour scheme and
+ * under forced colors, because scanners need it: the frame is the one place besides colour
+ * swatches with `forced-color-adjust: none` (theme-accessibility). Black and white are
+ * derived from role tokens with lightness 0 and 1, so no literal colour and no scheme
+ * dependency. Sizes come from `--rind-qr-code-*`; the download trigger is an outline key
+ * with at least the 24 px hit area.
+ */
+@layer rind.components {
+  :where([data-scope="qr-code"][data-part="root"]) {
+    gap: var(--rind-space-2);
+    justify-items: center;
+  }
+
+  :where([data-scope="qr-code"][data-part="frame"]) {
+    display: block;
+    box-sizing: content-box;
+    inline-size: var(--rind-qr-code-size, 11rem);
+    block-size: var(--rind-qr-code-size, 11rem);
+    padding: var(--rind-qr-code-padding, 0);
+    border-radius: var(--rind-qr-code-radius, var(--rind-radius-sm));
+    background: var(--rind-qr-code-bg, oklch(from var(--rind-color-bg) 1 0 0));
+  }
+
+  :where([data-scope="qr-code"][data-part="pattern"]) {
+    fill: var(--rind-qr-code-fg, oklch(from var(--rind-color-text) 0 0 0));
+  }
+
+  /* No symbol (empty or invalid): the frame keeps its size, nothing is drawn. */
+  :where([data-scope="qr-code"][data-part="frame"]:not([data-state="ready"])) {
+    background: var(--rind-qr-code-bg, oklch(from var(--rind-color-bg) 1 0 0));
+    outline: var(--rind-border-width) dashed var(--rind-color-border);
+    outline-offset: calc(var(--rind-border-width) * -1);
+  }
+
+  :where([data-scope="qr-code"][data-part="overlay"]) {
+    display: grid;
+    place-items: center;
+    inline-size: var(--rind-qr-code-overlay-size, 25%);
+    block-size: auto;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: var(--rind-qr-code-overlay-radius, var(--rind-radius-sm));
+    background: var(--rind-qr-code-bg, oklch(from var(--rind-color-bg) 1 0 0));
+    outline: var(--rind-qr-code-overlay-outline-width, 0.25rem) solid
+      var(--rind-qr-code-overlay-outline-color, oklch(from var(--rind-color-bg) 1 0 0));
+  }
+
+  :where([data-scope="qr-code"][data-part="overlay"] > :is(img, svg)) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+  }
+
+  /* The download trigger: an outline key, at least the 24 px hit area. */
+  :where([data-scope="qr-code"][data-part="download-trigger"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-2);
+    min-block-size: max(var(--rind-hit-area), var(--rind-size-md));
+    min-inline-size: max(var(--rind-hit-area), var(--rind-size-md));
+    padding-inline: var(--rind-space-3);
+    border: var(--rind-border-width) solid var(--rind-color-border);
+    border-radius: var(--rind-radius-control);
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-sm);
+    font-weight: 560;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-accent-text);
+  }
+
+  :where([data-scope="qr-code"][data-part="download-trigger"][data-hover]:not([data-disabled])) {
+    background: var(--rind-color-accent-soft-hover);
+  }
+
+  :where([data-scope="qr-code"][data-part="download-trigger"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    /* Keep the symbol readable: explicit black on white, not Canvas / CanvasText. */
+    :where([data-scope="qr-code"][data-part="frame"]) {
+      forced-color-adjust: none;
+      background: oklch(from var(--rind-color-bg) 1 0 0);
+    }
+
+    :where([data-scope="qr-code"][data-part="pattern"]) {
+      fill: oklch(from var(--rind-color-text) 0 0 0);
+    }
+
+    :where([data-scope="qr-code"][data-part="download-trigger"]) {
+      border-color: ButtonText;
+    }
+
+    :where([data-scope="qr-code"][data-part="download-trigger"][data-disabled]) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+  }
+}

@@ -499,20 +499,18 @@ describe("Menu: closing rules", () => {
 
   it("Non-modal toolbar menus: one click on the second trigger switches menus", async () => {
     render(
-      <>
-        {["File", "Edit"].map((label) => (
-          <Menu.Root key={label} modal={false}>
-            <Menu.Trigger>{label}</Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner>
-                <Menu.Content>
-                  <Menu.Item>{`${label} item`}</Menu.Item>
-                </Menu.Content>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
-        ))}
-      </>,
+      ["File", "Edit"].map((label) => (
+        <Menu.Root key={label} modal={false}>
+          <Menu.Trigger>{label}</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item>{`${label} item`}</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      )),
     )
     const file = getMenu(screen, { name: "File", modal: false }).via("pointer")
     const edit = getMenu(screen, { name: "Edit", modal: false }).via("pointer")
@@ -708,6 +706,66 @@ describe("Menu: rendered elements", () => {
     await m.open()
     expect(await m.focusedItem()).toBe("Undo")
     expect(onSelect).not.toHaveBeenCalled()
+    expect(await m.isOpen()).toBe(true)
+  })
+})
+
+describe("Menu: review r1", () => {
+  it("A link item with closeOnSelect={false} navigates and keeps the menu open", async () => {
+    interceptNativeNavigation(window)
+    const router = fakeRouter()
+    render(
+      <RouterProvider navigate={router.navigate}>
+        <Menu.Root>
+          <Menu.Trigger>Help</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item href="/docs" closeOnSelect={false}>
+                  Docs
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </RouterProvider>,
+    )
+    const m = getMenu(screen, { name: "Help" }).via("pointer")
+    await m.open()
+    await m.choose("Docs")
+    await waitFor(() => expect(router.calls.map((c) => c.href)).toEqual(["/docs"]))
+    expect(await m.isOpen()).toBe(true)
+  })
+
+  it("The expand key never opens a disabled submenu", async () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger>Encoding</Menu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.Submenu>
+                <Menu.SubmenuTrigger disabled>Reopen with</Menu.SubmenuTrigger>
+                <Menu.Portal>
+                  <Menu.Positioner>
+                    <Menu.Content>
+                      <Menu.Item>UTF-8</Menu.Item>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Submenu>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    )
+    const m = getMenu(screen, { name: "Encoding" }).via("keyboard")
+    await m.open()
+    expect(await m.focusedItem()).toBe("Reopen with")
+    await userEvent.keyboard("{ArrowRight}")
+    await userEvent.keyboard("{Enter}")
+    expect(await m.openPath()).toEqual([])
+    expect(screen.getAllByRole("menu")).toHaveLength(1)
     expect(await m.isOpen()).toBe(true)
   })
 })

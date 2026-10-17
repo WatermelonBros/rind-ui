@@ -13,13 +13,19 @@
 @import "./tabs.css";
 @import "./segmented-control.css";
 @import "./separator.css";
+@import "./scroll-area.css";
 @import "./skeleton.css";
 @import "./badge.css";
+@import "./alert.css";
+@import "./qr-code.css";
 @import "./breadcrumbs.css";
 @import "./avatar.css";
+@import "./image.css";
 @import "./toolbar.css";
 @import "./dialog.css";
 @import "./slider.css";
+@import "./progress.css";
+@import "./meter.css";
 @import "./popover.css";
 @import "./number-input.css";
 @import "./listbox.css";
@@ -29,3 +35,4 @@
 @import "./search-field.css";
 @import "./tooltip.css";
 @import "./pagination.css";
+@import "./menu.css";

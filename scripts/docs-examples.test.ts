@@ -25,9 +25,11 @@ for (const f of docs) {
  * Parts that are another component's Root (CheckboxGroup.Parent is a Checkbox.Root), or a
  * second root of their own (Avatar.Group holds avatars and its GroupOverflow).
  */
-const ROOT_ALIASES: Readonly<Record<string, string>> = {
+const ROOT_ALIASES: Readonly<Record<string, string | readonly string[]>> = {
   "CheckboxGroup.Parent": "Checkbox",
   "Avatar.Group": "Avatar",
+  // A context menu's root is the Menu's root level: Menu parts go inside it.
+  "ContextMenu.Root": ["ContextMenu", "Menu"],
 }
 
 /** Problems in one example: parts used outside an open Root of their component. */
@@ -37,11 +39,14 @@ function misplacedParts(code: string): string[] {
   for (const m of code.matchAll(/<(\/?)([A-Z]\w*)\.(\w+)([^>]*?)(\/?)>/g)) {
     const [, closing, tagName = "", part, , selfClosing] = m
     const alias = ROOT_ALIASES[`${tagName}.${part}`]
-    const name = alias ?? tagName
+    const names = alias === undefined ? [tagName] : typeof alias === "string" ? [alias] : alias
+    const name = names[0] ?? tagName
     if (part === "Root" || alias) {
-      const n = open.get(name) ?? 0
-      if (closing) open.set(name, n - 1)
-      else if (!selfClosing) open.set(name, n + 1)
+      for (const n of names) {
+        const count = open.get(n) ?? 0
+        if (closing) open.set(n, count - 1)
+        else if (!selfClosing) open.set(n, count + 1)
+      }
       continue
     }
     if (closing || !withRoot.has(name)) continue

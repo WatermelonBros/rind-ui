@@ -71,6 +71,8 @@ export interface MenuConnectInput {
   readonly manual?: boolean | undefined
   /** The root trigger is a menubar item (add-menubar). */
   readonly inMenubar?: boolean | undefined
+  /** A context menu: the trigger is a region, the content is named by the consumer only. */
+  readonly region?: boolean | undefined
 }
 
 /** One button-like part's own state. */
@@ -302,7 +304,8 @@ export function menuConnect(
         "aria-orientation": orientation === "horizontal" ? "horizontal" : undefined,
         "aria-label": own.label,
         "aria-labelledby":
-          own.labelledBy ?? (named ? undefined : (input.labelledBy ?? ids.trigger)),
+          own.labelledBy ?? (named || input.region ? undefined : (input.labelledBy ?? ids.trigger)),
+        "data-context-menu": dataFlag(input.region === true),
         "data-state": dataState,
         "data-orientation": orientation,
         "data-modal": dataFlag(input.level === "root" && input.modal),
@@ -358,8 +361,8 @@ export function menuConnect(
       }
     },
     /** A link item's same-tab activation (linkProps' onActivate). */
-    activateLink: (key: CollectionKey, modality: Modality) =>
-      send({ type: "ITEM_ACTIVATE", key, kind: "link-item", closeOnSelect: true, modality }),
+    activateLink: (key: CollectionKey, modality: Modality, closeOnSelect = true) =>
+      send({ type: "ITEM_ACTIVATE", key, kind: "link-item", closeOnSelect, modality }),
     submenuTrigger: (key: CollectionKey, s: MenuSubmenuTriggerState): PartProps => {
       const highlighted = isHighlighted(key) && (!s.open || s.focused)
       // VoiceOver reads the submenu's first item only without the state change.
