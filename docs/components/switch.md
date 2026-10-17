@@ -2,6 +2,12 @@
 
 An on/off setting that takes effect immediately (APG Switch). The Control is a real `<button role="switch">`; a hidden native `<input type="checkbox">` carries the value, validation and reset ([hidden-form-input](../guides/hidden-form-input.md)).
 
+## When to use
+
+- **Use it for** an on/off setting that takes effect immediately, such as "Airplane mode" or "Wi-Fi".
+- **Over a native `<input type="checkbox">`**: it exposes `role="switch"` and `aria-checked`, a thumb and label as styleable parts, `data-state`, and still submits through a hidden checkbox. A plain checkbox is enough when the choice is committed later with a form.
+- **Don't use it for** a choice that is saved with a Save button, or that can be mixed: use a [Checkbox](checkbox.md). Don't use it for a button that stays pressed, such as "Bold": use a [Toggle](toggle.md).
+
 ```tsx
 import { Switch } from "@rind-ui/react"
 

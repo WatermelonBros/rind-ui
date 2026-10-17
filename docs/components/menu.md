@@ -2,6 +2,13 @@
 
 A list of actions opened from a trigger button: `role="menu"` with items, checkbox and radio items, groups, links and nested submenus. It is modal by default (the page behind is inert); `modal={false}` leaves it usable. The content is positioned against the trigger by the shared positioning capability and named by the trigger.
 
+## When to use
+
+- **Use it for** a list of actions behind a button: item, checkbox and radio items, groups, links and nested submenus.
+- **Over a plain list of buttons**: it adds `role="menu"` with arrow-key navigation, a first-item or last-item focus rule on open, focus return to the trigger, positioning against the trigger, and submenu hover handling. There is no native element for an actions menu.
+- **Don't use it for** choosing a value for a form field: use [Select](select.md). Don't use it for a menu opened by right-click: use [Context Menu](context-menu.md).
+- **Don't use it for** arbitrary content such as a form or text: use [Popover](popover.md). Site navigation is usually plain `<a>` links in a `nav`.
+
 ```tsx
 import { Menu } from "@rind-ui/react"
 

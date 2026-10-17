@@ -2,6 +2,12 @@
 
 Navigation between the pages of a long list: a `nav` landmark with the page controls, Previous and Next, and optionally First and Last. The controls are buttons, or links when each page has a URL.
 
+## When to use
+
+- **Use it for** moving between the pages of a long list or table, with Previous, Next and optionally First and Last.
+- **Over a row of plain buttons**: it adds a `nav` landmark, a range of page controls whose size never changes, `aria-current="page"` on the current page, unavailable controls that keep focus, and real links when each page has a URL (`getPageHref`).
+- **Don't use it for** switching between views of the same page: use [Tabs](tabs.md). A "load more" button needs no component, only a `<button>`.
+
 ```tsx
 import { Pagination } from "@rind-ui/react"
 

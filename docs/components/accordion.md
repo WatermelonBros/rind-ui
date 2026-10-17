@@ -2,6 +2,12 @@
 
 A set of headers, each toggling one panel. Every item is a [Collapsible](collapsible.md), so closed panels stay findable by the browser's search (`closedContent="until-found"`, the default).
 
+## When to use
+
+- **Use it for** a stack of sections where each header shows or hides its panel: FAQs, settings groups, long forms split into steps. Single mode keeps one panel open; `multiple` allows several.
+- **Over `<details>`**: it adds the APG header/region wiring, optional arrow-key navigation between triggers (`keyboardNavigation`), a heading level taken from context, and one shared open value you can control. Plain `<details>` is enough for one standalone disclosure with no shared state.
+- **Don't use it for** a single show/hide region: use [Collapsible](collapsible.md). For switching between peer views, use [Tabs](tabs.md).
+
 ```tsx
 import { Accordion } from "@rind-ui/react"
 

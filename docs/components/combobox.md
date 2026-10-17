@@ -2,6 +2,12 @@
 
 A text input with a popup list of options: the user types to narrow the list, moves through it with the arrow keys and picks one. It covers the select-with-search case (the value is one of the options), the free-text case (`allowCustomValue`), inline completion, grouped and disabled options, and lists filtered by a server. The input keeps focus the whole time; the highlighted option is announced through `aria-activedescendant`. The option parts are the Listbox parts, so keys, attributes and selection match a Listbox.
 
+## When to use
+
+- **Use it for** picking one option from a long list by typing to narrow it, free text with suggestions (`allowCustomValue`), and lists filtered by a server.
+- **Over a native `<select>`**: a `<select>` cannot be filtered by typing. Combobox adds the text input, the filtered popup, inline completion, grouped and disabled options, and `aria-activedescendant` announcement while focus stays in the input.
+- **Don't use it for** a short list that needs no search: use a [Select](select.md). For a list that is always visible, use a [Listbox](listbox.md). For plain text with no options, use a [Text Field](text-field.md).
+
 ```tsx
 import { Combobox } from "@rind-ui/react"
 

@@ -2,6 +2,12 @@
 
 Selects one value, or several (a range), on a continuous axis (APG Slider and Multi-Thumb Slider). Every thumb is backed by a real `<input type="range">`, the only focusable element of the thumb: browsers, screen readers and forms treat it as a native slider ([hidden-form-input](../guides/hidden-form-input.md)).
 
+## When to use
+
+- **Use it for** choosing a number, or a range with two thumbs, on a continuous axis: volume, price range, zoom.
+- **Over a native `<input type="range">`**: it adds multiple thumbs with collision rules, a styled track and indicator, markers, value text from one formatted source, and drag cancel with Escape and a single commit event. Each thumb still is a native range input, so forms and screen readers work as usual. A plain `<input type="range">` is enough for one thumb with default styling.
+- **Don't use it for** an exact number the user must type: use a [Number Input](number-input.md). Don't use it to show progress or a measurement that the user cannot change: use a [Progress](progress.md) or [Meter](meter.md).
+
 ```tsx
 import { Slider } from "@rind-ui/react"
 

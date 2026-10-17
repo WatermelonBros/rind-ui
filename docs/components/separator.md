@@ -4,6 +4,16 @@ A static divider between groups of content or controls. It is never focusable an
 state; the same rules decide the role and orientation of every divider in rind-ui
 (Toolbar, Menu, the listbox popups).
 
+## When to use
+
+- **Use it for** a divider between groups of content or controls, in a toolbar, a menu or a
+  plain layout.
+- **Over a plain `<hr>`**: it sets the role and orientation for its context (toolbar, menu,
+  listbox popup), can be purely visual with `decorative`, and exposes `data-orientation`. A bare
+  `<hr>` is enough on a page of prose; you can also render one with `render={<hr />}`.
+- **Don't use it for** a resizable divider: a focusable separator with a value is a window
+  splitter, not a Separator. Don't put text inside it either; see the text divider below.
+
 ```tsx
 import { Separator } from "@rind-ui/react"
 
