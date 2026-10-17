@@ -29,6 +29,8 @@ const HostContext = createContext<HostCtx | null>(null)
 
 export type FieldHostProps = FieldRootProps & {
   readonly scope: string
+  /** Inside a Field: the root's `data-part` (default `root`; a host's part names its own). */
+  readonly rootPart?: string
   readonly children?: ReactNode
 }
 
@@ -36,19 +38,19 @@ export type FieldHostProps = FieldRootProps & {
  * Renders the host's root: a Field (standalone) or, inside a Field, a plain `div` with the
  * scope attributes and the Field's state attributes.
  */
-export function FieldHost({ scope, children, ...fieldProps }: FieldHostProps) {
+export function FieldHost({ scope, rootPart, children, ...fieldProps }: FieldHostProps) {
   const inside = useIsInsideField()
   if (!inside) {
     return (
       <HostContext value={{ scope, standalone: true }}>
-        <Field.Root {...fieldProps} scope={scope}>
+        <Field.Root {...fieldProps} scope={scope} {...(rootPart ? { rootPart } : {})}>
           {children}
         </Field.Root>
       </HostContext>
     )
   }
   return (
-    <JoinedRoot scope={scope} fieldProps={fieldProps}>
+    <JoinedRoot scope={scope} rootPart={rootPart ?? "root"} fieldProps={fieldProps}>
       {children}
     </JoinedRoot>
   )
@@ -56,10 +58,12 @@ export function FieldHost({ scope, children, ...fieldProps }: FieldHostProps) {
 
 function JoinedRoot({
   scope,
+  rootPart,
   fieldProps,
   children,
 }: {
   readonly scope: string
+  readonly rootPart: string
   readonly fieldProps: FieldRootProps
   readonly children?: ReactNode
 }) {
@@ -75,7 +79,7 @@ function JoinedRoot({
     <HostContext value={{ scope, standalone: false }}>
       <div
         data-scope={scope}
-        data-part="root"
+        data-part={rootPart}
         data-instance={typeof id === "string" ? id : undefined}
         {...binding?.data}
         {...(id === undefined ? {} : { id })}

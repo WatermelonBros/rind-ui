@@ -57,7 +57,7 @@ export const colorPickerInvariants: readonly Invariant<P, string>[] = [
       if (!want) return undefined
       const opaque = (c: NonNullable<typeof want>) => formatColor({ ...c, alpha: 1 }, "hex")
       // Every Area in the content shows the picker's colour (a bound Area has no value of its own).
-      for (const area of await env.part("content").scoped("color-area", "root").all()) {
+      for (const area of await env.part("content").scoped("color-picker", "area").all()) {
         const got = tryParseColor(await cssColorOf(await area.attr("style")))
         if (got && opaque(got) !== opaque(want)) {
           return `a Color Area in the content shows ${opaque(got)}, the picker ${opaque(want)}`

@@ -46,7 +46,7 @@ import { ColorArea, type ColorAreaRootProps } from "../color-area/color-area"
 import { ColorChannelField, ColorField, ColorFlushContext } from "../color-field/color-field"
 import { useColorProp } from "../color-input"
 import { ColorSlider, type ColorSliderRootProps } from "../color-slider/color-slider"
-import { ColorSwatch, TransparencyGrid as Grid } from "../color-swatch/color-swatch"
+import { ColorSwatch, TransparencyGrid as Grid, SwatchNaming } from "../color-swatch/color-swatch"
 import {
   ColorSwatchPicker,
   type ColorSwatchPickerItemProps,
@@ -667,12 +667,19 @@ function SwatchTrigger(props: ColorPickerSwatchTriggerProps) {
 }
 
 /** A Color Swatch. */
+const SWATCH = { scope: "color-picker", part: "swatch" } as const
+const VALUE_SWATCH = { scope: "color-picker", part: "value-swatch" } as const
+
 /** ColorPicker.Swatch's props: a colour to show (`color`), named by its colour name. */
 export type ColorPickerSwatchProps = ComponentPropsWithRef<typeof ColorSwatch.Root>
 
 function Swatch(props: ColorPickerSwatchProps) {
   const ctx = usePicker("Swatch")
-  return <ColorSwatch.Root messages={ctx.messages} {...props} />
+  return (
+    <SwatchNaming value={SWATCH}>
+      <ColorSwatch.Root messages={ctx.messages} {...props} />
+    </SwatchNaming>
+  )
 }
 
 /** The picker's colour as a swatch (decorative inside the Trigger). */
@@ -681,16 +688,22 @@ function ValueSwatch(props: Omit<ComponentPropsWithRef<typeof ColorSwatch.Root>,
   const inTrigger = useContext(InTriggerContext)
   if (inTrigger) {
     return (
-      <ColorSwatch.Root
-        color={ctx.color}
-        messages={ctx.messages}
-        aria-hidden="true"
-        role="presentation"
-        {...props}
-      />
+      <SwatchNaming value={VALUE_SWATCH}>
+        <ColorSwatch.Root
+          color={ctx.color}
+          messages={ctx.messages}
+          aria-hidden="true"
+          role="presentation"
+          {...props}
+        />
+      </SwatchNaming>
     )
   }
-  return <ColorSwatch.Root color={ctx.color} messages={ctx.messages} {...props} />
+  return (
+    <SwatchNaming value={VALUE_SWATCH}>
+      <ColorSwatch.Root color={ctx.color} messages={ctx.messages} {...props} />
+    </SwatchNaming>
+  )
 }
 
 /** The colour in the current format. Not a live region. */
@@ -840,7 +853,8 @@ function View({
 
 function TransparencyGrid(props: ComponentPropsWithRef<typeof Grid>) {
   usePicker("TransparencyGrid")
-  return <Grid scope="color-picker" {...props} />
+  // The picker's scope last: a consumer prop never moves the part out of it.
+  return <Grid {...props} scope="color-picker" />
 }
 
 export const ColorPicker = {

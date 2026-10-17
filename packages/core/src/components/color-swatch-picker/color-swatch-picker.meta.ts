@@ -62,7 +62,8 @@ export const colorSwatchPickerMeta = {
   },
   dataAttributes: {
     root: {
-      "data-color-swatch-picker": "Present: the theme's hook (parts keep Radio Group's scope).",
+      "data-scope": '"color-picker" (the swatch group is a Color Picker part)',
+      "data-part": '"swatch-group"',
     },
   },
   keyboard: [

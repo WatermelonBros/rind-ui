@@ -171,6 +171,12 @@ export interface ContractDef<
 > {
   readonly machine: M
   readonly anatomy: readonly P[]
+  /**
+   * Rendered as another component's part (a Slider inside a Color Picker): the `data-part` each
+   * anatomy part carries under the host's scope. The adapters locate parts through it; absent,
+   * a part's `data-part` is its anatomy name.
+   */
+  readonly partName?: ((part: P) => string) | undefined
   /** The anchor: role + exact accessible name of an element of the instance. */
   readonly locate: (...args: L) => By
   readonly queries: Q
@@ -325,6 +331,7 @@ export interface AnyContract {
   readonly scope: string
   readonly machine: AnyMachine
   readonly anatomy: readonly string[]
+  readonly partName?: ((part: never) => string) | undefined
   readonly locate: (...args: never) => By
   readonly queries: Readonly<Record<string, (env: never, ...args: never) => Promise<unknown>>>
   readonly actions: Readonly<Record<string, object>>
@@ -395,7 +402,8 @@ export function contract<
         ? { readonly announcements: Announcements<NoInfer<Q>> }
         : unknown),
 ): Contract<M, P, L, Q, A> {
-  return { scope, ...def }
+  // The scope given wins over one spread in from another contract (a hosted contract).
+  return { ...def, scope }
 }
 
 /** The one-state machine behind every stateless component's contract (Link, Separator). */
@@ -433,5 +441,5 @@ export function staticContract<
     readonly traits: T
   },
 ): Contract<StaticMachine, P, L, Q, A> {
-  return { scope, ...def, machine: STATIC_MACHINE, states: { static: {} }, events: {} }
+  return { ...def, scope, machine: STATIC_MACHINE, states: { static: {} }, events: {} }
 }
