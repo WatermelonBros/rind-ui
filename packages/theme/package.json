@@ -48,7 +48,8 @@
     }
   },
   "scripts": {
-    "build": "node scripts/token-manifest.mjs --check && tsdown && node scripts/build-presets.mjs --check",
+    "generate": "node scripts/token-manifest.mjs",
+    "build": "tsdown && node scripts/build-presets.mjs --check",
     "presets": "node scripts/token-manifest.mjs && tsdown && node scripts/build-presets.mjs",
     "typecheck": "tsc --noEmit",
     "icons": "node scripts/build-icons.mjs"
