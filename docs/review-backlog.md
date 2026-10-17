@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
+| add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
+| add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
+| add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-scroll-area (r1) | — | packages/core/src/dom/scroll-metrics.ts:152 | The tabbables walk runs per scroll frame; cache it and invalidate on subtree mutation |
 | add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Release outside the window is tested without a pointer move after release |
 | add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.dom.test.tsx | Unmount leak check covers wheel listeners only (pointer, resize and mutation observers unchecked) |
