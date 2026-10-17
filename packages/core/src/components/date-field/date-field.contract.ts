@@ -11,6 +11,7 @@ import {
   type DateFieldProps,
   dateFieldMachine,
   formatFor,
+  formValueOf,
 } from "./date-field.machine"
 import { dateFieldMessages } from "./date-field.messages"
 
@@ -94,7 +95,7 @@ async function active(env: E): Promise<Part> {
 
 const props = (p: Readonly<Record<string, unknown>>) => p as unknown as DateFieldProps
 const ctx = (view: { context: unknown }) => view.context as DateFieldContext
-const iso = (v: unknown) => (v === null || v === undefined ? "" : (v as DateValue).toString())
+const iso = (v: unknown) => formValueOf((v as DateValue | null | undefined) ?? null)
 
 /** The segment invariants (date-field "Segment Invariants"), exported for Time Field. */
 export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
@@ -124,9 +125,7 @@ export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
       if ((await hidden.count()) === 0) return undefined
       const want = iso(values["value"])
       const got = await hidden.value()
-      // datetime-local may drop zero seconds; the same instant either way.
-      const same = got === want || (want.endsWith(":00") && got === want.slice(0, -3))
-      return same ? undefined : `the hidden input holds "${got}", the value is "${want}"`
+      return got === want ? undefined : `the hidden input holds "${got}", the value is "${want}"`
     },
   },
   {
@@ -165,10 +164,13 @@ export const dateFieldContract = contract("date-field", {
   ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
   actions: {
-    /** Focuses the first segment (Tab, a click, or AT focus). */
+    /**
+     * Tabs into the focused (else first) segment. Keyboard only: typing into a text input
+     * after a click shows no focus ring (interaction-modality), so a click into a segment
+     * is a scenario test.
+     */
     enter: {
       keyboard: async (env) => (await active(env)).focusWithTab(),
-      pointer: async (env) => (await active(env)).click(),
       done: async () => true,
     },
     /** Every segment typed in the locale's order from an ISO date (or date-time). */
@@ -420,6 +422,12 @@ export const dateFieldContract = contract("date-field", {
           })
     },
   },
+  // Focusing a segment enters editing (and commits the one left): every segment, every state.
+  commitsOnFocus: [
+    { part: "segment", state: "idle" },
+    { part: "segment", state: "editing" },
+    { part: "segment", state: "composing" },
+  ],
   invariants: dateSegmentInvariants,
   formInput: {
     expected: (vals) => ({ value: iso(vals["value"]) }),

@@ -23,6 +23,7 @@ import {
   type FieldMessages,
   focusSafely,
   formatFor,
+  formValueOf,
   hiddenFormInput,
   type MessageOverrides,
   mergeFieldProps,
@@ -500,7 +501,7 @@ function HiddenInput() {
   const value = ctx.view.values.value ?? null
   const latest = useRef(value)
   latest.current = value
-  const [mirror] = useState(() => () => ({ value: latest.current?.toString() ?? "" }))
+  const [mirror] = useState(() => () => ({ value: formValueOf(latest.current) }))
   useIsoLayoutEffect(() => {
     formInput.sync(mirror(), { dispatch: false })
   })

@@ -304,6 +304,7 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
         ? undefined
         : [field["aria-describedby"], descriptionId].filter(Boolean).join(" ") || undefined,
       "aria-disabled": field.disabled ? "true" : undefined,
+      "aria-invalid": !input.embedded && invalid ? "true" : undefined,
       style: { "unicode-bidi": "isolate" },
     }),
     segments: (): readonly SegmentPart[] =>

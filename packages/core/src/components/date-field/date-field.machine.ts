@@ -223,7 +223,19 @@ export function draftValue(draft: Draft, props: DateFieldProps, value: DateValue
   return toValue(draft, f, shapeFor(props, value), value ?? props.placeholderValue, value)
 }
 
-const iso = (v: DateValue | null) => (v === null ? "" : v.toString())
+/**
+ * The hidden input's value for a value: its ISO text, as the native input normalises it (a
+ * `datetime-local` drops zero seconds and every fraction).
+ */
+export function formValueOf(v: DateValue | null): string {
+  if (v === null) return ""
+  if (v instanceof CalendarDateTime) {
+    const s = v.toString().slice(0, 19)
+    return v.second === 0 && v.millisecond === 0 ? s.slice(0, 16) : s
+  }
+  return v.toString()
+}
+const iso = formValueOf
 
 function syncHidden(args: Args, v: DateValue | null, dispatch: boolean) {
   args.env.formInput?.sync({ value: iso(v) }, { dispatch })
@@ -615,13 +627,16 @@ export const dateFieldMachine = setup({
         BACKSPACE: { guard: "editable", actions: ["backspace"] },
         CLEAR_ALL: { guard: "editable", actions: ["clearAll"] },
         PASTE: { guard: "editable", actions: ["paste"] },
-        "COMPOSITION.START": "composing",
+        "COMPOSITION.START": { guard: "editable", target: "composing" },
       },
     },
     // Keys and filtering are off while an IME composes; its text arrives at the end.
     composing: {
       on: {
-        "COMPOSITION.END": { target: "editing", actions: ["type"] },
+        "COMPOSITION.END": [
+          { guard: "editable", target: "editing", actions: ["type"] },
+          { target: "editing" },
+        ],
         "SEGMENT.BLUR": { guard: "leaves", target: "idle", actions: ["leave"] },
       },
     },
