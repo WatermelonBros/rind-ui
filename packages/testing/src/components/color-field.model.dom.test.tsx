@@ -1,11 +1,13 @@
 // Model-based tests (add-color-picker 9.1): the Color Field contract over all transitions
 // (typing, commit, blur, Escape, reset), keyboard in jsdom and in browser mode.
-import { colorFieldContract, parseColor, platforms } from "@rind-ui/core"
-import { ColorField, RindProvider } from "@rind-ui/react"
+import { parseColor, platforms } from "@rind-ui/core"
+import { colorFieldContract } from "@rind-ui/core/internal"
+import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { describe, it } from "vitest"
 import { currentRun, testMachine } from "../index"
+import { ColorField } from "./color-parts"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

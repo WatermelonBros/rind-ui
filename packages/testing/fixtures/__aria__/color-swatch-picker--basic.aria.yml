@@ -1,7 +1,0 @@
-- radiogroup "Palette":
-  - radio "vibrant pink"
-  - radio "vibrant orange"
-  - radio "vibrant orange yellow"
-  - radio "vibrant green"
-  - radio "vibrant blue" [checked]
-  - radio "vibrant purple"

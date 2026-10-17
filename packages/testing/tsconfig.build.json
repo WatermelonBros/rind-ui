@@ -1,6 +1,11 @@
 {
-  "//": "Declarations for the published entries only: fixtures and tests import the Storybook stories, and generating declarations for them wrote .d.ts files next to the stories.",
+  "//": "Declarations for the published entries only: fixtures and tests import the Storybook stories, and generating declarations for them wrote .d.ts files next to the stories. color-parts.ts is test support that reaches React's internal colour parts by alias.",
   "extends": "./tsconfig.json",
   "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.test-d.ts"]
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.test-d.ts",
+    "src/components/color-parts.ts"
+  ]
 }

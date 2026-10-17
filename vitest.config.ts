@@ -5,7 +5,14 @@ import { defineConfig } from "vitest/config"
 // Workspace packages resolve to their TypeScript sources (see the `@rind-ui/source`
 // export condition), so tests never wait for a build.
 const conditions = ["@rind-ui/source", "module", "browser", "default"]
-const resolve = { conditions }
+// The Color Picker's internal parts (not exported by @rind-ui/react) for their behaviour tests.
+const alias = {
+  "@rind-ui/react/color-internals": new URL(
+    "./packages/react/src/color-internals.ts",
+    import.meta.url,
+  ).pathname,
+}
+const resolve = { conditions, alias }
 // No "import": jsdom's require("decimal.js") would get the ESM build ("Decimal is not a
 // constructor" on a range input's validity).
 const ssr = { resolve: { conditions: ["@rind-ui/source", "node", "default"] } }

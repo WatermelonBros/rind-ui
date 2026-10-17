@@ -1,10 +1,13 @@
 // Color Swatch Picker scenarios (color-swatch-picker spec). Runs in jsdom and real browsers.
 import type { Color } from "@rind-ui/core"
-import { ColorSwatchPicker, type ColorSwatchPickerRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { describe, expect, it, vi } from "vitest"
-import { getColorSwatchPicker } from "../index"
+import {
+  ColorSwatchPicker,
+  type ColorSwatchPickerRootProps,
+  getColorSwatchPicker,
+} from "./color-parts"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

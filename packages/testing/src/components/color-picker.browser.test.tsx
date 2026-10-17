@@ -5,6 +5,15 @@ import { ColorPicker, Dialog } from "@rind-ui/react"
 import { act, render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
+import siteBase from "../../../../apps/site/skins/base.css?inline"
+import siteColor from "../../../../apps/site/skins/color.css?inline"
+// The stylesheets that draw a swatch's selected mark: the theme's and the docs site's skin.
+import siteRadio from "../../../../apps/site/skins/radio-group.css?inline"
+import themeBase from "../../../theme/src/base.css?inline"
+import swatchPicker from "../../../theme/src/color-swatch-picker.css?inline"
+import calm from "../../../theme/src/presets/calm.css?inline"
+import radioGroup from "../../../theme/src/radio-group.css?inline"
+import tokens from "../../../theme/src/tokens.css?inline"
 import { getColorPicker } from "../index"
 
 function Picker(props: { readonly onValueCommit?: () => void }) {
@@ -48,6 +57,76 @@ const pointer = (type: string, target: EventTarget, x: number, y: number) =>
   )
 
 describe("color picker in real browsers", () => {
+  for (const [sheet, css, skinned] of [
+    [
+      "theme",
+      `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${tokens}\n${calm}\n${themeBase}\n${radioGroup}\n${swatchPicker}`,
+      false,
+    ],
+    ["site skin", `${siteBase}\n${siteRadio}\n${siteColor}`, true],
+  ] as const) {
+    for (const glyph of [undefined, "✓"]) {
+      it(`a selected swatch shows exactly one mark, centred (${sheet}, ${glyph ? "a glyph" : "the default dot"})`, async () => {
+        const style = document.createElement("style")
+        style.textContent = css
+        document.head.append(style)
+        try {
+          const colors = ["#ef4444", "#22c55e", "#3b82f6"]
+          render(
+            <div {...(skinned ? { "data-skinned": "", "data-skin": "crisp" } : {})}>
+              <ColorPicker.Root inline defaultValue="#ffffff">
+                <ColorPicker.Label>Fill</ColorPicker.Label>
+                <ColorPicker.Content>
+                  <ColorPicker.SwatchGroup aria-label="Swatches">
+                    {colors.map((c) => (
+                      <ColorPicker.SwatchTrigger key={c} color={c}>
+                        <ColorPicker.Swatch color={c} aria-hidden="true" />
+                        <ColorPicker.SwatchIndicator>{glyph}</ColorPicker.SwatchIndicator>
+                      </ColorPicker.SwatchTrigger>
+                    ))}
+                  </ColorPicker.SwatchGroup>
+                </ColorPicker.Content>
+              </ColorPicker.Root>
+            </div>,
+          )
+          const radio = screen.getAllByRole("radio")[1] as HTMLElement
+          await userEvent.click(radio)
+          await vi.waitFor(() => expect(radio.getAttribute("aria-checked")).toBe("true"))
+          const marks = [...radio.querySelectorAll<HTMLElement>("*")].filter((el) => {
+            if (el.closest('[data-scope="color-swatch"]')) return false
+            const r = el.getBoundingClientRect()
+            return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden"
+          })
+          // One mark: the indicator element (a glyph inside it is the mark, with no dot).
+          expect(marks).toHaveLength(1)
+          const mark = marks[0] as HTMLElement
+          expect(mark.matches('[data-part="item-indicator"]')).toBe(true)
+          const paint = getComputedStyle(mark)
+          const a = radio.getBoundingClientRect()
+          const b = mark.getBoundingClientRect()
+          const painted =
+            paint.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+            (paint.boxShadow !== "none" && paint.boxShadow !== "")
+          if (glyph) {
+            // The glyph is the mark: no dot is painted behind it.
+            expect(painted).toBe(false)
+            expect(mark.textContent).toBe(glyph)
+          } else {
+            // The dot is really drawn: painted, with a size, smaller than the swatch.
+            expect(painted).toBe(true)
+            expect(b.width).toBeGreaterThan(0)
+            expect(b.height).toBeGreaterThan(0)
+            expect(b.width).toBeLessThan(a.width)
+          }
+          expect(Math.abs(b.left + b.width / 2 - (a.left + a.width / 2))).toBeLessThanOrEqual(1)
+          expect(Math.abs(b.top + b.height / 2 - (a.top + a.height / 2))).toBeLessThanOrEqual(1)
+        } finally {
+          style.remove()
+        }
+      })
+    }
+  }
+
   it("the content is positioned next to the control, not at the page origin", async () => {
     render(
       <div style={{ margin: "200px 0 0 300px" }}>

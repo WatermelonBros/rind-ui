@@ -1,10 +1,11 @@
 // Color Slider pointer behaviour in real browsers (spec "Track And Thumb Appearance"): the
 // Root is the pointer surface without a Control (design request to add-slider), vertical
 // (zag#3010) and right-to-left (zag#2666) gradients agree with the thumb.
-import { ColorSlider, Slider } from "@rind-ui/react"
+import { Slider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import { userEvent } from "vitest/browser"
+import { ColorSlider } from "./color-parts"
 
 const press = async (el: Element, fx: number, fy: number) => {
   const r = el.getBoundingClientRect()

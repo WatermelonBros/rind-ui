@@ -1,10 +1,9 @@
 // Color Area pointer behaviour in real browsers (spec "Pointer Interaction", "Drag
 // Lifecycle"): press jumps in one write, thumb grab without a jump, RTL, Escape while
 // dragging, and pointer-drag's 2D mode.
-import { ColorArea, type ColorAreaRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getColorArea } from "../index"
+import { ColorArea, type ColorAreaRootProps, getColorArea } from "./color-parts"
 
 afterEach(() => vi.restoreAllMocks())
 

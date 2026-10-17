@@ -128,16 +128,11 @@ seen in docs or source but not confirmed as public, stable API.
 | Month / Year Picker |  |  |  |  |  |  | ● |  |  | 1 | 3 | spec | Reka: Month/MonthRange/Year/YearRange Picker |
 | Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
-## Color (7)
+## Color (2)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
-| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
-| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done |  |
-| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | done | Kobalte also: Color Channel Field |
-| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | done |  |
-| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | done |  |
+| Color Picker | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | One component: area, channel sliders, hex and channel inputs (field), swatch group and swatches are its parts |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
 ## Display & feedback (19)
