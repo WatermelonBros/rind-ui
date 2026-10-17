@@ -41,9 +41,9 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Radix/Reka/Bits/Kobalte: Dropdown Menu |
+| Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
-| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | spec | Ark: Menu context trigger · RAC: useContextMenu |
+| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
 | Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
@@ -66,7 +66,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Used by Reado |
 | Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | spec |  |
-| Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | spec |  |
+| Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | spec | RAC: TokenField (unverified) |
@@ -94,7 +94,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Slider | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | done |  |
 | Button |  |  | ● | ● | ● | ● |  | ● | ● | 6 | 1 | done |  |
 | Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | done | Number Field |
-| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec | Radix/Base: OTP Field |
+| Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | todo | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
@@ -147,7 +147,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Progress | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 2 | spec | Linear + circular (Ark) |
 | Separator |  | ● | ● | ● |  | ● | ● | ● | ● | 7 | 1 | done |  |
 | Avatar | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Reado has PersonAvatar |
-| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | spec |  |
+| Scroll Area | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done |  |
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | spec |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
@@ -161,7 +161,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Used by Reado |
+| QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 
 ## AI-UI primitives (11)

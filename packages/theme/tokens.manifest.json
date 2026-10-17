@@ -574,6 +574,209 @@
         }
       }
     },
+    "color-area": {
+      "family": "range",
+      "tokens": {
+        "aspect-ratio": {
+          "fallback": "1",
+          "file": "color-area.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "color-area.css"
+        },
+        "cursor": {
+          "fallback": "crosshair",
+          "file": "color-area.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-md)",
+          "file": "color-area.css"
+        },
+        "size": {
+          "fallback": "12rem",
+          "file": "color-area.css"
+        },
+        "thumb-inner": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "color-area.css"
+        },
+        "thumb-outer": {
+          "fallback": "var(--rind-color-text)",
+          "file": "color-area.css"
+        },
+        "thumb-size": {
+          "fallback": "1.25rem",
+          "file": "color-area.css"
+        }
+      }
+    },
+    "color-field": {
+      "family": "field",
+      "tokens": {
+        "bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "color-field.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "color-field.css"
+        },
+        "border-invalid": {
+          "fallback": "var(--rind-color-danger-border)",
+          "file": "color-field.css"
+        },
+        "padding-inline": {
+          "fallback": "var(--rind-space-2)",
+          "file": "color-field.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-control)",
+          "file": "color-field.css"
+        },
+        "width": {
+          "fallback": "8rem",
+          "file": "color-field.css"
+        }
+      }
+    },
+    "color-picker": {
+      "family": "field",
+      "tokens": {
+        "border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "color-picker.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-3)",
+          "file": "color-picker.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-3)",
+          "file": "color-picker.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-control)",
+          "file": "color-picker.css"
+        },
+        "trigger-bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "color-picker.css"
+        },
+        "width": {
+          "fallback": "15rem",
+          "file": "color-picker.css"
+        }
+      }
+    },
+    "color-slider": {
+      "family": "range",
+      "tokens": {
+        "thumb-inner": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "color-slider.css"
+        },
+        "thumb-outer": {
+          "fallback": "var(--rind-color-text)",
+          "file": "color-slider.css"
+        },
+        "thumb-size": {
+          "fallback": "1.25rem",
+          "file": "color-slider.css"
+        },
+        "track-radius": {
+          "fallback": "var(--rind-radius-full)",
+          "file": "color-slider.css"
+        },
+        "track-size": {
+          "fallback": "0.75rem",
+          "file": "color-slider.css"
+        }
+      }
+    },
+    "color-swatch": {
+      "family": "decoration",
+      "tokens": {
+        "border": {
+          "fallback": "color-mix(in oklab, var(--rind-color-text) 45%, transparent)",
+          "file": "color-swatch.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "color-swatch.css"
+        },
+        "size": {
+          "fallback": "var(--rind-size-md)",
+          "file": "color-swatch.css"
+        }
+      }
+    },
+    "color-swatch-picker": {
+      "family": null,
+      "tokens": {
+        "gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "color-swatch-picker.css"
+        },
+        "mark": {
+          "fallback": "var(--rind-color-text)",
+          "file": "color-swatch-picker.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "color-swatch-picker.css"
+        },
+        "ring": {
+          "fallback": "var(--rind-color-text)",
+          "file": "color-swatch-picker.css"
+        }
+      }
+    },
+    "context-menu": {
+      "family": null,
+      "tokens": {
+        "bg": {
+          "fallback": "var(--rind-menu-bg, var(--rind-color-surface-raised))",
+          "file": "context-menu.css"
+        },
+        "border": {
+          "fallback": "var(--rind-menu-border, var(--rind-color-border-strong))",
+          "file": "context-menu.css"
+        },
+        "duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "context-menu.css"
+        },
+        "max-height": {
+          "fallback": "var(--rind-menu-max-height, 100vh)",
+          "file": "context-menu.css"
+        },
+        "min-width": {
+          "fallback": "var(--rind-menu-min-width, 10rem)",
+          "file": "context-menu.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-menu-padding, var(--rind-space-1))",
+          "file": "context-menu.css"
+        },
+        "pop-from": {
+          "fallback": "scale(0.96)",
+          "file": "context-menu.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-menu-radius, var(--rind-radius-md))",
+          "file": "context-menu.css"
+        },
+        "region-open-bg": {
+          "fallback": "transparent",
+          "file": "context-menu.css"
+        },
+        "shadow": {
+          "fallback": "var(--rind-menu-shadow, var(--rind-shadow-sm))",
+          "file": "context-menu.css"
+        }
+      }
+    },
     "dialog": {
       "family": "panel",
       "tokens": {
@@ -930,6 +1133,153 @@
         }
       }
     },
+    "listbox": {
+      "family": null,
+      "tokens": {
+        "bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "listbox.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "listbox.css"
+        },
+        "description-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "listbox.css"
+        },
+        "empty-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "listbox.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-space-1)",
+          "file": "listbox.css"
+        },
+        "indicator-size": {
+          "fallback": "1em",
+          "file": "listbox.css"
+        },
+        "item-disabled-text": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "listbox.css"
+        },
+        "item-height": {
+          "fallback": "var(--rind-hit-area)",
+          "file": "listbox.css"
+        },
+        "item-highlight-bg": {
+          "fallback": "var(--rind-color-neutral-soft)",
+          "file": "listbox.css"
+        },
+        "item-highlight-text": {
+          "fallback": "var(--rind-color-text)",
+          "file": "listbox.css"
+        },
+        "item-padding": {
+          "fallback": "var(--rind-space-1) var(--rind-space-2)",
+          "file": "listbox.css"
+        },
+        "item-radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "listbox.css"
+        },
+        "item-selected-bg": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "listbox.css"
+        },
+        "item-selected-text": {
+          "fallback": "var(--rind-color-accent-text)",
+          "file": "listbox.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-1)",
+          "file": "listbox.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-control)",
+          "file": "listbox.css"
+        },
+        "section-label-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "listbox.css"
+        },
+        "separator": {
+          "fallback": "var(--rind-color-border)",
+          "file": "listbox.css"
+        }
+      }
+    },
+    "menu": {
+      "family": "panel",
+      "tokens": {
+        "bg": {
+          "fallback": "var(--rind-color-surface-raised)",
+          "file": "context-menu.css"
+        },
+        "border": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "context-menu.css"
+        },
+        "group-label-text": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "menu.css"
+        },
+        "indicator-size": {
+          "fallback": "1rem",
+          "file": "menu.css"
+        },
+        "max-height": {
+          "fallback": "100vh",
+          "file": "context-menu.css"
+        },
+        "min-width": {
+          "fallback": "10rem",
+          "file": "context-menu.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-1)",
+          "file": "context-menu.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-md)",
+          "file": "context-menu.css"
+        },
+        "separator": {
+          "fallback": "var(--rind-color-border)",
+          "file": "menu.css"
+        },
+        "shadow": {
+          "fallback": "var(--rind-shadow-sm)",
+          "file": "context-menu.css"
+        }
+      }
+    },
+    "menu-item": {
+      "family": "collection item",
+      "tokens": {
+        "disabled-text": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "menu.css"
+        },
+        "height": {
+          "fallback": "var(--rind-hit-area)",
+          "file": "menu.css"
+        },
+        "highlight-bg": {
+          "fallback": "var(--rind-color-accent-soft)",
+          "file": "menu.css"
+        },
+        "highlight-text": {
+          "fallback": "var(--rind-color-text)",
+          "file": "menu.css"
+        },
+        "padding": {
+          "fallback": "var(--rind-space-1) var(--rind-space-2)",
+          "file": "menu.css"
+        }
+      }
+    },
     "number-input": {
       "family": "field",
       "tokens": {
@@ -1201,6 +1551,115 @@
         }
       }
     },
+    "pin-input": {
+      "family": "field",
+      "tokens": {
+        "badge-space": {
+          "fallback": "0px",
+          "file": "pin-input.css"
+        },
+        "caret-width": {
+          "fallback": "1px",
+          "file": "pin-input.css"
+        },
+        "color": {
+          "fallback": "var(--rind-text-field-color, var(--rind-color-text))",
+          "file": "pin-input.css"
+        },
+        "description-color": {
+          "fallback": "var(--rind-text-field-description-color, var(--rind-color-text-muted))",
+          "file": "pin-input.css"
+        },
+        "description-font-size": {
+          "fallback": "var(--rind-text-field-description-font-size, var(--rind-text-sm))",
+          "file": "pin-input.css"
+        },
+        "disabled-bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "pin-input.css"
+        },
+        "disabled-border": {
+          "fallback": "var(--rind-color-border)",
+          "file": "pin-input.css"
+        },
+        "disabled-color": {
+          "fallback": "var(--rind-text-field-disabled-color, var(--rind-color-text-disabled))",
+          "file": "pin-input.css"
+        },
+        "disabled-fg": {
+          "fallback": "var(--rind-color-text-disabled)",
+          "file": "pin-input.css"
+        },
+        "error-color": {
+          "fallback": "var(--rind-text-field-error-color, var(--rind-color-danger-text))",
+          "file": "pin-input.css"
+        },
+        "error-font-size": {
+          "fallback": "var(--rind-text-field-error-font-size, var(--rind-text-sm))",
+          "file": "pin-input.css"
+        },
+        "font-size": {
+          "fallback": "var(--rind-text-field-font-size, var(--rind-text-control, var(--rind-text-sm)))",
+          "file": "pin-input.css"
+        },
+        "gap": {
+          "fallback": "var(--rind-text-field-gap, var(--rind-space-1))",
+          "file": "pin-input.css"
+        },
+        "invalid-border": {
+          "fallback": "var(--rind-color-danger-border)",
+          "file": "pin-input.css"
+        },
+        "label-font-size": {
+          "fallback": "var(--rind-text-field-label-font-size, var(--rind-text-sm))",
+          "file": "pin-input.css"
+        },
+        "label-font-weight": {
+          "fallback": "var(--rind-text-field-label-font-weight, 580)",
+          "file": "pin-input.css"
+        },
+        "readonly-bg": {
+          "fallback": "var(--rind-color-surface)",
+          "file": "pin-input.css"
+        },
+        "slot-active-border": {
+          "fallback": "var(--rind-color-accent-border)",
+          "file": "pin-input.css"
+        },
+        "slot-bg": {
+          "fallback": "var(--rind-text-field-bg, var(--rind-color-surface-raised))",
+          "file": "pin-input.css"
+        },
+        "slot-border": {
+          "fallback": "var(--rind-text-field-border, var(--rind-color-border-strong))",
+          "file": "pin-input.css"
+        },
+        "slot-color": {
+          "fallback": "var(--rind-text-field-fg, var(--rind-color-text))",
+          "file": "pin-input.css"
+        },
+        "slot-gap": {
+          "fallback": "var(--rind-space-2)",
+          "file": "pin-input.css"
+        },
+        "slot-radius": {
+          "fallback": "var(--rind-text-field-radius, var(--rind-radius-control))",
+          "file": "pin-input.css"
+        },
+        "slot-shadow": {
+          "fallback": "var(--rind-shadow-key-pressed)",
+          "file": "pin-input.css"
+        },
+        "slot-size": {
+          "fallback": "var(--rind-text-field-height, var(--rind-size-control, var(--rind-size-md)))",
+          "file": "pin-input.css"
+        },
+        "slot-soft-bg": {
+          "fallback": "var(--rind-text-field-soft-bg, var(--rind-color-accent-soft))",
+          "file": "pin-input.css"
+        }
+      }
+    },
     "popover": {
       "family": "panel",
       "tokens": {
@@ -1247,6 +1706,47 @@
         "shadow": {
           "fallback": "var(--rind-shadow-sm)",
           "file": "popover.css"
+        }
+      }
+    },
+    "qr-code": {
+      "family": "decoration",
+      "tokens": {
+        "bg": {
+          "fallback": "oklch(from var(--rind-color-bg) 1 0 0)",
+          "file": "qr-code.css"
+        },
+        "fg": {
+          "fallback": "oklch(from var(--rind-color-text) 0 0 0)",
+          "file": "qr-code.css"
+        },
+        "overlay-outline-color": {
+          "fallback": "oklch(from var(--rind-color-bg) 1 0 0)",
+          "file": "qr-code.css"
+        },
+        "overlay-outline-width": {
+          "fallback": "0.25rem",
+          "file": "qr-code.css"
+        },
+        "overlay-radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "qr-code.css"
+        },
+        "overlay-size": {
+          "fallback": "25%",
+          "file": "qr-code.css"
+        },
+        "padding": {
+          "fallback": "0",
+          "file": "qr-code.css"
+        },
+        "radius": {
+          "fallback": "var(--rind-radius-sm)",
+          "file": "qr-code.css"
+        },
+        "size": {
+          "fallback": "11rem",
+          "file": "qr-code.css"
         }
       }
     },
@@ -1328,6 +1828,55 @@
         "size": {
           "fallback": "1.25rem",
           "file": "radio-group.css"
+        }
+      }
+    },
+    "scroll-area": {
+      "family": "decoration",
+      "tokens": {
+        "corner-bg": {
+          "fallback": "transparent",
+          "file": "scroll-area.css"
+        },
+        "fade-duration": {
+          "fallback": "var(--rind-duration-normal)",
+          "file": "scroll-area.css"
+        },
+        "scrollbar-padding": {
+          "fallback": "2px",
+          "file": "scroll-area.css"
+        },
+        "scrollbar-size": {
+          "fallback": "10px",
+          "file": "scroll-area.css"
+        },
+        "thumb-active-bg": {
+          "fallback": "var(--rind-color-text)",
+          "file": "scroll-area.css"
+        },
+        "thumb-bg": {
+          "fallback": "var(--rind-color-border-strong)",
+          "file": "scroll-area.css"
+        },
+        "thumb-hover-bg": {
+          "fallback": "var(--rind-color-text-muted)",
+          "file": "scroll-area.css"
+        },
+        "thumb-min-size": {
+          "fallback": "18px",
+          "file": "scroll-area.css"
+        },
+        "thumb-radius": {
+          "fallback": "9999px",
+          "file": "scroll-area.css"
+        },
+        "thumb-size": {
+          "fallback": "0px",
+          "file": "scroll-area.css"
+        },
+        "track-bg": {
+          "fallback": "transparent",
+          "file": "scroll-area.css"
         }
       }
     },

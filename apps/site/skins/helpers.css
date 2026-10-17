@@ -101,3 +101,8 @@ ol.readout li {
   place-items: center;
   height: 640px;
 }
+
+/* a popup trigger in a stack keeps its own width instead of spanning the column */
+.stack > [data-part="trigger"] {
+  justify-self: start;
+}

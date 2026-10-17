@@ -1,6 +1,7 @@
 // Drivers, adapters and model-based tests built on component contracts.
 
 export { platforms, withEngine } from "@rind-ui/core"
+export { parseQrPath } from "@rind-ui/core/qr"
 export {
   type AccordionStepInvariants,
   accordionStepInvariants,
@@ -31,6 +32,7 @@ export { getColorPicker } from "./components/color-picker"
 export { getColorSlider } from "./components/color-slider"
 export { getColorSwatch } from "./components/color-swatch"
 export { getColorSwatchPicker } from "./components/color-swatch-picker"
+export { getContextMenu } from "./components/context-menu"
 export { getDialog } from "./components/dialog"
 export { getField } from "./components/field"
 export { getFieldset } from "./components/fieldset"
@@ -38,11 +40,16 @@ export { getForm } from "./components/form"
 export { getHeading } from "./components/heading"
 export { getLabel } from "./components/label"
 export { getLink } from "./components/link"
+export { getListbox } from "./components/listbox"
+export { getMenu } from "./components/menu"
 export { getNumberInput } from "./components/number-input"
 export { getPagination } from "./components/pagination"
 export { getPasswordInput } from "./components/password-input"
+export { getPinInput } from "./components/pin-input"
 export { getPopover } from "./components/popover"
+export { getQrCode, qrCodeDecodingContract } from "./components/qr-code"
 export { getRadioGroup } from "./components/radio-group"
+export { getScrollArea } from "./components/scroll-area"
 export { getSearchField } from "./components/search-field"
 export { getSegmentedControl } from "./components/segmented-control"
 export { getSeparator } from "./components/separator"
@@ -110,6 +117,13 @@ export {
 } from "./number-input-invariants"
 export { type FakePositioning, fakePositioning } from "./positioning"
 export { englishLeaks, pseudo, pseudoMessages } from "./pseudo-locale"
+export {
+  correctBlock,
+  decodeQr,
+  type QrDecoded,
+  type QrDecodedSegment,
+  QrDecodeError,
+} from "./qr/decode"
 export {
   type SearchFieldStepInvariants,
   searchFieldStepInvariants,

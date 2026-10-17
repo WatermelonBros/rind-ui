@@ -100,6 +100,19 @@ export const quirks = defineQuirks([
     verified: "2026-10-14",
   },
   {
+    // VoiceOver announces the expanded-state change of a submenu trigger instead of the
+    // submenu's first item; without aria-expanded it reads the item focus moved to.
+    id: "vo-submenu-expanded",
+    when: (p) => p.apple,
+    links: [
+      "https://github.com/mui/base-ui/blob/master/packages/react/src/menu/submenu-trigger/MenuSubmenuTrigger.tsx",
+    ],
+    test: "packages/core/src/components/menu/menu.connect.test.ts",
+    removeWhen: "VoiceOver reads the focused submenu item after an aria-expanded change",
+    verified: "2026-10-16",
+    invariants: ["state-attrs"],
+  },
+  {
     id: "ios-emulated-mouse-after-touch",
     when: (p) => p.ios,
     links: ["https://bugs.webkit.org/show_bug.cgi?id=214609"],

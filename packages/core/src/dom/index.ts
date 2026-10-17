@@ -26,6 +26,7 @@ export {
   dismissable,
   dismissRequest,
 } from "./dismiss"
+export { sanitizeFileName, saveBlob } from "./download"
 export { type ElementInfo, elementInfo } from "./element-info"
 export { isEyeDropperSupported, pickScreenColor } from "./eye-dropper"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
@@ -159,6 +160,12 @@ export {
   type PressPointerEvent,
 } from "./press"
 export {
+  blobToDataUrl,
+  exportQr,
+  type QrExportInput,
+  type QrExportResult,
+} from "./qr-export"
+export {
   defineQuirks,
   type Quirk,
   type QuirkId,
@@ -168,6 +175,14 @@ export {
 } from "./quirks"
 export { registerReset } from "./resets"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"
+export {
+  domScrollMetrics,
+  isReversed,
+  physicalFraction,
+  SCROLL_AREA_RULE,
+  scrollAreaIds,
+  wheelTarget,
+} from "./scroll-metrics"
 export {
   type IndicatorBox,
   type IndicatorCause,

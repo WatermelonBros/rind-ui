@@ -394,6 +394,50 @@ function createPlaywrightEnv(
           : [box.x + box.width / 2, box.y + box.height / 2]
         await page.mouse.click(x, y)
       },
+      async longPress(hold) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        const x = (box?.x ?? 0) + (box?.width ?? 0) * (hold?.at?.x ?? 0.5)
+        const y = (box?.y ?? 0) + (box?.height ?? 0) * (hold?.at?.y ?? 0.5)
+        const init = {
+          bubbles: true,
+          cancelable: true,
+          clientX: x,
+          clientY: y,
+          pointerId: 7,
+          pointerType: hold?.pointerType ?? "touch",
+          isPrimary: true,
+          pressure: 0.5,
+          width: 20,
+          height: 20,
+        }
+        await l.dispatchEvent("pointerdown", { ...init, buttons: 1 })
+        // The environment's time, as `advance`: the page clock when the test gave one.
+        const ms = hold?.ms ?? 520
+        if (options.advanceTimers) await options.advanceTimers(ms)
+        else await (await getBase()).page.waitForTimeout(ms)
+        await l.dispatchEvent("pointerup", { ...init, buttons: 0 })
+      },
+      async contextMenu(options) {
+        const l = await waitFor()
+        const box = await l.boundingBox()
+        if (!box) throw new Error("contextMenu: the part has no box")
+        const position = {
+          x: box.width * (options?.at?.x ?? 0.5),
+          y: box.height * (options?.at?.y ?? 0.5),
+        }
+        if (modality === "virtual") {
+          // Assistive technology's "shortcut menu": the event alone, no press.
+          await l.dispatchEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+            clientX: box.x + position.x,
+            clientY: box.y + position.y,
+          })
+          return
+        }
+        await l.click({ button: "right", position })
+      },
       box: async () => {
         const box = await (await now()).boundingBox()
         return box && (box.width > 0 || box.height > 0) ? box : null
@@ -453,6 +497,41 @@ function createPlaywrightEnv(
           input.dispatchEvent(new Event("input", { bubbles: true }))
           input.dispatchEvent(new Event("change", { bubbles: true }))
         }, value)
+      },
+      async paste(text) {
+        const l = await waitFor()
+        await l.evaluate((el, text) => {
+          const input = el as HTMLInputElement
+          const start = input.selectionStart ?? input.value.length
+          const end = input.selectionEnd ?? start
+          // The real order: paste (cancelable, clipboardData) → beforeinput → input.
+          let paste: Event
+          if (typeof DataTransfer === "function" && typeof ClipboardEvent === "function") {
+            const clipboardData = new DataTransfer()
+            clipboardData.setData("text/plain", text)
+            paste = new ClipboardEvent("paste", { clipboardData, bubbles: true, cancelable: true })
+            // Firefox ignores the constructor's clipboardData: attach it.
+            if (!(paste as ClipboardEvent).clipboardData?.getData("text/plain")) {
+              Object.defineProperty(paste, "clipboardData", { value: clipboardData })
+            }
+          } else {
+            // jsdom has no DataTransfer: a paste Event carrying a clipboardData reader.
+            paste = new Event("paste", { bubbles: true, cancelable: true })
+            Object.defineProperty(paste, "clipboardData", {
+              value: { getData: (type: string) => (/^text(\/plain)?$/.test(type) ? text : "") },
+            })
+          }
+          if (!input.dispatchEvent(paste)) return
+          const init = { inputType: "insertFromPaste", data: text, bubbles: true }
+          const before = new InputEvent("beforeinput", { ...init, cancelable: true })
+          if (!input.dispatchEvent(before)) return
+          const next = input.value.slice(0, start) + text + input.value.slice(end)
+          const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set
+          if (setter) setter.call(input, next)
+          else input.value = next
+          input.setSelectionRange(start + text.length, start + text.length)
+          input.dispatchEvent(new InputEvent("input", init))
+        }, text)
       },
       waitForDetach: async () => {
         await until(

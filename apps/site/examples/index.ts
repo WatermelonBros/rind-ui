@@ -11,6 +11,7 @@ import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
+import * as collections from "./collections"
 import * as colorArea from "./color-area"
 import * as colorField from "./color-field"
 import * as colorPicker from "./color-picker"
@@ -29,15 +30,20 @@ import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
+import * as listbox from "./listbox"
+import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
 import * as passwordInput from "./password-input"
+import * as pinInput from "./pin-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
+import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
+import * as scrollArea from "./scroll-area"
 import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
@@ -63,6 +69,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "hidden-form-input": hiddenFormInput,
   labels: labels,
   "visually-hidden": visuallyHidden,
+  menu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   "alert-dialog": alertDialog,
@@ -80,6 +87,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "color-slider": colorSlider,
   "color-swatch": colorSwatch,
   "color-swatch-picker": colorSwatchPicker,
+  collections,
   dialog,
   field,
   "focus-and-modality": focusAndModality,
@@ -91,16 +99,20 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   overlays,
   pagination,
   "password-input": passwordInput,
+  "pin-input": pinInput,
   popover,
   positioning,
   label,
   link,
+  listbox,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
   "search-field": searchField,
   "segmented-control": segmentedControl,
   separator,
+  "qr-code": qrCode,
+  "scroll-area": scrollArea,
   skeleton,
   slider,
   switch: switchEx,
