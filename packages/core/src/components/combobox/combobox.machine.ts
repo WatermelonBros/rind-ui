@@ -26,6 +26,14 @@ import type { Align, PositionEnv, PositioningProps, Side } from "../../env/posit
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
+import {
+  type Chip,
+  type InputChipsContext,
+  type InputChipsEvent,
+  initialInputChipsContext,
+  inputChipsActions,
+  lastRemovable,
+} from "../input-chips/input-chips"
 import { listboxIds } from "../listbox/listbox.parts"
 import type { ComboboxMessages } from "./combobox.messages"
 import { completion, exactMatch, type OpenReason } from "./pattern/pattern"
@@ -34,6 +42,7 @@ export type ComboboxValue = string | null | readonly string[]
 
 export type ComboboxEvent =
   | CollectionEvent
+  | InputChipsEvent
   | {
       readonly type: "INPUT.CHANGE"
       readonly text: string
@@ -103,6 +112,8 @@ export interface ComboboxProps extends CollectionProps {
     | ((open: boolean, details: ChangeDetails<ComboboxEvent>) => void)
     | undefined
   readonly allowCustomValue?: boolean | undefined
+  /** Multiple: Backspace in the empty input arms, then removes, the last chip (default true). */
+  readonly removeOnBackspace?: boolean | undefined
   /** Default: true in single mode, false in multiple. */
   readonly closeOnSelect?: boolean | undefined
   /** Multiple: clear the text after a choice (default true). */
@@ -130,7 +141,7 @@ export interface ComboboxProps extends CollectionProps {
   readonly typingPause?: number | undefined
 }
 
-export interface ComboboxContext extends CollectionContext {
+export interface ComboboxContext extends CollectionContext, InputChipsContext {
   readonly focused: boolean
   /** Text typed since the last commit. */
   readonly dirty: boolean
@@ -164,15 +175,16 @@ type Types = {
 }
 type Args = ActionArgs<Types>
 
-const mode = (p: ComboboxProps) => p.selectionMode ?? "single"
+const mode = (p: Pick<ComboboxProps, "selectionMode">) => p.selectionMode ?? "single"
 const selectedKeys = (value: ComboboxValue | undefined): readonly string[] =>
   value == null ? [] : typeof value === "string" ? [value] : value
-const textOf = (p: ComboboxProps, key: string | undefined) =>
+const textOf = (p: Pick<ComboboxProps, "items">, key: string | undefined) =>
   key === undefined ? "" : (p.items.get(toKey(key))?.textValue ?? "")
 /** The text the selection implies: the selected option's (single), else empty. */
 const selectionText = (p: ComboboxProps, value: ComboboxValue | undefined) =>
   mode(p) === "single" ? textOf(p, selectedKeys(value)[0]) : ""
-const editable = (p: ComboboxProps) => p.disabled !== true && p.readOnly !== true
+const editable = (p: Pick<ComboboxProps, "disabled" | "readOnly">) =>
+  p.disabled !== true && p.readOnly !== true
 
 /** null as the runtime's fallback (a controlled null is a value). */
 const EMPTY = null as unknown as string
@@ -243,6 +255,33 @@ function choose(a: Args, key: CollectionKey) {
       key: `combobox-${props.root}:selection`,
     })
   }
+}
+
+/** The chips of a multiple selection: one per selected key, named by its option's text. */
+export const chipsOf = (
+  p: Pick<ComboboxProps, "items" | "selectionMode" | "disabled" | "readOnly">,
+  value: ComboboxValue | undefined,
+): readonly Chip[] =>
+  mode(p) === "multiple"
+    ? selectedKeys(value).map((key) => ({
+        key,
+        text: textOf(p, key) || key,
+        disabled: !editable(p),
+      }))
+    : []
+
+/** Deselects a chip's key and announces it on every platform (input-chips). */
+function removeChip(a: Args, key: string) {
+  const text = textOf(a.props, key) || key
+  a.set(
+    "value",
+    selectedKeys(a.values.value).filter((k) => k !== key),
+  )
+  a.env.announcer.announce({
+    message: a.props.messages.removedAnnouncement(text),
+    priority: "polite",
+    key: `combobox-${a.props.root}:chip-removed`,
+  })
 }
 
 const closesOnSelect = (p: ComboboxProps) => p.closeOnSelect ?? mode(p) !== "multiple"
@@ -325,6 +364,16 @@ export const comboboxMachine = setup({
     hasHighlight: ({ context, props }) =>
       context.highlightedKey !== null && props.collection.has(context.highlightedKey),
     isDirty: ({ context }) => context.dirty,
+    chipRemovable: ({ event, props, values }) =>
+      event.type === "CHIP.REMOVE" &&
+      editable(props) &&
+      selectedKeys(values.value).includes(event.key),
+    armedRemovable: ({ context, props }) => context.armedChip !== null && editable(props),
+    armsOnBackspace: ({ props, values }) =>
+      mode(props) === "multiple" &&
+      props.removeOnBackspace !== false &&
+      editable(props) &&
+      lastRemovable(chipsOf(props, values.value)) !== null,
     leaveClears: ({ context, props }) =>
       context.highlightSource === "pointer" && props.keepHighlight !== true,
     hasCompletion: ({ context }) => context.completion !== null,
@@ -344,6 +393,7 @@ export const comboboxMachine = setup({
       // The user types into a focused input (its focus event may come after, as in a test).
       a.set("focused", true)
       a.set("dirty", true)
+      a.set("armedChip", null)
       a.set("completion", null)
       // A text change clears the highlight (auto highlight re-applies on the new results).
       a.set("highlightedKey", null)
@@ -457,7 +507,28 @@ export const comboboxMachine = setup({
       setText(a, textOf(props, key))
     },
     setFocused: ({ set }) => set("focused", true),
-    clearFocused: ({ set }) => set("focused", false),
+    clearFocused: ({ set }) => {
+      set("focused", false)
+      set("armedChip", null)
+    },
+    ...inputChipsActions,
+    arm: (a) => a.set("armedChip", lastRemovable(chipsOf(a.props, a.values.value))),
+    removeArmed: (a) => {
+      const key = a.context.armedChip
+      a.set("armedChip", null)
+      if (key !== null) removeChip(a, key)
+    },
+    removeChip: (a) => {
+      if (a.event.type === "CHIP.REMOVE") removeChip(a, a.event.key)
+    },
+    /** Text typed on a chip goes to the input, like typing there. */
+    chipType: (a) => {
+      if (a.event.type !== "CHIP.TYPE") return
+      setText(a, a.values.inputValue + a.event.text)
+      a.set("focused", true)
+      a.set("dirty", true)
+      a.set("armedChip", null)
+    },
     startComposition: ({ set }) => set("composing", true),
     endComposition: ({ set }) => set("composing", false),
     /** New results while open: repair, auto highlight a typing result, count. */
@@ -558,6 +629,7 @@ export const comboboxMachine = setup({
   initial: "closed",
   context: (props) => ({
     ...initialCollectionContext(),
+    ...initialInputChipsContext(),
     lastCollection: props.collection,
     focused: false,
     dirty: false,
@@ -581,6 +653,17 @@ export const comboboxMachine = setup({
   },
   on: {
     "INPUT.FOCUS": { guard: { not: "isFocused" }, actions: ["setFocused"] },
+    // Chips (multiple, input-chips).
+    "CHIP.NAVIGATE": { actions: ["focusChip"] },
+    "CHIP.BLUR": { actions: ["blurChip"] },
+    "CHIP.REMOVE": { guard: "chipRemovable", actions: ["removeChip"] },
+    "CHIP.TYPE": { guard: "editable", actions: ["chipType"] },
+    BACKSPACE_EMPTY: [
+      { guard: { and: ["keyable", "armedRemovable"] }, actions: ["removeArmed"] },
+      { guard: { and: ["keyable", "armsOnBackspace"] }, actions: ["arm"] },
+    ],
+    CARET: { actions: ["disarm"] },
+    "INPUT.PRESS": { actions: ["disarm"] },
     "COMPOSITION.START": { actions: ["startComposition"] },
     "VALUE.SYNC": { actions: ["syncText"] },
     RESET: { actions: ["restoreDefault"] },
@@ -614,7 +697,11 @@ export const comboboxMachine = setup({
           target: "open",
           actions: ["setOpenReason", "highlightOnOpen", "announceHighlight"],
         },
-        "INPUT.PRESS": { guard: "opensOnPress", target: "open", actions: ["setOpenReason"] },
+        "INPUT.PRESS": {
+          guard: "opensOnPress",
+          target: "open",
+          actions: ["disarm", "setOpenReason"],
+        },
         "INPUT.FOCUS": [
           { guard: "opensOnFocus", target: "open", actions: ["setFocused", "setOpenReason"] },
           { guard: { not: "isFocused" }, actions: ["setFocused"] },
@@ -640,7 +727,7 @@ export const comboboxMachine = setup({
         HIGHLIGHT: { actions: ["endLag", "highlight", "complete"] },
         POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
         "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
-        CARET: { guard: "keyable", actions: ["clearHighlight", "removeCompletion"] },
+        CARET: { guard: "keyable", actions: ["disarm", "clearHighlight", "removeCompletion"] },
         "ITEM.CHOOSE": [
           { guard: "closesOnSelect", target: "closed", actions: ["choose"] },
           { actions: ["choose"] },

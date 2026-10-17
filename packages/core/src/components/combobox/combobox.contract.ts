@@ -26,6 +26,11 @@ type P =
   | "section-label"
   | "empty"
   | "load-more"
+  | "chips"
+  | "chip"
+  | "chip-remove"
+  | "chips-summary"
+  | "hidden-input"
 type E = Env<P>
 
 const optionNames = async (
@@ -44,6 +49,18 @@ const highlighted = async (env: E) =>
 /** The machine's state is the control's (the input's follows aria-expanded). */
 const isOpen = async (env: E) => (await env.part("control").attr("data-state")) === "open"
 const input = (env: E) => env.part("input")
+/** Chip names in order: each chip's text without its remove button's. */
+const chipNames = async (env: E) => {
+  const chips = await env.part("chip").all()
+  const removes = await env.part("chip-remove").all()
+  const out: string[] = []
+  for (const [i, chip] of chips.entries()) {
+    const remove = removes.length === chips.length ? await removes[i]?.text() : ""
+    const text = await chip.text()
+    out.push((remove && text.endsWith(remove) ? text.slice(0, -remove.length) : text).trim())
+  }
+  return out
+}
 /** Settled for pointer input: closed, empty (nothing to press), or open and placed. */
 const settled = async (env: E) =>
   !(await isOpen(env)) ||
@@ -95,6 +112,11 @@ export const comboboxContract = contract("combobox", {
     "section-label",
     "empty",
     "load-more",
+    "chips",
+    "chip",
+    "chip-remove",
+    "chips-summary",
+    "hidden-input",
   ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "combobox", name }),
   queries: {
@@ -116,6 +138,8 @@ export const comboboxContract = contract("combobox", {
         ? []
         : [await input(env).value()],
     hasFocus: (env: E) => input(env).isFocused(),
+    /** Multiple: the chip names in order (input-chips). */
+    chips: chipNames,
   },
   actions: {
     focusIn: {
@@ -200,6 +224,22 @@ export const comboboxContract = contract("combobox", {
       },
       done: async () => true,
     },
+    /** Multiple: removes the chip `name` (its remove button, or focus it and Backspace). */
+    removeChip: {
+      pointer: async (env: E, name: string) => {
+        const chips = await chipNames(env)
+        const removes = await env.part("chip-remove").all()
+        await removes[chips.indexOf(name)]?.click()
+      },
+      keyboard: async (env: E, name: string) => {
+        const chips = await chipNames(env)
+        const all = await env.part("chip").all()
+        await all[chips.indexOf(name)]?.focus()
+        await env.keyboard("Backspace")
+      },
+      done: async (env: E, name: string) => !(await chipNames(env)).includes(name),
+    },
+    backspace: { keyboard: (env: E) => env.keyboard("Backspace"), done: async () => true },
     /** Pointer: the clear button; keyboard: select all text, Delete, then blur. */
     clear: {
       pointer: (env: E) => env.part("clear-trigger").click(),
@@ -246,6 +286,12 @@ export const comboboxContract = contract("combobox", {
     TAB: { skip: "sent with INPUT.BLUR by tabOut; the Tab rules are scenario tests" },
     CARET: "caret",
     "ITEM.CHOOSE": { skip: "a press on an option: choose() scenario and driver tests" },
+    BACKSPACE_EMPTY: "backspace",
+    "CHIP.NAVIGATE": { skip: "chip focus: chip scenario tests (roving between chips)" },
+    "CHIP.BLUR": { skip: "chip focus: chip scenario tests" },
+    "CHIP.REMOVE": { skip: "removeChip(): chip scenario and driver tests" },
+    "CHIP.TYPE": { skip: "typing on a chip: chip scenario tests" },
+    AUTOFILL: { skip: "browser autofill: form scenario tests" },
     "COMPOSITION.START": { skip: "IME: compose() scenario and driver tests" },
     "COMPOSITION.END": { skip: "IME: compose() scenario and driver tests" },
     OUTSIDE_PRESS: { skip: "an outside press: scenario tests (dismiss layer)" },
@@ -285,5 +331,10 @@ export const comboboxContract = contract("combobox", {
     { part: "trigger", state: "open" },
     { part: "clear-trigger", state: "closed" },
     { part: "clear-trigger", state: "open" },
+    // hidden-form-input: a focus on the constraint input moves to the visible input.
+    { part: "hidden-input", state: "closed" },
+    { part: "hidden-input", state: "open" },
+    { part: "chip", state: "closed" },
+    { part: "chip", state: "open" },
   ],
 })

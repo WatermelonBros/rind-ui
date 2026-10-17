@@ -12,6 +12,7 @@ import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/pr
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import { contentPlacementProps, positionerProps } from "../../dom/position/connect"
+import { type Chip, inputChipsConnect } from "../input-chips/input-chips"
 import type { ListboxEvent } from "../listbox/listbox.machine"
 import { listboxParts } from "../listbox/listbox.parts"
 import type { ComboboxContext, ComboboxEvent } from "./combobox.machine"
@@ -44,6 +45,8 @@ export interface ComboboxConnectView {
   readonly form?: string | undefined
   /** The selected keys, for the hidden inputs. */
   readonly keys: readonly string[]
+  /** Multiple: the chips of the selection (input-chips). */
+  readonly chips: readonly Chip[]
   readonly autoComplete: "list" | "both"
   readonly loading?: LoadingStatus | undefined
   readonly modality: Modality
@@ -115,8 +118,32 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     if (e.button === 0) e.preventDefault()
   }
 
+  const chips = inputChipsConnect(
+    {
+      scope: "combobox",
+      instance: v.instance,
+      chips: v.chips,
+      context: c,
+      dir: v.dir,
+      messages: v.messages,
+      inputId: ids.input,
+      controlId: ids.control,
+      send,
+      blurHost: () => send({ type: "INPUT.BLUR" }),
+    },
+    env,
+  )
+  // Focus moving to a chip, a chip remove button or the trigger stays inside (input-chips).
+  const insideControl = (target: unknown) =>
+    env.dom.getById(ids.control)?.contains(target as Node | null) === true && target !== null
+
   return {
     ids,
+    chipsSummary: chips.summaryText,
+    chips: chips.chips,
+    chip: chips.chip,
+    chipRemove: chips.chipRemove,
+    chipsSummaryNode: chips.summary,
     /** The completion's selected range in the input, applied after render. */
     completionRange:
       c.completion !== null ? ([v.inputValue.length, c.completion.length] as const) : null,
@@ -154,6 +181,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       "aria-expanded": String(v.exposed),
       "aria-controls": v.present ? ids.list : undefined,
       "aria-labelledby": v.mounted.label ? ids.label : undefined,
+      "aria-describedby": chips.describedBy,
       "aria-invalid": v.invalid ? "true" : undefined,
       "aria-required": v.required ? "true" : undefined,
       name: v.inputName,
@@ -189,11 +217,18 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
           cause: env.modality.focusCause(el),
         })
       },
-      onBlur: () => send({ type: "INPUT.BLUR" }),
+      onBlur: (event: unknown) => {
+        if (!insideControl((event as FocusEvent).relatedTarget)) send({ type: "INPUT.BLUR" })
+      },
       onClick: () => send({ type: "INPUT.PRESS", modality: env.modality.modality() }),
       onKeyDown: (event: unknown) => {
         const e = event as NativeKey
         const ime = e.isComposing || composing() || e.keyCode === 229
+        if (!ime && v.selectionMode === "multiple") {
+          const el = e.currentTarget as HTMLInputElement
+          const atStart = el.selectionStart === 0 && el.selectionEnd === 0
+          if (chips.inputKeyDown(e, el.value, atStart)) return
+        }
         switch (e.key) {
           case "ArrowDown":
           case "ArrowUp":
@@ -227,7 +262,10 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
           case "ArrowRight":
           case "Home":
           case "End":
-            if (!ime && (c.highlightedKey !== null || c.completion !== null))
+            if (
+              !ime &&
+              (c.highlightedKey !== null || c.completion !== null || c.armedChip !== null)
+            )
               send({ type: "CARET" })
             return
         }

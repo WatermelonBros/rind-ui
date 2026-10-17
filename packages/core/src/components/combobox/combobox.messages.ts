@@ -1,5 +1,7 @@
+import { type InputChipsMessages, inputChipsMessages } from "../input-chips/input-chips"
+
 /** The pattern's messages (combobox-pattern "Pattern Messages") with English defaults. */
-export type ComboboxMessages = {
+export type ComboboxMessages = InputChipsMessages & {
   /** The listbox's name when no Label part is rendered. */
   readonly listboxLabel: string
   readonly triggerLabel: string
@@ -12,6 +14,8 @@ export type ComboboxMessages = {
 }
 
 export const comboboxMessages: ComboboxMessages = {
+  ...inputChipsMessages,
+  chipsLabel: "Selected options",
   listboxLabel: "Suggestions",
   triggerLabel: "Show suggestions",
   clearLabel: "Clear",

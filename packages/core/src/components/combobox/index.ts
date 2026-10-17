@@ -11,6 +11,7 @@ export {
   type ComboboxMachine,
   type ComboboxProps,
   type ComboboxValue,
+  chipsOf,
   comboboxIds,
   comboboxMachine,
 } from "./combobox.machine"

@@ -67,7 +67,7 @@ export function focusAfterRemoval(chips: readonly Chip[], key: string): string |
 }
 
 /** The host's context writer, as the host machine's actions receive it. */
-interface ChipArgs {
+export interface InputChipsActionArgs {
   readonly event: { readonly type: string }
   readonly context: InputChipsContext
   set(key: keyof InputChipsContext, value: never): void
@@ -76,15 +76,15 @@ interface ChipArgs {
 /** Actions a host spreads (its own CHIP.REMOVE handler removes the value). */
 export const inputChipsActions = {
   /** Any caret move, press or text change in the input, and focus leaving: disarm. */
-  disarm: (a: ChipArgs) => a.set("armedChip", null as never),
-  focusChip: (a: ChipArgs) => {
+  disarm: (a: InputChipsActionArgs) => a.set("armedChip", null as never),
+  focusChip: (a: InputChipsActionArgs) => {
     const e = a.event as InputChipsEvent
     if (e.type !== "CHIP.NAVIGATE") return
     a.set("focusedChip", e.key as never)
     a.set("focusedChipModality", e.modality as never)
     a.set("armedChip", null as never)
   },
-  blurChip: (a: ChipArgs) => {
+  blurChip: (a: InputChipsActionArgs) => {
     a.set("focusedChip", null as never)
     a.set("focusedChipModality", null as never)
   },

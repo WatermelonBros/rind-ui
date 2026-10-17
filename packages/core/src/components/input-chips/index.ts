@@ -1,0 +1,17 @@
+export {
+  type Chip,
+  focusAfterRemoval,
+  type InputChipsActionArgs,
+  type InputChipsApi,
+  type InputChipsContext,
+  type InputChipsEnv,
+  type InputChipsEvent,
+  type InputChipsMessages,
+  type InputChipsView,
+  initialInputChipsContext,
+  inputChipsActions,
+  inputChipsConnect,
+  inputChipsIds,
+  inputChipsMessages,
+  lastRemovable,
+} from "./input-chips"

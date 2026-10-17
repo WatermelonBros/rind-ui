@@ -53,6 +53,7 @@ function config(name: string, cfg: Config) {
             >
               <Combobox.Label>City</Combobox.Label>
               <Combobox.Control>
+                <Combobox.Chips />
                 <Combobox.Input />
                 <Combobox.Trigger />
               </Combobox.Control>
@@ -88,6 +89,7 @@ function config(name: string, cfg: Config) {
         closeOnSelect: undefined,
         selectOnTab: undefined,
         keepHighlight: undefined,
+        removeOnBackspace: undefined,
         ...rest,
       } as never,
       modalities: ["pointer", "keyboard", "touch", "virtual"],

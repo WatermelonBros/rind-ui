@@ -3,12 +3,14 @@
 // the listbox parts under scope "combobox". Wiring only.
 
 import {
+  type Chip as ChipData,
   type Collection,
   type CollectionKey,
   type ComboboxApi,
   type ComboboxFilter,
   type ComboboxMessages,
   type ComboboxValue,
+  chipsOf,
   comboboxConnect,
   comboboxIds,
   comboboxMachine,
@@ -89,6 +91,8 @@ interface Common {
   readonly defaultOpen?: boolean
   readonly onOpenChange?: (open: boolean, details: ComboboxChangeDetails) => void
   readonly allowCustomValue?: boolean
+  /** Multiple: Backspace in the empty input arms, then removes, the last chip. */
+  readonly removeOnBackspace?: boolean
   readonly closeOnSelect?: boolean
   readonly clearInputOnSelect?: boolean
   readonly selectOnTab?: boolean
@@ -142,6 +146,7 @@ export type ComboboxRootProps = Common & Selection
 
 interface ComboboxHost extends ListboxHost {
   readonly api: ComboboxApi
+  readonly chips: readonly ChipData[]
   readonly keys: readonly string[]
   readonly formInput: FormInputCapability
   readonly constraint: RefObject<HTMLInputElement | null>
@@ -165,6 +170,10 @@ const useComboboxHost = (part: string): ComboboxHost => {
 const reasonOf = (type: string) =>
   ({
     "ITEM.CHOOSE": "item-press",
+    "CHIP.REMOVE": "chip-remove",
+    BACKSPACE_EMPTY: "chip-remove",
+    "CHIP.TYPE": "input-change",
+    AUTOFILL: "autofill",
     ENTER: "enter",
     "CLEAR.PRESS": "clear",
     CLEAR: "clear",
@@ -241,6 +250,7 @@ function Root(all: ComboboxRootProps) {
       virtualized: all.virtualized,
       scrollToIndex: all.scrollToIndex,
       allowCustomValue: all.allowCustomValue,
+      removeOnBackspace: all.removeOnBackspace,
       closeOnSelect: all.closeOnSelect,
       clearInputOnSelect: all.clearInputOnSelect,
       selectOnTab: all.selectOnTab,
@@ -294,6 +304,7 @@ function Root(all: ComboboxRootProps) {
   }
   const value = view.values.value as ComboboxValue
   const keys = value == null ? [] : typeof value === "string" ? [value] : value
+  const chips = chipsOf({ items: full, selectionMode, disabled, readOnly: all.readOnly }, value)
   const formInput = useMemo(
     () =>
       hiddenFormInput(
@@ -333,6 +344,7 @@ function Root(all: ComboboxRootProps) {
       inputName: all.inputName,
       form: all.form,
       keys,
+      chips,
       send: service.send,
     },
     env,
@@ -370,6 +382,7 @@ function Root(all: ComboboxRootProps) {
       ].join("|")
     },
     keepMounted: all.keepMounted === true,
+    chips,
     keys,
     formInput,
     constraint,
@@ -434,6 +447,7 @@ function Control({ render, children, ...rest }: Own<"div">) {
       children: (
         <>
           {children}
+          <span {...normalizeProps(host.api.chipsSummaryNode())}>{host.api.chipsSummary}</span>
           {/* Inside the Control: the browser's validation message is anchored near it. */}
           <input {...normalizeProps(host.api.hiddenInput())} ref={host.constraint} />
           {host.api.carriers().map((p) => (
@@ -529,6 +543,66 @@ function Popup({ render, ref, ...rest }: Own<"div">) {
   )
 }
 
+const ChipCtx = createContext<string | null>(null)
+
+/** The chips toolbar (multiple): one Chip per selected option, before the Input. */
+function Chips({
+  render,
+  children,
+  ...rest
+}: Omit<Own<"div">, "children"> & {
+  /** Renders one chip; default: its text and a remove button. */
+  readonly children?: (chip: ChipData) => ReactNode
+}) {
+  const host = useLive("Chips")
+  return renderPart(
+    "div",
+    {
+      ...mergeProps(normalizeProps(host.api.chips()), rest),
+      children: host.chips.map((chip) => (
+        <ChipCtx key={chip.key} value={chip.key}>
+          {children ? (
+            children(chip)
+          ) : (
+            <Chip>
+              {chip.text}
+              <ChipRemove />
+            </Chip>
+          )}
+        </ChipCtx>
+      )),
+    },
+    render,
+    undefined,
+  )
+}
+
+const useChipKey = (part: string) => {
+  const key = useContext(ChipCtx)
+  if (key === null) throw new Error(`Combobox.${part} must be inside Combobox.Chips`)
+  return key
+}
+
+function Chip({ render, ...rest }: Own<"span">) {
+  const host = useLive("Chip")
+  const key = useChipKey("Chip")
+  return renderPart("span", mergeProps(normalizeProps(host.api.chip(key)), rest), render, undefined)
+}
+
+function ChipRemove({ render, children, ...rest }: Own<"button">) {
+  const host = useLive("ChipRemove")
+  const key = useChipKey("ChipRemove")
+  return renderPart(
+    "button",
+    mergeProps(normalizeProps(host.api.chipRemove(key)), {
+      ...rest,
+      children: children ?? <span aria-hidden="true">×</span>,
+    }),
+    render,
+    undefined,
+  )
+}
+
 const list = createListboxParts(useComboboxHost)
 
 export const Combobox = {
@@ -536,6 +610,9 @@ export const Combobox = {
   Label,
   Control,
   Input,
+  Chips,
+  Chip,
+  ChipRemove,
   Trigger,
   ClearTrigger,
   Positioner,
