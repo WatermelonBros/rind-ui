@@ -128,7 +128,11 @@ export const variants: Variants = {
     description:
       "A modal dialog at the bottom edge: swipe down, Escape, the backdrop or Done close it.",
   },
-  Open: { title: "Open", description: "`defaultOpen`: the open state, with its handle." },
+  Open: {
+    title: "Open",
+    description: "`defaultOpen`: the open state, with its handle.",
+    hidden: true,
+  },
   Side: {
     title: "Side panel",
     description: '`side="inline-end"`: the end edge in either direction.',
