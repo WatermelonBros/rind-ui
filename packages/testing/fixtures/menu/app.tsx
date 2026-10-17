@@ -1,5 +1,5 @@
 // The page menu.pw.test.ts drives: themed Menus, bundled by the test itself.
-import { Menu } from "@rind-ui/react"
+import { ContextMenu, Menu } from "@rind-ui/react"
 import { useState } from "react"
 import { createRoot } from "react-dom/client"
 
@@ -58,6 +58,22 @@ function App() {
           </Menu.Positioner>
         </Menu.Portal>
       </Menu.Root>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger
+          tabIndex={0}
+          style={{ width: 240, height: 80, border: "1px dashed", padding: 8 }}
+        >
+          <span>notes.txt</span>
+        </ContextMenu.Trigger>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Content aria-label="File actions">
+              <Menu.Item onSelect={() => setLast("Rename")}>Rename</Menu.Item>
+              <Menu.Item onSelect={() => setLast("Delete")}>Delete</Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </ContextMenu.Root>
       <output aria-label="Last">{last}</output>
     </div>
   )

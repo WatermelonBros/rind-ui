@@ -18,6 +18,19 @@ every change a consumer would notice adds a file in `.changeset/` (`pnpm changes
    is not on npm yet (with `pnpm publish`, so `workspace:*` becomes a real version), then
    tags the release and creates GitHub releases.
 
+## Manual checks before a release
+
+Some behaviour only a person with a device can confirm. Before releasing a version that
+changed the QR encoder or the QR Code component (add-qr-code 6.4):
+
+- Scan ten generated codes with the iOS Camera app and with Google Lens on Android: digits,
+  a URL, a Wi-Fi string (`WIFI:T:WPA;S:Home;P:secret;;`), non-ASCII text (`Grüße, 世界`), and
+  a code with a logo at levels L, M and H (expected: L with a large logo may fail; M and H
+  read). Record any failure in the PR.
+- With NVDA (Firefox) and VoiceOver (Safari), read a QR code with a `ValueText`: the image's
+  name ("QR code" or the translated label) and its description (the value) are spoken.
+  Record the pass in `docs/accessibility/tested-with.json`.
+
 ## One-time setup
 
 1. **The npm scope.** `@rind-ui` is an npm organisation: create it (free for public

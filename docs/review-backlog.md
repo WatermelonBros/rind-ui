@@ -7,6 +7,11 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-qr-code (r1) | — | packages/react/src/qr-code/qr-code.tsx | `apiRef` finds frame/pattern/overlay with `document.getElementById`: breaks inside a shadow root (use the Root element's root node) |
+| add-qr-code (r1) | — | packages/testing/src/components/qr-code.dom.test.tsx | No Root re-render test with an inline `encoding` object (the compare-by-value claim) |
+| add-qr-code (r1) | — | packages/core/src/qr/qr.test.ts | The auto-mask oracle is circular (it reuses the encoder's own penalty); compare with fixtures' chosen masks instead |
+| add-qr-code (impl) | — | packages/core/src/components/qr-code/qr-code.contract.ts | Contract is `qrCodeContractWith(decode)` (core cannot import the testing decoder); `setValue` types into the page's "Value" control |
+| add-qr-code (impl) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | ARIA snapshots and axe run inline in the Playwright fixture until the site-examples snapshot harness exists |
 | add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
 | add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
 | add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
@@ -182,6 +187,7 @@ See CLAUDE.md "Review rules".
 | retire-storybook (r1) | — | packages/testing/src/state-stories.ts, packages/*/tsdown.config.ts / tsconfig, PRODUCT.md, apps/site/examples/fixtures/* ("Ported from" headers) | stale Storybook wording in comments and docs: say site examples |
 | retire-storybook (r1) | — | packages/testing/fixtures/{anchored/viewport,segmented-control,disclosure}.pw.test.ts | pre-existing `waitForTimeout` waits: removed by the test-stability PR, which bans them |
 | retire-storybook (r1) | — | openspec/changes/archive/2026-10-16-retire-storybook/tasks.md (2.1) | the task names `openExample(page, slug, example, skin?)`; the helper is `openExample(page, base, slug, example, { skin, scheme })` |
+| add-context-menu (impl) | 5.3 | packages/testing/src/components/context-menu-scenarios.dom.test.tsx | Reado parity: only the bottom-right viewport corner is tested; the other corners and the left-click-opened menus are not |
 | add-menu (r1) | — | packages/testing/src/components/menu.dom.test.tsx | "Dialog from an item" checks the focus only after a keyboard choose: add a pointer variant |
 | add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |
 | add-menu (r1) | — | openspec/changes/add-menu/specs/menu/spec.md:616 | the content orientation text (`aria-orientation` only for horizontal) needs rewording |
@@ -197,6 +203,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-search-field | 10.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: searchbox role and name, Clear named and out of the Tab order, Escape inside a dialog, IME on macOS and Windows |
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
+| add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 
 ## Resolved
 
