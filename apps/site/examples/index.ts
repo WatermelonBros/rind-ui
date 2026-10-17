@@ -92,7 +92,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   breadcrumbs,
   button,
   calendar,
-  checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
   "color-picker": colorPicker,
