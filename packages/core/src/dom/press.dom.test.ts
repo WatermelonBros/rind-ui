@@ -364,6 +364,16 @@ describe("long press", () => {
     expect(events).not.toContain("LONG_PRESS:touch")
   })
 
+  it("the platform callout is suppressed during the touch press only", () => {
+    vi.useFakeTimers()
+    setup(undefined, platforms.ios, { longPress: true })
+    ptr("pointerdown", { pointerType: "touch" })
+    expect(el.hasAttribute("data-rind-long-pressing")).toBe(true)
+    expect(document.head.innerHTML).toContain("-webkit-touch-callout: none")
+    ptr("pointerup", { pointerType: "touch" })
+    expect(el.hasAttribute("data-rind-long-pressing")).toBe(false)
+  })
+
   it("a second pointer going down cancels it (a pinch)", () => {
     vi.useFakeTimers()
     setup(undefined, platforms.android, { longPress: true })

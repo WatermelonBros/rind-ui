@@ -187,11 +187,9 @@ describe("ContextMenu scenarios: several regions", () => {
 
   it("Fast right clicks across regions end with exactly one menu (bits-ui#1743)", async () => {
     render(
-      <>
-        {["A", "B", "C"].map((n) => (
-          <Files key={n} label={n} menuLabel={`${n} actions`} modal={false} />
-        ))}
-      </>,
+      ["A", "B", "C"].map((n) => (
+        <Files key={n} label={n} menuLabel={`${n} actions`} modal={false} />
+      )),
     )
     for (const n of ["A", "B", "C"]) {
       await getContextMenu(screen, { text: n, modal: false }).via("pointer").openAt()
@@ -332,5 +330,58 @@ describe("ContextMenu scenarios: layout (browser only)", () => {
       expect(Math.abs(box.left - 100)).toBeLessThanOrEqual(2)
       expect(Math.abs(box.top - 80)).toBeLessThanOrEqual(2)
     })
+  })
+})
+
+describe("ContextMenu: review r1", () => {
+  it("At most one context menu per document: opening one (even by openAt) closes the other", async () => {
+    const a = createRef<ContextMenuActions>()
+    const b = createRef<ContextMenuActions>()
+    render(
+      (
+        [
+          ["0", a],
+          ["1", b],
+        ] as const
+      ).map(([i, ref]) => (
+        <ContextMenu.Root key={i} actionsRef={ref} modal={false}>
+          <ContextMenu.Trigger>{`Region ${i}`}</ContextMenu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content aria-label={`Menu ${i}`}>
+                <Menu.Item>Item</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </ContextMenu.Root>
+      )),
+    )
+    act(() => a.current?.openAt({ x: 10, y: 10 }))
+    await waitFor(() => expect(screen.getByRole("menu", { name: "Menu 0" })).toBeTruthy())
+    act(() => b.current?.openAt({ x: 20, y: 20 }))
+    await waitFor(() => expect(screen.getAllByRole("menu")).toHaveLength(1))
+    expect(screen.getByRole("menu", { name: "Menu 1" })).toBeTruthy()
+  })
+
+  it("The platform callout is suppressed on the region during a touch press", () => {
+    render(
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>Photo</ContextMenu.Trigger>
+      </ContextMenu.Root>,
+    )
+    const region = screen.getByText("Photo")
+    const init = { bubbles: true, cancelable: true, pointerId: 3, pointerType: "touch" }
+    act(() => {
+      region.dispatchEvent(new PointerEvent("pointerdown", init))
+    })
+    expect(region.hasAttribute("data-rind-long-pressing")).toBe(true)
+    // WebKit is the engine with a callout; elsewhere the property is unknown.
+    if (CSS.supports("-webkit-touch-callout", "none")) {
+      expect(getComputedStyle(region).getPropertyValue("-webkit-touch-callout")).toBe("none")
+    }
+    act(() => {
+      region.dispatchEvent(new PointerEvent("pointerup", init))
+    })
+    expect(region.hasAttribute("data-rind-long-pressing")).toBe(false)
   })
 })

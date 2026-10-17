@@ -359,6 +359,9 @@ function pointRect(x: number, y: number) {
   return { x, y, left: x, top: y, right: x, bottom: y, width: 0, height: 0 } as DOMRect // the fields positioning reads
 }
 
+/** The open context menus of each document (their close functions). */
+const openRegions = new WeakMap<Document, Set<() => void>>()
+
 /**
  * While a region root is open: a `contextmenu` elsewhere (the region's own handlers see the
  * ones on it) re-anchors when its point is inside the region's boxes (a modal menu makes
@@ -397,9 +400,16 @@ function watchRegion(
   const onScroll = (e: Event) => {
     if (!inMenu(e.target)) a.send({ type: "SCROLL" })
   }
+  // At most one context menu per document: this one opening closes the others.
+  const open = openRegions.get(doc) ?? new Set<() => void>()
+  openRegions.set(doc, open)
+  for (const close of [...open]) close()
+  const close = () => a.send({ type: "CLOSE" })
+  open.add(close)
   doc.addEventListener("contextmenu", onContextMenu, true)
   if (!modal) doc.addEventListener("scroll", onScroll, { capture: true, passive: true })
   return () => {
+    open.delete(close)
     doc.removeEventListener("contextmenu", onContextMenu, true)
     if (!modal) doc.removeEventListener("scroll", onScroll, { capture: true })
   }
@@ -474,6 +484,8 @@ export const menuMachine = setup({
       set("keyActivation", null)
       set("hoverOpened", event.type.startsWith("after:"))
       set("pendingPointerKey", null)
+      // A new open anchors where its own gesture (setAnchor) says, never at an older point.
+      set("regionAnchor", null)
     },
     /** A region root's anchor from the opening gesture (or `openAt`). */
     setAnchor: ({ event, set }) => {

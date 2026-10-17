@@ -675,3 +675,40 @@ describe("navigation", () => {
     expect(m.ctx().highlightedKey).toBe("b")
   })
 })
+
+describe("menu machine: a context menu's region root", () => {
+  const right: MenuEvent = {
+    type: "REGION.CONTEXTMENU",
+    point: { x: 40, y: 60 },
+    target: null,
+    virtual: false,
+  }
+
+  it("a right click opens with reason context-menu and anchors at its point", () => {
+    const m = make({ region: true })
+    m.send(right)
+    expect(m.state()).toBe("open")
+    expect(m.changes()).toEqual([[true, "context-menu"]])
+    expect(m.ctx().regionAnchor).toEqual({ kind: "point", x: 40, y: 60, target: null })
+  })
+
+  it("an open without a gesture anchors at no earlier point (the region's corner)", () => {
+    const m = make({ region: true })
+    m.send(right)
+    m.send({ type: "CLOSE" })
+    m.send({ type: "OPEN" })
+    expect(m.state()).toBe("open")
+    expect(m.ctx().regionAnchor).toBe(null)
+  })
+
+  it("a right click elsewhere closes with outside-press; one in the region re-anchors", () => {
+    const m = make({ region: true }, undefined, { position: { reposition: () => {} } })
+    m.send(right)
+    m.send({ type: "DOCUMENT.CONTEXTMENU", point: { x: 80, y: 90 }, target: null, inRegion: true })
+    expect(m.state()).toBe("open")
+    expect(m.ctx().regionAnchor).toEqual({ kind: "point", x: 80, y: 90, target: null })
+    m.send({ type: "DOCUMENT.CONTEXTMENU", point: { x: 0, y: 0 }, target: null, inRegion: false })
+    expect(m.state()).toBe("closed")
+    expect(m.changes().at(-1)).toEqual([false, "outside-press"])
+  })
+})

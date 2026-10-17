@@ -22,10 +22,15 @@ import type {
   TimerHandle,
 } from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
+import { injectStyle } from "./inject-style"
 import { isImeKey } from "./keyboard"
 import { quirkActive } from "./quirks"
 import { textSelection } from "./text-selection"
 import { injectTouchAction } from "./touch-action"
+
+const CALLOUT_ATTR = "data-rind-long-pressing"
+/** During a touch long press only (the attribute's lifetime). */
+export const CALLOUT_RULE = `[${CALLOUT_ATTR}] { -webkit-touch-callout: none }`
 
 /** Structural event types, so React synthetic events and DOM events both fit. */
 export interface PressBaseEvent {
@@ -269,6 +274,7 @@ export function createPress(options: PressOptions): PressHandle {
     longPressTimer = null
   }
   const reset = () => {
+    if (state.kind === "pointer") state.target.removeAttribute(CALLOUT_ATTR)
     state = { kind: "idle" }
     setPressed(false)
     cancelLongPress()
@@ -371,6 +377,12 @@ export function createPress(options: PressOptions): PressHandle {
       // (e.g. iOS VoiceOver's zero-size touch) activates through the click that follows.
       if (env.modality.modality() === "virtual") return
       const target = e.currentTarget as Element
+      if (pointerType === "touch" && options.longPress) {
+        // A long press is the gesture: the platform's callout (iOS link preview, image menu)
+        // must not answer it first.
+        target.setAttribute(CALLOUT_ATTR, "")
+        injectStyle(target.ownerDocument, "long-press-callout", CALLOUT_RULE, env)
+      }
       if (pointerType === "touch") {
         // Implicit capture would keep the pointer "inside" while the finger slides off. It
         // belongs to the touched element (e.target), which may be a child of the part.
