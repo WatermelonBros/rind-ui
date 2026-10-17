@@ -20,7 +20,7 @@ describe("parsing", () => {
     }
     expect(parseColor("#ABC")).toEqual(rgb(170, 187, 204))
     expect(parseColor("  #abc ")).toEqual(rgb(170, 187, 204))
-    expect(parseColor("#FF000080")).toEqual(rgb(255, 0, 0, 0.5))
+    expect(parseColor("#FF000080")).toEqual(rgb(255, 0, 0, 128 / 255))
   })
 
   it("hue 360 survives, 370 wraps (react-spectrum#6202)", () => {
@@ -66,6 +66,14 @@ describe("parsing", () => {
 })
 
 describe("formatting", () => {
+  it("8-digit hex round-trips every alpha byte", () => {
+    for (let a = 0; a < 256; a++) {
+      const hex = `#112233${a.toString(16).toUpperCase().padStart(2, "0")}`
+      const back = formatColor(parseColor(hex), "hex")
+      expect(back).toBe(a === 255 ? "#112233" : hex)
+    }
+  })
+
   it("alpha in hex", () => {
     expect(formatColor(rgb(255, 0, 0, 0.5), "hex")).toBe("#FF000080")
     expect(formatColor(rgb(255, 0, 0), "hex")).toBe("#FF0000")

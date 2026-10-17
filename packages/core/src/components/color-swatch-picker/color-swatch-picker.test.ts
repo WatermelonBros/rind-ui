@@ -26,8 +26,8 @@ describe("matchSwatch", () => {
   })
   it("keys and alpha", () => {
     expect(swatchKey(parseColor("#00FF00"))).toBe("#00FF00FF")
-    expect(pickedColor(parseColor("#00FF00"), parseColor("#FF000080")).alpha).toBe(0.5)
-    expect(pickedColor(parseColor("#00FF0080"), parseColor("#FF0000")).alpha).toBe(0.5)
+    expect(pickedColor(parseColor("#00FF00"), parseColor("#FF000080")).alpha).toBeCloseTo(0.5, 2)
+    expect(pickedColor(parseColor("#00FF0080"), parseColor("#FF0000")).alpha).toBeCloseTo(0.5, 2)
   })
   it("meta queries exist", () => {
     for (const q of colorSwatchPickerMeta.contract.queries) {

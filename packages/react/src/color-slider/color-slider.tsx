@@ -37,7 +37,12 @@ import { useColorProp } from "../color-input"
 import { TransparencyGrid as Grid } from "../color-swatch/color-swatch"
 import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
-import { Slider, type SliderRootProps, type SliderThumbProps } from "../slider/slider"
+import {
+  Slider,
+  type SliderRootProps,
+  SliderRootSurface,
+  type SliderThumbProps,
+} from "../slider/slider"
 import { useMachine } from "../use-machine"
 
 declare module "../provider" {
@@ -155,45 +160,47 @@ function Root({
   }
   return (
     <ColorSliderContext value={ctx}>
-      <Slider.Root
-        {...rest}
-        {...api.data}
-        value={api.slider.value}
-        // What the hidden input's value attribute and a form reset show.
-        {...(defaultValue ? { defaultValue: getChannel(defaultValue, channel) } : {})}
-        min={api.slider.min}
-        max={api.slider.max}
-        step={api.slider.step}
-        largeStep={api.slider.largeStep}
-        orientation={orientation}
-        dir={dir}
-        locale={locale}
-        style={{ ...style(api.surfaceStyle), ...style(colorVariables(color)), ...ownStyle }}
-        // Unlabelled: the group is named by the channel too, so it can be found by name.
-        aria-label={
-          labelled || rest["aria-labelledby"] !== undefined
-            ? rest["aria-label"]
-            : (rest["aria-label"] ?? api.channelName)
-        }
-        messages={{
-          valueText: ({ value: v }) => api.valueText(v),
-          // Unlabelled: the thumb is named by the channel (Reado's sliders had no name).
-          thumbLabel: () => (labelled ? "" : api.channelName),
-        }}
-        onValueChange={(n, d) =>
-          // The Slider's form reset is the colour's: every channel back to the default.
-          d.event.type === "RESET"
-            ? send({ type: "RESET" })
-            : send({
-                type: "SET",
-                color: withChannel(latest.current.color, channel, n, latest.current.memory),
-                reason: "SLIDER",
-              })
-        }
-        onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
-      >
-        {children}
-      </Slider.Root>
+      <SliderRootSurface value={true}>
+        <Slider.Root
+          {...rest}
+          {...api.data}
+          value={api.slider.value}
+          // What the hidden input's value attribute and a form reset show.
+          {...(defaultValue ? { defaultValue: getChannel(defaultValue, channel) } : {})}
+          min={api.slider.min}
+          max={api.slider.max}
+          step={api.slider.step}
+          largeStep={api.slider.largeStep}
+          orientation={orientation}
+          dir={dir}
+          locale={locale}
+          style={{ ...style(api.surfaceStyle), ...style(colorVariables(color)), ...ownStyle }}
+          // Unlabelled: the group is named by the channel too, so it can be found by name.
+          aria-label={
+            labelled || rest["aria-labelledby"] !== undefined
+              ? rest["aria-label"]
+              : (rest["aria-label"] ?? api.channelName)
+          }
+          messages={{
+            valueText: ({ value: v }) => api.valueText(v),
+            // Unlabelled: the thumb is named by the channel (Reado's sliders had no name).
+            thumbLabel: () => (labelled ? "" : api.channelName),
+          }}
+          onValueChange={(n, d) =>
+            // The Slider's form reset is the colour's: every channel back to the default.
+            d.event.type === "RESET"
+              ? send({ type: "RESET" })
+              : send({
+                  type: "SET",
+                  color: withChannel(latest.current.color, channel, n, latest.current.memory),
+                  reason: "SLIDER",
+                })
+          }
+          onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
+        >
+          {children}
+        </Slider.Root>
+      </SliderRootSurface>
     </ColorSliderContext>
   )
 }

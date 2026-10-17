@@ -1,7 +1,7 @@
 // Color Slider pointer behaviour in real browsers (spec "Track And Thumb Appearance"): the
 // Root is the pointer surface without a Control (design request to add-slider), vertical
 // (zag#3010) and right-to-left (zag#2666) gradients agree with the thumb.
-import { ColorSlider } from "@rind-ui/react"
+import { ColorSlider, Slider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
 import { userEvent } from "vitest/browser"
@@ -26,6 +26,18 @@ const press = async (el: Element, fx: number, fy: number) => {
 }
 
 describe("pointer", () => {
+  it("a plain Slider's Root without a Control does not start a drag", async () => {
+    render(
+      <Slider.Root aria-label="Volume" defaultValue={10} style={{ width: 200, height: 20 }}>
+        <Slider.Track style={{ position: "absolute", inset: 0 }}>
+          <Slider.Thumb index={0} style={{ width: 10, height: 10 }} />
+        </Slider.Track>
+      </Slider.Root>,
+    )
+    await press(screen.getByRole("group", { name: "Volume" }), 0.9, 0.5)
+    expect(screen.getByRole("slider").getAttribute("aria-valuenow")).toBe("10")
+  })
+
   it("no Control: the Root is the pointer surface", async () => {
     render(
       <ColorSlider.Root

@@ -88,7 +88,7 @@ describe("Color Field", () => {
     render(<Field alpha defaultValue="#FF000080" onValueChange={onValueChange} />)
     const f = getColorField(screen, { name: "Fill" })
     await f.fill("00FF00")
-    expect((onValueChange.mock.calls[0]?.[0] as Color | undefined)?.alpha).toBe(0.5)
+    expect((onValueChange.mock.calls[0]?.[0] as Color | undefined)?.alpha).toBeCloseTo(0.5, 2)
     await f.fill("00FF00FF")
     expect((onValueChange.mock.calls[1]?.[0] as Color | undefined)?.alpha).toBe(1)
   })
@@ -179,7 +179,7 @@ describe("Color Channel Field", () => {
     render(<Channel channel="alpha" defaultValue="#336699" onValueChange={onValueChange} />)
     const f = getColorChannelField(screen, { name: "Alpha" })
     await f.fill("50")
-    expect((onValueChange.mock.calls.at(-1)?.[0] as Color | undefined)?.alpha).toBe(0.5)
+    expect((onValueChange.mock.calls.at(-1)?.[0] as Color | undefined)?.alpha).toBeCloseTo(0.5, 2)
     expect(await f.text()).toBe("50%")
   })
 

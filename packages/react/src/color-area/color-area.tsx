@@ -40,6 +40,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -161,14 +162,18 @@ function Root({
   const thumb = useRef<HTMLElement | null>(null)
   const latest = useRef({ x: 0, y: 0 })
   const [formInputs] = useState(() => new Map<Axis, FormInput>())
-  const formInput = (axis: Axis) => {
-    let cap = formInputs.get(axis)
-    if (!cap) {
-      cap = hiddenFormInput({ input: () => inputs.current[axis] }, env)
-      formInputs.set(axis, cap)
-    }
-    return cap
-  }
+  // Stable: the form-reset tracking effect depends on it.
+  const formInput = useCallback(
+    (axis: Axis) => {
+      let cap = formInputs.get(axis)
+      if (!cap) {
+        cap = hiddenFormInput({ input: () => inputs.current[axis] }, env)
+        formInputs.set(axis, cap)
+      }
+      return cap
+    },
+    [formInputs, env],
+  )
   const focusAxis = (axis: Axis, modality: Modality) => {
     const el = inputs.current[axis]
     if (el) void focusSafely(el, env, "programmatic", modality)

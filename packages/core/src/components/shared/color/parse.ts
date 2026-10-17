@@ -33,7 +33,8 @@ function parseHex(hex: string): Color {
   let h = hex.slice(1)
   if (h.length <= 4) h = [...h].map((c) => c + c).join("")
   const byte = (i: number) => Number.parseInt(h.slice(i, i + 2), 16)
-  const alpha = h.length === 8 ? roundTo(byte(6) / 255, 2) : 1
+  // Unrounded: every alpha byte survives a hex round trip (`alphaByte` rounds back).
+  const alpha = h.length === 8 ? byte(6) / 255 : 1
   return makeColor("rgb", [byte(0), byte(2), byte(4)], alpha)
 }
 

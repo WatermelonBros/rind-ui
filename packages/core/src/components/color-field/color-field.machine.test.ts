@@ -73,9 +73,12 @@ describe("text rules", () => {
 
   it("alpha on a hex commit (zag#884)", () => {
     const current = parseColor("#FF000080")
-    expect(commitAlpha(parseColor("#00FF00"), "00FF00", current, true).alpha).toBe(0.5)
+    expect(commitAlpha(parseColor("#00FF00"), "00FF00", current, true).alpha).toBeCloseTo(0.5, 2)
     expect(commitAlpha(parseColor("#00FF00FF"), "00FF00FF", current, true).alpha).toBe(1)
-    expect(commitAlpha(parseColor("#00FF00FF"), "00FF00FF", current, false).alpha).toBe(0.5)
+    expect(commitAlpha(parseColor("#00FF00FF"), "00FF00FF", current, false).alpha).toBeCloseTo(
+      0.5,
+      2,
+    )
   })
 })
 
@@ -154,7 +157,7 @@ describe("value and commit", () => {
     const m = make({ defaultValue: parseColor("#FF000080"), alpha: true })
     m.type("00FF00")
     m.enter()
-    expect(m.value()?.alpha).toBe(0.5)
+    expect(m.value()?.alpha).toBeCloseTo(0.5, 2)
     m.type("00FF00FF")
     m.enter()
     expect(m.value()?.alpha).toBe(1)

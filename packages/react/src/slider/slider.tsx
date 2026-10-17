@@ -115,6 +115,12 @@ interface Ctx {
 }
 
 const SliderContext = createContext<Ctx | null>(null)
+
+/**
+ * Internal (not exported from the package): set by Color Slider, whose Root is the pointer
+ * surface when there is no Control. A plain Slider's Root never starts a drag.
+ */
+export const SliderRootSurface = createContext(false)
 function useSlider(part: string): Ctx {
   const ctx = useContext(SliderContext)
   if (!ctx) throw new Error(`Slider.${part} must be inside Slider.Root`)
@@ -210,6 +216,7 @@ function Root<V extends SliderValue>({
   const inputs = useRef<(HTMLInputElement | null)[]>([])
   const thumbs = useRef<(HTMLElement | null)[]>([])
   const control = useRef<HTMLElement | null>(null)
+  const rootSurface = useContext(SliderRootSurface)
   const latest = useRef<readonly number[]>(creationDefault)
   const [thumbDisabled, setThumbDisabledState] = useState<readonly boolean[]>([])
   // Stable: Thumbs report their `disabled` from an effect keyed on it.
@@ -432,10 +439,10 @@ function Root<V extends SliderValue>({
       send({ type: "POINTER.DOWN", fraction, thumb: index, modality: touch ? "touch" : "pointer" })
     },
   }
-  // Without a Control part the Root is the pointer surface (Color Slider's shape); presses
-  // that start on the Label or the ValueText do not start a drag.
+  // Color Slider only: without a Control part its Root is the pointer surface; presses that
+  // start on the Label or the ValueText do not start a drag.
   const rootPress = (e: PointerEvent<HTMLElement>) => {
-    if (control.current) return
+    if (!rootSurface || control.current) return
     const from = (e.target as Element).closest?.('[data-scope="slider"][data-part]')
     const partName = from?.getAttribute("data-part")
     if (partName === "label" || partName === "value-text" || partName === "description") return
