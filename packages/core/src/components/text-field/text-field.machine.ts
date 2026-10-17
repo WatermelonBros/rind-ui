@@ -2,7 +2,8 @@
 // writes back to the DOM (uncontrolled, the input owns its value; controlled, the adapter
 // renders the prop). A Clear is the only DOM write, done by the adapter through the native
 // setter plus one `input` event, which comes back here as an ordinary INPUT with its reason.
-// Presets (Password Input, Search Field) build on the same definition.
+// One preset adds the password visibility and the Escape / Enter keys (merge-text-field-parts):
+// the builder stays internal, so there is one Text Field machine.
 
 import type { Modality } from "../../contract/env"
 import type { AnnouncerEnv } from "../../env/capabilities"
@@ -222,5 +223,111 @@ export function buildTextFieldMachine<X extends TextFieldPresetTypes = Record<ne
   }
 }
 
-export const { machine: textFieldMachine } = buildTextFieldMachine()
+export type TextFieldVisibilityHideReason = "SUBMIT" | "RESET"
+
+/** The native key event, as far as the machine touches it. */
+export interface TextFieldKey {
+  preventDefault(): void
+  stopPropagation(): void
+}
+
+/** Visibility (`type="password"`) and the keys (Escape clears, Enter submits). */
+export type TextFieldOwnEvent =
+  | {
+      readonly type: "VISIBILITY.TOGGLE"
+      readonly modality: Modality
+      /** Focus is in the input (a pointer press that kept it there): announce the change. */
+      readonly inputFocused: boolean
+      /** The input's selection when the press started, restored after the `type` change. */
+      readonly selection: readonly [number, number] | null
+    }
+  | { readonly type: "VISIBILITY.HIDE"; readonly reason: TextFieldVisibilityHideReason }
+  | { readonly type: "ESCAPE"; readonly event: TextFieldKey; readonly composing: boolean }
+  | { readonly type: "SUBMIT"; readonly event: TextFieldKey; readonly composing: boolean }
+
+export interface TextFieldSubmitDetails {
+  /** The Enter key event: `preventDefault()` stops the form's implicit submission. */
+  readonly event: TextFieldKey
+}
+
+export interface TextFieldOwnProps {
+  readonly visible?: boolean | undefined
+  readonly defaultVisible?: boolean | undefined
+  /** Translated by the adapter into `(visible, { reason: "PRESS" | "SUBMIT" | "RESET" })`. */
+  readonly onVisibleChange?: ((visible: boolean, details: unknown) => void) | undefined
+  /** Escape clears a non-empty editable value (default: true for `type="search"`). */
+  readonly escapeClears?: boolean | undefined
+  readonly onSubmit?: ((value: string, details: TextFieldSubmitDetails) => void) | undefined
+  /** Watches the input's form; returns the cleanup. Submit always hides, reset unless prevented. */
+  readonly watchForm?:
+    | ((on: { readonly submit: () => void; readonly reset: () => void }) => () => void)
+    | undefined
+  /** Restores the input's selection once the new `type` is rendered (same frame). */
+  readonly keepSelection?: ((selection: readonly [number, number]) => void) | undefined
+}
+
+export const { machine: textFieldMachine } = buildTextFieldMachine<{
+  props: TextFieldOwnProps
+  events: TextFieldOwnEvent
+  values: "visible"
+}>({
+  scope: "text-field",
+  values: { visible: { fallback: false } },
+  events: {
+    // Read-only allows it (nothing about the value changes); disabled refuses.
+    "VISIBILITY.TOGGLE": { guard: "notDisabled", actions: ["toggleVisible"] },
+    "VISIBILITY.HIDE": { actions: ["hide"] },
+    ESCAPE: {
+      guard: { and: ["keyNotComposing", "escapeClears", "hasValue", "editable"] },
+      actions: ["consumeKey", "clearOnEscape"],
+    },
+    SUBMIT: { guard: "keyNotComposing", actions: ["callOnSubmit"] },
+  },
+  guards: {
+    notDisabled: ({ props }) => !props.disabled && !props.focusableWhenDisabled,
+    // Safari reports the commit Enter after compositionend: the key says it still composes.
+    keyNotComposing: ({ event }) =>
+      !((event.type === "ESCAPE" || event.type === "SUBMIT") && event.composing),
+    escapeClears: ({ props }) => props.escapeClears === true,
+    hasValue: ({ values }) => values.value !== "",
+  },
+  actions: {
+    toggleVisible: ({ event, values, props, env, set }) => {
+      if (event.type !== "VISIBILITY.TOGGLE") return
+      const next = !values.visible
+      set("visible", next)
+      if (event.selection) props.keepSelection?.(event.selection)
+      // A focused trigger speaks its pressed state; only focus in the input needs words.
+      if (event.inputFocused) {
+        env.announcer.announce({
+          message: props.messages.visibilityAnnouncement(next),
+          priority: "polite",
+          key: `text-field-${props.id}-visibility`,
+        })
+      }
+    },
+    hide: ({ values, set }) => {
+      if (values.visible) set("visible", false)
+    },
+    // Only a taken transition consumes the key; otherwise it reaches the enclosing layer.
+    consumeKey: ({ event }) => {
+      if (event.type !== "ESCAPE") return
+      event.event.preventDefault()
+      event.event.stopPropagation()
+    },
+    clearOnEscape: ({ props }) => props.clearInput("ESCAPE", true),
+    callOnSubmit: ({ event, props, values }) => {
+      if (event.type === "SUBMIT") props.onSubmit?.(values.value, { event: event.event })
+    },
+  },
+  effects: {
+    // Live props (radix#4157): the hide is proposed through whatever is current at the event.
+    formVisibilityReset: ({ props, send }) =>
+      props.watchForm?.({
+        submit: () => send({ type: "VISIBILITY.HIDE", reason: "SUBMIT" }),
+        reset: () => send({ type: "VISIBILITY.HIDE", reason: "RESET" }),
+      }),
+  },
+  serviceEffects: ["formVisibilityReset"],
+})
 export type TextFieldMachine = typeof textFieldMachine

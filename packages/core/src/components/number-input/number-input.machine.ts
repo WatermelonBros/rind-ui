@@ -264,9 +264,7 @@ export const numberInputMachine = setup({
       args.props.disabled !== true &&
       args.props.readOnly !== true &&
       canStep(latest(args as never), directionOf(args.context.trigger), args.props),
-    spins: ({ props, context }) => props.spinOnPress !== false && context.pointerType !== "touch",
-    spinsTouch: ({ props, context }) =>
-      props.spinOnPress !== false && context.pointerType === "touch",
+    spins: ({ props }) => props.spinOnPress !== false,
     locked: ({ props }) => props.disabled === true || props.readOnly === true,
     dirty: ({ context }) => context.dirty,
     /** A press that activates on release: touch (not repeated), keyboard, assistive tech. */
@@ -397,8 +395,9 @@ export const numberInputMachine = setup({
     raiseCommit: ({ send }) => send({ type: "COMMIT", source: "blur" }),
   },
   delays: {
-    spinDelay: ({ props }) => props.spinDelay ?? 400,
-    touchSpinDelay: () => 600,
+    // A touch hold waits longer (a tap must not start a repeat).
+    spinDelay: ({ props, context }) =>
+      context.pointerType === "touch" ? 600 : (props.spinDelay ?? 400),
     spinInterval: ({ props }) => props.spinInterval ?? 60,
   },
 }).machine({
@@ -463,7 +462,6 @@ export const numberInputMachine = setup({
     pressing: {
       after: {
         spinDelay: { guard: { and: ["spins", "canKeepSpinning"] }, target: "spinning" },
-        touchSpinDelay: { guard: { and: ["spinsTouch", "canKeepSpinning"] }, target: "spinning" },
       },
       on: {
         // A blur while a trigger is held still commits typed text (a form submit sees it).

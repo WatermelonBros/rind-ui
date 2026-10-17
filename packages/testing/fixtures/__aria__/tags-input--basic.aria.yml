@@ -1,0 +1,10 @@
+- text: Tags
+- toolbar "Tags":
+  - text: rome
+  - button "Remove rome"
+  - text: paris
+  - button "Remove paris"
+- textbox "Tags":
+  - /placeholder: Add a tag
+- button "Clear all"
+- text: "2 tags: rome, paris"

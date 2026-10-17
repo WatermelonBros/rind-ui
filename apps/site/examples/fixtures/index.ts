@@ -24,6 +24,7 @@ import * as segmentedControl from "./segmented-control"
 import * as separator from "./separator"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
+import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
@@ -60,6 +61,7 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   separator,
   switch: switchEx,
   tabs,
+  "tags-input": tagsInput,
   "text-field": textField,
   toggle,
   "toggle-group": toggleGroup,

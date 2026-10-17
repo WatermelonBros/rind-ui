@@ -34,7 +34,22 @@
 }
 
 :is([data-skinned], [data-rind-theme^="skin-"])
-  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native) {
+  :is(
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]),
+    .native,
+    :where(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="color"],
+        [type="file"],
+        [type="hidden"]
+      ),
+      select,
+      textarea
+    ):not([data-scope], [class])
+  ) {
   width: 100%;
   max-width: 320px;
   font: 500 15px var(--s-font);
@@ -50,19 +65,64 @@
     background 0.3s;
 }
 :is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
-  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native):focus {
+  :is(
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]),
+    .native,
+    :where(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="color"],
+        [type="file"],
+        [type="hidden"]
+      ),
+      select,
+      textarea
+    ):not([data-scope], [class])
+  ):focus {
   translate: -2px -2px;
   box-shadow: 4px 4px 0 var(--s-acc);
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
-  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native) {
+  :is(
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]),
+    .native,
+    :where(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="color"],
+        [type="file"],
+        [type="hidden"]
+      ),
+      select,
+      textarea
+    ):not([data-scope], [class])
+  ) {
   background: #fff;
   box-shadow:
     inset 0 0 0 2px #d6ccf7,
     0 3px 0 #d6ccf7;
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
-  :is([data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]), .native):focus {
+  :is(
+    [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"]),
+    .native,
+    :where(
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="color"],
+        [type="file"],
+        [type="hidden"]
+      ),
+      select,
+      textarea
+    ):not([data-scope], [class])
+  ):focus {
   background: #fff;
   box-shadow:
     0 0 0 3px var(--s-acc),
@@ -79,4 +139,25 @@
   max-block-size: 9lh;
   line-height: 1.45;
   resize: none;
+}
+
+/* A plain <button> in an example (no rind part, no class) still looks like a button: the global
+   reset strips the browser's own. Specificity 0,1,0, so every component and helper rule wins. */
+:is([data-skinned], [data-rind-theme^="skin-"]) :where(button:not([data-scope], [class])) {
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) :where(button:not([data-scope], [class])):disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  :where(button:not([data-scope], [class])):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
 }
