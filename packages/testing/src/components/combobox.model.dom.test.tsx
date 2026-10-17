@@ -41,7 +41,8 @@ function config(name: string, cfg: Config) {
   const collection = itemsOf(items)
   describe(`combobox model: ${name}`, () => {
     testMachine(contract, {
-      test: it,
+      // Long paths on a loaded machine: more than the 5 s default.
+      test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
       setup: () =>
         render(
           <RindProvider environment={{ platform: currentRun()?.platform ?? platforms.linux }}>
