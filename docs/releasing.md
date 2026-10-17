@@ -52,3 +52,13 @@ pnpm release              # builds the four packages and publishes them
 ```
 
 `npm view @rind-ui/react` shows what is live.
+
+## Manual checks before a release
+
+Checks no automated test covers, run by hand on real assistive technology and devices.
+
+- **Tour**: a three-step tour (a centred welcome, two anchored steps) with VoiceOver (Safari,
+  macOS and iOS) and NVDA (Firefox and Chrome): the card's name and description are read when
+  the tour starts, the step change is announced when focus stays on Next, and the page stays
+  usable behind an anchored step. On a phone, pinch-zoom while a step is shown: the dimmed
+  area still covers the visible page and the cutout stays on the target.

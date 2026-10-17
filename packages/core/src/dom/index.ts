@@ -188,3 +188,11 @@ export {
   visuallyHiddenInputStyle,
   visuallyHiddenStyle,
 } from "./visually-hidden"
+export {
+  isRendered,
+  WaitAbortedError,
+  type WaitForElementOptions,
+  type WaitForEventOptions,
+  waitForElement,
+  waitForEvent,
+} from "./wait-for-element"

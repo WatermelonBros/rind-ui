@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-tour (impl) | — | packages/core/src/components/tour/tour.contract.ts | No `modal` trait on the modal variant (an anchored modal step keeps its target exposed); inert and Tab wrap are covered in the DOM suite. No `target` query (no attribute locator in the contract env) |
+| add-tour (impl) | — | packages/testing/src/components/tour.model.dom.test.tsx | Model walk covers no wait step (advancing one needs a page interaction the runner can't make); DOM tests cover wait steps |
+| add-tour (impl) | — | apps/site/examples/tour.tsx | No RTL, 320 px or nested-scroll examples; no ARIA snapshot files (site-examples harness not on main) |
+| add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
 | add-scroll-area (r1) | — | packages/core/src/dom/scroll-metrics.ts:152 | The tabbables walk runs per scroll frame; cache it and invalidate on subtree mutation |
 | add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.browser.test.tsx | Release outside the window is tested without a pointer move after release |
 | add-scroll-area (r1) | — | packages/testing/src/components/scroll-area.dom.test.tsx | Unmount leak check covers wheel listeners only (pointer, resize and mutation observers unchecked) |

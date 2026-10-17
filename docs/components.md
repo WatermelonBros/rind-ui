@@ -35,7 +35,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | spec | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec | Reado has TourCard/TourScrim |
+| Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Reado has TourCard/TourScrim |
 
 ## Menus & navigation (11)
 
