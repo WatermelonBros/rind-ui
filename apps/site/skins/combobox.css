@@ -1,0 +1,135 @@
+/* ── Combobox: the popup stays in place (no portal), so [data-skinned] reaches it ── */
+[data-skinned] [data-scope="combobox"][data-part="label"] {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+[data-skinned] [data-scope="combobox"][data-part="control"] {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  inline-size: min(100%, 20rem);
+  padding: 2px 6px 2px 12px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+[data-skinned] [data-scope="combobox"][data-part="control"][data-focus] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-skinned] [data-scope="combobox"][data-part="control"][data-readonly] {
+  background: var(--s-muted);
+}
+[data-skinned] [data-scope="combobox"][data-part="control"][data-invalid] {
+  border-color: var(--s-error);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-error);
+}
+[data-skinned] [data-scope="combobox"][data-part="control"][data-disabled] {
+  opacity: 0.5;
+}
+[data-skinned] [data-scope="combobox"][data-part="input"] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-skinned] [data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]) {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--s-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+[data-skinned] [data-scope="combobox"][data-part="trigger"]::after {
+  content: "▾" / "";
+}
+[data-skinned] [data-scope="combobox"][data-part="trigger"][aria-expanded="true"]::after {
+  content: "▴" / "";
+}
+[data-skinned] [data-scope="combobox"][data-part="clear-trigger"]::after {
+  content: "×" / "";
+  font-size: 18px;
+}
+[data-skinned] [data-scope="combobox"][data-part="clear-trigger"]:not([data-visible]) {
+  display: none;
+}
+[data-skinned]
+  [data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 1px;
+}
+[data-skinned] [data-scope="combobox"][data-part="popup"] {
+  box-sizing: border-box;
+  inline-size: var(--rind-anchor-width, 20rem);
+  max-block-size: min(16rem, var(--rind-available-height, 16rem));
+  overflow: auto;
+  padding: 4px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  box-shadow: var(--s-lift);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+[data-skinned] [data-scope="combobox"][data-part="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+[data-skinned] [data-scope="combobox"][data-part="item"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: calc(var(--s-r-sm) - 2px);
+  cursor: pointer;
+  user-select: none;
+}
+[data-skinned] [data-scope="combobox"][data-part="item"][data-highlighted] {
+  background: var(--s-muted);
+}
+[data-skinned] [data-scope="combobox"][data-part="item"][data-state="checked"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+[data-skinned] [data-scope="combobox"][data-part="item"][data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+[data-skinned] [data-scope="combobox"][data-part="item-text"] {
+  flex: 1 1 auto;
+}
+[data-skinned] [data-scope="combobox"][data-part="item-indicator"][data-state="checked"]::after {
+  content: "✓" / "";
+  font-weight: 700;
+}
+[data-skinned] [data-scope="combobox"][data-part="section-label"] {
+  display: block;
+  padding: 6px 10px 2px;
+  font-size: 13px;
+  font-weight: 700;
+}
+[data-skinned] [data-scope="combobox"][data-part="separator"] {
+  background: var(--s-line);
+  block-size: var(--s-bw);
+  min-block-size: 1px;
+  margin: 4px 0;
+}
+[data-skinned] [data-scope="combobox"][data-part="empty"] {
+  padding: 10px;
+  font-size: 14px;
+}

@@ -30,6 +30,7 @@
 @import "./popover.css";
 @import "./number-input.css";
 @import "./listbox.css";
+@import "./combobox.css";
 @import "./pin-input.css";
 @import "./password-input.css";
 @import "./search-field.css";
@@ -38,3 +39,4 @@
 @import "./menu.css";
 @import "./context-menu.css";
 @import "./hover-card.css";
+@import "./select.css";
