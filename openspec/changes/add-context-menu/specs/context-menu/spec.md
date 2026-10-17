@@ -14,9 +14,9 @@ The Context Menu SHALL consist of `root` (no element) and `trigger` (the region,
 plus the Menu parts `positioner`, `content`, `arrow`, items, groups, separators and
 submenus used inside the root. Inside the open menu every behaviour of the `menu`
 capability SHALL apply unchanged (navigation, typeahead, activation, checkbox and radio
-items, links, submenus, Escape, Tab, window blur, focus restore). Parts SHALL carry
-`data-scope="context-menu"` for `root` and `trigger` and `data-scope="menu"` for the
-Menu parts.
+items, links, submenus, Escape, Tab, window blur, focus restore). Every part SHALL carry
+`data-scope="menu"` (one instance, one scope for the driver and the theme); the region
+SHALL carry `data-part="trigger"` and `data-context-menu`.
 
 #### Scenario: Reado file tree
 
@@ -158,7 +158,7 @@ by the region's rectangles, since the region is inert while a modal menu is open
 re-anchor the open menu to the new point without closing it or restarting its entry
 animation, SHALL reset the highlight and focus the content, and SHALL report the new
 target in an `onOpenChange`-free `onAnchorChange(details)` callback. A `contextmenu`
-anywhere else SHALL close the menu with reason `OUTSIDE_PRESS` and let the browser
+anywhere else SHALL close the menu with reason `outside-press` and let the browser
 handle the event. At most one context menu SHALL be open per document; opening one closes
 another. Secondary-button presses inside the open menu SHALL neither close it nor
 activate items. With `modal={false}`, scrolling the page SHALL close the menu.
@@ -194,8 +194,10 @@ activate items. With `modal={false}`, scrolling the page SHALL close the menu.
 ### Requirement: Open Details And Programmatic Opening
 
 `onOpenChange(open, details)` SHALL carry, on open, the `point`, the `target` element
-the gesture started on and the originating `event`, with reasons `CONTEXT_MENU` (pointer
-or AT), `CONTEXT_MENU_KEY`, `LONG_PRESS` or `OPEN`. The root SHALL offer
+the gesture started on and the originating `nativeEvent`, with reasons (kebab case like
+every layer) `context-menu` (pointer or AT), `context-menu-key`, `long-press` or `api`
+(`openAt`, a programmatic open). A non-modal context menu closed by a page scroll SHALL
+report the reason `scroll`. The root SHALL offer
 `openAt(point, target?)` for programmatic opening; a controlled `open={true}` without a
 point SHALL anchor at the region's top-left corner and log a development warning.
 
@@ -260,8 +262,10 @@ Menu closing rules SHALL apply, including window blur.
 
 ### Requirement: Data Attributes
 
-`trigger` SHALL carry `data-scope="context-menu"`, `data-part="trigger"`,
-`data-instance`, `data-state` (`open` | `closed`) and `data-disabled` when disabled.
+`trigger` SHALL carry `data-scope="menu"`, `data-part="trigger"`, `data-context-menu`,
+`data-instance`, `data-state` (`open` | `closed`), `data-disabled` when disabled, and
+`data-focus` / `data-focus-visible` while a focusable region has focus itself. The
+long-press hint reference (`aria-describedby`) SHALL be present only while closed.
 The Menu parts SHALL carry the Menu data attributes; the content additionally SHALL carry
 `data-context-menu`.
 
@@ -273,17 +277,19 @@ The Menu parts SHALL carry the Menu data attributes; the content additionally SH
 ### Requirement: Context Menu Contract
 
 The `context-menu` contract SHALL extend the `menu` contract (its actions, queries,
-traits and exception), locate an instance by the region's `data-instance` and the
-content's accessible name, and replace `open` by `openAt(point)` (pointer: right click at
-the point; touch: long press; keyboard: focus an element in the region and press
-Shift+F10; virtual: a `contextmenu` with no preceding pointer press), plus
-`reanchor(point)` and the query `anchorPoint()`. `contextmenu` SHALL be dispatched as a
-PointerEvent by both adapters.
+traits and exception), locate an instance by a text inside its region (a closed menu has
+no content to name it by), and add `openAt(at)` (`at`: fractions of the region's box;
+pointer: a right click there; touch: a long press; keyboard: focus the region and press
+Shift+F10; virtual: a `contextmenu` with no preceding pointer press), `reanchor(at)` and
+the query `anchorPoint()`. It SHALL declare no restore-target part: focus returns to what
+had it when the menu opened (`<body>` when nothing had). Both adapters SHALL offer
+`contextMenu()` (dispatched as a PointerEvent) and `longPress()` (on the environment's
+time: fake timers or a virtual clock) on every part.
 
 #### Scenario: Driver round trip
 
-- **WHEN** a test runs `const c = getContextMenu(screen, { name: "File actions" })`,
-  `await c.openAt({ x: 40, y: 40 })`, `await c.choose("Rename")`
+- **WHEN** a test runs `const c = getContextMenu(screen, { text: "README.md" })`,
+  `await c.openAt()`, `await c.choose("Rename")`
 - **THEN** both resolve after their postconditions and `await c.isOpen()` is false
 
 #### Scenario: Long press in jsdom with fake timers
@@ -294,9 +300,9 @@ PointerEvent by both adapters.
 ### Requirement: Model-Based Coverage
 
 `testMachine` over the context-menu contract SHALL cover every opening path in every
-declared modality including `virtual`, with props classes `{ modal: true }`,
-`{ modal: false }` and `{ longPress: false }`, and SHALL pass every invariant the `menu`
-contract passes.
+declared modality including `virtual`, with props classes `{ modal: true }` and
+`{ modal: false }` (long presses on a virtual clock), and SHALL pass every invariant the
+`menu` contract passes. `longPress: false` is covered by the DOM tests.
 
 #### Scenario: Keyboard twin missing in a wrapper
 

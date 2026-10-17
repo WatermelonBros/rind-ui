@@ -2,8 +2,10 @@
 // No popup ARIA (the region is not a button), the consumer's tabindex untouched, the
 // long-press hint when focusable. Nested regions: the innermost claims the gesture.
 
+import { focusAttrs } from "../../a11y/focus"
 import { toLogicalKey } from "../../a11y/keys"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
+import type { Modality } from "../../contract/env"
 import { describeKey } from "../../dom/keyboard"
 import type { ModalityEnv, PlatformInfo } from "../../env/capabilities"
 import type { MenuEvent } from "../menu/menu.machine"
@@ -25,6 +27,9 @@ export interface ContextMenuRegionInput {
   readonly disabled: boolean
   /** The hint's id, when the region is focusable and long press is on. */
   readonly hintId?: string | undefined
+  /** A focusable region has focus itself (its focus ring). */
+  readonly focused?: boolean | undefined
+  readonly modality?: Modality | undefined
 }
 
 export type ContextMenuConnectEnv = PlatformInfo &
@@ -44,6 +49,7 @@ export function contextMenuRegionProps(
     "aria-describedby": input.open ? undefined : input.hintId,
     "data-state": input.open ? "open" : "closed",
     "data-disabled": dataFlag(input.disabled),
+    ...focusAttrs(input.focused === true, input.modality ?? "keyboard"),
     onContextMenu: (event: unknown) => {
       const e = event as MouseEvent
       // A descendant that handled it (a link's own menu), a disabled root, or an inner

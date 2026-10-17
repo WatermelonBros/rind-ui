@@ -115,8 +115,8 @@ function contextMenuContractWith(modal: boolean) {
     exceptions: base.exceptions ?? [],
     commitsOnFocus: base.commitsOnFocus ?? [],
     // The region is no disclosure trigger (no aria-expanded): only the content and items.
-    // Focus returns to what had it: the focused element inside the region.
-    semantics: { content: "content", item: "item", finalFocus: "trigger" },
+    // No restore target part: focus returns to what had it when the menu opened.
+    semantics: { content: "content", item: "item" },
   })
 }
 

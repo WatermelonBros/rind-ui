@@ -37,6 +37,7 @@ import { useEnvironment, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useSelector } from "../use-machine"
+import { useModality } from "../use-modality"
 import { usePress } from "../use-press"
 
 declare module "../provider" {
@@ -231,6 +232,8 @@ function Trigger({
   useEffect(() => {
     setFocusable(el.current?.hasAttribute("tabindex") === true)
   })
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
   const own = normalizeProps(
     contextMenuRegionProps(
       {
@@ -238,6 +241,8 @@ function Trigger({
         open,
         disabled: region.disabled,
         hintId: focusable && region.longPress ? hintId : undefined,
+        focused,
+        modality,
       },
       send,
       env,
@@ -249,7 +254,18 @@ function Trigger({
     press.props
   const props = mergeProps(
     {
-      ...joinHandlers(own, { onClick, onContextMenu, onDragStart, onPointerEnter, onPointerLeave }),
+      ...joinHandlers(own, {
+        onClick,
+        onContextMenu,
+        onDragStart,
+        onPointerEnter,
+        onPointerLeave,
+        // The region's own focus (a focusable region), not its rows'.
+        onFocus: (e: React.FocusEvent) => setFocused(e.target === e.currentTarget),
+        onBlur: (e: React.FocusEvent) => {
+          if (e.target === e.currentTarget) setFocused(false)
+        },
+      }),
       onPointerDown: (e: React.PointerEvent) => {
         // The innermost region takes a long press; an outer one never starts its timer.
         if (e.pointerType === "mouse" || !claimRegionEvent(e)) return
