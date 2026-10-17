@@ -1,0 +1,4 @@
+- text: Background
+- group "Background":
+  - button "Choose color, vibrant blue Background"
+  - text: "#3D8BFF"
