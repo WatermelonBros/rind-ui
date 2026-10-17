@@ -282,3 +282,16 @@ describe("Toast: focus, limit, stores, swipe", () => {
     expect(await getToast(screen, { name: "Stay" }).isShown()).toBe(true)
   })
 })
+
+describe("Toast: server rendering", () => {
+  it("the server renders no region; it appears after hydration", async () => {
+    const { renderToString } = await import("react-dom/server")
+    const store = createToaster()
+    store.show("Welcome back")
+    const html = renderToString(<App store={store} />)
+    expect(html).not.toContain("Welcome back")
+    expect(html).not.toContain('role="region"')
+    render(<App store={store} />)
+    expect(await screen.findByRole("listitem", { name: "Welcome back" })).toBeTruthy()
+  })
+})

@@ -97,7 +97,11 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
     onReason: (reason, on) => toaster.regionReason(reason, on),
   })
   // Bound to this environment while mounted; the announcer's regions created eagerly.
+  // The region renders after mount only: the server and the first client render show no
+  // toast (no hydration mismatch, no region before the store is bound).
+  const [mounted, setMounted] = useState(false)
   useEffect(() => {
+    setMounted(true)
     const stopPrepare = env.announcer.prepare()
     const detach = toaster.attach(env, { messages: latestMessages.current })
     return () => {
@@ -146,7 +150,7 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
     hotkey: toaster.options.hotkey,
     messages,
   })
-  if (!api.visible) return null
+  if (!api.visible || !mounted) return null
   const ctx: RegionCtx = {
     store: toaster,
     instance,
