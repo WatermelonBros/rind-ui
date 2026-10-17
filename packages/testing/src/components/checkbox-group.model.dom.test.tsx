@@ -3,7 +3,7 @@
 // group, controlled), in every modality, with the form-associated invariants over the items'
 // hidden inputs and the Parent-state invariant.
 import { checkboxGroupArgs, checkboxGroupContract, platforms } from "@rind-ui/core"
-import { Checkbox, CheckboxGroup, RindProvider } from "@rind-ui/react"
+import { CheckboxGroup, RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { type ReactElement, useState } from "react"
@@ -50,15 +50,15 @@ function Group({ cfg, root }: { cfg: Cfg; root?: Partial<RootProps> }) {
           <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
           {cfg.parent && (
             <CheckboxGroup.Parent>
-              <Checkbox.Control />
-              <Checkbox.Label>All toppings</Checkbox.Label>
+              <CheckboxGroup.ItemControl />
+              <CheckboxGroup.ItemLabel>All toppings</CheckboxGroup.ItemLabel>
             </CheckboxGroup.Parent>
           )}
           {ALL.map((v) => (
-            <Checkbox.Root key={v} value={v} disabled={cfg.disabledItem === v}>
-              <Checkbox.Control />
-              <Checkbox.Label>{LABELS[v]}</Checkbox.Label>
-            </Checkbox.Root>
+            <CheckboxGroup.Item key={v} value={v} disabled={cfg.disabledItem === v}>
+              <CheckboxGroup.ItemControl />
+              <CheckboxGroup.ItemLabel>{LABELS[v]}</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Item>
           ))}
         </CheckboxGroup.Root>
       </form>

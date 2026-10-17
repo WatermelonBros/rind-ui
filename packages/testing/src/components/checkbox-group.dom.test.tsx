@@ -1,5 +1,5 @@
 import { domEnvironment } from "@rind-ui/core"
-import { Checkbox, CheckboxGroup, Field, Fieldset } from "@rind-ui/react"
+import { CheckboxGroup, Field, Fieldset } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
@@ -19,14 +19,14 @@ function Toppings(props: Partial<Parameters<typeof CheckboxGroup.Root>[0]>) {
       <CheckboxGroup.Root name="toppings" allValues={["a", "b", "c"]} {...props}>
         <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
         <CheckboxGroup.Parent>
-          <Checkbox.Control />
-          <Checkbox.Label>All toppings</Checkbox.Label>
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>All toppings</CheckboxGroup.ItemLabel>
         </CheckboxGroup.Parent>
         {TOPPINGS.map((t) => (
-          <Checkbox.Root key={t.value} value={t.value}>
-            <Checkbox.Control />
-            <Checkbox.Label>{t.label}</Checkbox.Label>
-          </Checkbox.Root>
+          <CheckboxGroup.Item key={t.value} value={t.value}>
+            <CheckboxGroup.ItemControl />
+            <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+          </CheckboxGroup.Item>
         ))}
       </CheckboxGroup.Root>
     </form>
@@ -85,7 +85,7 @@ async function click(el: Element) {
 type ItemSpec = {
   value: string
   label: string
-  props?: Partial<Parameters<typeof Checkbox.Root>[0]>
+  props?: Partial<Parameters<typeof CheckboxGroup.Item>[0]>
   controlId?: string
 }
 function Grp({
@@ -117,15 +117,15 @@ function Grp({
         {error && <CheckboxGroup.ErrorMessage>{error}</CheckboxGroup.ErrorMessage>}
         {parent && (
           <CheckboxGroup.Parent>
-            <Checkbox.Control />
-            <Checkbox.Label>All toppings</Checkbox.Label>
+            <CheckboxGroup.ItemControl />
+            <CheckboxGroup.ItemLabel>All toppings</CheckboxGroup.ItemLabel>
           </CheckboxGroup.Parent>
         )}
         {items.map((t) => (
-          <Checkbox.Root key={t.value} value={t.value} {...t.props}>
-            <Checkbox.Control {...(t.controlId ? { id: t.controlId } : {})} />
-            <Checkbox.Label>{t.label}</Checkbox.Label>
-          </Checkbox.Root>
+          <CheckboxGroup.Item key={t.value} value={t.value} {...t.props}>
+            <CheckboxGroup.ItemControl {...(t.controlId ? { id: t.controlId } : {})} />
+            <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+          </CheckboxGroup.Item>
         ))}
       </CheckboxGroup.Root>
     </form>
@@ -168,9 +168,9 @@ describe("Group value", () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     render(
       <CheckboxGroup.Root>
-        <Checkbox.Root>
-          <Checkbox.Control aria-label="x" />
-        </Checkbox.Root>
+        <CheckboxGroup.Item>
+          <CheckboxGroup.ItemControl aria-label="x" />
+        </CheckboxGroup.Item>
       </CheckboxGroup.Root>,
     )
     expect(error.mock.calls.some((c) => /needs a `value`/.test(String(c[0])))).toBe(true)
@@ -330,7 +330,7 @@ describe("Parent", () => {
     render(
       <CheckboxGroup.Root>
         <CheckboxGroup.Parent>
-          <Checkbox.Control aria-label="all" />
+          <CheckboxGroup.ItemControl aria-label="all" />
         </CheckboxGroup.Parent>
       </CheckboxGroup.Root>,
     )
@@ -393,10 +393,10 @@ describe("Required group", () => {
         <CheckboxGroup.Root name="t" required>
           <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
           {TOPPINGS.map((t, i) => (
-            <Checkbox.Root key={t.value} value={t.value} disabled={i === 0}>
-              <Checkbox.Control />
-              <Checkbox.Label>{t.label}</Checkbox.Label>
-            </Checkbox.Root>
+            <CheckboxGroup.Item key={t.value} value={t.value} disabled={i === 0}>
+              <CheckboxGroup.ItemControl />
+              <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Item>
           ))}
         </CheckboxGroup.Root>
       </form>,
@@ -514,10 +514,10 @@ describe("Form submission and reset", () => {
         <CheckboxGroup.Root name="t" onValueChange={onValueChange}>
           <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
           {TOPPINGS.map((t) => (
-            <Checkbox.Root key={t.value} value={t.value}>
-              <Checkbox.Control />
-              <Checkbox.Label>{t.label}</Checkbox.Label>
-            </Checkbox.Root>
+            <CheckboxGroup.Item key={t.value} value={t.value}>
+              <CheckboxGroup.ItemControl />
+              <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Item>
           ))}
         </CheckboxGroup.Root>
         <button type="reset">Reset</button>
@@ -570,10 +570,10 @@ describe("Field binding", () => {
         <Field.Label>Toppings</Field.Label>
         <CheckboxGroup.Root name="t">
           {TOPPINGS.map((t) => (
-            <Checkbox.Root key={t.value} value={t.value}>
-              <Checkbox.Control />
-              <Checkbox.Label>{t.label}</Checkbox.Label>
-            </Checkbox.Root>
+            <CheckboxGroup.Item key={t.value} value={t.value}>
+              <CheckboxGroup.ItemControl />
+              <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Item>
           ))}
         </CheckboxGroup.Root>
         <Field.ErrorMessage>Pick one</Field.ErrorMessage>
@@ -598,10 +598,10 @@ describe("Field binding", () => {
           <Field.Label>Toppings</Field.Label>
           <CheckboxGroup.Root name="t" defaultValue={["a"]}>
             {TOPPINGS.map((t) => (
-              <Checkbox.Root key={t.value} value={t.value}>
-                <Checkbox.Control />
-                <Checkbox.Label>{t.label}</Checkbox.Label>
-              </Checkbox.Root>
+              <CheckboxGroup.Item key={t.value} value={t.value}>
+                <CheckboxGroup.ItemControl />
+                <CheckboxGroup.ItemLabel>{t.label}</CheckboxGroup.ItemLabel>
+              </CheckboxGroup.Item>
             ))}
           </CheckboxGroup.Root>
         </Field.Root>
@@ -618,14 +618,14 @@ describe("allValues and the rendered items (task 3.2)", () => {
     render(
       <CheckboxGroup.Root allValues={["a"]}>
         <CheckboxGroup.Label>Extras</CheckboxGroup.Label>
-        <Checkbox.Root value="a">
-          <Checkbox.Control />
-          <Checkbox.Label>A</Checkbox.Label>
-        </Checkbox.Root>
-        <Checkbox.Root value="z">
-          <Checkbox.Control />
-          <Checkbox.Label>Z</Checkbox.Label>
-        </Checkbox.Root>
+        <CheckboxGroup.Item value="a">
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>A</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
+        <CheckboxGroup.Item value="z">
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>Z</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
       </CheckboxGroup.Root>,
     )
     await vi.waitFor(() =>
@@ -645,10 +645,10 @@ describe("review fixes (add-radio-group r1): external Field errors (base-ui#1745
           <Field.Label>Extras</Field.Label>
           <CheckboxGroup.Root {...(value === undefined ? {} : { value })}>
             {["a", "b"].map((v) => (
-              <Checkbox.Root key={v} value={v}>
-                <Checkbox.Control />
-                <Checkbox.Label>{v.toUpperCase()}</Checkbox.Label>
-              </Checkbox.Root>
+              <CheckboxGroup.Item key={v} value={v}>
+                <CheckboxGroup.ItemControl />
+                <CheckboxGroup.ItemLabel>{v.toUpperCase()}</CheckboxGroup.ItemLabel>
+              </CheckboxGroup.Item>
             ))}
           </CheckboxGroup.Root>
           <Field.ErrorMessage />

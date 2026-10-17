@@ -22,7 +22,7 @@ for (const f of docs) {
 }
 
 /**
- * Parts that are another component's Root (CheckboxGroup.Parent is a Checkbox.Root), or a
+ * Parts that are another component's Root (CheckboxGroup.Parent is a CheckboxGroup.Item), or a
  * second root of their own (Avatar.Group holds avatars and its GroupOverflow).
  */
 const ROOT_ALIASES: Readonly<Record<string, string | readonly string[]>> = {

@@ -9,7 +9,6 @@ import * as avatar from "./avatar"
 import * as badge from "./badge"
 import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
-import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
@@ -60,7 +59,6 @@ import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as textField from "./text-field"
-import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
@@ -87,7 +85,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   badge,
   breadcrumbs,
   button,
-  checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
   "color-area": colorArea,
@@ -134,7 +131,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   switch: switchEx,
   tabs,
   "text-field": textField,
-  toggle,
   "toggle-group": toggleGroup,
   toolbar,
   tooltip,

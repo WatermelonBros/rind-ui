@@ -3,7 +3,6 @@ import * as accordion from "./accordion"
 import * as anchored from "./anchored"
 import * as announce from "./announce"
 import * as button from "./button"
-import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as combobox from "./combobox"
@@ -25,7 +24,6 @@ import * as separator from "./separator"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as textField from "./text-field"
-import * as toggle from "./toggle"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as visuallyHidden from "./visually-hidden"
@@ -39,7 +37,6 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   anchored,
   announce,
   button,
-  checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
   combobox,
@@ -61,7 +58,6 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   switch: switchEx,
   tabs,
   "text-field": textField,
-  toggle,
   "toggle-group": toggleGroup,
   toolbar,
   "visually-hidden": visuallyHidden,

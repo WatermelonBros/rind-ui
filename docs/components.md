@@ -10,7 +10,7 @@ Sources (collected 2026-10-14): Ark UI, Radix Primitives, React Aria Components
 `llms.txt` files and component folders on GitHub. Rows marked *unverified* were
 seen in docs or source but not confirmed as public, stable API.
 
-**90 components** in 10 categories, plus 11 AI-UI primitives no library ships.
+**88 components** in 10 categories, plus 11 AI-UI primitives no library ships.
 
 ## How to read this
 
@@ -76,16 +76,14 @@ seen in docs or source but not confirmed as public, stable API.
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark |
 | Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |
 
-## Boolean & toggles (6)
+## Boolean & toggles (4)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Checkbox | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
 | Radio Group | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | done |  |
-| Toggle | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC/Kobalte: Toggle Button |
-| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: ToggleButtonGroup |
-| Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | done | Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |
+| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: ToggleButtonGroup · a lone Item is the single Toggle (RAC/Kobalte: Toggle Button) |
+| Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | done | A lone Item is the single Checkbox (used by Reado) · Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |
 
 ## Inputs (12)
 

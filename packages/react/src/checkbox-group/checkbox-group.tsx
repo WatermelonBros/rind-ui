@@ -369,4 +369,22 @@ export type CheckboxGroupItemProps = CheckboxRootProps
 export type CheckboxGroupItemIndicatorProps = CheckboxIndicatorProps
 export type CheckboxGroupItemState = CheckboxState
 
-export const CheckboxGroup = { Root, Label, Description, ErrorMessage, Parent, Item, ItemIndicator }
+/** The item's (or the Parent's) focusable box. The group's own Label/Description are separate. */
+const ItemControl = Checkbox.Control
+/** The item's label; names its Control. */
+const ItemLabel = Checkbox.Label
+/** The item's description, wired into `aria-describedby`. */
+const ItemDescription = Checkbox.Description
+
+export const CheckboxGroup = {
+  Root,
+  Label,
+  Description,
+  ErrorMessage,
+  Parent,
+  Item,
+  ItemControl,
+  ItemIndicator,
+  ItemLabel,
+  ItemDescription,
+}

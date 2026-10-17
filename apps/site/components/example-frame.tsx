@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Heading, SegmentedControl, Tabs, Toggle } from "@rind-ui/react"
+import { Button, Heading, SegmentedControl, Tabs, ToggleGroup } from "@rind-ui/react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples, heroName } from "@/examples"
@@ -157,13 +157,13 @@ export function ExampleFrame({
           ))}
           <SegmentedControl.Indicator className={styles.viewIndicator} />
         </SegmentedControl.Root>
-        <Toggle.Root
+        <ToggleGroup.Item
           className={styles.getCode}
           pressed={tab !== null}
           onPressedChange={(on) => setTab(on ? "react" : null)}
         >
           {"</>"} Get code
-        </Toggle.Root>
+        </ToggleGroup.Item>
       </div>
 
       <div

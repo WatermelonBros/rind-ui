@@ -1,6 +1,6 @@
 "use client"
 
-import { Accordion, Button, Checkbox, Heading, Toggle } from "@rind-ui/react"
+import { Accordion, Button, CheckboxGroup, Heading, ToggleGroup } from "@rind-ui/react"
 import Link from "next/link"
 import { type ReactNode, useState } from "react"
 import styles from "./hero.module.css"
@@ -41,9 +41,9 @@ function Specimens() {
         >
           <span className={styles.tag}>toggle · aria-pressed</span>
           <div className="row">
-            <Toggle.Root defaultPressed>Bold</Toggle.Root>
-            <Toggle.Root>Italic</Toggle.Root>
-            <Toggle.Root defaultPressed>Mono</Toggle.Root>
+            <ToggleGroup.Item defaultPressed>Bold</ToggleGroup.Item>
+            <ToggleGroup.Item>Italic</ToggleGroup.Item>
+            <ToggleGroup.Item defaultPressed>Mono</ToggleGroup.Item>
           </div>
         </div>
 
@@ -54,12 +54,12 @@ function Specimens() {
           <span className={styles.tag}>checkbox · data-state</span>
           <div className="stack">
             {(["Keyboard", "Screen readers", "Your design"] as const).map((label, i) => (
-              <Checkbox.Root key={label} defaultChecked={i < 2}>
-                <Checkbox.Control>
-                  <Checkbox.Indicator>✓</Checkbox.Indicator>
-                </Checkbox.Control>
-                <Checkbox.Label>{label}</Checkbox.Label>
-              </Checkbox.Root>
+              <CheckboxGroup.Item key={label} defaultChecked={i < 2}>
+                <CheckboxGroup.ItemControl>
+                  <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                </CheckboxGroup.ItemControl>
+                <CheckboxGroup.ItemLabel>{label}</CheckboxGroup.ItemLabel>
+              </CheckboxGroup.Item>
             ))}
           </div>
         </div>

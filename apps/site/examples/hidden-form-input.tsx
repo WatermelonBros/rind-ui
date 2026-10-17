@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Checkbox, Switch } from "@rind-ui/react"
+import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { useState } from "react"
 import type { Variants } from "./types"
 
@@ -16,12 +16,12 @@ export function Basic() {
         )
       }}
     >
-      <Checkbox.Root name="terms" defaultChecked>
-        <Checkbox.Control>
-          <Checkbox.Indicator>✓</Checkbox.Indicator>
-        </Checkbox.Control>
-        <Checkbox.Label>Accept the terms</Checkbox.Label>
-      </Checkbox.Root>
+      <CheckboxGroup.Item name="terms" defaultChecked>
+        <CheckboxGroup.ItemControl>
+          <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+        </CheckboxGroup.ItemControl>
+        <CheckboxGroup.ItemLabel>Accept the terms</CheckboxGroup.ItemLabel>
+      </CheckboxGroup.Item>
       <Switch.Root name="news" value="weekly" uncheckedValue="never">
         <Switch.Control>
           <Switch.Thumb />
