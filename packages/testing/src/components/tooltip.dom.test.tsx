@@ -5,7 +5,7 @@
 // animation) run in the browsers only.
 import { getLayerStack, platforms, type TooltipChangeDetails } from "@rind-ui/core"
 import {
-  Checkbox,
+  CheckboxGroup,
   Dialog,
   Popover,
   RindProvider,
@@ -1280,10 +1280,10 @@ describe("A checkbox as the trigger", () => {
   it("keeps its id, scope and name, and the tooltip opens on hover and on keyboard focus", async () => {
     const { user } = fakeTime()
     render(
-      <Checkbox.Root>
+      <CheckboxGroup.Item>
         <Tooltip.Root>
-          <Tooltip.Trigger render={<Checkbox.Control />}>
-            <Checkbox.Indicator />
+          <Tooltip.Trigger render={<CheckboxGroup.ItemControl />}>
+            <CheckboxGroup.ItemIndicator />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Positioner>
@@ -1291,8 +1291,8 @@ describe("A checkbox as the trigger", () => {
             </Tooltip.Positioner>
           </Tooltip.Portal>
         </Tooltip.Root>
-        <Checkbox.Label>Newsletter</Checkbox.Label>
-      </Checkbox.Root>,
+        <CheckboxGroup.ItemLabel>Newsletter</CheckboxGroup.ItemLabel>
+      </CheckboxGroup.Item>,
     )
     const control = screen.getByRole("checkbox", { name: "Newsletter" })
     expect(control.getAttribute("data-scope")).toBe("checkbox")

@@ -26,6 +26,7 @@ import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { type RenderProp, renderPart } from "../render"
+import { Toggle, type ToggleIndicatorProps, type ToggleRootProps } from "../toggle/toggle"
 import { useCollectionItems, useRegisterItem } from "../use-collection-items"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -187,7 +188,8 @@ export interface ToggleGroupItemState {
   readonly disabled: boolean
 }
 
-export type ToggleGroupItemProps = Omit<ComponentPropsWithRef<"button">, "value"> & {
+/** An item of a group (its `value` is its key in the group's value). */
+type GroupItemProps = Omit<ComponentPropsWithRef<"button">, "value"> & {
   /** The item's key in the group's value. */
   readonly value: string
   readonly disabled?: boolean
@@ -195,7 +197,27 @@ export type ToggleGroupItemProps = Omit<ComponentPropsWithRef<"button">, "value"
   readonly render?: RenderProp<ToggleGroupItemState>
 }
 
-function Item({ value, disabled = false, textValue, render, ref, ...rest }: ToggleGroupItemProps) {
+/**
+ * A toggle: inside `ToggleGroup.Root` an item of the group (`value` is its key); alone, a
+ * single toggle button with its own `pressed` state (no group wrapper, no roving).
+ */
+export type ToggleGroupItemProps =
+  | GroupItemProps
+  | (ToggleRootProps & { readonly value?: undefined; readonly textValue?: undefined })
+
+/** The pressed state and indicator props an item gives its indicator. */
+const ItemContext = createContext<{ state: ToggleGroupItemState; indicator: object } | null>(null)
+
+function Item(props: ToggleGroupItemProps) {
+  const ctx = useContext(GroupContext)
+  if (!ctx) return <Toggle.Root {...(props as ToggleRootProps)} />
+  if (props.value === undefined) {
+    throw new Error("ToggleGroup.Item needs a `value` inside ToggleGroup.Root")
+  }
+  return <GroupItem {...(props as GroupItemProps)} />
+}
+
+function GroupItem({ value, disabled = false, textValue, render, ref, ...rest }: GroupItemProps) {
   const ctx = useGroup("Item")
   const env = useEnvironment()
   // The modality tracker must see the pointerdown that comes before focus.
@@ -249,10 +271,34 @@ function Item({ value, disabled = false, textValue, render, ref, ...rest }: Togg
     },
     rest,
   )
-  return renderPart("button", props, render, {
-    pressed: ctx.value.includes(key),
-    disabled: isDisabled(),
-  })
+  const state = { pressed: ctx.value.includes(key), disabled: isDisabled() }
+  return (
+    <ItemContext
+      value={{
+        state,
+        indicator: normalizeProps(ctx.api.itemIndicator(key, { itemDisabled: disabled })),
+      }}
+    >
+      {renderPart("button", props, render, state)}
+    </ItemContext>
+  )
 }
 
-export const ToggleGroup = { Root, Item }
+export type ToggleGroupItemIndicatorProps = ToggleIndicatorProps
+
+/** Decorative: its children while the item is pressed, `fallback` otherwise. */
+function ItemIndicator(props: ToggleGroupItemIndicatorProps) {
+  const item = useContext(ItemContext)
+  // A lone item is a single toggle: its own indicator.
+  if (!item) return <Toggle.Indicator {...props} />
+  const { fallback, render, children, ...rest } = props
+  const own = mergeProps(item.indicator as Record<string, unknown>, rest)
+  return renderPart(
+    "span",
+    { ...own, children: item.state.pressed ? children : fallback },
+    render,
+    item.state,
+  )
+}
+
+export const ToggleGroup = { Root, Item, ItemIndicator }

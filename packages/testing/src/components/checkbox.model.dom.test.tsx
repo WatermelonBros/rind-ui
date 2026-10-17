@@ -2,7 +2,7 @@
 // (uncontrolled, indeterminate default, read-only, focusable-disabled, controlled), in every
 // modality, with the form-associated invariants on every step; broken variants (7.2).
 import { type CheckedState, checkboxContract, platforms } from "@rind-ui/core"
-import { Checkbox, RindProvider } from "@rind-ui/react"
+import { CheckboxGroup, RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { type ReactElement, useState } from "react"
@@ -27,7 +27,7 @@ const base = {
 const anchor = [{ name: "Accept terms" }] as never
 const steps = checkboxStepInvariants()
 
-type RootProps = Parameters<typeof Checkbox.Root>[0]
+type RootProps = Parameters<typeof CheckboxGroup.Item>[0]
 const withPlatform = (ui: ReactElement) => (
   <RindProvider environment={{ platform: currentRun()?.platform ?? platforms.linux }}>
     {ui}
@@ -35,13 +35,13 @@ const withPlatform = (ui: ReactElement) => (
 )
 const Terms = (props: Partial<RootProps>) => (
   <form>
-    <Checkbox.Root name="tos" {...props}>
-      <Checkbox.Control>
-        <Checkbox.Indicator>✓</Checkbox.Indicator>
-      </Checkbox.Control>
-      <Checkbox.Label>Accept terms</Checkbox.Label>
-      <Checkbox.Description>Required to continue</Checkbox.Description>
-    </Checkbox.Root>
+    <CheckboxGroup.Item name="tos" {...props}>
+      <CheckboxGroup.ItemControl>
+        <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+      </CheckboxGroup.ItemControl>
+      <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+      <CheckboxGroup.ItemDescription>Required to continue</CheckboxGroup.ItemDescription>
+    </CheckboxGroup.Item>
     <button type="reset">Reset</button>
   </form>
 )
@@ -128,15 +128,15 @@ async function failures(ui: () => ReactElement, props: Record<string, unknown> =
 describe("broken Checkboxes fail readably (7.2)", () => {
   it("toggles on Enter → checkbox-enter-never-changes", { timeout: 60_000 }, async () => {
     render(
-      <Checkbox.Root>
-        <Checkbox.Control
+      <CheckboxGroup.Item>
+        <CheckboxGroup.ItemControl
           onKeyDown={(e) => {
             // Broken: the consumer toggles on Enter.
             if (e.key === "Enter") (e.currentTarget as HTMLElement).click()
           }}
         />
-        <Checkbox.Label>Accept terms</Checkbox.Label>
-      </Checkbox.Root>,
+        <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+      </CheckboxGroup.Item>,
     )
     steps.reset()
     await getCheckbox(screen, { name: "Accept terms" }).part("control").press("Enter")
@@ -198,8 +198,8 @@ describe("broken Checkboxes fail readably (7.2)", () => {
     let again = false
     const out = await failures(() => (
       <form>
-        <Checkbox.Root name="tos">
-          <Checkbox.Control
+        <CheckboxGroup.Item name="tos">
+          <CheckboxGroup.ItemControl
             onClick={(e) => {
               if (again) return
               again = true
@@ -207,8 +207,8 @@ describe("broken Checkboxes fail readably (7.2)", () => {
               again = false
             }}
           />
-          <Checkbox.Label>Accept terms</Checkbox.Label>
-        </Checkbox.Root>
+          <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
         <button type="reset">Reset</button>
       </form>
     ))

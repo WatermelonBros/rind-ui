@@ -2,7 +2,7 @@
 // virtual, uncontrolled and controlled (5.1), and broken variants that must fail readably
 // (5.2).
 import { platforms, toggleContract } from "@rind-ui/core"
-import { RindProvider, Toggle } from "@rind-ui/react"
+import { RindProvider, ToggleGroup } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactElement } from "react"
@@ -27,7 +27,7 @@ const withPlatform = (ui: ReactElement) => (
 describe("toggle model: uncontrolled", () => {
   testMachine(toggleContract, {
     test: it,
-    setup: () => render(withPlatform(<Toggle.Root>Bold</Toggle.Root>)),
+    setup: () => render(withPlatform(<ToggleGroup.Item>Bold</ToggleGroup.Item>)),
     target: () => screen,
     anchor,
     props: base as never,
@@ -38,7 +38,7 @@ describe("toggle model: uncontrolled", () => {
 describe("toggle model: starting on", () => {
   testMachine(toggleContract, {
     test: it,
-    setup: () => render(withPlatform(<Toggle.Root defaultPressed>Bold</Toggle.Root>)),
+    setup: () => render(withPlatform(<ToggleGroup.Item defaultPressed>Bold</ToggleGroup.Item>)),
     target: () => screen,
     anchor,
     props: { ...base, defaultPressed: true } as never,
@@ -47,7 +47,8 @@ describe("toggle model: starting on", () => {
 })
 
 describe("toggle model: controlled ($sync:pressed)", () => {
-  const ui = (pressed: boolean) => withPlatform(<Toggle.Root pressed={pressed}>Bold</Toggle.Root>)
+  const ui = (pressed: boolean) =>
+    withPlatform(<ToggleGroup.Item pressed={pressed}>Bold</ToggleGroup.Item>)
   testMachine(toggleContract, {
     test: it,
     setup: () => render(ui(false)),
@@ -62,7 +63,7 @@ describe("toggle model: controlled ($sync:pressed)", () => {
 // activateWithEnter is keyboard-only and not the PRESS mapping: its own path (design).
 describe("toggle: activateWithEnter on both edges", () => {
   it("off → on → off with Enter", async () => {
-    render(withPlatform(<Toggle.Root>Bold</Toggle.Root>))
+    render(withPlatform(<ToggleGroup.Item>Bold</ToggleGroup.Item>))
     const t = getToggle(screen, { name: "Bold" }).via("keyboard")
     await t.activateWithEnter(true)
     expect(await t.isPressed()).toBe(true)
@@ -96,7 +97,9 @@ async function failures(ui: () => ReactElement) {
 describe("broken Toggles fail readably", () => {
   it("a label that changes with the state → the anchor is lost", { timeout: 60_000 }, async () => {
     const results = await failures(() => (
-      <Toggle.Root render={(p, s) => <button {...p}>{s.pressed ? "Not bold" : "Bold"}</button>} />
+      <ToggleGroup.Item
+        render={(p, s) => <button {...p}>{s.pressed ? "Not bold" : "Bold"}</button>}
+      />
     ))
     expect(
       results.some((r) => /Bold/.test(r.error ?? "") && /match|found/i.test(r.error ?? "")),
@@ -105,7 +108,7 @@ describe("broken Toggles fail readably", () => {
 
   it("aria-pressed absent when off → the attrs check fails", { timeout: 60_000 }, async () => {
     const results = await failures(() => (
-      <Toggle.Root
+      <ToggleGroup.Item
         render={(p) => (
           <button {...p} aria-pressed={p["aria-pressed"] === "true" ? "true" : undefined}>
             Bold
@@ -119,7 +122,7 @@ describe("broken Toggles fail readably", () => {
   it("a double toggle on a bare click → virtual parity", { timeout: 60_000 }, async () => {
     let again = false
     const results = await failures(() => (
-      <Toggle.Root
+      <ToggleGroup.Item
         // Broken: a second activation for clicks with detail 0.
         onClick={(e) => {
           if (e.detail !== 0 || again) return
@@ -129,7 +132,7 @@ describe("broken Toggles fail readably", () => {
         }}
       >
         Bold
-      </Toggle.Root>
+      </ToggleGroup.Item>
     ))
     const virtual = results.filter((r) => r.name.includes("[virtual"))
     expect(virtual.some((r) => r.error !== null)).toBe(true)
