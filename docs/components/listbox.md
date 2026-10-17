@@ -2,6 +2,12 @@
 
 A list of options the user moves through with the keyboard and picks from: single or multiple selection, or an action list with no selection at all. Options can be grouped in sections, carry a description and an indicator, load more as the user scrolls, and be virtualized. The list is one tab stop and the options move by roving focus. The same parts power other composite components (see [Reusing the listbox parts](#reusing-the-listbox-parts)).
 
+## When to use
+
+- **Use it for** a visible list of options the user picks from with the keyboard: single or multiple selection, or an action list with no selection.
+- **Over a native `<select multiple>`**: it adds sections, descriptions, indicators, incremental loading, virtualization, and `data-*` state to style.
+- **Don't use it for** a list that opens from a control: use a [Select](select.md), or a [Combobox](combobox.md) when the user types to filter. For commands, use a [Menu](menu.md).
+
 ```tsx
 import { Listbox } from "@rind-ui/react"
 

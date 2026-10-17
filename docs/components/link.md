@@ -2,6 +2,12 @@
 
 A navigational link that behaves like a native `<a href>` wherever it appears: client routing without double navigation, modifier clicks left to the browser, disabled and current states, and a driver to test it.
 
+## When to use
+
+- **Use it for** navigation to a URL, including client-side routing, with the current and disabled states.
+- **Over a native `<a href>`**: it behaves like one and adds routing without double navigation, modifier clicks left to the browser, `current` (`aria-current`), `disabled`, and `onActivate`. Without a router, a plain `<a>` is enough.
+- **Don't use it for** an action that does not navigate: use a [Button](button.md). To preview the destination on hover, use a [Hover Card](hover-card.md).
+
 ```tsx
 import { Link } from "@rind-ui/react"
 

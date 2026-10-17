@@ -2,6 +2,12 @@
 
 A native `<form>` that validates every Field it contains on a submit attempt, focuses the first invalid one, holds a submission for pending async checks, maps server errors to Fields by name, announces a failed attempt once, and resets with rules that survive React form actions.
 
+## When to use
+
+- **Use it for** a form with several Fields that should validate together on submit, focus the first invalid one, show server errors by Field name and announce a failed attempt.
+- **Over a plain `<form>`**: it adds whole-form validation, holding a submission for pending async checks, typed values in `onFormSubmit`, and reset rules that survive React form actions.
+- **Don't use it for** a single control: a [Field](field.md) works in a plain `<form>` too. If native validation and a normal submit are enough, use the native `<form>`.
+
 ```tsx
 import { Field, Form, TextField } from "@rind-ui/react"
 

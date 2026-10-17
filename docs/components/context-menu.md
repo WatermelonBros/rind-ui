@@ -2,6 +2,12 @@
 
 A Menu opened from a region of the page instead of a button: a right click, a long press on touch, or the context-menu key on the keyboard opens `role="menu"` at the point of the gesture. It is modal by default (the page behind is inert); `modal={false}` leaves it usable. Items, groups, checkbox and radio items, links and submenus are the Menu's own parts.
 
+## When to use
+
+- **Use it for** actions on an item or region that open from a right click, a long press or the context-menu key, such as Rename or Delete on a file row.
+- **Over the browser's own menu**: it opens a real `role="menu"` at the pointer with the Menu's keyboard pattern, items, checkbox and radio items and submenus, and it adds touch and keyboard ways to open it.
+- **Don't use it for** actions that must be discoverable: a context menu has no visible affordance, so every action in it should also be reachable another way. For a menu opened from a button, use a [Menu](menu.md).
+
 ```tsx
 import { ContextMenu, Menu } from "@rind-ui/react"
 

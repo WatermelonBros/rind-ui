@@ -2,6 +2,12 @@
 
 A text field for numbers with an optional stepper on each side. It formats and parses in the user's locale (decimal, percent, currency, unit; Latin, Arabic, Persian, Devanagari and full-width digits), steps by keyboard, buttons, press-and-hold and wheel, and submits a real number through a hidden native `<input type="number">`. The Root is a Field, so labelling, description and validation work like any Field.
 
+## When to use
+
+- **Use it for** a number the user types or steps: a quantity, a price, a percentage, a measurement.
+- **Over `<input type="number">`**: it formats and parses in the user's locale (currency, percent, unit, non-Latin digits), steps by keyboard, steppers, press-and-hold and wheel, and submits the raw number through a hidden native input. It commits at defined points instead of changing the value on every keystroke.
+- **Don't use it for** a value picked along a range where the exact number matters less: use [Slider](slider.md). Don't use it for fixed-length codes or IDs: use [Pin Input](pin-input.md) or [Text Field](text-field.md).
+
 ```tsx
 import { NumberInput } from "@rind-ui/react"
 
