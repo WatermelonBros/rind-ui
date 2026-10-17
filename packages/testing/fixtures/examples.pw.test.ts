@@ -48,6 +48,7 @@ async function frames(page: pw.Page, n: number) {
 
 /** Pages loaded at once per engine. */
 const CONCURRENCY = 4
+const RECYCLE = 50
 
 const hydrated = waitHydrated
 
@@ -60,9 +61,16 @@ async function pool<T>(
   let next = 0
   await Promise.all(
     Array.from({ length: CONCURRENCY }, async () => {
-      const context = await browser.newContext()
-      const page = await context.newPage()
-      while (next < items.length) {
+      // A fresh context every RECYCLE pages: one page reused for ~2000 navigations grows
+      // Firefox's memory until the CI runner is killed.
+      let context = await browser.newContext()
+      let page = await context.newPage()
+      for (let done = 0; next < items.length; done++) {
+        if (done > 0 && done % RECYCLE === 0) {
+          await context.close()
+          context = await browser.newContext()
+          page = await context.newPage()
+        }
         const item = items[next++] as T // bounded by the loop condition
         await job(page, item)
       }
