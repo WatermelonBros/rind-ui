@@ -1,5 +1,6 @@
 import type { ComponentType } from "react"
 import * as accordion from "./accordion"
+import * as alert from "./alert"
 import * as alertDialog from "./alert-dialog"
 import * as announcements from "./announcements"
 import * as aspectRatio from "./aspect-ratio"
@@ -26,6 +27,7 @@ import * as form from "./form"
 import * as heading from "./heading"
 import * as hiddenFormInput from "./hidden-form-input"
 import * as hiddenUntilFound from "./hidden-until-found"
+import * as image from "./image"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
 import * as labels from "./labels"
@@ -33,6 +35,7 @@ import * as link from "./link"
 import * as listbox from "./listbox"
 import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
+import * as meter from "./meter"
 import * as numberInput from "./number-input"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
@@ -41,6 +44,7 @@ import * as pinInput from "./pin-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
+import * as progress from "./progress"
 import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
@@ -72,6 +76,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   menu,
   "messages-and-provider": messagesAndProvider,
   accordion,
+  alert,
   "alert-dialog": alertDialog,
   "aspect-ratio": aspectRatio,
   avatar,
@@ -94,6 +99,9 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   fieldset,
   form,
   heading,
+  image,
+  meter,
+  progress,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   overlays,

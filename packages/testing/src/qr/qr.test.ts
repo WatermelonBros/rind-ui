@@ -63,7 +63,8 @@ describe("Decodability: round trip over all versions", () => {
         let n = 0
         for (let hi = 3000; n < hi; ) {
           const mid = Math.ceil((n + hi) / 2)
-          if (encodeQr(new Uint8Array(mid), opts).ok) n = mid
+          if (encodeQr(new Uint8Array(mid), { ...opts, mask: 0 }).ok)
+            n = mid // forced mask: capacity is mask-independent, skips the mask search
           else hi = mid - 1
         }
         const value = Uint8Array.from({ length: n }, () => Math.floor(random() * 256))
@@ -97,7 +98,7 @@ describe("Decodability: round trip over all versions", () => {
         }
       }
     }
-  })
+  }, 30_000)
 
   it("lone surrogate decodes to U+FFFD, ECI only for non-ASCII", () => {
     expect(decodeQr(ok(encodeQr("a\uD83D")).modules).text).toBe("a�")

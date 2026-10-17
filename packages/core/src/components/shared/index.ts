@@ -21,3 +21,16 @@ export {
   labelInteraction,
   labelTarget,
 } from "./label-interaction"
+export {
+  checkRangeName,
+  percentFormat,
+  type RangeOrientation,
+  type RangeValue,
+  type RangeValueInput,
+  type RangeValueTextArgs,
+  rangeFillerProps,
+  rangeFillStyle,
+  rangeValueAttributes,
+  rangeValueText,
+  resolveRangeValue,
+} from "./range-value"

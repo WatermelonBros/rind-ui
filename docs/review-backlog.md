@@ -10,6 +10,9 @@ See CLAUDE.md "Review rules".
 | add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
 | add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
 | add-color-picker (impl) | — | packages/react/src/color-picker/color-picker.tsx | Eye dropper handled in the React adapter, not a machine effect; picker root never sets `data-dragging` |
+| add-progress (impl) | — | packages/core/src/components/progress/progress.contract.ts | `$props:value` prop steps set a fixed value (Progress 100, Meter 90): a prop step only receives the target state; coverage of both transitions relies on varied starting configurations |
+| add-meter (impl) | — | packages/core/src/components/meter/meter.machine.ts | Internal `VALUE.CHANGE` event from `onProps` instead of "no events" (design §5), so `testMachine` has edges to walk |
+| add-image (impl) | — | packages/testing/src/components/image.model.dom.test.tsx | As Avatar: image events are browser-fixture skips in the model walk; statuses covered by browser props-class tests |
 | add-qr-code (r1) | — | packages/react/src/qr-code/qr-code.tsx | `apiRef` finds frame/pattern/overlay with `document.getElementById`: breaks inside a shadow root (use the Root element's root node) |
 | add-qr-code (r1) | — | packages/testing/src/components/qr-code.dom.test.tsx | No Root re-render test with an inline `encoding` object (the compare-by-value claim) |
 | add-qr-code (r1) | — | packages/core/src/qr/qr.test.ts | The auto-mask oracle is circular (it reuses the encoder's own penalty); compare with fixtures' chosen masks instead |

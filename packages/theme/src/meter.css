@@ -1,0 +1,123 @@
+/*
+ * Meter (family: range): a bar on data attributes only. Core sizes the Indicator inline from
+ * --rind-meter-percent. Zones never rely on colour alone: `suboptimum` re-points the fill to
+ * the warning palette with sparse stripes and an end edge, `even-less-good` to the danger
+ * palette with dense stripes and a thicker edge; under forced colors (where backgrounds may
+ * be dropped) the zones keep apart by their border style: solid, dashed, double.
+ * data-tone re-points the accent roles (variants.css).
+ */
+@layer rind.components {
+  :where([data-scope="meter"][data-part="root"]) {
+    --_track: var(--rind-meter-track-size, 0.5rem);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--rind-meter-gap, var(--rind-space-2));
+    color: var(--rind-meter-color, var(--rind-color-text));
+  }
+  :where([data-scope="meter"][data-part="root"][data-size="sm"]) {
+    --_track: var(--rind-meter-track-size, 0.25rem);
+  }
+  :where([data-scope="meter"][data-part="root"][data-size="lg"]) {
+    --_track: var(--rind-meter-track-size, 0.75rem);
+  }
+  :where([data-scope="meter"][data-part="root"][data-orientation="vertical"]) {
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+  :where([data-scope="meter"][data-part="value-text"]) {
+    color: var(--rind-meter-value-color, var(--rind-color-text-muted));
+    font-variant-numeric: tabular-nums;
+  }
+  :where([data-scope="meter"][data-part="track"]) {
+    grid-column: 1 / -1;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--_track);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-meter-track-radius, var(--rind-radius-full));
+    background: var(--rind-meter-track-bg, var(--rind-color-neutral-soft));
+    overflow: hidden;
+  }
+  :where([data-scope="meter"][data-part="track"][data-orientation="vertical"]) {
+    display: flex;
+    flex-direction: column-reverse;
+    inline-size: var(--_track);
+    block-size: var(--rind-meter-length, 8rem);
+  }
+  :where([data-scope="meter"][data-part="indicator"]) {
+    --_fill: var(--rind-color-accent-solid);
+    box-sizing: border-box;
+    block-size: 100%;
+    border-inline-end: 0 solid var(--rind-color-text);
+    background-color: var(--rind-meter-indicator-bg, var(--_fill));
+    transition:
+      inline-size var(--rind-meter-duration, var(--rind-duration-normal)),
+      block-size var(--rind-meter-duration, var(--rind-duration-normal));
+  }
+  :where([data-scope="meter"][data-part="indicator"][data-orientation="vertical"]) {
+    inline-size: 100%;
+    border-inline-end: 0;
+    border-block-start: 0 solid var(--rind-color-text);
+  }
+  :where([data-scope="meter"][data-part="root"][data-variant="soft"] [data-part="indicator"]) {
+    --_fill: var(--rind-color-accent-soft-hover);
+  }
+
+  /* Zones: palette plus a pattern and an edge, so colour is never the only cue. */
+  :where([data-scope="meter"][data-part="indicator"][data-zone="suboptimum"]) {
+    --_fill: var(--rind-meter-suboptimum-bg, var(--rind-color-warning-solid));
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0 0.375rem,
+      color-mix(in oklab, var(--rind-color-warning-on-solid) 30%, transparent) 0.375rem 0.5rem
+    );
+    border-inline-end-width: 2px;
+  }
+  :where([data-scope="meter"][data-part="indicator"][data-zone="even-less-good"]) {
+    --_fill: var(--rind-meter-even-less-good-bg, var(--rind-color-danger-solid));
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent 0 0.125rem,
+      color-mix(in oklab, var(--rind-color-danger-on-solid) 40%, transparent) 0.125rem 0.25rem
+    );
+    border-inline-end-width: 4px;
+  }
+  :where(
+    [data-scope="meter"][data-part="indicator"][data-orientation="vertical"]:is(
+      [data-zone="suboptimum"],
+      [data-zone="even-less-good"]
+    )
+  ) {
+    border-inline-end-width: 0;
+  }
+  :where(
+    [data-scope="meter"][data-part="indicator"][data-orientation="vertical"][data-zone="suboptimum"]
+  ) {
+    border-block-start-width: 2px;
+  }
+  :where(
+    [data-scope="meter"][data-part="indicator"][data-orientation="vertical"][data-zone="even-less-good"]
+  ) {
+    border-block-start-width: 4px;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="meter"][data-part="track"]) {
+      border-color: CanvasText;
+    }
+    :where([data-scope="meter"][data-part="indicator"]) {
+      forced-color-adjust: none;
+      background-color: Highlight;
+      background-image: none;
+      border: 2px solid CanvasText;
+    }
+    :where([data-scope="meter"][data-part="indicator"][data-zone="suboptimum"]) {
+      border-style: dashed;
+    }
+    :where([data-scope="meter"][data-part="indicator"][data-zone="even-less-good"]) {
+      border-style: double;
+      border-width: 4px;
+    }
+  }
+}

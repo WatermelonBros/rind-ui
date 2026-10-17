@@ -64,14 +64,14 @@ The core runs no animation: loading Items carry `data-animate` (drop it with
 `prefers-reduced-motion: no-preference`, sweeps no faster than 1.5 s, stops on load, and is in
 phase across the page because every Item shares one fixed background.
 
-## Coming from Kobalte, MUI or Chakra
+## Coming from another Skeleton component
 
-| They write | rind-ui |
+| Elsewhere | rind-ui |
 |---|---|
-| Kobalte `<Skeleton visible>` | `<Skeleton.Root loading>` + `<Skeleton.Item>` |
+| `<Skeleton visible>` | `<Skeleton.Root loading>` + `<Skeleton.Item>` |
 | `width`, `height`, `circle`, `radius` | CSS on the Item; `--rind-skeleton-radius: 9999px` for a circle |
-| MUI `variant="text"` | an Item wrapping the text (one shape per line) |
-| Chakra `isLoaded` | `loading={!isLoaded}` |
+| `variant="text"` | an Item wrapping the text (one shape per line) |
+| `isLoaded` | `loading={!isLoaded}` |
 
 ## Styling
 
