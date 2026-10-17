@@ -101,20 +101,33 @@
   outline: 3px solid var(--s-acc);
   outline-offset: 5px;
 }
-/* the swatch's check replaces the radio dot the Radio Group skin draws */
+/* The one selected mark, centred: a ringed dot, or the Indicator's own glyph (no dot). It
+   replaces the radio dot the Radio Group skin draws. */
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-color-swatch-picker]
-  [data-scope="radio-group"][data-part="item-indicator"] {
-  width: auto;
-  height: auto;
+[data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker] {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: auto;
+  inline-size: 100%;
+  block-size: 100%;
   border-radius: 0;
   background: none;
-  animation: none;
-  position: absolute;
   color: #ffffff;
   font-weight: 800;
+  line-height: 1;
   text-shadow: 0 0 2px #000000;
   pointer-events: none;
+  animation: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker]:empty {
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #000000;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-field"][data-part="input"],
 :is([data-skinned], [data-rind-theme^="skin-"])

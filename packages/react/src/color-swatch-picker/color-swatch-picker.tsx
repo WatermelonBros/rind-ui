@@ -7,19 +7,21 @@ import {
   type ColorChangeDetails,
   type ColorInput,
   type ColorNameProp,
+  type MessageOverrides,
+  makeColor,
+  resolveColorName,
+  toSpace,
+} from "@rind-ui/core"
+import {
   type ColorSwatchPickerMessages,
   colorSwatchPickerMessages,
   colorVariables,
-  type MessageOverrides,
-  makeColor,
   matchSwatch,
   pickedColor,
-  resolveColorName,
   type SwatchItem,
   swatchColor,
   swatchKey,
-  toSpace,
-} from "@rind-ui/core"
+} from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,
@@ -238,9 +240,9 @@ function Swatch(rest: ComponentPropsWithRef<"div">) {
   return renderPart("div", mergeProps(normalizeProps(api.root()), { ...rest }), undefined, {})
 }
 
-/** Mounted only while the item is checked (a check mark): decorative. */
+/** Mounted only while the item is checked: the one selected mark, decorative. */
 function Indicator(props: ComponentPropsWithRef<typeof RadioGroup.ItemIndicator>) {
-  return <RadioGroup.ItemIndicator aria-hidden="true" {...props} />
+  return <RadioGroup.ItemIndicator aria-hidden="true" data-color-swatch-picker="" {...props} />
 }
 
 export const ColorSwatchPicker = { Root, Item, Swatch, Indicator }

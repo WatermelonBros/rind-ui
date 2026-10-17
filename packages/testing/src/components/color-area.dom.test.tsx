@@ -1,14 +1,13 @@
 // Color Area scenarios through its driver (color-area spec): anatomy, names, keyboard with
 // focus following a cross-axis key, assistive-technology adjustment, read-only, forms and
 // reset, server render and hydration. Runs in jsdom and in real browsers.
-import { ColorArea, type ColorAreaRootProps } from "@rind-ui/react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getColorArea } from "../index"
+import { ColorArea, type ColorAreaRootProps, getColorArea } from "./color-parts"
 
 afterEach(() => vi.restoreAllMocks())
 

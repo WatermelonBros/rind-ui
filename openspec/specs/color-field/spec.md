@@ -7,6 +7,8 @@ commit on explicit points and never while typing. Research: `docs/research/color
 ## Requirements
 ### Requirement: Color Field Anatomy
 
+The Color Field and the Color Channel Field are a part of the Color Picker (`ColorPicker.ChannelInput`, by its `channel`), not standalone components: no package SHALL export them on their own, and they SHALL be rendered only inside a `ColorPicker.Root`. A field-only picker is an inline Color Picker with one `ChannelInput`. The requirements of this capability describe that part.
+
 A Color Field SHALL consist of `Root` (a Field host: when not inside a Field it acts as one, as Text Field's Root does; inside
 a Field it registers as that Field's control and its own Label, Description and ErrorMessage are not rendered, with a
 development warning), `Label`, `Description`, `ErrorMessage`, `Input` (`<input type="text">`) and an automatic hidden input for

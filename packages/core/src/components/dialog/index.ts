@@ -17,8 +17,11 @@ export {
   type DialogMachineConfig,
   type DialogOpenReason,
   type DialogProps,
+  type DialogSetup,
+  type DialogTypes,
   type DismissEvent,
   dialogMachine,
+  dialogPieces,
   layerIdOf as dialogLayerId,
 } from "./dialog.machine"
 export { type DialogMessages, dialogMessages } from "./dialog.messages"

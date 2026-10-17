@@ -174,7 +174,13 @@ export function createService<M extends AnyMachine>(
   }
   const commit = (key: string, v: unknown) => patch({ internal: { ...snap.internal, [key]: v } })
 
-  const run = (names: readonly string[] | undefined, event: Event, ran: string[]) => {
+  /** `reason`: the transition's declared reason, for the controllable changes it makes. */
+  const run = (
+    names: readonly string[] | undefined,
+    event: Event,
+    ran: string[],
+    reason?: string,
+  ) => {
     for (const name of names ?? []) {
       impl.actions?.[name]?.(
         readArgs({
@@ -184,7 +190,7 @@ export function createService<M extends AnyMachine>(
           set: (key: string, v: unknown) => {
             if (!(key in values)) {
               patch({ context: { ...snap.context, [key]: v } })
-            } else if (!eq(key, v, value(key)) && write(key, v, event) === "commit") {
+            } else if (!eq(key, v, value(key)) && write(key, v, event, reason) === "commit") {
               commit(key, v)
               const s = stateFor(key, v)
               if (s !== undefined && s !== snap.state) queue.push({ type: "$sync", key, value: v })
@@ -264,7 +270,7 @@ export function createService<M extends AnyMachine>(
         // Proposed to the parent: the actions run, the state waits for `$sync`.
         // Cancelled: nothing runs.
         if (result === "propose") {
-          run(t.actions, event, ran)
+          run(t.actions, event, ran, t.reason)
           emit({ event, source, target: null, actions: ran })
         }
         return
@@ -277,7 +283,7 @@ export function createService<M extends AnyMachine>(
     }
     // Values change with the transition: exit actions still read the old ones.
     for (const [key, v] of commits) commit(key, v)
-    run(t.actions, event, ran)
+    run(t.actions, event, ran, t.reason)
     if (change) {
       patch({ state: target })
       entered = true

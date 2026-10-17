@@ -4,24 +4,13 @@
 // with props computed from the channel.
 
 import {
-  acceptColorText,
   type Color,
   type ColorChangeDetails,
   type ColorChannel,
-  type ColorFieldFormat,
-  type ColorFieldMessages,
   type ColorInput,
   type ColorSpace,
-  colorChannelFieldProps,
-  colorFieldConnect,
-  colorFieldFormValue,
-  colorFieldKeyEvent,
-  colorFieldMachine,
-  colorFieldMessages,
-  colorFieldValue,
   colorValueMachine,
   colorValueOf,
-  colorVariables,
   describeKey,
   type FieldMessages,
   type FlushRegistry,
@@ -34,6 +23,19 @@ import {
   withChannel,
   workingOf,
 } from "@rind-ui/core"
+import {
+  acceptColorText,
+  type ColorFieldFormat,
+  type ColorFieldMessages,
+  colorChannelFieldProps,
+  colorFieldConnect,
+  colorFieldFormValue,
+  colorFieldKeyEvent,
+  colorFieldMachine,
+  colorFieldMessages,
+  colorFieldValue,
+  colorVariables,
+} from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,

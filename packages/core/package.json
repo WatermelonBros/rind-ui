@@ -36,6 +36,11 @@
       "@rind-ui/source": "./src/qr/index.ts",
       "types": "./dist/qr.d.mts",
       "default": "./dist/qr.mjs"
+    },
+    "./internal": {
+      "@rind-ui/source": "./src/internal.ts",
+      "types": "./dist/internal.d.mts",
+      "default": "./dist/internal.mjs"
     }
   },
   "scripts": {

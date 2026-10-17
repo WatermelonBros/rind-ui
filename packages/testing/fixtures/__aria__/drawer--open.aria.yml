@@ -1,0 +1,21 @@
+- button "Filters"
+- dialog "Filters":
+  - heading "Filters" [level=2]
+  - paragraph: Narrow the product list.
+  - list:
+    - listitem:
+      - checkbox "In stock"
+      - text: In stock
+    - listitem:
+      - checkbox "On sale"
+      - text: On sale
+    - listitem:
+      - checkbox "Free shipping"
+      - text: Free shipping
+    - listitem:
+      - checkbox "New arrivals"
+      - text: New arrivals
+    - listitem:
+      - checkbox "Top rated"
+      - text: Top rated
+  - button "Done"

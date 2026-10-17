@@ -12,16 +12,15 @@ import * as button from "./button"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
-import * as colorArea from "./color-area"
-import * as colorField from "./color-field"
+import * as colorModel from "./color-model"
 import * as colorPicker from "./color-picker"
-import * as colorSlider from "./color-slider"
-import * as colorSwatch from "./color-swatch"
-import * as colorSwatchPicker from "./color-swatch-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
+import * as controlLabel from "./control-label"
 import * as dialog from "./dialog"
+import * as drawer from "./drawer"
 import * as field from "./field"
+import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
@@ -39,6 +38,7 @@ import * as menu from "./menu"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
+import * as numberParsing from "./number-parsing"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
 import * as passwordInput from "./password-input"
@@ -74,6 +74,10 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,
+  "color-model": colorModel,
+  "control-label": controlLabel,
+  "number-parsing": numberParsing,
+  "field-control": fieldControl,
   labels: labels,
   "visually-hidden": visuallyHidden,
   menu,
@@ -88,16 +92,12 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   button,
   "checkbox-group": checkboxGroup,
   collapsible,
-  "color-area": colorArea,
-  "color-field": colorField,
   "color-picker": colorPicker,
-  "color-slider": colorSlider,
-  "color-swatch": colorSwatch,
-  "color-swatch-picker": colorSwatchPicker,
   combobox,
   collections,
   "context-menu": contextMenu,
   dialog,
+  drawer,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,

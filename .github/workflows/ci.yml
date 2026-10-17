@@ -112,9 +112,13 @@ jobs:
       - run: pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests --reporter=default --reporter=json --outputFile.json=vitest-report.json
         env:
           RIND_BROWSERS: ${{ matrix.engine || (matrix.browsers != '' && matrix.browsers) || 'chromium' }}
+          RIND_MAX_WORKERS: ${{ startsWith(matrix.slice, 'browser-') && '2' || '' }}
           CHANGED: ${{ needs.changes.outputs.full == 'false' && matrix.slice != 'node' && format('--changed {0}', needs.changes.outputs.base) || '' }}
       - if: always()
         run: node scripts/flaky-report.mjs vitest-report.json
+      # Chromium has crashed mid-run with no output: on failure, show whether the kernel killed it.
+      - if: failure() && startsWith(matrix.slice, 'browser-')
+        run: sudo dmesg | grep -iE "oom|killed process|segfault" || echo "no OOM/kill in dmesg"
 
   # The required status check: green when every slice above passed or was not needed.
   check:

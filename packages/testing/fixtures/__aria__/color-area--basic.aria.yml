@@ -1,3 +1,0 @@
-- group "Fill":
-  - slider "Fill Saturation": "60"
-  - slider "Fill Brightness": "70"

@@ -620,6 +620,8 @@ function replayEnv(base: AdapterEnv, snapshot: DomSnapshot, mode: "touch-hover" 
     compose: async () => {},
     pressAtPosition: async () => {},
     pointer: async () => {},
+    // A drag is a press and a move: no hover to replay.
+    drag: async () => {},
     fill: async () => {},
     hover: async () => {
       if (mode !== "touch-hover") return

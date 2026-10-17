@@ -7,6 +7,8 @@ own, as the Color Picker's trigger preview and value swatch, and inside the Colo
 ## Requirements
 ### Requirement: Anatomy And Naming
 
+The Color Swatch is a part of the Color Picker (`ColorPicker.Swatch`, `ColorPicker.ValueSwatch`), not a standalone component: no package SHALL export it on its own, and it SHALL be rendered only inside a `ColorPicker.Root`. The requirements of this capability describe that part.
+
 A Color Swatch SHALL render one element (`div` by default) with `role="img"` and `aria-roledescription` from
 `messages.swatch` (default "color swatch"), named by the colour name (`color-model` "Colour Names", with the component's
 `locale`, `messages` and optional `colorName` function) followed, when the consumer passes `aria-label`, by a comma and that
