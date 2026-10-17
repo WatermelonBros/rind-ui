@@ -25,7 +25,9 @@ async function waitOut<P extends string>(env: Env<P>, done: () => Promise<boolea
 const toastsOf = (env: Env<RegionP>) => env.find({ role: "listitem" })
 
 const regionHasFocus = async (env: Env<RegionP>) =>
-  (await env.part("region").exists()) && (await env.focused().attr("data-scope")) === "toast"
+  (await env.part("region").exists()) &&
+  (await env.focused().exists()) &&
+  (await env.focused().attr("data-scope")) === "toast"
 
 /** The region of one store, located by its name ("Notifications (F6)"). */
 export const toasterContract = contract("toast", {
@@ -67,7 +69,9 @@ export const toasterContract = contract("toast", {
     leave: {
       keyboard: async (env: Env<RegionP>) => env.keyboard("F6"),
       pointer: async (env: Env<RegionP>) => env.pointerAway(),
-      done: async (env: Env<RegionP>) => !(await regionHasFocus(env)),
+      // With nothing remembered to return to, focus stays in the region (spec "Hotkey And
+      // Focus"): the state checks decide.
+      done: async () => true,
     },
     /** Advances time until no toast is shown. */
     waitForAll: {
@@ -86,6 +90,10 @@ export const toasterContract = contract("toast", {
     SWIPING: { skip: "covered by the toast's swipe" },
   },
   traits: ["timed", "presence"],
+  // Focus in the region pauses and (by keyboard) expands: focusing it commits.
+  commitsOnFocus: (["collapsed", "expanded"] as const).flatMap((state) =>
+    (["region", "root"] as const).map((part) => ({ part, state })),
+  ),
 })
 
 const closeTrigger = (env: Env<ToastP>): Part => env.part("close-trigger")
@@ -195,4 +203,8 @@ export const toastContract = contract("toast", {
     "SWIPE.CANCEL": { skip: "the gesture's cancellation: swipe-gesture tests" },
   },
   traits: ["timed", "presence"],
+  // Focus inside the region pauses every toast (spec "Pausing"): focusing a part commits.
+  commitsOnFocus: (["timing", "paused", "persistent", "idle"] as const).flatMap((state) =>
+    (["root", "action-trigger", "close-trigger"] as const).map((part) => ({ part, state })),
+  ),
 })

@@ -220,6 +220,8 @@ function Root({ render, ref, ...rest }: Own<"li">) {
   const { toast } = ctx
   const service = store.service(toast.instance)
   const node = useRef<HTMLElement | null>(null)
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
   const open = toast.state !== "dismissed"
   const { mounted } = usePresence(open, node, {
     // The exit ended: the record goes (presses during the exit keep nothing: mui/base-ui#5135).
@@ -275,10 +277,17 @@ function Root({ render, ref, ...rest }: Own<"li">) {
     }
   }, [toast.state, toast.data.id])
   if (!mounted || !service) return null
-  const own = normalizeProps(ctx.region.api.root(toast, { rendered: ctx.rendered }))
+  const own = normalizeProps(
+    ctx.region.api.root(toast, { rendered: ctx.rendered, focused, modality }),
+  )
   const props = mergeProps(
     {
-      ...joinHandlers(own, { onKeyDown: ctx.region.api.onRootKeyDown(service.send) }),
+      ...joinHandlers(own, {
+        onKeyDown: ctx.region.api.onRootKeyDown(service.send),
+        // The toast itself, not its buttons: data-focus(-visible) on the root.
+        onFocus: (e: React.FocusEvent) => setFocused(e.target === e.currentTarget),
+        onBlur: () => setFocused(false),
+      }),
       ref: composeRefs(node, ref),
     },
     rest,

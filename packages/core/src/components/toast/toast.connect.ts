@@ -38,6 +38,9 @@ export interface ToasterConnectInput {
 export interface ToastPartState {
   /** The title / description parts that are rendered (relations only to those). */
   readonly rendered: { readonly title: boolean; readonly description: boolean }
+  /** The toast itself has focus (the hotkey, a Tab stop). */
+  readonly focused: boolean
+  readonly modality: Modality
 }
 
 /** A button part's own state. */
@@ -102,6 +105,7 @@ export function toasterConnect(input: ToasterConnectInput) {
         "aria-labelledby": s.rendered.title ? ids.title : undefined,
         "aria-describedby": s.rendered.description ? ids.description : undefined,
         "data-state": exiting ? "closed" : "open",
+        ...focusAttrs(s.focused, s.modality),
         "data-type": t.data.type,
         "data-index": exiting ? undefined : String(Math.max(0, index)),
         "data-front": dataFlag(!exiting && index === 0),

@@ -59,7 +59,11 @@ describe("toast meta matches the code", () => {
     const parts = {
       region: a.region(),
       list: a.list(),
-      root: a.root(toast, { rendered: { title: true, description: true } }),
+      root: a.root(toast, {
+        rendered: { title: true, description: true },
+        focused: true,
+        modality: "keyboard",
+      }),
       title: a.title(toast),
       description: a.description(toast),
       "action-trigger": a.actionTrigger(toast, btn),
