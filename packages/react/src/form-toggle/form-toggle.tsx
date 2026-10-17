@@ -89,6 +89,10 @@ export interface FormToggleConfig<V extends CheckedState, D> {
   readonly indicatorPart: "indicator" | "thumb"
   /** Names the component in errors ("Checkbox", "Switch"). */
   readonly label: string
+  /** Public part names for guard messages (default `<label>.<Part>`). */
+  readonly partNames?: Partial<
+    Record<"Root" | "Control" | "Indicator" | "Label" | "Description", string>
+  >
   /** A hook: the component's own machine (useMachine). */
   readonly useService: (
     props: FormToggleServiceProps<V, D>,
@@ -142,9 +146,9 @@ export interface FormToggleGrouped {
 export const FormToggleGroupingContext = createContext<FormToggleGrouping | null>(null)
 
 const FormToggleContext = createContext<Ctx | null>(null)
-function useFormToggle(part: string): Ctx {
+function useFormToggle(part: string, root: string): Ctx {
   const ctx = useContext(FormToggleContext)
-  if (!ctx) throw new Error(`${part} must be inside its Root`)
+  if (!ctx) throw new Error(`${part} must be inside ${root}`)
   return ctx
 }
 
@@ -232,6 +236,8 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
 export function createFormToggle<V extends CheckedState, D>(config: FormToggleConfig<V, D>) {
   // The shared parts read the service through CheckedState; V narrows it per component.
   const shared = config as unknown as FormToggleConfig<CheckedState, unknown>
+  const partName = (part: "Root" | "Control" | "Indicator" | "Label" | "Description") =>
+    config.partNames?.[part] ?? `${config.label}.${part}`
   function Root({
     checked,
     defaultChecked = false as V,
@@ -455,7 +461,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
     "aria-labelledby": ariaLabelledBy,
     ...rest
   }: PartProps<"button">) {
-    const ctx = useFormToggle(`${config.label}.Control`)
+    const ctx = useFormToggle(partName("Control"), partName("Root"))
     const env = useEnvironment()
     // The modality tracker must see the pointerdown that comes before focus.
     useEffect(() => env.modality.subscribe(() => {}), [env])
@@ -520,7 +526,8 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
 
   function Indicator({ render, children, ...rest }: FormToggleIndicatorProps<V>) {
     const ctx = useFormToggle(
-      `${config.label}.${config.indicatorPart === "thumb" ? "Thumb" : "Indicator"}`,
+      config.indicatorPart === "thumb" ? `${config.label}.Thumb` : partName("Indicator"),
+      partName("Root"),
     )
     const api = useApi(ctx)
     const value = ctx.service.checked
@@ -533,7 +540,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
   }
 
   function Label({ render, ref, ...rest }: PartProps<"label">) {
-    const ctx = useFormToggle(`${config.label}.Label`)
+    const ctx = useFormToggle(partName("Label"), partName("Root"))
     const env = useEnvironment()
     useRegisterPart(ctx.registry, "label", ctx.ids.label)
     const api = useApi(ctx)
@@ -567,7 +574,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
   }
 
   function Description({ render, ...rest }: PartProps<"div">) {
-    const ctx = useFormToggle(`${config.label}.Description`)
+    const ctx = useFormToggle(partName("Description"), partName("Root"))
     useRegisterPart(ctx.registry, "description", ctx.ids.description)
     const api = useApi(ctx)
     const props = mergeProps(normalizeProps(api.description()), rest)

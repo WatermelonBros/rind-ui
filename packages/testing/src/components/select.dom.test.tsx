@@ -398,11 +398,30 @@ describe("Select: naming, Field and nesting", () => {
     expect(screen.getByRole("listbox").getAttribute("aria-labelledby")).toBe(null)
   })
 
-  it("Unnamed trigger: a development warning", async () => {
+  it("Unnamed trigger: one development warning, a frame after mount", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(<Bare />)
-    // checked after the Label's mount re-render (a microtask)
     await vi.waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/))
+    expect(warn.mock.calls.filter((c) => /no accessible name/.test(String(c[0])))).toHaveLength(1)
+    warn.mockRestore()
+  })
+
+  it("Named by Select.Label (or a Field label): no warning", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    render(
+      <>
+        <Fruit />
+        <Field.Root>
+          <Field.Label>Fruit too</Field.Label>
+          <Bare />
+        </Field.Root>
+      </>,
+    )
+    // Past the check's frame.
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    )
+    expect(warn.mock.calls.flat().join(" ")).not.toMatch(/no accessible name/)
     warn.mockRestore()
   })
 
