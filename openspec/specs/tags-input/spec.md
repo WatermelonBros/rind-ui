@@ -1,14 +1,17 @@
-## Purpose
+# tags-input Specification
 
+## Purpose
 Defines the rind-ui Tags Input: a text input whose typed or pasted text becomes a list of
 string tags — creation by Enter and delimiters, paste splitting, IME safety, validation,
 duplicates, maximum, blur behaviour, editing a tag in place, optional suggestions, form
 participation, parts, `data-*` attributes, messages and the contract. Chip display,
 navigation and removal come from the shared `input-chips` behaviour of `add-combobox`;
-suggestions come from `combobox-pattern`.
-
-## ADDED Requirements
-
+suggestions come from `combobox-pattern`. Follow-up (not yet delivered, tracked in docs/review-backlog.md): the
+Suggestions requirement and the suggestion parts, delivered with the extraction of the
+`combobox-pattern` pieces shared with Autocomplete. Root renders no element of its own: the
+form carriers are rendered by the Control and the machine state is the Control's
+`data-state`.
+## Requirements
 ### Requirement: Anatomy
 
 The Tags Input SHALL consist of: Root, Label, Control (wraps chips, input and buttons),
@@ -485,3 +488,4 @@ targets for ChipRemove and ClearTrigger.
 - **WHEN** the themed component is rendered with `forced-colors: active` and a chip is
   highlighted
 - **THEN** every chip has a visible border and the highlighted chip a visible outline
+

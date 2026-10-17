@@ -189,8 +189,14 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
         "data-disabled": dataFlag(chip?.disabled === true),
         "data-highlighted": dataFlag(focused || v.context.armedChip === key),
         "data-armed": dataFlag(v.context.armedChip === key),
-        "data-focus-visible": dataFlag(focused && v.context.focusedChipModality === "keyboard"),
-        onFocus: () => {
+        // Armed by Backspace is a keyboard highlight too.
+        "data-focus-visible": dataFlag(
+          (focused && v.context.focusedChipModality === "keyboard") || v.context.armedChip === key,
+        ),
+        onFocus: (event: unknown) => {
+          // Focus on the chip itself (its remove button's focus bubbles here in React).
+          const e = event as FocusEvent
+          if (e.target !== e.currentTarget) return
           if (v.context.focusedChip !== key) {
             v.send({ type: "CHIP.NAVIGATE", key, modality: env.modality.modality() })
           }

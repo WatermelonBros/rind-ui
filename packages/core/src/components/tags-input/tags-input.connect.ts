@@ -246,7 +246,13 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
       const own = chips.chipRemove(key)
       // Read-only: shown, but not actionable.
       return v.readOnly
-        ? { ...own, disabled: undefined, "aria-disabled": "true", onClick: undefined }
+        ? {
+            ...own,
+            disabled: undefined,
+            "aria-disabled": "true",
+            "data-disabled": "",
+            onClick: undefined,
+          }
         : own
     },
     /** Rendered only while `key` is edited. */
@@ -296,6 +302,7 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
         "data-visible": dataFlag(visible),
         disabled: v.disabled || undefined,
         "aria-disabled": v.readOnly ? "true" : undefined,
+        "data-disabled": dataFlag(v.disabled || v.readOnly),
         onMouseDown: (event: unknown) => {
           if ((event as MouseEvent).button === 0) (event as MouseEvent).preventDefault()
         },
