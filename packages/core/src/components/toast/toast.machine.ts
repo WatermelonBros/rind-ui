@@ -65,7 +65,7 @@ export type ToastEnv = SchedulerEnv & ClockEnv & AnnouncerEnv & LocaleEnv
 
 const durationOf = (data: ToastData, props: ToastProps) => data.duration ?? props.duration
 
-const DISMISS: Partial<Record<ToastEvent["type"], ToastDismissReason>> = {
+const DISMISS: Partial<Record<string, ToastDismissReason>> = {
   CLOSE_TRIGGER_PRESS: "close-trigger",
   ACTION_PRESS: "action",
   ESCAPE_KEY: "escape-key",
