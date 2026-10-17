@@ -42,7 +42,13 @@ export interface Modifiers {
 }
 
 export type CollectionEvent =
-  | { readonly type: "NAVIGATE"; readonly move: Move; readonly extend?: boolean }
+  | {
+      readonly type: "NAVIGATE"
+      readonly move: Move
+      readonly extend?: boolean
+      /** The platform modifier was held (replace behaviour: move without selecting). */
+      readonly mod?: boolean
+    }
   | {
       readonly type: "HIGHLIGHT"
       readonly key: CollectionKey | null
@@ -158,7 +164,7 @@ export type CollectionEnv = DomEnv &
 export interface SelectionPort {
   read(values: Readonly<Record<string, unknown>>, props: CollectionProps): SelectionValue
   /** The value to `set` for a new selection (the component maps sets to its shape). */
-  write(selection: SelectionValue, collection: Collection<unknown>): unknown
+  write(selection: SelectionValue, collection: Collection<unknown>, props: CollectionProps): unknown
   /** The controllable key holding the selection (default "value"). */
   readonly key?: string
 }
@@ -218,7 +224,7 @@ export function collectionPieces(options: {
   const readSelection = (a: CollectionArgs) => selection?.read(a.values, a.props) ?? new Set()
   const writeSelection = (a: CollectionArgs, s: SelectionValue) => {
     if (!selection) return
-    a.set(selectionKey, selection.write(s, a.props.collection))
+    a.set(selectionKey, selection.write(s, a.props.collection, a.props))
     a.set("texts", rememberTexts(a.context.texts, a.props.collection, s))
   }
   const setHighlight = (
