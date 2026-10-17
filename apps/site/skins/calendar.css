@@ -1,0 +1,137 @@
+/* ── Calendar: a date grid; every state is an attribute, drawn here without colour alone ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="root"] {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  max-inline-size: 100%;
+  padding: 14px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="root"][data-invalid] {
+  border-color: var(--s-error);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-error);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="root"][data-disabled] {
+  opacity: 0.5;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="header"] {
+  display: flex;
+  flex: 1 0 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="heading"] {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"]) {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  padding: 0;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 99px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="prev-trigger"]::after {
+  content: "‹" / "";
+  font-size: 20px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="next-trigger"]::after {
+  content: "›" / "";
+  font-size: 20px;
+}
+/* The glyphs point the way the pages go: mirrored under rtl. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [dir="rtl"]
+  [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"]) {
+  scale: -1 1;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"]:is(
+    [data-part="prev-trigger"],
+    [data-part="next-trigger"]
+  )[data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"]:is(
+    [data-part="prev-trigger"],
+    [data-part="next-trigger"]
+  )[data-focus-visible],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-focus-visible] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="grid"] {
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="header-cell"] {
+  padding-block-end: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="cell"] {
+  box-sizing: border-box;
+  inline-size: 36px;
+  block-size: 36px;
+  padding: 0;
+  border: var(--s-bw) solid transparent;
+  border-radius: calc(var(--s-r-sm) - 2px);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-hover] {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-today] {
+  border-color: var(--s-line);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-selected] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-invalid] {
+  background: var(--s-error);
+  color: var(--s-card);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-unavailable] {
+  opacity: 0.55;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-outside-month] {
+  opacity: 0.35;
+  cursor: default;
+}
