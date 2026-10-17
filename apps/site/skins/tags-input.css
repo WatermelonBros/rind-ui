@@ -1,0 +1,118 @@
+/* ── Tags Input: chips wrap inside the control; the input takes the rest of the row ── */
+[data-skinned] [data-scope="tags-input"][data-part="label"] {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+[data-skinned] [data-scope="tags-input"][data-part="control"] {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  inline-size: min(100%, 24rem);
+  padding: 6px 8px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+[data-skinned] [data-scope="tags-input"][data-part="control"][data-focus] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+[data-skinned] [data-scope="tags-input"][data-part="control"][data-readonly] {
+  background: var(--s-muted);
+}
+[data-skinned]
+  [data-scope="tags-input"][data-part="control"]:is([data-invalid], :has([data-refused])) {
+  border-color: var(--s-error);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-error);
+}
+[data-skinned] [data-scope="tags-input"][data-part="control"][data-disabled] {
+  opacity: 0.5;
+}
+[data-skinned] [data-scope="tags-input"][data-part="chips"] {
+  display: contents;
+}
+[data-skinned] [data-scope="tags-input"][data-part="chip"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-inline-start: 10px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 99px;
+  background: var(--s-muted);
+}
+[data-skinned] [data-scope="tags-input"][data-part="chip"][data-highlighted] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 1px;
+}
+[data-skinned] [data-scope="tags-input"][data-part="chip"][data-disabled] {
+  opacity: 0.5;
+}
+[data-skinned] [data-scope="tags-input"][data-part="chip-input"] {
+  field-sizing: content;
+  min-inline-size: 4ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-skinned]
+  [data-scope="tags-input"]:is([data-part="chip-remove"], [data-part="clear-trigger"]) {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--s-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+[data-skinned] [data-scope="tags-input"][data-part="clear-trigger"] {
+  margin-inline-start: auto;
+}
+[data-skinned] [data-scope="tags-input"][data-part="clear-trigger"]::after {
+  content: "×" / "";
+  font-size: 18px;
+}
+[data-skinned] [data-scope="tags-input"][data-part="clear-trigger"]:not([data-visible]) {
+  display: none;
+}
+[data-skinned] [data-scope="tags-input"][data-part="input"] {
+  flex: 1;
+  field-sizing: content;
+  min-inline-size: 8ch;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-skinned] [data-scope="tags-input"][data-part="input"][data-refused] {
+  color: var(--s-error);
+}
+[data-skinned] [data-scope="tags-input"][data-part="chips-summary"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+[data-skinned]
+  [data-scope="tags-input"]:is(
+    [data-part="chip-remove"],
+    [data-part="clear-trigger"]
+  ):focus-visible {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 1px;
+}
