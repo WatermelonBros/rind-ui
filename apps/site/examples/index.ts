@@ -13,6 +13,7 @@ import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
+import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as dialog from "./dialog"
 import * as field from "./field"
@@ -83,6 +84,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
+  combobox,
   collections,
   "context-menu": contextMenu,
   dialog,

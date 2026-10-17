@@ -7,6 +7,18 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
+| add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
+| add-combobox (impl) | — | openspec/changes/add-combobox | Task 0.2: design "Requests to other changes" 1–3 not raised with their owners (the Apple-only rule is behind `vo-activedescendant`) |
+| add-combobox (impl) | — | packages/react/src/combobox | Task 0.3: the abort signal is an AbortController in the adapter; no `env.abort()` capability |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.1: no tests for the IME edge cases (Korean mid-syllable, Android composition filtering, pointer choice during a composition), the touch ghost click, VoiceOver iOS double tap |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.3: no virtualized combobox test (10,000 options, End/wrap to index 9999) |
+| add-combobox (impl) | — | packages/testing/src/components | Task 6.4: no virtual screen-reader log test (open, arrow, choose, empty results) |
+| add-combobox (impl) | — | packages/theme/src/combobox.css | Task 7.2: no Playwright forced-colors captures |
+| add-combobox (impl) | — | packages/core/src/components/combobox | Task A.5: `patternEffects` / `patternConnect` / `optionsNeverSelected` not extracted (one host); do it with Autocomplete or Command |
+| add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
+| add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
+| add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
 | add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
 | add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |

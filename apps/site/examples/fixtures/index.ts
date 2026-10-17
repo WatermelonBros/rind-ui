@@ -6,6 +6,7 @@ import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
+import * as combobox from "./combobox"
 import * as dialog from "./dialog"
 import * as disclosure from "./disclosure"
 import * as field from "./field"
@@ -41,6 +42,7 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
+  combobox,
   dialog,
   disclosure,
   field,
