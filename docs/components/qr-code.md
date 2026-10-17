@@ -26,7 +26,7 @@ import { QrCode } from "@rind-ui/react"
 inline object (`encoding={{ ecc: "M" }}`) re-rendered with the same value does not encode
 again.
 
-| Option | Default | |
+| Option | Default | Description |
 |---|---|---|
 | `ecc` | `"M"` | Error-correction level: `L` 7 %, `M` 15 %, `Q` 25 %, `H` 30 % of the codewords recover. |
 | `boostEcc` | `false` | Raise the level to the highest that fits the chosen version. Off, so the output equals other generators at the same level. |
