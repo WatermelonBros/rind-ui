@@ -217,6 +217,8 @@ function wrap(env: FocusEnv, container: HTMLElement, e: KeyboardEvent) {
 
 interface Containment {
   readonly containers: Map<LayerId, HTMLElement>
+  /** Layers whose Tab closes them (a select, a menu): their Tab is never wrapped. */
+  readonly passTab: Set<LayerId>
   /** Watches a shadow root for removals too (a body observer does not see inside it). */
   readonly observe: (root: Node) => void
   readonly remove: () => void
@@ -237,6 +239,10 @@ export function containFocus(
   env: FocusEnv,
   layer: LayerHandle,
   container: HTMLElement,
+  options: {
+    /** Tab closes the layer and the browser's Tab moves on: it is never wrapped. */
+    readonly tabCloses?: boolean | undefined
+  } = {},
 ): () => void {
   const doc = container.ownerDocument
   let c = containments.get(doc)
@@ -245,12 +251,14 @@ export function containFocus(
     containments.set(doc, c)
   }
   c.containers.set(layer.id, container)
+  if (options.tabCloses) c.passTab.add(layer.id)
   const root = container.getRootNode()
   if (root instanceof ShadowRoot) c.observe(root)
   const own = c
   return () => {
     if (own.containers.get(layer.id) !== container) return
     own.containers.delete(layer.id)
+    own.passTab.delete(layer.id)
     if (own.containers.size === 0) {
       own.remove()
       containments.delete(doc)
@@ -260,6 +268,7 @@ export function containFocus(
 
 function install(env: FocusEnv, doc: Document): Containment {
   const containers = new Map<LayerId, HTMLElement>()
+  const passTab = new Set<LayerId>()
   const stack = getLayerStack(doc)
   const current = () => {
     const top = stack.topmostModal()
@@ -271,6 +280,8 @@ function install(env: FocusEnv, doc: Document): Containment {
   const onKeyDown = (e: KeyboardEvent) => {
     const container = current()
     if (!container || e.key !== "Tab" || e.defaultPrevented) return
+    const top = stack.topmostModal()
+    if (top && passTab.has(top.id)) return
     if (e.altKey || e.ctrlKey || e.metaKey) return
     wrap(env, container, e)
   }
@@ -303,6 +314,7 @@ function install(env: FocusEnv, doc: Document): Containment {
   doc.addEventListener("focusin", onFocusIn, true)
   return {
     containers,
+    passTab,
     observe: (root) => observer.observe(root, watch),
     remove: () => {
       observer.disconnect()
