@@ -25,21 +25,25 @@
   font: 500 12px var(--s-font);
   color: color-mix(in oklab, var(--s-ink) 78%, var(--s-card));
 }
-[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {
   background: var(--s-muted);
   border-style: solid;
 }
-[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu]:focus-visible {
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu]:focus-visible {
   outline: 3px solid var(--s-acc);
   outline-offset: 2px;
 }
-[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu][data-disabled] {
+[data-rind-theme^="skin-"]
+  [data-scope="menu"][data-part="trigger"][data-context-menu][data-disabled] {
   border-style: dotted;
   background: var(--s-muted);
   cursor: default;
 }
 /* not a button: the menu trigger's lift and press motion are off for a region */
-[data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu]:is([data-hover], [data-state="open"]) {
+[data-rind-theme^="skin-"]
+[data-scope="menu"][data-part="trigger"][data-context-menu]:is([data-hover], [data-state="open"]) {
   translate: none;
   box-shadow: none;
 }
