@@ -112,7 +112,7 @@ export function OpenOnFocus() {
 }
 
 export function EmptyState() {
-  return <City label="Nothing to pick" items={[]} defaultOpen empty="No cities yet" />
+  return <City label="Nothing to pick" items={[]} empty="No cities yet" />
 }
 
 export function ReadOnly() {
