@@ -185,7 +185,8 @@ export function createService<M extends AnyMachine>(
       impl.actions?.[name]?.(
         readArgs({
           event,
-          send: (e: Event) => queue.push(e),
+          // Inside a step it queues; later (a scheduler callback the action set) it is a send.
+          send: (e: Event) => (busy ? queue.push(e) : send(e)),
           set: (key: string, v: unknown) => {
             if (!(key in values)) {
               patch({ context: { ...snap.context, [key]: v } })

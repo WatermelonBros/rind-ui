@@ -45,10 +45,10 @@
 - [ ] 7.1 Tier-3 tokens `--rind-toast-*` defaulting to semantic tokens (decision 0007); collapsed/expanded stack from the CSS variables, gap filler, swipe and swipe-out, `@starting-style` entry, exit, safe-area insets, placements incl. RTL
 - [ ] 7.2 Reduced motion, forced colors (border, type glyph), close trigger ≥ 24×24; Playwright forced-colors captures
 
-## 8. Stories (`apps/storybook`)
+## 8. Site examples
 
-- [ ] 8.1 Default, every type, action (Undo), promise, limit with held toasts, two toasters, above a modal dialog, RTL, expanded option; state stories for collapsed/expanded and a toast's states
-- [ ] 8.2 A driver story (docs testing example); all stories pass axe on the themed component
+- [ ] 8.1 Site examples (apps/site/examples/toast.tsx, state examples for every contract state): Default, every type, action (Undo), promise, limit with held toasts, two toasters, above a modal dialog, RTL, expanded option; state examples for collapsed/expanded and a toast's states
+- [ ] 8.2 A driver example (docs testing example); all examples pass axe on the themed component
 
 ## 9. Docs and manual checks
 

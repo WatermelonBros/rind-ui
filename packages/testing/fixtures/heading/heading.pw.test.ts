@@ -1,50 +1,23 @@
 /// <reference types="node" />
-// Heading through the Playwright adapter, against the built Storybook: the driver, the
+// Heading through the Playwright adapter, against the site examples harness: the driver, the
 // accessibility level, computed sizes per level and the generic invariants on every story.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
 import { headingContract } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, createDriverWith, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +25,7 @@ async function open(id: string) {
   const context = await browser.newContext()
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-heading--${id}&viewMode=story`)
+  await openExample(page, site.base, "heading", id)
   await page.locator('[data-scope="heading"]').first().waitFor()
   return page
 }
@@ -85,7 +58,7 @@ describe("heading driver through Playwright", () => {
   })
 
   it("level 2 on an h4 is exposed at level 2 in Chromium's tree", { timeout: 60_000 }, async () => {
-    const page = await open("as-h-4")
+    const page = await open("as-h4")
     // Playwright's role locator reads the tag; the browser's own tree is what a screen reader gets.
     const cdp = await page.context().newCDPSession(page)
     await cdp.send("Accessibility.enable")
@@ -141,7 +114,7 @@ const STORIES = [
   "card-titles",
   "in-popover",
   "as-div",
-  "as-h-4",
+  "as-h4",
   "depth-warning",
   "size-override",
   "driver-example",

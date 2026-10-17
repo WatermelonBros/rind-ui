@@ -1,0 +1,5 @@
+- button "Open" [expanded]
+- dialog "Details":
+  - heading "Details" [level=2]
+  - textbox "Note"
+  - button "Close"

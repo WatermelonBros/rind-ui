@@ -64,8 +64,8 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | spec | Used by Reado |
-| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | spec |  |
+| Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
+| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done |  |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
@@ -132,12 +132,12 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec | Ark: part of Color Picker |
-| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec | Ark: part of Color Picker |
-| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | spec |  |
-| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | spec | Kobalte also: Color Channel Field |
-| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | spec |  |
-| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | spec |  |
+| Color Area | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
+| Color Slider | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | Ark: part of Color Picker |
+| Color Swatch | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done |  |
+| Color Field |  |  | ● |  |  |  | ● |  | ● | 3 | 3 | done | Kobalte also: Color Channel Field |
+| Color Picker | ● |  | ● |  |  |  |  |  |  | 2 | 3 | done |  |
+| Color Swatch Picker |  |  | ● |  |  |  | ● |  |  | 2 | 3 | done |  |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
 ## Display & feedback (19)

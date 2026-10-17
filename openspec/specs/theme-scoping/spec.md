@@ -88,8 +88,7 @@ content through these attributes and the cascade only, without framework context
 
 #### Scenario: Brand switch while a popover is open
 
-- **WHEN** the Storybook brand switcher changes `data-rind-theme` on the story root
-  while a popover is open
+- **WHEN** `data-rind-theme` changes on an example's root while a popover is open
 - **THEN** the popover content uses the new brand
 
 ### Requirement: No Script For First Paint

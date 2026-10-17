@@ -98,7 +98,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-tabs--default -->
+<!-- aria:tabs--default -->
 ```yaml
 - tablist "Sections":
   - tab "Account" [selected]

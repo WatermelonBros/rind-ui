@@ -122,9 +122,9 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-An address group, and the same group disabled (generated from the state stories):
+An address group, and the same group disabled (generated from the state examples):
 
-<!-- aria:components-fieldset--address-group -->
+<!-- aria:fieldset--address-group -->
 ```yaml
 - group "Shipping address":
   - text: Shipping address
@@ -136,7 +136,7 @@ An address group, and the same group disabled (generated from the state stories)
 ```
 <!-- /aria -->
 
-<!-- aria:components-fieldset--disabled -->
+<!-- aria:fieldset--disabled-story -->
 ```yaml
 - group "Shipping address":
   - text: Shipping address Street

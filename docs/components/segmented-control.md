@@ -96,7 +96,7 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-<!-- aria:components-segmentedcontrol--default -->
+<!-- aria:segmented-control--default -->
 ```yaml
 - radiogroup "Range":
   - radio "Day" [checked]

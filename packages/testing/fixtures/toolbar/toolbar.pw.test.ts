@@ -1,50 +1,26 @@
 /// <reference types="node" />
-// Toolbar through the Playwright adapter, against the built Storybook: the driver in a
+// Toolbar through the Playwright adapter, against the site examples harness: the driver in a
 // real browser, forced colors on the focus ring, separators and pressed toggles, RTL, and the generic
 // invariants on every Toolbar story.
-import { createReadStream, existsSync, mkdirSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
+
+import { mkdirSync } from "node:fs"
+import { join } from "node:path"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
 import { checkGeneric, getToolbar, playwrightEnv } from "../../src/index"
+import { openExample, type SiteServer, serveSite } from "../harness"
 
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
 const pages: Page[] = []
@@ -52,7 +28,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await page.goto(`${base}/iframe.html?id=components-toolbar--${id}&viewMode=story`)
+  await openExample(page, site.base, "toolbar", id)
   await page.locator('[data-scope="toolbar"]').first().waitFor()
   return page
 }
@@ -149,7 +125,7 @@ describe("toolbar keyboard", () => {
   })
 
   it("vertical: Up and Down move", { timeout: 60_000 }, async () => {
-    const page = await open("vertical")
+    const page = await open("vertical-story")
     await page.getByRole("button", { name: "Before" }).focus()
     await page.keyboard.press("Tab")
     expect(await focusedName(page)).toBe("Cut")
@@ -162,8 +138,13 @@ describe("toolbar keyboard", () => {
   it("a text field keeps its caret keys", { timeout: 60_000 }, async () => {
     const page = await open("text-field-in-the-middle")
     const search = page.getByRole("textbox", { name: "Search" })
+    // A static page hydrated by React leaves the caret at the start; a client-rendered input
+    // (as the story was) has it at the end, so set it as the user's last click would have.
+    await search.evaluate((el: HTMLInputElement) =>
+      el.setSelectionRange(el.value.length, el.value.length),
+    )
     await search.focus()
-    // Focus puts the caret at the end ("rind"): ArrowLeft moves it, the toolbar does not.
+    // Focus keeps the caret at the end ("rind"): ArrowLeft moves it, the toolbar does not.
     await page.keyboard.press("ArrowLeft")
     expect(await focusedName(page)).toBe("Search")
     await page.keyboard.press("ArrowRight") // back at the end, still the field's key

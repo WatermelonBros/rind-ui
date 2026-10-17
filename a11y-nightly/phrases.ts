@@ -13,4 +13,5 @@ export function missingPhrases(spoken: readonly string[], expected: readonly str
   return missing
 }
 
-export const story = (id: string) => `/iframe.html?id=${id}&viewMode=story`
+/** A site example in the harness, themed as the docs show it. */
+export const story = (slug: string, example: string) => `/examples/${slug}/${example}/theme-calm/`

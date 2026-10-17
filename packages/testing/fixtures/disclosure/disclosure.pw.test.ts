@@ -1,108 +1,38 @@
 /// <reference types="node" />
-// The shared driver scenario through the Playwright adapter, against the built Storybook.
-import { createReadStream, existsSync } from "node:fs"
-import { createServer, type Server } from "node:http"
-import { extname, join, normalize } from "node:path"
+// The shared driver scenario through the Playwright adapter, against the site examples harness.
+import { join } from "node:path"
 import { contract, setup, type } from "@rind-ui/core"
 import { type Browser, chromium, type Page } from "playwright"
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest"
-import { states as accordionStates } from "../../../../apps/storybook/stories/Accordion.stories"
-import { states as announceStates } from "../../../../apps/storybook/stories/AnnounceFixture.stories"
-import { states as buttonStates } from "../../../../apps/storybook/stories/Button.stories"
-import { states as checkboxStates } from "../../../../apps/storybook/stories/Checkbox.stories"
-import { states as checkboxGroupStates } from "../../../../apps/storybook/stories/CheckboxGroup.stories"
-import { states as collapsibleStates } from "../../../../apps/storybook/stories/Collapsible.stories"
-import { states as dialogStates } from "../../../../apps/storybook/stories/Dialog.stories"
-import { states as disclosureStates } from "../../../../apps/storybook/stories/Disclosure.stories"
-import { states as fieldStates } from "../../../../apps/storybook/stories/Field.stories"
-import { states as fieldsetStates } from "../../../../apps/storybook/stories/Fieldset.stories"
-import { states as formStates } from "../../../../apps/storybook/stories/Form.stories"
-import { states as headingStates } from "../../../../apps/storybook/stories/Heading.stories"
-import { states as labelStates } from "../../../../apps/storybook/stories/Label.stories"
-import { states as layerStates } from "../../../../apps/storybook/stories/LayerFixture.stories"
-import { states as linkStates } from "../../../../apps/storybook/stories/Link.stories"
-import { states as pressStates } from "../../../../apps/storybook/stories/PressFixture.stories"
-import { states as radioGroupStates } from "../../../../apps/storybook/stories/RadioGroup.stories"
-import { states as segmentedControlStates } from "../../../../apps/storybook/stories/SegmentedControl.stories"
-import { states as separatorStates } from "../../../../apps/storybook/stories/Separator.stories"
-import { states as switchStates } from "../../../../apps/storybook/stories/Switch.stories"
-import { states as tabsStates } from "../../../../apps/storybook/stories/Tabs.stories"
-import { states as textFieldStates } from "../../../../apps/storybook/stories/TextField.stories"
-import { states as toggleStates } from "../../../../apps/storybook/stories/Toggle.stories"
-import { states as toggleGroupStates } from "../../../../apps/storybook/stories/ToggleGroup.stories"
-import { states as toolbarStates } from "../../../../apps/storybook/stories/Toolbar.stories"
-import { createDriver, missingAriaLines, playwrightEnv, testMachine } from "../../src/index"
+import { createDriver, playwrightEnv, testMachine } from "../../src/index"
 import { chromiumTree } from "../../src/playwright"
 import { streamContract } from "../announce/announce.contract"
+import { exampleUrl, openExample, type SiteServer, serveSite } from "../harness"
 import { disclosureContract } from "./disclosure.contract"
 import { disclosureScenario } from "./disclosure.scenario"
 
-/** Drains animation frames in the page (a condition-free "let it settle"). */
-const frames = (page: Page, count = 6) =>
-  page.evaluate(
-    (n) =>
-      new Promise<void>((resolve) => {
-        const step = (left: number) =>
-          left <= 0 ? resolve() : requestAnimationFrame(() => step(left - 1))
-        step(n)
-      }),
-    count,
-  )
-
-const root = join(import.meta.dirname, "../../../../apps/storybook/storybook-static")
-const types: Record<string, string> = {
-  ".html": "text/html",
-  ".js": "text/javascript",
-  ".css": "text/css",
-  ".json": "application/json",
-  ".svg": "image/svg+xml",
-  ".woff2": "font/woff2",
-}
-
-let server: Server
+let site: SiteServer
 let browser: Browser
-let base = ""
 
 beforeAll(async () => {
-  if (!existsSync(root))
-    throw new Error("Build Storybook first: pnpm --filter @rind-ui/storybook build")
-  server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/"))
-    const file = join(root, path.endsWith("/") ? `${path}index.html` : path)
-    if (!file.startsWith(root) || !existsSync(file)) {
-      res.writeHead(404).end()
-      return
-    }
-    res.writeHead(200, { "content-type": types[extname(file)] ?? "application/octet-stream" })
-    createReadStream(file).pipe(res)
-  })
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve))
-  const address = server.address()
-  base = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`
+  site = await serveSite()
   browser = await chromium.launch()
 }, 60_000)
 
 afterAll(async () => {
   await browser?.close()
-  server?.close()
+  site?.close()
 })
 
-const story = (id = "closed") =>
-  `${base}/iframe.html?id=foundations-disclosure-fixture--${id}&viewMode=story`
+const story = (id = "closed") => exampleUrl(site.base, "disclosure", id)
 const pages: Page[] = []
-async function open(url?: string) {
+async function open(example?: string) {
   const context = await browser.newContext({ hasTouch: true })
   const page = await context.newPage()
   pages.push(page)
-  if (url) {
-    await page.goto(url)
+  if (example) {
+    await openExample(page, site.base, "disclosure", example)
     await page.getByRole("button", { name: "Details", exact: true }).waitFor()
-    // Storybook's a11y addon styles <body> and adds nodes once it initialises; wait for
-    // it so the path's baseline is the settled page.
-    await page
-      .locator("#storybook-a11y-vision-filters")
-      .waitFor({ state: "attached" })
-      .catch(() => {})
   }
   return page
 }
@@ -111,10 +41,10 @@ afterEach(async () => {
 })
 
 describe("disclosure driver through Playwright", () => {
-  it("runs the shared scenario against Storybook", { timeout: 60_000 }, async () => {
+  it("runs the shared scenario against the site harness", { timeout: 60_000 }, async () => {
     const context = await browser.newContext({ hasTouch: true })
     const page = await context.newPage()
-    await page.goto(`${base}/iframe.html?id=foundations-disclosure-fixture--closed&viewMode=story`)
+    await openExample(page, site.base, "disclosure", "closed")
     await page.getByRole("button", { name: "Details", exact: true }).waitFor()
     await disclosureScenario(page)
     await context.close()
@@ -126,6 +56,8 @@ describe("Playwright targets", () => {
     const page = await open()
     await page.setContent(`<button>Details</button><iframe src="${story()}"></iframe>`)
     const frame = page.frameLocator("iframe")
+    // A static page is interactive only once React hydrated it.
+    await frame.locator("[data-example-root][data-hydrated]").waitFor({ state: "attached" })
     await frame.getByRole("button", { name: "Details", exact: true }).waitFor()
     await disclosureScenario(frame)
   })
@@ -133,11 +65,11 @@ describe("Playwright targets", () => {
   it("a Locator target limits the anchor search to the container", {
     timeout: 60_000,
   }, async () => {
-    const page = await open(story())
+    const page = await open("closed")
     await page.evaluate(() =>
       document.body.insertAdjacentHTML("afterbegin", "<button>Details</button>"),
     )
-    await disclosureScenario(page.locator("#storybook-root"))
+    await disclosureScenario(page.locator("[data-example-root]"))
   })
 
   it("exists() and text anchors agree with the DOM adapter", { timeout: 60_000 }, async () => {
@@ -162,7 +94,7 @@ describe("Playwright targets", () => {
 describe("testMachine through Playwright", () => {
   testMachine(disclosureContract, {
     test: (name, fn) => it(name, { timeout: 60_000 }, () => fn()),
-    setup: () => open(story()),
+    setup: () => open("closed"),
     target: (page) => page,
     anchor: ["Details"],
     props: { closeOnEscape: undefined, autoCloseMs: undefined },
@@ -198,7 +130,7 @@ describe("announcements through Playwright", () => {
     timeout: 60_000,
   }, async () => {
     const page = await open()
-    await page.goto(`${base}/iframe.html?id=foundations-announce-fixture--stream&viewMode=story`)
+    await openExample(page, site.base, "announce", "stream")
     await page.getByRole("button", { name: "Stream", exact: true }).waitFor()
     const stream = createDriver(streamContract, page, "Stream")
     await stream.stream()
@@ -322,102 +254,6 @@ describe("Chromium accessibility tree (RA#9737)", () => {
   })
 })
 
-describe("ARIA snapshots per state story (Chromium, Firefox, WebKit)", () => {
-  const ariaDir = join(import.meta.dirname, "../../../../apps/storybook/stories/__aria__")
-  // The story files' own `states` exports (the same the coverage check reads).
-  const stories: Record<string, Record<string, Record<string, string>>> = {
-    "./stories/Disclosure.stories.tsx": disclosureStates,
-    "./stories/PressFixture.stories.tsx": pressStates,
-    "./stories/AnnounceFixture.stories.tsx": announceStates,
-    "./stories/LayerFixture.stories.tsx": layerStates,
-    "./stories/Link.stories.tsx": linkStates,
-    "./stories/Heading.stories.tsx": headingStates,
-    "./stories/Separator.stories.tsx": separatorStates,
-    "./stories/Button.stories.tsx": buttonStates,
-    "./stories/Label.stories.tsx": labelStates,
-    "./stories/Fieldset.stories.tsx": fieldsetStates,
-    "./stories/Field.stories.tsx": fieldStates,
-    "./stories/TextField.stories.tsx": textFieldStates,
-    "./stories/Form.stories.tsx": formStates,
-    "./stories/Accordion.stories.tsx": accordionStates,
-    "./stories/Checkbox.stories.tsx": checkboxStates,
-    "./stories/CheckboxGroup.stories.tsx": checkboxGroupStates,
-    "./stories/Collapsible.stories.tsx": collapsibleStates,
-    "./stories/RadioGroup.stories.tsx": radioGroupStates,
-    "./stories/SegmentedControl.stories.tsx": segmentedControlStates,
-    "./stories/Switch.stories.tsx": switchStates,
-    "./stories/Tabs.stories.tsx": tabsStates,
-    "./stories/Toggle.stories.tsx": toggleStates,
-    "./stories/ToggleGroup.stories.tsx": toggleGroupStates,
-    "./stories/Toolbar.stories.tsx": toolbarStates,
-    "./stories/Dialog.stories.tsx": dialogStates,
-  }
-  it("each state story matches its ARIA snapshot in every engine", {
-    timeout: 180_000,
-  }, async () => {
-    const { readFileSync, writeFileSync, mkdirSync } = await import("node:fs")
-    const pw = await import("playwright")
-    const index = JSON.parse(readFileSync(join(root, "index.json"), "utf8")) as {
-      entries: Record<string, { id: string; importPath: string; exportName: string }>
-    }
-    const ids = Object.entries(stories).flatMap(([importPath, byScope]) =>
-      Object.values(byScope).flatMap((byState) =>
-        Object.values(byState).map((exportName) => {
-          const entry = Object.values(index.entries).find(
-            (e) => e.importPath === importPath && e.exportName === exportName,
-          )
-          if (!entry) throw new Error(`no story ${importPath} ${exportName}`)
-          return entry.id
-        }),
-      ),
-    )
-    mkdirSync(ariaDir, { recursive: true })
-    // Snapshots are written only on request (from Chromium); a missing one fails, so CI
-    // never approves a snapshot by writing it.
-    const update = process.env["RIND_UPDATE_ARIA"] === "1"
-    const failures: string[] = []
-    for (const engine of [pw.chromium, pw.firefox, pw.webkit]) {
-      const b = engine === pw.chromium ? browser : await engine.launch()
-      const page = await b.newPage()
-      for (const id of ids) {
-        await page.goto(`${base}/iframe.html?id=${id}&viewMode=story`)
-        await page.locator("#storybook-root > *").first().waitFor()
-        // The whole body: overlays render in portals outside the story root (matching is
-        // partial, so Storybook's own nodes do not matter).
-        const file = join(ariaDir, `${id}.aria.yml`)
-        if (!update && !existsSync(file)) {
-          failures.push(`${id}: no ARIA snapshot (run with RIND_UPDATE_ARIA=1 and review it)`)
-          continue
-        }
-        // Portalled overlays mount after the story root (a layer opened on mount): retake
-        // the snapshot until it matches or 3 s pass (CI WebKit read it before the dialog).
-        let snapshot = await page.locator("body").ariaSnapshot()
-        let missing: string[] = []
-        if (!update) {
-          const want = readFileSync(file, "utf8")
-          const until = Date.now() + 3000
-          missing = missingAriaLines(snapshot, want)
-          while (missing.length > 0 && Date.now() < until) {
-            await frames(page, 2)
-            snapshot = await page.locator("body").ariaSnapshot()
-            missing = missingAriaLines(snapshot, want)
-          }
-        }
-        if (update && engine === pw.chromium) writeFileSync(file, `${snapshot}\n`)
-        if (update) missing = missingAriaLines(snapshot, readFileSync(file, "utf8"))
-        if (missing.length > 0) {
-          failures.push(
-            `${id} in ${engine.name()}: missing ${JSON.stringify(missing)}\n${snapshot}`,
-          )
-        }
-      }
-      await page.close()
-      if (b !== browser) await b.close()
-    }
-    expect(failures).toEqual([])
-  })
-})
-
 describe("theme accessibility (forced colors, reduced motion, target size)", () => {
   const { readFileSync, mkdirSync } = require("node:fs") as typeof import("node:fs")
   const themeDir = join(import.meta.dirname, "../../../theme/src")
@@ -439,7 +275,7 @@ describe("theme accessibility (forced colors, reduced motion, target size)", () 
     })
 
   it("forced colors: the keyboard focus ring stays visible (RA#5931)", async () => {
-    const page = await open(story("closed"))
+    const page = await open("closed")
     await page.emulateMedia({ forcedColors: "active" })
     await page.keyboard.press("Tab")
     const trigger = '[data-part="trigger"]'
@@ -451,7 +287,7 @@ describe("theme accessibility (forced colors, reduced motion, target size)", () 
   })
 
   it("pointer focus draws no ring", async () => {
-    const page = await open(story("closed"))
+    const page = await open("closed")
     await page.locator('[data-part="trigger"]').click()
     expect((await outline(page, '[data-part="trigger"]')).style).toBe("none")
   })
@@ -525,7 +361,7 @@ describe("theme accessibility (forced colors, reduced motion, target size)", () 
     expect(await duration()).not.toBe("0s")
     await page.emulateMedia({ reducedMotion: "reduce" })
     expect(await duration()).toBe("0s")
-    const fixture = await open(story("open"))
+    const fixture = await open("open")
     await fixture.emulateMedia({ reducedMotion: "reduce", forcedColors: "active" })
     await fixture.screenshot({
       path: join(captures, "disclosure-open-reduced-motion-forced-colors.png"),

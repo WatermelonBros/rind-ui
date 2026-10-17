@@ -94,9 +94,9 @@ The same test runs with a Playwright `page`.
 
 ## Accessibility tree
 
-Group with a Parent: unchecked, mixed and checked (generated from the state stories):
+Group with a Parent: unchecked, mixed and checked (generated from the state examples):
 
-<!-- aria:components-checkboxgroup--default -->
+<!-- aria:checkbox-group--default -->
 ```yaml
 - group "Toppings":
   - text: Toppings
@@ -109,7 +109,7 @@ Group with a Parent: unchecked, mixed and checked (generated from the state stor
 ```
 <!-- /aria -->
 
-<!-- aria:components-checkboxgroup--parent-unchecked -->
+<!-- aria:checkbox-group--parent-unchecked -->
 ```yaml
 - group "Toppings":
   - text: Toppings
@@ -124,7 +124,7 @@ Group with a Parent: unchecked, mixed and checked (generated from the state stor
 ```
 <!-- /aria -->
 
-<!-- aria:components-checkboxgroup--parent-mixed -->
+<!-- aria:checkbox-group--parent-mixed -->
 ```yaml
 - group "Toppings":
   - text: Toppings
@@ -139,7 +139,7 @@ Group with a Parent: unchecked, mixed and checked (generated from the state stor
 ```
 <!-- /aria -->
 
-<!-- aria:components-checkboxgroup--parent-checked -->
+<!-- aria:checkbox-group--parent-checked -->
 ```yaml
 - group "Toppings":
   - text: Toppings

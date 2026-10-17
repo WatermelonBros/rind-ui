@@ -1,0 +1,6 @@
+- text: README.mdRight click, long press or Shift+F10
+- menu "README.md actions":
+  - menuitem "Rename"
+  - menuitem "Duplicate"
+  - separator
+  - menuitem "Delete"

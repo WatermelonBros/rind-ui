@@ -1,0 +1,11 @@
+- text: Pick a city
+- combobox "Pick a city" [expanded]
+- button "Show suggestions" [expanded]
+- listbox "Pick a city":
+  - option "Rome"
+  - option "Paris"
+  - option "Prague"
+  - option "Oslo"
+  - option "Lisbon"
+- log
+- log

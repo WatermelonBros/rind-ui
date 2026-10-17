@@ -22,12 +22,12 @@ Read before changing anything:
 
 ```sh
 pnpm install
-pnpm build        # turbo: all packages + storybook
+pnpm build        # turbo: all packages + the docs site
 pnpm typecheck    # turbo: tsc in every package
 pnpm test         # turbo: vitest
 pnpm lint         # biome check (CI fails on any diagnostic)
 pnpm format       # biome check --write
-pnpm storybook    # playground on :6006
+pnpm --filter @rind-ui/site dev   # docs site with the examples harness
 pnpm changeset    # describe a release-worthy change
 ```
 
@@ -41,7 +41,7 @@ packages/core      @rind-ui/core     machines, connect, dom/, collection/, contr
 packages/react     @rind-ui/react    React parts + normalizeProps
 packages/testing   @rind-ui/testing  drivers, DOM/Playwright adapters, model-based tests, env setup
 packages/theme     @rind-ui/theme    optional CSS on data-* attributes
-apps/storybook                       playground and docs examples
+apps/site                            docs site; examples harness at /examples/<slug>/<example>/<skin>/
 ```
 
 ## The four layers — one direction only
@@ -88,8 +88,8 @@ And:
 - **Accessibility is behaviour.** Roles, keyboard support and announcements follow
   the WAI-ARIA APG pattern and are specified in OpenSpec like any other behaviour.
 - **Every component ships**: machine, connect, parts, contract, driver, tests,
-  theme stylesheet, stories (rendering the themed component), docs page — in that
-  order: the theme comes before the stories. Missing one = not done.
+  theme stylesheet, site examples (rendering the themed component), docs page — in
+  that order: the theme comes before the examples. Missing one = not done.
 
 ## TypeScript
 
@@ -132,13 +132,13 @@ If it only makes the library's code shorter, write the simpler type.
 - Primary: Vitest browser mode (Playwright). A jsdom suite proves
   `@rind-ui/testing/setup` works for consumers.
 - Model-based tests from the machine graph for every component with a machine.
-- Every story passes axe (`a11y.test: "error"`).
+- Every site example passes axe (none and theme skins, light and dark, three engines).
 
 ## Docs for humans and LLMs
 
 API facts (props, parts, `data-*`, states, contract actions) are **generated** from
 source, never hand-copied, so `llms.txt` and the per-component markdown cannot
-drift. When adding a component, make sure its docs page and stories exist; see
+drift. When adding a component, make sure its docs page and site examples exist; see
 [docs/decisions/0005-llm-knowledge.md](docs/decisions/0005-llm-knowledge.md).
 
 ## Review rules

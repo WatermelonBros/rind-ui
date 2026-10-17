@@ -174,6 +174,8 @@ describe("Menu: keyboard", () => {
     await m.open()
     await m.tabOut()
     expect(await m.isOpen()).toBe(false)
+    // The browser's Tab moves on from the trigger (the modal containment never wraps it).
+    expect(name(active())).toBe("After")
   })
 
   it("Typeahead moves to the matching item", async () => {

@@ -1,0 +1,49 @@
+/*
+ * Color Swatch (family: decoration, its own tokens): the colour is drawn inline (the content);
+ * the border is a CanvasText-like ring from the text role so a white swatch keeps 3:1 on a
+ * white page; a transparent colour sits on the shared checkerboard.
+ */
+@layer rind.components {
+  :where([data-scope="color-swatch"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-md));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-md));
+    border-radius: var(--rind-color-swatch-radius, var(--rind-radius-sm));
+    box-shadow: inset 0 0 0 var(--rind-border-width)
+      var(--rind-color-swatch-border, color-mix(in oklab, var(--rind-color-text) 45%, transparent));
+    vertical-align: middle;
+  }
+
+  /* The colour layer (from the inline variable) over the checkerboard. */
+  :where([data-scope="color-swatch"][data-part="root"][data-transparent]) {
+    background-image:
+      linear-gradient(var(--rind-color), var(--rind-color)),
+      conic-gradient(
+        var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 25%,
+        var(--rind-color-checker-light, var(--rind-color-surface)) 0 50%,
+        var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 0 75%,
+        var(--rind-color-checker-light, var(--rind-color-surface)) 0
+      );
+    background-size:
+      100% 100%,
+      var(--rind-color-checker-size, 0.5rem) var(--rind-color-checker-size, 0.5rem);
+  }
+
+  :where([data-scope="color-swatch"][data-part="root"][data-size="sm"]) {
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-sm));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-sm));
+  }
+
+  :where([data-scope="color-swatch"][data-part="root"][data-size="lg"]) {
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-lg));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-lg));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="color-swatch"][data-part="root"]) {
+      border: var(--rind-border-width) solid CanvasText;
+    }
+  }
+}

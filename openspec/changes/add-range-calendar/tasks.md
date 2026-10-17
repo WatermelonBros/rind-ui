@@ -34,9 +34,9 @@
 - [ ] 6.1 `packages/theme/src/range-calendar.css` per design §5: `@layer rind.components`, `:where()` selectors, `--rind-range-calendar-*` tokens read with fallbacks and never declared, Calendar's families, sizes, `data-tone="danger"` invalid, range caps, dashed preview, forced-colors rules, RTL caps mirrored; imported from `index.css`
 - [ ] 6.2 Playwright captures: forced colors with range + preview, RTL, two months
 
-## 7. Stories
+## 7. Site examples
 
-- [ ] 7.1 Stories (themed): basic, two months, drag, unavailable dates contiguous and non-contiguous, max 7 nights recipe, each `commitOnBlur`, read-only, invalid range, RTL, inside a dialog, driver example; state stories `idle`/`anchored`/`dragging` with ARIA snapshots; axe clean
+- [ ] 7.1 Site examples (apps/site/examples/range-calendar.tsx, state examples for every contract state): basic, two months, drag, unavailable dates contiguous and non-contiguous, max 7 nights recipe, each `commitOnBlur`, read-only, invalid range, RTL, inside a dialog, driver example; state examples `idle`/`anchored`/`dragging` with ARIA snapshots; axe clean
 
 ## 8. Docs
 

@@ -89,7 +89,7 @@ Pass `modal: false` for a non-modal dialog. `testMachine(dialogContract, …)` (
 
 ## Accessibility tree
 
-<!-- aria:components-dialog--open -->
+<!-- aria:dialog--open -->
 ```yaml
 - button "Edit profile"
 - dialog "Edit profile":

@@ -150,7 +150,7 @@ Hosted groups keep their own drivers, located by name anywhere in the document (
 
 ## Accessibility tree
 
-<!-- aria:components-toolbar--default -->
+<!-- aria:toolbar--default -->
 ```yaml
 - button "Before"
 - toolbar "Formatting":

@@ -86,7 +86,7 @@ Story: Components/Label → ForInput (and AsSpan, NonLabelableTarget). Record ea
 
 ## Device checklist: Fieldset (add-fieldset 10.1)
 
-Stories: Components/Fieldset → AddressGroup, Disabled, Invalid. Record each pass in
+Examples (/examples/fieldset/…): address-group, disabled, invalid. Record each pass in
 `tested-with.json` with `component: "fieldset"`.
 
 - [ ] **NVDA + Chrome**, **JAWS + Chrome**, **VoiceOver + Safari**: Tab into the first
@@ -97,7 +97,7 @@ Stories: Components/Fieldset → AddressGroup, Disabled, Invalid. Record each pa
 
 ## Device checklist: Field (add-field 12.1)
 
-Stories: Components/Field → WithDescriptionAndError, Blur. Record each pass in
+Examples (/examples/field/…): with-description-and-error, blur. Record each pass in
 `tested-with.json` with `component: "field"`.
 
 - [ ] **NVDA + Chrome, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS, TalkBack**:
@@ -118,7 +118,7 @@ Story: Components/Form → SignUp. Record each pass in `tested-with.json` with
 
 ## Device checklist: Text Field (add-text-field 11.1)
 
-Stories: Components/TextField → WithDescriptionAndError, SearchBox, CharacterCountSoft.
+Examples (/examples/text-field/…): with-description-and-error, search-box, character-count-soft.
 Record each pass in `tested-with.json` with `component: "text-field"`.
 
 - [ ] **NVDA + Chrome, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS, TalkBack**:
@@ -131,8 +131,7 @@ Record each pass in `tested-with.json` with `component: "text-field"`.
 
 ## Device checklist: Checkbox (add-checkbox 11.1)
 
-Stories: Components/Checkbox → Default, Checked, Indeterminate, RequiredInvalid, InForm,
-RenderAsDiv. Record each pass in `tested-with.json` with `component: "checkbox"`.
+Examples (/examples/checkbox/…): default, checked, indeterminate, required-invalid, in-form, render-as-div. Record each pass in `tested-with.json` with `component: "checkbox"`.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
       TalkBack + Chrome**: name ("Accept the terms"), role (check box), state (checked / not
@@ -149,8 +148,7 @@ RenderAsDiv. Record each pass in `tested-with.json` with `component: "checkbox"`
 
 ## Device checklist: Checkbox Group (add-checkbox-group)
 
-Stories: Components/CheckboxGroup → Default, WithParent, DisabledItem, ReadOnly,
-RequiredWithError, Fieldset. Record each pass in `tested-with.json` with
+Examples (/examples/checkbox-group/…): default, with-parent, disabled-item, read-only, required-with-error, fieldset. Record each pass in `tested-with.json` with
 `component: "checkbox-group"`. Deferred to devices.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, TalkBack +
@@ -173,8 +171,7 @@ RequiredWithError, Fieldset. Record each pass in `tested-with.json` with
 
 ## Device checklist: Radio Group (add-radio-group)
 
-Stories: Components/RadioGroup → Default, Horizontal, WithDescriptions, DisabledItem,
-ReadOnly, RequiredInvalid, InForm, RTL. Record each pass in `tested-with.json` with
+Examples (/examples/radio-group/…): default, horizontal, with-descriptions, disabled-item, read-only, required-invalid, in-form, rtl. Record each pass in `tested-with.json` with
 `component: "radio-group"`. Deferred to devices.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
@@ -195,8 +192,7 @@ ReadOnly, RequiredInvalid, InForm, RTL. Record each pass in `tested-with.json` w
 
 ## Device checklist: Toggle Group (add-toggle-group)
 
-Stories: Components/ToggleGroup → Single, Multiple, DisallowEmpty, Vertical, DisabledItem,
-FocusableWhenDisabled, IconOnly, RTL. Record each pass in `tested-with.json` with
+Examples (/examples/toggle-group/…): single, multiple, disallow-empty, vertical, disabled-item, focusable-when-disabled, icon-only, rtl. Record each pass in `tested-with.json` with
 `component: "toggle-group"`. Deferred to devices.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,
@@ -215,8 +211,7 @@ FocusableWhenDisabled, IconOnly, RTL. Record each pass in `tested-with.json` wit
 
 ## Device checklist: Toolbar (add-toolbar 8.2)
 
-Stories: Components/Toolbar → Default, Vertical, TextFieldLast, TextFieldInTheMiddle,
-DisabledControls, DisabledSkipped, EditorToolbar, RTL. Record each pass in `tested-with.json`
+Examples (/examples/toolbar/…): default, vertical, text-field-last, text-field-in-the-middle, disabled-controls, disabled-skipped, editor-toolbar, rtl. Record each pass in `tested-with.json`
 with `component: "toolbar"`. Deferred to devices.
 
 - [ ] **NVDA + Firefox and Chrome**: entering the toolbar announces its name ("Formatting,
@@ -244,8 +239,7 @@ with `component: "toolbar"`. Deferred to devices.
 
 ## Device checklist: Dialog (add-dialog 8.2)
 
-Stories: Components/Dialog -> Default, Controlled, NonModal, Nested, FormInside, LongContent,
-TwoTriggers, KeepMounted, ExitAnimation. Record each pass in `tested-with.json` with
+Examples (/examples/dialog/…): default, controlled, non-modal, nested, form-inside, long-content, two-triggers, keep-mounted, exit-animation. Record each pass in `tested-with.json` with
 `component: "dialog"`. Deferred to devices.
 
 - [ ] **Name and description on open** (radix#3348, #2038, #3377): NVDA + Firefox/Chrome, JAWS
@@ -325,7 +319,7 @@ Use a "Delete project?" alert dialog with a description, Cancel and Delete.
 
 ## Device checklist: Switch (add-switch)
 
-Stories: Components/Switch → Default, Checked, Disabled, ReadOnly, InForm, WithDescription, RTL.
+Examples (/examples/switch/…): default, checked, disabled, read-only, in-form, with-description, rtl.
 Record each pass in `tested-with.json` with `component: "switch"`. Deferred to devices.
 
 - [ ] **NVDA + Chrome and Firefox, JAWS + Chrome, VoiceOver macOS + Safari, VoiceOver iOS,

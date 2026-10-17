@@ -195,9 +195,9 @@ name the Field's Label gives it.
 
 ## Accessibility tree
 
-Idle, valid and invalid (generated from the state stories):
+Idle, valid and invalid (generated from the state examples):
 
-<!-- aria:components-field--idle -->
+<!-- aria:field--idle -->
 ```yaml
 - text: Email
 - textbox "Email"
@@ -205,7 +205,7 @@ Idle, valid and invalid (generated from the state stories):
 ```
 <!-- /aria -->
 
-<!-- aria:components-field--valid -->
+<!-- aria:field--valid -->
 ```yaml
 - text: Email
 - textbox "Email": ada@example.com
@@ -213,7 +213,7 @@ Idle, valid and invalid (generated from the state stories):
 ```
 <!-- /aria -->
 
-<!-- aria:components-field--invalid -->
+<!-- aria:field--invalid -->
 ```yaml
 - text: Email
 - textbox "Email" [invalid]: abc
