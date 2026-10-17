@@ -12,7 +12,7 @@ import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { type ReactElement, useState } from "react"
 import { describe, it } from "vitest"
-import { currentRun, numberInputStepInvariants, testMachine } from "../index"
+import { currentRun, numberInputStepInvariants, testMachine, virtualClock } from "../index"
 
 const inJsdom = navigator.userAgent.includes("jsdom")
 const a11y = async () => {
@@ -22,10 +22,9 @@ const a11y = async () => {
   if (violations.length > 0) throw new Error(violations.map((v) => `${v.id}: ${v.help}`).join("\n"))
 }
 
-// No press-and-hold: the runner walks `after:*` edges in real time, and tests never wait on
-// elapsed time. Holds are covered by the fake-timer scenario and machine tests. Restore the
-// delay edges when testMachine drives them through the machine's injected Scheduler.
-const SPIN = { spinOnPress: false }
+// Press-and-hold delays (`after:*` edges) run on a virtual clock: the runner advances it,
+// no real time passes.
+const clock = virtualClock()
 
 type PartLike = {
   compose(updates: readonly string[], commit?: string): Promise<void>
@@ -53,9 +52,15 @@ function contractFor(role: "spinbutton" | "textbox") {
   const c = {
     ...base,
     actions: { ...base.actions, type: { ...base.actions.type, keyboard: keyed(role) } },
-    events: inJsdom
-      ? { ...base.events, "PRESS.START": { skip: "no layout in jsdom: walked in browser mode" } }
-      : base.events,
+    events: {
+      ...base.events,
+      ...(inJsdom ? { "PRESS.START": { skip: "no layout in jsdom: walked in browser mode" } } : {}),
+      // Walking the 600 ms touch hold also passes the 400 ms pointer hold in the page, which
+      // the oracle does not see: the touch twin is covered by the machine tests.
+      "after:touchSpinDelay": {
+        skip: "the touch hold: machine tests (the pointer hold is walked)",
+      },
+    },
     // The iOS quirk drops the spinbutton role and value attributes by design.
     ...(role === "textbox" ? { traits: base.traits.filter((t) => t !== "valued") } : {}),
   }
@@ -68,7 +73,7 @@ function Fixture({
 }: NumberInputRootProps & { readonly label?: string }) {
   return (
     <form>
-      <NumberInput.Root name="q" {...SPIN} {...props}>
+      <NumberInput.Root name="q" {...props}>
         <NumberInput.Label>{label}</NumberInput.Label>
         <NumberInput.Control>
           <NumberInput.DecrementTrigger>−</NumberInput.DecrementTrigger>
@@ -97,7 +102,12 @@ function Parent({ cap, ...props }: NumberInputRootProps & { readonly cap?: numbe
 }
 
 const withRun = (ui: ReactElement) => (
-  <RindProvider environment={{ platform: currentRun()?.platform ?? platforms.linux }}>
+  <RindProvider
+    environment={{
+      platform: currentRun()?.platform ?? platforms.linux,
+      scheduler: clock.scheduler,
+    }}
+  >
     {ui}
   </RindProvider>
 )
@@ -134,7 +144,7 @@ const configs: Config[] = [
     ui: (p) => (
       <Field.Root validationMode="change">
         <Field.Label>Quantity</Field.Label>
-        <NumberInput.Root name="q" {...SPIN} {...p}>
+        <NumberInput.Root name="q" {...p}>
           <NumberInput.Control>
             <NumberInput.DecrementTrigger>−</NumberInput.DecrementTrigger>
             <NumberInput.Input />
@@ -166,6 +176,7 @@ for (const cfg of configs) {
     const parser = createNumberParser(locale, rest.formatOptions)
     testMachine(contractFor(cfg.role ?? "spinbutton"), {
       test: it,
+      clock,
       setup: () => {
         steps.reset()
         pageChanges = 0
@@ -183,7 +194,7 @@ for (const cfg of configs) {
         step: rest.step,
         largeStep: undefined,
         commitBehavior: rest.commitBehavior,
-        ...SPIN,
+        spinOnPress: rest.spinOnPress,
         disabled: undefined,
         readOnly: rest.readOnly,
         parser,
