@@ -39,6 +39,13 @@ describe("Slider: hosted naming", () => {
 
   it("keeps its own names without a host", () => {
     const { container } = render(<Bar />)
-    expect(parts(container).every((p) => p.startsWith("slider:"))).toBe(true)
+    expect(parts(container)).toEqual([
+      "slider:root",
+      "slider:control",
+      "slider:track",
+      "slider:indicator",
+      "slider:thumb",
+      "slider:hidden-input",
+    ])
   })
 })

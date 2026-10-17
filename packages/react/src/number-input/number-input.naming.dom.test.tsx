@@ -21,27 +21,35 @@ const Amount = () => (
 )
 
 describe("Number Input: hosted naming", () => {
-  it("renders its connect parts under the host's scope and names", () => {
+  it("renders every part under the host's scope and names", () => {
     const { container } = render(
       <NumberInputNaming value={{ scope: "host", part: (name) => `amount-${name}` }}>
         <Amount />
       </NumberInputNaming>,
     )
-    const all = parts(container)
-    for (const p of [
-      "control",
-      "input",
-      "increment-trigger",
-      "decrement-trigger",
-      "hidden-input",
-    ]) {
-      expect(all).toContain(`host:amount-${p}`)
-    }
-    expect(all.some((p) => p.startsWith("number-input:") && !p.endsWith(":root"))).toBe(false)
+    // Every part, under the host's names; the Label is the Field host's own part (its scope follows
+    // the host, its name is the Field's: a Color Picker's inputs render no Label).
+    expect(parts(container)).toEqual([
+      "host:amount-root",
+      "host:label",
+      "host:amount-control",
+      "host:amount-input",
+      "host:amount-increment-trigger",
+      "host:amount-decrement-trigger",
+      "host:amount-hidden-input",
+    ])
   })
 
   it("keeps its own names without a host", () => {
     const { container } = render(<Amount />)
-    expect(parts(container)).toContain("number-input:input")
+    expect(parts(container)).toEqual([
+      "number-input:root",
+      "number-input:label",
+      "number-input:control",
+      "number-input:input",
+      "number-input:increment-trigger",
+      "number-input:decrement-trigger",
+      "number-input:hidden-input",
+    ])
   })
 })

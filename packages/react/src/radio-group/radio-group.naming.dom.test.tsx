@@ -42,6 +42,12 @@ describe("Radio Group: hosted naming", () => {
 
   it("keeps its own names without a host", () => {
     const { container } = render(<Sizes />)
-    expect(parts(container).every((p) => p.startsWith("radio-group:"))).toBe(true)
+    expect(parts(container)).toEqual([
+      "radio-group:root",
+      "radio-group:item",
+      "radio-group:item-control",
+      "radio-group:item-indicator",
+      "radio-group:hidden-input",
+    ])
   })
 })

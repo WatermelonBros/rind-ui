@@ -853,7 +853,8 @@ function View({
 
 function TransparencyGrid(props: ComponentPropsWithRef<typeof Grid>) {
   usePicker("TransparencyGrid")
-  return <Grid scope="color-picker" {...props} />
+  // The picker's scope last: a consumer prop never moves the part out of it.
+  return <Grid {...props} scope="color-picker" />
 }
 
 export const ColorPicker = {

@@ -66,6 +66,26 @@ describe("colour stylesheets", () => {
     expect(q(host, '[data-part="content"]').getBoundingClientRect().width).toBeCloseTo(240, 0)
   })
 
+  it("an input's wrapper stacks its parts and a swatch item keeps the hit area (as before the one scope)", () => {
+    sheet()
+    const host = mount(
+      `<div data-scope="color-picker" data-part="channel-input-root"><label>Hue</label><input data-scope="color-picker" data-part="channel-input"></div><div data-scope="color-picker" data-part="swatch-item"><button data-scope="color-picker" data-part="swatch-trigger"></button></div>`,
+    )
+    const root = getComputedStyle(q(host, '[data-part="channel-input-root"]'))
+    expect(root.display).toBe("grid")
+    expect(Number.parseFloat(root.rowGap)).toBeGreaterThan(0)
+    const item = q(host, '[data-part="swatch-item"]')
+    expect(getComputedStyle(item).display).toBe("inline-grid")
+    expect(Number.parseFloat(getComputedStyle(item).columnGap)).toBeGreaterThan(0)
+    expect(item.getBoundingClientRect().height).toBeGreaterThanOrEqual(24)
+  })
+
+  it("in forced colors, the swatch item and its mark drop the checked outline base.css draws", () => {
+    expect(picker).toMatch(
+      /forced-colors: active\)[\s\S]*:is\(\s*\[data-part="swatch-item"\],\s*\[data-part="swatch-indicator"\]\s*\):not\(\s*\[data-focus-visible\]\s*\)\s*\{\s*outline: none;/,
+    )
+  })
+
   it("has forced-colors rules and no selector outside the picker's scope", () => {
     expect(picker).toMatch(/@media \(forced-colors: active\)/)
     for (const scope of picker.matchAll(/data-scope="([^"]+)"/g))

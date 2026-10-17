@@ -247,7 +247,8 @@ function Description(props: ComponentPropsWithRef<typeof Slider.Description>) {
 }
 
 function TransparencyGrid(props: ComponentPropsWithRef<typeof Grid>) {
-  return <Grid scope={COLOR_PICKER_SCOPE} {...useColorSlider("TransparencyGrid").data} {...props} />
+  // The picker's scope last: a consumer prop never moves the part out of it.
+  return <Grid {...useColorSlider("TransparencyGrid").data} {...props} scope={COLOR_PICKER_SCOPE} />
 }
 
 export const ColorSlider = {

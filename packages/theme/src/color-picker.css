@@ -347,6 +347,13 @@
   }
 
   /* ── The hex, CSS and channel inputs: one field look, monospaced digits ── */
+  /* An input's wrapper (its root): the label, the input and the messages stacked. */
+  :where([data-scope="color-picker"][data-part="channel-input-root"]) {
+    display: grid;
+    gap: var(--rind-color-field-gap, var(--rind-space-1));
+    color: var(--rind-color-text);
+  }
+
   :where([data-scope="color-picker"][data-part="channel-input"]) {
     box-sizing: border-box;
     inline-size: var(--rind-color-field-width, 8rem);
@@ -385,6 +392,14 @@
   }
 
   /* ── The swatch group: a wrapping row of swatches, each at least the hit area ── */
+  :where([data-scope="color-picker"][data-part="swatch-item"]) {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: var(--rind-color-swatch-picker-item-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+  }
+
   :where([data-scope="color-picker"][data-part="swatch-group"]) {
     display: flex;
     flex-flow: row wrap;
@@ -490,6 +505,21 @@
       box-shadow: none;
       outline: 2px solid Highlight;
       outline-offset: 2px;
+    }
+
+    /*
+     * base.css paints every [data-state="checked"] part Highlight with a double outline: the
+     * swatch item and its mark carry no outline of their own (the trigger's ring above does).
+     */
+    [data-scope="color-picker"]:is([data-part="swatch-item"], [data-part="swatch-indicator"]):not(
+        [data-focus-visible]
+      ) {
+      outline: none;
+    }
+
+    [data-scope="color-picker"][data-part="swatch-item"] {
+      background-color: transparent;
+      color: CanvasText;
     }
   }
 }

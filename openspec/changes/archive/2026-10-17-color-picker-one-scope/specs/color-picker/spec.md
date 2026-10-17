@@ -10,7 +10,7 @@ another component's scope. Their `data-part` names SHALL be:
 |---|---|
 | Area, AreaBackground, AreaThumb, the area's inputs | `area`, `area-background`, `area-thumb`, `area-input` |
 | ChannelSlider and its Label, ValueText, Control, Track, Thumb | `channel-slider`, `channel-slider-label`, `channel-slider-value-text`, `channel-slider-control`, `channel-slider-track`, `channel-slider-thumb` (the Slider's indicator, if rendered: `channel-slider-range`) |
-| ChannelInput (channel, hex or CSS) and its wrapper, steppers | `channel-input`, `channel-input-root`, `channel-input-control`, `channel-input-increment`, `channel-input-decrement` |
+| ChannelInput (channel, hex or CSS) and its wrapper | `channel-input`, `channel-input-root` |
 | SwatchGroup, its item, SwatchTrigger, SwatchIndicator | `swatch-group`, `swatch-item`, `swatch-trigger`, `swatch-indicator` |
 | Swatch, ValueSwatch, TransparencyGrid | `swatch`, `value-swatch`, `transparency-grid` |
 
