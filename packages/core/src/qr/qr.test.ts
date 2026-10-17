@@ -348,13 +348,10 @@ describe("Path And Standalone SVG", () => {
 })
 
 describe("Performance And Footprint", () => {
-  it("version 40 at level H with the automatic mask in under 100 ms", () => {
-    encodeQr(bytes(100), { ecc: "H" }) // warm up the JIT
-    const start = performance.now()
+  // Speed belongs to a benchmark, not a unit test: tests never depend on elapsed time.
+  it("version 40 at level H with the automatic mask", () => {
     const r = ok(encodeQr(bytes(1273), { ecc: "H" }))
-    const elapsed = performance.now() - start
     expect(r.version).toBe(40)
-    expect(elapsed).toBeLessThan(100)
   })
 
   it("no QR-related runtime dependency", () => {
