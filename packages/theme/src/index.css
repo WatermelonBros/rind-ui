@@ -45,6 +45,13 @@
 @import "./checkbox-group.css";
 @import "./radio-group.css";
 @import "./slider.css";
+@import "./color-checker.css";
+@import "./color-swatch.css";
+@import "./color-area.css";
+@import "./color-slider.css";
+@import "./color-field.css";
+@import "./color-swatch-picker.css";
+@import "./color-picker.css";
 @import "./progress.css";
 @import "./meter.css";
 @import "./switch.css";
