@@ -24,7 +24,11 @@ export type DrawerPart =
   | "indent"
   | "indent-background"
 
-export interface DrawerConnectInput extends Omit<DialogConnectInput, "scope" | "messages"> {
+/** What the drawer adds to the Dialog's connect input. */
+export interface DrawerExtrasInput {
+  readonly instance: string
+  readonly open: boolean
+  readonly closeReason: DialogConnectInput["closeReason"]
   readonly side: PhysicalSide
   readonly swipe: DrawerContext["swipe"]
   readonly nested: DrawerContext["nested"]
@@ -35,6 +39,10 @@ export interface DrawerConnectInput extends Omit<DialogConnectInput, "scope" | "
   readonly messages: DrawerMessages
 }
 
+export interface DrawerConnectInput
+  extends Omit<DialogConnectInput, "scope" | "messages">,
+    DrawerExtrasInput {}
+
 /** The handle's own state when it is a button. */
 export interface DrawerHandleState {
   readonly focused: boolean
@@ -44,9 +52,12 @@ export interface DrawerHandleState {
 
 const styleOf = (p: PartProps) => (p["style"] as Record<string, string> | undefined) ?? {}
 
-export function drawerConnect(input: DrawerConnectInput, send: (event: DrawerEvent) => void) {
+/**
+ * The drawer's own attributes: what it adds to the Dialog's positioner, backdrop and content
+ * (an adapter passes them to the Dialog part), and the handle.
+ */
+export function drawerExtras(input: DrawerExtrasInput, send: (event: DrawerEvent) => void) {
   const { instance } = input
-  const dialog = dialogConnect({ ...input, scope: "drawer" }, send)
   const index = input.resolved.findIndex((r) => r.point === input.snapPoint)
   const active = index >= 0 ? input.resolved[index] : undefined
   const snapIndex = input.resolved.length > 0 && index >= 0 ? String(index) : undefined
@@ -57,41 +68,26 @@ export function drawerConnect(input: DrawerConnectInput, send: (event: DrawerEve
     input.resolved.length > 0 ? input.resolved[(index + 1) % input.resolved.length] : undefined
   const growing = next !== undefined && active !== undefined && next.size > active.size
   return {
-    ...dialog,
-    positioner: (): PartProps => ({
-      ...dialog.positioner(),
+    positioner: (): PartProps => ({ "data-side": input.side }),
+    backdrop: (): PartProps => ({ "data-swiping": dataFlag(swiping) }),
+    content: (): PartProps => ({
       "data-side": input.side,
-    }),
-    backdrop: (): PartProps => ({
-      ...dialog.backdrop(),
       "data-swiping": dataFlag(swiping),
+      // From the dismissing release until the next open (a controlled parent may hold it).
+      "data-swipe-dismiss": dataFlag(
+        input.swipe === "releasing" || (!input.open && input.closeReason === "swipe"),
+      ),
+      "data-expanded": dataFlag(expanded),
+      "data-snap-point": snapIndex,
+      "data-nested-swiping": dataFlag(input.nested.swiping),
+      style: {
+        "--rind-drawer-snap-offset": `${active?.offset ?? 0}px`,
+        "--rind-drawer-size": `${Math.round(input.size)}px`,
+        ...(input.nested.count > 0
+          ? { "--rind-drawer-frontmost-size": `${input.nested.frontmostSize}px` }
+          : {}),
+      },
     }),
-    content: (own: {
-      labelledBy?: string | undefined
-      describedBy?: string | undefined
-    }): PartProps => {
-      const base = dialog.content(own)
-      return {
-        ...base,
-        "data-side": input.side,
-        "data-swiping": dataFlag(swiping),
-        // From the dismissing release until the next open (a controlled parent may hold it).
-        "data-swipe-dismiss": dataFlag(
-          input.swipe === "releasing" || (!input.open && input.closeReason === "swipe"),
-        ),
-        "data-expanded": dataFlag(expanded),
-        "data-snap-point": snapIndex,
-        "data-nested-swiping": dataFlag(input.nested.swiping),
-        style: {
-          ...styleOf(base),
-          "--rind-drawer-snap-offset": `${active?.offset ?? 0}px`,
-          "--rind-drawer-size": `${Math.round(input.size)}px`,
-          ...(input.nested.count > 0
-            ? { "--rind-drawer-frontmost-size": `${input.nested.frontmostSize}px` }
-            : {}),
-        },
-      }
-    },
     /** A button with two or more snap points (it cycles them), else decorative. */
     handle: (s: DrawerHandleState): PartProps =>
       isButton
@@ -112,6 +108,28 @@ export function drawerConnect(input: DrawerConnectInput, send: (event: DrawerEve
           },
     handleIsButton: isButton,
     pressHandle: (modality: Modality) => send({ type: "HANDLE_PRESS", modality }),
+  }
+}
+
+/** Every drawer part: the Dialog's (scope `drawer`) with the drawer's attributes merged. */
+export function drawerConnect(input: DrawerConnectInput, send: (event: DrawerEvent) => void) {
+  const dialog = dialogConnect({ ...input, scope: "drawer" }, send)
+  const extras = drawerExtras(input, send)
+  return {
+    ...dialog,
+    handle: extras.handle,
+    handleIsButton: extras.handleIsButton,
+    pressHandle: extras.pressHandle,
+    positioner: (): PartProps => ({ ...dialog.positioner(), ...extras.positioner() }),
+    backdrop: (): PartProps => ({ ...dialog.backdrop(), ...extras.backdrop() }),
+    content: (own: {
+      labelledBy?: string | undefined
+      describedBy?: string | undefined
+    }): PartProps => {
+      const base = dialog.content(own)
+      const add = extras.content()
+      return { ...base, ...add, style: { ...styleOf(base), ...styleOf(add) } }
+    },
   }
 }
 

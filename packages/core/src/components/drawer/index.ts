@@ -1,10 +1,17 @@
 export {
   type DrawerConnectInput,
+  type DrawerExtrasInput,
   type DrawerHandleState,
   type DrawerPart,
   drawerConnect,
+  drawerExtras,
   drawerIndentProps,
 } from "./drawer.connect"
+export {
+  drawerContract,
+  drawerTraits,
+  nonModalDrawerContract,
+} from "./drawer.contract"
 export {
   type DrawerContext,
   type DrawerEvent,

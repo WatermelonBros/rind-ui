@@ -111,10 +111,37 @@ const settings = (props: DrawerProps) => ({
 })
 
 /** The resolved snap points for the current sizes (empty without snap points). */
-export const resolvedPoints = (props: DrawerProps, sizes: SnapSizes): ResolvedSnapPoint[] =>
+export const resolvedPoints = (
+  props: Pick<DrawerProps, "snapPoints">,
+  sizes: SnapSizes,
+): ResolvedSnapPoint[] =>
   props.snapPoints && props.snapPoints.length > 0 && sizes.content > 0
     ? resolveSnapPoints(props.snapPoints, sizes)
     : []
+
+/**
+ * Runs `start` once `el()` exists: a portalled content mounts after the state's effects
+ * start. Frames, bounded; returns the cleanup of whichever ran.
+ */
+function whenMounted(
+  env: DomEnvironment,
+  el: () => HTMLElement | null,
+  start: (el: HTMLElement) => () => void,
+): () => void {
+  let stop: (() => void) | null = null
+  let frame: ReturnType<DomEnvironment["scheduler"]["requestAnimationFrame"]> | null = null
+  const attempt = (left: number) => {
+    frame = null
+    const node = el()
+    if (node) stop = start(node)
+    else if (left > 0) frame = env.scheduler.requestAnimationFrame(() => attempt(left - 1))
+  }
+  attempt(60)
+  return () => {
+    if (frame !== null) env.scheduler.cancelAnimationFrame(frame)
+    stop?.()
+  }
+}
 
 /** The runtime's fallback for "no snap point" (a controllable needs a value of its type). */
 const NO_POINT = null as unknown as SnapPoint
@@ -213,53 +240,57 @@ export const drawerMachine = setup({
       const content = () => env.dom.getById(partId("drawer", props.root, "content"))
       const handle = () => env.dom.getById(partId("drawer", props.root, "handle"))
       const side = drawerSide(props)
-      const tracker = trackSwipe(env, {
-        element: content,
-        directions: () => AXIS[side],
-        prefix: "drawer",
-        alwaysFrom: () => [handle()].filter((e): e is HTMLElement => e !== null),
-        onStart: (e) => send({ type: "SWIPE.START", modality: e.modality }),
-        onEnd: (e) => {
-          send({ type: "SWIPE", ...e })
-          // An uncontrolled `cancel()` ran no actions: the gesture settles here.
-          // (Effects read live context and values.)
-          if (a.values.open && a.context.swipe === "swiping") send({ type: "SWIPE.CANCEL" })
-          if (a.context.swipe !== "releasing") tracker.reset()
-        },
-        onCancel: () => send({ type: "SWIPE.CANCEL" }),
-        onProgress: (p) => drawerStack(env).progress(layerIdOf("drawer", props.root), p),
+      return whenMounted(env, content, (node) => {
+        const tracker = trackSwipe(env, {
+          element: () => node,
+          directions: () => AXIS[side],
+          prefix: "drawer",
+          alwaysFrom: () => [handle()].filter((e): e is HTMLElement => e !== null),
+          onStart: (e) => send({ type: "SWIPE.START", modality: e.modality }),
+          onEnd: (e) => {
+            send({ type: "SWIPE", ...e })
+            // An uncontrolled `cancel()` ran no actions: the gesture settles here.
+            // (Effects read live context and values.)
+            if (a.values.open && a.context.swipe === "swiping") send({ type: "SWIPE.CANCEL" })
+            if (a.context.swipe !== "releasing") tracker.reset()
+          },
+          onCancel: () => send({ type: "SWIPE.CANCEL" }),
+          onProgress: (p) => drawerStack(env).progress(layerIdOf("drawer", props.root), p),
+        })
+        return () => tracker.stop()
       })
-      return () => tracker.stop()
     },
     /** Border-box size on the axis, the viewport and the root font size. */
     measureSize: ({ env, props, send }) => {
       if (typeof document === "undefined") return undefined
-      const el = env.dom.getById(partId("drawer", props.root, "content"))
-      const win = el?.ownerDocument.defaultView
-      if (!el || !win) return undefined
-      const vertical = (() => {
-        const s = drawerSide(props)
-        return s === "top" || s === "bottom"
-      })()
-      const measure = () => {
-        const r = el.getBoundingClientRect()
-        const root = win.getComputedStyle(el.ownerDocument.documentElement)
-        send({
-          type: "SIZE.CHANGE",
-          content: vertical ? r.height : r.width,
-          viewport: vertical ? win.innerHeight : win.innerWidth,
-          rootFontSize: Number.parseFloat(root.fontSize) || 16,
-        })
-      }
-      measure()
-      const observer =
-        typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => measure())
-      observer?.observe(el, { box: "border-box" })
-      win.addEventListener("resize", measure)
-      return () => {
-        observer?.disconnect()
-        win.removeEventListener("resize", measure)
-      }
+      const content = () => env.dom.getById(partId("drawer", props.root, "content"))
+      return whenMounted(env, content, (el) => {
+        const win = el.ownerDocument.defaultView
+        if (!win) return () => {}
+        const vertical = (() => {
+          const s = drawerSide(props)
+          return s === "top" || s === "bottom"
+        })()
+        const measure = () => {
+          const r = el.getBoundingClientRect()
+          const root = win.getComputedStyle(el.ownerDocument.documentElement)
+          send({
+            type: "SIZE.CHANGE",
+            content: vertical ? r.height : r.width,
+            viewport: vertical ? win.innerHeight : win.innerWidth,
+            rootFontSize: Number.parseFloat(root.fontSize) || 16,
+          })
+        }
+        measure()
+        const observer =
+          typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => measure())
+        observer?.observe(el, { box: "border-box" })
+        win.addEventListener("resize", measure)
+        return () => {
+          observer?.disconnect()
+          win.removeEventListener("resize", measure)
+        }
+      })
     },
     /** This drawer in the document's registry; nested drawers' metrics come back as events. */
     nestedMetrics: (a) => {

@@ -56,7 +56,7 @@ const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayo
 interface Ctx {
   /** The family member: `dialog` or `alert-dialog` (scope, layer kind, names). */
   readonly scope: string
-  readonly kind: "dialog" | "alertdialog"
+  readonly kind: "dialog" | "alertdialog" | "drawer"
   readonly service: Service<typeof dialogMachine>
   readonly root: string
   readonly modal: boolean
@@ -156,7 +156,7 @@ export type DialogRootProps = Omit<DialogProps, "root" | "parent"> & {
 /** The Root of a dialog-family member: its machine, scope and layer kind. */
 export function createDialogRoot(family: {
   readonly scope: string
-  readonly kind: "dialog" | "alertdialog"
+  readonly kind: "dialog" | "alertdialog" | "drawer"
   readonly machine: typeof dialogMachine
   /** Always modal (the Alert Dialog): the props cannot turn it off. */
   readonly alwaysModal?: boolean
