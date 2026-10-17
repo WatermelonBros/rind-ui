@@ -205,7 +205,13 @@ describe("overlay effect wiring", () => {
       modal: true,
       parent: "p",
     })
-    expect(lastOptions().parentKinds).toEqual(["dialog", "alertdialog", "drawer", "popover"])
+    expect(lastOptions().parentKinds).toEqual([
+      "dialog",
+      "alertdialog",
+      "drawer",
+      "popover",
+      "tour",
+    ])
   })
 
   it("onEscapeKeyDown can veto Escape (radix#2227); an outside request is never sent", () => {

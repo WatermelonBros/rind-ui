@@ -18,6 +18,7 @@ export type LayerKind =
   | "alertdialog"
   | "drawer"
   | "popover"
+  | "tour"
   | "menu"
   | "listbox"
   | "tooltip"

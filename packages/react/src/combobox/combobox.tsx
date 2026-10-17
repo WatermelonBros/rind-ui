@@ -170,6 +170,8 @@ interface ComboboxHost extends ListboxHost {
   readonly keepMounted: boolean
   readonly open: boolean
   readonly setPresent: (present: boolean) => void
+  /** The positioner joins the top layer (the engine has the Popover API). */
+  readonly topLayer: boolean
 }
 
 const HostContext = createContext<ComboboxHost | null>(null)
@@ -353,6 +355,11 @@ function Root(all: ComboboxRootProps) {
   const view = service.view()
   const open = view.matches("open")
   const [present, setPresent] = useState(false)
+  // Known after mount: the server render and hydration never carry `popover`.
+  const [topLayer, setTopLayer] = useState(false)
+  useEffect(() => {
+    setTopLayer(typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype)
+  }, [])
   const [mounted, setMounted] = useState({ label: false, empty: false })
   const [mount] = useState(
     () => (part: "label" | "empty", on: boolean) =>
@@ -407,6 +414,7 @@ function Root(all: ComboboxRootProps) {
       dir: env.locale.dir(),
       messages,
       mounted,
+      topLayer,
       name: field.name,
       inputName: all.inputName,
       form: all.form,
@@ -463,6 +471,7 @@ function Root(all: ComboboxRootProps) {
     },
     open,
     setPresent,
+    topLayer,
   }
   return <HostContext value={host}>{children}</HostContext>
 }
@@ -591,10 +600,28 @@ function Positioner({ render, ref, children, ...rest }: Own<"div">) {
   const node = useRef<HTMLElement | null>(null)
   // It holds the popup: it stays while the popup's exit animations run.
   const { mounted } = usePresence(host.open, node, { keepMounted: host.keepMounted, subtree: true })
-  const { setPresent } = host
+  const { setPresent, topLayer } = host
   useIsoLayoutEffect(() => {
     setPresent(mounted)
   }, [mounted, setPresent])
+  // Into the top layer while mounted (`popover="manual"`): above every stacking context of
+  // the page, with no portal. Engines without the Popover API keep it in place.
+  useIsoLayoutEffect(() => {
+    const el = node.current as (HTMLElement & { showPopover?: () => void }) | null
+    if (!mounted || !topLayer || !el || typeof el.showPopover !== "function") return
+    try {
+      if (!el.matches(":popover-open")) el.showPopover()
+    } catch {
+      // Already shown, or not connected yet: the next commit retries.
+    }
+    return () => {
+      try {
+        if (el.matches(":popover-open")) el.hidePopover()
+      } catch {
+        // Removed with its subtree.
+      }
+    }
+  }, [mounted, topLayer])
   if (!mounted) return null
   const own = normalizeProps(host.api.positioner())
   const props = mergeProps(

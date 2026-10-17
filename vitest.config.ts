@@ -53,8 +53,10 @@ const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
 
 // Locally the machine is shared by several sessions: at most half the cores per run unless
 // RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
+// On CI, RIND_MAX_WORKERS (set for the real-browser slices) caps the pages one browser runs at
+// once: Chromium crashed mid-run ("Browser connection was closed") with the default.
 const maxWorkers = process.env["CI"]
-  ? undefined
+  ? Number(process.env["RIND_MAX_WORKERS"]) || undefined
   : Number(process.env["RIND_MAX_WORKERS"]) || Math.max(1, Math.floor(availableParallelism() / 2))
 
 // `expect.poll` waits on a condition; its timeout is only the failure deadline, and a loaded
