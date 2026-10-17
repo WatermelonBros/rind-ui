@@ -23,6 +23,7 @@
 @import "./image.css";
 @import "./toolbar.css";
 @import "./dialog.css";
+@import "./drawer.css";
 @import "./slider.css";
 @import "./color.css";
 @import "./progress.css";
@@ -32,9 +33,9 @@
 @import "./number-input.css";
 @import "./listbox.css";
 @import "./combobox.css";
+@import "./tags-input.css";
 @import "./pin-input.css";
-@import "./password-input.css";
-@import "./search-field.css";
+@import "./text-field.css";
 @import "./tooltip.css";
 @import "./pagination.css";
 @import "./menu.css";

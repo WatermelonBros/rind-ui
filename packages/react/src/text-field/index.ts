@@ -1,10 +1,12 @@
+export { TextField } from "./parts"
 export {
   createTextFieldRoot,
-  TextField,
   type TextFieldDetails,
   type TextFieldHostConfig,
   type TextFieldHostContext,
   type TextFieldHostRefs,
   type TextFieldRootProps,
+  type TextFieldVisibilityDetails,
+  type TextFieldVisibilityReason,
   useTextFieldHost,
 } from "./text-field"

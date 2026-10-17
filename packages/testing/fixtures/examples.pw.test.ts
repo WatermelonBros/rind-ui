@@ -304,9 +304,10 @@ const TRANSIENT = new Set([
   "number-input:composing",
   "number-input:pressing",
   "number-input:spinning",
-  "password-input:composing",
   "pin-input:composing",
-  "search-field:composing",
+  // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
+  "tags-input:typing",
+  "tags-input:editing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
   // Pointer interactions: scrollbars shown while scrolling or hovered, a thumb dragged.
@@ -316,6 +317,9 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // A toast not yet started by a region, and one exiting: both last for moments.
+  "toast:idle",
+  "toast:dismissed",
 ])
 
 /**
