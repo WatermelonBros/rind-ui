@@ -15,6 +15,7 @@ import { contentPlacementProps, positionerProps } from "../../dom/position/conne
 import { type Chip, inputChipsConnect } from "../input-chips/input-chips"
 import type { ListboxEvent } from "../listbox/listbox.machine"
 import { listboxParts } from "../listbox/listbox.parts"
+import type { FieldControlProps } from "../shared/field-control"
 import type { ComboboxContext, ComboboxEvent } from "./combobox.machine"
 import { comboboxIds } from "./combobox.machine"
 import type { ComboboxMessages } from "./combobox.messages"
@@ -38,6 +39,10 @@ export interface ComboboxConnectView {
   readonly readOnly: boolean
   readonly invalid: boolean
   readonly required: boolean
+  /** The Field's attributes for the registered input (field-control). */
+  readonly field?: FieldControlProps | undefined
+  /** The Field's validation data attributes, on Root and Control too. */
+  readonly fieldData?: Readonly<Record<`data-${string}`, string | undefined>> | undefined
   /** The form name of the selected keys (one hidden entry per key). */
   readonly name?: string | undefined
   /** The form name of the visible text. */
@@ -148,6 +153,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     completionRange:
       c.completion !== null ? ([v.inputValue.length, c.completion.length] as const) : null,
     root: (): PartProps => ({
+      ...v.fieldData,
       ...common("root"),
       "data-focus": dataFlag(c.focused),
       "data-empty-value": dataFlag(!v.hasValue),
@@ -158,6 +164,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       htmlFor: ids.input,
     }),
     control: (): PartProps => ({
+      ...v.fieldData,
       ...common("control"),
       id: ids.control,
       "data-focus": dataFlag(c.focused),
@@ -180,10 +187,12 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       "aria-autocomplete": v.autoComplete,
       "aria-expanded": String(v.exposed),
       "aria-controls": v.present ? ids.list : undefined,
-      "aria-labelledby": v.mounted.label ? ids.label : undefined,
-      "aria-describedby": chips.describedBy,
+      "aria-labelledby": v.mounted.label ? ids.label : v.field?.["aria-labelledby"],
+      "aria-describedby":
+        [v.field?.["aria-describedby"], chips.describedBy].filter(Boolean).join(" ") || undefined,
       "aria-invalid": v.invalid ? "true" : undefined,
-      "aria-required": v.required ? "true" : undefined,
+      "aria-required": v.field?.["aria-required"] ?? (v.required ? "true" : undefined),
+      "aria-errormessage": v.field?.["aria-errormessage"],
       name: v.inputName,
       form: v.inputName !== undefined ? v.form : undefined,
       "aria-activedescendant":

@@ -18,12 +18,14 @@ import {
   createListCollection,
   domPositioning,
   type FormInputCapability,
+  focusSafely,
   hiddenFormInput,
   isEmptyState,
   isExposed,
   isStale,
   type LoadingStatus,
   type Modality,
+  mergeFieldProps,
   type PositioningProps,
   patternQuery,
   patternResults,
@@ -44,6 +46,8 @@ import {
   useRef,
   useState,
 } from "react"
+import { useFieldControl } from "../field/field"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { createListboxParts, type ListboxHost } from "../listbox/parts"
 import { composeRefs, mergeProps } from "../merge-props"
@@ -81,6 +85,11 @@ export interface ComboboxChangeDetails {
   readonly reason: string
 }
 
+export interface ComboboxInputChangeDetails extends ComboboxChangeDetails {
+  /** Aborted when a newer text change is reported or the popup closes (async fetches). */
+  readonly signal: AbortSignal
+}
+
 interface Common {
   readonly id?: string
   readonly children?: ReactNode
@@ -89,7 +98,7 @@ interface Common {
   readonly collection?: Collection<unknown>
   readonly inputValue?: string
   readonly defaultInputValue?: string
-  readonly onInputValueChange?: (text: string, details: ComboboxChangeDetails) => void
+  readonly onInputValueChange?: (text: string, details: ComboboxInputChangeDetails) => void
   readonly open?: boolean
   readonly defaultOpen?: boolean
   readonly onOpenChange?: (open: boolean, details: ComboboxChangeDetails) => void
@@ -191,10 +200,26 @@ const reasonOf = (type: string) =>
   })[type] ?? type.toLowerCase()
 
 function Root(all: ComboboxRootProps) {
-  const { id, items, collection: given, children, disabled = false } = all
+  const { id, items, collection: given, children } = all
   const p = all as Record<string, unknown>
   const base = useEnvironment()
   const env = useMemo(() => ({ ...base, position: domPositioning(base) }), [base])
+  // field-control: the Field's and an enclosing Fieldset's flags, OR-merged with our own.
+  const binding = useFieldControl()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const field = mergeFieldProps(
+    {
+      role: "combobox",
+      labelable: true,
+      disabled: all.disabled === true || fieldsetDisabled,
+      readOnly: all.readOnly,
+      required: all.required,
+      invalid: all.invalid,
+      name: all.name,
+    },
+    binding,
+  )
+  const { disabled, readOnly } = field
   const instance = useRootId(id)
   const { collection: registered, registry } = useCollectionItems()
   const data = useMemo(() => (items ? fromData(items) : null), [items])
@@ -208,6 +233,13 @@ function Root(all: ComboboxRootProps) {
   const latest = useRef(all)
   latest.current = all
   const pending = useRef(false)
+  // One controller per reported text; the previous one is aborted.
+  const fetches = useRef<AbortController | null>(null)
+  const nextSignal = () => {
+    fetches.current?.abort()
+    fetches.current = new AbortController()
+    return fetches.current.signal
+  }
   const constraint = useRef<HTMLInputElement | null>(null)
 
   // The selection's text is the initial text (no change callback for it at mount).
@@ -246,7 +278,7 @@ function Root(all: ComboboxRootProps) {
       strategy: "active-descendant",
       selectionMode,
       disabled,
-      readOnly: all.readOnly,
+      readOnly,
       disallowEmptySelection: all.disallowEmptySelection,
       loop: all.loop,
       loading: all.loading,
@@ -279,16 +311,45 @@ function Root(all: ComboboxRootProps) {
       defaultOpen: all.defaultOpen,
       onValueChange: (v, d) => {
         pending.current = true
+        binding?.report({ type: "change", value: v, user: true, composing: false })
         const cb = latest.current.onValueChange as ((v: unknown, d: unknown) => void) | undefined
         cb?.(v, { reason: reasonOf(d.event.type) })
       },
       onInputValueChange: (t, d) =>
-        latest.current.onInputValueChange?.(t, { reason: reasonOf(d.event.type) }),
-      onOpenChange: (o, d) => latest.current.onOpenChange?.(o, { reason: reasonOf(d.event.type) }),
+        latest.current.onInputValueChange?.(t, {
+          reason: reasonOf(d.event.type),
+          signal: nextSignal(),
+        }),
+      onOpenChange: (o, d) => {
+        // Closing the popup is a commit (field-control "Reporting Changes").
+        if (!o) {
+          binding?.report({ type: "commit" })
+          fetches.current?.abort()
+        }
+        latest.current.onOpenChange?.(o, { reason: reasonOf(d.event.type) })
+      },
     },
     env,
   )
   svc.current = service
+  const register = binding?.register
+  useIsoLayoutEffect(() => {
+    if (!register) return
+    return register(
+      {
+        id: ids.input,
+        labelable: true,
+        focus: (m) => {
+          // Sound: the Input part renders an <input> with this id.
+          const el = env.dom.getById(ids.input) as HTMLElement | null
+          if (el) void focusSafely(el, env, "programmatic", m)
+        },
+        validityElement: () => constraint.current,
+        value: () => service.view().values.value,
+      },
+      ids.input,
+    )
+  }, [register, ids.input, env, service])
   const view = service.view()
   const open = view.matches("open")
   const [present, setPresent] = useState(false)
@@ -335,16 +396,18 @@ function Root(all: ComboboxRootProps) {
       inputValue: view.values.inputValue as string,
       hasValue: Array.isArray(value) ? value.length > 0 : value != null,
       disabled,
-      readOnly: all.readOnly === true,
-      invalid: all.invalid === true,
-      required: all.required === true,
+      readOnly: readOnly,
+      invalid: field.invalid,
+      required: field.required,
+      field,
+      fieldData: binding?.data,
       autoComplete: all.autoComplete ?? "list",
       loading: all.loading,
       modality,
       dir: env.locale.dir(),
       messages,
       mounted,
-      name: all.name,
+      name: field.name,
       inputName: all.inputName,
       form: all.form,
       keys,

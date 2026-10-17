@@ -273,6 +273,11 @@ export interface FormInputDecl {
   }
   readonly silentEvents?: readonly string[]
   /**
+   * The values the hidden input mirrors (default: all): a change of another value (a
+   * combobox's text or open state) is not a form change.
+   */
+  readonly values?: readonly string[]
+  /**
    * Events whose action makes the browser dispatch one `change` itself (assistive technology
    * adjusting an accessible native input): one change each, whether or not the value changes.
    */

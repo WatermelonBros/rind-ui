@@ -834,6 +834,12 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
   /** The last step's facts: the base of the unmount-while-open check. */
   /** Steps whose user action changed the value (form-associated: one `change` each). */
   let userChanges = 0
+  /** The values the hidden input mirrors, serialised (a change of them is a form change). */
+  const formValues = () => {
+    const all = oracle.service.view().values as Record<string, unknown>
+    const keys = contract.formInput?.values
+    return JSON.stringify(keys ? keys.map((k) => all[k]) : all)
+  }
   let lastFacts: StepFacts | null = null
   const verify = async (
     step: number,
@@ -1134,12 +1140,12 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         let stepMod: Modality | null = null
         if (mapping?.kind === "delay") {
           const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
-          const valuesBefore = JSON.stringify(oracle.service.view().values)
+          const valuesBefore = formValues()
           send(edge.event)
           // A value changed by a timer of a held gesture (a stepper's repeat) is the user's.
           if (
             contract.formInput &&
-            JSON.stringify(oracle.service.view().values) !== valuesBefore &&
+            formValues() !== valuesBefore &&
             !contract.formInput.silentEvents?.includes(edge.event)
           ) {
             userChanges += 1
@@ -1193,13 +1199,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
               from,
             )
           }
-          const valuesBefore = JSON.stringify(oracle.service.view().values)
+          const valuesBefore = formValues()
           send(edge.event, { ...mapping.event?.(oracle.service.view()), modality: stepMod })
           if (contract.formInput?.nativeEvents?.includes(edge.event)) {
             // The browser's own change, dispatched whatever the component does with it.
             userChanges += 1
           } else if (
-            JSON.stringify(oracle.service.view().values) !== valuesBefore &&
+            formValues() !== valuesBefore &&
             !contract.formInput?.silentEvents?.includes(edge.event)
           ) {
             userChanges += 1

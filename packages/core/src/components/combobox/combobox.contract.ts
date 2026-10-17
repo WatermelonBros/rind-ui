@@ -88,6 +88,8 @@ export function comboboxTraits(
     "layer",
     "presence",
     "anchored",
+    "form-associated",
+    "field-associated",
     ...((props.selectionMode ?? "single") === "none" ? [] : (["selectable"] as const)),
     ...(props.virtualized ? (["set-metadata"] as const) : []),
   ]
@@ -322,7 +324,24 @@ export const comboboxContract = contract("combobox", {
     "$sync:open": { skip: "a controlled open: scenario tests" },
     "$props:loading": { skip: "async: scenario tests" },
   },
-  traits: ["composite-activedescendant", "layer", "presence", "anchored", "selectable"],
+  traits: [
+    "composite-activedescendant",
+    "layer",
+    "presence",
+    "anchored",
+    "selectable",
+    "form-associated",
+    "field-associated",
+  ],
+  // The constraint input holds the selected keys (empty exactly when nothing is selected).
+  formInput: {
+    // Only the selection is submitted; the text and the open state are not form values.
+    values: ["value"],
+    expected: (vals) => {
+      const v = vals["value"] as string | null | readonly string[] | undefined
+      return { value: v == null ? "" : typeof v === "string" ? v : v.join(",") }
+    },
+  },
   // Focus on the input is a focus event; programmatic focus on a button leaves the input.
   commitsOnFocus: [
     { part: "input", state: "closed" },
