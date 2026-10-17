@@ -30,10 +30,13 @@ function View({
   /** In the example itself (state examples), not the page's corner. */
   inline?: boolean
 }) {
-  return (
+  // Not portalled on this site: the region stays inside the example, so it takes the skin picked
+  // in the demo (a portal would only see the page). It is still fixed to the viewport corner;
+  // in an app, render one Toaster at the root with the default portal.
+  const region = (
     <Toaster
       toaster={store}
-      portal={!inline}
+      portal={false}
       messages={{ regionLabel: (key) => `${name} notifications (${key})` }}
     >
       {(t) => (
@@ -50,6 +53,7 @@ function View({
       )}
     </Toaster>
   )
+  return inline ? <div className="toast-inline">{region}</div> : region
 }
 
 const basic = createToaster()
