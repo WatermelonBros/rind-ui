@@ -432,7 +432,19 @@ function Root<V extends SliderValue>({
       send({ type: "POINTER.DOWN", fraction, thumb: index, modality: touch ? "touch" : "pointer" })
     },
   }
-  const props = mergeProps({ ...normalizeProps(api.root()), ref }, rest)
+  // Without a Control part the Root is the pointer surface (Color Slider's shape); presses
+  // that start on the Label or the ValueText do not start a drag.
+  const rootPress = (e: PointerEvent<HTMLElement>) => {
+    if (control.current) return
+    const from = (e.target as Element).closest?.('[data-scope="slider"][data-part]')
+    const partName = from?.getAttribute("data-part")
+    if (partName === "label" || partName === "value-text" || partName === "description") return
+    ctx.press(e)
+  }
+  const props = mergeProps(
+    { ...joinHandlers(normalizeProps(api.root()), { onPointerDown: rootPress }), ref },
+    rest,
+  )
   return (
     <SliderContext value={ctx}>
       {renderPart("div", { ...props, children }, render, state)}

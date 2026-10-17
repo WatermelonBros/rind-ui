@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
+| add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
+| add-color-picker (impl) | — | packages/react/src/color-picker/color-picker.tsx | Eye dropper handled in the React adapter, not a machine effect; picker root never sets `data-dragging` |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.machine.test.ts | Out-of-range page clamp (`defaultPage` above `totalPages`, below 1) untested |
 | add-pagination (r1) | — | packages/testing/src/components/pagination.dom.test.tsx | "current page does nothing" has no positive control (a non-current page does call `onPageChange`) |
 | add-pagination (r1) | — | packages/core/src/components/pagination/pagination.connect.test.ts:84 | Loose `toContain` where an exact list is meant |

@@ -11,6 +11,12 @@ import * as button from "./button"
 import * as checkbox from "./checkbox"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
+import * as colorArea from "./color-area"
+import * as colorField from "./color-field"
+import * as colorPicker from "./color-picker"
+import * as colorSlider from "./color-slider"
+import * as colorSwatch from "./color-swatch"
+import * as colorSwatchPicker from "./color-swatch-picker"
 import * as dialog from "./dialog"
 import * as field from "./field"
 import * as fieldset from "./fieldset"
@@ -68,6 +74,12 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   checkbox,
   "checkbox-group": checkboxGroup,
   collapsible,
+  "color-area": colorArea,
+  "color-field": colorField,
+  "color-picker": colorPicker,
+  "color-slider": colorSlider,
+  "color-swatch": colorSwatch,
+  "color-swatch-picker": colorSwatchPicker,
   dialog,
   field,
   "focus-and-modality": focusAndModality,

@@ -27,6 +27,7 @@ export {
   dismissRequest,
 } from "./dismiss"
 export { type ElementInfo, elementInfo } from "./element-info"
+export { isEyeDropperSupported, pickScreenColor } from "./eye-dropper"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
 export { captureFocus, type FocusReturn } from "./focus-restore"
@@ -122,13 +123,20 @@ export {
   withEngine,
 } from "./platform"
 export {
+  type DragArea,
   type DragAxis,
   type DragMessage,
+  type DragMessage2D,
+  type DragPoint,
   isDragPress,
   type PointerDragCapability,
+  type PointerDragCapability2D,
   type PointerDragSession,
+  type PointerDragSession2D,
   pointerDragSession,
+  pointerDragSession2D,
   pointerFraction,
+  pointerPoint,
   startDrag,
 } from "./pointer-drag"
 export { pointerMoved } from "./pointer-guard"

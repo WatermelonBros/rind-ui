@@ -83,8 +83,20 @@ export function startDrag(
   o: DragAxis,
   send: (m: DragMessage) => void,
 ): () => void {
+  return trackPointer<DragMessage & { readonly type: "move" }>(surface, e.pointerId, send, (p) => {
+    const fraction = pointerFraction(surface, p, o)
+    return fraction === null ? null : { type: "move", fraction }
+  })
+}
+
+/** One pointer's drag lifecycle; `move` maps each pointer position to a message (or none). */
+function trackPointer<M extends { readonly type: string }>(
+  surface: Element,
+  id: number,
+  send: (m: M | { readonly type: "up" } | { readonly type: "cancel" }) => void,
+  move: (p: PointerLike) => M | null,
+): () => void {
   const doc = surface.ownerDocument
-  const id = e.pointerId
   try {
     surface.setPointerCapture?.(id)
   } catch {
@@ -105,7 +117,7 @@ export function startDrag(
       // Capture already gone.
     }
   }
-  const end = (m: DragMessage) => {
+  const end = (m: { readonly type: "up" } | { readonly type: "cancel" }) => {
     if (!active) return
     stop()
     send(m)
@@ -115,8 +127,8 @@ export function startDrag(
     if (p.pointerId !== id) return
     // No button pressed any more: released where no pointerup reached us (an iframe edge).
     if (p.buttons === 0) return end({ type: "up" })
-    const fraction = pointerFraction(surface, p, o)
-    if (fraction !== null) send({ type: "move", fraction })
+    const m = move(p)
+    if (m !== null) send(m)
   }
   function onUp(ev: Event) {
     if ((ev as PointerEvent).pointerId === id) end({ type: "up" })
@@ -193,3 +205,94 @@ export function pointerDragSession() {
 }
 
 export type PointerDragSession = ReturnType<typeof pointerDragSession>
+
+// --- 2D mode (Color Area): both axes at once ---
+
+/** A point as fractions: x from the inline start (mirrored under RTL), y from the bottom. */
+export interface DragPoint {
+  readonly x: number
+  readonly y: number
+}
+
+export type DragMessage2D =
+  | { readonly type: "move"; readonly x: number; readonly y: number }
+  | { readonly type: "up" }
+  | { readonly type: "cancel" }
+
+export interface DragArea {
+  readonly dir: "ltr" | "rtl"
+  /** Subtracted from every point: where the press landed relative to the dragged thumb. */
+  readonly grabOffset?: DragPoint
+}
+
+function rawPoint(surface: Element, p: PointerLike, dir: "ltr" | "rtl"): DragPoint | null {
+  const x = rawFraction(surface, p, { axis: "horizontal", dir })
+  const y = rawFraction(surface, p, { axis: "vertical", dir: "ltr" })
+  return x === null || y === null ? null : { x, y }
+}
+
+/** The point a pointer is at, after the grab offset, clamped to 0..1; null without layout. */
+export function pointerPoint(surface: Element, p: PointerLike, o: DragArea): DragPoint | null {
+  const raw = rawPoint(surface, p, o.dir)
+  if (!raw) return null
+  return {
+    x: clamp01(raw.x - (o.grabOffset?.x ?? 0)),
+    y: clamp01(raw.y - (o.grabOffset?.y ?? 0)),
+  }
+}
+
+/** What a 2D machine's drag effect reaches the press through. */
+export interface PointerDragCapability2D {
+  track(send: (m: DragMessage2D) => void): () => void
+}
+
+/** `pointerDragSession` for two axes (design request to `pointer-drag`: `axis: "both"`). */
+export function pointerDragSession2D() {
+  let pending: { surface: Element; pointerId: number; options: DragArea } | null = null
+  let tracking = false
+  return {
+    get active() {
+      return tracking
+    },
+    /** Records a press; returns its point (`null` without layout); `anchor`: the thumb's point. */
+    press(
+      surface: Element,
+      e: PointerLike & { readonly pointerId: number },
+      options: { readonly dir: "ltr" | "rtl"; readonly anchor?: DragPoint | undefined },
+    ): DragPoint | null {
+      const raw = rawPoint(surface, e, options.dir)
+      const grabOffset =
+        raw !== null && options.anchor
+          ? { x: raw.x - options.anchor.x, y: raw.y - options.anchor.y }
+          : { x: 0, y: 0 }
+      pending = { surface, pointerId: e.pointerId, options: { dir: options.dir, grabOffset } }
+      return raw === null
+        ? null
+        : { x: clamp01(raw.x - grabOffset.x), y: clamp01(raw.y - grabOffset.y) }
+    },
+    track(send: (m: DragMessage2D) => void): () => void {
+      const p = pending
+      pending = null
+      if (!p || tracking) return () => {}
+      tracking = true
+      const stop = trackPointer<DragMessage2D>(
+        p.surface,
+        p.pointerId,
+        (m) => {
+          if (m.type !== "move") tracking = false
+          send(m)
+        },
+        (ptr) => {
+          const point = pointerPoint(p.surface, ptr, p.options)
+          return point === null ? null : { type: "move", ...point }
+        },
+      )
+      return () => {
+        tracking = false
+        stop()
+      }
+    },
+  } satisfies PointerDragCapability2D & Record<string, unknown>
+}
+
+export type PointerDragSession2D = ReturnType<typeof pointerDragSession2D>

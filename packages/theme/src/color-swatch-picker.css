@@ -1,0 +1,56 @@
+/*
+ * Color Swatch Picker (the swatch: decoration; the group inherits data-size): a wrapping row
+ * of swatches at least the hit area; the checked one gets a ring and its Indicator's mark
+ * (never colour alone).
+ */
+@layer rind.components {
+  :where([data-scope="radio-group"][data-part="root"][data-color-swatch-picker]) {
+    display: flex;
+    flex-flow: row wrap;
+    gap: var(--rind-color-swatch-picker-gap, var(--rind-space-2));
+  }
+
+  :where([data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker]) {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-color-swatch-picker-radius, var(--rind-radius-sm));
+    background: transparent;
+    color: var(--rind-color-text);
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-state="checked"]
+  ) {
+    box-shadow:
+      0 0 0 2px var(--rind-color-surface),
+      0 0 0 4px var(--rind-color-swatch-picker-ring, var(--rind-color-text));
+  }
+
+  :where(
+    [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) + 4px);
+  }
+
+  :where([data-scope="radio-group"][data-part="item-indicator"]) {
+    position: absolute;
+    color: var(--rind-color-swatch-picker-mark, var(--rind-color-text));
+  }
+
+  @media (forced-colors: active) {
+    :where(
+        [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-state="checked"]
+      ) {
+      box-shadow: none;
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+  }
+}

@@ -4,6 +4,7 @@ export {
   buttonLikeKind,
   buttonLikeProps,
 } from "./button-like"
+export * from "./color"
 export { type ControlLabelInput, controlLabel, warnOwnLabelInField } from "./control-label"
 export {
   type FieldControlBinding,

@@ -1,0 +1,40 @@
+/*
+ * Color Slider (family: range): a Slider whose track is the channel's gradient (inline from
+ * core). On top of slider.css: a taller track with no fill of its own (a Transparency Grid
+ * placed under it shows through an alpha gradient), the thumb painted with the colour at it
+ * and the Color Area's double ring.
+ */
+@layer rind.components {
+  :where([data-scope="slider"][data-channel][data-part="root"]) {
+    --_track: var(--rind-color-slider-track-size, 0.75rem);
+    --_thumb: var(--rind-color-slider-thumb-size, 1.25rem);
+  }
+
+  :where([data-scope="slider"][data-channel][data-part="track"]) {
+    background-color: transparent;
+    border-radius: var(--rind-color-slider-track-radius, var(--rind-radius-full));
+    overflow: visible;
+  }
+
+  :where([data-scope="slider"][data-channel][data-part="thumb"]) {
+    border: 0;
+    background: var(--rind-color);
+    box-shadow:
+      0 0 0 2px var(--rind-color-slider-thumb-inner, var(--rind-color-surface)),
+      0 0 0 3px var(--rind-color-slider-thumb-outer, var(--rind-color-text));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="slider"][data-channel][data-part="track"]) {
+      background-color: transparent;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="slider"][data-channel][data-part="thumb"]) {
+      background: var(--rind-color);
+      box-shadow:
+        0 0 0 2px Canvas,
+        0 0 0 3px CanvasText;
+    }
+  }
+}
