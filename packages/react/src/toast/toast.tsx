@@ -22,6 +22,7 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -126,6 +127,15 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
       tracker.current = null
     }
   }, [visible, env, toaster, send])
+  // Stable across renders: the toasts' swipe effects depend on them (a re-run mid-drag
+  // would stop the gesture).
+  const directions =
+    toaster.options.swipeDirections ?? defaultDirections(toaster.options.placement, dir ?? "ltr")
+  const directionsKey = directions.join(",")
+  // biome-ignore lint/correctness/useExhaustiveDependencies: keyed by the directions' value
+  const swipeDirections = useMemo(() => directions, [directionsKey])
+  const [setSwiping] = useState(() => (active: boolean) => send({ type: "SWIPING", active }))
+  const [leaving] = useState(() => (el: HTMLElement) => tracker.current?.leaving(el))
   const api = toasterConnect({
     instance,
     placement: toaster.options.placement,
@@ -141,10 +151,9 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
     store: toaster,
     instance,
     api,
-    swipeDirections:
-      toaster.options.swipeDirections ?? defaultDirections(toaster.options.placement, dir ?? "ltr"),
-    setSwiping: (active) => send({ type: "SWIPING", active }),
-    leaving: (el) => tracker.current?.leaving(el),
+    swipeDirections,
+    setSwiping,
+    leaving,
   }
   const modalityOf = () => env.modality.modality()
   const region = (

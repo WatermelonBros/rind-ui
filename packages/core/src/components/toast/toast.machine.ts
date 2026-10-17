@@ -121,7 +121,11 @@ export const toastMachine = setup({
     actionCloses: ({ context }) => context.data.action?.closes !== false,
     swipeDismisses: ({ context, event, props }) => {
       if (event.type !== "SWIPE" || context.data.dismissible === false) return false
-      if (event.direction === null || !props.swipeDirections.includes(event.direction)) return false
+      if (event.direction === null) return false
+      // The tracker reports only the region's allowed directions (the placement's edge and
+      // the inline end, from the document's direction); an explicit store list is checked.
+      const allowed = props.swipeDirections
+      if (allowed.length > 0 && !allowed.includes(event.direction)) return false
       return (
         event.offset >= (props.swipeThreshold ?? 45) ||
         event.velocity >= (props.swipeVelocity ?? 0.11)
