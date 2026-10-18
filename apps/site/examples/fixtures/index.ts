@@ -17,6 +17,7 @@ import * as label from "./label"
 import * as layer from "./layer"
 import * as link from "./link"
 import * as listbox from "./listbox"
+import * as menubar from "./menubar"
 import * as popover from "./popover"
 import * as press from "./press"
 import * as radioGroup from "./radio-group"
@@ -65,6 +66,7 @@ export const fixtures: Readonly<Record<string, ExampleModule>> = {
   "text-field": textField,
   toggle,
   "toggle-group": toggleGroup,
+  menubar,
   toolbar,
   "visually-hidden": visuallyHidden,
 }

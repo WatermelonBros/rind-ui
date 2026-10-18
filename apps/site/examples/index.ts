@@ -36,6 +36,7 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
 import * as menu from "./menu"
+import * as menubar from "./menubar"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
@@ -83,6 +84,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   labels: labels,
   "visually-hidden": visuallyHidden,
   menu,
+  menubar,
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
