@@ -8,6 +8,8 @@ import { Why } from "@/components/home/why"
 import { Marquee } from "@/components/marquee"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import { pages } from "@/lib/docs"
+// only the skins of the components the landing renders: a smaller first-paint stylesheet
+import "@/skins/home.css"
 
 export default function Home() {
   return (
