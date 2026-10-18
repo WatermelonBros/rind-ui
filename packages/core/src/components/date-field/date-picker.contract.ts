@@ -18,7 +18,10 @@ export const datePickerActions = {
   openPicker: {
     keyboard: async (env: E) => env.part("trigger").press("Enter"),
     pointer: async (env: E) => env.part("trigger").click(),
-    done: isOpen,
+    // Open and placed: until the first placement the popup takes no pointer input (the
+    // positioner's first-frame style), so a pick right after the open would miss.
+    done: async (env: E) =>
+      (await isOpen(env)) && (await env.part("content").attr("data-placing")) === null,
   },
   /** A day of the open calendar, ISO `YYYY-MM-DD` (twice in range mode: start, then end). */
   pickDate: {

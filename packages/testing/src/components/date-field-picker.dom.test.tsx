@@ -1,12 +1,13 @@
 // Date Field picker parts (date-field spec "Picker Parts", "Picker — …"): single and range.
 import { CalendarDate, CalendarDateTime, type DateValue, isWeekend } from "@internationalized/date"
+import type { Scheduler } from "@rind-ui/core"
 import { Calendar, DateField, Dialog, RindProvider } from "@rind-ui/react"
 import { render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import type { ReactNode } from "react"
 import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { fixedDateClock, getDateField } from "../index"
+import { domEnv, fixedDateClock, getDateField } from "../index"
 
 const clock = fixedDateClock("2026-10-17T12:00:00Z", "UTC")
 const d = (m: number, day: number) => new CalendarDate(2026, m, day)
@@ -388,6 +389,47 @@ describe("Date Field picker (range)", () => {
     await stay.pickDate("2026-10-12")
     await stay.pickDate("2026-10-16")
     await waitFor(async () => expect(await stay.isOpen()).toBe(false))
+    expect(await stay.range()).toEqual({ start: "2026-10-12", end: "2026-10-16" })
+  })
+
+  it("driver: openPicker waits for the first placement (the popup takes no pointer input before)", async () => {
+    // Held animation frames: the first placement waits for one, as on a starved CI page.
+    const held: (() => void)[] = []
+    let hold = true
+    const scheduler: Scheduler = {
+      // fake-time: timers pass through untouched; only the animation frames are held.
+      setTimeout: (cb, ms) => window.setTimeout(cb, ms),
+      // The handles are the window's own numbers (or a held frame's index, never cancelled).
+      clearTimeout: (h) => window.clearTimeout(h as number),
+      requestAnimationFrame: (cb) => (hold ? held.push(cb) : window.requestAnimationFrame(cb)),
+      cancelAnimationFrame: (h) => {
+        if (!hold) window.cancelAnimationFrame(h as number)
+      },
+    }
+    render(
+      <RindProvider environment={{ dateClock: clock, scheduler }}>
+        <DateField.Root selectionMode="range" locale="en-US">
+          <DateField.Label>Stay</DateField.Label>
+          <Parts />
+        </DateField.Root>
+      </RindProvider>,
+    )
+    const short = getDateField(() => domEnv({ timeout: 200 }), {
+      name: "Stay",
+      selectionMode: "range",
+    })
+    // Open but unplaced: the postcondition is not met.
+    await expect(short.openPicker()).rejects.toThrow(/openPicker/)
+    const content = screen.getByRole("dialog")
+    expect(content.getAttribute("data-state")).toBe("open")
+    expect(content.hasAttribute("data-placing")).toBe(true)
+    hold = false
+    for (const cb of held.splice(0)) cb()
+    const stay = getDateField(screen, { name: "Stay", selectionMode: "range" })
+    await waitFor(async () => expect(await stay.isOpen()).toBe(true))
+    await waitFor(() => expect(content.hasAttribute("data-placing")).toBe(false))
+    await stay.pickDate("2026-10-12")
+    await stay.pickDate("2026-10-16")
     expect(await stay.range()).toEqual({ start: "2026-10-12", end: "2026-10-16" })
   })
 })
