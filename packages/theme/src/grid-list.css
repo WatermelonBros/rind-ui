@@ -77,6 +77,15 @@
     cursor: pointer;
   }
 
+  /* The row's one gridcell holds every part: it, not the row, lays them out. */
+  :where([data-scope="grid-list"][data-part="item-cell"]) {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-inline-size: 0;
+  }
+
   :where([data-scope="grid-list"][data-part="item-text"]) {
     flex: 1 1 auto;
     min-inline-size: 0;
