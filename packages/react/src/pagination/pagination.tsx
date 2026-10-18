@@ -262,7 +262,10 @@ function Control(
   )
 }
 
-export type PaginationPageProps = ControlProps & { readonly value: number }
+export type PaginationPageProps = ControlProps & {
+  /** The page number it goes to; `aria-current="page"` when it is the current page. */
+  readonly value: number
+}
 
 function Page({ value, children, ...rest }: PaginationPageProps) {
   const ctx = usePagination("Page")
@@ -338,6 +341,7 @@ function trigger(direction: PaginationDirection) {
 }
 
 export type PaginationEllipsisProps = ComponentPropsWithRef<"span"> & {
+  /** Which gap it stands for, before or after the current page (`data-position`). Default: "end". */
   readonly position?: "start" | "end"
   readonly render?: RenderProp
 }

@@ -211,16 +211,16 @@ export const tourMeta = {
       type: "{ next?, prev?, skip?, close?, finish?, progressText?, stepLabel?, stepAnnouncement? }",
       description: "Every string the tour exposes; English defaults.",
     },
-    level: {
+    "*.level": {
       type: "1 | 2 | 3 | 4 | 5 | 6",
       default: "2",
       description: "On `Tour.Title`: its heading level; headings in the card are one deeper.",
     },
-    action: {
+    "*.action": {
       type: "TourAction",
       description: "On `Tour.ActionTrigger`: one of the step's actions.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

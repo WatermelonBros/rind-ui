@@ -86,6 +86,7 @@ export interface AccordionState {
 }
 
 export type AccordionRootProps = Omit<ComponentPropsWithRef<"div">, "children" | "dir"> & {
+  /** The accordion's items. */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -110,6 +111,7 @@ export type AccordionRootProps = Omit<ComponentPropsWithRef<"div">, "children" |
   readonly closedContent?: ClosedContent
   /** Overrides the region rule for open panels. */
   readonly contentRole?: "region" | "none"
+  /** Another element or a render function receiving the props and the accordion's state. */
   readonly render?: RenderProp<AccordionState>
 }
 
@@ -199,11 +201,13 @@ function Root({
 }
 
 export type AccordionItemProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The item's Header and Content. */
   readonly children?: ReactNode
   /** A non-empty string, unique within the accordion. */
   readonly value: string
   readonly disabled?: boolean
   readonly closedContent?: ClosedContent
+  /** Another element or a render function receiving the props and the item's state. */
   readonly render?: RenderProp<CollapsibleState>
 }
 
@@ -301,6 +305,7 @@ function Item({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the item's state. */
   readonly render?: RenderProp<CollapsibleState>
 }
 

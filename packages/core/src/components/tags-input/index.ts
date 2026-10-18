@@ -12,7 +12,7 @@ export {
   tagsInputConnect,
   tagsInputIds,
 } from "./tags-input.connect"
-export { tagsInputContract } from "./tags-input.contract"
+export { tagsInputContract, tagsInputInvariants, tagsInputTraits } from "./tags-input.contract"
 export {
   type TagRefusal,
   type TagsInputContext,
@@ -21,6 +21,7 @@ export {
   type TagsInputProps,
   tagChips,
   tagKeys,
+  tagSuggestions,
   tagsInputMachine,
 } from "./tags-input.machine"
 export {

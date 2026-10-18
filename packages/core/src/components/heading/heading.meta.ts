@@ -27,7 +27,7 @@ export const headingMeta = {
       description:
         "On `Heading`: overrides the nesting. On `Heading.Level`: the level below it (default: one more than around it).",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         'Another element: a non-heading gets `role="heading"` and `aria-level`, another `h1`–`h6` gets `aria-level`.',

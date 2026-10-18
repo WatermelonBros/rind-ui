@@ -68,7 +68,7 @@ export const meterMeta = {
       type: "{ valueText?: ({ value, percent, formatted, zone }) => string }",
       description: "Overrides the English default (also through the provider); say the zone.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element.",
     },

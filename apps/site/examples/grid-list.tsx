@@ -153,8 +153,7 @@ export function NestedTags() {
           <GridList.Item key={issue.key} value={issue.key}>
             <GridList.ItemText>{issue.key}</GridList.ItemText>
             <TagGroup.Root>
-              <TagGroup.Label>Labels of {issue.key}</TagGroup.Label>
-              <TagGroup.List>
+              <TagGroup.List aria-label={`Labels of ${issue.key}`}>
                 {issue.tags.map((t) => (
                   <TagGroup.Tag key={t} value={t}>
                     <TagGroup.TagText>{t}</TagGroup.TagText>

@@ -165,12 +165,12 @@ export const popoverMeta = {
       type: "Ref<{ open(): void; close(): void; reposition(): void }>",
       description: "Programmatic open, close and a forced reposition.",
     },
-    level: {
+    "*.level": {
       type: "1 | 2 | 3 | 4 | 5 | 6",
       default: "2",
       description: "On `Popover.Title`: its heading level; headings in the content are one deeper.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

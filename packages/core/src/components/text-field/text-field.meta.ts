@@ -138,16 +138,19 @@ export const textFieldMeta = {
       type: "Field messages",
       description: "The Field's messages when the Root is the Field.",
     },
-    autosize: {
+    "*.autosize": {
       type: "boolean",
       default: "false",
       description: "On Textarea: grows with its content (native `field-sizing` where supported).",
     },
-    max: {
+    "*.max": {
       type: "number",
       description: "On CharacterCount: a soft limit (an error past it, never a truncation).",
     },
-    count: { type: "(value) => number", description: "On CharacterCount: replaces the counter." },
+    "*.count": {
+      type: "(value) => number",
+      description: "On CharacterCount: replaces the counter.",
+    },
   },
   dataAttributes: {
     root: {

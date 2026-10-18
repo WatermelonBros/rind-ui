@@ -41,7 +41,10 @@ export const formMeta = {
       type: "{ invalidSummary?: (count) => string }",
       description: "The failed-attempt summary.",
     },
-    render: { type: "ReactElement | (props, state) => ReactNode", description: "Another element." },
+    "*.render": {
+      type: "ReactElement | (props, state) => ReactNode",
+      description: "Another element.",
+    },
   },
   dataAttributes: {
     root: {

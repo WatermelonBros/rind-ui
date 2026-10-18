@@ -340,6 +340,7 @@ export type QrCodeDownloadTriggerProps = Omit<
   "render" | "disabled" | "focusableWhenDisabled" | "onPress" | "type"
 > &
   QrDownloadOptions & {
+    /** Visible content; without it the trigger is named by `messages.download`. */
     readonly children?: ReactNode
     readonly render?: RenderProp<QrCodeState>
   }

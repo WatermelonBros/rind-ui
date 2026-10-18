@@ -67,6 +67,7 @@ export type ScrollAreaRootProps = ComponentPropsWithRef<"div"> & {
   readonly trackPress?: "page" | "jump"
   readonly actionsRef?: Ref<ScrollAreaActions>
   readonly render?: RenderProp<ScrollAreaState>
+  /** The Viewport, Scrollbars and Corner. */
   readonly children?: ReactNode
 }
 

@@ -158,12 +158,12 @@ export const dialogMeta = {
       type: "Ref<{ open(): void; close(): void }>",
       description: "Programmatic open and close (reason `api`).",
     },
-    level: {
+    "*.level": {
       type: "1 | 2 | 3 | 4 | 5 | 6",
       default: "2",
       description: "On `Dialog.Title`: its heading level; headings in the content are one deeper.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

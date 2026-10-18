@@ -62,7 +62,7 @@ export const toggleGroupMeta = {
       default: "false",
       description: "Disabled items stay focusable (`aria-disabled`).",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

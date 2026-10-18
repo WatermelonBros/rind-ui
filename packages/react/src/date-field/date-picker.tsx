@@ -61,8 +61,11 @@ export interface DatePickerProps
     PopoverRootProps,
     "modal" | "initialFocus" | "finalFocus" | "positioning" | "persistentElements"
   > {
+  /** Controlled open state of the calendar popover. */
   readonly open?: boolean
+  /** Initial open state of the calendar popover. Default: false. */
   readonly defaultOpen?: boolean
+  /** Every open or close request, with `details.reason` and `details.cancel()`. */
   readonly onOpenChange?: (open: boolean, details: DatePickerOpenChangeDetails) => void
   /** A pick closes the popover (default true). */
   readonly closeOnSelect?: boolean
@@ -90,6 +93,7 @@ const InControlContext = createContext(false)
 export const useInControl = () => useContext(InControlContext)
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
