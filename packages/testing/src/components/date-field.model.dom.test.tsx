@@ -41,6 +41,7 @@ function config(name: string, cfg: Config) {
 }
 
 config("en-US day", {})
+config("picker closed", { picker: "closed" })
 config("en-GB day", { locale: "en-GB" })
 config("de-DE minute, 24-hour", {
   locale: "de-DE",

@@ -36,6 +36,8 @@ export type PopoverEvent =
   | Dismissal<"outside-press">
   | Dismissal<"outside-focus">
   | Dismissal<"parent-dismissed">
+  /** The content committed a choice and closes (a date picker's pick). */
+  | { readonly type: "select"; readonly modality: Modality }
   /** Programmatic open (`actionsRef`). */
   | { readonly type: "open" }
   /** Programmatic close (`close: true`), or the `disabled` prop changed (closes when set). */
@@ -56,6 +58,7 @@ export type PopoverCloseReason =
   | "outside-press"
   | "outside-focus"
   | "parent-dismissed"
+  | "select"
   | "api"
 
 const CLOSE_REASONS = new Set<string>([
@@ -65,6 +68,7 @@ const CLOSE_REASONS = new Set<string>([
   "outside-press",
   "outside-focus",
   "parent-dismissed",
+  "select",
   "api",
 ] satisfies PopoverCloseReason[])
 
@@ -327,6 +331,7 @@ export const popoverMachine = setup({
         },
         "outside-focus": { target: "closed", actions: ["setCloseReason"] },
         "parent-dismissed": { target: "closed", actions: ["setCloseReason"] },
+        select: { target: "closed", actions: ["setCloseReason"] },
         api: { guard: "apiCloses", target: "closed", actions: ["setCloseReason"] },
         "POSITION.PLACED": { actions: ["setPlacement"] },
         "POSITION.REPOSITION": { actions: ["reposition"] },

@@ -81,6 +81,10 @@ export type DateFieldEvent =
   | { readonly type: "CLEAR_ALL" }
   | { readonly type: "PASTE"; readonly text: string }
   | { readonly type: "RESET" }
+  /** A picker's calendar picked a value (already of the field's type: `pickedValue`). */
+  | { readonly type: "PICK"; readonly value: DateValue; readonly modality: Modality }
+  /** A picker's Clear trigger: the value and every draft segment cleared. */
+  | { readonly type: "CLEAR" }
   /** The hidden input changed behind the component (autofill): its ISO text. */
   | { readonly type: "INPUT.ADOPT"; readonly value: string }
   /** The controlled value changed (onProps). */
@@ -89,7 +93,7 @@ export type DateFieldEvent =
   | { readonly type: "FORMAT.CHANGED" }
 
 /** Public change reasons (spec "Commit Points"). */
-export type DateFieldReason = "SEGMENT.COMMIT" | "STEP" | "PASTE" | "CLEAR" | "RESET"
+export type DateFieldReason = "SEGMENT.COMMIT" | "STEP" | "PASTE" | "CLEAR" | "RESET" | "CALENDAR"
 
 export type DateFieldBoundary = {
   readonly direction: "next" | "previous"
@@ -490,7 +494,7 @@ export const dateFieldMachine = setup({
     },
     step: (args) => {
       const { event } = args
-      if (!("modality" in event) || event.type === "SEGMENT.FOCUS") return
+      if (!("modality" in event) || event.type === "SEGMENT.FOCUS" || event.type === "PICK") return
       stepSegment(args, event.segment, event.type)
     },
     moveVisual: (args) => {
@@ -539,6 +543,12 @@ export const dateFieldMachine = setup({
       if (sameDateValue(current(args), v)) return
       set("value", v ?? EMPTY)
       if (controlled(props)) set("proposed", { value: v })
+    },
+    pick: (args) => {
+      if (args.event.type !== "PICK") return
+      args.set("draft", draftOf(args.event.value, formatFor(args.props, args.event.value)))
+      args.set("buffer", "")
+      commit(args)
     },
     adopt: (args) => {
       if (args.event.type !== "INPUT.ADOPT") return
@@ -612,6 +622,8 @@ export const dateFieldMachine = setup({
   },
   on: {
     RESET: { actions: ["restoreDefault"] },
+    PICK: { guard: "editable", actions: ["pick"] },
+    CLEAR: { guard: "editable", actions: ["clearAll"] },
     "INPUT.ADOPT": [{ guard: "editable", actions: ["adopt"] }, { actions: ["resyncHidden"] }],
     "VALUE.SYNCED": { actions: ["applySynced"] },
     "FORMAT.CHANGED": { actions: ["reformat"] },

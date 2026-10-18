@@ -20,6 +20,7 @@ import {
   initialCalendarFocus,
   isoOf,
   type MessageOverrides,
+  type Modality,
   type MonthGrid,
   monthGrid,
   resolveCalendar,
@@ -125,6 +126,13 @@ export type CalendarRootProps = Omit<
   readonly timeZone?: string
   readonly disabled?: boolean
   readonly readOnly?: boolean
+  /** Shown invalid whatever the value (a host field's own validity). */
+  readonly invalid?: boolean
+  /**
+   * A date was chosen (single) or a range completed (range), also when the value did not
+   * change: a picker closes on it.
+   */
+  readonly onDateSelect?: (date: CalendarDate, details: { readonly modality: Modality }) => void
   readonly messages?: MessageOverrides<CalendarMessages>
 }
 
@@ -157,6 +165,8 @@ function Root({
   timeZone,
   disabled = false,
   readOnly = false,
+  invalid,
+  onDateSelect,
   messages: ownMessages,
   children,
   id,
@@ -189,8 +199,8 @@ function Root({
         .focused,
   )
   const pendingFocus = useRef<{ date: CalendarDate; modality: string | undefined } | null>(null)
-  const latest = useRef({ onValueChange, onFocusChange, onAnchorChange })
-  latest.current = { onValueChange, onFocusChange, onAnchorChange }
+  const latest = useRef({ onValueChange, onFocusChange, onAnchorChange, onDateSelect })
+  latest.current = { onValueChange, onFocusChange, onAnchorChange, onDateSelect }
   const range = {
     minRangeLength,
     maxRangeLength,
@@ -215,11 +225,13 @@ function Root({
     ...(anchor !== undefined ? { anchor: show(anchor) } : {}),
     ...(defaultAnchor !== undefined ? { defaultAnchor: show(defaultAnchor) } : {}),
     onAnchorChange: (a) => latest.current.onAnchorChange?.(a),
+    onDateSelect: (date, details) => latest.current.onDateSelect?.(date, details),
     ...range,
     selectionMode,
     isDateUnavailable,
     disabled,
     readOnly,
+    invalid,
     calendar,
     formatLocale,
     messages,
@@ -241,6 +253,7 @@ function Root({
     isDateUnavailable,
     disabled,
     readOnly,
+    invalid,
     calendar,
     formatLocale,
     messages,

@@ -7,7 +7,7 @@ import {
   isWeekend,
   parseZonedDateTime,
 } from "@internationalized/date"
-import { Button, DateField, type DateFieldRootProps, Field } from "@rind-ui/react"
+import { Button, Calendar, DateField, type DateFieldRootProps, Field } from "@rind-ui/react"
 import type { States, Variants } from "./types"
 
 /**
@@ -25,6 +25,98 @@ function Dates({ label, ...props }: DateFieldRootProps & { readonly label: strin
     <DateField.Root {...props}>
       <DateField.Label>{label}</DateField.Label>
       <DateField.Input />
+    </DateField.Root>
+  )
+}
+
+/** The picker parts: the field and its triggers in a Control, the Calendar in a popover. */
+function PickerParts() {
+  return (
+    <>
+      <DateField.Control>
+        <DateField.Input />
+        <DateField.ClearTrigger>
+          <span aria-hidden="true">×</span>
+        </DateField.ClearTrigger>
+        <DateField.Trigger>
+          <CalendarIcon />
+        </DateField.Trigger>
+      </DateField.Control>
+      <DateField.Portal>
+        <DateField.Positioner>
+          <DateField.Content>
+            <DateField.Calendar>
+              <Calendar.Header>
+                <Calendar.PrevTrigger />
+                <Calendar.Heading />
+                <Calendar.NextTrigger />
+              </Calendar.Header>
+              <Calendar.Grid />
+            </DateField.Calendar>
+          </DateField.Content>
+        </DateField.Positioner>
+      </DateField.Portal>
+    </>
+  )
+}
+
+function CalendarIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+export function DatePicker() {
+  return (
+    <DateField.Root name="departure" defaultValue={fixed}>
+      <DateField.Label>Departure</DateField.Label>
+      <PickerParts />
+      <DateField.ErrorMessage />
+    </DateField.Root>
+  )
+}
+
+export function DateRangePicker() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      startName="check-in"
+      endName="check-out"
+      defaultValue={{ start: new CalendarDate(2026, 10, 12), end: new CalendarDate(2026, 10, 16) }}
+    >
+      <DateField.Label>Stay</DateField.Label>
+      <PickerParts />
+      <DateField.ErrorMessage />
+    </DateField.Root>
+  )
+}
+
+/** The picker open on its value (a state example). */
+export function DatePickerOpen() {
+  return (
+    <DateField.Root defaultValue={fixed} defaultOpen>
+      <DateField.Label>Departure</DateField.Label>
+      <PickerParts />
+    </DateField.Root>
+  )
+}
+
+export function DatePickerRules() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      validationMode="blur"
+      minValue={new CalendarDate(2026, 10, 1)}
+      maxValue={new CalendarDate(2026, 12, 31)}
+      isDateUnavailable={(date) => isWeekend(date, "en-US")}
+    >
+      <DateField.Label>Working week</DateField.Label>
+      <DateField.Description>Weekdays from October to December.</DateField.Description>
+      <PickerParts />
+      <DateField.ErrorMessage />
     </DateField.Root>
   )
 }
@@ -223,6 +315,22 @@ export function RangeRules() {
 }
 
 export const variants: Variants = {
+  DatePicker: {
+    title: "Date picker",
+    description: "Type the date, or open the calendar with the button or Alt+Down.",
+  },
+  DateRangePicker: {
+    title: "Date range picker",
+    description: '`selectionMode="range"`: pick the start, then the end; both ends stay typeable.',
+  },
+  DatePickerOpen: {
+    title: "Picker open",
+    description: "The calendar opens on the selected date; Escape closes it.",
+  },
+  DatePickerRules: {
+    title: "Range picker with rules",
+    description: "Bounds and unavailable days reach the calendar: no range across a weekend.",
+  },
   Basic: {
     title: "Basic",
     description: "A date with locale order; type digits or use the arrows.",

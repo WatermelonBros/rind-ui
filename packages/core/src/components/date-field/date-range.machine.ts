@@ -38,6 +38,8 @@ export type DateRangeFieldEvent =
   | { readonly type: "VALUE.SYNC" }
   /** Select all + Backspace, or the clear trigger: both ends. */
   | { readonly type: "CLEAR" }
+  /** A picker's calendar completed a range (each end already of the field's type). */
+  | { readonly type: "PICK"; readonly start: DateValue; readonly end: DateValue }
   /** A form reset: the default range. */
   | { readonly type: "RESET" }
 
@@ -118,9 +120,11 @@ export const dateRangeFieldMachine = setup({
       const v: DateRangeFieldValue =
         event.type === "CLEAR"
           ? null
-          : event.type === "RESET"
-            ? (props.defaultValue ?? null)
-            : (values.value ?? null)
+          : event.type === "PICK"
+            ? { start: event.start, end: event.end }
+            : event.type === "RESET"
+              ? (props.defaultValue ?? null)
+              : (values.value ?? null)
       set("start", endOf(v?.start ?? null))
       set("end", endOf(v?.end ?? null))
       set("startValue", v?.start ?? null)
@@ -152,6 +156,7 @@ export const dateRangeFieldMachine = setup({
         "END.VALIDITY": { actions: ["validityOfEnd"] },
         "VALUE.SYNC": { guard: "newFromParent", actions: ["pushValue"] },
         CLEAR: { reason: "CLEAR", actions: ["pushValue", "derive"] },
+        PICK: { reason: "CALENDAR", actions: ["pushValue", "derive"] },
         RESET: { reason: "RESET", actions: ["pushValue", "derive"] },
       },
     },
