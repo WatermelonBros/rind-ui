@@ -28,6 +28,8 @@ See CLAUDE.md "Review rules".
 | add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
 | add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
 | add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
+| add-menubar (impl) | — | (Reado repo) | Task 8.3: migrate Reado's `MenuBar.tsx` and its tests to Menubar (design Migration Plan); the site's Application example models it |
+| add-menubar (impl) | — | packages/testing/src/components/menubar.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test (radix-ui/primitives#3699 VoiceOver click and #3762 are covered by the model's virtual run and the vertical tests only) |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |
@@ -260,6 +262,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 | add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
+| add-menubar | 8.2 (deferred) | VO + Safari macOS: VO+Space opens on the first item, VO cursor order along the bar, focus stays in the bar on open; NVDA + Firefox / Chrome; JAWS + Chrome; VO iOS and TalkBack; whether keyboard switching should keep focus on the bar item (design Risks) |
 
 ## Resolved
 
