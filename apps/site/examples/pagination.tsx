@@ -65,7 +65,7 @@ export function Range() {
 }
 
 export function Links() {
-  return <Pager totalPages={8} getPageHref={(page) => `#page-${page}`} aria-label="Posts" />
+  return <Pager totalPages={8} getPageHref={(page) => `?page=${page}`} aria-label="Posts" />
 }
 
 export function PageSize() {

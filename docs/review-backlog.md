@@ -263,7 +263,6 @@ See CLAUDE.md "Review rules".
 
 - **Lighthouse**: re-run on rind.watermelon-studio.it after the zero-CLS intro (#142). Locally and live, Chromium measures CLS 0.0004, LCP ~0.5 s, TBT 0; the official score (last 76, from CLS 0.62) is not re-measured.
 - **Home JS**: ~300 KB gzip (React/Next ~100 KB). The skin builder's Color Picker could load when the section nears the viewport, with its height reserved (no CLS); TBT is already 0, so it only helps the transfer.
-- **Example demo links** jump to anchors that do not exist (`#page-1` in Pagination, `#profile` in Hover Card, `#bikes` in Image, `#dialog`/`#popover` in Tag Group, `#install` in Tree View): harmless demo data, could point at real headings.
 - **Warning guard in the browser project**: still jsdom-only (row above).
 - **Sweep tools** (ran by hand, not in CI): every example in juicy/crisp/bare measured for overflow and 24px targets; internal links and anchors of `out/` checked. Worth adding the target and link checks to `tests/audit.ts`.
 

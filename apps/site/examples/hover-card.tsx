@@ -18,7 +18,9 @@ function Profile({
     <div>
       Notes by{" "}
       <HoverCard.Root {...root}>
-        <HoverCard.Trigger href="#profile">{name}</HoverCard.Trigger>
+        <HoverCard.Trigger href="https://en.wikipedia.org/wiki/Ada_Lovelace">
+          {name}
+        </HoverCard.Trigger>
         <HoverCard.Portal>
           <HoverCard.Positioner>
             <HoverCard.Content>
