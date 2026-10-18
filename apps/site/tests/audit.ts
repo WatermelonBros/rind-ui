@@ -176,24 +176,39 @@ async function focusRing(page: Page, frame: Locator, url: string, where: string)
         ]
       return out
     }
-    // the ring is on the focused element or the part around it (a control, an item)
+    // the ring is on the focused element or the part around it (a control, an item); a
+    // two-tone indicator (an outline beside spread rings) passes when one tone reaches 3:1
     for (let n: HTMLElement | null = active; n && s.contains(n); n = n.parentElement) {
       const cs = getComputedStyle(n)
-      let ring = ""
+      const r = n.getBoundingClientRect()
+      // a visually hidden input draws nothing: its visible part further up shows the focus
+      if (r.width < 2 || r.height < 2 || cs.clipPath !== "none" || cs.clip !== "auto") continue
+      const tones: string[] = []
       let inside = false
       if (cs.outlineStyle !== "none" && Number.parseFloat(cs.outlineWidth) > 0) {
-        ring = cs.outlineColor
+        tones.push(cs.outlineColor)
         inside = Number.parseFloat(cs.outlineOffset) < 0
-      } else if (cs.boxShadow !== "none") {
-        ring = /(?:rgba?|oklab|oklch|color)\([^)]*\)/.exec(cs.boxShadow)?.[0] ?? ""
-        inside = cs.boxShadow.includes("inset")
       }
-      if (!ring || (rgba(ring)[3] ?? 0) === 0) continue
+      const shadows = cs.boxShadow === "none" ? [] : cs.boxShadow.split(/,(?![^(]*\))/)
+      for (const sh of shadows) {
+        const ring = /^\s*(.+\)) 0px 0px 0px [\d.]+px( inset)?\s*$/.exec(sh)
+        if (ring?.[1]) tones.push(ring[1])
+        if (ring?.[2] && tones.length === 1) inside = true
+      }
+      // no spread ring: an offset shadow (a lift) as the indicator
+      const lift = /(?:rgba?|oklab|oklch|color)\([^)]*\)/.exec(shadows[0] ?? "")?.[0]
+      if (!tones.length && lift) tones.push(lift)
+      const visible = tones.filter((t) => (rgba(t)[3] ?? 0) > 0)
+      if (!visible.length) continue
       const bg = backdrop(inside ? n : n.parentElement)
-      const [a, b] = [lum(rgba(ring)), lum(bg)]
-      const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+      const ratio = Math.max(
+        ...visible.map((t) => {
+          const [a, b] = [lum(rgba(t)), lum(bg)]
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+        }),
+      )
       const name = `${n.tagName.toLowerCase()}[data-part=${n.dataset["part"] ?? ""}]`
-      return { name, ring, bg: `rgb(${bg.map(Math.round).join(", ")})`, ratio }
+      return { name, ring: visible.join(" + "), bg: `rgb(${bg.map(Math.round).join(", ")})`, ratio }
     }
     return null
   })

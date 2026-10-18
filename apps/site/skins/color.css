@@ -41,7 +41,7 @@
     [data-part="channel-slider-thumb"]
   )[data-focus-visible] {
   outline: 3px solid var(--s-focus);
-  outline-offset: 5px;
+  outline-offset: 4px;
 }
 
 /* the channel slider: a gradient track centred in a touch-sized control, the thumb across it */

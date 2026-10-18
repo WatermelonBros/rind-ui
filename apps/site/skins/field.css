@@ -131,6 +131,10 @@
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="text-field"][data-part="input"][aria-invalid="true"] {
   border-color: var(--s-acc-deep);
+}
+/* the halo gives way to the focus ring while the field has focus */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="text-field"][data-part="input"][aria-invalid="true"]:not(:focus) {
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--s-acc) 35%, transparent);
 }
 
