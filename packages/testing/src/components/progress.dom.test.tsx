@@ -3,7 +3,7 @@
 import { Progress, type ProgressRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getProgress } from "../index"
+import { expectRindWarning, getProgress } from "../index"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -76,6 +76,8 @@ describe("Progress driver", () => {
   })
 
   it("unnamed: a development error; decorative (aria-hidden) is fine (RS#9987)", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/progress: the expected part "label" is not rendered/)
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     const { unmount } = render(<Progress.Root value={10} aria-hidden="true" />)
     expect(error).not.toHaveBeenCalled()

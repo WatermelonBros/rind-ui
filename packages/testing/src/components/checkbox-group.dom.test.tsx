@@ -4,7 +4,7 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getCheckboxGroup } from "../index"
+import { expectRindWarning, getCheckboxGroup } from "../index"
 
 const platform = domEnvironment().platform
 const TOPPINGS = [
@@ -264,6 +264,8 @@ describe("Parent", () => {
   })
 
   it("aria-controls lists rendered ids only, including a consumer id (base-ui#2691)", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/checkbox-group: allValues \["b"\] have no rendered item/)
     render(
       <Grp
         parent
@@ -340,6 +342,8 @@ describe("Parent", () => {
 
 describe("Disabled and read-only", () => {
   it("the group's disabled wins over an item's disabled={false} (base-ui#1043)", async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/checkbox-group: allValues \["b","c"\] have no rendered item/)
     render(
       <Grp disabled items={[{ value: "a", label: "Olives", props: { disabled: false } }]} parent />,
     )

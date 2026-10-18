@@ -6,7 +6,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { createRef, useState } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { decodeQr, getQrCode, parseQrPath } from "../index"
+import { allowRindWarning, decodeQr, getQrCode, parseQrPath } from "../index"
 
 const a11y = async (root: Element = document.body) => {
   const { violations } = await axe.run(root, {
@@ -152,6 +152,8 @@ describe("anatomy and naming", () => {
 
 describe("element substitution", () => {
   it("parts rendered as other elements keep their behaviour", async () => {
+    // the substituted overlay is oversized on purpose: its warnings are not the subject here
+    allowRindWarning(/qr-code: the overlay/)
     render(
       <QrCode.Root defaultValue="swap" render={<section />}>
         <QrCode.Frame>

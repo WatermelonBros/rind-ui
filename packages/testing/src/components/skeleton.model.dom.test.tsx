@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest"
 import {
   type ConsumerInvariant,
   domEnv,
+  expectRindWarning,
   installAnnouncementLog,
   spokenLog,
   testMachine,
@@ -117,6 +118,8 @@ describe("screen reader reading", () => {
 
 describe("broken Skeleton fails with the invariant's name", () => {
   it("Status inside Content → skeleton-status-outside-content", { timeout: 60_000 }, async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/skeleton: Skeleton.Status is inside Skeleton.Content/)
     const tests: { name: string; fn: () => Promise<void> }[] = []
     testMachine(skeletonContract, {
       test: (n, fn) => tests.push({ name: n, fn }),

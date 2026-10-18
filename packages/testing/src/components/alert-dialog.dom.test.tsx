@@ -15,7 +15,7 @@ import { act, cleanup, render, screen, within } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { createRef, type ReactNode, type RefObject, useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getAlertDialog } from "../index"
+import { allowRindWarning, getAlertDialog } from "../index"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -613,6 +613,8 @@ describe("Data attributes", () => {
 
 describe("Title heading level", () => {
   it("Title defaults to h2 with data-level 2", async () => {
+    // a title-only fixture: the description check logs in some engines
+    allowRindWarning(/alert-dialog: .* has no description/)
     render(
       <AlertDialog.Root defaultOpen>
         <AlertDialog.Content>
