@@ -33,6 +33,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - name: Version pull request, or publish
+        id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm version-packages
@@ -46,3 +47,44 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           # Provenance needs a public repository; turn it on when the repo goes public.
           NPM_CONFIG_PROVENANCE: false
+      # Announce a publish in Discord, with this version's changelog. Runs only after npm
+      # accepted the packages, so a failed publish is never announced. The notes come from the
+      # GitHub releases changesets just created (one per package, body = its CHANGELOG section).
+      - name: Announce on Discord
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          # Set this secret to switch the announcement on; without it the step is a no-op.
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          set -euo pipefail
+          if [ -z "${WEBHOOK}" ]; then
+            echo "No DISCORD_WEBHOOK secret set: nothing to announce to."
+            exit 0
+          fi
+          # The React package names the release; if it was not published, the highest version.
+          version=$(jq -r '(map(select(.name == "@rind-ui/react")) | first | .version)
+            // (map(.version) | sort_by(split("-")[0] | split(".") | map(tonumber)) | last)' <<<"$PUBLISHED")
+          : > notes.md
+          for row in $(jq -c '.[]' <<<"$PUBLISHED"); do
+            name=$(jq -r .name <<<"$row"); ver=$(jq -r .version <<<"$row")
+            printf '### %s %s\n' "$name" "$ver" >> notes.md
+            gh release view "$name@$ver" --json body --jq '.body' >> notes.md || true
+            printf '\n' >> notes.md
+          done
+          url="https://github.com/${GH_REPO}/releases"
+          # ponytail: one embed, cut at Discord's 4096-character description limit minus room
+          # for the link. Split into several embeds if the notes outgrow it.
+          body=$(head -c 3900 notes.md)
+          if [ "$(wc -c < notes.md)" -gt 3900 ]; then
+            body="${body}"$'\n\n'"…full notes: ${url}"
+          fi
+          # Everything reaches jq as data, never as shell interpolation: release notes are Markdown.
+          jq -n --arg v "$version" --arg b "$body" --arg u "$url" \
+            '{content: "rind-ui \($v) is out.",
+              embeds: [{title: "rind-ui \($v)", url: $u, description: $b, color: 5814783}]}' \
+            > payload.json
+          curl -sS --fail-with-body -X POST -H "Content-Type: application/json" \
+            --data @payload.json "$WEBHOOK"
