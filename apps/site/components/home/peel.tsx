@@ -86,20 +86,22 @@ export function Peel() {
               <span className={styles.curl} />
             </div>
 
+            {/* two chips above, two below, one under them: each pair anchored to its own side of the
+                centre, so they never overlap whatever their width */}
             <ul className={styles.attrs}>
-              <li style={{ "--x": "-120px", "--y": "-62px" } as CSSProperties}>
+              <li style={{ "--x": "-6px", "--y": "-82px", "--ax": 1 } as CSSProperties}>
                 data-scope=<b>"switch"</b>
               </li>
-              <li style={{ "--x": "-130px", "--y": "58px" } as CSSProperties}>
+              <li style={{ "--x": "-6px", "--y": "82px", "--ax": 1 } as CSSProperties}>
                 role=<b>"switch"</b>
               </li>
-              <li style={{ "--x": "110px", "--y": "-66px" } as CSSProperties}>
+              <li style={{ "--x": "6px", "--y": "-82px", "--ax": 0 } as CSSProperties}>
                 data-state=<b>"{checked ? "checked" : "unchecked"}"</b>
               </li>
-              <li style={{ "--x": "125px", "--y": "52px" } as CSSProperties}>
+              <li style={{ "--x": "6px", "--y": "82px", "--ax": 0 } as CSSProperties}>
                 aria-checked=<b>"{String(checked)}"</b>
               </li>
-              <li style={{ "--x": "0px", "--y": "84px" } as CSSProperties}>
+              <li style={{ "--x": "0px", "--y": "118px", "--ax": 0.5 } as CSSProperties}>
                 data-part=<b>"thumb"</b>
               </li>
             </ul>

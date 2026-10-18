@@ -55,8 +55,13 @@
   position: relative;
 }
 .component {
+  inline-size: max-content;
   padding: 30px 40px;
   border-radius: 18px;
+}
+/* the label never breaks ("Wi-" / "Fi"): the component keeps its natural width */
+.component [data-part="label"] {
+  white-space: nowrap;
 }
 .under .component {
   background: #fff;
@@ -112,9 +117,13 @@
   border-radius: 99px;
   background: #0b0b0c;
   color: #f5f5ee;
-  translate: calc(-50% + var(--x) * var(--p2)) calc(-50% + var(--y) * var(--p2));
+  /* from the centre to its slot: --ax is the chip's anchor (1 its right edge, 0 its left edge) */
+  /* they reach their slots in the first half of act 2, then hold while it is read */
+  --fly: min(1, var(--p2) * 2.5);
+  translate: calc(-50% + (50% - var(--ax, 0.5) * 100% + var(--x)) * var(--fly))
+    calc(-50% + var(--y) * var(--fly));
   opacity: calc(var(--p2) * 1.4 - var(--p3) * 1.6);
-  scale: calc(0.6 + var(--p2) * 0.4);
+  scale: calc(0.6 + var(--fly) * 0.4);
 }
 .attrs b {
   color: #d4ff3a;
@@ -181,6 +190,11 @@
   }
   .graph {
     width: 300px;
+  }
+  /* two chips side by side fit a 360px screen */
+  .attrs li {
+    font-size: 10px;
+    padding: 4px 8px;
   }
   .text {
     font-size: 16px;
