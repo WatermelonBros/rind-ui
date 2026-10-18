@@ -1,4 +1,4 @@
-// The actions and queries every dialog-family contract shares (Dialog, Alert Dialog): one
+// The actions and queries every dialog-family contract shares (Dialog in both roles, Drawer): one
 // definition, so a fix reaches both (reka-ui#2702). Parts read: trigger, backdrop, content.
 
 import type { Env } from "../../contract/env"

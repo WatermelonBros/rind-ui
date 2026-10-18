@@ -12,7 +12,7 @@ text changes while shown. A dismissal keeps focus on the page, never on `body`.
 - **Over a plain `<div>`**: it announces once when it appears and again when its text changes,
   without a live region of its own, and it keeps focus on the page when dismissed. A static banner
   present at load can use `announce="off"`.
-- **Don't use it for** a modal question that needs an answer: use [Alert Dialog](alert-dialog.md).
+- **Don't use it for** a modal question that needs an answer: use a [confirmation dialog](dialog.md#confirmation-alert-dialog).
   For a label or count on another control, use [Badge](badge.md).
 
 ```tsx
@@ -121,13 +121,13 @@ stable id, `alert-<id>-title` (`alertIds(id).title` from `@rind-ui/core`).
 </Alert.Root>
 ```
 
-## Alert, Toast or Alert Dialog
+## Alert, Toast or a confirmation dialog
 
 - **Alert**: in the page layout, stays until the page or the user removes it, never takes
   focus.
 - **Toast**: floats over the page and times out; set `announce="off"` on an Alert rendered
   inside a toast, since the toast announces its own text.
-- **Alert Dialog**: interrupts and requires a decision; it takes focus.
+- **Confirmation dialog** (`role="alertdialog"`): interrupts and requires a decision; it takes focus.
 
 ## Styling
 

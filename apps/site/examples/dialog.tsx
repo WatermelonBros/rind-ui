@@ -1,7 +1,7 @@
 "use client"
 
-import { Button, Dialog } from "@rind-ui/react"
-import { useState } from "react"
+import { Button, Dialog, type DialogActions } from "@rind-ui/react"
+import { useRef, useState } from "react"
 import type { Variants } from "./types"
 
 export function Basic() {
@@ -171,6 +171,135 @@ export function LongContent() {
   )
 }
 
+export function Confirmation() {
+  return (
+    <Dialog.Root role="alertdialog">
+      <Dialog.Trigger>Delete project</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Title>Delete project?</Dialog.Title>
+            <Dialog.Description>
+              Its files and history go for everyone. This cannot be undone.
+            </Dialog.Description>
+            <Dialog.Cancel>Cancel</Dialog.Cancel>
+            <Dialog.Action>Delete</Dialog.Action>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+
+export function ConfirmationAsync() {
+  const actions = useRef<DialogActions>(null)
+  const [pending, setPending] = useState(false)
+  const [done, setDone] = useState(0)
+  return (
+    <div className="stack">
+      <Dialog.Root
+        role="alertdialog"
+        actionsRef={actions}
+        onOpenChange={(open, details) => {
+          if (open || details.reason !== "action") return
+          details.cancel()
+          setPending(true)
+          setTimeout(() => {
+            setPending(false)
+            setDone((n) => n + 1)
+            actions.current?.close()
+          }, 1200)
+        }}
+      >
+        <Dialog.Trigger>Empty trash</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Title>Empty the trash?</Dialog.Title>
+              <Dialog.Description>
+                The dialog stays open until the request is done.
+              </Dialog.Description>
+              <Dialog.Cancel>Cancel</Dialog.Cancel>
+              <Dialog.Action disabled={pending}>
+                {pending ? "Emptying…" : "Empty trash"}
+              </Dialog.Action>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Portal>
+      </Dialog.Root>
+      <span className="note">emptied: {done}</span>
+    </div>
+  )
+}
+
+export function ConfirmationReasons() {
+  const [reason, setReason] = useState("—")
+  return (
+    <div className="stack">
+      <Dialog.Root
+        role="alertdialog"
+        onOpenChange={(open, details) => !open && setReason(details.reason)}
+      >
+        <Dialog.Trigger>Discard changes</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Title>Discard your changes?</Dialog.Title>
+              <Dialog.Description>
+                Cancel, Discard and Escape each close it with their own reason.
+              </Dialog.Description>
+              <Dialog.Cancel>Keep editing</Dialog.Cancel>
+              <Dialog.Action>Discard</Dialog.Action>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Portal>
+      </Dialog.Root>
+      <span className="note">closed with: {reason}</span>
+    </div>
+  )
+}
+
+export function ConfirmationNoEscape() {
+  return (
+    <Dialog.Root role="alertdialog" closeOnEscape={false}>
+      <Dialog.Trigger>Accept the terms</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Title>New terms of service</Dialog.Title>
+            <Dialog.Description>Choose one: Escape does nothing here.</Dialog.Description>
+            <Dialog.Cancel>Decline</Dialog.Cancel>
+            <Dialog.Action>Accept</Dialog.Action>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+
+export function ConfirmationOpen() {
+  return (
+    <Dialog.Root role="alertdialog" defaultOpen>
+      <Dialog.Trigger>Delete project</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Title>Delete project?</Dialog.Title>
+            <Dialog.Description>This cannot be undone.</Dialog.Description>
+            <Dialog.Cancel>Cancel</Dialog.Cancel>
+            <Dialog.Action>Delete</Dialog.Action>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
+}
+
 export const variants: Variants = {
   Basic: { title: "Basic", description: "Modal: focus moves in, Tab stays inside, Escape closes." },
   Controlled: {
@@ -190,4 +319,22 @@ export const variants: Variants = {
     title: "Long content",
     description: '`initialFocus="title"` starts reading at the top.',
   },
+  Confirmation: {
+    title: "Confirmation (alert dialog)",
+    description:
+      '`role="alertdialog"`: always modal, focus starts on Cancel, a press outside does nothing.',
+  },
+  ConfirmationAsync: {
+    title: "Confirmation: async",
+    description: "`details.cancel()` keeps it open while the work runs; `actionsRef` closes it.",
+  },
+  ConfirmationReasons: {
+    title: "Confirmation: close reasons",
+    description: "`cancel`, `action` and `escape-key` tell the three apart.",
+  },
+  ConfirmationNoEscape: {
+    title: "Confirmation: no Escape",
+    description: "`closeOnEscape={false}` for a choice that must be explicit.",
+  },
+  ConfirmationOpen: { title: "Confirmation open", hidden: true },
 }

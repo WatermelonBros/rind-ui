@@ -2,11 +2,11 @@
 // 4.2). Every pw fixture runs against the built Storybook, which is being retired, so the
 // Playwright-level checks live here as browser tests; the forced-colors and reduced-motion
 // rules are checked as CSS rules in packages/theme/src/alert-dialog.browser.test.tsx.
-import { AlertDialog } from "@rind-ui/react"
+import { Dialog } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
-import { getAlertDialog } from "../index"
+import { getDialog } from "../index"
 
 const EXIT = "rind-test-alert-exit"
 const css = (ms: number) => (
@@ -23,20 +23,20 @@ function Fixture({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {
   return (
     <>
       {css(400)}
-      <AlertDialog.Root {...(onOpenChange ? { onOpenChange } : {})}>
-        <AlertDialog.Trigger>Delete project?</AlertDialog.Trigger>
-        <AlertDialog.Portal>
-          <AlertDialog.Backdrop />
-          <AlertDialog.Positioner>
-            <AlertDialog.Content>
-              <AlertDialog.Title>Delete project?</AlertDialog.Title>
-              <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-              <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-              <AlertDialog.Action>Delete</AlertDialog.Action>
-            </AlertDialog.Content>
-          </AlertDialog.Positioner>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+      <Dialog.Root role="alertdialog" {...(onOpenChange ? { onOpenChange } : {})}>
+        <Dialog.Trigger>Delete project?</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Title>Delete project?</Dialog.Title>
+              <Dialog.Description>This cannot be undone.</Dialog.Description>
+              <Dialog.Cancel>Cancel</Dialog.Cancel>
+              <Dialog.Action>Delete</Dialog.Action>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Portal>
+      </Dialog.Root>
     </>
   )
 }
@@ -85,7 +85,9 @@ describe("Alert Dialog in a real browser", () => {
     "driver round trip in %s: open, confirm Delete, closeReason action",
     async (modality) => {
       render(<Fixture />)
-      const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
+      const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" }).via(
+        modality as never,
+      )
       await a.open()
       expect(await a.isOpen()).toBe(true)
       await a.confirm("Delete")

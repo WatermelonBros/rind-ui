@@ -103,7 +103,7 @@ function CardTitle({ children }: { children: React.ReactNode }) {
 }
 ```
 
-rind-ui's own heading parts (Dialog, Alert Dialog, Drawer and Popover titles, Accordion
+rind-ui's own heading parts (Dialog, Drawer and Popover titles, Accordion
 headers) use the same rules, and each wraps its content in a `Heading.Level` one below its
 title, so a `Heading` inside a dialog body nests under the dialog's title.
 

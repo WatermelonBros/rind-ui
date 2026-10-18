@@ -1,21 +1,24 @@
-// The Alert Dialog's attributes (openspec add-alert-dialog 2.1, 2.2): the scope, the role, the
-// always-on modality, Cancel and Action, and the close-reason attribute.
+// A Dialog with `role="alertdialog"` (openspec merge-alert-dialog-into-dialog, formerly
+// add-alert-dialog 2.1, 2.2): the scope, the role, the always-on modality, Cancel and Action,
+// and the close-reason attribute.
 import { describe, expect, it, vi } from "vitest"
-import { dialogMessages } from "../dialog/dialog.messages"
-import { type AlertDialogConnectInput, alertDialogConnect } from "./alert-dialog.connect"
+import { type DialogConnectInput, dialogConnect } from "./dialog.connect"
+import { dialogMessages } from "./dialog.messages"
+
+type AlertDialogConnectInput = Omit<DialogConnectInput, "scope" | "modal" | "role">
 
 const base: AlertDialogConnectInput = {
   instance: "r",
   open: true,
   opener: "t1",
   closeReason: null,
-  rendered: { title: "alert-dialog-r-title", description: "alert-dialog-r-description" },
+  rendered: { title: "dialog-r-title", description: "dialog-r-description" },
   contentMounted: true,
   titleFocusTarget: false,
   messages: dialogMessages,
 }
 const api = (over: Partial<AlertDialogConnectInput> = {}, send = vi.fn()) =>
-  alertDialogConnect({ ...base, ...over }, send)
+  dialogConnect({ ...base, ...over, scope: "dialog", role: "alertdialog", modal: false }, send)
 const btn = (id: string, over = {}) => ({
   id,
   focused: false,
@@ -25,7 +28,7 @@ const btn = (id: string, over = {}) => ({
 })
 
 describe("scoping", () => {
-  it("every part carries data-scope alert-dialog, its data-part and data-instance", () => {
+  it("every part carries data-scope dialog, its data-part and data-instance", () => {
     const a = api()
     const parts = {
       trigger: a.trigger(btn("t1")),
@@ -38,17 +41,17 @@ describe("scoping", () => {
       action: a.action(btn("a1")),
     }
     for (const [part, props] of Object.entries(parts)) {
-      expect(props["data-scope"], part).toBe("alert-dialog")
+      expect(props["data-scope"], part).toBe("dialog")
       expect(props["data-part"], part).toBe(part)
       expect(props["data-instance"], part).toBe("r")
     }
   })
 
-  it("ids derive from the alert-dialog scope", () => {
+  it("ids derive from the dialog scope", () => {
     const a = api()
-    expect(a.content({})["id"]).toBe("alert-dialog-r-content")
-    expect(a.title({ level: 2, tag: "h2" })["id"]).toBe("alert-dialog-r-title")
-    expect(a.trigger(btn("t1"))["aria-controls"]).toBe("alert-dialog-r-content")
+    expect(a.content({})["id"]).toBe("dialog-r-content")
+    expect(a.title({ level: 2, tag: "h2" })["id"]).toBe("dialog-r-title")
+    expect(a.trigger(btn("t1"))["aria-controls"]).toBe("dialog-r-content")
   })
 })
 
@@ -70,9 +73,9 @@ describe("content: always modal", () => {
   })
 
   it("aria-labelledby / -describedby list the rendered parts only (no description: none)", () => {
-    expect(api().content({})["aria-labelledby"]).toBe("alert-dialog-r-title")
-    expect(api().content({})["aria-describedby"]).toBe("alert-dialog-r-description")
-    const noDesc = api({ rendered: { title: "alert-dialog-r-title" } }).content({})
+    expect(api().content({})["aria-labelledby"]).toBe("dialog-r-title")
+    expect(api().content({})["aria-describedby"]).toBe("dialog-r-description")
+    const noDesc = api({ rendered: { title: "dialog-r-title" } }).content({})
     expect(noDesc["aria-describedby"]).toBeUndefined()
     expect(
       api({ rendered: {} }).content({ labelledBy: "mine", describedBy: "hint" })[
