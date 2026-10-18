@@ -65,6 +65,7 @@ jobs:
           tail -20 disk.log
         env:
           CI: "true"
+          VITEST_CHROMIUM_GC_FORCE: "1"
           RIND_BROWSERS: chromium
           RIND_MAX_WORKERS: 2
           DEBUG: "pw:browser*,vitest:browser:*"
