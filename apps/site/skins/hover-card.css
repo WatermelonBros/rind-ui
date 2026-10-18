@@ -15,7 +15,7 @@
   background: color-mix(in oklab, var(--s-acc) 22%, transparent);
 }
 [data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="trigger"]:focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 [data-rind-theme^="skin-"] [data-scope="hover-card"][data-part="positioner"] {

@@ -115,7 +115,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="slider"][data-part="thumb"][data-focus-visible] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 /* no easing on position while a drag follows the pointer */

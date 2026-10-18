@@ -82,7 +82,7 @@
     ):not([data-scope], [class])
   ):focus {
   translate: -2px -2px;
-  box-shadow: 4px 4px 0 var(--s-acc);
+  box-shadow: 4px 4px 0 var(--s-focus);
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   :is(
@@ -125,12 +125,16 @@
   ):focus {
   background: #fff;
   box-shadow:
-    0 0 0 3px var(--s-acc),
+    0 0 0 3px var(--s-focus),
     0 6px 16px #ff8fb133;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="text-field"][data-part="input"][aria-invalid="true"] {
   border-color: var(--s-acc-deep);
+}
+/* the halo gives way to the focus ring while the field has focus */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="text-field"][data-part="input"][aria-invalid="true"]:not(:focus) {
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--s-acc) 35%, transparent);
 }
 
@@ -158,7 +162,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   :where(button:not([data-scope], [class])):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 /* juicy draws no borders (--s-bw is 0): every field boundary gets the inset ring instead, so a
