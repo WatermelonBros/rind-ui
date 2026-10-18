@@ -107,7 +107,7 @@ const topics = [
 - **Choosing.** Enter on the highlighted suggestion, or a press on one, creates a tag whose value is the suggestion's `key`, subject to every check below. The draft is cleared and the popup stays open for the next tag; `closeOnSelect` closes it. The chip and the announcements show the suggestion's `label`.
 - **Chosen suggestions are hidden** from the list, unless `allowDuplicates`.
 - **Free text.** Enter with nothing highlighted creates a tag from the draft, as without suggestions. `allowCustom={false}` refuses typed text with the reason `invalid` (Enter, delimiters, paste and blur alike), so only suggestions become tags. `autoHighlight` highlights the first match while typing, so Enter takes it.
-- **Inside.** Chip navigation, removal, editing and the clear button do not close the popup or count as leaving; editing a chip closes it while the chip input is open.
+- **Inside.** Chip navigation, removal and the clear button do not close the popup or count as leaving. Editing a chip closes it: focus is then in the chip input, not in the combobox the popup belongs to.
 - **Filtering.** `filter` replaces the matcher; `filter={null}` lists the collection as given (filter on a server). With `itemsQuery` and `loading`, results that answer an older draft are shown but not highlighted or counted, as in Combobox.
 
 ## Delimiters

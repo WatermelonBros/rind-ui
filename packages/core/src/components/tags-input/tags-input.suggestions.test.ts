@@ -11,10 +11,14 @@ import { type TagsInputProps, tagSuggestions, tagsInputMachine } from "./tags-in
 import { tagsInputMessages } from "./tags-input.messages"
 
 const items = createListCollection({
-  items: ["Partner", "Party", "Apple", "Apricot"].map((label) => ({
-    id: label.toLowerCase(),
-    label,
-  })),
+  items: [
+    ...["Partner", "Party", "Apple", "Apricot"].map((label) => ({
+      id: label.toLowerCase(),
+      label,
+    })),
+    // A mixed-case key: a lowercasing `normalize` must not change it.
+    { id: "NewYork", label: "New York" },
+  ],
   getKey: (r) => r.id,
   getText: (r) => r.label,
 })
@@ -126,6 +130,14 @@ describe("Tags Input suggestions", () => {
     // The chosen option is hidden; its text names the announcement.
     expect(m.listed()).not.toContain("apple")
     expect(announce).toHaveBeenCalledWith(expect.objectContaining({ message: "Apple added" }))
+  })
+
+  it("a chosen option's key is the tag, never normalised", () => {
+    const m = make({ normalize: (t) => t.trim().toLowerCase() })
+    m.focus()
+    m.down()
+    m.choose("NewYork")
+    expect(m.tags()).toEqual(["NewYork"])
   })
 
   it("closeOnSelect closes after a choice", () => {

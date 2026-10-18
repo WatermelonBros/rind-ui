@@ -230,7 +230,8 @@ function createTags(a: Args, texts: readonly string[], fromOption = false) {
   const refused: string[] = []
   let first: TagRefusal | null = null
   for (const raw of texts) {
-    const text = norm(raw)
+    // A chosen option's key is the tag as is (Suggestions: the value is the option's key).
+    const text = fromOption ? raw : norm(raw)
     if (text === "") continue
     const all = [...value, ...accepted]
     let why: TagRefusalReason | null = null
