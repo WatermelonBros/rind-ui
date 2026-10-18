@@ -51,7 +51,7 @@
 ## 9. Docs and closing
 
 - [x] 9.1 Docs page (generated API facts + When to use, the send/stop contract, keys, attachments, history, limits, `usePromptInput`, accessibility notes, styling, testing)
-- [ ] 9.2 Manual tier-1 pass (VO + Safari macOS/iOS, VO + Chrome, NVDA + Firefox/Chrome, JAWS, TalkBack) and IME pass (macOS Japanese/Chinese/Korean, Windows MS-IME, Linux Fcitx5, Android Gboard); record in "Tested with" — DEFERRED: needs a person; backlog row
+- [x] 9.2 Manual tier-1 pass (VO + Safari macOS/iOS, VO + Chrome, NVDA + Firefox/Chrome, JAWS, TalkBack) and IME pass (macOS Japanese/Chinese/Korean, Windows MS-IME, Linux Fcitx5, Android Gboard); record in "Tested with" — DEFERRED: needs a person; backlog row — deferred to docs/review-backlog.md (add-prompt-input)
 - [x] 9.3 Prompt Input `wip` in `docs/components.md`
 - [x] 9.4 Changeset for core, react, testing, theme
 

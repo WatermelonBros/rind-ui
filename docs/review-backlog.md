@@ -314,3 +314,11 @@ verified at round 3 (2026-10-14).
 - 3.1 / 6.3: virtualization (`aria-rowcount`/`aria-rowindex`), plus a virtualized fixture and measured spatial moves in three columns.
 - 4.3: React tests for Strict Mode, SSR + hydration tab stop, nested Tag Group, static vs data items.
 - 6.4: virtual screen-reader reading-order test.
+
+## add-prompt-input: verification (2026-10-18)
+
+- warning: `settleSend` clears `snapshot` only when `context.pending` is set. A send with no promise and no `status` keeps the pasted image blobs until the next submit. Also clear it when `props.status === undefined`.
+- warning: the DOM test presses Stop only once. Add a second press in `stopped` (or a `detail: 2` click) and assert that `onStop` is still called once.
+- warning: `replaceText` lives in dom/file-intake.ts. Move it to a text-edit module.
+- warning: a sync throw from onSubmit through `requestSubmit` is reported by the listener, not to the `control.submit()` caller.
+- 9.2: manual tier-1 AT pass and IME pass.
