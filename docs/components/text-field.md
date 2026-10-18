@@ -39,24 +39,48 @@ import { TextField } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `type` | `string` | `"text"` | The Input's native type. `"password"`: the visibility parts and rules; `"search"`: a searchbox, "Clear search", Escape clears. |
-| `visible` | `boolean` | — | Controlled visibility (`type="password"`). |
-| `defaultVisible` | `boolean` | `false` | Uncontrolled visibility. |
-| `onVisibleChange` | `(visible, { reason }) => void` | — | Reasons `PRESS`, `SUBMIT` (any form submit) and `RESET` (an unprevented reset). |
-| `escapeClears` | `boolean` | `true with `type="search"`, else false` | Escape clears a non-empty editable value (reason `ESCAPE`) and is consumed only then. |
-| `onSubmit` | `(value, { event }) => void` | — | Enter, never while composing; the form still submits unless `event.preventDefault()`. |
-| `value` | `string \| null` | — | Controlled value (`null` renders empty). |
-| `defaultValue` | `string` | — | Uncontrolled: the DOM owns the value. |
-| `onValueChange` | `(value, { reason, event, isComposing }) => void` | — | Every change, with its reason (`INPUT`, `CLEAR`, `ESCAPE`, `RESET`). Native `onChange` is forwarded untouched. |
-| `focusableWhenDisabled` | `boolean` | `false` | Disabled but focusable: read-only + `aria-disabled`. |
-| `countThreshold` | `number` | — | Announce the count at this many remaining (default max(10, 20% of the limit)). |
-| `messages` | `{ clear?, clearSearch?, charactersRemaining?, charactersOver?, toggleLabel?, visibilityAnnouncement? }` | — | The ClearTrigger name (also for search), count announcements, the VisibilityTrigger's name and the shown/hidden announcement. |
-| `fieldMessages` | `Field messages` | — | The Field's messages when the Root is the Field. |
-| `autosize` | `boolean` | `false` | On Textarea: grows with its content (native `field-sizing` where supported). |
-| `max` | `number` | — | On CharacterCount: a soft limit (an error past it, never a truncation). |
-| `count` | `(value) => number` | — | On CharacterCount: replaces the counter. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `TextField.Root` | `type` | `string` | `"text"` | The Input's native type. `"password"`: the visibility parts and rules; `"search"`: a searchbox, "Clear search", Escape clears. |
+| `TextField.Root` | `visible` | `boolean` | — | Controlled visibility (`type="password"`). |
+| `TextField.Root` | `defaultVisible` | `boolean` | `false` | Uncontrolled visibility. |
+| `TextField.Root` | `onVisibleChange` | `(visible, { reason }) => void` | — | Reasons `PRESS`, `SUBMIT` (any form submit) and `RESET` (an unprevented reset). |
+| `TextField.Root` | `escapeClears` | `boolean` | `true with `type="search"`, else false` | Escape clears a non-empty editable value (reason `ESCAPE`) and is consumed only then. |
+| `TextField.Root` | `onSubmit` | `(value, { event }) => void` | — | Enter, never while composing; the form still submits unless `event.preventDefault()`. |
+| `TextField.Root` | `value` | `string \| null` | — | Controlled value (`null` renders empty). |
+| `TextField.Root` | `defaultValue` | `string` | — | Uncontrolled: the DOM owns the value. |
+| `TextField.Root` | `onValueChange` | `(value, { reason, event, isComposing }) => void` | — | Every change, with its reason (`INPUT`, `CLEAR`, `ESCAPE`, `RESET`). Native `onChange` is forwarded untouched. |
+| `TextField.Root` | `focusableWhenDisabled` | `boolean` | `false` | Disabled but focusable: read-only + `aria-disabled`. |
+| `TextField.Root` | `countThreshold` | `number` | — | Announce the count at this many remaining (default max(10, 20% of the limit)). |
+| `TextField.Root` | `messages` | `{ clear?, clearSearch?, charactersRemaining?, charactersOver?, toggleLabel?, visibilityAnnouncement? }` | — | The ClearTrigger name (also for search), count announcements, the VisibilityTrigger's name and the shown/hidden announcement. |
+| `TextField.Root` | `fieldMessages` | `Field messages` | — | The Field's messages when the Root is the Field. |
+| `TextField.Root` | `children` | `ReactNode` | — | The parts: Label, Input or Textarea, Description, ErrorMessage and the triggers. |
+| `TextField.Root` | `name` | `string` | — | The control's `name` when it has none; the key of `validate`'s values. |
+| `TextField.Root` | `disabled` | `boolean` | — | Disables the control; no validity is displayed. Also inherited from an enclosing Field. |
+| `TextField.Root` | `readOnly` | `boolean` | — | Makes the control read-only. Also inherited from an enclosing Field. |
+| `TextField.Root` | `required` | `boolean` | — | Native `required` (`aria-required` in `aria` behaviour). |
+| `TextField.Root` | `invalid` | `boolean` | — | `true` forces invalid, `false` valid; `undefined` validates. |
+| `TextField.Root` | `errors` | `readonly string[]` | — | External errors (server): shown at once, cleared by the next change. |
+| `TextField.Root` | `validate` | `Validate` | — | Runs after native constraints pass. |
+| `TextField.Root` | `validationMode` | `ValidationMode` | `"submit"` | When errors are displayed. |
+| `TextField.Root` | `validationBehavior` | `ValidationBehavior` | `"native"` | Whether an invalid Field blocks submission. |
+| `TextField.Root` | `validationDebounce` | `number` | `0` | Delays `validate` in `change` mode (ms). |
+| `TextField.Label` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `TextField.Description` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `TextField.ErrorMessage` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `TextField.ErrorMessage` | `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
+| `TextField.ErrorMessage` | `children` | `ReactNode \| ((messages: readonly string[]) => ReactNode)` | — | Replaces the default text; a function returning null/undefined falls back to it. |
+| `TextField.Input` | `max` | `number` | — | On CharacterCount: a soft limit (an error past it, never a truncation). |
+| `TextField.Input` | `render` | `RenderProp<{ composing: boolean }>` | — | Another element or a render function receiving the props and the part's state (`composing`). |
+| `TextField.Textarea` | `autosize` | `boolean` | `false` | On Textarea: grows with its content (native `field-sizing` where supported). |
+| `TextField.Textarea` | `render` | `RenderProp<{ composing: boolean }>` | — | Another element or a render function receiving the props and the part's state (`composing`). |
+| `TextField.ClearTrigger` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TextField.CharacterCount` | `max` | `number` | — | On CharacterCount: a soft limit (an error past it, never a truncation). |
+| `TextField.CharacterCount` | `count` | `(value) => number` | — | On CharacterCount: replaces the counter. |
+| `TextField.CharacterCount` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TextField.VisibilityTrigger` | `render` | `RenderProp<{ visible: boolean }>` | — | Another element or a render function receiving the props and `{ visible }`. |
+| `TextField.VisibilityIndicator` | `children` | `ReactNode` | — | The icon; style it by `data-state` (`aria-hidden`). |
+| `TextField.VisibilityIndicator` | `render` | `RenderProp<{ visible: boolean }>` | — | Another element or a render function receiving the props and `{ visible }`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

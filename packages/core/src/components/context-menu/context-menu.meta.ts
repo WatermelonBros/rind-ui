@@ -78,7 +78,7 @@ export const contextMenuMeta = {
       type: "Ref<{ openAt(point, target?): void; close(): void }>",
       description: "Programmatic open at viewport coordinates, and close.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "On the region: substitutes the rendered element without changing behaviour.",
     },

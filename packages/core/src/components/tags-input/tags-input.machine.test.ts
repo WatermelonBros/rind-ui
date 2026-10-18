@@ -1,7 +1,9 @@
 // The Tags Input machine in Node (task 1.7): creation paths, delimiters, IME, paste,
 // refusal, max, duplicates, keys, editing, blur behaviour, chips. No DOM.
 import { describe, expect, it, vi } from "vitest"
+import { createListCollection } from "../../collection/list"
 import { createService } from "../../machine/service"
+import { tagsInputIds } from "./tags-input.connect"
 import { type TagsInputProps, tagKeys, tagsInputMachine } from "./tags-input.machine"
 import { tagsInputMessages } from "./tags-input.messages"
 
@@ -12,6 +14,10 @@ function make(over: Partial<TagsInputProps> = {}) {
   const onValueChange = vi.fn()
   const onRefuse = vi.fn()
   const props: TagsInputProps = {
+    collection: createListCollection<string>({ items: [], getKey: String, getText: String }),
+    ids: tagsInputIds("t"),
+    strategy: "active-descendant",
+    root: "t",
     locale: "en",
     messages: tagsInputMessages,
     onValueChange,

@@ -59,9 +59,14 @@ See CLAUDE.md "Review rules".
 | add-combobox (impl) | — | packages/testing/src/components | Task 6.3: no virtualized combobox test (10,000 options, End/wrap to index 9999) |
 | add-combobox (impl) | — | packages/testing/src/components | Task 6.4: no virtual screen-reader log test (open, arrow, choose, empty results) |
 | add-combobox (impl) | — | packages/theme/src/combobox.css | Task 7.2: no Playwright forced-colors captures |
-| add-combobox (impl) | — | packages/core/src/components/combobox | Task A.5: `patternEffects` / `patternConnect` / `optionsNeverSelected` not extracted (one host); do it with Autocomplete or Command |
 | add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
-| add-tags-input (impl) | — | packages/core/src/components/tags-input | Task 1.6 / "Suggestions": not implemented; with the combobox-pattern extraction (Autocomplete is the third host) |
+| tags-input-suggestions (impl) | — | packages/react/src/tags-input/tags-input.tsx | Suggestions are data-driven only (`items` / `collection`): static `<TagsInput.Item>` children do not register (the host's `registry` is null), unlike Combobox |
+| tags-input-suggestions (review) | — | packages/react/src/tags-input/tags-input.tsx | `results` uses the stale frozen list whenever the popup is closed: use `openNow \|\| !present ? live : frozen.current` |
+| tags-input-suggestions (review) | — | packages/core/src/components/tags-input/tags-input.machine.ts | `tagSuggestions` hides chosen options by exact match while the duplicate check uses `compare` |
+| tags-input-suggestions (review) | — | packages/core/src/components/tags-input/tags-input.machine.ts | A refusal of a chosen option announces its raw key, not its label |
+| tags-input-suggestions (review) | — | packages/testing/src/components/tags-input-suggestions.dom.test.tsx | Missing tests: aria-activedescendant on arrows, ArrowDown opening on the first option, Escape inside a Dialog, Backspace on an empty draft with the popup open, Enter in pointer modality |
+| tags-input-suggestions (review) | — | packages/react/src/tags-input/tags-input.tsx | No dev warning for static Items rendered without `items` / `collection` |
+| tags-input-suggestions (impl) | — | packages/testing/fixtures/examples.pw.test.ts | `tags-input:suggesting` is listed as transient (no prop opens the popup): no static state example; its ARIA is covered by the suggestions DOM tests |
 | add-tags-input (impl) | — | packages/testing/src/components | Tasks 5.1/5.2: no browser IME replays (Japanese, Pinyin, Korean, Safari commit Enter), no Android keyCode 229 delimiter test, no modal dialog host test |
 | add-tags-input (impl) | — | packages/theme/src/tags-input.css | Task 6.2: no Playwright forced-colors captures |
 | add-tags-input (impl) | — | packages/testing/src/components | Task 5.3: no RTL model run |
@@ -302,6 +307,9 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
 | add-navigation-menu | design | Links in a Sub level's own list mark the parent item's trigger `data-current`; a current link deeper in a Sub panel marks only the Sub trigger |
 | add-navigation-menu | design | A press on a top-level link that is not a layer element counts as an outside press before the link activation (both close; reason `outside-press` instead of `link-activate`) |
+| docs-props-guard | #159 review (warning) | scripts/docs-gen.ts | A prop that two union variants declare (`selectionMode` single/multiple) shows the first variant's type only: join the variants' types in the Type column |
+| docs-props-guard | #159 review (warning) | packages/core/src/components/toast/toast.meta.ts | The Options table (`createToaster`, toast options) is not checked against the types like props are; it also misses the toast options `id`, `type`, `title`, `description` and `meta` |
+| docs-props-guard | #159 review (warning) | packages/react/src (JSDoc) | `dir` props: the precise default is "the locale's, else the provider's"; several JSDoc comments say "the provider's" only |
 | date-family-consolidation | 2.1 (#152) | Calendar view trigger: its name joins the heading and the action ("October 2026, Choose month") with a hard-coded ", " that cannot be localised, and the h2 takes the action text. Name the button by its visible text plus aria-describedby, or pass the heading to \`viewUp({ view, heading })\` (needs a spec tweak) |
 
 ## Resolved

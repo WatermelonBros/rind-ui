@@ -47,18 +47,35 @@ The list needs an accessible name: render a `TagGroup.Label`, or pass `aria-labe
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `onRemove` | `(keys: string[], { reason }) => void` | — | Tags are removable: drop the keys from your data (or keep them). |
-| `selectionMode` | `"none" \| "single" \| "multiple"` | `"none"` | Selectable tags (filter chips). |
-| `value` | `string \| null \| string[]` | — | Controlled selection. |
-| `defaultValue` | `string \| null \| string[]` | — | Uncontrolled selection. |
-| `onValueChange` | `(value, { reason, key }) => void` | — | Every selection change. |
-| `onAction` | `(key, { modality, via }) => void` | — | Enter, Space or a press on a tag. |
-| `disabled` | `boolean` | `false` | No Tab stop, no keys or presses. |
-| `loop` | `boolean` | `true` | Arrow keys wrap around. |
-| `items` | `{ key, label, disabled?, href? }[]` | — | Data tags (else Tag parts register). |
-| `messages` | `Partial<TagGroupMessages>` | — | removeLabel, removeHint, removedAnnouncement, removedCountAnnouncement. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `TagGroup.Root` | `onRemove` | `(keys: string[], { reason }) => void` | — | Tags are removable: drop the keys from your data (or keep them). |
+| `TagGroup.Root` | `selectionMode` | `"none" \| "single" \| "multiple"` | `"none"` | Selectable tags (filter chips). |
+| `TagGroup.Root` | `value` | `string \| null \| string[]` | — | Controlled selection. |
+| `TagGroup.Root` | `defaultValue` | `string \| null \| string[]` | — | Uncontrolled selection. |
+| `TagGroup.Root` | `onValueChange` | `(value, { reason, key }) => void` | — | Every selection change. |
+| `TagGroup.Root` | `onAction` | `(key, { modality, via }) => void` | — | Enter, Space or a press on a tag. |
+| `TagGroup.Root` | `disabled` | `boolean` | `false` | No Tab stop, no keys or presses. |
+| `TagGroup.Root` | `loop` | `boolean` | `true` | Arrow keys wrap around. |
+| `TagGroup.Root` | `items` | `{ key, label, disabled?, href? }[]` | — | Data tags (else Tag parts register). |
+| `TagGroup.Root` | `messages` | `Partial<TagGroupMessages>` | — | removeLabel, removeHint, removedAnnouncement, removedCountAnnouncement. |
+| `TagGroup.Root` | `focusableWhenDisabled` | `boolean` | — | Disabled tags stay reachable (announced as dimmed). Default true. |
+| `TagGroup.Root` | `typeaheadTimeout` | `number` | `1000` | How long typed characters build one typeahead search (ms). |
+| `TagGroup.Root` | `collection` | `Collection<unknown>` | — | A collection built by the consumer, used instead of `items`. |
+| `TagGroup.Root` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Root` | `disallowEmptySelection` | `boolean` | — | No user action leaves the selection empty. |
+| `TagGroup.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Description` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.List` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Tag` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Tag` | `value` | `string` | — | The tag key. |
+| `TagGroup.Tag` | `textValue` | `string \| undefined` | — | The tag's text for typeahead and the remove button's name. |
+| `TagGroup.Tag` | `disabled` | `boolean \| undefined` | — | Disables this tag: it cannot be selected or removed. |
+| `TagGroup.Tag` | `href` | `string \| undefined` | — | A link tag: TagText renders an anchor to it. |
+| `TagGroup.TagText` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.TagRemove` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Empty` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Tags` | `children` | `(label: string, key: string) => ReactNode` | — | Renders one tag's content from its label and key; default: TagText and TagRemove. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

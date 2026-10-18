@@ -1,0 +1,7 @@
+- text: Topics
+- toolbar "Tags":
+  - text: Design
+  - button "Remove Design"
+- combobox "Topics"
+- button "Clear all"
+- text: "1 tag: Design"

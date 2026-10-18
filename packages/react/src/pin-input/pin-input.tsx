@@ -105,6 +105,7 @@ export type PinInputRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The Field parts, the Control and its Input and Slots. */
   readonly children?: ReactNode
   /** The number of characters (a positive integer). */
   readonly length: number
@@ -129,20 +130,34 @@ export type PinInputRootProps = Omit<
   /** Submits the form once a user change completes the code (`requestSubmit`, no focus moves). */
   readonly autoSubmit?: boolean
   readonly enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
+  /** The id of the form the input belongs to. */
   readonly form?: string
+  /** The consumer's direction; the code itself is always laid out left to right. Default: `"ltr"`. */
   readonly dir?: "ltr" | "rtl"
+  /** Message overrides (the Pin Input has no string of its own; see `fieldMessages`). */
   readonly messages?: MessageOverrides<PinInputMessages>
   // Field props (the Root is a Field when not inside one).
+  /** The input's form name; the key of `validate`'s values. */
   readonly name?: string
+  /** Disables the input; no validity is displayed. */
   readonly disabled?: boolean
+  /** Makes the input read-only. */
   readonly readOnly?: boolean
+  /** Native `required` (`aria-required` in `aria` behaviour): an incomplete code is invalid. */
   readonly required?: boolean
+  /** `true` forces invalid, `false` valid; `undefined` validates. */
   readonly invalid?: boolean
+  /** External errors (server): shown at once, cleared by the next change. */
   readonly errors?: readonly string[]
+  /** Runs after native constraints pass. */
   readonly validate?: Validate
+  /** When errors are displayed. Default: `"submit"`. */
   readonly validationMode?: ValidationMode
+  /** Whether an invalid Field blocks submission. Default: `"native"`. */
   readonly validationBehavior?: ValidationBehavior
+  /** Delays `validate` in `change` mode (ms). */
   readonly validationDebounce?: number
+  /** The Field's announcement and per-constraint messages. */
   readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
 
@@ -328,7 +343,10 @@ const stateOf = (ctx: Ctx): PinInputState => ({
 function Control({
   render,
   ...rest
-}: ComponentPropsWithRef<"div"> & { readonly render?: RenderProp<PinInputState> }) {
+}: ComponentPropsWithRef<"div"> & {
+  /** Another element or a render function receiving the props and the Pin Input's state. */
+  readonly render?: RenderProp<PinInputState>
+}) {
   const ctx = usePinInput("Control")
   const env = useEnvironment()
   const modality = useModality(env.modality, ctx.view.context.focused)
@@ -364,6 +382,7 @@ function Input({
   id,
   ...rest
 }: Omit<ComponentPropsWithRef<"input">, "value" | "defaultValue" | "type"> & {
+  /** Another element or a render function receiving the props and the Pin Input's state. */
   readonly render?: RenderProp<PinInputState>
 }) {
   const ctx = usePinInput("Input")
@@ -539,7 +558,9 @@ function Slot({
   render,
   ...rest
 }: Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The slot's position, from 0. */
   readonly index: number
+  /** Another element or a render function receiving the props and the Pin Input's state plus the slot's `char`. */
   readonly render?: RenderProp<PinInputState & { readonly char: string | undefined }>
 }) {
   const ctx = usePinInput("Slot")

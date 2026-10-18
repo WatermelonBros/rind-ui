@@ -154,6 +154,7 @@ export type TextFieldRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onSubmit"
 > & {
+  /** The parts: Label, Input or Textarea, Description, ErrorMessage and the triggers. */
   readonly children?: ReactNode
   /**
    * The Input's native type. `"password"`: the visibility parts and rules (hidden on submit
@@ -178,15 +179,25 @@ export type TextFieldRootProps = Omit<
   readonly countThreshold?: number
   readonly messages?: MessageOverrides<TextFieldMessages>
   // Field props (the Root is a Field when not inside one).
+  /** The control's `name` when it has none; the key of `validate`'s values. */
   readonly name?: string
+  /** Disables the control; no validity is displayed. Also inherited from an enclosing Field. */
   readonly disabled?: boolean
+  /** Makes the control read-only. Also inherited from an enclosing Field. */
   readonly readOnly?: boolean
+  /** Native `required` (`aria-required` in `aria` behaviour). */
   readonly required?: boolean
+  /** `true` forces invalid, `false` valid; `undefined` validates. */
   readonly invalid?: boolean
+  /** External errors (server): shown at once, cleared by the next change. */
   readonly errors?: readonly string[]
+  /** Runs after native constraints pass. */
   readonly validate?: Validate
+  /** When errors are displayed. Default: `"submit"`. */
   readonly validationMode?: ValidationMode
+  /** Whether an invalid Field blocks submission. Default: `"native"`. */
   readonly validationBehavior?: ValidationBehavior
+  /** Delays `validate` in `change` mode (ms). Default: 0. */
   readonly validationDebounce?: number
   readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
@@ -366,6 +377,7 @@ type ControlProps<T extends "input" | "textarea"> = Omit<
   ComponentPropsWithRef<T>,
   "value" | "defaultValue"
 > & {
+  /** Another element or a render function receiving the props and the part's state (`composing`). */
   readonly render?: RenderProp<{ composing: boolean }>
 }
 
@@ -530,6 +542,7 @@ function ClearTrigger({
   render,
   ...rest
 }: ComponentPropsWithRef<"button"> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }) {
   const ctx = useTextField("ClearTrigger")
@@ -573,6 +586,7 @@ function CharacterCount({
   readonly max?: number
   /** Replaces the counter (default: UTF-16 code units, a line break counts once). */
   readonly count?: (value: string) => number
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }) {
   const ctx = useTextField("CharacterCount")

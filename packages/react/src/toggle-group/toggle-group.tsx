@@ -76,6 +76,7 @@ export type ToggleGroupRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue"
 > & {
+  /** The group's Items. */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -192,7 +193,9 @@ export interface ToggleGroupItemState {
 type GroupItemProps = Omit<ComponentPropsWithRef<"button">, "value"> & {
   /** The item's key in the group's value. */
   readonly value: string
+  /** Disables this item: it cannot be pressed. */
   readonly disabled?: boolean
+  /** The item's text in the group's collection (icon-only items). Default: its text content. */
   readonly textValue?: string
   readonly render?: RenderProp<ToggleGroupItemState>
 }

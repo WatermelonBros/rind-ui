@@ -29,11 +29,11 @@ rind-ui label; see [Labels](../guides/labels.md).
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `htmlFor` | `string` | — | The id of the control it names. Kept on the server; dropped after mount when it names a non-labelable element (focus is forwarded instead, with a development warning). |
-| `id` | `string` | — | Generated when absent, the same on the server and the client. |
-| `render` | `ReactElement \| (props) => ReactNode` | — | Another element: a non-`<label>` forwards focus to `htmlFor`'s element itself. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Label` | `htmlFor` | `string` | — | The id of the control it names. Kept on the server; dropped after mount when it names a non-labelable element (focus is forwarded instead, with a development warning). |
+| `Label` | `id` | `string` | — | Generated when absent, the same on the server and the client. |
+| `Label` | `render` | `ReactElement \| (props) => ReactNode` | — | Another element: a non-`<label>` forwards focus to `htmlFor`'s element itself. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

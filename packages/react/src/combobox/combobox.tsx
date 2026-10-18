@@ -61,8 +61,8 @@ import { useCollectionIdentityWarning, useCollectionItems } from "../use-collect
 import { useRootId } from "../use-ids"
 import { useMachine, useSelector } from "../use-machine"
 import { useModality } from "../use-modality"
-import { usePresence } from "../use-presence"
 import { usePress } from "../use-press"
+import { createPopupParts } from "./popup-parts"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -96,7 +96,9 @@ export interface ComboboxInputChangeDetails extends ComboboxChangeDetails {
 }
 
 interface Common {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
+  /** The combobox parts. */
   readonly children?: ReactNode
   readonly items?: readonly ComboboxItemData[]
   /** A collection built by the consumer (virtualized or async lists). */
@@ -111,13 +113,17 @@ interface Common {
   /** Multiple: Backspace in the empty input arms, then removes, the last chip. */
   readonly removeOnBackspace?: boolean
   readonly closeOnSelect?: boolean
+  /** Multiple: clears the text after a choice. Default: true. */
   readonly clearInputOnSelect?: boolean
   readonly selectOnTab?: boolean
+  /** Opens when the text changes. Default: true. */
   readonly openOnInput?: boolean
+  /** ArrowDown / ArrowUp in the input open the popup. Default: true. */
   readonly openOnArrow?: boolean
   readonly openOnInputPress?: boolean
   readonly openOnFocus?: boolean
   readonly autoHighlight?: boolean
+  /** Keeps a pointer highlight when the pointer leaves the list. Default: false (true inline). */
   readonly keepHighlight?: boolean
   readonly autoComplete?: "list" | "both"
   /** The matcher; `null` lists the collection unfiltered (consumer or server filtering). */
@@ -126,22 +132,30 @@ interface Common {
   readonly itemsQuery?: string
   readonly loading?: LoadingStatus
   readonly onLoadMore?: () => void
+  /** The items are virtualized: highlight scrolling goes through `scrollToIndex` and options carry `aria-setsize` / `aria-posinset`. */
   readonly virtualized?: boolean
+  /** Scrolls the highlighted item into view instead of the native `scrollIntoView` (virtualized lists). */
   readonly scrollToIndex?: (details: ScrollToIndexDetails) => void
   readonly disabled?: boolean
   readonly readOnly?: boolean
   readonly invalid?: boolean
   readonly required?: boolean
+  /** Clearing the text keeps the selection instead of emptying it. */
   readonly disallowEmptySelection?: boolean
+  /** Wraps the highlight at the ends of the list. Default: false. */
   readonly loop?: boolean
   readonly messages?: Partial<ComboboxMessages>
+  /** Side, align, offset, collisions. */
   readonly positioning?: PositioningProps
+  /** Keep the popup in the DOM (hidden) while closed. */
   readonly keepMounted?: boolean
+  /** Milliseconds a typing highlight waits before it reaches `aria-activedescendant`. Default: 500. */
   readonly typingPause?: number
   /** The form name of the selected key(s); the visible text is not submitted. */
   readonly name?: string
   /** Submits the visible text under this name too. */
   readonly inputName?: string
+  /** The id of the form the hidden inputs belong to. */
   readonly form?: string
   /** Runs an item (inline), or follows a choice (free text). */
   readonly onAction?: (key: string, details: ComboboxActionDetails) => void
@@ -610,6 +624,7 @@ function Root(all: ComboboxRootProps) {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -746,68 +761,7 @@ function ClearTrigger({ render, ...rest }: Own<"button">) {
   )
 }
 
-function Positioner({ render, ref, children, ...rest }: Own<"div">) {
-  const host = useLive("Positioner")
-  useInlineWarning(host, "Positioner")
-  const node = useRef<HTMLElement | null>(null)
-  // It holds the popup: it stays while the popup's exit animations run.
-  const { mounted } = usePresence(host.open, node, { keepMounted: host.keepMounted, subtree: true })
-  const { setPresent, topLayer } = host
-  useIsoLayoutEffect(() => {
-    setPresent(mounted)
-  }, [mounted, setPresent])
-  // Into the top layer while mounted (`popover="manual"`): above every stacking context of
-  // the page, with no portal. Engines without the Popover API keep it in place.
-  useIsoLayoutEffect(() => {
-    const el = node.current as (HTMLElement & { showPopover?: () => void }) | null
-    if (!mounted || !topLayer || !el || typeof el.showPopover !== "function") return
-    try {
-      if (!el.matches(":popover-open")) el.showPopover()
-    } catch {
-      // Already shown, or not connected yet: the next commit retries.
-    }
-    return () => {
-      try {
-        if (el.matches(":popover-open")) el.hidePopover()
-      } catch {
-        // Removed with its subtree.
-      }
-    }
-  }, [mounted, topLayer])
-  if (!mounted || host.inline) return null
-  const own = normalizeProps(host.api.positioner())
-  const props = mergeProps(
-    {
-      ...own,
-      hidden: own["hidden"] === true || (!host.open && host.keepMounted) || undefined,
-      ref: composeRefs(node, ref),
-    },
-    { ...rest, children },
-  )
-  return renderPart("div", props, render, undefined)
-}
-
-function Popup({ render, ref, ...rest }: Own<"div">) {
-  const host = useLive("Popup")
-  useInlineWarning(host, "Popup")
-  const node = useRef<HTMLElement | null>(null)
-  const { mounted, state } = usePresence(host.open, node, { keepMounted: host.keepMounted })
-  if (!mounted || host.inline) return null
-  const exiting = !host.open && state === "exiting"
-  return renderPart(
-    "div",
-    mergeProps(
-      {
-        ...normalizeProps(host.api.popup()),
-        ...(exiting ? { inert: true } : {}),
-        ref: composeRefs(node, ref),
-      },
-      rest,
-    ),
-    render,
-    undefined,
-  )
-}
+const popup = createPopupParts(useLive)
 
 const ChipCtx = createContext<string | null>(null)
 
@@ -887,8 +841,8 @@ export const Combobox = {
   ChipRemove,
   Trigger,
   ClearTrigger,
-  Positioner,
-  Popup,
+  Positioner: popup.Positioner,
+  Popup: popup.Popup,
   List: list.List,
   Item: list.Item,
   ItemText: list.ItemText,

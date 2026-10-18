@@ -65,8 +65,7 @@ import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { Popover } from "../popover"
-import { usePopoverControls } from "../popover/popover"
+import { ScopedPopoverRoot, usePopoverControls } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
@@ -220,6 +219,7 @@ export type DateFieldRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The parts: Label, Input, Description, ErrorMessage and, for a picker, its parts. */
   readonly children?: ReactNode
   readonly value?: DateValue | null
   /** Read at creation; a later change only changes what a form reset restores. */
@@ -235,6 +235,7 @@ export type DateFieldRootProps = Omit<
   readonly maxValue?: DateValue | null
   readonly isDateUnavailable?: (date: DateValue) => boolean
   readonly locale?: string
+  /** The Root's `dir` and which way Left/Right move between segments. Default: the locale's. */
   readonly dir?: "ltr" | "rtl"
   /** Calendar systems other than gregorian (`createCalendar` from @internationalized/date). */
   readonly createCalendar?: CreateCalendar
@@ -263,12 +264,19 @@ export type DateFieldRootProps = Omit<
   readonly disabled?: boolean
   readonly readOnly?: boolean
   readonly required?: boolean
+  /** `true` forces invalid, `false` valid; `undefined` validates. */
   readonly invalid?: boolean
+  /** External errors (server): shown at once, cleared by the next change. */
   readonly errors?: readonly string[]
+  /** Runs after the field's own constraints pass. */
   readonly validate?: Validate
+  /** When errors are displayed. Default: `"submit"`. */
   readonly validationMode?: ValidationMode
+  /** Whether an invalid Field blocks submission. Default: `"native"`. */
   readonly validationBehavior?: ValidationBehavior
+  /** Delays `validate` in `change` mode (ms). Default: 0. */
   readonly validationDebounce?: number
+  /** The Field's messages when the Root is the Field. */
   readonly fieldMessages?: MessageOverrides<FieldMessages>
   /** `"range"` selects a start and an end (DateRangeFieldRootProps). */
   readonly selectionMode?: "single"
@@ -558,7 +566,7 @@ function SingleRoot({
       {...(ownFieldMessages ? { messages: ownFieldMessages } : {})}
       {...rootData}
     >
-      <Popover.Root
+      <ScopedPopoverRoot
         id={instance}
         scope="date-field"
         disabled={disabled}
@@ -586,7 +594,7 @@ function SingleRoot({
           <SinglePicker>{children}</SinglePicker>
           <HiddenInput />
         </DateFieldContext>
-      </Popover.Root>
+      </ScopedPopoverRoot>
     </FieldHost>
   )
 }
@@ -639,6 +647,7 @@ function HiddenInput() {
 type InputProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   /** Segments in order; without children every segment renders automatically. */
   readonly children?: ((segments: readonly SegmentPart[]) => ReactNode) | ReactNode
+  /** Another element or a render function receiving the props and the field's state (not in range mode). */
   readonly render?: RenderProp<DateFieldState>
 }
 
@@ -834,7 +843,9 @@ function SingleInput({ children, render, ref, ...rest }: InputProps) {
 }
 
 type SegmentProps = Omit<ComponentPropsWithRef<"input">, "value" | "defaultValue"> & {
+  /** The segment to render, one of those Input's children function receives. */
   readonly segment: SegmentPart
+  /** Another element or a render function receiving the props and the field's state. */
   readonly render?: RenderProp<DateFieldState>
 }
 

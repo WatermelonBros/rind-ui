@@ -213,22 +213,42 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultChecked"
 > & {
+  /** The toggle parts (Control, Label, Description). */
   readonly children?: ReactNode
+  /** Controlled value. */
   readonly checked?: V
   /** Read at creation; a later change only changes what a form reset restores. */
   readonly defaultChecked?: V
+  /** Every user-caused change (toggle or form reset); never called for a parent change. */
   readonly onCheckedChange?: (checked: V, details: D) => void
+  /**
+   * Ignores activation. In a Checkbox Group the group's `disabled` also applies; a Parent
+   * follows only the group's.
+   */
   readonly disabled?: boolean
+  /** Disabled but still in the Tab order (`aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
+  /**
+   * Keeps focus and value, ignores activation. In a Checkbox Group the group's `readOnly` also
+   * applies; a Parent follows only the group's.
+   */
   readonly readOnly?: boolean
+  /** Must be checked to submit. A Checkbox Group Parent is never required. */
   readonly required?: boolean
+  /** Marks the toggle invalid (`aria-invalid`, `data-invalid`). */
   readonly invalid?: boolean
+  /** The submitted field name; ignored in a Checkbox Group (the group's `name` applies). */
   readonly name?: string
   /** Submitted while checked (default "on"). */
   readonly value?: string
+  /**
+   * The id of the form the hidden input belongs to; ignored in a Checkbox Group (the group's
+   * `form` applies).
+   */
   readonly form?: string
   /** Submitted while unchecked (and enabled); unchecked submits nothing without it. */
   readonly uncheckedValue?: string
+  /** Another element or a render function receiving the props and the toggle's state. */
   readonly render?: RenderProp<FormToggleState<V>>
 }
 
@@ -441,6 +461,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
   }
 
   type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+    /** Another element or a render function receiving the props and the toggle's state. */
     readonly render?: RenderProp<FormToggleState<V>>
   }
 
@@ -592,5 +613,6 @@ export type FormToggleIndicatorProps<V extends CheckedState = CheckedState> = Om
   readonly children?:
     | ReactNode
     | ((state: { checked: boolean; indeterminate: boolean }) => ReactNode)
+  /** Another element or a render function receiving the props and the toggle's state. */
   readonly render?: RenderProp<FormToggleState<V>>
 }

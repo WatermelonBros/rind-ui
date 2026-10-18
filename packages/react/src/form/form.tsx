@@ -66,6 +66,7 @@ export interface FormState {
 }
 
 export type FormRootProps = Omit<ComponentPropsWithRef<"form">, "children"> & {
+  /** The form's content (its Fields and controls). */
   readonly children?: ReactNode
   /** Default mode for the Fields inside. */
   readonly validationMode?: ValidationMode

@@ -1,17 +1,31 @@
 // Tags Input (tags-input spec): Root owns the machine and the form inputs; the chips are
-// rendered from the value. Wiring only.
+// rendered from the value. With suggestions, Root derives the listed ones from the draft
+// (patternResults, without the chosen options) and the list parts are the listbox parts
+// under scope "tags-input", the popup parts the Combobox's. Wiring only.
 
 import {
   type Chip as ChipData,
+  type Collection,
+  type CollectionKey,
+  type ComboboxFilter,
+  createListCollection,
   type Delimiters,
+  domPositioning,
   type FormInputCapability,
   focusSafely,
   hiddenFormInput,
+  isEmptyState,
+  isExposed,
+  isStale,
+  type LoadingStatus,
   mergeFieldProps,
+  type PositioningProps,
+  patternResults,
   type TagRefusal,
   type TagsInputApi,
   type TagsInputMessages,
   tagChips,
+  tagSuggestions,
   tagsInputConnect,
   tagsInputIds,
   tagsInputMachine,
@@ -30,8 +44,10 @@ import {
   useState,
 } from "react"
 import { flushSync } from "react-dom"
+import { createPopupParts } from "../combobox/popup-parts"
 import { useFieldControl } from "../field/field"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
+import { createListboxParts, type ListboxHost } from "../listbox/parts"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -46,8 +62,28 @@ export interface TagsInputChangeDetails {
   readonly reason: string
 }
 
+/** One suggestion of a data-driven Tags Input: choosing it creates the tag `key`. */
+export interface TagsInputItemData {
+  readonly key: string
+  readonly label: string
+  readonly disabled?: boolean
+  readonly section?: { readonly key: string; readonly label: string }
+}
+
+const fromData = (items: readonly TagsInputItemData[]) =>
+  createListCollection({
+    items,
+    getKey: (i) => i.key,
+    getText: (i) => i.label,
+    isDisabled: (i) => i.disabled === true,
+    getSection: (i) => i.section,
+  })
+const NO_ITEMS = fromData([])
+
 export interface TagsInputRootProps {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
+  /** The Tags Input parts (Root renders no element). */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -75,22 +111,43 @@ export interface TagsInputRootProps {
   readonly required?: boolean
   readonly name?: string
   readonly inputName?: string
+  /** The id of the form the submitted tags (and the named text input) belong to. */
   readonly form?: string
   readonly messages?: Partial<TagsInputMessages>
+  /** Suggestions: the input becomes a combobox; choosing one creates a tag from its key. */
+  readonly items?: readonly TagsInputItemData[]
+  /** Suggestions built by the consumer (virtualized or async lists). */
+  readonly collection?: Collection<unknown>
+  /** The suggestion matcher; `null` lists them unfiltered (consumer or server filtering). */
+  readonly filter?: ComboboxFilter
+  /** The draft the given suggestions answer (async): another draft's are stale. */
+  readonly itemsQuery?: string
+  readonly loading?: LoadingStatus
+  readonly onLoadMore?: () => void
+  /** Choosing a suggestion closes the popup (default false). */
+  readonly closeOnSelect?: boolean
+  /** With suggestions, typed text may become a tag (default true). */
+  readonly allowCustom?: boolean
+  readonly autoHighlight?: boolean
+  readonly typingPause?: number
+  readonly positioning?: PositioningProps
+  readonly keepMounted?: boolean
 }
 
-interface Host {
+interface Host extends ListboxHost {
   readonly api: TagsInputApi
   readonly chips: readonly ChipData[]
   readonly editingKey: string | null
-  readonly service: Parameters<typeof useSelector>[0]
-  readonly mount: (on: boolean) => void
   readonly setDisabled: (key: string, on: boolean) => void
   readonly formInput: FormInputCapability
   readonly constraint: RefObject<HTMLInputElement | null>
   readonly pending: RefObject<boolean>
   readonly tags: readonly string[]
   readonly reset: () => void
+  readonly open: boolean
+  readonly keepMounted: boolean
+  readonly setPresent: (present: boolean) => void
+  readonly topLayer: boolean
 }
 
 const HostContext = createContext<Host | null>(null)
@@ -117,11 +174,13 @@ const reasonOf = (type: string, delimiter: boolean) =>
     "COMPOSITION.END": delimiter ? "delimiter" : "input-change",
     "CHIP.TYPE": "input-change",
     ADD: "add",
+    "ITEM.CHOOSE": "item-press",
   })[type] ?? type.toLowerCase()
 
 function Root(all: TagsInputRootProps) {
   const { id, children } = all
-  const env = useEnvironment()
+  const base = useEnvironment()
+  const env = useMemo(() => ({ ...base, position: domPositioning(base) }), [base])
   const instance = useRootId(id)
   const binding = useFieldControl()
   const fieldsetDisabled = useFieldsetDisabled()
@@ -156,7 +215,49 @@ function Root(all: TagsInputRootProps) {
         return next
       }),
   )
-  const [labelMounted, setLabelMounted] = useState(false)
+  const [mounted, setMounted] = useState<{
+    label: boolean
+    empty: boolean
+    descriptions: ReadonlySet<CollectionKey>
+  }>({ label: false, empty: false, descriptions: new Set() })
+  const [mount] = useState(
+    () => (part: "label" | "empty", on: boolean) =>
+      setMounted((m) => (m[part] === on ? m : { ...m, [part]: on })),
+  )
+  const [mountDescription] = useState(
+    () => (key: CollectionKey, on: boolean) =>
+      setMounted((m) => {
+        if (m.descriptions.has(key) === on) return m
+        const next = new Set(m.descriptions)
+        if (on) next.add(key)
+        else next.delete(key)
+        return { ...m, descriptions: next }
+      }),
+  )
+  // Suggestions: every option, and the listed ones (the draft's, without the chosen tags).
+  const data = useMemo(() => (all.items ? fromData(all.items) : null), [all.items])
+  const full = all.collection ?? data
+  const svc = useRef<{ view(): { state: string; values: Record<string, unknown> } } | null>(null)
+  const snapView = svc.current?.view()
+  const query = (snapView?.values["inputValue"] as string | undefined) ?? ""
+  const chosen = (snapView?.values["value"] as readonly string[] | undefined) ?? []
+  const openNow = snapView?.state === "suggesting"
+  const live = useMemo(
+    () =>
+      full
+        ? tagSuggestions(
+            patternResults(full, query, all.filter, locale),
+            chosen,
+            all.allowDuplicates === true,
+          )
+        : NO_ITEMS,
+    [full, query, all.filter, locale, chosen, all.allowDuplicates],
+  )
+  // While closing, the listed options are those of the moment it started closing.
+  const frozen = useRef(live)
+  if (openNow) frozen.current = live
+  const results = openNow || !full ? live : frozen.current
+  const stale = isStale({ itemsQuery: all.itemsQuery, query })
   const props = {
     ...("value" in all ? { value: all.value ?? [] } : {}),
     defaultValue: all.defaultValue ?? [],
@@ -179,6 +280,19 @@ function Root(all: TagsInputRootProps) {
     readOnly,
     locale,
     messages,
+    items: full ?? undefined,
+    collection: results,
+    ids,
+    strategy: "active-descendant",
+    root: instance,
+    closeOnSelect: all.closeOnSelect,
+    allowCustom: all.allowCustom,
+    autoHighlight: all.autoHighlight,
+    typingPause: all.typingPause,
+    positioning: all.positioning,
+    loading: all.loading,
+    onLoadMore: all.onLoadMore,
+    stale,
     onValueChange: (v: readonly string[], d: { event: { type: string } }) => {
       pending.current = true
       binding?.report({ type: "change", value: v, user: true, composing: false })
@@ -189,7 +303,16 @@ function Root(all: TagsInputRootProps) {
       latest.current.onInputValueChange?.(t, { reason: reasonOf(d.event.type, false) }),
   }
   const { service } = useMachine(tagsInputMachine, props as never, env as never)
+  svc.current = service as never
   const view = service.view()
+  const open = view.state === "suggesting"
+  const [present, setPresent] = useState(false)
+  // Known after mount: the server render and hydration never carry `popover`.
+  const [topLayer, setTopLayer] = useState(false)
+  useEffect(() => {
+    setTopLayer(typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype)
+  }, [])
+  const exposure = { open, results, query, itemsQuery: all.itemsQuery, loading: all.loading }
   const tags = view.values.value as readonly string[]
   const chips = tagChips({ ...props, disabled, readOnly }, tags)
   const register = binding?.register
@@ -228,7 +351,7 @@ function Root(all: TagsInputRootProps) {
   const api = tagsInputConnect(
     {
       instance,
-      state: view.state as "idle" | "typing" | "editing",
+      state: view.state as "idle" | "typing" | "suggesting" | "editing",
       context: view.context,
       tags,
       chips,
@@ -246,7 +369,18 @@ function Root(all: TagsInputRootProps) {
       dir: env.locale.dir(),
       locale,
       messages,
-      mounted: { label: labelMounted },
+      mounted: {
+        label: mounted.label,
+        empty: mounted.empty,
+        description: (key) => mounted.descriptions.has(key),
+      },
+      suggestions: full !== null,
+      results,
+      exposed: isExposed(exposure),
+      empty: isEmptyState(exposure),
+      present: present || open,
+      loading: all.loading,
+      topLayer,
       name: field.name,
       inputName: all.inputName,
       form: all.form,
@@ -257,12 +391,43 @@ function Root(all: TagsInputRootProps) {
     },
     env,
   )
+  const loadedFor = useRef<Collection<unknown> | null>(null)
   const host: Host = {
+    name: "TagsInput",
+    // Sound: the tags-input api has every listbox part the shared React parts call.
+    parts: { ...api, isEmpty: isEmptyState(exposure) } as unknown as ListboxHost["parts"],
+    collection: results,
+    registry: null,
+    listed: (key: CollectionKey) => results.has(key),
+    mountDescription,
+    requestLoadMore: () => {
+      if ((all.loading ?? "idle") !== "idle" || loadedFor.current === full) return
+      loadedFor.current = full
+      all.onLoadMore?.()
+    },
+    itemSignature: (raw, key) => {
+      // Sound: this host's service is the tags-input machine's.
+      const v = raw as ReturnType<typeof service.view>
+      const c = v.context
+      const highlighted = c.highlightedKey === key
+      return [
+        highlighted,
+        highlighted ? c.highlightSource : null,
+        v.state === "suggesting",
+        results.has(key),
+        results.get(key)?.setIndex,
+        results.size,
+      ].join("|")
+    },
+    open,
+    keepMounted: all.keepMounted === true,
+    setPresent,
+    topLayer,
     api,
     chips,
     editingKey: view.state === "editing" ? view.context.editingKey : null,
     service: service as never,
-    mount: setLabelMounted,
+    mount,
     setDisabled,
     formInput,
     constraint,
@@ -274,6 +439,7 @@ function Root(all: TagsInputRootProps) {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -287,8 +453,8 @@ function Label({ render, ...rest }: Own<"label">) {
   const host = useLive("Label")
   const { mount } = host
   useIsoLayoutEffect(() => {
-    mount(true)
-    return () => mount(false)
+    mount("label", true)
+    return () => mount("label", false)
   }, [mount])
   return renderPart("label", mergeProps(normalizeProps(host.api.label()), rest), render, undefined)
 }
@@ -374,7 +540,14 @@ const useChip = (part: string) => {
   return chip
 }
 
-function Chip({ render, disabled, ...rest }: Own<"span"> & { readonly disabled?: boolean }) {
+function Chip({
+  render,
+  disabled,
+  ...rest
+}: Own<"span"> & {
+  /** Locks this tag: it cannot be edited or removed, and clearing keeps it. */
+  readonly disabled?: boolean
+}) {
   const host = useLive("Chip")
   const chip = useChip("Chip")
   const { setDisabled } = host
@@ -441,6 +614,9 @@ function ClearTrigger({ render, ...rest }: Own<"button">) {
   )
 }
 
+const list = createListboxParts(useHost)
+const popup = createPopupParts(useLive)
+
 export const TagsInput = {
   Root,
   Label,
@@ -452,4 +628,13 @@ export const TagsInput = {
   ChipRemove,
   Input,
   ClearTrigger,
+  Positioner: popup.Positioner,
+  Popup: popup.Popup,
+  List: list.List,
+  Item: list.Item,
+  ItemText: list.ItemText,
+  Group: list.Section,
+  Separator: list.Separator,
+  Empty: list.Empty,
+  Items: list.Items,
 }

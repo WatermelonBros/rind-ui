@@ -89,7 +89,9 @@ export interface SelectActions {
 }
 
 type Common = {
+  /** The base the parts' ids derive from. Default: generated. */
   readonly id?: string
+  /** The select's parts (Label, Trigger, Positioner, …). */
   readonly children?: ReactNode
   /** Data items: the value text needs no option mounted (a closed select mounts none). */
   readonly items?: readonly ListboxItemData[]
@@ -101,6 +103,7 @@ type Common = {
   /** Default true. */
   readonly modal?: boolean
   readonly disabled?: boolean
+  /** A disabled trigger stays focusable (`aria-disabled`), and disabled options stay navigable. */
   readonly focusableWhenDisabled?: boolean
   readonly readOnly?: boolean
   readonly required?: boolean
@@ -116,6 +119,7 @@ type Common = {
   readonly positioning?: Parameters<typeof selectPositioning>[0]["positioning"]
   /** Positioner and content stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
+  /** Receives `open()` and `close()` to drive the select imperatively. */
   readonly actionsRef?: Ref<SelectActions>
 }
 
@@ -461,6 +465,7 @@ function HiddenInputs({
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements, S = undefined> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<S>
 }
 

@@ -22,6 +22,14 @@ export const fieldMeta = {
   scope: "field",
   name: "Field",
   stateless: false,
+  // Building blocks for components that host a Field (Text Field, Date Field), not parts.
+  notParts: [
+    "FieldControlBoundary",
+    "FieldHost",
+    "HostDescription",
+    "HostErrorMessage",
+    "HostLabel",
+  ],
   parts: [
     {
       name: "Field.Root",
@@ -103,7 +111,7 @@ export const fieldMeta = {
       type: "{ errorAnnouncement?, invalid?, valueMissing?, … }",
       description: "Announcement and per-constraint messages.",
     },
-    match: {
+    "*.match": {
       type: "ValidityKey",
       description: "On ErrorMessage: rendered only when this key is the cause.",
     },

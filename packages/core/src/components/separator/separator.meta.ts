@@ -7,6 +7,7 @@ export const separatorMeta = {
   scope: "separator",
   name: "Separator",
   stateless: true,
+  notParts: ["SeparatorHostContext"],
   parts: [
     {
       name: "Separator.Root",
@@ -27,7 +28,7 @@ export const separatorMeta = {
       default: "false",
       description: 'Purely visual: `role="none"`, removed from the accessibility tree.',
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description: "Another element, for example `<hr />` (rendered without children).",
     },

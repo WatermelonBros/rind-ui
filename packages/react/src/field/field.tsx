@@ -66,7 +66,12 @@ const EmbeddedContext = createContext(false)
  * not register with the enclosing Field, do not become a Field themselves and get no Field
  * wiring (design request "Embedded Controls" to field-control).
  */
-export function FieldControlBoundary({ children }: { readonly children?: ReactNode }) {
+export function FieldControlBoundary({
+  children,
+}: {
+  /** The subtree whose form controls stay out of the enclosing Field. */
+  readonly children?: ReactNode
+}) {
   return (
     <FieldControlContext value={null}>
       <EmbeddedContext value>{children}</EmbeddedContext>
@@ -125,6 +130,7 @@ export interface FieldState {
 }
 
 export type FieldRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The form control and the Field's parts. */
   readonly children?: ReactNode
   readonly name?: string
   readonly disabled?: boolean
@@ -146,6 +152,7 @@ export type FieldRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   /** "both" adds `aria-errormessage` to `aria-describedby`. */
   readonly errorMessageAttribute?: "describedby" | "both"
   readonly messages?: MessageOverrides<FieldMessages>
+  /** Another element or a render function receiving the props and the Field's state. */
   readonly render?: RenderProp<FieldState>
   /**
    * For Field hosts (Text Field, …): the scope the Field's parts carry, so a host's Label
@@ -471,6 +478,7 @@ function useFieldListeners(
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the Field's state. */
   readonly render?: RenderProp<FieldState>
 }
 

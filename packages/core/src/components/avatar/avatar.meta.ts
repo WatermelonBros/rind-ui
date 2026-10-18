@@ -62,15 +62,15 @@ export const avatarMeta = {
       type: "(status, { reason, event }) => void",
       description: "Root: called on every status change (observed, not controlled).",
     },
-    count: {
+    "*.count": {
       type: "number",
       description: "GroupOverflow: how many avatars are not shown.",
     },
-    messages: {
+    "*.messages": {
       type: "{ overflowLabel?: (count) => string }",
       description: 'Root and GroupOverflow: the overflow label (default "N more").',
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         "Substitutes the rendered element; on Image, a framework image component receives the ref, `alt`, `hidden`, `data-*` and the load handlers.",
