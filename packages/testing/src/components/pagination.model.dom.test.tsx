@@ -6,8 +6,8 @@ import { type PaginationMachineProps, paginationArgs, paginationContract } from 
 import { Pagination, type PaginationRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { describe, expect, it } from "vitest"
-import { type ConsumerInvariant, domEnv, testMachine } from "../index"
+import { beforeEach, describe, expect, it } from "vitest"
+import { allowRindWarning, type ConsumerInvariant, domEnv, testMachine } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -81,6 +81,12 @@ const base: PaginationMachineProps = {
   boundaryCount: undefined,
   disabled: undefined,
 }
+
+// The model's $props steps switch pageSize between controlled and uncontrolled on purpose.
+beforeEach(() => {
+  allowRindWarning(/pagination: "pageSize" changed between controlled and uncontrolled/)
+  allowRindWarning(/pagination: pageSize is controlled without onPageSizeChange/)
+})
 
 function model(name: string, totalPages: number, start: PaginationMachineProps, extra: Extra = {}) {
   describe(`pagination model: ${name}`, () => {

@@ -141,4 +141,4 @@ export {
 } from "./text-field-key-invariants"
 export { type VirtualClock, virtualClock } from "./virtual-clock"
 export { liveAnnouncements, spokenLog } from "./virtual-sr"
-export { expectRindWarning } from "./warning-guard"
+export { allowRindWarning, expectRindWarning } from "./warning-guard"

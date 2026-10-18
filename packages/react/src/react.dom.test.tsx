@@ -87,12 +87,14 @@ interface RootProps {
   readonly on?: boolean
   readonly onOnChange?: (on: boolean) => void
   readonly id?: string
+  /** Parts related to before they render (the expected-parts tests pass ["title"]). */
+  readonly expected?: readonly Part[]
   readonly children: ReactNode
 }
-function Root({ defaultOn, on, onOnChange, id, children }: RootProps) {
+function Root({ defaultOn, on, onOnChange, id, expected = [], children }: RootProps) {
   const root = useRootId(id)
-  // The title is expected: relations to it render on the server even when it comes later.
-  const registry = usePartRegistry<Part>({ scope: "toggle", root, expected: ["title"] })
+  // An expected part: relations to it render on the server even when it comes later.
+  const registry = usePartRegistry<Part>({ scope: "toggle", root, expected })
   const { service } = useMachine(toggle, { defaultOn, on, onOnChange }, domEnvironment())
   // A stable context value: parts re-render through their selectors, not through context.
   const value = useMemo(() => ({ service, root, registry }), [service, root, registry])
@@ -202,7 +204,7 @@ describe("binding a service", () => {
   it("server render and hydration match, with items and relations in the server HTML", async () => {
     log.length = 0
     const ui = (
-      <Root defaultOn>
+      <Root defaultOn expected={["title"]}>
         <Title>Mute</Title>
         <Button>x</Button>
         <ul>
@@ -603,7 +605,7 @@ describe("instance scoping", () => {
 describe("expected parts (7.3)", () => {
   it("server HTML relates to an expected part rendered after the referencing one", async () => {
     const ui = (
-      <Root id="ssr">
+      <Root id="ssr" expected={["title"]}>
         <Button>x</Button>
         <Title>Mute</Title>
       </Root>
@@ -632,7 +634,7 @@ describe("expected parts (7.3)", () => {
       throw never
     }
     render(
-      <Root id="susp">
+      <Root id="susp" expected={["title"]}>
         <Suspense fallback={null}>
           <Title>T</Title>
           <Suspends />
@@ -648,7 +650,7 @@ describe("expected parts (7.3)", () => {
   it("an omitted expected part: no relation after commit, and a warning naming it", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
-      <Root id="omit">
+      <Root id="omit" expected={["title"]}>
         <Button>x</Button>
       </Root>,
     )

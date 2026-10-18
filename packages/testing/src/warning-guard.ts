@@ -9,11 +9,12 @@ const KEY = Symbol.for("rind-ui.warning-guard")
 interface GuardState {
   seen: string[]
   expected: RegExp[]
+  allowed: RegExp[]
 }
 
 function state(): GuardState {
   const g = globalThis as unknown as Record<symbol, GuardState | undefined>
-  g[KEY] ??= { seen: [], expected: [] }
+  g[KEY] ??= { seen: [], expected: [], allowed: [] }
   return g[KEY]
 }
 
@@ -23,6 +24,14 @@ function state(): GuardState {
  */
 export function expectRindWarning(pattern: RegExp): void {
   state().expected.push(pattern)
+}
+
+/**
+ * Lets the current test log a `[rind-ui]` message matching `pattern` without requiring it: for
+ * a file whose shared fixture logs it in some tests (call it in `beforeEach`).
+ */
+export function allowRindWarning(pattern: RegExp): void {
+  state().allowed.push(pattern)
 }
 
 /** Wraps `console.warn` and `console.error` once; every call still reaches the original. */
@@ -44,9 +53,10 @@ export function installWarningGuard(): void {
 /** What the current test logged against what it expected; resets for the next test. */
 export function takeWarningGuard(): { unexpected: string[]; missing: RegExp[] } {
   const s = state()
-  const unexpected = s.seen.filter((m) => !s.expected.some((p) => p.test(m)))
+  const unexpected = s.seen.filter((m) => ![...s.expected, ...s.allowed].some((p) => p.test(m)))
   const missing = s.expected.filter((p) => !s.seen.some((m) => p.test(m)))
   s.seen = []
   s.expected = []
+  s.allowed = []
   return { unexpected, missing }
 }
