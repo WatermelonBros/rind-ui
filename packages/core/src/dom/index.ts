@@ -35,14 +35,10 @@ export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
 export {
   dragHasFiles,
   dragLeftRoot,
-  type FileLimits,
-  type FileRejection,
-  type FileRejectionReason,
   filesFromClipboard,
   filesFromDrop,
-  matchesAccept,
+  replaceText,
   syncFileInput,
-  validateFiles,
 } from "./file-intake"
 export { focusPast } from "./focus-past"
 export { captureFocus, type FocusReturn } from "./focus-restore"
@@ -128,7 +124,7 @@ export {
 } from "./live-announcer"
 export { describedByHint, longPressMessages } from "./long-press"
 export { modalityTracker } from "./modality"
-export { motionPreference } from "./motion"
+export { motionPreference, pointerPreference } from "./motion"
 export { type NonModalTabOrderOptions, trackNonModalTabOrder } from "./non-modal-tab-order"
 export { type OverlayEffectOptions, overlayEffect } from "./overlay"
 export { warnDuplicateLandmark } from "./pagination-landmark"

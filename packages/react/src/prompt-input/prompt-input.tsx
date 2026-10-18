@@ -1,39 +1,50 @@
-// Prompt Input (prompt-input spec): Root owns the machine and renders the form, the hidden
-// file inputs and the attachments summary; every other part is wiring.
+// Prompt Input (prompt-input spec): Root owns the machine and renders the form, a Field
+// (standalone, or joined to an enclosing one), the hidden file inputs and the attachments
+// summary; every other part is wiring. Derived state and keys live in core's connect.
 
 import {
   autosize as attachAutosize,
-  attachmentChips,
-  type Chip as ChipData,
-  defaultCount,
+  type FieldMessages,
   type FileRejection,
-  isOverLimit,
-  isSubmittable,
+  focusSafely,
+  type MessageOverrides,
+  mergeFieldProps,
   type PromptAttachment,
+  type PromptAttachmentsReason,
   type PromptInputApi,
   type PromptInputMessages,
+  type PromptInputState,
   type PromptInputStatus,
   type PromptMessage,
   type PromptSubmitDetails,
   type PromptSubmitKey,
+  type PromptValueReason,
+  promptAttachmentsReason,
   promptInputConnect,
   promptInputIds,
   promptInputMachine,
   promptInputMessages,
+  promptValueReason,
+  replaceText,
   syncFileInput,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
   createContext,
   type ReactNode,
+  type RefObject,
   useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react"
-import { mergeProps } from "../merge-props"
+import { useFieldBindingPeek, useFieldControl } from "../field/field"
+import { FieldHost, HostDescription, HostErrorMessage, HostLabel } from "../field/use-field-host"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
+import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { type RenderProp, renderPart } from "../render"
@@ -45,38 +56,15 @@ declare const process: { env: { NODE_ENV?: string } }
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
-/** Why the draft changed. */
-export type PromptValueReason = "input" | "submit" | "restore" | "history" | "api"
-/** Why the attachments changed. */
-export type PromptAttachmentsReason = "add" | "remove" | "submit" | "restore"
-
-const valueReason = (type: string): PromptValueReason =>
-  type === "SUBMIT"
-    ? "submit"
-    : type === "SETTLED" || type === "STATUS"
-      ? "restore"
-      : type === "RECALL"
-        ? "history"
-        : type === "SET.VALUE"
-          ? "api"
-          : "input"
-const attachmentsReason = (type: string): PromptAttachmentsReason =>
-  type === "FILES.ADD"
-    ? "add"
-    : type === "SUBMIT"
-      ? "submit"
-      : type === "SETTLED" || type === "STATUS"
-        ? "restore"
-        : "remove"
-
 export interface PromptInputRootProps
   extends Omit<ComponentPropsWithRef<"form">, "onSubmit" | "defaultValue" | "children"> {
+  /** The parts. */
   readonly children?: ReactNode
   /** Substitutes the `<form>` element. */
   readonly render?: RenderProp<undefined>
-  /** The draft (controlled). */
+  /** The draft (controlled). The machine's own writes are then plain proposals. */
   readonly value?: string
-  /** The initial draft (uncontrolled). Default `""`. */
+  /** The initial draft (uncontrolled: the Textarea owns its value, writes are undoable). */
   readonly defaultValue?: string
   /** Every draft change: typing, the clear on send, a restore after a failure, a recall. */
   readonly onValueChange?: (value: string, details: { readonly reason: PromptValueReason }) => void
@@ -92,12 +80,13 @@ export interface PromptInputRootProps
   /**
    * Sends the prompt: called once per send with the draft and attachments as they were; both
    * clear at once. Return a promise to stay `submitting` until it settles; a rejection
-   * restores the prompt into an empty draft.
+   * restores the prompt into an empty draft. A synchronous throw fails the send and is
+   * rethrown to whatever submitted.
    */
   readonly onSubmit?: (message: PromptMessage, details: PromptSubmitDetails) => unknown
   /**
    * Your request's progress: `submitting` and `streaming` turn Submit into Stop, `idle` ends
-   * it, `error` fails the send. Pass it when your chat state reports a status.
+   * it, `error` fails the send.
    */
   readonly status?: PromptInputStatus
   /** Submit was pressed while a reply is on its way. */
@@ -106,8 +95,8 @@ export interface PromptInputRootProps
   readonly onReject?: (rejections: readonly FileRejection[]) => void
   /**
    * What sends from the Textarea: `"enter"` (Shift+Enter is a newline), `"mod+enter"`, or
-   * `"none"` (only Submit). Mod+Enter always sends; on phones and tablets Enter is a
-   * newline. Default `"enter"`.
+   * `"none"` (only Submit). Mod+Enter always sends; with a coarse primary pointer (phones,
+   * tablets) Enter is a newline. Default `"enter"`.
    */
   readonly submitKey?: PromptSubmitKey
   /** Past prompts, newest last: ArrowUp in an empty draft recalls them. */
@@ -128,21 +117,14 @@ export interface PromptInputRootProps
   readonly disabled?: boolean
   /** No typing and no files; the draft can still be sent. */
   readonly readOnly?: boolean
+  /** The Field is invalid (also while over a CharacterCount's max). */
+  readonly invalid?: boolean
+  /** The Field's error messages (PromptInput.ErrorMessage shows them). */
+  readonly errors?: readonly string[]
   /** Replaces any string that reaches assistive technology. */
   readonly messages?: Partial<PromptInputMessages>
-}
-
-interface Host {
-  readonly api: PromptInputApi
-  readonly chips: readonly ChipData[]
-  readonly value: string
-  readonly state: string
-  readonly attachments: readonly PromptAttachment[]
-  readonly control: PromptInputControl
-  readonly setCount: (c: CountState | null) => void
-  readonly count: { readonly used: number; readonly limit: number | undefined } | null
-  readonly mount: (part: "label" | "description", on: boolean) => void
-  readonly labelled: boolean
+  /** Replaces the Field's own strings. */
+  readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
 
 interface CountState {
@@ -152,17 +134,19 @@ interface CountState {
 
 /** What `usePromptInput()` returns: the state and the actions a suggestion or a menu uses. */
 export interface PromptInputControl {
-  /** `idle`, `composing`, `submitting`, `streaming` or `stopped`. */
-  readonly state: string
+  /** The machine state. */
+  readonly state: PromptInputState
+  /** The draft. */
   readonly value: string
+  /** The attachments. */
   readonly attachments: readonly PromptAttachment[]
   /** Sends the draft, through the same checks as Enter. */
   submit(): void
   /** Stops the reply (as Submit does while busy). */
   stop(): void
-  /** Replaces the draft (reason `api`). */
+  /** Replaces the draft (reason `api`); ignored while an IME composition is open. */
   setValue(value: string): void
-  /** Inserts text at the caret (or replaces the selection). */
+  /** Inserts text at the caret (or over the selection); ignored while composing. */
   insertText(text: string): void
   /** Focuses the Textarea. */
   focus(): void
@@ -170,6 +154,25 @@ export interface PromptInputControl {
   openFilePicker(): void
   /** Adds files, through the same checks as a drop. */
   addFiles(files: readonly File[]): void
+}
+
+interface Host {
+  readonly api: PromptInputApi
+  readonly ids: ReturnType<typeof promptInputIds>
+  readonly value: string
+  readonly controlled: boolean
+  readonly defaultValue: string
+  readonly attachments: readonly PromptAttachment[]
+  readonly disabled: boolean
+  readonly readOnly: boolean
+  readonly name: string
+  readonly control: PromptInputControl
+  readonly setCount: (c: CountState | null) => void
+  readonly count: { readonly used: number; readonly max: number | undefined } | null
+  readonly setTextareaId: (id: string) => void
+  readonly textarea: RefObject<HTMLTextAreaElement | null>
+  readonly mounted: RefObject<{ textareas: number; submits: number }>
+  readonly takeReason: () => PromptValueReason | undefined
 }
 
 const HostContext = createContext<Host | null>(null)
@@ -185,6 +188,7 @@ export function usePromptInput(): PromptInputControl {
 }
 
 const EMPTY: readonly PromptAttachment[] = []
+const noSubscription = () => () => {}
 
 function Root(all: PromptInputRootProps) {
   const {
@@ -192,7 +196,7 @@ function Root(all: PromptInputRootProps) {
     children,
     render,
     value: _value,
-    defaultValue,
+    defaultValue = "",
     onValueChange: _onValueChange,
     attachments: _attachments,
     defaultAttachments,
@@ -209,27 +213,36 @@ function Root(all: PromptInputRootProps) {
     maxFileSize,
     name = "message",
     filesName = "files",
-    disabled = false,
-    readOnly = false,
+    disabled: ownDisabled = false,
+    readOnly: ownReadOnly = false,
+    invalid,
+    errors,
     messages: overrides,
+    fieldMessages,
     ...form
   } = all
   const env = useEnvironment()
   const instance = useRootId(id)
   const ids = useMemo(() => promptInputIds(instance), [instance])
+  const enclosing = useFieldBindingPeek()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const disabled = ownDisabled || enclosing?.state.disabled === true || fieldsetDisabled
+  const readOnly = ownReadOnly || enclosing?.state.readOnly === true
   const locale = env.locale.locale()
   const messages = useMemo(() => ({ ...promptInputMessages, ...overrides }), [overrides])
   const latest = useRef(all)
   latest.current = all
+  const controlled = all.value !== undefined
   const [countState, setCount] = useState<CountState | null>(null)
-  const [mounted, setMounted] = useState({ label: false, description: false })
-  const [mount] = useState(
-    () => (part: "label" | "description", on: boolean) =>
-      setMounted((m) => (m[part] === on ? m : { ...m, [part]: on })),
-  )
+  const [textareaId, setTextareaId] = useState(ids.textarea)
+  const [focusedButton, setFocusedButton] = useState<"submit" | "attach-trigger" | null>(null)
+  const textarea = useRef<HTMLTextAreaElement | null>(null)
+  const mounted = useRef({ textareas: 0, submits: 0 })
+  const reason = useRef<PromptValueReason | undefined>(undefined)
+  const thrown = useRef<{ readonly error: unknown } | null>(null)
   const props = {
-    ...("value" in all ? { value: all.value ?? "" } : {}),
-    defaultValue: defaultValue ?? "",
+    ...(controlled ? { value: all.value ?? "" } : {}),
+    defaultValue,
     ...("attachments" in all ? { attachments: all.attachments ?? EMPTY } : {}),
     defaultAttachments: defaultAttachments ?? EMPTY,
     status,
@@ -247,55 +260,58 @@ function Root(all: PromptInputRootProps) {
     onSubmit: (m: PromptMessage, d: PromptSubmitDetails) => latest.current.onSubmit?.(m, d),
     onStop: () => latest.current.onStop?.(),
     onReject: (r: readonly FileRejection[]) => latest.current.onReject?.(r),
+    onThrow: (error: unknown) => {
+      thrown.current = { error }
+    },
+    // Uncontrolled: an undoable edit of the Textarea; its `input` event brings the value back.
+    writeDraft: controlled
+      ? undefined
+      : (text: string, why: PromptValueReason) => {
+          const el = textarea.current
+          if (!el) return false
+          reason.current = why
+          try {
+            return replaceText(el, text)
+          } finally {
+            reason.current = undefined
+          }
+        },
     onValueChange: (v: string, d: { event: { type: string } }) =>
-      latest.current.onValueChange?.(v, { reason: valueReason(d.event.type) }),
+      latest.current.onValueChange?.(v, { reason: promptValueReason(d.event) }),
     onAttachmentsChange: (v: readonly PromptAttachment[], d: { event: { type: string } }) =>
-      latest.current.onAttachmentsChange?.(v, { reason: attachmentsReason(d.event.type) }),
+      latest.current.onAttachmentsChange?.(v, { reason: promptAttachmentsReason(d.event) }),
   }
+  // Sound: `props` is the machine's props (the React-only ones are split off above).
   const { service } = useMachine(promptInputMachine, props as never, env as never)
   const view = service.view()
   const value = (view.values.value as string | undefined) ?? ""
   const attachments = (view.values.attachments as readonly PromptAttachment[] | undefined) ?? EMPTY
   const context = view.context
-  const chips = attachmentChips(attachments, disabled || readOnly)
-  const [focusedButton, setFocusedButton] = useState<"submit" | "attach-trigger" | null>(null)
   // The modality tracker must see the pointerdown that comes before a focus.
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const modality = useModality(env.modality, context.focused || focusedButton !== null)
-  // platform-convention: on phones and tablets Enter is a newline (the on-screen keyboard)
-  const touch = env.platform.ios || env.platform.android
-  const count = countState
-    ? { used: (countState.count ?? defaultCount)(value), limit: countState.max }
-    : null
-  const historyList = history ?? []
-  const at = context.historyIndex
+  // Server and hydration: a fine pointer; the client's own after hydration.
+  const touchPrimary = useSyncExternalStore(
+    env.pointer?.subscribeCoarse ?? noSubscription,
+    () => env.pointer?.coarse() ?? false,
+    () => false,
+  )
   const api = promptInputConnect(
     {
       instance,
-      state: view.state as never,
+      state: view.state as PromptInputState,
       context,
       value,
       attachments,
-      chips,
-      disabled,
-      readOnly,
-      submittable: isSubmittable(props as never, value, attachments, context.composing),
-      overLimit: isOverLimit(props, value),
+      props: { disabled, readOnly, history, limit: countState?.max, count: countState?.count },
       submitKey,
-      enterSubmits: submitKey === "enter" && !touch,
-      recall: {
-        older:
-          historyList.length > 0 &&
-          (at === null ? value === "" : at > 0 && historyList[at] === value),
-        newer: at !== null,
-        browsing: at !== null && historyList[at] === value,
-      },
+      touchPrimary,
       accept,
       multiple,
       name,
       filesName,
-      count,
-      mounted,
+      textareaId,
+      countMounted: countState !== null,
       modality,
       dir: env.locale.dir(),
       locale,
@@ -303,6 +319,12 @@ function Root(all: PromptInputRootProps) {
       focusedButton,
       setFocusedButton,
       nativeAction: form.action !== undefined,
+      takeThrown: () => {
+        const t = thrown.current
+        thrown.current = null
+        return t
+      },
+      takeReason: () => reason.current,
       send: service.send,
     },
     env,
@@ -314,39 +336,33 @@ function Root(all: PromptInputRootProps) {
     const files = attachments.flatMap((a) => (a.file ? [a.file] : []))
     if (files.length > 0 || (el.files?.length ?? 0) > 0) syncFileInput(el, files)
   }, [attachments, env, ids.files])
-  const focusTextarea = () => (env.dom.getById(ids.textarea) as HTMLElement | null)?.focus()
-  const control: PromptInputControl = {
-    state: view.state,
-    value,
-    attachments,
-    submit: api.requestSubmit,
-    stop: () => service.send({ type: "STOP", clickCount: 0 }),
-    setValue: (v) => service.send({ type: "SET.VALUE", value: v }),
-    insertText: (text) => {
-      const el = env.dom.getById(ids.textarea) as HTMLTextAreaElement | null
-      const current = service.view().values.value as string
-      const start = el?.selectionStart ?? current.length
-      const end = el?.selectionEnd ?? start
-      service.send({
-        type: "SET.VALUE",
-        value: current.slice(0, start) + text + current.slice(end),
-      })
-    },
-    focus: focusTextarea,
-    openFilePicker: api.openPicker,
-    addFiles: (files) => service.send({ type: "FILES.ADD", files, via: "api" }),
-  }
+  // Exactly one Textarea and one Submit (development error otherwise).
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return
+    const { textareas, submits } = mounted.current
+    if (textareas !== 1 || submits !== 1) {
+      console.error(
+        `[rind-ui] prompt-input: renders ${textareas} Textarea and ${submits} Submit parts; exactly one of each is required.`,
+      )
+    }
+  }, [])
   const host: Host = {
     api,
-    chips,
+    ids,
     value,
-    state: view.state,
+    controlled,
+    defaultValue,
     attachments,
-    control,
+    disabled,
+    readOnly,
+    name,
+    control: { ...api.control, state: view.state as PromptInputState, value, attachments },
     setCount,
-    count,
-    mount,
-    labelled: mounted.label,
+    count: countState ? { used: api.derived.used, max: countState.max } : null,
+    setTextareaId,
+    textarea,
+    mounted,
+    takeReason: () => reason.current,
   }
   return (
     <HostContext value={host}>
@@ -356,7 +372,18 @@ function Root(all: PromptInputRootProps) {
           ...mergeProps(normalizeProps(api.root()), form),
           children: (
             <>
-              {children}
+              <FieldHost
+                scope="prompt-input"
+                rootPart="field"
+                id={`${instance}-field`}
+                disabled={disabled}
+                readOnly={readOnly}
+                invalid={invalid === true || api.derived.overLimit}
+                {...(errors ? { errors } : {})}
+                {...(fieldMessages ? { messages: fieldMessages } : {})}
+              >
+                {children}
+              </FieldHost>
               <span {...normalizeProps(api.chipsSummary())}>{api.summaryText}</span>
               <input {...normalizeProps(api.picker())} />
               <input {...normalizeProps(api.files())} />
@@ -375,43 +402,58 @@ type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T>
   readonly render?: RenderProp<undefined>
 }
 
-function Label({ render, ...rest }: Own<"label">) {
-  const host = useHost("Label")
-  const { mount } = host
+/** Counts a part for the "exactly one" development check. */
+function useCounted(host: Host, key: "textareas" | "submits") {
+  const { mounted } = host
   useIsoLayoutEffect(() => {
-    mount("label", true)
-    return () => mount("label", false)
-  }, [mount])
-  return renderPart("label", mergeProps(normalizeProps(host.api.label()), rest), render, undefined)
-}
-
-function Description({ render, ...rest }: Own<"p">) {
-  const host = useHost("Description")
-  const { mount } = host
-  useIsoLayoutEffect(() => {
-    mount("description", true)
-    return () => mount("description", false)
-  }, [mount])
-  return renderPart(
-    "p",
-    mergeProps(normalizeProps(host.api.description()), rest),
-    render,
-    undefined,
-  )
+    mounted.current[key] += 1
+    return () => {
+      mounted.current[key] -= 1
+    }
+  }, [mounted, key])
 }
 
 function Textarea({
   render,
   autosize = true,
   ref,
+  id,
   ...rest
-}: Own<"textarea"> & {
+}: Omit<Own<"textarea">, "value" | "defaultValue"> & {
   /** Grows with the content (`field-sizing: content`, a measured fallback). Default `true`. */
   readonly autosize?: boolean
 }) {
   const host = useHost("Textarea")
+  useCounted(host, "textareas")
   const env = useEnvironment()
+  const binding = useFieldControl()
   const el = useRef<HTMLTextAreaElement | null>(null)
+  // The Field's control id first: its Label is `for` it from the first render.
+  const controlId = id ?? binding?.controlId ?? host.ids.textarea
+  const { setTextareaId, textarea } = host
+  useIsoLayoutEffect(() => setTextareaId(controlId), [controlId, setTextareaId])
+  useIsoLayoutEffect(() => {
+    textarea.current = el.current
+    return () => {
+      textarea.current = null
+    }
+  }, [textarea])
+  const register = binding?.register
+  useIsoLayoutEffect(() => {
+    if (!register) return
+    return register(
+      {
+        id: controlId,
+        labelable: true,
+        focus: (modality) => {
+          if (el.current) void focusSafely(el.current, env, "programmatic", modality)
+        },
+        validityElement: () => el.current,
+        value: () => el.current?.value ?? "",
+      },
+      controlId,
+    )
+  }, [register, controlId, env])
   const handle = useRef<ReturnType<typeof attachAutosize> | null>(null)
   useIsoLayoutEffect(() => {
     if (!autosize || !el.current) return
@@ -428,23 +470,61 @@ function Textarea({
     void value
     handle.current?.measure()
   }, [value])
-  const labelled =
-    host.labelled || rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined
+  // Development: the placeholder is never a name. Checked once the Field's Label settled
+  // (its `for` follows the registered control).
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production" && !labelled) {
-      console.warn(
-        "PromptInput.Textarea has no accessible name: render a PromptInput.Label or pass aria-label (a placeholder is not a name).",
-      )
-    }
-  }, [labelled])
-  const setRef = (node: HTMLTextAreaElement | null) => {
-    el.current = node
-    if (typeof ref === "function") ref(node)
-    else if (ref) ref.current = node
-  }
+    if (process.env.NODE_ENV === "production") return
+    const frame = env.scheduler.requestAnimationFrame(() => {
+      const node = el.current
+      if (!node) return
+      const named =
+        (node.labels?.length ?? 0) > 0 ||
+        node.hasAttribute("aria-label") ||
+        node.hasAttribute("aria-labelledby")
+      if (!named) {
+        console.warn(
+          "[rind-ui] prompt-input: the Textarea has no accessible name: render a PromptInput.Label or pass aria-label (a placeholder is not a name).",
+        )
+      }
+    })
+    return () => env.scheduler.cancelAnimationFrame(frame)
+  }, [env])
+  const field = mergeFieldProps(
+    {
+      role: "textbox",
+      labelable: true,
+      disabled: host.disabled,
+      readOnly: host.readOnly,
+      invalid: host.api.derived.overLimit,
+      name: host.name,
+      consumerDescribedBy: rest["aria-describedby"],
+      ariaLabel: rest["aria-label"],
+      ariaLabelledBy: rest["aria-labelledby"],
+    },
+    binding,
+  )
+  const report = binding?.report
   return renderPart(
     "textarea",
-    mergeProps(normalizeProps(host.api.textarea()), { ...rest, ref: setRef }),
+    mergeProps(
+      normalizeProps({
+        ...host.api.textarea(field),
+        ...(host.controlled ? { value: host.value } : { defaultValue: host.defaultValue }),
+      }),
+      {
+        ...rest,
+        "aria-describedby": undefined,
+        ref: composeRefs(el, ref),
+        // The Field validates on the control's changes.
+        onChange: (e: { target: HTMLTextAreaElement; nativeEvent: Event }) =>
+          report?.({
+            type: "change",
+            value: e.target.value,
+            user: true,
+            composing: (e.nativeEvent as InputEvent).isComposing === true,
+          }),
+      },
+    ),
     render,
     undefined,
   )
@@ -452,6 +532,7 @@ function Textarea({
 
 function Submit({ render, children, ...rest }: Own<"button">) {
   const host = useHost("Submit")
+  useCounted(host, "submits")
   return renderPart(
     "button",
     mergeProps(normalizeProps(host.api.submit()), { ...rest, children }),
@@ -471,7 +552,7 @@ function AttachTrigger({ render, ...rest }: Own<"button">) {
 }
 
 const ChipCtx = createContext<{
-  readonly chip: ChipData
+  readonly key: string
   readonly attachment: PromptAttachment
 } | null>(null)
 
@@ -489,22 +570,19 @@ function Attachments({
   return renderPart(
     "div",
     {
-      ...mergeProps(normalizeProps(host.api.chips()), rest),
-      children: host.attachments.map((attachment, i) => {
-        const chip = host.chips[i] as ChipData // same order and length as attachments
-        return (
-          <ChipCtx key={attachment.id} value={{ chip, attachment }}>
-            {children ? (
-              children(attachment)
-            ) : (
-              <Attachment>
-                <AttachmentName />
-                <AttachmentRemove />
-              </Attachment>
-            )}
-          </ChipCtx>
-        )
-      }),
+      ...mergeProps(normalizeProps(host.api.chipsPart()), rest),
+      children: host.attachments.map((attachment) => (
+        <ChipCtx key={attachment.id} value={{ key: attachment.id, attachment }}>
+          {children ? (
+            children(attachment)
+          ) : (
+            <Attachment>
+              <AttachmentName />
+              <AttachmentRemove />
+            </Attachment>
+          )}
+        </ChipCtx>
+      )),
     },
     render,
     undefined,
@@ -519,13 +597,8 @@ const useChip = (part: string) => {
 
 function Attachment({ render, ...rest }: Own<"span">) {
   const host = useHost("Attachment")
-  const { chip } = useChip("Attachment")
-  return renderPart(
-    "span",
-    mergeProps(normalizeProps(host.api.chip(chip.key)), rest),
-    render,
-    undefined,
-  )
+  const { key } = useChip("Attachment")
+  return renderPart("span", mergeProps(normalizeProps(host.api.chip(key)), rest), render, undefined)
 }
 
 function AttachmentName({ render, children, ...rest }: Own<"span">) {
@@ -544,10 +617,10 @@ function AttachmentName({ render, children, ...rest }: Own<"span">) {
 
 function AttachmentRemove({ render, children, ...rest }: Own<"button">) {
   const host = useHost("AttachmentRemove")
-  const { chip } = useChip("AttachmentRemove")
+  const { key } = useChip("AttachmentRemove")
   return renderPart(
     "button",
-    mergeProps(normalizeProps(host.api.chipRemove(chip.key)), {
+    mergeProps(normalizeProps(host.api.chipRemove(key)), {
       ...rest,
       children: children ?? <span aria-hidden="true">×</span>,
     }),
@@ -574,6 +647,7 @@ function CharacterCount({
     setCount({ max, count })
     return () => setCount(null)
   }, [setCount, max, count])
+  // Frozen at the committed draft while a composition is open (core's derivation).
   const used = host.count?.used ?? 0
   return renderPart(
     "span",
@@ -588,8 +662,9 @@ function CharacterCount({
 
 export const PromptInput = {
   Root,
-  Label,
-  Description,
+  Label: HostLabel,
+  Description: HostDescription,
+  ErrorMessage: HostErrorMessage,
   Textarea,
   Submit,
   AttachTrigger,

@@ -11,18 +11,31 @@ announcements for what it changes.
 
 A Prompt Input SHALL consist of a Root (`<form>`) that renders two `hidden`
 `<input type="file">` (the chooser AttachTrigger opens, and the carrier of the attached files),
-an optional Label (`<label for>` the Textarea), an optional Description (in the Textarea's
-`aria-describedby`), exactly one Textarea (`<textarea>`), exactly one Submit (`<button>`), and
-the optional parts AttachTrigger (`<button>`), Attachments, Attachment, AttachmentName and
-AttachmentRemove (the `input-chips` Chips, Chip, chip text and ChipRemove with scope
-`prompt-input`) and CharacterCount (`<span>`). Each part SHALL render one element and accept
-`render` to substitute it.
+exactly one Textarea (`<textarea>`), exactly one Submit (`<button>`), and the optional parts
+Label, Description and ErrorMessage, AttachTrigger (`<button>`), Attachments, Attachment,
+AttachmentName and AttachmentRemove (the `input-chips` Chips, Chip, chip text and ChipRemove
+with scope `prompt-input`) and CharacterCount (`<span>`). Inside the form the Root SHALL act
+as a Field for its Label, Description, ErrorMessage and the Textarea (`use-field-host`, scope
+`prompt-input`, a `field` part), or, inside an enclosing Field, join it (the Textarea is that
+Field's registered control and the Root's own Label, Description and ErrorMessage render
+nothing). Each part SHALL render one element and accept `render` to substitute it.
+Rendering no Textarea, two Textareas, no Submit or two Submits SHALL be a development error.
 
 #### Scenario: Minimal prompt input
 
 - **WHEN** a consumer renders Root, Label "Message", Textarea and Submit
 - **THEN** there is a `form` holding a `textbox` named "Message" and a `button` named "Send
   message"
+
+#### Scenario: Inside a Field
+
+- **WHEN** a Prompt Input is rendered inside a Field with a Label "Question" and a Description
+- **THEN** the Textarea is named "Question" and described by the Field's Description
+
+#### Scenario: A missing Submit
+
+- **WHEN** a Root renders a Label and a Textarea but no Submit
+- **THEN** a development error names "1 Textarea and 0 Submit parts"
 
 #### Scenario: No nested buttons (ibelick/prompt-kit#109)
 
@@ -72,26 +85,45 @@ plain Enter submits and `"enter"` otherwise, unless the consumer sets it.
 
 The draft SHALL be a controllable `value` (`value` / `defaultValue` /
 `onValueChange(value, details)`), where `details.reason` is `input`, `submit` (cleared on
-send), `restore` (put back after a failed send), `history` (recalled) or `api`
-(`usePromptInput().setValue`). `onValueChange` SHALL be called for every `input` event,
-composing or not. The Textarea SHALL render the machine's draft; the component SHALL change
-it only to clear, restore or recall, never while composing.
+send), `restore` (put back after a failed send), `history` (recalled), `api`
+(`usePromptInput().setValue` / `insertText`) or `reset` (a form reset). `onValueChange` SHALL
+be called for every `input` event, composing or not. Uncontrolled, the Textarea SHALL own its
+value (the DOM is the source, read from `input` events and after a form reset); the component
+SHALL write it only to clear, restore, recall or apply the API, never while composing, and
+through an editing command (`insertText`, or `delete` for an empty draft, over the whole text)
+when the Textarea has focus, so the user can undo it where the platform keeps an undo stack;
+otherwise through the native value setter and one `input` event. Controlled, the writes are
+proposals through `onValueChange`.
 
 #### Scenario: Controlled draft
 
 - **WHEN** a controlled Prompt Input holding "hi" is sent
 - **THEN** `onValueChange` is called with `""` and reason `submit`
 
+#### Scenario: Undo a recall
+
+- **WHEN** a user recalls a previous prompt with ArrowUp in an uncontrolled Prompt Input and
+  presses Mod+Z
+- **THEN** the draft is empty again
+
+#### Scenario: Undo a send
+
+- **WHEN** a user sends "hello" with Enter and presses Mod+Z
+- **THEN** the draft is "hello" again
+
 ### Requirement: IME Composition
 
 The machine SHALL enter `composing` on `compositionstart` from `idle` and return to `idle`
 on `compositionend`, on blur, and on an `input` event with `isComposing: false`, so a
-composition that never ends (dead keys) cannot hold the state. In every state the Root and
+composition that never ends (dead keys) cannot hold the state. A `status` change during a
+composition SHALL be handled as in `idle` (it is never lost), and a request that ends during a
+composition SHALL return to `composing`. In every state the Root and
 Textarea SHALL carry `data-composing` while a composition is in progress. Every key that the
 Prompt Input acts on (submit, history, attachment arming and removal, focus moves to the
 attachments) SHALL apply the `keyboard-interactions` IME guard, which marks `isComposing`,
-`keyCode 229` and Safari's committing Enter after `compositionend` as composing. Counting and
-count announcements SHALL wait for the commit.
+`keyCode 229` and Safari's committing Enter after `compositionend` as composing. Counting,
+the over-limit state, `aria-invalid` and count announcements SHALL stay at the draft as it was
+when the composition started, until the commit.
 
 #### Scenario: Japanese conversion Enter (vercel/ai-elements#21)
 
@@ -115,8 +147,9 @@ count announcements SHALL wait for the commit.
 
 `submitKey` SHALL choose what submits from the Textarea: `"enter"` (Enter submits,
 Shift+Enter inserts a newline), `"mod+enter"` (Mod+Enter submits, Enter inserts a newline)
-or `"none"` (only Submit sends). The default SHALL be `"enter"`, except on a touch-primary
-device (`Environment` platform: coarse primary pointer), where plain Enter SHALL insert a
+or `"none"` (only Submit sends). The default SHALL be `"enter"`, except with a coarse primary
+pointer (`(pointer: coarse)`, read through the Environment; a fine pointer on the server and
+during hydration), where plain Enter SHALL insert a
 newline and only Submit and Mod+Enter send. Mod+Enter SHALL submit in every mode except
 `"none"`. A submitting Enter SHALL have its default prevented before the value is read, so
 no newline is inserted at the caret. Auto-repeated keys SHALL NOT submit. A key event whose
@@ -186,9 +219,11 @@ SDK's `ready`/`submitted`/`streaming`/`error` map one to one) and through the pr
   `streaming` or `stopped`;
 - `status` `"error"`, a rejected promise or a synchronous throw SHALL run the failure path
   (Requirement: Failed Send) and return to `idle`;
-- when `onSubmit` returns no promise and `status` is not given, the machine SHALL return to
-  `idle` at once; with `status` given, it SHALL wait for `status` to change (a consumer that
-  passes `status` drives the lifecycle).
+- when `onSubmit` returns no promise, the machine SHALL return to `idle` at once, and a later
+  `status` of `"submitting"` or `"streaming"` SHALL start the request from `idle` (or
+  `composing`), so the input is never left in `submitting` when `onSubmit` decides not to
+  send, when `status` goes idle → submitting → idle in one batch, or when `status` is never
+  updated.
 
 A status change SHALL never move focus. The initial state SHALL follow the initial `status`
 (`idle` when absent).
@@ -222,7 +257,10 @@ attachments }` — the draft and the attachment list as they were at submit time
 `details` holds the native `submit` event and the `FormData`. In the same transition the
 Prompt Input SHALL clear the draft (reason `submit`) and the attachments (reason `submit`),
 so text typed or files added while the request is pending belong to the next prompt and are
-never cleared later. Text and attachments SHALL be one message, never two calls.
+never cleared later. Text and attachments SHALL be one message, never two calls. A
+synchronous throw of `onSubmit` SHALL fail the send (Requirement: Failed Send) and SHALL then be
+rethrown to whatever submitted (the submit handler, `usePromptInput().submit()`). The snapshot
+of the message SHALL be kept only until the request ends.
 
 #### Scenario: One call for files without text (assistant-ui/assistant-ui#3577)
 
@@ -541,8 +579,9 @@ The Prompt Input SHALL expose the seams later components use, without depending 
   `aria-activedescendant` set by the composing component) with every Prompt Input behaviour
   unchanged;
 - an API (`usePromptInput()`: `setValue(text)`, `insertText(text)` at the caret,
-  `submit()`, `focus()`) that Suggestions calls to fill or send a prompt, going through the
-  same guard and announcements as the user's actions.
+  `submit()`, `stop()`, `focus()`, `openFilePicker()`, `addFiles(files)`) that Suggestions
+  calls to fill or send a prompt, going through the same guard and announcements as the
+  user's actions; `setValue` and `insertText` SHALL be ignored while a composition is open.
 
 #### Scenario: A popup owns Enter
 
@@ -558,8 +597,8 @@ The Prompt Input SHALL expose the seams later components use, without depending 
 
 ### Requirement: Prompt Input Data Attributes
 
-Every part SHALL carry `data-scope="prompt-input"`, its `data-part` (`root`, `label`,
-`description`, `textarea`, `submit`, `attach-trigger`, `chips`, `chip`, `chip-remove`,
+Every part SHALL carry `data-scope="prompt-input"`, its `data-part` (`root`, `field`,
+`label`, `description`, `error-message`, `textarea`, `submit`, `attach-trigger`, `chips`, `chip`, `chip-remove`,
 `chips-summary`, `character-count`) and `data-instance`. Root and Textarea SHALL carry
 `data-state` (`idle`, `composing`, `submitting`, `streaming`, `stopped`), `data-empty` while
 the draft is empty, `data-composing`, `data-disabled`, `data-over-limit`, `data-focus` and
@@ -581,21 +620,31 @@ The contract SHALL use scope `prompt-input`, locate the instance by the Textarea
 fragment, and declare:
 
 - actions: `type(text)`; `fill(text)`; `compose(text, committed)` (pointer: none,
-  "composition is keyboard input"); `submit` (keyboard: Enter, or Mod+Enter in
-  `"mod+enter"` mode; pointer: press Submit); `stop` (pointer: press Submit; keyboard: focus
-  Submit and press Enter); `attach(files)` (pointer: the file chooser's selection, through the
-  environment's `setFiles`; keyboard: none, "the file chooser is the operating system's
-  dialog"); `paste(text)`; `removeAttachment(name)` and `removeChip(name)`;
-  `recall(direction)` (ArrowUp / ArrowDown); file paste and drop are browser scenario tests;
+  "composition is keyboard input"); `submit` (keyboard: Mod+Enter, which sends in every
+  `submitKey` mode but `"none"`; pointer: press Submit); `settle` (a fixture's "Settle
+  request" button; keyboard: F6, which the fixture listens to); `stop` (pointer: press
+  Submit; keyboard: focus Submit and press Enter); `attach(files)` (pointer: press
+  AttachTrigger, then the file chooser's selection through the environment's `setFiles`;
+  keyboard: focus AttachTrigger, Enter, then the selection); `paste(text)`;
+  `removeAttachment(name)` and `removeChip(name)`; `recall(direction)` (ArrowUp / ArrowDown);
+  file paste and drop are browser scenario tests;
 - queries: `value`, `name`, `state`, `attachments` (names in order), `canSubmit`,
   `submitName`, `submitAction`, `characterCount`, `isOverLimit`, `isDisabled`,
   `isDragging`;
 - states: `idle`, `composing`, `submitting`, `streaming`, `stopped`;
 - events mapped to actions, with the `$props:status` prop step (the fixture's consumer
-  drives `status`), `FOCUS`/`BLUR` `skip` ("covered by every action");
-- traits: none.
+  drives `status`), `SETTLED` mapped to `settle`, `FOCUS`/`BLUR` `skip` ("covered by every
+  action");
+- traits: `field-associated`.
 
-The postcondition of `stop` SHALL be that `state` is neither `submitting` nor `streaming`.
+The postcondition of `submit` SHALL be that the draft is empty (sent) or that nothing could be
+sent (Submit is `aria-disabled`, disabled or Stop); that `onSubmit` was called exactly once per
+send SHALL be checked by the model's activation parity (`activations: "submit"`). The
+postcondition of `stop` SHALL be that `state` is neither `submitting` nor `streaming`; that
+`onStop` was called once SHALL be checked by the DOM scenario tests. The announcements (stop,
+failure, files attached, refused, removed) SHALL be asserted through the driver's
+`announcements()`: the contract's announcement declarations cover only the composite kinds
+(focus, count, selection).
 
 #### Scenario: Same test in both environments
 
@@ -611,15 +660,18 @@ The postcondition of `stop` SHALL be that `state` is neither `submitting` nor `s
 ### Requirement: Model-Based Coverage
 
 `testMachine` SHALL run the Prompt Input over the props classes default, with attachments,
-read-only, and status-driven (`status` walked through `submitting` and `streaming` by
-rerenders), in pointer, keyboard and virtual modalities (keyboard and pointer for the
-rerendered class), with axe per state.
+read-only, disabled, `"mod+enter"`, touch-primary (a coarse pointer), CharacterCount (a
+limit), `history`, a resolving request fixture and a rejecting one (its `onSubmit` promise
+settled by the fixture's "Settle request" step, so the walk takes the failure path), and
+status-driven (`status` walked through `submitting` and `streaming` by rerenders), in
+pointer, keyboard and virtual modalities (keyboard and pointer for the rerendered class),
+with axe per state and activation parity on `submit`.
 
 #### Scenario: Lifecycle across fixtures
 
-- **WHEN** the status-driven class runs
-- **THEN** it reaches `submitting`, `streaming` and `stopped`, and no step leaves focus on
-  `<body>`
+- **WHEN** the resolving, rejecting and status-driven classes run
+- **THEN** they reach `submitting`, `streaming` and `stopped`, the rejecting one returns to
+  `idle` with the draft restored, and no step leaves focus on `<body>`
 
 ### Requirement: Theme
 

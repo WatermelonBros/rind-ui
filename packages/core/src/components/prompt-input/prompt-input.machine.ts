@@ -1,10 +1,10 @@
 // Prompt Input (design §1): the request lifecycle `idle | composing | submitting | streaming |
 // stopped`. The request is the consumer's: `onSubmit` may return a promise and `status`
 // reports progress; the machine never knows about a model. One guard (`submittable`) decides
-// every submit path. Attachments are `input-chips`; files enter through one action.
+// every submit path. Attachments are `input-chips`; files enter through one action. Every
+// write of the draft goes through `writeDraft` (an undoable edit in the adapter).
 
 import type { Modality } from "../../contract/env"
-import { type FileRejection, validateFiles } from "../../dom/file-intake"
 import type { AnnouncerEnv } from "../../env/capabilities"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
@@ -16,20 +16,22 @@ import {
   inputChipsActions,
   lastRemovable,
 } from "../input-chips/input-chips"
+import { type FileRejection, validateFiles } from "../shared/file-validation"
 import { countAnnouncement, defaultCount } from "../text-field/text-field.machine"
 import { textFieldMessages } from "../text-field/text-field.messages"
 import type { PromptInputMessages } from "./prompt-input.messages"
 
-/** One attached file (or a consumer item without a `File`, e.g. an uploaded document). */
+/** One attached file, or a consumer item without a `File` (an uploaded document). */
 export interface PromptAttachment {
   /** Unique within the input. */
   readonly id: string
   /** Shown and announced; names the chip. */
   readonly name: string
+  /** The file itself, when the user attached one (it is also in the form's data). */
   readonly file?: File | undefined
   /** MIME type. */
   readonly type?: string | undefined
-  /** Bytes. */
+  /** Size in bytes. */
   readonly size?: number | undefined
   /** Still uploading: the input is not submittable while any attachment is pending. */
   readonly pending?: boolean | undefined
@@ -37,15 +39,22 @@ export interface PromptAttachment {
   readonly disabled?: boolean | undefined
 }
 
-/** The request status the consumer reports (the AI SDK's ready/submitted/streaming/error). */
+// One to one with a chat state's ready / submitted / streaming / error.
+/** The request status the consumer reports. */
 export type PromptInputStatus = "idle" | "submitting" | "streaming" | "error"
+
+/** The machine's states (also `data-state`). */
+export type PromptInputState = "idle" | "composing" | "submitting" | "streaming" | "stopped"
 
 /** What one submit sends: the draft and the attachments as they were at submit time. */
 export interface PromptMessage {
+  /** The draft. */
   readonly text: string
+  /** The attachments, in order. */
   readonly attachments: readonly PromptAttachment[]
 }
 
+/** The second argument of `onSubmit`. */
 export interface PromptSubmitDetails {
   /** The native `submit` event (null for a programmatic submit without a form). */
   readonly event: Event | null
@@ -56,10 +65,23 @@ export interface PromptSubmitDetails {
 /** Which keys submit from the Textarea. */
 export type PromptSubmitKey = "enter" | "mod+enter" | "none"
 
+/** Why the draft changed (`onValueChange` details). */
+export type PromptValueReason = "input" | "submit" | "restore" | "history" | "api" | "reset"
+/** Why the attachments changed (`onAttachmentsChange` details). */
+export type PromptAttachmentsReason = "add" | "remove" | "submit" | "restore"
+
 export type PromptInputEvent =
   | InputChipsEvent
-  | { readonly type: "INPUT"; readonly value: string; readonly composing: boolean }
+  | {
+      readonly type: "INPUT"
+      readonly value: string
+      readonly composing: boolean
+      /** Set when the change is the machine's own write (`writeDraft`) coming back. */
+      readonly reason?: PromptValueReason | undefined
+    }
   | { readonly type: "COMPOSITION.START" }
+  /** Back in idle while a composition is still open (a request ended meanwhile). */
+  | { readonly type: "COMPOSITION.RESUME" }
   | { readonly type: "COMPOSITION.END"; readonly value: string }
   | { readonly type: "FOCUS"; readonly modality: Modality }
   | { readonly type: "BLUR" }
@@ -74,8 +96,14 @@ export type PromptInputEvent =
   | { readonly type: "STOP"; readonly clickCount: number }
   /** The `status` prop changed. */
   | { readonly type: "STATUS" }
-  /** The promise `onSubmit` returned settled (by submit token). */
-  | { readonly type: "SETTLED"; readonly token: number; readonly ok: boolean }
+  /** The send settled: the promise `onSubmit` returned, or at once without one (by token). */
+  | {
+      readonly type: "SETTLED"
+      readonly token: number
+      readonly ok: boolean
+      /** Settled within the submit (no promise, or a throw), not by a pending promise. */
+      readonly sync?: boolean | undefined
+    }
   /** A stop with nothing to wait for. */
   | { readonly type: "STOP.SETTLE" }
   | {
@@ -86,37 +114,74 @@ export type PromptInputEvent =
   | { readonly type: "DRAG.ENTER" }
   | { readonly type: "DRAG.LEAVE" }
   | { readonly type: "RECALL"; readonly direction: "older" | "newer" }
-  /** A programmatic draft change (`api.setValue`, a suggestion). */
+  /** A programmatic draft change (`usePromptInput().setValue`, a suggestion). */
   | { readonly type: "SET.VALUE"; readonly value: string }
+  /** Inserts `text` over `[start, end)` of the draft (the caret or the selection). */
+  | {
+      readonly type: "INSERT.TEXT"
+      readonly text: string
+      readonly start: number
+      readonly end: number
+    }
+  /** A form reset: the draft is the Textarea's value after it. */
+  | { readonly type: "RESET"; readonly value: string }
 
 export interface PromptInputProps {
+  /** The draft (controlled). */
   readonly value?: string | undefined
+  /** The initial draft (uncontrolled). */
   readonly defaultValue?: string | undefined
+  /** Every draft change; the adapter turns the details into a `PromptValueReason`. */
   readonly onValueChange?:
     | ((value: string, details: ChangeDetails<PromptInputEvent>) => void)
     | undefined
+  /** The attachments (controlled). */
   readonly attachments?: readonly PromptAttachment[] | undefined
+  /** The initial attachments (uncontrolled). */
   readonly defaultAttachments?: readonly PromptAttachment[] | undefined
+  /** Every attachments change; the adapter turns the details into a reason. */
   readonly onAttachmentsChange?:
     | ((attachments: readonly PromptAttachment[], details: ChangeDetails<PromptInputEvent>) => void)
     | undefined
+  /** The request's progress, reported by the consumer. */
   readonly status?: PromptInputStatus | undefined
+  /** Sends the prompt; a returned promise keeps the input submitting until it settles. */
   readonly onSubmit?:
     | ((message: PromptMessage, details: PromptSubmitDetails) => unknown)
     | undefined
+  /** Submit pressed while busy. */
   readonly onStop?: (() => void) | undefined
+  /** Files refused by the limits, each with its reason. */
   readonly onReject?: ((rejections: readonly FileRejection[]) => void) | undefined
+  /** A synchronous throw of `onSubmit`, handed back so the adapter rethrows it to its caller. */
+  readonly onThrow?: ((error: unknown) => void) | undefined
+  /**
+   * Writes the whole draft as an undoable edit and lets the resulting `input` event come back
+   * as INPUT (with `reason`); returns false when it did not write (the machine then sets the
+   * value itself). Absent: the machine sets the value.
+   */
+  readonly writeDraft?: ((text: string, reason: PromptValueReason) => boolean) | undefined
+  /** Every part is disabled. */
   readonly disabled?: boolean | undefined
+  /** No typing and no files. */
   readonly readOnly?: boolean | undefined
+  /** Past prompts, newest last. */
   readonly history?: readonly string[] | undefined
+  /** The `<input accept>` list. */
   readonly accept?: string | undefined
+  /** The most attachments at once. */
   readonly maxFiles?: number | undefined
+  /** The largest file, in bytes. */
   readonly maxFileSize?: number | undefined
   /** A CharacterCount's `max` (soft limit). */
   readonly limit?: number | undefined
+  /** A CharacterCount's counter (a tokenizer for a token limit). */
   readonly count?: ((value: string) => number) | undefined
+  /** Announce the count when this many or fewer remain. */
   readonly threshold?: number | undefined
+  /** The instance id (attachment ids, announcement keys). */
   readonly id: string
+  /** For plural rules. */
   readonly locale: string
   readonly messages: PromptInputMessages
 }
@@ -124,11 +189,14 @@ export interface PromptInputProps {
 export interface PromptInputContext extends InputChipsContext {
   readonly focused: boolean
   readonly composing: boolean
+  /** The draft when the current composition started: counts freeze on it meanwhile. */
+  readonly committed: string
   readonly dragging: boolean
   /** The current submit; a settle of an older one is ignored. */
   readonly token: number
   /** The promise of the current submit has not settled. */
   readonly pending: boolean
+  /** The message of the current submit, until it settled. */
   readonly snapshot: PromptMessage | null
   /** Index into `history` of the recalled entry, or null. */
   readonly historyIndex: number | null
@@ -157,26 +225,92 @@ export const attachmentChips = (
 
 const attachmentsOf = (a: { readonly values: { readonly attachments: unknown } }) =>
   (a.values.attachments as readonly PromptAttachment[] | undefined) ?? NONE
-const interactive = (p: PromptInputProps) => p.disabled !== true && p.readOnly !== true
+const interactive = (p: Pick<PromptInputProps, "disabled" | "readOnly">) =>
+  p.disabled !== true && p.readOnly !== true
 
-/** Over a CharacterCount's `max`. */
-export const isOverLimit = (p: Pick<PromptInputProps, "limit" | "count">, value: string) =>
-  p.limit !== undefined && (p.count ?? defaultCount)(value) > p.limit
+/** What a view of the machine derives (spec "Submittable", "Character And Token Limit"). */
+export interface PromptInputDerived {
+  /** The draft that counts: the committed one while a composition is open. */
+  readonly counted: string
+  /** The count of `counted` (characters, or the consumer's tokens). */
+  readonly used: number
+  readonly overLimit: boolean
+  /** The one guard every submit path asks, apart from the state. */
+  readonly submittable: boolean
+  /** What ArrowUp / ArrowDown would recall; `browsing`: the draft is a recalled entry. */
+  readonly recall: { readonly older: boolean; readonly newer: boolean; readonly browsing: boolean }
+}
 
-/** The one guard every submit path asks (spec "Submittable"), apart from the state. */
-export function isSubmittable(
-  p: PromptInputProps,
+/** Derives the counts, the limit, the submit guard and the recall options. */
+export function derivePromptInput(
+  p: Pick<PromptInputProps, "disabled" | "limit" | "count" | "history">,
   value: string,
   attachments: readonly PromptAttachment[],
-  composing: boolean,
-): boolean {
-  return (
-    p.disabled !== true &&
-    !composing &&
-    (value.trim() !== "" || attachments.length > 0) &&
-    !attachments.some((a) => a.pending === true) &&
-    !isOverLimit(p, value)
-  )
+  c: Pick<PromptInputContext, "composing" | "committed" | "historyIndex">,
+): PromptInputDerived {
+  const counted = c.composing ? c.committed : value
+  const used = (p.count ?? defaultCount)(counted)
+  const overLimit = p.limit !== undefined && used > p.limit
+  const history = p.history ?? []
+  const at = c.historyIndex
+  const browsing = at !== null && history[at] === value
+  return {
+    counted,
+    used,
+    overLimit,
+    submittable:
+      p.disabled !== true &&
+      !c.composing &&
+      (value.trim() !== "" || attachments.length > 0) &&
+      !attachments.some((a) => a.pending === true) &&
+      !overLimit,
+    recall: {
+      older:
+        !c.composing && history.length > 0 && (at === null ? value === "" : browsing && at > 0),
+      newer: !c.composing && at !== null,
+      browsing,
+    },
+  }
+}
+
+const derived = (a: Pick<Args, "props" | "values" | "context">) =>
+  derivePromptInput(a.props, a.values.value, attachmentsOf(a), a.context)
+
+/** A draft change's public reason, from the machine event that made it. */
+export function promptValueReason(event: { readonly type: string }): PromptValueReason {
+  const e = event as { readonly type: string; readonly reason?: PromptValueReason }
+  if (e.type === "INPUT" && e.reason) return e.reason
+  switch (e.type) {
+    case "SUBMIT":
+      return "submit"
+    case "SETTLED":
+    case "STATUS":
+      return "restore"
+    case "RECALL":
+      return "history"
+    case "SET.VALUE":
+    case "INSERT.TEXT":
+      return "api"
+    case "RESET":
+      return "reset"
+    default:
+      return "input"
+  }
+}
+
+/** An attachments change's public reason, from the machine event that made it. */
+export function promptAttachmentsReason(event: { readonly type: string }): PromptAttachmentsReason {
+  switch (event.type) {
+    case "FILES.ADD":
+      return "add"
+    case "SUBMIT":
+      return "submit"
+    case "SETTLED":
+    case "STATUS":
+      return "restore"
+    default:
+      return "remove"
+  }
 }
 
 const announce = (a: Args, message: string, assertive = false, key?: string) =>
@@ -185,6 +319,18 @@ const announce = (a: Args, message: string, assertive = false, key?: string) =>
     priority: assertive ? "assertive" : "polite",
     ...(key ? { key: `prompt-input-${a.props.id}-${key}` } : {}),
   })
+
+/**
+ * The machine's own draft writes (clear, restore, recall, the API): an undoable edit through
+ * the adapter when it can (its `input` event comes back as INPUT), else a plain set. Never
+ * while composing.
+ */
+function writeDraft(a: Args, text: string, reason: PromptValueReason) {
+  if (a.context.composing) return
+  if (text === a.values.value) return
+  if (a.props.writeDraft?.(text, reason) === true) return
+  a.set("value", text)
+}
 
 const chipsOf = (a: Pick<Args, "props" | "values">) =>
   attachmentChips(attachmentsOf(a), !interactive(a.props))
@@ -205,16 +351,26 @@ const statusIs =
   ({ props }: { readonly props: Readonly<PromptInputProps> }): boolean =>
     s.includes(props.status)
 
+/** idle and composing start a request the consumer reports (initial status, suggestions). */
+const startFromStatus = [
+  { guard: "statusSubmitting", target: "submitting" },
+  { guard: "statusStreaming", target: "streaming" },
+] as const
+
 export const promptInputMachine = setup({
   types: type<Types>(),
   guards: {
-    submittable: ({ props, values, context }) =>
-      isSubmittable(props, values.value, attachmentsOf({ values }), context.composing),
+    submittable: (a) => derived(a).submittable,
     commits: ({ event }) => event.type === "INPUT" && !event.composing,
+    notComposing: ({ context }) => !context.composing,
     clickOnce: ({ event }) => event.type === "STOP" && event.clickCount <= 1,
-    currentToken: ({ event, context }) => event.type === "SETTLED" && event.token === context.token,
+    /** This submit's settle: within the submit, or of its still-pending promise. */
+    currentToken: ({ event, context }) =>
+      event.type === "SETTLED" &&
+      event.token === context.token &&
+      (event.sync === true || context.pending),
     settledOk: ({ event }) => event.type === "SETTLED" && event.ok,
-    /** The consumer does not drive `status` past this point: a resolved promise ends it. */
+    /** The consumer does not report a running request: a settled send ends it. */
     notStreaming: ({ props }) => props.status !== "streaming" && props.status !== "submitting",
     statusSubmitting: statusIs("submitting"),
     statusStreaming: statusIs("streaming"),
@@ -228,29 +384,29 @@ export const promptInputMachine = setup({
     armedRemovable: ({ context, props }) => context.armedChip !== null && interactive(props),
     armsOnBackspace: ({ props, values }) =>
       interactive(props) && lastRemovable(chipsOf({ props, values })) !== null,
-    canRecall: ({ event, props, values, context }) => {
-      const history = props.history ?? []
-      if (event.type !== "RECALL" || history.length === 0 || context.composing) return false
-      if (event.direction === "newer") return context.historyIndex !== null
-      if (context.historyIndex === null) return values.value === ""
-      return values.value === history[context.historyIndex] && context.historyIndex > 0
-    },
-    editable: ({ props }) => interactive(props),
+    canRecall: (a) =>
+      a.event.type === "RECALL" &&
+      (a.event.direction === "older" ? derived(a).recall.older : derived(a).recall.newer),
+    editable: ({ props, context }) => interactive(props) && !context.composing,
   },
   actions: {
     ...inputChipsActions,
     setFocused: ({ set }) => set("focused", true),
     blurred: ({ set }) => {
       set("focused", false)
-      // A composition that never ended (dead keys, assistant-ui#3923) ends here.
+      // A composition that never ended (dead keys) ends here.
       set("composing", false)
       set("armedChip", null)
     },
-    startComposing: ({ set }) => set("composing", true),
+    startComposing: ({ set, values }) => {
+      set("composing", true)
+      set("committed", values.value)
+    },
     endComposing: ({ set }) => set("composing", false),
+    /** The Textarea's value (typing, a composition, the machine's own write coming back). */
     setValue: (a) => {
       const e = a.event
-      if (e.type !== "INPUT" && e.type !== "COMPOSITION.END" && e.type !== "SET.VALUE") return
+      if (e.type !== "INPUT" && e.type !== "COMPOSITION.END" && e.type !== "RESET") return
       if (e.type === "INPUT" && !e.composing) a.set("composing", false)
       a.set("armedChip", null)
       if (e.value !== a.values.value) a.set("value", e.value)
@@ -258,6 +414,14 @@ export const promptInputMachine = setup({
       if (a.context.historyIndex !== null) {
         const entry = a.props.history?.[a.context.historyIndex]
         if (entry !== e.value) a.set("historyIndex", null)
+      }
+    },
+    apiValue: (a) => {
+      if (a.event.type === "SET.VALUE") writeDraft(a, a.event.value, "api")
+      if (a.event.type === "INSERT.TEXT") {
+        const v = a.values.value
+        const { text, start, end } = a.event
+        writeDraft(a, v.slice(0, start) + text + v.slice(end), "api")
       }
     },
     /** Near and over the limit, focused, not composing: keyed, so a pause speaks once. */
@@ -286,16 +450,16 @@ export const promptInputMachine = setup({
       a.set("historyIndex", null)
       a.set("armedChip", null)
       // Cleared now: what the user types while the request is pending is the next prompt.
-      a.set("value", "")
+      writeDraft(a, "", "submit")
       if (attachments.length > 0) a.set("attachments", NONE)
       const details = { event: a.event.event, formData: a.event.formData }
       let result: unknown
       try {
         result = a.props.onSubmit?.({ text, attachments }, details)
       } catch (error) {
-        a.send({ type: "SETTLED", token, ok: false })
-        // Not swallowed: surfaces as an unhandled rejection, like the throw it was.
-        void Promise.reject(error)
+        a.send({ type: "SETTLED", token, ok: false, sync: true })
+        // Handed back: the adapter rethrows it to the caller once the step is done.
+        a.props.onThrow?.(error)
         return
       }
       if (
@@ -308,32 +472,50 @@ export const promptInputMachine = setup({
           () => a.send({ type: "SETTLED", token, ok: true }),
           () => a.send({ type: "SETTLED", token, ok: false }),
         )
-      } else if (a.props.status === undefined) {
-        a.send({ type: "SETTLED", token, ok: true })
+      } else {
+        // Nothing to wait for: ready at once; `status` then takes it from idle.
+        a.send({ type: "SETTLED", token, ok: true, sync: true })
       }
     },
     settled: ({ set }) => set("pending", false),
+    /**
+     * A send settled well. A promise's settle ends the request: the snapshot goes. Without a
+     * promise the request may go on under `status` (an error then still restores it).
+     */
+    settleSend: ({ set, context }) => {
+      if (context.pending) set("snapshot", null)
+      set("pending", false)
+    },
+    clearSnapshot: ({ set }) => set("snapshot", null),
     /** A failed send: announce; restore into an empty draft only (spec "Failed Send"). */
     failSend: (a) => {
       announce(a, a.props.messages.sendFailedAnnouncement, true)
       const snap = a.context.snapshot
+      a.set("snapshot", null)
       if (!snap || a.values.value !== "" || attachmentsOf(a).length > 0) return
-      if (snap.text !== "") a.set("value", snap.text)
+      if (snap.text !== "") writeDraft(a, snap.text, "restore")
       if (snap.attachments.length > 0) a.set("attachments", snap.attachments)
     },
-    announceFailure: (a) => announce(a, a.props.messages.sendFailedAnnouncement, true),
+    announceFailure: (a) => {
+      a.set("snapshot", null)
+      announce(a, a.props.messages.sendFailedAnnouncement, true)
+    },
     callOnStop: (a) => a.props.onStop?.(),
     announceStopped: (a) => announce(a, a.props.messages.stoppedAnnouncement),
     /** Nothing reports the end of a stopped request: idle at once. */
     settleStop: (a) => {
       if (a.props.status === undefined && !a.context.pending) a.send({ type: "STOP.SETTLE" })
     },
-    /** The initial `status` decides the first state (assistant-ui#4505: idle by default). */
+    /** The initial `status` decides the first state (idle by default). */
     initialStatus: (a) => {
       if (a.event.type !== "$start") return
       if (a.props.status === "submitting" || a.props.status === "streaming") {
         a.send({ type: "STATUS" })
       }
+    },
+    /** Back in idle while a composition is open: composing again (no key may send). */
+    resumeComposing: (a) => {
+      if (a.context.composing) a.send({ type: "COMPOSITION.RESUME" })
     },
     addFiles: (a) => {
       if (a.event.type !== "FILES.ADD") return
@@ -391,8 +573,8 @@ export const promptInputMachine = setup({
     },
     chipType: (a) => {
       if (a.event.type !== "CHIP.TYPE") return
-      a.set("value", a.values.value + a.event.text)
       a.set("armedChip", null)
+      writeDraft(a, a.values.value + a.event.text, "input")
     },
     recall: (a) => {
       if (a.event.type !== "RECALL") return
@@ -402,17 +584,17 @@ export const promptInputMachine = setup({
         if (at === null) a.set("savedDraft", a.values.value)
         const next = at === null ? history.length - 1 : at - 1
         a.set("historyIndex", next)
-        a.set("value", history[next] ?? "")
+        writeDraft(a, history[next] ?? "", "history")
         return
       }
       if (at === null) return
       const next = at + 1
       if (next >= history.length) {
         a.set("historyIndex", null)
-        a.set("value", a.context.savedDraft)
+        writeDraft(a, a.context.savedDraft, "history")
       } else {
         a.set("historyIndex", next)
-        a.set("value", history[next] ?? "")
+        writeDraft(a, history[next] ?? "", "history")
       }
     },
   },
@@ -423,6 +605,7 @@ export const promptInputMachine = setup({
     ...initialInputChipsContext(),
     focused: false,
     composing: false,
+    committed: "",
     dragging: false,
     token: 0,
     pending: false,
@@ -438,7 +621,9 @@ export const promptInputMachine = setup({
   onProps: { status: "STATUS" },
   on: {
     INPUT: { actions: ["setValue", "announceCount"] },
-    "SET.VALUE": { actions: ["setValue"] },
+    RESET: { actions: ["setValue"] },
+    "SET.VALUE": { guard: "notComposing", actions: ["apiValue"] },
+    "INSERT.TEXT": { guard: "notComposing", actions: ["apiValue"] },
     "COMPOSITION.START": { actions: ["startComposing"] },
     "COMPOSITION.END": { actions: ["endComposing", "setValue", "announceCount"] },
     FOCUS: { actions: ["setFocused"] },
@@ -461,14 +646,12 @@ export const promptInputMachine = setup({
   },
   states: {
     idle: {
-      entry: ["initialStatus"],
+      entry: ["initialStatus", "resumeComposing"],
       on: {
         "COMPOSITION.START": { target: "composing", actions: ["startComposing"] },
+        "COMPOSITION.RESUME": "composing",
         SUBMIT: { guard: "submittable", target: "submitting", actions: ["submit"] },
-        STATUS: [
-          { guard: "statusSubmitting", target: "submitting" },
-          { guard: "statusStreaming", target: "streaming" },
-        ],
+        STATUS: startFromStatus,
       },
     },
     composing: {
@@ -480,6 +663,8 @@ export const promptInputMachine = setup({
         // A composition that never ended: the next plain input or a blur ends it.
         INPUT: { guard: "commits", target: "idle", actions: ["setValue", "announceCount"] },
         BLUR: { target: "idle", actions: ["blurred", "blurChip"] },
+        // A request the consumer starts meanwhile is not lost (the composition goes on).
+        STATUS: startFromStatus,
       },
     },
     submitting: {
@@ -487,13 +672,13 @@ export const promptInputMachine = setup({
         STATUS: [
           { guard: "statusStreaming", target: "streaming" },
           { guard: "statusError", target: "idle", actions: ["failSend"] },
-          { guard: "statusIdle", target: "idle" },
+          { guard: "statusIdle", target: "idle", actions: ["clearSnapshot"] },
         ],
         SETTLED: [
           {
             guard: { and: ["currentToken", "settledOk", "notStreaming"] },
             target: "idle",
-            actions: ["settled"],
+            actions: ["settleSend"],
           },
           {
             guard: { and: ["currentToken", { not: "settledOk" }] },
@@ -513,13 +698,13 @@ export const promptInputMachine = setup({
       on: {
         STATUS: [
           { guard: "statusError", target: "idle", actions: ["announceFailure"] },
-          { guard: "statusIdle", target: "idle" },
+          { guard: "statusIdle", target: "idle", actions: ["clearSnapshot"] },
         ],
         SETTLED: [
           {
             guard: { and: ["currentToken", "settledOk", "notStreaming"] },
             target: "idle",
-            actions: ["settled"],
+            actions: ["settleSend"],
           },
           {
             guard: { and: ["currentToken", { not: "settledOk" }] },
@@ -539,11 +724,15 @@ export const promptInputMachine = setup({
       entry: ["settleStop"],
       on: {
         STATUS: [
-          { guard: "statusIdle", target: "idle" },
-          { guard: "statusError", target: "idle" },
+          { guard: "statusIdle", target: "idle", actions: ["clearSnapshot"] },
+          { guard: "statusError", target: "idle", actions: ["clearSnapshot"] },
         ],
-        SETTLED: { guard: "currentToken", target: "idle", actions: ["settled"] },
-        "STOP.SETTLE": "idle",
+        SETTLED: {
+          guard: "currentToken",
+          target: "idle",
+          actions: ["settled", "clearSnapshot"],
+        },
+        "STOP.SETTLE": { target: "idle", actions: ["clearSnapshot"] },
       },
     },
   },

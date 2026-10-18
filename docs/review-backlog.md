@@ -260,12 +260,14 @@ See CLAUDE.md "Review rules".
 | add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |
 | add-menu (r1) | — | openspec/changes/add-menu/specs/menu/spec.md:616 | the content orientation text (`aria-orientation` only for horizontal) needs rewording |
 | add-prompt-input (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT and the IME pass (macOS Japanese/Chinese/Korean, MS-IME, Fcitx5, Gboard), recorded in "Tested with" (task 9.2) |
-| add-prompt-input (impl) | — | packages/react/src/prompt-input/prompt-input.tsx | No Field integration (`use-field-host`): Label/Description are wired directly; a Prompt Input inside a Field does not join it |
-| add-prompt-input (impl) | — | packages/react/src/prompt-input/prompt-input.tsx | No development error for a missing Textarea or Submit (only the unnamed-Textarea warning) |
-| add-prompt-input (impl) | — | packages/react/src/prompt-input/prompt-input.tsx | The draft is rendered from the machine: clear, restore and recall replace the value (no `setRangeText`/`insertText`, so they are not undoable), and a native form reset is not reflected in the draft |
-| add-prompt-input (impl) | — | packages/core/src/components/prompt-input/prompt-input.contract.ts | Contract has no `paste(files)` / `drop(files)` actions and no announcement declarations; FILES.ADD, DRAG.*, RECALL, CHIP.* and SETTLED are model-walk skips (DOM tests cover them); no mod+enter, touch-primary, history or limit props classes |
-| add-prompt-input (impl) | — | packages/testing/fixtures | No Playwright fixture for the Prompt Input (driver through a real page, WebKit Safari IME late Enter, real file chooser `filechooser`, forced-colors captures) |
-| add-prompt-input (impl) | — | packages/react/src/prompt-input/prompt-input.tsx | A React form `action` passes the native submission through, untested |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.contract.ts | No `paste(files)` / `drop(files)` contract actions (the environment has no file paste or drop): browser scenario tests cover them |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.connect.ts | History in a multi-line draft: browsing recalled entries steps on any caret, so ArrowUp inside a recalled multi-line prompt recalls instead of moving the caret; step only from the first / last line |
+| add-prompt-input (r1) | — | openspec/changes/add-prompt-input/specs/prompt-input/spec.md | Touch focus: a press on AttachmentRemove keeps focus off the Textarea on touch (`input-chips`), the spec's focus rule does not say so |
+| add-prompt-input (r1) | — | packages/core/src/dom/file-intake.ts | A file copied in a file manager pastes as `text/plain` (its name) plus the file: text wins, so it is not attached |
+| add-prompt-input (r1) | — | packages/react/src/prompt-input/prompt-input.tsx | `props as never` into `useMachine`: say why the cast is sound (or type the machine props) |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.connect.ts | The connect view's documentation (top of the file) does not list which values are derived here and which come from the adapter |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.contract.ts | RECALL from `stopped` is a model skip: after a pointer stop the jsdom walk's keyboard recall finds the Textarea without `data-focus-visible` although a real Tab turns the ring on |
+| add-prompt-input (r1) | — | packages/react/src/prompt-input/prompt-input.tsx | Inside an enclosing Field the over-limit state is not reported to that Field (the Root's own Field gets `invalid`); `aria-invalid` still follows the limit |
 
 ## Site: open items (docs-site handoff, 2026-10-18)
 

@@ -2,7 +2,7 @@ import { collectionLayout } from "../dom/collection-layout"
 import { type ConstraintValidity, constraintValidity } from "../dom/constraint-validity"
 import { liveAnnouncer } from "../dom/live-announcer"
 import { modalityTracker } from "../dom/modality"
-import { motionPreference } from "../dom/motion"
+import { motionPreference, pointerPreference } from "../dom/motion"
 import { readPlatform, withEngine } from "../dom/platform"
 import { documentLocale, fixedLocale } from "../i18n/locale"
 import type {
@@ -23,6 +23,7 @@ import type {
   PageVisibility,
   PlatformFlags,
   PlatformInfo,
+  PointerEnv,
   Scheduler,
   SchedulerEnv,
   StyleEnv,
@@ -36,6 +37,7 @@ export type DomEnvironment = SchedulerEnv &
   PlatformInfo &
   ModalityEnv &
   MotionEnv &
+  PointerEnv &
   StyleEnv &
   LocaleEnv &
   AnnouncerEnv &
@@ -60,6 +62,8 @@ export interface DomEnvironmentOptions {
   readonly engine?: Engine
   /** Fixed reduced-motion preference (default: follows `prefers-reduced-motion`). */
   readonly reducedMotion?: boolean
+  /** Fixed primary-pointer preference (default: follows `(pointer: coarse)`). */
+  readonly coarsePointer?: boolean
   /** A modality source (default: the per-window tracker). */
   readonly modality?: ModalitySource
   /** CSP nonce for the style rules rind-ui injects. */
@@ -136,6 +140,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
     },
     modality: options.modality ?? modalityTracker(getRootNode, getPlatform),
     motion: motionPreference(options.reducedMotion),
+    pointer: pointerPreference(options.coarsePointer),
     style: options.nonce === undefined ? {} : { nonce: options.nonce },
     locale: localeSource(options, documentOf),
     announcer:

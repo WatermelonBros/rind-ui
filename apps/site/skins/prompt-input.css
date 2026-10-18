@@ -261,6 +261,18 @@
   outline-width: 2px;
 }
 
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="field"] {
+  display: contents;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="error-message"] {
+  flex-basis: 100%;
+  order: 11;
+  margin: 0;
+  font-size: 13px;
+  color: var(--s-error);
+}
+
 /* ── the chat example: a short log above the composer ── */
 .chat {
   display: grid;

@@ -15,6 +15,13 @@ export {
   mergeFieldProps,
 } from "./field-control"
 export {
+  type FileLimits,
+  type FileRejection,
+  type FileRejectionReason,
+  matchesAccept,
+  validateFiles,
+} from "./file-validation"
+export {
   checkLabelTarget,
   isLabelable,
   type LabelInteractionOptions,

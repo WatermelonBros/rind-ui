@@ -8,6 +8,7 @@ import { type PromptInputStatus, promptInputMachine } from "./prompt-input.machi
 
 type P =
   | "root"
+  | "field"
   | "label"
   | "description"
   | "textarea"
@@ -25,7 +26,8 @@ type E = Env<P>
 
 const textarea = (env: E) => env.part("textarea")
 const focusTextarea = async (env: E) => {
-  if (!(await textarea(env).isFocused())) await textarea(env).focus()
+  // With Tab, as a keyboard user gets there (typing after a click keeps the pointer's ring rule).
+  if (!(await textarea(env).isFocused())) await textarea(env).focusWithTab()
 }
 const names = async (env: E) => {
   const out: string[] = []
@@ -46,10 +48,17 @@ const removeByName = {
   done: async (env: E, name: string) => !(await names(env)).includes(name),
 }
 
+const recallOlder = {
+  action: "recall",
+  args: (): ["older"] => ["older"],
+  event: () => ({ direction: "older" }),
+} as const
+
 export const promptInputContract = contract("prompt-input", {
   machine: promptInputMachine,
   anatomy: [
     "root",
+    "field",
     "label",
     "description",
     "textarea",
@@ -127,13 +136,29 @@ export const promptInputContract = contract("prompt-input", {
       },
       done: async () => true,
     },
-    /** Keyboard: Enter in the Textarea (Mod+Enter with `mod`); pointer: press Submit. */
+    /**
+     * Keyboard: Mod+Enter in the Textarea (it sends in every `submitKey` mode but "none");
+     * pointer: press Submit. Done: the draft is empty (sent), or there was nothing to send.
+     */
     submit: {
-      keyboard: async (env: E, options?: { readonly mod?: boolean }) => {
+      keyboard: async (env: E) => {
         await focusTextarea(env)
-        await textarea(env).press("Enter", options?.mod ? { mod: true } : {})
+        await textarea(env).press("Enter", { mod: true })
       },
       pointer: (env: E) => env.part("submit").click(),
+      done: async (env: E) =>
+        (await textarea(env).value()) === "" ||
+        (await env.part("submit").attr("aria-disabled")) === "true" ||
+        (await env.part("submit").attr("disabled")) !== null ||
+        (await env.part("submit").attr("data-action")) === "stop",
+    },
+    /**
+     * Settles the fixture's pending `onSubmit` promise: its "Settle request" button (which
+     * keeps focus where it was), or F6, which the fixture listens to on the document.
+     */
+    settle: {
+      pointer: (env: E) => env.find({ role: "button", name: "Settle request" }).click(),
+      keyboard: (env: E) => env.keyboard("F6"),
       done: async () => true,
     },
     /** Pointer: press Submit (it is Stop while busy); keyboard: focus it, Enter. */
@@ -147,10 +172,17 @@ export const promptInputContract = contract("prompt-input", {
         (await env.part("root").attr("data-state")) !== "submitting" &&
         (await env.part("root").attr("data-state")) !== "streaming",
     },
-    /** What the file chooser does after AttachTrigger opens it. */
+    /** AttachTrigger opens the file chooser; the chooser's selection lands in the picker. */
     attach: {
-      pointer: (env: E, files: readonly FileSpec[]) => env.part("file-picker").setFiles(files),
-      none: { keyboard: "the file chooser is the operating system's dialog" },
+      pointer: async (env: E, files: readonly FileSpec[]) => {
+        await env.part("attach-trigger").click()
+        await env.part("file-picker").setFiles(files)
+      },
+      keyboard: async (env: E, files: readonly FileSpec[]) => {
+        await env.part("attach-trigger").focus()
+        await env.keyboard("Enter")
+        await env.part("file-picker").setFiles(files)
+      },
       done: async () => true,
     },
     paste: {
@@ -191,6 +223,29 @@ export const promptInputContract = contract("prompt-input", {
     CARET: "caret",
     BACKSPACE_EMPTY: "backspace",
     SUBMIT: { action: "submit", event: () => ({ event: null, formData: null }) },
+    // The fixture rejects a draft that starts with "fail" (its rejecting class starts so).
+    SETTLED: {
+      action: "settle",
+      event: (view) => {
+        const c = view.context as { token: number; snapshot: { text: string } | null }
+        return {
+          token: c.token,
+          ok: !(c.snapshot?.text ?? "").startsWith("fail"),
+          sync: false,
+        }
+      },
+    },
+    RECALL: {
+      from: {
+        idle: recallOlder,
+        composing: recallOlder,
+        submitting: recallOlder,
+        streaming: recallOlder,
+        // After a pointer stop the walk's keyboard step finds the ring off in jsdom although a
+        // real Tab turns it on (prompt-input DOM tests): the guard-false recall is skipped here.
+        stopped: { skip: "recall after a stop: DOM tests" },
+      },
+    },
     STOP: { action: "stop", event: () => ({ clickCount: 1 }) },
     "COMPOSITION.START": { skip: "IME: compose() scenario and driver tests" },
     "COMPOSITION.END": { skip: "IME: compose() scenario and driver tests" },
@@ -202,17 +257,18 @@ export const promptInputContract = contract("prompt-input", {
           : "idle") as PromptInputStatus,
       }),
     },
-    SETTLED: { skip: "the fixture's onSubmit promise: scenario tests" },
     "STOP.SETTLE": { skip: "sent on entering stopped" },
     "FILES.ADD": { skip: "attach(files) / paste / drop: scenario and driver tests" },
     "DRAG.ENTER": { skip: "a file drag: browser scenario tests" },
     "DRAG.LEAVE": { skip: "a file drag: browser scenario tests" },
-    RECALL: { skip: "recall(direction): scenario and driver tests (needs history)" },
-    "SET.VALUE": { skip: "programmatic (the API)" },
+    "SET.VALUE": { skip: "programmatic (the API): DOM tests" },
+    "INSERT.TEXT": { skip: "programmatic (the API): DOM tests" },
+    RESET: { skip: "a form reset: DOM tests" },
+    "COMPOSITION.RESUME": { skip: "a request ending during a composition: machine tests" },
     "CHIP.NAVIGATE": { skip: "chip focus: chip scenario tests (roving)" },
     "CHIP.BLUR": { skip: "chip focus: chip scenario tests" },
     "CHIP.REMOVE": { skip: "removeAttachment(name): scenario and driver tests" },
     "CHIP.TYPE": { skip: "typing on a chip: scenario tests" },
   },
-  traits: [],
+  traits: ["field-associated"],
 })

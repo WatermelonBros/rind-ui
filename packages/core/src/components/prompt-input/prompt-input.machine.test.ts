@@ -1,12 +1,14 @@
 // The Prompt Input machine in Node: lifecycle per fixture (promise, status, plain), failed
-// sends, stop, double submit, stale settles, composition, attachments, history. No DOM.
+// sends, stop, double submit, stale settles, composition, attachments, history, writes. No DOM.
 import { describe, expect, it, vi } from "vitest"
-import { matchesAccept } from "../../dom/file-intake"
 import { createService } from "../../machine/service"
+import { matchesAccept } from "../shared/file-validation"
 import {
+  derivePromptInput,
   type PromptAttachment,
   type PromptInputProps,
   promptInputMachine,
+  promptValueReason,
 } from "./prompt-input.machine"
 import { promptInputMessages } from "./prompt-input.messages"
 
@@ -83,7 +85,7 @@ describe("Prompt Input machine", () => {
     expect(d.onSubmit).not.toHaveBeenCalled()
   })
 
-  it("a promise: submitting until it resolves; text typed meanwhile is kept (ai-elements#518)", async () => {
+  it("a promise: submitting until it resolves; text typed meanwhile is kept; the snapshot goes", async () => {
     let resolve = () => {}
     const m = make({ onSubmit: () => new Promise<void>((r) => (resolve = r)) })
     m.type("first")
@@ -95,9 +97,10 @@ describe("Prompt Input machine", () => {
     resolve()
     await vi.waitFor(() => expect(m.state()).toBe("idle"))
     expect(m.value()).toBe("second")
+    expect(m.ctx().snapshot).toBeNull()
   })
 
-  it("a rejected promise restores into an empty draft and announces assertively (ai-elements#126)", async () => {
+  it("a rejected promise restores into an empty draft and announces assertively", async () => {
     let reject = () => {}
     const m = make({ onSubmit: () => new Promise<void>((_, r) => (reject = () => r(new Error()))) })
     m.type("look")
@@ -112,7 +115,7 @@ describe("Prompt Input machine", () => {
     ])
   })
 
-  it("a failure after a new draft keeps the new draft (assistant-ui#8242)", async () => {
+  it("a failure after a new draft keeps the new draft", async () => {
     let reject = () => {}
     const m = make({ onSubmit: () => new Promise<void>((_, r) => (reject = () => r(new Error()))) })
     m.type("old")
@@ -125,12 +128,14 @@ describe("Prompt Input machine", () => {
     expect(m.files()).toEqual([])
   })
 
-  it("status drives the lifecycle; a status change in idle starts it (initial too)", () => {
+  it("no promise: idle at once, then status takes it from idle (never stuck in submitting)", () => {
     const m = make({ status: "idle" })
     m.type("q")
     m.submit()
-    expect(m.state()).toBe("submitting")
+    // onSubmit decided not to send, or batched idle → submitted → idle: nothing changes.
+    expect(m.state()).toBe("idle")
     m.setProps({ status: "submitting" })
+    expect(m.state()).toBe("submitting")
     m.setProps({ status: "streaming" })
     expect(m.state()).toBe("streaming")
     m.setProps({ status: "idle" })
@@ -139,10 +144,11 @@ describe("Prompt Input machine", () => {
     expect(make().state()).toBe("idle")
   })
 
-  it("status error while submitting fails the send; while streaming it only announces", () => {
+  it("status error while submitting restores a status-driven send; while streaming it only announces", () => {
     const m = make({ status: "idle" })
     m.type("q")
     m.submit()
+    m.setProps({ status: "submitting" })
     m.setProps({ status: "error" })
     expect(m.state()).toBe("idle")
     expect(m.value()).toBe("q")
@@ -153,10 +159,31 @@ describe("Prompt Input machine", () => {
     expect(m.value()).toBe("")
   })
 
+  it("a status change during a composition is not lost: no send while streaming after it", () => {
+    const m = make({ status: "idle" })
+    m.send({ type: "COMPOSITION.START" })
+    m.setProps({ status: "streaming" })
+    expect(m.state()).toBe("streaming")
+    m.send({ type: "COMPOSITION.END", value: "日本" })
+    m.submit()
+    expect(m.onSubmit).not.toHaveBeenCalled()
+    expect(m.state()).toBe("streaming")
+  })
+
+  it("a request ending during a composition goes back to composing", () => {
+    const m = make({ status: "streaming" })
+    m.send({ type: "COMPOSITION.START" })
+    m.setProps({ status: "idle" })
+    expect(m.state()).toBe("composing")
+    m.submit()
+    expect(m.onSubmit).not.toHaveBeenCalled()
+  })
+
   it("stop: once, announced; a double click's second click does not stop", () => {
     const m = make({ status: "idle" })
     m.type("q")
     m.submit()
+    m.setProps({ status: "submitting" })
     m.send({ type: "STOP", clickCount: 2 })
     expect(m.onStop).not.toHaveBeenCalled()
     m.setProps({ status: "streaming" })
@@ -198,24 +225,23 @@ describe("Prompt Input machine", () => {
     expect(m.state()).toBe("submitting")
   })
 
-  it("a synchronous throw is a failed send, and the error is not swallowed", () => {
+  it("a synchronous throw fails the send and is handed back to rethrow", () => {
     const boom = new Error("boom")
+    const onThrow = vi.fn()
     const m = make({
+      onThrow,
       onSubmit: () => {
         throw boom
       },
     })
-    // The machine re-raises it as a rejected promise; caught here so the run stays clean.
-    const reject = vi.spyOn(Promise, "reject").mockImplementation(() => Promise.resolve() as never)
     m.type("x")
     m.submit()
     expect(m.state()).toBe("idle")
     expect(m.value()).toBe("x")
-    expect(reject).toHaveBeenCalledWith(boom)
-    reject.mockRestore()
+    expect(onThrow).toHaveBeenCalledWith(boom)
   })
 
-  it("composition: no submit while composing; a dead key without compositionend does not freeze (assistant-ui#3923)", () => {
+  it("composition: no submit while composing; a dead key without compositionend does not freeze", () => {
     const m = make()
     m.send({ type: "COMPOSITION.START" })
     m.type("に", true)
@@ -231,6 +257,48 @@ describe("Prompt Input machine", () => {
     m.send({ type: "BLUR" })
     expect(m.state()).toBe("idle")
     expect(m.ctx().composing).toBe(false)
+  })
+
+  it("the count and the limit freeze at the committed draft while composing", () => {
+    const m = make({ limit: 3 })
+    m.type("ab")
+    m.send({ type: "COMPOSITION.START" })
+    m.type("abにほんご", true)
+    const during = derivePromptInput({ limit: 3 }, m.value(), [], m.ctx())
+    expect(during.used).toBe(2)
+    expect(during.overLimit).toBe(false)
+    m.send({ type: "COMPOSITION.END", value: "ab日本語" })
+    const after = derivePromptInput({ limit: 3 }, m.value(), [], m.ctx())
+    expect(after.used).toBe(5)
+    expect(after.overLimit).toBe(true)
+  })
+
+  it("the API writes through writeDraft with their reasons; never while composing", () => {
+    const writes: [string, string][] = []
+    const m = make({
+      history: ["one"],
+      writeDraft: (text, reason) => {
+        writes.push([text, reason])
+        return false
+      },
+    })
+    m.send({ type: "SET.VALUE", value: "hello" })
+    m.send({ type: "INSERT.TEXT", text: " world", start: 5, end: 5 })
+    expect(m.value()).toBe("hello world")
+    m.send({ type: "COMPOSITION.START" })
+    m.send({ type: "SET.VALUE", value: "lost" })
+    m.send({ type: "INSERT.TEXT", text: "x", start: 0, end: 0 })
+    m.send({ type: "COMPOSITION.END", value: "hello world" })
+    m.submit()
+    m.send({ type: "RECALL", direction: "older" })
+    expect(writes).toEqual([
+      ["hello", "api"],
+      ["hello world", "api"],
+      ["", "submit"],
+      ["one", "history"],
+    ])
+    expect(promptValueReason({ type: "INPUT", reason: "history" } as never)).toBe("history")
+    expect(promptValueReason({ type: "SET.VALUE" })).toBe("api")
   })
 
   it("files: accept with extensions, size and count limits, every rejection reported", () => {

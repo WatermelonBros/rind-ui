@@ -19,6 +19,8 @@ export type {
   PageVisibility,
   PlatformFlags,
   PlatformInfo,
+  PointerEnv,
+  PointerPreference,
   Scheduler,
   SchedulerEnv,
   StyleEnv,

@@ -111,6 +111,14 @@ export interface ModalityEnv {
 export interface MotionEnv {
   readonly motion: MotionPreference
 }
+/** The primary pointer: `(pointer: coarse)` on phones and tablets. */
+export interface PointerPreference {
+  coarse(): boolean
+  subscribeCoarse(listener: (coarse: boolean) => void): () => void
+}
+export interface PointerEnv {
+  readonly pointer: PointerPreference
+}
 export interface LocaleEnv {
   readonly locale: LocaleSource
 }

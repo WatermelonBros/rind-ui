@@ -1,17 +1,18 @@
 export type {
   FileRejection,
   PromptAttachment,
+  PromptAttachmentsReason,
   PromptInputMessages,
+  PromptInputState,
   PromptInputStatus,
   PromptMessage,
   PromptSubmitDetails,
   PromptSubmitKey,
+  PromptValueReason,
 } from "@rind-ui/core"
 export {
-  type PromptAttachmentsReason,
   PromptInput,
   type PromptInputControl,
   type PromptInputRootProps,
-  type PromptValueReason,
   usePromptInput,
 } from "./prompt-input"

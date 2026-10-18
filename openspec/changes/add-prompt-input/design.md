@@ -88,6 +88,25 @@ own a store; a promise-only design cannot express `streaming`. Both are accepted
 the same states. Parallel regions for composition × lifecycle: the runtime has none, and only
 `idle` needs the composing state.
 
+### 1b. After review r1
+
+- **Writes**: every write of the draft (clear, restore, recall, the API) goes through
+  `props.writeDraft(text, reason)`. The React adapter keeps the Textarea uncontrolled and
+  writes with `core/dom` `replaceText` (an `insertText` / `delete` editing command when
+  focused, so it can be undone; else the native setter); the `input` event comes back as INPUT
+  carrying the reason. Without a writer (controlled, Node) the machine sets the value.
+- **Settles**: `SETTLED` carries `sync` (settled inside the submit). A promise-less submit
+  settles at once and returns to `idle`; `status` then starts the request from `idle` or
+  `composing`. A promise's settle counts only while it is pending, so a walk never takes a
+  settle for a request that does not exist.
+- **Derived**: `derivePromptInput` (counted draft, used, over limit, submittable, recall) is
+  core; while composing it reads `context.committed` (the draft at `compositionstart`).
+  Connect computes it and the Enter decision from `touchPrimary` (the Environment's
+  `pointer.coarse()`, a fine pointer on the server).
+- **Field**: the form wraps a `FieldHost` (part `field`, `display: contents` in the theme);
+  the Textarea registers with the Field and takes its control id, so an enclosing Field's
+  Label names it.
+
 ### 2. Keys (connect, through `core/dom/keyboard`)
 
 | Event | Condition | Machine event |

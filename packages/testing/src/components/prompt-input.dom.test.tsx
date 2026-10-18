@@ -3,6 +3,7 @@
 
 import { platforms } from "@rind-ui/core"
 import {
+  Field,
   PromptInput,
   type PromptInputRootProps,
   RindProvider,
@@ -11,7 +12,7 @@ import {
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
-import { getPromptInput, installAnnouncementLog } from "../index"
+import { expectRindWarning, getPromptInput, installAnnouncementLog } from "../index"
 
 function Prompt(props: Partial<PromptInputRootProps> & { readonly count?: number }) {
   const { count, ...rest } = props
@@ -26,6 +27,11 @@ function Prompt(props: Partial<PromptInputRootProps> & { readonly count?: number
     </PromptInput.Root>
   )
 }
+
+/** The driver's Mod is Control: the page's platform must agree (a Mac browser says Meta). */
+const Linux = ({ children }: { readonly children: React.ReactNode }) => (
+  <RindProvider environment={{ platform: platforms.linux }}>{children}</RindProvider>
+)
 
 const textarea = () => screen.getByRole("textbox", { name: "Message" }) as HTMLTextAreaElement
 const submitButton = () =>
@@ -148,7 +154,9 @@ describe("Prompt Input", () => {
     await pi().attach([spec("photo.jpg", "image/jpeg")])
     await pi().fill("look")
     const before = installAnnouncementLog().length
-    await pi().submit()
+    // Not the driver's submit: its postcondition is a sent (empty) draft.
+    const u = await user()
+    await u.click(submitButton())
     await waitFor(async () => expect(await pi().value()).toBe("look"))
     expect(await pi().attachments()).toEqual(["photo.jpg"])
     await waitFor(() =>
@@ -181,7 +189,11 @@ describe("Prompt Input", () => {
     "the form's data carries the text and the attached files",
     async () => {
       const onSubmit = vi.fn()
-      render(<Prompt onSubmit={onSubmit} />)
+      render(
+        <Linux>
+          <Prompt onSubmit={onSubmit} />
+        </Linux>,
+      )
       await pi().attach([spec("report.pdf", "application/pdf")])
       await pi().fill("Summarise this")
       await pi({ modality: "keyboard" }).submit()
@@ -319,7 +331,8 @@ describe("Prompt Input", () => {
       </PromptInput.Root>,
     )
     await pi().type("hi")
-    await pi({ modality: "keyboard" }).submit()
+    const u = await user()
+    await u.keyboard("{Enter}")
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
@@ -355,7 +368,7 @@ describe("Prompt Input", () => {
     expect(onSubmit.mock.calls[0]?.[0].text).toBe("Explain this")
   })
 
-  it("a Textarea with only a placeholder warns in development", () => {
+  it("a Textarea with only a placeholder warns in development", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
       <PromptInput.Root>
@@ -363,7 +376,115 @@ describe("Prompt Input", () => {
         <PromptInput.Submit />
       </PromptInput.Root>,
     )
-    expect(warn.mock.calls.some(([m]) => String(m).includes("no accessible name"))).toBe(true)
+    await waitFor(() =>
+      expect(warn.mock.calls.some(([m]) => String(m).includes("no accessible name"))).toBe(true),
+    )
     warn.mockRestore()
+  })
+  it("inside a Field: joins it; the Field's Label names the Textarea, its Description describes it", () => {
+    render(
+      <Field.Root>
+        <Field.Label>Question</Field.Label>
+        <PromptInput.Root>
+          <PromptInput.Textarea />
+          <PromptInput.Submit />
+        </PromptInput.Root>
+        <Field.Description>Ask one thing at a time.</Field.Description>
+      </Field.Root>,
+    )
+    const box = screen.getByRole("textbox", { name: "Question" })
+    const described = (box.getAttribute("aria-describedby") ?? "")
+      .split(" ")
+      .map((id) => document.getElementById(id)?.textContent)
+    expect(described).toContain("Ask one thing at a time.")
+  })
+
+  it("standalone: the Root is a Field (data-invalid over the limit, Description in describedby)", async () => {
+    render(
+      <PromptInput.Root>
+        <PromptInput.Label>Message</PromptInput.Label>
+        <PromptInput.Textarea />
+        <PromptInput.Description>Be brief.</PromptInput.Description>
+        <PromptInput.CharacterCount max={3} />
+        <PromptInput.Submit />
+      </PromptInput.Root>,
+    )
+    const field = document.querySelector('[data-scope="prompt-input"][data-part="field"]')
+    expect(field).not.toBeNull()
+    expect(textarea().getAttribute("aria-describedby")?.split(" ").length).toBeGreaterThan(1)
+    await pi().type("toolong")
+    expect(field?.hasAttribute("data-invalid")).toBe(true)
+    expect(textarea().getAttribute("aria-invalid")).toBe("true")
+  })
+
+  it("a missing Submit, or two Textareas, is a development error", () => {
+    // The guard fails the test unless the error is logged.
+    expectRindWarning(/1 Textarea and 0 Submit parts; exactly one of each/)
+    render(
+      <PromptInput.Root>
+        <PromptInput.Label>Message</PromptInput.Label>
+        <PromptInput.Textarea />
+      </PromptInput.Root>,
+    )
+  })
+
+  it("a coarse primary pointer: Enter is a newline and the key hint says so", async () => {
+    const onSubmit = vi.fn()
+    render(
+      <RindProvider environment={{ coarsePointer: true }}>
+        <Prompt onSubmit={onSubmit} />
+      </RindProvider>,
+    )
+    expect(textarea().getAttribute("enterkeyhint")).toBe("enter")
+    const u = await user()
+    await u.click(textarea())
+    await u.keyboard("a{Enter}b")
+    expect(textarea().value).toBe("a\nb")
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it("reasons: typing is input, a send clears with submit, a recall is history, a reset is reset", async () => {
+    const reasons: string[] = []
+    render(
+      <Linux>
+        <Prompt
+          history={["one"]}
+          onSubmit={() => {}}
+          onValueChange={(_, d) => {
+            reasons.push(d.reason)
+          }}
+        />
+      </Linux>,
+    )
+    await pi().type("a")
+    await pi({ modality: "keyboard" }).submit()
+    await pi().recall("older")
+    expect(textarea().value).toBe("one")
+    act(() => (textarea().form as HTMLFormElement).reset())
+    await waitFor(() => expect(reasons.at(-1)).toBe("reset"))
+    expect(reasons.slice(0, 3)).toEqual(["input", "submit", "history"])
+  })
+
+  it("usePromptInput().insertText inserts at the caret", async () => {
+    function Insert() {
+      const prompt = usePromptInput()
+      return (
+        <button type="button" onClick={() => prompt.insertText("@ada ")}>
+          Mention
+        </button>
+      )
+    }
+    render(
+      <PromptInput.Root>
+        <PromptInput.Label>Message</PromptInput.Label>
+        <PromptInput.Textarea />
+        <Insert />
+        <PromptInput.Submit />
+      </PromptInput.Root>,
+    )
+    await pi().fill("hi there")
+    act(() => textarea().setSelectionRange(3, 3))
+    fireEvent.click(screen.getByRole("button", { name: "Mention" }))
+    expect(textarea().value).toBe("hi @ada there")
   })
 })

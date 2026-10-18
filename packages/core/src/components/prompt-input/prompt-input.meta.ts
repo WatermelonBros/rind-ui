@@ -26,16 +26,29 @@ export const promptInputMeta = {
         "The form: owns the state, is the drop target, renders the hidden file inputs; a press on its padding focuses the Textarea.",
     },
     {
+      name: "(none)",
+      part: "field",
+      element: "div",
+      description:
+        "The Field inside the form (`display: contents` in the theme); joins an enclosing Field instead when there is one.",
+    },
+    {
       name: "PromptInput.Label",
       part: "label",
       element: "label",
-      description: "Names the Textarea (`for`).",
+      description: "The Field's Label: names the Textarea (`for`).",
     },
     {
       name: "PromptInput.Description",
       part: "description",
       element: "p",
-      description: "Describes the Textarea (`aria-describedby`).",
+      description: "The Field's Description (`aria-describedby`).",
+    },
+    {
+      name: "PromptInput.ErrorMessage",
+      part: "error-message",
+      element: "p",
+      description: "The Field's errors, while invalid.",
     },
     {
       name: "PromptInput.Textarea",
@@ -94,7 +107,7 @@ export const promptInputMeta = {
     defaultValue: { type: "string", default: '""', description: "Uncontrolled draft." },
     onValueChange: {
       type: "(value, { reason }) => void",
-      description: "Reasons `input`, `submit` (cleared), `restore`, `history`, `api`.",
+      description: "Reasons `input`, `submit` (cleared), `restore`, `history`, `api`, `reset`.",
     },
     attachments: { type: "PromptAttachment[]", description: "Controlled attachments." },
     defaultAttachments: {
@@ -141,6 +154,12 @@ export const promptInputMeta = {
       default: "false",
       description: "No typing, no files; the draft can still be sent.",
     },
+    invalid: {
+      type: "boolean",
+      default: "false",
+      description: "The Field is invalid (also while over a CharacterCount's max).",
+    },
+    errors: { type: "string[]", description: "The Field's error messages." },
     messages: {
       type: "Partial<PromptInputMessages>",
       description: "Every string reaching assistive technology.",
@@ -206,8 +225,9 @@ export const promptInputMeta = {
       fill: ["keyboard"],
       compose: ["keyboard"],
       submit: ["pointer", "keyboard", "virtual"],
+      settle: ["pointer", "keyboard", "virtual"],
       stop: ["pointer", "keyboard", "virtual"],
-      attach: ["pointer", "virtual"],
+      attach: ["pointer", "keyboard", "virtual"],
       paste: ["keyboard"],
       recall: ["keyboard"],
       backspace: ["keyboard"],
@@ -228,6 +248,6 @@ export const promptInputMeta = {
       "isDisabled",
       "isDragging",
     ],
-    traits: [],
+    traits: ["field-associated"],
   },
 } as const satisfies ComponentMeta

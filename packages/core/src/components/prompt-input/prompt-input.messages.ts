@@ -1,5 +1,5 @@
-import type { FileRejectionReason } from "../../dom/file-intake"
 import { type InputChipsMessages, inputChipsMessages } from "../input-chips/input-chips"
+import type { FileRejectionReason } from "../shared/file-validation"
 import { type TextFieldMessages, textFieldMessages } from "../text-field/text-field.messages"
 
 /** Every string the Prompt Input sends to assistive technology (English defaults). */

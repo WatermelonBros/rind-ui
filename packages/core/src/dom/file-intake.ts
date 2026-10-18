@@ -1,63 +1,6 @@
-// File intake (prompt-input design §3): the `<input accept>` grammar, files from a paste or a
-// drag, and the file input that carries attached files into FormData. Framework-free; File
-// Upload reuses it.
-
-/** Why a file was not attached. */
-export type FileRejectionReason = "ACCEPT" | "MAX_FILES" | "MAX_SIZE"
-
-export interface FileRejection {
-  readonly file: File
-  readonly reason: FileRejectionReason
-}
-
-/**
- * Whether `file` matches an `accept` list, with the native `<input accept>` grammar: MIME
- * types, `type/*` wildcards and `.ext` extensions, comma-separated, case-insensitive. An
- * empty or missing list accepts everything (vercel/ai-elements#501: extensions too).
- */
-export function matchesAccept(
-  file: { readonly name: string; readonly type: string },
-  accept: string | undefined,
-): boolean {
-  const entries = (accept ?? "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean)
-  if (entries.length === 0) return true
-  const name = file.name.toLowerCase()
-  const type = file.type.toLowerCase()
-  return entries.some((entry) => {
-    if (entry.startsWith(".")) return name.endsWith(entry)
-    if (entry.endsWith("/*")) return type.startsWith(entry.slice(0, -1))
-    return type === entry
-  })
-}
-
-export interface FileLimits {
-  readonly accept?: string | undefined
-  readonly maxFiles?: number | undefined
-  readonly maxFileSize?: number | undefined
-  /** Files already attached (counted against `maxFiles`). */
-  readonly current: number
-}
-
-/** Splits one gesture's files into accepted and rejected (every rejection reported). */
-export function validateFiles(
-  files: readonly File[],
-  limits: FileLimits,
-): { readonly accepted: readonly File[]; readonly rejected: readonly FileRejection[] } {
-  const accepted: File[] = []
-  const rejected: FileRejection[] = []
-  for (const file of files) {
-    if (!matchesAccept(file, limits.accept)) rejected.push({ file, reason: "ACCEPT" })
-    else if (limits.maxFileSize !== undefined && file.size > limits.maxFileSize)
-      rejected.push({ file, reason: "MAX_SIZE" })
-    else if (limits.maxFiles !== undefined && limits.current + accepted.length >= limits.maxFiles)
-      rejected.push({ file, reason: "MAX_FILES" })
-    else accepted.push(file)
-  }
-  return { accepted, rejected }
-}
+// File intake (prompt-input design §3): files from a paste or a drag, the file input that
+// carries attached files into FormData, and the undo-preserving draft write. The accept
+// grammar and the limits are pure: components/shared/file-validation.ts.
 
 interface TransferLike {
   readonly files?: ArrayLike<File> | null | undefined
@@ -66,11 +9,11 @@ interface TransferLike {
   getData?(type: string): string
 }
 
+// Spreadsheet cells come with a picture of themselves (vercel/ai-elements#509); WebKit exposes
+// some images only in `files`, others only in `items` (lobehub/lobehub#4098).
 /**
  * The files of a paste, or `null` when it is a text paste: a clipboard that also carries
- * non-empty `text/plain` (spreadsheet cells come with a picture of themselves,
- * vercel/ai-elements#509) pastes the text. WebKit exposes some images only in `files`,
- * others only in `items` (lobehub#4098): both are read.
+ * non-empty `text/plain` pastes the text. Both `files` and `items` are read.
  */
 export function filesFromClipboard(data: TransferLike | null | undefined): readonly File[] | null {
   if (!data) return null
@@ -113,4 +56,27 @@ export function syncFileInput(input: HTMLInputElement, files: readonly File[]): 
   } catch {
     // An engine that refuses the assignment: FormData simply has no files.
   }
+}
+
+/**
+ * Replaces a text control's whole value as an edit the user can undo: with the control
+ * focused, an `insertText` (or `delete`) editing command over the selected text; otherwise
+ * the native value setter. Either way one `input` event follows. Returns false when it
+ * could not write (no command support and no setter).
+ */
+export function replaceText(el: HTMLTextAreaElement | HTMLInputElement, text: string): boolean {
+  if (el.value === text) return true
+  const doc = el.ownerDocument
+  if (doc.activeElement === el && doc.queryCommandSupported?.("insertText") === true) {
+    el.select()
+    // execCommand is deprecated but is the only edit that joins the undo stack.
+    const done =
+      text === "" ? doc.execCommand("delete", false) : doc.execCommand("insertText", false, text)
+    if (done && el.value === text) return true
+  }
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), "value")?.set
+  if (!setter) return false
+  setter.call(el, text)
+  el.dispatchEvent(new Event("input", { bubbles: true }))
+  return true
 }

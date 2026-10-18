@@ -36,8 +36,10 @@ The Textarea needs an accessible name: render a `PromptInput.Label` (visually hi
 | Part | `data-part` | Element | Description |
 |---|---|---|---|
 | `PromptInput.Root` | `root` | `<form>` | The form: owns the state, is the drop target, renders the hidden file inputs; a press on its padding focuses the Textarea. |
-| `PromptInput.Label` | `label` | `<label>` | Names the Textarea (`for`). |
-| `PromptInput.Description` | `description` | `<p>` | Describes the Textarea (`aria-describedby`). |
+| `(none)` | `field` | `<div>` | The Field inside the form (`display: contents` in the theme); joins an enclosing Field instead when there is one. |
+| `PromptInput.Label` | `label` | `<label>` | The Field's Label: names the Textarea (`for`). |
+| `PromptInput.Description` | `description` | `<p>` | The Field's Description (`aria-describedby`). |
+| `PromptInput.ErrorMessage` | `error-message` | `<p>` | The Field's errors, while invalid. |
 | `PromptInput.Textarea` | `textarea` | `<textarea>` | The draft: autosizes (`field-sizing: content`, measured fallback); Enter submits; pastes files. |
 | `PromptInput.Submit` | `submit` | `<button>` | One button: "Send message" (`type="submit"`) while idle, "Stop response" while busy; never unmounts. |
 | `PromptInput.AttachTrigger` | `attach-trigger` | `<button>` | Opens the native file chooser. |
@@ -53,7 +55,7 @@ The Textarea needs an accessible name: render a `PromptInput.Label` (visually hi
 |---|---|---|---|
 | `value` | `string` | — | Controlled draft. |
 | `defaultValue` | `string` | `""` | Uncontrolled draft. |
-| `onValueChange` | `(value, { reason }) => void` | — | Reasons `input`, `submit` (cleared), `restore`, `history`, `api`. |
+| `onValueChange` | `(value, { reason }) => void` | — | Reasons `input`, `submit` (cleared), `restore`, `history`, `api`, `reset`. |
 | `attachments` | `PromptAttachment[]` | — | Controlled attachments. |
 | `defaultAttachments` | `PromptAttachment[]` | `[]` | Uncontrolled attachments. |
 | `onAttachmentsChange` | `(attachments, { reason }) => void` | — | Reasons `add`, `remove`, `submit`, `restore`. |
@@ -71,6 +73,8 @@ The Textarea needs an accessible name: render a `PromptInput.Label` (visually hi
 | `filesName` | `string` | `"files"` | The files' form name. |
 | `disabled` | `boolean` | `false` | Every part is disabled. |
 | `readOnly` | `boolean` | `false` | No typing, no files; the draft can still be sent. |
+| `invalid` | `boolean` | `false` | The Field is invalid (also while over a CharacterCount's max). |
+| `errors` | `string[]` | — | The Field's error messages. |
 | `messages` | `Partial<PromptInputMessages>` | — | Every string reaching assistive technology. |
 
 Every attribute of the rendered element is accepted and forwarded.
@@ -151,8 +155,9 @@ Every attribute of the rendered element is accepted and forwarded.
 | `fill` | keyboard |
 | `compose` | keyboard |
 | `submit` | pointer, keyboard, virtual |
+| `settle` | pointer, keyboard, virtual |
 | `stop` | pointer, keyboard, virtual |
-| `attach` | pointer, virtual |
+| `attach` | pointer, keyboard, virtual |
 | `paste` | keyboard |
 | `recall` | keyboard |
 | `backspace` | keyboard |
@@ -160,19 +165,19 @@ Every attribute of the rendered element is accepted and forwarded.
 | `removeAttachment` | pointer, keyboard, virtual |
 | `removeChip` | pointer, keyboard, virtual |
 
-Queries: `value`, `state`, `attachments`, `chips`, `canSubmit`, `submitName`, `submitAction`, `characterCount`, `isOverLimit`, `isDisabled`, `isDragging`. Traits: none.
+Queries: `value`, `state`, `attachments`, `chips`, `canSubmit`, `submitName`, `submitAction`, `characterCount`, `isOverLimit`, `isDisabled`, `isDragging`. Traits: `field-associated`.
 <!-- /api -->
 
 ## The send/stop contract
 
 - `onSubmit({ text, attachments }, { event, formData })` is called **once** per send, with the draft and the attachments as they were. Both clear at once, so what the user types while the request runs is the next prompt and is never cleared later.
-- Return a promise to stay `submitting` until it settles. A rejected promise (or a thrown error) is a failed send: "Message not sent" is announced and the prompt comes back, unless the user has already started a new one.
-- Pass `status` when your chat state reports one: `"submitting"` and `"streaming"` turn Submit into Stop, `"idle"` ends the request, `"error"` fails it. Without `status` and without a promise, the input is ready again at once.
+- Return a promise to stay `submitting` until it settles. A rejected promise is a failed send: "Message not sent" is announced and the prompt comes back, unless the user has already started a new one. A synchronous throw fails the send the same way and is then rethrown to whatever submitted.
+- Pass `status` when your chat state reports one: `"submitting"` and `"streaming"` turn Submit into Stop, `"idle"` ends the request, `"error"` fails it. Without a promise the input is ready again at once, and your `status` takes it from there, so it never waits for a request you decided not to send.
 - While busy, Submit is Stop: pressing it calls `onStop()` once and announces "Response stopped". Enter never stops and never sends a second message; the draft stays editable. The second click of a double click on Send never stops the reply it just started.
 
 ## Keys
 
-Enter sends and Shift+Enter adds a line. `submitKey="mod+enter"` makes Enter a newline and Ctrl+Enter (⌘+Enter on Apple platforms) the send key, which people who write with an input method often prefer; `"none"` leaves sending to the button. On phones and tablets Enter is always a newline, and `enterkeyhint` tells the on-screen keyboard which it is.
+Enter sends and Shift+Enter adds a line. `submitKey="mod+enter"` makes Enter a newline and Ctrl+Enter (⌘+Enter on Apple platforms) the send key, which people who write with an input method often prefer; `"none"` leaves sending to the button. With a coarse primary pointer (phones and tablets, `(pointer: coarse)`) Enter is always a newline, and `enterkeyhint` tells the on-screen keyboard which it is.
 
 Every key the input acts on ignores a key that belongs to an input method composition, including the Enter that Safari delivers right after the composition ends. A composition that never ends (a dead key) does not block typing.
 
@@ -183,6 +188,14 @@ A handler on the Textarea that calls `preventDefault()` takes the key: a popup o
 Files come from `AttachTrigger` (the native file chooser), a paste of files, or a drop on the Root. `accept` uses the `<input accept>` grammar (MIME types, `image/*`, `.xlsx`) on every path, with `maxFiles` and `maxFileSize`; every refused file goes to `onReject` with its reason and is announced. A paste that also carries text (spreadsheet cells come with a picture of themselves) pastes the text. Attachments are chips: arrow keys move between them, Backspace or Delete removes one, Backspace in an empty draft arms the last one and removes it on the second press, and each removal is announced. Mark an attachment `pending` while it uploads: the input is not submittable until it is done.
 
 The attached files are also in the form's data under `filesName`, next to the text under `name`, so a form action receives both.
+
+## The draft and undo
+
+Without `value`, the Textarea owns its text. The input's own changes (the clear when you send, the prompt put back after a failure, a recalled prompt, `usePromptInput().setValue`) are made as edits, so Ctrl+Z (⌘+Z) brings back what was there. None of them happens while an input method composition is open.
+
+## Field
+
+The Root is a Field: `PromptInput.Label`, `Description` and `ErrorMessage` are its parts, and `invalid` / `errors` on the Root feed it (it is also invalid while over a CharacterCount's max). Inside an enclosing `Field.Root`, the Prompt Input joins it instead: that Field's Label names the Textarea.
 
 ## History
 
