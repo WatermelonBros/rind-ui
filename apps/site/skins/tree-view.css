@@ -21,7 +21,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="tree-view"][data-part="tree"][data-focus-visible]:not(:has([data-highlighted])) {
-  outline: 2px solid var(--s-brand);
+  outline: 2px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tree-view"][data-part="item"] {
@@ -46,7 +46,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="tree-view"][data-part="item"][data-highlighted][data-focus-visible] {
-  outline: 2px solid var(--s-brand);
+  outline: 2px solid var(--s-focus);
   outline-offset: -2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])

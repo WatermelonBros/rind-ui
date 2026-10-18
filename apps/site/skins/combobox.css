@@ -19,7 +19,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="combobox"][data-part="control"][data-focus] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
@@ -78,7 +78,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="combobox"]:is([data-part="trigger"], [data-part="clear-trigger"]):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 1px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="combobox"][data-part="popup"] {

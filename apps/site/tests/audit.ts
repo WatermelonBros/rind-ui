@@ -125,6 +125,101 @@ async function targets(frame: Locator, url: string, where: string) {
   for (const t of small) report(url, "target-size", `${where}: ${t}`)
 }
 
+/**
+ * The focus ring of an example's first focusable element is at least 3:1 against the background
+ * it sits on (WCAG 1.4.11, 2.4.11). Real keyboard focus: Tab from the stage itself, so both
+ * :focus-visible and the parts' own data-focus-visible apply.
+ */
+async function focusRing(page: Page, frame: Locator, url: string, where: string) {
+  const stage = frame.locator("[data-skin]").first()
+  await stage.evaluate((s) => {
+    s.setAttribute("tabindex", "-1")
+    s.focus()
+  })
+  await page.keyboard.press("Tab")
+  await settled(page, url)
+  const result = await stage.evaluate((s) => {
+    s.removeAttribute("tabindex")
+    const active = document.activeElement
+    if (!(active instanceof HTMLElement) || !s.contains(active) || active === s) return null
+    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true })
+    /** Any CSS colour → [r, g, b, a] in sRGB, through the canvas (oklab, color-mix…). */
+    const rgba = (c: string): number[] => {
+      if (!ctx) return [0, 0, 0, 0]
+      ctx.clearRect(0, 0, 1, 1)
+      ctx.fillStyle = c
+      ctx.fillRect(0, 0, 1, 1)
+      const d = ctx.getImageData(0, 0, 1, 1).data
+      return [d[0] ?? 0, d[1] ?? 0, d[2] ?? 0, (d[3] ?? 0) / 255]
+    }
+    const lum = ([r = 0, g = 0, b = 0]: number[]) => {
+      const f = (v: number) => {
+        const x = v / 255
+        return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+      }
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+    }
+    /** The opaque background under an element: its own and its ancestors' fills, blended. */
+    const backdrop = (from: Element | null): number[] => {
+      const layers: number[][] = []
+      for (let n = from; n; n = n.parentElement) {
+        const c = rgba(getComputedStyle(n).backgroundColor)
+        if ((c[3] ?? 0) > 0) layers.push(c)
+        if ((c[3] ?? 0) >= 1) break
+      }
+      let out = [255, 255, 255]
+      for (const [r = 0, g = 0, b = 0, a = 0] of layers.reverse())
+        out = [
+          r * a + (out[0] ?? 0) * (1 - a),
+          g * a + (out[1] ?? 0) * (1 - a),
+          b * a + (out[2] ?? 0) * (1 - a),
+        ]
+      return out
+    }
+    // the ring is on the focused element or the part around it (a control, an item); a
+    // two-tone indicator (an outline beside spread rings) passes when one tone reaches 3:1
+    for (let n: HTMLElement | null = active; n && s.contains(n); n = n.parentElement) {
+      const cs = getComputedStyle(n)
+      const r = n.getBoundingClientRect()
+      // a visually hidden input draws nothing: its visible part further up shows the focus
+      if (r.width < 2 || r.height < 2 || cs.clipPath !== "none" || cs.clip !== "auto") continue
+      const tones: string[] = []
+      let inside = false
+      if (cs.outlineStyle !== "none" && Number.parseFloat(cs.outlineWidth) > 0) {
+        tones.push(cs.outlineColor)
+        inside = Number.parseFloat(cs.outlineOffset) < 0
+      }
+      const shadows = cs.boxShadow === "none" ? [] : cs.boxShadow.split(/,(?![^(]*\))/)
+      for (const sh of shadows) {
+        const ring = /^\s*(.+\)) 0px 0px 0px [\d.]+px( inset)?\s*$/.exec(sh)
+        if (ring?.[1]) tones.push(ring[1])
+        if (ring?.[2] && tones.length === 1) inside = true
+      }
+      // no spread ring: an offset shadow (a lift) as the indicator
+      const lift = /(?:rgba?|oklab|oklch|color)\([^)]*\)/.exec(shadows[0] ?? "")?.[0]
+      if (!tones.length && lift) tones.push(lift)
+      const visible = tones.filter((t) => (rgba(t)[3] ?? 0) > 0)
+      if (!visible.length) continue
+      const bg = backdrop(inside ? n : n.parentElement)
+      const ratio = Math.max(
+        ...visible.map((t) => {
+          const [a, b] = [lum(rgba(t)), lum(bg)]
+          return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+        }),
+      )
+      const name = `${n.tagName.toLowerCase()}[data-part=${n.dataset["part"] ?? ""}]`
+      return { name, ring: visible.join(" + "), bg: `rgb(${bg.map(Math.round).join(", ")})`, ratio }
+    }
+    return null
+  })
+  if (result && result.ratio < 3)
+    report(
+      url,
+      "focus-contrast",
+      `${where}: ${result.name} ring ${result.ring} on ${result.bg} is ${result.ratio.toFixed(2)}:1`,
+    )
+}
+
 async function exercise(page: Page, url: string) {
   const frames = page.locator("section[data-example]")
   for (let i = 0; i < (await frames.count()); i++) {
@@ -136,6 +231,7 @@ async function exercise(page: Page, url: string) {
     for (const skin of ["juicy", "bare", "crisp"]) {
       await frame.getByRole("radio", { name: skin, exact: true }).click()
       await targets(frame, url, `example ${i} ${skin}`)
+      await focusRing(page, frame, url, `example ${i} ${skin}`)
     }
     // the open code panel's text, not a <pre> or tab panel the example renders in its stage
     const shownCode = async () => {
