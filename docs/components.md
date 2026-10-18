@@ -69,7 +69,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
-| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | spec | RAC/Reka: Tree |
+| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark |
 | Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |

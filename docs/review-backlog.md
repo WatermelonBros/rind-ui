@@ -8,6 +8,13 @@ See CLAUDE.md "Review rules".
 | Change | Reado id | File | Finding |
 |---|---|---|---|
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
+| add-tree-view (pending) | — | docs/research/tree-view.md | Manual real-AT pass of flat vs nested (`group`) DOM (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack): expand/collapse announcement, level/position, busy; freeze the DOM shape before 1.x (task 0.2) |
+| add-tree-view (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
+| add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |
+| add-tree-view (impl) | — | packages/testing/src/components/tree-view.model.dom.test.tsx | PRESS, INDICATOR, CHECK, programmatic expand/collapse, loader settle and tree/expandedValue prop changes are skipped in the model walk (DOM scenario tests cover them); no lazy or link props class |
+| add-tree-view (impl) | — | apps/site/examples/tree-view.tsx | No inline-input example (an input in a treeitem fails axe nested-interactive; covered by a DOM test) and no virtualized example |
+| color-picker-one-scope (r1) | — | packages/react/src/number-input | A hosted Number Input's Label still renders `host:label` (the Field host's part); the picker never renders it, so no Field part-name option (YAGNI) |
+| color-picker (site) | — | packages/core/src/components/shared/color/format.ts | The picker's ValueText shows unrounded hsl/hsb (`hsl(215.88, 100%, 61.96%)` for #3D8BFF); round to the channel step as the sliders do |
 | add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
 | add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
 | add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
