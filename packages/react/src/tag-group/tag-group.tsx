@@ -329,8 +329,12 @@ function List({ render, children, ...rest }: Own<"div">) {
   useSelector(host.service, (v) => v)
   const el = useRef<HTMLDivElement | null>(null)
   const interactive = host.parts.interactive
+  // After the re-render a Label's registration causes (a layout effect), not on the first commit.
   useEffect(() => {
-    if (el.current) checkTagGroupList(el.current, interactive)
+    const node = el.current
+    queueMicrotask(() => {
+      if (node?.isConnected) checkTagGroupList(node, interactive)
+    })
   }, [interactive])
   const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
   const props = mergeProps({ ...normalizeProps(host.parts.list(naming)), ref: el }, rest)
