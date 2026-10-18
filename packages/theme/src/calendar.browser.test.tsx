@@ -142,6 +142,38 @@ describe("Calendar stylesheet", () => {
     expect(style(host, "preview").backgroundColor).toBe(style(host, "plain").backgroundColor)
   })
 
+  it("month view: four short-month columns fit 320 px; the view trigger has a hit area and a ring", () => {
+    sheet()
+    const months = ["Jan", "Feb", "Mar", "Apr"]
+      .map((m, i) => `<td ${a("cell", `id="m${i}"`)}>${m}</td>`)
+      .join("")
+    const host =
+      mount(`<div style="inline-size:320px"><div ${a("root", 'role="group" data-view="months"')}>
+      <div ${a("header")}><h2 ${a("heading")}><button type="button" ${a("view-trigger", 'data-focus-visible id="up"')}>2026</button></h2></div>
+      <table role="grid" ${a("grid", 'data-view="months"')}><tbody ${a("grid-body")}><tr ${a("row")}>${months}</tr></tbody></table>
+    </div></div>`)
+    const grid = q(host, '[data-part="grid"]')
+    expect(grid.offsetWidth).toBeLessThanOrEqual(320)
+    for (const id of ["m0", "m1", "m2", "m3"]) {
+      const c = q(host, `#${id}`)
+      // The text fits its cell (no overflow of a short month name).
+      expect(c.scrollWidth).toBeLessThanOrEqual(c.clientWidth)
+      expect(c.offsetWidth).toBeGreaterThanOrEqual(40)
+    }
+    const up = q(host, "#up")
+    expect(up.offsetHeight).toBeGreaterThanOrEqual(24)
+    expect(getComputedStyle(up).outlineStyle).toBe("solid")
+  })
+
+  it("forced colors (months and years views): the range, current, unavailable and focus rules apply to period cells", () => {
+    // Period cells are cells: the same forced-colors rules (no view-specific override).
+    const css = calendar.replace(/\/\*[\s\S]*?\*\//g, "")
+    const forced = css.slice(css.indexOf("@media (forced-colors: active)"))
+    expect(forced).not.toMatch(/data-view/)
+    expect(forced).toMatch(/data-in-range\][\s\S]*?Highlight;/)
+    expect(forced).toMatch(/data-today\]\) \{[\s\S]*?border/)
+  })
+
   it("forced colors: the range uses Highlight, the preview a dashed outline", () => {
     const css = calendar.replace(/\/\*[\s\S]*?\*\//g, "")
     const forced = css.slice(css.indexOf("@media (forced-colors: active)"))

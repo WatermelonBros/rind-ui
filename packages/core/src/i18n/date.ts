@@ -139,7 +139,11 @@ export function dateFormatter(
 /** A `Date` for formatting only: the date's own day, at noon UTC (no host-zone shift). */
 function formatDate(date: CalendarDate): Date {
   const g = toCalendar(date, new GregorianCalendar())
-  return new Date(Date.UTC(g.year, g.month - 1, g.day, 12))
+  // BC years count backwards (1 BC is year 0); setUTCFullYear keeps years 0–99 as written
+  // (Date.UTC reads them as 1900–1999).
+  const at = new Date(Date.UTC(2000, g.month - 1, g.day, 12))
+  at.setUTCFullYear(g.era === "BC" ? 1 - g.year : g.year, g.month - 1, g.day)
+  return at
 }
 
 /** The day number a cell shows: the `day` part only (react-spectrum#4135: "14", not "14日"). */
@@ -152,16 +156,52 @@ export function dayText(date: CalendarDate, locale: string, calendar: Calendar):
   return f.formatToParts(formatDate(date)).find((p) => p.type === "day")?.value ?? String(date.day)
 }
 
+/** The era where a year alone is ambiguous: several eras, or BC in gregorian. */
+function eraOption(date: CalendarDate, calendar: Calendar): "short" | undefined {
+  if (calendar.getEras().length > 1 && calendar.identifier !== "gregory") return "short"
+  return toCalendar(date, new GregorianCalendar()).era === "BC" ? "short" : undefined
+}
+
+/** A month and year, or a year, a month or year cell is named by ("October 2026", "3 BC"). */
+export function periodName(
+  date: CalendarDate,
+  view: "months" | "years",
+  locale: string,
+  calendar: Calendar,
+): string {
+  const era = eraOption(date, calendar)
+  return dateFormatter(locale, {
+    ...(view === "months" ? { month: "long" } : {}),
+    year: "numeric",
+    ...(era ? { era } : {}),
+    calendar: calendar.identifier,
+    timeZone: "UTC",
+  }).format(formatDate(date))
+}
+
+/** The month a month cell shows ("Oct"), or the year part a year cell shows ("2569"). */
+export function periodText(
+  date: CalendarDate,
+  view: "months" | "years",
+  locale: string,
+  calendar: Calendar,
+  monthFormat: "short" | "long" | "narrow" | "numeric" = "short",
+): string {
+  const type = view === "months" ? "month" : "year"
+  const f = dateFormatter(locale, {
+    ...(view === "months" ? { month: monthFormat } : { year: "numeric" }),
+    calendar: calendar.identifier,
+    timeZone: "UTC",
+  })
+  return (
+    f.formatToParts(formatDate(date)).find((p) => p.type === type)?.value ??
+    String(view === "months" ? date.month : date.year)
+  )
+}
+
 /** The full date a cell is named by ("Wednesday, October 14, 2026"), with the era when needed. */
 export function fullDate(date: CalendarDate, locale: string, calendar: Calendar): string {
-  const g = toCalendar(date, new GregorianCalendar())
-  // Eras where a year alone is ambiguous: several eras, or BC in gregorian.
-  const era =
-    calendar.getEras().length > 1 && calendar.identifier !== "gregory"
-      ? "short"
-      : g.era === "BC"
-        ? "short"
-        : undefined
+  const era = eraOption(date, calendar)
   return dateFormatter(locale, {
     weekday: "long",
     day: "numeric",

@@ -174,3 +174,31 @@
   background: var(--s-brand);
   color: var(--s-brand-text);
 }
+/* the heading as a button one view up (days, months, years) */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="view-trigger"] {
+  min-block-size: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="view-trigger"]:hover {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="view-trigger"][data-focus-visible] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+/* month and year cells: a short month name, four to a row */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="grid"]:is([data-view="months"], [data-view="years"])
+  [data-part="cell"] {
+  inline-size: 64px;
+  block-size: 40px;
+}

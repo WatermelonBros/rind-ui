@@ -51,7 +51,8 @@ Give the Root an accessible name with `aria-label` or `aria-labelledby`; without
 |---|---|---|
 | `Calendar.Root` | `root` | `<div role="group">`; owns the state. |
 | `Calendar.Header` | `header` | `<div>` around the heading and the triggers. |
-| `Calendar.Heading` | `heading` | `<h2>` with the visible range ("October 2026"). |
+| `Calendar.Heading` | `heading` | `<h2>` with the visible range ("October 2026", "2026", "2016 – 2027"). |
+| (inside `Calendar.Heading`) | `view-trigger` | `<button>` one view up, while a higher view exists and `view` is not fixed. |
 | `Calendar.PrevTrigger` / `NextTrigger` | `prev-trigger`, `next-trigger` | `<button>` that pages; stays focusable at a bound. |
 | `Calendar.Grid` | `grid` | `<table role="grid">`; `month` is the offset from the first visible month. |
 | `Calendar.GridHeader` | `grid-header` | `<thead>` with the weekday names, hidden from assistive technology (each cell's name has its weekday). |
@@ -125,6 +126,30 @@ const [stay, setStay] = useState<CalendarValue>(null)
 
 The range is drawn with `data-in-range`, `data-range-start`, `data-range-end`, `data-anchor`, `data-preview`, `data-preview-start` and `data-preview-end` on the cells, and `data-anchored` on the root. `calendar.css` draws it as one band per week row, with a dashed preview. The helpers it uses, `makeRange`, `rangeLength`, `availableBounds`, `lengthBounds`, `crossesUnavailable` and `canEndRange`, are exported for your own range logic.
 
+## Month and year views
+
+`view` is `"days"` (default), `"months"` (the months of one year) or `"years"` (a page of `yearsPerPage` years, default 12), in rows of `columns` cells (default 4). It is controllable: `view`, `defaultView` and `onViewChange(view, { reason })`, with the reasons `heading`, `select`, `escape-key` and `api`. `minView` and `maxView` (default `"days"` and `"years"`) bound it.
+
+- **Drill-down.** While a higher view exists, the heading is a button ("October 2026, Choose month", from `messages.viewUp`) that goes up one view: days, months, years, keeping the focused period. Picking a period in a view above `minView` goes back down one view onto its first day (or month) without changing the value; Escape there goes down one view and is consumed. Each view change moves focus to the new view's tab stop and announces its heading. With `view` controlled and no `onViewChange` the heading is plain text.
+- **A month or year picker.** Set `minView="months"` (or `"years"`): the value is chosen there. Choosing a month changes only the value's month (the day clamped, 31 March to 28 February); choosing a year changes only its year (29 February to 28 February in a common year). The type, calendar, time of day and zone are kept; with no value the period's first day is emitted. Choosing the month that is already selected changes nothing.
+- **Pages.** A month page is one year of the display calendar (13 months in a Hebrew leap year). Year pages are fixed blocks (2016–2027, 2028–2039 with 12 per page), so paging never drifts, and stop at an era's first and last year. ArrowUp and ArrowDown keep the column; PageUp and PageDown keep the position on the next page.
+- **Constraints.** A month or year is allowed when any of its days is inside `minValue` / `maxValue`. `isMonthUnavailable(month)` and `isYearUnavailable(year)` decide availability for the period (never from its days); unavailable cells stay focusable.
+- **Names.** Cells are named "October 2026" (`messages.cellLabel`) and show the month in `monthFormat` (`"short"` default, `"long"`, `"narrow"`, `"numeric"`) or the year as the display calendar writes it (2569 in the Buddhist calendar); years carry their era when one is needed ("3 BC"). `data-value` is the period's first day. The triggers are "Previous year" / "Next year" and "Previous years" / "Next years": `messages.previous` and `messages.next` take a string or a function of the view.
+- **Ranges.** `selectionMode="range"` works at the period: the band, the preview and `minRangeLength` / `maxRangeLength` are in months or years. Commits are announced as "Selected March 2026 to June 2026".
+
+```tsx
+<Calendar.Root aria-label="Billing month" minView="months" onValueChange={setMonth}>
+  <Calendar.Header>
+    <Calendar.PrevTrigger />
+    <Calendar.Heading />
+    <Calendar.NextTrigger />
+  </Calendar.Header>
+  <Calendar.Grid />
+</Calendar.Root>
+```
+
+The grid of a month or year view has no weekday row and carries `data-view`, like the Root.
+
 ## Calendar systems and locale
 
 `locale` and `dir` default to the provider's. The Calendar shows the locale's calendar system. For a system other than Gregorian pass `createCalendar` from `@internationalized/date`; without it a non-Gregorian locale falls back to Gregorian with a warning in development.
@@ -172,6 +197,9 @@ Inside the grid, which follows the WAI-ARIA grid pattern. The grid is one tab st
 | Page Down / Page Up | Next / previous month. |
 | Shift + Page Down / Page Up | Next / previous year. |
 | Enter / Space | Select the focused date, when it is selectable. |
+| Escape | Range mode: cancel the range in progress. Above `minView`: one view down. Else it bubbles. |
+
+In the month and year views the arrows move by one period (Up and Down by a row), Home and End go to the page's first and last period, and Page Down / Page Up keep the position on the next or previous page.
 
 A move past the visible range pages to the date. Keys are ignored while an IME composes. The triggers are buttons: Enter and Space page.
 
@@ -196,7 +224,7 @@ Style the `data-*` attributes above. The theme reads `--rind-calendar-*` tokens 
 
 ## Testing
 
-`getCalendar(screen, { name })` locates the Calendar by its group role and accessible name. Actions: `select` (pages to the month if needed; by pointer or keyboard), `focusDate`, `nextPage`, `previousPage`, `press` (a key in the grid). Queries: `value`, `focusedDate`, `heading`, `visibleMonths`, `isSelected`, `isUnavailable`, `isDisabled`, `today`, `isInvalid`, `isFocused`. In range mode, the actions `selectRange(start, end)`, `startRange(date)` and `cancel()`, and the queries `range()` (the committed range's visible ends), `anchor()`, `preview()` and `isAnchored()`. Dates are ISO strings (`"2026-10-20"`).
+`getCalendar(screen, { name })` locates the Calendar by its group role and accessible name. Actions: `select` (pages to the month if needed; by pointer or keyboard), `focusDate`, `nextPage`, `previousPage`, `press` (a key in the grid). Queries: `value`, `focusedDate`, `heading`, `visibleMonths`, `isSelected`, `isUnavailable`, `isDisabled`, `today`, `isInvalid`, `isFocused`, `view`. `viewUp()` presses the heading button and `viewDown()` presses Escape in the grid. In the month and year views the same actions take a period: `select("2027-03")`, `select("2031")`. In range mode, the actions `selectRange(start, end)`, `startRange(date)` and `cancel()`, and the queries `range()` (the committed range's visible ends), `anchor()`, `preview()` and `isAnchored()`. Dates are ISO strings (`"2026-10-20"`).
 
 ```tsx
 import { getCalendar } from "@rind-ui/testing"

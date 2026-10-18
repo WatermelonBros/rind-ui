@@ -5,7 +5,7 @@ import { render } from "@testing-library/react"
 import { useLayoutEffect } from "react"
 import { describe, expect, it } from "vitest"
 import { domEnv, testMachine } from "../index"
-import { oracle, Story } from "./calendar-model"
+import { type Config, oracle, Story } from "./calendar-model"
 
 /** Re-applies `mutate` after every DOM change (a wrapper that keeps breaking the markup). */
 function Breaker({ mutate }: { readonly mutate: () => void }) {
@@ -49,14 +49,25 @@ const variants: Record<string, () => void> = {
   },
 }
 
-async function failuresOf(mutate: (() => void) | null) {
+/** A focusable button inside every cell (a consumer wrapper's button per day). */
+const buttonInCells = () => {
+  for (const c of cells()) {
+    if (c.querySelector("button")) continue
+    const b = document.createElement("button")
+    b.type = "button"
+    b.textContent = "•"
+    c.append(b)
+  }
+}
+
+async function failuresOf(mutate: (() => void) | null, cfg: Config = {}) {
   const tests: { name: string; fn: () => Promise<void> }[] = []
   testMachine(calendarContract, {
     test: (name: string, fn: () => Promise<void>) => tests.push({ name, fn }),
-    setup: () => render(<Story cfg={{}}>{mutate ? <Breaker mutate={mutate} /> : null}</Story>),
+    setup: () => render(<Story cfg={cfg}>{mutate ? <Breaker mutate={mutate} /> : null}</Story>),
     target: () => domEnv({ timeout: 300 }),
     anchor: [{ name: "Departure" }],
-    props: oracle({}) as never,
+    props: oracle(cfg) as never,
     modalities: ["keyboard"],
   } as never)
   const out: string[] = []
@@ -83,6 +94,20 @@ describe("calendar broken variants fail readably", () => {
     "placeholder focusable": /calendar-placeholders-inert|placeholder/,
     "two tab stops": /calendar-one-tab-stop|tabindex/,
   }
+  it("the correct month view passes", { timeout: 120_000 }, async () => {
+    expect(await failuresOf(null, { minView: "months" })).toEqual([])
+  })
+
+  for (const cfg of [{}, { minView: "months" }] as const) {
+    it(`a button inside cells fails on the roving tab stop (${cfg.minView ?? "days"} view)`, {
+      timeout: 120_000,
+    }, async () => {
+      const errors = await failuresOf(buttonInCells, cfg)
+      expect(errors.length).toBeGreaterThan(0)
+      expect(errors[0]).toMatch(/calendar-one-tab-stop|roving|focusable/)
+    })
+  }
+
   for (const [name, mutate] of Object.entries(variants)) {
     it(`${name} fails, naming it`, { timeout: 120_000 }, async () => {
       const errors = await failuresOf(mutate)

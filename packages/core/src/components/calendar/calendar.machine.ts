@@ -1,7 +1,9 @@
 // Calendar (design §3): `idle` / `focused` (only "is the grid focused" changes behaviour), a
-// controllable value (by day) and focused date; the visible start is context, the grids are
-// derived. Dates in context are in the display calendar; emitted values keep the caller's type,
-// calendar and time (toEmitted). Runs in Node: "today" comes from the injected date clock.
+// controllable value (by day), focused date and view; the visible start is context, the grids
+// are derived. Dates in context are in the display calendar; emitted values keep the caller's
+// type, calendar and time (toEmitted). Runs in Node: "today" comes from the injected date clock.
+// In the month and year views (spec "Month And Year Views") the unit is the period: the focused
+// period is the focused date's, and the page is derived from it (period-navigation).
 
 import {
   type Calendar,
@@ -13,7 +15,7 @@ import {
 } from "@internationalized/date"
 import type { Modality } from "../../contract/env"
 import type { AnnouncerEnv } from "../../env/capabilities"
-import { fullDate, toEmitted } from "../../i18n/date"
+import { fullDate, periodName, toEmitted } from "../../i18n/date"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs } from "../../machine/types"
 import type { CalendarMessages } from "./calendar.messages"
@@ -27,10 +29,25 @@ import {
   page,
 } from "./calendar.navigation"
 import {
+  type CalendarView,
+  canPagePeriod,
+  clampView,
+  movePeriod,
+  type PeriodMove,
+  type PeriodOptions,
+  type PeriodView,
+  periodAllowed,
+  periodStart,
+  viewRank,
+  viewStep,
+} from "./calendar.period"
+import {
+  announceHeading,
   announceVisibleRange,
   focusedValueControllable,
   prepareAnnouncer,
   requestCellFocus,
+  viewHeadingText,
 } from "./calendar.pieces"
 import { canEndRange, type DateRange, makeRange } from "./calendar.range"
 
@@ -42,7 +59,11 @@ export type CalendarValue = DateValue | readonly DateValue[] | CalendarRangeValu
 export type CalendarCommitOnBlur = "reset" | "select" | "clear"
 
 export type CalendarEvent =
-  | { readonly type: "NAVIGATE"; readonly move: CalendarMove; readonly composing: boolean }
+  | {
+      readonly type: "NAVIGATE"
+      readonly move: CalendarMove | PeriodMove
+      readonly composing: boolean
+    }
   | { readonly type: "CELL.FOCUS"; readonly date: CalendarDate; readonly modality: Modality }
   | { readonly type: "CELL.PRESS"; readonly date: CalendarDate; readonly modality: Modality }
   | { readonly type: "CELL.HOVER"; readonly date: CalendarDate }
@@ -61,8 +82,24 @@ export type CalendarEvent =
   | { readonly type: "LEAVE" }
   /** The parent changed `value` (onProps): a range in progress is dropped. */
   | { readonly type: "VALUE.SYNC" }
+  /** The heading button: one view up (days → months → years). */
+  | { readonly type: "VIEW.UP"; readonly modality: Modality }
+  /** Escape in a view above `minView`: one view down. */
+  | { readonly type: "VIEW.DOWN" }
 
-export interface CalendarProps extends NavigationOptions {
+export interface CalendarProps extends NavigationOptions, PeriodOptions {
+  /** The shown view (controllable): days, the months of a year, or a page of years. */
+  readonly view?: CalendarView | undefined
+  readonly defaultView?: CalendarView | undefined
+  /** Translated by the adapter into `(view, { reason })`. */
+  readonly onViewChange?: ((view: CalendarView, details: unknown) => void) | undefined
+  /** The lowest and highest view (default "days" / "years"); the value is chosen in `minView`. */
+  readonly minView?: CalendarView | undefined
+  readonly maxView?: CalendarView | undefined
+  /** The month view's availability, told the month's first day (never derived from its days). */
+  readonly isMonthUnavailable?: ((month: CalendarDate) => boolean) | undefined
+  /** The year view's availability, told the year's first day. */
+  readonly isYearUnavailable?: ((year: CalendarDate) => boolean) | undefined
   /** Shown invalid whatever the value (a host field's own validity). */
   readonly invalid?: boolean | undefined
   /**
@@ -87,7 +124,7 @@ export interface CalendarProps extends NavigationOptions {
   readonly anchor?: CalendarDate | null | undefined
   readonly defaultAnchor?: CalendarDate | null | undefined
   readonly onAnchorChange?: ((anchor: CalendarDate | null, details: unknown) => void) | undefined
-  /** Range length bounds in days, both ends included. */
+  /** Range length bounds in periods (days in the days view), both ends included. */
   readonly minRangeLength?: number | undefined
   readonly maxRangeLength?: number | undefined
   /** A range may contain unavailable dates (default false). */
@@ -105,7 +142,7 @@ export interface CalendarProps extends NavigationOptions {
 }
 
 export interface CalendarContext {
-  /** The first day of the first visible month (display calendar). */
+  /** The first day of the first visible month. */
   visibleStart: CalendarDate
   hovered: CalendarDate | null
 }
@@ -115,7 +152,7 @@ type Types = {
   events: CalendarEvent
   env: AnnouncerEnv
   context: CalendarContext
-  values: "value" | "focusedValue" | "anchor"
+  values: "value" | "focusedValue" | "anchor" | "view"
 }
 type Args = ActionArgs<Types>
 
@@ -154,31 +191,51 @@ export function sameDays(a: CalendarValue, b: CalendarValue): boolean {
 export const display = (date: DateValue, calendar: Calendar): CalendarDate =>
   toCalendar(toCalendarDate(date), calendar)
 
-/** The consumer's availability, told the current anchor. */
+/** The shown view: the value inside [minView, maxView]. */
+export const viewIn = (
+  view: CalendarView | undefined,
+  props: Pick<CalendarProps, "minView" | "maxView">,
+): CalendarView => clampView(view ?? "days", props.minView ?? "days", props.maxView ?? "years")
+
+/** The consumer's availability, told the current anchor (days) or the period (months, years). */
 export const unavailable = (
-  props: Pick<CalendarProps, "isDateUnavailable">,
+  props: Pick<CalendarProps, "isDateUnavailable" | "isMonthUnavailable" | "isYearUnavailable">,
   date: CalendarDate,
   anchor: CalendarDate | null = null,
-) => props.isDateUnavailable?.(date, { anchor }) === true
+  view: CalendarView = "days",
+) =>
+  (view === "days"
+    ? props.isDateUnavailable?.(date, { anchor })
+    : view === "months"
+      ? props.isMonthUnavailable?.(date)
+      : props.isYearUnavailable?.(date)) === true
+
+/** The range module's period for a view. */
+export const rangePeriod = (view: CalendarView) =>
+  view === "days" ? "day" : view === "months" ? "month" : "year"
 
 /**
- * Whether a date can be chosen: enabled, inside the constraints, available; while anchored
- * (range mode) also a valid end for the anchor (length bounds, no unavailable date inside).
+ * Whether a date (a period's first day in the month and year views) can be chosen: enabled,
+ * inside the constraints, available; while anchored (range mode) also a valid end for the
+ * anchor (length bounds, no unavailable period inside).
  */
 export function isSelectable(
   date: CalendarDate,
   props: CalendarProps,
   anchor: CalendarDate | null = null,
+  view: CalendarView = "days",
 ): boolean {
   if (props.disabled || props.readOnly) return false
-  if (!isSameDay(clamp(date, props), date)) return false
-  if (unavailable(props, date, anchor)) return false
+  if (view === "days" ? !isSameDay(clamp(date, props), date) : !periodAllowed(date, view, props))
+    return false
+  if (unavailable(props, date, anchor, view)) return false
   if (props.selectionMode !== "range" || anchor === null) return true
   return canEndRange(anchor, date, {
     minRangeLength: props.minRangeLength,
     maxRangeLength: props.maxRangeLength,
-    isUnavailable: (d) => unavailable(props, d, anchor),
+    isUnavailable: (d) => unavailable(props, d, anchor, view),
     allowsNonContiguousRanges: props.allowsNonContiguousRanges,
+    period: rangePeriod(view),
   })
 }
 
@@ -193,8 +250,23 @@ const NO_ANCHOR = null as unknown as CalendarDate
 /** The adapter always passes `defaultFocusedValue` (initialFocus with the clock's today). */
 const EPOCH = new CalendarDate(1970, 1, 1)
 
+const viewOf = (args: Pick<Args, "values" | "props">) => viewIn(args.values.view, args.props)
+
+/** The focused date, or in the month and year views the focused period's first day. */
 const focusedOf = (args: Pick<Args, "values" | "props">) =>
-  toCalendar(args.values.focusedValue, args.props.calendar)
+  periodStart(toCalendar(args.values.focusedValue, args.props.calendar), viewOf(args))
+
+/** A view above `minView` drills down when a period is chosen (spec "View Drill-Down"). */
+const drills = (args: Pick<Args, "values" | "props">) =>
+  viewRank(viewOf(args)) > viewRank(args.props.minView ?? "days")
+
+/** Whether pressing `date` does something: drills down, or selects it. */
+function canChoose(args: Pick<Args, "values" | "props">, date: CalendarDate) {
+  const view = viewOf(args)
+  if (!drills(args)) return isSelectable(date, args.props, anchorOf(args), view)
+  // Drilling is navigation: read-only and unavailable periods can be opened.
+  return args.props.disabled !== true && periodAllowed(date, view, args.props)
+}
 
 /** Moves the focus (and the visible range with it). */
 function focus(args: Args, date: CalendarDate, visibleStart: CalendarDate) {
@@ -202,16 +274,21 @@ function focus(args: Args, date: CalendarDate, visibleStart: CalendarDate) {
   args.set("visibleStart", visibleStart)
 }
 
+/** A date's name in announcements: the full date, or the period ("March 2026"). */
+const nameIn = (date: CalendarDate, view: CalendarView, props: CalendarProps) =>
+  view === "days"
+    ? fullDate(date, props.formatLocale, props.calendar)
+    : periodName(date, view, props.formatLocale, props.calendar)
+
 /** One step of a range selection: the first sets the anchor, the second commits. */
 function rangeStep(args: Args, date: CalendarDate) {
   const { props, values, env } = args
+  const view = viewOf(args)
   const anchor = anchorOf(args)
   if (anchor === null) {
     args.set("anchor", date)
     env.announcer.announce({
-      message: props.messages.anchorSet({
-        anchor: fullDate(date, props.formatLocale, props.calendar),
-      }),
+      message: props.messages.anchorSet({ anchor: nameIn(date, view, props) }),
       priority: "polite",
       key: `calendar-${props.id}-range`,
     })
@@ -227,16 +304,29 @@ function rangeStep(args: Args, date: CalendarDate) {
   args.set("anchor", NO_ANCHOR)
   env.announcer.announce({
     message: props.messages.rangeSelected({
-      start: fullDate(start, props.formatLocale, props.calendar),
-      end: fullDate(end, props.formatLocale, props.calendar),
+      start: nameIn(start, view, props),
+      end: nameIn(end, view, props),
     }),
     priority: "polite",
     key: `calendar-${props.id}-range`,
   })
 }
 
+/**
+ * The date a period choice emits (display calendar): the base with only its month, or only its
+ * era and year, changed (the day clamped, 29 February to 28 February); else the period's first
+ * day.
+ */
+function atPeriod(base: CalendarDate | null, period: CalendarDate, view: PeriodView) {
+  if (base === null) return period
+  return view === "months"
+    ? period.set({ day: base.day })
+    : base.set({ era: period.era, year: period.year })
+}
+
 function select(args: Args, date: CalendarDate) {
   const { props, values } = args
+  const view = viewOf(args)
   const modality: Modality = args.event.type === "CELL.PRESS" ? args.event.modality : "keyboard"
   if (props.selectionMode === "range") {
     const anchored = anchorOf(args) !== null
@@ -247,9 +337,17 @@ function select(args: Args, date: CalendarDate) {
   }
   const current = valuesOf(values.value)
   const base = current[0] ?? valuesOf(props.defaultValue)[0] ?? null
-  const emitted = toEmitted(date, base)
+  const samePeriod = (d: DateValue) =>
+    isSameDay(periodStart(display(d, props.calendar), view), date)
+  const emitted =
+    view === "days"
+      ? toEmitted(date, base)
+      : toEmitted(
+          atPeriod(current[0] ? display(current[0], props.calendar) : null, date, view),
+          base,
+        )
   if (props.selectionMode === "multiple") {
-    const without = current.filter((d) => !isSameDay(d, date))
+    const without = current.filter((d) => !samePeriod(d))
     const next =
       without.length < current.length
         ? without
@@ -257,9 +355,31 @@ function select(args: Args, date: CalendarDate) {
     args.set("value", next)
     return
   }
-  // Pressing the selected date again keeps it selected (a host still sees the choice).
-  if (!(current[0] && isSameDay(current[0], date))) args.set("value", emitted)
+  // Pressing the selected date (period) again keeps it selected (a host still sees the choice).
+  if (!(current[0] && samePeriod(current[0]))) args.set("value", emitted)
   props.onDateSelect?.(date, { modality })
+}
+
+/** Shows `view` with the focus kept, its tab stop focused and its heading announced. */
+function showView(args: Args, view: CalendarView, date: CalendarDate) {
+  const focused = clamp(date, args.props)
+  const shown = periodStart(focused, view)
+  const visibleStart = align(focused, args.context.visibleStart, args.props)
+  focus(args, focused, visibleStart)
+  args.set("view", view)
+  announceHeading(
+    args.env,
+    viewHeadingText(view, visibleStart, shown, args.props),
+    args.props,
+    "calendar",
+  )
+  requestCellFocus(args.props, shown)
+}
+
+/** One view down onto the chosen period, focused on its first day (or month). */
+function drillDown(args: Args, date: CalendarDate) {
+  const below = viewStep(viewOf(args), -1)
+  if (below) showView(args, below, clamp(date, args.props))
 }
 
 export const calendarMachine = setup({
@@ -268,32 +388,58 @@ export const calendarMachine = setup({
     interactive: ({ props }) => props.disabled !== true,
     notComposing: ({ event }) =>
       !((event.type === "NAVIGATE" || event.type === "SELECT_FOCUSED") && event.composing),
-    focusedSelectable: (args) => isSelectable(focusedOf(args), args.props, anchorOf(args)),
+    focusedSelectable: (args) => canChoose(args, focusedOf(args)),
     anchored: (args) => anchorOf(args) !== null,
     // A press (pointer, touch, or a key on the focused trigger) has moved focus to the
     // trigger; a screen reader's click (virtual) has not, so the grid keeps focus and
     // repairs it after paging.
     pagedByPress: ({ event }) => event.type === "PAGE" && event.modality !== "virtual",
-    canPage: ({ event, context, props }) =>
-      event.type === "PAGE" &&
-      props.disabled !== true &&
-      canPage(context.visibleStart, event.direction, props),
+    canPage: (args) => {
+      const { event, context, props } = args
+      if (event.type !== "PAGE" || props.disabled === true) return false
+      const view = viewOf(args)
+      return view === "days"
+        ? canPage(context.visibleStart, event.direction, props)
+        : canPagePeriod(focusedOf(args), view, event.direction, props)
+    },
+    canViewUp: (args) => {
+      const max = args.props.maxView ?? "years"
+      return args.props.disabled !== true && viewRank(viewOf(args)) < viewRank(max)
+    },
+    canViewDown: (args) => drills(args),
   },
   actions: {
     move: (args) => {
       if (args.event.type !== "NAVIGATE") return
-      const next = move(
-        { focused: focusedOf(args), visibleStart: args.context.visibleStart },
-        args.event.move,
-        args.props,
-      )
-      focus(args, next.focused, next.visibleStart)
+      const view = viewOf(args)
+      const m = args.event.move
+      const focused =
+        view === "days"
+          ? isPeriodMove(m)
+            ? null
+            : move(
+                { focused: focusedOf(args), visibleStart: args.context.visibleStart },
+                m,
+                args.props,
+              ).focused
+          : isPeriodMove(m)
+            ? clamp(movePeriod(focusedOf(args), view, m, args.props), args.props)
+            : null
+      if (focused === null) return
+      focus(args, focused, align(focused, args.context.visibleStart, args.props))
       // The arrows move the preview even while the pointer rests on a cell.
       if (args.context.hovered !== null) args.set("hovered", null)
-      requestCellFocus(args.props, next.focused)
+      requestCellFocus(args.props, focused)
     },
     page: (args) => {
       if (args.event.type !== "PAGE") return
+      const view = viewOf(args)
+      if (view !== "days") {
+        const m = args.event.direction > 0 ? "next-page" : "previous-page"
+        const focused = clamp(movePeriod(focusedOf(args), view, m, args.props), args.props)
+        focus(args, focused, align(focused, args.context.visibleStart, args.props))
+        return
+      }
       const next = page(
         { focused: focusedOf(args), visibleStart: args.context.visibleStart },
         args.event.direction,
@@ -303,12 +449,25 @@ export const calendarMachine = setup({
     },
     /** Keyboard paging in the grid: the focus follows into the new month's cell. */
     focusAfterPage: (args) => requestCellFocus(args.props, focusedOf(args)),
-    /** Paging from outside the grid announces the range (the focused cell's name carries it inside). */
-    announceRange: (args) =>
-      announceVisibleRange(args.env, args.context.visibleStart, args.props, "calendar"),
+    /** Paging from outside the grid announces the heading (the focused cell's name carries it inside). */
+    announceRange: (args) => {
+      const view = viewOf(args)
+      if (view === "days")
+        announceVisibleRange(args.env, args.context.visibleStart, args.props, "calendar")
+      else
+        announceHeading(
+          args.env,
+          viewHeadingText(view, args.context.visibleStart, focusedOf(args), args.props),
+          args.props,
+          "calendar",
+        )
+    },
     setFocused: (args) => {
       if (args.event.type !== "CELL.FOCUS" && args.event.type !== "CELL.PRESS") return
       const date = clamp(args.event.date, args.props)
+      // A period's cell keeps the focused date when it is already inside that period.
+      const same = isSameDay(periodStart(date, viewOf(args)), focusedOf(args))
+      if (same) return
       focus(args, date, align(date, args.context.visibleStart, args.props))
     },
     pressFocus: (args) => {
@@ -317,14 +476,24 @@ export const calendarMachine = setup({
       requestCellFocus(args.props, args.event.date, args.event.modality)
     },
     selectPressed: (args) => {
-      if (
-        args.event.type === "CELL.PRESS" &&
-        isSelectable(args.event.date, args.props, anchorOf(args))
-      ) {
-        select(args, args.event.date)
-      }
+      if (args.event.type !== "CELL.PRESS") return
+      const date = periodStart(args.event.date, viewOf(args))
+      if (!canChoose(args, date)) return
+      if (drills(args)) drillDown(args, date)
+      else select(args, date)
     },
-    selectFocused: (args) => select(args, focusedOf(args)),
+    selectFocused: (args) => {
+      if (drills(args)) drillDown(args, focusedOf(args))
+      else select(args, focusedOf(args))
+    },
+    viewUp: (args) => {
+      const above = viewStep(viewOf(args), 1)
+      if (above) showView(args, above, toCalendar(args.values.focusedValue, args.props.calendar))
+    },
+    viewDown: (args) => {
+      const below = viewStep(viewOf(args), -1)
+      if (below) showView(args, below, toCalendar(args.values.focusedValue, args.props.calendar))
+    },
     setHovered: ({ event, set }) => {
       if (event.type === "CELL.HOVER") set("hovered", event.date)
     },
@@ -341,7 +510,7 @@ export const calendarMachine = setup({
       const mode = args.props.commitOnBlur ?? "reset"
       if (mode === "select") {
         const end = args.context.hovered ?? focusedOf(args)
-        if (isSelectable(end, args.props, anchor)) {
+        if (isSelectable(end, args.props, anchor, viewOf(args))) {
           rangeStep(args, end)
           return
         }
@@ -352,17 +521,21 @@ export const calendarMachine = setup({
     },
     /** A parent's focusedValue: clamped, the range realigned, announced from outside the grid. */
     syncFocus: (args) => {
-      const date = clamp(focusedOf(args), args.props)
+      const focused = toCalendar(args.values.focusedValue, args.props.calendar)
+      const date = clamp(focused, args.props)
       const visibleStart = align(date, args.context.visibleStart, args.props)
-      if (!isSameDay(date, focusedOf(args))) args.set("focusedValue", date)
-      if (!isSameDay(visibleStart, args.context.visibleStart)) {
+      const view = viewOf(args)
+      const before = viewHeadingText(view, args.context.visibleStart, focusedOf(args), args.props)
+      if (!isSameDay(date, focused)) args.set("focusedValue", date)
+      if (!isSameDay(visibleStart, args.context.visibleStart))
         args.set("visibleStart", visibleStart)
-        announceVisibleRange(args.env, visibleStart, args.props, "calendar")
-      }
+      const after = viewHeadingText(view, visibleStart, periodStart(date, view), args.props)
+      if (after !== before) announceHeading(args.env, after, args.props, "calendar")
     },
     constrain: (args) => {
-      const date = clamp(focusedOf(args), args.props)
-      if (!isSameDay(date, focusedOf(args)))
+      const focused = toCalendar(args.values.focusedValue, args.props.calendar)
+      const date = clamp(focused, args.props)
+      if (!isSameDay(date, focused))
         focus(args, date, align(date, args.context.visibleStart, args.props))
     },
   },
@@ -388,6 +561,7 @@ export const calendarMachine = setup({
     value: { fallback: EMPTY, equal: sameDays },
     focusedValue: focusedValueControllable(EPOCH),
     anchor: { fallback: NO_ANCHOR, equal: sameAnchor },
+    view: { fallback: "days" },
   },
   effects: ["prepareAnnouncer"],
   onProps: {
@@ -412,6 +586,9 @@ export const calendarMachine = setup({
     idle: {
       on: {
         "GRID.FOCUS": { target: "focused", guard: "interactive" },
+        // The heading button has focus; the new view's tab stop takes it.
+        "VIEW.UP": { guard: "canViewUp", target: "focused", actions: ["viewUp"] },
+        "VIEW.DOWN": { guard: "canViewDown", target: "focused", actions: ["viewDown"] },
         // The triggers page (keys move the focus instead): announced from outside the grid.
         PAGE: { guard: "canPage", actions: ["page", "announceRange"] },
         // A pointer press focuses the cell too; it selects only a selectable date.
@@ -425,6 +602,8 @@ export const calendarMachine = setup({
     focused: {
       on: {
         "GRID.BLUR": "idle",
+        "VIEW.UP": { guard: "canViewUp", actions: ["viewUp"] },
+        "VIEW.DOWN": { guard: "canViewDown", actions: ["viewDown"] },
         NAVIGATE: { guard: "notComposing", actions: ["move"] },
         // Focus alone never selects (cause C).
         "CELL.FOCUS": { actions: ["setFocused"] },
@@ -442,9 +621,25 @@ export const calendarMachine = setup({
             actions: ["page", "announceRange"],
           },
           { guard: "canPage", actions: ["page", "focusAfterPage"] },
+          // A press on a trigger at a bound (aria-disabled, still focusable) leaves the grid.
+          { guard: "pagedByPress", target: "idle" },
         ],
       },
     },
   },
 })
 export type CalendarMachine = typeof calendarMachine
+
+const PERIOD_MOVES: ReadonlySet<string> = new Set<PeriodMove>([
+  "next",
+  "previous",
+  "next-row",
+  "previous-row",
+  "first",
+  "last",
+  "next-page",
+  "previous-page",
+])
+function isPeriodMove(m: CalendarMove | PeriodMove): m is PeriodMove {
+  return PERIOD_MOVES.has(m)
+}
