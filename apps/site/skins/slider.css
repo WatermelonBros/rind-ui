@@ -51,7 +51,7 @@
   block-size: var(--s-slider-track);
   border-radius: 99px;
   background: var(--s-muted);
-  box-shadow: inset 0 0 0 var(--s-bw) var(--s-line);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-field-line);
   overflow: hidden;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
@@ -83,7 +83,7 @@
   inline-size: var(--s-slider-thumb);
   block-size: var(--s-slider-thumb);
   border-radius: 50%;
-  border: max(var(--s-bw), 2px) solid var(--s-line);
+  border: max(var(--s-bw), 2px) solid var(--s-field-line);
   background: var(--s-card);
   box-shadow: var(--s-lift-lo);
   transition:
