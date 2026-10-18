@@ -12,6 +12,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 |---|---|
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/combobox.machine.ts` | `vo-activedescendant` |
+| `packages/core/src/components/grid-list/grid-list.machine.ts` | `webkit-grid-selection-not-announced` |
 | `packages/core/src/components/menu/menu.connect.ts` | `vo-submenu-expanded` |
 | `packages/core/src/dom/autosize.ts` | `firefox-textarea-overflow` |
 | `packages/core/src/dom/hover.ts` | `ios-emulated-mouse-after-touch` |
@@ -27,6 +28,15 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+
+## `webkit-grid-selection-not-announced`
+
+- Bugs: <https://bugs.webkit.org/show_bug.cgi?id=235068>
+- Repro test: `packages/testing/src/components/grid-list.dom.test.tsx`
+- Checked in: `packages/core/src/components/grid-list/grid-list.machine.ts`
+- Allowed contract exceptions: `announcement-parity`
+- Last verified: 2026-10-18
+- Remove when: VoiceOver speaks aria-selected changes on grid rows in Safari
 
 ## `firefox-textarea-overflow`
 
