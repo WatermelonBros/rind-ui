@@ -340,6 +340,17 @@ describe("Date Field", () => {
     expect(hidden().checkValidity()).toBe(false)
     fireEvent.click(screen.getByRole("button", { name: "Submit" }))
     expect(onSubmit).not.toHaveBeenCalled()
+    // Validation focuses the hidden input, which forwards focus to the first segment (jsdom
+    // runs no interactive validation: the forward is what the browser triggers).
+    if (inJsdom) act(() => hidden().focus())
+    await vi.waitFor(() => expect(document.activeElement).toBe(segment("month Birthday")))
+  })
+
+  it("Seconds kept at minute granularity never block submission", () => {
+    render(<D granularity="minute" defaultValue={new CalendarDateTime(2026, 10, 14, 9, 30, 15)} />)
+    expect(hidden().getAttribute("step")).toBe("60")
+    expect(hidden().value).toBe("2026-10-14T09:30")
+    expect(hidden().checkValidity()).toBe(true)
   })
 
   it("Read-only stays focusable (reka-ui#2007); ArrowUp changes nothing", async () => {
@@ -404,7 +415,7 @@ describe("Field Integration", () => {
   it("Error shown after leaving (react-spectrum#3328); moving between segments does not touch", async () => {
     render(
       <RindProvider environment={{ dateClock: clock }}>
-        {/* The spec's "default validation" shows on leave: the Field's blur mode. */}
+        {/* The Field shows errors on leave in its blur mode (the default is submit). */}
         <Field.Root validationMode="blur">
           <Field.Label>Birthday</Field.Label>
           <DateField.Root>

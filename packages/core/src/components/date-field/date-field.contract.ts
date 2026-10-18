@@ -95,7 +95,11 @@ async function active(env: E): Promise<Part> {
 
 const props = (p: Readonly<Record<string, unknown>>) => p as unknown as DateFieldProps
 const ctx = (view: { context: unknown }) => view.context as DateFieldContext
-const iso = (v: unknown) => formValueOf((v as DateValue | null | undefined) ?? null)
+/** The oracle value as the hidden input holds it (granularity from the oracle's format). */
+const iso = (v: unknown, p?: Readonly<Record<string, unknown>>) => {
+  const value = (v as DateValue | null | undefined) ?? null
+  return formValueOf(value, p ? formatFor(props(p), value).options.granularity : "second")
+}
 
 /** The segment invariants (date-field "Segment Invariants"), exported for Time Field. */
 export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
@@ -120,10 +124,10 @@ export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
   },
   {
     name: "date-segment-hidden-mirrors-value",
-    check: async ({ env, values }) => {
+    check: async ({ env, values, props: p }) => {
       const hidden = env.part("hidden-input")
       if ((await hidden.count()) === 0) return undefined
-      const want = iso(values["value"])
+      const want = iso(values["value"], p)
       const got = await hidden.value()
       return got === want ? undefined : `the hidden input holds "${got}", the value is "${want}"`
     },
@@ -446,7 +450,5 @@ function pasteFor(view: { values: Record<string, unknown>; context: unknown }): 
   if (v) return v.add({ years: 1 }).toString()
   const { options } = ctx(view).format
   if (options.granularity === "day") return "2030-06-15"
-  return options.timeZone === "UTC"
-    ? "2030-06-15T10:20:30"
-    : `2030-06-15T10:20:30[${options.timeZone}]`
+  return options.timeZone === "UTC" ? "2030-06-15T10:20" : `2030-06-15T10:20[${options.timeZone}]`
 }

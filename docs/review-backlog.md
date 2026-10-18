@@ -15,9 +15,6 @@ See CLAUDE.md "Review rules".
 | add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
 | add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
 | add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
-| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
-| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
-| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
 | add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
 | add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
 | add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
