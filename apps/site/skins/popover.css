@@ -36,7 +36,7 @@
 }
 [data-rind-theme^="skin-"]
   [data-scope="popover"]:is([data-part="trigger"], [data-part="close-trigger"]):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 /* the toggletip's round info button */

@@ -40,8 +40,8 @@
     [data-part="area-thumb"],
     [data-part="channel-slider-thumb"]
   )[data-focus-visible] {
-  outline: 3px solid var(--s-acc);
-  outline-offset: 5px;
+  outline: 3px solid var(--s-focus);
+  outline-offset: 4px;
 }
 
 /* the channel slider: a gradient track centred in a touch-sized control, the thumb across it */
@@ -187,7 +187,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="color-picker"][data-part="swatch-trigger"][data-focus-visible] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 5px;
 }
 /* The one selected mark, centred: a ringed dot, or the indicator's own glyph (no dot). */

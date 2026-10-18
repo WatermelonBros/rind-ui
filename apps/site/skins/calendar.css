@@ -96,7 +96,7 @@
   )[data-focus-visible],
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-focus-visible] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="grid"] {
@@ -173,4 +173,34 @@
   [data-scope="calendar"][data-part="cell"][data-anchor] {
   background: var(--s-brand);
   color: var(--s-brand-text);
+}
+/* the heading as a button one view up (days, months, years) */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="view-trigger"] {
+  min-block-size: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="view-trigger"]:hover {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="view-trigger"][data-focus-visible] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 2px;
+}
+/* month and year cells: a long month name, four to a row */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="grid"]:is([data-view="months"], [data-view="years"])
+  [data-part="cell"] {
+  inline-size: 74px;
+  block-size: 40px;
+  padding-inline: 2px;
+  font-size: 13px;
 }

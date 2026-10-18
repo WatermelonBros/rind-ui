@@ -21,6 +21,7 @@ const el = (part: string | null, id: string, rect: Rect, attrs: Record<string, s
     inAriaHidden: false,
     inInert: false,
     focusable: false,
+    focusableInside: false,
     animations: 0,
     motion: false,
     group: "",

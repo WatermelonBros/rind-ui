@@ -1,0 +1,25 @@
+- group "Billing month":
+  - button "Previous year"
+  - heading "2026, Choose year" [level=2]:
+    - button "2026, Choose year": "2026"
+  - button "Next year"
+  - grid "2026":
+    - rowgroup:
+      - row "January February March April":
+        - gridcell "January"
+        - gridcell "February"
+        - gridcell "March"
+        - gridcell "April"
+      - row "May June July August":
+        - gridcell "May"
+        - gridcell "June"
+        - gridcell "July"
+        - gridcell "August"
+      - row "September October November December":
+        - gridcell "September"
+        - gridcell "October"
+        - gridcell "November"
+        - gridcell "December"
+- text: "selected: none"
+- log
+- log

@@ -7,6 +7,7 @@ import {
   type CalendarMessages,
   type CalendarSelectionMode,
   type CalendarValue,
+  type CalendarView,
   type CreateCalendar,
   calendarConnect,
   calendarKey,
@@ -27,6 +28,7 @@ import {
   today as todayOf,
   todayZone,
   valuesOf,
+  viewIn,
   visibleEnd,
   visuallyHiddenStyle,
   watchLeave,
@@ -144,6 +146,29 @@ export type CalendarRootProps = Omit<
   readonly onDateSelect?: (date: CalendarDate, details: { readonly modality: Modality }) => void
   /** Every string reaching assistive technology. */
   readonly messages?: MessageOverrides<CalendarMessages>
+  /** The shown view: days, the months of a year, or a page of years (controllable). */
+  readonly view?: CalendarView
+  /** The view shown first (uncontrolled). Default: `minView`. */
+  readonly defaultView?: CalendarView
+  /** The view changed; `reason` is `heading`, `select` (a period drilled into), `escape-key` or `api`. */
+  readonly onViewChange?: (view: CalendarView, details: CalendarViewChangeDetails) => void
+  /** The lowest view (default "days"): the value is chosen there; higher views drill down. */
+  readonly minView?: CalendarView
+  /** The highest view the heading drills up to (default "years"). */
+  readonly maxView?: CalendarView
+  /** Years per page in the years view (default 12). */
+  readonly yearsPerPage?: number
+  /** Cells per row in the month and year views (default 4). */
+  readonly columns?: number
+  /** Month view availability, told the month's first day. */
+  readonly isMonthUnavailable?: (month: CalendarDate) => boolean
+  /** Year view availability, told the year's first day. */
+  readonly isYearUnavailable?: (year: CalendarDate) => boolean
+}
+
+export interface CalendarViewChangeDetails {
+  /** The heading button, a period chosen (drill-down), Escape, or a parent's change. */
+  readonly reason: "heading" | "select" | "escape-key" | "api"
 }
 
 function Root({
@@ -178,6 +203,15 @@ function Root({
   invalid,
   onDateSelect,
   messages: ownMessages,
+  view: viewProp,
+  defaultView,
+  onViewChange,
+  minView = "days",
+  maxView = "years",
+  yearsPerPage,
+  columns,
+  isMonthUnavailable,
+  isYearUnavailable,
   children,
   id,
   render,
@@ -212,13 +246,29 @@ function Root({
         .focused,
   )
   const pendingFocus = useRef<{ date: CalendarDate; modality: string | undefined } | null>(null)
-  const latest = useRef({ onValueChange, onFocusChange, onAnchorChange, onDateSelect })
-  latest.current = { onValueChange, onFocusChange, onAnchorChange, onDateSelect }
+  const latest = useRef({
+    onValueChange,
+    onFocusChange,
+    onAnchorChange,
+    onDateSelect,
+    onViewChange,
+  })
+  latest.current = { onValueChange, onFocusChange, onAnchorChange, onDateSelect, onViewChange }
   const range = {
     minRangeLength,
     maxRangeLength,
     allowsNonContiguousRanges,
     commitOnBlur,
+  }
+  // A fixed view (controlled, no onViewChange) is the only view: the value is chosen there.
+  const fixedView = viewProp !== undefined && onViewChange === undefined ? viewProp : undefined
+  const periods = {
+    minView: fixedView ?? minView,
+    maxView: fixedView ?? maxView,
+    yearsPerPage,
+    columns,
+    isMonthUnavailable,
+    isYearUnavailable,
   }
   const { view, send } = useMachine(calendarMachine, {
     ...nav,
@@ -240,6 +290,22 @@ function Root({
     onAnchorChange: (a) => latest.current.onAnchorChange?.(a),
     onDateSelect: (date, details) => latest.current.onDateSelect?.(date, details),
     ...range,
+    ...periods,
+    view: viewProp,
+    defaultView: defaultView ?? minView,
+    onViewChange: (v, details) => {
+      const type = (details as { event: { type: string } }).event.type
+      latest.current.onViewChange?.(v, {
+        reason:
+          type === "VIEW.UP"
+            ? "heading"
+            : type === "VIEW.DOWN"
+              ? "escape-key"
+              : type === "CELL.PRESS" || type === "SELECT_FOCUSED"
+                ? "select"
+                : "api",
+      })
+    },
     selectionMode,
     isDateUnavailable,
     disabled,
@@ -261,6 +327,10 @@ function Root({
   const api = calendarConnect({
     ...nav,
     ...range,
+    ...periods,
+    view: viewIn(view.values.view, periods),
+    // Controlled and never changed: the heading is plain text (spec "View Drill-Down").
+    viewFixed: fixedView !== undefined,
     anchor: anchored ? display(anchored, calendar) : null,
     selectionMode,
     isDateUnavailable,
@@ -334,12 +404,13 @@ function Root({
     {
       ...normalizeProps(api.root()),
       // Escape anywhere inside cancels a range in progress and is consumed; with no anchor
-      // it bubbles (to an enclosing dialog).
+      // (and in minView) it bubbles (to an enclosing dialog).
       onKeyDown: (e: KeyboardEvent) => {
-        if (e.key !== "Escape" || !isAnchored || e.defaultPrevented) return
+        // Then, in a view above minView, it goes one view down before any outer layer.
+        if (e.key !== "Escape" || e.defaultPrevented || !(isAnchored || api.escapeGoesDown)) return
         e.preventDefault()
         e.stopPropagation()
-        send({ type: "CANCEL" })
+        send(isAnchored ? { type: "CANCEL" } : { type: "VIEW.DOWN" })
       },
       ref: root,
     },
@@ -382,7 +453,34 @@ function Header({ render, ...rest }: PartP<"div">) {
 
 function Heading({ render, ...rest }: PartP<"h2">) {
   const { api } = useCalendar("Heading")
-  return renderPart("h2", mergeProps(normalizeProps(api.heading()), rest), render, undefined)
+  const own = normalizeProps(api.heading())
+  // With a higher view, the heading's text is a button one view up (spec "View Drill-Down").
+  const content = api.viewTrigger() ? { children: <ViewTrigger /> } : {}
+  return renderPart("h2", mergeProps({ ...own, ...content }, rest), render, undefined)
+}
+
+function ViewTrigger() {
+  const ctx = useCalendar("Heading")
+  const env = useEnvironment()
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  const own = ctx.api.viewTrigger({ focused, modality })
+  const press = usePress({
+    env,
+    send: (e) => {
+      if (e.type === "PRESS") ctx.send({ type: "VIEW.UP", modality: e.modality })
+    },
+  })
+  if (!own) return null
+  const props = joinHandlers(normalizeProps(own), press.props, {
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  })
+  return (
+    <button {...props} type="button">
+      <span {...normalizeProps(ctx.api.viewTriggerText())} />
+    </button>
+  )
 }
 
 function useTrigger(direction: 1 | -1, part: string) {
@@ -431,7 +529,9 @@ function Grid({
 }) {
   const ctx = useCalendar("Grid")
   const env = useEnvironment()
-  const g = ctx.grid(month)
+  // The month and year views have one grid per page: its rows are the page's periods.
+  const days = ctx.api.view === "days"
+  const g = days ? ctx.grid(month) : { weeks: ctx.api.periodRows(), month: ctx.grid(0).month }
   const { send } = ctx
   const handlers = {
     onFocus: (e: { target: EventTarget }) => {
@@ -455,6 +555,7 @@ function Grid({
         describeKey(e.nativeEvent, env),
         ctx.api.root()["dir"] === "rtl" ? "rtl" : "ltr",
         env.platform,
+        ctx.api.view,
       )
       if (!event) return
       e.preventDefault()
@@ -467,13 +568,15 @@ function Grid({
       ? children({ weeks: g.weeks, month: g.month })
       : (children ?? (
           <>
-            <GridHeader>
-              <tr>
-                {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                  <HeaderCell key={i} day={i} />
-                ))}
-              </tr>
-            </GridHeader>
+            {days ? (
+              <GridHeader>
+                <tr>
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                    <HeaderCell key={i} day={i} />
+                  ))}
+                </tr>
+              </GridHeader>
+            ) : null}
             <GridBody>
               {g.weeks.map((week) => (
                 <Row key={isoOf(week[0] as CalendarDate)}>
@@ -486,6 +589,7 @@ function Grid({
           </>
         ))
   const own = joinHandlers(normalizeProps(ctx.api.grid(month)), handlers)
+  if (!days && month > 0) return null
   return (
     <GridContext value={month}>
       {renderPart("table", { ...mergeProps(own, rest), children: content }, render, undefined)}

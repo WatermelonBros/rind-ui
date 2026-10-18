@@ -32,7 +32,7 @@
 }
 [data-rind-theme^="skin-"]
   [data-scope="menu"][data-part="trigger"][data-context-menu]:focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 [data-rind-theme^="skin-"]
