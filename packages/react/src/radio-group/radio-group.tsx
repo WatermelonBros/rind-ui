@@ -123,9 +123,11 @@ export type RadioGroupRootProps = Omit<
   readonly onValueChange?: (value: string | null, details: ChangeDetails<RadioGroupEvent>) => void
   /** Only `aria-orientation` and `data-orientation`: every arrow key moves. */
   readonly orientation?: "vertical" | "horizontal"
+  /** Disables every radio. */
   readonly disabled?: boolean
   /** A disabled group stays discoverable: the root is one tab stop. */
   readonly focusableWhenDisabled?: boolean
+  /** Navigable, never changes. */
   readonly readOnly?: boolean
   /** Valid with one radio checked. */
   readonly required?: boolean
@@ -408,6 +410,7 @@ export interface RadioItemState {
 export type RadioGroupItemProps = PartProps<"div", RadioItemState> & {
   /** The item's value: what the group's value and the form submit. */
   readonly value: string
+  /** Disables this radio only. */
   readonly disabled?: boolean
   /** The text for the collection (defaults to the item's text content). */
   readonly textValue?: string

@@ -225,7 +225,9 @@ export interface ToolbarItemState {
 }
 
 export type ToolbarItemProps = Omit<ComponentPropsWithRef<"button">, "disabled"> & {
+  /** Disables this control (the toolbar's or its group's `disabled` also does). */
   readonly disabled?: boolean
+  /** Overrides the toolbar's `focusableWhenDisabled` for this control. */
   readonly focusableWhenDisabled?: boolean
   /** The control: another component's part (a Menu trigger), a checkbox, a text input. */
   readonly render: RenderProp<ToolbarItemState>

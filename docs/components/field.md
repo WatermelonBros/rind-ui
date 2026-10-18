@@ -39,27 +39,31 @@ One Field wraps **one** control. To group several controls under one name, use a
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `name` | `string` | — | The control's `name` when it has none; the key of `validate`'s values. |
-| `disabled` | `boolean` | `false` | Disables the control; no validity is displayed. |
-| `readOnly` | `boolean` | `false` | Makes the control read-only. |
-| `required` | `boolean` | `false` | Native `required` (`aria-required` in `aria` behaviour). |
-| `invalid` | `boolean` | — | `true` forces invalid, `false` valid; `undefined` validates. |
-| `errors` | `string[]` | — | External errors (server): shown at once, cleared by the next change. |
-| `validate` | `(value, values) => string \| string[] \| null \| Promise<…>` | — | Runs after native constraints pass. |
-| `validationMode` | `"submit" \| "blur" \| "change"` | `"submit"` | When errors are displayed. |
-| `validationBehavior` | `"native" \| "aria"` | `"native"` | Whether an invalid Field blocks submission. |
-| `validationDebounce` | `number` | `0` | Delays `validate` in `change` mode (ms). |
-| `touched` | `boolean` | — | Controlled touched flag. |
-| `dirty` | `boolean` | — | Controlled dirty flag. |
-| `errorMessageAttribute` | `"describedby" \| "both"` | `"describedby"` | `both` adds `aria-errormessage`. |
-| `messages` | `{ errorAnnouncement?, invalid?, valueMissing?, … }` | — | Announcement and per-constraint messages. |
-| `match` | `ValidityKey` | — | On ErrorMessage: rendered only when this key is the cause. |
-| `children` | `ReactNode` | — | The form control and the Field's parts. |
-| `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
-| `scope` | `string` | — | For Field hosts (Text Field, …): the scope the Field's parts carry, so a host's Label is `data-scope="text-field"`. Default `field`. |
-| `rootPart` | `string` | — | For a Field host that is another component's part: its root's part name. Default `root`. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Field.Root` | `name` | `string` | — | The control's `name` when it has none; the key of `validate`'s values. |
+| `Field.Root` | `disabled` | `boolean` | `false` | Disables the control; no validity is displayed. |
+| `Field.Root` | `readOnly` | `boolean` | `false` | Makes the control read-only. |
+| `Field.Root` | `required` | `boolean` | `false` | Native `required` (`aria-required` in `aria` behaviour). |
+| `Field.Root` | `invalid` | `boolean` | — | `true` forces invalid, `false` valid; `undefined` validates. |
+| `Field.Root` | `errors` | `string[]` | — | External errors (server): shown at once, cleared by the next change. |
+| `Field.Root` | `validate` | `(value, values) => string \| string[] \| null \| Promise<…>` | — | Runs after native constraints pass. |
+| `Field.Root` | `validationMode` | `"submit" \| "blur" \| "change"` | `"submit"` | When errors are displayed. |
+| `Field.Root` | `validationBehavior` | `"native" \| "aria"` | `"native"` | Whether an invalid Field blocks submission. |
+| `Field.Root` | `validationDebounce` | `number` | `0` | Delays `validate` in `change` mode (ms). |
+| `Field.Root` | `touched` | `boolean` | — | Controlled touched flag. |
+| `Field.Root` | `dirty` | `boolean` | — | Controlled dirty flag. |
+| `Field.Root` | `errorMessageAttribute` | `"describedby" \| "both"` | `"describedby"` | `both` adds `aria-errormessage`. |
+| `Field.Root` | `messages` | `{ errorAnnouncement?, invalid?, valueMissing?, … }` | — | Announcement and per-constraint messages. |
+| `Field.Root` | `children` | `ReactNode` | — | The form control and the Field's parts. |
+| `Field.Root` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `Field.Root` | `scope` | `string` | — | For Field hosts (Text Field, …): the scope the Field's parts carry, so a host's Label is `data-scope="text-field"`. Default `field`. |
+| `Field.Root` | `rootPart` | `string` | — | For a Field host that is another component's part: its root's part name. Default `root`. |
+| `Field.Label` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `Field.Description` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `Field.ErrorMessage` | `match` | `ValidityKey` | — | On ErrorMessage: rendered only when this key is the cause. |
+| `Field.ErrorMessage` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `Field.ErrorMessage` | `children` | `ReactNode \| ((messages: readonly string[]) => ReactNode)` | — | Replaces the default text; a function returning null/undefined falls back to it. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

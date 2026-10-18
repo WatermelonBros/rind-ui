@@ -48,6 +48,7 @@ export type LinkProps = Omit<ComponentPropsWithRef<"a">, "href" | "download" | "
   readonly referrerPolicy?: ComponentPropsWithRef<"a">["referrerPolicy"]
   /** Passed unchanged to the router's `navigate`. */
   readonly routerOptions?: RouterOptions
+  /** No `href`, `aria-disabled`, out of the Tab order (unless `focusableWhenDisabled`); nothing navigates. */
   readonly disabled?: boolean
   /** Keeps a disabled link in the Tab order (it stays `aria-disabled`). */
   readonly focusableWhenDisabled?: boolean

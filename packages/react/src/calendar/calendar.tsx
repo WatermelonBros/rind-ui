@@ -142,6 +142,7 @@ export type CalendarRootProps = Omit<
    * change: a picker closes on it.
    */
   readonly onDateSelect?: (date: CalendarDate, details: { readonly modality: Modality }) => void
+  /** Every string reaching assistive technology. */
   readonly messages?: MessageOverrides<CalendarMessages>
 }
 

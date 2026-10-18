@@ -46,15 +46,20 @@ import { ScrollArea } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `type` | `"hover" \| "scroll" \| "auto" \| "always"` | `"hover"` | Root: when scrollbars show. `hover`: pointer, focus or scroll; `scroll`: while scrolling; `auto`: whenever the axis overflows; `always`. |
-| `hideDelay` | `number` | `600` | Root: milliseconds the scrollbars stay after the last hover, focus or scroll. |
-| `trackPress` | `"page" \| "jump"` | `"page"` | Root: a press on the track scrolls one page toward it, or jumps there and drags. |
-| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Scrollbar: its axis. |
-| `actionsRef` | `Ref<{ measure(): void }>` | — | Root: call `measure()` after a change the observers cannot see (a deep descendant resized). |
-| `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
-| `children` | `ReactNode` | — | The Viewport, Scrollbars and Corner. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `ScrollArea.Root` | `type` | `"hover" \| "scroll" \| "auto" \| "always"` | `"hover"` | Root: when scrollbars show. `hover`: pointer, focus or scroll; `scroll`: while scrolling; `auto`: whenever the axis overflows; `always`. |
+| `ScrollArea.Root` | `hideDelay` | `number` | `600` | Root: milliseconds the scrollbars stay after the last hover, focus or scroll. |
+| `ScrollArea.Root` | `trackPress` | `"page" \| "jump"` | `"page"` | Root: a press on the track scrolls one page toward it, or jumps there and drags. |
+| `ScrollArea.Root` | `actionsRef` | `Ref<{ measure(): void }>` | — | Root: call `measure()` after a change the observers cannot see (a deep descendant resized). |
+| `ScrollArea.Root` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Root` | `children` | `ReactNode` | — | The Viewport, Scrollbars and Corner. |
+| `ScrollArea.Viewport` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Content` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Scrollbar` | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Scrollbar: its axis. |
+| `ScrollArea.Scrollbar` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Thumb` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Corner` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

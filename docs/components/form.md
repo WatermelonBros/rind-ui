@@ -36,16 +36,16 @@ A [Field](field.md) works in a plain `<form>` too; Form adds what needs the whol
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `validationMode` | `"submit" \| "blur" \| "change"` | — | Default mode for the Fields inside. |
-| `validationBehavior` | `"native" \| "aria"` | — | Default behaviour for the Fields inside; `aria` adds `novalidate`. |
-| `errors` | `Record<string, string \| string[]>` | — | Server errors by exact Field name; shown at once, cleared by that Field's next change. |
-| `onFormSubmit` | `(values, { event, submitter }) => void` | — | Replaces the native submission with the typed values of every named Field. |
-| `actionsRef` | `Ref<{ validate(name?): void }>` | — | The imperative `validate`: displays errors, focuses nothing. |
-| `messages` | `{ invalidSummary?: (count) => string }` | — | The failed-attempt summary. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element. |
-| `children` | `ReactNode` | — | The form's content (its Fields and controls). |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Form.Root` | `validationMode` | `"submit" \| "blur" \| "change"` | — | Default mode for the Fields inside. |
+| `Form.Root` | `validationBehavior` | `"native" \| "aria"` | — | Default behaviour for the Fields inside; `aria` adds `novalidate`. |
+| `Form.Root` | `errors` | `Record<string, string \| string[]>` | — | Server errors by exact Field name; shown at once, cleared by that Field's next change. |
+| `Form.Root` | `onFormSubmit` | `(values, { event, submitter }) => void` | — | Replaces the native submission with the typed values of every named Field. |
+| `Form.Root` | `actionsRef` | `Ref<{ validate(name?): void }>` | — | The imperative `validate`: displays errors, focuses nothing. |
+| `Form.Root` | `messages` | `{ invalidSummary?: (count) => string }` | — | The failed-attempt summary. |
+| `Form.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element. |
+| `Form.Root` | `children` | `ReactNode` | — | The form's content (its Fields and controls). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

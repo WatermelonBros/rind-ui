@@ -53,26 +53,33 @@ derived from the trail on every render.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `maxItems` | `number` | — | Collapse the middle items past this many (Root). |
-| `itemsBeforeCollapse` | `number` | `1` | Items always shown before the collapsed range (Root). |
-| `itemsAfterCollapse` | `number` | `1` | Items always shown after the collapsed range (Root). |
-| `currentValue` | `"page" \| "location" \| "date" \| "time" \| true` | `"page"` | The current item's `aria-current` value (Root). |
-| `items` | `readonly BreadcrumbsTrailItem[]` | — | The trail as data (Root): collapse is known while rendering, so the server render collapses too. Items still render with the same `value`s. |
-| `messages` | `Partial<BreadcrumbsMessages>` | — | `label` and `showCollapsed(count)` (Root). |
-| `value` | `string` | — | The Item's key, stable across renders (Item). |
-| `current` | `boolean` | — | `true` makes the Item current; `false` on the last Item opts out of the default (Item). |
-| `disabled` | `boolean` | `false` | Disables the Item's Link (Item). |
-| `textValue` | `string` | — | The Item's text in the ellipsis menu; default its Link's text (Item). |
-| `href` | `Href` | — | Where the crumb goes (Link). |
-| `routerOptions` | `RouterOptions` | — | Passed unchanged to the router's `navigate` (Link). |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
-| `children` | `ReactNode \| ((state: BreadcrumbsItemState) => ReactNode)` | — | Nodes, or a function of the Item's state (a non-link control sets `aria-current`). |
-| `download` | `boolean \| string` | — | Download instead of navigating (the browser handles it); a string names the file. |
-| `referrerPolicy` | `ComponentPropsWithRef<"a">["referrerPolicy"]` | — | Passed to the anchor. |
-| `focusableWhenDisabled` | `boolean` | — | Keeps a disabled link in the Tab order (it stays `aria-disabled`). |
-| `onActivate` | `LinkInput["onActivate"]` | — | Once per activation that is not disabled or prevented, with where it opened. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Breadcrumbs.Root` | `maxItems` | `number` | — | Collapse the middle items past this many (Root). |
+| `Breadcrumbs.Root` | `itemsBeforeCollapse` | `number` | `1` | Items always shown before the collapsed range (Root). |
+| `Breadcrumbs.Root` | `itemsAfterCollapse` | `number` | `1` | Items always shown after the collapsed range (Root). |
+| `Breadcrumbs.Root` | `currentValue` | `"page" \| "location" \| "date" \| "time" \| true` | `"page"` | The current item's `aria-current` value (Root). |
+| `Breadcrumbs.Root` | `items` | `readonly BreadcrumbsTrailItem[]` | — | The trail as data (Root): collapse is known while rendering, so the server render collapses too. Items still render with the same `value`s. |
+| `Breadcrumbs.Root` | `messages` | `Partial<BreadcrumbsMessages>` | — | `label` and `showCollapsed(count)` (Root). |
+| `Breadcrumbs.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.List` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.Item` | `value` | `string` | — | The Item's key, stable across renders (Item). |
+| `Breadcrumbs.Item` | `current` | `boolean` | — | `true` makes the Item current; `false` on the last Item opts out of the default (Item). |
+| `Breadcrumbs.Item` | `disabled` | `boolean` | `false` | Disables the Item's Link (Item). |
+| `Breadcrumbs.Item` | `textValue` | `string` | — | The Item's text in the ellipsis menu; default its Link's text (Item). |
+| `Breadcrumbs.Item` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.Item` | `children` | `ReactNode \| ((state: BreadcrumbsItemState) => ReactNode)` | — | Nodes, or a function of the Item's state (a non-link control sets `aria-current`). |
+| `Breadcrumbs.Link` | `href` | `Href` | — | Where the crumb goes (Link). |
+| `Breadcrumbs.Link` | `routerOptions` | `RouterOptions` | — | Passed unchanged to the router's `navigate` (Link). |
+| `Breadcrumbs.Link` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.Link` | `download` | `boolean \| string` | — | Download instead of navigating (the browser handles it); a string names the file. |
+| `Breadcrumbs.Link` | `referrerPolicy` | `ComponentPropsWithRef<"a">["referrerPolicy"]` | — | Passed to the anchor. |
+| `Breadcrumbs.Link` | `focusableWhenDisabled` | `boolean` | — | Keeps a disabled link in the Tab order (it stays `aria-disabled`). |
+| `Breadcrumbs.Link` | `onActivate` | `LinkInput["onActivate"]` | — | Once per activation that is not disabled or prevented, with where it opened. |
+| `Breadcrumbs.Separator` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.Ellipsis` | `value` | `string` | — | The Item's key, stable across renders (Item). |
+| `Breadcrumbs.Ellipsis` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `Breadcrumbs.Ellipsis` | `children` | `ReactNode \| ((state: BreadcrumbsEllipsisState) => ReactNode)` | — | Usually a function: render a Menu (or Popover) whose trigger is named `label`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

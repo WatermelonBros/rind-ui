@@ -119,6 +119,7 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     readonly value: string
     /** Used by typeahead, filtering, announcements and form labels (default: the text content). */
     readonly textValue?: string
+    /** Disables this option: it cannot be selected. */
     readonly disabled?: boolean
     /** Extra filter terms (synonyms); never typeahead, announcements or labels. */
     readonly keywords?: readonly string[]

@@ -315,6 +315,7 @@ export type MenuRootProps = LevelOptions & {
   readonly modal?: boolean
   /** Positioner and content stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
+  /** Programmatic open and close: exposes `open()` and `close()`. */
   readonly actionsRef?: Ref<MenuActions>
   /** The menu's parts: its trigger, portal, positioner and content. */
   readonly children?: ReactNode
@@ -894,6 +895,7 @@ const SubmenuContext = createContext<{
 } | null>(null)
 
 export type MenuSubmenuProps = Omit<LevelOptions, "loop"> & {
+  /** Arrow navigation in this submenu wraps from the last item to the first and back. Default: true. */
   readonly loop?: boolean
   /** The submenu's parts: its `Menu.SubmenuTrigger` and its portal, positioner and content. */
   readonly children?: ReactNode

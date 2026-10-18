@@ -19,6 +19,7 @@ export const toastMeta = {
   scope: "toast",
   name: "Toast",
   stateless: false,
+  exports: ["Toast", "Toaster"],
   parts: [
     {
       name: "Toaster",
@@ -83,7 +84,7 @@ export const toastMeta = {
       default: '{ regionLabel: "Notifications (F6)", close: "Dismiss notification", … }',
       description: "On `Toaster`: the assistive-technology strings.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, toast) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

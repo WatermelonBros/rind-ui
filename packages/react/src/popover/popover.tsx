@@ -159,7 +159,7 @@ export interface PopoverActions {
   reposition(): void
 }
 
-export type PopoverRootProps = Omit<PopoverProps, "root" | "parent" | "anchored"> & {
+export type PopoverRootProps = Omit<PopoverProps, "root" | "parent" | "anchored" | "scope"> & {
   /** Base for the ids of the popover's parts. Default: generated. */
   readonly id?: string
   /** Positioner and content stay mounted (hidden) while closed. */
@@ -177,7 +177,7 @@ function Root({
   actionsRef,
   children,
   ...rest
-}: PopoverRootProps) {
+}: PopoverRootProps & Pick<PopoverProps, "scope">) {
   const root = useRootId(id)
   const parent = useParentLayer()
   const messages = useMessages("popover", popoverMessages, ownMessages)
@@ -475,8 +475,12 @@ function Portal(props: PortalProps) {
   return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
+/** Popover.Root with its parts re-scoped (`data-scope`), for composites (Date Picker): internal. */
+export const ScopedPopoverRoot = Root
+
 export const Popover = {
-  Root,
+  // Public: no `scope` (a narrower parameter, so the same function is sound as this type).
+  Root: Root as (props: PopoverRootProps) => ReturnType<typeof Root>,
   Trigger,
   Anchor,
   Indicator,

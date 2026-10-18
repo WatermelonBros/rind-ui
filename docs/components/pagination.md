@@ -52,31 +52,60 @@ import { Pagination } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `totalPages` | `number` | — | The number of pages (at least 1). Or pass `count` and `pageSize`. |
-| `count` | `number` | — | The number of items; the total is `ceil(count / pageSize)`. |
-| `page` | `number` | — | Controlled current page (1-based). |
-| `defaultPage` | `number` | `1` | Uncontrolled initial page. |
-| `onPageChange` | `(page, { reason, cancel }) => void` | — | Every change, once; `reason` is SET_PAGE, PREV, NEXT, FIRST, LAST, SET_PAGE_SIZE or COUNT.CHANGE. |
-| `pageSize` | `number` | — | Controlled page size (with `count` only). |
-| `defaultPageSize` | `number` | `10` | Uncontrolled page size. |
-| `onPageSizeChange` | `(pageSize, details) => void` | — | Page size changes; the page moves so its first item stays visible. |
-| `siblingCount` | `number` | `1` | Pages shown beside the current one. |
-| `boundaryCount` | `number` | `1` | Pages always shown at each end. |
-| `getPageHref` | `(page, pageSize) => string` | — | Renders links instead of buttons; same-tab activations also change the page. |
-| `disabled` | `boolean` | `false` | Every control ignores activation and shows no hover (disable while loading). |
-| `focusableWhenDisabled` | `boolean` | `true` | Unavailable controls keep focus (`aria-disabled`); `false` uses native disabled. |
-| `messages` | `Partial<PaginationMessages>` | — | `label`, `page(n)`, `first`, `previous`, `next`, `last`. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
-| `children` | `ReactNode \| ((state: PaginationRootState) => ReactNode)` | — | The parts, or a function of the state (to map `pages`). |
-| `type` | `"page" \| "ellipsis" \| "trigger"` | — | What the item holds (`data-type`). Default `"page"`. |
-| `value` | `number` | — | The page number it goes to; `aria-current="page"` when it is the current page. |
-| `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
-| `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
-| `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
-| `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
-| `position` | `"start" \| "end"` | — | Which gap it stands for, before or after the current page (`data-position`). Default: "end". |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Pagination.Root` | `totalPages` | `number` | — | The number of pages (at least 1). Or pass `count` and `pageSize`. |
+| `Pagination.Root` | `count` | `number` | — | The number of items; the total is `ceil(count / pageSize)`. |
+| `Pagination.Root` | `page` | `number` | — | Controlled current page (1-based). |
+| `Pagination.Root` | `defaultPage` | `number` | `1` | Uncontrolled initial page. |
+| `Pagination.Root` | `onPageChange` | `(page, { reason, cancel }) => void` | — | Every change, once; `reason` is SET_PAGE, PREV, NEXT, FIRST, LAST, SET_PAGE_SIZE or COUNT.CHANGE. |
+| `Pagination.Root` | `pageSize` | `number` | — | Controlled page size (with `count` only). |
+| `Pagination.Root` | `defaultPageSize` | `number` | `10` | Uncontrolled page size. |
+| `Pagination.Root` | `onPageSizeChange` | `(pageSize, details) => void` | — | Page size changes; the page moves so its first item stays visible. |
+| `Pagination.Root` | `siblingCount` | `number` | `1` | Pages shown beside the current one. |
+| `Pagination.Root` | `boundaryCount` | `number` | `1` | Pages always shown at each end. |
+| `Pagination.Root` | `getPageHref` | `(page, pageSize) => string` | — | Renders links instead of buttons; same-tab activations also change the page. |
+| `Pagination.Root` | `disabled` | `boolean` | `false` | Every control ignores activation and shows no hover (disable while loading). |
+| `Pagination.Root` | `focusableWhenDisabled` | `boolean` | `true` | Unavailable controls keep focus (`aria-disabled`); `false` uses native disabled. |
+| `Pagination.Root` | `messages` | `Partial<PaginationMessages>` | — | `label`, `page(n)`, `first`, `previous`, `next`, `last`. |
+| `Pagination.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Root` | `children` | `ReactNode \| ((state: PaginationRootState) => ReactNode)` | — | The parts, or a function of the state (to map `pages`). |
+| `Pagination.List` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Item` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Item` | `type` | `"page" \| "ellipsis" \| "trigger"` | — | What the item holds (`data-type`). Default `"page"`. |
+| `Pagination.Page` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Page` | `value` | `number` | — | The page number it goes to; `aria-current="page"` when it is the current page. |
+| `Pagination.Page` | `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `Pagination.Page` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `Pagination.Page` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Pagination.Page` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Pagination.Page` | `focusableWhenDisabled` | `boolean` | — | Default: the Root's (`true`). |
+| `Pagination.Ellipsis` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Ellipsis` | `position` | `"start" \| "end"` | `"end"` | Which gap it stands for, before or after the current page (`data-position`). |
+| `Pagination.First` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.First` | `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `Pagination.First` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `Pagination.First` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Pagination.First` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Pagination.First` | `focusableWhenDisabled` | `boolean` | — | Default: the Root's (`true`). |
+| `Pagination.Previous` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Previous` | `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `Pagination.Previous` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `Pagination.Previous` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Pagination.Previous` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Pagination.Previous` | `focusableWhenDisabled` | `boolean` | — | Default: the Root's (`true`). |
+| `Pagination.Next` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Next` | `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `Pagination.Next` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `Pagination.Next` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Pagination.Next` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Pagination.Next` | `focusableWhenDisabled` | `boolean` | — | Default: the Root's (`true`). |
+| `Pagination.Last` | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `Pagination.Last` | `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `Pagination.Last` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `Pagination.Last` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Pagination.Last` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Pagination.Last` | `focusableWhenDisabled` | `boolean` | — | Default: the Root's (`true`). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

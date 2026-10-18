@@ -104,6 +104,10 @@ export type ColorAreaRootProps = Omit<
   readonly value?: ColorInput
   /** Default `hsb(0, 0%, 100%)`; a later change only changes what a form reset restores. */
   readonly defaultValue?: ColorInput
+  /**
+   * Each applied change, in the space of the colour you passed; not for a change that leaves
+   * the emitted colour as it is (hue at black).
+   */
   readonly onValueChange?: (color: Color, details: ColorChangeDetails<ColorAreaReason>) => void
   /** Once at the end of each interaction that changed the colour. */
   readonly onValueCommit?: (color: Color, details: ColorCommitDetails<ColorAreaReason>) => void
@@ -119,7 +123,9 @@ export type ColorAreaRootProps = Omit<
   readonly yName?: string
   /** The id of the form the inputs belong to. */
   readonly form?: string
+  /** Ignores presses and keys. */
   readonly disabled?: boolean
+  /** Focusable, changes nothing. */
   readonly readOnly?: boolean
   /** Replaces the colour name in the value text. */
   readonly colorName?: ColorNameProp
@@ -127,6 +133,7 @@ export type ColorAreaRootProps = Omit<
   readonly locale?: string
   /** Mirrors the x axis. Default: the provider's direction. */
   readonly dir?: "ltr" | "rtl"
+  /** Names, role description, value text and colour words. */
   readonly messages?: MessageOverrides<ColorAreaMessages>
   /** Another element or a render function receiving the props and the area's state. */
   readonly render?: RenderProp<ColorAreaState>

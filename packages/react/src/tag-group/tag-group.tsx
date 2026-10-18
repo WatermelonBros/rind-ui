@@ -365,6 +365,7 @@ function Tag({
   readonly value: string
   /** The tag's text for typeahead and the remove button's name. */
   readonly textValue?: string | undefined
+  /** Disables this tag: it cannot be selected or removed. */
   readonly disabled?: boolean | undefined
   /** A link tag: TagText renders an anchor to it. */
   readonly href?: string | undefined

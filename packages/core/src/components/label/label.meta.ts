@@ -25,7 +25,7 @@ export const labelMeta = {
       type: "string",
       description: "Generated when absent, the same on the server and the client.",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props) => ReactNode",
       description: "Another element: a non-`<label>` forwards focus to `htmlFor`'s element itself.",
     },

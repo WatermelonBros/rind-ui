@@ -221,16 +221,30 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
   readonly defaultChecked?: V
   /** Every user-caused change (toggle or form reset); never called for a parent change. */
   readonly onCheckedChange?: (checked: V, details: D) => void
+  /**
+   * Ignores activation. In a Checkbox Group the group's `disabled` also applies; a Parent
+   * follows only the group's.
+   */
   readonly disabled?: boolean
   /** Disabled but still in the Tab order (`aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
+  /**
+   * Keeps focus and value, ignores activation. In a Checkbox Group the group's `readOnly` also
+   * applies; a Parent follows only the group's.
+   */
   readonly readOnly?: boolean
+  /** Must be checked to submit. A Checkbox Group Parent is never required. */
   readonly required?: boolean
   /** Marks the toggle invalid (`aria-invalid`, `data-invalid`). */
   readonly invalid?: boolean
+  /** The submitted field name; ignored in a Checkbox Group (the group's `name` applies). */
   readonly name?: string
   /** Submitted while checked (default "on"). */
   readonly value?: string
+  /**
+   * The id of the form the hidden input belongs to; ignored in a Checkbox Group (the group's
+   * `form` applies).
+   */
   readonly form?: string
   /** Submitted while unchecked (and enabled); unchecked submits nothing without it. */
   readonly uncheckedValue?: string

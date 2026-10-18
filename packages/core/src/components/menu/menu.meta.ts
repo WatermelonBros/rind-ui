@@ -37,6 +37,7 @@ export const menuMeta = {
   scope: "menu",
   name: "Menu",
   stateless: false,
+  notParts: ["MenuHostContext"],
   parts: [
     {
       name: "Menu.Root",
@@ -206,49 +207,49 @@ export const menuMeta = {
       type: "Ref<{ open(): void; close(): void }>",
       description: "Programmatic open and close.",
     },
-    value: {
+    "*.value": {
       type: "string",
       description:
         "On items: the key (default: generated). On `Menu.RadioItem` (required): the value it selects; on `Menu.RadioGroup`: the controlled selected value.",
     },
-    textValue: {
+    "*.textValue": {
       type: "string",
       description: "On items: the typeahead text (default: the text content).",
     },
-    disabled: {
+    "*.disabled": {
       type: "boolean",
       default: "false",
       description: "On the trigger, items, the radio group and submenu triggers.",
     },
-    closeOnSelect: {
+    "*.closeOnSelect": {
       type: "boolean",
       default: "true (`false` for checkbox and radio items)",
       description: "On items: activating it closes the whole menu tree.",
     },
-    onSelect: {
+    "*.onSelect": {
       type: "(details: MenuSelectDetails) => void",
       description:
         "On items: runs on activation with the item's `key`, `kind`, `modality` and `details.cancel()` to keep the menu open.",
     },
-    href: {
+    "*.href": {
       type: "string",
       description:
         "On `Menu.Item`: renders a link; with `target`, `rel`, `download` and `routerOptions`.",
     },
-    checked: {
+    "*.checked": {
       type: "boolean",
       description:
         "On `Menu.CheckboxItem`: controlled checked state (`defaultChecked`, `onCheckedChange`).",
     },
-    onValueChange: {
+    "*.onValueChange": {
       type: "(value: string | null) => void",
       description: "On `Menu.RadioGroup`: the selected value changed (`defaultValue` for initial).",
     },
-    orientation: {
+    "*.orientation": {
       type: '"horizontal" | "vertical"',
       description: "On `Menu.Separator`: overrides the orientation (default: across the menu).",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

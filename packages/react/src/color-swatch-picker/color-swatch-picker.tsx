@@ -83,9 +83,11 @@ export type ColorSwatchPickerRootProps = Omit<
   readonly value?: ColorInput | null
   /** Default `null`: no swatch checked. */
   readonly defaultValue?: ColorInput | null
+  /** A swatch was checked; `details.value` is its key, `details.index` its index. */
   readonly onValueChange?: (color: Color, details: ColorSwatchPickerChangeDetails) => void
   /** Formats the swatches' colour names. Default: the provider's. */
   readonly locale?: string
+  /** The group's label (`swatchPickerLabel`) and the colour words. */
   readonly messages?: MessageOverrides<ColorSwatchPickerMessages>
   /** The swatch items. */
   readonly children?: ReactNode
@@ -181,6 +183,7 @@ export type ColorSwatchPickerItemProps = Omit<
   readonly color: ColorInput
   /** The item's key (default the canonical `#RRGGBBAA`). */
   readonly value?: string
+  /** Disables this swatch only. */
   readonly disabled?: boolean
   /** A fixed name or a function replacing the computed colour name (the swatch's accessible name). */
   readonly colorName?: ColorNameProp

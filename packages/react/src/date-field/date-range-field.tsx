@@ -44,7 +44,7 @@ import { FieldHost } from "../field/use-field-host"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { Popover } from "../popover"
+import { ScopedPopoverRoot } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
@@ -340,7 +340,7 @@ export function DateRangeFieldRoot({
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusWithin(false)
       }}
     >
-      <Popover.Root
+      <ScopedPopoverRoot
         id={instance}
         scope="date-field"
         disabled={disabled}
@@ -364,7 +364,7 @@ export function DateRangeFieldRoot({
           <input {...normalizeProps(own.hiddenInput("start"))} ref={startHidden} />
           <input {...normalizeProps(own.hiddenInput("end"))} ref={endHidden} />
         </RangeContext>
-      </Popover.Root>
+      </ScopedPopoverRoot>
     </FieldHost>
   )
 }

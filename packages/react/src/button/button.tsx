@@ -48,6 +48,7 @@ export interface ButtonState {
 export type ButtonProps = Omit<ComponentPropsWithRef<"button">, "type" | "disabled"> & {
   /** Default "button": never submits a form by accident. */
   readonly type?: "button" | "submit" | "reset"
+  /** Ignores activation: native `disabled` on a `<button>`, `aria-disabled` elsewhere or with `focusableWhenDisabled`. */
   readonly disabled?: boolean
   /** Keeps a disabled Button in the Tab order (`aria-disabled` instead of `disabled`). */
   readonly focusableWhenDisabled?: boolean

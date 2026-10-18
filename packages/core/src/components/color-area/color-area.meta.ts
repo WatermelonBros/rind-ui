@@ -75,7 +75,10 @@ export const colorAreaMeta = {
       type: "Partial<ColorAreaMessages>",
       description: "Names, role description, value text, colour words.",
     },
-    render: { type: "ReactElement | (props, state) => ReactNode", description: "Another element." },
+    "*.render": {
+      type: "ReactElement | (props, state) => ReactNode",
+      description: "Another element.",
+    },
   },
   dataAttributes: {
     root: {

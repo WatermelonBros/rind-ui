@@ -18,10 +18,15 @@ export interface ComponentMeta {
     readonly element: string
     readonly description: string
   }[]
+  /** The React exports whose parts the page documents. Default: the scope in PascalCase. */
+  readonly exports?: readonly string[]
+  /** The module's other capitalised value exports, which are not parts (contexts, hosts). */
+  readonly notParts?: readonly string[]
   /**
    * Overrides what the docs say about a prop: every prop a part declares is listed from the
-   * types (its JSDoc is the description), so an entry here is only for better wording, a default,
-   * a DOM attribute with behaviour of its own, or a part-scoped key (`Item.value`).
+   * types (its JSDoc is the description), so an entry here is only for better wording, a default
+   * or a DOM attribute with behaviour of its own. An unscoped key (`value`) is the root part's
+   * (`X.Root`, or an export with no namespace); `Item.value` is the Item part's.
    */
   readonly props: Readonly<Record<string, PropMeta>>
   /** Options of functions the component ships (`createToaster`), not props of a part. */

@@ -87,7 +87,7 @@ export interface TooltipActions {
   close(): void
 }
 
-export type TooltipRootProps = Omit<TooltipProps, "root" | "parent"> & {
+export type TooltipRootProps = Omit<TooltipProps, "root" | "parent" | "getTrigger"> & {
   /** Base for the ids of the tooltip's parts. Default: generated. */
   readonly id?: string
   /** `description` (default): the text describes the trigger. `label`: it names it. */

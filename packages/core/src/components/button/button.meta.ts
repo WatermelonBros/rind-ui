@@ -53,7 +53,7 @@ export const buttonMeta = {
       type: "{ pending?: string }",
       description: 'Overrides; default `pending: "Loading"`.',
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         'Another element: `<a href>` stays a link and routes like a Link; anything else gets `role="button"` and `tabIndex`.',

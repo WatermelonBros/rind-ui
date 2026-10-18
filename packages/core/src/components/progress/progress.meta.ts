@@ -87,7 +87,7 @@ export const progressMeta = {
       type: "{ valueText?: (args) => string; complete?: string }",
       description: "Overrides the English defaults (also through the provider).",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element.",
     },

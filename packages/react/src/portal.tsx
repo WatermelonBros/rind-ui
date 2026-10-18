@@ -19,8 +19,8 @@ export type PortalProps = ComponentPropsWithRef<"div"> & {
   /** The element the content belongs to (its trigger): target resolution and dir/lang/theme. */
   readonly logicalParent?: (() => Element | null) | undefined
   /**
-   * Follow the logical parent's attributes as they change (default true). An always-mounted
-   * part that is closed passes false: applied once, no observer.
+   * Keeps the host's `dir`, `lang` and theme in step with the logical parent as they change;
+   * `false` copies them once. Default: true.
    */
   readonly observe?: boolean | undefined
   /** Another element or a render function receiving the props, in place of the host `div`. */

@@ -220,6 +220,7 @@ export interface TabsTabState {
 export type TabsTabProps = Omit<ComponentPropsWithRef<"button">, "value"> & {
   /** The key pairing this tab with its panel. */
   readonly value: string
+  /** Disables this tab: it is never selected. */
   readonly disabled?: boolean
   /** The text for the collection (defaults to the tab's text content). */
   readonly textValue?: string

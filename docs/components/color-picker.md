@@ -63,54 +63,131 @@ import { ColorPicker } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `value` | `string \| Color` | — | The colour (controlled). |
-| `defaultValue` | `string \| Color` | `"#000000"` | The initial colour. |
-| `onValueChange` | `(color: Color, details) => void` | — | Each change, in the space of `format`. |
-| `onValueCommit` | `(color: Color, details) => void` | — | Once at the end of each interaction. |
-| `format` | `"hex" \| "rgb" \| "hsl" \| "hsb"` | — | Display and emission format (controlled). |
-| `defaultFormat` | `format` | — | Default: from the first colour (a hex string gives `hex`). |
-| `onFormatChange` | `(format) => void` | — | The format changed. |
-| `open` | `boolean` | — | Open (controlled). |
-| `defaultOpen` | `boolean` | `false` | Open at first. |
-| `onOpenChange` | `(open, details) => void` | — | Popover reasons plus `select`. |
-| `inline` | `boolean` | `false` | The content in place: no Popover, no layer, no listeners. |
-| `closeOnSelect` | `boolean` | `false` | A swatch pick closes the Popover. |
-| `modal` | `boolean` | `false` | As Popover. |
-| `name` | `string` | — | Submits `#RRGGBB(AA)` (or `formFormat`). |
-| `formFormat` | `"hex" \| "rgb" \| "hsl" \| "hsb" \| "css"` | — | The submitted text's format. |
-| `disabled` | `boolean` | `false` | Disables every part and closes. |
-| `readOnly` | `boolean` | `false` | Focusable, changes nothing. |
-| `messages` | `Partial<ColorPickerMessages>` | — | Every string of the picker and its children. |
-| `children` | `ReactNode` | — | The picker parts. |
-| `positioning` | `PopoverProps["positioning"]` | — | The Popover's positioning: side, align, offsets, flip, shift, size, arrow and mode. |
-| `initialFocus` | `PopoverProps["initialFocus"]` | — | Where focus goes once the Popover is placed: a function, or the overlay's rule. |
-| `persistentElements` | `PopoverProps["persistentElements"]` | — | Elements whose presses and focus count as inside the Popover (a toast region). |
-| `form` | `string` | — | The id of the form the hidden input belongs to. |
-| `required` | `boolean` | — | Marks the picker required (Field state, `data-required` on the hidden input). |
-| `invalid` | `boolean` | — | Marks the picker invalid (`data-invalid`, the Field's error state). |
-| `colorName` | `ColorNameProp` | — | A fixed name or a function replacing the computed colour name (Trigger label, value texts, announcements). |
-| `locale` | `string` | — | Formats the colour name and the numbers. Default: the provider's. |
-| `dir` | `"ltr" \| "rtl"` | — | Reading direction; mirrors the area and sliders. Default: the provider's. |
-| `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
-| `container` | `Element \| ShadowRoot \| null \| undefined` | — | Where to render (default: resolved from the logical parent, then `body`). |
-| `logicalParent` | `(() => Element \| null) \| undefined` | — | The element the content belongs to (its trigger): target resolution and dir/lang/theme. |
-| `observe` | `boolean \| undefined` | — | Follow the logical parent's attributes as they change (default true). An always-mounted part that is closed passes false: applied once, no observer. |
-| `colorSpace` | `ColorSpace` | — | The space of the axes (default: the first colour's space, else `hsb`). |
-| `xChannel` | `ColorChannel` | — | The horizontal channel. Default: saturation (hsb, hsl), red (rgb). |
-| `yChannel` | `ColorChannel` | — | The vertical channel. Default: brightness (hsb), lightness (hsl), green (rgb). |
-| `xName` | `string` | — | Submits the x channel under this name. |
-| `yName` | `string` | — | Submits the y channel under this name. |
-| `thumbAlignment` | `ThumbAlignment` | — | `contain` keeps thumbs inside the track; set `--rind-slider-thumb-size` to the thumb size. Default: `center`. |
-| `orientation` | `SliderOrientation` | — | The axis. Default: `horizontal`. |
-| `channel` | `ColorChannel` | — | The edited channel: red, green, blue, hue, saturation, lightness, brightness or alpha. |
-| `alpha` | `boolean` | — | Accept and show 8-digit hex (default: when the colour has alpha below 1). |
-| `focusableWhenDisabled` | `boolean` | — | A disabled group stays discoverable: the root is one tab stop. |
-| `color` | `ColorInput` | — | The swatch's colour: a colour, or a string `parseColor` reads. |
-| `respectAlpha` | `boolean` | — | `false`: the opaque colour (default true). |
-| `scope` | `string` | — | The `data-scope` it carries (default `"color-swatch"`). |
-| `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `ColorPicker.Root` | `value` | `string \| Color` | — | The colour (controlled). |
+| `ColorPicker.Root` | `defaultValue` | `string \| Color` | `"#000000"` | The initial colour. |
+| `ColorPicker.Root` | `onValueChange` | `(color: Color, details) => void` | — | Each change, in the space of `format`. |
+| `ColorPicker.Root` | `onValueCommit` | `(color: Color, details) => void` | — | Once at the end of each interaction. |
+| `ColorPicker.Root` | `format` | `"hex" \| "rgb" \| "hsl" \| "hsb"` | — | Display and emission format (controlled). |
+| `ColorPicker.Root` | `defaultFormat` | `format` | — | Default: from the first colour (a hex string gives `hex`). |
+| `ColorPicker.Root` | `onFormatChange` | `(format) => void` | — | The format changed. |
+| `ColorPicker.Root` | `open` | `boolean` | — | Open (controlled). |
+| `ColorPicker.Root` | `defaultOpen` | `boolean` | `false` | Open at first. |
+| `ColorPicker.Root` | `onOpenChange` | `(open, details) => void` | — | Popover reasons plus `select`. |
+| `ColorPicker.Root` | `inline` | `boolean` | `false` | The content in place: no Popover, no layer, no listeners. |
+| `ColorPicker.Root` | `closeOnSelect` | `boolean` | `false` | A swatch pick closes the Popover. |
+| `ColorPicker.Root` | `modal` | `boolean` | `false` | As Popover. |
+| `ColorPicker.Root` | `name` | `string` | — | Submits `#RRGGBB(AA)` (or `formFormat`). |
+| `ColorPicker.Root` | `formFormat` | `"hex" \| "rgb" \| "hsl" \| "hsb" \| "css"` | — | The submitted text's format. |
+| `ColorPicker.Root` | `disabled` | `boolean` | `false` | Disables every part and closes. |
+| `ColorPicker.Root` | `readOnly` | `boolean` | `false` | Focusable, changes nothing. |
+| `ColorPicker.Root` | `messages` | `Partial<ColorPickerMessages>` | — | Every string of the picker and its children. |
+| `ColorPicker.Root` | `children` | `ReactNode` | — | The picker parts. |
+| `ColorPicker.Root` | `positioning` | `PopoverProps["positioning"]` | — | The Popover's positioning: side, align, offsets, flip, shift, size, arrow and mode. |
+| `ColorPicker.Root` | `initialFocus` | `PopoverProps["initialFocus"]` | — | Where focus goes once the Popover is placed: a function, or the overlay's rule. |
+| `ColorPicker.Root` | `persistentElements` | `PopoverProps["persistentElements"]` | — | Elements whose presses and focus count as inside the Popover (a toast region). |
+| `ColorPicker.Root` | `form` | `string` | — | The id of the form the hidden input belongs to. |
+| `ColorPicker.Root` | `required` | `boolean` | — | Marks the picker required (Field state, `data-required` on the hidden input). |
+| `ColorPicker.Root` | `invalid` | `boolean` | — | Marks the picker invalid (`data-invalid`, the Field's error state). |
+| `ColorPicker.Root` | `colorName` | `ColorNameProp` | — | A fixed name or a function replacing the computed colour name (Trigger label, value texts, announcements). |
+| `ColorPicker.Root` | `locale` | `string` | `the provider's` | Formats the colour name and the numbers. |
+| `ColorPicker.Root` | `dir` | `"ltr" \| "rtl"` | `the provider's` | Reading direction; mirrors the area and sliders. |
+| `ColorPicker.Label` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.Control` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.Trigger` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.Portal` | `children` | `ReactNode` | — | The content rendered into the portal host. |
+| `ColorPicker.Portal` | `container` | `Element \| ShadowRoot \| null \| undefined` | — | Where to render (default: resolved from the logical parent, then `body`). |
+| `ColorPicker.Portal` | `logicalParent` | `(() => Element \| null) \| undefined` | — | The element the content belongs to (its trigger): target resolution and dir/lang/theme. |
+| `ColorPicker.Portal` | `observe` | `boolean \| undefined` | `true` | Keeps the host's `dir`, `lang` and theme in step with the logical parent as they change; `false` copies them once. |
+| `ColorPicker.Portal` | `render` | `RenderProp` | — | Another element or a render function receiving the props, in place of the host `div`. |
+| `ColorPicker.Positioner` | `render` | `RenderProp<S>` | — | Another element or a render function receiving the props and the part's state. |
+| `ColorPicker.Content` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.Area` | `children` | `ReactNode` | — | The area's parts (Background, Thumb). |
+| `ColorPicker.Area` | `onValueChange` | `(color: Color, details: ColorChangeDetails<ColorAreaReason>) => void` | — | Each applied change, in the space of the colour you passed; not for a change that leaves the emitted colour as it is (hue at black). |
+| `ColorPicker.Area` | `onValueCommit` | `(color: Color, details: ColorCommitDetails<ColorAreaReason>) => void` | — | Once at the end of each interaction that changed the colour. |
+| `ColorPicker.Area` | `colorSpace` | `ColorSpace` | — | The space of the axes (default: the first colour's space, else `hsb`). |
+| `ColorPicker.Area` | `xChannel` | `ColorChannel` | `saturation (hsb, hsl), red (rgb)` | The horizontal channel. |
+| `ColorPicker.Area` | `yChannel` | `ColorChannel` | `brightness (hsb), lightness (hsl), green (rgb)` | The vertical channel. |
+| `ColorPicker.Area` | `xName` | `string` | — | Submits the x channel under this name. |
+| `ColorPicker.Area` | `yName` | `string` | — | Submits the y channel under this name. |
+| `ColorPicker.Area` | `form` | `string` | — | The id of the form the inputs belong to. |
+| `ColorPicker.Area` | `disabled` | `boolean` | — | Ignores presses and keys. |
+| `ColorPicker.Area` | `readOnly` | `boolean` | — | Focusable, changes nothing. |
+| `ColorPicker.Area` | `colorName` | `ColorNameProp` | — | Replaces the colour name in the value text. |
+| `ColorPicker.Area` | `locale` | `string` | `the provider's locale` | Formats the value text. |
+| `ColorPicker.Area` | `dir` | `"ltr" \| "rtl"` | `the provider's direction` | Mirrors the x axis. |
+| `ColorPicker.Area` | `messages` | `MessageOverrides<ColorAreaMessages>` | — | Names, role description, value text and colour words. |
+| `ColorPicker.Area` | `render` | `RenderProp<ColorAreaState>` | — | Another element or a render function receiving the props and the area's state. |
+| `ColorPicker.AreaBackground` | `render` | `RenderProp<ColorAreaState>` | — | Another element or a render function receiving the props and the area's state. |
+| `ColorPicker.AreaThumb` | `render` | `RenderProp<ColorAreaState>` | — | Another element or a render function receiving the props and the area's state. |
+| `ColorPicker.ChannelSlider` | `children` | `ReactNode` | — | The slider's parts: label, control, thumbs, markers, value text and description. |
+| `ColorPicker.ChannelSlider` | `thumbAlignment` | `ThumbAlignment` | `center` | `contain` keeps thumbs inside the track; set `--rind-slider-thumb-size` to the thumb size. |
+| `ColorPicker.ChannelSlider` | `orientation` | `SliderOrientation` | `horizontal` | The axis. |
+| `ColorPicker.ChannelSlider` | `disabled` | `boolean` | — | Ignores all input; thumbs leave the tab order. |
+| `ColorPicker.ChannelSlider` | `readOnly` | `boolean` | — | Keeps focus and value, ignores changes. |
+| `ColorPicker.ChannelSlider` | `required` | `boolean` | — | `data-required` only: a range input always has a value. |
+| `ColorPicker.ChannelSlider` | `invalid` | `boolean` | — | Sets `aria-invalid` and `data-invalid`. |
+| `ColorPicker.ChannelSlider` | `name` | `string` | — | The submitted field name of every thumb. |
+| `ColorPicker.ChannelSlider` | `form` | `string` | — | The id of the form the inputs belong to. |
+| `ColorPicker.ChannelSlider` | `locale` | `string` | `the provider's` | Locale for formatting. |
+| `ColorPicker.ChannelSlider` | `dir` | `"ltr" \| "rtl"` | `the provider's` | Reading direction; mirrors a horizontal Slider. |
+| `ColorPicker.ChannelSlider` | `render` | `RenderProp<SliderState>` | — | Another element or a render function receiving the props and the slider's state. |
+| `ColorPicker.ChannelSlider` | `channel` | `ColorChannel` | — | The edited channel: red, green, blue, hue, saturation, lightness, brightness or alpha. |
+| `ColorPicker.ChannelSlider` | `onValueChange` | `(color: Color, details: ColorChangeDetails) => void` | — | Each applied change, in the space of the colour you passed. |
+| `ColorPicker.ChannelSlider` | `onValueCommit` | `(color: Color, details: ColorCommitDetails) => void` | — | Once at the end of each interaction that changed the colour. |
+| `ColorPicker.ChannelSlider` | `colorSpace` | `ColorSpace` | `the colour's when it has the channel` | The working space. |
+| `ColorPicker.ChannelSlider` | `colorName` | `ColorNameProp` | — | Replaces the colour name in the value text. |
+| `ColorPicker.ChannelSlider` | `messages` | `MessageOverrides<ColorSliderMessages>` | — | Channel names, value text and colour words. |
+| `ColorPicker.ChannelSliderLabel` | `render` | `RenderProp<SliderState>` | — | Another element or a render function receiving the props and the slider's state. |
+| `ColorPicker.ChannelSliderValueText` | `render` | `RenderProp<SliderState>` | — | Another element or a render function receiving the props and the slider's state. |
+| `ColorPicker.ChannelSliderTrack` | `render` | `RenderProp<SliderState>` | — | Another element or a render function receiving the props and the slider's state. |
+| `ColorPicker.ChannelSliderThumb` | `render` | `RenderProp<SliderState>` | — | Another element or a render function receiving the props and the slider's state. |
+| `ColorPicker.ChannelSliderThumb` | `disabled` | `boolean` | — | Disables this thumb only. |
+| `ColorPicker.ChannelSliderThumb` | `name` | `string` | — | Submitted under this name instead of the Root's. |
+| `ColorPicker.ChannelSliderThumb` | `children` | `ReactNode` | — | The thumb's visible content, rendered before its native range input. |
+| `ColorPicker.ChannelInput` | `channel` | `ColorChannel \| "hex" \| "css"` | — | A colour channel (a Color Channel Field), or `hex` / `css` (a Color Field). |
+| `ColorPicker.ChannelInput` | `alpha` | `boolean` | — | Accept and show 8-digit hex (default: when the colour has alpha below 1). |
+| `ColorPicker.EyeDropperTrigger` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.SwatchGroup` | `children` | `ReactNode` | — | The group's parts (Label, Items, Description, ErrorMessage). |
+| `ColorPicker.SwatchGroup` | `orientation` | `"vertical" \| "horizontal"` | — | Only `aria-orientation` and `data-orientation`: every arrow key moves. |
+| `ColorPicker.SwatchGroup` | `disabled` | `boolean` | — | Disables every radio. |
+| `ColorPicker.SwatchGroup` | `focusableWhenDisabled` | `boolean` | — | A disabled group stays discoverable: the root is one tab stop. |
+| `ColorPicker.SwatchGroup` | `readOnly` | `boolean` | — | Navigable, never changes. |
+| `ColorPicker.SwatchGroup` | `required` | `boolean` | — | Valid with one radio checked. |
+| `ColorPicker.SwatchGroup` | `invalid` | `boolean` | — | Marks the group invalid; shows the ErrorMessage. |
+| `ColorPicker.SwatchGroup` | `name` | `string` | — | Default: derived from the root id (two groups never form one browser group). |
+| `ColorPicker.SwatchGroup` | `form` | `string` | — | The id of the form the hidden inputs belong to. |
+| `ColorPicker.SwatchGroup` | `render` | `RenderProp<RadioGroupState>` | — | Another element or a render function receiving the props and the group's state. |
+| `ColorPicker.SwatchGroup` | `onValueChange` | `(color: Color, details: ColorSwatchPickerChangeDetails) => void` | — | A swatch was checked; `details.value` is its key, `details.index` its index. |
+| `ColorPicker.SwatchGroup` | `locale` | `string` | `the provider's` | Formats the swatches' colour names. |
+| `ColorPicker.SwatchGroup` | `messages` | `MessageOverrides<ColorSwatchPickerMessages>` | — | The group's label (`swatchPickerLabel`) and the colour words. |
+| `ColorPicker.SwatchTrigger` | `disabled` | `boolean` | — | Disables this swatch only. |
+| `ColorPicker.SwatchTrigger` | `color` | `ColorInput` | — | The swatch's colour: a colour, or a string `parseColor` reads. |
+| `ColorPicker.SwatchTrigger` | `value` | `string` | — | The item's key (default the canonical `#RRGGBBAA`). |
+| `ColorPicker.SwatchTrigger` | `colorName` | `ColorNameProp` | — | A fixed name or a function replacing the computed colour name (the swatch's accessible name). |
+| `ColorPicker.SwatchIndicator` | `render` | `RenderProp<S>` | — | Another element or a render function receiving the props and the part's state. |
+| `ColorPicker.Swatch` | `color` | `ColorInput` | — | Default transparent black. |
+| `ColorPicker.Swatch` | `respectAlpha` | `boolean` | — | `false`: the opaque colour (default true). |
+| `ColorPicker.Swatch` | `colorName` | `ColorNameProp` | — | A fixed name (a design token) or a function replacing the computed name. |
+| `ColorPicker.Swatch` | `locale` | `string` | `the provider's locale` | Formats the transparency percentage. |
+| `ColorPicker.Swatch` | `messages` | `MessageOverrides<ColorSwatchMessages>` | — | The role description and the colour words. |
+| `ColorPicker.Swatch` | `render` | `RenderProp<ColorSwatchState>` | — | Another element or a render function receiving the props and the swatch's state. |
+| `ColorPicker.ValueSwatch` | `respectAlpha` | `boolean` | — | `false`: the opaque colour (default true). |
+| `ColorPicker.ValueSwatch` | `colorName` | `ColorNameProp` | — | A fixed name (a design token) or a function replacing the computed name. |
+| `ColorPicker.ValueSwatch` | `locale` | `string` | `the provider's locale` | Formats the transparency percentage. |
+| `ColorPicker.ValueSwatch` | `messages` | `MessageOverrides<ColorSwatchMessages>` | — | The role description and the colour words. |
+| `ColorPicker.ValueSwatch` | `render` | `RenderProp<ColorSwatchState>` | — | Another element or a render function receiving the props and the swatch's state. |
+| `ColorPicker.FormatSelect` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.FormatTrigger` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.View` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.View` | `format` | `ColorPickerFormat` | — | The format this view is for: the children render only while it is the picker's. |
+| `ColorPicker.ValueText` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `ColorPicker.TransparencyGrid` | `render` | `RenderProp<Record<never, never>>` | — | Another element or a render function receiving the props. |
+| `ColorPicker.Description` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `ColorPicker.ErrorMessage` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `ColorPicker.ErrorMessage` | `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
+| `ColorPicker.ErrorMessage` | `children` | `ReactNode \| ((messages: readonly string[]) => ReactNode)` | — | Replaces the default text; a function returning null/undefined falls back to it. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

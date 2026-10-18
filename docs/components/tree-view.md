@@ -46,41 +46,51 @@ import { TreeView } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `items` | `{ key, label, children?, isBranch?, disabled?, href? }[]` | — | The tree's data (or `collection`: a tree collection built by you). |
-| `selectionMode` | `"single" \| "multiple" \| "none"` | `"single"` | None: activation only. |
-| `selectionBehavior` | `"toggle" \| "replace"` | `"toggle"` | Replace: selection follows focus; mod+press toggles. |
-| `value` | `string \| null \| string[]` | — | Controlled selection. |
-| `defaultValue` | `string \| null \| string[]` | — | Uncontrolled selection. |
-| `onValueChange` | `(value, { reason, key }) => void` | — | Every selection change. |
-| `expandedValue` | `string[]` | — | Controlled expanded branch keys. |
-| `defaultExpandedValue` | `string[]` | — | Uncontrolled expanded keys. |
-| `onExpandedChange` | `(keys, { reason: "key" \| "press" \| "api" \| "siblings" \| "all" }) => void` | — | Every expansion change. |
-| `checkable` | `boolean` | `false` | Items carry `aria-checked`; no selection. |
-| `checkedValue` | `string[]` | — | Controlled checked leaf keys. |
-| `defaultCheckedValue` | `string[]` | — | Uncontrolled checked leaf keys. |
-| `onCheckedChange` | `(keys, { reason, key }) => void` | — | Once per user action. |
-| `checkPropagation` | `"both" \| "none"` | `"both"` | Both: a branch is derived from its leaves. |
-| `expandOnClick` | `boolean` | `true` | A press on a branch toggles it. |
-| `onAction` | `(key, { modality, via }) => void` | — | Enter, and a press when the selection does not consume it. |
-| `onLoadChildren` | `(key, { signal }) => Promise \| void` | — | Called once per unloaded branch when first expanded. |
-| `disabled` | `boolean` | `false` | No Tab stop, no keys or presses. |
-| `id` | `string` | — | Base of the parts' generated ids (default: a `useId`). |
-| `children` | `ReactNode` | — | The tree's parts (Label, Tree, Empty). |
-| `collection` | `TreeCollection<unknown>` | — | A tree collection you built, used instead of `items`. |
-| `focusableWhenDisabled` | `boolean` | — | Disabled items (and a disabled tree) stay focusable and reachable by arrows; nothing toggles. |
-| `loop` | `boolean` | — | Arrow moves wrap at both ends. Default: false. |
-| `typeaheadTimeout` | `number` | — | Typeahead reset delay in ms. Default: 1000. |
-| `messages` | `Partial<TreeViewMessages>` | — | Overrides for the loading announcements and the Empty and Loading default texts. |
-| `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
-| `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
-| `rel` | `string \| undefined` | — | With `href`: passed to the anchor. |
-| `href` | `Href \| undefined` | — | Renders a native `<a role="treeitem">` (link navigation). |
-| `target` | `string \| undefined` | — | With `href`: passed to the anchor; not `_self` opens elsewhere. |
-| `current` | `LinkCurrent \| undefined` | — | With `href`: sets `aria-current` and `data-current`; the link still navigates. |
-| `routerOptions` | `RouterOptions \| undefined` | — | With `href`: passed unchanged to the router's `navigate`. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `TreeView.Root` | `items` | `{ key, label, children?, isBranch?, disabled?, href? }[]` | — | The tree's data (or `collection`: a tree collection built by you). |
+| `TreeView.Root` | `selectionMode` | `"single" \| "multiple" \| "none"` | `"single"` | None: activation only. |
+| `TreeView.Root` | `selectionBehavior` | `"toggle" \| "replace"` | `"toggle"` | Replace: selection follows focus; mod+press toggles. |
+| `TreeView.Root` | `value` | `string \| null \| string[]` | — | Controlled selection. |
+| `TreeView.Root` | `defaultValue` | `string \| null \| string[]` | — | Uncontrolled selection. |
+| `TreeView.Root` | `onValueChange` | `(value, { reason, key }) => void` | — | Every selection change. |
+| `TreeView.Root` | `expandedValue` | `string[]` | — | Controlled expanded branch keys. |
+| `TreeView.Root` | `defaultExpandedValue` | `string[]` | — | Uncontrolled expanded keys. |
+| `TreeView.Root` | `onExpandedChange` | `(keys, { reason: "key" \| "press" \| "api" \| "siblings" \| "all" }) => void` | — | Every expansion change. |
+| `TreeView.Root` | `checkable` | `boolean` | `false` | Items carry `aria-checked`; no selection. |
+| `TreeView.Root` | `checkedValue` | `string[]` | — | Controlled checked leaf keys. |
+| `TreeView.Root` | `defaultCheckedValue` | `string[]` | — | Uncontrolled checked leaf keys. |
+| `TreeView.Root` | `onCheckedChange` | `(keys, { reason, key }) => void` | — | Once per user action. |
+| `TreeView.Root` | `checkPropagation` | `"both" \| "none"` | `"both"` | Both: a branch is derived from its leaves. |
+| `TreeView.Root` | `expandOnClick` | `boolean` | `true` | A press on a branch toggles it. |
+| `TreeView.Root` | `onAction` | `(key, { modality, via }) => void` | — | Enter, and a press when the selection does not consume it. |
+| `TreeView.Root` | `onLoadChildren` | `(key, { signal }) => Promise \| void` | — | Called once per unloaded branch when first expanded. |
+| `TreeView.Root` | `disabled` | `boolean` | `false` | No Tab stop, no keys or presses. |
+| `TreeView.Root` | `id` | `string` | — | Base of the parts' generated ids (default: a `useId`). |
+| `TreeView.Root` | `children` | `ReactNode` | — | The tree's parts (Label, Tree, Empty). |
+| `TreeView.Root` | `collection` | `TreeCollection<unknown>` | — | A tree collection you built, used instead of `items`. |
+| `TreeView.Root` | `focusableWhenDisabled` | `boolean` | — | Disabled items (and a disabled tree) stay focusable and reachable by arrows; nothing toggles. |
+| `TreeView.Root` | `loop` | `boolean` | `false` | Arrow moves wrap at both ends. |
+| `TreeView.Root` | `typeaheadTimeout` | `number` | `1000` | Typeahead reset delay in ms. |
+| `TreeView.Root` | `messages` | `Partial<TreeViewMessages>` | — | Overrides for the loading announcements and the Empty and Loading default texts. |
+| `TreeView.Root` | `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
+| `TreeView.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Tree` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Tree` | `children` | `(node: TreeViewNodeState) => ReactNode` | — | Called once per visible node with its state; returns its row (usually a `TreeView.Item`). |
+| `TreeView.Tree` | `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
+| `TreeView.Item` | `rel` | `string \| undefined` | — | With `href`: passed to the anchor. |
+| `TreeView.Item` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Item` | `value` | `string` | — | The node key. |
+| `TreeView.Item` | `children` | `ReactNode` | — | The row's content (ItemText, ItemIndicator, ItemCheckbox). |
+| `TreeView.Item` | `href` | `Href \| undefined` | — | Renders a native `<a role="treeitem">` (link navigation). |
+| `TreeView.Item` | `target` | `string \| undefined` | — | With `href`: passed to the anchor; not `_self` opens elsewhere. |
+| `TreeView.Item` | `current` | `LinkCurrent \| undefined` | — | With `href`: sets `aria-current` and `data-current`; the link still navigates. |
+| `TreeView.Item` | `routerOptions` | `RouterOptions \| undefined` | — | With `href`: passed unchanged to the router's `navigate`. |
+| `TreeView.ItemText` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.ItemIndicator` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.ItemCheckbox` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Loading` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Empty` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

@@ -254,6 +254,7 @@ export interface SegmentState {
 export type SegmentedControlItemProps = Omit<PartProps<"button", SegmentState>, "value"> & {
   /** The segment's value: what the control's value and the form submit. */
   readonly value: string
+  /** Disables this segment: it cannot be checked. */
   readonly disabled?: boolean
   /** The text for the collection (defaults to the segment's text content). */
   readonly textValue?: string

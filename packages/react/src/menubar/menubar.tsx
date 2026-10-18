@@ -260,6 +260,7 @@ export type MenubarMenuProps = Omit<
 > & {
   /** The menu's key in the bar's `value`. */
   readonly value: string
+  /** Disables this menu: its trigger never opens it. */
   readonly disabled?: boolean
 }
 

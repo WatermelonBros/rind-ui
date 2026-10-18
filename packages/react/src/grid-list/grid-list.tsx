@@ -400,6 +400,7 @@ function Item({
   readonly value: string
   /** The row's text for typeahead and announcements. Default: its ItemText's text. */
   readonly textValue?: string | undefined
+  /** Disables this row: it cannot be selected and, unless the Root's `disabledBehavior` is `"selection"`, it does not act. */
   readonly disabled?: boolean | undefined
   /** A link row: Enter and a press follow it (role stays `row`). */
   readonly href?: string | undefined

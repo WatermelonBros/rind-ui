@@ -57,7 +57,7 @@ import { FieldHost, HostDescription, HostErrorMessage } from "../field/use-field
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { Popover } from "../popover/popover"
+import { Popover, ScopedPopoverRoot } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
@@ -333,7 +333,7 @@ function Root({
       {inline ? (
         body
       ) : (
-        <Popover.Root
+        <ScopedPopoverRoot
           id={instance}
           scope="color-picker"
           open={open}
@@ -353,7 +353,7 @@ function Root({
           {...(persistentElements === undefined ? {} : { persistentElements })}
         >
           {body}
-        </Popover.Root>
+        </ScopedPopoverRoot>
       )}
     </FieldHost>
   )
@@ -855,14 +855,17 @@ function View({
   render,
   children,
   ...rest
-}: Own<"div"> & { readonly format: ColorPickerFormat }) {
+}: Own<"div"> & {
+  /** The format this view is for: the children render only while it is the picker's. */
+  readonly format: ColorPickerFormat
+}) {
   const ctx = usePicker("View")
   if (ctx.format !== format) return null
   const props = mergeProps(normalizeProps(ctx.api.view(format)), rest)
   return renderPart("div", { ...props, children }, render, ctx.state)
 }
 
-function TransparencyGrid(props: ComponentPropsWithRef<typeof Grid>) {
+function TransparencyGrid(props: Omit<ComponentPropsWithRef<typeof Grid>, "scope">) {
   usePicker("TransparencyGrid")
   // The picker's scope last: a consumer prop never moves the part out of it.
   return <Grid {...props} scope="color-picker" />

@@ -65,8 +65,7 @@ import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { Popover } from "../popover"
-import { usePopoverControls } from "../popover/popover"
+import { ScopedPopoverRoot, usePopoverControls } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
@@ -567,7 +566,7 @@ function SingleRoot({
       {...(ownFieldMessages ? { messages: ownFieldMessages } : {})}
       {...rootData}
     >
-      <Popover.Root
+      <ScopedPopoverRoot
         id={instance}
         scope="date-field"
         disabled={disabled}
@@ -595,7 +594,7 @@ function SingleRoot({
           <SinglePicker>{children}</SinglePicker>
           <HiddenInput />
         </DateFieldContext>
-      </Popover.Root>
+      </ScopedPopoverRoot>
     </FieldHost>
   )
 }

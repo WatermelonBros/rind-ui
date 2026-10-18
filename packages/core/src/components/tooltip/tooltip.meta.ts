@@ -115,7 +115,7 @@ export const tooltipMeta = {
       type: "Ref<{ open(): void; close(): void }>",
       description: "Programmatic open and close.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

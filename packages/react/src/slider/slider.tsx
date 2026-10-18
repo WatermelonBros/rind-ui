@@ -160,12 +160,15 @@ export type SliderRootProps<V extends SliderValue = SliderValue> = Omit<
   readonly thumbAlignment?: ThumbAlignment
   /** The axis. Default: `horizontal`. */
   readonly orientation?: SliderOrientation
+  /** Ignores all input; thumbs leave the tab order. */
   readonly disabled?: boolean
+  /** Keeps focus and value, ignores changes. */
   readonly readOnly?: boolean
   /** `data-required` only: a range input always has a value. */
   readonly required?: boolean
   /** Sets `aria-invalid` and `data-invalid`. */
   readonly invalid?: boolean
+  /** The submitted field name of every thumb. */
   readonly name?: string
   /** The id of the form the inputs belong to. */
   readonly form?: string
@@ -555,6 +558,7 @@ function Indicator({ render, ...rest }: PartProps<"div">) {
 export type SliderThumbProps = Omit<PartProps<"div">, "children"> & {
   /** The thumb's value index (known on the server). */
   readonly index: number
+  /** Disables this thumb only. */
   readonly disabled?: boolean
   /** Submitted under this name instead of the Root's. */
   readonly name?: string
@@ -652,7 +656,10 @@ function MarkerGroup({ render, ...rest }: PartProps<"div">) {
   return renderPart("div", props, render, ctx.state)
 }
 
-export type SliderMarkerProps = PartProps<"div"> & { readonly value: number }
+export type SliderMarkerProps = PartProps<"div"> & {
+  /** The value the tick marks. */
+  readonly value: number
+}
 
 /** A tick at `value`: `data-state` under-value, at-value or over-value. */
 function Marker({ value, render, ...rest }: SliderMarkerProps) {

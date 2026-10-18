@@ -59,7 +59,7 @@ type Common = {
   readonly disabledBehavior?: "all" | "selection"
   /** Arrow keys wrap from the last item to the first and back. Default: `false`. */
   readonly loop?: boolean
-  /** How long typed characters build one typeahead search (ms). Default: the provider's, 1000. */
+  /** How long typed characters build one typeahead search (ms). Default: 1000. */
   readonly typeaheadTimeout?: number
   /** Data items. Without them (and without `collection`), item parts register themselves. */
   readonly items?: readonly ListboxItemData[]

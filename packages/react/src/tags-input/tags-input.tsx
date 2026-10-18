@@ -378,7 +378,14 @@ const useChip = (part: string) => {
   return chip
 }
 
-function Chip({ render, disabled, ...rest }: Own<"span"> & { readonly disabled?: boolean }) {
+function Chip({
+  render,
+  disabled,
+  ...rest
+}: Own<"span"> & {
+  /** Locks this tag: it cannot be edited or removed, and clearing keeps it. */
+  readonly disabled?: boolean
+}) {
   const host = useLive("Chip")
   const chip = useChip("Chip")
   const { setDisabled } = host
