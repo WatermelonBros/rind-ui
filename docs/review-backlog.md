@@ -293,15 +293,14 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
 | add-navigation-menu | 2.2 | Connect unit tests per "Data Attributes" row; the absence of `aria-orientation`, `aria-haspopup`, `aria-owns` and menu roles is covered by the DOM tests and a per-contract invariant only |
 | add-navigation-menu | 3.3 (rest) | SSR: hydrate test, Suspense inside a trigger, no `document` during render (server HTML with `hidden` panels is tested) |
-| add-navigation-menu | 4.2 (rest) | The same driver test through the Playwright adapter against the site's examples |
-| add-navigation-menu | 5.1 (rest) | Model classes for nested levels and RTL (pointer, keyboard, touch, virtual × both `closedContent` modes × `openOnHover` run) |
 | add-navigation-menu | 5.2 | One browser test per listed regression in three engines; today the DOM suite covers the core scenarios in jsdom and Chromium |
 | add-navigation-menu | 5.3 | Tab-order equality inline vs viewport vs portal, viewport size under fast switching and items without content, window resize while open |
 | add-navigation-menu | 5.4 (rest) | ARIA snapshots for open-by-hover, open-by-press and nested-open examples (closed and open exist) |
-| add-navigation-menu | 6.2 (rest) | Examples: client-router links with the current page, a 320 px layout, driver usage |
 | add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
-| add-navigation-menu | design | Links in a Sub level's own list mark the parent item's trigger `data-current`; a current link deeper in a Sub panel marks only the Sub trigger |
-| add-navigation-menu | design | A press on a top-level link that is not a layer element counts as an outside press before the link activation (both close; reason `outside-press` instead of `link-activate`) |
+| add-navigation-menu | #163 review (warning) | `navigation-menu-no-menu-semantics` scans only root, list, triggers and contents: scan every part (links, viewport, positioner, indicator, Sub roots) |
+| add-navigation-menu | #163 review (warning) | `navigationSet` (the arrow-key set from the DOM) belongs in `core/dom`, not the machine module |
+| add-navigation-menu | #163 review (warning) | A shared `useContentSize` hook for Collapsible, Accordion and Navigation Menu (each adapter runs the size sequence itself today) |
+| add-navigation-menu | #163 review | Model walk of a controlled menu: the `$props:value` / `$sync:value` prop steps are mapped, but a parent that accepts proposals is not modelled by the oracle, so no controlled config runs them |
 | date-family-consolidation | 2.1 (#152) | Calendar view trigger: its name joins the heading and the action ("October 2026, Choose month") with a hard-coded ", " that cannot be localised, and the h2 takes the action text. Name the button by its visible text plus aria-describedby, or pass the heading to \`viewUp({ view, heading })\` (needs a spec tweak) |
 
 ## Resolved

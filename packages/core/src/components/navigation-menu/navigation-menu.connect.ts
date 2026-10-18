@@ -32,6 +32,7 @@ export type NavigationMenuPart =
   | "positioner"
 
 export interface NavigationMenuConnectInput {
+  /** The level's instance id (part ids derive from it). */
   readonly instance: string
   /** The open item's key, or null. */
   readonly value: string | null
@@ -39,24 +40,35 @@ export interface NavigationMenuConnectInput {
   readonly previous: string | null
   /** The level's item keys in DOM order (motion direction). */
   readonly order: readonly string[]
+  /** The level's orientation (which arrows move along the bar). */
   readonly orientation: "horizontal" | "vertical"
+  /** The reading direction: arrows and motion mirror in RTL. */
   readonly dir: "ltr" | "rtl"
   /** The last open skipped the open delay. */
   readonly instant: boolean
+  /** The positioned panel's side and alignment. */
   readonly placement: PlacementState
+  /** The open trigger's measured box (the Indicator), or null. */
   readonly indicator: MeasuredIndicator | null
   /** `positioning.mode` is manual. */
   readonly manual?: boolean | undefined
+  /** The resolved messages (the landmark's default name). */
   readonly messages: NavigationMenuMessages
 }
 
 /** A trigger's own state (from the adapter). */
 export interface NavigationMenuTriggerState {
+  /** The trigger has focus. */
   readonly focused: boolean
+  /** How focus or the last interaction arrived (focus-visible). */
   readonly modality: Modality
+  /** A press is in progress. */
   readonly pressed: boolean
+  /** A mouse or pen is over it. */
   readonly hovered: boolean
+  /** The rendered tag (lowercase): a substituted element gets the button role. */
   readonly tag: string
+  /** Never opens by press, keyboard or hover. */
   readonly disabled: boolean
   /** Its panel holds the current page's link. */
   readonly current: boolean
@@ -195,18 +207,23 @@ export function navigationMenuConnect(
       "data-orientation": input.orientation,
       "data-instant": dataFlag(input.value !== null && input.instant),
     }),
-    positioner: (): PartProps => ({
-      ...scope("positioner"),
-      ...positionerProps(
-        input.placement,
-        {
-          positioner: ids.positioner,
-          anchor: input.value === null ? ids.list : ids.trigger(input.value),
-        },
-        { dir: input.dir, manual: input.manual === true },
-      ),
-      "data-state": dataState,
-    }),
+    /** The level's Positioner, or (`key`) one item's around its own Content. */
+    positioner: (key?: string): PartProps => {
+      const open = key === undefined ? input.value !== null : input.value === key
+      const anchor = key ?? input.value
+      return {
+        ...scope("positioner"),
+        ...positionerProps(
+          input.placement,
+          {
+            positioner: key === undefined ? ids.positioner : ids.itemPositioner(key),
+            anchor: anchor === null ? ids.list : ids.trigger(anchor),
+          },
+          { dir: input.dir, manual: input.manual === true },
+        ),
+        "data-state": open ? "open" : "closed",
+      }
+    },
     indicator: (): PartProps =>
       indicatorProps({
         scope: "navigation-menu",

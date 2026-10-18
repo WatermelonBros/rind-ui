@@ -8,7 +8,7 @@
 import type { Modality } from "../../contract/env"
 import type { DismissReason } from "../../dom/dismiss"
 import { focusSafely } from "../../dom/focus-safely"
-import { getLayerStack, type LayerId, layerId } from "../../dom/layer-stack"
+import { getLayerStack, type LayerHandle, type LayerId, layerId } from "../../dom/layer-stack"
 import { trackNonModalTabOrder } from "../../dom/non-modal-tab-order"
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
@@ -104,6 +104,7 @@ export interface NavigationMenuProps {
   readonly skipDelay?: number | undefined
   /** A press this soon after a hover open keeps the item open (default 500 ms). */
   readonly patientClick?: number | undefined
+  /** Which arrows move along the bar and which one enters an open panel. */
   readonly orientation?: "horizontal" | "vertical" | undefined
   /** The level's instance id (part ids derive from it). */
   readonly root: string
@@ -113,16 +114,21 @@ export interface NavigationMenuProps {
   readonly level?: NavigationMenuLevel | undefined
   /** An item's trigger is disabled. */
   readonly isItemDisabled?: ((item: string) => boolean) | undefined
-  /** A Positioner part is rendered for this level. */
-  readonly positioned?: boolean | undefined
+  /**
+   * A Positioner is rendered: around the level's Viewport (`level`), or one per item around
+   * its Content (`item`).
+   */
+  readonly positioned?: "level" | "item" | undefined
   /** The Positioner's anchor (default the open trigger). */
   readonly anchor?: "trigger" | "list" | undefined
+  /** Side, alignment and offsets, over the defaults (below, start, 4 px). */
   readonly positioning?: PositioningProps | undefined
 }
 
 export interface NavigationMenuContext {
   /** The item waiting for the open delay. */
   readonly pending: string | null
+  /** How the open item opened: only a hover-opened item closes when the pointer leaves. */
   readonly openedBy: "hover" | "press" | "keyboard" | "api"
   /** Clock time of the last open (the patient-click window). */
   readonly openedAt: number
@@ -132,8 +138,11 @@ export interface NavigationMenuContext {
   readonly previous: string | null
   /** The last open skipped the open delay (a switch or a warm open). */
   readonly instant: boolean
+  /** Why the level last closed. */
   readonly closeReason: NavigationMenuReason | null
+  /** The positioned panel's side and alignment. */
   readonly placement: PlacementState
+  /** The open trigger's box, for the Indicator. */
   readonly indicator: MeasuredIndicator | null
 }
 
@@ -142,6 +151,8 @@ export const navigationMenuIds = (root: string) => ({
   list: partId("navigation-menu", root, "list"),
   viewport: partId("navigation-menu", root, "viewport"),
   positioner: partId("navigation-menu", root, "positioner"),
+  /** A Positioner around one item's Content (no Viewport). */
+  itemPositioner: (key: string) => itemId("navigation-menu", root, "positioner", key),
   trigger: (key: string) => itemId("navigation-menu", root, "trigger", key),
   content: (key: string) => itemId("navigation-menu", root, "content", key),
 })
@@ -182,6 +193,27 @@ const inTransit = (env: Env) => {
   const node = env.dom.getRootNode() as Document | ShadowRoot | undefined
   if (!node) return false
   return env.hoverIntent.isInTransit("body" in node ? node : node.ownerDocument)
+}
+
+/**
+ * The layer as hover zones and the Tab order see it: its panels and descendant layers
+ * rendered outside the root, not the whole root (the layer holds the root so presses on
+ * the bar are inside; the bar's other items are not part of an item's zone).
+ */
+function panelLayer(
+  layer: LayerHandle,
+  panels: () => readonly HTMLElement[],
+  root: () => HTMLElement | null,
+): LayerHandle {
+  return {
+    ...layer,
+    id: layer.id,
+    parentId: layer.parentId,
+    contains: (target: EventTarget | null) =>
+      target instanceof Node &&
+      (panels().some((p) => p.contains(target)) ||
+        (layer.contains(target) && root()?.contains(target) !== true)),
+  }
 }
 
 const ITEM = '[data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])'
@@ -277,9 +309,10 @@ export const navigationMenuMachine = setup({
     warmOpen: ({ set }) => set("instant", true),
     delayedOpen: ({ set }) => set("instant", false),
     /** From the open item to the event's, in one step. */
-    switchTo: ({ event, env, values, set }) => {
+    switchTo: ({ event, env, props, values, set }) => {
       const item = itemOf(event)
       if (item === null || item === values.value) return
+      props.level?.closeChildren()
       set("previous", values.value)
       set(
         "openedBy",
@@ -290,6 +323,8 @@ export const navigationMenuMachine = setup({
       set("value", item)
     },
     keepByPress: ({ set }) => set("openedBy", "press"),
+    /** The open panel closed or changed: its nested levels close (even while opening). */
+    closeChildren: ({ props }) => props.level?.closeChildren(),
     /** A default or controlled value at start opens that item. */
     startOpen: ({ event, values, send }) => {
       if (event.type === "$start" && values.value !== null && values.value !== undefined)
@@ -396,10 +431,15 @@ export const navigationMenuMachine = setup({
             const k = key()
             return k === null ? null : byId(ids.content(k))
           }
-          const panels = () =>
-            [content(), byId(ids.viewport), byId(ids.positioner)].filter(
-              (e): e is HTMLElement => e !== null,
-            )
+          const panels = () => {
+            const k = key()
+            return [
+              content(),
+              byId(ids.viewport),
+              byId(ids.positioner),
+              k === null ? null : byId(ids.itemPositioner(k)),
+            ].filter((e): e is HTMLElement => e !== null)
+          }
           const id = navigationMenuLayerId(root)
           const doc = docOf(env)
           const rootEl = () => byId(ids.root)
@@ -416,20 +456,20 @@ export const navigationMenuMachine = setup({
             modal: false,
             parent: props().parent,
             opener: trigger,
-            // The level's triggers are inside: a press on another one switches, not dismisses.
-            // Not the whole root: leaving the panel forward goes to the next top-level item.
-            elements: () => [
-              ...(rootEl()?.querySelectorAll<HTMLElement>(
-                `[data-scope="navigation-menu"][data-part="trigger"][data-instance="${CSS.escape(root)}"]`,
-              ) ?? []),
-              ...panels(),
-            ],
+            // The whole level is inside: a press on another trigger switches, and a press on a
+            // bar link is that link's activation (or an "open elsewhere" that keeps it open).
+            elements: () => [rootEl(), ...panels()].filter((e): e is HTMLElement => e !== null),
             container: () => content() ?? byId(ids.viewport),
             // Disclosure navigation: opening never moves focus.
             initialFocus: () => false,
             // To the trigger, only when focus was inside the closing panel or fell to <body>:
             // focus that moved elsewhere (outside focus, a press on a field) stays there.
-            finalFocus: () => trigger(),
+            // Escape, or a link activated inside the panel (the panel hides around it): to the
+            // trigger. Hover, outside press and outside focus closes never move focus.
+            finalFocus: (reason) =>
+              reason === "escape-key" || s.owner.context.closeReason === "link-activate"
+                ? trigger()
+                : false,
             modality: env.modality.modality(),
             dismiss: {
               escape: true,
@@ -455,7 +495,7 @@ export const navigationMenuMachine = setup({
             ? env.hoverIntent.track({
                 trigger,
                 elements: panels,
-                layer,
+                layer: panelLayer(layer, panels, rootEl),
                 onLeave: () => send({ type: "HOVER.END", item: null }),
                 onEnter: () => {
                   const v = open()
@@ -463,28 +503,29 @@ export const navigationMenuMachine = setup({
                 },
               })
             : () => {}
-          const track = props().positioned
-            ? env.position.track({
-                anchor: {
-                  kind: "virtual",
-                  get: () => {
-                    const el = props().anchor === "list" ? byId(ids.list) : trigger()
-                    return el
-                      ? {
-                          getBoundingClientRect: () => el.getBoundingClientRect(),
-                          contextElement: el,
-                        }
-                      : null
+          const track =
+            props().positioned === "level"
+              ? env.position.track({
+                  anchor: {
+                    kind: "virtual",
+                    get: () => {
+                      const el = props().anchor === "list" ? byId(ids.list) : trigger()
+                      return el
+                        ? {
+                            getBoundingClientRect: () => el.getBoundingClientRect(),
+                            contextElement: el,
+                          }
+                        : null
+                    },
                   },
-                },
-                positioner: ids.positioner,
-                options: () => navigationMenuPositioning(props()),
-                onPlacement: (p, first) => {
-                  s.placed = { type: "POSITION.PLACED", ...p, first: true }
-                  send({ type: "POSITION.PLACED", ...p, first })
-                },
-              })
-            : null
+                  positioner: ids.positioner,
+                  options: () => navigationMenuPositioning(props()),
+                  onPlacement: (p, first) => {
+                    s.placed = { type: "POSITION.PLACED", ...p, first: true }
+                    send({ type: "POSITION.PLACED", ...p, first })
+                  },
+                })
+              : null
           return () => {
             track?.stop()
             stopHover()
@@ -497,18 +538,41 @@ export const navigationMenuMachine = setup({
       )
     },
     /** The open item's content follows its trigger in the Tab order; restarted per switch. */
-    follow: ({ env, props, values }) => {
+    follow: ({ env, props, values, send }) => {
       if (typeof document === "undefined" || values.value === null) return undefined
       const ids = navigationMenuIds(props.root)
       const key = values.value
       const layer = getLayerStack(docOf(env)).get(navigationMenuLayerId(props.root))
-      if (props.positioned) env.position.reposition(ids.positioner)
-      if (!layer) return undefined
-      return trackNonModalTabOrder(env, {
+      if (props.positioned === "level") env.position.reposition(ids.positioner)
+      // One Positioner per item: the open item's, against its own trigger.
+      const track =
+        props.positioned === "item"
+          ? env.position.track({
+              anchor: { kind: "element", id: ids.trigger(key) },
+              positioner: ids.itemPositioner(key),
+              options: () => navigationMenuPositioning(props),
+              onPlacement: (p, first) => send({ type: "POSITION.PLACED", ...p, first }),
+            })
+          : null
+      if (!layer) return () => track?.stop()
+      // Leaving the panel forward continues after the trigger, past the other bar items:
+      // only the panels count as this layer for the Tab order (the layer holds the root).
+      const panels = () =>
+        [
+          env.dom.getById(ids.content(key)),
+          env.dom.getById(ids.viewport),
+          env.dom.getById(ids.positioner),
+          env.dom.getById(ids.itemPositioner(key)),
+        ].filter((e): e is HTMLElement => e !== null)
+      const stopTab = trackNonModalTabOrder(env, {
         trigger: () => env.dom.getById(ids.trigger(key)),
         content: () => env.dom.getById(ids.content(key)),
-        layer,
+        layer: panelLayer(layer, panels, () => env.dom.getById(ids.root)),
       })
+      return () => {
+        track?.stop()
+        stopTab()
+      }
     },
   },
 }).machine({
@@ -545,7 +609,7 @@ export const navigationMenuMachine = setup({
   states: {
     closed: {
       // A default or controlled value at start: open.
-      entry: ["startOpen"],
+      entry: ["startOpen", "closeChildren"],
       on: {
         "HOVER.START": { guard: "hoverable", target: "opening", actions: ["setPending"] },
         PRESS: {
@@ -558,8 +622,10 @@ export const navigationMenuMachine = setup({
       },
     },
     warm: {
+      entry: ["closeChildren"],
       after: { skipDelay: "closed" },
       on: {
+        "PARENT.CLOSE": "closed",
         "HOVER.START": {
           guard: "hoverable",
           target: "open",
@@ -598,6 +664,8 @@ export const navigationMenuMachine = setup({
         OPEN: { guard: "canOpen", target: "open", reason: "api", actions: ["delayedOpen", "open"] },
         CLOSE: { target: "closed", actions: ["clearPending"] },
         DISABLED: { target: "closed", actions: ["clearPending"] },
+        // The parent panel closed: a nested level never opens hidden.
+        "PARENT.CLOSE": { target: "closed", actions: ["clearPending"] },
       },
     },
     open: {

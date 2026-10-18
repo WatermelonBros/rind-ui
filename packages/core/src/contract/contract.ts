@@ -60,13 +60,18 @@ interface Pointerish<P extends string> {
 /**
  * An action, per modality. Every action with a pointer or touch implementation also
  * declares a keyboard implementation, or `none.keyboard` with the reason there is none.
- * `virtual` is derived from `pointer`.
+ * `none.touch` says why a pointer action has no touch form (hover). `virtual` is derived
+ * from `pointer`.
  */
 export type ActionDef<P extends string, Q> = Pointerish<P> & {
   readonly done: Done<P, Q>
 } & (
     | { readonly keyboard: ActionImpl<P>; readonly none?: never }
-    | { readonly keyboard?: never; readonly none: { readonly keyboard: string } }
+    | { readonly keyboard: ActionImpl<P>; readonly none: { readonly touch: string } }
+    | {
+        readonly keyboard?: never
+        readonly none: { readonly keyboard: string; readonly touch?: string }
+      }
   )
 
 /** An event deliberately not exercised; the reason is shown in the coverage report. */

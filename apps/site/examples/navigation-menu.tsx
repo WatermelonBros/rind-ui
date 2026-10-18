@@ -1,6 +1,7 @@
 "use client"
 
-import { NavigationMenu, Portal, RindProvider } from "@rind-ui/react"
+import { NavigationMenu, Portal, RindProvider, RouterProvider } from "@rind-ui/react"
+import { useState } from "react"
 import type { States, Variants } from "./types"
 
 export const states: States = { "navigation-menu": { closed: "Basic", open: "Open" } }
@@ -258,6 +259,69 @@ export function RightToLeft() {
   )
 }
 
+export function ClientRouter() {
+  const [page, setPage] = useState("/docs/button/")
+  return (
+    <RouterProvider navigate={(href) => setPage(String(href))}>
+      <NavigationMenu.Root aria-label="Routed">
+        <NavigationMenu.List>
+          <NavigationMenu.Item value="components">
+            <NavigationMenu.Trigger>Components</NavigationMenu.Trigger>
+            <NavigationMenu.Content>
+              {[
+                ["/docs/button/", "Button"],
+                ["/docs/dialog/", "Dialog"],
+                ["/docs/tabs/", "Tabs"],
+              ].map(([href = "", label]) => (
+                <NavigationMenu.Link
+                  key={href}
+                  href={href}
+                  current={page === href ? "page" : false}
+                >
+                  {label}
+                </NavigationMenu.Link>
+              ))}
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+          <NavigationMenu.Item>
+            <NavigationMenu.Link href="/docs/" current={page === "/docs/" ? "page" : false}>
+              All docs
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        </NavigationMenu.List>
+      </NavigationMenu.Root>
+      <p>Current page: {page}</p>
+    </RouterProvider>
+  )
+}
+
+export function Narrow() {
+  return (
+    <div style={{ inlineSize: 320, maxInlineSize: "100%" }}>
+      <NavigationMenu.Root aria-label="Phone" orientation="vertical" openOnHover={false}>
+        <NavigationMenu.List>
+          <NavigationMenu.Item value="components">
+            <NavigationMenu.Trigger>Components</NavigationMenu.Trigger>
+            <NavigationMenu.Content>
+              <NavigationMenu.Link href="/docs/button/">Button</NavigationMenu.Link>
+              <NavigationMenu.Link href="/docs/dialog/">Dialog</NavigationMenu.Link>
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+          <NavigationMenu.Item value="guides">
+            <NavigationMenu.Trigger>Guides</NavigationMenu.Trigger>
+            <NavigationMenu.Content>
+              <NavigationMenu.Link href="/docs/positioning/">Positioning</NavigationMenu.Link>
+            </NavigationMenu.Content>
+          </NavigationMenu.Item>
+          <NavigationMenu.Item>
+            <NavigationMenu.Link href="/docs/">All docs</NavigationMenu.Link>
+          </NavigationMenu.Item>
+        </NavigationMenu.List>
+      </NavigationMenu.Root>
+    </div>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Basic",
@@ -289,5 +353,16 @@ export const variants: Variants = {
   },
   ClickOnly: { title: "Click only", description: "`openOnHover={false}`: press and keys only." },
   RightToLeft: { title: "Right to left", description: "Arrow keys follow the reading direction." },
+  ClientRouter: {
+    title: "Client router",
+    description:
+      "Under a `RouterProvider` the links navigate through the router; `current` follows the route, and the trigger of the current section gets `data-current`.",
+  },
+  Narrow: {
+    title: "Phone width",
+    description:
+      "320 px, vertical and click only: the panels open in flow, as a list of disclosures in a drawer.",
+    viewport: "mobile",
+  },
   Open: { title: "Open", hidden: true },
 }

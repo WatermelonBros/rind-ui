@@ -4,9 +4,10 @@
 
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
+import { positioningQueries } from "../../contract/positioning"
 import { navigationMenuMachine } from "./navigation-menu.machine"
 
-type P = "root" | "list" | "trigger" | "content" | "link" | "viewport" | "indicator"
+type P = "root" | "list" | "trigger" | "content" | "link" | "viewport" | "indicator" | "positioner"
 type E = Env<P>
 type Name = string | RegExp
 
@@ -18,8 +19,13 @@ export const navigationMenuArgs: {
 const matches = (n: string, name: Name) => (typeof name === "string" ? n === name : name.test(n))
 
 const triggers = (env: E) => env.part("trigger").all()
+/** Every level's triggers: the root's, then the nested levels' inside its panels. */
+const allTriggers = async (env: E) => [
+  ...(await triggers(env)),
+  ...(await env.part("root").scoped("navigation-menu", "trigger").all()),
+]
 const trigger = async (env: E, name: Name): Promise<Part> => {
-  for (const t of await triggers(env)) if (matches(await t.accessibleName(), name)) return t
+  for (const t of await allTriggers(env)) if (matches(await t.accessibleName(), name)) return t
   throw new Error(`navigation-menu: no trigger named ${String(name)}`)
 }
 const link = async (env: E, name: Name): Promise<Part> => {
@@ -84,12 +90,23 @@ const FORBIDDEN_ROLES = ["menu", "menubar", "menuitem", "menuitemcheckbox", "men
 export const navigationMenuInvariants: readonly Invariant<P, string>[] = [
   {
     name: "navigation-menu-at-most-one-open",
+    // Per level: every level (the root and each Sub) has its own instance.
     check: async ({ env }) => {
-      const open: string[] = []
-      for (const t of await triggers(env)) {
-        if ((await t.attr("aria-expanded")) === "true") open.push(await t.accessibleName())
+      const open = new Map<string, string[]>()
+      const all = await allTriggers(env)
+      const seen = new Set<string>()
+      for (const t of all) {
+        const id = (await t.attr("id")) ?? ""
+        if (seen.has(id) || (await t.attr("aria-expanded")) !== "true") continue
+        seen.add(id)
+        const level = (await t.attr("data-instance")) ?? ""
+        open.set(level, [...(open.get(level) ?? []), await t.accessibleName()])
       }
-      return open.length <= 1 ? undefined : `${open.length} items are open: ${open.join(", ")}`
+      for (const [level, names] of open) {
+        if (names.length > 1)
+          return `${names.length} items of level ${level} are open: ${names.join(", ")}`
+      }
+      return undefined
     },
   },
   {
@@ -156,10 +173,13 @@ export const navigationMenuInvariants: readonly Invariant<P, string>[] = [
 const item = () => navigationMenuArgs.current.item
 const linkName = () => navigationMenuArgs.current.link
 
-/** The Navigation Menu's contract (spec "Navigation Menu Contract"). */
-export const navigationMenuContract = contract("navigation-menu", {
+/** `data-state` of the root follows the open value (a controlled run proposes first). */
+const rootState = (view: { readonly values: Readonly<Record<string, unknown>> }) =>
+  view.values["value"] === null || view.values["value"] === undefined ? "closed" : "open"
+
+const definition = {
   machine: navigationMenuMachine,
-  anatomy: ["root", "list", "trigger", "content", "link", "viewport", "indicator"],
+  anatomy: ["root", "list", "trigger", "content", "link", "viewport", "indicator", "positioner"],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "navigation", name }),
   queries: {
     /** The open top-level item's trigger name, or null. */
@@ -221,6 +241,7 @@ export const navigationMenuContract = contract("navigation-menu", {
     },
     /** Rests the pointer on `name` until it opens (keyboard: Enter on it). */
     hover: {
+      none: { touch: "hover intent is mouse/pen only" },
       pointer: async (env: E, name: Name) => {
         await (await trigger(env, name)).hover()
         await waitOut(env, () => openedOrRefused(env, name))
@@ -238,6 +259,12 @@ export const navigationMenuContract = contract("navigation-menu", {
       none: { keyboard: "hover intent is a pointer interaction" },
       done: async () => true,
     },
+    /** The pointer leaves the trigger and the panel (the close delay starts). */
+    pointerAway: {
+      pointer: async (env: E) => env.pointerAway(),
+      none: { keyboard: "the pointer leaving is a pointer interaction" },
+      done: async () => true,
+    },
     followLink: {
       pointer: async (env: E, name: Name) => (await link(env, name)).click(),
       keyboard: async (env: E, name: Name) => (await link(env, name)).press("Enter"),
@@ -250,6 +277,24 @@ export const navigationMenuContract = contract("navigation-menu", {
     pressOutside: {
       pointer: async (env: E) => env.pointerOutside(),
       none: { keyboard: "an outside press is a pointer interaction" },
+      done: closed,
+    },
+    /**
+     * Leaves the menu for the fixture's "After" link: a press on it, or focus moved to it.
+     * Focus lands somewhere real, so the close keeps it there.
+     */
+    leave: {
+      // A bare click (virtual) presses nothing outside: focus moves there instead.
+      pointer: async (env: E) => {
+        const after = env.find({ role: "link", name: "After" })
+        await after.click()
+        if (await closed(env)) return
+        // From the menu (where the screen reader's focus is) to the link: focus leaves it.
+        const open = await openItem(env)
+        if (open !== null) await (await trigger(env, open)).focus()
+        await after.focus()
+      },
+      keyboard: async (env: E) => env.find({ role: "link", name: "After" }).focus(),
       done: closed,
     },
     /** ArrowDown on `name`'s open trigger: focus moves to its panel's first link. */
@@ -270,11 +315,11 @@ export const navigationMenuContract = contract("navigation-menu", {
     closing: {},
   },
   dataState: {
-    closed: { root: "closed" },
-    warm: { root: "closed" },
-    opening: { root: "closed" },
-    open: { root: "open" },
-    closing: { root: "open" },
+    closed: { root: rootState },
+    warm: { root: rootState },
+    opening: { root: rootState },
+    open: { root: rootState },
+    closing: { root: rootState },
   },
   events: {
     "HOVER.START": {
@@ -297,19 +342,41 @@ export const navigationMenuContract = contract("navigation-menu", {
       event: () => ({ item: item(), modality: "pointer" }),
     },
     ESCAPE: "pressEscape",
-    DISMISS: { action: "pressOutside", event: () => ({ reason: "outside-press" }) },
+    DISMISS: { action: "leave", event: () => ({ reason: "outside-press" }) },
     "LINK.ACTIVATE": { action: "followLink", args: (() => [linkName()]) as never },
     "PARENT.CLOSE": { skip: "internal tree event: the nested DOM tests" },
     OPEN: { skip: "api only: the machine tests" },
     CLOSE: { skip: "api only: the machine tests" },
     "FOCUS.MOVE": { skip: "focus-only; driven by enterContent and the keyboard DOM tests" },
-    "VALUE.SYNC": { skip: "a parent's value: the DOM tests" },
-    "$props:value": { skip: "a parent's value: the DOM tests" },
+    "VALUE.SYNC": { skip: "sent by the $props:value step" },
+    // A parent's value: the target state's open item, or none.
+    "$props:value": {
+      props: (target: string) => ({
+        value: target === "open" || target === "closing" ? "products" : null,
+      }),
+    },
+    "$sync:value": {
+      props: (target: string) => ({
+        value: target === "open" || target === "closing" ? "products" : null,
+      }),
+    },
     DISABLED: { skip: "the disabled prop step ($props:disabled)" },
     "$props:disabled": { props: () => ({ disabled: true }) },
     "INDICATOR.MEASURE": { skip: "sent by the selection indicator, not a user step" },
     "POSITION.PLACED": { skip: "sent by the position capability, not a user step" },
   },
-  traits: ["layer", "presence", "timed"],
   invariants: navigationMenuInvariants,
+} as const
+
+/** The Navigation Menu's contract (spec "Navigation Menu Contract"). */
+export const navigationMenuContract = contract("navigation-menu", {
+  ...definition,
+  traits: ["layer", "presence", "timed"],
+})
+
+/** The same contract for a menu that renders a Positioner: placed panels (`anchored`). */
+export const anchoredNavigationMenuContract = contract("navigation-menu", {
+  ...definition,
+  queries: { ...definition.queries, ...positioningQueries },
+  traits: ["layer", "presence", "timed", "anchored"],
 })

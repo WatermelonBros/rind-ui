@@ -49,7 +49,7 @@ By default each `Content` renders in its `Item`, right after its trigger: the re
 
 ## Positioning
 
-Without a `Positioner`, panels are positioned by your CSS (the theme drops them below their item). A `Positioner` around the `Viewport` (or a `Content`) places it next to the open trigger, or next to the list with `anchor="list"`, below and aligned to the start by default, and exposes `--rind-available-height` so a tall panel scrolls instead of leaving the screen.
+Without a `Positioner`, panels are positioned by your CSS (the theme drops them below their item). A `Positioner` around the `Viewport` (or a `Content`) places it next to the open trigger, or next to the list with `anchor="list"`, below and aligned to the start by default, and exposes `--rind-available-height` so a tall panel scrolls instead of leaving the screen. Without a `Viewport`, put a `Positioner` around each item's `Content` instead: each one places its own panel next to its own trigger. Test a positioned menu with `anchoredNavigationMenuContract`, which adds the `anchored` checks.
 
 ## Closed panels
 

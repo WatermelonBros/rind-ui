@@ -72,23 +72,44 @@ interface LevelCtx {
   readonly setViewport: (el: HTMLElement | null) => void
   readonly viewportExiting: boolean
   readonly setViewportExiting: (on: boolean) => void
-  readonly setPositioner: (p: Positioned | null) => void
+  /** Registers a Positioner: `slot` is its item's key, or `""` around the Viewport. */
+  readonly registerPositioner: (slot: string, p: Positioned) => () => void
   readonly current: ReadonlySet<string>
   readonly markCurrent: (key: string, on: boolean) => void
   readonly triggerOf: () => HTMLElement | null
+  /** The delays a Sub level inherits. */
+  readonly delays: Delays
+}
+
+interface Delays {
+  readonly openDelay?: number | undefined
+  readonly closeDelay?: number | undefined
+  readonly skipDelay?: number | undefined
+  readonly patientClick?: number | undefined
 }
 
 interface Positioned {
   readonly anchor: "trigger" | "list"
   readonly positioning?: PositioningProps | undefined
+  /** One Positioner per item (around its Content), not one around the Viewport. */
+  readonly perItem: boolean
 }
 
 const LevelContext = createContext<LevelCtx | null>(null)
 const ItemContext = createContext<ItemCtx | null>(null)
 /** Inside a panel: links and nested triggers move with ArrowDown / ArrowUp. */
-const PanelContext = createContext<{ readonly item: string; readonly level: LevelCtx } | null>(null)
+const PanelContext = createContext<PanelCtx | null>(null)
+
+/** A panel, and the panel it is nested in (a current link marks every ancestor trigger). */
+interface PanelCtx {
+  readonly item: string
+  readonly level: LevelCtx
+  readonly parent: PanelCtx | null
+}
 
 interface ItemCtx {
+  /** The level the item belongs to (a Sub's Positioner is not its parent item's). */
+  readonly root: string
   readonly key: string
   readonly contentMounted: boolean
   readonly setContentMounted: (on: boolean) => void
@@ -149,7 +170,18 @@ function useLevelState(
   const disabledItems = useRef(new Map<string, boolean>()).current
   const [viewport, setViewport] = useState<HTMLElement | null>(null)
   const [viewportExiting, setViewportExiting] = useState(false)
-  const [positioner, setPositioner] = useState<Positioned | null>(null)
+  // Keyed per Positioner, so one item's Positioner unmounting leaves the others registered.
+  const [positioners, setPositioners] = useState<ReadonlyMap<string, Positioned>>(() => new Map())
+  const registerPositioner = useCallback((slot: string, p: Positioned) => {
+    setPositioners((m) => new Map(m).set(slot, p))
+    return () =>
+      setPositioners((m) => {
+        if (m.get(slot) !== p) return m
+        const next = new Map(m)
+        next.delete(slot)
+        return next
+      })
+  }, [])
   const [current, setCurrent] = useState<ReadonlySet<string>>(() => new Set())
   const markCurrent = useCallback(
     (key: string, on: boolean) =>
@@ -168,11 +200,20 @@ function useLevelState(
   const [level] = useState(() =>
     navigationMenuLevel(parent?.level ?? null, {
       close: () => serviceRef.current?.send({ type: "LINK.ACTIVATE" }),
+      parentClose: () => serviceRef.current?.send({ type: "PARENT.CLOSE" }),
       openOnHover: () => latestHover.current !== false,
     }),
   )
   useEffect(() => parent?.level.add(level), [parent, level])
   const orientation = own.orientation ?? own.defaultOrientation
+  // The open item's own Positioner, else the Viewport's, else any item's (a closed menu).
+  // ponytail: read from the last render's value, so per-item `positioning` that differs
+  // between items lags one switch; pass a per-key getter to the machine if that matters.
+  const lastValue = useRef<string | null>(null)
+  const positioner: Positioned | undefined =
+    positioners.get(lastValue.current ?? "") ??
+    positioners.get("") ??
+    positioners.values().next().value
   const props: NavigationMenuProps = {
     value: own.value,
     defaultValue: own.defaultValue,
@@ -188,13 +229,14 @@ function useLevelState(
     parent: useParentLayer(),
     level,
     isItemDisabled: (key) => disabledItems.get(key) === true,
-    positioned: positioner !== null,
+    positioned: positioner === undefined ? undefined : positioner.perItem ? "item" : "level",
     anchor: positioner?.anchor,
     positioning: positioner?.positioning,
   }
   const { view, service } = useMachine(navigationMenuMachine, props, navEnv)
   serviceRef.current = service
   const value = (view.values.value as string | null | undefined) ?? null
+  lastValue.current = value
   // Item order for the motion direction: document order of the registered items.
   const order = [...items.entries()]
     .sort(([, a], [, b]) => (a.compareDocumentPosition(b) & 4 ? -1 : 1))
@@ -232,10 +274,16 @@ function useLevelState(
     setViewport,
     viewportExiting,
     setViewportExiting,
-    setPositioner,
+    registerPositioner,
     current,
     markCurrent,
     triggerOf: () => (value === null ? null : env.dom.getById(ids.trigger(value))),
+    delays: {
+      openDelay: own.openDelay,
+      closeDelay: own.closeDelay,
+      skipDelay: own.skipDelay,
+      patientClick: own.patientClick,
+    },
   }
 }
 
@@ -327,6 +375,7 @@ function Sub({
       onValueChange,
       orientation,
       disabled: parent.disabled,
+      ...parent.delays,
       closedContent: parent.closedContent,
       id,
       defaultOrientation: "vertical",
@@ -364,7 +413,10 @@ function Item({ value, render, ref, ...rest }: NavigationMenuItemProps) {
       ctx.items.delete(key)
     }
   }, [ctx.items, key])
-  const item = useMemo(() => ({ key, contentMounted, setContentMounted }), [key, contentMounted])
+  const item = useMemo(
+    () => ({ root: ctx.root, key, contentMounted, setContentMounted }),
+    [ctx.root, key, contentMounted],
+  )
   const props = mergeProps(
     { ...normalizeProps(ctx.api.item(key)), ref: composeRefs(el, ref) },
     rest,
@@ -373,6 +425,7 @@ function Item({ value, render, ref, ...rest }: NavigationMenuItemProps) {
 }
 
 export interface NavigationMenuTriggerState {
+  /** Its panel is open. */
   readonly open: boolean
 }
 
@@ -408,13 +461,11 @@ function Trigger({ render, ref, disabled: own = false, ...rest }: NavigationMenu
     disabled: () => disabled,
   })
   const hover = useHover({ env, disabled: () => disabled, send: () => {} })
-  const { api } = ctx
+  const { api, service, hoverIntent } = ctx
+  // Stable for the trigger's life: the handlers remember whether the pointer is on it.
   const intent = useMemo(
-    () =>
-      ctx.hoverIntent.triggerProps((e) =>
-        e.type === "HOVER.START" ? api.hoverStart(item.key) : api.hoverEnd(item.key),
-      ),
-    [ctx.hoverIntent, api, item.key],
+    () => hoverIntent.triggerProps((e) => service.send({ type: e.type, item: item.key })),
+    [hoverIntent, service, item.key],
   )
   const el = useRef<HTMLElement | null>(null)
   const tag = useRenderedTag("button", render, el)
@@ -484,6 +535,7 @@ function useSizeSequence(
 }
 
 export interface NavigationMenuContentState {
+  /** The panel is open. */
   readonly open: boolean
 }
 
@@ -506,7 +558,11 @@ function Content({ render, ref, children, ...rest }: Own<"div", NavigationMenuCo
     return () => setContentMounted(false)
   }, [mounted, setContentMounted])
   useSizeSequence(el, open ? item.key : null, "content", !inViewport)
-  const panel = useMemo(() => ({ item: item.key, level: ctx }), [item.key, ctx])
+  const parentPanel = useContext(PanelContext)
+  const panel = useMemo(
+    () => ({ item: item.key, level: ctx, parent: parentPanel }),
+    [item.key, ctx, parentPanel],
+  )
   if (!mounted) return null
   const props = mergeProps(
     {
@@ -536,14 +592,21 @@ function NavLink({ onActivate, current, ...rest }: NavigationMenuLinkProps) {
   const ctx = useLevel("Link")
   const panel = useContext(PanelContext)
   const on = current !== undefined && current !== false
-  const owner = panel?.level ?? ctx
-  const markCurrent = owner.markCurrent
-  const key = panel?.item
+  // The current page marks the trigger of every panel the link is in, outermost included.
+  // Keyed by the chain's identity (its items), not by the per-render panel objects.
+  const chain: { readonly item: string; readonly mark: LevelCtx["markCurrent"] }[] = []
+  for (let p = panel; p; p = p.parent) chain.push({ item: p.item, mark: p.level.markCurrent })
+  const chainKey = chain.map((c) => c.item).join(" ")
+  const latestChain = useRef(chain)
+  latestChain.current = chain
   useIsoLayoutEffect(() => {
-    if (key === undefined || !on) return
-    markCurrent(key, true)
-    return () => markCurrent(key, false)
-  }, [key, on, markCurrent])
+    if (!on) return
+    const marked = latestChain.current
+    for (const c of marked) c.mark(c.item, true)
+    return () => {
+      for (const c of marked) c.mark(c.item, false)
+    }
+  }, [chainKey, on])
   // Arrow keys find the link by its id.
   const generated = useId()
   const own = normalizeProps(ctx.api.link({ inPanel: panel !== null }))
@@ -613,7 +676,10 @@ export type NavigationMenuPositionerProps = Own<"div"> & {
   readonly positioning?: PositioningProps
 }
 
-/** Places the Viewport (or a Content) next to the open trigger. */
+/**
+ * Places the Viewport next to the open trigger; inside an Item (no Viewport), places that
+ * item's Content next to its own trigger.
+ */
 function Positioner({
   anchor = "trigger",
   positioning,
@@ -622,19 +688,23 @@ function Positioner({
   ...rest
 }: NavigationMenuPositionerProps) {
   const ctx = useLevel("Positioner")
+  const inItem = useContext(ItemContext)
+  // An item of this level (a Sub's Positioner sits in its parent's item, not its own).
+  const item = inItem?.root === ctx.root ? inItem.key : undefined
   const el = useRef<HTMLElement | null>(null)
-  const open = ctx.value !== null
+  const open = item === undefined ? ctx.value !== null : ctx.value === item
   const presence = usePresence(open, el, { subtree: true })
   const exiting = !open && presence.state === "exiting"
-  const { setPositioner } = ctx
+  const { registerPositioner } = ctx
   const key = JSON.stringify(positioning ?? null)
-  useIsoLayoutEffect(() => {
-    setPositioner({ anchor, positioning })
-    return () => setPositioner(null)
-  }, [anchor, key, setPositioner])
+  const perItem = item !== undefined
+  useIsoLayoutEffect(
+    () => registerPositioner(item ?? "", { anchor, positioning, perItem }),
+    [anchor, key, item, perItem, registerPositioner],
+  )
   const props = mergeProps(
     {
-      ...normalizeProps(ctx.api.positioner()),
+      ...normalizeProps(ctx.api.positioner(item)),
       hidden: !open && !exiting ? true : undefined,
       ref: composeRefs(el, ref),
     },

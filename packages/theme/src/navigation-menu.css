@@ -104,6 +104,20 @@
     box-shadow: var(--rind-navigation-menu-shadow, var(--rind-shadow-sm));
   }
 
+  /* A horizontal bar's panels drop below their item, over the page, not in the bar's flow. */
+  :where(
+    [data-scope="navigation-menu"][data-part="root"][data-orientation="horizontal"]
+      > [data-part="list"]
+      > [data-part="item"]
+      > [data-scope="navigation-menu"][data-part="content"]
+  ) {
+    position: absolute;
+    inset-block-start: calc(100% + var(--rind-space-1));
+    inset-inline-start: 0;
+    z-index: var(--rind-navigation-menu-z, 50);
+    min-inline-size: max-content;
+  }
+
   /* Content inside a viewport has no frame of its own: the viewport is the panel. */
   :where([data-scope="navigation-menu"][data-part="viewport"]) {
     position: relative;
@@ -128,8 +142,13 @@
     opacity: 0;
   }
 
+  /* A switch or a warm open: the size still moves, only the fade is skipped. */
   :where([data-scope="navigation-menu"][data-part="viewport"][data-instant]) {
-    transition: none;
+    transition:
+      inline-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
+      var(--rind-ease-out),
+      block-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
+      var(--rind-ease-out);
   }
 
   /* A positioned panel never outgrows the space next to its trigger: it scrolls. */

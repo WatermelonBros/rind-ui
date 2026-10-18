@@ -383,3 +383,12 @@
   [data-scope="navigation-menu"][data-part="content"][data-state] {
   border-inline-start: 3px solid #e2d9fb;
 }
+
+/* the current page inside a panel: underlined like the bar's */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"]
+  [data-scope="navigation-menu"][data-part="link"][data-current] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}

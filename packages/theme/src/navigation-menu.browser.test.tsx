@@ -54,7 +54,7 @@ describe("Navigation Menu stylesheet", () => {
     expect(getComputedStyle(closed as HTMLElement).boxShadow).toBe("none")
   })
 
-  it("the viewport takes the size properties; data-instant skips the transition", () => {
+  it("the viewport takes the size properties; data-instant keeps the size transition, not the fade", () => {
     sheet()
     const host = mount(
       menu(
@@ -65,7 +65,10 @@ describe("Navigation Menu stylesheet", () => {
     const box = v.getBoundingClientRect()
     expect(Math.round(box.width)).toBe(220)
     expect(Math.round(box.height)).toBe(120)
-    expect(getComputedStyle(v).transitionProperty).toBe("none")
+    const transitioned = getComputedStyle(v).transitionProperty
+    expect(transitioned).toMatch(/block-size|height/)
+    expect(transitioned).toMatch(/inline-size|width/)
+    expect(transitioned).not.toContain("opacity")
   })
 
   it("a positioned panel is capped at the available height and scrolls", () => {

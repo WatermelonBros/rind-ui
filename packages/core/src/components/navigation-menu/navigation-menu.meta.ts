@@ -52,7 +52,7 @@ export const navigationMenuMeta = {
     {
       name: "NavigationMenu.Indicator",
       part: "indicator",
-      element: "div",
+      element: "li",
       description: "Decorative, inside `List`: the open trigger's box as `--rind-indicator-*`.",
     },
     {
@@ -185,9 +185,11 @@ export const navigationMenuMeta = {
       toggle: ["pointer", "touch", "keyboard", "virtual"],
       hover: ["pointer", "keyboard", "virtual"],
       hoverTrigger: ["pointer", "virtual"],
+      pointerAway: ["pointer", "virtual"],
       followLink: ["pointer", "keyboard", "virtual"],
       pressEscape: ["keyboard"],
       pressOutside: ["pointer", "virtual"],
+      leave: ["pointer", "keyboard", "virtual"],
       enterContent: ["keyboard"],
     },
     queries: ["openItem", "isOpen", "links", "currentLink", "contentText"],

@@ -5,6 +5,7 @@ export {
   navigationMenuConnect,
 } from "./navigation-menu.connect"
 export {
+  anchoredNavigationMenuContract,
   navigationMenuArgs,
   navigationMenuContract,
   navigationMenuInvariants,

@@ -239,6 +239,30 @@ describe("navigation menu machine: closing", () => {
   })
 })
 
+describe("navigation menu machine: nested levels", () => {
+  it("a level still waiting for its open delay closes with its parent", () => {
+    const m = make()
+    m.send(hover("more"))
+    expect(m.state()).toBe("opening")
+    m.send({ type: "PARENT.CLOSE" })
+    m.advance(1000)
+    expect([m.state(), m.value()]).toEqual(["closed", null])
+  })
+
+  it("closing or switching the open panel closes the child levels", () => {
+    const closeChildren = vi.fn()
+    const level = { closeChildren } as never
+    const m = make({ level })
+    m.send(press("a"))
+    closeChildren.mockClear()
+    m.send(press("b"))
+    expect(closeChildren).toHaveBeenCalled()
+    closeChildren.mockClear()
+    m.send({ type: "ESCAPE" })
+    expect(closeChildren).toHaveBeenCalled()
+  })
+})
+
 describe("navigation menu machine: controlled", () => {
   it("a refused open leaves it closed; an accepted one opens", () => {
     const refuse = vi.fn((_: unknown, d: { cancel(): void }) => d.cancel())
@@ -269,20 +293,26 @@ describe("navigation menu tree", () => {
     const order: string[] = []
     const root = navigationMenuLevel(null, {
       close: () => order.push("root"),
+      parentClose: () => order.push("root parent-close"),
       openOnHover: () => false,
     })
     const child = navigationMenuLevel(root, {
       close: () => order.push("child"),
+      parentClose: () => order.push("child parent-close"),
       openOnHover: () => true,
     })
     root.add(child)
     const grandchild = navigationMenuLevel(child, {
       close: () => order.push("grandchild"),
+      parentClose: () => order.push("grandchild parent-close"),
       openOnHover: () => true,
     })
     child.add(grandchild)
     grandchild.closeTree()
     expect(order).toEqual(["grandchild", "child", "root"])
+    order.length = 0
+    root.closeChildren()
+    expect(order).toEqual(["child parent-close"])
     // A Sub inherits the root's openOnHover.
     expect(grandchild.openOnHover()).toBe(false)
   })
