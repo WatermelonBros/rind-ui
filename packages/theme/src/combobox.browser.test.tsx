@@ -118,4 +118,34 @@ describe("Combobox stylesheet", () => {
     )
     expect(css).not.toMatch(/\[hidden\]/)
   })
+
+  it("inline list scrolls on its own; popup list does not", () => {
+    sheet()
+    const host = mount(
+      markup() +
+        `<div id="inline" role="listbox" ${a("list")}><div role="option" ${a("item")}>Go</div></div>`,
+    )
+    const inline = getComputedStyle(q(host, "#inline"))
+    expect(inline.overflowY).toBe("auto")
+    expect(inline.maxHeight).not.toBe("none")
+    expect(getComputedStyle(q(host, '[data-part="popup"] [data-part="list"]')).overflowY).toBe(
+      "visible",
+    )
+  })
+
+  it("danger-tone items read in the danger colour", () => {
+    sheet()
+    const host = mount(
+      markup() +
+        `<div role="option" id="d" ${a("item", 'data-tone="danger"')}>Delete</div><div role="option" id="n" ${a("item")}>Open</div>`,
+    )
+    expect(getComputedStyle(q(host, "#d")).color).not.toBe(getComputedStyle(q(host, "#n")).color)
+  })
+
+  it("forced colors: inline list keeps the Highlight outline", () => {
+    const css = combobox.replace(/\/\*[\s\S]*?\*\//g, "")
+    expect(css).toMatch(
+      /forced-colors: active\)[\s\S]*:not\(:where\(\[data-part="popup"\]\) \*\)[\s\S]*Highlight/,
+    )
+  })
 })

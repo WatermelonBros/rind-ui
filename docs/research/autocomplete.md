@@ -150,8 +150,9 @@ native and asserted in browser mode.
 
 ## Decisions
 
-- **Same machine as Combobox** with `selectionMode: "none"` — `add-autocomplete` adds only
-  the `autocomplete` capability on top of `combobox-pattern` (no machine of its own,
+- **Same machine as Combobox** with `selectionMode: "none"` — specified as the Combobox's
+  free-text mode in `add-combobox-variants` (which retired `add-autocomplete`), on top of
+  `combobox-pattern` (no machine of its own,
   Base UI's design).
 - **Values**: `value` (the text, controllable) and `open`; `onValueChange(text, details)`
   with reasons `input-change`, `item-press`, `enter`, `clear`, `escape`, `reset`.

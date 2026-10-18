@@ -40,6 +40,36 @@ import { completion, exactMatch, type OpenReason } from "./pattern/pattern"
 
 export type ComboboxValue = string | null | readonly string[]
 
+/** The keyboard modifiers of the activation that ran an item. */
+export interface ActionModifiers {
+  readonly shift: boolean
+  readonly alt: boolean
+  readonly ctrl: boolean
+  readonly meta: boolean
+  readonly mod: boolean
+}
+
+/** `onAction`'s details, the same in every configuration. */
+export interface ComboboxActionDetails {
+  readonly modality: Modality
+  readonly modifiers: ActionModifiers
+}
+
+/** An inline combobox's page (`depth` 0: the root page). */
+export interface ComboboxPage {
+  readonly key: string
+  readonly label: string
+  readonly depth: number
+}
+
+const NO_MODIFIERS: ActionModifiers = {
+  shift: false,
+  alt: false,
+  ctrl: false,
+  meta: false,
+  mod: false,
+}
+
 export type ComboboxEvent =
   | CollectionEvent
   | InputChipsEvent
@@ -62,12 +92,23 @@ export type ComboboxEvent =
       readonly alt: boolean
       readonly composing: boolean
     }
-  | { readonly type: "ENTER"; readonly composing: boolean }
+  | {
+      readonly type: "ENTER"
+      readonly composing: boolean
+      readonly modifiers?: ActionModifiers | undefined
+    }
   | { readonly type: "ESCAPE"; readonly composing: boolean }
   | { readonly type: "TAB"; readonly composing: boolean }
   /** Left, Right, Home, End: back to editing. */
   | { readonly type: "CARET" }
-  | { readonly type: "ITEM.CHOOSE"; readonly key: CollectionKey; readonly modality: Modality }
+  | {
+      readonly type: "ITEM.CHOOSE"
+      readonly key: CollectionKey
+      readonly modality: Modality
+      readonly modifiers?: ActionModifiers | undefined
+    }
+  /** Inline: the `page` prop's key changed (onProps). */
+  | { readonly type: "PAGE.CHANGE" }
   | { readonly type: "COMPOSITION.START" }
   /** The pointer left the list. */
   | { readonly type: "LIST.POINTER_LEAVE" }
@@ -139,6 +180,19 @@ export interface ComboboxProps extends CollectionProps {
   readonly stale?: boolean | undefined
   /** How long a typing highlight waits before it reaches `aria-activedescendant` (500 ms). */
   readonly typingPause?: number | undefined
+  /** Free text: Escape on a closed popup clears the text (default false). */
+  readonly clearOnEscape?: boolean | undefined
+  /** Runs an item (inline), or follows a choice (free text). */
+  readonly onAction?: ((key: string, details: ComboboxActionDetails) => void) | undefined
+  /** Inline: the current page. */
+  readonly page?: ComboboxPage | undefined
+  /** Inline: Backspace on an empty query above the root page. */
+  readonly onBack?: (() => void) | undefined
+  /**
+   * Inline: Escape on an empty query asks the host to close (`onOpenChange(false)`); absent,
+   * Escape is left to an enclosing layer.
+   */
+  readonly requestClose?: (() => void) | undefined
 }
 
 export interface ComboboxContext extends CollectionContext, InputChipsContext {
@@ -154,6 +208,8 @@ export interface ComboboxContext extends CollectionContext, InputChipsContext {
   /** A typing highlight not yet exposed as the active descendant; its flush token. */
   readonly typingLag: number | null
   readonly placement: PlacementState
+  /** Inline: the query the current highlight was made for (a new query highlights first). */
+  readonly highlightQuery: string | null
 }
 
 export const comboboxIds = (root: string) => ({
@@ -235,6 +291,41 @@ function commit(a: Args) {
   setText(a, selectionText(props, values.value))
 }
 
+/** Calls `onAction` for an item (inline: runs it; free text: follows the fill). */
+function runItem(a: Args, key: CollectionKey) {
+  const { props, event } = a
+  const node = props.collection.get(key) ?? props.items.get(key)
+  if (!node || node.disabled) return
+  props.onAction?.(String(key), {
+    modality: "modality" in event ? event.modality : "keyboard",
+    modifiers:
+      (event.type === "ITEM.CHOOSE" || event.type === "ENTER" ? event.modifiers : undefined) ??
+      NO_MODIFIERS,
+  })
+}
+
+/** The first navigable listed item, highlighted as a typing highlight (its pause applies). */
+function highlightFirst(a: Args) {
+  const { props, context } = a
+  a.set("highlightQuery", a.values.inputValue)
+  if (props.autoHighlight === false || props.stale) return
+  const first = [...props.collection].find((n) => n.type === "item" && !n.disabled)
+  if (!first) {
+    a.set("highlightedKey", null)
+    a.set("highlightSource", null)
+    return
+  }
+  a.set("highlightedKey", first.key)
+  a.set("highlightSource", "typing")
+  a.set("scrollReason", null)
+  const token = (context.typingLag ?? 0) + 1
+  a.set("typingLag", token)
+  a.env.scheduler.setTimeout(
+    () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token }),
+    props.typingPause ?? 500,
+  )
+}
+
 function choose(a: Args, key: CollectionKey) {
   const { props, values } = a
   const node = props.collection.get(key) ?? props.items.get(key)
@@ -249,12 +340,14 @@ function choose(a: Args, key: CollectionKey) {
     if (mode(props) === "single" && selectedKeys(values.value)[0] !== key) a.set("value", key)
     setText(a, node.textValue)
   }
-  if (quirkActive("vo-activedescendant", a.env)) {
+  if (quirkActive("vo-activedescendant", a.env) && mode(props) !== "none") {
     a.env.announcer.announce({
       message: props.messages.selectedAnnouncement(node.textValue),
       key: `combobox-${props.root}:selection`,
     })
   }
+  // Free text: the choice filled the input; the host may react to the key.
+  if (mode(props) === "none") runItem(a, key)
 }
 
 /** The chips of a multiple selection: one per selected key, named by its option's text. */
@@ -338,7 +431,8 @@ function announceCount(a: Args) {
   })
 }
 
-export const comboboxMachine = setup({
+/** One setup, two definitions: the popup combobox and the inline one (design §1). */
+const comboboxSetup = setup({
   types: type<Types>(),
   guards: {
     enabled: ({ props }) => props.disabled !== true,
@@ -383,6 +477,14 @@ export const comboboxMachine = setup({
       context.highlightSource !== "pointer" &&
       context.highlightedKey !== null,
     closesOnSelect: ({ props }) => closesOnSelect(props),
+    hasQuery: ({ values }) => values.inputValue !== "",
+    /** Inline: Backspace goes back only above the root page. */
+    canBack: ({ props, values }) =>
+      props.onBack !== undefined && (props.page?.depth ?? 0) > 0 && values.inputValue === "",
+    escapeCloses: ({ props }) => props.requestClose !== undefined,
+    /** Free text: Escape on a closed popup clears the text. */
+    clearsOnEscape: ({ props, values }) =>
+      mode(props) === "none" && props.clearOnEscape === true && values.inputValue !== "",
   },
   actions: {
     ...pieces.actions,
@@ -578,12 +680,58 @@ export const comboboxMachine = setup({
       }
     },
     endLag: ({ set }) => set("typingLag", null),
+    run: (a) => {
+      if (a.event.type === "ITEM.CHOOSE") runItem(a, a.event.key)
+      else if (a.context.highlightedKey !== null) runItem(a, a.context.highlightedKey)
+    },
+    /** Inline mount and page change: the first item highlighted, nothing scrolled or said. */
+    highlightFirst: (a) => highlightFirst(a),
+    /**
+     * Inline results: a new query highlights its first item and announces the count; the
+     * same query (items appended, async) keeps a surviving highlight (dip/cmdk#97).
+     */
+    inlineResults: (a) => {
+      pieces.actions.repairCollection(a)
+      const { context, values } = a
+      const newQuery = context.highlightQuery !== values.inputValue
+      if (newQuery || context.highlightedKey === null) highlightFirst(a)
+      if (newQuery) announceCount(a)
+    },
+    clearQuery: (a) => {
+      a.set("dirty", false)
+      setText(a, "")
+    },
+    requestClose: (a) => a.props.requestClose?.(),
+    back: (a) => a.props.onBack?.(),
+    pageChanged: (a) => {
+      a.set("dirty", false)
+      setText(a, "")
+      // The page's items are the collection already (onProps: collection, then page).
+      highlightFirst(a)
+      const label = a.props.page?.label
+      if (label) {
+        a.env.announcer.announce({
+          message: a.props.messages.pageAnnouncement(label),
+          priority: "polite",
+          key: `combobox-page:${a.props.root}`,
+        })
+      }
+    },
     resetPlacement: ({ set }) => set("placement", unplaced("bottom", "start")),
     resetOpen: ({ set }) => {
       set("openReason", null)
     },
   },
   effects: {
+    /** Inline: the mount highlight reaches aria-activedescendant after the typing pause. */
+    mountLag: (a) => {
+      if (a.context.typingLag !== -1) return undefined
+      const handle = a.env.scheduler.setTimeout(
+        () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token: -1 }),
+        a.props.typingPause ?? 500,
+      )
+      return () => a.env.scheduler.clearTimeout(handle)
+    },
     /** The non-modal listbox layer and its positioning (combobox-pattern "Popup Placement"). */
     overlay: (a) => {
       const { env, send } = a
@@ -626,22 +774,46 @@ export const comboboxMachine = setup({
       }
     },
   },
-}).machine({
+})
+
+const initialContext = (props: ComboboxProps): ComboboxContext => ({
+  ...initialCollectionContext(),
+  ...initialInputChipsContext(),
+  lastCollection: props.collection,
+  focused: false,
+  dirty: false,
+  openReason: null,
+  composing: false,
+  completable: false,
+  completion: null,
+  typingLag: null,
+  placement: unplaced("bottom", "start"),
+  highlightQuery: null,
+})
+
+/**
+ * Inline: the first navigable item is highlighted from the start (a typing highlight, so the
+ * active descendant follows after the pause the `mountLag` effect waits).
+ */
+const initialInlineContext = (props: ComboboxProps): ComboboxContext => {
+  const first =
+    props.autoHighlight === false
+      ? undefined
+      : [...props.collection].find((n) => n.type === "item" && !n.disabled)
+  return {
+    ...initialContext(props),
+    highlightedKey: first?.key ?? null,
+    highlightSource: first ? "typing" : null,
+    // A token no later typing highlight reuses (they count up from 1).
+    typingLag: first ? -1 : null,
+    highlightQuery: props.inputValue ?? props.defaultInputValue ?? "",
+  }
+}
+
+export const comboboxMachine = comboboxSetup.machine({
   id: "combobox",
   initial: "closed",
-  context: (props) => ({
-    ...initialCollectionContext(),
-    ...initialInputChipsContext(),
-    lastCollection: props.collection,
-    focused: false,
-    dirty: false,
-    openReason: null,
-    composing: false,
-    completable: false,
-    completion: null,
-    typingLag: null,
-    placement: unplaced("bottom", "start"),
-  }),
+  context: initialContext,
   values: {
     value: { fallback: EMPTY },
     inputValue: { fallback: "" },
@@ -710,7 +882,10 @@ export const comboboxMachine = setup({
         ],
         OPEN: { guard: "enabled", target: "open", actions: ["setOpenReason"] },
         ENTER: { guard: "keyable", actions: ["commit"] },
-        ESCAPE: { guard: { and: ["keyable", "isDirty"] }, actions: ["commit"] },
+        ESCAPE: [
+          { guard: { and: ["keyable", "clearsOnEscape"] }, actions: ["clear"] },
+          { guard: { and: ["keyable", "isDirty"] }, actions: ["commit"] },
+        ],
         TAB: { guard: "keyable", actions: ["commit"] },
         "INPUT.BLUR": { guard: "isFocused", actions: ["clearFocused", "commit"] },
         "COLLECTION.CHANGE": { actions: ["repairCollection", "syncText"] },
@@ -768,3 +943,61 @@ export const comboboxMachine = setup({
   },
 })
 export type ComboboxMachine = typeof comboboxMachine
+
+/**
+ * The inline combobox (combobox "Inline Mode"): the list in place, always shown. Its only
+ * state is `open`: no closed node, no open or close transitions, no overlay or positioning;
+ * items run `onAction`; Escape clears the query, then asks the host to close; Backspace on an
+ * empty query goes back a page.
+ */
+export const inlineComboboxMachine = comboboxSetup.machine({
+  id: "combobox",
+  initial: "open",
+  context: initialInlineContext,
+  values: {
+    value: { fallback: EMPTY },
+    inputValue: { fallback: "" },
+    open: { fallback: true, states: { open: true } },
+  },
+  onProps: {
+    collection: "COLLECTION.CHANGE",
+    // After the collection: a page's items are listed when its change is handled.
+    page: "PAGE.CHANGE",
+    loading: "LOADING.SYNC",
+  },
+  on: {
+    "INPUT.FOCUS": { guard: { not: "isFocused" }, actions: ["setFocused"] },
+    "INPUT.BLUR": { guard: "isFocused", actions: ["clearFocused"] },
+    "COMPOSITION.START": { actions: ["startComposition"] },
+    CLEAR: { guard: "editable", actions: ["clearQuery"] },
+    "CLEAR.PRESS": { guard: "editable", actions: ["clearQuery"] },
+  },
+  states: {
+    open: {
+      effects: ["mountLag"],
+      on: {
+        "INPUT.CHANGE": { guard: "editable", actions: ["typed"] },
+        "COMPOSITION.END": { actions: ["endComposition", "typed"] },
+        ARROW: { guard: "keyable", actions: ["arrow"] },
+        NAVIGATE: { actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlight"] },
+        HIGHLIGHT: { actions: ["endLag", "highlight"] },
+        POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
+        "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
+        // Home, End, Left and Right edit the text; the highlight stays.
+        CARET: {},
+        "ITEM.CHOOSE": { actions: ["run"] },
+        ENTER: { guard: { and: ["keyable", "hasHighlight"] }, actions: ["run"] },
+        ESCAPE: [
+          { guard: { and: ["keyable", "hasQuery"] }, actions: ["clearQuery"] },
+          { guard: { and: ["keyable", "escapeCloses"] }, actions: ["requestClose"] },
+        ],
+        BACKSPACE_EMPTY: { guard: { and: ["keyable", "canBack"] }, actions: ["back"] },
+        "COLLECTION.CHANGE": { actions: ["inlineResults"] },
+        "PAGE.CHANGE": { actions: ["pageChanged"] },
+        "LOADING.SYNC": { actions: ["announceLoading"] },
+        "ACTIVEDESCENDANT.FLUSH": { actions: ["flush"] },
+      },
+    },
+  },
+})
+export type InlineComboboxMachine = typeof inlineComboboxMachine
