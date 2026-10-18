@@ -1,11 +1,18 @@
 // Tags Input parts: a native text input (no combobox role without suggestions), the chips
 // of `input-chips` under scope "tags-input", the ChipInput of an edited tag, the form inputs.
+// With suggestions the input, popup and list are the combobox-pattern's (`patternConnect`):
+// the reusable listbox parts under scope "tags-input", never a copy.
 
 import { focusAttrs } from "../../a11y/focus"
+import type { CollectionKey } from "../../collection/key"
+import { type Collection, createListCollection } from "../../collection/list"
+import type { LoadingStatus } from "../../collection/machine"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import { partId } from "../../ids"
+import { type PatternConnectEnv, patternConnect } from "../combobox/pattern/connect"
+import { patternIds } from "../combobox/pattern/machine"
 import {
   type Chip,
   focusAfterRemoval,
@@ -19,7 +26,7 @@ import type { TagsInputMessages } from "./tags-input.messages"
 
 export interface TagsInputConnectView {
   readonly instance: string
-  readonly state: "idle" | "typing" | "editing"
+  readonly state: "idle" | "typing" | "suggesting" | "editing"
   readonly context: TagsInputContext
   readonly tags: readonly string[]
   readonly chips: readonly Chip[]
@@ -38,7 +45,23 @@ export interface TagsInputConnectView {
   readonly dir: "ltr" | "rtl"
   readonly locale: string
   readonly messages: TagsInputMessages
-  readonly mounted: { readonly label: boolean }
+  readonly mounted: {
+    readonly label: boolean
+    readonly empty?: boolean | undefined
+    readonly description?: ((key: CollectionKey) => boolean) | undefined
+  }
+  /** Suggestions are given (`items`): the input is a combobox. */
+  readonly suggestions?: boolean | undefined
+  /** The listed suggestions (the machine's `collection`). */
+  readonly results?: Collection<unknown> | undefined
+  /** The listbox is shown (open with options). */
+  readonly exposed?: boolean | undefined
+  /** Open with no options, not loading or stale. */
+  readonly empty?: boolean | undefined
+  /** The popup is rendered (open, or playing its exit). */
+  readonly present?: boolean | undefined
+  readonly loading?: LoadingStatus | undefined
+  readonly topLayer?: boolean | undefined
   readonly name?: string | undefined
   readonly inputName?: string | undefined
   readonly form?: string | undefined
@@ -49,12 +72,10 @@ export interface TagsInputConnectView {
   readonly send: (event: TagsInputEvent) => void
 }
 
-export type TagsInputConnectEnv = InputChipsEnv
+export type TagsInputConnectEnv = InputChipsEnv & PatternConnectEnv
 
 export const tagsInputIds = (instance: string) => ({
-  label: partId("tags-input", instance, "label"),
-  control: partId("tags-input", instance, "control"),
-  input: partId("tags-input", instance, "input"),
+  ...patternIds("tags-input", instance),
   clear: partId("tags-input", instance, "clear-trigger"),
   chipInput: (key: string) =>
     `${partId("tags-input", instance, "chip-input")}-${encodeURIComponent(key)}`,
@@ -62,13 +83,12 @@ export const tagsInputIds = (instance: string) => ({
 
 type Key = KeyboardEvent
 const imeKey = (e: Key) => e.isComposing || e.keyCode === 229
+const NO_RESULTS = createListCollection<unknown>({ items: [], getKey: String, getText: String })
 
 export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectEnv) {
   const ids = tagsInputIds(v.instance)
   const { send, context: c } = v
   const focusEl = (id: string) => (env.dom.getById(id) as HTMLElement | null)?.focus()
-  const insideControl = (target: unknown) =>
-    target !== null && env.dom.getById(ids.control)?.contains(target as Node | null) === true
   const chips = inputChipsConnect(
     {
       scope: "tags-input",
@@ -87,12 +107,51 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
     env,
   )
   const editing = v.state === "editing"
+  const open = v.state === "suggesting"
   const common = (part: string): PartProps => ({
     ...scopeAttrs("tags-input", part, v.instance),
     "data-disabled": dataFlag(v.disabled),
     "data-readonly": dataFlag(v.readOnly),
     "data-invalid": dataFlag(v.invalid),
   })
+  const results = v.results ?? NO_RESULTS
+  const pattern = patternConnect(
+    {
+      scope: "tags-input",
+      instance: v.instance,
+      open,
+      exposed: v.exposed === true,
+      empty: v.empty === true,
+      present: v.present === true,
+      results,
+      context: c,
+      // Options are never selected: a chosen one becomes a tag and leaves the list.
+      selection: new Set(),
+      selectionMode: "none",
+      disabled: v.disabled,
+      loading: v.loading,
+      modality: v.modality,
+      dir: v.dir,
+      autoComplete: "list",
+      messages: v.messages,
+      mounted: {
+        label: v.mounted.label,
+        empty: v.mounted.empty === true,
+        description: v.mounted.description,
+      },
+      topLayer: v.topLayer,
+      common,
+      choose: (key, modality) => send({ type: "ITEM.CHOOSE", key, modality }),
+      blur: () => send({ type: "FOCUS.LEAVE" }),
+      send,
+    },
+    env,
+  )
+  // Chips, ChipRemove, ClearTrigger and the popup are inside: focus there is no leave.
+  const { insideControl } = pattern
+  /** Enter acts on the highlighted suggestion (it is prevented: no implicit submission). */
+  const choosesOnEnter = () =>
+    open && c.highlightedKey !== null && results.has(c.highlightedKey) && !v.readOnly
   const rootLike = (part: string): PartProps => ({
     ...v.fieldData,
     ...common(part),
@@ -139,6 +198,7 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
     }),
     input: (): PartProps => ({
       ...common("input"),
+      ...(v.suggestions ? pattern.input() : {}),
       ...focusAttrs(c.focused && c.focusedChip === null && !editing, v.modality),
       id: ids.input,
       type: "text",
@@ -204,15 +264,34 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
         if (chips.inputKeyDown(e, el.value, atStart)) return
         switch (e.key) {
           case "Enter":
-            // Prevented only when it creates: an empty Enter submits the form.
-            if (v.draftNotEmpty && !v.disabled && !v.readOnly) e.preventDefault()
+            // Prevented only when it creates or chooses: an empty Enter submits the form.
+            if (choosesOnEnter() || (v.draftNotEmpty && !v.disabled && !v.readOnly)) {
+              e.preventDefault()
+            }
             send({ type: "ENTER", composing: false })
+            return
+          case "ArrowDown":
+          case "ArrowUp":
+            if (!v.suggestions || v.disabled) return
+            send({
+              type: "ARROW",
+              key: e.key === "ArrowDown" ? "NEXT" : "PREV",
+              alt: e.altKey,
+              composing: false,
+            })
+            e.preventDefault()
+            return
+          case "Escape":
+            // Only an open popup handles Escape: otherwise an enclosing layer closes.
+            if (!open) return
+            send({ type: "ESCAPE", composing: false })
+            e.preventDefault()
             return
           case "ArrowLeft":
           case "ArrowRight":
           case "Home":
           case "End":
-            if (c.armedChip !== null) send({ type: "CARET" })
+            if (c.armedChip !== null || (open && c.highlightedKey !== null)) send({ type: "CARET" })
             return
         }
       },
@@ -314,6 +393,19 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
       }
     },
     chipsSummary: chips.summary,
+    positioner: pattern.positioner,
+    popup: pattern.popup,
+    list: pattern.list,
+    item: pattern.item,
+    itemText: pattern.itemText,
+    itemDescription: pattern.itemDescription,
+    itemIndicator: pattern.itemIndicator,
+    section: pattern.section,
+    sectionLabel: pattern.sectionLabel,
+    separator: pattern.separator,
+    empty: pattern.empty,
+    loadMore: pattern.loadMore,
+    loading: pattern.loading,
     /** The constraint input: empty exactly while there are no tags. */
     hiddenInput: (): PartProps => ({
       ...scopeAttrs("tags-input", "hidden-input", v.instance),

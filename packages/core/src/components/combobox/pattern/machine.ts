@@ -261,6 +261,8 @@ export function patternPieces(options: {
     announceOpen: (a) => {
       if (a.context.highlightedKey === null) announceCount(a, scope)
     },
+    /** The listed count, as the list is exposed (a host whose open never re-lists). */
+    announceCount: (a) => announceCount(a, scope),
     announceLoading: (a) => {
       if (a.props.loading === "loading" || a.props.loading === "loading-more") {
         a.env.announcer.announce({
