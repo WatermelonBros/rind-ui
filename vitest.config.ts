@@ -149,7 +149,7 @@ export default defineConfig({
           // A no-op in real browsers; listed so that is tested.
           setupFiles: [
             "packages/testing/src/setup.ts",
-            "packages/testing/src/warning-guard.setup.ts",
+            // BISECT (temporary): guard off in the browser project to test the Chromium crash
           ],
         },
       },

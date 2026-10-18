@@ -5,6 +5,7 @@
 // reach the guard through a spy are not recorded.
 
 const KEY = Symbol.for("rind-ui.warning-guard")
+const INSTALLED = Symbol.for("rind-ui.warning-guard.installed")
 
 interface GuardState {
   seen: string[]
@@ -36,6 +37,10 @@ export function allowRindWarning(pattern: RegExp): void {
 
 /** Wraps `console.warn` and `console.error` once; every call still reaches the original. */
 export function installWarningGuard(): void {
+  // once per realm: a setup file that runs again in the same window must not stack wrappers
+  const g = globalThis as unknown as Record<symbol, boolean | undefined>
+  if (g[INSTALLED]) return
+  g[INSTALLED] = true
   for (const level of ["warn", "error"] as const) {
     const original = console[level]
     const guard = (...args: unknown[]) => {
