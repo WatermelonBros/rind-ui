@@ -45,12 +45,12 @@ function* periods(range: DateRange, period: RangePeriod, limit: number) {
   }
 }
 
-/** Whether the range contains an unavailable period (searched up to `limit` periods). */
+/** Whether the range contains an unavailable period (every period of it by default). */
 export function crossesUnavailable(
   range: DateRange,
   isUnavailable: (date: CalendarDate) => boolean,
   period: RangePeriod = "day",
-  limit = 366,
+  limit = rangeLength(range, period),
 ): boolean {
   for (const p of periods(range, period, limit)) if (isUnavailable(p)) return true
   return false
@@ -114,6 +114,44 @@ export function lengthBounds(
     latest: max === undefined ? null : from.add(by(max - 1)),
     tooCloseBefore: min === undefined ? null : from.subtract(by(min - 1)),
     tooCloseAfter: min === undefined ? null : from.add(by(min - 1)),
+  }
+}
+
+/** The searches longer than this stop: a range that long is checked again at commit. */
+const BOUNDS_LIMIT = 3660
+
+/**
+ * A checker for the ends a range from `anchor` may take, with the contiguity bounds found
+ * once (spec "Unavailable Dates In Ranges"): a calendar asks it for every cell of a render.
+ */
+export function rangeEnds(
+  anchor: CalendarDate,
+  options: {
+    readonly minRangeLength?: number | undefined
+    readonly maxRangeLength?: number | undefined
+    readonly isUnavailable?: ((date: CalendarDate) => boolean) | undefined
+    readonly allowsNonContiguousRanges?: boolean | undefined
+    readonly period?: RangePeriod | undefined
+  },
+): (end: CalendarDate) => boolean {
+  const period = options.period ?? "day"
+  const bounds =
+    options.isUnavailable && !options.allowsNonContiguousRanges
+      ? availableBounds(
+          anchor,
+          options.isUnavailable,
+          period,
+          // The farthest end that can matter: the length bound, else a decade of periods.
+          options.maxRangeLength ?? BOUNDS_LIMIT,
+        )
+      : null
+  return (end) => {
+    const length = rangeLength(makeRange(anchor, end), period)
+    if (options.maxRangeLength !== undefined && length > options.maxRangeLength) return false
+    if (options.minRangeLength !== undefined && length < options.minRangeLength) return false
+    if (bounds?.before && end.compare(bounds.before) <= 0) return false
+    if (bounds?.after && end.compare(bounds.after) >= 0) return false
+    return true
   }
 }
 

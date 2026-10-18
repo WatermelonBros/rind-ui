@@ -27,7 +27,7 @@ import {
 } from "./calendar.machine"
 import { type CalendarMove, canPage, clamp } from "./calendar.navigation"
 import { visibleRangeText } from "./calendar.pieces"
-import { crossesUnavailable, makeRange, rangeLength } from "./calendar.range"
+import { crossesUnavailable, makeRange, rangeEnds, rangeLength } from "./calendar.range"
 
 export interface CalendarConnectInput extends CalendarProps {
   readonly instance: string
@@ -96,9 +96,19 @@ export function calendarConnect(input: CalendarConnectInput) {
   // A controlled focusedValue outside min/max (also at mount) focuses the nearest bound.
   const focusedDate = clamp(input.focused, input)
   const isUnavailable = (date: CalendarDate) => unavailable(input, date, anchor)
-  // The preview: from the anchor to the hovered (else focused) date, in date order.
-  const previewEnd = input.hovered ?? focusedDate
-  const preview = anchor ? makeRange(anchor, previewEnd) : null
+  // The preview: from the anchor to the hovered date, else the focused one while focus is in
+  // a grid (spec "Range Preview": nothing once the pointer and focus are both elsewhere).
+  const previewEnd = input.hovered ?? (input.gridFocused ? focusedDate : null)
+  const preview = anchor && previewEnd ? makeRange(anchor, previewEnd) : null
+  // The ends a range from the anchor may take: contiguity bounds found once per render.
+  const endsOk = anchor
+    ? rangeEnds(anchor, {
+        minRangeLength: input.minRangeLength,
+        maxRangeLength: input.maxRangeLength,
+        isUnavailable: (d) => isUnavailable(d),
+        allowsNonContiguousRanges: input.allowsNonContiguousRanges,
+      })
+    : null
   const rangeInvalid =
     range !== null &&
     (outOfRange(range.start) ||
@@ -212,7 +222,8 @@ export function calendarConnect(input: CalendarConnectInput) {
     row: (): PartProps => scopeAttrs("calendar", "row", input.instance),
     cell: (date: CalendarDate, offset: number): PartProps => {
       const placeholder = !inMonth(date, month(offset))
-      const off = !isUnavailable(date) && !isSelectable(date, input, anchor)
+      const off =
+        !isUnavailable(date) && (!isSelectable(date, input) || (endsOk !== null && !endsOk(date)))
       // While anchored, dates no range from the anchor may end on are disabled too.
       const disabled =
         placeholder || input.disabled === true || outOfRange(date) || (anchor !== null && off)

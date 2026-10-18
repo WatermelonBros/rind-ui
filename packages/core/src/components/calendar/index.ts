@@ -53,5 +53,6 @@ export {
   lengthBounds,
   makeRange,
   type RangePeriod,
+  rangeEnds,
   rangeLength,
 } from "./calendar.range"

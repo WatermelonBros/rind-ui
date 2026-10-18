@@ -429,9 +429,12 @@ plain date. The Calendar SHALL announce, politely and keyed per instance,
 
 ### Requirement: Reusable Range Helpers
 
-The pure range module SHALL export `makeRange(a, b)`, `availableBounds(anchor, isUnavailable,
-visibleMonths)`, `lengthBounds(anchor, minRangeLength, maxRangeLength)` and
-`crossesUnavailable(range, isUnavailable)` as public helpers, generic over comparable period
+The pure range module SHALL export `makeRange(a, b)`, `rangeLength(range, period)`,
+`availableBounds(anchor, isUnavailable, period, limit)` (the nearest unavailable period before
+and after, searched up to `limit` periods), `lengthBounds(anchor, minRangeLength,
+maxRangeLength, period)`, `crossesUnavailable(range, isUnavailable, period)` (over the whole
+range), `canEndRange(anchor, end, rules)` and `rangeEnds(anchor, rules)` (a checker that finds
+the contiguity bounds once per anchor, for every cell of a render) as public helpers, generic over comparable period
 starts: they SHALL work on `CalendarDate`s and take the period (`day`, `month` or `year`) as an
 argument, so the month and year views pass first-of-period dates and receive bounds and
 crossings in the same unit. `availableBounds` SHALL return the nearest unavailable period start

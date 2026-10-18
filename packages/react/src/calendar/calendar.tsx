@@ -304,7 +304,21 @@ function Root({
     instance,
     grid: (offset) => monthGrid(start.add({ months: offset }), locale, firstDay, fixedWeeks),
   }
-  const props = mergeProps({ ...normalizeProps(api.root()), ref: root }, rest)
+  const props = mergeProps(
+    {
+      ...normalizeProps(api.root()),
+      // Escape anywhere inside cancels a range in progress and is consumed; with no anchor
+      // it bubbles (to an enclosing dialog).
+      onKeyDown: (e: KeyboardEvent) => {
+        if (e.key !== "Escape" || !isAnchored || e.defaultPrevented) return
+        e.preventDefault()
+        e.stopPropagation()
+        send({ type: "CANCEL" })
+      },
+      ref: root,
+    },
+    rest,
+  )
   // Range mode: the focused cell's prompt, read as its description.
   const prompt =
     selectionMode === "range" ? (
@@ -410,13 +424,6 @@ function Grid({
       if (!inside) send({ type: "GRID.BLUR" })
     },
     onKeyDown: (e: KeyboardEvent & { nativeEvent: KeyboardEvent }) => {
-      // Escape cancels a range in progress and is consumed; with no anchor it bubbles.
-      if (e.key === "Escape" && ctx.api.root()["data-anchored"] !== undefined) {
-        e.preventDefault()
-        e.stopPropagation()
-        send({ type: "CANCEL" })
-        return
-      }
       const event = calendarKey(
         describeKey(e.nativeEvent, env),
         ctx.api.root()["dir"] === "rtl" ? "rtl" : "ltr",

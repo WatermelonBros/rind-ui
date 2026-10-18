@@ -275,6 +275,8 @@ export const calendarMachine = setup({
         args.props,
       )
       focus(args, next.focused, next.visibleStart)
+      // The arrows move the preview even while the pointer rests on a cell.
+      if (args.context.hovered !== null) args.set("hovered", null)
       requestCellFocus(args.props, next.focused)
     },
     page: (args) => {
@@ -379,7 +381,8 @@ export const calendarMachine = setup({
     focusedValue: "FOCUS.SYNC",
     minValue: "CONSTRAINTS",
     maxValue: "CONSTRAINTS",
-    value: "VALUE.SYNC",
+    // A new object with the same days (an inline value={{ start, end }}) is no change.
+    value: { event: "VALUE.SYNC", equal: (a, b) => sameDays(a ?? null, b ?? null) },
   },
   on: {
     "CELL.HOVER": { actions: ["setHovered"] },

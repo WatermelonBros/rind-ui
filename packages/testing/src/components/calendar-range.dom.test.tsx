@@ -3,7 +3,7 @@
 // Announcements", "Data Attributes"): runs in jsdom and in real browsers (a fixed clock).
 import { CalendarDate } from "@internationalized/date"
 import { Calendar, type CalendarRootProps, Dialog, RindProvider } from "@rind-ui/react"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -303,5 +303,71 @@ describe("Calendar range", () => {
     const v = onValueChange.mock.calls[0]?.[0] as { start: unknown; end: unknown }
     expect(`${v.start}..${v.end}`).toBe("2026-10-08..2026-10-17")
     host.remove()
+  })
+
+  it("Controlled anchor cleared by the parent: no anchor, no preview, no change", async () => {
+    const onValueChange = vi.fn()
+    function Controlled() {
+      const [anchor, setAnchor] = useState<CalendarDate | null>(d(10, 10))
+      return (
+        <>
+          <button type="button" onClick={() => setAnchor(null)}>
+            Drop
+          </button>
+          <Range anchor={anchor} onAnchorChange={setAnchor} onValueChange={onValueChange} />
+        </>
+      )
+    }
+    render(<Controlled />)
+    expect(attr("2026-10-10", "data-anchor")).toBe(true)
+    fireEvent.click(screen.getByRole("button", { name: "Drop" }))
+    await waitFor(() => expect(document.querySelector("[data-anchor]")).toBeNull())
+    expect(document.querySelector("[data-preview]")).toBeNull()
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("The preview clears when the pointer leaves and focus is outside the grid", async () => {
+    render(<Range />)
+    await cal().startRange("2026-10-10")
+    fireEvent.pointerEnter(cell("2026-10-14"), { pointerType: "mouse" })
+    await waitFor(async () => expect((await cal().preview()).length).toBeGreaterThan(0))
+    fireEvent.pointerLeave(screen.getByRole("grid"), { pointerType: "mouse" })
+    screen.getByRole("button", { name: "Next month" }).focus()
+    await waitFor(async () => expect(await cal().preview()).toEqual([]))
+    expect(await cal().isAnchored()).toBe(true)
+  })
+
+  it("An inline object value re-rendered by the parent keeps the anchor", async () => {
+    let rerender = () => {}
+    function Inline() {
+      const [, setTick] = useState(0)
+      rerender = () => setTick((t) => t + 1)
+      return <Range value={{ start: d(10, 1), end: d(10, 5) }} />
+    }
+    render(<Inline />)
+    await cal().startRange("2026-10-12")
+    // A new object with the same days on every render (value={{ … }}): not a new value.
+    act(() => rerender())
+    act(() => rerender())
+    expect(await cal().anchor()).toBe("2026-10-12")
+  })
+
+  it("Escape on a trigger inside the root cancels the anchor", async () => {
+    render(<Range />)
+    await cal().startRange("2026-10-12")
+    screen.getByRole("button", { name: "Next month" }).focus()
+    await userEvent.setup().keyboard("{Escape}")
+    expect(await cal().isAnchored()).toBe(false)
+  })
+
+  it("Arrows move the preview while the mouse rests on a cell", async () => {
+    render(<Range defaultFocusedValue={d(10, 10)} />)
+    const user = userEvent.setup()
+    cell("2026-10-10").focus()
+    await user.keyboard("{Enter}")
+    fireEvent.pointerEnter(cell("2026-10-12"), { pointerType: "mouse" })
+    await waitFor(async () => expect((await cal().preview()).at(-1)).toBe("2026-10-12"))
+    await user.keyboard("{ArrowDown}")
+    expect((await cal().preview()).at(-1)).toBe("2026-10-17")
   })
 })

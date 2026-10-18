@@ -7,6 +7,7 @@ import {
   crossesUnavailable,
   lengthBounds,
   makeRange,
+  rangeEnds,
   rangeLength,
 } from "./calendar.range"
 
@@ -58,5 +59,19 @@ describe("range helpers", () => {
       canEndRange(d(10, 12), d(10, 16), { isUnavailable: oct15, allowsNonContiguousRanges: true }),
     ).toBe(true)
     expect(canEndRange(d(10, 12), d(10, 12), {})).toBe(true)
+  })
+
+  it("a range longer than a year is checked over its whole length", () => {
+    const late = (x: CalendarDate) => x.compare(d(1, 20, 2028)) === 0
+    expect(crossesUnavailable(makeRange(d(10, 1), d(3, 1, 2028)), late)).toBe(true)
+    expect(canEndRange(d(10, 1), d(3, 1, 2028), { isUnavailable: late })).toBe(false)
+  })
+
+  it("rangeEnds finds the contiguity bounds once and agrees with canEndRange", () => {
+    const ok = rangeEnds(d(10, 12), { isUnavailable: oct15, maxRangeLength: 30 })
+    expect(ok(d(10, 14))).toBe(true)
+    expect(ok(d(10, 15))).toBe(false)
+    expect(ok(d(10, 16))).toBe(false)
+    expect(ok(d(10, 1))).toBe(true)
   })
 })
