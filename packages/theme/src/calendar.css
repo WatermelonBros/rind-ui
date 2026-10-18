@@ -188,6 +188,58 @@
     color: var(--rind-calendar-invalid-text, var(--rind-color-danger-on-solid));
   }
 
+  /*
+   * Range mode: the committed range is one band across each week row. Middle days are the
+   * soft band with top and bottom edges (not colour alone), and paint the gap before them so
+   * the band is continuous; the start and end are the selected look with rounded caps.
+   */
+  :where(
+    [data-scope="calendar"][data-part="cell"][data-in-range]:not(
+      [data-range-start],
+      [data-range-end]
+    )
+  ) {
+    border-radius: 0;
+    background: var(--rind-calendar-range-bg, var(--rind-color-accent-soft));
+    color: var(--rind-calendar-range-text, var(--rind-color-text));
+    box-shadow:
+      calc(-1 * var(--rind-calendar-cell-gap, 2px)) 0 0 0
+      var(--rind-calendar-range-bg, var(--rind-color-accent-soft)),
+      inset 0 var(--rind-border-width) 0 0
+      var(--rind-calendar-range-edge, var(--rind-color-accent-border)),
+      inset 0 calc(-1 * var(--rind-border-width)) 0 0
+      var(--rind-calendar-range-edge, var(--rind-color-accent-border));
+    font-weight: 600;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-range-start]:not([data-range-end])) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-range-end]:not([data-range-start])) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    box-shadow:
+      calc(-1 * var(--rind-calendar-cell-gap, 2px)) 0 0 0
+      var(--rind-calendar-range-bg, var(--rind-color-accent-soft)),
+      inset 0 0 0 calc(var(--rind-border-width) * 2)
+      var(--rind-calendar-selected-edge, var(--rind-color-border-strong));
+  }
+
+  /* The anchor looks selected; the preview is a dashed edge, never the committed look. */
+  :where([data-scope="calendar"][data-part="cell"][data-anchor]) {
+    background: var(--rind-calendar-selected-bg, var(--rind-color-accent-solid));
+    color: var(--rind-calendar-selected-text, var(--rind-color-accent-on-solid));
+    font-weight: 700;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-preview]:not([data-anchor])) {
+    outline: var(--rind-border-width) dashed
+      var(--rind-calendar-preview-edge, var(--rind-color-accent-border));
+    outline-offset: calc(-1 * var(--rind-border-width) * 2);
+  }
+
   :where([data-scope="calendar"][data-part="cell"][data-focus-visible]) {
     outline: var(--rind-focus-width) solid var(--rind-focus-color);
     outline-offset: var(--rind-focus-offset);
@@ -277,6 +329,18 @@
     :where([data-scope="calendar"][data-part="cell"][data-selected][data-invalid]) {
       outline: 2px dashed HighlightText;
       outline-offset: -4px;
+    }
+    /* Range: the committed days use Highlight; the preview a dashed outline. */
+    :where([data-scope="calendar"][data-part="cell"]:is([data-in-range], [data-anchor])) {
+      background: Highlight;
+      color: HighlightText;
+      box-shadow: none;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-preview]:not([data-anchor])) {
+      outline: 2px dashed CanvasText;
+      outline-offset: -3px;
     }
   }
 }

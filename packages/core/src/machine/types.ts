@@ -229,9 +229,18 @@ export interface MachineDefBase<
   readonly initial: NoInfer<S>
   /** Derived values, memoised per view. Never decide transitions. */
   readonly computed?: { readonly [K in keyof CP]: (view: BaseView<T, NoInfer<S>>) => CP[K] }
-  /** Prop-change events: when the prop's identity changes, the event is sent. */
+  /**
+   * Prop-change events: when the prop's identity changes, the event is sent. An object-valued
+   * prop passes `equal` so a new object with the same content (an inline `value={{ … }}`) is
+   * no change.
+   */
   readonly onProps?: {
-    readonly [K in Str<keyof T["props"]>]?: BareEventType<T["events"]>
+    readonly [K in Str<keyof T["props"]>]?:
+      | BareEventType<T["events"]>
+      | {
+          readonly event: BareEventType<T["events"]>
+          readonly equal: (a: T["props"][K], b: T["props"][K]) => boolean
+        }
   }
   /** Effects active for the whole life of the started service. */
   readonly effects?: readonly EffectName<I>[]

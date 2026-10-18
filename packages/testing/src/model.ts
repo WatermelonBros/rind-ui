@@ -260,7 +260,8 @@ function stepEvent(machine: AnyMachine, edge: GraphEdge): string {
   if (edge.event.startsWith("$sync:")) return "$sync"
   if (edge.event.startsWith("$props:")) {
     // Every machine's definition has the raw shape; the typed one refines it.
-    return (machine.def as RawMachineDef).onProps?.[edge.event.slice(7)] ?? edge.event
+    const entry = (machine.def as RawMachineDef).onProps?.[edge.event.slice(7)]
+    return entry === undefined ? edge.event : typeof entry === "string" ? entry : entry.event
   }
   return edge.event
 }

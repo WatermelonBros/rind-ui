@@ -14,6 +14,7 @@ const state = {
   "data-invalid": "A selected date is out of range or unavailable.",
   "data-focus": "Focus is in the grid.",
   "data-focus-visible": "Keyboard focus is in the grid.",
+  "data-anchored": "Range mode: an anchor is set (a range is being selected).",
 }
 
 export const calendarMeta = {
@@ -79,11 +80,21 @@ export const calendarMeta = {
       description:
         '`role="gridcell"`: one Tab stop (roving), explicit `aria-selected`, named by its full date.',
     },
+    {
+      name: "(rendered by Calendar.Root)",
+      part: "prompt",
+      element: "span",
+      description:
+        "Range mode: visually hidden, describes the focused cell (start or end the range).",
+    },
   ],
   props: {
-    value: { type: "DateValue | DateValue[] | null", description: "Controlled selection." },
+    value: {
+      type: "DateValue | DateValue[] | { start, end } | null",
+      description: "Controlled selection.",
+    },
     defaultValue: {
-      type: "DateValue | DateValue[] | null",
+      type: "DateValue | DateValue[] | { start, end } | null",
       description: "Uncontrolled selection.",
     },
     onValueChange: {
@@ -91,9 +102,34 @@ export const calendarMeta = {
       description: "Reasons `CELL.PRESS` (a press) and `KEY` (Enter or Space).",
     },
     selectionMode: {
-      type: '"single" | "multiple"',
+      type: '"single" | "multiple" | "range"',
       default: '"single"',
-      description: "One date or several.",
+      description: "One date, several, or a range selected in two steps (anchor, then end).",
+    },
+    anchor: {
+      type: "DateValue | null",
+      description: "Range mode: the first end while a range is selected (controllable).",
+    },
+    defaultAnchor: { type: "DateValue | null", description: "Uncontrolled anchor." },
+    onAnchorChange: { type: "(anchor) => void", description: "The anchor was set or cleared." },
+    minRangeLength: {
+      type: "number",
+      description: "Range mode: shortest range in days (ends included); closer ends are disabled.",
+    },
+    maxRangeLength: {
+      type: "number",
+      description: "Range mode: longest range in days (ends included); farther ends are disabled.",
+    },
+    allowsNonContiguousRanges: {
+      type: "boolean",
+      default: "false",
+      description: "Range mode: a range may contain unavailable dates.",
+    },
+    commitOnBlur: {
+      type: '"reset" | "select" | "clear"',
+      default: '"reset"',
+      description:
+        "Range mode: leaving while anchored keeps the value, commits the preview, or clears it.",
     },
     focusedValue: { type: "DateValue", description: "Controlled focused date (pages to show it)." },
     defaultFocusedValue: {
@@ -108,8 +144,9 @@ export const calendarMeta = {
     minValue: { type: "DateValue | null", description: "Earlier dates are disabled." },
     maxValue: { type: "DateValue | null", description: "Later dates are disabled." },
     isDateUnavailable: {
-      type: "(date) => boolean",
-      description: "Focusable but not selectable (booked days), unlike disabled.",
+      type: "(date, { anchor }) => boolean",
+      description:
+        "Focusable but not selectable (booked days), unlike disabled; told the range anchor.",
     },
     visibleMonths: { type: "number", default: "1", description: "Months shown side by side." },
     pageBehavior: {
@@ -148,6 +185,13 @@ export const calendarMeta = {
       "data-hover": "Under the pointer.",
       "data-focus": "Focused.",
       "data-focus-visible": "Keyboard focus.",
+      "data-in-range": "Range mode: inside the committed range (ends included).",
+      "data-range-start": "Range mode: the committed range's first day.",
+      "data-range-end": "Range mode: the committed range's last day.",
+      "data-anchor": "Range mode: the anchor, while a range is being selected.",
+      "data-preview": "Range mode: between the anchor and the hovered or focused date.",
+      "data-preview-start": "Range mode: the preview's first day.",
+      "data-preview-end": "Range mode: the preview's last day.",
     },
   },
   keyboard: [
@@ -156,7 +200,8 @@ export const calendarMeta = {
     ["Home / End", "First / last day of the week."],
     ["PageUp / PageDown", "Previous / next month."],
     ["Shift + PageUp / PageDown", "Previous / next year."],
-    ["Enter / Space", "Select the focused date."],
+    ["Enter / Space", "Select the focused date (range mode: set the anchor, then the end)."],
+    ["Escape", "Range mode: cancel the range in progress (bubbles with no anchor)."],
   ],
   states: {
     idle: "Focus is outside the grid: a trigger's paging is announced.",
@@ -168,6 +213,9 @@ export const calendarMeta = {
       focusDate: ["keyboard"],
       nextPage: ["pointer", "keyboard", "virtual"],
       previousPage: ["pointer", "keyboard", "virtual"],
+      selectRange: ["pointer", "keyboard", "touch", "virtual"],
+      startRange: ["pointer", "keyboard", "virtual"],
+      cancel: ["keyboard"],
       press: ["keyboard"],
     },
     queries: [
@@ -181,6 +229,10 @@ export const calendarMeta = {
       "today",
       "isInvalid",
       "isFocused",
+      "range",
+      "anchor",
+      "preview",
+      "isAnchored",
     ],
     traits: ["selectable", "composite-roving"],
   },

@@ -157,3 +157,20 @@
   color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
   cursor: default;
 }
+/* Range mode: one band per week row; the ends keep the selected look */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="calendar"][data-part="cell"][data-in-range]:not([data-range-start], [data-range-end]) {
+  background: color-mix(in oklab, var(--s-brand) 22%, var(--s-card));
+  color: var(--s-ink);
+  border-radius: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-preview]:not([data-anchor]) {
+  outline: 2px dashed var(--s-brand);
+  outline-offset: -3px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="calendar"][data-part="cell"][data-anchor] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}

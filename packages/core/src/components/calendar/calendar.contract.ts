@@ -15,6 +15,7 @@ type P =
   | "grid-body"
   | "row"
   | "cell"
+  | "prompt"
 type E = Env<P>
 
 /** The in-month cell of an ISO date, if visible. */
@@ -135,6 +136,65 @@ export const calendarInvariants: readonly Invariant<P, string>[] = [
   },
 ]
 
+/** Range invariants (spec "Range Invariants"), read from the page; silent in other modes. */
+export const rangeInvariants: readonly Invariant<P, string>[] = [
+  {
+    name: "calendar-range-selection",
+    check: async ({ env }) => {
+      // Range mode renders the prompt part; other modes have no range to check.
+      if (!(await env.part("prompt").exists())) return undefined
+      for (const c of await env.part("cell").all()) {
+        if ((await c.attr("aria-selected")) !== "true") continue
+        if ((await c.attr("data-in-range")) === null)
+          return `${await c.attr("data-value")} is aria-selected outside the committed range`
+        if ((await c.attr("data-preview")) !== null && (await c.attr("data-in-range")) === null)
+          return `preview cell ${await c.attr("data-value")} is aria-selected`
+      }
+      return undefined
+    },
+  },
+  {
+    name: "calendar-range-anchor",
+    check: async ({ env }) => {
+      const anchored = (await env.part("root").attr("data-anchored")) !== null
+      let anchors = 0
+      let previews = 0
+      for (const c of await env.part("cell").all()) {
+        if ((await c.attr("data-anchor")) !== null) anchors += 1
+        if ((await c.attr("data-preview")) !== null) previews += 1
+      }
+      if (!anchored && anchors > 0) return `${anchors} cells carry data-anchor with no anchor`
+      if (!anchored && previews > 0) return `${previews} cells carry data-preview with no anchor`
+      return anchors <= 1 ? undefined : `${anchors} cells carry data-anchor`
+    },
+  },
+  {
+    name: "calendar-range-order",
+    check: async ({ env }) => {
+      let start: string | null = null
+      let end: string | null = null
+      for (const c of await env.part("cell").all()) {
+        if ((await c.attr("data-range-start")) !== null) start = await c.attr("data-value")
+        if ((await c.attr("data-range-end")) !== null) end = await c.attr("data-value")
+      }
+      return start && end && start > end
+        ? `range start ${start} is after its end ${end}`
+        : undefined
+    },
+  },
+]
+
+/** The visible cells carrying an attribute, as ISO dates. */
+async function cellsWith(env: E, attr: string): Promise<string[]> {
+  const out: string[] = []
+  for (const c of await env.part("cell").all()) {
+    if ((await c.attr(attr)) !== null && (await c.attr("data-outside-month")) === null) {
+      out.push((await c.attr("data-value")) ?? "")
+    }
+  }
+  return out
+}
+
 /** The Calendar's contract (spec "Contract"). */
 export const calendarContract = contract("calendar", {
   machine: calendarMachine,
@@ -150,6 +210,7 @@ export const calendarContract = contract("calendar", {
     "grid-body",
     "row",
     "cell",
+    "prompt",
   ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
   actions: {
@@ -183,6 +244,58 @@ export const calendarContract = contract("calendar", {
       pointer: async (env: E) => env.part("prev-trigger").click(),
       keyboard: (env: E) => env.keyboard("PageUp"),
       done: async () => true,
+    },
+    /** Range mode: two selections (an anchor, then the end). */
+    selectRange: {
+      pointer: async (env: E, start: string, end: string) => {
+        await pageTo(env, start)
+        await (await cellOf(env, start))?.click()
+        await pageTo(env, end)
+        await (await cellOf(env, end))?.click()
+      },
+      touch: async (env: E, start: string, end: string) => {
+        await pageTo(env, start)
+        await (await cellOf(env, start))?.tap()
+        await pageTo(env, end)
+        await (await cellOf(env, end))?.tap()
+      },
+      keyboard: async (env: E, start: string, end: string) => {
+        await keyTo(env, start)
+        await env.keyboard("Enter")
+        await keyTo(env, end)
+        await env.keyboard("Enter")
+      },
+      done: async (env: E, start: string, end: string) => {
+        const [a, b] = start <= end ? [start, end] : [end, start]
+        const from = await cellsWith(env, "data-range-start")
+        const to = await cellsWith(env, "data-range-end")
+        // An end on another page is not visible: the anchor is gone either way.
+        return (
+          (await env.part("root").attr("data-anchored")) === null &&
+          (from.length === 0 || from[0] === a) &&
+          (to.length === 0 || to[0] === b)
+        )
+      },
+    },
+    /** Range mode: the first selection only. */
+    startRange: {
+      pointer: async (env: E, iso: string) => {
+        await pageTo(env, iso)
+        await (await cellOf(env, iso))?.click()
+      },
+      keyboard: async (env: E, iso: string) => {
+        await keyTo(env, iso)
+        await env.keyboard("Enter")
+      },
+      done: async () => true,
+    },
+    /** Range mode: Escape drops the range in progress. */
+    cancel: {
+      keyboard: async (env: E) => {
+        await enterGrid(env)
+        await env.keyboard("Escape")
+      },
+      done: async (env: E) => (await env.part("root").attr("data-anchored")) === null,
     },
     press: {
       keyboard: async (
@@ -235,6 +348,15 @@ export const calendarContract = contract("calendar", {
     },
     isInvalid: async (env: E) => (await env.part("root").attr("data-invalid")) !== null,
     isFocused: async (env: E) => (await env.part("root").attr("data-focus")) !== null,
+    /** Range mode: the committed range's visible ends (ISO), or null. */
+    range: async (env: E) => {
+      const start = (await cellsWith(env, "data-range-start"))[0]
+      const end = (await cellsWith(env, "data-range-end"))[0]
+      return start && end ? { start, end } : null
+    },
+    anchor: async (env: E) => (await cellsWith(env, "data-anchor"))[0] ?? null,
+    preview: async (env: E) => cellsWith(env, "data-preview"),
+    isAnchored: async (env: E) => (await env.part("root").attr("data-anchored")) !== null,
   },
   states: { idle: { isFocused: false }, focused: { isFocused: true } },
   events: {
@@ -261,6 +383,16 @@ export const calendarContract = contract("calendar", {
       event: () => ({ move: "next-day", composing: false }),
     },
     PAGE: { action: "nextPage", event: () => ({ direction: 1, modality: "pointer" }) },
+    // Escape is the grid's key: from idle it needs focus in the grid first (a state change).
+    CANCEL: {
+      from: {
+        idle: { skip: "Escape reaches the calendar only with focus in a grid" },
+        focused: "cancel",
+      },
+    },
+    LEAVE: { skip: "focus or a press leaving the calendar: the DOM scenario tests" },
+    "VALUE.SYNC": { skip: "a parent's value: machine and DOM tests" },
+    "$props:value": { skip: "a parent's value: machine and DOM tests" },
     "CELL.FOCUS": { skip: "covered by every action" },
     "GRID.FOCUS": { skip: "covered by every action" },
     "GRID.BLUR": { skip: "covered by every action" },
@@ -282,5 +414,5 @@ export const calendarContract = contract("calendar", {
     { part: "prev-trigger", state: "focused" },
     { part: "next-trigger", state: "focused" },
   ],
-  invariants: calendarInvariants,
+  invariants: [...calendarInvariants, ...rangeInvariants],
 })

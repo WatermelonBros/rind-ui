@@ -879,9 +879,22 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
     if (value !== undefined && value !== "all" && list.every((el) => itemValue(el) !== undefined)) {
       // Only values with a rendered item: a selection survives filtering and virtualization.
       const rendered = new Set(list.map((el) => itemValue(el)))
-      const want = new Set(
-        (Array.isArray(value) ? value : [value]).map(String).filter((v) => rendered.has(v)),
-      )
+      // A range value ({ start, end } of ordered ISO values, a range calendar) selects the
+      // enabled items between its ends; an end's longer text (a time) is cut to the item's.
+      const range =
+        value !== null && typeof value === "object" && "start" in value && "end" in value
+          ? { lo: String(value.start), hi: String(value.end) }
+          : null
+      const want = range
+        ? new Set(
+            list
+              .filter((el) => !isTrue(el.attrs["aria-disabled"]))
+              .map((el) => itemValue(el) ?? "")
+              .filter((v) => v >= range.lo.slice(0, v.length) && v <= range.hi.slice(0, v.length)),
+          )
+        : new Set(
+            (Array.isArray(value) ? value : [value]).map(String).filter((v) => rendered.has(v)),
+          )
       const have = new Set(selected.map((el) => itemValue(el) ?? ""))
       if (want.size !== have.size || [...want].some((v) => !have.has(v))) {
         out.push(
