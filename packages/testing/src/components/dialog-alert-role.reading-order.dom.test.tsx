@@ -1,22 +1,22 @@
 // add-alert-dialog 5.3: on open a screen reader reaches the alert dialog's name, then its
 // description, then the focused "Cancel", in that order.
-import { AlertDialog } from "@rind-ui/react"
+import { Dialog } from "@rind-ui/react"
 import { render } from "@testing-library/react"
 import { expect, it } from "vitest"
 import { spokenLog } from "../index"
 
 it("the alert dialog name, then the description, then Cancel", async () => {
   const { container } = render(
-    <AlertDialog.Root defaultOpen>
-      <AlertDialog.Positioner>
-        <AlertDialog.Content>
-          <AlertDialog.Title>Delete project?</AlertDialog.Title>
-          <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          <AlertDialog.Action>Delete</AlertDialog.Action>
-        </AlertDialog.Content>
-      </AlertDialog.Positioner>
-    </AlertDialog.Root>,
+    <Dialog.Root role="alertdialog" defaultOpen>
+      <Dialog.Positioner>
+        <Dialog.Content>
+          <Dialog.Title>Delete project?</Dialog.Title>
+          <Dialog.Description>This cannot be undone.</Dialog.Description>
+          <Dialog.Cancel>Cancel</Dialog.Cancel>
+          <Dialog.Action>Delete</Dialog.Action>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Dialog.Root>,
   )
   const log = await spokenLog(container, async (virtual) => {
     for (let i = 0; i < 12; i++) await virtual.next()

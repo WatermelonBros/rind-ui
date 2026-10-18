@@ -19,7 +19,6 @@ export { type CheckboxStepInvariants, checkboxStepInvariants } from "./checkbox-
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
 export { getAccordion } from "./components/accordion"
 export { getAlert } from "./components/alert"
-export { getAlertDialog } from "./components/alert-dialog"
 export { getAvatar } from "./components/avatar"
 export { getBadge } from "./components/badge"
 export { getBreadcrumbs } from "./components/breadcrumbs"

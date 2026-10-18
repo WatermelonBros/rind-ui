@@ -299,10 +299,10 @@ describe("close trigger", () => {
   })
 })
 
-describe("alert dialog scope", () => {
-  it("uses the alertdialog role for the alert-dialog scope", () => {
-    const p = dialogConnect({ ...base, scope: "alert-dialog" }, vi.fn()).content({})
+describe("alertdialog role", () => {
+  it("the content takes the role; the scope stays dialog", () => {
+    const p = dialogConnect({ ...base, role: "alertdialog" }, vi.fn()).content({})
     expect(p["role"]).toBe("alertdialog")
-    expect(p["data-scope"]).toBe("alert-dialog")
+    expect(p["data-scope"]).toBe("dialog")
   })
 })

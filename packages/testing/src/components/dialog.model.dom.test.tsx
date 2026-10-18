@@ -33,7 +33,10 @@ function Example(props: Partial<DialogRootProps>) {
               <label>
                 Name <input />
               </label>
-              <Dialog.CloseTrigger>Cancel</Dialog.CloseTrigger>
+              <Dialog.CloseTrigger>Close</Dialog.CloseTrigger>
+              {/* Cancel and Action are Dialog parts: any dialog may use them. */}
+              <Dialog.Cancel>Cancel</Dialog.Cancel>
+              <Dialog.Action>Save</Dialog.Action>
             </Dialog.Content>
           </Dialog.Positioner>
         </Dialog.Portal>
@@ -59,6 +62,7 @@ for (const { name, props } of sets) {
       props: {
         open: undefined,
         root: "oracle",
+        role: undefined,
         modal: undefined,
         closeOnEscape: undefined,
         closeOnInteractOutside: undefined,
@@ -79,6 +83,7 @@ describe("dialog model: non-modal", () => {
     props: {
       open: undefined,
       root: "oracle",
+      role: undefined,
       modal: false,
       closeOnEscape: undefined,
       closeOnInteractOutside: undefined,

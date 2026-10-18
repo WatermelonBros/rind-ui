@@ -296,10 +296,11 @@ Record each pass in `tested-with.json` with `component: "tooltip"`. Deferred to 
 - [ ] **Touch**: a tap on the trigger does not leave a stuck tooltip.
 - [ ] **Windows High Contrast / forced colors**: the content border is visible.
 
-## Device checklist: Alert Dialog (add-alert-dialog 8.2)
+## Device checklist: Dialog with role="alertdialog" (formerly add-alert-dialog 8.2)
 
-Record each pass in `tested-with.json` with `component: "alert-dialog"`. Deferred to devices.
-Use a "Delete project?" alert dialog with a description, Cancel and Delete.
+Record each pass in `tested-with.json` with `component: "dialog"` and a note "alertdialog".
+Deferred to devices. Use a "Delete project?" confirmation (`role="alertdialog"`) with a
+description, Cancel and Delete.
 
 - [ ] **Name, description and focused Cancel** (radix#1615, react-spectrum#9916): NVDA +
       Firefox/Chrome, JAWS + Chrome, VoiceOver macOS + Safari and Chrome, VoiceOver iOS +

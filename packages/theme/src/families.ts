@@ -123,7 +123,6 @@ export const familyMatrix = [
     family: "panel",
     components: [
       "dialog",
-      "alert-dialog",
       "drawer",
       "popover",
       "menu",

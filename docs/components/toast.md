@@ -11,7 +11,7 @@ What it adds over plain HTML: HTML has no notification element. A toast adds a s
 Do not use a toast for:
 
 - An error the user must fix, or anything they must read: put it next to the field, or use an [Alert](alert.md) in the page. A message that disappears in five seconds is not for that.
-- A choice, a confirmation or a form: use a [Dialog](dialog.md) or an [Alert Dialog](alert-dialog.md).
+- A choice, a confirmation or a form: use a [Dialog](dialog.md) or a [confirmation](dialog.md#confirmation-alert-dialog).
 - A persistent state of the page ("You are offline"): use an Alert that stays.
 - Anything the user cannot afford to miss. If a toast carries the only copy of the information, a user who reads slowly, uses magnification or looks away loses it.
 
