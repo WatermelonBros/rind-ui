@@ -64,6 +64,8 @@ const chipNames = async (env: E) => {
 /** Settled for pointer input: closed, empty (nothing to press), or open and placed. */
 const settled = async (env: E) =>
   !(await isOpen(env)) ||
+  // Inline: the list is in place, nothing to place.
+  (await env.part("positioner").count()) === 0 ||
   (await input(env).attr("aria-expanded")) === "false" ||
   (await positioningQueries.isPlaced(env))
 const focusInput = async (env: E) => {

@@ -124,7 +124,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
           // A link item navigates natively: its press is the browser's, not a choice.
           if (linkOf(e.key)) return
           send({ type: "ITEM.CHOOSE", key: e.key, modality: e.modality })
-        } else if (e.type === "POINTER_MOVE") send(e)
+        } else if (e.type === "POINTER_MOVE" || (v.inline && e.type === "HIGHLIGHT")) send(e)
       },
     },
     env,
@@ -482,7 +482,14 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       const own = list.item(key)
       return {
         ...own,
-        "data-state": isSelected(v.results, v.selection, key) ? "checked" : "unchecked",
+        "data-state":
+          v.selectionMode === "none"
+            ? undefined
+            : isSelected(v.results, v.selection, key)
+              ? "checked"
+              : "unchecked",
+        // Nothing can be selected: explicitly never selected (optionsNeverSelected).
+        ...(v.selectionMode === "none" ? { "aria-selected": "false" } : {}),
         // Roving focus never applies: the input keeps focus.
         onFocus: undefined,
       }
