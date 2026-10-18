@@ -92,10 +92,11 @@ html.unstyled body {
 /* Scroll reveal (components/home/reveal.tsx; not data-reveal, which rind uses): content fades and lifts in once. */
 [data-scroll-reveal] {
   opacity: 0;
-  translate: 0 28px;
+  translate: 0 24px;
+  /* short: a fast scroll on a phone never reads washed-out text */
   transition:
-    opacity 0.9s var(--spring),
-    translate 0.9s var(--spring);
+    opacity 0.6s var(--spring),
+    translate 0.6s var(--spring);
 }
 [data-scroll-reveal][data-in] {
   opacity: 1;
