@@ -72,7 +72,11 @@ export { getTooltip } from "./components/tooltip"
 export { getTour } from "./components/tour"
 export { getTreeView } from "./components/tree-view"
 export { fixedDateClock } from "./date-clock"
-export { type DateFieldStepInvariants, dateFieldStepInvariants } from "./date-field-invariants"
+export {
+  type DateFieldStepInvariants,
+  dateFieldStepInvariants,
+  dateRangeStepInvariants,
+} from "./date-field-invariants"
 export {
   type FakeDelayGroup,
   type FakeHoverIntent,

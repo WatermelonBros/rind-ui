@@ -1,7 +1,11 @@
 // Date Field range mode (date-field spec "Range Mode — …"): jsdom and real browsers.
 import { CalendarDate, isWeekend } from "@internationalized/date"
 import { type DateRangeFieldValue, domEnvironment } from "@rind-ui/core"
+<<<<<<< HEAD
 import { DateField, RindProvider } from "@rind-ui/react"
+=======
+import { DateField, Field, RindProvider } from "@rind-ui/react"
+>>>>>>> date-field-range
 import { render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
@@ -152,8 +156,67 @@ describe("Date Field range", () => {
 
   it("inside a Field: one control, no second-control warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+<<<<<<< HEAD
     render(<Stay />)
     expect(warn.mock.calls.some((c) => String(c[0]).includes("second control"))).toBe(false)
+=======
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <Field.Root>
+          <Field.Label>Stay</Field.Label>
+          <DateField.Root selectionMode="range" locale="en-US">
+            <DateField.Input />
+          </DateField.Root>
+        </Field.Root>
+      </RindProvider>,
+    )
+    expect(screen.getByRole("group", { name: "Stay" })).toBeTruthy()
+    expect(spin("month Start date Stay")).toBeTruthy()
+    expect(warn.mock.calls.some((c) => String(c[0]).includes("[rind-ui]"))).toBe(false)
+  })
+
+  it("Description describes the group and the first start segment", () => {
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <DateField.Root selectionMode="range" locale="en-US">
+          <DateField.Label>Stay</DateField.Label>
+          <DateField.Description>Check-in to check-out</DateField.Description>
+          <DateField.Input />
+        </DateField.Root>
+      </RindProvider>,
+    )
+    const id = screen.getByText("Check-in to check-out").id
+    const group = screen.getByRole("group", { name: "Stay" })
+    expect(group.getAttribute("aria-describedby")?.split(" ")).toContain(id)
+    expect(spin("month Start date Stay").getAttribute("aria-describedby")?.split(" ")).toContain(id)
+  })
+
+  it("an invalid pair marks every segment of both ends aria-invalid", async () => {
+    render(<Stay validationMode="blur" />)
+    const user = userEvent.setup()
+    await user.click(spin("month Start date Stay"))
+    await user.keyboard("10162026")
+    await user.keyboard("10142026")
+    await user.tab()
+    await waitFor(() => expect(spin("day End date Stay").getAttribute("aria-invalid")).toBe("true"))
+    expect(spin("day Start date Stay").getAttribute("aria-invalid")).toBe("true")
+  })
+
+  it("select all + Backspace in a partial end clears the other end too", async () => {
+    render(<Stay />)
+    const user = userEvent.setup()
+    await user.click(spin("month Start date Stay"))
+    await user.keyboard("10142026")
+    // The end is partial: its own value stays null when cleared.
+    await user.keyboard("10")
+    expect(document.activeElement).toBe(spin("day End date Stay"))
+    expect(spin("year Start date Stay").getAttribute("aria-valuenow")).toBe("2026")
+    const mod = domEnvironment().platform.mac ? "Meta" : "Control"
+    await user.keyboard(`{${mod}>}a{/${mod}}{Backspace}`)
+    await waitFor(() =>
+      expect(spin("year Start date Stay").getAttribute("aria-valuenow")).toBeNull(),
+    )
+>>>>>>> date-field-range
   })
 
   it("Backspace in one segment of the start leaves the end alone (bits-ui#1348)", async () => {

@@ -359,8 +359,11 @@ segment's value and keep focus on the segment of the same type and end.
 The contract fragment SHALL ship invariants checked after every model step: the public value equals the value derived
 from the two ends' committed values; no step changed a segment of an end other than the one edited, cleared or
 adopted; exactly two hidden inputs exist, neither ever focused; each hidden input's value equals the oracle's end
-ISO string only when the value is a range, else `""`; every `aria-labelledby`/`aria-describedby` id resolves; exactly one
-Field registration; `onValueChange` was called exactly as often as the derived value changed.
+ISO string only when the value is a range, else `""`; every `aria-labelledby`/`aria-describedby` id resolves (the generic IDREF invariant); exactly one
+Field registration (a second one logs the Field's second-control warning, which fails the jsdom suite);
+`onValueChange` was called exactly as often as the derived value changed (a step invariant of
+`@rind-ui/testing`, `dateRangeStepInvariants`). The untouched-end invariant reads each end against
+the dates the model typed into it (`dateRangeArgs`) and the instance's initial value.
 
 #### Scenario: Broken coordinator pushes the start back
 

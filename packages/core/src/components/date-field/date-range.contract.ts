@@ -21,7 +21,18 @@ type E = Env<P>
 type Edge = "start" | "end"
 
 /** The ISO values a model step types into each end (set by a model test). */
+<<<<<<< HEAD
 export const dateRangeArgs: { current: { readonly start: string; readonly end: string } } = {
+=======
+export const dateRangeArgs: {
+  current: {
+    readonly start: string
+    readonly end: string
+    /** The ends the instance was rendered with (ISO), when it has a default value. */
+    readonly initial?: { readonly start: string; readonly end: string }
+  }
+} = {
+>>>>>>> date-field-range
   current: { start: "2026-10-14", end: "2026-10-16" },
 }
 
@@ -55,9 +66,70 @@ const hiddenValue = async (env: E, edge: Edge) => {
   return ""
 }
 
+<<<<<<< HEAD
 /** Pair invariants (spec "Range Mode — Pair Invariants") read from the page. */
 export const dateRangeInvariants: readonly Invariant<P, string>[] = [
   {
+=======
+/** An end's shown date as ISO (Gregorian day segments), "" while any segment is empty. */
+async function shownIso(env: E, edge: Edge): Promise<string | null> {
+  const n: Partial<Record<DateSegmentType, number>> = {}
+  for (const { type, part } of await editable(env, edge)) {
+    const v = await part.attr("aria-valuenow")
+    if (v === null) return ""
+    n[type] = Number(v)
+  }
+  // Only Gregorian dates are read back (an era or a time segment: not checked).
+  if (Object.keys(n).some((t) => t !== "year" && t !== "month" && t !== "day")) return null
+  const pad = (x: number | undefined, w: number) => String(x ?? 0).padStart(w, "0")
+  return `${pad(n.year, 4)}-${pad(n.month, 2)}-${pad(n.day, 2)}`
+}
+
+/** Pair invariants (spec "Range Mode — Pair Invariants") read from the page. */
+export const dateRangeInvariants: readonly Invariant<P, string>[] = [
+  {
+    // The model's actions type `dateRangeArgs.current[edge]` into that end only: an end
+    // shows either nothing or its own argument, never the other end's or a rewritten date.
+    name: "date-range-other-end-untouched",
+    check: async ({ env }) => {
+      for (const edge of ["start", "end"] as const) {
+        const shown = await shownIso(env, edge)
+        const typed = dateRangeArgs.current[edge]
+        const initial = dateRangeArgs.current.initial?.[edge]
+        if (shown !== null && shown !== "" && shown !== typed && shown !== initial) {
+          return `the ${edge} shows ${shown}, but only ${typed} was typed into it`
+        }
+      }
+      return undefined
+    },
+  },
+  {
+    // The public value (the hidden inputs) is the one derived from the two shown ends.
+    name: "date-range-value-is-derived",
+    check: async ({ env, props }) => {
+      const [s, e] = [await shownIso(env, "start"), await shownIso(env, "end")]
+      if (s === null || e === null) return undefined
+      // Unavailable dates and a required pair are the coordinator's own tests.
+      if (props["isDateUnavailable"]) return undefined
+      const valid = s !== "" && e !== "" && s <= e
+      const want = valid ? { start: s, end: e } : { start: "", end: "" }
+      const have = { start: await hiddenValue(env, "start"), end: await hiddenValue(env, "end") }
+      return have.start === want.start && have.end === want.end
+        ? undefined
+        : `hidden inputs ${JSON.stringify(have)}, derived ${JSON.stringify(want)}`
+    },
+  },
+  {
+    name: "date-range-hidden-never-focused",
+    check: async ({ env }) => {
+      for (const h of await env.part("hidden-input").all()) {
+        if (await h.isFocused()) return "a hidden input has focus"
+      }
+      return undefined
+    },
+  },
+  {
+>>>>>>> date-field-range
     name: "date-range-two-hidden-inputs",
     check: async ({ env }) => {
       const n = (await env.part("hidden-input").all()).length

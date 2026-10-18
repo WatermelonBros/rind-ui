@@ -270,6 +270,9 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 | add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 | add-menubar | 8.2 (deferred) | VO + Safari macOS: VO+Space opens on the first item, VO cursor order along the bar, focus stays in the bar on open; NVDA + Firefox / Chrome; JAWS + Chrome; VO iOS and TalkBack; whether keyboard switching should keep focus on the bar item (design Risks) |
+| date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
+| date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
+| date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 
 ## Resolved
 
