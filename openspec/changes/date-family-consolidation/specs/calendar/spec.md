@@ -530,8 +530,9 @@ the period.
 #### Scenario: Range across pages (zag#2556)
 
 - **WHEN** in the month view the value is October 2026 – April 2027 and 2027 is shown
-- **THEN** January to April carry `data-in-range`, April carries `data-range-end`, and paging back
-  to 2026 shows October as `data-range-start`
+- **THEN** January to April carry `data-in-range`, April carries `data-range-end`, and the months
+  before and after carry neither; paging back to 2026 shows October as `data-range-start` and
+  November and December as `data-in-range`
 
 #### Scenario: Controlled focus does not steal focus (react-spectrum#9427)
 
