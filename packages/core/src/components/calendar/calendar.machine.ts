@@ -86,12 +86,11 @@ export type CalendarEvent =
   | { readonly type: "DRAG.START"; readonly date: CalendarDate; readonly modality: Modality }
   /** The dragging pointer moved onto another date: the preview follows. */
   | { readonly type: "DRAG.MOVE"; readonly date: CalendarDate }
-  /** Released: `date` is the last date moved onto (null: none, the press stays an anchor). */
-  | {
-      readonly type: "DRAG.END"
-      readonly date: CalendarDate | null
-      readonly modality: Modality
-    }
+  /**
+   * Released: the preview's end (`hovered`) commits. `moved: false` (no real pointer movement
+   * onto another cell, so the calendar moved under a still pointer) is a click: the anchor stays.
+   */
+  | { readonly type: "DRAG.END"; readonly moved: boolean; readonly modality: Modality }
   /** The browser took the pointer (pointercancel, a hidden page): the range in progress goes. */
   | { readonly type: "DRAG.CANCEL" }
   /** The heading button: one view up (days → months → years). */
@@ -426,6 +425,18 @@ export const calendarMachine = setup({
       canStartDrag(args.event.date, args.props, anchorOf(args), viewOf(args)),
     dragging: ({ context }) => context.dragging,
     notDragging: ({ context }) => !context.dragging,
+    // While dragging, the preview only reaches the anchor or a valid end for it: never across
+    // an unavailable day, never past the length bounds.
+    hoverAllowed: (args) => {
+      const e = args.event
+      if (e.type !== "DRAG.MOVE" && e.type !== "CELL.HOVER") return false
+      if (!args.context.dragging) return e.type === "CELL.HOVER"
+      const anchor = anchorOf(args)
+      return (
+        anchor !== null &&
+        (isSameDay(e.date, anchor) || isSelectable(e.date, args.props, anchor, viewOf(args)))
+      )
+    },
     // A press (pointer, touch, or a key on the focused trigger) has moved focus to the
     // trigger; a screen reader's click (virtual) has not, so the grid keeps focus and
     // repairs it after paging.
@@ -532,7 +543,7 @@ export const calendarMachine = setup({
       if (below) showView(args, below, toCalendar(args.values.focusedValue, args.props.calendar))
     },
     setHovered: ({ event, set }) => {
-      if (event.type === "CELL.HOVER") set("hovered", event.date)
+      if (event.type === "CELL.HOVER" || event.type === "DRAG.MOVE") set("hovered", event.date)
     },
     clearHovered: ({ set }) => set("hovered", null),
     /** The press sets the anchor; the preview starts on it. */
@@ -542,16 +553,13 @@ export const calendarMachine = setup({
       args.set("hovered", args.event.date)
       rangeStep(args, args.event.date)
     },
-    dragMove: ({ event, set }) => {
-      if (event.type === "DRAG.MOVE") set("hovered", event.date)
-    },
     /** A release on another valid end commits; on the anchor (or nowhere new) it stays. */
     dragEnd: (args) => {
       if (args.event.type !== "DRAG.END") return
       args.set("dragging", false)
-      const date = args.event.date
+      const date = args.context.hovered
       const anchor = anchorOf(args)
-      if (date === null || anchor === null || isSameDay(date, anchor)) return
+      if (!args.event.moved || date === null || anchor === null || isSameDay(date, anchor)) return
       if (isSelectable(date, args.props, anchor, viewOf(args))) select(args, date)
     },
     /** Escape, a parent's value, or leaving with "reset": the range in progress is dropped. */
@@ -634,10 +642,10 @@ export const calendarMachine = setup({
     value: { event: "VALUE.SYNC", equal: (a, b) => sameDays(a ?? null, b ?? null) },
   },
   on: {
-    "CELL.HOVER": { actions: ["setHovered"] },
+    "CELL.HOVER": { guard: "hoverAllowed", actions: ["setHovered"] },
     // A drag out of the grid keeps the last date (spec "Drag Selection").
     "GRID.HOVER_END": { guard: "notDragging", actions: ["clearHovered"] },
-    "DRAG.MOVE": { guard: "dragging", actions: ["dragMove"] },
+    "DRAG.MOVE": { guard: "hoverAllowed", actions: ["setHovered"] },
     "DRAG.END": { guard: "dragging", actions: ["dragEnd"] },
     "DRAG.CANCEL": { guard: "dragging", actions: ["clearAnchor"] },
     "FOCUS.SYNC": { actions: ["syncFocus"] },

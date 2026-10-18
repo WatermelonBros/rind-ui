@@ -218,4 +218,58 @@ describe("Calendar drag selection", () => {
     await act(() => cell("2026-10-14").click())
     expect(await cal().range()).toEqual({ start: "2026-10-10", end: "2026-10-14" })
   })
+
+  it("minRangeLength 3: 10, 12, back to 10, release keeps the anchor", async () => {
+    const onValueChange = vi.fn()
+    const { cal } = setup({ minRangeLength: 3, onValueChange })
+    await pointer("pointerdown", centre("2026-10-10"))
+    await pointer("pointermove", centre("2026-10-12"))
+    await pointer("pointermove", centre("2026-10-10"))
+    await pointer("pointerup", centre("2026-10-10"))
+    expect(await cal().anchor()).toBe("2026-10-10")
+    expect(await cal().range()).toBeNull()
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("A pointercancel mid-drag drops it: no anchor, no data-dragging, no change", async () => {
+    const onValueChange = vi.fn()
+    const { cal } = setup({ onValueChange })
+    await pointer("pointerdown", centre("2026-10-10"))
+    await pointer("pointermove", centre("2026-10-12"))
+    await pointer("pointercancel", centre("2026-10-12"))
+    expect(await cal().isAnchored()).toBe(false)
+    expect(root().hasAttribute("data-dragging")).toBe(false)
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("RTL: a drag from 10 to 14 commits 10-14", async () => {
+    const { cal } = setup({ dir: "rtl" })
+    await cal().dragRange("2026-10-10", "2026-10-14")
+    expect(await cal().range()).toEqual({ start: "2026-10-10", end: "2026-10-14" })
+  })
+
+  it("maxRangeLength during a drag: the preview stops at the last allowed day", async () => {
+    const { cal } = setup({ maxRangeLength: 3 })
+    await pointer("pointerdown", centre("2026-10-10"))
+    await pointer("pointermove", centre("2026-10-12"))
+    await pointer("pointermove", centre("2026-10-16"))
+    expect(has("2026-10-12", "data-preview-end")).toBe(true)
+    expect(has("2026-10-16", "data-preview")).toBe(false)
+    await pointer("pointerup", centre("2026-10-16"))
+    expect(await cal().range()).toEqual({ start: "2026-10-10", end: "2026-10-12" })
+  })
+
+  it("While dragging the cells' text is not selectable", async () => {
+    setup()
+    await pointer("pointerdown", centre("2026-10-10"))
+    expect(getComputedStyle(cell("2026-10-11")).userSelect).toBe("none")
+    await pointer("pointerup", centre("2026-10-10"))
+    expect(getComputedStyle(cell("2026-10-11")).userSelect).not.toBe("none")
+  })
+
+  it("Touch with dragDelay 300: the driver holds until the drag starts", async () => {
+    const { cal } = setup({ dragDelay: 300 })
+    await cal("touch").dragRange("2026-10-10", "2026-10-13")
+    expect(await cal().range()).toEqual({ start: "2026-10-10", end: "2026-10-13" })
+  })
 })

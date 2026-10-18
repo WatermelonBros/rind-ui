@@ -17,7 +17,9 @@ export type CellDragMessage<K> =
   | { readonly type: "end"; readonly key: K | null; readonly pointerType: DragPointer }
   | { readonly type: "cancel" }
 
+/** How a cell drag finds cells and reports to its owner. */
 export interface CellDragOptions<K> {
+  /** The scheduler (touch delay), the modality (an AT pointer never drags) and the platform. */
   readonly env: SchedulerEnv & ModalityEnv & PlatformInfo
   /** The draggable cell's key at an element, or null (the last cell is kept). */
   readonly keyAt: (el: Element | null) => K | null
@@ -25,6 +27,7 @@ export interface CellDragOptions<K> {
   readonly canStart: (key: K) => boolean
   /** Touch: how long (ms) a touch is held still before it drags (read at press time). */
   readonly delay: () => number
+  /** Receives every start, move, end and cancel of the gesture. */
   readonly send: (m: CellDragMessage<K>) => void
   /** Keys equal (default `===`). */
   readonly equal?: (a: K, b: K) => boolean
@@ -47,6 +50,7 @@ export interface CellDragPointerEvent {
   readonly altKey: boolean
 }
 
+/** One drag controller per grid: a gesture at a time. */
 export interface CellDrag {
   /** The surface's `pointerdown` (it contains every cell). */
   pointerDown(surface: Element, e: CellDragPointerEvent): void
@@ -54,9 +58,11 @@ export interface CellDrag {
   consumes(press: { readonly pointerType: string }): boolean
   /** While dragging, a touch does not scroll the page: a non-passive `touchmove` on `surface`. */
   attach(surface: Element): () => void
+  /** Stops tracking a gesture in progress (no message sent). */
   dispose(): void
 }
 
+/** Creates the controller; it listens to the document only while a gesture is held. */
 export function createCellDrag<K>(o: CellDragOptions<K>): CellDrag {
   const equal = o.equal ?? ((a: K, b: K) => a === b)
   let stop: (() => void) | null = null

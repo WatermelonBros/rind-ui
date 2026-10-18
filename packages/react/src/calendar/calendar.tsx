@@ -13,7 +13,7 @@ import {
   calendarKey,
   calendarMachine,
   calendarMessages,
-  createCellDrag,
+  createCalendarDrag,
   type DateValue,
   type DayOfWeek,
   describeKey,
@@ -25,7 +25,6 @@ import {
   type Modality,
   type MonthGrid,
   monthGrid,
-  parseDate,
   resolveCalendar,
   today as todayOf,
   todayZone,
@@ -464,36 +463,14 @@ function useCellDrag(
   const latest = useRef({ env, instance, calendar, dragDelay, send })
   latest.current = { env, instance, calendar, dragDelay, send }
   const [handle] = useState(() =>
-    createCellDrag<CalendarDate>({
+    createCalendarDrag({
       get env() {
         return latest.current.env
       },
-      // An enabled in-month cell of this Calendar, as a date in its display calendar.
-      keyAt: (el) => {
-        const cell = el?.closest?.('[data-scope="calendar"][data-part="cell"]')
-        const iso = cell?.getAttribute("data-value")
-        if (
-          !cell ||
-          !iso ||
-          cell.getAttribute("data-instance") !== latest.current.instance ||
-          cell.hasAttribute("data-disabled")
-        )
-          return null
-        return display(parseDate(iso), latest.current.calendar)
-      },
+      target: () => latest.current,
       canStart: (date) => canStart.current(date),
       delay: () => latest.current.dragDelay,
-      equal: (a, b) => a.compare(b) === 0,
-      send: (m) => {
-        const s = latest.current.send
-        const modality = (p: string): Modality => (p === "touch" ? "touch" : "pointer")
-        if (m.type === "start")
-          s({ type: "DRAG.START", date: m.key, modality: modality(m.pointerType) })
-        else if (m.type === "move") s({ type: "DRAG.MOVE", date: m.key })
-        else if (m.type === "end")
-          s({ type: "DRAG.END", date: m.key, modality: modality(m.pointerType) })
-        else s({ type: "DRAG.CANCEL" })
-      },
+      send: (e) => latest.current.send(e),
     }),
   )
   useEffect(() => () => handle.dispose(), [handle])

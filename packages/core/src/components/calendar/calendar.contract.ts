@@ -246,9 +246,13 @@ async function keyRange(env: E, start: string, end: string) {
 
 const CENTRE = { x: 0.5, y: 0.5 }
 
+/** Touch hold steps (ms of the environment's time) until the drag starts, whatever `dragDelay`. */
+const HOLD_STEP = 50
+const HOLD_STEPS = 200
+
 /**
- * A press on `start`, a move onto `end`, a release there (both visible). A touch is held until
- * the drag starts (`dragDelay`: the environment's time, then the root's `data-dragging`).
+ * A press on `start`, a move onto `end`, a release there (both visible). A touch is held,
+ * stepping the environment's time, until the root carries `data-dragging` (any `dragDelay`).
  */
 async function dragBetween(env: E, start: string, end: string, pointerType: "mouse" | "touch") {
   await pageTo(env, start)
@@ -257,11 +261,11 @@ async function dragBetween(env: E, start: string, end: string, pointerType: "mou
   if (!from || !to) throw new Error(`calendar: ${start} and ${end} must both be visible to drag`)
   await from.pointer("down", { at: CENTRE, pointerType })
   if (pointerType === "touch") {
-    await env.advance(200)
-    await env.until(
-      () => env.part("root").attr("data-dragging"),
-      (v) => v !== null,
-    )
+    const root = env.part("root")
+    for (let i = 0; i < HOLD_STEPS && (await root.attr("data-dragging")) === null; i++)
+      await env.advance(HOLD_STEP)
+    if ((await root.attr("data-dragging")) === null)
+      throw new Error("calendar: a held touch never started a drag")
   }
   await to.pointer("move", { at: CENTRE, pointerType })
   await to.pointer("up", { at: CENTRE, pointerType })

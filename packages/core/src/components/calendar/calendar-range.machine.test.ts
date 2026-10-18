@@ -226,8 +226,7 @@ describe("drag selection (spec Drag Selection)", () => {
   const start = (m: M, date: CalendarDate) =>
     m.s.send({ type: "DRAG.START", date, modality: "pointer" })
   const move = (m: M, date: CalendarDate) => m.s.send({ type: "DRAG.MOVE", date })
-  const end = (m: M, date: CalendarDate | null) =>
-    m.s.send({ type: "DRAG.END", date, modality: "pointer" })
+  const end = (m: M, moved = true) => m.s.send({ type: "DRAG.END", moved, modality: "pointer" })
   const dragging = (m: M) => m.s.view().context.dragging
 
   it("mouse drag: press anchors, moves preview, release commits once", () => {
@@ -237,7 +236,7 @@ describe("drag selection (spec Drag Selection)", () => {
     expect(dragging(m)).toBe(true)
     for (const day of [11, 12, 13, 14]) move(m, d(10, day))
     expect(m.s.view().context.hovered?.toString()).toBe("2026-10-14")
-    end(m, d(10, 14))
+    end(m)
     expect(m.range()).toBe("2026-10-10..2026-10-14")
     expect(m.onValueChange).toHaveBeenCalledTimes(1)
     expect(dragging(m)).toBe(false)
@@ -249,7 +248,7 @@ describe("drag selection (spec Drag Selection)", () => {
   it("a release on the anchor, or with no move, keeps the anchor (a click)", () => {
     const m = make()
     start(m, d(10, 10))
-    end(m, null)
+    end(m, false)
     expect(m.anchor()).toBe("2026-10-10")
     expect(m.onValueChange).not.toHaveBeenCalled()
     m.press(d(10, 12))
@@ -270,12 +269,34 @@ describe("drag selection (spec Drag Selection)", () => {
     expect(r.anchor()).toBeNull()
   })
 
-  it("a release on an end the rules refuse keeps the anchor", () => {
+  it("a move onto an end the rules refuse keeps the preview; the release commits it", () => {
     const m = make({ maxRangeLength: 3 })
     start(m, d(10, 10))
-    end(m, d(10, 20))
+    move(m, d(10, 12))
+    move(m, d(10, 20))
+    expect(m.s.view().context.hovered?.toString()).toBe("2026-10-12")
+    end(m)
+    expect(m.range()).toBe("2026-10-10..2026-10-12")
+  })
+
+  it("the preview never crosses an unavailable day", () => {
+    const m = make({ isDateUnavailable: (date) => date.day === 15 })
+    start(m, d(10, 10))
+    move(m, d(10, 14))
+    move(m, d(10, 16))
+    m.s.send({ type: "CELL.HOVER", date: d(10, 18) })
+    expect(m.s.view().context.hovered?.toString()).toBe("2026-10-14")
+  })
+
+  it("minRangeLength 3: 10, 12, back to 10, release keeps the anchor", () => {
+    const m = make({ minRangeLength: 3 })
+    start(m, d(10, 10))
+    move(m, d(10, 12))
+    move(m, d(10, 10))
+    end(m)
     expect(m.anchor()).toBe("2026-10-10")
     expect(m.range()).toBeNull()
+    expect(m.onValueChange).not.toHaveBeenCalled()
   })
 
   it("Escape and a cancel drop the drag; a later release does nothing", () => {
@@ -284,7 +305,7 @@ describe("drag selection (spec Drag Selection)", () => {
     move(m, d(10, 12))
     m.s.send({ type: "CANCEL" })
     expect(m.anchor()).toBeNull()
-    end(m, d(10, 12))
+    end(m)
     expect(m.range()).toBeNull()
     start(m, d(10, 10))
     m.s.send({ type: "DRAG.CANCEL" })

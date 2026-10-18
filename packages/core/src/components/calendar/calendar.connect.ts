@@ -399,6 +399,10 @@ export function calendarConnect(input: CalendarConnectInput) {
         "data-preview-end": dataFlag(
           ranged && preview !== null && inPreview && isSameDay(date, preview.end),
         ),
+        // A drag never selects the days' text (headless: no stylesheet needed).
+        ...(isRange && input.dragging
+          ? { style: { "user-select": "none", "-webkit-user-select": "none" } }
+          : {}),
         children: text,
       }
     },
