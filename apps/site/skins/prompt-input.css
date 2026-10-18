@@ -48,7 +48,7 @@
   order: 10;
   margin: 2px 0 0;
   font-size: 13px;
-  opacity: 0.72;
+  opacity: 0.86;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="textarea"] {
   box-sizing: border-box;

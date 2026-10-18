@@ -28,7 +28,10 @@ restating:
 
 ## Decisions
 
-### 1. Machine (`core/ai/prompt-input/prompt-input.machine.ts`)
+### 1. Machine (`core/components/prompt-input/prompt-input.machine.ts`)
+
+The folder is `components/`, not `ai/` (decision 0002's sketch): the docs generator and the
+site read every `<scope>.meta.ts` from `components/`.
 
 ```
           COMPOSITION.START                    SUBMIT [submittable]

@@ -312,6 +312,9 @@ const TRANSIENT = new Set([
   "number-input:pressing",
   "number-input:spinning",
   "pin-input:composing",
+  // An IME composition in the draft; a stop that lasts until the status reports idle.
+  "prompt-input:composing",
+  "prompt-input:stopped",
   // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
   "tags-input:typing",
   "tags-input:editing",

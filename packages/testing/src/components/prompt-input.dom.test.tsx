@@ -177,6 +177,20 @@ describe("Prompt Input", () => {
     expect(await pi().canSubmit()).toBe(true)
   })
 
+  it.skipIf(typeof DataTransfer !== "function")(
+    "the form's data carries the text and the attached files",
+    async () => {
+      const onSubmit = vi.fn()
+      render(<Prompt onSubmit={onSubmit} />)
+      await pi().attach([spec("report.pdf", "application/pdf")])
+      await pi().fill("Summarise this")
+      await pi({ modality: "keyboard" }).submit()
+      const data = onSubmit.mock.calls[0]?.[1].formData as FormData
+      expect(data.get("message")).toBe("Summarise this")
+      expect(data.getAll("files").map((f) => (f as File).name)).toEqual(["report.pdf"])
+    },
+  )
+
   it("accept with an extension; a mixed selection reports the refused file (ai-elements#501, #511)", async () => {
     const onReject = vi.fn()
     render(<Prompt accept=".xlsx" onReject={onReject} />)

@@ -9,15 +9,14 @@ announcements for what it changes.
 
 ### Requirement: Anatomy
 
-A Prompt Input SHALL consist of a Root (`<form>`) that renders one visually hidden
-`<input type="file">`, an optional Label, an optional Description, exactly one Textarea
-(`<textarea>`), exactly one Submit (`<button>`), and the optional parts AttachTrigger
-(`<button>`), Attachments, Attachment and AttachmentRemove (the `input-chips` Chips, Chip
-and ChipRemove with scope `prompt-input`) and CharacterCount (`<span>`). The Root SHALL act
-as a Field for its Label, Description and the Textarea (`use-field-host`, scope
-`prompt-input`), or join an enclosing Field. Each part SHALL render one element and accept
-`render` to substitute it. Rendering no Textarea, two Textareas, or no Submit SHALL be a
-development error.
+A Prompt Input SHALL consist of a Root (`<form>`) that renders two `hidden`
+`<input type="file">` (the chooser AttachTrigger opens, and the carrier of the attached files),
+an optional Label (`<label for>` the Textarea), an optional Description (in the Textarea's
+`aria-describedby`), exactly one Textarea (`<textarea>`), exactly one Submit (`<button>`), and
+the optional parts AttachTrigger (`<button>`), Attachments, Attachment, AttachmentName and
+AttachmentRemove (the `input-chips` Chips, Chip, chip text and ChipRemove with scope
+`prompt-input`) and CharacterCount (`<span>`). Each part SHALL render one element and accept
+`render` to substitute it.
 
 #### Scenario: Minimal prompt input
 
@@ -35,8 +34,8 @@ development error.
 The Root SHALL be a native `<form>`. Submitting SHALL go through native form submission
 (`requestSubmit(submitter)` for keys), so `submit` listeners, constraint validation and
 `FormData` behave as for any form. The Textarea SHALL carry the consumer's `name` (default
-`"message"`), and the hidden file input SHALL hold the attachments that have a `File`
-(assigned through a `DataTransfer`), with the consumer's `filesName` (default `"files"`), so
+`"message"`), and the carrier file input SHALL hold the attachments that have a `File`
+(assigned through a `DataTransfer` where the engine has one), with the consumer's `filesName` (default `"files"`), so
 `new FormData(form)` contains the text and the files. When the consumer gives `onSubmit`,
 the Root SHALL prevent the native navigation; when it gives a form `action` instead (React
 form actions), the native submission SHALL proceed.
@@ -72,24 +71,16 @@ plain Enter submits and `"enter"` otherwise, unless the consumer sets it.
 ### Requirement: Draft Value
 
 The draft SHALL be a controllable `value` (`value` / `defaultValue` /
-`onValueChange(value, details)`), where `details.reason` is `INPUT`, `SUBMIT` (cleared on
-send), `RESTORE` (put back after a failed send), `HISTORY` (recalled) or `RESET`, and
-`details.isComposing` tells whether a composition is in progress. `onValueChange` SHALL be
-called for every `input` event, composing or not. Uncontrolled, the DOM SHALL own the value;
-the component SHALL write it only to clear, restore or recall, never while composing, and
-through an editing command (`setRangeText` or `insertText`) so the user can undo it where
-the platform keeps an undo stack.
+`onValueChange(value, details)`), where `details.reason` is `input`, `submit` (cleared on
+send), `restore` (put back after a failed send), `history` (recalled) or `api`
+(`usePromptInput().setValue`). `onValueChange` SHALL be called for every `input` event,
+composing or not. The Textarea SHALL render the machine's draft; the component SHALL change
+it only to clear, restore or recall, never while composing.
 
 #### Scenario: Controlled draft
 
 - **WHEN** a controlled Prompt Input holding "hi" is sent
-- **THEN** `onValueChange` is called with `""` and reason `SUBMIT`
-
-#### Scenario: Undo a recall
-
-- **WHEN** a user recalls a previous prompt with ArrowUp in an uncontrolled Prompt Input and
-  presses Mod+Z
-- **THEN** the draft is empty again
+- **THEN** `onValueChange` is called with `""` and reason `submit`
 
 ### Requirement: IME Composition
 
@@ -195,8 +186,9 @@ SDK's `ready`/`submitted`/`streaming`/`error` map one to one) and through the pr
   `streaming` or `stopped`;
 - `status` `"error"`, a rejected promise or a synchronous throw SHALL run the failure path
   (Requirement: Failed Send) and return to `idle`;
-- when `onSubmit` returns no promise and `status` is not given or is still `"idle"` after
-  `onSubmit` returns, the machine SHALL return to `idle` at once.
+- when `onSubmit` returns no promise and `status` is not given, the machine SHALL return to
+  `idle` at once; with `status` given, it SHALL wait for `status` to change (a consumer that
+  passes `status` drives the lifecycle).
 
 A status change SHALL never move focus. The initial state SHALL follow the initial `status`
 (`idle` when absent).
@@ -228,7 +220,7 @@ A status change SHALL never move focus. The initial state SHALL follow the initi
 A submit SHALL call `onSubmit(message, details)` exactly once, where `message` is `{ text,
 attachments }` — the draft and the attachment list as they were at submit time —, and
 `details` holds the native `submit` event and the `FormData`. In the same transition the
-Prompt Input SHALL clear the draft (reason `SUBMIT`) and the attachments (reason `SUBMIT`),
+Prompt Input SHALL clear the draft (reason `submit`) and the attachments (reason `submit`),
 so text typed or files added while the request is pending belong to the next prompt and are
 never cleared later. Text and attachments SHALL be one message, never two calls.
 
@@ -252,8 +244,8 @@ never cleared later. Text and attachments SHALL be one message, never two calls.
 
 When a send fails while `submitting` (Requirement: Lifecycle States), the Prompt Input SHALL
 announce `sendFailedAnnouncement` assertively and, if the draft is still empty and there
-are no attachments, restore the submitted text (reason `RESTORE`) and attachments (reason
-`RESTORE`); otherwise it SHALL keep the new draft. A failure while `streaming` SHALL only
+are no attachments, restore the submitted text (reason `restore`) and attachments (reason
+`restore`); otherwise it SHALL keep the new draft. A failure while `streaming` SHALL only
 announce. A synchronous throw from `onSubmit` SHALL be rethrown after the failure path.
 
 #### Scenario: Attachments survive a failed send (vercel/ai-elements#126)
@@ -315,8 +307,8 @@ SHALL NOT move focus.
 ### Requirement: Attachments
 
 Attachments SHALL be a controllable list (`attachments` / `defaultAttachments` /
-`onAttachmentsChange(list, details)`, `details.reason` `ADD`, `REMOVE`, `SUBMIT`,
-`RESTORE`) of `PromptAttachment` items `{ id, name, file?, type?, size?, pending?,
+`onAttachmentsChange(list, details)`, `details.reason` `add`, `remove`, `submit`,
+`restore`) of `PromptAttachment` items `{ id, name, file?, type?, size?, pending?,
 disabled? }`, generic over consumer fields. They SHALL be rendered with `input-chips`
 (Attachments = Chips, `role="toolbar"`, labelled by `attachmentsLabel`; Attachment = Chip,
 named by the attachment's `name`; AttachmentRemove = ChipRemove, named
@@ -339,7 +331,7 @@ inert data: an Attachment has no activation of its own, so it is not announced a
 ### Requirement: Adding Files
 
 Files SHALL be added through three paths, each producing one `onAttachmentsChange` call
-(reason `ADD`) per gesture with every accepted file:
+(reason `add`) per gesture with every accepted file:
 
 - **AttachTrigger**: a `button` named `attachLabel` that opens the native file chooser of the
   hidden file input (`accept` and `multiple` from the Root); after each pick the input's
@@ -400,16 +392,17 @@ when other files of the same gesture were accepted.
 
 An attachment SHALL be removed by AttachmentRemove, by Backspace or Delete on its chip, or by
 Backspace on an empty draft (armed first), each through one `onAttachmentsChange` call
-(reason `REMOVE`) by `id`; a second request for an id already removed SHALL do nothing. Focus
-SHALL follow `input-chips` (next chip, else previous, else the Textarea) and the removal
+(reason `remove`) by `id`; a second request for an id already removed SHALL do nothing. Focus
+SHALL follow `input-chips` (a key on a chip: the next chip, else the previous, else the
+Textarea; a press on AttachmentRemove: the Textarea) and the removal
 SHALL be announced (`removedAnnouncement(name)`). A `disabled` attachment SHALL not be
 removable by the user.
 
 #### Scenario: Remove by button
 
 - **WHEN** a user presses "Remove q1.pdf" with "q1.pdf" and "q2.pdf" attached
-- **THEN** one `onAttachmentsChange` call removes "q1.pdf", focus is on "q2.pdf" and "q1.pdf
-  removed" is announced
+- **THEN** one `onAttachmentsChange` call removes "q1.pdf", focus is in the Textarea and
+  "q1.pdf removed" is announced
 
 #### Scenario: Removed twice (assistant-ui/assistant-ui#8360)
 
@@ -455,9 +448,9 @@ limit SHALL be the native `maxLength`, forwarded.
 
 When the consumer gives `history` (past prompts, newest last), ArrowUp in the Textarea with
 an empty draft and the caret at the start SHALL replace the draft with the newest entry
-(reason `HISTORY`), and further ArrowUp presses, with the caret at the start, SHALL step to
-older entries. ArrowDown with the caret at the end SHALL step to newer entries and, past the
-newest, restore the draft the user had before recalling. Recall SHALL be ignored with any
+(reason `history`), and, while the draft is an unchanged recalled entry, further ArrowUp
+presses SHALL step to older entries and ArrowDown to newer ones (wherever the caret is), and,
+past the newest, restore the draft the user had before recalling. Recall SHALL be ignored with any
 modifier, while composing, when the key's default was prevented, when the Textarea has
 `aria-expanded="true"` (a Mentions popup), and with a non-empty draft that is not a recalled
 entry. Without `history` the arrows SHALL be native.
@@ -547,7 +540,7 @@ The Prompt Input SHALL expose the seams later components use, without depending 
 - a Textarea whose role may become `combobox` (with `aria-expanded`, `aria-controls`,
   `aria-activedescendant` set by the composing component) with every Prompt Input behaviour
   unchanged;
-- an API from the machine (`setValue(text, reason)`, `insertText(text)` at the caret,
+- an API (`usePromptInput()`: `setValue(text)`, `insertText(text)` at the caret,
   `submit()`, `focus()`) that Suggestions calls to fill or send a prompt, going through the
   same guard and announcements as the user's actions.
 
@@ -590,22 +583,19 @@ fragment, and declare:
 - actions: `type(text)`; `fill(text)`; `compose(text, committed)` (pointer: none,
   "composition is keyboard input"); `submit` (keyboard: Enter, or Mod+Enter in
   `"mod+enter"` mode; pointer: press Submit); `stop` (pointer: press Submit; keyboard: focus
-  Submit and press Enter); `attach(files)` (pointer: AttachTrigger and the file chooser;
-  keyboard: focus AttachTrigger, Enter, file chooser); `paste(files | text)`; `drop(files)`
-  (keyboard twin: `attach`); `removeAttachment(name)` (the fragment's `removeChip`);
-  `recall(direction)` (ArrowUp / ArrowDown; pointer: none, "a key");
+  Submit and press Enter); `attach(files)` (pointer: the file chooser's selection, through the
+  environment's `setFiles`; keyboard: none, "the file chooser is the operating system's
+  dialog"); `paste(text)`; `removeAttachment(name)` and `removeChip(name)`;
+  `recall(direction)` (ArrowUp / ArrowDown); file paste and drop are browser scenario tests;
 - queries: `value`, `name`, `state`, `attachments` (names in order), `canSubmit`,
   `submitName`, `submitAction`, `characterCount`, `isOverLimit`, `isDisabled`,
   `isDragging`;
 - states: `idle`, `composing`, `submitting`, `streaming`, `stopped`;
-- events mapped to actions, with `$sync:status`, `$sync:value` and `$sync:attachments` prop
-  steps (the fixture's consumer drives `status`), `FOCUS`/`BLUR` `skip` ("covered by every
-  action");
-- announcements: stop, failure, add, reject, remove;
-- traits: `field-associated`.
+- events mapped to actions, with the `$props:status` prop step (the fixture's consumer
+  drives `status`), `FOCUS`/`BLUR` `skip` ("covered by every action");
+- traits: none.
 
-The postcondition of `submit` SHALL be that the fixture's `onSubmit` was called once and the
-draft is empty; of `stop`, that `onStop` was called once and `state` is `stopped` or `idle`.
+The postcondition of `stop` SHALL be that `state` is neither `submitting` nor `streaming`.
 
 #### Scenario: Same test in both environments
 
@@ -620,16 +610,16 @@ draft is empty; of `stop`, that `onStop` was called once and `state` is `stopped
 
 ### Requirement: Model-Based Coverage
 
-`testMachine` SHALL run the Prompt Input over the props classes default, `"mod+enter"`,
-touch-primary, with attachments (`accept`, `maxFiles`, `maxFileSize`), with CharacterCount,
-with `history`, and disabled, against fixtures whose `onSubmit` resolves, rejects, and drives
-`status` through `submitting` and `streaming`, in pointer, keyboard and virtual modalities,
-with axe per state.
+`testMachine` SHALL run the Prompt Input over the props classes default, with attachments,
+read-only, and status-driven (`status` walked through `submitting` and `streaming` by
+rerenders), in pointer, keyboard and virtual modalities (keyboard and pointer for the
+rerendered class), with axe per state.
 
 #### Scenario: Lifecycle across fixtures
 
-- **WHEN** the resolving, rejecting and status-driven fixtures run
-- **THEN** each reaches every state its fixture allows, and no step leaves focus on `<body>`
+- **WHEN** the status-driven class runs
+- **THEN** it reaches `submitting`, `streaming` and `stopped`, and no step leaves focus on
+  `<body>`
 
 ### Requirement: Theme
 

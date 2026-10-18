@@ -36,7 +36,7 @@ normalisation and the IME guard, press, modality, announcer, messages, invariant
   attachments as `input-chips` parts with picker, paste and drop intake, validation,
   removal and announcements, an optional character or token limit, opt-in history recall,
   parts, `data-*`, contract and driver.
-- `@rind-ui/core`: `ai/prompt-input` machine, connect, contract, messages; a small
+- `@rind-ui/core`: `components/prompt-input` machine, connect, contract, messages, meta; a small
   `core/dom/file-intake.ts` (accept matching, clipboard and drop extraction, `DataTransfer`
   sync to the file input) that File Upload will reuse.
 - `@rind-ui/react`: `PromptInput.Root`, `Label`, `Description`, `Textarea`, `Submit`,
@@ -78,7 +78,7 @@ normalisation and the IME guard, press, modality, announcer, messages, invariant
 
 ## Impact
 
-- New code: `packages/core/src/ai/prompt-input/{prompt-input.machine,prompt-input.connect,prompt-input.contract,prompt-input.messages}.ts`,
+- New code: `packages/core/src/components/prompt-input/{prompt-input.machine,prompt-input.connect,prompt-input.contract,prompt-input.messages,prompt-input.meta}.ts`,
   `packages/core/src/dom/file-intake.ts`, `packages/react/src/prompt-input/*`,
   `getPromptInput` in `@rind-ui/testing`, `packages/theme/src/prompt-input.css`,
   `apps/site/examples/prompt-input.tsx`, generated docs page.

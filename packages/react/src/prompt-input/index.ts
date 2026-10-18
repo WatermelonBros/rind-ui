@@ -1,11 +1,3 @@
-export {
-  type PromptAttachmentsReason,
-  PromptInput,
-  type PromptInputControl,
-  type PromptInputRootProps,
-  type PromptValueReason,
-  usePromptInput,
-} from "./prompt-input"
 export type {
   FileRejection,
   PromptAttachment,
@@ -15,3 +7,11 @@ export type {
   PromptSubmitDetails,
   PromptSubmitKey,
 } from "@rind-ui/core"
+export {
+  type PromptAttachmentsReason,
+  PromptInput,
+  type PromptInputControl,
+  type PromptInputRootProps,
+  type PromptValueReason,
+  usePromptInput,
+} from "./prompt-input"
