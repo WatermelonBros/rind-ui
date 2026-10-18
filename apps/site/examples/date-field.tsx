@@ -219,7 +219,7 @@ export const variants: Variants = {
   },
   UnavailableWeekends: {
     title: "Unavailable weekends",
-    description: "`isDateUnavailable` marks a Saturday invalid.",
+    description: "`isDateUnavailable` makes weekends invalid: type a Saturday.",
   },
   RequiredInForm: {
     title: "Required in a form",

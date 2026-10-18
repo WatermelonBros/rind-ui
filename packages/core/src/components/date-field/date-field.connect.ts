@@ -7,7 +7,7 @@
 import type { DateValue } from "@internationalized/date"
 import { CalendarDateTime, ZonedDateTime } from "@internationalized/date"
 import { focusAttrs } from "../../a11y/focus"
-import { type KeyDescription, toLogicalKey } from "../../a11y/keys"
+import { isMod, type KeyDescription, toLogicalKey } from "../../a11y/keys"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
@@ -55,7 +55,7 @@ export function dateFieldKey(
   o: { readonly dir: "ltr" | "rtl"; readonly platform: PlatformFlags; readonly selectAll: boolean },
 ): DateFieldEvent | "select-all" | null {
   if (k.composing) return null
-  const mod = o.platform.apple ? k.meta : k.ctrl
+  const mod = isMod(k, o.platform)
   if (mod && !k.alt && !k.shift && k.key.toLowerCase() === "a") return "select-all"
   if (k.alt || k.ctrl || k.meta) return null
   if (k.key === "Backspace" || k.key === "Delete") {

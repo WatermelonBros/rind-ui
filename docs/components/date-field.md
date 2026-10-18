@@ -89,7 +89,7 @@ Typing inside a segment never changes the value. The value changes at a commit p
 - **Clearing** a segment with Backspace or Delete, or every segment with Select All and Backspace. `CLEAR`.
 - **Form reset** restores the current `defaultValue`. `RESET`.
 
-The value is `null` until every editable segment has a value. An incomplete or impossible draft (February 31) keeps the previous value out of the form and marks the field invalid; it never invents a date. Stepping an empty segment starts from `placeholderValue`, which also sets the value's type and zone when there is no value (default: today at 00:00).
+The value is `null` until every editable segment has a value. An incomplete or impossible entry (February 31) makes the value `null` (the form submits an empty value) and the field invalid; its segments keep what was typed, and no other date is invented. Stepping an empty segment starts from `placeholderValue`, which also sets the value's type and zone when there is no value (default: today at 00:00).
 
 ## Validity
 
