@@ -43,26 +43,36 @@ import { CodeBlock } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `code` | `string` | — | Required. The source: rendered when no highlight is given, and what Copy writes. |
-| `language` | `CodeLanguage \| (string & {}) \| CodeGrammar` | — | Built-in highlighting: `ts`, `tsx`, `js`, `jsx`, `css`, `html`, `json`, `bash` (and aliases), or your own `CodeGrammar`. An unknown name renders plain. |
-| `lines` | `readonly (readonly CodeToken[])[]` | — | Escape hatch: your highlighter's tokens, one list per line (`{ text, token?, className?, style? }`), rendered as text. Wins over `language`. |
-| `html` | `TrustedCodeHtml` | — | Escape hatch: highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input. Wins over `language`. |
-| `lineNumbers` | `boolean` | `false` | Draws line numbers with a CSS counter (never in the text). |
-| `startLineNumber` | `number` | `1` | The first line's number (`data-line`, `highlightLines` and the counter follow it). |
-| `highlightLines` | `LineRanges` | — | Line numbers and inclusive ranges: `[3, [5, 7]]`. |
-| `maxLines` | `number` | — | Longer blocks start collapsed to this many lines. |
-| `wrapped` | `boolean` | — | Controlled soft wrap. |
-| `defaultWrapped` | `boolean` | `false` | Uncontrolled initial wrap. |
-| `onWrappedChange` | `(wrapped, details) => void` | — | WrapTrigger proposes the opposite value; `cancel()` vetoes it. |
-| `expanded` | `boolean` | — | Controlled expansion (with `maxLines`). |
-| `defaultExpanded` | `boolean` | — | Uncontrolled initial expansion; default: collapsed when longer than `maxLines`. |
-| `onExpandedChange` | `(expanded, details) => void` | — | CollapseTrigger proposes the opposite value. |
-| `copyFeedbackDuration` | `number` | `2000` | How long `copied` / `error` last (ms). |
-| `onCopy` | `({ ok, error? }) => void` | — | The copy's result, after the write settled. |
-| `messages` | `Partial<CodeBlockMessages>` | — | Overrides the strings (also through the provider). |
-| `render` | `element \| (props, state) => element` | — | Substitutes the rendered element without changing behaviour. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `CodeBlock.Root` | `code` | `string` | — | Required. The source: rendered when no highlight is given, and what Copy writes. |
+| `CodeBlock.Root` | `language` | `CodeLanguage \| (string & {}) \| CodeGrammar` | — | Built-in highlighting: `ts`, `tsx`, `js`, `jsx`, `css`, `html`, `json`, `bash` (and aliases), or your own `CodeGrammar`. An unknown name renders plain. |
+| `CodeBlock.Root` | `lines` | `readonly (readonly CodeToken[])[]` | — | Escape hatch: your highlighter's tokens, one list per line (`{ text, token?, className?, style? }`), rendered as text. Wins over `language`. |
+| `CodeBlock.Root` | `html` | `TrustedCodeHtml` | — | Escape hatch: highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input. Wins over `language`. |
+| `CodeBlock.Root` | `lineNumbers` | `boolean` | `false` | Draws line numbers with a CSS counter (never in the text). |
+| `CodeBlock.Root` | `startLineNumber` | `number` | `1` | The first line's number (`data-line`, `highlightLines` and the counter follow it). |
+| `CodeBlock.Root` | `highlightLines` | `LineRanges` | — | Line numbers and inclusive ranges: `[3, [5, 7]]`. |
+| `CodeBlock.Root` | `maxLines` | `number` | — | Longer blocks start collapsed to this many lines. |
+| `CodeBlock.Root` | `wrapped` | `boolean` | — | Controlled soft wrap. |
+| `CodeBlock.Root` | `defaultWrapped` | `boolean` | `false` | Uncontrolled initial wrap. |
+| `CodeBlock.Root` | `onWrappedChange` | `(wrapped, details) => void` | — | WrapTrigger proposes the opposite value; `cancel()` vetoes it. |
+| `CodeBlock.Root` | `expanded` | `boolean` | — | Controlled expansion (with `maxLines`). |
+| `CodeBlock.Root` | `defaultExpanded` | `boolean` | — | Uncontrolled initial expansion; default: collapsed when longer than `maxLines`. |
+| `CodeBlock.Root` | `onExpandedChange` | `(expanded, details) => void` | — | CollapseTrigger proposes the opposite value. |
+| `CodeBlock.Root` | `copyFeedbackDuration` | `number` | `2000` | How long `copied` / `error` last (ms). |
+| `CodeBlock.Root` | `onCopy` | `({ ok, error? }) => void` | — | The copy's result, after the write settled. |
+| `CodeBlock.Root` | `messages` | `Partial<CodeBlockMessages>` | — | Overrides the strings (also through the provider). |
+| `CodeBlock.Root` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element without changing behaviour. |
+| `CodeBlock.Root` | `locale` | `string` | — | Default: the provider's locale (the announcement's language). |
+| `CodeBlock.Header` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Title` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.CopyTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.WrapTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.CollapseTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Content` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Content` | `children` | `(line: CodeBlockLine) => ReactNode` | — | Renders each line (default `<CodeBlock.Line line={line} />`). |
+| `CodeBlock.Line` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Line` | `line` | `CodeBlockLine` | — | The line to render: one entry of the tokens from `Root` (number, text and token spans). |
 
 Every attribute of the rendered element is accepted and forwarded.
 
