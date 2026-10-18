@@ -181,3 +181,21 @@ export interface CollectionLayout {
 export interface CollectionLayoutEnv {
   readonly layout: CollectionLayout
 }
+
+// --- Clipboard (add-code-block) ---
+
+export interface ClipboardWriteOptions {
+  /**
+   * The element the copy starts from (the copy button): a fallback inserts its temporary node
+   * next to it, so the node is inside the same layer (a modal dialog) and not inert.
+   */
+  readonly near?: Element | undefined
+}
+
+/** Writes text to the system clipboard; resolves on success, rejects on failure, never throws. */
+export interface Clipboard {
+  writeText(text: string, options?: ClipboardWriteOptions): Promise<void>
+}
+export interface ClipboardEnv {
+  readonly clipboard: Clipboard
+}

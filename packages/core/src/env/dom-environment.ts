@@ -1,3 +1,4 @@
+import { domClipboard } from "../dom/clipboard"
 import { collectionLayout } from "../dom/collection-layout"
 import { type ConstraintValidity, constraintValidity } from "../dom/constraint-validity"
 import { liveAnnouncer } from "../dom/live-announcer"
@@ -8,6 +9,8 @@ import { documentLocale, fixedLocale } from "../i18n/locale"
 import type {
   Announcer,
   AnnouncerEnv,
+  Clipboard,
+  ClipboardEnv,
   ClockEnv,
   CollectionLayoutEnv,
   DateClock,
@@ -46,7 +49,8 @@ export type DomEnvironment = SchedulerEnv &
   CollectionLayoutEnv &
   RouterCapability &
   ValidityEnv &
-  VisibilityEnv
+  VisibilityEnv &
+  ClipboardEnv
 
 /** Native constraint validity, for machines that validate a form control (Field). */
 export interface ValidityEnv {
@@ -81,6 +85,8 @@ export interface DomEnvironmentOptions {
   readonly router?: Router
   /** The date clock (default: `Date.now()` and the platform's resolved time zone). */
   readonly dateClock?: DateClock
+  /** The clipboard (default: the Clipboard API, with a fallback). Tests pass a fake. */
+  readonly clipboard?: Clipboard
 }
 
 /**
@@ -156,6 +162,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
     },
     layout: collectionLayout(dom),
     visibility: options.visibility ?? documentVisibility(documentOf),
+    clipboard: options.clipboard ?? domClipboard(documentOf),
   }
 }
 
