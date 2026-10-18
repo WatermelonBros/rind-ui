@@ -101,3 +101,36 @@
   background: var(--s-ink);
   color: var(--s-on);
 }
+/* bare: a visible edge, so a tag reads as a tag and not as plain text */
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="tag-group"][data-part="item"] {
+  border-color: var(--s-line);
+  background: var(--s-card);
+}
+/* variants on the Root (soft is the default above) and sizes on each Tag */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-variant="solid"]
+  [data-part="item"] {
+  border-color: transparent;
+  /* ink, not brand: in juicy the brand colour is the soft tag's own fill */
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-variant="outline"]
+  [data-part="item"] {
+  border-color: var(--s-ink);
+  background: transparent;
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item"][data-size="sm"] {
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item"][data-size="lg"] {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 16px;
+}
