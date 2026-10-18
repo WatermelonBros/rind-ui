@@ -1,0 +1,23 @@
+- group "Model year":
+  - button "Previous years"
+  - heading "2016 – 2027" [level=2]
+  - button "Next years"
+  - grid "2016 – 2027":
+    - rowgroup:
+      - row "2016 2017 2018 2019":
+        - gridcell "2016"
+        - gridcell "2017"
+        - gridcell "2018"
+        - gridcell "2019"
+      - row "2020 2021 2022 2023":
+        - gridcell "2020"
+        - gridcell "2021"
+        - gridcell "2022"
+        - gridcell "2023"
+      - row "2024 2025 2026 2027":
+        - gridcell "2024"
+        - gridcell "2025"
+        - gridcell "2026"
+        - gridcell "2027"
+- log
+- log

@@ -1,7 +1,8 @@
 import { CalendarDate, parseDate } from "@internationalized/date"
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
-import { calendarMachine } from "./calendar.machine"
+import { calendarMachine, viewIn } from "./calendar.machine"
+import type { CalendarView } from "./calendar.period"
 
 type P =
   | "root"
@@ -16,10 +17,27 @@ type P =
   | "row"
   | "cell"
   | "prompt"
+  | "view-trigger"
 type E = Env<P>
 
-/** The in-month cell of an ISO date, if visible. */
-async function cellOf(env: E, iso: string): Promise<Part | null> {
+/** The shown view (`data-view` on the root). */
+const viewOf = async (env: E) => ((await env.part("root").attr("data-view")) ?? "days") as string
+
+/**
+ * An ISO date, month ("2027-03") or year ("2031") as the ISO date of its cell in the shown view:
+ * a period's cell carries its first day.
+ */
+async function cellIso(env: E, iso: string): Promise<string> {
+  const full = iso.length <= 5 ? `${iso}-01-01` : iso.length <= 8 ? `${iso}-01` : iso
+  const view = await viewOf(env)
+  if (view === "months") return `${full.slice(0, -3)}-01`
+  if (view === "years") return `${full.slice(0, -6)}-01-01`
+  return full
+}
+
+/** The in-month cell of an ISO date (a period's cell in the month and year views), if visible. */
+async function cellOf(env: E, given: string): Promise<Part | null> {
+  const iso = await cellIso(env, given)
   for (const cell of await env.part("cell").all()) {
     if (
       (await cell.attr("data-value")) === iso &&
@@ -47,8 +65,10 @@ async function enterGrid(env: E) {
 }
 
 /** Keyboard moves to `iso` through calendar-navigation's keys: years, months, then days. */
-async function keyTo(env: E, iso: string) {
+async function keyTo(env: E, given: string) {
   await enterGrid(env)
+  const iso = await cellIso(env, given)
+  const view = await viewOf(env)
   const target = parseDate(iso)
   for (let i = 0; i < 400; i++) {
     const at = await focusedDate(env)
@@ -58,15 +78,21 @@ async function keyTo(env: E, iso: string) {
     const months = (target.year - from.year) * 12 + (target.month - from.month)
     const press = (key: "PageDown" | "PageUp" | "ArrowRight" | "ArrowLeft", shift = false) =>
       env.keyboard(key, shift ? { shift: true } : undefined)
-    if (Math.abs(months) >= 12) await press(months > 0 ? "PageDown" : "PageUp", true)
+    // Period views: a page is a year of months; years move one by one.
+    if (view === "years") await press(target.compare(from) > 0 ? "ArrowRight" : "ArrowLeft")
+    else if (view === "months" && Math.abs(months) >= 12)
+      await press(months > 0 ? "PageDown" : "PageUp")
+    else if (view === "months") await press(months > 0 ? "ArrowRight" : "ArrowLeft")
+    else if (Math.abs(months) >= 12) await press(months > 0 ? "PageDown" : "PageUp", true)
     else if (months !== 0) await press(months > 0 ? "PageDown" : "PageUp")
     else await press(target.compare(from) > 0 ? "ArrowRight" : "ArrowLeft")
   }
   throw new Error(`calendar: could not reach ${iso} with the keyboard`)
 }
 
-/** Pointer paging until the date's month is visible. */
-async function pageTo(env: E, iso: string) {
+/** Pointer paging until the date's month (period) is visible. */
+async function pageTo(env: E, given: string) {
+  const iso = await cellIso(env, given)
   const target = parseDate(iso)
   for (let i = 0; i < 240; i++) {
     if (await cellOf(env, iso)) return
@@ -128,7 +154,8 @@ export const calendarInvariants: readonly Invariant<P, string>[] = [
     check: async ({ env }) => {
       for (const c of await env.part("cell").all()) {
         const v = await c.attr("data-value")
-        if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v))
+        // Years before 1 or after 9999 (a BC page) carry the extended ISO year.
+        if (!v || !/^([+-]\d{6}|\d{4})-\d{2}-\d{2}$/.test(v))
           return `a cell's data-value "${v}" is not an ISO date`
       }
       return undefined
@@ -211,6 +238,7 @@ export const calendarContract = contract("calendar", {
     "row",
     "cell",
     "prompt",
+    "view-trigger",
   ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
   actions: {
@@ -266,7 +294,8 @@ export const calendarContract = contract("calendar", {
         await env.keyboard("Enter")
       },
       done: async (env: E, start: string, end: string) => {
-        const [a, b] = start <= end ? [start, end] : [end, start]
+        const [x, y] = [await cellIso(env, start), await cellIso(env, end)]
+        const [a, b] = x <= y ? [x, y] : [y, x]
         const from = await cellsWith(env, "data-range-start")
         const to = await cellsWith(env, "data-range-end")
         // An end on another page is not visible: the anchor is gone either way.
@@ -296,6 +325,29 @@ export const calendarContract = contract("calendar", {
         await env.keyboard("Escape")
       },
       done: async (env: E) => (await env.part("root").attr("data-anchored")) === null,
+    },
+    /** The heading button: one view up (days, months, years). */
+    viewUp: {
+      // At maxView (or with a fixed view) there is no button: nothing to press.
+      pointer: async (env: E) => {
+        const trigger = env.part("view-trigger")
+        if (await trigger.exists()) await trigger.click()
+      },
+      keyboard: async (env: E) => {
+        const trigger = env.part("view-trigger")
+        if (!(await trigger.exists())) return
+        await trigger.focus()
+        await trigger.press("Enter")
+      },
+      done: async () => true,
+    },
+    /** Escape in the grid: one view down. */
+    viewDown: {
+      keyboard: async (env: E) => {
+        await enterGrid(env)
+        await env.keyboard("Escape")
+      },
+      done: async () => true,
     },
     press: {
       keyboard: async (
@@ -357,6 +409,8 @@ export const calendarContract = contract("calendar", {
     anchor: async (env: E) => (await cellsWith(env, "data-anchor"))[0] ?? null,
     preview: async (env: E) => cellsWith(env, "data-preview"),
     isAnchored: async (env: E) => (await env.part("root").attr("data-anchored")) !== null,
+    /** The shown view: "days", "months" or "years". */
+    view: viewOf,
   },
   states: { idle: { isFocused: false }, focused: { isFocused: true } },
   events: {
@@ -380,7 +434,23 @@ export const calendarContract = contract("calendar", {
     NAVIGATE: {
       action: "press",
       args: (() => ["ArrowRight"]) as never,
-      event: () => ({ move: "next-day", composing: false }),
+      // ArrowRight is the next day, or the next period in the month and year views.
+      event: (view) => ({
+        move:
+          viewIn((view as unknown as { values: { view?: CalendarView } }).values.view, {
+            minView: (view as unknown as { props?: { minView?: CalendarView } }).props?.minView,
+          }) === "days"
+            ? "next-day"
+            : "next",
+        composing: false,
+      }),
+    },
+    "VIEW.UP": { action: "viewUp", event: () => ({ modality: "pointer" }) },
+    "VIEW.DOWN": {
+      from: {
+        idle: { skip: "Escape reaches the calendar only with focus in a grid" },
+        focused: "viewDown",
+      },
     },
     PAGE: { action: "nextPage", event: () => ({ direction: 1, modality: "pointer" }) },
     // Escape is the grid's key: from idle it needs focus in the grid first (a state change).
@@ -413,6 +483,7 @@ export const calendarContract = contract("calendar", {
     // Focus on a trigger leaves the grid (focused → idle): the next paging is announced.
     { part: "prev-trigger", state: "focused" },
     { part: "next-trigger", state: "focused" },
+    { part: "view-trigger", state: "focused" },
   ],
   invariants: [...calendarInvariants, ...rangeInvariants],
 })

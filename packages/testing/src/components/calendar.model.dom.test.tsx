@@ -41,5 +41,19 @@ config("range, weekends unavailable (non-contiguous)", {
   isDateUnavailable: (d) => isWeekend(d, "en-US"),
   allowsNonContiguousRanges: true,
 })
+// Month and year views (spec "Month And Year Views"): the value is chosen at the period.
+config("month view", { minView: "months" })
+config("month view, columns 3, unavailable August", {
+  minView: "months",
+  columns: 3,
+  isMonthUnavailable: (m) => m.month === 8,
+})
+config("month view, range", { minView: "months", selectionMode: "range" })
+config("year view", { minView: "years" })
+config("year view, min and max", {
+  minView: "years",
+  minValue: new CalendarDate(2020, 6, 1),
+  maxValue: new CalendarDate(2031, 6, 1),
+})
 // Display calendars: the oracle stays gregorian (paths and values are by day).
 void createCalendar
