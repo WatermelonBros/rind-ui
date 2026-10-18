@@ -65,6 +65,12 @@ const before = async (env: E, name: Name) => {
 const toggled = async (env: E, name: Name) =>
   wasOpen ? !(await isOpen(env, name)) : openedOrRefused(env, name)
 
+/** Keyboard focus on `name`'s trigger: Tab onto it unless it already has focus. */
+const tabTo = async (env: E, name: Name) => {
+  const t = await trigger(env, name)
+  if (!(await t.isFocused())) await t.focusWithTab()
+}
+
 const names = async (list: readonly Part[]) => {
   const out: string[] = []
   for (const p of list) if (await p.exists()) out.push(await p.accessibleName())
@@ -183,7 +189,7 @@ export const navigationMenuContract = contract("navigation-menu", {
       },
       keyboard: async (env: E, name: Name) => {
         if (await isOpen(env, name)) return
-        await (await trigger(env, name)).focusWithTab()
+        await tabTo(env, name)
         await env.keyboard("Enter")
       },
       done: openedOrRefused,
@@ -206,7 +212,7 @@ export const navigationMenuContract = contract("navigation-menu", {
       },
       keyboard: async (env: E, name: Name) => {
         await before(env, name)
-        await (await trigger(env, name)).focusWithTab()
+        await tabTo(env, name)
         await env.keyboard("Enter")
       },
       done: toggled,
@@ -219,7 +225,7 @@ export const navigationMenuContract = contract("navigation-menu", {
       },
       keyboard: async (env: E, name: Name) => {
         if (await isOpen(env, name)) return
-        await (await trigger(env, name)).focusWithTab()
+        await tabTo(env, name)
         await env.keyboard("Enter")
       },
       done: openedOrRefused,

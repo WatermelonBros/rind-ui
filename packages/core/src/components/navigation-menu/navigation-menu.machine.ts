@@ -166,6 +166,14 @@ const docOf = (env: Env) => {
   return "body" in node ? node : node.ownerDocument
 }
 
+/** The pointer is in some layer's grace area (no document, as on the server: never). */
+const inTransit = (env: Env) => {
+  if (typeof document === "undefined") return false
+  const node = env.dom.getRootNode() as Document | ShadowRoot | undefined
+  if (!node) return false
+  return env.hoverIntent.isInTransit("body" in node ? node : node.ownerDocument)
+}
+
 const ITEM =
   '[data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])'
 const BOX = '[data-scope="navigation-menu"]:is([data-part="content"], [data-part="root"])'
@@ -207,7 +215,7 @@ export const navigationMenuMachine = setup({
       props.openOnHover !== false &&
       enabled(props, event.item) &&
       context.suppressHover !== event.item &&
-      !(typeof document !== "undefined" && env.hoverIntent.isInTransit(docOf(env))),
+      !inTransit(env),
     canOpen: ({ event, props }) => {
       const item = itemOf(event)
       return item !== null && enabled(props, item)
@@ -397,20 +405,24 @@ export const navigationMenuMachine = setup({
             container: () => content() ?? byId(ids.viewport),
             // Disclosure navigation: opening never moves focus.
             initialFocus: () => false,
-            // Focus returns to the trigger on Escape only; outside closes leave it where it went.
-            finalFocus: (reason) =>
-              reason === "escape-key" ? trigger() : reason === undefined ? null : false,
+            // To the trigger, only when focus was inside the closing panel or fell to <body>:
+            // focus that moved elsewhere (outside focus, a press on a field) stays there.
+            finalFocus: () => trigger(),
             modality: env.modality.modality(),
             dismiss: {
               escape: true,
               outsidePress: true,
               outsideFocus: true,
               onRequest: (request) => {
-                // Focus arriving from outside (another layer's initial focus) is not leaving.
+                // Outside focus closes only when focus leaves the menu (a top-level link is
+                // inside), and only from inside it: focus arriving from outside (another
+                // layer's initial focus) is not leaving.
                 if (request.reason === "outside-focus") {
+                  const inMenu = (n: unknown) =>
+                    n instanceof Node &&
+                    (rootEl()?.contains(n) === true || panels().some((p) => p.contains(n)))
                   const from = (request.event as FocusEvent | undefined)?.relatedTarget
-                  const inside = from instanceof Node && (rootEl()?.contains(from) || panels().some((p) => p.contains(from)))
-                  if (!inside) return request.cancel()
+                  if (inMenu(request.target) || !inMenu(from)) return request.cancel()
                 }
                 send(DISMISSAL[request.reason])
               },

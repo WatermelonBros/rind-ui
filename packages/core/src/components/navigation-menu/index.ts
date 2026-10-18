@@ -4,7 +4,11 @@ export {
   type NavigationMenuTriggerState,
   navigationMenuConnect,
 } from "./navigation-menu.connect"
-export { navigationMenuContract, navigationMenuInvariants } from "./navigation-menu.contract"
+export {
+  navigationMenuArgs,
+  navigationMenuContract,
+  navigationMenuInvariants,
+} from "./navigation-menu.contract"
 export {
   type NavigationMenuChangeDetails,
   type NavigationMenuContext,
