@@ -192,10 +192,49 @@ export function InAField() {
   )
 }
 
+export function Range() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      startName="from"
+      endName="to"
+      defaultValue={{ start: new CalendarDate(2026, 10, 12), end: new CalendarDate(2026, 10, 16) }}
+    >
+      <DateField.Label>Stay</DateField.Label>
+      <DateField.Input />
+      <DateField.ErrorMessage />
+    </DateField.Root>
+  )
+}
+
+export function RangeRules() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      validationMode="blur"
+      isDateUnavailable={(date) => isWeekend(date, "en-US")}
+    >
+      <DateField.Label>Working week</DateField.Label>
+      <DateField.Description>Weekends cannot be inside the range.</DateField.Description>
+      <DateField.Input />
+      <DateField.ErrorMessage />
+    </DateField.Root>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Basic",
     description: "A date with locale order; type digits or use the arrows.",
+  },
+  Range: {
+    title: "Date range",
+    description:
+      '`selectionMode="range"`: two ends in one group; typing past the start moves to the end.',
+  },
+  RangeRules: {
+    title: "Range rules",
+    description: "An end before the start, or a weekend inside the range, is invalid.",
   },
   DateTime12Hour: {
     title: "Date and time, 12-hour",

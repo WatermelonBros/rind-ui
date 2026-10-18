@@ -128,7 +128,11 @@ inputs (part `hidden-input`, `data-edge`); the segment render function SHALL rec
 segment lists. The value SHALL be `{ start, end } | null` (types `DateRangeValue` and
 `TimeRangeValue` exported), `startName` and `endName` SHALL name the hidden inputs, and
 `allowsNonContiguousRanges` SHALL be accepted. Every other prop SHALL behave as in single mode,
-applied to both ends. The requirements "Range Mode — …" below define the pair; "the pair" is a
+applied to both ends. Each end SHALL be an embedded Date Field (Embedded Mode) whose committed
+value and validity a coordinator combines; the embedded ends SHALL NOT claim the Field. Select
+all and Backspace in a segment of either end SHALL clear both ends (Range Mode — Controlled
+Value, Clear And Reset). `DateField.Start`, `DateField.Separator` and `DateField.End` SHALL be
+renderable inside `DateField.Input` for a custom layout. The requirements "Range Mode — …" below define the pair; "the pair" is a
 range-mode Date Field. Time ends follow the time requirements per end.
 
 #### Scenario: Standalone range field
@@ -1003,11 +1007,15 @@ The Date Field SHALL ship a contract with scope `date-field`, anatomy as above, 
 - traits `field-associated`, `form-associated` (compared property: the hidden input's `value`),
   plus the segment invariants and, for a time field, "no hour edit step changed the day period".
 
-The range variant (`getDateField(target, { name, selectionMode: "range" })`) SHALL replace
-`fill` with `fill({ start, end })` and add `fillStart(date)`, `fillEnd(date)`, `clearEnd()`, the
-`edge` argument on `typeSegment`, `step`, `paste` and `setDayPeriod`, the queries `range()` (both
-hidden inputs' values) and `segments(edge)`, and the pair invariants; `END.BOUNDARY` SHALL map to
-`skip` ("covered by fill"). The picker variant (`picker: true`) SHALL add `open()`,
+The range variant (`getDateField(target, { name, selectionMode: "range" })`) SHALL run over the
+coordinator's graph (`START.COMMIT` / `END.COMMIT` mapped to `fillStart` / `fillEnd`, `CLEAR` to
+`clear`, the ends' validity reports, the parent's value and a form reset to skips) and declare
+`fill({ start, end })`, `fillStart(date)`, `fillEnd(date)`, `clear()`, `clearEnd()`,
+`typeSegment(edge, type, text)`, `step(edge, type, direction, { large? })`, `paste(edge, text)`,
+`resetForm()` and, with time values, `setDayPeriod(edge, period)`; the queries `range()` (both
+hidden inputs' values), `segments(edge)`, `focusedSegment()` (with its edge), `validity()`,
+`isInvalid()`, `invalidEdge()` and `isComplete()`; the trait `field-associated`; and the pair
+invariants. The picker variant (`picker: true`) SHALL add `open()`,
 `openFromField()`, `close()`, `selectDate(date)` (in range mode `selectRange(start, end)`,
 `startRange(date)` and `cancel()`), `pressOutside()`, `tab()`, `shiftTab()`, the queries
 `isOpen()`, `isModal()`, `closeReason()`, `focusedElement()`, `calendar()` (the Calendar driver

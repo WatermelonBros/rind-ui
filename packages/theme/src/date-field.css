@@ -55,6 +55,32 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /*
+   * Range mode: the outer group is the field; each end is an embedded field whose own input
+   * (role presentation) draws nothing, and the separator sits in the muted text role.
+   */
+  :where(
+    [data-scope="date-field"]:is([data-part="start"], [data-part="end"])
+      [data-scope="date-field"]:is([data-part="root"], [data-part="input"])
+  ) {
+    display: inline-flex;
+    min-block-size: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  :where([data-scope="date-field"]:is([data-part="start"], [data-part="end"])) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  :where([data-scope="date-field"][data-part="separator"]) {
+    padding-inline: var(--rind-date-field-separator-gap, var(--rind-space-2));
+    color: var(--rind-date-field-separator-color, var(--rind-color-text-muted));
+  }
+
   :where([data-scope="date-field"][data-part="root"][data-variant="soft"] [data-part="input"]) {
     background: var(--rind-date-field-soft-bg, var(--rind-color-accent-soft));
     box-shadow: none;
