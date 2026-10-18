@@ -15,6 +15,7 @@
   --s-card: #ffffff;
   --s-muted: #ecece4;
   --s-line: #0b0b0c;
+  --s-field-line: var(--s-line);
   --s-bw: 3px;
   --s-r: 14px;
   --s-r-sm: 8px;
@@ -38,6 +39,8 @@
   --s-card: #ffffff;
   --s-muted: #f1ecff;
   --s-line: transparent;
+  /* control and field edges: 3:1 against the lavender (WCAG 1.4.11) */
+  --s-field-line: #7a68cf;
   --s-bw: 0px;
   --s-r: 22px;
   --s-r-sm: 14px;
@@ -61,6 +64,8 @@
   --s-card: #ffffff;
   --s-muted: #f4f4f5;
   --s-line: #d4d4d8;
+  /* control and field edges: 3:1 against white and the page (WCAG 1.4.11) */
+  --s-field-line: #8a8a93;
   --s-bw: 1px;
   --s-r: 8px;
   --s-r-sm: 6px;

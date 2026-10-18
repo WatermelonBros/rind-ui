@@ -14,7 +14,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: 7px;
   background: var(--s-card);
   color: transparent;
@@ -58,7 +58,7 @@
   border-radius: 9px;
   background: #fff;
   box-shadow:
-    inset 0 0 0 2px #d6ccf7,
+    inset 0 0 0 2px var(--s-field-line),
     0 3px 0 #d6ccf7;
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
