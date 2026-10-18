@@ -1,10 +1,3 @@
-## Purpose
-
-Defines how a month or year grid moves its focused period and its visible page — by one period,
-by a row, to the page edges, and by a page — constrained by minimum and maximum dates, as pure
-date logic shared by Month Picker and Year Picker. The sibling of `calendar-navigation` one level
-up. Introduced by `add-month-year-picker`.
-
 ## ADDED Requirements
 
 ### Requirement: Pages And Grid Shape
@@ -100,12 +93,12 @@ SHALL be reachable only if it contains an allowed period.
 
 #### Scenario: Min and max within two adjacent years (zag#2153)
 
-- **WHEN** `minValue` is 15 December 2025 and `maxValue` is 20 February 2026, in the year picker
+- **WHEN** `minValue` is 15 December 2025 and `maxValue` is 20 February 2026, in the Calendar year view
 - **THEN** both 2025 and 2026 are allowed, and 2024 and 2027 are not
 
 #### Scenario: Month containing the minimum
 
-- **WHEN** `minValue` is 15 October 2026 in the month picker
+- **WHEN** `minValue` is 15 October 2026 in the Calendar month view
 - **THEN** October 2026 is allowed and September 2026 is not
 
 #### Scenario: Arrow past the minimum
@@ -126,7 +119,7 @@ initial page SHALL contain it, so that the focused cell always exists.
 
 #### Scenario: Minimum in the next year (bits-ui#1873)
 
-- **WHEN** no value is set, today is in 2026 and `minValue` is 1 January 2027, in the month picker
+- **WHEN** no value is set, today is in 2026 and `minValue` is 1 January 2027, in the Calendar month view
 - **THEN** the page is 2027, January 2027 is focused and exactly one cell has `tabindex="0"`
 
 #### Scenario: Pages without allowed periods are not reachable

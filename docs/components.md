@@ -113,15 +113,8 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip |  |
-| Date Field | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip | Ark: Date Input |
-| Date Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec |  |
-| Date Range Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: range mode of Date Picker |
-| Time Field |  |  | ● |  |  |  | ● | ● | ● | 4 | 3 | spec |  |
-| Range Calendar |  |  | ● |  |  |  | ● | ● |  | 3 | 3 | spec |  |
-| Date Range Field |  |  |  |  |  |  | ● | ● |  | 2 | 3 | spec |  |
-| Time Range Field |  |  |  |  |  |  | ● | ● |  | 2 | 3 | spec |  |
-| Month / Year Picker |  |  |  |  |  |  | ● |  |  | 1 | 3 | spec | Reka: Month/MonthRange/Year/YearRange Picker |
+| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
+| Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | wip | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
 | Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
 ## Color (2)
