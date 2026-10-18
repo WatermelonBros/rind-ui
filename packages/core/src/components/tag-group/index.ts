@@ -1,4 +1,4 @@
-export { checkTagGroupList } from "../../dom/tag-group-host"
+export { checkTagGroupList, isWithinId } from "../../dom/tag-group-host"
 export {
   type TagGroupParts,
   type TagGroupView,

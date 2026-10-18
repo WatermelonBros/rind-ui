@@ -286,7 +286,9 @@ function Root(all: TagGroupRootProps) {
           children: (
             <>
               {children}
-              {onRemove ? <span {...normalizeProps(parts.hint())}>{parts.hintText}</span> : null}
+              {parts.hinted ? (
+                <span {...normalizeProps(parts.hint())}>{parts.hintText}</span>
+              ) : null}
             </>
           ),
         },

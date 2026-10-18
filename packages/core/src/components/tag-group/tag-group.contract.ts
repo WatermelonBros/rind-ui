@@ -51,19 +51,21 @@ const focusInside = async (env: E) =>
  */
 const removalHint: Invariant<P> = {
   name: "tag-group-removal-hint",
-  check: async ({ env, props, modality }) => {
+  check: async ({ env, props }) => {
     if (props["onRemove"] === undefined) return undefined
-    if (modality !== "keyboard" && modality !== "virtual") return undefined
-    // The hint is hidden: read it by its attributes (`exists` means rendered and shown).
+    // The hint is rendered only while it applies (keyboard or virtual, not touch); it is
+    // hidden, so it is read by its attributes (`exists` means rendered and shown).
     const [hint] = await env.part("hint").all()
     const id = hint ? await hint.attr("id") : null
-    if (!hint || id === null) return "the removal hint is missing (no hint part in the group)"
-    if ((await hint.attr("data-state")) !== "active") return undefined
     for (const tag of await env.part("item").all()) {
       if ((await tag.attr("aria-disabled")) === "true") continue
-      const ids = ((await tag.attr("aria-describedby")) ?? "").split(/\s+/)
-      if (id === null || !ids.includes(id)) {
-        return `the removable tag "${await tag.accessibleName()}" does not reference the removal hint (aria-describedby="${(await tag.attr("aria-describedby")) ?? ""}", hint id "${id ?? ""}")`
+      const described = ((await tag.attr("aria-describedby")) ?? "").split(/\s+/)
+      const name = await tag.accessibleName()
+      if (id !== null && !described.includes(id)) {
+        return `the removable tag "${name}" does not reference the removal hint (aria-describedby="${(await tag.attr("aria-describedby")) ?? ""}", hint id "${id}")`
+      }
+      if (id === null && described.some((d) => d.endsWith("-hint"))) {
+        return `the removable tag "${name}" references a removal hint that is not rendered`
       }
     }
     return undefined
@@ -189,8 +191,11 @@ export const tagGroupContract = contract("tag-group", {
     { part: "item", state: "focused" },
     { part: "list", state: "idle" },
     { part: "list", state: "focused" },
-    // Focus inside a tag (its remove button) is that tag's focus: the highlight follows.
+    // Focus inside a tag (its remove button, a link tag's anchor) is that tag's focus: the
+    // highlight follows.
     { part: "item-remove", state: "idle" },
     { part: "item-remove", state: "focused" },
+    { part: "item-text", state: "idle" },
+    { part: "item-text", state: "focused" },
   ],
 })

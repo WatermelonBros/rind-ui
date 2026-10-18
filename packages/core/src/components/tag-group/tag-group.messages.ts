@@ -2,6 +2,7 @@
 // remove label and the removal announcement share their keys with Combobox's input chips.
 
 import { plural } from "../../i18n/messages"
+import { inputChipsMessages } from "../input-chips/input-chips"
 
 export interface TagGroupMessages {
   readonly [key: string]: string | ((...args: never) => string)
@@ -16,9 +17,10 @@ export interface TagGroupMessages {
 }
 
 export const tagGroupMessages: TagGroupMessages = {
-  removeLabel: (text) => `Remove ${text}`,
+  // Shared with the input chips (Combobox, Tags Input): one translation for both.
+  removeLabel: inputChipsMessages.removeLabel,
   removeHint: "Press Delete to remove",
-  removedAnnouncement: (text) => `${text} removed`,
+  removedAnnouncement: inputChipsMessages.removedAnnouncement,
   // English plural rules: a translation supplies its own forms.
   removedCountAnnouncement: (count) =>
     plural("en", count, { one: "# tag removed", other: "# tags removed" }),

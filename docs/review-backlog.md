@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-tag-group (r1) | — | packages/react/src/tag-group/tag-group.tsx | Link-only static Tag Group: the server HTML renders `role="list"` until the layout effect runs (registration at commit); the `tags` data form is correct on the server |
 | color-picker (site, #103) | — | packages/react/src/color-slider/color-slider.tsx | The channel slider's `defaultValue` (`getChannel(defaultValue, channel)`) is not snapped to the step grid like `value` is (#81): alpha 0.50196… for #33669980 logs the slider warning; snap it, then remove #103's allowance in color-slider.model.dom.test |
 | add-tag-group (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
 | add-tag-group (impl) | — | packages/core/src/components/tag-group/tag-group.contract.ts | Removal announcements are asserted through the announcement log in DOM tests (the contract's announcement kinds don't include removal); ACTIVATE and REMOVE are model-walk skips (DOM tests cover them) |

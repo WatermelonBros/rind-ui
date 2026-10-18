@@ -15,7 +15,12 @@ import { render, screen } from "@testing-library/react"
 import { describe, it } from "vitest"
 import { currentRun, testMachine } from "../index"
 
-type Item = { readonly key: string; readonly label: string; readonly disabled?: boolean }
+type Item = {
+  readonly key: string
+  readonly label: string
+  readonly disabled?: boolean
+  readonly href?: string
+}
 const CITIES: readonly Item[] = ["Rome", "Paris", "Oslo", "Lima"].map((label) => ({
   key: label.toLowerCase(),
   label,
@@ -76,6 +81,7 @@ function config(name: string, cfg: Config) {
         loop: true,
         ...(cfg.removable ? { onRemove: () => {} } : {}),
         ...(cfg.actions ? { onAction: () => {} } : {}),
+        links: new Set(items.filter((i) => i.href !== undefined).map((i) => i.key)),
       } as never,
       modalities: ["pointer", "keyboard", "touch", "virtual"],
     } as never)
@@ -92,3 +98,4 @@ config("disabled tags", {
   items: CITIES.map((c) => (c.key === "paris" ? { ...c, disabled: true } : c)),
 })
 config("empty", { removable: true, items: [] })
+config("links", { items: CITIES.map((c) => ({ ...c, href: `#${c.key}` })) })

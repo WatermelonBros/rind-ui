@@ -13,6 +13,7 @@ import type { SelectionValue } from "../../collection/selection"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { describeKey } from "../../dom/keyboard"
+import { isWithinId } from "../../dom/tag-group-host"
 import { itemId, partId } from "../../ids"
 import type { TagGroupEvent } from "./tag-group.machine"
 import { tagLinkId } from "./tag-group.machine"
@@ -218,9 +219,8 @@ export function tagGroupConnect(v: TagGroupView, env: CompositeEnv) {
             key,
             source: modality === "keyboard" ? "keyboard" : "pointer",
           })
-          // A press on the anchor follows natively; any other press clicks it once.
-          const anchor = (e.target as Element | null)?.closest?.("a[href]")
-          if (link && anchor) return
+          // A press on the tag's own anchor follows natively; any other press clicks it once.
+          if (link && isWithinId(e.target as Element | null, ids.text(key))) return
           v.send({ type: "ACTIVATE", key, modality, via: "press" })
         },
       }
@@ -261,13 +261,9 @@ export function tagGroupConnect(v: TagGroupView, env: CompositeEnv) {
       }
     },
     /** The hidden description of removable tags (keyboard and virtual modality). */
-    hint: (): PartProps => ({
-      ...scoped("hint"),
-      id: ids.hint,
-      hidden: true,
-      // Active while removable tags reference it (keyboard or virtual modality, not touch).
-      "data-state": hinted ? "active" : "inactive",
-    }),
+    /** Rendered only while removable tags reference it (keyboard or virtual, not touch). */
+    hinted,
+    hint: (): PartProps => ({ ...scoped("hint"), id: ids.hint, hidden: true }),
     hintText: messages.removeHint,
     empty: (): PartProps => ({ ...scoped("empty"), id: ids.empty }),
   }

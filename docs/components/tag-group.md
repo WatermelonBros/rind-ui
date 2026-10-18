@@ -199,6 +199,33 @@ expect(await cities.focusedItem()).toBe("Paris")
 
 The driver locates the group by its list's name whatever its role (`grid`, `group` or `list`). `remove(name)` presses the tag's button (pointer) or presses Delete on it (keyboard), and resolves once the tag is gone and focus is on its neighbour or on the list.
 
+## Accessibility tree
+
+A removable group (generated from the state example):
+
+<!-- aria:tag-group--removable -->
+```yaml
+- text: Cities
+- grid "Cities":
+  - row "Rome":
+    - gridcell "Rome Remove Rome":
+      - text: Rome
+      - button "Remove Rome"
+  - row "Paris":
+    - gridcell "Paris Remove Paris":
+      - text: Paris
+      - button "Remove Paris"
+  - row "Oslo":
+    - gridcell "Oslo Remove Oslo":
+      - text: Oslo
+      - button "Remove Oslo"
+  - row "Lima":
+    - gridcell "Lima Remove Lima":
+      - text: Lima
+      - button "Remove Lima"
+```
+<!-- /aria -->
+
 ## Tested with
 
 <!-- tested-with:tag-group -->

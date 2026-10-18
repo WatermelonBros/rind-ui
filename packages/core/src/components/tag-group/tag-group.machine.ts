@@ -172,7 +172,8 @@ export const tagGroupMachine = setup({
     },
     /**
      * The keys of a removal request: the selection minus disabled tags when a selected tag
-     * is removed by a key, else the tag alone. Removed selected keys are deselected.
+     * is removed by a key, else the tag alone. Nothing is deselected yet: a consumer that
+     * keeps the keys keeps them selected (`settleRemoval` deselects the ones that left).
      */
     requestRemoval: (a) => {
       const { event, props, values, context, set } = a
@@ -183,12 +184,6 @@ export const tagGroupMachine = setup({
       const keys = bySelection
         ? selectedKeys(props.collection, selection).filter((k) => enabled(props, k))
         : [event.key]
-      if (bySelection || isSelected(props.collection, selection, event.key)) {
-        const remaining = new Set([...selectedKeys(props.collection, selection)])
-        for (const k of keys) remaining.delete(k)
-        // Sound: the value stores the public shape, where null is a value (see EMPTY).
-        set("value", tagGroupValueOf(remaining, props) as string)
-      }
       // A removal by its button highlights its tag: focus repairs from there.
       if (event.via === "button" && context.highlightedKey !== event.key) {
         set("highlightedKey", event.key)
@@ -200,8 +195,11 @@ export const tagGroupMachine = setup({
       })
       props.onRemove(keys, { reason: event.via })
     },
-    /** The keys of the last request that left the collection are announced, once. */
-    announceRemoved: ({ context, props, env, set }) => {
+    /**
+     * The keys of the last request that left the collection: deselected through the value
+     * and announced, once. Keys the consumer kept stay selected and unannounced.
+     */
+    settleRemoval: ({ context, props, values, env, set }) => {
       const pending = context.pendingRemoval
       if (!pending) return
       set("pendingRemoval", null)
@@ -209,6 +207,13 @@ export const tagGroupMachine = setup({
         .map((k, i) => ({ key: k, text: pending.texts[i] ?? k }))
         .filter((x) => !props.collection.has(x.key))
       if (gone.length === 0) return
+      const selection = tagSelectionOf(values.value)
+      if (selection !== "all" && gone.some((x) => selection.has(x.key))) {
+        const remaining = new Set(selection)
+        for (const x of gone) remaining.delete(x.key)
+        // Sound: the value stores the public shape, where null is a value (see EMPTY).
+        set("value", tagGroupValueOf(remaining, props) as string)
+      }
       const messages = { ...tagGroupMessages, ...props.messages }
       env.announcer.announce({
         message:
@@ -237,7 +242,7 @@ export const tagGroupMachine = setup({
   values: { value: { fallback: EMPTY, equal: sameTagValue as never } },
   onProps: { collection: "COLLECTION.CHANGE" },
   on: {
-    "COLLECTION.CHANGE": { actions: ["repairCollection", "announceRemoved"] },
+    "COLLECTION.CHANGE": { actions: ["repairCollection", "settleRemoval"] },
     // A TagRemove press may arrive before the group's FOCUS (a virtual cursor click).
     REMOVE: { actions: ["requestRemoval"] },
     ACTIVATE: { actions: ["activate"] },
@@ -255,7 +260,7 @@ export const tagGroupMachine = setup({
       on: {
         "COMPOSITE.BLUR": "idle",
         "COLLECTION.CHANGE": {
-          actions: ["repairCollection", "keepFocusInside", "announceRemoved"],
+          actions: ["repairCollection", "keepFocusInside", "settleRemoval"],
         },
         FOCUS: { actions: ["focusHighlighted"] },
         NAVIGATE: { actions: ["navigate", "scrollToHighlighted", "focusHighlighted"] },

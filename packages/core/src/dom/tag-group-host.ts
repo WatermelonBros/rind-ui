@@ -19,3 +19,9 @@ export function checkTagGroupList(el: Element, interactive: boolean): void {
     )
   }
 }
+
+/** The element is the one registered under `id` (the tag's own anchor), or inside it. */
+export function isWithinId(target: Element | null, id: string): boolean {
+  const el = target?.ownerDocument.getElementById(id)
+  return el !== null && el !== undefined && target !== null && el.contains(target)
+}

@@ -94,12 +94,23 @@ describe("removal", () => {
     }
   })
 
-  it("a selected tag removes the selection; the selection is emptied", () => {
+  it("a selected tag removes the selection; deselected once the rows are gone", () => {
     const m = make({ selectionMode: "multiple", defaultValue: ["a", "c"] })
     m.focus()
     m.remove("c")
     expect([...keysOf(m.onRemove)].sort()).toEqual(["a", "c"])
+    // Still selected until the consumer's data drops them.
+    expect(m.value()).toEqual(["a", "c"])
+    m.setData(tags("b"))
     expect(m.value()).toEqual([])
+  })
+
+  it("a refused removal keeps the selection (uncontrolled)", () => {
+    const m = make({ selectionMode: "multiple", defaultValue: ["a", "c"] })
+    m.focus()
+    m.remove("c")
+    m.setData(tags("a", "b", "c"))
+    expect(m.value()).toEqual(["a", "c"])
   })
 
   it("a disabled tag is never part of a removal (reka-ui#2785)", () => {
@@ -125,8 +136,9 @@ describe("removal", () => {
     const m = make({ selectionMode: "multiple", defaultValue: ["a", "b"] })
     m.remove("b", "button")
     expect(keysOf(m.onRemove)).toEqual(["b"])
-    expect(m.value()).toEqual(["a"])
     expect(m.highlighted()).toBe("b")
+    m.setData(tags("a", "c"))
+    expect(m.value()).toEqual(["a"])
   })
 
   it("removal announces once the keys leave the collection: one tag", () => {
