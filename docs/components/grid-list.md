@@ -100,25 +100,25 @@ Rows with a checkbox and actions (generated from the state example):
   - row "Ada Lovelace":
     - gridcell "Select Ada Lovelace Analyst Message Ada Lovelace Archive Ada Lovelace":
       - checkbox "Select Ada Lovelace"
-      - text: Ada LovelaceAnalyst
+      - text: Ada Lovelace Analyst
       - button "Message Ada Lovelace": Message
       - button "Archive Ada Lovelace": Archive
   - row "Grace Hopper":
     - gridcell "Select Grace Hopper Compiler engineer Message Grace Hopper Archive Grace Hopper":
       - checkbox "Select Grace Hopper"
-      - text: Grace HopperCompiler engineer
+      - text: Grace Hopper Compiler engineer
       - button "Message Grace Hopper": Message
       - button "Archive Grace Hopper": Archive
   - row "Alan Turing":
     - gridcell "Select Alan Turing Mathematician Message Alan Turing Archive Alan Turing":
       - checkbox "Select Alan Turing"
-      - text: Alan TuringMathematician
+      - text: Alan Turing Mathematician
       - button "Message Alan Turing": Message
       - button "Archive Alan Turing": Archive
   - row "Edsger Dijkstra":
     - gridcell "Select Edsger Dijkstra Researcher Message Edsger Dijkstra Archive Edsger Dijkstra":
       - checkbox "Select Edsger Dijkstra"
-      - text: Edsger DijkstraResearcher
+      - text: Edsger Dijkstra Researcher
       - button "Message Edsger Dijkstra": Message
       - button "Archive Edsger Dijkstra": Archive
 - paragraph
