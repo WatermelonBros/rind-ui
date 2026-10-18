@@ -8,6 +8,7 @@ export {
 } from "./composite"
 export type { CompositeHost } from "./composite-host"
 export { contains, createFilter, type Filter, startsWith } from "./filter"
+export { type ChildNavigation, childMove, gridHandlesOnControl, type KeyOwner, owner } from "./grid"
 export { type CollectionKey, toKey } from "./key"
 export {
   type Collection,

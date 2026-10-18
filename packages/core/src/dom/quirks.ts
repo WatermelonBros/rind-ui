@@ -28,6 +28,17 @@ export function defineQuirks<const Q extends readonly Quirk[]>(entries: Q): Q {
 
 export const quirks = defineQuirks([
   {
+    id: "webkit-grid-selection-not-announced",
+    // VoiceOver with WebKit does not speak aria-selected changes on grid rows: Grid List
+    // announces "{name} selected" itself (as React Aria's useGridSelectionAnnouncement).
+    when: (p) => p.apple && p.webkit,
+    links: ["https://bugs.webkit.org/show_bug.cgi?id=235068"],
+    test: "packages/testing/src/components/grid-list.dom.test.tsx",
+    removeWhen: "VoiceOver speaks aria-selected changes on grid rows in Safari",
+    verified: "2026-10-18",
+    invariants: ["announcement-parity"],
+  },
+  {
     id: "firefox-textarea-overflow",
     // Firefox shows a scrollbar when overflow is toggled on an autosizing textarea; it keeps
     // its own overflow (as React Aria does).
