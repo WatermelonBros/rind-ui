@@ -70,7 +70,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | done | RAC: TokenField (unverified) |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
-| Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | wip | Missing in Ark |
+| Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark |
 | Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |
 
 ## Boolean & toggles (4)

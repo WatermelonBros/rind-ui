@@ -270,7 +270,6 @@ See CLAUDE.md "Review rules".
 - **Lighthouse**: re-run on rind.watermelon-studio.it after the zero-CLS intro (#142). Locally and live, Chromium measures CLS 0.0004, LCP ~0.5 s, TBT 0; the official score (last 76, from CLS 0.62) is not re-measured.
 - **Home JS**: ~300 KB gzip (React/Next ~100 KB). The skin builder's Color Picker could load when the section nears the viewport, with its height reserved (no CLS); TBT is already 0, so it only helps the transfer.
 - **Warning guard in the browser project**: still jsdom-only (row above).
-- **Sweep tools** (ran by hand, not in CI): every example in juicy/crisp/bare measured for overflow and 24px targets; internal links and anchors of `out/` checked. Worth adding the target and link checks to `tests/audit.ts`.
 
 ## Manual AT protocol
 
@@ -297,9 +296,17 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 | date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| date-family-consolidation | 2.1 (#152) | Calendar view trigger: its name joins the heading and the action ("October 2026, Choose month") with a hard-coded ", " that cannot be localised, and the h2 takes the action text. Name the button by its visible text plus aria-describedby, or pass the heading to \`viewUp({ view, heading })\` (needs a spec tweak) |
 
 ## Resolved
 
 The six add-foundations warnings first recorded here (10e5b, 10e6c, 1394b, 1394d,
 1394e, 1394f) were fixed by the implementer in the same round, before the move;
 verified at round 3 (2026-10-14).
+
+## add-grid-list: deferred tasks (archived 2026-10-18)
+
+- 0.2 / 9.2: real-AT pass (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack). Record it in "Tested with".
+- 3.1 / 6.3: virtualization (`aria-rowcount`/`aria-rowindex`), plus a virtualized fixture and measured spatial moves in three columns.
+- 4.3: React tests for Strict Mode, SSR + hydration tab stop, nested Tag Group, static vs data items.
+- 6.4: virtual screen-reader reading-order test.
