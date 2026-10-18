@@ -190,9 +190,11 @@
       [data-part="cell"]
   ) {
     inline-size: var(--rind-calendar-period-cell-size, 4.75rem);
-    padding-inline: 2px;
-    font-size: var(--rind-text-sm);
-    white-space: nowrap;
+    padding-inline: 0;
+    font-size: var(--rind-text-xs);
+    /* A table without a set width grows with its content: a name longer than its cell (a
+       locale's, a font's) wraps instead of widening the grid. */
+    overflow-wrap: anywhere;
   }
 
   :where([data-scope="calendar"][data-part="cell"][data-hover]) {
