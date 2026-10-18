@@ -5,7 +5,12 @@ export {
   codeBlockConnect,
 } from "./code-block.connect"
 export { codeBlockContract } from "./code-block.contract"
-export { type CodeLanguage, codeGrammars, resolveGrammar } from "./code-block.grammars"
+export {
+  type CodeLanguage,
+  codeBlockTokens,
+  codeGrammars,
+  resolveGrammar,
+} from "./code-block.grammars"
 export {
   CODE_TOKEN_TYPES,
   type CodeGrammar,

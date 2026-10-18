@@ -3,7 +3,13 @@
 // line end, unterminated comments at the input end, and quantified alternatives start with
 // disjoint characters, so no input backtracks catastrophically.
 
-import type { CodeGrammar, CodeGrammarRule, HighlightPrev } from "./code-block.highlight"
+import {
+  type CodeGrammar,
+  type CodeGrammarRule,
+  type HighlightPrev,
+  type HighlightToken,
+  highlightCode,
+} from "./code-block.highlight"
 
 const ws: CodeGrammarRule = { match: /\s+/ }
 const blockComment: CodeGrammarRule = { match: /\/\*[\s\S]*?(?:\*\/|$)/, token: "comment" }
@@ -22,11 +28,15 @@ const TS_KEYWORDS = words(
 const TS_TYPES = words("any bigint boolean never number object string symbol unknown void")
 const OPERAND_KEYWORDS = words("this super true false null undefined")
 
-/** After an operand, `/` divides and `<` compares; elsewhere they start a regex or a JSX tag. */
+/**
+ * After an operand, `/` divides and `<` compares; elsewhere they start a regex or a JSX tag.
+ * `++`/`--` count as postfix (`x++ / 2`): a prefix one before a regex literal is not real code.
+ */
 function afterOperand(prev: HighlightPrev): boolean {
   if (!prev) return false
   if (prev.token === "keyword") return OPERAND_KEYWORDS.has(prev.text)
-  if (prev.token === "punctuation" || prev.token === "operator") return /^[)\]}]$/.test(prev.text)
+  if (prev.token === "punctuation" || prev.token === "operator")
+    return /^(?:[)\]}]|\+\+|--)$/.test(prev.text)
   return true
 }
 
@@ -63,7 +73,10 @@ function jsGrammar(o: { readonly ts: boolean; readonly jsx: boolean }): CodeGram
     { match: /\{/, token: "punctuation", push: "code" },
     { match: /\}/, token: "punctuation", pop: true },
     { match: /\?\.|\.\.\.|[()[\];,.]/, token: "punctuation" },
-    { match: /[-+*%=&|^!<>?~:]+|\//, token: "operator" },
+    // Alone, so a JSX tag right after them is not swallowed: `i=><li>`, `a&&<b/>`.
+    { match: /=>|&&=?|\|\|=?|\?\?=?|\+\+|--/, token: "operator" },
+    // A run never takes a `<` that may open a tag (`?<A/>`): that `<` is lexed on its own.
+    { match: /(?:[-+*%=&|^!>?~:]|<(?![\p{L}_$>]))+|[</]/u, token: "operator" },
   ]
   return {
     states: {
@@ -83,7 +96,8 @@ function jsGrammar(o: { readonly ts: boolean; readonly jsx: boolean }): CodeGram
 const jsxStart: readonly CodeGrammarRule[] = [
   { match: /<>/, token: "punctuation", push: "jsxChildren", when: (p) => !afterOperand(p) },
   {
-    match: /<(?=[\p{L}_$])/u,
+    // Not a generic arrow's type parameters: `<T,>(x) =>`, `<T extends U>(x) =>`.
+    match: /<(?=[\p{L}_$])(?![\p{L}_$][\p{L}\p{N}_$]*\s*(?:,|extends\s))/u,
     token: "punctuation",
     push: "jsxTagName",
     when: (p) => !afterOperand(p),
@@ -129,7 +143,8 @@ const css: CodeGrammar = {
       { match: /@[\w-]+/, token: "keyword" },
       { match: /\{/, token: "punctuation", push: "block" },
       { match: /\}/, token: "punctuation", pop: true },
-      { match: /::?[\w-]+/, token: "keyword" },
+      // A letter after the colon: `(min-width:600px)` is a feature and a value, not a pseudo.
+      { match: /::?-?[a-zA-Z][\w-]*/, token: "keyword" },
       { match: /[.#][\w-]+/, token: "attr" },
       { match: /--[\w-]+/, token: "variable" },
       { match: /[a-zA-Z][\w-]*(?=\()/, token: "function" },
@@ -213,7 +228,8 @@ const bash: CodeGrammar = {
     root: [
       ws,
       bashVar,
-      { match: /#[^\n]*/, token: "comment" },
+      // Only at the start of a word: `a#b` and `$#` are not comments.
+      { match: /(?<![^\s;|&()])#[^\n]*/, token: "comment" },
       { match: /'[^']*'?/, token: "string" },
       { match: /"/, token: "string", push: "dq" },
       { match: /--?[a-zA-Z][\w-]*/, token: "attr" },
@@ -259,6 +275,21 @@ export const codeGrammars = {
 } as const satisfies Record<string, CodeGrammar>
 
 export type CodeLanguage = keyof typeof codeGrammars
+
+/**
+ * The tokens per line a block renders: the consumer's `lines`; none for `html` (it renders its
+ * own markup); else the built-in highlighting of `language`; none for an unknown language.
+ */
+export function codeBlockTokens<T extends HighlightToken>(input: {
+  readonly code: string
+  readonly language?: string | CodeGrammar | undefined
+  readonly lines?: readonly (readonly T[])[] | undefined
+  readonly html?: unknown
+}): readonly (readonly (T | HighlightToken)[])[] | undefined {
+  if (input.lines || input.html !== undefined) return input.lines
+  const grammar = resolveGrammar(input.language)
+  return grammar ? highlightCode(input.code, grammar) : undefined
+}
 
 /** A grammar, a built-in name (any case), or `undefined` for an unknown name: rendered plain. */
 export function resolveGrammar(

@@ -8,6 +8,13 @@
   --cb-soft: #ffffff14;
   --cb-soft-hi: #ffffff1f;
   --cb-mark: #d4ff3a;
+  /* line numbers: >= 4.5:1 on the block and on a highlighted line */
+  --cb-gutter: #9a9a93;
+  --cb-keyword: #ff7ab0;
+  --cb-string: #d4ff3a;
+  --cb-function: #9be7ff;
+  --cb-number: #ffd84d;
+  --cb-comment: #b4b4ac;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -21,6 +28,7 @@
   [data-scope="code-block"][data-part="root"] {
   --cb-bg: #2a1d5c;
   --cb-mark: #ff8fb1;
+  --cb-gutter: #b8afd9;
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="code-block"][data-part="root"] {
   --cb-bg: #f4f4f5;
@@ -28,6 +36,12 @@
   --cb-soft: #18181b0f;
   --cb-soft-hi: #18181b1a;
   --cb-mark: #2563eb;
+  --cb-gutter: #5f6068;
+  --cb-keyword: #a3195b;
+  --cb-string: #1d6b32;
+  --cb-function: #1f4fbf;
+  --cb-number: #8a4a00;
+  --cb-comment: #5f6068;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="header"] {
   display: flex;
@@ -140,7 +154,7 @@
   top: 0;
   width: 3.5ch;
   text-align: end;
-  opacity: 0.6;
+  color: var(--cb-gutter);
   user-select: none;
   -webkit-user-select: none;
   pointer-events: none;
@@ -151,52 +165,43 @@
   border-inline-start-color: var(--cb-mark);
 }
 
-/* tokens: the site's highlight.js palette on the dark skins */
+/* tokens: the site's highlight.js palette; each type reads its own property, then its
+   group's (attr falls back to string), then the skin's colour */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="keyword"] {
-  color: var(--rind-code-token-keyword, #ff7ab0);
+  color: var(--rind-code-token-keyword, var(--cb-keyword));
 }
-:is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="code-block"]
-  :is([data-token="string"], [data-token="attr"], [data-token="property"], [data-token="regex"]) {
-  color: var(--rind-code-token-string, #d4ff3a);
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="string"] {
+  color: var(--rind-code-token-string, var(--cb-string));
 }
-:is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="code-block"]
-  :is([data-token="function"], [data-token="type"], [data-token="tag"], [data-token="variable"]) {
-  color: var(--rind-code-token-function, #9be7ff);
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="attr"] {
+  color: var(--rind-code-token-attr, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="property"] {
+  color: var(--rind-code-token-property, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="regex"] {
+  color: var(--rind-code-token-regex, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="function"] {
+  color: var(--rind-code-token-function, var(--cb-function));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="type"] {
+  color: var(--rind-code-token-type, var(--rind-code-token-function, var(--cb-function)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="tag"] {
+  color: var(--rind-code-token-tag, var(--rind-code-token-function, var(--cb-function)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="variable"] {
+  color: var(--rind-code-token-variable, var(--rind-code-token-function, var(--cb-function)));
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="number"] {
-  color: var(--rind-code-token-number, #ffd84d);
+  color: var(--rind-code-token-number, var(--cb-number));
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="comment"] {
-  color: var(--rind-code-token-comment, #b4b4ac);
+  color: var(--rind-code-token-comment, var(--cb-comment));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="comment"] {
   font-style: italic;
-}
-/* bare: a light block, so the light palette (≥ 4.5:1 on #f4f4f5 and the highlighted line) */
-:is([data-skin="bare"], [data-rind-theme="skin-bare"])
-  [data-scope="code-block"]
-  [data-token="keyword"] {
-  color: var(--rind-code-token-keyword, #a3195b);
-}
-:is([data-skin="bare"], [data-rind-theme="skin-bare"])
-  [data-scope="code-block"]
-  :is([data-token="string"], [data-token="attr"], [data-token="property"], [data-token="regex"]) {
-  color: var(--rind-code-token-string, #1d6b32);
-}
-:is([data-skin="bare"], [data-rind-theme="skin-bare"])
-  [data-scope="code-block"]
-  :is([data-token="function"], [data-token="type"], [data-token="tag"], [data-token="variable"]) {
-  color: var(--rind-code-token-function, #1f4fbf);
-}
-:is([data-skin="bare"], [data-rind-theme="skin-bare"])
-  [data-scope="code-block"]
-  [data-token="number"] {
-  color: var(--rind-code-token-number, #8a4a00);
-}
-:is([data-skin="bare"], [data-rind-theme="skin-bare"])
-  [data-scope="code-block"]
-  [data-token="comment"] {
-  color: var(--rind-code-token-comment, #5f6068);
 }
 
 @media (forced-colors: active) {

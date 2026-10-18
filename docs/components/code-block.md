@@ -202,6 +202,8 @@ const ini: CodeGrammar = {
 <CodeBlock.Root code={source} language={ini}>…</CodeBlock.Root>
 ```
 
+Define the grammar at module level (or memoize it): the tokens are memoized on the grammar's identity, so an object literal written inside a component re-highlights the block on every render.
+
 Keep rules linear: let an unterminated construct end at the line or the input end (`/\/\*[\s\S]*?(?:\*\/|$)/`) instead of failing after a long scan, and keep the alternatives of a repeated group starting with different characters.
 
 ## Input: text, tokens or HTML

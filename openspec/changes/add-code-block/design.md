@@ -136,8 +136,9 @@ declarations, nested blocks); html (`name`, `tag`, `close`; script/style bodies 
 consumes what it scans or fails in a bounded look; the 5,000-line test asserts completion and
 size, never time.
 
-Rendering: React's Root computes `highlightCode(code, resolveGrammar(language))` when neither
-`lines` nor `html` is given; Line renders `{ text, token }` as `<span data-token>` from connect's
+Rendering: core's `codeBlockTokens({ code, language, lines, html })` owns the precedence
+(`lines`, then none for `html`, then `highlightCode(code, resolveGrammar(language))`); React's
+Root memoizes it on the inputs, so a custom grammar must be module-level or memoized. Line renders `{ text, token }` as `<span data-token>` from connect's
 `token(type)`, and plain text unwrapped. Colours: theme tokens `--rind-color-code-*` (tokens.css,
 `light-dark()`), read by `code-block.css` as `var(--rind-code-token-<type>,
 var(--rind-color-code-<type>))`; the block's `color-scheme` is `var(--rind-code-block-scheme,

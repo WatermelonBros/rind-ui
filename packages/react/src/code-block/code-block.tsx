@@ -10,14 +10,13 @@ import {
   codeBlockConnect,
   codeBlockMachine,
   codeBlockMessages,
-  highlightCode,
+  codeBlockTokens,
   type LineRanges,
   lineRuns,
   type MessageOverrides,
   type OverflowWatch,
   parseRanges,
   partId,
-  resolveGrammar,
   splitLines,
   type TrustedCodeHtml,
   watchOverflow,
@@ -115,7 +114,8 @@ export type CodeBlockRootProps = ComponentPropsWithRef<"div"> & {
   readonly code: string
   /**
    * Built-in highlighting: a built-in language name (any case) or your own `CodeGrammar`. An
-   * unknown name renders plain. `lines` and `html` win over it.
+   * unknown name renders plain. `lines` and `html` win over it. A custom grammar must be
+   * module-level or memoized: the tokens are memoized on its identity.
    */
   readonly language?: CodeLanguage | (string & {}) | CodeGrammar
   /** Your highlighter's tokens, one list per source line, rendered as text. */
@@ -191,11 +191,11 @@ function Root({
     defaultExpanded: defaultExpanded ?? !collapsible,
     onExpandedChange,
   })
-  const tokens = useMemo(() => {
-    if (ownTokens || html) return ownTokens
-    const grammar = resolveGrammar(language)
-    return grammar ? highlightCode(code, grammar) : undefined
-  }, [ownTokens, html, language, code])
+  // Keyed on the grammar's identity: a grammar object made in render re-lexes on every render.
+  const tokens = useMemo(
+    () => codeBlockTokens({ code, language, lines: ownTokens, html }),
+    [ownTokens, html, language, code],
+  )
   const highlighted = useMemo(() => parseRanges(highlightLines), [highlightLines])
   const lines = useMemo(
     () =>

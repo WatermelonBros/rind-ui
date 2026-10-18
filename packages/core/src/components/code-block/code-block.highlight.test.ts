@@ -1,6 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: JS source under test, not templates
 import { describe, expect, it } from "vitest"
-import { codeGrammars, resolveGrammar } from "./code-block.grammars"
+import { codeBlockTokens, codeGrammars, resolveGrammar } from "./code-block.grammars"
 import {
   type CodeGrammar,
   type CodeTokenType,
@@ -91,6 +91,62 @@ describe("jsx / tsx", () => {
     expect(of("a < b && c > d", "tsx", "tag")).toEqual([])
     expect(of("useState<string>(x)", "tsx", "tag")).toEqual([])
     expect(of("useState<string>(x)", "tsx", "function")).toEqual(["useState"])
+  })
+})
+
+describe("review regressions (#151)", () => {
+  it("a generic arrow's type parameters open no JSX", () => {
+    for (const code of [
+      "const id = <T,>(x: T) => x\nconst n = 1",
+      "const f = <T extends U>(x: T) => x\nconst n = 1",
+    ]) {
+      expect(of(code, "tsx", "tag"), code).toEqual([])
+      expect(of(code, "tsx", "keyword"), code).toContain("const")
+      expect(of(code, "tsx", "number"), code).toEqual(["1"])
+    }
+    expect(of("const a = <T>x</T>", "tsx", "tag")).toEqual(["T", "T"])
+  })
+
+  it("=>, &&, || and ?? do not swallow a following tag", () => {
+    for (const code of [
+      "items.map(i=><li>{i}</li>)",
+      "ok&&<li>{i}</li>",
+      "ok||<li>{i}</li>",
+      "x??<li>{i}</li>",
+      "ok?<li>{i}</li>:null",
+    ]) {
+      expect(of(code, "tsx", "tag"), code).toEqual(["li", "li"])
+      expect(of(code, "tsx", "regex"), code).toEqual([])
+    }
+    expect(of("a => b && c", "ts", "operator")).toEqual(["=>", "&&"])
+    expect(of("a <= b << 2", "ts", "operator")).toEqual(["<=", "<<"])
+  })
+
+  it("postfix ++ and -- are operands: the next / divides", () => {
+    expect(of("x++ / 2 / y", "js", "regex")).toEqual([])
+    expect(of("x-- / 2 / y", "js", "regex")).toEqual([])
+  })
+
+  it("bash: # starts a comment only at the start of a word", () => {
+    expect(of("echo a#b c # d", "bash", "comment")).toEqual(["# d"])
+    expect(of("x=1;# c", "bash", "comment")).toEqual(["# c"])
+    expect(of("# top", "bash", "comment")).toEqual(["# top"])
+  })
+
+  it("css: a colon before a value is no pseudo", () => {
+    const code = "@media (min-width:600px) {}\na::before:hover { top: 0 }"
+    expect(of(code, "css", "keyword")).toEqual(["@media", "::before", ":hover"])
+    expect(of(code, "css", "number")).toContain("600px")
+  })
+
+  it("codeBlockTokens: lines win, html renders none, else the language, unknown none", () => {
+    const own = [[{ text: "x", token: "string" as const }]]
+    expect(codeBlockTokens({ code: "x", language: "ts", lines: own })).toBe(own)
+    expect(codeBlockTokens({ code: "x", language: "ts", html: {} })).toBeUndefined()
+    expect(codeBlockTokens({ code: "const", language: "ts" })).toEqual([
+      [{ text: "const", token: "keyword" }],
+    ])
+    expect(codeBlockTokens({ code: "x", language: "cobol" })).toBeUndefined()
   })
 })
 
