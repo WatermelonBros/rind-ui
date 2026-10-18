@@ -108,14 +108,14 @@ accessible name, with anatomy as above and:
   selecting is keyboard only"), `nextPage()` / `previousPage()` (pointer: the trigger; keyboard:
   PageDown/PageUp in the grid), `press(key)`, and in range mode `selectRange(start, end)`
   (pointer: two clicks; keyboard: navigate and Enter twice; touch: two taps; virtual: two bare
-  clicks), `startRange(date)`, `dragRange(start, end)` (pointer and pen; keyboard declared as
-  `selectRange`) and `cancel()` (Escape);
+  clicks), `startRange(date)`, `cancel()` (Escape), and from phase 1b `dragRange(start, end)`
+  (pointer and pen; keyboard declared as `selectRange`);
 - queries: `value()` (ISO dates of cells with `aria-selected="true"`), `range()`, `anchor()`,
   `preview()`, `focusedDate()`, `heading()`, `visibleMonths()`, `isSelected(date)`,
   `isUnavailable(date)`, `isDisabled(date)`, `today()` (the cell with `aria-current="date"`),
   `isInvalid()`, `announcements()`;
-- states `idle`, `focused`, and in range mode `anchored` and `dragging`, observed through
-  `data-focus`, `data-anchored` and `data-dragging` on the root;
+- states `idle`, `focused`, and in range mode `anchored` (and from phase 1b `dragging`),
+  observed through `data-focus`, `data-anchored` and `data-dragging` on the root;
 - events: `CELL.PRESS` and `SELECT_FOCUSED` map to `select` (`selectRange` / `startRange` in
   range mode), `NAVIGATE` to `press`, `PAGE` to `nextPage`/`previousPage`, `CANCEL` to `cancel`,
   `CELL.FOCUS`, `GRID.BLUR`, `CELL.HOVER` and `LEAVE` `skip` ("covered by every action"), prop
@@ -125,7 +125,7 @@ accessible name, with anatomy as above and:
   range mode from the committed range), `composite-roving`, plus the calendar invariants and, in
   range mode, the range invariants.
 
-The same contract SHALL serve the month and year views, with the period (`"2027-03"`, `"2031"`)
+From phase 2 the same contract SHALL serve the month and year views, with the period (`"2027-03"`, `"2031"`)
 in place of the date in `select`, `focusDate` and `selectRange`.
 
 #### Scenario: Same test in both environments
@@ -230,6 +230,17 @@ thereby lets the next selection complete it. The grids SHALL carry
   presses 14 October
 - **THEN** `onValueChange` is called once with 10–14 October and no value was committed when
   the anchor was set
+
+#### Scenario: Same keyboard as Calendar
+
+- **WHEN** a cell of a range Calendar is focused and Shift+PageDown, Home and ArrowRight are
+  pressed
+- **THEN** the focused date moves exactly as in a single-mode Calendar with the same props
+
+#### Scenario: Controlled anchor cleared by the parent
+
+- **WHEN** a controlled `anchor` of 10 October is changed to `null`
+- **THEN** no cell has `data-anchor`, the preview is gone and `onValueChange` was not called
 
 #### Scenario: One change per commit (reka-ui#2396)
 
@@ -355,7 +366,8 @@ so. A committed value outside the bounds SHALL make the Calendar invalid.
 #### Scenario: At most a week
 
 - **WHEN** `maxRangeLength={7}` and the anchor is 10 October
-- **THEN** 3 to 16 October can be pressed and 17 October is disabled until the anchor is cleared
+- **THEN** 4 to 16 October can be pressed, 3 and 17 October are disabled until the anchor is
+  cleared
 
 #### Scenario: At least two nights
 
@@ -538,6 +550,236 @@ the period.
 - **WHEN** the locale is `th-TH` with `createCalendar` in the year view
 - **THEN** the cell for 2026 reads "2569" and its `data-value` is "2026-01-01"
 
+
+
+#### Scenario: Default page (months view)
+
+- **WHEN** a Calendar in the month view for 2026 in `en-US` is rendered with a heading and both triggers
+- **THEN** there is one element with role `grid` with three rows of four cells named "January 2026"
+  to "December 2026", the cells' text is "Jan" to "Dec", the heading reads "2026", and the
+  triggers are named "Previous year" and "Next year"
+
+#### Scenario: Custom column count (months view)
+
+- **WHEN** `columns={3}` is set
+- **THEN** the grid has four rows of three cells
+
+#### Scenario: Day and time kept (reka-ui#2587) (months view)
+
+- **WHEN** the value is `CalendarDateTime(2026, 10, 14, 9, 30)` and the user selects March
+- **THEN** the emitted value is `CalendarDateTime(2026, 3, 14, 9, 30)`
+
+#### Scenario: No value emits the first day (months view)
+
+- **WHEN** no value is set and the user selects June 2026
+- **THEN** the emitted value is the gregorian `CalendarDate` 2026-06-01
+
+#### Scenario: Same month is no change (months view)
+
+- **WHEN** the value is 14 October 2026 and the user presses October
+- **THEN** `onValueChange` is not called and the month stays selected
+
+#### Scenario: Controlled clear (months view)
+
+- **WHEN** the parent sets `value={null}` while a month is selected
+- **THEN** no cell is selected
+
+#### Scenario: New object for the same month (reka-ui#2960) (months view)
+
+- **WHEN** the parent passes a new `CalendarDate` object for the same month while the user has paged
+  to another year
+- **THEN** the page does not change
+
+#### Scenario: Page follows the value (months view)
+
+- **WHEN** the value is set by the parent to March 2031
+- **THEN** 2031 is shown and March has `tabindex="0"`
+
+#### Scenario: Arrow across the year (APG) (months view)
+
+- **WHEN** December 2026 is focused and ArrowRight is pressed
+- **THEN** January 2027 is focused and shown
+
+#### Scenario: RTL (months view)
+
+- **WHEN** `dir="rtl"` and ArrowLeft is pressed on October
+- **THEN** November is focused; ArrowDown still moves to the next row
+
+#### Scenario: Keyboard works in every mode (zag#2397) (months view)
+
+- **WHEN** each key above is pressed in single mode and in range mode
+- **THEN** none throws and each lands as specified
+
+#### Scenario: Virtual focus does not select (months view)
+
+- **WHEN** a screen reader moves its cursor onto October without activating it
+- **THEN** the value is unchanged
+
+#### Scenario: Bare click selects (months view)
+
+- **WHEN** a bare `click` with no pointer events is dispatched on the cell for October
+- **THEN** October is selected once
+
+#### Scenario: Max month selectable (months view)
+
+- **WHEN** `maxValue` is 5 October 2026
+- **THEN** October 2026 can be selected and November 2026 is disabled
+
+#### Scenario: Unavailable is not disabled (months view)
+
+- **WHEN** `isMonthUnavailable` is true for August
+- **THEN** the August cell has `data-unavailable`, not `data-disabled`, is reachable with the arrows and
+  pressing it changes nothing
+
+#### Scenario: Disabled keeps the selection (react-spectrum#8542) (months view)
+
+- **WHEN** a disabled month view has a value
+- **THEN** its month still has `aria-selected="true"`
+
+#### Scenario: Read-only pages (months view)
+
+- **WHEN** a read-only picker's next trigger is pressed and a month is pressed
+- **THEN** the next year is shown and the value is unchanged
+
+#### Scenario: Leaving cancels (months view)
+
+- **WHEN** the value is January–March, the user sets the anchor on June and clicks outside
+- **THEN** the value is still January–March and no anchor is set
+
+#### Scenario: Paging keeps the anchor (react-spectrum#8889) (months view)
+
+- **WHEN** the user presses November 2026, presses the next trigger and presses February 2027
+- **THEN** the value is November 2026 – February 2027
+
+#### Scenario: Hover never pages (zag#3084) (months view)
+
+- **WHEN** an anchor is set and the pointer moves over cells
+- **THEN** the shown year does not change
+
+#### Scenario: Preview is not selection (months view)
+
+- **WHEN** an anchor is set on March and October is hovered
+- **THEN** April to October carry `data-preview` and `aria-selected` stays `"false"` for them
+
+#### Scenario: Focus lands on the gridcell (months view)
+
+- **WHEN** the user tabs into the grid
+- **THEN** the focused element has role `gridcell` and no ancestor has role `application`
+
+#### Scenario: Header controls exposed (bits-ui#902) (months view)
+
+- **WHEN** a native `<select>` is rendered inside the `header`
+- **THEN** it has no `aria-hidden` ancestor
+
+#### Scenario: Name and state of the current, selected month (months view)
+
+- **WHEN** October 2026 is current and selected in `en-US`
+- **THEN** the cell's name is "October 2026", with `aria-selected="true"` and `aria-current="date"`
+
+#### Scenario: Locale names (months view)
+
+- **WHEN** the locale is `de-DE`
+- **THEN** the cell of October 2026 reads "Okt" and is named "Oktober 2026"
+
+#### Scenario: Explicit unselected state (months view)
+
+- **WHEN** a picker with a value is rendered
+- **THEN** every selectable cell has `aria-selected` set to "true" or "false"
+
+#### Scenario: Trigger at the maximum keeps focus (months view)
+
+- **WHEN** the next trigger is pressed until the year of `maxValue` is shown
+- **THEN** it has `aria-disabled="true"` and still has focus
+
+#### Scenario: Trigger paging announced once (months view)
+
+- **WHEN** inside a modal dialog the user presses the next trigger twice quickly
+- **THEN** exactly one announcement "2028" is made
+
+#### Scenario: Keyboard paging is silent (months view)
+
+- **WHEN** a cell is focused and PageDown is pressed
+- **THEN** no announcement is made
+
+#### Scenario: Range commit announced (months view)
+
+- **WHEN** the user commits March 2026 – June 2026
+- **THEN** one announcement "Selected March 2026 to June 2026" is made
+
+#### Scenario: Italian names (months view)
+
+- **WHEN** `messages={{ next: "Anno successivo" }}` is set
+- **THEN** the next trigger is named "Anno successivo"
+
+#### Scenario: One focus ring (months view)
+
+- **WHEN** the user pages with the keyboard across ten years
+- **THEN** after every step exactly one cell carries `data-focus-visible`
+
+#### Scenario: Anchor is not a range end (react-spectrum#5456) (months view)
+
+- **WHEN** an anchor is set and no range exists
+- **THEN** the anchor cell has `data-anchor` and no `data-selection-end`
+
+#### Scenario: Month, day and time kept (reka-ui#2588) (years view)
+
+- **WHEN** the value is `CalendarDateTime(2026, 10, 14, 9, 30)` and the user selects 2031
+- **THEN** the emitted value is `CalendarDateTime(2031, 10, 14, 9, 30)`
+
+#### Scenario: Leap day (years view)
+
+- **WHEN** the value is 29 February 2028 and the user selects 2029
+- **THEN** the emitted value is 28 February 2029
+
+#### Scenario: Default page (years view)
+
+- **WHEN** a Calendar in the year view is rendered with the focused year 2026 in `en-US`
+- **THEN** the heading reads "2016 – 2027", the grid has three rows of four cells for 2016 to 2027 and
+  the cell of 2026 has `tabindex="0"`
+
+#### Scenario: Ten years per page (years view)
+
+- **WHEN** `yearsPerPage={10}` and `columns={5}` are set
+- **THEN** the page is 2020–2029 in two rows of five
+
+#### Scenario: Page change announced (years view)
+
+- **WHEN** the next trigger is pressed with focus on it
+- **THEN** one announcement "2028 – 2039" is made
+
+#### Scenario: BC years (years view)
+
+- **WHEN** a gregorian page shows 3 BC to 8 BC
+- **THEN** the cells are named with their era ("3 BC") and the value emitted for the cell of 3 BC is a
+  gregorian BC date
+
+#### Scenario: Backward range (months view)
+
+- **WHEN** the user presses November 2026 and then March 2026
+- **THEN** `onValueChange` is called once with March 2026 – November 2026
+
+#### Scenario: Same test in both environments (months view)
+
+- **WHEN** `getCalendar(screen, { name: "Billing month" }).select("2027-03")` runs in jsdom and with a
+  Playwright `page`, starting from 2026
+- **THEN** both resolve with `value()` equal to `["2027-03-01"]`
+
+#### Scenario: Broken wrapper adds a button inside cells (months view)
+
+- **WHEN** a consumer wrapper renders a focusable `button` inside each cell
+- **THEN** the first keyboard step fails, naming the roving tab-stop invariant
+
+#### Scenario: Forced colors (months view)
+
+- **WHEN** a Calendar in the month view with a selected range, a current month and an unavailable month is rendered
+  under forced colors
+- **THEN** the range (`Highlight`), the current month (border), the unavailable month (strike-through,
+  `GrayText`) and the focused cell (outline) are all distinguishable
+
+#### Scenario: Forced colors (years view)
+
+- **WHEN** a Calendar in the year view with a selected year and the current year is rendered under forced colors
+- **THEN** both are distinguishable and the focused cell has an outline
 
 ### Requirement: View Drill-Down
 

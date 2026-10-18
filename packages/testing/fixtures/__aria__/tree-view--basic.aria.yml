@@ -1,0 +1,8 @@
+- text: Files
+- tree "Files":
+  - treeitem "src" [expanded] [level=1]
+  - treeitem "components" [level=2]
+  - treeitem "index.ts" [level=2] [selected]
+  - treeitem "server.ts" [level=2]
+  - treeitem "docs" [level=1]
+  - treeitem "package.json" [level=1]

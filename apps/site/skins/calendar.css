@@ -1,10 +1,15 @@
 /* ── Calendar: a date grid; every state is an attribute, drawn here without colour alone ── */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="root"] {
+  /* as wide as its months: the header is laid over the top padding, so it never widens the
+     calendar, and a flex or grid parent never stretches it */
+  position: relative;
   display: inline-flex;
   flex-wrap: wrap;
   gap: 12px 20px;
+  align-self: start;
+  justify-self: start;
   max-inline-size: 100%;
-  padding: 14px;
+  padding: 58px 14px 14px;
   border: var(--s-bw) solid var(--s-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
@@ -21,15 +26,18 @@
   opacity: 0.5;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="header"] {
+  position: absolute;
+  inset: 14px 14px auto;
   display: flex;
-  flex: 1 0 100%;
   align-items: center;
   justify-content: space-between;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="heading"] {
+  /* an h2: the docs' own heading style must not reach it */
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font: 700 16px / 1.3 var(--s-font);
+  letter-spacing: normal;
+  text-transform: none;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"]) {
@@ -45,15 +53,27 @@
   cursor: pointer;
   touch-action: manipulation;
 }
+/* juicy has no border width: a soft fill draws the circle */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+[data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"]) {
+  background: var(--s-muted);
+}
+/* a chevron drawn with two borders: centred in the circle whatever the font's metrics */
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="calendar"][data-part="prev-trigger"]::after {
-  content: "‹" / "";
-  font-size: 20px;
+[data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])::after {
+  content: "";
+  inline-size: 7px;
+  block-size: 7px;
+  /* physical sides: the trigger is mirrored under rtl already */
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  translate: 1.5px 0;
+  rotate: -45deg;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="next-trigger"]::after {
-  content: "›" / "";
-  font-size: 20px;
+  translate: -1.5px 0;
+  rotate: 135deg;
 }
 /* The glyphs point the way the pages go: mirrored under rtl. */
 :is([data-skinned], [data-rind-theme^="skin-"])
@@ -106,7 +126,8 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-today] {
-  border-color: var(--s-line);
+  /* a ring, not the border: juicy has no border width */
+  box-shadow: inset 0 0 0 2px var(--s-ink);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-selected] {

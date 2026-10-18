@@ -75,6 +75,8 @@ archives; merge `origin/main` once #113 lands.
 
 Every requirement of the seven retired changes and where it went. Nothing is dropped: each
 coverage class moves with its requirement (model classes per mode in tasks.md).
+Scenarios move with their requirement too: the month and year pickers' scenarios are kept as
+period scenarios of calendar "Month And Year Views" (suffixed "(months view)" / "(years view)").
 
 | Retired change | Capability | Requirement | Where it went |
 |---|---|---|---|

@@ -29,6 +29,12 @@ SHALL be `hour`, `minute` (default) or `second`. Times SHALL never pass through 
 - **WHEN** the value is `CalendarDateTime(2026, 10, 14, 9, 30)` and the user types 10:45
 - **THEN** the value is `CalendarDateTime(2026, 10, 14, 10, 45)`
 
+#### Scenario: Standalone time field
+
+- **WHEN** a time field labelled "Alarm" is rendered in `en-US`
+- **THEN** there is one element with role `group` named "Alarm" containing spinbuttons named
+  "hour Alarm", "minute Alarm" and "AM/PM Alarm" (the locale's display name for the day period)
+
 ### Requirement: Time Values — Hour Cycles
 
 `hourCycle={24}` SHALL show hours 0–23 with no day-period segment; `hourCycle={12}` SHALL show
@@ -136,6 +142,16 @@ range-mode Date Field. Time ends follow the time requirements per end.
 - **WHEN** a range-mode time field labelled "Shift" is rendered in `en-US`
 - **THEN** the group "Shift" contains spinbuttons named "hour Start time Shift", "minute Start time
   Shift", "AM/PM Start time Shift" and the same three for the end
+
+#### Scenario: Types from the value
+
+- **WHEN** the default value is two `CalendarDateTime`s and the user edits the end's day
+- **THEN** `onValueChange` receives two `CalendarDateTime`s, the start unchanged
+
+#### Scenario: Type exported (reka-ui#2589)
+
+- **WHEN** a consumer imports the range value type for a time range
+- **THEN** `TimeRangeValue` is available from the package
 
 ### Requirement: Range Mode — One Control Two Embedded Fields
 
@@ -456,10 +472,18 @@ props type with the Calendar's data props so none is dropped (react-spectrum#855
 - **WHEN** `minValue` is after `maxValue`
 - **THEN** a development warning names both props and opening the calendar does not loop
 
+#### Scenario: Standalone range picker
+
+- **WHEN** a range-mode picker labelled "Stay" is rendered in `en-US`
+- **THEN** there is one `group` named "Stay" containing six spinbuttons (the first named "month Start date Stay") and a button named
+  "Choose dates Stay"
+
 ### Requirement: Picker — Calendar Binding
 
 The `calendar` part SHALL be the Calendar bound to the picker: its `value`, `focusedValue`, `minValue`, `maxValue`,
-`isDateUnavailable`, `disabled`, `readOnly`, `invalid`, locale, time zone and `firstDayOfWeek` SHALL come from the picker, and its
+`isDateUnavailable`, `disabled`, `readOnly`, `invalid`, locale, time zone, `firstDayOfWeek` and, in range mode,
+`allowsNonContiguousRanges`, `minRangeLength`, `maxRangeLength` and `commitOnBlur` SHALL come from
+the picker (so the field never accepts a range the calendar cannot pick), and its
 `selectionMode` SHALL be the field's; view props (`visibleMonths`, `pageBehavior`, `fixedWeeks`, `weekdayFormat`, `messages`) SHALL be the
 part's own. The picker's and the Calendar's data props SHALL be one shared props type so none is dropped (react-spectrum#8557).
 
@@ -675,8 +699,8 @@ SHALL clear the value and the calendar's selection.
 
 The Control SHALL be a `group` named by the Label and described by the Field's ids and a visually hidden value description
 `messages.valueDescription({ formatted })` (default "Selected date: {formatted}", absent when the value is `null`). The embedded
-field's `Input` SHALL have `role="presentation"` so no nested group is announced. The trigger SHALL be named by
-`messages.trigger` and the Label (`aria-labelledby` its own id and the Label's) and described by the value description. The content
+field's `Input` SHALL have `role="presentation"` so no nested group is announced. The trigger SHALL have `aria-haspopup="dialog"`, `aria-expanded` and, while the content is
+mounted, `aria-controls`, and SHALL be named by `messages.trigger` and the Label (`aria-labelledby` its own id and the Label's) and described by the value description. The content
 SHALL be a `dialog` named by the trigger name and the Label unless a Title or consumer name is given. No string reaching assistive technology SHALL be
 hard-coded outside `messages`.
 
@@ -822,7 +846,9 @@ anchor. Two presses on the same date SHALL commit a one-day range.
 
 ### Requirement: Picker — Range: Cancel And Leave
 
-While the range Calendar is anchored, the first Escape SHALL clear the anchor and be consumed (the popover stays open); a second
+The picker SHALL force the range Calendar's `commitOnBlur` to `"reset"` when the popover closes
+(a preview is never committed by closing); `commitOnBlur` on the picker applies only to focus
+leaving the calendar while the popover stays open. While the range Calendar is anchored, the first Escape SHALL clear the anchor and be consumed (the popover stays open); a second
 Escape SHALL close the popover with reason `"escape-key"`. Closing the popover by an outside press, by Tab leaving, by the trigger or
 by the API while anchored SHALL reset the anchor and keep the previous value; it SHALL NOT commit a preview. The Control and the content
 SHALL be inside; a layer opened from the calendar's header SHALL be inside and SHALL keep the anchor. One press SHALL close at most one
@@ -1037,3 +1063,88 @@ the same.
 
 - **WHEN** the consumer renders children inside the trigger
 - **THEN** the children are shown and no masked icon is drawn
+
+### Requirement: Value And Callbacks
+
+The Date Field SHALL have a controllable `value` (`value`, `defaultValue`, `onValueChange(value,
+details)`) of type `CalendarDate | CalendarDateTime | ZonedDateTime | Time | null` in single
+mode and `{ start, end } | null` (`DateRangeValue`, `TimeRangeValue`) in range mode, changed only
+at the commit points of `date-segments`, keeping the value's type, calendar and zone
+(`date-values`; a date-time keeps its date when only its time is edited). `placeholderValue`
+SHALL set the type and zone when there is no value. `onValueChange` SHALL NOT be called when the
+committed value equals the current one, and SHALL NOT be called by a controlled change.
+
+#### Scenario: Value type from the placeholder
+
+- **WHEN** a field with no value has `placeholderValue={new CalendarDateTime(2026, 1, 1, 9, 0)}`
+  and the user fills every segment
+- **THEN** `onValueChange` receives a `CalendarDateTime`
+
+### Requirement: Group Semantics And Value Description
+
+The group SHALL have `role="group"`, be named by the Field's Label (`aria-labelledby`), carry
+`aria-disabled` when disabled, and be described by the Field's description and error ids and by
+a visually hidden value description from `messages.valueDescription` (default "Selected date:
+{formatted}" with the full localised date; in range mode `messages.rangeDescription`; absent when
+the value is `null`). The group is the `input` part, except with picker parts, where the
+`control` part is the group and the `input` has `role="presentation"` so no nested group is
+announced; in range mode the `input` (or the `control` with picker parts) is the one group of
+both ends and the `start` and `end` parts have no role. The Field's description ids SHALL reach
+the segments as `date-segments` defines. A press on the Label SHALL focus the first editable
+segment.
+
+#### Scenario: Group description carries the whole value
+
+- **WHEN** the value is 14 October 2026 in `en-US`
+- **THEN** the group's accessible description contains "Selected date: Wednesday, October 14,
+  2026"
+
+#### Scenario: One group with picker parts
+
+- **WHEN** a field with picker parts labelled "Birthday" is rendered
+- **THEN** the `control` is the only `group` named "Birthday" and the `input` has
+  `role="presentation"`
+
+### Requirement: Form Participation
+
+The hidden native input SHALL be declared by value type: `type="date"` for `CalendarDate`,
+`type="datetime-local"` for `CalendarDateTime` with `step` 3600, 60 or 1 for hour, minute or
+second granularity, `type="time"` with the same steps for `Time`, and `type="text"` for
+`ZonedDateTime`. Its value SHALL be the value's ISO string (gregorian; with offset and zone for
+`ZonedDateTime`; the ISO time for `Time`) or `""` when the value is `null`, including while
+segments hold an incomplete or impossible entry. `name`, `form`, `required`, `disabled` and, for
+the native date and time types, `min`/`max` from `minValue`/`maxValue` SHALL be mirrored.
+`autoComplete` SHALL be set on the hidden input only. A browser autofill of the hidden input with
+a valid ISO string SHALL be adopted as the value. In range mode there SHALL be two hidden inputs
+(`startName`, `endName`), as Range Mode — Hidden Inputs And Form defines.
+
+#### Scenario: Stale form value after clearing (react-spectrum#9801)
+
+- **WHEN** a field inside a form has 14 October 2026 and the user clears the day
+- **THEN** the form data has the field's name with an empty value
+
+#### Scenario: Seconds without step mismatch (reka-ui#3000)
+
+- **WHEN** a `CalendarDateTime` field with `granularity="second"` holds 09:30:15 and the form
+  is validated
+- **THEN** the hidden input has `step="1"` and no `stepMismatch`
+
+#### Scenario: Out of range blocks submission (reka-ui#2275)
+
+- **WHEN** `maxValue` is 31 December 2026, the user types 1 January 2027 and submits
+- **THEN** submission is cancelled and focus is on the field's first segment
+
+### Requirement: Draft Hint
+
+The Date Field SHALL take `onDraftChange({ year, month, day })`, called after each commit point
+and each segment clear with the committed segments only (numbers in the field's calendar, `null`
+for an empty or uncommitted segment), only when the triple changes. Typing digits inside a
+segment SHALL NOT call it. It is a hint for hosts that follow the typed date (the picker's
+calendar) and SHALL NOT change the value or its callbacks.
+
+#### Scenario: Calendar follows the typed month and year
+
+- **WHEN** the user types "3" and "/" in the month segment, then "2","0","3","1" in the year
+  segment of an empty field
+- **THEN** `onDraftChange` was called with `{ year: null, month: 3, day: null }` and then with
+  `{ year: 2031, month: 3, day: null }`, and `onValueChange` was not called
