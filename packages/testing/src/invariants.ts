@@ -805,6 +805,10 @@ export const traitInvariants: Readonly<Partial<Record<Trait, GenericInvariant>>>
       list.length > 0 && stops !== 1 && !(stops === 0 && container)
         ? [`${stops} items have tabindex="0"; expected exactly 1`]
         : []
+    // A grid cell is the tab stop itself: a control inside it is a second, unmanaged stop.
+    for (const el of list)
+      if (el.focusableInside)
+        out.push(`${el.describe} contains a focusable descendant; the roving tab stop is the cell`)
     // A step that removed or filtered out the focused item leaves focus in the composite.
     if (f.before?.focus.inInstance && f.after.focus.onBody) {
       out.push("focus fell to <body> after the step (the focused item was removed?)")

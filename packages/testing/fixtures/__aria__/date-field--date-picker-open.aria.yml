@@ -8,7 +8,8 @@
 - dialog "Choose date Departure":
   - group "October 2026":
     - button "Previous month"
-    - heading "October 2026" [level=2]
+    - heading "October 2026, Choose month" [level=2]:
+      - button "October 2026, Choose month": October 2026
     - button "Next month"
     - grid "October 2026":
       - rowgroup:

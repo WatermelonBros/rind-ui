@@ -27,8 +27,8 @@ instance behaves the same.
 #### Scenario: Month view
 
 - **WHEN** a Calendar with `view="months"` is rendered for 2026 in `en-US`
-- **THEN** there is one element with role `grid` with three rows of four cells named "January
-  2026" to "December 2026", the cells read "Jan" to "Dec", the heading reads "2026" and the
+- **THEN** there is one element with role `grid` with three rows of four cells named and reading
+  "January" to "December", the grid is named "2026", the heading reads "2026" and the
   triggers are named "Previous year" and "Next year"
 
 ### Requirement: Value And Selection
@@ -504,11 +504,12 @@ column of the adjacent row, Home / End the first / last period of the page, Page
 same position on the adjacent page, Enter and Space select; there SHALL be no drag selection.
 `isMonthUnavailable(month)` / `isYearUnavailable(year)` SHALL decide availability for the period
 (never derived from its days); disabled (outside `minValue`/`maxValue` at the period, or the
-Calendar disabled) and unavailable SHALL stay distinct. Cells SHALL be named by
-`messages.cellLabel` for the period (default "October 2026", or the localised year with its era
-when the calendar shows eras), show the month in `monthFormat` (`"short"` default, `"long"`,
-`"narrow"`, `"numeric"`) or the year's `year` part in the display calendar, and carry
-`aria-current="date"` on the current period. The heading SHALL show the page's year, or the
+Calendar disabled) and unavailable SHALL stay distinct. Month cells SHALL show the locale's
+long month name (`Intl.DateTimeFormat(locale, { month: "long" })`, "October", "gennaio") and
+year cells the year's `year` part in the display calendar, with its era when the calendar shows
+eras; period cells SHALL carry no `aria-label`, so their name is their visible text in every
+locale (WCAG 2.5.3), and the year SHALL come from the grid's name (labelled by the heading).
+They SHALL carry `aria-current="date"` on the current period. The heading SHALL show the page's year, or the
 page's first and last year as a range ("2016 – 2027"); the triggers SHALL page by one year or
 one block of years and be named by the view's messages (default "Previous year" / "Next year",
 "Previous years" / "Next years"). Range mode SHALL work in both views with the range module at
@@ -581,8 +582,8 @@ the period.
 #### Scenario: Default page (months view)
 
 - **WHEN** a Calendar in the month view for 2026 in `en-US` is rendered with a heading and both triggers
-- **THEN** there is one element with role `grid` with three rows of four cells named "January 2026"
-  to "December 2026", the cells' text is "Jan" to "Dec", the heading reads "2026", and the
+- **THEN** there is one element with role `grid` with three rows of four cells named and reading
+  "January" to "December", the grid is named "2026", the heading reads "2026", and the
   triggers are named "Previous year" and "Next year"
 
 #### Scenario: Custom column count (months view)
@@ -700,12 +701,12 @@ the period.
 #### Scenario: Name and state of the current, selected month (months view)
 
 - **WHEN** October 2026 is current and selected in `en-US`
-- **THEN** the cell's name is "October 2026", with `aria-selected="true"` and `aria-current="date"`
+- **THEN** the cell's name is "October" in the grid named "2026", with `aria-selected="true"` and `aria-current="date"`
 
 #### Scenario: Locale names (months view)
 
 - **WHEN** the locale is `de-DE`
-- **THEN** the cell of October 2026 reads "Okt" and is named "Oktober 2026"
+- **THEN** the cell of October 2026 reads and is named "Oktober"
 
 #### Scenario: Explicit unselected state (months view)
 

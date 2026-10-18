@@ -21,8 +21,14 @@ export {
   rangeOf,
   sameDays,
   valuesOf,
+  viewIn,
 } from "./calendar.machine"
-export { type CalendarMessages, calendarMessages } from "./calendar.messages"
+export {
+  type CalendarMessages,
+  calendarMessages,
+  type ViewMessage,
+  viewMessage,
+} from "./calendar.messages"
 export { calendarMeta } from "./calendar.meta"
 export {
   align as alignVisibleMonths,
@@ -38,11 +44,28 @@ export {
   visibleEnd,
 } from "./calendar.navigation"
 export {
+  type CalendarView,
+  canPagePeriod,
+  clampPeriod,
+  clampView,
+  movePeriod,
+  type PeriodMove,
+  type PeriodOptions,
+  type PeriodView,
+  pageOf,
+  periodAllowed,
+  periodEnd,
+  periodStart,
+  viewStep,
+} from "./calendar.period"
+export {
+  announceHeading,
   announceVisibleRange,
   type DateGridPieceProps,
   focusedValueControllable,
   prepareAnnouncer,
   requestCellFocus,
+  viewHeadingText,
   visibleRangeText,
 } from "./calendar.pieces"
 export {

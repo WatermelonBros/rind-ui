@@ -47,6 +47,15 @@ export const oracle = (cfg: Config) => ({
   messages: calendarMessages,
   id: "cal",
   focusCell: () => {},
+  view: undefined,
+  defaultView: cfg.defaultView ?? cfg.minView ?? "days",
+  onViewChange: undefined,
+  minView: cfg.minView ?? "days",
+  maxView: cfg.maxView ?? "years",
+  yearsPerPage: cfg.yearsPerPage,
+  columns: cfg.columns,
+  isMonthUnavailable: cfg.isMonthUnavailable,
+  isYearUnavailable: cfg.isYearUnavailable,
 })
 
 /** The model's story: the Calendar under the run's platform and direction, with a fixed clock. */
