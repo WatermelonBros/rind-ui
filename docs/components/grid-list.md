@@ -31,7 +31,15 @@ import { GridList } from "@rind-ui/react"
 Every focusable element inside a row must be an `ItemControl` (or the `ItemCheckbox`): the list navigates only to those, and in development it warns about any other focusable element it finds in a row. Give `ItemControl` your own element with `render`:
 
 ```tsx
-<GridList.ItemControl render={(props) => <input {...props} aria-label="Quantity" />} />
+<GridList.Root childNavigation="tab">
+  <GridList.Label>Shopping list</GridList.Label>
+  <GridList.List>
+    <GridList.Item value="bread">
+      <GridList.ItemText>Bread</GridList.ItemText>
+      <GridList.ItemControl render={(props) => <input {...props} aria-label="Quantity" />} />
+    </GridList.Item>
+  </GridList.List>
+</GridList.Root>
 ```
 
 ## API
