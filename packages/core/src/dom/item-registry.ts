@@ -76,10 +76,13 @@ export function createItemRegistry(
     list.every(
       (it, i) => i === 0 || inDocumentOrder(list[i - 1]?.element ?? it.element, it.element) <= 0,
     )
+  /** The first commit is always reported: a root with no items yet is empty, not pending. */
+  let reported = false
   const flush = () => {
     // Nothing registered, but the same elements may have moved (a reorder keeps every key,
     // text and element: headlessui#2131), so the root's per-commit flush re-checks the order.
-    if (!scheduled && inOrder(emitted)) return
+    if (reported && !scheduled && inOrder(emitted)) return
+    reported = true
     scheduled = false
     let list = [...items.values()]
     // Fast path: parts usually register in document order already.

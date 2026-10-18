@@ -21,6 +21,14 @@ afterEach(() => {
 })
 
 describe("createItemRegistry", () => {
+  it("the first flush reports even with no items: an empty root is empty, not pending", () => {
+    const { calls, registry } = setup()
+    registry.flush()
+    expect(calls).toEqual([[]])
+    registry.flush()
+    expect(calls).toHaveLength(1)
+  })
+
   it("flushes once per batch: 1,000 registrations in one microtask call onChange once", async () => {
     const { calls, registry, el } = setup()
     for (let i = 0; i < 1000; i++) registry.register({ key: `k${i}`, element: el(`item ${i}`) })
