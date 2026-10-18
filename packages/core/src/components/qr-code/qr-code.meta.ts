@@ -75,23 +75,23 @@ export const qrCodeMeta = {
       type: "({ fileName, mimeType, overlay }) => void",
       description: 'Root: once per download; `overlay` is "included", "omitted" or "none".',
     },
-    mimeType: {
+    "*.mimeType": {
       type: '"image/png" | "image/jpeg" | "image/webp" | "image/svg+xml"',
       default: '"image/png"',
       description: "DownloadTrigger: the file type.",
     },
-    fileName: {
+    "*.fileName": {
       type: "string",
       default: '"qr-code.<ext>"',
       description: "DownloadTrigger: the file name; path separators are removed.",
     },
-    size: {
+    "*.size": {
       type: "number",
       default: "1024",
       description:
         "DownloadTrigger: the image width in CSS pixels, rounded up to whole pixels per module.",
     },
-    quality: { type: "number", description: "DownloadTrigger: 0–1 for JPEG and WebP." },
+    "*.quality": { type: "number", description: "DownloadTrigger: 0–1 for JPEG and WebP." },
     apiRef: {
       type: "Ref<{ getDataUrl(mimeType?, { size?, quality? }?), download(options?), setValue(value) }>",
       description:
@@ -102,7 +102,7 @@ export const qrCodeMeta = {
       description:
         'Root: the frame\'s default name ("QR code") and the trigger\'s ("Download QR code").',
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description: "Substitutes the rendered element of any part.",
     },

@@ -47,13 +47,19 @@ export interface ListboxChangeDetails {
 }
 
 type Common = {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
+  /** The listbox parts. */
   readonly children?: ReactNode
   readonly orientation?: "vertical" | "horizontal"
   readonly disabled?: boolean
+  /** A disabled list keeps its Tab stop and disabled items stay reachable (not selectable). */
   readonly focusableWhenDisabled?: boolean
+  /** `all`: disabled items are skipped and not actionable; `selection`: reachable, only not selectable. Default: `"all"`. */
   readonly disabledBehavior?: "all" | "selection"
+  /** Arrow keys wrap from the last item to the first and back. Default: `false`. */
   readonly loop?: boolean
+  /** How long typed characters build one typeahead search (ms). Default: 1000. */
   readonly typeaheadTimeout?: number
   /** Data items. Without them (and without `collection`), item parts register themselves. */
   readonly items?: readonly ListboxItemData[]
@@ -61,8 +67,11 @@ type Common = {
   readonly collection?: Collection<unknown>
   readonly loading?: LoadingStatus
   readonly onLoadMore?: () => void
+  /** Items are not all rendered: the highlighted item is scrolled through `scrollToIndex`, never `scrollIntoView`. */
   readonly virtualized?: boolean
+  /** Scrolls the highlighted item into view on navigation, typeahead and open (replaces `scrollIntoView`). */
   readonly scrollToIndex?: (details: ScrollToIndexDetails) => void
+  /** `roving`: DOM focus moves to the item; `active-descendant`: focus stays on the list. Default: `"roving"`. */
   readonly strategy?: FocusStrategy
 }
 
@@ -82,6 +91,7 @@ type Selection =
         value: readonly string[] | "all",
         details: ListboxChangeDetails,
       ) => void
+      /** No user action leaves the selection empty. */
       readonly disallowEmptySelection?: boolean
     }
   | {

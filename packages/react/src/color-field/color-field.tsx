@@ -117,6 +117,7 @@ export type ColorFieldRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir" | "color"
 > & {
+  /** The field's parts (Label, Input, Description, ErrorMessage). */
   readonly children?: ReactNode
   readonly value?: ColorInput | null
   /** Default `null` (no colour). */
@@ -133,14 +134,19 @@ export type ColorFieldRootProps = Omit<
   readonly alpha?: boolean
   readonly colorSpace?: ColorSpace
   readonly name?: string
+  /** The id of the form the hidden input belongs to. */
   readonly form?: string
   readonly disabled?: boolean
   readonly readOnly?: boolean
   readonly required?: boolean
+  /** Marks the field invalid whatever the text (`aria-invalid`, `data-invalid`). */
   readonly invalid?: boolean
+  /** Sets the direction when `dir` is not given. Default: the provider's. */
   readonly locale?: string
+  /** Reading direction of the root. Default: the locale's, else the provider's. */
   readonly dir?: "ltr" | "rtl"
   readonly messages?: MessageOverrides<ColorFieldMessages>
+  /** The Field's messages when the Root is the Field. */
   readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
 
@@ -326,6 +332,7 @@ function Input({
   id,
   ...rest
 }: Omit<ComponentPropsWithRef<"input">, "value" | "defaultValue"> & {
+  /** Another element or a render function receiving the props and the field's state. */
   readonly render?: RenderProp<ColorFieldState>
 }) {
   const ctx = useColorField("Input")

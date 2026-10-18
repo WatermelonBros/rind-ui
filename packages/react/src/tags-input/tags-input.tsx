@@ -81,7 +81,9 @@ const fromData = (items: readonly TagsInputItemData[]) =>
 const NO_ITEMS = fromData([])
 
 export interface TagsInputRootProps {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
+  /** The Tags Input parts (Root renders no element). */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -109,6 +111,7 @@ export interface TagsInputRootProps {
   readonly required?: boolean
   readonly name?: string
   readonly inputName?: string
+  /** The id of the form the submitted tags (and the named text input) belong to. */
   readonly form?: string
   readonly messages?: Partial<TagsInputMessages>
   /** Suggestions: the input becomes a combobox; choosing one creates a tag from its key. */
@@ -436,6 +439,7 @@ function Root(all: TagsInputRootProps) {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -536,7 +540,14 @@ const useChip = (part: string) => {
   return chip
 }
 
-function Chip({ render, disabled, ...rest }: Own<"span"> & { readonly disabled?: boolean }) {
+function Chip({
+  render,
+  disabled,
+  ...rest
+}: Own<"span"> & {
+  /** Locks this tag: it cannot be edited or removed, and clearing keeps it. */
+  readonly disabled?: boolean
+}) {
   const host = useLive("Chip")
   const chip = useChip("Chip")
   const { setDisabled } = host

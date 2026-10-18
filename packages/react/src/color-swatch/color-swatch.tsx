@@ -31,9 +31,13 @@ export type ColorSwatchProps = Omit<ComponentPropsWithRef<"div">, "color"> & {
   readonly color?: ColorInput
   /** `false`: the opaque colour (default true). */
   readonly respectAlpha?: boolean
+  /** A fixed name (a design token) or a function replacing the computed name. */
   readonly colorName?: ColorNameProp
+  /** Formats the transparency percentage. Default: the provider's locale. */
   readonly locale?: string
+  /** The role description and the colour words. */
   readonly messages?: MessageOverrides<ColorSwatchMessages>
+  /** Another element or a render function receiving the props and the swatch's state. */
   readonly render?: RenderProp<ColorSwatchState>
 }
 
@@ -110,7 +114,9 @@ export function TransparencyGrid({
   render,
   ...rest
 }: ComponentPropsWithRef<"div"> & {
+  /** The `data-scope` it carries (default `"color-swatch"`). */
   readonly scope?: string
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<Record<never, never>>
 }) {
   const instance = useRootId(undefined)

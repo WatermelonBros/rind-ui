@@ -34,10 +34,10 @@ Heading is stateless: it has no machine.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `level` | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | — | On `Heading`: overrides the nesting. On `Heading.Level`: the level below it (default: one more than around it). |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: a non-heading gets `role="heading"` and `aria-level`, another `h1`–`h6` gets `aria-level`. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Heading` | `level` | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | — | On `Heading`: overrides the nesting. On `Heading.Level`: the level below it (default: one more than around it). |
+| `Heading` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: a non-heading gets `role="heading"` and `aria-level`, another `h1`–`h6` gets `aria-level`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

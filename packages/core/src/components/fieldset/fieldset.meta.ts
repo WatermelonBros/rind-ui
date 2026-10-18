@@ -53,12 +53,12 @@ export const fieldsetMeta = {
       default: "false",
       description: "On Root: shows the ErrorMessage. Never passed to the controls inside.",
     },
-    forceMount: {
+    "*.forceMount": {
       type: "boolean",
       default: "false",
       description: "On ErrorMessage: keep it mounted while not invalid.",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         'Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls.',

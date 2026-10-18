@@ -89,6 +89,7 @@ export type CalendarRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The calendar's parts (header, grids). */
   readonly children?: ReactNode
   readonly value?: CalendarValue
   readonly defaultValue?: CalendarValue
@@ -97,6 +98,7 @@ export type CalendarRootProps = Omit<
   readonly focusedValue?: DateValue
   readonly defaultFocusedValue?: DateValue
   readonly onFocusChange?: (date: CalendarDate) => void
+  /** The visible months changed. */
   readonly onVisibleRangeChange?: (range: { start: CalendarDate; end: CalendarDate }) => void
   readonly minValue?: DateValue | null
   readonly maxValue?: DateValue | null
@@ -107,20 +109,27 @@ export type CalendarRootProps = Omit<
   ) => boolean
   /** Range mode: the first end while a range is being selected (controllable). */
   readonly anchor?: CalendarDate | null
+  /** Uncontrolled anchor. */
   readonly defaultAnchor?: CalendarDate | null
+  /** The anchor was set or cleared. */
   readonly onAnchorChange?: (anchor: CalendarDate | null) => void
   /** Range mode: length bounds in days, both ends included. */
   readonly minRangeLength?: number
+  /** Range mode: longest range in days (ends included); farther ends are disabled. */
   readonly maxRangeLength?: number
   /** Range mode: a range may contain unavailable dates (default false). */
   readonly allowsNonContiguousRanges?: boolean
   /** Range mode: what leaving while anchored does (default "reset"). */
   readonly commitOnBlur?: CalendarCommitOnBlur
+  /** Months shown side by side. Default: 1. */
   readonly visibleMonths?: number
+  /** A trigger pages by all visible months, or by one. Default: "visible". */
   readonly pageBehavior?: "visible" | "single"
+  /** Always six weeks per month. */
   readonly fixedWeeks?: boolean
   readonly firstDayOfWeek?: DayOfWeek
   readonly locale?: string
+  /** Reading direction; RTL mirrors the arrow keys. Default: the provider's. */
   readonly dir?: "ltr" | "rtl"
   /** Calendar systems other than gregorian (`createCalendar` from @internationalized/date). */
   readonly createCalendar?: CreateCalendar
@@ -135,10 +144,13 @@ export type CalendarRootProps = Omit<
    * change: a picker closes on it.
    */
   readonly onDateSelect?: (date: CalendarDate, details: { readonly modality: Modality }) => void
+  /** Every string reaching assistive technology. */
   readonly messages?: MessageOverrides<CalendarMessages>
   /** The shown view: days, the months of a year, or a page of years (controllable). */
   readonly view?: CalendarView
+  /** The view shown first (uncontrolled). Default: `minView`. */
   readonly defaultView?: CalendarView
+  /** The view changed; `reason` is `heading`, `select` (a period drilled into), `escape-key` or `api`. */
   readonly onViewChange?: (view: CalendarView, details: CalendarViewChangeDetails) => void
   /** The lowest view (default "days"): the value is chosen there; higher views drill down. */
   readonly minView?: CalendarView
@@ -204,7 +216,10 @@ function Root({
   id,
   render,
   ...rest
-}: CalendarRootProps & { readonly render?: RenderProp<undefined> }) {
+}: CalendarRootProps & {
+  /** Another element or a render function receiving the props. */
+  readonly render?: RenderProp<undefined>
+}) {
   const env = useEnvironment()
   const generated = useId()
   const instance = id ?? generated
@@ -427,6 +442,7 @@ function Root({
 }
 
 type PartP<T extends keyof HTMLElementTagNameMap> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -586,7 +602,14 @@ function GridHeader({ render, ...rest }: PartP<"thead">) {
   return renderPart("thead", mergeProps(normalizeProps(api.gridHeader()), rest), render, undefined)
 }
 
-function HeaderCell({ day, render, ...rest }: PartP<"th"> & { readonly day: number }) {
+function HeaderCell({
+  day,
+  render,
+  ...rest
+}: PartP<"th"> & {
+  /** The weekday, 0-6 from the week's first day. */
+  readonly day: number
+}) {
   const { api } = useCalendar("HeaderCell")
   return renderPart("th", mergeProps(normalizeProps(api.headerCell(day)), rest), render, undefined)
 }
@@ -611,7 +634,9 @@ function Cell({
   render,
   ...rest
 }: Omit<ComponentPropsWithRef<"td">, "children"> & {
+  /** The date this cell shows and selects. */
   readonly date: CalendarDate
+  /** Another element or a render function receiving the props and the cell's state. */
   readonly render?: RenderProp<CalendarCellState>
 }) {
   const ctx = useCalendar("Cell")

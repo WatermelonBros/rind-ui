@@ -71,6 +71,7 @@ interface RegionCtx {
 const RegionContext = createContext<RegionCtx | null>(null)
 
 export type ContextMenuRootProps = MenuLevelOptions & {
+  /** Base for the ids of the menu's parts. Default: generated. */
   readonly id?: string
   readonly open?: boolean
   readonly defaultOpen?: boolean
@@ -88,6 +89,7 @@ export type ContextMenuRootProps = MenuLevelOptions & {
   readonly keepMounted?: boolean
   readonly messages?: MessageOverrides<ContextMenuMessages>
   readonly actionsRef?: Ref<ContextMenuActions>
+  /** The context menu's parts: its trigger region and the `Menu` portal, positioner and content. */
   readonly children?: ReactNode
 }
 

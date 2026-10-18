@@ -176,6 +176,7 @@ export interface CollapsibleState {
 }
 
 export type CollapsibleRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The Trigger, the Content and any other parts. */
   readonly children?: ReactNode
   readonly open?: boolean
   readonly defaultOpen?: boolean
@@ -185,6 +186,7 @@ export type CollapsibleRootProps = Omit<ComponentPropsWithRef<"div">, "children"
   readonly focusableWhenDisabled?: boolean
   /** What closed content becomes: findable by the browser's search (default), hidden, or removed. */
   readonly closedContent?: ClosedContent
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<CollapsibleState>
 }
 
@@ -265,6 +267,7 @@ function useApi(
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<CollapsibleState>
 }
 

@@ -26,7 +26,7 @@ export const badgeMeta = {
       description:
         "Default: generated. A host that keeps an `aria-label` lists it in `aria-describedby`.",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description: "Another element.",
     },
