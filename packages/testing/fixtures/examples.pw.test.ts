@@ -328,6 +328,10 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // A copy in flight, and its feedback after a press (2 s): entered by pressing Copy.
+  "code-block:copying",
+  "code-block:copied",
+  "code-block:error",
   // A toast not yet started by a region, and one exiting: both last for moments.
   "toast:idle",
   "toast:dismissed",

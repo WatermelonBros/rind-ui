@@ -26,6 +26,7 @@ export { getButton } from "./components/button"
 export { getCalendar } from "./components/calendar"
 export { getCheckbox } from "./components/checkbox"
 export { getCheckboxGroup } from "./components/checkbox-group"
+export { getCodeBlock } from "./components/code-block"
 export { getCollapsible } from "./components/collapsible"
 export { getColorPicker } from "./components/color-picker"
 export { getCombobox } from "./components/combobox"
@@ -92,6 +93,12 @@ export {
   runAction,
   type Target,
 } from "./driver"
+export {
+  type FakeClipboard,
+  type FakeClipboardMode,
+  type FakeClipboardOptions,
+  fakeClipboard,
+} from "./fake-clipboard"
 export { type FakeVisibility, fakeVisibility } from "./fake-visibility"
 export { type FormStepInvariants, formStepInvariants } from "./form-invariants"
 export {
