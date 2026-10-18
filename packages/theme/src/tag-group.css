@@ -1,0 +1,182 @@
+/*
+ * Tag Group (family: status): pills in a wrapping row. Reads accent roles only, so `data-tone`
+ * recolours it; `data-variant` and `data-size` go on the Root (every tag) or on one Tag. The
+ * List is always a box (never `display: contents`, ariakit#7160): it takes focus when empty.
+ * The tag's cell is `display: contents`, so the text and the remove button are laid out by the
+ * tag. Selection has a non-colour cue (a thicker border), focus an outline.
+ */
+@layer rind.components {
+  :where([data-scope="tag-group"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-space-1);
+    font-family: var(--rind-font-sans);
+  }
+
+  :where([data-scope="tag-group"][data-part="label"]) {
+    color: var(--rind-tag-group-label-text, var(--rind-color-text));
+    font-size: var(--rind-text-sm);
+    font-weight: 500;
+  }
+
+  :where([data-scope="tag-group"][data-part="description"]) {
+    color: var(--rind-tag-group-description-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="tag-group"][data-part="list"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-tag-group-gap, var(--rind-space-2));
+    min-inline-size: 0;
+    border-radius: var(--rind-radius-md);
+  }
+
+  :where([data-scope="tag-group"][data-part="empty"]) {
+    color: var(--rind-tag-group-empty-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="tag-group"][data-part="item"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: max(var(--rind-tag-group-tag-height, 1.75rem), 24px);
+    padding-block: 0;
+    padding-inline: var(--rind-tag-group-tag-padding, 0.625em);
+    border: var(--rind-border-width) solid var(--rind-tag-group-tag-border, transparent);
+    border-radius: var(--rind-tag-group-tag-radius, var(--rind-radius-full));
+    font-size: var(--rind-text-sm);
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: default;
+    /* Soft, the default. */
+    background: var(--rind-tag-group-tag-bg, var(--rind-color-accent-soft));
+    color: var(--rind-tag-group-tag-text, var(--rind-color-accent-text));
+  }
+
+  :where([data-scope="tag-group"][data-part="item"][data-hover]) {
+    background: var(--rind-tag-group-tag-hover-bg, var(--rind-color-accent-soft-hover));
+  }
+
+  :where([data-scope="tag-group"][data-part="item"][data-selected]) {
+    background: var(--rind-tag-group-tag-selected-bg, var(--rind-color-accent-solid));
+    color: var(--rind-tag-group-tag-selected-text, var(--rind-color-accent-on-solid));
+    /* The non-colour cue: a drawn border. */
+    border-color: var(--rind-tag-group-tag-selected-border, var(--rind-color-accent-border));
+    border-width: 2px;
+  }
+
+  :where([data-scope="tag-group"][data-part="item"][data-disabled]) {
+    color: var(--rind-tag-group-tag-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="tag-group"][data-part="item"][data-link]) {
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="tag-group"][data-variant="solid"] [data-part="item"],
+    [data-scope="tag-group"][data-part="item"][data-variant="solid"]
+  ) {
+    background: var(--rind-tag-group-tag-bg, var(--rind-color-accent-solid));
+    color: var(--rind-tag-group-tag-text, var(--rind-color-accent-on-solid));
+  }
+
+  :where(
+    [data-scope="tag-group"][data-variant="outline"] [data-part="item"],
+    [data-scope="tag-group"][data-part="item"][data-variant="outline"]
+  ) {
+    background: var(--rind-tag-group-tag-bg, transparent);
+    border-color: var(--rind-tag-group-tag-border, var(--rind-color-accent-border));
+  }
+
+  :where(
+    [data-scope="tag-group"][data-size="sm"] [data-part="item"],
+    [data-scope="tag-group"][data-part="item"][data-size="sm"]
+  ) {
+    font-size: var(--rind-text-xs);
+  }
+
+  :where(
+    [data-scope="tag-group"][data-size="lg"] [data-part="item"],
+    [data-scope="tag-group"][data-part="item"][data-size="lg"]
+  ) {
+    font-size: var(--rind-text-md);
+  }
+
+  :where([data-scope="tag-group"][data-part="item-cell"]) {
+    display: contents;
+  }
+
+  /* Long text ends with an ellipsis inside the available width (react-spectrum#6962). */
+  :where([data-scope="tag-group"][data-part="item-text"]) {
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :where([data-scope="tag-group"][data-part="item-remove"]) {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--rind-tag-group-remove-size, 1.25em);
+    block-size: var(--rind-tag-group-remove-size, 1.25em);
+    margin-inline-end: -0.25em;
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-tag-group-remove-radius, var(--rind-radius-full));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* A remove button smaller than the target size gets a centred, invisible hit area. */
+  :where([data-scope="tag-group"][data-part="item-remove"])::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, var(--rind-hit-area));
+    height: max(100%, var(--rind-hit-area));
+    transform: translate(-50%, -50%);
+  }
+
+  :where([data-scope="tag-group"][data-part="item-remove"]:hover:not(:disabled)) {
+    background: var(--rind-tag-group-remove-hover-bg, var(--rind-color-accent-soft-hover));
+  }
+
+  :where([data-scope="tag-group"][data-part="item-remove"]:disabled) {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="tag-group"][data-part="item"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="tag-group"][data-part="item"][data-selected]) {
+      background: SelectedItem;
+      color: SelectedItemText;
+      border-color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="tag-group"][data-part="item"][data-focus-visible]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="tag-group"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}

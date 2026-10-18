@@ -8,8 +8,11 @@ import styles from "./peel.module.css"
 const clamp = (n: number) => Math.min(1, Math.max(0, n))
 
 const ACTS = [
-  { title: "Peel the skin.", text: "What you see on this site is a stylesheet on top." },
-  { title: "This is what ships.", text: "Parts, state and ARIA, exposed as attributes you style." },
+  { title: "Peel the skin.", text: "Every pixel on this page is a stylesheet laid on top." },
+  {
+    title: "This is what ships.",
+    text: "Parts, state and ARIA, as attributes. Style them any way you like.",
+  },
   { title: "A machine underneath.", text: "Every interaction is a transition you can test." },
 ] as const
 
