@@ -1,5 +1,5 @@
-import Link from "next/link"
 import roadmap from "@/content/generated/roadmap.json"
+import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -41,7 +41,7 @@ export function Wall() {
                   .map((i) => (
                     <li key={i.name} data-status={i.status}>
                       {i.slug ? (
-                        <Link href={`/docs/${i.slug}/`}>{i.name}</Link>
+                        <MorphLink href={`/docs/${i.slug}/`}>{i.name}</MorphLink>
                       ) : (
                         <span>{i.name}</span>
                       )}
