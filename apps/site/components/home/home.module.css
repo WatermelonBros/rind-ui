@@ -363,16 +363,6 @@
 }
 .lookStage {
   padding: 48px clamp(20px, 5vw, 64px);
-  transition: background 0.5s var(--spring);
-}
-.lookStage[data-view="crisp"] {
-  background: #d4ff3a;
-}
-.lookStage[data-view="juicy"] {
-  background: #e9e2ff;
-}
-.lookStage[data-view="bare"] {
-  background: #fafafa;
 }
 .lookGrid {
   display: grid;
@@ -397,8 +387,9 @@
 .lookCode .lookPre {
   color: #e8e8e3;
   margin: 0;
-  max-height: 260px;
+  max-height: 320px;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 4px 16px 16px;
   font: 500 12px / 1.6 var(--mono);
   white-space: pre;
@@ -406,20 +397,30 @@
 :global([data-phase="juicy"]) .lookCode {
   background: #2a1d5c;
 }
-/* the stage's components ease between looks instead of jumping */
-.lookStage
-:is(
-  [data-part="root"],
-  [data-part="control"],
-  [data-part="trigger"],
-  [data-part="item"],
-  [data-part="input"]
-) {
-  transition:
-    border-radius 0.35s var(--spring),
-    border-width 0.35s var(--spring),
-    box-shadow 0.35s var(--spring),
-    background-color 0.35s var(--spring);
+/* the stage's own layout only: every component style comes from the generated skin.css */
+.lookCol {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+.lookRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* the generated CSS, coloured by kind */
+.tkCom {
+  color: #b9b9b0;
+  font-style: italic;
+}
+.tkSel {
+  color: #d4ff3a;
+}
+.tkProp {
+  color: #8fc7ff;
+}
+.tkVal {
+  color: #ffb3cf;
 }
 
 /* ── tested: a driver test that plays itself ─────────────────────────────────────────── */
@@ -576,10 +577,27 @@
 }
 
 .testStage {
-  padding: 40px 28px;
+  padding: 40px clamp(20px, 4vw, 48px);
   display: grid;
-  place-items: center;
+  align-content: center;
   background: var(--bg);
+}
+/* full width of the stage, so the components keep their natural size */
+.testStageInner {
+  display: grid;
+  gap: 24px;
+  inline-size: min(100%, 380px);
+  justify-self: center;
+}
+/* an assertion's real outcome, shown once its line has run */
+.verdict {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  color: #ff8f8f;
+  font-weight: 700;
+}
+.verdict[data-ok] {
+  color: #9be7c4;
 }
 
 /* ── wall: the whole roadmap ─────────────────────────────────────────────────────────── */
@@ -663,8 +681,6 @@
   padding: 120px 56px 32px;
 }
 .outroTitle {
-  --mx: -400px;
-  --my: -400px;
   position: relative;
   display: grid;
   font: 900 clamp(44px, 8vw, 128px) / 0.92 var(--display);
@@ -682,13 +698,14 @@
 /* filled in a circle around the pointer: the rind peeled where you point */
 .outroFill {
   color: var(--bg);
-  clip-path: circle(150px at var(--mx) var(--my));
-  transition: clip-path 0.08s linear;
+  /* hidden until the pointer comes in; outro.tsx moves the circle */
+  clip-path: circle(0 at 50% 50%);
   pointer-events: none;
 }
 @media (hover: none), (prefers-reduced-motion: reduce) {
   .outroFill {
-    clip-path: none;
+    /* biome-ignore lint/complexity/noImportantStyles: beats the circle outro.tsx writes inline */
+    clip-path: none !important;
   }
 }
 

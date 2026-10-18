@@ -1,3 +1,4 @@
+import Link from "next/link"
 import type { ReactNode } from "react"
 import { type NavGroup, Sidebar } from "@/components/sidebar"
 import { pages } from "@/lib/docs"
@@ -38,7 +39,9 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
       <main id="content" className={styles.main}>
         {children}
         <footer className={styles.footer}>
-          <span>rind · headless components by Watermelon · MIT</span>
+          <span>
+            rind · headless components by Watermelon · MIT · <Link href="/privacy/">Privacy</Link>
+          </span>
           <a href="https://reado.watermelon-studio.it">
             Built using <b>Reado</b> ↗
           </a>

@@ -219,6 +219,11 @@
   text-decoration: none;
   color: var(--ink);
 }
+/* a link inside the footer's sentence is told apart by more than colour */
+.footer span a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .footer b {
   padding: 1px 6px;
   border-radius: 99px;

@@ -77,7 +77,6 @@ export function Why() {
     <div className={styles.band} data-band="paper">
       <section className={styles.section} aria-labelledby="why-title">
         <Reveal>
-          <p className={styles.kicker}>Why rind</p>
           <h2 id="why-title" className={styles.h2}>
             Everything but the look.
           </h2>

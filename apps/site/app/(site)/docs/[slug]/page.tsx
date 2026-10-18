@@ -41,7 +41,6 @@ export default async function DocPage({ params }: Props) {
     <div className={styles.page}>
       <article>
         <header className={styles.head}>
-          <p className={styles.kicker}>{page.section === "components" ? "Component" : "Guide"}</p>
           <h1 className={styles.title} data-page-title="">
             {page.title}
           </h1>

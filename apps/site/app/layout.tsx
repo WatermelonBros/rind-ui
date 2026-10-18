@@ -61,11 +61,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <head>
         {/* Before paint: restore the phase (no crisp flash for a juicy visitor) and, on a first
-            visit of the landing, start unstyled for the intro. */}
+            visit of the landing, mark the intro (components/intro.tsx). */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("unstyled")}catch(e){}`,
+            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
           }}
         />
       </head>

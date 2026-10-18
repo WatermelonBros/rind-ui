@@ -42,6 +42,7 @@ const urls = [
   "/",
   "/docs/",
   "/404.html",
+  "/privacy/",
   ...docs.map((p) => `/docs/${p.slug}/`),
   ...["/theme/", "/theme/tokens/", "/theme/contrast/", "/theme/showcase/"],
 ]
@@ -311,19 +312,25 @@ for (const url of urls) {
   }
   await page.close()
 }
-// the intro itself: a first visit starts unstyled and ends styled
+// the intro itself: a first visit shows the raw copy over the page, then reveals the styled page
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))
   await page.goto(`${base}/`, { waitUntil: "domcontentloaded" })
-  const started = await page.evaluate(() => document.documentElement.classList.contains("unstyled"))
+  const started = await page.evaluate(
+    () => (document.getElementById("rind-intro-layer")?.childElementCount ?? 0) > 0,
+  )
   const ended = await page
-    .waitForFunction(() => !document.documentElement.classList.contains("unstyled"), undefined, {
-      timeout: 10_000,
-    })
+    .waitForFunction(
+      () =>
+        !document.getElementById("rind-intro-layer") &&
+        !document.documentElement.classList.contains("intro"),
+      undefined,
+      { timeout: 10_000 },
+    )
     .then(() => true)
     .catch(() => false)
-  if (!started) report("/ (intro)", "intro", "a first visit did not start unstyled")
+  if (!started) report("/ (intro)", "intro", "a first visit did not show the unstyled copy")
   if (!ended) report("/ (intro)", "intro", "the intro never revealed the styled page")
   await page.close()
 }

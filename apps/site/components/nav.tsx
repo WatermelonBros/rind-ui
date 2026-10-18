@@ -32,6 +32,7 @@ export function Nav() {
       <Link href="/docs/#components">Components</Link>
       <Link href="/docs/testing-accessibility/">Testing</Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>
+      <a href="https://discord.gg/HHqT9ucXn4">Discord</a>
       {/* The site's phase is an on/off setting that applies at once: a rind Switch. */}
       <Switch.Root
         className={styles.phase}

@@ -5,7 +5,6 @@ import Link from "next/link"
 import { type ReactNode, useState } from "react"
 import styles from "./hero.module.css"
 import { usePhase } from "./phase"
-import { useRelease } from "./release"
 import { Wordmark } from "./wordmark"
 
 /**
@@ -101,14 +100,10 @@ function Specimens() {
 }
 
 export function Hero({ children }: { children?: ReactNode }) {
-  const version = useRelease()
   return (
     <main>
       <div className={styles.hero}>
         <section className={styles.copy} aria-label="Introduction">
-          <span className={styles.eyebrow}>
-            <b aria-hidden="true" />v{version} · headless · React · built to be tested
-          </span>
           <h1 className={styles.visuallyHidden}>rind</h1>
           <Wordmark />
           <p className={styles.lede}>
