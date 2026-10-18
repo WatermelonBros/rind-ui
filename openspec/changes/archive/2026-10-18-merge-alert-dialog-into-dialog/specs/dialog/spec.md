@@ -5,8 +5,10 @@
 `Dialog.Root` SHALL accept `role` (`"dialog"`, the default, or `"alertdialog"`). With
 `role="alertdialog"` the dialog is a confirmation: its content SHALL have role
 `alertdialog`, its layer kind SHALL be `alertdialog`, it SHALL be modal whatever the
-props, an outside press SHALL never close it, its initial focus SHALL default to the
-`cancel` part, and a missing description SHALL log a development warning. `modal` and
+props, an outside press SHALL never close it, a close trigger SHALL NOT close it (it is
+answered with Cancel, an Action or Escape), its initial focus SHALL default to the `cancel`
+part (with no enabled Cancel, the content, so a lone "OK" is not activated by a stray Enter),
+and a missing description SHALL log a development warning. `modal` and
 `closeOnInteractOutside` SHALL NOT be props of a `role="alertdialog"` Root (a type error).
 Every other behaviour SHALL be the Dialog's; the parts SHALL keep `data-scope="dialog"`.
 There SHALL be no separate Alert Dialog component or machine.

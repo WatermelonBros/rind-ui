@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| merge-alert-dialog-into-dialog (review) | — | packages/testing/src/components/dialog-alert-role.dom.test.tsx | `frames(6)` waits (pre-existing from add-alert-dialog): wait on a postcondition instead of a frame count |
 | add-tree-view (pending) | — | docs/research/tree-view.md | Manual real-AT pass of flat vs nested (`group`) DOM (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack): expand/collapse announcement, level/position, busy; freeze the DOM shape before 1.x (task 0.2) |
 | add-tree-view (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
 | add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |

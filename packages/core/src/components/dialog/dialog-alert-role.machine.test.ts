@@ -97,11 +97,10 @@ describe("transitions", () => {
     expect(m.onOpenChange).not.toHaveBeenCalled()
   })
 
-  it("a close trigger in a confirmation closes it with its own reason (Dialog parts work in both)", () => {
+  it("CLOSE_TRIGGER_PRESS is not a close part of a confirmation (Cancel, Action, Escape answer it)", () => {
     const m = make({ defaultOpen: true })
     m.send({ type: "CLOSE_TRIGGER_PRESS", modality: "pointer" })
-    expect(m.state()).toBe("closed")
-    expect(m.onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("close-trigger")
+    expect(m.state()).toBe("open")
   })
 
   it("the trigger never toggles it closed (always modal)", () => {

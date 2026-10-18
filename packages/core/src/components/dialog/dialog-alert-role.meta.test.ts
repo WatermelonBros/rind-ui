@@ -26,6 +26,16 @@ describe("dialog meta matches a confirmation's code", () => {
     )
   })
 
+  it("no modal or outside-close prop for a confirmation (the React type has none)", () => {
+    // The meta documents the Dialog's props; for role="alertdialog" both are type errors,
+    // which the description of `role` says (checked in dialog-alert-role.test-d.ts).
+    expect(dialogMeta.props.role.description).toMatch(/always modal/i)
+    expect(dialogMeta.props.role.description).toMatch(/outside press never closes it/i)
+    expect(dialogMeta.props.modal).toBeDefined()
+    // Its contract has no close-trigger step: a confirmation is answered, not closed.
+    expect(alertDialogRoleContract.events.CLOSE_TRIGGER_PRESS).toHaveProperty("skip")
+  })
+
   it("documents the role and the confirmation's buttons", () => {
     expect(dialogMeta.props.role.type).toBe('"dialog" | "alertdialog"')
     expect(dialogMeta.contract.actions).toHaveProperty("cancel")

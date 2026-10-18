@@ -102,9 +102,9 @@ A dialog opened from inside another dialog is its child: Escape and a press on t
 
 ### Escape, naming and focus
 
-Escape closes the topmost confirmation with reason `escape-key`; turn it off with `closeOnEscape={false}` for a choice that must be explicit, or decide per request with `onEscapeKeyDown` and `event.preventDefault()`. A press on the backdrop or the positioner does nothing and calls no `onOpenChange`.
+Escape closes the topmost confirmation with reason `escape-key`; turn it off with `closeOnEscape={false}` for a choice that must be explicit, or decide per request with `onEscapeKeyDown` and `event.preventDefault()`. A press on the backdrop or the positioner does nothing and calls no `onOpenChange`. A `Dialog.CloseTrigger` does not close a confirmation either: it is answered with Cancel, an Action or Escape.
 
-It needs a name (`Dialog.Title`, or `aria-label` / `aria-labelledby`) and a description of the message (`Dialog.Description`, or `aria-describedby`); each missing one logs a development warning. Focus moves to Cancel on open, looked up when focus moves; with no Cancel, the content takes focus. `initialFocus` takes `"cancel"` (the default here), `"content"`, `"title"`, a function, or `false`.
+It needs a name (`Dialog.Title`, or `aria-label` / `aria-labelledby`) and a description of the message (`Dialog.Description`, or `aria-describedby`); each missing one logs a development warning. Focus moves to Cancel on open, looked up when focus moves; with no Cancel, the content takes focus (so a lone "OK" is not activated by a stray Enter; pass `initialFocus` or `data-autofocus` to choose another element). `initialFocus` takes `"cancel"` (the default here), `"content"`, `"title"`, a function, or `false`.
 
 ### Async confirm
 

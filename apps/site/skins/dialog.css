@@ -174,13 +174,13 @@
 [data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"] {
   grid-column: 3;
 }
-[data-rind-theme^="skin-"] [data-scope="dialog"][data-part="action"] {
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"] {
   background: var(--s-brand);
   color: var(--s-brand-text);
   border-color: var(--s-brand-deep);
 }
 /* muted by colour, not opacity: opacity stacks on a muted skin (contrast) */
-[data-rind-theme^="skin-"] [data-scope="dialog"][data-part="action"]:disabled {
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"]:disabled {
   background: color-mix(in oklab, var(--s-brand) 55%, var(--s-card));
   cursor: progress;
 }

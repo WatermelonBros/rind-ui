@@ -208,6 +208,8 @@ export function dialogPieces(config: DialogMachineConfig) {
     // The overlay sends these only when enabled; the guards make the graph say so too.
     closesOnEscape: ({ props }) => props.closeOnEscape !== false,
     closesOnOutsidePress: ({ props }) => closeOnOutside(props),
+    // A confirmation is answered with Cancel, an Action or Escape, never a close trigger.
+    closesOnCloseTrigger: ({ props }) => !isAlertDialog(props),
   } satisfies DialogSetup["guards"]
   const actions = {
     /** Entering open: the trigger that opened it, or none (programmatic, `open` prop). */
@@ -346,7 +348,15 @@ export function dialogPieces(config: DialogMachineConfig) {
         ...Object.fromEntries(
           closeParts.map((e) => [
             e,
-            { target: "closed", reason: CLOSE_REASONS[e], actions: ["setCloseReason"] },
+            {
+              // Only the Dialog takes a role (the Drawer is never a confirmation).
+              ...(e === "CLOSE_TRIGGER_PRESS" && kind === "dialog"
+                ? { guard: "closesOnCloseTrigger" as const }
+                : {}),
+              target: "closed",
+              reason: CLOSE_REASONS[e],
+              actions: ["setCloseReason"],
+            },
           ]),
         ),
         ESCAPE_KEY: {
