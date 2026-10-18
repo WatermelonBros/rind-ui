@@ -44,4 +44,4 @@
 - [x] 7.1 `packages/theme/src/code-block.css` per design §6, imported from `index.css`, family row in `families.ts`; theme browser test (numbers `user-select: none`, highlight cue under forced colors, collapse clip, trigger contrast)
 - [x] 7.2 Site examples (`apps/site/examples/code-block.tsx`): plain, tokens, a highlight.js adapter example (`trustedCodeHtml`), line numbers, highlighted lines, wrap, collapse, multi-file Tabs, RTL page, copy failure (fake), driver example; `states` for every contract state; ARIA snapshots for the state examples
 - [x] 7.3 Docs page `docs/components/code-block.md` (generated API facts + guide: input forms and why HTML is "trusted", line numbers, copy and its failure modes, SSR without JS, adapters); no other library named
-- [ ] 7.4 Mark `docs/research/code-block.md` done on archive; set Code Block `done` in `docs/components.md`; changeset for core, react, testing, theme; `pnpm lint`, `pnpm typecheck`, `pnpm docs:check` green
+- [x] 7.4 Mark `docs/research/code-block.md` done on archive; set Code Block `done` in `docs/components.md`; changeset for core, react, testing, theme; `pnpm lint`, `pnpm typecheck`, `pnpm docs:check` green
