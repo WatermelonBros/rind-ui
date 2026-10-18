@@ -75,7 +75,7 @@ const propsOf = (cfg: Cfg) => ({
   strategy: "roving",
   ids: { list: "root", item: (k: string) => k },
   loop: cfg.root?.loop ?? true,
-  focusableWhenDisabled: false,
+  focusableWhenDisabled: cfg.root?.focusableWhenDisabled ?? true,
   orientation: cfg.root?.orientation ?? "horizontal",
   modal: cfg.root?.modal ?? true,
   disabled: cfg.root?.disabled ?? false,

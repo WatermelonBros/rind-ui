@@ -42,7 +42,8 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="menu"][data-part="trigger"][data-host="menubar"][data-disabled] {
-  opacity: 0.5;
+  /* muted by colour, not opacity: opacity stacks on a muted skin (contrast) */
+  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
   cursor: not-allowed;
 }
 /* shortcut hints sit at the item's end */

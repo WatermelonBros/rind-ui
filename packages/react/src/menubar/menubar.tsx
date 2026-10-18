@@ -141,6 +141,8 @@ function Root({
   const [menus] = useState<MenubarMenus>(() => ({
     open(key, how) {
       const h = handles.get(key)
+      // A reopened menu reports its next close again (a mark its last close left behind).
+      closing.delete(key)
       if (!h || h.isOpen()) return
       if (how.edge) h.send({ type: "TRIGGER_KEY", key: how.edge })
       else h.send({ type: "TRIGGER_PRESS", modality: how.modality })
@@ -148,9 +150,11 @@ function Root({
     close(key, { switching }) {
       const h = handles.get(key)
       if (!h?.isOpen()) return
-      // Cleared by the menu's onOpenChange, which may run after this returns.
+      // Cleared by the menu's onOpenChange, which may run after this returns; at once when
+      // the menu did not close (nothing will be reported), and by the next open otherwise.
       closing.add(key)
       h.send(switching ? { type: "TREE.SIBLING_OPENED" } : { type: "CLOSE" })
+      if (h.isOpen()) closing.delete(key)
     },
   }))
   const ids = useMemo(
@@ -165,8 +169,9 @@ function Root({
     strategy: "roving",
     ids,
     loop,
-    // Each item registers as skipped when it is not focusable while disabled.
-    focusableWhenDisabled: false,
+    // Disabled items stay reachable by the bar's arrows and typeahead unless `false`;
+    // keyboard switching between open menus skips them either way.
+    focusableWhenDisabled,
     orientation,
     modal,
     disabled,

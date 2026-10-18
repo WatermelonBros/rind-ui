@@ -149,6 +149,17 @@ describe("menubar machine", () => {
     expect(m.value()).toBe("file")
   })
 
+  it("closed bar: arrows reach a disabled item by default, skip it with focusableWhenDisabled false", () => {
+    const reach = make({ focusableWhenDisabled: true }, ["edit"])
+    reach.send({ type: "NAVIGATE", move: "next" })
+    reach.send({ type: "NAVIGATE", move: "next" })
+    expect(reach.focused.at(-1)).toBe("edit")
+    const skip = make({ focusableWhenDisabled: false }, ["edit"])
+    skip.send({ type: "NAVIGATE", move: "next" })
+    skip.send({ type: "NAVIGATE", move: "next" })
+    expect(skip.focused.at(-1)).toBe("view")
+  })
+
   it("loop false stops at the ends", () => {
     const m = make({ loop: false })
     m.press("view", "keyboard")

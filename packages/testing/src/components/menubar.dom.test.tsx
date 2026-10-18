@@ -114,6 +114,43 @@ describe("menubar", () => {
     expect(open()).toEqual([])
   })
 
+  it("closed bar: ArrowRight reaches a disabled item by default; it opens nothing", async () => {
+    const user = userEvent.setup()
+    render(<App editDisabled />)
+    await user.tab()
+    await user.tab()
+    await user.keyboard("{ArrowRight}")
+    expect(name(active())).toBe("Edit")
+    expect(active()?.getAttribute("aria-disabled")).toBe("true")
+    await user.keyboard("{Enter}{ArrowDown}")
+    expect(open()).toEqual([])
+    await user.keyboard("{ArrowRight}")
+    expect(name(active())).toBe("View")
+  })
+
+  it("focusableWhenDisabled false: ArrowRight skips a disabled item", async () => {
+    const user = userEvent.setup()
+    render(<App editDisabled focusableWhenDisabled={false} />)
+    await user.tab()
+    await user.tab()
+    await user.keyboard("{ArrowRight}")
+    expect(name(active())).toBe("View")
+  })
+
+  it("a switch away clears its mark: the menu's next own close is reported", async () => {
+    const user = userEvent.setup()
+    const changes = vi.fn()
+    render(<App onValueChange={changes} />)
+    await user.click(screen.getByRole("menuitem", { name: "File" }))
+    await user.hover(screen.getByRole("menuitem", { name: "Edit" }))
+    await user.hover(screen.getByRole("menuitem", { name: "File" }))
+    await waitFor(() => expect(open()).toEqual(["File"]))
+    await user.keyboard("{Escape}")
+    await waitFor(() => expect(open()).toEqual([]))
+    expect(changes.mock.calls.at(-1)?.[0]).toBeNull()
+    expect(changes.mock.calls.at(-1)?.[1].reason).toBe("escape-key")
+  })
+
   it("skips a disabled item when switching by keyboard", async () => {
     const user = userEvent.setup()
     render(<App editDisabled />)
