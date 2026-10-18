@@ -1,6 +1,6 @@
 - text: Notes by
 - link "Ada Lovelace" [expanded]:
-  - /url: "#profile"
+  - /url: https://en.wikipedia.org/wiki/Ada_Lovelace
 - text: on the analytical engine.
 - dialog "Ada Lovelace":
   - strong: Ada Lovelace

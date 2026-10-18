@@ -49,6 +49,28 @@
     text-align: center;
   }
 
+  /* The heading as a button one view up: the heading's text, a hit area, a ring. */
+  :where([data-scope="calendar"][data-part="view-trigger"]) {
+    box-sizing: border-box;
+    min-block-size: var(--rind-hit-area);
+    padding: 0 var(--rind-space-2);
+    border: 0;
+    border-radius: var(--rind-calendar-trigger-radius, var(--rind-radius-indicator));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where([data-scope="calendar"][data-part="view-trigger"]):hover {
+    background: var(--rind-calendar-trigger-hover-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="calendar"][data-part="view-trigger"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
   /* Paging buttons: 24px keys drawing a chevron in currentColor, mirrored in rtl. */
   :where([data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])) {
     display: inline-flex;
@@ -157,6 +179,22 @@
     cursor: pointer;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+   * Month and year cells: wide enough for a long month name ("September"); four columns fit
+   * 320 px. The range band runs along each row as in the days view.
+   */
+  :where(
+    [data-scope="calendar"][data-part="grid"]:is([data-view="months"], [data-view="years"])
+      [data-part="cell"]
+  ) {
+    inline-size: var(--rind-calendar-period-cell-size, 4.75rem);
+    padding-inline: 0;
+    font-size: var(--rind-text-xs);
+    /* A table without a set width grows with its content: a name longer than its cell (a
+       locale's, a font's) wraps instead of widening the grid. */
+    overflow-wrap: anywhere;
   }
 
   :where([data-scope="calendar"][data-part="cell"][data-hover]) {

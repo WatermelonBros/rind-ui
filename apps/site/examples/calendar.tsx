@@ -7,13 +7,15 @@ import {
   isWeekend,
   today,
 } from "@internationalized/date"
-import type { CalendarValue } from "@rind-ui/core"
+import type { CalendarValue, CalendarView } from "@rind-ui/core"
 import { Calendar, type CalendarRootProps } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
 /** `focused` needs real focus inside the grid: it is reached by the driver. */
-export const states: States = { calendar: { idle: "Single" } }
+export const states: States = {
+  calendar: { idle: "Single", months: "MonthPicker", years: "YearPicker" },
+}
 
 /** Header with both pagers and the heading, then one grid per visible month. */
 function Cal({
@@ -171,6 +173,56 @@ export function RangeShown() {
   )
 }
 
+/** A month picker: the value is chosen in the months view (`minView`); the heading opens years. */
+export function MonthPicker() {
+  const [value, setValue] = useState<CalendarValue>(null)
+  return (
+    <div className="stack">
+      <Cal
+        label="Billing month"
+        minView="months"
+        value={value}
+        onValueChange={(v) => setValue(v)}
+        defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+      />
+      <span className="note">selected: {value ? String(value) : "none"}</span>
+    </div>
+  )
+}
+
+export function YearPicker() {
+  return (
+    <Cal label="Model year" minView="years" defaultFocusedValue={new CalendarDate(2026, 10, 14)} />
+  )
+}
+
+export function MonthRange() {
+  return (
+    <Cal
+      label="Contract"
+      minView="months"
+      selectionMode="range"
+      defaultValue={{ start: new CalendarDate(2026, 10, 1), end: new CalendarDate(2027, 4, 1) }}
+      defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+    />
+  )
+}
+
+export function DrillDown() {
+  const [view, setView] = useState<CalendarView>("days")
+  return (
+    <div className="stack">
+      <Cal
+        label="Birthday"
+        view={view}
+        onViewChange={setView}
+        defaultFocusedValue={new CalendarDate(1990, 6, 15)}
+      />
+      <span className="note">view: {view}</span>
+    </div>
+  )
+}
+
 export const variants: Variants = {
   Single: { title: "Single date", description: "Click or press Enter or Space to select." },
   Multiple: {
@@ -212,6 +264,21 @@ export const variants: Variants = {
   Invalid: {
     title: "Invalid",
     description: "A selected date that is out of range or unavailable marks the calendar invalid.",
+  },
+  MonthPicker: {
+    title: "Month picker",
+    description:
+      '`minView="months"`: the value is a month (its day and time kept); the heading opens the years.',
+  },
+  YearPicker: { title: "Year picker", description: '`minView="years"`: pages of 12 years.' },
+  MonthRange: {
+    title: "Range of months",
+    description: "Range mode in the months view: the band runs across the rows.",
+  },
+  DrillDown: {
+    title: "Drill-down",
+    description:
+      "The heading goes up (days, months, years); a pick goes back down; Escape goes down one view.",
   },
   ControlledFocus: {
     title: "Controlled focused date",

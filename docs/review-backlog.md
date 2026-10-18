@@ -302,9 +302,17 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
 | add-navigation-menu | design | Links in a Sub level's own list mark the parent item's trigger `data-current`; a current link deeper in a Sub panel marks only the Sub trigger |
 | add-navigation-menu | design | A press on a top-level link that is not a layer element counts as an outside press before the link activation (both close; reason `outside-press` instead of `link-activate`) |
+| date-family-consolidation | 2.1 (#152) | Calendar view trigger: its name joins the heading and the action ("October 2026, Choose month") with a hard-coded ", " that cannot be localised, and the h2 takes the action text. Name the button by its visible text plus aria-describedby, or pass the heading to \`viewUp({ view, heading })\` (needs a spec tweak) |
 
 ## Resolved
 
 The six add-foundations warnings first recorded here (10e5b, 10e6c, 1394b, 1394d,
 1394e, 1394f) were fixed by the implementer in the same round, before the move;
 verified at round 3 (2026-10-14).
+
+## add-grid-list: deferred tasks (archived 2026-10-18)
+
+- 0.2 / 9.2: real-AT pass (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack). Record it in "Tested with".
+- 3.1 / 6.3: virtualization (`aria-rowcount`/`aria-rowindex`), plus a virtualized fixture and measured spatial moves in three columns.
+- 4.3: React tests for Strict Mode, SSR + hydration tab stop, nested Tag Group, static vs data items.
+- 6.4: virtual screen-reader reading-order test.

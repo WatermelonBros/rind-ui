@@ -20,7 +20,7 @@
   font: 500 15px var(--s-font);
 }
 [data-skinned] [data-scope="tags-input"][data-part="control"][data-focus] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 [data-skinned] [data-scope="tags-input"][data-part="control"][data-readonly] {
@@ -114,6 +114,6 @@
     [data-part="chip-remove"],
     [data-part="clear-trigger"]
   ):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 1px;
 }

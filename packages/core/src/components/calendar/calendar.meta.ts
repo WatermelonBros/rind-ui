@@ -15,6 +15,7 @@ const state = {
   "data-focus": "Focus is in the grid.",
   "data-focus-visible": "Keyboard focus is in the grid.",
   "data-anchored": "Range mode: an anchor is set (a range is being selected).",
+  "data-view": '`"days"`, `"months"` or `"years"`: the shown view.',
 }
 
 export const calendarMeta = {
@@ -38,7 +39,15 @@ export const calendarMeta = {
       name: "Calendar.Heading",
       part: "heading",
       element: "h2",
-      description: 'The visible range ("October 2026"); announced when a trigger pages.',
+      description:
+        'The visible range ("October 2026", "2026", "2016 – 2027"); announced when a trigger pages. With a higher view its text is the view trigger.',
+    },
+    {
+      name: "(rendered by Calendar.Heading)",
+      part: "view-trigger",
+      element: "button",
+      description:
+        'One view up (days, months, years), named by the heading and `messages.viewUp` ("October 2026, Choose month"); absent at `maxView` or with a fixed `view`.',
     },
     {
       name: "Calendar.PrevTrigger",
@@ -164,6 +173,44 @@ export const calendarMeta = {
     timeZone: { type: "string", description: "The time zone `today` is computed in." },
     disabled: { type: "boolean", default: "false", description: "Nothing focuses or changes." },
     readOnly: { type: "boolean", default: "false", description: "Navigable; nothing is selected." },
+    view: {
+      type: '"days" | "months" | "years"',
+      description: "Controlled view: days, the months of a year, or a page of years.",
+    },
+    defaultView: { type: '"days" | "months" | "years"', description: "Default: `minView`." },
+    onViewChange: {
+      type: "(view, { reason }) => void",
+      description: "Reasons `heading`, `select` (a period drilled into), `escape-key`, `api`.",
+    },
+    minView: {
+      type: '"days" | "months" | "years"',
+      default: '"days"',
+      description:
+        'The value is chosen in this view (a month picker: `"months"`); higher views drill down.',
+    },
+    maxView: {
+      type: '"days" | "months" | "years"',
+      default: '"years"',
+      description: "The highest view the heading opens.",
+    },
+    yearsPerPage: {
+      type: "number",
+      default: "12",
+      description: "Years per page in the years view.",
+    },
+    columns: {
+      type: "number",
+      default: "4",
+      description: "Cells per row in the month and year views.",
+    },
+    isMonthUnavailable: {
+      type: "(month) => boolean",
+      description: "Month view: told the month's first day; never derived from its days.",
+    },
+    isYearUnavailable: {
+      type: "(year) => boolean",
+      description: "Year view: told the year's first day.",
+    },
     messages: {
       type: "Partial<CalendarMessages>",
       description: "Every string reaching assistive technology.",
@@ -174,9 +221,9 @@ export const calendarMeta = {
     "prev-trigger": { ...base("prev-trigger"), "data-disabled": "Cannot page further." },
     cell: {
       ...base("cell"),
-      "data-value": "The date (ISO).",
+      "data-value": "The date (ISO); a period's first day in the month and year views.",
       "data-selected": "Selected.",
-      "data-today": "Today.",
+      "data-today": "Today (the current month or year in those views).",
       "data-weekend": "A weekend day in the locale.",
       "data-outside-month": "A placeholder of another month (inert).",
       "data-disabled": "Out of range, or the calendar is disabled.",
@@ -201,7 +248,14 @@ export const calendarMeta = {
     ["PageUp / PageDown", "Previous / next month."],
     ["Shift + PageUp / PageDown", "Previous / next year."],
     ["Enter / Space", "Select the focused date (range mode: set the anchor, then the end)."],
-    ["Escape", "Range mode: cancel the range in progress (bubbles with no anchor)."],
+    [
+      "Month and year views",
+      "Arrows move by one period, Up / Down by a row, Home / End to the page's first / last, PageUp / PageDown by a page.",
+    ],
+    [
+      "Escape",
+      "Range mode: cancel the range in progress; above `minView`: one view down; else it bubbles.",
+    ],
   ],
   states: {
     idle: "Focus is outside the grid: a trigger's paging is announced.",
@@ -216,6 +270,8 @@ export const calendarMeta = {
       selectRange: ["pointer", "keyboard", "touch", "virtual"],
       startRange: ["pointer", "keyboard", "virtual"],
       cancel: ["keyboard"],
+      viewUp: ["pointer", "keyboard", "virtual"],
+      viewDown: ["keyboard"],
       press: ["keyboard"],
     },
     queries: [
@@ -233,6 +289,7 @@ export const calendarMeta = {
       "anchor",
       "preview",
       "isAnchored",
+      "view",
     ],
     traits: ["selectable", "composite-roving"],
   },

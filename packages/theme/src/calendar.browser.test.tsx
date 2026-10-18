@@ -142,6 +142,48 @@ describe("Calendar stylesheet", () => {
     expect(style(host, "preview").backgroundColor).toBe(style(host, "plain").backgroundColor)
   })
 
+  // The longest month names per locale (en, de, fr, it), on every engine's font metrics.
+  const longMonths: Record<string, string[]> = {
+    en: ["September", "February", "November", "December"],
+    de: ["September", "Oktober", "Dezember", "November"],
+    fr: ["septembre", "novembre", "décembre", "février"],
+    it: ["settembre", "novembre", "dicembre", "febbraio"],
+  }
+  for (const [lang, names] of Object.entries(longMonths)) {
+    it(`month view (${lang}): four long-month columns fit 320 px, one line each; the view trigger has a hit area and a ring`, () => {
+      sheet()
+      const months = names.map((m, i) => `<td ${a("cell", `id="m${i}"`)}>${m}</td>`).join("")
+      const host =
+        mount(`<div style="inline-size:320px" lang="${lang}"><div ${a("root", 'role="group" data-view="months"')}>
+      <div ${a("header")}><h2 ${a("heading")}><button type="button" ${a("view-trigger", 'data-focus-visible id="up"')}>2026</button></h2></div>
+      <table role="grid" ${a("grid", 'data-view="months"')}><tbody ${a("grid-body")}><tr ${a("row")}>${months}</tr></tbody></table>
+    </div></div>`)
+      const grid = q(host, '[data-part="grid"]')
+      expect(grid.offsetWidth).toBeLessThanOrEqual(320)
+      for (const id of ["m0", "m1", "m2", "m3"]) {
+        const c = q(host, `#${id}`)
+        expect(c.scrollWidth, id).toBeLessThanOrEqual(c.clientWidth)
+        expect(c.offsetWidth).toBeGreaterThanOrEqual(40)
+        // The name fits on one line: it is not broken to fit.
+        const range = document.createRange()
+        range.selectNodeContents(c)
+        expect(new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size, id).toBe(1)
+      }
+      const up = q(host, "#up")
+      expect(up.offsetHeight).toBeGreaterThanOrEqual(24)
+      expect(getComputedStyle(up).outlineStyle).toBe("solid")
+    })
+  }
+
+  it("forced colors (months and years views): the range, current, unavailable and focus rules apply to period cells", () => {
+    // Period cells are cells: the same forced-colors rules (no view-specific override).
+    const css = calendar.replace(/\/\*[\s\S]*?\*\//g, "")
+    const forced = css.slice(css.indexOf("@media (forced-colors: active)"))
+    expect(forced).not.toMatch(/data-view/)
+    expect(forced).toMatch(/data-in-range\][\s\S]*?Highlight;/)
+    expect(forced).toMatch(/data-today\]\) \{[\s\S]*?border/)
+  })
+
   it("forced colors: the range uses Highlight, the preview a dashed outline", () => {
     const css = calendar.replace(/\/\*[\s\S]*?\*\//g, "")
     const forced = css.slice(css.indexOf("@media (forced-colors: active)"))
