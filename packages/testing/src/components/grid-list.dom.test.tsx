@@ -696,4 +696,31 @@ describe("review fixes", () => {
     await gl("pointer").pressControl("Ada", "Edit")
     expect(onAction).not.toHaveBeenCalled()
   })
+
+  it("mixed rows: only the row with its own onAction acts; the other selects", async () => {
+    const user = userEvent.setup()
+    const onRow = vi.fn()
+    render(
+      <GridList.Root selectionMode="multiple">
+        <GridList.Label>People</GridList.Label>
+        <GridList.List>
+          <GridList.Item value="Ada" onAction={onRow}>
+            <GridList.ItemText>Ada</GridList.ItemText>
+          </GridList.Item>
+          <GridList.Item value="Grace">
+            <GridList.ItemText>Grace</GridList.ItemText>
+          </GridList.Item>
+        </GridList.List>
+      </GridList.Root>,
+    )
+    row("Grace").focus()
+    await user.keyboard("{Enter}")
+    expect(await gl().selected()).toEqual(["Grace"])
+    await user.click(row("Grace"))
+    expect(await gl().selected()).toEqual([])
+    row("Ada").focus()
+    await user.keyboard("{Enter}")
+    expect(onRow).toHaveBeenCalledTimes(1)
+    expect(await gl().selected()).toEqual([])
+  })
 })

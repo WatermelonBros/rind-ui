@@ -77,6 +77,8 @@ export interface GridListProps extends CollectionProps {
     | ((value: GridListValue, details: ChangeDetails<GridListEvent>) => void)
     | undefined
   readonly onAction?: ((key: string, details: GridListActionDetails) => void) | undefined
+  /** The rows that have an action (an Item's own `onAction`); unset: every row (the Root's). */
+  readonly actionRows?: ReadonlySet<CollectionKey> | undefined
   /** Rows that render an ItemCheckbox: a press on their body never selects. */
   readonly checkboxes?: ReadonlySet<CollectionKey> | undefined
   readonly disabled?: boolean | undefined
@@ -126,6 +128,9 @@ const EMPTY = null as unknown as string
 const mode = (p: GridListProps) => p.selectionMode ?? "none"
 const enabled = (p: GridListProps, key: CollectionKey) =>
   p.disabled !== true && p.collection.get(key)?.disabled !== true
+/** Whether `key` has an action: the Root's for every row, else that row's own. */
+const hasAction = (p: GridListProps, key: CollectionKey) =>
+  p.onAction !== undefined && (p.actionRows === undefined || p.actionRows.has(key))
 /** `disabledBehavior="selection"`: a disabled row is not selectable but still acts. */
 const actionable = (p: GridListProps, key: CollectionKey) =>
   p.disabled !== true &&
@@ -167,7 +172,7 @@ export const gridListMachine = setup({
       if (event.type !== "PRESS_ROW" || !actionable(props, event.key)) return
       const { key, modality } = event
       const act = () => {
-        if (props.onAction) countAction(key)
+        if (hasAction(props, key)) countAction(key)
         props.onAction?.(key, { modality, via: "press" })
       }
       if (props.checkboxes?.has(key) || mode(props) === "none" || !enabled(props, key)) {
@@ -175,14 +180,19 @@ export const gridListMachine = setup({
       }
       const empty = gridSelectionOf(values.value)
       const nothingSelected = empty !== "all" && empty.size === 0
-      if (props.onAction && (props.selectionBehavior ?? "toggle") === "toggle" && nothingSelected) {
+      if (
+        hasAction(props, key) &&
+        (props.selectionBehavior ?? "toggle") === "toggle" &&
+        nothingSelected
+      ) {
         return act()
       }
       send({ type: "SELECT", key, modality, shift: event.shift, mod: event.mod })
     },
     act: ({ event, props, context, set }) => {
       if (event.type !== "ACTION" || !actionable(props, event.key)) return
-      if (props.onAction) {
+      if (!hasAction(props, event.key)) return
+      {
         const k = event.key
         set("actionCounts", { ...context.actionCounts, [k]: (context.actionCounts[k] ?? 0) + 1 })
       }

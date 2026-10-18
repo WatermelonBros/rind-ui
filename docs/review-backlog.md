@@ -287,6 +287,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-grid-list | #144 review (warning) | A `GridLayout` env capability (measured spatial targets injected, not read from the DOM in connect) and the `isOnControl` / `canMoveSpatially` guards of the design |
 | add-grid-list | #144 review (warning) | A row named by `aria-labelledby` without an `ItemText`: typeahead and announcements fall back to the key |
 | add-grid-list | #144 review (warning) | `warnForeignFocusables` warns again on every remount of a row; warn once per element |
+| add-grid-list | #144 review (warning) | `grid-list.connect.ts`: the module-level `pressedDown` WeakSet can keep a stale entry (a pointer down without a click), which drops the next virtual or screen-reader click on that row |
 | date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
 | date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |

@@ -34,7 +34,8 @@ export interface GridListView {
   readonly selectionBehavior: "toggle" | "replace"
   readonly childNavigation: ChildNavigation
   readonly layout: GridListLayout
-  readonly actions: boolean
+  /** Whether a row has an action (the Root's `onAction`, or the Item's own). */
+  readonly actions: (key: CollectionKey) => boolean
   /** Mouse presses commit on pointer up (inside popups); else on pointer down. */
   readonly selectOnPressUp?: boolean | undefined
   /** Rows with `href`: activated as links. */
@@ -87,7 +88,7 @@ export function gridListConnect(v: GridListView, env: CompositeEnv & LinkEnv) {
   const empty = !v.pending && c.size === 0
   const scoped = (part: string) => scopeAttrs("grid-list", part, v.instance)
   const inert = v.disabled && v.focusableWhenDisabled !== true
-  const enterActs = v.actions
+  const enterActs = (key: CollectionKey) => v.actions(key)
   const parts = composite(
     {
       collection: c,
@@ -198,7 +199,7 @@ export function gridListConnect(v: GridListView, env: CompositeEnv & LinkEnv) {
       const href = v.links.get(key)
       if (href !== undefined) {
         activateLink({ href, tag: "div" }, row, keyPress(e), env)
-      } else if (enterActs) {
+      } else if (enterActs(key)) {
         v.send({ type: "ACTION", key, modality: "keyboard", via: "enter" })
       } else if (v.selectionMode !== "none") {
         v.send({ type: "SELECT", key, modality: "keyboard", shift: false, mod: false })
@@ -334,7 +335,7 @@ export function gridListConnect(v: GridListView, env: CompositeEnv & LinkEnv) {
         },
         onDoubleClick: (event: unknown) => {
           const e = event as MouseEvent
-          if (inert || !enterActs || v.selectionBehavior !== "replace") return
+          if (inert || !enterActs(key) || v.selectionBehavior !== "replace") return
           if (owner(e.target as Element, e.currentTarget as Element) === "control") return
           v.send({ type: "ACTION", key, modality: env.modality.modality(), via: "double-press" })
         },

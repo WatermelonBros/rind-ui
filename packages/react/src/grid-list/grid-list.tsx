@@ -182,16 +182,23 @@ function Root(all: GridListRootProps) {
   const [checkboxes, setCheckboxes] = useState<ReadonlySet<CollectionKey>>(new Set())
   // Per-row actions (Item `onAction`): any of them makes the list actionable.
   const rowActions = useRef(new Map<CollectionKey, (details: GridListActionDetails) => void>())
-  const [rowActionCount, setRowActionCount] = useState(0)
+  // Bumped whenever a row gains or loses its action (keys can swap at the same count).
+  const [rowActionVersion, setRowActionVersion] = useState(0)
   const [mountRowAction] = useState(
     () => (key: CollectionKey, fn: ((details: GridListActionDetails) => void) | null) => {
       const had = rowActions.current.has(key)
       if (fn) rowActions.current.set(key, fn)
       else rowActions.current.delete(key)
-      if (had !== (fn !== null)) setRowActionCount(rowActions.current.size)
+      if (had !== (fn !== null)) setRowActionVersion((n) => n + 1)
     },
   )
-  const actionable = all.onAction !== undefined || rowActionCount > 0
+  const actionable = all.onAction !== undefined || rowActions.current.size > 0
+  // Only the Item actions: the rows that have one (the Root's acts on every row).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the count tracks the map's keys
+  const actionRows = useMemo(
+    () => (all.onAction ? undefined : new Set(rowActions.current.keys())),
+    [all.onAction, rowActionVersion],
+  )
   const latest = useRef({
     onValueChange: p["onValueChange"] as ((v: unknown, d: unknown) => void) | undefined,
     onAction: all.onAction,
@@ -222,6 +229,7 @@ function Root(all: GridListRootProps) {
       const e = details.event as { type: string; key?: string }
       latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
     },
+    actionRows,
     onAction: actionable
       ? (key, d) => {
           rowActions.current.get(toKey(key))?.(d)
@@ -284,7 +292,7 @@ function Root(all: GridListRootProps) {
       selectionBehavior,
       childNavigation,
       layout,
-      actions: actionable,
+      actions: (key) => actionable && (actionRows === undefined || actionRows.has(key)),
       selectOnPressUp: all.selectOnPressUp === true,
       links,
       disabled,
