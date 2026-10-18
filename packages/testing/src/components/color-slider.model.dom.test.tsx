@@ -7,9 +7,12 @@ import { channelSliderNaming, colorSliderContract } from "@rind-ui/core/internal
 import { RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { describe, it } from "vitest"
-import { currentRun, sliderStepInvariants, testMachine } from "../index"
+import { beforeEach, describe, it } from "vitest"
+import { allowRindWarning, currentRun, sliderStepInvariants, testMachine } from "../index"
 import { ColorSlider, type ColorSliderRootProps } from "./color-parts"
+
+// Library issue reported (alpha from #RRGGBB80 is off the slider's step grid); remove when fixed.
+beforeEach(() => allowRindWarning(/slider: defaultValue \[0\.50196/))
 
 const inJsdom = navigator.userAgent.includes("jsdom")
 const a11y = async () => {

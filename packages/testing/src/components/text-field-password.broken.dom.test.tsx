@@ -5,7 +5,7 @@ import { RindProvider, TextField } from "@rind-ui/react"
 import { render } from "@testing-library/react"
 import { type ReactNode, useState } from "react"
 import { describe, expect, it } from "vitest"
-import { domEnv, installAnnouncementLog, testMachine } from "../index"
+import { domEnv, expectRindWarning, installAnnouncementLog, testMachine } from "../index"
 
 const base = {
   messages: textFieldMessages,
@@ -113,6 +113,8 @@ describe("text-field password broken variants fail readably", () => {
   })
 
   it("a name that follows the state", { timeout: 60_000 }, async () => {
+    // the broken variant this test exercises logs it
+    expectRindWarning(/text-field: the VisibilityTrigger's name changed with its state/)
     const errors = await failuresOf(
       () => (
         <Frame>

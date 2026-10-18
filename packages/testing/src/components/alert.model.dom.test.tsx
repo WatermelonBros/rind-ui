@@ -8,8 +8,17 @@ import { alertContract, alertMessages, PENDING_ANNOUNCEMENTS } from "@rind-ui/co
 import { Alert, type AlertRootProps } from "@rind-ui/react"
 import { render, screen, waitFor } from "@testing-library/react"
 import axe from "axe-core"
-import { describe, expect, it } from "vitest"
-import { type ConsumerInvariant, domEnv, installAnnouncementLog, testMachine } from "../index"
+import { beforeEach, describe, expect, it } from "vitest"
+import {
+  allowRindWarning,
+  type ConsumerInvariant,
+  domEnv,
+  installAnnouncementLog,
+  testMachine,
+} from "../index"
+
+// The broken role=alert wrapper below logs it on purpose.
+beforeEach(() => allowRindWarning(/alert: an alert is never a live region of its own/))
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

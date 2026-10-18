@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactElement } from "react"
 import { describe, expect, it } from "vitest"
-import { currentRun, domEnv, getToggle, testMachine } from "../index"
+import { currentRun, domEnv, expectRindWarning, getToggle, testMachine } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -96,6 +96,8 @@ async function failures(ui: () => ReactElement) {
 
 describe("broken Toggles fail readably", () => {
   it("a label that changes with the state → the anchor is lost", { timeout: 60_000 }, async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/toggle: the accessible name changed with the state/)
     const results = await failures(() => (
       <ToggleGroup.Item
         render={(p, s) => <button {...p}>{s.pressed ? "Not bold" : "Bold"}</button>}
