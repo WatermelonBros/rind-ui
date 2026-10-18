@@ -22,6 +22,16 @@ export function Peel() {
   const section = useRef<HTMLElement>(null)
   const [progress, setProgress] = useState(0)
   const [checked, setChecked] = useState(false)
+  // the skinned component's size: the fold geometry is in its pixels
+  const layers = useRef<HTMLDivElement>(null)
+  const [box, setBox] = useState({ w: 0, h: 0 })
+  useEffect(() => {
+    const el = layers.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setBox({ w: el.offsetWidth, h: el.offsetHeight }))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     const el = section.current
@@ -55,6 +65,28 @@ export function Peel() {
   const act = progress < 0.33 ? 0 : progress < 0.62 ? 1 : 2
   const vars = { "--p1": p1, "--p2": p2, "--p3": p3 } as CSSProperties
 
+  // The peel, in two beats. First a 45° fold line x + y = d travels in from the bottom-right
+  // corner (d = w + h) until the corner is as deep as the short side: the skin keeps the part before the line, and the
+  // part beyond it is the flap, reflected across the line ((x, y) → (d − y, d − x)) so its back,
+  // the rind, lies on top. Then the skin and its flap lift together and slide away.
+  const eased = p1 * p1 * (3 - 2 * p1)
+  const fold = Math.min(1, eased / 0.6)
+  const lift = clamp((eased - 0.6) / 0.4)
+  // the fold stops at a corner as deep as the short side: the reflected flap stays on the skin
+  const d = box.w + box.h - fold * Math.min(box.w, box.h)
+  const far = box.w + box.h
+  const away = `translate(${-lift * 70}px, ${-lift * 90}px)`
+  const skinStyle = {
+    clipPath: `polygon(0 0, ${d}px 0, 0 ${d}px)`,
+    transform: away,
+    opacity: 1 - lift,
+  } as CSSProperties
+  const flapStyle = {
+    clipPath: `polygon(${d}px 0, ${far}px 0, ${far}px ${far}px, 0 ${far}px, 0 ${d}px)`,
+    transform: `${away} matrix(0, -1, -1, 0, ${d}, ${d})`,
+    opacity: fold > 0 ? 1 - lift : 0,
+  } as CSSProperties
+
   const control = (skin: string) => (
     <div className={styles.component} data-skinned="" data-skin={skin}>
       <Switch.Root checked={checked} onCheckedChange={setChecked}>
@@ -80,10 +112,13 @@ export function Peel() {
         {/* the scene is an illustration of the text beside it: not focusable, not announced */}
         <div className={styles.scene} inert aria-hidden="true">
           <div className={styles.camera}>
-            <div className={styles.layers}>
+            <div className={styles.layers} ref={layers}>
               <div className={styles.under}>{control("bare")}</div>
-              <div className={styles.skin}>{control(phase)}</div>
-              <span className={styles.curl} />
+              <div className={styles.skin} style={skinStyle}>
+                {control(phase)}
+              </div>
+              {/* the back of the peeled corner: the rind */}
+              <span className={styles.flap} data-skin={phase} style={flapStyle} />
             </div>
 
             {/* two chips above, two below, one under them: each pair anchored to its own side of the

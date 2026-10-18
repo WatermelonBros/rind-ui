@@ -75,8 +75,19 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="tree-view"][data-part="item-indicator"] {
-  font-size: 12px;
+  /* the example's glyph is hidden: a chevron drawn with two borders reads at any font size */
+  font-size: 0;
   transition: rotate 140ms ease-out;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tree-view"][data-part="item-indicator"]::before {
+  content: "";
+  inline-size: 6px;
+  block-size: 6px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  translate: -1px 0;
+  rotate: 45deg;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="tree-view"][data-part="item-indicator"][data-state="open"] {

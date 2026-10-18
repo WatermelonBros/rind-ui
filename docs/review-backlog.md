@@ -8,6 +8,14 @@ See CLAUDE.md "Review rules".
 | Change | Reado id | File | Finding |
 |---|---|---|---|
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
+| add-date-field (impl) | — | packages/theme/src/date-field.css | Task 8.2: no Playwright captures (forced colors, RTL ar-AE, invalid, placeholder state) |
+| add-date-field (impl) | — | openspec/changes/archive/*-add-date-field | Spec "Error shown after leaving" says default validation, but the Field defaults to submit mode: the test uses validationMode="blur"; decide whether Date Field should default to blur |
+| add-date-field (impl) | — | packages/core/src/components/date-field/date-field.connect.ts | `data-validity` on the hidden input (contract query `validity`) is not in the spec's data-attribute list; add it to the spec or replace the query |
+| add-date-field (impl) | — | packages/theme/src/date-field.browser.test.tsx | The theme test imports @rind-ui/react and @rind-ui/testing by relative path (other theme tests mount static markup) |
+| add-date-field (impl) | — | packages/react/src/date-field/date-field.tsx | A controlled `null` set again over a partial draft (value already null) cannot clear it: no prop change reaches the machine; reset does |
+| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
+| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
+| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
 | add-tree-view (pending) | — | docs/research/tree-view.md | Manual real-AT pass of flat vs nested (`group`) DOM (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack): expand/collapse announcement, level/position, busy; freeze the DOM shape before 1.x (task 0.2) |
 | add-tree-view (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
 | add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |

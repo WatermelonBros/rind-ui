@@ -18,6 +18,7 @@ import * as colorPicker from "./color-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as controlLabel from "./control-label"
+import * as dateField from "./date-field"
 import * as dialog from "./dialog"
 import * as drawer from "./drawer"
 import * as field from "./field"
@@ -99,6 +100,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   combobox,
   collections,
   "context-menu": contextMenu,
+  "date-field": dateField,
   dialog,
   drawer,
   field,
