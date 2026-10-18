@@ -152,6 +152,7 @@ export const familyMatrix = [
     components: [
       "menu-item",
       "listbox-option",
+      "grid-list-item",
       "tree-view-item",
       "calendar-day",
       "range-calendar-day",

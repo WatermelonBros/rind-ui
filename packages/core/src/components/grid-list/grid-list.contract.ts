@@ -144,8 +144,16 @@ export const gridListContract = contract("grid-list", {
       },
       done: { hasFocus: true },
     },
+    /** Tab until focus leaves the list (tab mode: past the highlighted row's controls). */
     tabOut: {
-      keyboard: (env: E) => env.keyboard("Tab"),
+      keyboard: async (env: E) => {
+        // A row and its controls: at most one Tab each, plus the one that leaves.
+        const bound = (await env.part("item-control").all()).length + 2
+        for (let i = 0; i < bound; i++) {
+          await env.keyboard("Tab")
+          if (!(await focusInside(env))) return
+        }
+      },
       done: async () => true,
     },
     next: {

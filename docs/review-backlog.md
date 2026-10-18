@@ -271,6 +271,10 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 | add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 | add-menubar | 8.2 (deferred) | VO + Safari macOS: VO+Space opens on the first item, VO cursor order along the bar, focus stays in the bar on open; NVDA + Firefox / Chrome; JAWS + Chrome; VO iOS and TalkBack; whether keyboard switching should keep focus on the bar item (design Risks) |
+| add-grid-list | 0.2 / 9.2 (deferred) | Real-AT prototype and manual pass: VoiceOver macOS/iOS (Safari, Chrome) row focus + `aria-labelledby`, selection announcement, fast arrow repeat; NVDA, JAWS, TalkBack |
+| add-grid-list | 4.3 (follow-up) | React tests: Strict Mode, SSR + hydration tab stop, static vs data items, nested Tag Group (react-spectrum#6757, #5179) beyond the DOM test |
+| add-grid-list | 6.3 (follow-up) | Virtualized fixture (`aria-rowcount`/`aria-rowindex`, select all) and measured spatial moves in a three-column fixture (browser mode) |
+| add-grid-list | 6.4 (follow-up) | Virtual screen-reader reading-order test: row name excludes controls, checkbox "Select …", selection announcement on Apple WebKit |
 
 ## Resolved
 
