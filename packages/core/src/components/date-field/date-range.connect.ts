@@ -88,9 +88,18 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
     const v = input.start ?? input.end ?? input.minValue ?? null
     return v ? valueKind(v) : "date"
   }
+  const fieldIds = field["aria-describedby"]?.split(" ") ?? []
   return {
     ids: id,
     description,
+    /** The pair is invalid (each end's segments carry it). */
+    invalid,
+    /**
+     * The ids an end's embedded field is described by: the Field's description (and error
+     * while invalid) on the start; the end only while invalid (its segments then name the error).
+     */
+    endDescribedBy: (edge: DateRangeEdge): readonly string[] =>
+      edge === "start" || invalid ? fieldIds : [],
     root: (): PartProps => ({
       "data-range": "",
       "data-invalid": dataFlag(invalid),

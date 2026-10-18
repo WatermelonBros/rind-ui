@@ -140,6 +140,8 @@ interface Ctx {
     readonly labelledBy: string | undefined
   }
   readonly embedded: boolean
+  /** Embedded: select all + Backspace cleared this field (the host clears its pair). */
+  readonly onClearAll: () => void
   readonly disabled: boolean
   readonly readOnly: boolean
   readonly dir: "ltr" | "rtl"
@@ -353,7 +355,6 @@ function SingleRoot({
     value,
     defaultValue,
     onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) => {
-      if (details.event.type === "CLEAR_ALL") latest.current.onClearAll?.()
       latest.current.onValueChange?.(v, {
         reason: publicReason(details.event.type),
         modality: (details.event as { modality?: string }).modality,
@@ -456,6 +457,7 @@ function SingleRoot({
     base,
     own,
     embedded,
+    onClearAll: () => latest.current.onClearAll?.(),
     disabled,
     readOnly,
     dir,
@@ -587,7 +589,7 @@ function RangeEnd({
   if (!ctx) throw new Error("DateField.Start / End must be inside a range DateField.Root")
   // The group registers with the Field; an end only reads its label's id.
   const binding = useFieldBindingPeek()
-  const api = ctx.api(binding?.ids.label)
+  const api = ctx.api(binding)
   const env = useEnvironment()
   const EDGE = edge === "start" ? "START" : "END"
   const value = edge === "start" ? ctx.view.context.startValue : ctx.view.context.endValue
@@ -621,6 +623,9 @@ function RangeEnd({
             ctx.send({ type: `${EDGE}.VALIDITY`, flags, message })
           }
           labelledBy={labelledBy}
+          // The pair's validity and the Field's description reach the ends' segments.
+          invalid={api.invalid}
+          describedBy={api.endDescribedBy(edge)}
           segmentScope={ctx.inputEl}
           // Focus between ends (spec "Range Mode — Focus Between Ends").
           onBoundary={(b) => {
@@ -653,10 +658,7 @@ function Separator(props: ComponentPropsWithRef<"span">) {
   if (!ctx) throw new Error("DateField.Separator must be inside a range DateField.Root")
   return (
     <span
-      {...mergeProps(
-        normalizeProps(ctx.api(undefined).separator()),
-        props as Record<string, unknown>,
-      )}
+      {...mergeProps(normalizeProps(ctx.api(null).separator()), props as Record<string, unknown>)}
     />
   )
 }
@@ -868,6 +870,9 @@ function EditableSegment({
       ctx.selectAll.current = false
       if (!event) return
       e.preventDefault()
+      // Embedded: select all + Backspace clears the host's pair, even when this field's own
+      // value does not change (a partial end).
+      if (typeof event === "object" && event.type === "CLEAR_ALL") ctx.onClearAll()
       send(event)
     },
     // Only a composition changes the input natively; its text arrives at the end.
