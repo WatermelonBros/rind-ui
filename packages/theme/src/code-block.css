@@ -68,6 +68,11 @@
     cursor: pointer;
   }
 
+  /* The display above would beat the UA's [hidden] (a short block's CollapseTrigger). */
+  :where([data-scope="code-block"][data-part="collapse-trigger"][hidden]) {
+    display: none;
+  }
+
   :where(
     [data-scope="code-block"][data-part="copy-trigger"],
     [data-scope="code-block"][data-part="wrap-trigger"],
