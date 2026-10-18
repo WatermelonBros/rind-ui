@@ -135,11 +135,11 @@ const PAGES: readonly TreeViewItemData[] = [
     key: "guides",
     label: "Guides",
     children: [
-      { key: "install", label: "Install" },
-      { key: "theming", label: "Theming" },
+      { key: "get-started", label: "Get started" },
+      { key: "theme", label: "Theming" },
     ],
   },
-  { key: "changelog", label: "Changelog" },
+  { key: "testing-accessibility", label: "Testing" },
 ]
 
 export function Links() {
@@ -156,7 +156,7 @@ export function Links() {
           ) : (
             <TreeView.Item
               value={node.key}
-              href={`#${node.key}`}
+              href={node.key === "theme" ? "/theme/" : `/docs/${node.key}/`}
               current={node.key === "theming" ? "page" : undefined}
             >
               <span aria-hidden="true" className="tree-spacer" />

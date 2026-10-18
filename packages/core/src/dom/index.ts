@@ -45,6 +45,7 @@ export {
   tabbables,
   trapTab,
 } from "./focus-scope"
+export { spatialTarget } from "./grid-layout"
 export {
   type FormInputCapability,
   type HiddenInputElements,
@@ -177,6 +178,7 @@ export {
   quirks,
 } from "./quirks"
 export { registerReset } from "./resets"
+export { CONTROL as ROW_CONTROL, controlsOf, warnForeignFocusables } from "./row-controls"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"
 export {
   domScrollMetrics,

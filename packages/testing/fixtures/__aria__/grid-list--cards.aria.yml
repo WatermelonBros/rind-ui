@@ -1,0 +1,26 @@
+- text: Projects
+- grid "Projects":
+  - row "Atlas":
+    - gridcell "Atlas Share Atlas":
+      - text: Atlas
+      - button "Share Atlas": Share
+  - row "Borealis":
+    - gridcell "Borealis Share Borealis":
+      - text: Borealis
+      - button "Share Borealis": Share
+  - row "Cirrus":
+    - gridcell "Cirrus Share Cirrus":
+      - text: Cirrus
+      - button "Share Cirrus": Share
+  - row "Dune":
+    - gridcell "Dune Share Dune":
+      - text: Dune
+      - button "Share Dune": Share
+  - row "Ember":
+    - gridcell "Ember Share Ember":
+      - text: Ember
+      - button "Share Ember": Share
+  - row "Fjord":
+    - gridcell "Fjord Share Fjord":
+      - text: Fjord
+      - button "Share Fjord": Share
