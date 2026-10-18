@@ -7,6 +7,7 @@ export const colorSwatchMeta = {
   scope: "color-swatch",
   name: "Color Swatch",
   stateless: true,
+  notParts: ["SwatchNaming", "TransparencyGrid"],
   parts: [
     {
       name: "ColorSwatch.Root",
@@ -41,7 +42,10 @@ export const colorSwatchMeta = {
       type: "Partial<ColorSwatchMessages>",
       description: "The role description and the colour words.",
     },
-    render: { type: "ReactElement | (props, state) => ReactNode", description: "Another element." },
+    "*.render": {
+      type: "ReactElement | (props, state) => ReactNode",
+      description: "Another element.",
+    },
   },
   dataAttributes: {
     root: {

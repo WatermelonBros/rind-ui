@@ -72,25 +72,32 @@ export interface GridListChangeDetails {
 }
 
 type Common = {
+  /** The base the parts' ids derive from. Default: generated. */
   readonly id?: string
+  /** The list's parts (Label, List). */
   readonly children?: ReactNode
   readonly disabled?: boolean
+  /** Disabled rows stay navigable, and a disabled list keeps its Tab stop. */
   readonly focusableWhenDisabled?: boolean
+  /** "selection": a disabled row is not selectable but still acts. Default: "all". */
   readonly disabledBehavior?: "all" | "selection"
   /** Arrow keys wrap around. Default false. */
   readonly loop?: boolean
+  /** Milliseconds of idle time that end a typeahead search. Default: 1000. */
   readonly typeaheadTimeout?: number
   readonly disallowTypeAhead?: boolean
   readonly childNavigation?: "arrow" | "tab"
   readonly layout?: GridListLayout
   readonly items?: readonly GridListItemData[]
+  /** A collection built by the consumer (wins over `items` and Item parts). */
   readonly collection?: Collection<unknown>
   readonly onAction?: (key: string, details: GridListActionDetails) => void
-  /** Presses select on pointer up (lists inside popups: react-spectrum#7887). Default false. */
+  /** Presses select on pointer up (for lists inside popups). Default false. */
   readonly selectOnPressUp?: boolean
   /** Focus the selected row (else the first) on mount. */
   readonly autoFocus?: boolean
   readonly onLoadMore?: () => void
+  /** Selection announcements and the checkboxes' names. */
   readonly messages?: Partial<GridListMessages>
 }
 
@@ -102,6 +109,7 @@ type Selection =
       readonly value?: string | null
       readonly defaultValue?: string | null
       readonly onValueChange?: (value: string | null, details: GridListChangeDetails) => void
+      /** No user action leaves the selection empty. */
       readonly disallowEmptySelection?: boolean
     }
   | {
@@ -110,6 +118,7 @@ type Selection =
       readonly value?: readonly string[]
       readonly defaultValue?: readonly string[]
       readonly onValueChange?: (value: readonly string[], details: GridListChangeDetails) => void
+      /** No user action leaves the selection empty. */
       readonly disallowEmptySelection?: boolean
     }
 
@@ -148,6 +157,7 @@ const useItemKey = (part: string) => {
 const ListContext = createContext(false)
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -388,10 +398,13 @@ function Item({
 }: Omit<Own<"div">, "onAction"> & {
   /** The row key. */
   readonly value: string
+  /** The row's text for typeahead and announcements. Default: its ItemText's text. */
   readonly textValue?: string | undefined
+  /** Disables this row: it cannot be selected and, unless the Root's `disabledBehavior` is `"selection"`, it does not act. */
   readonly disabled?: boolean | undefined
   /** A link row: Enter and a press follow it (role stays `row`). */
   readonly href?: string | undefined
+  /** Marks the row current (`aria-current`, `data-current`), e.g. a link row for the current page. */
   readonly current?: GridListItemOptions["current"]
   /** This row's action (with the Root's `onAction`, both run). */
   readonly onAction?: (details: GridListActionDetails) => void
@@ -489,7 +502,13 @@ function ItemDescription({ render, ...rest }: Own<"span">) {
  * The row's selection checkbox; with `all` (outside the rows, multiple mode) the select-all
  * checkbox: checked, mixed or unchecked from the selection.
  */
-function ItemCheckbox({ all, ...props }: Own<"input"> & { readonly all?: boolean }) {
+function ItemCheckbox({
+  all,
+  ...props
+}: Own<"input"> & {
+  /** The select-all checkbox (outside the rows, multiple mode) instead of a row's. */
+  readonly all?: boolean
+}) {
   return all ? <SelectAllCheckbox {...props} /> : <RowCheckbox {...props} />
 }
 
@@ -606,7 +625,12 @@ function LoadMore({ render, children, ...rest }: Own<"div">) {
 }
 
 /** Data mode: every row of `items`, with its text. */
-function Items({ children }: { readonly children?: (label: string, key: string) => ReactNode }) {
+function Items({
+  children,
+}: {
+  /** Renders a row's content from its text and key. Default: an ItemText with the text. */
+  readonly children?: (label: string, key: string) => ReactNode
+}) {
   const host = useHost("Items")
   const out: ReactNode[] = []
   for (const node of host.collection) {

@@ -85,7 +85,7 @@ export const scrollAreaMeta = {
       description:
         "Root: a press on the track scrolls one page toward it, or jumps there and drags.",
     },
-    orientation: {
+    "*.orientation": {
       type: '"vertical" | "horizontal"',
       default: '"vertical"',
       description: "Scrollbar: its axis.",
@@ -95,7 +95,7 @@ export const scrollAreaMeta = {
       description:
         "Root: call `measure()` after a change the observers cannot see (a deep descendant resized).",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element.",
     },

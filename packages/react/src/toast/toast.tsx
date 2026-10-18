@@ -74,6 +74,7 @@ function defaultDirections(placement: string, dir: "ltr" | "rtl"): SwipeDirectio
 
 export interface ToasterProps {
   readonly toaster: ToasterStore
+  /** Base of the region's generated ids (default: a `useId`). */
   readonly id?: string
   /** One toast's markup (newest first). */
   readonly children: (toast: ToastSnapshot) => ReactNode

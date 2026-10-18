@@ -49,11 +49,11 @@ export const toggleMeta = {
       default: "false",
       description: "Disabled but focusable: `aria-disabled` instead of native `disabled`.",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },
-    fallback: {
+    "*.fallback": {
       type: "ReactNode",
       description: "ToggleGroup.ItemIndicator only: rendered while the toggle is off.",
     },

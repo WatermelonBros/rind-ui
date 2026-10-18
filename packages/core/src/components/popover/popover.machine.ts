@@ -104,6 +104,7 @@ export interface PopoverProps {
     | null
     | false
     | undefined
+  /** Side, align, offsets, flip, shift, size, arrow and mode (`manual` for CSS anchor positioning). */
   readonly positioning?: PositioningProps | undefined
   /** The instance id (part ids derive from it). */
   readonly root: string

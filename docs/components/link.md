@@ -30,21 +30,24 @@ Navigation Menu links) uses the same rules, from `linkProps` in `@rind-ui/core`.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `href` | `Href` | — | Where it goes. Typed by an augmented `RouterConfig`. |
-| `target` | `string` | — | Passed to the anchor; not `_self` opens elsewhere. |
-| `rel` | `string` | — | Passed to the anchor. |
-| `download` | `boolean \| string` | — | Download instead of navigating. |
-| `ping` | `string` | — | Passed to the anchor. |
-| `referrerPolicy` | `ReferrerPolicy` | — | Passed to the anchor. |
-| `hrefLang` | `string` | — | Passed to the anchor. |
-| `routerOptions` | `RouterOptions` | — | Passed unchanged to the router's `navigate`. |
-| `disabled` | `boolean` | `false` | No `href`, `aria-disabled`, out of the Tab order; nothing navigates. |
-| `focusableWhenDisabled` | `boolean` | `false` | Keeps a disabled link in the Tab order. |
-| `current` | `boolean \| "page" \| "step" \| "location" \| "date" \| "time"` | — | Sets `aria-current` and `data-current`; the link still navigates. |
-| `onActivate` | `(details: LinkActivation) => void` | — | Once per activation, with `href`, `modality` and `disposition` (`"same-tab"` or `"elsewhere"`). |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element (`<div />` gets the `role="link"` fallback) or a component, such as a router's Link, which then navigates itself. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Link` | `href` | `Href` | — | Where it goes. Typed by an augmented `RouterConfig`. |
+| `Link` | `target` | `string` | — | Passed to the anchor; not `_self` opens elsewhere. |
+| `Link` | `rel` | `string` | — | Passed to the anchor. |
+| `Link` | `download` | `boolean \| string` | — | Download instead of navigating. |
+| `Link` | `ping` | `string` | — | Passed to the anchor. |
+| `Link` | `referrerPolicy` | `ReferrerPolicy` | — | Passed to the anchor. |
+| `Link` | `hrefLang` | `string` | — | Passed to the anchor. |
+| `Link` | `routerOptions` | `RouterOptions` | — | Passed unchanged to the router's `navigate`. |
+| `Link` | `disabled` | `boolean` | `false` | No `href`, `aria-disabled`, out of the Tab order; nothing navigates. |
+| `Link` | `focusableWhenDisabled` | `boolean` | `false` | Keeps a disabled link in the Tab order. |
+| `Link` | `current` | `boolean \| "page" \| "step" \| "location" \| "date" \| "time"` | — | Sets `aria-current` and `data-current`; the link still navigates. |
+| `Link` | `onActivate` | `(details: LinkActivation) => void` | — | Once per activation, with `href`, `modality` and `disposition` (`"same-tab"` or `"elsewhere"`). |
+| `Link` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element (`<div />` gets the `role="link"` fallback) or a component, such as a router's Link, which then navigates itself. |
+| `RouterProvider` | `href` | `Href` | — | Where it goes. Typed by an augmented `RouterConfig`. |
+| `RouterProvider` | `navigate` | `Router["navigate"]` | — | Client navigation, e.g. react-router's `navigate` or Next.js `router.push`. |
+| `RouterProvider` | `children` | `ReactNode` | — | The tree whose link parts route through `navigate`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

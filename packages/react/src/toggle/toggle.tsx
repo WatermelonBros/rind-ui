@@ -41,8 +41,11 @@ type Api = ReturnType<typeof toggleConnect>
 const ToggleContext = createContext<{ api: Api; state: ToggleState } | null>(null)
 
 export type ToggleRootProps = Omit<ComponentPropsWithRef<"button">, "type"> & {
+  /** Controlled pressed state. */
   readonly pressed?: boolean
+  /** Uncontrolled initial state. Default: false. */
   readonly defaultPressed?: boolean
+  /** Every activation proposes the opposite value; `details.cancel()` vetoes it. */
   readonly onPressedChange?: (pressed: boolean, details: ChangeDetails<ToggleEvent>) => void
   readonly disabled?: boolean
   /** Stays in the tab order while disabled (`aria-disabled`), e.g. for a tooltip. */

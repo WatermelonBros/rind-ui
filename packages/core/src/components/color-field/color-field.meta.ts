@@ -7,6 +7,7 @@ export const colorFieldMeta = {
   scope: "color-field",
   name: "Color Field",
   stateless: false,
+  notParts: ["ColorFlushContext", "ColorChannelField"],
   parts: [
     {
       name: "ColorField.Root",

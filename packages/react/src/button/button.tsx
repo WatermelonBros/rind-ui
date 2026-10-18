@@ -48,6 +48,7 @@ export interface ButtonState {
 export type ButtonProps = Omit<ComponentPropsWithRef<"button">, "type" | "disabled"> & {
   /** Default "button": never submits a form by accident. */
   readonly type?: "button" | "submit" | "reset"
+  /** Ignores activation: native `disabled` on a `<button>`, `aria-disabled` elsewhere or with `focusableWhenDisabled`. */
   readonly disabled?: boolean
   /** Keeps a disabled Button in the Tab order (`aria-disabled` instead of `disabled`). */
   readonly focusableWhenDisabled?: boolean
@@ -58,9 +59,13 @@ export type ButtonProps = Omit<ComponentPropsWithRef<"button">, "type" | "disabl
    * Focus": an editor toolbar's Bold keeps the editor focused).
    */
   readonly focusOnPress?: boolean
+  /** Once per activation, with `modality` and the modifier keys. */
   readonly onPress?: (details: ButtonPressDetails) => void
+  /** A press starts. */
   readonly onPressStart?: (details: ButtonPressDetails) => void
+  /** A press ends, also when cancelled or released outside. */
   readonly onPressEnd?: (details: ButtonPressDetails) => void
+  /** Overrides the announced texts. Default: `pending: "Loading"`. */
   readonly messages?: MessageOverrides<ButtonMessages>
   /** Another element; `<a href>` keeps link semantics and routes like a Link. */
   readonly render?: RenderProp<ButtonState>

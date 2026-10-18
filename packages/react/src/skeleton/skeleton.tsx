@@ -132,6 +132,7 @@ export type SkeletonItemProps = ComponentPropsWithRef<"span"> & {
   readonly loading?: boolean
   /** Overrides the Root's `animate`. */
   readonly animate?: boolean
+  /** Stale content, hidden from assistive technology and inert while loading; none: a placeholder. */
   readonly children?: ReactNode
   readonly render?: RenderProp<SkeletonState>
 }

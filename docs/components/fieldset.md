@@ -35,12 +35,15 @@ The Fieldset is stateless: it has no machine. `disabled` and `invalid` are props
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `disabled` | `boolean` | `false` | On Root: disables every control inside, native and rind-ui, portalled parts included (the first Legend's content is exempt). |
-| `invalid` | `boolean` | `false` | On Root: shows the ErrorMessage. Never passed to the controls inside. |
-| `forceMount` | `boolean` | `false` | On ErrorMessage: keep it mounted while not invalid. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Fieldset.Root` | `disabled` | `boolean` | `false` | On Root: disables every control inside, native and rind-ui, portalled parts included (the first Legend's content is exempt). |
+| `Fieldset.Root` | `invalid` | `boolean` | `false` | On Root: shows the ErrorMessage. Never passed to the controls inside. |
+| `Fieldset.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls. |
+| `Fieldset.Legend` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls. |
+| `Fieldset.Description` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls. |
+| `Fieldset.ErrorMessage` | `forceMount` | `boolean` | `false` | On ErrorMessage: keep it mounted while not invalid. |
+| `Fieldset.ErrorMessage` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Every part. A substituted Root gets `role="group"` and `aria-disabled` but cannot disable native controls. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

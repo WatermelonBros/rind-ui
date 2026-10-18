@@ -141,6 +141,7 @@ export type SliderRootProps<V extends SliderValue = SliderValue> = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The slider's parts: label, control, thumbs, markers, value text and description. */
   readonly children?: ReactNode
   readonly value?: V
   /** Read at creation (default `min`); a later change only changes what a form reset restores. */
@@ -155,19 +156,29 @@ export type SliderRootProps<V extends SliderValue = SliderValue> = Omit<
   readonly largeStep?: number
   readonly minStepsBetweenThumbs?: number
   readonly thumbCollision?: ThumbCollision
+  /** `contain` keeps thumbs inside the track; set `--rind-slider-thumb-size` to the thumb size. Default: `center`. */
   readonly thumbAlignment?: ThumbAlignment
+  /** The axis. Default: `horizontal`. */
   readonly orientation?: SliderOrientation
+  /** Ignores all input; thumbs leave the tab order. */
   readonly disabled?: boolean
+  /** Keeps focus and value, ignores changes. */
   readonly readOnly?: boolean
   /** `data-required` only: a range input always has a value. */
   readonly required?: boolean
+  /** Sets `aria-invalid` and `data-invalid`. */
   readonly invalid?: boolean
+  /** The submitted field name of every thumb. */
   readonly name?: string
+  /** The id of the form the inputs belong to. */
   readonly form?: string
   readonly formatOptions?: Intl.NumberFormatOptions
+  /** Locale for formatting. Default: the provider's. */
   readonly locale?: string
+  /** Reading direction; mirrors a horizontal Slider. Default: the provider's. */
   readonly dir?: "ltr" | "rtl"
   readonly messages?: Partial<SliderMessages>
+  /** Another element or a render function receiving the props and the slider's state. */
   readonly render?: RenderProp<SliderState>
 }
 
@@ -479,6 +490,7 @@ function Root<V extends SliderValue>({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the slider's state. */
   readonly render?: RenderProp<SliderState>
 }
 
@@ -546,9 +558,11 @@ function Indicator({ render, ...rest }: PartProps<"div">) {
 export type SliderThumbProps = Omit<PartProps<"div">, "children"> & {
   /** The thumb's value index (known on the server). */
   readonly index: number
+  /** Disables this thumb only. */
   readonly disabled?: boolean
   /** Submitted under this name instead of the Root's. */
   readonly name?: string
+  /** The thumb's visible content, rendered before its native range input. */
   readonly children?: ReactNode
 }
 
@@ -642,7 +656,10 @@ function MarkerGroup({ render, ...rest }: PartProps<"div">) {
   return renderPart("div", props, render, ctx.state)
 }
 
-export type SliderMarkerProps = PartProps<"div"> & { readonly value: number }
+export type SliderMarkerProps = PartProps<"div"> & {
+  /** The value the tick marks. */
+  readonly value: number
+}
 
 /** A tick at `value`: `data-state` under-value, at-value or over-value. */
 function Marker({ value, render, ...rest }: SliderMarkerProps) {

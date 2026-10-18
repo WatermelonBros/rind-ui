@@ -5,11 +5,10 @@
 // Run: node scripts/content.ts → content/generated/{docs.json,llms.txt,tokens.md,…}
 
 import { execFileSync } from "node:child_process"
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { basename, join } from "node:path"
 import ts from "typescript"
-import type { ComponentMeta } from "../../../packages/core/src/components/meta.ts"
-import { llms, renderApi } from "../../../scripts/docs-gen.ts"
+import { apiMetas, llms, renderApi } from "../../../scripts/docs-gen.ts"
 // @ts-expect-error plain .mjs script, no types
 import { renderTokens } from "../../../scripts/theme-docs.mjs"
 
@@ -22,19 +21,6 @@ export interface DocPage {
   readonly title: string
   readonly summary: string
   readonly markdown: string
-}
-
-async function loadMetas(): Promise<Map<string, ComponentMeta>> {
-  const dir = join(repo, "packages/core/src/components")
-  const metas = new Map<string, ComponentMeta>()
-  for (const scope of readdirSync(dir)) {
-    const file = join(dir, scope, `${scope}.meta.ts`)
-    if (!existsSync(file)) continue
-    const mod = (await import(file)) as Record<string, ComponentMeta>
-    const meta = Object.values(mod).find((v) => v.scope === scope)
-    if (meta) metas.set(scope, meta)
-  }
-  return metas
 }
 
 // Only pages committed to git: an untracked page is another session's work in progress.
@@ -58,7 +44,8 @@ function page(file: string, section: DocPage["section"], markdown: string): DocP
   return { slug: basename(file, ".md"), section, title, summary, markdown }
 }
 
-const metas = await loadMetas()
+// The same metas as the docs pages: the meta file plus every prop read from the types.
+const { metas } = await apiMetas()
 // An api block is `<!-- api:scope -->`, optionally already filled up to `<!-- /api -->`.
 const fillApi = (md: string) =>
   md.replace(/<!-- api:([\w-]+) -->(?:[\s\S]*?<!-- \/api -->)?/g, (whole, scope: string) => {

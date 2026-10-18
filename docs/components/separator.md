@@ -35,11 +35,12 @@ Separator is stateless: it has no machine.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Its own orientation; wins over the container's default (a toolbar's separators are vertical). |
-| `decorative` | `boolean` | `false` | Purely visual: `role="none"`, removed from the accessibility tree. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, for example `<hr />` (rendered without children). |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Separator.Root` | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Its own orientation; wins over the container's default (a toolbar's separators are vertical). |
+| `Separator.Root` | `decorative` | `boolean` | `false` | Purely visual: `role="none"`, removed from the accessibility tree. |
+| `Separator.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, for example `<hr />` (rendered without children). |
+| `Separator.Root` | `children` | `ComponentPropsWithRef<"div">["children"]` | — | Ignored when the rendered element is void (`<hr>`). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

@@ -25,17 +25,18 @@ import { Button } from "@rind-ui/react"
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form by accident; rendered as `button` while pending. |
-| `disabled` | `boolean` | `false` | Native `disabled` on a `<button>`, `aria-disabled` elsewhere. |
-| `focusableWhenDisabled` | `boolean` | `false` | Disabled but still in the Tab order (`aria-disabled`). |
-| `pending` | `boolean` | `false` | Ignores activation and keeps focus (`aria-disabled`, never `disabled`); announces `messages.pending` when focused. |
-| `onPress` | `(details: ButtonPressDetails) => void` | — | Once per activation, with `modality` and the modifier keys. |
-| `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
-| `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
-| `messages` | `{ pending?: string }` | — | Overrides; default `pending: "Loading"`. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: `<a href>` stays a link and routes like a Link; anything else gets `role="button"` and `tabIndex`. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Button` | `type` | `"button" \| "submit" \| "reset"` | `"button"` | Never submits a form by accident; rendered as `button` while pending. |
+| `Button` | `disabled` | `boolean` | `false` | Native `disabled` on a `<button>`, `aria-disabled` elsewhere. |
+| `Button` | `focusableWhenDisabled` | `boolean` | `false` | Disabled but still in the Tab order (`aria-disabled`). |
+| `Button` | `pending` | `boolean` | `false` | Ignores activation and keeps focus (`aria-disabled`, never `disabled`); announces `messages.pending` when focused. |
+| `Button` | `onPress` | `(details: ButtonPressDetails) => void` | — | Once per activation, with `modality` and the modifier keys. |
+| `Button` | `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `Button` | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `Button` | `messages` | `{ pending?: string }` | — | Overrides; default `pending: "Loading"`. |
+| `Button` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: `<a href>` stays a link and routes like a Link; anything else gets `role="button"` and `tabIndex`. |
+| `Button` | `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

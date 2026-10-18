@@ -1,11 +1,20 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+import type { ComponentMeta } from "../packages/core/src/components/meta"
 import {
+  extractParts,
   fillBlocks,
   fillTestedWith,
+  generate,
+  main,
+  type OwnProp,
+  type PartProps,
+  propRows,
+  reactEntry,
   renderAria,
   renderLlms,
   renderQuirks,
   renderTestedWith,
+  splitDefault,
   type TestedWith,
 } from "./docs-gen"
 
@@ -93,5 +102,107 @@ describe("docs generator", () => {
       fillBlocks("<!-- aria:x--open -->\n<!-- /aria -->", "aria", (id) => renderAria(id, read)),
     ).toBe('<!-- aria:x--open -->\n```yaml\n- button "Details" [expanded]\n```\n<!-- /aria -->')
     expect(() => renderAria("x--closed", read)).toThrow(/no ARIA snapshot for story x--closed/)
+  })
+})
+
+describe("props from the types", () => {
+  const meta: ComponentMeta = {
+    scope: "x",
+    name: "X",
+    stateless: true,
+    parts: [],
+    props: {
+      value: { type: "string", description: "From the meta." },
+      "Item.value": { type: "string", description: "The item's." },
+      "*.render": { type: "RenderProp", description: "Another element." },
+      gone: { type: "string", description: "No part has it." },
+    },
+    dataAttributes: {},
+    keyboard: [],
+    contract: { actions: {}, queries: [], traits: [] },
+  }
+  const own = (description: string): OwnProp => ({ type: "boolean", description, at: "x.tsx:1" })
+  const parts: PartProps[] = [
+    {
+      part: "X.Root",
+      own: new Map([
+        ["value", own("")],
+        ["open", own("JSDoc.")],
+        ["bare", own("")],
+        ["render", own("")],
+      ]),
+      all: new Set(["value", "open", "bare", "render", "id"]),
+    },
+    {
+      part: "X.Item",
+      own: new Map([
+        ["value", own("")],
+        ["disabled", own("")],
+        ["render", own("")],
+      ]),
+      all: new Set(["value", "disabled", "render"]),
+    },
+  ]
+
+  it("rows per part; an unscoped key is the root's only; gaps name component, part and prop", () => {
+    const { props, gaps } = propRows(meta, parts)
+    expect(Object.keys(props)).toEqual([
+      "X.Root.value",
+      "X.Root.render",
+      "X.Root.open",
+      "X.Item.value",
+      "X.Item.render",
+    ])
+    expect(props["X.Item.value"]?.description).toBe("The item's.")
+    expect(gaps).toEqual([
+      "X: X.Root prop `bare` has no description (add JSDoc at x.tsx:1)",
+      "X: X.Item prop `disabled` has no description (add JSDoc at x.tsx:1)",
+      "X: x.meta.ts prop `gone` is accepted by no part",
+    ])
+  })
+
+  it("moves a trailing Default sentence of the JSDoc to the Default column", () => {
+    expect(splitDefault("Wraps around. Default: `true`.")).toEqual({
+      description: "Wraps around.",
+      default: "true",
+    })
+    expect(splitDefault("Default: generated. A host lists it.")).toEqual({
+      description: "Default: generated. A host lists it.",
+    })
+  })
+
+  it("docs:check exits non-zero on a gap, and generates nothing", async () => {
+    const load = async () => ({
+      metas: new Map(),
+      gaps: ["X: X.Root prop `bare` has no description"],
+    })
+    await expect(generate(load)).rejects.toThrow(/X\.Root prop `bare`/)
+    const errors: unknown[] = []
+    const spy = vi.spyOn(console, "error").mockImplementation((m) => errors.push(m))
+    try {
+      expect(await main(true, () => generate(load))).toBe(1)
+    } finally {
+      spy.mockRestore()
+    }
+    expect(String(errors[0])).toMatch(/props missing from the docs \(1\)/)
+  })
+
+  it("reads own props from every source type, never the element's DOM props", () => {
+    const read = (scope: string, exports: string[]) =>
+      extractParts(new Map([[scope, { entry: reactEntry(scope) ?? "", exports }]])).get(scope)
+    const badge = read("badge", ["Badge"])
+    const root = badge?.parts[0]
+    expect(root?.part).toBe("Badge.Root")
+    expect([...(root?.own.keys() ?? [])].sort()).toEqual(["label", "render"])
+    expect(root?.own.get("label")?.description).toMatch(/assistive technology/)
+    expect(root?.all.has("onClick")).toBe(true)
+    expect(badge?.errors).toEqual([])
+    // Single and multiple selection are a union of prop sets: both variants' props count.
+    const listbox = read("listbox", ["Listbox"])?.parts.find((p) => p.part === "Listbox.Root")
+    expect(listbox?.own.has("onValueChange")).toBe(true)
+    // An export that is not there is an error, never a silent skip.
+    expect(read("badge", ["Nope"])?.errors).toEqual([
+      "packages/react/src/badge/index.ts exports no `Nope`",
+    ])
   })
 })

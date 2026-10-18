@@ -70,6 +70,7 @@ export interface CheckboxGroupState {
 }
 
 export type CheckboxGroupRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The group's parts (Label, checkboxes, Description, ErrorMessage). */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -87,6 +88,7 @@ export type CheckboxGroupRootProps = Omit<ComponentPropsWithRef<"div">, "childre
   /** Submitted for every checked item (an item's own `name` is ignored). */
   readonly name?: string
   readonly form?: string
+  /** Another element or a render function receiving the props and the group's state. */
   readonly render?: RenderProp<CheckboxGroupState>
 }
 
@@ -314,6 +316,7 @@ function Root({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 

@@ -1,9 +1,13 @@
-// The Tags Input contract (tags-input "Tags Input Contract"): located by role textbox and
-// name; the input-chips fragment (chips, removeTag), creation, paste, editing, compose.
+// The Tags Input contract (tags-input "Tags Input Contract"): located by role textbox (or
+// combobox with suggestions) and name; the input-chips fragment (chips, removeTag), creation,
+// paste, editing, compose; with suggestions, the combobox-pattern fragment.
 
-import { contract } from "../../contract/contract"
+import { contract, type Trait } from "../../contract/contract"
 import type { Env } from "../../contract/env"
+import { patternContract } from "../combobox/pattern/contract"
+import { optionsNeverSelected } from "../combobox/pattern/invariants"
 import { tagsInputMachine } from "./tags-input.machine"
+import { tagsInputMessages } from "./tags-input.messages"
 
 type P =
   | "root"
@@ -18,6 +22,14 @@ type P =
   | "chips-summary"
   | "clear-trigger"
   | "hidden-input"
+  | "positioner"
+  | "popup"
+  | "list"
+  | "item"
+  | "item-text"
+  | "section"
+  | "section-label"
+  | "empty"
 type E = Env<P>
 
 const input = (env: E) => env.part("input")
@@ -36,6 +48,31 @@ const chipNamed = async (env: E, name: string) => {
   return chips[names.indexOf(name)]
 }
 const state = (env: E) => env.part("control").attr("data-state")
+const pattern = patternContract({
+  isOpen: async (env) => (await (env as E).part("control").attr("data-state")) === "suggesting",
+  messages: tagsInputMessages,
+})
+
+/**
+ * The traits of a props class. With suggestions the items are the options (the pattern's
+ * popup traits, as for Combobox's chips): the composite traits read one item part.
+ */
+export function tagsInputTraits(props: { readonly items?: unknown }): readonly Trait[] {
+  return props.items === undefined
+    ? ["form-associated", "field-associated", "composite-roving"]
+    : [
+        "form-associated",
+        "field-associated",
+        "composite-activedescendant",
+        "layer",
+        "presence",
+        "anchored",
+      ]
+}
+
+/** With suggestions no option is ever selected: a chosen one becomes a tag. */
+export const tagsInputInvariants = (props: { readonly items?: unknown }) =>
+  props.items === undefined ? [] : [optionsNeverSelected]
 
 export const tagsInputContract = contract("tags-input", {
   machine: tagsInputMachine,
@@ -52,13 +89,24 @@ export const tagsInputContract = contract("tags-input", {
     "chips-summary",
     "clear-trigger",
     "hidden-input",
+    "positioner",
+    "popup",
+    "list",
+    "item",
+    "item-text",
+    "section",
+    "section-label",
+    "empty",
   ],
-  locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "textbox", name }),
+  locate: ({ name }: { readonly name: string | RegExp }) => ({
+    role: ["textbox", "combobox"],
+    name,
+  }),
   queries: {
+    ...pattern.queries,
     tags: tagNames,
     /** input-chips: the chip names. */
     chips: tagNames,
-    inputValue: (env: E) => input(env).value(),
     isAtMax: async (env: E) => (await env.part("control").attr("data-at-max")) !== null,
     /** The draft's refusal reason, or null. */
     refusal: (env: E) => input(env).attr("data-refused"),
@@ -66,6 +114,9 @@ export const tagsInputContract = contract("tags-input", {
     isActive: async (env: E) => (await state(env)) !== "idle",
   },
   actions: {
+    ...pattern.actions,
+    // Keyboard only: there is no trigger, suggestions open by typing or ArrowDown.
+    open: pattern.open,
     focusIn: {
       keyboard: async (env: E) => {
         if (!(await input(env).isFocused())) await input(env).focusWithTab()
@@ -76,14 +127,6 @@ export const tagsInputContract = contract("tags-input", {
       keyboard: async (env: E, text: string) => {
         await focusInput(env)
         await input(env).type(text)
-      },
-      done: async () => true,
-    },
-    /** One letter as a committed composition (the model's text change; see Combobox). */
-    typeR: {
-      keyboard: async (env: E) => {
-        await focusInput(env)
-        await input(env).compose(["r"], "r")
       },
       done: async () => true,
     },
@@ -103,17 +146,6 @@ export const tagsInputContract = contract("tags-input", {
       },
       done: async () => true,
     },
-    compose: {
-      keyboard: async (env: E, text: string, commit: boolean) => {
-        await focusInput(env)
-        await input(env).compose(
-          [...text].map((_, i) => text.slice(0, i + 1)),
-          commit ? text : undefined,
-        )
-      },
-      done: async () => true,
-    },
-    pressEnter: { keyboard: (env: E) => env.keyboard("Enter"), done: async () => true },
     backspace: { keyboard: (env: E) => env.keyboard("Backspace"), done: async () => true },
     caret: { keyboard: (env: E) => env.keyboard("End"), done: async () => true },
     tabOut: { keyboard: (env: E) => env.keyboard("Tab"), done: { isActive: false } },
@@ -174,10 +206,12 @@ export const tagsInputContract = contract("tags-input", {
     },
   },
   states: {
-    idle: { isActive: false },
-    typing: { isActive: true, isEditing: false },
-    editing: { isEditing: true },
+    idle: { isActive: false, isOpen: false },
+    typing: { isActive: true, isEditing: false, isOpen: false },
+    suggesting: { isActive: true, isEditing: false, isOpen: true },
+    editing: { isEditing: true, isOpen: false },
   },
+  announcements: pattern.announcements,
   events: {
     "INPUT.CHANGE": {
       action: "typeR",
@@ -194,7 +228,28 @@ export const tagsInputContract = contract("tags-input", {
     CARET: "caret",
     "FOCUS.LEAVE": "tabOut",
     PASTE: { skip: "paste(text): scenario and driver tests (the clipboard text is the argument)" },
-    ESCAPE: { skip: "Escape has no effect without suggestions" },
+    ESCAPE: { action: "pressEscape", event: () => ({ composing: false }) },
+    ARROW: { action: "arrowDown", event: () => ({ key: "NEXT", alt: false, composing: false }) },
+    "ITEM.CHOOSE": { skip: "a press on a suggestion: choose() scenario and driver tests" },
+    "LIST.POINTER_LEAVE": { skip: "pointer leave: scenario tests" },
+    OUTSIDE_PRESS: { skip: "an outside press: scenario tests (dismiss layer)" },
+    "POSITION.PLACED": { skip: "sent by positioning" },
+    "ACTIVEDESCENDANT.FLUSH": { skip: "the typing pause: scenario tests with fake time" },
+    "LOADING.SYNC": { skip: "sent by the $props:loading edge" },
+    "COLLECTION.CHANGE": { skip: "sent by the $props:collection edge" },
+    NAVIGATE: { skip: "sent by ARROW" },
+    HIGHLIGHT: { skip: "sent by item clicks; covered by scenario tests" },
+    POINTER_MOVE: { skip: "pointer highlight: scenario tests (real movement only)" },
+    TYPEAHEAD: { skip: "the input takes the typing, no typeahead" },
+    SELECT: { skip: "a suggestion is chosen through ITEM.CHOOSE" },
+    SELECT_ALL: { skip: "mod+A selects the input's text" },
+    CLEAR_SELECTION: { skip: "nothing is selected" },
+    DESELECT: { skip: "nothing is selected" },
+    EXPAND: { skip: "flat" },
+    COLLAPSE: { skip: "flat" },
+    "COMPOSITE.BLUR": { skip: "the list is never focused" },
+    "$props:collection": { skip: "results are a derivation of the draft (INPUT.CHANGE)" },
+    "$props:loading": { skip: "async: scenario tests" },
     "COMPOSITION.START": { skip: "IME: compose() scenario and driver tests" },
     "COMPOSITION.END": { skip: "IME: compose() scenario and driver tests" },
     "TAG.EDIT": { skip: "editTag(name, text): scenario and driver tests" },
@@ -228,5 +283,12 @@ export const tagsInputContract = contract("tags-input", {
     { part: "hidden-input", state: "typing" },
     { part: "clear-trigger", state: "typing" },
     { part: "chip-remove", state: "typing" },
+    { part: "chip", state: "suggesting" },
+    { part: "hidden-input", state: "suggesting" },
+    { part: "clear-trigger", state: "suggesting" },
+    { part: "chip-remove", state: "suggesting" },
+    // The scrolling popup and list are focusable by script (scrollable-region-focusable).
+    { part: "popup", state: "suggesting" },
+    { part: "list", state: "suggesting" },
   ],
 })
