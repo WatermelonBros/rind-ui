@@ -149,7 +149,10 @@ export function ExampleFrame({
       if (el.dataset["scope"] !== scope || el.dataset["part"] !== part) continue
       el.dataset["anatomyOn"] = ""
       const r = el.getBoundingClientRect()
-      at.push({ x: r.left - box.left, y: r.top - box.top })
+      const x = r.left - box.left
+      const y = r.top - box.top
+      // two matching parts at the same origin (a part inside another) share one label
+      if (!at.some((t) => t.x === x && t.y === y)) at.push({ x, y })
     }
     // labels live in an overlay so they never move the part or get clipped by its container
     setTags(at)
