@@ -1,6 +1,6 @@
 "use client"
 
-import { Field, TagsInput, type TagsInputRootProps } from "@rind-ui/react"
+import { Field, TagsInput, type TagsInputItemData, type TagsInputRootProps } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
@@ -87,6 +87,44 @@ export function InField() {
   )
 }
 
+const TOPICS: readonly TagsInputItemData[] = [
+  { key: "design", label: "Design" },
+  { key: "research", label: "Research" },
+  { key: "react", label: "React" },
+  { key: "accessibility", label: "Accessibility" },
+  { key: "testing", label: "Testing" },
+]
+
+/** Tags with suggestions: the input is a combobox over the topics, the popup below it. */
+function Topics(props: Omit<TagsInputRootProps, "children" | "items">) {
+  return (
+    <TagsInput.Root items={TOPICS} {...props}>
+      <TagsInput.Label>Topics</TagsInput.Label>
+      <TagsInput.Control data-variant="outline">
+        <TagsInput.Chips />
+        <TagsInput.Input placeholder="Add a topic" />
+        <TagsInput.ClearTrigger aria-label="Clear all" />
+      </TagsInput.Control>
+      <TagsInput.Positioner>
+        <TagsInput.Popup>
+          <TagsInput.List>
+            <TagsInput.Items />
+          </TagsInput.List>
+          <TagsInput.Empty>No matching topic</TagsInput.Empty>
+        </TagsInput.Popup>
+      </TagsInput.Positioner>
+    </TagsInput.Root>
+  )
+}
+
+export function Suggestions() {
+  return <Topics defaultValue={["design"]} />
+}
+
+export function SuggestionsOnly() {
+  return <Topics allowCustom={false} autoHighlight />
+}
+
 export function Rtl() {
   return (
     <div dir="rtl">
@@ -121,6 +159,16 @@ export const variants: Variants = {
   InField: {
     title: "In a Field",
     description: "`required` and the Field's description and error message reach the input.",
+  },
+  Suggestions: {
+    title: "With suggestions",
+    description:
+      "`items` makes the input a combobox: choose a topic or type your own; a chosen topic leaves the list.",
+  },
+  SuggestionsOnly: {
+    title: "Suggestions only",
+    description:
+      "`allowCustom={false}` refuses typed text; `autoHighlight` puts the first match under Enter.",
   },
   Rtl: { title: "Right to left", description: "Chips flow from the right; keys follow `dir`." },
 }

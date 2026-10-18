@@ -82,11 +82,11 @@ export const alertMeta = {
       type: "{ dismiss?: string; announcement?: (segments) => string }",
       description: "Root: overrides the English defaults (also through the provider).",
     },
-    label: {
+    "*.label": {
       type: "string",
       description: 'Icon: names it as an image (`role="img"`) and puts it in the announcement.',
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element (a Title as a Heading, say).",
     },

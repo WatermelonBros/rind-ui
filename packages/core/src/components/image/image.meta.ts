@@ -53,7 +53,7 @@ export const imageMeta = {
       type: "(status, { reason, event }) => void",
       description: "Root: called on every status change (observed, not controlled).",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         "Substitutes the rendered element; on Img, a framework image component receives the ref, `alt`, `hidden`, `data-*` and the load handlers.",

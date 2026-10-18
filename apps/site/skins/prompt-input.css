@@ -20,7 +20,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="prompt-input"][data-part="root"][data-focus] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
   box-shadow: var(--s-lift-hi);
 }
@@ -145,7 +145,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"]):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
@@ -221,7 +221,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="prompt-input"][data-part="chip-remove"]:focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: -2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])

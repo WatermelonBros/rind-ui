@@ -27,7 +27,27 @@ export {
 } from "./combobox.machine"
 export { type ComboboxMessages, comboboxMessages } from "./combobox.messages"
 export { comboboxMeta } from "./combobox.meta"
+export {
+  type PatternApi,
+  type PatternConnectEnv,
+  type PatternConnectView,
+  patternConnect,
+} from "./pattern/connect"
+export { patternContract } from "./pattern/contract"
 export { optionsNeverSelected } from "./pattern/invariants"
+export {
+  initialPatternContext,
+  type PatternArgs,
+  type PatternContext,
+  type PatternEvent,
+  type PatternMessages,
+  type PatternProps,
+  type PatternReadArgs,
+  patternIds,
+  patternMessages,
+  patternPieces,
+  popupOverlay,
+} from "./pattern/machine"
 export {
   type ComboboxFilter,
   completion,

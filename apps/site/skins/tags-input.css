@@ -117,3 +117,44 @@
   outline: 3px solid var(--s-focus);
   outline-offset: 1px;
 }
+
+/* Suggestions: the Combobox popup's look (the same listbox parts). */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tags-input"][data-part="popup"] {
+  box-sizing: border-box;
+  inline-size: var(--rind-anchor-width, 20rem);
+  max-block-size: min(16rem, var(--rind-available-height, 16rem));
+  overflow: auto;
+  padding: 4px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  box-shadow: var(--s-lift);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tags-input"][data-part="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tags-input"][data-part="item"] {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: calc(var(--s-r-sm) - 2px);
+  cursor: pointer;
+  user-select: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tags-input"][data-part="item"][data-highlighted] {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tags-input"][data-part="item"][data-disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tags-input"][data-part="empty"] {
+  padding: 10px;
+  font-size: 14px;
+}

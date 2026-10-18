@@ -42,13 +42,17 @@ export interface LinkState {
 export type LinkProps = Omit<ComponentPropsWithRef<"a">, "href" | "download" | "referrerPolicy"> & {
   /** Typed by `RouterConfig` (augmentable). */
   readonly href?: Href
+  /** Download instead of navigating (the browser handles it); a string names the file. */
   readonly download?: boolean | string
+  /** Passed to the anchor. */
   readonly referrerPolicy?: ComponentPropsWithRef<"a">["referrerPolicy"]
   /** Passed unchanged to the router's `navigate`. */
   readonly routerOptions?: RouterOptions
+  /** No `href`, `aria-disabled`, out of the Tab order (unless `focusableWhenDisabled`); nothing navigates. */
   readonly disabled?: boolean
   /** Keeps a disabled link in the Tab order (it stays `aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
+  /** Sets `aria-current` and `data-current`; the link still navigates. */
   readonly current?: LinkCurrent
   /** Once per activation that is not disabled or prevented, with where it opened. */
   readonly onActivate?: LinkInput["onActivate"]

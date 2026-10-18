@@ -51,31 +51,51 @@ The Textarea needs an accessible name: render a `PromptInput.Label` (visually hi
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `value` | `string` | — | Controlled draft. |
-| `defaultValue` | `string` | `""` | Uncontrolled draft. |
-| `onValueChange` | `(value, { reason }) => void` | — | Reasons `input`, `submit` (cleared), `restore`, `history`, `api`, `reset`. |
-| `attachments` | `PromptAttachment[]` | — | Controlled attachments. |
-| `defaultAttachments` | `PromptAttachment[]` | `[]` | Uncontrolled attachments. |
-| `onAttachmentsChange` | `(attachments, { reason }) => void` | — | Reasons `add`, `remove`, `submit`, `restore`. |
-| `onSubmit` | `({ text, attachments }, { event, formData }) => void \| Promise` | — | Called once per send; the draft and attachments clear at once. A rejected promise restores them into an empty draft. |
-| `status` | `"idle" \| "submitting" \| "streaming" \| "error"` | — | The request's progress, as your chat state reports it. |
-| `onStop` | `() => void` | — | Submit pressed while busy. |
-| `onReject` | `({ file, reason }[]) => void` | — | Files refused by `accept`, `maxFiles` or `maxFileSize`. |
-| `submitKey` | `"enter" \| "mod+enter" \| "none"` | `"enter"` | What submits from the Textarea; on phones and tablets Enter is a newline. |
-| `history` | `string[]` | — | Past prompts, newest last: ArrowUp in an empty draft recalls them. |
-| `accept` | `string` | — | The `<input accept>` grammar, for every path. |
-| `multiple` | `boolean` | `true` | The chooser picks several. |
-| `maxFiles` | `number` | — | More attachments are refused. |
-| `maxFileSize` | `number` | — | Bytes; larger files are refused. |
-| `name` | `string` | `"message"` | The Textarea's form name. |
-| `filesName` | `string` | `"files"` | The files' form name. |
-| `disabled` | `boolean` | `false` | Every part is disabled. |
-| `readOnly` | `boolean` | `false` | No typing, no files; the draft can still be sent. |
-| `invalid` | `boolean` | `false` | The Field is invalid (also while over a CharacterCount's max). |
-| `errors` | `string[]` | — | The Field's error messages. |
-| `messages` | `Partial<PromptInputMessages>` | — | Every string reaching assistive technology. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `PromptInput.Root` | `value` | `string` | — | Controlled draft. |
+| `PromptInput.Root` | `defaultValue` | `string` | `""` | Uncontrolled draft. |
+| `PromptInput.Root` | `onValueChange` | `(value, { reason }) => void` | — | Reasons `input`, `submit` (cleared), `restore`, `history`, `api`, `reset`. |
+| `PromptInput.Root` | `attachments` | `PromptAttachment[]` | — | Controlled attachments. |
+| `PromptInput.Root` | `defaultAttachments` | `PromptAttachment[]` | `[]` | Uncontrolled attachments. |
+| `PromptInput.Root` | `onAttachmentsChange` | `(attachments, { reason }) => void` | — | Reasons `add`, `remove`, `submit`, `restore`. |
+| `PromptInput.Root` | `onSubmit` | `({ text, attachments }, { event, formData }) => void \| Promise` | — | Called once per send; the draft and attachments clear at once. A rejected promise restores them into an empty draft. |
+| `PromptInput.Root` | `status` | `"idle" \| "submitting" \| "streaming" \| "error"` | — | The request's progress, as your chat state reports it. |
+| `PromptInput.Root` | `onStop` | `() => void` | — | Submit pressed while busy. |
+| `PromptInput.Root` | `onReject` | `({ file, reason }[]) => void` | — | Files refused by `accept`, `maxFiles` or `maxFileSize`. |
+| `PromptInput.Root` | `submitKey` | `"enter" \| "mod+enter" \| "none"` | `"enter"` | What submits from the Textarea; on phones and tablets Enter is a newline. |
+| `PromptInput.Root` | `history` | `string[]` | — | Past prompts, newest last: ArrowUp in an empty draft recalls them. |
+| `PromptInput.Root` | `accept` | `string` | — | The `<input accept>` grammar, for every path. |
+| `PromptInput.Root` | `multiple` | `boolean` | `true` | The chooser picks several. |
+| `PromptInput.Root` | `maxFiles` | `number` | — | More attachments are refused. |
+| `PromptInput.Root` | `maxFileSize` | `number` | — | Bytes; larger files are refused. |
+| `PromptInput.Root` | `name` | `string` | `"message"` | The Textarea's form name. |
+| `PromptInput.Root` | `filesName` | `string` | `"files"` | The files' form name. |
+| `PromptInput.Root` | `disabled` | `boolean` | `false` | Every part is disabled. |
+| `PromptInput.Root` | `readOnly` | `boolean` | `false` | No typing, no files; the draft can still be sent. |
+| `PromptInput.Root` | `invalid` | `boolean` | `false` | The Field is invalid (also while over a CharacterCount's max). |
+| `PromptInput.Root` | `errors` | `string[]` | — | The Field's error messages. |
+| `PromptInput.Root` | `messages` | `Partial<PromptInputMessages>` | — | Every string reaching assistive technology. |
+| `PromptInput.Root` | `children` | `ReactNode` | — | The parts. |
+| `PromptInput.Root` | `render` | `RenderProp<undefined>` | — | Substitutes the `<form>` element. |
+| `PromptInput.Root` | `fieldMessages` | `MessageOverrides<FieldMessages>` | — | Replaces the Field's own strings. |
+| `PromptInput.Label` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `PromptInput.Description` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `PromptInput.ErrorMessage` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `PromptInput.ErrorMessage` | `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
+| `PromptInput.ErrorMessage` | `children` | `ReactNode \| ((messages: readonly string[]) => ReactNode)` | — | Replaces the default text; a function returning null/undefined falls back to it. |
+| `PromptInput.Textarea` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Textarea` | `autosize` | `boolean` | — | Grows with the content (`field-sizing: content`, a measured fallback). Default `true`. |
+| `PromptInput.Submit` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.AttachTrigger` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Attachments` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Attachments` | `children` | `(attachment: PromptAttachment) => ReactNode` | — | Renders one attachment; default: its name and its remove button. |
+| `PromptInput.Attachment` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.AttachmentName` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.AttachmentRemove` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.CharacterCount` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.CharacterCount` | `max` | `number` | — | A soft limit: over it, nothing is sent and the input is invalid; never a truncation. |
+| `PromptInput.CharacterCount` | `count` | `(value: string) => number` | `characters, a line break once` | Counts the draft (a tokenizer for a token limit). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

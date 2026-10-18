@@ -8,21 +8,13 @@ import type { CollectionKey } from "../../collection/key"
 import { toKey } from "../../collection/key"
 import type { Collection } from "../../collection/list"
 import {
-  type CollectionContext,
   type CollectionEnv,
-  type CollectionEvent,
-  type CollectionProps,
   collectionPieces,
   initialCollectionContext,
 } from "../../collection/machine"
-import type { DismissRequest } from "../../dom/dismiss"
-import { layerId } from "../../dom/layer-stack"
-import { overlayEffect } from "../../dom/overlay"
-import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
-import { positioningPresets, resolvePositioning } from "../../dom/position/options"
 import { quirkActive } from "../../dom/quirks"
 import type { DomEnvironment } from "../../env/dom-environment"
-import type { Align, PositionEnv, PositioningProps, Side } from "../../env/position"
+import type { PositionEnv } from "../../env/position"
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
@@ -34,8 +26,18 @@ import {
   inputChipsActions,
   lastRemovable,
 } from "../input-chips/input-chips"
-import { listboxIds } from "../listbox/listbox.parts"
 import type { ComboboxMessages } from "./combobox.messages"
+import {
+  announceCount,
+  highlightFirstTyped,
+  initialPatternContext,
+  type PatternContext,
+  type PatternEvent,
+  type PatternProps,
+  patternIds,
+  patternPieces,
+  popupOverlay,
+} from "./pattern/machine"
 import { completion, exactMatch, type OpenReason } from "./pattern/pattern"
 
 export type ComboboxValue = string | null | readonly string[]
@@ -71,7 +73,7 @@ const NO_MODIFIERS: ActionModifiers = {
 }
 
 export type ComboboxEvent =
-  | CollectionEvent
+  | PatternEvent
   | InputChipsEvent
   | {
       readonly type: "INPUT.CHANGE"
@@ -86,12 +88,6 @@ export type ComboboxEvent =
   | { readonly type: "INPUT.PRESS"; readonly modality: Modality }
   | { readonly type: "TRIGGER.PRESS"; readonly modality: Modality }
   | { readonly type: "CLEAR.PRESS"; readonly modality: Modality }
-  | {
-      readonly type: "ARROW"
-      readonly key: "NEXT" | "PREV"
-      readonly alt: boolean
-      readonly composing: boolean
-    }
   | {
       readonly type: "ENTER"
       readonly composing: boolean
@@ -110,22 +106,9 @@ export type ComboboxEvent =
   /** Inline: the `page` prop's key changed (onProps). */
   | { readonly type: "PAGE.CHANGE" }
   | { readonly type: "COMPOSITION.START" }
-  /** The pointer left the list. */
-  | { readonly type: "LIST.POINTER_LEAVE" }
   | { readonly type: "COMPOSITION.END"; readonly text: string }
-  | { readonly type: "OUTSIDE_PRESS"; readonly request: DismissRequest }
-  | {
-      readonly type: "POSITION.PLACED"
-      readonly first: boolean
-      readonly side: Side
-      readonly align: Align
-      readonly anchorHidden: boolean
-    }
-  /** The typing pause ended: the typing highlight reaches aria-activedescendant. */
-  | { readonly type: "ACTIVEDESCENDANT.FLUSH"; readonly token: number }
   /** A parent's value, or new items: the text follows when not dirty. */
   | { readonly type: "VALUE.SYNC" }
-  | { readonly type: "LOADING.SYNC" }
   /** A form reset: the default value and its text come back. */
   | { readonly type: "RESET" }
   /** The browser filled the hidden input: the option whose key, else whose text, it is. */
@@ -134,7 +117,7 @@ export type ComboboxEvent =
   | { readonly type: "CLOSE" }
   | { readonly type: "CLEAR" }
 
-export interface ComboboxProps extends CollectionProps {
+export interface ComboboxProps extends PatternProps {
   /** Every option (the visible results are `collection`). */
   readonly items: Collection<unknown>
   readonly value?: ComboboxValue | undefined
@@ -166,20 +149,12 @@ export interface ComboboxProps extends CollectionProps {
   readonly openOnArrow?: boolean | undefined
   readonly openOnInputPress?: boolean | undefined
   readonly openOnFocus?: boolean | undefined
-  readonly autoHighlight?: boolean | undefined
-  readonly keepHighlight?: boolean | undefined
   /** "both": inline completion of the highlighted option. */
   readonly autoComplete?: "list" | "both" | undefined
   readonly readOnly?: boolean | undefined
   readonly disabled?: boolean | undefined
   readonly locale: string
   readonly messages: ComboboxMessages
-  readonly root: string
-  readonly positioning?: PositioningProps | undefined
-  /** The results answer an older query (async): no highlight, count or empty state. */
-  readonly stale?: boolean | undefined
-  /** How long a typing highlight waits before it reaches `aria-activedescendant` (500 ms). */
-  readonly typingPause?: number | undefined
   /** Free text: Escape on a closed popup clears the text (default false). */
   readonly clearOnEscape?: boolean | undefined
   /** Runs an item (inline), or follows a choice (free text). */
@@ -195,31 +170,20 @@ export interface ComboboxProps extends CollectionProps {
   readonly requestClose?: (() => void) | undefined
 }
 
-export interface ComboboxContext extends CollectionContext, InputChipsContext {
-  readonly focused: boolean
-  /** Text typed since the last commit. */
-  readonly dirty: boolean
+export interface ComboboxContext extends PatternContext, InputChipsContext {
   readonly openReason: OpenReason | null
-  readonly composing: boolean
   /** The last typing went forward with the caret at the end (inline completion may show). */
   readonly completable: boolean
   /** The inline completion shown in the input (the typed query plus the option's rest). */
   readonly completion: string | null
-  /** A typing highlight not yet exposed as the active descendant; its flush token. */
-  readonly typingLag: number | null
-  readonly placement: PlacementState
   /** Inline: the query the current highlight was made for (a new query highlights first). */
   readonly highlightQuery: string | null
 }
 
 export const comboboxIds = (root: string) => ({
-  ...listboxIds("combobox", root),
-  control: partId("combobox", root, "control"),
-  input: partId("combobox", root, "input"),
+  ...patternIds("combobox", root),
   trigger: partId("combobox", root, "trigger"),
   clear: partId("combobox", root, "clear-trigger"),
-  positioner: partId("combobox", root, "positioner"),
-  popup: partId("combobox", root, "popup"),
 })
 
 type Types = {
@@ -306,24 +270,9 @@ function runItem(a: Args, key: CollectionKey) {
 
 /** The first navigable listed item, highlighted as a typing highlight (its pause applies). */
 function highlightFirst(a: Args) {
-  const { props, context } = a
   a.set("highlightQuery", a.values.inputValue)
-  if (props.autoHighlight === false || props.stale) return
-  const first = [...props.collection].find((n) => n.type === "item" && !n.disabled)
-  if (!first) {
-    a.set("highlightedKey", null)
-    a.set("highlightSource", null)
-    return
-  }
-  a.set("highlightedKey", first.key)
-  a.set("highlightSource", "typing")
-  a.set("scrollReason", null)
-  const token = (context.typingLag ?? 0) + 1
-  a.set("typingLag", token)
-  a.env.scheduler.setTimeout(
-    () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token }),
-    props.typingPause ?? 500,
-  )
+  if (a.props.autoHighlight === false || a.props.stale) return
+  highlightFirstTyped(a)
 }
 
 function choose(a: Args, key: CollectionKey) {
@@ -379,67 +328,19 @@ function removeChip(a: Args, key: string) {
 
 const closesOnSelect = (p: ComboboxProps) => p.closeOnSelect ?? mode(p) !== "multiple"
 
-/** The first or last navigable option, or the selected one (arrow and keyboard opens). */
-function highlightEntry(a: Args, edge: "first" | "last") {
-  const c = a.props.collection
-  const selected = selectedKeys(a.values.value).find((k) => c.has(toKey(k)))
-  let key: CollectionKey | null = selected === undefined ? null : toKey(selected)
-  if (key === null) {
-    const step = edge === "first" ? 1 : -1
-    for (let i = edge === "first" ? 0 : c.size - 1; i >= 0 && i < c.size; i += step) {
-      const n = c.at(i)
-      if (n && !n.disabled) {
-        key = n.key
-        break
-      }
-    }
-  }
-  a.set("highlightedKey", key)
-  a.set("highlightSource", "keyboard")
-  a.set("scrollReason", "open")
-}
-
-/** VoiceOver in Safari ignores activedescendant: keyboard highlights are announced. */
-function announceHighlight(a: Args) {
-  const { context, props } = a
-  if (context.highlightSource !== "keyboard" || !quirkActive("vo-activedescendant", a.env)) return
-  const key = context.highlightedKey
-  const node = key === null ? undefined : props.collection.get(key)
-  if (!node || key === null) return
-  const section = props.collection.sectionOf(key)
-  const entered = section && section.key !== context.announcedSection ? section.label : undefined
-  a.set("announcedSection", section?.key ?? null)
-  a.env.announcer.announce({
-    message: props.messages.focusAnnouncement(
-      node.textValue,
-      selectedKeys(a.values.value).includes(key),
-      entered,
-    ),
-    key: `combobox-${props.root}:highlight`,
-    lang: a.env.locale.locale(),
-  })
-}
-
-function announceCount(a: Args) {
-  const { props } = a
-  if (props.stale || props.loading === "loading" || props.loading === "loading-more") return
-  const n = props.collection.size
-  a.env.announcer.announce({
-    message: n === 0 ? props.messages.noResults : props.messages.count(n),
-    priority: "polite",
-    key: `combobox-count:${props.root}`,
-  })
-}
+const pattern = patternPieces({
+  scope: "combobox",
+  selected: ({ values }) => selectedKeys(values["value"] as ComboboxValue | undefined),
+  collection: pieces.actions,
+})
 
 /** One setup, two definitions: the popup combobox and the inline one (design §1). */
 const comboboxSetup = setup({
   types: type<Types>(),
   guards: {
+    ...pattern.guards,
     enabled: ({ props }) => props.disabled !== true,
     editable: ({ props }) => editable(props),
-    /** A key reaches the input: it is focused and no composition is in progress. */
-    keyable: ({ event, context }) =>
-      context.focused && !context.composing && !("composing" in event && event.composing === true),
     isFocused: ({ context }) => context.focused,
     opensOnInput: ({ props, event }) =>
       props.openOnInput !== false &&
@@ -455,8 +356,6 @@ const comboboxSetup = setup({
       event.type === "INPUT.FOCUS" &&
       event.cause !== "layer" &&
       event.cause !== "window",
-    hasHighlight: ({ context, props }) =>
-      context.highlightedKey !== null && props.collection.has(context.highlightedKey),
     isDirty: ({ context }) => context.dirty,
     chipRemovable: ({ event, props, values }) =>
       event.type === "CHIP.REMOVE" &&
@@ -468,8 +367,6 @@ const comboboxSetup = setup({
       props.removeOnBackspace !== false &&
       editable(props) &&
       lastRemovable(chipsOf(props, values.value)) !== null,
-    leaveClears: ({ context, props }) =>
-      context.highlightSource === "pointer" && props.keepHighlight !== true,
     hasCompletion: ({ context }) => context.completion !== null,
     tabChooses: ({ props, context }) =>
       props.selectOnTab === true &&
@@ -488,6 +385,7 @@ const comboboxSetup = setup({
   },
   actions: {
     ...pieces.actions,
+    ...pattern.actions,
     typed: (a) => {
       if (a.event.type !== "INPUT.CHANGE" && a.event.type !== "COMPOSITION.END") return
       const text = a.event.type === "INPUT.CHANGE" ? a.event.text : a.event.text
@@ -524,19 +422,14 @@ const comboboxSetup = setup({
     },
     highlightOnOpen: (a) => {
       if (a.event.type === "ARROW") {
-        if (a.event.alt) return
-        highlightEntry(a, a.event.key === "NEXT" ? "first" : "last")
+        pattern.actions.highlightOnArrowOpen(a)
       } else if (
         a.event.type === "TRIGGER.PRESS" &&
         a.event.modality !== "pointer" &&
         a.event.modality !== "touch"
       ) {
-        highlightEntry(a, "first")
+        pattern.highlightEntry(a, "first")
       }
-    },
-    arrow: (a) => {
-      if (a.event.type !== "ARROW") return
-      a.send({ type: "NAVIGATE", move: a.event.key === "NEXT" ? "next" : "previous" })
     },
     /** A keyboard highlight completes inline (autoComplete both), when typing allowed it. */
     complete: (a) => {
@@ -550,10 +443,6 @@ const comboboxSetup = setup({
     removeCompletion: ({ set }) => {
       set("completion", null)
       set("completable", false)
-    },
-    clearHighlight: ({ set }) => {
-      set("highlightedKey", null)
-      set("highlightSource", null)
     },
     choose: (a) => {
       if (a.event.type === "ITEM.CHOOSE") choose(a, a.event.key)
@@ -633,53 +522,6 @@ const comboboxSetup = setup({
       a.set("dirty", true)
       a.set("armedChip", null)
     },
-    startComposition: ({ set }) => set("composing", true),
-    endComposition: ({ set }) => set("composing", false),
-    /** New results while open: repair, auto highlight a typing result, count. */
-    results: (a) => {
-      pieces.actions.repairCollection(a)
-      const { props, context } = a
-      if (props.autoHighlight && context.dirty && !context.composing && !props.stale) {
-        const first = [...props.collection].find((n) => n.type === "item" && !n.disabled)
-        if (first) {
-          a.set("highlightedKey", first.key)
-          a.set("highlightSource", "typing")
-          a.set("scrollReason", null)
-          // The typed character is spoken first: the active descendant waits for the pause.
-          const token = (context.typingLag ?? 0) + 1
-          a.set("typingLag", token)
-          a.env.scheduler.setTimeout(
-            () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token }),
-            props.typingPause ?? 500,
-          )
-        }
-      }
-      announceCount(a)
-    },
-    announceHighlight,
-    announceOpen: (a) => {
-      if (a.context.highlightedKey === null) announceCount(a)
-    },
-    announceLoading: (a) => {
-      if (a.props.loading === "loading" || a.props.loading === "loading-more") {
-        a.env.announcer.announce({
-          message: a.props.messages.loading,
-          priority: "polite",
-          key: `combobox-count:${a.props.root}`,
-        })
-      }
-    },
-    placed: (a) => {
-      if (a.event.type !== "POSITION.PLACED") return
-      a.set("placement", placementFrom(a.event))
-      if (a.event.first) pieces.actions.scrollToHighlighted(a)
-    },
-    flush: (a) => {
-      if (a.event.type === "ACTIVEDESCENDANT.FLUSH" && a.event.token === a.context.typingLag) {
-        a.set("typingLag", null)
-      }
-    },
-    endLag: ({ set }) => set("typingLag", null),
     run: (a) => {
       if (a.event.type === "ITEM.CHOOSE") runItem(a, a.event.key)
       else if (a.context.highlightedKey !== null) runItem(a, a.context.highlightedKey)
@@ -695,7 +537,7 @@ const comboboxSetup = setup({
       const { context, values } = a
       const newQuery = context.highlightQuery !== values.inputValue
       if (newQuery || context.highlightedKey === null) highlightFirst(a)
-      if (newQuery) announceCount(a)
+      if (newQuery) announceCount(a, "combobox")
     },
     clearQuery: (a) => {
       a.set("dirty", false)
@@ -717,7 +559,6 @@ const comboboxSetup = setup({
         })
       }
     },
-    resetPlacement: ({ set }) => set("placement", unplaced("bottom", "start")),
     resetOpen: ({ set }) => {
       set("openReason", null)
     },
@@ -733,61 +574,18 @@ const comboboxSetup = setup({
       return () => a.env.scheduler.clearTimeout(handle)
     },
     /** The non-modal listbox layer and its positioning (combobox-pattern "Popup Placement"). */
-    overlay: (a) => {
-      const { env, send } = a
-      if (typeof document === "undefined") return undefined
-      const ids = comboboxIds(a.props.root)
-      const byId = (id: string) => env.dom.getById(id) as HTMLElement | null
-      const stop = overlayEffect(env, {
-        id: layerId(`combobox-${a.props.root}`),
-        kind: "listbox",
-        family: "listbox",
-        modal: false,
-        opener: () => byId(ids.input),
-        // The control (input, trigger, clear, chips) is inside: its presses never dismiss.
-        elements: () =>
-          [byId(ids.control), byId(ids.positioner), byId(ids.popup)].filter(
-            (e): e is HTMLElement => e !== null,
-          ),
-        container: () => byId(ids.popup),
-        initialFocus: () => false,
-        finalFocus: () => false,
-        modality: env.modality.modality(),
-        dismiss: {
-          // Escape is the input's key (the machine decides and prevents only when it acted).
-          escape: false,
-          outsidePress: true,
-          outsideFocus: false,
-          onRequest: (request: DismissRequest) => send({ type: "OUTSIDE_PRESS", request }),
-        },
-      })
-      const track = env.position.track({
-        anchor: { kind: "element", id: ids.control },
-        positioner: ids.positioner,
-        arrow: `${ids.positioner}-arrow`,
-        options: () => resolvePositioning(a.props.positioning, positioningPresets.dropdown),
-        onPlacement: (p, first) => send({ type: "POSITION.PLACED", ...p, first }),
-      })
-      return () => {
-        track.stop()
-        stop()
-      }
-    },
+    overlay: (a) => popupOverlay(a, "combobox", a.props.root),
   },
 })
 
 const initialContext = (props: ComboboxProps): ComboboxContext => ({
   ...initialCollectionContext(),
   ...initialInputChipsContext(),
+  ...initialPatternContext(),
   lastCollection: props.collection,
-  focused: false,
-  dirty: false,
   openReason: null,
-  composing: false,
   completable: false,
   completion: null,
-  typingLag: null,
-  placement: unplaced("bottom", "start"),
   highlightQuery: null,
 })
 

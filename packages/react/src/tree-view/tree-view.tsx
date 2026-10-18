@@ -89,15 +89,19 @@ type Selection =
       readonly value?: readonly string[]
       readonly defaultValue?: readonly string[]
       readonly onValueChange?: (value: readonly string[], details: TreeViewChangeDetails) => void
+      /** The last selected item cannot be deselected. */
       readonly disallowEmptySelection?: boolean
     }
   | { readonly selectionMode: "none" }
 
 export type TreeViewRootProps = {
+  /** Base of the parts' generated ids (default: a `useId`). */
   readonly id?: string
+  /** The tree's parts (Label, Tree, Empty). */
   readonly children?: ReactNode
   /** The tree's data; or `collection`, a tree collection you built. */
   readonly items?: readonly TreeViewItemData[]
+  /** A tree collection you built, used instead of `items`. */
   readonly collection?: TreeCollection<unknown>
   readonly selectionBehavior?: "toggle" | "replace"
   readonly expandedValue?: readonly string[]
@@ -115,9 +119,13 @@ export type TreeViewRootProps = {
     options: { readonly signal: AbortSignal },
   ) => Promise<unknown> | undefined
   readonly disabled?: boolean
+  /** Disabled items (and a disabled tree) stay focusable and reachable by arrows; nothing toggles. */
   readonly focusableWhenDisabled?: boolean
+  /** Arrow moves wrap at both ends. Default: false. */
   readonly loop?: boolean
+  /** Typeahead reset delay in ms. Default: 1000. */
   readonly typeaheadTimeout?: number
+  /** Overrides for the loading announcements and the Empty and Loading default texts. */
   readonly messages?: Partial<TreeViewMessages>
 } & Selection
 
@@ -340,6 +348,7 @@ function Root(all: TreeViewRootProps) {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -363,6 +372,7 @@ function Tree({
   render,
   ...rest
 }: Omit<Own<"div">, "children"> & {
+  /** Called once per visible node with its state; returns its row (usually a `TreeView.Item`). */
   readonly children: (node: TreeViewNodeState) => ReactNode
   /** Under a loading branch (default: the Loading part with the loading text). */
   readonly loading?: (node: TreeViewNodeState) => ReactNode
@@ -412,12 +422,17 @@ function Item({
 }: Omit<Own<"div">, "children"> & {
   /** The node key. */
   readonly value: string
+  /** The row's content (ItemText, ItemIndicator, ItemCheckbox). */
   readonly children?: ReactNode
   /** Renders a native `<a role="treeitem">` (link navigation). */
   readonly href?: Href | undefined
+  /** With `href`: passed to the anchor; not `_self` opens elsewhere. */
   readonly target?: string | undefined
+  /** With `href`: passed to the anchor. */
   readonly rel?: string | undefined
+  /** With `href`: sets `aria-current` and `data-current`; the link still navigates. */
   readonly current?: LinkCurrent | undefined
+  /** With `href`: passed unchanged to the router's `navigate`. */
   readonly routerOptions?: RouterOptions | undefined
 }) {
   const host = useHost("Item")
