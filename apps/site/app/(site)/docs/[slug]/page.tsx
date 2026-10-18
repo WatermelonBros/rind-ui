@@ -36,7 +36,11 @@ export default async function DocPage({ params }: Props) {
     html,
     toc: outline,
   } = render(page, { hasExample: Boolean(source) && page.section === "components" })
-  const toc = source ? [{ id: "examples", text: "Examples" }, ...outline] : outline
+  // the Examples section lists every example but the first, so a page with one (a guide) has none
+  const toc =
+    source && Object.keys(source.code).length > 1
+      ? [{ id: "examples", text: "Examples" }, ...outline]
+      : outline
   return (
     <div className={styles.page}>
       <article>

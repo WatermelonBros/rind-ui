@@ -152,10 +152,10 @@ export function LinkTags() {
     <TagGroup.Root>
       <TagGroup.Label>Related</TagGroup.Label>
       <TagGroup.List>
-        <TagGroup.Tag value="dialog" href="#dialog">
+        <TagGroup.Tag value="dialog" href="/docs/dialog/">
           <TagGroup.TagText>Dialog</TagGroup.TagText>
         </TagGroup.Tag>
-        <TagGroup.Tag value="popover" href="#popover">
+        <TagGroup.Tag value="popover" href="/docs/popover/">
           <TagGroup.TagText>Popover</TagGroup.TagText>
         </TagGroup.Tag>
       </TagGroup.List>

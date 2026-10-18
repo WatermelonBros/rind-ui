@@ -110,7 +110,7 @@ export function Figure() {
 
 export function InLink() {
   return (
-    <a href="#bikes" style={{ display: "inline-block", maxInlineSize: 320 }}>
+    <a href="/docs/image/" style={{ display: "inline-block", maxInlineSize: 320 }}>
       <Image.Root alt="Bicycles" style={ratio}>
         <Image.Img src={BIKE} />
       </Image.Root>
