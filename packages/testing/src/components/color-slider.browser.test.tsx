@@ -66,7 +66,7 @@ describe("pointer", () => {
     )
     await press(screen.getByRole("group", { name: "Hue" }), 0.5, 0.02)
     expect(Number(screen.getByRole("slider").getAttribute("aria-valuenow"))).toBeGreaterThan(340)
-    const track = document.querySelector<HTMLElement>('[data-part="track"]')
+    const track = document.querySelector<HTMLElement>('[data-part="channel-slider-track"]')
     expect(track?.style.backgroundImage).toContain("to top")
   })
 
@@ -86,7 +86,8 @@ describe("pointer", () => {
     await press(screen.getByRole("group", { name: "Alpha" }), 0.005, 0.5)
     expect(screen.getByRole("slider").getAttribute("aria-valuenow")).toBe("1")
     expect(
-      document.querySelector<HTMLElement>('[data-part="track"]')?.style.backgroundImage,
+      document.querySelector<HTMLElement>('[data-part="channel-slider-track"]')?.style
+        .backgroundImage,
     ).toContain("to left")
   })
 

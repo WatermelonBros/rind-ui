@@ -13,6 +13,7 @@ import {
   toSpace,
 } from "@rind-ui/core"
 import {
+  COLOR_PICKER_SCOPE,
   type ColorSwatchPickerMessages,
   colorSwatchPickerMessages,
   colorVariables,
@@ -20,6 +21,7 @@ import {
   pickedColor,
   type SwatchItem,
   swatchColor,
+  swatchGroupNaming,
   swatchKey,
 } from "@rind-ui/core/internal"
 import {
@@ -37,7 +39,7 @@ import { useSwatchProps } from "../color-swatch/color-swatch"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
-import { RadioGroup, type RadioGroupRootProps } from "../radio-group/radio-group"
+import { RadioGroup, RadioGroupNaming, type RadioGroupRootProps } from "../radio-group/radio-group"
 import { renderPart } from "../render"
 
 declare module "../provider" {
@@ -121,39 +123,40 @@ function Root({
   const ctx: Ctx = { register, messages, locale, checked }
   return (
     <PickerContext value={ctx}>
-      <RadioGroup.Root
-        orientation="horizontal"
-        {...rest}
-        data-color-swatch-picker=""
-        aria-label={
-          ariaLabelledBy === undefined ? (ariaLabel ?? messages.swatchPickerLabel) : ariaLabel
-        }
-        aria-labelledby={ariaLabelledBy}
-        value={checked}
-        onValueChange={(key, details) => {
-          const index = ordered.findIndex((i) => i.key === key)
-          const item = ordered[index]
-          if (!item || key === null) return
-          const next = pickedColor(item.color, color)
-          const emitted = color ? toSpace(next, color.space) : next
-          let cancelled = false
-          onValueChange?.(emitted, {
-            reason: details.reason,
-            space: emitted.space,
-            value: key,
-            index,
-            cancel: () => {
-              cancelled = true
-              details.cancel()
-            },
-          })
-          if (cancelled) return
-          lastKey.current = key
-          if (!controlled) setInternal(emitted)
-        }}
-      >
-        {children}
-      </RadioGroup.Root>
+      <RadioGroupNaming value={swatchGroupNaming}>
+        <RadioGroup.Root
+          orientation="horizontal"
+          {...rest}
+          aria-label={
+            ariaLabelledBy === undefined ? (ariaLabel ?? messages.swatchPickerLabel) : ariaLabel
+          }
+          aria-labelledby={ariaLabelledBy}
+          value={checked}
+          onValueChange={(key, details) => {
+            const index = ordered.findIndex((i) => i.key === key)
+            const item = ordered[index]
+            if (!item || key === null) return
+            const next = pickedColor(item.color, color)
+            const emitted = color ? toSpace(next, color.space) : next
+            let cancelled = false
+            onValueChange?.(emitted, {
+              reason: details.reason,
+              space: emitted.space,
+              value: key,
+              index,
+              cancel: () => {
+                cancelled = true
+                details.cancel()
+              },
+            })
+            if (cancelled) return
+            lastKey.current = key
+            if (!controlled) setInternal(emitted)
+          }}
+        >
+          {children}
+        </RadioGroup.Root>
+      </RadioGroupNaming>
     </PickerContext>
   )
 }
@@ -211,17 +214,11 @@ function Item({
   const vars = normalizeProps({ style: colorVariables(color) }) as { style?: object }
   return (
     <ItemContext value={{ color }}>
-      <RadioGroup.Item
-        value={key}
-        disabled={disabled === true}
-        textValue={name}
-        data-color-swatch-picker=""
-      >
+      <RadioGroup.Item value={key} disabled={disabled === true} textValue={name}>
         <RadioGroup.ItemControl
           {...rest}
           ref={el}
           data-value={key}
-          data-color-swatch-picker=""
           aria-label={ariaLabel ? `${name}, ${ariaLabel}` : name}
           style={{ ...vars.style, ...style }}
         >
@@ -237,12 +234,17 @@ function Swatch(rest: ComponentPropsWithRef<"div">) {
   const item = useContext(ItemContext)
   if (!item) throw new Error("ColorSwatchPicker.Swatch must be inside ColorSwatchPicker.Item")
   const { api } = useSwatchProps({ color: item.color, decorative: true })
-  return renderPart("div", mergeProps(normalizeProps(api.root()), { ...rest }), undefined, {})
+  return renderPart(
+    "div",
+    mergeProps(normalizeProps(api.root(COLOR_PICKER_SCOPE, "swatch")), { ...rest }),
+    undefined,
+    {},
+  )
 }
 
 /** Mounted only while the item is checked: the one selected mark, decorative. */
 function Indicator(props: ComponentPropsWithRef<typeof RadioGroup.ItemIndicator>) {
-  return <RadioGroup.ItemIndicator aria-hidden="true" data-color-swatch-picker="" {...props} />
+  return <RadioGroup.ItemIndicator aria-hidden="true" {...props} />
 }
 
 export const ColorSwatchPicker = { Root, Item, Swatch, Indicator }

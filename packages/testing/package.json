@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/testing",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Test drivers and environment setup for rind-ui components (Testing Library and Playwright).",
   "license": "MIT",
   "author": "Watermelon Bros",
@@ -61,6 +61,7 @@
     "dom-accessibility-api": "^0.7.1"
   },
   "devDependencies": {
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",

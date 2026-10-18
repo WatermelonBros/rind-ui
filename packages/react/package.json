@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/react",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "React adapter for rind-ui headless components.",
   "license": "MIT",
   "author": "Watermelon Bros",

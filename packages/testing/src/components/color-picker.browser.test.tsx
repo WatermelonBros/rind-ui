@@ -8,11 +8,9 @@ import { userEvent } from "vitest/browser"
 import siteBase from "../../../../apps/site/skins/base.css?inline"
 import siteColor from "../../../../apps/site/skins/color.css?inline"
 // The stylesheets that draw a swatch's selected mark: the theme's and the docs site's skin.
-import siteRadio from "../../../../apps/site/skins/radio-group.css?inline"
 import themeBase from "../../../theme/src/base.css?inline"
-import swatchPicker from "../../../theme/src/color-swatch-picker.css?inline"
+import pickerSheet from "../../../theme/src/color-picker.css?inline"
 import calm from "../../../theme/src/presets/calm.css?inline"
-import radioGroup from "../../../theme/src/radio-group.css?inline"
 import tokens from "../../../theme/src/tokens.css?inline"
 import { getColorPicker } from "../index"
 
@@ -60,10 +58,10 @@ describe("color picker in real browsers", () => {
   for (const [sheet, css, skinned] of [
     [
       "theme",
-      `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${tokens}\n${calm}\n${themeBase}\n${radioGroup}\n${swatchPicker}`,
+      `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${tokens}\n${calm}\n${themeBase}\n${pickerSheet}`,
       false,
     ],
-    ["site skin", `${siteBase}\n${siteRadio}\n${siteColor}`, true],
+    ["site skin", `${siteBase}\n${siteColor}`, true],
   ] as const) {
     for (const glyph of [undefined, "✓"]) {
       it(`a selected swatch shows exactly one mark, centred (${sheet}, ${glyph ? "a glyph" : "the default dot"})`, async () => {
@@ -93,14 +91,16 @@ describe("color picker in real browsers", () => {
           await userEvent.click(radio)
           await vi.waitFor(() => expect(radio.getAttribute("aria-checked")).toBe("true"))
           const marks = [...radio.querySelectorAll<HTMLElement>("*")].filter((el) => {
-            if (el.closest('[data-scope="color-swatch"]')) return false
+            if (el.closest('[data-part="swatch"]')) return false
             const r = el.getBoundingClientRect()
             return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden"
           })
           // One mark: the indicator element (a glyph inside it is the mark, with no dot).
           expect(marks).toHaveLength(1)
           const mark = marks[0] as HTMLElement
-          expect(mark.matches('[data-part="item-indicator"]')).toBe(true)
+          expect(mark.matches('[data-scope="color-picker"][data-part="swatch-indicator"]')).toBe(
+            true,
+          )
           const paint = getComputedStyle(mark)
           const a = radio.getBoundingClientRect()
           const b = mark.getBoundingClientRect()
@@ -189,7 +189,9 @@ describe("color picker in real browsers", () => {
     render(<Picker onValueCommit={onValueCommit} />)
     const picker = getColorPicker(screen, { name: "Fill" })
     await picker.open()
-    const thumb = document.querySelector('[data-scope="slider"][data-part="thumb"]') as HTMLElement
+    const thumb = document.querySelector(
+      '[data-scope="color-picker"][data-part="channel-slider-thumb"]',
+    ) as HTMLElement
     const r = thumb.getBoundingClientRect()
     const x = r.left + r.width / 2
     const y = r.top + r.height / 2

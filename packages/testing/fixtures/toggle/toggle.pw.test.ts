@@ -24,7 +24,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await openExample(page, site.base, "toggle", id)
+  await openExample(page, site.base, "toggle-group", `alone-${id}`)
   await page.locator('[data-scope="toggle"]').first().waitFor()
   return page
 }

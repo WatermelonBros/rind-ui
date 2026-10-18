@@ -3,6 +3,7 @@
 
 import { contract } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
+import { COLOR_PICKER_SCOPE, swatchGroupPart } from "../color-picker/color-picker.naming"
 import { cssColorOf } from "../color-swatch/color-swatch.contract"
 import { radioGroupContract } from "../radio-group/radio-group.contract"
 import type { ColorFormat } from "../shared/color/color"
@@ -36,8 +37,9 @@ async function controlOf(env: Env<P>, target: string | number): Promise<Part | n
   return null
 }
 
-export const colorSwatchPickerContract = contract("radio-group", {
+export const colorSwatchPickerContract = contract(COLOR_PICKER_SCOPE, {
   ...radioGroupContract,
+  partName: swatchGroupPart,
   queries: {
     ...radioGroupContract.queries,
     colors: async (env) => {

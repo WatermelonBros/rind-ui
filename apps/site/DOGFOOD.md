@@ -5,7 +5,7 @@ as it ships. This lists every site-built piece still waiting for its rind counte
 
 | Site piece | Where | Today | Becomes |
 |---|---|---|---|
-| Skin switch (crisp / juicy / bare) | `components/example-frame.tsx`, `components/home/any-look.tsx` | three `Toggle`s | Segmented Control |
+| Skin switch (crisp / juicy / bare) | `components/example-frame.tsx`, `components/home/any-look.tsx` | three `ToggleGroup.Item`s | Segmented Control |
 | Copy code | `components/example-frame.tsx` | `Button` + `navigator.clipboard` | Clipboard |
 | Code block | `lib/docs.ts`, `components/example-frame.tsx` | highlight.js `<pre>` | Code Block (roadmap, wave 2, first in line) |
 | API and docs tables | `lib/docs.ts` (markdown tables) | `<table>` in a focusable scroll box | Table |

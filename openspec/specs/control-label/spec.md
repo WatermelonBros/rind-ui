@@ -25,7 +25,7 @@ copy of the name. When no Label part is rendered, the control SHALL reference no
 
 #### Scenario: Wrapped in a consumer label (base-ui#4122)
 
-- **WHEN** a consumer renders `<label><Checkbox.Root>…</Checkbox.Root> Accept terms</label>`
+- **WHEN** a consumer renders `<label><CheckboxGroup.Item>…</CheckboxGroup.Item> Accept terms</label>`
   with no Label part
 - **THEN** the control's accessible name is "Accept terms"
 

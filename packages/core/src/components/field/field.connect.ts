@@ -40,6 +40,8 @@ export interface FieldConnectInput {
   readonly initial: { readonly value: unknown } | null
   /** A Field host's scope (`text-field`, …): its parts carry it. Default `field`. */
   readonly scope?: string | undefined
+  /** A hosted Field host's root part name (a Color Picker's channel input). Default `root`. */
+  readonly rootPart?: string | undefined
   /** The Field's name (`data-name` on the root: a Form's contract reads it). */
   readonly name?: string | undefined
 }
@@ -51,7 +53,11 @@ export function fieldConnect(input: FieldConnectInput) {
   const dirty = input.dirty ?? fieldIsDirty(context, input.initial)
   const filled = fieldIsFilled(context)
   const data = (part: FieldPart) => ({
-    ...scopeAttrs(input.scope ?? "field", part, input.instance),
+    ...scopeAttrs(
+      input.scope ?? "field",
+      part === "root" ? (input.rootPart ?? "root") : part,
+      input.instance,
+    ),
     "data-disabled": dataFlag(props.disabled === true),
     "data-readonly": dataFlag(props.readOnly === true),
     "data-required": dataFlag(props.required === true),

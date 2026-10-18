@@ -14,6 +14,12 @@ See CLAUDE.md "Review rules".
 | add-tree-view (impl) | — | apps/site/examples/tree-view.tsx | No inline-input example (an input in a treeitem fails axe nested-interactive; covered by a DOM test) and no virtualized example |
 | color-picker-one-scope (r1) | — | packages/react/src/number-input | A hosted Number Input's Label still renders `host:label` (the Field host's part); the picker never renders it, so no Field part-name option (YAGNI) |
 | color-picker (site) | — | packages/core/src/components/shared/color/format.ts | The picker's ValueText shows unrounded hsl/hsb (`hsl(215.88, 100%, 61.96%)` for #3D8BFF); round to the channel step as the sliders do |
+| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
+| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
+| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
+| add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
+| add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
+| add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |
@@ -24,7 +30,6 @@ See CLAUDE.md "Review rules".
 | add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
 | add-qr-code (r2) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | The download postcondition needed a 20 s deadline on CI (page JS export ~1.6 s at 20× CPU throttle); profile the export path |
 | add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
-| add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
 | add-color-picker (impl) | — | packages/react/src/color-picker/color-picker.tsx | Eye dropper handled in the React adapter, not a machine effect; picker root never sets `data-dragging` |
 | add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
 | add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |
@@ -44,7 +49,6 @@ See CLAUDE.md "Review rules".
 | add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
 | add-listbox (impl) | — | packages/core/src/i18n/locale.ts | Direction comes from the provider or `<html>`; a nested `dir="rtl"` around a horizontal list is ignored (repo-wide; pass the provider's `dir`) |
 | add-listbox (impl) | — | packages/theme/src/listbox.browser.test.tsx | Forced-colors checks read the stylesheet; emulated captures still to add (tasks 6.2) |
-| add-select (r1) | — | packages/react/src/select/select.tsx | The unnamed-trigger warning effect runs after every render (no deps): run it once per mount or when the naming props change |
 | add-select (impl) | — | packages/testing | Task 4.2: driver tests in happy-dom (not a repo dependency; needs a decision) |
 | add-select (impl) | — | packages/testing/src/components/select.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test; Task 3.4: select inside a popover |
 | add-select (impl) | — | packages/testing/fixtures/select | Task 6.2: forced-colors Playwright captures; Task 5.3: scroll-overflow and one-element-per-query tests |
@@ -85,10 +89,8 @@ See CLAUDE.md "Review rules".
 | add-breadcrumbs (impl) | — | packages/react/src/breadcrumbs/breadcrumbs.tsx | Static Items register at commit: the server HTML has no `aria-current` (design §6 covers collapse; the `items` form has both) |
 | add-breadcrumbs (impl) | — | packages/core/src/components/breadcrumbs/breadcrumbs.contract.ts | No Menu yet: `openCollapsed`/`followCollapsed` work with a Popover; extra Ellipsis `data-label` locates the trigger |
 | add-pagination (impl) | — | packages/core/src/components/pagination/pagination.contract.ts | `focused()` became `isFocused(control)`: the runner reads every no-argument query after each step and a focus query trips its focus-does-not-commit check |
-| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:67 | The Escape-clear scenario should assert `onValueChange` is called exactly once |
-| add-search-field (r1) | — | packages/testing/src/components/search-field.dom.test.tsx:175 | The pointer-clear path should assert focus stays in the input and the change is reported once |
-| add-password-input (impl) | — | packages/theme/src/password-input.browser.test.tsx, search-field.browser.test.tsx | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
-| add-search-field (impl) | — | packages/testing/src/components/search-field.broken.dom.test.tsx | Broken variant "clear bypassing validation (react-spectrum#7265)" not modelled: no invariant observes a stale Field error yet; the scenario test "Clear re-validates" covers the correct path |
+| add-password-input (impl) | — | packages/theme/src/text-field theme tests (password and search) | The forced-colors checks read the stylesheet's system colours (as number-input's theme test); an emulated forced-colors capture of the rendered parts is still to add (tasks 7.2) |
+| add-search-field (impl) | — | packages/testing/src/components/text-field-search.broken.dom.test.tsx | Broken variant "clear bypassing validation (react-spectrum#7265)" not modelled: no invariant observes a stale Field error yet; the scenario test "Clear re-validates" covers the correct path |
 | add-password-input (impl) | — | packages/core/src/components/field (submit on an invalid Field) | A pointer submit of a natively invalid Field focuses the control with `data-focus-visible` (seen in the password model; that config uses `validationBehavior="aria"`) |
 | add-number-input (r1) | — | packages/core/src/components/number-input/number-input.machine.ts:253, number-input.connect.ts:181 | `canStep` (trigger aria-disabled, guard) is judged on the committed value while `stepBase` steps from the typed text |
 | add-badge (impl) | — | packages/core/src/components/badge/badge.contract.ts | `isExposed()` reads only the root's own `aria-hidden`; an `aria-hidden` ancestor needs an adapter query (`ponytail:` comment) |

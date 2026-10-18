@@ -70,6 +70,64 @@ export function DisabledItem() {
   )
 }
 
+export function AloneBasic() {
+  return (
+    <div className="row">
+      <ToggleGroup.Item defaultPressed>Bold</ToggleGroup.Item>
+      <ToggleGroup.Item>Italic</ToggleGroup.Item>
+      <ToggleGroup.Item>Underline</ToggleGroup.Item>
+    </div>
+  )
+}
+
+export function AloneControlled() {
+  const [pressed, setPressed] = useState(false)
+  return (
+    <div className="row">
+      <ToggleGroup.Item pressed={pressed} onPressedChange={setPressed}>
+        Mute
+      </ToggleGroup.Item>
+      <span className="note">{pressed ? "Muted" : "Sound on"}</span>
+    </div>
+  )
+}
+
+export function AloneDisabled() {
+  return (
+    <div className="row">
+      <ToggleGroup.Item disabled>Disabled</ToggleGroup.Item>
+      <ToggleGroup.Item disabled defaultPressed>
+        Disabled, pressed
+      </ToggleGroup.Item>
+      <ToggleGroup.Item disabled focusableWhenDisabled>
+        Still focusable
+      </ToggleGroup.Item>
+    </div>
+  )
+}
+
+export function AloneIndicator() {
+  return (
+    <ToggleGroup.Item aria-label="Favorite">
+      <ToggleGroup.ItemIndicator fallback="☆">★</ToggleGroup.ItemIndicator>
+    </ToggleGroup.Item>
+  )
+}
+
+export function AloneEvents() {
+  const [log, setLog] = useState<boolean[]>([])
+  return (
+    <div className="stack">
+      <ToggleGroup.Item onPressedChange={(pressed) => setLog((l) => [...l.slice(-4), pressed])}>
+        Notifications
+      </ToggleGroup.Item>
+      <span className="note">
+        {log.map((p) => (p ? "on" : "off")).join(", ") || "No changes yet"}
+      </span>
+    </div>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Basic",
@@ -87,4 +145,22 @@ export const variants: Variants = {
   },
   Controlled: { title: "Controlled", description: "`value` and `onValueChange`." },
   DisabledItem: { title: "Disabled item", description: "Arrow keys skip a `disabled` item." },
+  AloneBasic: { title: "Alone, basic" },
+  AloneControlled: {
+    title: "Alone, controlled",
+    description: "`pressed` with `onPressedChange` keeps the state in your component.",
+  },
+  AloneDisabled: {
+    title: "Alone, disabled",
+    description: "`disabled` blocks toggling; `focusableWhenDisabled` keeps it in the Tab order.",
+  },
+  AloneIndicator: {
+    title: "Alone, indicator",
+    description:
+      "`ToggleGroup.ItemIndicator` shows its children while pressed and `fallback` otherwise.",
+  },
+  AloneEvents: {
+    title: "Alone, change events",
+    description: "`onPressedChange` receives the new value on every change.",
+  },
 }

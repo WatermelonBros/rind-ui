@@ -225,7 +225,7 @@ export function createService<M extends AnyMachine>(
     }
     for (const name in sd?.after) {
       if (!scheduler) throw new Error(`${def.id}: delay "${name}" needs env.scheduler`)
-      const ms = impl.delays?.[name]?.({ props }) ?? 0
+      const ms = impl.delays?.[name]?.({ props, context: snap.context }) ?? 0
       const handle = scheduler.setTimeout(() => alive && send({ type: `after:${name}` }), ms)
       cleanups.push(() => scheduler.clearTimeout(handle))
     }

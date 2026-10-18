@@ -1,0 +1,187 @@
+// The Calendar's API facts for the generated docs (scripts/docs-gen.ts). Data only; checked
+// against the code in calendar.meta.test.ts.
+
+import type { ComponentMeta } from "../meta"
+
+const base = (part: string) => ({
+  "data-scope": '"calendar"',
+  "data-part": `"${part}"`,
+  "data-instance": "The instance id.",
+})
+const state = {
+  "data-disabled": "While disabled.",
+  "data-readonly": "While read-only.",
+  "data-invalid": "A selected date is out of range or unavailable.",
+  "data-focus": "Focus is in the grid.",
+  "data-focus-visible": "Keyboard focus is in the grid.",
+}
+
+export const calendarMeta = {
+  scope: "calendar",
+  name: "Calendar",
+  stateless: false,
+  parts: [
+    {
+      name: "Calendar.Root",
+      part: "root",
+      element: "div",
+      description: '`role="group"` named by `aria-label` (never `application`); holds the state.',
+    },
+    {
+      name: "Calendar.Header",
+      part: "header",
+      element: "div",
+      description: "Holds the heading and the triggers.",
+    },
+    {
+      name: "Calendar.Heading",
+      part: "heading",
+      element: "h2",
+      description: 'The visible range ("October 2026"); announced when a trigger pages.',
+    },
+    {
+      name: "Calendar.PrevTrigger",
+      part: "prev-trigger",
+      element: "button",
+      description: '"Previous"; `aria-disabled` at the minimum, still focusable.',
+    },
+    {
+      name: "Calendar.NextTrigger",
+      part: "next-trigger",
+      element: "button",
+      description: '"Next"; `aria-disabled` at the maximum, still focusable.',
+    },
+    {
+      name: "Calendar.Grid",
+      part: "grid",
+      element: "table",
+      description:
+        '`role="grid"` for one month (`month` offset); children may be a render function with the weeks.',
+    },
+    {
+      name: "Calendar.GridHeader",
+      part: "grid-header",
+      element: "thead",
+      description: "The weekday row.",
+    },
+    {
+      name: "Calendar.HeaderCell",
+      part: "header-cell",
+      element: "th",
+      description: "A weekday: short label shown, full name for assistive technology.",
+    },
+    { name: "Calendar.GridBody", part: "grid-body", element: "tbody", description: "The weeks." },
+    { name: "Calendar.Row", part: "row", element: "tr", description: "A week." },
+    {
+      name: "Calendar.Cell",
+      part: "cell",
+      element: "td",
+      description:
+        '`role="gridcell"`: one Tab stop (roving), explicit `aria-selected`, named by its full date.',
+    },
+  ],
+  props: {
+    value: { type: "DateValue | DateValue[] | null", description: "Controlled selection." },
+    defaultValue: {
+      type: "DateValue | DateValue[] | null",
+      description: "Uncontrolled selection.",
+    },
+    onValueChange: {
+      type: "(value, { reason, modality }) => void",
+      description: "Reasons `CELL.PRESS` (a press) and `KEY` (Enter or Space).",
+    },
+    selectionMode: {
+      type: '"single" | "multiple"',
+      default: '"single"',
+      description: "One date or several.",
+    },
+    focusedValue: { type: "DateValue", description: "Controlled focused date (pages to show it)." },
+    defaultFocusedValue: {
+      type: "DateValue",
+      description: "Uncontrolled focused date (default: the selection, else today).",
+    },
+    onFocusChange: { type: "(date) => void", description: "The focused date changed." },
+    onVisibleRangeChange: {
+      type: "({ start, end }) => void",
+      description: "The visible months changed.",
+    },
+    minValue: { type: "DateValue | null", description: "Earlier dates are disabled." },
+    maxValue: { type: "DateValue | null", description: "Later dates are disabled." },
+    isDateUnavailable: {
+      type: "(date) => boolean",
+      description: "Focusable but not selectable (booked days), unlike disabled.",
+    },
+    visibleMonths: { type: "number", default: "1", description: "Months shown side by side." },
+    pageBehavior: {
+      type: '"visible" | "single"',
+      default: '"visible"',
+      description: "A trigger pages by all visible months, or by one.",
+    },
+    fixedWeeks: { type: "boolean", default: "false", description: "Always six weeks per month." },
+    firstDayOfWeek: { type: '"sun" | "mon" | …', description: "Default: the locale's." },
+    locale: { type: "string", description: "Default: the provider's." },
+    createCalendar: {
+      type: "(identifier) => Calendar",
+      description: "From `@internationalized/date`: enables calendar systems other than gregorian.",
+    },
+    timeZone: { type: "string", description: "The time zone `today` is computed in." },
+    disabled: { type: "boolean", default: "false", description: "Nothing focuses or changes." },
+    readOnly: { type: "boolean", default: "false", description: "Navigable; nothing is selected." },
+    messages: {
+      type: "Partial<CalendarMessages>",
+      description: "Every string reaching assistive technology.",
+    },
+  },
+  dataAttributes: {
+    root: { ...base("root"), ...state },
+    "prev-trigger": { ...base("prev-trigger"), "data-disabled": "Cannot page further." },
+    cell: {
+      ...base("cell"),
+      "data-value": "The date (ISO).",
+      "data-selected": "Selected.",
+      "data-today": "Today.",
+      "data-weekend": "A weekend day in the locale.",
+      "data-outside-month": "A placeholder of another month (inert).",
+      "data-disabled": "Out of range, or the calendar is disabled.",
+      "data-unavailable": "Unavailable (focusable, not selectable).",
+      "data-invalid": "Selected but out of range or unavailable.",
+      "data-hover": "Under the pointer.",
+      "data-focus": "Focused.",
+      "data-focus-visible": "Keyboard focus.",
+    },
+  },
+  keyboard: [
+    ["ArrowLeft / ArrowRight", "Previous / next day (mirrored in RTL); crosses months."],
+    ["ArrowUp / ArrowDown", "Previous / next week."],
+    ["Home / End", "First / last day of the week."],
+    ["PageUp / PageDown", "Previous / next month."],
+    ["Shift + PageUp / PageDown", "Previous / next year."],
+    ["Enter / Space", "Select the focused date."],
+  ],
+  states: {
+    idle: "Focus is outside the grid: a trigger's paging is announced.",
+    focused: "Focus is in the grid: keys move the focused date.",
+  },
+  contract: {
+    actions: {
+      select: ["pointer", "keyboard", "virtual"],
+      focusDate: ["keyboard"],
+      nextPage: ["pointer", "keyboard", "virtual"],
+      previousPage: ["pointer", "keyboard", "virtual"],
+      press: ["keyboard"],
+    },
+    queries: [
+      "value",
+      "focusedDate",
+      "heading",
+      "visibleMonths",
+      "isSelected",
+      "isUnavailable",
+      "isDisabled",
+      "today",
+      "isInvalid",
+      "isFocused",
+    ],
+    traits: ["selectable", "composite-roving"],
+  },
+} as const satisfies ComponentMeta
