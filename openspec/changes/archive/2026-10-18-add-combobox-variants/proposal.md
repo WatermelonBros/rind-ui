@@ -12,9 +12,6 @@ page, with no separate exports.
 - **Command** = the inline action variant: always open with no popup or toggle, and items run
   an action instead of being selected, with pages and Backspace to go back.
 
-This change also extracts what Tags Input needs from the Combobox machine into the shared
-pattern module and delivers Tags Input's already specified Suggestions requirement.
-
 It retires the unimplemented changes `add-command` and `add-autocomplete`. Every requirement
 they specified is either carried into a Combobox requirement below or listed as out of scope
 (design.md "Where the retired requirements went").
@@ -47,10 +44,8 @@ requirement), `add-collections` (keywords), `add-dialog` (the palette's containe
     - the dialog composition.
   - Anatomy gains `Loading` and `ItemDescription`. Data attributes, contract (`run`, `back`,
     `page`, `items`) and theme cover both modes.
-- **`tags-input` (modified):** the suggestion list parts are the reusable listbox parts (no
-  copy), and `closeOnChoose` becomes `closeOnSelect` (one name across the pattern's hosts). Its
-  Suggestions requirement is implemented on the pattern actions, guards and connect helpers
-  extracted from the Combobox machine into `combobox/pattern`.
+- **Tags Input suggestions** (the pattern extraction, the suggestion parts, `closeOnSelect`) are
+  the follow-up change `tags-input-suggestions`.
 - **Retired:** `openspec/changes/add-command` and `openspec/changes/add-autocomplete` are
   removed. The inventory rows "Autocomplete" and "Command" merge into "Combobox".
 
@@ -62,8 +57,6 @@ None.
 
 ### Modified Capabilities
 
-- `tags-input`: Anatomy (suggestion parts reuse the listbox parts), Suggestions
-  (`closeOnSelect`).
 - `combobox`: Anatomy, Combobox Data Attributes, Combobox Contract and Theme are modified.
   Added: Free-Text Mode, Free-Text Forms, Free-Text Escape And Clear, Inline Mode, Running
   Actions, Inline Escape, Inline Highlight And Scrolling, Filtering Without Reordering,

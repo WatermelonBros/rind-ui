@@ -490,6 +490,11 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
               : "unchecked",
         // Nothing can be selected: explicitly never selected (optionsNeverSelected).
         ...(v.selectionMode === "none" ? { "aria-selected": "false" } : {}),
+        // A typing highlight (inline mount, a new query) shows the ring under the keyboard,
+        // never after a pointer interaction.
+        ...(c.highlightSource === "typing" && c.highlightedKey === key
+          ? { "data-focus-visible": dataFlag(v.modality === "keyboard") }
+          : {}),
         // Roving focus never applies: the input keeps focus.
         onFocus: undefined,
       }

@@ -8,6 +8,7 @@ import { positioningQueries } from "../../contract/positioning"
 import type { ComboboxProps } from "./combobox.machine"
 import { comboboxMachine, inlineComboboxMachine } from "./combobox.machine"
 import { comboboxMessages } from "./combobox.messages"
+import { optionsNeverSelected } from "./pattern/invariants"
 
 type P =
   | "root"
@@ -85,17 +86,23 @@ const arrowTo = async (env: E, name: string) => {
 export function comboboxTraits(
   props: Pick<ComboboxProps, "selectionMode" | "virtualized">,
 ): readonly Trait[] {
+  const freeText = (props.selectionMode ?? "single") === "none"
   return [
     "composite-activedescendant",
     "layer",
     "presence",
     "anchored",
-    "form-associated",
+    // Free text: the visible input is the native form control (no hidden input to compare).
+    ...(freeText ? [] : (["form-associated"] as const)),
     "field-associated",
-    ...((props.selectionMode ?? "single") === "none" ? [] : (["selectable"] as const)),
+    ...(freeText ? [] : (["selectable"] as const)),
     ...(props.virtualized ? (["set-metadata"] as const) : []),
   ]
 }
+
+/** The per-component invariants of a props class: never selected when nothing can be. */
+export const comboboxInvariants = (props: Pick<ComboboxProps, "selectionMode">) =>
+  (props.selectionMode ?? "single") === "none" ? [optionsNeverSelected] : []
 
 const anatomy = [
   "root",
@@ -431,6 +438,7 @@ export const inlineComboboxContract = contract("combobox", {
     "$props:page": { skip: "pages: scenario tests" },
   },
   traits: ["composite-activedescendant"],
+  invariants: [optionsNeverSelected],
   commitsOnFocus: [
     { part: "input", state: "open" },
     { part: "list", state: "open" },

@@ -4,7 +4,12 @@ export {
   type ComboboxConnectView,
   comboboxConnect,
 } from "./combobox.connect"
-export { comboboxContract, comboboxTraits, inlineComboboxContract } from "./combobox.contract"
+export {
+  comboboxContract,
+  comboboxInvariants,
+  comboboxTraits,
+  inlineComboboxContract,
+} from "./combobox.contract"
 export {
   type ActionModifiers,
   type ComboboxActionDetails,
@@ -22,6 +27,7 @@ export {
 } from "./combobox.machine"
 export { type ComboboxMessages, comboboxMessages } from "./combobox.messages"
 export { comboboxMeta } from "./combobox.meta"
+export { optionsNeverSelected } from "./pattern/invariants"
 export {
   type ComboboxFilter,
   completion,

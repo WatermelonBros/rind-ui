@@ -723,6 +723,15 @@ const comboboxSetup = setup({
     },
   },
   effects: {
+    /** Inline: the mount highlight reaches aria-activedescendant after the typing pause. */
+    mountLag: (a) => {
+      if (a.context.typingLag !== -1) return undefined
+      const handle = a.env.scheduler.setTimeout(
+        () => a.send({ type: "ACTIVEDESCENDANT.FLUSH", token: -1 }),
+        a.props.typingPause ?? 500,
+      )
+      return () => a.env.scheduler.clearTimeout(handle)
+    },
     /** The non-modal listbox layer and its positioning (combobox-pattern "Popup Placement"). */
     overlay: (a) => {
       const { env, send } = a
@@ -781,6 +790,25 @@ const initialContext = (props: ComboboxProps): ComboboxContext => ({
   placement: unplaced("bottom", "start"),
   highlightQuery: null,
 })
+
+/**
+ * Inline: the first navigable item is highlighted from the start (a typing highlight, so the
+ * active descendant follows after the pause the `mountLag` effect waits).
+ */
+const initialInlineContext = (props: ComboboxProps): ComboboxContext => {
+  const first =
+    props.autoHighlight === false
+      ? undefined
+      : [...props.collection].find((n) => n.type === "item" && !n.disabled)
+  return {
+    ...initialContext(props),
+    highlightedKey: first?.key ?? null,
+    highlightSource: first ? "typing" : null,
+    // A token no later typing highlight reuses (they count up from 1).
+    typingLag: first ? -1 : null,
+    highlightQuery: props.inputValue ?? props.defaultInputValue ?? "",
+  }
+}
 
 export const comboboxMachine = comboboxSetup.machine({
   id: "combobox",
@@ -925,7 +953,7 @@ export type ComboboxMachine = typeof comboboxMachine
 export const inlineComboboxMachine = comboboxSetup.machine({
   id: "combobox",
   initial: "open",
-  context: initialContext,
+  context: initialInlineContext,
   values: {
     value: { fallback: EMPTY },
     inputValue: { fallback: "" },
@@ -946,7 +974,7 @@ export const inlineComboboxMachine = comboboxSetup.machine({
   },
   states: {
     open: {
-      entry: ["highlightFirst"],
+      effects: ["mountLag"],
       on: {
         "INPUT.CHANGE": { guard: "editable", actions: ["typed"] },
         "COMPOSITION.END": { actions: ["endComposition", "typed"] },

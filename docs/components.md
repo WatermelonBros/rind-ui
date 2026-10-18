@@ -65,7 +65,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
-| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | wip | Includes Autocomplete (free text) and Command (inline) |
+| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done | Includes Autocomplete (free text) and Command (inline) |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |

@@ -53,22 +53,7 @@ scope (backlog).
 
 ### 3. Pattern extraction for Tags Input
 
-`combobox/pattern/pattern.ts` (111 lines today) becomes the home of everything a second host
-needs. That is:
-- the highlight-while-typing actions and guards;
-- `ACTIVEDESCENDANT.FLUSH` scheduling;
-- collection repair by key;
-- the count and no-results announcements;
-- composition tracking;
-- Enter-on-highlight;
-- `patternConnect` (input, listbox, option and empty props, with `expanded` from the host's
-  `exposed`);
-- the `optionsNeverSelected` invariant;
-- the contract fragment.
-
-Combobox spreads them; Tags Input spreads the same ones into its machine for its Suggestions
-requirement, so "one machine" holds for both. No behaviour of Combobox changes. Its model
-tests are the regression check.
+Moved to the follow-up change `tags-input-suggestions`.
 
 ### 4. Parts and rendering
 
@@ -97,7 +82,7 @@ exported, so the model tests declare each variant once.
 
 | Before | After | Why |
 |---|---|---|
-| Tags Input `closeOnChoose` (tags-input Suggestions) | `closeOnSelect` | one name for every host of the shared pattern (Combobox already ships `closeOnSelect`) |
+| Tags Input `closeOnChoose` (tags-input Suggestions) | `closeOnSelect` | one name for every host of the shared pattern (Combobox already ships `closeOnSelect`); applied in `tags-input-suggestions` |
 | retired Autocomplete `closeOnChoose` | `closeOnSelect` | same |
 | retired Autocomplete `value` (the text) | `inputValue` / `onInputValueChange` | one text value per Combobox; `onValueChange` never fires in free-text mode |
 | retired Autocomplete `mode` | `autoComplete` (`list` / `both`) | Combobox's existing prop |

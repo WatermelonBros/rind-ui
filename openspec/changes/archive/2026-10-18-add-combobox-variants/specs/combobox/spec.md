@@ -485,8 +485,7 @@ configurations (static items, data items with keywords, groups with separators, 
 with consumer-ranked collections and `itemsQuery`, async loading and empty results, pages with
 `onBack`, link items, inside a modal dialog, virtualized), in every modality including
 `virtual`, in RTL, on emulated Apple/WebKit, Apple/Blink and Windows platforms, and with IME
-replays, with an axe check per state; and Tags Input's model tests SHALL include a configuration
-with suggestions. The inline configurations SHALL walk the inline machine definition, whose only
+replays, with an axe check per state. The inline configurations SHALL walk the inline machine definition, whose only
 state is `open`.
 
 #### Scenario: Generated paths for the palette
