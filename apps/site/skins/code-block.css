@@ -1,0 +1,231 @@
+/* ── Code Block: the site's own code look (example frames, docs fences); dark ink in crisp,
+   deep violet in juicy, a light neutral block in bare. Lines carry the inline padding, so a
+   highlighted line runs edge to edge; numbers are a ::before counter, never text. Token colours
+   are the --rind-code-token-* properties with the site's palette as the fallback (≥ 4.5:1). ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="root"] {
+  --cb-bg: #0b0b0c;
+  --cb-text: #e8e8e3;
+  --cb-soft: #ffffff14;
+  --cb-soft-hi: #ffffff1f;
+  --cb-mark: #d4ff3a;
+  /* line numbers: >= 4.5:1 on the block and on a highlighted line */
+  --cb-gutter: #9a9a93;
+  --cb-keyword: #ff7ab0;
+  --cb-string: #d4ff3a;
+  --cb-function: #9be7ff;
+  --cb-number: #ffd84d;
+  --cb-comment: #b4b4ac;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: var(--cb-bg);
+  color: var(--cb-text);
+  overflow: hidden;
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="code-block"][data-part="root"] {
+  --cb-bg: #2a1d5c;
+  --cb-mark: #ff8fb1;
+  --cb-gutter: #b8afd9;
+}
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="code-block"][data-part="root"] {
+  --cb-bg: #f4f4f5;
+  --cb-text: #18181b;
+  --cb-soft: #18181b0f;
+  --cb-soft-hi: #18181b1a;
+  --cb-mark: #2563eb;
+  --cb-gutter: #5f6068;
+  --cb-keyword: #a3195b;
+  --cb-string: #1d6b32;
+  --cb-function: #1f4fbf;
+  --cb-number: #8a4a00;
+  --cb-comment: #5f6068;
+}
+/* filling a card (a tab panel): the block covers the card, border on border, so no card
+   background shows at the corners (an inner radius still leaves an anti-aliased fringe) */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="panel"]
+  > [data-scope="code-block"][data-part="root"] {
+  margin: calc(-1 * var(--s-bw));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="header"] {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 10px 0;
+  padding: 4px 4px 4px 12px;
+  border-radius: 99px;
+  background: var(--cb-soft);
+  font: 600 13px / 1.4 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="title"] {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--mono, ui-monospace, monospace);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"]:is(
+    [data-part="copy-trigger"],
+    [data-part="wrap-trigger"],
+    [data-part="collapse-trigger"]
+  ) {
+  min-height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background 140ms ease-out;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"]:is(
+    [data-part="copy-trigger"],
+    [data-part="wrap-trigger"],
+    [data-part="collapse-trigger"]
+  ):hover {
+  background: var(--cb-soft-hi);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="wrap-trigger"][aria-pressed="true"] {
+  background: var(--cb-mark);
+  color: var(--cb-bg);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"]:is(
+    [data-part="copy-trigger"],
+    [data-part="wrap-trigger"],
+    [data-part="collapse-trigger"],
+    [data-part="content"]
+  ):focus-visible {
+  outline: 2px solid var(--cb-mark);
+  outline-offset: -2px;
+}
+/* a pressed Wrap fills with --cb-mark: the ring sits outside, on the bar */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="code-block"]:is(
+  [data-part="copy-trigger"],
+  [data-part="wrap-trigger"],
+  [data-part="collapse-trigger"]
+):focus-visible {
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="content"] {
+  margin: 0;
+  padding-block: 16px 20px;
+  overflow: auto;
+  font: 500 13.5px / 1.6 var(--mono, ui-monospace, monospace);
+  tab-size: 2;
+  white-space: pre;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="content"][data-collapsible]:not([data-expanded]) {
+  max-height: calc(var(--rind-code-block-max-lines) * 1lh + 36px);
+  overflow-y: hidden;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="content"][data-wrapped] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="code"] {
+  display: inline-block;
+  min-width: 100%;
+  font: inherit;
+  counter-reset: rind-code-line var(--rind-code-block-start, 0);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="content"][data-wrapped]
+  [data-part="code"] {
+  display: block;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="line"] {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  min-width: 100%;
+  min-height: 1lh;
+  vertical-align: top;
+  padding-inline: 20px;
+  border-inline-start: 3px solid transparent;
+  counter-increment: rind-code-line;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="content"][data-line-numbers]
+  [data-part="line"] {
+  padding-inline-start: calc(3.5ch + 20px);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="content"][data-line-numbers]
+  [data-part="line"]::before {
+  content: counter(rind-code-line);
+  position: absolute;
+  inset-inline-start: 10px;
+  top: 0;
+  width: 3.5ch;
+  text-align: end;
+  color: var(--cb-gutter);
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"][data-part="line"][data-highlighted] {
+  background: var(--cb-soft);
+  border-inline-start-color: var(--cb-mark);
+}
+
+/* tokens: the site's highlight.js palette; each type reads its own property, then its
+   group's (attr falls back to string), then the skin's colour */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="keyword"] {
+  color: var(--rind-code-token-keyword, var(--cb-keyword));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="string"] {
+  color: var(--rind-code-token-string, var(--cb-string));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="attr"] {
+  color: var(--rind-code-token-attr, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="property"] {
+  color: var(--rind-code-token-property, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="regex"] {
+  color: var(--rind-code-token-regex, var(--rind-code-token-string, var(--cb-string)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="function"] {
+  color: var(--rind-code-token-function, var(--cb-function));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="type"] {
+  color: var(--rind-code-token-type, var(--rind-code-token-function, var(--cb-function)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="tag"] {
+  color: var(--rind-code-token-tag, var(--rind-code-token-function, var(--cb-function)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="variable"] {
+  color: var(--rind-code-token-variable, var(--rind-code-token-function, var(--cb-function)));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="number"] {
+  color: var(--rind-code-token-number, var(--cb-number));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="comment"] {
+  color: var(--rind-code-token-comment, var(--cb-comment));
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token="comment"] {
+  font-style: italic;
+}
+
+@media (forced-colors: active) {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"] [data-token] {
+    color: CanvasText;
+  }
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="code-block"][data-part="line"][data-highlighted] {
+    border-inline-start-color: Highlight;
+  }
+}
