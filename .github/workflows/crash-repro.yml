@@ -63,9 +63,12 @@ jobs:
             fi
           done
           tail -20 disk.log
+          echo "gc triggered: $(grep -c 'triggered: true' debug-*.log 2>/dev/null | tr '\n' ' ') sent: $(grep -c 'cdpSendMs: [0-9]' debug-*.log | tr '\n' ' ')"
+          grep renderer fds.log | awk '{sub("fds=","",$4); if($4+0>m[$2]) m[$2]=$4+0} END{for(p in m) print "max fds", p, m[p]}'
         env:
           CI: "true"
           VITEST_CHROMIUM_GC_FORCE: "1"
+          VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB: "1000"
           RIND_BROWSERS: chromium
           RIND_MAX_WORKERS: 2
           DEBUG: "pw:browser*,vitest:browser:*"
