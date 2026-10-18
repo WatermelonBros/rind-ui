@@ -31,6 +31,7 @@ export { getCollapsible } from "./components/collapsible"
 export { getColorPicker } from "./components/color-picker"
 export { getCombobox } from "./components/combobox"
 export { getContextMenu } from "./components/context-menu"
+export { getDateField } from "./components/date-field"
 export { getDialog } from "./components/dialog"
 export { getDrawer } from "./components/drawer"
 export { getField } from "./components/field"
@@ -69,6 +70,7 @@ export { getTooltip } from "./components/tooltip"
 export { getTour } from "./components/tour"
 export { getTreeView } from "./components/tree-view"
 export { fixedDateClock } from "./date-clock"
+export { type DateFieldStepInvariants, dateFieldStepInvariants } from "./date-field-invariants"
 export {
   type FakeDelayGroup,
   type FakeHoverIntent,

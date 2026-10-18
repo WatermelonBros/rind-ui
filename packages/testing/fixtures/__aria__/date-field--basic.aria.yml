@@ -1,0 +1,5 @@
+- text: Birthday
+- group "Birthday":
+  - spinbutton "month Birthday": "10"
+  - spinbutton "day Birthday": "14"
+  - spinbutton "year Birthday": "2026"

@@ -185,6 +185,7 @@ export {
   scrollAreaIds,
   wheelTarget,
 } from "./scroll-metrics"
+export { adjacentSegment, editableSegments, segmentAtPress } from "./segment-layout"
 export {
   type IndicatorBox,
   type IndicatorCause,
