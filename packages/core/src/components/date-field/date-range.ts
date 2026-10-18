@@ -2,7 +2,15 @@
 // Overnight"): the pair's public value and validity from its two ends. Pure: the ends are the
 // embedded fields' committed values and their own validity; nothing here edits an end.
 
-import { type CalendarDate, type DateValue, Time, toCalendarDate } from "@internationalized/date"
+import {
+  type CalendarDate,
+  type DateValue,
+  parseDate,
+  parseDateTime,
+  parseZonedDateTime,
+  Time,
+  toCalendarDate,
+} from "@internationalized/date"
 import { type DateValidityFlags, validityFlags } from "../date-segments"
 import type { DateFieldMessages } from "./date-field.messages"
 
@@ -164,4 +172,19 @@ export function sameRange(
     compareEnds(a.start, b.start) === 0 &&
     compareEnds(a.end, b.end) === 0
   )
+}
+
+/**
+ * A hidden input's ISO text (a browser autofill) as an end value of the input's type, or null
+ * when it does not parse (spec "Range Mode — Hidden Inputs And Form").
+ */
+export function parseEndValue(text: string, type: string): DateValue | null {
+  try {
+    if (text === "") return null
+    if (type === "date") return parseDate(text)
+    if (type === "datetime-local") return parseDateTime(text)
+    return parseZonedDateTime(text)
+  } catch {
+    return null
+  }
 }

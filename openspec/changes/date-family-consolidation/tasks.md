@@ -23,7 +23,8 @@
 ## 3. Date Field time values and range (PR 3)
 
 - [ ] 3.1 Time values: `Time` type, hour cycles, day period, zones and DST, `type="time"` form value, `setDayPeriod`, the 12-hour "0" rule in `date-segments`
-- [ ] 3.2 Range mode: pair coordinator, derived value, ends never edit each other, range validity, focus between ends, names, two hidden inputs, controlled value / clear / reset, time ends and `allowsOvernight`; contract range variant and pair invariants; model classes (date, date-time, time, overnight, RTL)
+- [x] 3.2a Date ranges (date and date-time ends): coordinator, embedded ends, range validity, focus between ends, names and description, two hidden inputs with autofill, clear / reset / controlled value, contract range variant, pair invariants, model classes (in order, inverted), theme, examples, docs
+- [ ] 3.2 Range mode (time ends with 3.1): pair coordinator, derived value, ends never edit each other, range validity, focus between ends, names, two hidden inputs, controlled value / clear / reset, time ends and `allowsOvernight`; contract range variant and pair invariants; model classes (date, date-time, time, overnight, RTL)
 - [ ] 3.3 Theme, examples, snapshots, docs
 
 ## 4. Picker parts (PR 4)
