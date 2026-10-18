@@ -14,6 +14,8 @@
   opacity: 0.75;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="list"] {
+  /* focusable even when empty: never a sliver of a target */
+  min-block-size: 24px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -66,9 +68,11 @@
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  margin-inline-end: -4px;
+  /* 24px: the minimum target size (WCAG 2.5.8) */
+  flex: none;
+  width: 24px;
+  height: 24px;
+  margin-inline-end: -6px;
   padding: 0;
   border: 0;
   border-radius: 99px;
@@ -133,4 +137,10 @@
   min-height: 36px;
   padding: 0 14px;
   font-size: 16px;
+}
+/* a tag that is a link: the link fills the tag's height, so it is a 24px target too */
+:is([data-skinned], [data-rind-theme^="skin-"]) a[data-scope="tag-group"][data-part="item-text"] {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
 }

@@ -62,8 +62,8 @@ function Panel({ scheme }: { scheme: "light" | "dark" }) {
         <Heading level={2}>Workspace settings</Heading>
         <p style={{ margin: 0, maxWidth: "60ch", color: "var(--rind-color-text-muted)" }}>
           Changes apply to every brand that inherits this theme. Read the{" "}
-          <Link href="#tokens">token reference</Link> or open the{" "}
-          <Link href="#contrast">contrast report</Link> before shipping a new brand.
+          <Link href="/theme/tokens/">token reference</Link> or open the{" "}
+          <Link href="/theme/contrast/">contrast report</Link> before shipping a new brand.
         </p>
       </div>
 

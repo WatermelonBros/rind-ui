@@ -6,6 +6,8 @@
   margin-bottom: 6px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tree-view"][data-part="tree"] {
+  /* focusable even when empty: never a sliver of a target */
+  min-block-size: 24px;
   display: block;
   inline-size: min(100%, 20rem);
   max-block-size: 18rem;

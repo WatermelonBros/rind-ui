@@ -15,7 +15,7 @@ const withCode = (text: string) =>
     ),
   )
 
-/** Every example but the hero (the first visible one), Ark-style: a title, one line of why, the live component. */
+/** Every example but the hero (the first visible one): a title, one line of why, the live component. */
 export function ExamplesSection({ slug, source }: { slug: string; source: ExampleCode }) {
   const mod = examples[slug]
   if (!mod) return null
