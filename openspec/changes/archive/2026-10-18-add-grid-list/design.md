@@ -176,3 +176,11 @@ today; future row-with-actions lists use this instead of `role="listbox"`.
 4. **APPLIED (coordinator, 2026-10-15)** **`add-collections`** (`collection-navigation` "Logical Moves"): informational — the
    `Move` union stays closed; spatial moves use their own event (`NAVIGATE_SPATIAL`) owned by
    `collection-grid`. No action needed unless collections prefers to absorb the event.
+
+## Handoff (2026-10-18, after #144 merged)
+
+- State: Grid List merged (#144): collection-grid, machine, connect, contract + driver, React parts, theme, nine site examples, ARIA snapshots, docs; review fixes in; quirk A.1 done.
+- Open tasks: 0.2 / 9.2 manual AT (deferred), 3.1 / 6.3 virtualization, 4.3 React Strict/SSR/nested tests, 6.4 virtual screen reader, 9.3 / 9.4 status and archive.
+- Backlog: rows `add-grid-list` in docs/review-backlog.md (virtualization, GridLayout capability, labelledby without ItemText, warn once, stale pressedDown entry).
+- Next step: decide whether 3.1 / 4.3 / 6.3 / 6.4 block archiving; if not, set Grid List `done` in docs/components.md and archive `add-grid-list`.
+- Worktree rind-ui-impl3-gl removed; branch grid-list merged.
