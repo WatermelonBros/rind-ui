@@ -36,6 +36,7 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
 import * as menu from "./menu"
+import * as menubar from "./menubar"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as numberInput from "./number-input"
@@ -57,6 +58,7 @@ import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
+import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as toast from "./toast"
@@ -83,6 +85,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   labels: labels,
   "visually-hidden": visuallyHidden,
   menu,
+  menubar,
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
@@ -120,6 +123,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   label,
   link,
   listbox,
+  "tag-group": tagGroup,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,

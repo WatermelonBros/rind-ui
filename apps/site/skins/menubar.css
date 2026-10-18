@@ -1,0 +1,55 @@
+/* ── Menubar: a bar of menu triggers; the menus are the Menu skin ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="menubar"][data-part="root"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: calc(var(--s-r-sm) + 4px);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="menubar"][data-part="root"][data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+/* the bar items are menu triggers: flat, not the Menu skin's button */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="menu"][data-part="trigger"][data-host="menubar"] {
+  font: 600 14px var(--s-font);
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="menu"][data-part="trigger"][data-host="menubar"]:is(
+    [data-hover],
+    [data-highlighted]
+  ) {
+  background: color-mix(in oklab, var(--s-ink) 8%, transparent);
+  translate: 0 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="menu"][data-part="trigger"][data-host="menubar"][data-state="open"] {
+  background: color-mix(in oklab, var(--s-acc) 18%, transparent);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-line);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="menu"][data-part="trigger"][data-host="menubar"][data-disabled] {
+  /* muted by colour, not opacity: opacity stacks on a muted skin (contrast) */
+  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+  cursor: not-allowed;
+}
+/* shortcut hints sit at the item's end */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="menu"] [data-hint] {
+  margin-inline-start: auto;
+  padding-inline-start: 24px;
+  opacity: 0.6;
+  font-size: 0.85em;
+}

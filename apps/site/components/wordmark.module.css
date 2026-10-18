@@ -230,7 +230,8 @@
 }
 
 /* on a phone the state chips would collide under the letters; the letters still play */
-@media (max-width: 640px) {
+/* below the two-column hero the letters are too narrow for their chips: they would collide */
+@media (max-width: 960px) {
   .chip {
     display: none;
   }

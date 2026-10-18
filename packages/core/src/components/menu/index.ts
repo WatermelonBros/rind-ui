@@ -7,7 +7,13 @@ export {
   type MenuTriggerState,
   menuConnect,
 } from "./menu.connect"
-export { menuArgs, menuContract, nonModalMenuContract } from "./menu.contract"
+export {
+  menuArgs,
+  menubarMenuContract,
+  menuContract,
+  nonModalMenubarMenuContract,
+  nonModalMenuContract,
+} from "./menu.contract"
 export {
   type MenuActivation,
   type MenuAnchor,

@@ -48,7 +48,11 @@ export type AriaRole = string
 
 /** How to find an element. Role + exact accessible name first; text as a fallback. */
 export type By =
-  | { readonly role: AriaRole; readonly name?: string | RegExp }
+  /**
+   * A role, or a set of roles for a part whose role changes with its state (an empty Tag
+   * Group's list is a `group`, a full one a `grid`): any one of them with the exact name.
+   */
+  | { readonly role: AriaRole | readonly AriaRole[]; readonly name?: string | RegExp }
   /** A labelable control by its exact accessible name, for controls with no role (password). */
   | { readonly label: string | RegExp }
   | { readonly text: string | RegExp }
