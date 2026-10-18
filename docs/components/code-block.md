@@ -64,14 +64,14 @@ import { CodeBlock } from "@rind-ui/react"
 | `CodeBlock.Root` | `messages` | `Partial<CodeBlockMessages>` | — | Overrides the strings (also through the provider). |
 | `CodeBlock.Root` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element without changing behaviour. |
 | `CodeBlock.Root` | `locale` | `string` | — | Default: the provider's locale (the announcement's language). |
-| `CodeBlock.Header` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
-| `CodeBlock.Title` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
-| `CodeBlock.CopyTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
-| `CodeBlock.WrapTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
-| `CodeBlock.CollapseTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
-| `CodeBlock.Content` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Header` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
+| `CodeBlock.Title` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
+| `CodeBlock.CopyTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
+| `CodeBlock.WrapTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
+| `CodeBlock.CollapseTrigger` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
+| `CodeBlock.Content` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
 | `CodeBlock.Content` | `children` | `(line: CodeBlockLine) => ReactNode` | — | Renders each line (default `<CodeBlock.Line line={line} />`). |
-| `CodeBlock.Line` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props. |
+| `CodeBlock.Line` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
 | `CodeBlock.Line` | `line` | `CodeBlockLine` | — | The line to render: one entry of the tokens from `Root` (number, text and token spans). |
 
 Every attribute of the rendered element is accepted and forwarded.

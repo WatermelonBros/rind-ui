@@ -252,7 +252,7 @@ function Root({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
-  /** Another element or a render function receiving the props. */
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<CodeBlockRenderState>
 }
 
