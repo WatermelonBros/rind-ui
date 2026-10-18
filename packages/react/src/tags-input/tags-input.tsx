@@ -123,7 +123,7 @@ export interface TagsInputRootProps {
   /** The draft the given suggestions answer (async): another draft's are stale. */
   readonly itemsQuery?: string
   readonly loading?: LoadingStatus
-  /** Called when the list end is reached, so the consumer loads the next page. */
+  /** The suggestions' LoadMore sentinel came into view. */
   readonly onLoadMore?: () => void
   /** Choosing a suggestion closes the popup (default false). */
   readonly closeOnSelect?: boolean
