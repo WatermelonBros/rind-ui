@@ -4,7 +4,6 @@ import { Intro } from "@/components/intro"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "../globals.css"
-import "@/skins/index.css"
 
 /** The site: navigation, phase, intro and the site stylesheet. */
 export default function SiteLayout({ children }: { children: ReactNode }) {
