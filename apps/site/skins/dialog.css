@@ -1,4 +1,4 @@
-/* Dialog and Alert Dialog (data-scope$="dialog"): the content is portalled to <body>, outside the example stage; the portal host
+/* Dialog and Drawer (data-scope$="dialog"): the content is portalled to <body>, outside the example stage; the portal host
    carries the stage's data-rind-theme, so these rules select on that. */
 [data-rind-theme^="skin-"] [data-scope$="dialog"][data-part="trigger"],
 [data-rind-theme^="skin-"]
@@ -159,25 +159,28 @@
   }
 }
 
-/* Alert Dialog: Cancel and Action on one end-aligned row */
-[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="content"] {
+/* Confirmations (role="alertdialog"): Cancel and Action on one end-aligned row */
+[data-rind-theme^="skin-"] [data-scope="dialog"][data-part="content"][role="alertdialog"] {
   grid-template-columns: 1fr auto auto;
 }
 [data-rind-theme^="skin-"]
-  [data-scope="alert-dialog"][data-part="content"]
+  [data-scope="dialog"][data-part="content"][role="alertdialog"]
   > :not([data-part="cancel"], [data-part="action"]) {
   grid-column: 1 / -1;
 }
-[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="cancel"] {
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="cancel"] {
   grid-column: 2;
 }
-[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="action"] {
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"] {
   grid-column: 3;
+}
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"] {
   background: var(--s-brand);
   color: var(--s-brand-text);
   border-color: var(--s-brand-deep);
 }
-[data-rind-theme^="skin-"] [data-scope="alert-dialog"][data-part="action"]:disabled {
-  opacity: 0.55;
+/* muted by colour, not opacity: opacity stacks on a muted skin (contrast) */
+[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"]:disabled {
+  background: color-mix(in oklab, var(--s-brand) 55%, var(--s-card));
   cursor: progress;
 }

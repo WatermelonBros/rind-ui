@@ -8,9 +8,11 @@ import {
   type DateRangeEdge,
   type DateRangeFieldValue,
   type DateValue,
+  type DayOfWeek,
   dateFieldMessages,
   dateRangeConnect,
   dateRangeFieldMachine,
+  type FieldControlBinding,
   type FieldMessages,
   focusSafely,
   hiddenFormInput,
@@ -27,7 +29,9 @@ import {
 import {
   type ComponentPropsWithRef,
   createContext,
+  type Dispatch,
   type ReactNode,
+  type SetStateAction,
   useContext,
   useEffect,
   useId,
@@ -40,9 +44,16 @@ import { FieldHost } from "../field/use-field-host"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
+import { Popover } from "../popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
+import {
+  calendarTabStop,
+  controlElement,
+  type DatePickerCloseReason,
+  type DatePickerProps,
+} from "./date-picker"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -97,7 +108,7 @@ export type DateRangeFieldRootProps = Omit<
     readonly validationBehavior?: ValidationBehavior
     readonly validationDebounce?: number
     readonly fieldMessages?: MessageOverrides<FieldMessages>
-  }
+  } & DatePickerProps
 
 type Machine = ReturnType<typeof useMachine<typeof dateRangeFieldMachine>>
 
@@ -112,8 +123,30 @@ interface RangeCtx {
   }
   readonly inputEl: { current: HTMLDivElement | null }
   readonly hidden: Record<DateRangeEdge, { current: HTMLInputElement | null }>
-  readonly api: (labelledBy: string | undefined) => ReturnType<typeof dateRangeConnect>
+  /** The pair's api with the Field binding the part sees (the Root's own Field inside it). */
+  readonly api: (binding: FieldControlBinding | null) => ReturnType<typeof dateRangeConnect>
   readonly state: ReturnType<typeof rangeStateOf>
+  // The picker parts (date-field "Picker — Range: …").
+  readonly triggers: number
+  readonly setTriggers: Dispatch<SetStateAction<number>>
+  readonly cancelled: { current: boolean }
+  readonly closeOnSelect: boolean
+  readonly allowsNonContiguousRanges: boolean
+  readonly firstDayOfWeek: DayOfWeek | undefined
+  readonly granularity: DateGranularity | undefined
+  readonly placeholderValue: DateValue | undefined
+}
+
+/** `onOpenChange` with the picker's public reasons. */
+function onOpenChangeRef(
+  fn: DatePickerProps["onOpenChange"],
+  next: boolean,
+  details: { readonly reason: string; cancel(): void },
+) {
+  fn?.(next, {
+    reason: next ? "trigger" : (details.reason as DatePickerCloseReason),
+    cancel: details.cancel,
+  })
 }
 
 const RangeContext = createContext<RangeCtx | null>(null)
@@ -143,6 +176,16 @@ export function DateRangeFieldRoot({
   children,
   id,
   selectionMode: _mode,
+  open,
+  defaultOpen,
+  onOpenChange,
+  closeOnSelect = true,
+  modal,
+  initialFocus,
+  finalFocus,
+  positioning,
+  persistentElements,
+  firstDayOfWeek,
   ...fieldProps
 }: DateRangeFieldRootProps) {
   void _mode
@@ -160,11 +203,27 @@ export function DateRangeFieldRoot({
   const required = fieldProps.required === true || enclosing?.state.required === true
   const latest = useRef(onValueChange)
   latest.current = onValueChange
+  const latestOpen = useRef(onOpenChange)
+  latestOpen.current = onOpenChange
+  // A consumer's details.cancel() of the last change (a refused pick keeps the popover open).
+  const cancelled = useRef(false)
+  const [triggers, setTriggers] = useState(0)
   const machineProps = {
     value,
     defaultValue,
-    onValueChange: (v: DateRangeFieldValue, details: { event: { type: string }; cancel(): void }) =>
-      latest.current?.(v, { reason: details.event.type, cancel: details.cancel }),
+    onValueChange: (
+      v: DateRangeFieldValue,
+      details: { event: { type: string }; cancel(): void },
+    ) => {
+      cancelled.current = false
+      latest.current?.(v, {
+        reason: details.event.type,
+        cancel: () => {
+          cancelled.current = true
+          details.cancel()
+        },
+      })
+    },
     isDateUnavailable,
     allowsNonContiguousRanges,
     required,
@@ -176,7 +235,7 @@ export function DateRangeFieldRoot({
   const startHidden = useRef<HTMLInputElement | null>(null)
   const endHidden = useRef<HTMLInputElement | null>(null)
   const [focusWithin, setFocusWithin] = useState(false)
-  const api = (labelledBy: string | undefined) =>
+  const api = (binding: FieldControlBinding | null) =>
     dateRangeConnect({
       instance,
       state,
@@ -188,9 +247,9 @@ export function DateRangeFieldRoot({
       messages,
       field: mergeFieldProps(
         { role: "group", labelable: false, disabled, readOnly, required },
-        enclosing,
+        binding ?? enclosing,
       ),
-      labelledBy,
+      labelledBy: binding?.ids.label,
       startName,
       endName,
       form,
@@ -198,7 +257,7 @@ export function DateRangeFieldRoot({
       maxValue,
       focusWithin,
     })
-  const own = api(undefined)
+  const own = api(null)
   // The pair's own validity on the start hidden input (the registered validity element).
   useIsoLayoutEffect(() => {
     if (startHidden.current) setControlValidity(startHidden.current, state.message)
@@ -259,6 +318,14 @@ export function DateRangeFieldRoot({
     hidden: { start: startHidden, end: endHidden },
     api,
     state,
+    triggers,
+    setTriggers,
+    cancelled,
+    closeOnSelect,
+    allowsNonContiguousRanges,
+    firstDayOfWeek,
+    granularity,
+    placeholderValue,
   }
   return (
     <FieldHost
@@ -272,11 +339,31 @@ export function DateRangeFieldRoot({
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusWithin(false)
       }}
     >
-      <RangeContext value={ctx}>
-        {children}
-        <input {...normalizeProps(own.hiddenInput("start"))} ref={startHidden} />
-        <input {...normalizeProps(own.hiddenInput("end"))} ref={endHidden} />
-      </RangeContext>
+      <Popover.Root
+        id={instance}
+        scope="date-field"
+        disabled={disabled}
+        {...(open === undefined ? {} : { open })}
+        {...(defaultOpen === undefined ? {} : { defaultOpen })}
+        onOpenChange={(next, details) => {
+          if (next && readOnly) return details.cancel()
+          onOpenChangeRef(latestOpen.current, next, details)
+        }}
+        {...(modal === undefined ? {} : { modal })}
+        initialFocus={initialFocus === undefined ? calendarTabStop(instance) : initialFocus}
+        {...(finalFocus === undefined ? {} : { finalFocus })}
+        {...(positioning === undefined ? {} : { positioning })}
+        persistentElements={() => {
+          const control = controlElement(instance)
+          return [...(control ? [control] : []), ...(persistentElements?.() ?? [])]
+        }}
+      >
+        <RangeContext value={ctx}>
+          {children}
+          <input {...normalizeProps(own.hiddenInput("start"))} ref={startHidden} />
+          <input {...normalizeProps(own.hiddenInput("end"))} ref={endHidden} />
+        </RangeContext>
+      </Popover.Root>
     </FieldHost>
   )
 }
@@ -298,7 +385,7 @@ export function DateRangeInput({
   if (!ctx) throw new Error("DateField.Input must be inside DateField.Root")
   const env = useEnvironment()
   const binding = useFieldControl()
-  const api = ctx.api(binding?.ids.label)
+  const api = ctx.api(binding)
   const firstSegment = () =>
     ctx.inputEl.current?.querySelector<HTMLElement>('[data-edge="start"] input[data-editable]') ??
     null

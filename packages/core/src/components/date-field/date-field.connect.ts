@@ -41,22 +41,29 @@ export type DateFieldPart =
   | "segment-name"
   | "value-description"
   | "hidden-input"
+  | "control"
+  | "trigger"
+  | "clear-trigger"
 
 // ── Keys and insertions ─────────────────────────────────────────────────────────────
 
 /**
  * A key on a segment as a machine event, `"select-all"` (⌘/Ctrl+A: the next Backspace
- * clears every segment), or null (left to the browser: Tab, Enter's implicit submission,
+ * clears every segment), `"open-picker"` (Alt+ArrowDown / Alt+ArrowUp), or null (left to the browser: Tab, Enter's implicit submission,
  * shortcuts). Up/Down step and Left/Right move (`value: "vertical"`).
  */
 export function dateFieldKey(
   k: KeyDescription,
   segment: DateSegmentType,
   o: { readonly dir: "ltr" | "rtl"; readonly platform: PlatformFlags; readonly selectAll: boolean },
-): DateFieldEvent | "select-all" | null {
+): DateFieldEvent | "select-all" | "open-picker" | null {
   if (k.composing) return null
   const mod = isMod(k, o.platform)
   if (mod && !k.alt && !k.shift && k.key.toLowerCase() === "a") return "select-all"
+  // Alt+ArrowDown / Alt+ArrowUp open a picker's popover (the segment's value is untouched).
+  if (k.alt && !k.ctrl && !k.meta && (k.key === "ArrowDown" || k.key === "ArrowUp")) {
+    return "open-picker"
+  }
   if (k.alt || k.ctrl || k.meta) return null
   if (k.key === "Backspace" || k.key === "Delete") {
     return o.selectAll ? { type: "CLEAR_ALL" } : { type: "BACKSPACE", segment }
@@ -294,18 +301,67 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
       dir: input.dir,
       lang: f.options.locale,
     }),
-    input: (): PartProps => ({
-      ...part("input"),
+    /**
+     * The segments' container: the group, or (embedded, or inside a picker's Control, which is
+     * then the group) a presentation element.
+     */
+    input: (o: { readonly inControl?: boolean } = {}): PartProps => {
+      const plain = input.embedded || o.inControl === true
+      return {
+        ...part("input"),
+        ...state,
+        role: plain ? "presentation" : "group",
+        id: id(input, "input"),
+        "aria-labelledby": plain ? undefined : input.labelledBy,
+        "aria-describedby": plain
+          ? undefined
+          : [field["aria-describedby"], descriptionId].filter(Boolean).join(" ") || undefined,
+        "aria-disabled": field.disabled ? "true" : undefined,
+        "aria-invalid": !plain && invalid ? "true" : undefined,
+        style: { "unicode-bidi": "isolate" },
+      }
+    },
+    /** A picker's group around the input and its triggers (spec "Picker — Names"). */
+    control: (): PartProps => ({
+      ...part("control"),
       ...state,
-      role: input.embedded ? "presentation" : "group",
-      id: id(input, "input"),
-      "aria-labelledby": input.embedded ? undefined : input.labelledBy,
-      "aria-describedby": input.embedded
-        ? undefined
-        : [field["aria-describedby"], descriptionId].filter(Boolean).join(" ") || undefined,
+      role: "group",
+      id: id(input, "control"),
+      "aria-labelledby": input.labelledBy,
+      "aria-describedby":
+        [field["aria-describedby"], descriptionId].filter(Boolean).join(" ") || undefined,
       "aria-disabled": field.disabled ? "true" : undefined,
-      "aria-invalid": !input.embedded && invalid ? "true" : undefined,
-      style: { "unicode-bidi": "isolate" },
+      "aria-invalid": invalid ? "true" : undefined,
+    }),
+    /**
+     * The picker trigger, named by its message and the Label, described by the value. The
+     * Popover's trigger adds `aria-expanded`, `aria-controls` and `aria-haspopup`.
+     */
+    trigger: (o: { readonly range?: boolean } = {}): PartProps => ({
+      ...part("trigger"),
+      id: id(input, "trigger"),
+      "aria-label": o.range ? input.messages.rangeTrigger : input.messages.trigger,
+      "aria-labelledby": [id(input, "trigger"), input.labelledBy].filter(Boolean).join(" "),
+      "aria-describedby": descriptionId,
+      // Read-only: focusable, announced unavailable, never opens.
+      "aria-disabled": field.readOnly && !field.disabled ? "true" : undefined,
+      "data-disabled": dataFlag(field.disabled),
+      "data-readonly": dataFlag(field.readOnly),
+    }),
+    /** The open content's name: the trigger's (its message and the Label). */
+    contentLabelledBy: (): string =>
+      [id(input, "trigger"), input.labelledBy].filter(Boolean).join(" "),
+    /** Clears the value and every draft segment (spec "Picker — Clear"). */
+    clearTrigger: (): PartProps => ({
+      ...part("clear-trigger"),
+      type: "button",
+      id: id(input, "clear-trigger"),
+      "aria-label": input.messages.clear,
+      "aria-labelledby": [id(input, "clear-trigger"), input.labelledBy].filter(Boolean).join(" "),
+      disabled: field.disabled || undefined,
+      "aria-disabled": field.readOnly && !field.disabled ? "true" : undefined,
+      "data-disabled": dataFlag(field.disabled),
+      "data-empty": dataFlag(conversion === "empty"),
     }),
     segments: (): readonly SegmentPart[] =>
       f.segments.map((s, i) => ({

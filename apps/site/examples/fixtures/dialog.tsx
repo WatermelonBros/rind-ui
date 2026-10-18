@@ -176,7 +176,12 @@ export function ExitAnimation() {
   return (
     <>
       <style>{slowExit}</style>
-      <Box label="Slow exit" contentProps={{ "data-slow-exit": "" } as never} />
+      <Box label="Slow exit" contentProps={{ "data-slow-exit": "" } as never}>
+        <input aria-label="Display name" defaultValue="Ada" />
+        {/* Cancel and Action are Dialog parts: the model run presses them too. */}
+        <Dialog.Cancel>Cancel</Dialog.Cancel>
+        <Dialog.Action>Save</Dialog.Action>
+      </Box>
     </>
   )
 }

@@ -29,9 +29,11 @@
 
 ## 4. Picker parts (PR 4)
 
-- [ ] 4.1 Picker parts in single and range mode: one value owner, open state and reasons, opening, modality, focus and restore, dismissal and nesting, select and close, typing while open, names, clear, Field and form participation, state kept until exit, touch, resume and committing a range
+- [x] 4.1a Picker parts, single and range (range resume and range typing while open included): Control, Trigger, ClearTrigger, Portal, Positioner, Content, Calendar; one value owner (the field's machine: `PICK`, `CLEAR`); open state and reasons (Popover `select`); Alt+Arrow opening; initial focus on the calendar's tab stop; dismissal with the Control inside; select and close (type, time and zone kept; same date closes; refusal keeps it open); typing while open; names; clear; read-only; Calendar `invalid` and `onDateSelect`; the range picker forces `commitOnBlur="reset"`
+- [ ] 4.1 Picker parts in single and range mode (rest, in the backlog: touch-specific checks, state kept until exit, Field touched accounting, modal picker tests; range resume, range typing while open, outside press, Escape twice, disabled, unavailable day and SSR are in 4.1a): one value owner, open state and reasons, opening, modality, focus and restore, dismissal and nesting, select and close, typing while open, names, clear, Field and form participation, state kept until exit, touch, resume and committing a range
+- [x] 4.2a Driver actions `openPicker`, `pickDate`, `closePicker`, `clearPicker`; queries `isOpen`, `calendarSelection`; invariants expanded-is-open, content-is-named-dialog, views-agree; model class "picker closed"
 - [ ] 4.2 Contract picker variant and picker invariants; model classes (modal / non-modal, single / range, nested in a Dialog)
-- [ ] 4.3 Theme (trigger icon, panel content), examples, snapshots, docs
+- [x] 4.3 Theme (trigger icon, panel content), examples, snapshots, docs
 
 ## 5. Close
 

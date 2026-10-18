@@ -93,7 +93,7 @@ with status, is in [`docs/components.md`](docs/components.md).
 | Actions | Button, Link, Toggle Group, Toolbar |
 | Forms | Label, Field, Fieldset, Form, Text Field, Switch, Checkbox Group, Radio Group, Segmented Control |
 | Disclosure | Collapsible, Accordion, Tabs |
-| Overlays | Dialog, Alert Dialog, Popover, Tooltip |
+| Overlays | Dialog (incl. `role="alertdialog"` confirmations), Popover, Tooltip |
 | Typography | Heading |
 | Display | Badge, Skeleton, Avatar, Image, Progress, Meter, Alert |
 | Layout | Separator, Aspect Ratio (a recipe on the native CSS property) |

@@ -13,7 +13,7 @@
   gap: 6px;
   inline-size: min(100%, 24rem);
   padding: 6px 8px;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
   color: var(--s-ink);

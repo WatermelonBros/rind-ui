@@ -10,7 +10,7 @@
   align-items: center;
   gap: 1px;
   padding: 8px 10px;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
   font: 500 15px var(--s-font);
@@ -51,4 +51,60 @@
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-invalid]:not([data-focus]) {
   color: var(--s-error);
+}
+
+/* ── Date Field picker: the Control is the box; the Input inside it draws nothing ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="control"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 4px 4px 10px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  font: 500 15px var(--s-font);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="control"]
+  [data-part="input"] {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]) {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  font: inherit;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]):hover,
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="trigger"][data-state="open"] {
+  background: color-mix(in srgb, var(--s-brand) 14%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]):focus-visible {
+  outline: 2px solid var(--s-brand);
+  outline-offset: 1px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="clear-trigger"][data-empty] {
+  visibility: hidden;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="content"] {
+  padding: 12px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: var(--s-card);
+  color: var(--s-ink);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.16);
 }

@@ -142,4 +142,38 @@ describe("Date Field stylesheet", () => {
     const sep = document.querySelector<HTMLElement>('[data-part="separator"]') as HTMLElement
     expect(getComputedStyle(sep).color).not.toBe(getComputedStyle(outer).color)
   })
+
+  it("picker: the Control is the box, the Input inside draws nothing, triggers are 24px", () => {
+    sheet()
+    render(
+      <RindProvider
+        locale="en-US"
+        environment={{ dateClock: fixedDateClock("2026-10-17T12:00:00Z", "UTC") }}
+      >
+        <DateField.Root>
+          <DateField.Label>Departure</DateField.Label>
+          <DateField.Control>
+            <DateField.Input />
+            <DateField.ClearTrigger>
+              <span aria-hidden="true">×</span>
+            </DateField.ClearTrigger>
+            <DateField.Trigger>
+              <span aria-hidden="true">▾</span>
+            </DateField.Trigger>
+          </DateField.Control>
+        </DateField.Root>
+      </RindProvider>,
+    )
+    const control = document.querySelector<HTMLElement>('[data-part="control"]') as HTMLElement
+    const input = document.querySelector<HTMLElement>('[data-part="input"]') as HTMLElement
+    const trigger = document.querySelector<HTMLElement>('[data-part="trigger"]') as HTMLElement
+    expect(Number.parseFloat(getComputedStyle(control).borderTopWidth)).toBeGreaterThan(0)
+    expect(getComputedStyle(input).borderTopWidth).toBe("0px")
+    const box = trigger.getBoundingClientRect()
+    expect(box.width).toBeGreaterThanOrEqual(24)
+    expect(box.height).toBeGreaterThanOrEqual(24)
+    // No value and no draft: the clear trigger keeps its place but is hidden.
+    const clear = document.querySelector<HTMLElement>('[data-part="clear-trigger"]') as HTMLElement
+    expect(getComputedStyle(clear).visibility).toBe("hidden")
+  })
 })

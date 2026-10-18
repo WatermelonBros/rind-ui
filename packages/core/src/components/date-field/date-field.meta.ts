@@ -63,6 +63,40 @@ export const dateFieldMeta = {
       description:
         'An editable segment is a native `<input role="spinbutton">` named "month" + label; a literal is an `aria-hidden` span.',
     },
+    {
+      name: "DateField.Control",
+      part: "control",
+      element: "div",
+      description:
+        'Picker: `role="group"` around the Input and the triggers (the Input is then `role="presentation"`); the popover anchor.',
+    },
+    {
+      name: "DateField.Trigger",
+      part: "trigger",
+      element: "button",
+      description:
+        'Picker: opens the calendar; `aria-haspopup="dialog"`, named "Choose date" and the Label.',
+    },
+    {
+      name: "DateField.ClearTrigger",
+      part: "clear-trigger",
+      element: "button",
+      description: 'Picker: clears the value and every draft; named "Clear" and the Label.',
+    },
+    {
+      name: "DateField.Content",
+      part: "content",
+      element: "div",
+      description:
+        'Picker: the popover\'s `role="dialog"` (inside `DateField.Portal` and `DateField.Positioner`), named like the trigger.',
+    },
+    {
+      name: "DateField.Calendar",
+      part: "root",
+      element: "div",
+      description:
+        "Picker: the Calendar bound to the field (value, constraints, rules); its own parts go inside.",
+    },
   ],
   props: {
     value: { type: "DateValue | null", description: "Controlled value." },
@@ -70,7 +104,7 @@ export const dateFieldMeta = {
     onValueChange: {
       type: "(value, { reason, modality }) => void",
       description:
-        "At commit points only: `SEGMENT.COMMIT`, `STEP`, `PASTE`, `CLEAR`, `RESET`. Typing inside a segment never changes the value.",
+        "At commit points only: `SEGMENT.COMMIT`, `STEP`, `PASTE`, `CLEAR`, `RESET`, `CALENDAR` (a picker's pick). Typing inside a segment never changes the value.",
     },
     placeholderValue: {
       type: "DateValue",
@@ -163,6 +197,10 @@ export const dateFieldMeta = {
     ["Backspace / Delete", "Remove a digit; in an empty segment go back."],
     ["⌘/Ctrl+A, then Backspace", "Clear every segment."],
     ["Enter", "Submit the form (never changes a segment)."],
+    [
+      "Alt+ArrowDown / Alt+ArrowUp",
+      "With picker parts: open the calendar (the segment is unchanged).",
+    ],
   ],
   states: {
     idle: "No segment has focus.",
@@ -186,6 +224,10 @@ export const dateFieldMeta = {
       composeOpen: ["keyboard"],
       composeEnd: ["keyboard"],
       resetForm: ["pointer", "keyboard", "virtual"],
+      openPicker: ["pointer", "keyboard", "virtual"],
+      pickDate: ["pointer", "keyboard", "virtual"],
+      closePicker: ["pointer", "keyboard", "virtual"],
+      clearPicker: ["pointer", "keyboard", "virtual"],
     },
     queries: [
       "value",
@@ -198,6 +240,8 @@ export const dateFieldMeta = {
       "isComposing",
       "isDisabled",
       "isReadOnly",
+      "isOpen",
+      "calendarSelection",
     ],
     traits: ["valued", "form-associated", "field-associated"],
   },

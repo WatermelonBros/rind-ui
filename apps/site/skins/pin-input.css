@@ -29,7 +29,7 @@
   place-items: center;
   inline-size: 40px;
   block-size: 48px;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
   color: var(--s-ink);

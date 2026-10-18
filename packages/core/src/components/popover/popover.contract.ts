@@ -125,6 +125,7 @@ function popoverContractWith(modal: boolean) {
       },
       "parent-dismissed": { skip: "closing the parent layer: covered by the nesting DOM tests" },
       open: { skip: "programmatic (actionsRef.open): covered by the machine tests" },
+      select: { skip: "a content's commit (the Date Field picker's tests)" },
       api: { skip: "programmatic close and the disabled prop: covered by the machine tests" },
       "POSITION.PLACED": {
         skip: "sent by the position capability, not a gesture (fakePositioning in the node tests)",

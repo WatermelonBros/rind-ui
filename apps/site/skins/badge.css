@@ -49,3 +49,19 @@
   background: transparent;
   box-shadow: inset 0 0 0 2px var(--s-acc-deep);
 }
+/* bare: the muted fill disappears on a light page, so a hairline gives the badge its shape */
+:is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="badge"][data-part="root"] {
+  border: 1px solid var(--s-line);
+  background: var(--s-card);
+}
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="badge"][data-part="root"]:is([data-variant="solid"], [data-tone="danger"]) {
+  border-color: var(--s-ink);
+  background: var(--s-ink);
+  color: var(--s-on);
+}
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+  [data-scope="badge"][data-part="root"][data-variant="outline"] {
+  border-color: var(--s-ink);
+  background: transparent;
+}

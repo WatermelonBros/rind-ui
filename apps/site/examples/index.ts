@@ -1,7 +1,6 @@
 import type { ComponentType } from "react"
 import * as accordion from "./accordion"
 import * as alert from "./alert"
-import * as alertDialog from "./alert-dialog"
 import * as announcements from "./announcements"
 import * as aspectRatio from "./aspect-ratio"
 import * as autosize from "./autosize"
@@ -91,7 +90,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
-  "alert-dialog": alertDialog,
   "aspect-ratio": aspectRatio,
   avatar,
   badge,

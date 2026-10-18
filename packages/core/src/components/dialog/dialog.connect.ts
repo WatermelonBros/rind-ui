@@ -1,6 +1,7 @@
 // Dialog parts (design §3): a trigger that opens it (and toggles a non-modal one), a
 // backdrop and positioner that are dismiss surfaces, the `dialog` content named and
-// described only by the parts that are rendered, a title heading, and close triggers.
+// described only by the parts that are rendered, a title heading, close triggers, and the
+// Cancel and Action buttons of a confirmation (`role="alertdialog"`, any dialog may use them).
 
 import { focusAttrs } from "../../a11y/focus"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
@@ -19,6 +20,8 @@ export type DialogPart =
   | "title"
   | "description"
   | "close-trigger"
+  | "cancel"
+  | "action"
 
 export const dialogIds = (scope: string, root: string) => ({
   content: partId(scope, root, "content"),
@@ -30,6 +33,8 @@ export const dialogIds = (scope: string, root: string) => ({
 
 export interface DialogConnectInput {
   readonly scope: string
+  /** The content's role: an alert dialog interrupts with a message that needs a response. */
+  readonly role?: "dialog" | "alertdialog" | undefined
   readonly instance: string
   readonly open: boolean
   readonly modal: boolean
@@ -76,6 +81,8 @@ const join = (...ids: (string | undefined)[]) => ids.filter(Boolean).join(" ") |
 
 export function dialogConnect(input: DialogConnectInput, send: (event: DialogEvent) => void) {
   const { scope, instance } = input
+  // A confirmation is always modal, whatever the input says.
+  const modal = input.modal || input.role === "alertdialog"
   const ids = dialogIds(scope, instance)
   const dataState = input.open ? "open" : "closed"
   const closeReason = !input.open && input.closeReason ? input.closeReason : undefined
@@ -90,6 +97,15 @@ export function dialogConnect(input: DialogConnectInput, send: (event: DialogEve
           },
         }
       : {}
+  /** Cancel and Action: press-activated buttons that close with their own reason. */
+  const button = (part: "cancel" | "action", s: DialogButtonState): PartProps => ({
+    ...scopeAttrs(scope, part, instance),
+    id: s.id,
+    type: "button",
+    ...focusAttrs(s.focused, s.modality),
+    "data-pressed": dataFlag(s.pressed),
+    "data-disabled": dataFlag(s.disabled === true),
+  })
   return {
     trigger: (s: DialogButtonState): PartProps => {
       const opened = input.open && input.opener === s.id
@@ -124,11 +140,11 @@ export function dialogConnect(input: DialogConnectInput, send: (event: DialogEve
         ...scopeAttrs(scope, "positioner", instance),
         id: ids.positioner,
         "data-state": dataState,
-        "data-modal": dataFlag(input.modal),
+        "data-modal": dataFlag(modal),
         ...s,
         onMouseDown: keepFocus,
         // Non-modal: the page outside the content stays operable (zag#3401).
-        ...(input.modal ? {} : { style: { ...(s["style"] as object), pointerEvents: "none" } }),
+        ...(modal ? {} : { style: { ...(s["style"] as object), pointerEvents: "none" } }),
       }
     },
     content: (own: {
@@ -139,19 +155,19 @@ export function dialogConnect(input: DialogConnectInput, send: (event: DialogEve
       return {
         ...scopeAttrs(scope, "content", instance),
         id: ids.content,
-        role: scope === "alert-dialog" ? "alertdialog" : "dialog",
+        role: input.role ?? "dialog",
         tabindex: -1,
-        "aria-modal": input.modal ? "true" : undefined,
+        "aria-modal": modal ? "true" : undefined,
         // The consumer's ids first, then the parts that are rendered (radix#3007, ark#4182).
         "aria-labelledby": join(own.labelledBy, input.rendered.title),
         "aria-describedby": join(own.describedBy, input.rendered.description),
         "data-state": dataState,
-        "data-modal": dataFlag(input.modal),
+        "data-modal": dataFlag(modal),
         "data-close-reason": closeReason,
         "data-focus-within": dataFlag(input.focusWithin === true),
         ...focusAttrs(input.contentFocused === true, input.modality ?? "keyboard"),
         ...s,
-        ...(input.modal ? {} : { style: { ...(s["style"] as object), pointerEvents: "auto" } }),
+        ...(modal ? {} : { style: { ...(s["style"] as object), pointerEvents: "auto" } }),
       }
     },
     title: (own: { level: HeadingLevel; tag: string }): PartProps => ({
@@ -172,6 +188,11 @@ export function dialogConnect(input: DialogConnectInput, send: (event: DialogEve
       ...focusAttrs(s.focused, s.modality),
       "data-pressed": dataFlag(s.pressed),
     }),
+    cancel: (s: DialogButtonState): PartProps => button("cancel", s),
+    action: (s: DialogButtonState): PartProps => button("action", s),
+    pressCancel: (modality: Modality) => send({ type: "CANCEL_PRESS", modality }),
+    pressAction: (id: string, modality: Modality) =>
+      send({ type: "ACTION_PRESS", action: id, modality }),
     /** Press handlers: the adapter wires them through press interactions. */
     pressTrigger: (id: string, modality: Modality) =>
       send({ type: "TRIGGER_PRESS", trigger: id, modality }),

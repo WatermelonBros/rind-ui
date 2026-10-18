@@ -85,14 +85,34 @@ export const dialogMeta = {
       description:
         'Closes the dialog; named by `messages.close` when it has no content of its own. A `type="submit"` one closes on its form\'s submit.',
     },
+    {
+      name: "Dialog.Cancel",
+      part: "cancel",
+      element: "button",
+      description:
+        'Closes with reason `cancel`; the initial focus of a `role="alertdialog"` dialog.',
+    },
+    {
+      name: "Dialog.Action",
+      part: "action",
+      element: "button",
+      description:
+        "Closes with reason `action` (`details.cancel()` keeps it open for an async confirm); several may be rendered.",
+    },
   ],
   props: {
+    role: {
+      type: '"dialog" | "alertdialog"',
+      default: '"dialog"',
+      description:
+        "`alertdialog`: a confirmation. Always modal, an outside press never closes it, focus starts on Cancel, a missing description warns.",
+    },
     open: { type: "boolean", description: "Controlled open state." },
     defaultOpen: { type: "boolean", default: "false", description: "Initial open state." },
     onOpenChange: {
       type: "(open: boolean, details: ChangeDetails) => void",
       description:
-        "Every change request, with `details.reason` (`trigger`, `close-trigger`, `escape-key`, `outside-press`, `outside-focus`, `parent-dismissed`, `api`) and `details.cancel()`.",
+        "Every change request, with `details.reason` (`trigger`, `close-trigger`, `cancel`, `action`, `escape-key`, `outside-press`, `outside-focus`, `parent-dismissed`, `api`) and `details.cancel()`.",
     },
     modal: {
       type: "boolean",
@@ -187,10 +207,15 @@ export const dialogMeta = {
       "data-focus-visible": button["data-focus-visible"],
       "data-pressed": button["data-pressed"],
     },
+    cancel: { ...base("cancel"), ...button, "data-disabled": "While disabled." },
+    action: { ...base("action"), ...button, "data-disabled": "While disabled." },
   },
   keyboard: [
     ["Enter / Space on the trigger", "Opens the dialog (closes it when non-modal and open)."],
-    ["Enter / Space on a close trigger", "Closes the dialog."],
+    [
+      "Enter / Space on a close trigger, Cancel or an Action",
+      "Closes the dialog with that reason.",
+    ],
     ["Escape", "Closes the topmost dialog (`closeOnEscape`)."],
     ["Tab / Shift+Tab", "Moves through the tabbable elements; wraps at the edges while modal."],
     ["Enter in a form field", "Submits the form natively; the dialog does not handle Enter."],
@@ -203,6 +228,8 @@ export const dialogMeta = {
     actions: {
       open: ["pointer", "touch", "keyboard", "virtual"],
       close: ["pointer", "touch", "keyboard", "virtual"],
+      cancel: ["pointer", "touch", "keyboard", "virtual"],
+      confirm: ["pointer", "touch", "keyboard", "virtual"],
       pressEscape: ["keyboard"],
       pressOutside: ["pointer", "virtual"],
       tab: ["keyboard"],

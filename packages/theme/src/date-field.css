@@ -56,6 +56,123 @@
   }
 
   /*
+   * Picker: the Control is the visible field (the same box as a bare Input) holding the
+   * Input, the trigger and the clear trigger; the Input inside it draws nothing.
+   */
+  :where([data-scope="date-field"][data-part="control"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: var(--rind-space-1);
+    min-block-size: var(--rind-date-field-height, var(--rind-size-control, var(--rind-size-md)));
+    padding-inline: var(--rind-date-field-padding-inline, var(--rind-space-2)) var(--rind-space-1);
+    border: var(--rind-border-width) solid
+      var(--rind-date-field-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-date-field-radius, var(--rind-radius-control));
+    background: var(--rind-date-field-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-date-field-shadow, var(--rind-shadow-key-pressed));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-date-field-font-size, var(--rind-text-control, var(--rind-text-sm)));
+  }
+
+  :where([data-scope="date-field"][data-part="control"] [data-part="input"]) {
+    min-block-size: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-invalid] [data-part="control"]) {
+    border-color: var(--rind-color-danger-border);
+  }
+
+  :where([data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"])) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--rind-date-field-trigger-size, 24px);
+    min-block-size: var(--rind-date-field-trigger-size, 24px);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-sm);
+    background: none;
+    color: var(--rind-color-text-muted);
+    font: inherit;
+    cursor: default;
+  }
+
+  :where([data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]):hover) {
+    background: var(--rind-color-accent-soft);
+    color: var(--rind-color-text);
+  }
+
+  :where(
+    [data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]):focus-visible
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="date-field"][data-part="trigger"][data-state="open"]) {
+    background: var(--rind-color-accent-soft);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="date-field"][data-part="clear-trigger"][data-empty]) {
+    visibility: hidden;
+  }
+
+  :where(
+    [data-scope="date-field"]:is([data-part="trigger"], [data-part="clear-trigger"]):is(
+      [data-disabled],
+      [aria-disabled="true"]
+    )
+  ) {
+    background: none;
+    color: var(--rind-color-text-disabled, var(--rind-color-text-muted));
+  }
+
+  /* The popover panel around the Calendar. */
+  :where([data-scope="date-field"][data-part="content"]) {
+    box-sizing: border-box;
+    max-block-size: var(--rind-available-height, 100vh);
+    overflow: auto;
+    padding: var(--rind-date-field-content-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid var(--rind-color-border);
+    border-radius: var(--rind-radius-panel);
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-text);
+    box-shadow: var(--rind-shadow-lg);
+  }
+
+  :where([data-scope="date-field"][data-part="content"][data-state="open"]) {
+    transition:
+      opacity var(--rind-duration-fast) var(--rind-ease-out),
+      scale var(--rind-duration-fast) var(--rind-ease-out);
+    @starting-style {
+      opacity: 0;
+      scale: 0.97;
+    }
+  }
+
+  :where([data-scope="date-field"][data-part="content"][data-state="closed"]) {
+    opacity: 0;
+    scale: 0.97;
+    transition:
+      opacity var(--rind-duration-fast) var(--rind-ease-out),
+      scale var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="date-field"][data-part="content"]) {
+      transition: none;
+    }
+  }
+
+  /*
    * Range mode: the outer group is the field; each end is an embedded field whose own input
    * (role presentation) draws nothing, and the separator sits in the muted text role.
    */
@@ -181,6 +298,10 @@
   }
 
   @media (forced-colors: active) {
+    :where([data-scope="date-field"]:is([data-part="control"], [data-part="content"])) {
+      border-color: CanvasText;
+    }
+
     :where([data-scope="date-field"][data-part="input"]) {
       background: Field;
       color: FieldText;

@@ -4,7 +4,7 @@ A date, or a date and time, typed segment by segment: month, day, year, hour, mi
 
 ## When to use
 
-Use a Date Field when the user knows the date and typing it is the fastest way: a birth date, a deadline, an arrival, a meeting time. It is also the input of a date picker (a Calendar in a popup).
+Use a Date Field when the user knows the date and typing it is the fastest way: a birth date, a deadline, an arrival, a meeting time. Add the picker parts when the user may also want to see the month and pick from a calendar: the same component becomes a date picker, or a date range picker with `selectionMode="range"`.
 
 What it adds over a native `<input type="date">`:
 
@@ -17,14 +17,43 @@ What it adds over a native `<input type="date">`:
 
 When not to use it:
 
-- **The user picks from a calendar** (a day in a schedule, a booking window): use [Calendar](calendar.md) or Date Picker.
+- **The user only picks from a calendar always on screen** (a day in a schedule): use [Calendar](calendar.md).
 - **Free text** such as "next Friday": use [Text Field](text-field.md) and parse it yourself.
 - **A single number** such as a year or an age: use [Number Input](number-input.md).
 
 ```tsx
 import { CalendarDate } from "@internationalized/date"
-import { DateField } from "@rind-ui/react"
+import { Calendar, DateField } from "@rind-ui/react"
 
+<DateField.Root name="departure" defaultValue={new CalendarDate(2026, 10, 14)}>
+  <DateField.Label>Departure</DateField.Label>
+  <DateField.Control>
+    <DateField.Input />
+    <DateField.Trigger>
+      <CalendarIcon aria-hidden="true" />
+    </DateField.Trigger>
+  </DateField.Control>
+  <DateField.Portal>
+    <DateField.Positioner>
+      <DateField.Content>
+        <DateField.Calendar>
+          <Calendar.Header>
+            <Calendar.PrevTrigger />
+            <Calendar.Heading />
+            <Calendar.NextTrigger />
+          </Calendar.Header>
+          <Calendar.Grid />
+        </DateField.Calendar>
+      </DateField.Content>
+    </DateField.Positioner>
+  </DateField.Portal>
+  <DateField.ErrorMessage />
+</DateField.Root>
+```
+
+Without the picker parts it is a typed field only:
+
+```tsx
 <DateField.Root name="birthday" defaultValue={new CalendarDate(1990, 12, 1)}>
   <DateField.Label>Birthday</DateField.Label>
   <DateField.Input />
@@ -58,6 +87,12 @@ import { DateField } from "@rind-ui/react"
 | `DateField.ErrorMessage` | `error-message` | `<div>`; the error, shown per the validation mode. |
 | `DateField.Input` | `input` | `<div role="group">` named by the Label and described by the whole value. |
 | `DateField.Segment` | `segment` | An editable segment is `<input role="spinbutton">`; a literal ("/", ",") is an `aria-hidden` span. |
+| `DateField.Control` | `control` | Picker: `<div role="group">` around the Input and the triggers (the Input is then `role="presentation"`); the popover is placed against it. |
+| `DateField.Trigger` | `trigger` | Picker: `<button aria-haspopup="dialog">` named "Choose date" and the Label, with `aria-expanded` and `aria-controls`. |
+| `DateField.ClearTrigger` | `clear-trigger` | Picker: `<button>` named "Clear" and the Label; `data-empty` with no value and no draft. |
+| `DateField.Portal`, `DateField.Positioner` | `positioner` | Picker: the popover's portal and placement. |
+| `DateField.Content` | `content` | Picker: `<div role="dialog">` named like the trigger. |
+| `DateField.Calendar` | — | Picker: the Calendar bound to the field; render the Calendar's own parts inside. |
 
 State is on the parts: `data-disabled`, `data-readonly`, `data-required`, `data-invalid`, `data-focus`, `data-focus-visible` on the Root, the Input and the segments, plus `data-placeholder-shown`, `data-complete` and `data-composing` on the Root and the Input. A segment carries `data-type`, `data-editable` and `data-placeholder` while empty.
 
@@ -79,6 +114,21 @@ Inside a segment (the API block lists the same keys):
 | Enter | Submit the form; never changes a segment. |
 
 Keys are ignored while an IME composes.
+
+## Picker
+
+Rendering `DateField.Trigger` and the popover parts makes the field a date picker; with `selectionMode="range"` a date range picker. There is no separate picker component: the field owns the one value, the calendar is a view of it.
+
+- **Opening.** The trigger opens on press, Enter or Space; Alt+ArrowDown or Alt+ArrowUp opens from any segment. Focus moves to the calendar's selected date (else today, within `minValue`/`maxValue`). Focus entering the field never opens it.
+- **Picking.** A pick commits through the field (`onValueChange` reason `"CALENDAR"`), closes the popover (`closeOnSelect`, default `true`) and returns focus to the trigger. The value keeps its type, time of day and zone; with no value, a `CalendarDate` (or midnight at a time granularity). Picking the selected date again closes without a change. A pick refused with `details.cancel()` keeps every view and the popover open.
+- **Typing while open.** The field stays operable: a typed date moves the calendar's selection, and a typed month and year show that month.
+- **Range.** The first pick starts the range, the second ends it and commits both ends at once. The calendar leaves a half range unpicked when focus leaves (`commitOnBlur` is always `"reset"` in a picker).
+- **Rules.** `minValue`, `maxValue`, `isDateUnavailable` and, in range mode, `allowsNonContiguousRanges` reach the calendar, so it never offers a date the field would refuse. `firstDayOfWeek` is forwarded; view props (`visibleMonths`, `pageBehavior`, `fixedWeeks`) go on `DateField.Calendar`.
+- **Open state.** `open`, `defaultOpen` and `onOpenChange(open, { reason, cancel })` with reasons `"trigger"`, `"select"`, `"escape-key"`, `"outside-press"`, `"outside-focus"`, `"parent-dismissed"`, `"api"`. `modal` makes the popover modal; `initialFocus`, `finalFocus`, `positioning` and `persistentElements` work as on Popover.
+- **Read-only and disabled.** A read-only picker's trigger stays focusable with `aria-disabled="true"` and never opens; a disabled one is disabled.
+- **Dialogs.** Inside a Dialog or Drawer, a pick closes the picker only.
+
+The strings are in `messages`: `trigger` ("Choose date"), `rangeTrigger` ("Choose dates") and `clear` ("Clear").
 
 ## Typing and commit rules
 

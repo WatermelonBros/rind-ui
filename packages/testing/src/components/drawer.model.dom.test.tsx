@@ -53,6 +53,7 @@ for (const { name, props, modal } of sets) {
       props: {
         open: undefined,
         root: "oracle",
+        role: undefined,
         modal: undefined,
         closeOnEscape: undefined,
         closeOnInteractOutside: undefined,

@@ -189,6 +189,24 @@ enough for a short month name at 320 px in four columns.
 
 ## ADDED Requirements
 
+### Requirement: Host Hooks
+
+The Calendar SHALL accept `invalid` (shown invalid, `data-invalid` on the root, whatever the
+value: a host field's own validity) and `onDateSelect(date, { modality })`, called when a
+date is chosen in single mode or a range completes in range mode, also when the value did not
+change, and not for a refused or unselectable date. A picker closes on it.
+
+#### Scenario: Same date chosen again
+
+- **WHEN** 14 October is selected and the user presses it again
+- **THEN** the value is unchanged and `onDateSelect` was called once with 14 October
+
+#### Scenario: Host invalid
+
+- **WHEN** `invalid` is set and the value is a valid date
+- **THEN** the root has `data-invalid`
+
+
 ### Requirement: Range Selection
 
 With `selectionMode="range"` the value SHALL be `{ start, end } | null`, with `start ≤ end`,

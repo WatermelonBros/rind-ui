@@ -29,6 +29,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react"
 import { Heading } from "../heading/heading"
 import { joinHandlers } from "../join-handlers"
@@ -77,6 +78,26 @@ function usePopover(part: string): Ctx {
   const ctx = useContext(PopoverContext)
   if (!ctx) throw new Error(`Popover.${part} must be inside Popover.Root`)
   return ctx
+}
+
+/**
+ * For components composed on the Popover (Date Field's picker): the enclosing Popover's open
+ * state and its machine's `send`, or null outside one. Not exported from the package.
+ */
+export function usePopoverControls(): {
+  readonly open: boolean
+  readonly send: Service<typeof popoverMachine>["send"]
+} | null {
+  const ctx = useContext(PopoverContext)
+  const open = useSelectorOrNull(ctx?.service ?? null)
+  return ctx ? { open, send: ctx.service.send } : null
+}
+
+const noSubscribe = () => () => {}
+/** Whether a service that may be absent (hooks run unconditionally) is open. */
+function useSelectorOrNull(service: Service<typeof popoverMachine> | null): boolean {
+  const get = () => service?.getSnapshot().state === "open"
+  return useSyncExternalStore(service ? service.subscribe : noSubscribe, get, get)
 }
 
 /** The stack's metadata for this layer, followed while open. */

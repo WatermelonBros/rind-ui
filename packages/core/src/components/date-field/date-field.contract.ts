@@ -14,6 +14,7 @@ import {
   formValueOf,
 } from "./date-field.machine"
 import { dateFieldMessages } from "./date-field.messages"
+import { datePickerActions, datePickerInvariants, datePickerQueries } from "./date-picker.contract"
 
 type P =
   | "root"
@@ -25,6 +26,9 @@ type P =
   | "segment-name"
   | "value-description"
   | "hidden-input"
+  | "trigger"
+  | "clear-trigger"
+  | "content"
 type E = Env<P>
 
 /** One segment of the field, by type. */
@@ -165,9 +169,13 @@ export const dateFieldContract = contract("date-field", {
     "segment-name",
     "value-description",
     "hidden-input",
+    "trigger",
+    "clear-trigger",
+    "content",
   ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
   actions: {
+    ...datePickerActions,
     /**
      * Tabs into the focused (else first) segment. Keyboard only: typing into a text input
      * after a click shows no focus ring (interaction-modality), so a click into a segment
@@ -300,7 +308,8 @@ export const dateFieldContract = contract("date-field", {
     /** The control's own validity reason ("" when valid). */
     validity: async (env) => (await env.part("hidden-input").attr("data-validity")) ?? "",
     isComplete: async (env) => (await env.part("root").attr("data-complete")) !== null,
-    isFocused: async (env) => (await env.part("root").attr("data-focus")) !== null,
+    /** A segment has focus (the Input's state; the Root's is the Field's focus-within). */
+    isFocused: async (env) => (await env.part("input").attr("data-focus")) !== null,
     isComposing: async (env) => (await env.part("root").attr("data-composing")) !== null,
     isDisabled: async (env) => {
       const first = (await editable(env))[0]
@@ -310,6 +319,7 @@ export const dateFieldContract = contract("date-field", {
       const first = (await editable(env))[0]
       return first ? (await first.part.attr("readonly")) !== null : false
     },
+    ...datePickerQueries,
   },
   states: {
     idle: { isFocused: false, isComposing: false },
@@ -393,6 +403,8 @@ export const dateFieldContract = contract("date-field", {
       },
     },
     "INPUT.ADOPT": { skip: "autofill is a scenario test" },
+    PICK: { skip: "a picker's calendar pick: the picker tests" },
+    CLEAR: { skip: "a picker's Clear trigger: the picker tests" },
     "VALUE.SYNCED": { skip: "the parent's prop change; walked by the controlled configurations" },
     "FORMAT.CHANGED": { skip: "a locale change is a scenario test" },
     "$props:value": { skip: "the parent's prop change; walked by the controlled configurations" },
@@ -431,8 +443,13 @@ export const dateFieldContract = contract("date-field", {
     { part: "segment", state: "idle" },
     { part: "segment", state: "editing" },
     { part: "segment", state: "composing" },
+    // A picker's trigger and content are outside the segments: focus there leaves (a commit).
+    { part: "trigger", state: "editing" },
+    { part: "trigger", state: "composing" },
+    { part: "content", state: "editing" },
+    { part: "content", state: "composing" },
   ],
-  invariants: dateSegmentInvariants,
+  invariants: [...dateSegmentInvariants, ...datePickerInvariants],
   formInput: {
     expected: (vals) => ({ value: iso(vals["value"]) }),
     silentEvents: ["RESET"],

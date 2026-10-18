@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| merge-alert-dialog-into-dialog (review) | — | packages/testing/src/components/dialog-alert-role.dom.test.tsx | `frames(6)` waits (pre-existing from add-alert-dialog): wait on a postcondition instead of a frame count |
 | test-warning-guard (#103) | — | vitest.config.ts | Warning guard in the browser project: re-enable after the Chromium connection-drop root cause (console/task.meta traffic suspected; with the guard, browser-chromium-1 dropped 2/2 runs, without it passed) |
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
 | add-color-picker (site report) | — | packages/core/src/components/color-picker | The hue ChannelSlider track is drawn at the current saturation/brightness: with a near-black value (#0B0B0C) the whole hue track is black and the hue cannot be picked by eye. Draw the hue track at full saturation and brightness (the Area shows the S/B) |
@@ -275,6 +276,11 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-grid-list | 4.3 (follow-up) | React tests: Strict Mode, SSR + hydration tab stop, static vs data items, nested Tag Group (react-spectrum#6757, #5179) beyond the DOM test |
 | add-grid-list | 6.3 (follow-up) | Virtualized fixture (`aria-rowcount`/`aria-rowindex`, select all) and measured spatial moves in a three-column fixture (browser mode) |
 | add-grid-list | 6.4 (follow-up) | Virtual screen-reader reading-order test: row name excludes controls, checkbox "Select …", selection announcement on Apple WebKit |
+| date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
+| date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
+| date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
+| date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
+| date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
 
 ## Resolved
 

@@ -5,7 +5,7 @@ export {
   dialogConnect,
   dialogIds,
 } from "./dialog.connect"
-export { dialogContract, nonModalDialogContract } from "./dialog.contract"
+export { alertDialogRoleContract, dialogContract, nonModalDialogContract } from "./dialog.contract"
 export {
   buildDialogMachine,
   DIALOG_PARENT_KINDS,
@@ -22,6 +22,7 @@ export {
   type DismissEvent,
   dialogMachine,
   dialogPieces,
+  isAlertDialog,
   layerIdOf as dialogLayerId,
 } from "./dialog.machine"
 export { type DialogMessages, dialogMessages } from "./dialog.messages"

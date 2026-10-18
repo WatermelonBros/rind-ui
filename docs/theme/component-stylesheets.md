@@ -53,7 +53,7 @@ Default first.
 | selector | Segmented Control | soft, outline | md, sm, lg |
 | status | Badge, Tag, Alert, Toast | soft, solid, outline | md, sm, lg |
 | identity | Avatar, Avatar Group | soft, solid, outline | md, sm, lg |
-| panel | Dialog, Alert Dialog, Drawer, Popover, Menu, Hover Card, Tooltip, Toolbar / Menubar root, Navigation Menu viewport and content, Calendar / Range Calendar root, Date (Range) Picker popover content, Month / Year Picker root | none | Dialog / Drawer: md, sm, lg (width); others inherit |
+| panel | Dialog, Drawer, Popover, Menu, Hover Card, Tooltip, Toolbar / Menubar root, Navigation Menu viewport and content, Calendar / Range Calendar root, Date (Range) Picker popover content, Month / Year Picker root | none | Dialog / Drawer: md, sm, lg (width); others inherit |
 | collection item | Menu item, Listbox option, Calendar / Range Calendar day, Month / Year Picker cell | none | inherited |
 | link | Link, Breadcrumbs link, Navigation Menu content link | none | none (inherits font size) |
 | range | Slider, Progress, Meter | solid, soft | md, sm, lg |
