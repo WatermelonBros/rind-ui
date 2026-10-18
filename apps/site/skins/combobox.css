@@ -146,3 +146,39 @@
   padding: 10px;
   font-size: 14px;
 }
+
+/* Inline (command palette): the list sits in place, framed like the popup surface. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="combobox"][data-part="control"]
+  ~ [data-part="list"] {
+  box-sizing: border-box;
+  inline-size: min(100%, 20rem);
+  max-block-size: 16rem;
+  overflow: auto;
+  margin-block-start: 6px;
+  padding: 4px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 15px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="combobox"][data-part="item"][data-tone="danger"] {
+  color: var(--s-error);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="combobox"][data-part="item-description"] {
+  color: color-mix(in srgb, var(--s-ink) 65%, var(--s-card));
+  font-size: 13px;
+  font-weight: 500;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="combobox"][data-part="item"][data-state="checked"]
+  [data-part="item-description"] {
+  color: inherit;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="combobox"][data-part="loading"] {
+  padding: 10px;
+  font-size: 14px;
+}

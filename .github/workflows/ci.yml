@@ -114,8 +114,8 @@ jobs:
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
           BROWSERS: ${{ matrix.browsers }}
-      # Chromium sometimes drops the vitest connection mid-run ("Browser connection was closed";
-      # no OOM, no navigation found). Only then, run the slice once more; any other failure fails.
+      # A dropped vitest connection ("Browser connection was closed") reruns the slice once; any
+      # other failure fails. The Chromium drop itself is fixed by the forced GC below.
       - run: |
           run() { pnpm exec vitest run ${{ matrix.projects }} $CHANGED --passWithNoTests --reporter=default --reporter=json --outputFile.json=vitest-report.json 2>&1 | tee vitest.log; return ${PIPESTATUS[0]}; }
           if run; then exit 0; fi
@@ -129,6 +129,15 @@ jobs:
           RIND_BROWSERS: ${{ matrix.engine || (matrix.browsers != '' && matrix.browsers) || 'chromium' }}
           RIND_MAX_WORKERS: ${{ startsWith(matrix.slice, 'browser-') && '2' || '' }}
           CHANGED: ${{ needs.changes.outputs.full == 'false' && matrix.slice != 'node' && format('--changed {0}', needs.changes.outputs.base) || '' }}
+          # Chromium drop: every test iframe leaves ~400 shared-memory fds in the page's renderer, freed
+          # only when GC collects the detached iframe. Near 16k the renderer's network pipes all fail
+          # at once (every WebSocket, the orchestrator's included). Vitest can force a GC over CDP
+          # after each file, but only when /tmp has less free space than the threshold; the huge
+          # threshold makes it run always (peak fds ~16k -> ~150). Undocumented Vitest internals,
+          # recheck on upgrade: maybeCollectChromiumGarbage in vitest/dist/chunks/index.*.js
+          # (vitest 5.0.4: lines 4765-4827). Chromium and Playwright only; a no-op elsewhere.
+          VITEST_CHROMIUM_GC_FORCE: "1"
+          VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB: "1000"
       - if: always()
         run: node scripts/flaky-report.mjs vitest-report.json
       # Chromium has crashed mid-run with no output: on failure, show whether the kernel killed it.

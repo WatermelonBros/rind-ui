@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectDom } from "../collect"
 import {
   checkGeneric,
+  expectRindWarning,
   fakeRouter,
   getLink,
   interceptNativeNavigation,
@@ -79,6 +80,8 @@ describe("Link smoke", () => {
   })
 
   it("div fallback activates once per input", async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/link: rendered as <div>/)
     const router = fakeRouter({ href: (h) => `/base${h}` })
     render(
       <RouterProvider navigate={router.navigate} {...(router.href ? { href: router.href } : {})}>

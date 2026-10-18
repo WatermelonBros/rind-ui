@@ -337,7 +337,7 @@ describe("hint, selection, actions, links", () => {
 })
 
 describe("development warnings", () => {
-  it("Tag Group in an option (RS#8740): a warning, and the page renders", () => {
+  it("Tag Group in an option (RS#8740): a warning, and the page renders", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
       <Listbox.Root>
@@ -349,10 +349,12 @@ describe("development warnings", () => {
         </Listbox.List>
       </Listbox.Root>,
     )
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/TagGroup: a Tag Group is inside a option/)
+    await waitFor(() =>
+      expect(warn.mock.calls.flat().join(" ")).toMatch(/TagGroup: a Tag Group is inside a option/),
+    )
   })
 
-  it("an interactive list without a name warns", () => {
+  it("an interactive list without a name warns", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
       <TagGroup.Root onRemove={() => {}}>
@@ -363,7 +365,7 @@ describe("development warnings", () => {
         </TagGroup.List>
       </TagGroup.Root>,
     )
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/)
+    await waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/))
   })
 
   it("Messages: a localised remove label", () => {
@@ -405,5 +407,19 @@ describe("server render", () => {
     )
     expect(stops.map((r) => r.textContent)).toEqual(["b"])
     container.remove()
+  })
+})
+
+describe("empty state", () => {
+  it("Empty inside List shows when the group starts with no tags", async () => {
+    render(
+      <TagGroup.Root onRemove={() => {}}>
+        <TagGroup.Label>Saved filters</TagGroup.Label>
+        <TagGroup.List>
+          <TagGroup.Empty>No filters saved</TagGroup.Empty>
+        </TagGroup.List>
+      </TagGroup.Root>,
+    )
+    await waitFor(() => expect(screen.getByText("No filters saved")).toBeTruthy())
   })
 })

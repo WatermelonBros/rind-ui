@@ -296,6 +296,9 @@ describe("ARIA snapshot per state example", () => {
 const TRANSIENT = new Set([
   // Focus in the grid: entered by focusing a cell.
   "calendar:focused",
+  // A segment focused, or an IME composing in it: entered by focusing a segment.
+  "date-field:editing",
+  "date-field:composing",
   "field:validating",
   "form:validating",
   "form:awaiting-server",

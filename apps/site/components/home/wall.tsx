@@ -1,5 +1,5 @@
-import Link from "next/link"
 import roadmap from "@/content/generated/roadmap.json"
+import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -22,13 +22,12 @@ export function Wall() {
     <div className={styles.band} data-band="paper">
       <section className={styles.section} aria-labelledby="wall-title">
         <Reveal>
-          <p className={styles.kicker}>The whole set</p>
           <h2 id="wall-title" className={styles.h2}>
             {ready} ready. {items.length - ready} on the way.
           </h2>
           <p className={styles.lead}>
-            The goal is every component any headless library ships, plus the AI-UI primitives none
-            of them do. They land one at a time, each with its spec, tests, driver and docs.
+            Every component you would reach for, plus the AI-UI primitives nobody ships yet. Each
+            lands complete: spec, tests, driver and docs.
           </p>
         </Reveal>
         <div className={styles.wall}>
@@ -41,7 +40,7 @@ export function Wall() {
                   .map((i) => (
                     <li key={i.name} data-status={i.status}>
                       {i.slug ? (
-                        <Link href={`/docs/${i.slug}/`}>{i.name}</Link>
+                        <MorphLink href={`/docs/${i.slug}/`}>{i.name}</MorphLink>
                       ) : (
                         <span>{i.name}</span>
                       )}

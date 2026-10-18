@@ -143,9 +143,11 @@ export interface TransitionDef<S extends string, A extends string, G extends str
   readonly reenter?: boolean
   /**
    * Reported as `details.reason` of the controllable change this transition makes, instead
-   * of the event type (a delayed open is a "hover", not an `after:` event).
+   * of the event type (a delayed open is a "hover", not an `after:` event). A function
+   * reads it from the event (a menubar passes on the reason its menu closed with); its
+   * parameter is the machine's event union, which the definition's own type checks.
    */
-  readonly reason?: string
+  readonly reason?: string | ((event: never) => string)
 }
 
 /** A target, one transition, or guarded alternatives (the first whose guard passes wins). */
@@ -227,9 +229,18 @@ export interface MachineDefBase<
   readonly initial: NoInfer<S>
   /** Derived values, memoised per view. Never decide transitions. */
   readonly computed?: { readonly [K in keyof CP]: (view: BaseView<T, NoInfer<S>>) => CP[K] }
-  /** Prop-change events: when the prop's identity changes, the event is sent. */
+  /**
+   * Prop-change events: when the prop's identity changes, the event is sent. An object-valued
+   * prop passes `equal` so a new object with the same content (an inline `value={{ … }}`) is
+   * no change.
+   */
   readonly onProps?: {
-    readonly [K in Str<keyof T["props"]>]?: BareEventType<T["events"]>
+    readonly [K in Str<keyof T["props"]>]?:
+      | BareEventType<T["events"]>
+      | {
+          readonly event: BareEventType<T["events"]>
+          readonly equal: (a: T["props"][K], b: T["props"][K]) => boolean
+        }
   }
   /** Effects active for the whole life of the started service. */
   readonly effects?: readonly EffectName<I>[]

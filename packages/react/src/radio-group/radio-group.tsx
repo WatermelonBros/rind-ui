@@ -270,15 +270,19 @@ function Root({
   useIsoLayoutEffect(() => {
     if (pending.current !== null && pending.current !== current) pending.current = null
   })
-  // Development: a radiogroup needs a name (Label, aria-label, or a Field's Label).
+  // Development: a radiogroup needs a name (Label, aria-label, or a Field's Label). Checked after
+  // the re-render a Label's or a Field's registration causes, not on the first commit.
   useEffect(() => {
     const node = el.current
     if (process.env.NODE_ENV === "production" || !node) return
-    if (!node.getAttribute("aria-labelledby") && !node.getAttribute("aria-label")) {
-      console.warn(
-        `[rind-ui] radio-group: #${node.id} has no accessible name; render RadioGroup.Label or pass aria-label`,
-      )
-    }
+    queueMicrotask(() => {
+      if (!node.isConnected) return
+      if (!node.getAttribute("aria-labelledby") && !node.getAttribute("aria-label")) {
+        console.warn(
+          `[rind-ui] radio-group: #${node.id} has no accessible name; render RadioGroup.Label or pass aria-label`,
+        )
+      }
+    })
   })
   // field-control: the group registers once as one (non-labelable) control.
   const register = binding?.register

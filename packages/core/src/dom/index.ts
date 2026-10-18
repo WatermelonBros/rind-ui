@@ -62,6 +62,7 @@ export { domHoverIntent, gracePolygon, pointInPolygon } from "./hover-intent"
 export { type ImageSettled, imageSettled } from "./image-status"
 export { hideOutsideModal, inertOutside } from "./inert-outside"
 export { injectStyle } from "./inject-style"
+export { eventIsInside, watchLeave } from "./inside-watch"
 export {
   createItemRegistry,
   type ItemRegistration,
@@ -187,6 +188,7 @@ export {
   scrollAreaIds,
   wheelTarget,
 } from "./scroll-metrics"
+export { adjacentSegment, editableSegments, segmentAtPress } from "./segment-layout"
 export {
   type IndicatorBox,
   type IndicatorCause,

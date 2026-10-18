@@ -44,7 +44,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
-| Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | spec | Reado has MenuBar |
+| Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | wip | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
 | Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | done |  |
@@ -65,13 +65,11 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Select | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
-| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done |  |
+| Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done | Includes Autocomplete (free text) and Command (inline) |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
-| Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
-| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | spec | RAC/Reka: Tree |
-| Command |  |  |  |  |  |  |  | ● |  | 1 | 2 | spec | Missing in Ark |
+| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark |
 | Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |
@@ -113,15 +111,8 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip |  |
-| Date Field | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: Date Input |
-| Date Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec |  |
-| Date Range Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: range mode of Date Picker |
-| Time Field |  |  | ● |  |  |  | ● | ● | ● | 4 | 3 | spec |  |
-| Range Calendar |  |  | ● |  |  |  | ● | ● |  | 3 | 3 | spec |  |
-| Date Range Field |  |  |  |  |  |  | ● | ● |  | 2 | 3 | spec |  |
-| Time Range Field |  |  |  |  |  |  | ● | ● |  | 2 | 3 | spec |  |
-| Month / Year Picker |  |  |  |  |  |  | ● |  |  | 1 | 3 | spec | Reka: Month/MonthRange/Year/YearRange Picker |
+| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
+| Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | wip | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
 | Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
 ## Color (2)

@@ -143,8 +143,9 @@ Palette-specific points:
   using `aria-selected` for the highlight is ZG#2947's bug class, cmdk#83).
 - **`aria-expanded`**: `true` while options are exposed; `false` when the list is empty
   (the pattern's empty-state rule). A consumer handling Escape by looking for an expanded
-  combobox (cmdk#316) gets a coherent answer because Command leaves Escape unhandled once
-  the query is empty.
+  combobox (cmdk#316) gets a coherent answer: once the query is empty, Escape calls
+  `onOpenChange(false)` for a dialog host and is left unhandled without one (decision in
+  add-combobox-variants, where Command is the Combobox's `inline` mode).
 - **Listbox children**: only options and groups; separator `role="none"`, loading and empty
   content outside the listbox (cmdk#179; mui/base-ui#5443).
 - **Group headings**: `group` labelled by its heading (`aria-labelledby`), the heading is not
@@ -273,8 +274,8 @@ in [combobox.md](combobox.md) and [autocomplete.md](autocomplete.md) apply too.
   collection with `filter: null` (Ariakit's match-sorter approach). Empty query = original
   order by construction.
 - **Keys**: ArrowUp/Down (loop), PageUp/PageDown, Enter (run; IME-guarded; link items
-  activate natively once, with modifiers), Escape (clear a non-empty query, else unhandled
-  so the dialog closes), Backspace on an empty query with the caret at the start →
+  activate natively once, with modifiers), Escape (clear a non-empty query, else
+  `onOpenChange(false)` for a dialog host, unhandled without one), Backspace on an empty query with the caret at the start →
   `onBack` (nested pages), Home/End/Left/Right edit text, Tab leaves.
 - **Pages**: consumer state; Command takes `page` (`{ key, label }`, read-only binding):
   a change clears the query, highlights the first item, resets the scroll and announces

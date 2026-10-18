@@ -27,8 +27,12 @@ export interface KeyContext {
    */
   readonly orientation: "horizontal" | "vertical" | "both" | "grid"
   readonly platform: PlatformFlags
-  /** A value control (slider, spinbutton): arrows increase and decrease. */
-  readonly value?: boolean
+  /**
+   * A value control (slider, spinbutton): arrows increase and decrease. `"vertical"`: only
+   * ArrowUp/ArrowDown step; ArrowLeft/ArrowRight move (`PREV`/`NEXT`, mirrored in rtl), as
+   * in a segmented date field.
+   */
+  readonly value?: boolean | "vertical"
 }
 
 /** Meta (⌘) on Apple platforms, Control elsewhere. */
@@ -56,6 +60,12 @@ export function toLogicalKey(k: KeyDescription, c: KeyContext): LogicalKey | und
   if (key === "PageUp") return "PAGE_PREV"
   if (key === "Enter" || key === " ") return "ACTIVATE"
   if (key === "Escape") return "DISMISS"
+  if (c.value === "vertical") {
+    if (key === "ArrowUp") return "INCREASE"
+    if (key === "ArrowDown") return "DECREASE"
+    if (key === "ArrowLeft" || key === "ArrowRight") return key === forward(c.dir) ? "NEXT" : "PREV"
+    return undefined
+  }
   if (c.value) {
     // ArrowUp always increases; horizontally, the reading direction's end increases.
     if (key === "ArrowUp" || key === forward(c.dir)) return "INCREASE"

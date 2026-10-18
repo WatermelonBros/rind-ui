@@ -1,0 +1,104 @@
+/*
+ * Menubar: a bar of menu triggers (toggle item family, ghost by default). The open trigger
+ * draws an inset edge as well as a background, so it survives forced colors and is never
+ * colour alone (WCAG 1.4.1). `data-highlighted` is the roving focus; `data-pressed` is a press
+ * in progress. The menus themselves are styled by menu.css. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="menubar"][data-part="root"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--rind-menubar-gap, var(--rind-space-1));
+    padding: var(--rind-menubar-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid var(--rind-menubar-border, var(--rind-color-border));
+    border-radius: var(--rind-menubar-radius, var(--rind-radius-md));
+    background: var(--rind-menubar-bg, transparent);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="menubar"][data-part="root"][data-orientation="vertical"]) {
+    flex-direction: column;
+    align-items: stretch;
+    inline-size: max-content;
+  }
+
+  :where([data-scope="menu"][data-part="trigger"][data-host="menubar"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: max(
+      var(--rind-menubar-trigger-height, var(--rind-hit-area)),
+      var(--rind-hit-area)
+    );
+    min-inline-size: var(--rind-hit-area);
+    padding-inline: var(--rind-menubar-trigger-padding, var(--rind-space-3));
+    border: 0;
+    border-radius: var(--rind-menubar-trigger-radius, var(--rind-radius-sm));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="menu"][data-part="trigger"][data-host="menubar"]:is([data-highlighted], :hover)
+  ) {
+    background: var(--rind-color-accent-soft-hover);
+  }
+
+  :where([data-scope="menu"][data-part="trigger"][data-host="menubar"][data-pressed]) {
+    background: var(--rind-color-accent-soft);
+  }
+
+  :where([data-scope="menu"][data-part="trigger"][data-host="menubar"][data-state="open"]) {
+    background: var(--rind-menubar-trigger-open-bg, var(--rind-color-accent-soft));
+    color: var(--rind-menubar-trigger-open-text, inherit);
+    box-shadow: inset 0 0 0 var(--rind-border-width) var(--rind-color-border-strong);
+  }
+
+  :where([data-scope="menu"][data-part="trigger"][data-host="menubar"][data-tone="danger"]) {
+    color: var(--rind-color-accent-text);
+  }
+
+  :where(
+    [data-scope="menu"][data-part="trigger"][data-host="menubar"]:is([data-disabled], :disabled)
+  ) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="menubar"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="menu"][data-part="trigger"][data-host="menubar"]) {
+      color: ButtonText;
+    }
+
+    :where(
+        [data-scope="menu"][data-part="trigger"][data-host="menubar"]:is(
+          [data-highlighted],
+          [data-state="open"]
+        )
+      ) {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    /* box-shadow is dropped in forced colours: the open item's edge is an outline. */
+    :where([data-scope="menu"][data-part="trigger"][data-host="menubar"][data-state="open"]) {
+      outline: var(--rind-border-width) solid CanvasText;
+      outline-offset: calc(-1 * var(--rind-border-width));
+    }
+
+    :where(
+        [data-scope="menu"][data-part="trigger"][data-host="menubar"]:is([data-disabled], :disabled)
+      ) {
+      color: GrayText;
+    }
+  }
+}

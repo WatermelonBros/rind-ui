@@ -4,7 +4,7 @@ import { Combobox, Dialog, Portal } from "@rind-ui/react"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { type ReactNode, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
-import { getCombobox } from "../index"
+import { expectRindWarning, getCombobox } from "../index"
 
 const ITEMS = [
   { key: "rome", label: "Rome" },
@@ -56,6 +56,8 @@ describe("Combobox: controlled text", () => {
   })
 
   it("a parent mirroring the text agrees after an outside press reverts it", async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/combobox: "inputValue" changed between controlled and uncontrolled/)
     let parentText = ""
     function Mirror() {
       const [text, setText] = useState("")

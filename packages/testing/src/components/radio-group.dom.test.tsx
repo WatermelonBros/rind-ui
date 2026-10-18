@@ -686,15 +686,20 @@ describe("Roles and names", () => {
     ])
   })
 
-  it("an unnamed group warns in development", () => {
+  it("an unnamed group warns in development", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(<Grp label={null} />)
-    expect(warn.mock.calls.some((c) => /no accessible name/.test(String(c[0])))).toBe(true)
+    // checked after the Label's mount re-render (a microtask)
+    await vi.waitFor(() =>
+      expect(warn.mock.calls.some((c) => /no accessible name/.test(String(c[0])))).toBe(true),
+    )
   })
 
-  it("a named group (aria-label) does not warn", () => {
+  it("a named group (aria-label) does not warn", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(<Grp label={null} aria-label="Size" />)
+    // the check runs in a microtask: let it run before asserting it said nothing
+    await act(async () => {})
     expect(warn.mock.calls.filter((c) => /radio-group/.test(String(c[0])))).toEqual([])
   })
 })

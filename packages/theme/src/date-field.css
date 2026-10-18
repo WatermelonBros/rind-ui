@@ -1,0 +1,219 @@
+/*
+ * Date Field (family: field): the group (`input` part) is the visible control (border-strong
+ * edge, 3:1) holding one borderless <input> per editable segment and the literals between
+ * them. The ring is drawn on the focused segment, not the group. Numerals are tabular and
+ * numeric segments are end-aligned so a changing value does not move its neighbours.
+ * Segments are never reordered: the DOM order is the visual order in every direction.
+ * `data-variant` / `data-size` go on the Root. Muted text uses colour, never opacity.
+ */
+@layer rind.components {
+  :where([data-scope="date-field"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-date-field-gap, var(--rind-space-1));
+    color: var(--rind-date-field-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="date-field"][data-part="label"]) {
+    font-size: var(--rind-date-field-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-date-field-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  :where([data-scope="date-field"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-date-field-description-font-size, var(--rind-text-sm));
+    color: var(--rind-date-field-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="date-field"][data-part="error-message"]) {
+    margin: 0;
+    font-size: var(--rind-date-field-error-font-size, var(--rind-text-sm));
+    color: var(--rind-date-field-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-tone="danger"] [data-part="label"]) {
+    color: var(--rind-color-accent-text);
+  }
+
+  /* The group is the field. */
+  :where([data-scope="date-field"][data-part="input"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    unicode-bidi: isolate;
+    min-block-size: var(--rind-date-field-height, var(--rind-size-control, var(--rind-size-md)));
+    padding-inline: var(--rind-date-field-padding-inline, var(--rind-space-2));
+    border: var(--rind-border-width) solid
+      var(--rind-date-field-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-date-field-radius, var(--rind-radius-control));
+    background: var(--rind-date-field-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-date-field-shadow, var(--rind-shadow-key-pressed));
+    color: inherit;
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-date-field-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * Range mode: the outer group is the field; each end is an embedded field whose own input
+   * (role presentation) draws nothing, and the separator sits in the muted text role.
+   */
+  :where(
+    [data-scope="date-field"]:is([data-part="start"], [data-part="end"])
+      [data-scope="date-field"]:is([data-part="root"], [data-part="input"])
+  ) {
+    display: inline-flex;
+    min-block-size: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  :where([data-scope="date-field"]:is([data-part="start"], [data-part="end"])) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  :where([data-scope="date-field"][data-part="separator"]) {
+    padding-inline: var(--rind-date-field-separator-gap, var(--rind-space-2));
+    color: var(--rind-date-field-separator-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-variant="soft"] [data-part="input"]) {
+    background: var(--rind-date-field-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  :where([data-scope="date-field"][data-part="segment"]) {
+    box-sizing: border-box;
+    min-block-size: 24px;
+    margin: 0;
+    padding-block: 0;
+    padding-inline: var(--rind-date-field-segment-padding-inline, 0.125em);
+    border: 0;
+    border-radius: var(--rind-date-field-segment-radius, var(--rind-radius-sm, 0.25rem));
+    background: transparent;
+    caret-color: transparent;
+    color: inherit;
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+    outline: none;
+  }
+
+  :where(
+    [data-scope="date-field"][data-part="segment"]:is(
+      [data-type="year"],
+      [data-type="month"],
+      [data-type="day"],
+      [data-type="hour"],
+      [data-type="minute"],
+      [data-type="second"]
+    )
+  ) {
+    text-align: end;
+  }
+
+  @supports (field-sizing: content) {
+    :where([data-scope="date-field"][data-part="segment"]:is(input)) {
+      field-sizing: content;
+      min-inline-size: 1ch;
+    }
+  }
+
+  :where([data-scope="date-field"][data-part="segment"]:is(input)[data-type="timeZoneName"]) {
+    color: var(--rind-color-text-muted);
+  }
+
+  /* Literals: separators, never targets. */
+  :where([data-scope="date-field"][data-part="segment"][data-type="literal"]) {
+    padding-inline: 0;
+    color: var(--rind-date-field-literal-color, var(--rind-color-text-muted));
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  :where([data-scope="date-field"][data-part="segment"]::placeholder) {
+    color: var(--rind-date-field-placeholder-text, var(--rind-color-text-muted));
+    opacity: 1;
+  }
+
+  :where([data-scope="date-field"][data-part="segment"][data-placeholder]) {
+    color: var(--rind-date-field-placeholder-text, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="date-field"][data-part="segment"][data-focus]) {
+    background: var(--rind-date-field-segment-focus-bg, var(--rind-color-accent-soft));
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="date-field"][data-part="segment"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) * -1);
+  }
+
+  /* Invalid: a doubled danger edge (data-tone="danger" is the consumer's way to say the same). */
+  :where(
+    [data-scope="date-field"][data-part="root"]:is([data-invalid], [data-tone="danger"])
+      [data-part="input"]
+  ) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-date-field-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-disabled] [data-part="input"]) {
+    background: var(--rind-date-field-disabled-bg, var(--rind-color-surface));
+    border-color: var(--rind-color-border);
+    box-shadow: none;
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-disabled] [data-part="segment"]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="date-field"][data-part="root"][data-readonly] [data-part="input"]) {
+    background: var(--rind-date-field-readonly-bg, var(--rind-color-surface));
+    box-shadow: none;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="date-field"][data-part="input"]) {
+      background: Field;
+      color: FieldText;
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="date-field"][data-part="segment"][data-focus]) {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="date-field"][data-part="segment"][data-focus-visible]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="date-field"][data-part="segment"][data-placeholder]),
+    :where([data-scope="date-field"][data-part="segment"]::placeholder) {
+      color: GrayText;
+    }
+
+    :where(
+        [data-scope="date-field"][data-part="root"]:is([data-invalid], [data-tone="danger"])
+          [data-part="input"]
+      ) {
+      border-color: CanvasText;
+      border-style: double;
+    }
+
+    :where([data-scope="date-field"][data-part="root"][data-disabled] [data-part="input"]),
+    :where([data-scope="date-field"][data-part="root"][data-disabled] [data-part="segment"]) {
+      border-color: GrayText;
+      color: GrayText;
+    }
+  }
+}

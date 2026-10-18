@@ -4,7 +4,7 @@ import { Meter, type MeterRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getMeter } from "../index"
+import { expectRindWarning, getMeter } from "../index"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -79,6 +79,8 @@ describe("Meter driver", () => {
   })
 
   it("unnamed: a development error; aria-hidden is fine", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/meter: the expected part "label" is not rendered/)
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     const { unmount } = render(<Meter.Root value={1} aria-hidden="true" />)
     expect(error).not.toHaveBeenCalled()

@@ -21,6 +21,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/core/src/dom/press.ts` | `webkit-menuitem-double-click`, `macos-meta-keyup` |
 | `packages/core/src/dom/scroll-lock.ts` | `ios-overflow-hidden-scroll` |
 | `packages/core/src/dom/text-selection.ts` | `ios-text-selection` |
+| `packages/react/src/date-field/date-field.tsx` | `ios-vo-spinbutton-input` |
 | `packages/react/src/form/form.tsx` | `react-action-form-reset` |
 | `packages/react/src/meter/meter.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
@@ -153,7 +154,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/number-input/number-input.tsx`
+- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`
 - Last verified: 2026-10-14
 - Remove when: a device test shows iOS VoiceOver focusing and editing an <input role="spinbutton">
 

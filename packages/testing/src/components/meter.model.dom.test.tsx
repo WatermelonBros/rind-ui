@@ -5,8 +5,11 @@ import { meterContract, meterZone, resolveRangeValue } from "@rind-ui/core"
 import { Meter, type MeterRootProps } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
-import { describe, it } from "vitest"
-import { type ConsumerInvariant, testMachine } from "../index"
+import { beforeEach, describe, it } from "vitest"
+import { allowRindWarning, type ConsumerInvariant, testMachine } from "../index"
+
+// The model's $props steps set values outside the range on purpose.
+beforeEach(() => allowRindWarning(/meter: value \d+ is outside/))
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {

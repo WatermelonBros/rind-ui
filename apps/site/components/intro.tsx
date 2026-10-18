@@ -9,18 +9,31 @@ type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { ready: Promise<void> }
 }
 
+/*
+ * Runs while the HTML is parsed, right after the page (this component sits after it in the
+ * layout): copies the header and main into a layer that shows them with no CSS at all. The layer
+ * hangs off <html>, outside the tree React hydrates, so hydration never touches it.
+ * The real page is styled from its first paint and never changes layout, so the effect costs no
+ * layout shift; the copy only covers it, then goes.
+ */
+const FILL = `(function(){var r=document.documentElement;try{if(!r.classList.contains("intro"))return;var l=document.createElement("div");l.id="rind-intro-layer";l.setAttribute("aria-hidden","true");l.inert=true;["header","main"].forEach(function(s){var e=document.querySelector(s);if(e)l.appendChild(e.cloneNode(true))});r.appendChild(l)}finally{r.setAttribute("data-intro-ready","")}})()`
+
 /**
- * First visit of the landing: the page boots as the browser's raw HTML (the inline script in
- * <head> set html.unstyled before paint), a drop falls, and the styles spread out from where it
- * lands. Click anywhere to skip. Never runs under reduced motion.
+ * First visit of the landing: the page appears as the browser's raw HTML, a drop falls, and the
+ * styles spread out from where it lands. Click, scroll or press a key to skip. Never runs under
+ * reduced motion (the inline script in <head> only sets html.intro without it).
  */
 export function Intro() {
-  const [dropping, setDropping] = useState(false)
+  const [phase, setPhase] = useState<"on" | "dropping" | "gone">("on")
 
   useEffect(() => {
     const root = document.documentElement
-    if (!root.classList.contains("unstyled")) return
-    setDropping(true)
+    const layer = document.getElementById("rind-intro-layer")
+    if (!root.classList.contains("intro") || !layer) {
+      setPhase("gone")
+      return
+    }
+    setPhase("dropping")
     let done = false
     const reveal = () => {
       if (done) return
@@ -33,8 +46,10 @@ export function Intro() {
       const x = "50%"
       const y = "42%"
       const finish = () => {
-        root.classList.remove("unstyled")
-        setDropping(false)
+        // synchronous, so the view transition's new snapshot is the styled page
+        layer.remove()
+        root.classList.remove("intro")
+        setPhase("gone")
       }
       const doc = document as ViewTransitionDocument
       if (!doc.startViewTransition) return finish()
@@ -50,14 +65,24 @@ export function Intro() {
       })
     }
     const timer = setTimeout(reveal, DROP_MS)
-    window.addEventListener("pointerdown", reveal, { once: true })
-    window.addEventListener("keydown", reveal, { once: true })
+    const skip = ["pointerdown", "keydown", "wheel", "touchstart"] as const
+    for (const type of skip) window.addEventListener(type, reveal, { once: true, passive: true })
     return () => {
       clearTimeout(timer)
-      window.removeEventListener("pointerdown", reveal)
-      window.removeEventListener("keydown", reveal)
+      for (const type of skip) window.removeEventListener(type, reveal)
     }
   }, [])
 
-  return dropping ? <span className={styles.drop} data-intro-drop="" aria-hidden="true" /> : null
+  if (phase === "gone") return null
+  return (
+    <>
+      <script
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
+        dangerouslySetInnerHTML={{ __html: FILL }}
+      />
+      {phase === "dropping" ? (
+        <span className={styles.drop} data-intro-drop="" aria-hidden="true" />
+      ) : null}
+    </>
+  )
 }

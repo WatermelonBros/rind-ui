@@ -119,4 +119,33 @@ describe("Calendar stylesheet", () => {
     expect(forced).toMatch(/data-disabled[\s\S]*?GrayText/)
     expect(css).not.toMatch(/\[hidden\]/)
   })
+
+  it("range: middle days are a square band with edges, the ends cap it, the preview is dashed", () => {
+    sheet()
+    const row = `<div ${a("root", 'role="group"')}><table role="grid" ${a("grid")}><tbody ${a("grid-body")}><tr ${a("row")}>
+      <td ${a("cell", 'data-selected data-in-range data-range-start id="start"')}>10</td>
+      <td ${a("cell", 'data-selected data-in-range id="middle"')}>11</td>
+      <td ${a("cell", 'data-selected data-in-range data-range-end id="end"')}>12</td>
+      <td ${a("cell", 'data-preview id="preview"')}>13</td>
+      <td ${a("cell", 'id="plain"')}>14</td>
+    </tr></tbody></table></div>`
+    const host = mount(row)
+    const middle = style(host, "middle")
+    expect(middle.borderTopLeftRadius).toBe("0px")
+    expect(middle.backgroundColor).not.toBe(style(host, "plain").backgroundColor)
+    // Edges, not colour alone; the gap before it painted by the band.
+    expect(middle.boxShadow).toMatch(/inset/)
+    expect(style(host, "start").borderTopRightRadius).toBe("0px")
+    expect(style(host, "start").borderTopLeftRadius).not.toBe("0px")
+    expect(style(host, "end").borderTopLeftRadius).toBe("0px")
+    expect(style(host, "preview").outlineStyle).toBe("dashed")
+    expect(style(host, "preview").backgroundColor).toBe(style(host, "plain").backgroundColor)
+  })
+
+  it("forced colors: the range uses Highlight, the preview a dashed outline", () => {
+    const css = calendar.replace(/\/\*[\s\S]*?\*\//g, "")
+    const forced = css.slice(css.indexOf("@media (forced-colors: active)"))
+    expect(forced).toMatch(/data-in-range\][\s\S]*?Highlight;/)
+    expect(forced).toMatch(/data-preview\][\s\S]*?dashed/)
+  })
 })

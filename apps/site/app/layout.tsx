@@ -30,6 +30,8 @@ const fredoka = localFont({
   ],
   variable: "--font-fredoka",
   display: "swap",
+  // juicy only: not on the first paint of the default (crisp) page
+  preload: false,
 })
 const mono = localFont({
   src: [
@@ -39,6 +41,8 @@ const mono = localFont({
   ],
   variable: "--font-mono",
   display: "swap",
+  // small labels: they can swap in a moment later without delaying the first paint
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -57,11 +61,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     >
       <head>
         {/* Before paint: restore the phase (no crisp flash for a juicy visitor) and, on a first
-            visit of the landing, start unstyled for the intro. */}
+            visit of the landing, mark the intro (components/intro.tsx). */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("unstyled")}catch(e){}`,
+            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
           }}
         />
       </head>

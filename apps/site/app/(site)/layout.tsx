@@ -4,20 +4,20 @@ import { Intro } from "@/components/intro"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "../globals.css"
-import "@/skins/index.css"
 
 /** The site: navigation, phase, intro and the site stylesheet. */
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <GooFilters />
-      <Intro />
       <PhaseProvider>
         <header>
           <Nav />
         </header>
         {children}
       </PhaseProvider>
+      {/* after the page: its inline script copies the parsed header and main */}
+      <Intro />
     </>
   )
 }

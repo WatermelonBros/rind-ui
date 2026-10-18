@@ -73,15 +73,32 @@ a {
   border-radius: 6px;
 }
 
-/* Intro (components/intro.tsx): the page as the browser renders it with no CSS at all. */
-html.unstyled,
-html.unstyled body,
-html.unstyled body *:not([data-intro-drop], svg, svg *) {
-  /* biome-ignore lint/complexity/noImportantStyles: the raw page must beat every stylesheet, skins included */
-  all: revert !important;
+/* Intro (components/intro.tsx): until its copy of the page exists, nothing shows, so the styled
+   page never flashes first. A failsafe shows it anyway if the copy never comes. */
+html.intro:not([data-intro-ready]) body {
+  visibility: hidden;
+  animation: intro-failsafe 0s 2s forwards;
 }
-html.unstyled body {
-  margin: 8px;
+@keyframes intro-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+/* the page as the browser renders it with no CSS: a static copy over the real, styled page */
+#rind-intro-layer {
+  all: initial;
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  overflow: hidden;
+  padding: 8px;
+  background: Canvas;
+  color: CanvasText;
+  font: 16px serif;
+}
+#rind-intro-layer *:not(svg, svg *) {
+  /* biome-ignore lint/complexity/noImportantStyles: the raw copy must beat every stylesheet, skins included */
+  all: revert !important;
 }
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -92,10 +109,11 @@ html.unstyled body {
 /* Scroll reveal (components/home/reveal.tsx; not data-reveal, which rind uses): content fades and lifts in once. */
 [data-scroll-reveal] {
   opacity: 0;
-  translate: 0 28px;
+  translate: 0 24px;
+  /* short: a fast scroll on a phone never reads washed-out text */
   transition:
-    opacity 0.9s var(--spring),
-    translate 0.9s var(--spring);
+    opacity 0.6s var(--spring),
+    translate 0.6s var(--spring);
 }
 [data-scroll-reveal][data-in] {
   opacity: 1;
@@ -126,4 +144,17 @@ html.unstyled body {
     /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat every transition */
     transition: none !important;
   }
+}
+
+/* Home → docs: the clicked component name morphs into the page title (components/morph-link.tsx). */
+[data-page-title] {
+  view-transition-name: page-title;
+}
+::view-transition-group(page-title) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
 }

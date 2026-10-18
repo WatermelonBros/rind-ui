@@ -14,7 +14,7 @@ export interface RawTransition {
   readonly guard?: RawGuard
   readonly actions?: readonly string[]
   readonly reenter?: boolean
-  readonly reason?: string
+  readonly reason?: string | ((event: never) => string)
 }
 export type RawTransitions = string | RawTransition | readonly RawTransition[]
 
@@ -41,7 +41,12 @@ export interface RawMachineDef {
   readonly context?: (props: Record<string, unknown>) => Record<string, unknown>
   readonly values?: Readonly<Record<string, RawValue>>
   readonly computed?: Readonly<Record<string, (view: Readonly<Record<string, unknown>>) => unknown>>
-  readonly onProps?: Readonly<Record<string, string>>
+  readonly onProps?: Readonly<
+    Record<
+      string,
+      string | { readonly event: string; readonly equal: (a: never, b: never) => boolean }
+    >
+  >
   readonly effects?: readonly string[]
   readonly on?: Readonly<Record<string, RawTransitions>>
   readonly states: Readonly<Record<string, RawStateDef>>

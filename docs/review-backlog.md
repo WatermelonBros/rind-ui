@@ -7,17 +7,37 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| test-warning-guard (#103) | — | vitest.config.ts | Warning guard in the browser project: re-enable after the Chromium connection-drop root cause (console/task.meta traffic suspected; with the guard, browser-chromium-1 dropped 2/2 runs, without it passed) |
+| add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
+| add-color-picker (site report) | — | packages/core/src/components/color-picker | The hue ChannelSlider track is drawn at the current saturation/brightness: with a near-black value (#0B0B0C) the whole hue track is black and the hue cannot be picked by eye. Draw the hue track at full saturation and brightness (the Area shows the S/B) |
 | add-tag-group (r1) | — | packages/react/src/tag-group/tag-group.tsx | Link-only static Tag Group: the server HTML renders `role="list"` until the layout effect runs (registration at commit); the `tags` data form is correct on the server |
 | color-picker (site, #103) | — | packages/react/src/color-slider/color-slider.tsx | The channel slider's `defaultValue` (`getChannel(defaultValue, channel)`) is not snapped to the step grid like `value` is (#81): alpha 0.50196… for #33669980 logs the slider warning; snap it, then remove #103's allowance in color-slider.model.dom.test |
 | add-tag-group (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
 | add-tag-group (impl) | — | packages/core/src/components/tag-group/tag-group.contract.ts | Removal announcements are asserted through the announcement log in DOM tests (the contract's announcement kinds don't include removal); ACTIVATE and REMOVE are model-walk skips (DOM tests cover them) |
 | add-tag-group (impl) | — | packages/react/src/tag-group/tag-group.tsx | The hidden "Press Delete to remove" hint is one node per group, not one per document; hover/press state lives in React, not the machine |
+| add-date-field (impl) | — | packages/theme/src/date-field.css | Task 8.2: no Playwright captures (forced colors, RTL ar-AE, invalid, placeholder state) |
+| add-date-field (impl) | — | openspec/changes/archive/*-add-date-field | Spec "Error shown after leaving" says default validation, but the Field defaults to submit mode: the test uses validationMode="blur"; decide whether Date Field should default to blur |
+| add-date-field (impl) | — | packages/core/src/components/date-field/date-field.connect.ts | `data-validity` on the hidden input (contract query `validity`) is not in the spec's data-attribute list; add it to the spec or replace the query |
+| add-date-field (impl) | — | packages/theme/src/date-field.browser.test.tsx | The theme test imports @rind-ui/react and @rind-ui/testing by relative path (other theme tests mount static markup) |
+| add-date-field (impl) | — | packages/react/src/date-field/date-field.tsx | A controlled `null` set again over a partial draft (value already null) cannot clear it: no prop change reaches the machine; reset does |
+| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
+| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
+| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
+| add-tree-view (pending) | — | docs/research/tree-view.md | Manual real-AT pass of flat vs nested (`group`) DOM (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack): expand/collapse announcement, level/position, busy; freeze the DOM shape before 1.x (task 0.2) |
+| add-tree-view (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
+| add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |
+| add-tree-view (impl) | — | packages/testing/src/components/tree-view.model.dom.test.tsx | PRESS, INDICATOR, CHECK, programmatic expand/collapse, loader settle and tree/expandedValue prop changes are skipped in the model walk (DOM scenario tests cover them); no lazy or link props class |
+| add-tree-view (impl) | — | apps/site/examples/tree-view.tsx | No inline-input example (an input in a treeitem fails axe nested-interactive; covered by a DOM test) and no virtualized example |
+| color-picker-one-scope (r1) | — | packages/react/src/number-input | A hosted Number Input's Label still renders `host:label` (the Field host's part); the picker never renders it, so no Field part-name option (YAGNI) |
+| color-picker (site) | — | packages/core/src/components/shared/color/format.ts | The picker's ValueText shows unrounded hsl/hsb (`hsl(215.88, 100%, 61.96%)` for #3D8BFF); round to the channel step as the sliders do |
 | add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
 | add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
 | add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
 | add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
 | add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
 | add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
+| add-menubar (impl) | — | (Reado repo) | Task 8.3: migrate Reado's `MenuBar.tsx` and its tests to Menubar (design Migration Plan); the site's Application example models it |
+| add-menubar (impl) | — | packages/testing/src/components/menubar.dom.test.tsx | Task 5.1: not every cited regression issue has its own reproduction test (radix-ui/primitives#3699 VoiceOver click and #3762 are covered by the model's virtual run and the vertical tests only) |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |
@@ -250,6 +270,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-number-input | 11.1 (deferred) | NVDA, JAWS, VoiceOver macOS/iOS, TalkBack: spinbutton value read after each key, trigger names, touch trigger announcement, the `ios-vo-spinbutton-input` quirk on an iOS device (design Open Questions), Arabic / Persian keyboard input |
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 | add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
+| add-menubar | 8.2 (deferred) | VO + Safari macOS: VO+Space opens on the first item, VO cursor order along the bar, focus stays in the bar on open; NVDA + Firefox / Chrome; JAWS + Chrome; VO iOS and TalkBack; whether keyboard switching should keep focus on the bar item (design Risks) |
 
 ## Resolved
 

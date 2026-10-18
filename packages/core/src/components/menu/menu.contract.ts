@@ -81,7 +81,7 @@ const focusedItem = async (env: E) => {
 const focusInMenu = async (env: E) =>
   (await focusedItem(env)) !== null || (await env.part("content").isFocused())
 
-function menuContractWith(modal: boolean) {
+function menuContractWith(modal: boolean, triggerRole: "button" | "menuitem" = "button") {
   return contract("menu", {
     machine: menuMachine,
     anatomy: [
@@ -100,8 +100,9 @@ function menuContractWith(modal: boolean) {
       "separator",
       "submenu-trigger",
     ],
-    // Located through its trigger: a closed menu has no content to find.
-    locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "button" as const, name }),
+    // Located through its trigger: a closed menu has no content to find. A menubar's
+    // triggers are bar items (role menuitem).
+    locate: ({ name }: { readonly name: string | RegExp }) => ({ role: triggerRole, name }),
     queries: {
       ...positioningQueries,
       isOpen,
@@ -297,3 +298,7 @@ function menuContractWith(modal: boolean) {
 export const menuContract = menuContractWith(true)
 /** A non-modal menu (`modal={false}`). */
 export const nonModalMenuContract = menuContractWith(false)
+
+/** A menubar's menu, located through its bar item (add-menubar). */
+export const menubarMenuContract = menuContractWith(true, "menuitem")
+export const nonModalMenubarMenuContract = menuContractWith(false, "menuitem")

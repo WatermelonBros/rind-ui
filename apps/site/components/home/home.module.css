@@ -275,9 +275,9 @@
 .lookControls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  padding: 12px 16px;
+  align-items: end;
+  gap: 18px 24px;
+  padding: 16px 18px;
   border-bottom: var(--bw) solid var(--line);
   font: 600 13px var(--mono);
 }
@@ -330,52 +330,97 @@
     translate 0.45s var(--spring),
     width 0.45s var(--spring);
 }
-.tune {
+/* the builder's controls: rind components in the bare skin, laid out here */
+.tuneSlider {
+  display: grid;
+  gap: 6px;
+  inline-size: 150px;
+}
+.tuneHead {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tune input[type="color"] {
-  width: 34px;
-  height: 26px;
-  padding: 0;
-  border: 2px solid var(--ink);
-  border-radius: 6px;
-  background: none;
-  cursor: pointer;
-}
-.tune input[type="range"] {
-  accent-color: var(--acc);
-  width: 120px;
-}
-.reset {
-  margin-left: auto;
+  justify-content: space-between;
   font: 600 12px var(--mono);
-  padding: 6px 12px;
-  border-radius: 99px;
-  border: 2px solid var(--ink);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+}
+.tuneValue {
+  opacity: 0.7;
+}
+.tuneChoice {
+  display: grid;
+  gap: 6px;
+}
+.tuneLabel {
+  font: 600 12px var(--mono);
+}
+.tuneColor {
+  display: grid;
+  gap: 6px;
+}
+.tuneActions {
+  display: flex;
+  gap: 8px;
+  margin-inline-start: auto;
+  align-self: end;
 }
 .lookStage {
   padding: 48px clamp(20px, 5vw, 64px);
-  transition: background 0.5s var(--spring);
-}
-.lookStage[data-view="crisp"] {
-  background: #d4ff3a;
-}
-.lookStage[data-view="juicy"] {
-  background: #e9e2ff;
-}
-.lookStage[data-view="bare"] {
-  background: #fafafa;
 }
 .lookGrid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 40px;
   align-items: start;
+}
+
+.lookCode {
+  border-top: var(--bw) solid var(--line);
+  background: #0b0b0c;
+  color: #e8e8e3;
+}
+.lookCodeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font: 600 12px var(--mono);
+  color: #d4ff3a;
+}
+.lookCode .lookPre {
+  color: #e8e8e3;
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px 16px;
+  font: 500 12px / 1.6 var(--mono);
+  white-space: pre;
+}
+:global([data-phase="juicy"]) .lookCode {
+  background: #2a1d5c;
+}
+/* the stage's own layout only: every component style comes from the generated skin.css */
+.lookCol {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+.lookRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+/* the generated CSS, coloured by kind */
+.tkCom {
+  color: #b9b9b0;
+  font-style: italic;
+}
+.tkSel {
+  color: #d4ff3a;
+}
+.tkProp {
+  color: #8fc7ff;
+}
+.tkVal {
+  color: #ffb3cf;
 }
 
 /* ── tested: a driver test that plays itself ─────────────────────────────────────────── */
@@ -532,10 +577,27 @@
 }
 
 .testStage {
-  padding: 40px 28px;
+  padding: 40px clamp(20px, 4vw, 48px);
   display: grid;
-  place-items: center;
+  align-content: center;
   background: var(--bg);
+}
+/* full width of the stage, so the components keep their natural size */
+.testStageInner {
+  display: grid;
+  gap: 24px;
+  inline-size: min(100%, 380px);
+  justify-self: center;
+}
+/* an assertion's real outcome, shown once its line has run */
+.verdict {
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+  color: #ff8f8f;
+  font-weight: 700;
+}
+.verdict[data-ok] {
+  color: #9be7c4;
 }
 
 /* ── wall: the whole roadmap ─────────────────────────────────────────────────────────── */
@@ -583,8 +645,23 @@
 .wallGroup li a:hover {
   background-size: 100% 100%;
 }
+/* on touch, every component link is a comfortable target (WCAG 2.5.8: 24px; here 44px rows) */
+@media (pointer: coarse) {
+  .wallGroup li {
+    padding: 0;
+    min-block-size: 44px;
+    align-items: center;
+  }
+  .wallGroup li a {
+    display: inline-block;
+    padding-block: 12px;
+    /* the underline stays under the text, not at the bottom of the padded target */
+    background-origin: content-box;
+    background-clip: content-box;
+  }
+}
 .wallGroup small {
-  font: 600 10px var(--mono);
+  font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.65;
@@ -604,8 +681,84 @@
   padding: 120px 56px 32px;
 }
 .outroTitle {
+  position: relative;
+  display: grid;
   font: 900 clamp(44px, 8vw, 128px) / 0.92 var(--display);
   letter-spacing: -0.04em;
+}
+/* the outline and its filled copy share one grid cell, so they overlap exactly */
+.outroOutline,
+.outroFill {
+  grid-area: 1 / 1;
+}
+/* the unpeeled title: faint, so the filled copy reads as the rind coming off */
+.outroOutline {
+  color: color-mix(in oklab, var(--bg) 20%, transparent);
+}
+/* filled in a circle around the pointer: the rind peeled where you point */
+.outroFill {
+  color: var(--bg);
+  /* hidden until the pointer comes in; outro.tsx moves the circle */
+  clip-path: circle(0 at 50% 50%);
+  pointer-events: none;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .outroFill {
+    /* biome-ignore lint/complexity/noImportantStyles: beats the circle outro.tsx writes inline */
+    clip-path: none !important;
+  }
+}
+
+/* the easter egg: seeds fall once, the note pops */
+.seeds {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  overflow: hidden;
+}
+.seed {
+  position: absolute;
+  top: -24px;
+  left: var(--x);
+  width: 10px;
+  height: 16px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #1a1410;
+  rotate: var(--r);
+  animation: fall 2.4s cubic-bezier(0.4, 0, 0.6, 1) var(--d) forwards;
+}
+.seedsNote {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  translate: -50% -50%;
+  padding: 14px 22px;
+  border-radius: 99px;
+  background: #ff3d8b;
+  color: #fff;
+  font: 800 22px var(--display);
+  animation: pop 0.5s var(--spring);
+}
+@keyframes fall {
+  to {
+    translate: 0 calc(100vh + 48px);
+    rotate: calc(var(--r) + 220deg);
+  }
+}
+@keyframes pop {
+  from {
+    scale: 0.6;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seed {
+    display: none;
+  }
+  .seedsNote {
+    animation: none;
+  }
 }
 .outroCtas {
   display: flex;
