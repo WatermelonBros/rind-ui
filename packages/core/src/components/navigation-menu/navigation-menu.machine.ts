@@ -352,13 +352,19 @@ export const navigationMenuMachine = setup({
           const props = () => s.owner.props
           const open = () => s.owner.values.value
           const byId = (id: string) => env.dom.getById(id)
+          // The last open item's trigger: still the opener while the layer closes down.
+          let last: string | null = null
+          const key = () => {
+            last = open() ?? last
+            return last
+          }
           const trigger = () => {
-            const v = open()
-            return v === null ? null : byId(ids.trigger(v))
+            const k = key()
+            return k === null ? null : byId(ids.trigger(k))
           }
           const content = () => {
-            const v = open()
-            return v === null ? null : byId(ids.content(v))
+            const k = key()
+            return k === null ? null : byId(ids.content(k))
           }
           const panels = () =>
             [content(), byId(ids.viewport), byId(ids.positioner)].filter(
@@ -380,8 +386,14 @@ export const navigationMenuMachine = setup({
             modal: false,
             parent: props().parent,
             opener: trigger,
-            // The whole level is inside: a press on another trigger switches, not dismisses.
-            elements: () => [rootEl(), ...panels()].filter((e): e is HTMLElement => e !== null),
+            // The level's triggers are inside: a press on another one switches, not dismisses.
+            // Not the whole root: leaving the panel forward goes to the next top-level item.
+            elements: () => [
+              ...(rootEl()?.querySelectorAll<HTMLElement>(
+                `[data-scope="navigation-menu"][data-part="trigger"][data-instance="${CSS.escape(root)}"]`,
+              ) ?? []),
+              ...panels(),
+            ],
             container: () => content() ?? byId(ids.viewport),
             // Disclosure navigation: opening never moves focus.
             initialFocus: () => false,
