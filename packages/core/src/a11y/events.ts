@@ -64,6 +64,9 @@ export interface BlurEvent {
 export type LogicalKey =
   | "NEXT"
   | "PREV"
+  /** A move across rows of a two-dimensional composite (`"grid"` orientation only). */
+  | "NEXT_ROW"
+  | "PREV_ROW"
   | "FIRST"
   | "LAST"
   | "PAGE_NEXT"

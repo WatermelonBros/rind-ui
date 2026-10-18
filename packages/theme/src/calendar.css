@@ -1,0 +1,282 @@
+/*
+ * Calendar (families: panel for the root, collection item for the cells): a date grid.
+ * Every state is distinguishable without colour (WCAG 1.4.1): the selected date has a solid
+ * background AND an edge in the border role, today has a border, an unavailable date is
+ * struck through, a disabled or outside-month date is muted. Cells are at least 24x24
+ * (WCAG 2.5.8). Logical properties throughout, so the grid mirrors under dir="rtl".
+ * Colours never transition.
+ */
+@layer rind.components {
+  :where([data-scope="calendar"][data-part="root"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--rind-calendar-gap, var(--rind-space-3));
+    padding: var(--rind-calendar-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid var(--rind-calendar-border, var(--rind-color-border));
+    border-radius: var(--rind-calendar-radius, var(--rind-radius-panel));
+    background: var(--rind-calendar-bg, var(--rind-color-surface-raised));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    max-inline-size: 100%;
+  }
+
+  :where([data-scope="calendar"][data-part="root"][data-invalid]) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-calendar-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="calendar"][data-part="root"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* The header takes the whole first line; the grids sit side by side below it. */
+  :where([data-scope="calendar"][data-part="header"]) {
+    display: flex;
+    flex: 1 0 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rind-space-2);
+  }
+
+  :where([data-scope="calendar"][data-part="heading"]) {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: inherit;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Paging buttons: 24px keys drawing a chevron in currentColor, mirrored in rtl. */
+  :where([data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])) {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-calendar-trigger-radius, var(--rind-radius-indicator));
+    background: transparent;
+    color: var(--rind-calendar-trigger-color, var(--rind-color-text));
+    cursor: pointer;
+  }
+
+  :where([data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])):hover {
+    background: var(--rind-calendar-trigger-hover-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where(
+    [data-scope="calendar"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"]
+    )[data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* At a bound the trigger stays focusable (aria-disabled), only muted. */
+  :where(
+    [data-scope="calendar"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"]
+    )[data-disabled]
+  ) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where(
+    [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])
+  )::after {
+    content: "";
+    inline-size: var(--rind-calendar-icon-size, 1em);
+    block-size: var(--rind-calendar-icon-size, 1em);
+    background-color: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="calendar"][data-part="prev-trigger"])::after {
+    mask-image: var(--rind-calendar-prev-icon, var(--rind-icon-caret-left));
+  }
+
+  :where([data-scope="calendar"][data-part="next-trigger"])::after {
+    mask-image: var(--rind-calendar-next-icon, var(--rind-icon-caret-right));
+  }
+
+  /* The chevrons point the way the pages go: mirrored under rtl. */
+  :where(
+    [dir="rtl"] [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])
+  ) {
+    scale: -1 1;
+  }
+
+  :where([data-scope="calendar"][data-part="grid"]) {
+    border-collapse: separate;
+    border-spacing: var(--rind-calendar-cell-gap, 2px);
+    table-layout: fixed;
+  }
+
+  :where([data-scope="calendar"][data-part="header-cell"]) {
+    min-inline-size: var(
+      --rind-calendar-cell-size,
+      max(var(--rind-hit-area), var(--rind-size-control, var(--rind-size-md)))
+    );
+    padding: 0 0 var(--rind-space-1);
+    color: var(--rind-calendar-weekday, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"]) {
+    box-sizing: border-box;
+    inline-size: var(
+      --rind-calendar-cell-size,
+      max(var(--rind-hit-area), var(--rind-size-control, var(--rind-size-md)))
+    );
+    min-inline-size: var(--rind-hit-area);
+    block-size: var(
+      --rind-calendar-cell-size,
+      max(var(--rind-hit-area), var(--rind-size-control, var(--rind-size-md)))
+    );
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-calendar-cell-radius, var(--rind-radius-sm));
+    text-align: center;
+    vertical-align: middle;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-hover]) {
+    background: var(--rind-calendar-cell-hover-bg, var(--rind-color-neutral-soft));
+  }
+
+  /* Today: a border. Weekend cells take no rule of their own (data-weekend is for skins). */
+  :where([data-scope="calendar"][data-part="cell"][data-today]) {
+    border-color: var(--rind-calendar-today-border, var(--rind-color-accent-border));
+    font-weight: 600;
+  }
+
+  /* Selected: solid background, heavier weight and an inner edge in the border role. */
+  :where([data-scope="calendar"][data-part="cell"][data-selected]) {
+    background: var(--rind-calendar-selected-bg, var(--rind-color-accent-solid));
+    color: var(--rind-calendar-selected-text, var(--rind-color-accent-on-solid));
+    box-shadow: inset 0 0 0 calc(var(--rind-border-width) * 2)
+      var(--rind-calendar-selected-edge, var(--rind-color-border-strong));
+    font-weight: 700;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-selected][data-hover]) {
+    background: var(--rind-calendar-selected-bg, var(--rind-color-accent-solid-hover));
+  }
+
+  /* A selected date that became unavailable or out of range. */
+  :where([data-scope="calendar"][data-part="cell"][data-selected][data-invalid]) {
+    background: var(--rind-calendar-invalid-bg, var(--rind-color-danger-solid));
+    color: var(--rind-calendar-invalid-text, var(--rind-color-danger-on-solid));
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* Unavailable: struck through, not only muted. Still focusable, never selectable. */
+  :where([data-scope="calendar"][data-part="cell"][data-unavailable]) {
+    color: var(--rind-calendar-unavailable-text, var(--rind-color-text-muted));
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="calendar"][data-part="cell"][data-disabled]) {
+    color: var(--rind-calendar-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  /* Placeholders (the neighbouring month's days) are muted and inert. */
+  :where([data-scope="calendar"][data-part="cell"][data-outside-month]) {
+    color: var(--rind-calendar-outside-text, var(--rind-color-text-muted));
+    background: transparent;
+    cursor: default;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="calendar"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="calendar"][data-part="root"][data-disabled]) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    :where(
+        [data-scope="calendar"]:is([data-part="prev-trigger"], [data-part="next-trigger"])
+      )::after {
+      background-color: ButtonText;
+    }
+
+    :where(
+        [data-scope="calendar"]:is(
+          [data-part="prev-trigger"],
+          [data-part="next-trigger"]
+        )[data-disabled]
+      ) {
+      color: GrayText;
+    }
+
+    :where(
+        [data-scope="calendar"]:is(
+          [data-part="prev-trigger"],
+          [data-part="next-trigger"]
+        )[data-disabled]
+      )::after {
+      background-color: GrayText;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-selected]) {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-today]) {
+      border: 2px solid CanvasText;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-today][data-selected]) {
+      border-color: HighlightText;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-focus-visible]) {
+      outline: 3px solid CanvasText;
+      outline-offset: 2px;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-unavailable]) {
+      color: GrayText;
+      text-decoration: line-through;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"]:is([data-disabled], [data-outside-month])) {
+      color: GrayText;
+    }
+
+    :where([data-scope="calendar"][data-part="cell"][data-selected][data-invalid]) {
+      outline: 2px dashed HighlightText;
+      outline-offset: -4px;
+    }
+  }
+}

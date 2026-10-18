@@ -78,8 +78,6 @@ export const familyMatrix = [
       "time-range-field",
       "date-picker",
       "date-range-picker",
-      "color-field",
-      "color-channel-field",
       "color-picker",
     ],
     variants: ["outline", "soft"],
@@ -172,7 +170,7 @@ export const familyMatrix = [
   },
   {
     family: "range",
-    components: ["slider", "progress", "meter", "color-area", "color-slider"],
+    components: ["slider", "progress", "meter"],
     variants: ["solid", "soft"],
     size: "own",
     sizes,
@@ -181,7 +179,7 @@ export const familyMatrix = [
     // Look via each component's own tokens: --rind-separator-*, --rind-skeleton-*,
     // --rind-image-*, --rind-scroll-area-*, --rind-qr-code-*.
     family: "decoration",
-    components: ["separator", "skeleton", "image", "scroll-area", "qr-code", "color-swatch"],
+    components: ["separator", "skeleton", "image", "scroll-area", "qr-code"],
     variants: [],
     size: "none",
     sizes: [],

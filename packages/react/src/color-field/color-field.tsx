@@ -25,14 +25,17 @@ import {
 } from "@rind-ui/core"
 import {
   acceptColorText,
+  COLOR_PICKER_SCOPE,
   type ColorFieldFormat,
   type ColorFieldMessages,
+  channelInputNaming,
   colorChannelFieldProps,
   colorFieldConnect,
   colorFieldFormValue,
   colorFieldKeyEvent,
   colorFieldMachine,
   colorFieldMessages,
+  colorFieldPart,
   colorFieldValue,
   colorVariables,
 } from "@rind-ui/core/internal"
@@ -55,7 +58,11 @@ import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { NumberInput, type NumberInputRootProps } from "../number-input/number-input"
+import {
+  NumberInput,
+  NumberInputNaming,
+  type NumberInputRootProps,
+} from "../number-input/number-input"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
@@ -267,7 +274,8 @@ function Root({
   }
   return (
     <FieldHost
-      scope="color-field"
+      scope={COLOR_PICKER_SCOPE}
+      rootPart={colorFieldPart("root")}
       id={instance}
       dir={dir}
       {...fieldProps}
@@ -484,24 +492,26 @@ function ChannelRoot({
   const messages = useMessages("color-field", colorFieldMessages)
   return (
     <ChannelContext value={messages.channelName(channel)}>
-      <NumberInput.Root
-        {...rest}
-        {...numberProps}
-        data-channel={dataChannel}
-        style={{ ...vars.style, ...style }}
-        // A colour always has every channel: an empty commit is refused (the text returns).
-        onValueChange={(n) => {
-          if (n === null) return
-          send({
-            type: "SET",
-            color: withChannel(latest.current.color, channel, n, latest.current.memory),
-            reason: "INPUT",
-          })
-        }}
-        onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
-      >
-        {children}
-      </NumberInput.Root>
+      <NumberInputNaming value={channelInputNaming}>
+        <NumberInput.Root
+          {...rest}
+          {...numberProps}
+          data-channel={dataChannel}
+          style={{ ...vars.style, ...style }}
+          // A colour always has every channel: an empty commit is refused (the text returns).
+          onValueChange={(n) => {
+            if (n === null) return
+            send({
+              type: "SET",
+              color: withChannel(latest.current.color, channel, n, latest.current.memory),
+              reason: "INPUT",
+            })
+          }}
+          onValueCommit={(_n, d) => send({ type: "COMMIT", reason: String(d.reason) })}
+        >
+          {children}
+        </NumberInput.Root>
+      </NumberInputNaming>
     </ChannelContext>
   )
 }

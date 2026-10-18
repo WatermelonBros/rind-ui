@@ -8,7 +8,7 @@ import {
   swatchColor,
   transparencyGridProps,
 } from "@rind-ui/core/internal"
-import type { ComponentPropsWithRef } from "react"
+import { type ComponentPropsWithRef, createContext, useContext } from "react"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
@@ -36,6 +36,14 @@ export type ColorSwatchProps = Omit<ComponentPropsWithRef<"div">, "color"> & {
   readonly messages?: MessageOverrides<ColorSwatchMessages>
   readonly render?: RenderProp<ColorSwatchState>
 }
+
+/**
+ * Internal (not exported from the package): set by the Color Picker's swatch parts, whose
+ * swatches render under the picker's scope (`swatch`, `value-swatch`).
+ */
+export const SwatchNaming = createContext<{ readonly scope: string; readonly part: string } | null>(
+  null,
+)
 
 /** The swatch's props for a colour; shared with the parts that show one (picker, swatch picker). */
 export function useSwatchProps(options: {
@@ -85,7 +93,11 @@ function Root({
     messages,
     ariaLabel,
   })
-  const props = mergeProps(normalizeProps(api.root()), rest)
+  const naming = useContext(SwatchNaming)
+  const props = mergeProps(
+    normalizeProps(naming ? api.root(naming.scope, naming.part) : api.root()),
+    rest,
+  )
   return renderPart("div", props, render, {
     color,
     transparent: (respectAlpha === false ? 1 : color.alpha) < 1,

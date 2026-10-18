@@ -13,7 +13,14 @@ import {
   PENDING_ANNOUNCEMENTS,
   tabbables,
 } from "@rind-ui/core"
-import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
+import {
+  type AdapterEnv,
+  describeBy,
+  type EnvFactory,
+  type EnvOptions,
+  poll,
+  renamedSnapshot,
+} from "../adapter"
 import { installAnnouncementLog } from "../announcements"
 import { collectDom, isVisible } from "../collect"
 import { labelledControl } from "../labelled"
@@ -228,7 +235,7 @@ const ACT_ENV = "IS_REACT_ACT_ENVIRONMENT"
 const NATIVE_KEY: Partial<Record<Key, string>> = { Space: " " }
 
 function createDomEnv(
-  { scope, anchor, modality, platform }: EnvOptions,
+  { scope, anchor, modality, platform, partName, anatomyName }: EnvOptions,
   options: DomAdapterOptions & { readonly timeout: number },
   getUser: () => Promise<UserLike>,
   errors: () => string[],
@@ -311,7 +318,7 @@ function createDomEnv(
     if ("part" in by) {
       return Array.from(
         within.querySelectorAll(
-          `[data-scope="${CSS.escape(scope)}"][data-part="${CSS.escape(by.part)}"]`,
+          `[data-scope="${CSS.escape(scope)}"][data-part="${CSS.escape(partName?.(by.part) ?? by.part)}"]`,
         ),
       )
     }
@@ -795,7 +802,8 @@ function createDomEnv(
 
   const partEls = async (name: string, by?: By) => {
     const id = await instance()
-    const sel = `[data-scope="${CSS.escape(scope)}"][data-part="${CSS.escape(name)}"][data-instance="${CSS.escape(id)}"]`
+    const part = partName?.(name) ?? name
+    const sel = `[data-scope="${CSS.escape(scope)}"][data-part="${CSS.escape(part)}"][data-instance="${CSS.escape(id)}"]`
     const parts = Array.from(doc().querySelectorAll(sel))
     if (!by) return parts
     const matching = new Set(await queryBy(by, doc()))
@@ -838,7 +846,8 @@ function createDomEnv(
     },
     instance,
     anchorCount: async () => (await anchorEls()).length,
-    collect: async () => collectDom({ scope, instance: await instance() }),
+    collect: async () =>
+      renamedSnapshot(collectDom({ scope, instance: await instance() }), anatomyName),
     // No instance matches this id: only the document-wide fields are filled.
     collectDocument: async () => collectDom({ scope, instance: "\u0000unmounted" }),
     announcements: async () => {

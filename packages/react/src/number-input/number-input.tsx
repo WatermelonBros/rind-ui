@@ -15,12 +15,14 @@ import {
   type NumberInputCommitDetails,
   type NumberInputEvent,
   type NumberInputMessages,
+  type NumberInputPart,
   type NumberInputReason,
   type NumberInputTrigger,
   numberInputConnect,
   numberInputKey,
   numberInputMachine,
   numberInputMessages,
+  type PartNaming,
   partId,
   planInsertion,
   quirkActive,
@@ -125,6 +127,11 @@ interface Ctx {
 }
 
 const NumberInputContext = createContext<Ctx | null>(null)
+/**
+ * Internal (not exported from the package): set by a component that renders a Number Input as
+ * its part (Color Picker's channel input): the host's scope and part names.
+ */
+export const NumberInputNaming = createContext<PartNaming<NumberInputPart> | null>(null)
 function useNumberInput(part: string): Ctx {
   const ctx = useContext(NumberInputContext)
   if (!ctx) throw new Error(`NumberInput.${part} must be inside NumberInput.Root`)
@@ -198,6 +205,7 @@ function Root({
   id,
   ...fieldProps
 }: NumberInputRootProps) {
+  const hostNaming = useContext(NumberInputNaming)
   const env = useEnvironment()
   const generated = useId()
   const instance = id ?? generated
@@ -300,7 +308,8 @@ function Root({
   }
   return (
     <FieldHost
-      scope="number-input"
+      scope={hostNaming?.scope ?? "number-input"}
+      {...(hostNaming ? { rootPart: hostNaming.part("root") } : {})}
       id={instance}
       dir={dir}
       {...fieldProps}
@@ -329,9 +338,11 @@ function useApi(ctx: Ctx, binding: ReturnType<typeof useFieldBindingPeek>) {
   )
   const modality = useModality(env.modality, ctx.view.context.focused)
   const value = ctx.view.values.value ?? null
+  const naming = useContext(NumberInputNaming)
   return numberInputConnect(
     {
       instance: ctx.instance,
+      ...(naming ? { naming } : {}),
       value,
       text: ctx.view.context.text,
       defaultValue: ctx.defaultValue,

@@ -9,6 +9,7 @@ import * as avatar from "./avatar"
 import * as badge from "./badge"
 import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
+import * as calendar from "./calendar"
 import * as checkboxGroup from "./checkbox-group"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
@@ -90,6 +91,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   badge,
   breadcrumbs,
   button,
+  calendar,
   "checkbox-group": checkboxGroup,
   collapsible,
   "color-picker": colorPicker,

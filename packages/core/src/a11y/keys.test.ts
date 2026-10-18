@@ -110,4 +110,52 @@ describe("platform modifier", () => {
     expect(isContextMenuClick({ button: 0, ctrlKey: true }, platforms.apple)).toBe(true)
     expect(isContextMenuClick({ button: 0, ctrlKey: true }, platforms.windows)).toBe(false)
   })
+
+  describe("grid orientation", () => {
+    const grid = (key: string, dir: "ltr" | "rtl" = "ltr") =>
+      toLogicalKey(
+        {
+          key,
+          code: key,
+          shift: false,
+          alt: false,
+          ctrl: false,
+          meta: false,
+          repeat: false,
+          composing: false,
+        },
+        { dir, orientation: "grid", platform: {} as never },
+      )
+
+    it("Grid day and week moves", () => {
+      expect(grid("ArrowRight")).toBe("NEXT")
+      expect(grid("ArrowDown")).toBe("NEXT_ROW")
+      expect(grid("ArrowUp")).toBe("PREV_ROW")
+    })
+
+    it("Calendar grid in RTL: horizontal mirrors, rows do not", () => {
+      expect(grid("ArrowLeft", "rtl")).toBe("NEXT")
+      expect(grid("ArrowDown", "rtl")).toBe("NEXT_ROW")
+      expect(grid("Home", "rtl")).toBe("FIRST")
+    })
+
+    it("Other orientations have no row keys", () => {
+      for (const orientation of ["vertical", "both", "horizontal"] as const) {
+        const key = toLogicalKey(
+          {
+            key: "ArrowDown",
+            code: "ArrowDown",
+            shift: false,
+            alt: false,
+            ctrl: false,
+            meta: false,
+            repeat: false,
+            composing: false,
+          },
+          { dir: "ltr", orientation, platform: {} as never },
+        )
+        expect(key === "NEXT_ROW" || key === "PREV_ROW").toBe(false)
+      }
+    })
+  })
 })

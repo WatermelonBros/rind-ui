@@ -7,6 +7,9 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
+| add-calendar (impl) | — | packages/theme/src/calendar.css | Task 8.2: no Playwright captures (forced colors, RTL, two months, reduced motion) |
+| add-calendar (impl) | — | packages/core/src/dom/quirks.ts | Task A.2: reserve `nvda-calendar-focus-mode` with the manual pass (11.1); enable only if NVDA needs it |
 | add-toast (impl) | — | packages/testing/src/components/toast.dom.test.tsx | Task 6.1: not every cited regression issue has its own reproduction test |
 | add-toast (impl) | — | packages/testing/fixtures/toast | Task 7.2: forced-colors Playwright captures |
 | add-toast (impl) | — | docs/components/toast.md | Task 9.2: manual screen-reader pass (NVDA, JAWS, VO macOS/iOS, TalkBack) |
@@ -20,7 +23,6 @@ See CLAUDE.md "Review rules".
 | add-tour (impl) | — | packages/react/src/tour/tour.tsx | Spotlight geometry painted by the tour from the virtual anchor + a MutationObserver on the positioner's style (positioning reports no `anchorRect`) |
 | add-qr-code (r2) | — | packages/testing/fixtures/qr-code/qr-code.pw.test.ts | The download postcondition needed a 20 s deadline on CI (page JS export ~1.6 s at 20× CPU throttle); profile the export path |
 | add-color-picker (impl) | — | packages/core/src/components/color-picker | Machine has `closed`/`open` only; `inline` is a prop that blocks opening (a bound state would block leaving `closed`) |
-| add-color-picker (impl) | — | packages/react/src/color-slider, color-swatch-picker | Color Slider and Swatch Picker have no machine of their own and keep the underlying `data-scope` (`slider`, `radio-group`; the picker adds `data-color-swatch-picker`) |
 | add-color-picker (impl) | — | packages/react/src/color-picker/color-picker.tsx | Eye dropper handled in the React adapter, not a machine effect; picker root never sets `data-dragging` |
 | add-listbox (r1) | — | packages/testing/src/components | Task 5.4 (virtual screen-reader reading order: name, options, description, selection state, empty description) not done |
 | add-listbox (r1) | — | apps/site/examples/listbox.tsx | Task 7.1: no virtualized site example (needs a virtualizer recipe without a new dependency) |

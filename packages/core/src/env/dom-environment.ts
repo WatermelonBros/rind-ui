@@ -10,6 +10,8 @@ import type {
   AnnouncerEnv,
   ClockEnv,
   CollectionLayoutEnv,
+  DateClock,
+  DateClockEnv,
   DomEnv,
   DomRoot,
   Engine,
@@ -38,6 +40,7 @@ export type DomEnvironment = SchedulerEnv &
   LocaleEnv &
   AnnouncerEnv &
   ClockEnv &
+  DateClockEnv &
   CollectionLayoutEnv &
   RouterCapability &
   ValidityEnv &
@@ -72,6 +75,8 @@ export interface DomEnvironmentOptions {
   readonly visibility?: PageVisibility
   /** Client routing for every link part below (default: none, the browser navigates). */
   readonly router?: Router
+  /** The date clock (default: `Date.now()` and the platform's resolved time zone). */
+  readonly dateClock?: DateClock
 }
 
 /**
@@ -139,6 +144,11 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
         : liveAnnouncer({ scheduler, dom }, { backend: options.announcer ?? "live-region" }),
     // Looked up at call time, like the timers, so fake clocks installed later drive it.
     clock: { now: () => globalThis.performance?.now() ?? Date.now() },
+    // Read at call time, never at module scope or on import (no server-render "now").
+    dateClock: options.dateClock ?? {
+      now: () => Date.now(),
+      timeZone: () => new Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
     layout: collectionLayout(dom),
     visibility: options.visibility ?? documentVisibility(documentOf),
   }

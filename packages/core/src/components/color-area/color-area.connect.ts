@@ -7,6 +7,7 @@ import type { KeyDescription } from "../../a11y/keys"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { visuallyHiddenInputStyle } from "../../dom/visually-hidden"
+import { areaPart, COLOR_PICKER_SCOPE } from "../color-picker/color-picker.naming"
 import { formatChannel } from "../shared/color/channel-format"
 import { channelRange, getChannel } from "../shared/color/channels"
 import { type Color, type ColorMemory, makeColor } from "../shared/color/color"
@@ -101,7 +102,8 @@ export function colorAreaConnect(input: ColorAreaConnectInput) {
     "data-dragging": dataFlag(input.dragging),
   }
   const focus = focusAttrs(input.focused !== null, input.modality)
-  const part = (p: string) => scopeAttrs("color-area", p, input.instance)
+  const part = (p: Parameters<typeof areaPart>[0]) =>
+    scopeAttrs(COLOR_PICKER_SCOPE, areaPart(p), input.instance)
   const gradient = areaGradient(color, axes.x, axes.y, { rtl: input.dir === "rtl", memory })
   const value = (axis: AreaAxis) => getChannel(color, axes[axis], memory)
   const channelText = (axis: AreaAxis | "z") => ({

@@ -13,7 +13,6 @@ import {
   getColorChannelField,
   getColorField,
   getColorSlider,
-  getColorSwatch,
   getColorSwatchPicker,
 } from "../../src/components/color-parts"
 import { getColorPicker } from "../../src/index"
@@ -111,14 +110,20 @@ describe("colour drivers through Playwright (8.3)", () => {
     const field = getColorChannelField(page, { name: "Hue" })
     await field.fill("999")
     expect(await field.channel()).toBe("hue")
-    expect(await page.locator('[data-scope="number-input"][data-part="input"]').inputValue()).toBe(
-      "360°",
-    )
+    expect(
+      await page
+        .locator(
+          '[data-scope="color-picker"][data-part="channel-input-root"][data-channel] [data-part="channel-input"]',
+        )
+        .inputValue(),
+    ).toBe("360°")
   })
 
   it("Color Swatch and Swatch Picker: names, a pick, a move", { timeout: 60_000 }, async () => {
     const page = await open()
-    expect(await getColorSwatch(page, { name: "vibrant pink" }).color("hex")).toBe("#FF3D8B")
+    expect(await getColorPicker(page, { name: "Chips" }).swatch("vibrant pink").color("hex")).toBe(
+      "#FF3D8B",
+    )
     const palette = getColorSwatchPicker(page, { name: "Palette" })
     await palette.pick("vibrant blue")
     expect((await palette.selected())?.name).toBe("vibrant blue")
@@ -152,10 +157,10 @@ describe("colour theme captures (10.2)", () => {
     const css = await page.evaluate(() => {
       const q = (s: string) => getComputedStyle(document.querySelector(s) as Element)
       return {
-        thumb: q('[data-scope="color-area"][data-part="thumb"]').boxShadow,
-        swatch: q('[data-scope="color-swatch"][data-part="root"]').borderTopStyle,
-        swatchColor: q('[data-scope="color-swatch"][data-part="root"]').backgroundColor,
-        adjust: q('[data-scope="color-area"][data-part="background"]').forcedColorAdjust,
+        thumb: q('[data-scope="color-picker"][data-part="area-thumb"]').boxShadow,
+        swatch: q('[data-testid="chip"]').borderTopStyle,
+        swatchColor: q('[data-testid="chip"]').backgroundColor,
+        adjust: q('[data-scope="color-picker"][data-part="area-background"]').forcedColorAdjust,
       }
     })
     expect(css.thumb).not.toBe("none")
@@ -177,8 +182,8 @@ describe("colour theme captures (10.2)", () => {
     await opacity.toEdge(0, "max")
     const group = page.getByRole("group", { name: "Opacity" })
     const [t, c] = [
-      await group.locator('[data-part="thumb"]').boundingBox(),
-      await group.locator('[data-part="control"]').boundingBox(),
+      await group.locator('[data-part="channel-slider-thumb"]').boundingBox(),
+      await group.locator('[data-part="channel-slider-control"]').boundingBox(),
     ]
     expect((t?.x ?? 0) - (c?.x ?? 0)).toBeLessThan((c?.width ?? 0) / 4)
   })
@@ -193,7 +198,7 @@ describe("colour theme captures (10.2)", () => {
     )
     expect(
       await page
-        .locator('[data-scope="color-swatch"][data-transparent]')
+        .locator('[data-testid="chip-alpha"]')
         .evaluate((el) => getComputedStyle(el).backgroundImage),
     ).toContain("conic-gradient")
   })
@@ -211,7 +216,9 @@ describe("colour theme captures (10.2)", () => {
   it("the themed popover content is a raised panel", { timeout: 60_000 }, async () => {
     const page = await open()
     await getColorPicker(page, { name: "Background" }).open()
-    const content = page.locator('[data-scope="color-picker"][data-part="content"]')
+    const content = page.locator(
+      '[data-scope="color-picker"][data-part="content"]:not([data-inline])',
+    )
     const style = await content.evaluate((el) => ({
       bg: getComputedStyle(el).backgroundColor,
       shadow: getComputedStyle(el).boxShadow,
@@ -224,7 +231,7 @@ describe("colour theme captures (10.2)", () => {
   it("reduced motion: the area thumb does not transition", { timeout: 60_000 }, async () => {
     const page = await open({ reducedMotion: "reduce" })
     const d = await page
-      .locator('[data-scope="color-area"][data-part="thumb"]')
+      .locator('[data-scope="color-picker"][data-part="area-thumb"]')
       .evaluate((el) => getComputedStyle(el).transitionDuration)
     expect(d.split(",").every((x) => Number.parseFloat(x) === 0)).toBe(true)
   })
