@@ -112,7 +112,7 @@ Enter, a double press, or any press with no selection mode runs the action; touc
 virtual presses follow the collections toggle rule. Enter on a row SHALL run the action
 when one exists, else (selectable) select. Space SHALL toggle selection and SHALL NOT run
 the action. With a checkbox: the row press runs the action only. `selectOnPressUp` (default
-false) SHALL make presses commit on pointer up, for lists inside popups (react-spectrum#7887,
+false: a mouse press commits on pointer down) SHALL make presses commit on pointer up, for lists inside popups (react-spectrum#7887,
 #9572). The `value` shapes are `string[]` for `multiple` and `string | null` for `single`.
 Escape SHALL NOT clear the selection.
 
@@ -242,6 +242,7 @@ collection part attributes:
   `data-pressed`, `data-current`, `data-state` (`selected` | `unselected`, absent without
   selection).
 - `item-checkbox`: `data-state` (`checked` | `unchecked` | `indeterminate`), `data-disabled`.
+- `item`: `data-action-count` (how often the row's action ran; drivers check that a control's press left it unchanged).
 - `item-control`: `data-disabled`, `data-focus-visible`.
 - `item-cell`, `item-text`, `item-description`, `empty`, `load-more`, `label`: scoping
   attributes only.

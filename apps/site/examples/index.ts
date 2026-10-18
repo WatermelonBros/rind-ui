@@ -26,6 +26,7 @@ import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
+import * as gridList from "./grid-list"
 import * as heading from "./heading"
 import * as hiddenFormInput from "./hidden-form-input"
 import * as hiddenUntilFound from "./hidden-until-found"
@@ -125,6 +126,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   label,
   link,
   listbox,
+  "grid-list": gridList,
   "tag-group": tagGroup,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,

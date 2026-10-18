@@ -29,6 +29,7 @@ See CLAUDE.md "Review rules".
 | add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |
 | add-tree-view (impl) | — | packages/testing/src/components/tree-view.model.dom.test.tsx | PRESS, INDICATOR, CHECK, programmatic expand/collapse, loader settle and tree/expandedValue prop changes are skipped in the model walk (DOM scenario tests cover them); no lazy or link props class |
 | add-tree-view (impl) | — | apps/site/examples/tree-view.tsx | No inline-input example (an input in a treeitem fails axe nested-interactive; covered by a DOM test) and no virtualized example |
+| add-grid-list | 3.1 / 6.3 (follow-up, with tree-view virtualization) | Virtualized Grid List: `aria-rowcount`, `aria-colcount`, `aria-rowindex` and select all over unloaded rows; a virtualized fixture and measured spatial moves in a three-column fixture |
 | color-picker-one-scope (r1) | — | packages/react/src/number-input | A hosted Number Input's Label still renders `host:label` (the Field host's part); the picker never renders it, so no Field part-name option (YAGNI) |
 | color-picker (site) | — | packages/core/src/components/shared/color/format.ts | The picker's ValueText shows unrounded hsl/hsb (`hsl(215.88, 100%, 61.96%)` for #3D8BFF); round to the channel step as the sliders do |
 | add-calendar (impl) | — | packages/testing/src/components | Task 7.2: no tests yet for a Calendar inside a modal dialog (announcer not inert), touch scroll over cells (no selection), ten-step keyboard paging focus ring, japanese era boundary |
@@ -263,7 +264,6 @@ See CLAUDE.md "Review rules".
 
 - **Lighthouse**: re-run on rind.watermelon-studio.it after the zero-CLS intro (#142). Locally and live, Chromium measures CLS 0.0004, LCP ~0.5 s, TBT 0; the official score (last 76, from CLS 0.62) is not re-measured.
 - **Home JS**: ~300 KB gzip (React/Next ~100 KB). The skin builder's Color Picker could load when the section nears the viewport, with its height reserved (no CLS); TBT is already 0, so it only helps the transfer.
-- **Example demo links** jump to anchors that do not exist (`#page-1` in Pagination, `#profile` in Hover Card, `#bikes` in Image, `#dialog`/`#popover` in Tag Group, `#install` in Tree View): harmless demo data, could point at real headings.
 - **Warning guard in the browser project**: still jsdom-only (row above).
 - **Sweep tools** (ran by hand, not in CI): every example in juicy/crisp/bare measured for overflow and 24px targets; internal links and anchors of `out/` checked. Worth adding the target and link checks to `tests/audit.ts`.
 
@@ -280,6 +280,13 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | add-menu | 8.2 (deferred) | VoiceOver Safari macOS/iOS: submenu announcement with the `vo-submenu-expanded` quirk, swipe past the last submenu item; NVDA + Firefox browse-mode open; JAWS + Chrome; TalkBack submenu close |
 | add-context-menu | 8.2 (deferred) | iOS long press with VoiceOver off and on, Android long press, VO+Shift+M, NVDA/JAWS Shift+F10, Safari text selection on open |
 | add-menubar | 8.2 (deferred) | VO + Safari macOS: VO+Space opens on the first item, VO cursor order along the bar, focus stays in the bar on open; NVDA + Firefox / Chrome; JAWS + Chrome; VO iOS and TalkBack; whether keyboard switching should keep focus on the bar item (design Risks) |
+| add-grid-list | 0.2 / 9.2 (deferred) | Real-AT prototype and manual pass: VoiceOver macOS/iOS (Safari, Chrome) row focus + `aria-labelledby`, selection announcement, fast arrow repeat; NVDA, JAWS, TalkBack |
+| add-grid-list | 4.3 (follow-up) | React tests: Strict Mode, SSR + hydration tab stop, static vs data items, nested Tag Group (react-spectrum#6757, #5179) beyond the DOM test |
+| add-grid-list | 6.4 (follow-up) | Virtual screen-reader reading-order test: row name excludes controls, checkbox "Select …", selection announcement on Apple WebKit |
+| add-grid-list | #144 review (warning) | A `GridLayout` env capability (measured spatial targets injected, not read from the DOM in connect) and the `isOnControl` / `canMoveSpatially` guards of the design |
+| add-grid-list | #144 review (warning) | A row named by `aria-labelledby` without an `ItemText`: typeahead and announcements fall back to the key |
+| add-grid-list | #144 review (warning) | `warnForeignFocusables` warns again on every remount of a row; warn once per element |
+| add-grid-list | #144 review (warning) | `grid-list.connect.ts`: the module-level `pressedDown` WeakSet can keep a stale entry (a pointer down without a click), which drops the next virtual or screen-reader click on that row |
 | date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
 | date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |

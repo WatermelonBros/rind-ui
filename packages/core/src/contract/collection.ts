@@ -14,6 +14,11 @@ export interface CollectionContractOptions {
   readonly selectionAttr?: "aria-selected" | "aria-checked" | "aria-pressed"
   /** Default vertical: ArrowDown moves next. */
   readonly orientation?: "vertical" | "horizontal"
+  /**
+   * How queries name an item. Default `text` (its text content); `accessible` for items that
+   * hold labelled controls and are named by `aria-labelledby` (grid rows).
+   */
+  readonly naming?: "text" | "accessible"
 }
 
 export function collectionContract(o: CollectionContractOptions) {
@@ -28,7 +33,9 @@ export function collectionContract(o: CollectionContractOptions) {
   ) => {
     const out: string[] = []
     for (const p of await env.part("item").all()) {
-      if (await test((n) => p.attr(n))) out.push(await p.text())
+      if (await test((n) => p.attr(n))) {
+        out.push(o.naming === "accessible" ? await p.accessibleName() : await p.text())
+      }
     }
     return out
   }
@@ -78,7 +85,10 @@ export function collectionContract(o: CollectionContractOptions) {
       disabled: (env: E) => names(env, async (attr) => (await attr("aria-disabled")) === "true"),
       /** The focused item, or the `aria-activedescendant` of the focused element. */
       focusedItem: async (env: E) => {
-        for (const p of await env.part("item").all()) if (await p.isFocused()) return p.text()
+        for (const p of await env.part("item").all())
+          if (await p.isFocused()) {
+            return o.naming === "accessible" ? p.accessibleName() : p.text()
+          }
         return null
       },
     },
