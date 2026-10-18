@@ -4,15 +4,20 @@ import {
   type CodeBlockCopyState,
   type CodeBlockEvent,
   type CodeBlockMessages,
+  type CodeGrammar,
+  type CodeLanguage,
+  type CodeTokenType,
   codeBlockConnect,
   codeBlockMachine,
   codeBlockMessages,
+  highlightCode,
   type LineRanges,
   lineRuns,
   type MessageOverrides,
   type OverflowWatch,
   parseRanges,
   partId,
+  resolveGrammar,
   splitLines,
   type TrustedCodeHtml,
   watchOverflow,
@@ -59,6 +64,8 @@ const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayo
 /** One highlighted token, rendered as text (never HTML). */
 export interface CodeToken {
   readonly text: string
+  /** Rendered as `data-token`, coloured by the theme's `--rind-code-token-<type>`. */
+  readonly token?: CodeTokenType
   readonly className?: string
   readonly style?: CSSProperties
 }
@@ -106,7 +113,12 @@ function useCodeBlock(part: string): Ctx {
 export type CodeBlockRootProps = ComponentPropsWithRef<"div"> & {
   /** The source: rendered when no highlight is given, and what Copy writes. */
   readonly code: string
-  /** Highlighted tokens, one list per source line, rendered as text. */
+  /**
+   * Built-in highlighting: a built-in language name (any case) or your own `CodeGrammar`. An
+   * unknown name renders plain. `lines` and `html` win over it.
+   */
+  readonly language?: CodeLanguage | (string & {}) | CodeGrammar
+  /** Your highlighter's tokens, one list per source line, rendered as text. */
   readonly lines?: readonly (readonly CodeToken[])[]
   /** Highlighter output from `trustedCodeHtml()`, injected per line. Never user input. */
   readonly html?: TrustedCodeHtml
@@ -132,7 +144,8 @@ export type CodeBlockRootProps = ComponentPropsWithRef<"div"> & {
 
 function Root({
   code,
-  lines: tokens,
+  language,
+  lines: ownTokens,
   html,
   lineNumbers = false,
   startLineNumber = 1,
@@ -178,6 +191,11 @@ function Root({
     defaultExpanded: defaultExpanded ?? !collapsible,
     onExpandedChange,
   })
+  const tokens = useMemo(() => {
+    if (ownTokens || html) return ownTokens
+    const grammar = resolveGrammar(language)
+    return grammar ? highlightCode(code, grammar) : undefined
+  }, [ownTokens, html, language, code])
   const highlighted = useMemo(() => parseRanges(highlightLines), [highlightLines])
   const lines = useMemo(
     () =>
@@ -369,12 +387,22 @@ function Line({ line, render, children, ...rest }: CodeBlockLineProps) {
         ? { dangerouslySetInnerHTML: { __html: html } }
         : tokens
           ? {
-              children: tokens.map((t, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: tokens have no identity but their place
-                <span key={i} className={t.className} style={t.style}>
-                  {t.text}
-                </span>
-              )),
+              children: tokens.map((t, i) =>
+                // Plain text is not wrapped: fewer nodes on long blocks.
+                t.token === undefined && t.className === undefined && t.style === undefined ? (
+                  t.text
+                ) : (
+                  <span
+                    // biome-ignore lint/suspicious/noArrayIndexKey: tokens have no identity but their place
+                    key={i}
+                    {...(t.token === undefined ? {} : normalizeProps(ctx.api.token(t.token)))}
+                    className={t.className}
+                    style={t.style}
+                  >
+                    {t.text}
+                  </span>
+                ),
+              ),
             }
           : { children: line.text }
   return renderPart("span", { ...mergeProps(own, rest), ...content }, render, ctx.state)

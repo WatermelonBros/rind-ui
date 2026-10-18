@@ -94,6 +94,82 @@ describe("code-block lines", () => {
   })
 })
 
+describe("code-block built-in highlighting", () => {
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: JS source under test, not a template
+  const ts = "/* a\n   b */ const s = `x\n${y}`\r\n\n\tif (a < b) f('<b>')\n"
+
+  it("tokens are data-token spans; plain text is not wrapped; nothing becomes markup", () => {
+    setup(<Block code={ts} language="ts" lineNumbers />)
+    const code = document.querySelector("code") as HTMLElement
+    expect(code.querySelector("b")).toBeNull()
+    expect(code.querySelector('[data-token="keyword"]')?.textContent).toBe("const")
+    expect(code.querySelector('[data-token="function"]')?.textContent).toBe("f")
+    expect([...code.querySelectorAll("[data-token]")].every((s) => s.childElementCount === 0)).toBe(
+      true,
+    )
+    // A multi-line comment and template string keep their type on every line.
+    const second = code.querySelector('[data-line="2"]') as HTMLElement
+    expect(second.querySelector('[data-token="comment"]')?.textContent).toBe("   b */")
+    const strings = (n: number) =>
+      [...code.querySelectorAll(`[data-line="${n}"] [data-token="string"]`)].map(
+        (s) => s.textContent,
+      )
+    expect(strings(2)).toEqual(["`", "x"])
+    expect(strings(3)).toEqual(["`"])
+  })
+
+  it("lines, numbers and copy are the source's: the text is unchanged by tokens", async () => {
+    const { clipboard } = setup(<Block code={ts} language="ts" highlightLines={[4]} />)
+    const d = getCodeBlock(screen, { title: "app.ts" })
+    const code = document.querySelector("code") as HTMLElement
+    expect(code.textContent).toBe(ts.replace(/\r\n/g, "\n").replace(/\n$/, ""))
+    expect(await d.lineCount()).toBe(5)
+    expect(await d.highlightedLines()).toEqual([4])
+    await d.copy()
+    await d.settleCopy()
+    expect(clipboard.copied).toEqual([ts])
+  })
+
+  it("an unknown language renders plain; lines and html win over language", () => {
+    setup(
+      <>
+        <Block title="u" code="const a" language="cobol" />
+        <Block
+          title="t"
+          code="const a"
+          language="ts"
+          lines={[[{ text: "const a", token: "string" }]]}
+        />
+      </>,
+    )
+    const [unknown, own] = [...document.querySelectorAll("code")]
+    expect(unknown?.querySelector("[data-token]")).toBeNull()
+    expect(unknown?.textContent).toBe("const a")
+    expect(own?.querySelector('[data-token="string"]')?.textContent).toBe("const a")
+    expect(own?.querySelector('[data-token="keyword"]')).toBeNull()
+  })
+
+  it("server HTML is highlighted and hydrates without a warning", async () => {
+    const tree = (
+      <StrictMode>
+        <Block code={ts} language="tsx" />
+      </StrictMode>
+    )
+    const container = document.createElement("div")
+    container.innerHTML = renderToString(tree)
+    expect(container.querySelector('[data-token="keyword"]')?.textContent).toBe("const")
+    document.body.append(container)
+    const error = vi.spyOn(console, "error").mockImplementation(() => {})
+    let root: ReturnType<typeof hydrateRoot> | undefined
+    await act(async () => {
+      root = hydrateRoot(container, tree, { onRecoverableError: (e) => error(String(e)) })
+    })
+    expect(error.mock.calls).toEqual([])
+    await act(async () => root?.unmount())
+    container.remove()
+  })
+})
+
 describe("code-block copy", () => {
   it("copies the exact source, announces once, keeps the name (docusaurus#11414)", async () => {
     const { log, clipboard } = setup(<Block />)

@@ -289,3 +289,71 @@ Applying [accessibility.md](accessibility.md),
 - Should `Files` be its own part, or should consumers compose `Tabs` + `CodeBlock` themselves
   (the site's example frame already uses Tabs)? Proposed: a thin `CodeBlock.Files` wrapper that
   is just Tabs with the right defaults, since the user asked for "Tabs for multiple files".
+
+## Addendum (2026-10-18): built-in highlighting
+
+The user rejected the highlighter-agnostic v1 in review of PR #151: "no highlighting per
+language… the highlighting should live directly in the component's code and let you pick the
+colours at most". This reverses "highlighting entirely outside" above. The `lines`/`html` input
+stays as an escape hatch for external highlighters.
+
+### How small highlighters tokenize
+
+- **sugar-high** (~1 KB, JS/JSX; `packages/sugar-high/lib/core.js`): one hand-written loop over
+  an index, no grammar. Each branch eats a run (whitespace, word, quoted string to the matching
+  quote with `\` escapes, comment via hooks); words are classified after the fact (keyword set,
+  after `.` → property, capitalised → class). `\n` is its own break token; multi-line strings
+  and comments are single tokens split per line by the renderer. It does **not** tell regex
+  from division (`/` is always a sign), does not parse `${…}` (an inner backtick ends the
+  string), and has no JSX-text state (JSX text is coloured as code). Linear and tiny, at the
+  cost of those three cases.
+- **Prism** (`components/prism-core.js`): a grammar is an ordered map `type → RegExp |
+  { pattern, lookbehind, greedy, inside, alias }`. `matchGrammar` walks a linked list of text
+  nodes and, per pattern, splits unmatched strings around matches; `inside` re-tokenizes a
+  token with a nested grammar; `greedy` matches over the remaining text (so a string can swallow
+  something an earlier pattern took) and triggers a bounded rematch (`cause`/`reach` guard).
+  Cost is patterns × nodes × regex cost; greedy patterns rescan the rest of the text. Regex vs
+  division is a lookbehind on the previous character/keyword; template interpolation is a regex
+  with a fixed nesting depth. No state stack, so JSX text and deep `${}` are approximations.
+  Prism shipped ReDoS fixes in grammars (CVE-2021-23341, fixed 1.23.0; CVE-2021-32723, fixed
+  1.24.0): catastrophic backtracking from nested quantifiers like `(a|b+)+`.
+- **highlight.js** (mode reference): a mode is `begin`/`end` with `contains` sub-modes, a mode
+  **stack**, `keywords`, `endsWithParent`, `returnBegin`/`excludeEnd`. All `begin`s of the
+  current mode are compiled into one alternation, so scanning is one regex per step. Output is
+  one HTML string whose spans cross newlines (why `splitHtmlLines` closes and reopens tags).
+  The stack handles nesting (template interpolation, JSX attribute expressions) that Prism
+  cannot.
+- **Heavy reference only**: **Shiki** runs VS Code's TextMate grammars (Oniguruma in WASM, or a
+  JS regex engine) with per-line state; grammars are tens to hundreds of KB each. **Lezer** is an
+  incremental LR parser generator (CodeMirror 6); exact but a parser per language. Both are far
+  beyond a component's budget and stay behind the `lines`/`html` escape hatch.
+
+### Known bugs and pitfalls
+
+- **Template literals**: `${` opens code that may contain `}` of objects and nested backticks;
+  a flat regex or "string to the next backtick" breaks (sugar-high, Prism's fixed depth). Needs
+  a stack: backtick → template state, `${` → code state, `}` → back.
+- **Regex vs division**: undecidable from the next characters alone (`a / b / c` vs `x = /b/c`).
+  Every lexer uses the previous significant token: after an operand (identifier, number,
+  string, `)`, `]`) `/` is division, else a regex literal starts.
+- **JSX text**: `<div>don't</div>` — the `'` is text, not a string; without a JSX-children state
+  it opens a string that runs to the next quote. TSX also has `a < b` and `f<T>()`; `<` starts
+  a tag only where an operand would be expected and a name follows.
+- **Nested strings and comments**: `"/* no */"`, `// "no"`, `'it\'s'`; the first construct to
+  start wins and escapes are consumed in place.
+- **Multi-line tokens**: block comments and template strings span lines; the per-line render
+  must split them and keep the type on every piece (Shiki and sugar-high do; hljs leaves it to
+  the consumer). Copy must still equal the source.
+- **Performance**: backtracking regexes (nested quantifiers, unanchored lazy scans that fail at
+  the end) make huge or unterminated input quadratic or exponential. Use sticky (`y`) patterns
+  tried at one position, quantifiers over disjoint classes, and let unterminated constructs end
+  at the line or input end (`(?:\*\/|$)`) so a scan never fails after consuming the rest.
+
+### Decision
+
+A Monarch/hljs-style **state-stack lexer** in pure TypeScript, no dependency: a grammar is a map
+of states to ordered rules (`match` sticky RegExp, `token`, optional `push`/`pop`/`next`, and a
+`when(prev)` guard for regex-vs-division and tag-vs-less-than). One rule tries at a time at the
+current index; no match consumes one character as plain text. Built-in grammars: ts/tsx/js/jsx,
+css, html, json, bash. Tokens render as `<span data-token>`; colours are theme custom
+properties only.

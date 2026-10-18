@@ -1,17 +1,18 @@
 # Code Block
 
-Source code shown as text: readable in the server HTML without JavaScript, with a copy button whose result is announced, line numbers that are never copied, highlighted lines that do not depend on colour, soft wrap, and a collapsed preview for long blocks. It does not highlight: pass tokens or your highlighter's HTML.
+Source code shown as text: readable in the server HTML without JavaScript, with a copy button whose result is announced, line numbers that are never copied, highlighted lines that do not depend on colour, soft wrap, and a collapsed preview for long blocks. It highlights ts/tsx/js/jsx, css, html, json and bash itself, with no dependency; the colours are yours to pick through CSS custom properties.
 
 ## When to use
 
 - **Use it for** code samples in docs, snippets in a reader, configuration a user copies.
+- **Highlighting**: built in with `language`, enough for docs and snippets. For a language it does not ship, write a grammar (below); for editor-grade accuracy (TextMate grammars, every language), pass your highlighter's output through `lines` or `html`.
 - **Over a bare `<pre>`**: copy that reports failure instead of claiming success, a tab stop only when the block scrolls (and a name for it), numbers outside the text, wrapped lines that keep their numbers aligned, and long blocks clipped without removing lines from the page.
 - **Don't use it for** inline code in a sentence (use `<code>`), or for editing code (that is an editor).
 
 ```tsx
 import { CodeBlock } from "@rind-ui/react"
 
-<CodeBlock.Root code={source} lineNumbers highlightLines={[3, [5, 7]]}>
+<CodeBlock.Root code={source} language="ts" lineNumbers highlightLines={[3, [5, 7]]}>
   <CodeBlock.Header>
     <CodeBlock.Title>app.ts</CodeBlock.Title>
     <CodeBlock.WrapTrigger />
@@ -37,6 +38,7 @@ import { CodeBlock } from "@rind-ui/react"
 | `CodeBlock.Content` | `content` | `<pre>` | The scroll container (`dir="ltr"`). A named tab stop (`role="group"`) only while it overflows. Renders the `code` element and one Line per source line, or `children(line)` per line. |
 | `(inside Content)` | `code` | `<code>` | Sets the line-number counter start. |
 | `CodeBlock.Line` | `line` | `<span>` | One source line: tokens as text, or the line's trusted HTML. |
+| `(inside Line)` | `token` | `<span>` | One highlighted token (`data-token` only, no scope attributes); plain text is not wrapped. |
 | `(inside Content)` | `description` | `<span>` | Visually hidden "Highlighted lines: …", the Content's description. |
 
 ### Props
@@ -44,8 +46,9 @@ import { CodeBlock } from "@rind-ui/react"
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `code` | `string` | — | Required. The source: rendered when no highlight is given, and what Copy writes. |
-| `lines` | `readonly (readonly CodeToken[])[]` | — | Highlighted tokens, one list per line (`{ text, className?, style? }`), rendered as text. |
-| `html` | `TrustedCodeHtml` | — | Highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input. |
+| `language` | `CodeLanguage \| (string & {}) \| CodeGrammar` | — | Built-in highlighting: `ts`, `tsx`, `js`, `jsx`, `css`, `html`, `json`, `bash` (and aliases), or your own `CodeGrammar`. An unknown name renders plain. |
+| `lines` | `readonly (readonly CodeToken[])[]` | — | Escape hatch: your highlighter's tokens, one list per line (`{ text, token?, className?, style? }`), rendered as text. Wins over `language`. |
+| `html` | `TrustedCodeHtml` | — | Escape hatch: highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input. Wins over `language`. |
 | `lineNumbers` | `boolean` | `false` | Draws line numbers with a CSS counter (never in the text). |
 | `startLineNumber` | `number` | `1` | The first line's number (`data-line`, `highlightLines` and the counter follow it). |
 | `highlightLines` | `LineRanges` | — | Line numbers and inclusive ranges: `[3, [5, 7]]`. |
@@ -115,6 +118,7 @@ Every attribute of the rendered element is accepted and forwarded.
 | `line` | `data-instance` | The instance id. |
 | `line` | `data-line` | The line's number. |
 | `line` | `data-highlighted` | Listed in `highlightLines`. |
+| `token` | `data-token` | "keyword", "string", "comment", "number", "function", "type", "tag", "attr", "punctuation", "operator", "property", "variable" or "regex"; coloured by `--rind-code-token-<type>`. |
 | `description` | `data-scope` | "code-block" |
 | `description` | `data-part` | "description" |
 | `description` | `data-instance` | The instance id. |
@@ -147,11 +151,64 @@ Every attribute of the rendered element is accepted and forwarded.
 Queries: `text`, `lineCount`, `highlightedLines`, `isWrapped`, `isExpanded`, `isScrollable`, `copyState`. Traits: none.
 <!-- /api -->
 
+## Highlighting
+
+`language` highlights the source in the component, on the server too: `ts` (`typescript`), `tsx`, `js` (`javascript`, `mjs`, `cjs`), `jsx`, `css`, `html`, `json` (`jsonc`), `bash` (`sh`, `shell`, `zsh`), in any case. An unknown name renders plain text. Every token is a `<span data-token="…">` from a fixed set: `keyword`, `string`, `comment`, `number`, `function`, `type`, `tag`, `attr`, `punctuation`, `operator`, `property`, `variable`, `regex`; plain text is not wrapped. Tokens never change the text: a block comment or a template string that spans lines is cut per line and keeps its type, and Copy, the line count and the numbers are the source's.
+
+The lexer is a state stack (template literals with nested `${}`, JSX text, regex versus division by the previous token) and linear: patterns are tried at one position and never backtrack over the rest of the input, so a 5,000-line block or an unterminated comment stays fast.
+
+### Pick the colours
+
+The theme colours each token with one custom property, `--rind-code-token-<type>`, falling back to a palette with light and dark values that keep 4.5:1 on the block and on a highlighted line; under forced colours the system text colour wins. The block is dark by default; `--rind-code-block-scheme: light` makes it light. Override the properties anywhere above the block:
+
+```css
+:root {
+  --rind-code-token-keyword: #c2185b;
+  --rind-code-token-string: #2e7d32;
+  --rind-code-token-comment: #6b6b6b;
+}
+/* or for one block */
+.docs [data-scope="code-block"] {
+  --rind-code-block-scheme: light;
+  --rind-code-token-function: #1565c0;
+}
+```
+
+Without the theme, style `[data-token]` yourself: `[data-token="keyword"] { color: … }`.
+
+### Your own language
+
+A `CodeGrammar` is states of ordered rules; lexing starts in `root`. Each rule has a `match` regex (tried at the current position only), an optional `token` (a type, or a function of the matched text, for keyword sets), `when(prev)` to depend on the previous significant token, and `push`, `next` (replace) or `pop` to move between states.
+
+```ts
+import type { CodeGrammar } from "@rind-ui/core"
+
+const ini: CodeGrammar = {
+  states: {
+    root: [
+      { match: /;[^\n]*/, token: "comment" },
+      { match: /\[/, token: "punctuation", push: "section" },
+      { match: /[\w.]+(?=\s*=)/, token: "property" },
+      { match: /=/, token: "operator" },
+      { match: /[^\s;]+/, token: "string" },
+    ],
+    section: [
+      { match: /\]/, token: "punctuation", pop: true },
+      { match: /[^\]\n]+/, token: "type" },
+    ],
+  },
+}
+
+<CodeBlock.Root code={source} language={ini}>…</CodeBlock.Root>
+```
+
+Keep rules linear: let an unterminated construct end at the line or the input end (`/\/\*[\s\S]*?(?:\*\/|$)/`) instead of failing after a long scan, and keep the alternatives of a repeated group starting with different characters.
+
 ## Input: text, tokens or HTML
 
-`code` is always required: it is what the block shows without highlighting, and the exact string Copy writes (tabs and indentation included, whatever the rendering).
+`code` is always required: it is what the block shows without highlighting, and the exact string Copy writes (tabs and indentation included, whatever the rendering). `lines` and `html` are the escape hatch for an external highlighter, and win over `language`.
 
-- **Tokens** (`lines`): one list per source line of `{ text, className?, style? }`, rendered as text spans. Nothing is parsed as HTML, so this is the safe form.
+- **Tokens** (`lines`): one list per source line of `{ text, token?, className?, style? }`, rendered as text spans (`token` becomes `data-token`, so the theme colours apply). Nothing is parsed as HTML, so this is the safe form.
 - **HTML** (`html`): your highlighter's output, wrapped with `trustedCodeHtml(html)`. A plain string does not compile: the wrapper is the explicit opt-in. It is a marker, not a sanitizer: pass only what a highlighter produced from the source (highlighters escape it), never user input. One string is split per line, and an element that spans lines (a multi-line string or comment) is closed and reopened on each line, so every line parses on its own; you can also pass one string per line.
 
 An adapter is a few lines. With highlight.js:
@@ -164,7 +221,7 @@ const html = trustedCodeHtml(hljs.highlight(source, { language: "typescript" }).
 <CodeBlock.Root code={source} html={html}>…</CodeBlock.Root>
 ```
 
-The token colours are your highlighter's stylesheet.
+The token colours are your highlighter's stylesheet, or map its classes to `data-token` before `trustedCodeHtml` and the theme's colours apply.
 
 ## Lines
 
@@ -217,7 +274,7 @@ Every string that reaches assistive technology comes from `messages`: `label` ("
 
 ## Styling
 
-The theme places Code Block in the decoration family (no variants or sizes). Tokens: `--rind-code-block-*` (background, text, border, radius, font size, leading, gutter width and colour, highlight background and border).
+The theme places Code Block in the decoration family (no variants or sizes). Tokens: `--rind-code-block-*` (scheme, background, text, border, radius, font size, leading, block and inline padding, gutter width and colour, highlight background and border) and `--rind-code-token-*` (one colour per token type). The inline padding is on each line, so a highlighted line runs edge to edge.
 
 ## Testing
 

@@ -14,8 +14,8 @@ binding unless this document says otherwise.
 ## Goals / Non-Goals
 
 **Goals:** server HTML that reads completely without JavaScript; a copy whose result is the
-truth of the write and is announced; no line number ever in the text; no highlighter in the
-package.
+truth of the write and is announced; no line number ever in the text; built-in highlighting
+with no dependency, coloured only by CSS custom properties.
 
 **Non-Goals:** the proposal's Non-goals.
 
@@ -118,7 +118,37 @@ spans the scroll width; numbers by `::before` with `counter(rind-code-line)` and
 forced colors); collapse by `max-block-size: calc(var(--rind-code-block-max-lines) * 1lh)`;
 contrast of the trigger buttons checked against the code surface.
 
+### 7. Built-in highlighting (amended 2026-10-18)
+
+Research: the addendum in `docs/research/code-block.md`. A Monarch/hljs-style state-stack lexer
+(`code-block.highlight.ts`): a `CodeGrammar` is `{ states: { root, ... } }` of ordered rules
+`{ match, token?, when?, push?, next?, pop? }`. At each index the current state's rules are tried
+in order with a sticky copy of `match` (made once per regex); the first non-empty match wins, else
+one character is plain. `when(prev)` sees the previous significant token (not whitespace or a
+comment): regex versus division and `<` as JSX versus less-than. `pop` never empties the stack.
+`highlightCode` splits tokens on `\n` (keeping the type) and drops one trailing empty line,
+exactly as `splitLines`, so counts, numbers and hydration agree.
+
+Grammars (`code-block.grammars.ts`): one JS factory (`ts`, `jsx` flags) with `template`, `code`,
+`jsxTagName`, `jsxTag`, `jsxChildren`, `jsxClose` states; css (`root` selectors, `block`
+declarations, nested blocks); html (`name`, `tag`, `close`; script/style bodies plain); json
+(keys as `property`); bash (`dq` state for variables inside double quotes). Every pattern
+consumes what it scans or fails in a bounded look; the 5,000-line test asserts completion and
+size, never time.
+
+Rendering: React's Root computes `highlightCode(code, resolveGrammar(language))` when neither
+`lines` nor `html` is given; Line renders `{ text, token }` as `<span data-token>` from connect's
+`token(type)`, and plain text unwrapped. Colours: theme tokens `--rind-color-code-*` (tokens.css,
+`light-dark()`), read by `code-block.css` as `var(--rind-code-token-<type>,
+var(--rind-color-code-<type>))`; the block's `color-scheme` is `var(--rind-code-block-scheme,
+dark)`, so the palette, background and triggers follow the block, not the page. The default look
+is the docs site's (dark block, its highlight.js palette); the site skins
+(`apps/site/skins/code-block.css`) repeat it per skin.
+
 ## Risks / Trade-offs
+
+- [A regex lexer is not a parser] → the tricky cases (template nesting, JSX text, regex vs
+  division) are tested; anything beyond goes through `lines`/`html`.
 
 - [Single-string `html` split on `\n` can break tags that span lines] → documented; per-line HTML
   recommended; tokens are the safe default.

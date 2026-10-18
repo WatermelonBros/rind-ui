@@ -31,6 +31,14 @@
 - [x] 6.1 Model-based walk (`testMachine`) over copy (success / failure through the fake), wrap and expand, pointer / keyboard / virtual
 - [x] 6.2 Browser tests: tab stop only when scrolling (and after resize/wrap), numbers not copied (select-all + copy), numbers aligned under wrap (docusaurus#7907), highlight across horizontal scroll (chakra-ui#10239) in the theme browser test; copy inside a modal `<dialog>` with the fallback (docusaurus#11109) in the clipboard DOM test; indentation kept (#11414) in the DOM test; 3 engines in CI
 
+## 6b. Built-in highlighting (amendment 2026-10-18)
+
+- [x] 6b.1 Research addendum (sugar-high, Prism, highlight.js, Shiki/lezer; known bugs)
+- [x] 6b.2 `code-block.highlight.ts` (lexer, `CodeGrammar`, `highlightCode`) and `code-block.grammars.ts` (ts/tsx/js/jsx, css, html, json, bash, aliases, `resolveGrammar`); node tests per grammar for the tricky cases and a 5,000-line input
+- [x] 6b.3 Connect `token(type)` + meta; React `language` prop, `data-token` spans, `CodeToken.token`; DOM tests (spans, copy fidelity, unknown language, escape hatch wins, SSR + hydration)
+- [x] 6b.4 Theme: `--rind-color-code-*` in tokens.css, `--rind-code-token-*` in code-block.css, dark default scheme, padding (block on content, inline on lines), forced colors; browser tests (contrast in both schemes, override, padding, RTL)
+- [x] 6b.5 Site skin `apps/site/skins/code-block.css` (crisp/juicy/bare, the site's code look); every example uses `language`; docs page (when to use, colours, own grammar)
+
 ## 7. Theme, site examples, docs
 
 - [x] 7.1 `packages/theme/src/code-block.css` per design §6, imported from `index.css`, family row in `families.ts`; theme browser test (numbers `user-select: none`, highlight cue under forced colors, collapse clip, trigger contrast)

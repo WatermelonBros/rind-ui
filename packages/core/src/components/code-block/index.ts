@@ -5,6 +5,17 @@ export {
   codeBlockConnect,
 } from "./code-block.connect"
 export { codeBlockContract } from "./code-block.contract"
+export { type CodeLanguage, codeGrammars, resolveGrammar } from "./code-block.grammars"
+export {
+  CODE_TOKEN_TYPES,
+  type CodeGrammar,
+  type CodeGrammarRule,
+  type CodeTokenType,
+  type HighlightPrev,
+  type HighlightToken,
+  highlightCode,
+  tokenize,
+} from "./code-block.highlight"
 export {
   type LineRanges,
   lineRuns,

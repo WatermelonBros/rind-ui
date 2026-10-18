@@ -14,16 +14,18 @@ Every part SHALL accept the `render` prop and the props of the element it render
 - **WHEN** `<CodeBlock.Root code={"const a = 1\nconst b = 2"}><CodeBlock.Content /></CodeBlock.Root>` is rendered
 - **THEN** a `pre` containing one `code` with two lines and the text "const a = 1\nconst b = 2" is rendered, with no role on the `pre` while it fits
 
-### Requirement: Highlighter-Agnostic Input
+### Requirement: Input
 
-`Root` SHALL take the source as `code: string` (required) and MAY take highlighted content as
-either `lines` (an array, one entry per source line, of token lists `{ text, className?, style? }`,
-rendered as text spans) or `html` (a `TrustedCodeHtml` value, created only by
+`Root` SHALL take the source as `code: string` (required) and MAY take a `language` (built-in
+highlighting, see Built-in Highlighting) or, as the escape hatch for an external highlighter,
+highlighted content as either `lines` (an array, one entry per source line, of token lists
+`{ text, token?, className?, style? }`, rendered as text spans, `token` as `data-token`) or
+`html` (a `TrustedCodeHtml` value, created only by
 `trustedCodeHtml(value)` from a string or one string per line, injected as HTML; a single string
 is split per line and an element spanning lines is closed and reopened on each line). A plain
-string SHALL NOT be assignable to `html` (compile error). Without `lines` and `html`, the
-lines SHALL render the source as text. The component SHALL NOT call or depend on a
-highlighter.
+string SHALL NOT be assignable to `html` (compile error). `lines` and `html` SHALL win over
+`language`. Without `lines`, `html` and a known `language`, the lines SHALL render the source as
+text. The component SHALL NOT depend on an external highlighter.
 
 #### Scenario: Raw string rejected
 
@@ -34,6 +36,75 @@ highlighter.
 
 - **WHEN** `lines` contains a token whose text is `"<b>"`
 - **THEN** the line shows the characters `<b>` and no `b` element is created
+
+#### Scenario: Escape hatch wins
+
+- **WHEN** `language="ts"` and `lines` are both given
+- **THEN** the lines render `lines`, not the built-in tokens
+
+### Requirement: Built-in Highlighting
+
+`@rind-ui/core` SHALL highlight in pure TypeScript with no runtime dependency: `tokenize(code,
+grammar)` and `highlightCode(code, grammar)` (tokens per line). `language` SHALL accept a
+built-in name, case-insensitive (`ts`/`typescript`/`mts`/`cts`, `tsx`, `js`/`javascript`/`mjs`/
+`cjs`, `jsx`, `css`, `html`, `json`/`jsonc`, `bash`/`sh`/`shell`/`zsh`) or a consumer
+`CodeGrammar` (public type: states of ordered rules `{ match, token?, when?, push?, next?, pop? }`,
+lexing from `root`). An unknown name SHALL render plain text. Tokens SHALL be rendered as
+`<span data-token="<type>">` with the fixed, documented set `keyword | string | comment | number
+| function | type | tag | attr | punctuation | operator | property | variable | regex`; plain text
+SHALL NOT be wrapped. The concatenated text of a line's tokens SHALL equal the source line: tokens
+SHALL NOT change the copied text, the line split, the line count or the numbers; a token spanning
+lines (block comment, template string) SHALL be split per line and keep its type on each piece.
+The lexer SHALL track template literals with nested `${}`, JSX text versus code, and regex versus
+division by the previous significant token; it SHALL be linear in the input (each pattern tried at
+one position, no catastrophic backtracking, unterminated constructs end at the line or input end).
+Server HTML SHALL contain the tokens.
+
+#### Scenario: Multi-line token keeps its type
+
+- **WHEN** `language="ts"` and the code has a block comment over three lines
+- **THEN** each of the three lines has a `data-token="comment"` span with that line's part
+
+#### Scenario: Copy fidelity
+
+- **WHEN** a highlighted block with CRLF newlines and tabs is copied
+- **THEN** the clipboard receives exactly `code`
+
+#### Scenario: JSX text is not a string
+
+- **WHEN** `language="tsx"` and the code is `<p>don't</p>`
+- **THEN** no `data-token="string"` span is created for `'t</p>`
+
+#### Scenario: Large input
+
+- **WHEN** 5,000 lines of mixed TSX, with an unterminated comment, are highlighted
+- **THEN** it completes with 5,000 lines of tokens (completion and size asserted, never timing)
+
+#### Scenario: Unknown language
+
+- **WHEN** `language="cobol"`
+- **THEN** the block renders plain text with no `data-token` span
+
+### Requirement: Token Colours
+
+The theme SHALL colour each token type through one custom property per type,
+`--rind-code-token-<type>`, falling back to theme tokens `--rind-color-code-<type>` with light and
+dark values; no JavaScript theme object. Picking colours SHALL mean overriding those properties.
+The block SHALL default to a dark scheme (`--rind-code-block-scheme`, `light` or `dark`) that
+every token inside it follows. Every default token colour SHALL reach 4.5:1 (WCAG 1.4.3) against
+the block background and a highlighted line, in both schemes; under forced colors tokens SHALL use
+`CanvasText`. The content SHALL have block padding, and the inline padding SHALL be on the lines,
+so a highlighted line runs edge to edge, also in a right-to-left page.
+
+#### Scenario: Override a colour
+
+- **WHEN** a page sets `--rind-code-token-keyword: rgb(1, 2, 3)` above a block
+- **THEN** keyword tokens are that colour
+
+#### Scenario: Contrast
+
+- **WHEN** a block with every token type and a highlighted line renders in the light and the dark scheme
+- **THEN** every token colour is at least 4.5:1 on the block and on the highlighted line
 
 ### Requirement: Line Model
 
@@ -224,7 +295,8 @@ SHALL carry `data-copy-state` (`idle | copying | copied | error`), `data-wrapped
 `data-expanded`, `data-collapsible` and `data-scrollable` (present-empty or absent); Content
 `data-line-numbers` and `data-scrollable`; Line `data-line` and `data-highlighted`; CopyTrigger
 `data-state` (the copy state); WrapTrigger `data-state` (`on | off`); CollapseTrigger
-`data-state` (`open | closed`); the triggers `data-focus` and `data-focus-visible`. Consumer `data-variant` / `data-size` / `data-tone` SHALL pass
+`data-state` (`open | closed`); the triggers `data-focus` and `data-focus-visible`. Token spans
+carry only `data-token` (no scope attributes, to keep long blocks light). Consumer `data-variant` / `data-size` / `data-tone` SHALL pass
 through.
 
 #### Scenario: Copy state styling hook

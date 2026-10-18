@@ -8,6 +8,7 @@ import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/pr
 import type { Modality } from "../../contract/env"
 import type { LinkEnv } from "../../dom/link"
 import { buttonLikeProps } from "../shared/button-like"
+import type { CodeTokenType } from "./code-block.highlight"
 import type { CodeBlockCopyState } from "./code-block.machine"
 import type { CodeBlockMessages } from "./code-block.messages"
 
@@ -21,6 +22,7 @@ export type CodeBlockPart =
   | "content"
   | "code"
   | "line"
+  | "token"
   | "description"
 
 export interface CodeBlockConnectInput {
@@ -119,6 +121,8 @@ export function codeBlockConnect(input: CodeBlockConnectInput, env: LinkEnv) {
       "data-line": String(n),
       "data-highlighted": dataFlag(input.highlighted.has(n)),
     }),
+    /** A highlighted token: only its type, so a 5,000-line block stays light. */
+    token: (type: CodeTokenType): PartProps => ({ "data-token": type }),
     description: (): PartProps => ({ ...base("description"), id: input.descriptionId }),
     descriptionText: highlightedAny ? input.messages.highlighted(input.highlightRuns) : "",
   }

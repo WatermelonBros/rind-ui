@@ -30,9 +30,15 @@ press, messages, Announcer), `tabs` (multi-file blocks) and `react-adapter`.
 - A `code-block` component (machine, connect, contract) and React parts: `Root`, `Header`,
   `Title`, `CopyTrigger`, `WrapTrigger`, `CollapseTrigger`, `Content` (the `pre` and its `code`)
   and `Line`. Several files are a Tabs composition (one block per panel), documented, not a part.
-- Highlighter-agnostic input: `code` (the source, always), plus either `lines` (tokens, rendered
-  as spans) or `html` (pre-highlighted HTML, a branded `TrustedCodeHtml` made with
-  `trustedCodeHtml()`); no highlighter dependency.
+- Built-in highlighting (user decision 2026-10-18, reversing the highlighter-agnostic v1: "the
+  highlighting should live directly in the component's code and let you pick the colours at
+  most"): a `language` prop; a pure-TypeScript state-stack lexer in `@rind-ui/core` with no
+  dependency; grammars for ts/tsx/js/jsx, css, html, json and bash; a public `CodeGrammar` type for
+  more languages; tokens as `data-token` spans from a fixed set; colours only through theme custom
+  properties `--rind-code-token-*` (light and dark defaults at 4.5:1, forced-colors fallback).
+- Escape hatch: `code` plus either `lines` (tokens, rendered as spans) or `html`
+  (pre-highlighted HTML, a branded `TrustedCodeHtml` made with `trustedCodeHtml()`) for an
+  external highlighter.
 - Copy states `idle | copying | copied | error` decided by the write's promise, announced through
   the Announcer (polite), the trigger's name never changes.
 - Line numbers by CSS counters (never in the text), 1-based `highlightLines` described once on
@@ -50,8 +56,9 @@ press, messages, Announcer), `tabs` (multi-file blocks) and `react-adapter`.
 
 ## Non-goals
 
-- A bundled or required highlighter, language detection, themes for token colours (the
-  consumer's highlighter CSS).
+- An external highlighter dependency, language detection, JS theme objects, editor-grade
+  accuracy (TextMate grammars: the escape hatch covers it), embedded languages in HTML
+  (`<script>`/`<style>` bodies render plain).
 - Editing (that's an editor), inline code (`<code>` in prose), diff semantics beyond `data-*`
   hooks, line annotations/callouts, character-range highlights.
 - Virtualization of very long blocks.
@@ -60,7 +67,8 @@ press, messages, Announcer), `tabs` (multi-file blocks) and `react-adapter`.
 
 ## Impact
 
-- New code: `packages/core/src/env/clipboard.ts` (+ DOM implementation in `dom-environment`),
+- New code: `packages/core/src/components/code-block/code-block.{highlight,grammars}.ts`,
+  `apps/site/skins/code-block.css`, `packages/core/src/env/clipboard.ts` (+ DOM implementation in `dom-environment`),
   `packages/core/src/components/code-block/*`, `packages/react/src/code-block/*`,
   `getCodeBlock` in `@rind-ui/testing` (+ fake clipboard in the test environment),
   `packages/theme/src/code-block.css`, site examples, a docs page.

@@ -1,9 +1,22 @@
 // add-code-block 7.1: the Code Block stylesheet alone, on the markup the parts render.
 import { afterEach, describe, expect, it } from "vitest"
 import codeBlock from "./code-block.css?inline"
-import { cleanup, files, inject, mount, q, ratio, rgba } from "./test-css"
+import { cleanup, files, inject, mount, q, type Rgba, ratio, rgba } from "./test-css"
 
 afterEach(cleanup)
+
+/** An element's computed colour as 8-bit sRGB + alpha, through the canvas helper. */
+function computed(el: HTMLElement, property: string): Rgba {
+  el.style.setProperty("--probe", getComputedStyle(el).getPropertyValue(property))
+  return rgba(el, "--probe")
+}
+
+/** `top` (alpha 0-255) composited over the opaque `under`. */
+function over(top: Rgba, under: Rgba): Rgba {
+  const a = top[3] / 255
+  const mix = (i: 0 | 1 | 2) => Math.round(top[i] * a + under[i] * (1 - a))
+  return [mix(0), mix(1), mix(2), 255]
+}
 
 const sheet = () =>
   inject(
@@ -104,10 +117,74 @@ describe("Code Block stylesheet", () => {
     sheet()
     const root = mount(markup(src))
     const button = q(root, "[data-part=copy-trigger]")
-    // The roles the sheet paints the triggers and the surface with.
-    expect(getComputedStyle(button).color).toBe(getComputedStyle(q(root, "pre")).color)
-    const fg = rgba(root, "--rind-color-text")
-    const bg = rgba(root, "--rind-color-surface")
-    expect(ratio(fg, bg)).toBeGreaterThanOrEqual(4.5)
+    const bg = computed(q(root, "[data-part=root]"), "background-color")
+    expect(ratio(computed(button, "color"), bg)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it("content is padded; the inline padding is on the lines, so they run edge to edge", () => {
+    sheet()
+    const pre = q(mount(markup(src, { highlight: 1 })), "pre")
+    const line = q(pre, "[data-line='1']")
+    expect(Number.parseFloat(getComputedStyle(pre).paddingTop)).toBeGreaterThanOrEqual(12)
+    expect(Number.parseFloat(getComputedStyle(pre).paddingInlineStart)).toBe(0)
+    expect(Number.parseFloat(getComputedStyle(line).paddingInlineEnd)).toBeGreaterThanOrEqual(16)
+    expect(line.getBoundingClientRect().left).toBeCloseTo(pre.getBoundingClientRect().left, 0)
+  })
+
+  it("rtl page: the lines keep their padding and run left to right", () => {
+    sheet()
+    const pre = q(mount(`<div dir="rtl">${markup(src)}</div>`), "pre")
+    const line = q(pre, "[data-line='1']")
+    expect(getComputedStyle(pre).direction).toBe("ltr")
+    expect(line.getBoundingClientRect().left).toBeCloseTo(pre.getBoundingClientRect().left, 0)
+    expect(Number.parseFloat(getComputedStyle(line).paddingLeft)).toBeGreaterThan(
+      Number.parseFloat(getComputedStyle(line).paddingRight),
+    )
+  })
+
+  const tokens = [
+    "keyword",
+    "string",
+    "comment",
+    "number",
+    "function",
+    "type",
+    "tag",
+    "attr",
+    "property",
+    "variable",
+    "regex",
+    "punctuation",
+    "operator",
+  ]
+  const tokenLine = tokens.map((t) => `<span data-token="${t}">${t}</span>`).join(" ")
+
+  it.each([
+    ["light page", "light", ""],
+    ["dark page", "dark", ""],
+    ["light block", "light", "--rind-code-block-scheme:light"],
+    ["light block, dark page", "dark", "--rind-code-block-scheme:light"],
+  ])("token colours reach 4.5:1 on the block and a highlighted line (%s)", (_, theme, style) => {
+    sheet()
+    document.documentElement.setAttribute("data-theme", theme)
+    const host = mount(
+      `<div style="${style}">${markup([tokenLine, tokenLine], { highlight: 2 })}</div>`,
+    )
+    const block = computed(q(host, "[data-part=root]"), "background-color")
+    const lit = over(computed(q(host, "[data-line='2']"), "background-color"), block)
+    for (const t of tokens) {
+      const fg = computed(q(host, `[data-line='1'] [data-token=${t}]`), "color")
+      expect(ratio(fg, block), t).toBeGreaterThanOrEqual(4.5)
+      expect(ratio(fg, lit), `${t} highlighted`).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it("a token colour is picked by overriding its custom property", () => {
+    sheet()
+    const host = mount(
+      `<div style="--rind-code-token-keyword:rgb(1, 2, 3)">${markup([tokenLine])}</div>`,
+    )
+    expect(getComputedStyle(q(host, "[data-token=keyword]")).color).toBe("rgb(1, 2, 3)")
+    expect(getComputedStyle(q(host, "[data-token=comment]")).fontStyle).toBe("italic")
   })
 })

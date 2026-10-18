@@ -67,6 +67,7 @@ describe("code-block meta matches the code", () => {
       content: a.content(),
       code: a.code(),
       line: a.line(2),
+      token: a.token("keyword"),
       description: a.description(),
     }
     for (const [part, props] of Object.entries(parts)) {

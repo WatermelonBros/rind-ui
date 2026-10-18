@@ -80,6 +80,13 @@ export const codeBlockMeta = {
       description: "One source line: tokens as text, or the line's trusted HTML.",
     },
     {
+      name: "(inside Line)",
+      part: "token",
+      element: "span",
+      description:
+        "One highlighted token (`data-token` only, no scope attributes); plain text is not wrapped.",
+    },
+    {
       name: "(inside Content)",
       part: "description",
       element: "span",
@@ -92,15 +99,20 @@ export const codeBlockMeta = {
       description:
         "Required. The source: rendered when no highlight is given, and what Copy writes.",
     },
+    language: {
+      type: "CodeLanguage | (string & {}) | CodeGrammar",
+      description:
+        "Built-in highlighting: `ts`, `tsx`, `js`, `jsx`, `css`, `html`, `json`, `bash` (and aliases), or your own `CodeGrammar`. An unknown name renders plain.",
+    },
     lines: {
       type: "readonly (readonly CodeToken[])[]",
       description:
-        "Highlighted tokens, one list per line (`{ text, className?, style? }`), rendered as text.",
+        "Escape hatch: your highlighter's tokens, one list per line (`{ text, token?, className?, style? }`), rendered as text. Wins over `language`.",
     },
     html: {
       type: "TrustedCodeHtml",
       description:
-        "Highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input.",
+        "Escape hatch: highlighter output from `trustedCodeHtml(html)`, injected per line. Never user input. Wins over `language`.",
     },
     lineNumbers: {
       type: "boolean",
@@ -177,6 +189,10 @@ export const codeBlockMeta = {
       ...base("line"),
       "data-line": "The line's number.",
       "data-highlighted": "Listed in `highlightLines`.",
+    },
+    token: {
+      "data-token":
+        '"keyword", "string", "comment", "number", "function", "type", "tag", "attr", "punctuation", "operator", "property", "variable" or "regex"; coloured by `--rind-code-token-<type>`.',
     },
     description: base("description"),
   },
