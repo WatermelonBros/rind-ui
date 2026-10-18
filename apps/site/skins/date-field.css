@@ -106,5 +106,33 @@
   border-radius: var(--s-r);
   background: var(--s-card);
   color: var(--s-ink);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.16);
+  box-shadow: var(--s-lift-hi);
+}
+/* the popup: above the page like a popover, and in the popover's look */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="positioner"] {
+  z-index: 62;
+}
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="date-field"][data-part="content"] {
+  box-shadow: 5px 5px 0 var(--s-ink);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="date-field"][data-part="content"] {
+  box-shadow: 0 8px 0 #c9bdf2;
+  outline: 2px solid #e2d9fb;
+  outline-offset: -2px;
+}
+/* the calendar inside is the popup's content, not a second card */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="content"]
+  [data-scope="calendar"][data-part="root"] {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  padding: 44px 0 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="content"]
+  [data-scope="calendar"][data-part="header"] {
+  inset: 0 0 auto;
 }
