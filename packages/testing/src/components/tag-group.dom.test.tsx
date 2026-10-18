@@ -409,3 +409,17 @@ describe("server render", () => {
     container.remove()
   })
 })
+
+describe("empty state", () => {
+  it("Empty inside List shows when the group starts with no tags", async () => {
+    render(
+      <TagGroup.Root onRemove={() => {}}>
+        <TagGroup.Label>Saved filters</TagGroup.Label>
+        <TagGroup.List>
+          <TagGroup.Empty>No filters saved</TagGroup.Empty>
+        </TagGroup.List>
+      </TagGroup.Root>,
+    )
+    await waitFor(() => expect(screen.getByText("No filters saved")).toBeTruthy())
+  })
+})
