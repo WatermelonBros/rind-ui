@@ -95,7 +95,7 @@ describe("anatomy and roles", () => {
     expect(row("lazy").getAttribute("aria-expanded")).toBe("true")
   })
 
-  it("Unnamed tree warns (react-arborist#325)", () => {
+  it("Unnamed tree warns (react-arborist#325)", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
       <TreeView.Root items={FILES}>
@@ -104,13 +104,15 @@ describe("anatomy and roles", () => {
         </TreeView.Tree>
       </TreeView.Root>,
     )
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/)
+    // the development checks run after the mount re-render (a microtask)
+    await vi.waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/no accessible name/))
   })
 
-  it("A button inside an item warns", () => {
+  it("A button inside an item warns", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(<Files itemExtra={(k) => (k === "docs" ? <button type="button">Open</button> : null)} />)
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/interactive <button>/)
+    // the development checks run after the mount re-render (a microtask)
+    await vi.waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/interactive <button>/))
   })
 
   it("Keys are strings: '0' renders and can be selected (react-spectrum#9991)", async () => {
