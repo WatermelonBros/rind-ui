@@ -7,6 +7,13 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-tree-view (pending) | — | docs/research/tree-view.md | Manual real-AT pass of flat vs nested (`group`) DOM (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack): expand/collapse announcement, level/position, busy; freeze the DOM shape before 1.x (task 0.2) |
+| add-tree-view (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
+| add-tree-view (impl) | — | packages/react/src/tree-view/tree-view.tsx | Every row re-renders when the highlight moves (no per-row selectors) |
+| add-tree-view (impl) | — | packages/testing/src/components/tree-view.model.dom.test.tsx | PRESS, INDICATOR, CHECK, programmatic expand/collapse, loader settle and tree/expandedValue prop changes are skipped in the model walk (DOM scenario tests cover them); no lazy or link props class |
+| add-tree-view (impl) | — | apps/site/examples/tree-view.tsx | No inline-input example (an input in a treeitem fails axe nested-interactive; covered by a DOM test) and no virtualized example |
+| color-picker-one-scope (r1) | — | packages/react/src/number-input | A hosted Number Input's Label still renders `host:label` (the Field host's part); the picker never renders it, so no Field part-name option (YAGNI) |
+| color-picker (site) | — | packages/core/src/components/shared/color/format.ts | The picker's ValueText shows unrounded hsl/hsb (`hsl(215.88, 100%, 61.96%)` for #3D8BFF); round to the channel step as the sliders do |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |

@@ -1,0 +1,205 @@
+/*
+ * Tree View: tier-3 tokens are read with semantic fallbacks, never declared. Rows indent
+ * from `--rind-tree-view-level` (set by the part), are at least 24px tall and as wide as their
+ * content (`fit-content`), so highlight backgrounds span a horizontal scroll. The tree is not
+ * a flex container. Selected carries a background AND a heavier weight (never colour alone).
+ * The indicator rotates open and mirrors in right-to-left. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="tree-view"][data-part="tree"]) {
+    box-sizing: border-box;
+    display: block;
+    margin: 0;
+    padding: var(--rind-tree-view-padding, var(--rind-space-1));
+    border-radius: var(--rind-tree-view-radius, var(--rind-radius-control));
+    background: var(--rind-tree-view-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font: inherit;
+    overflow: auto;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-tree-view-gap, var(--rind-space-1));
+    min-inline-size: fit-content;
+    min-block-size: var(--rind-tree-view-item-height, var(--rind-hit-area));
+    padding-block: var(--rind-tree-view-item-padding, calc(var(--rind-space-1) / 2));
+    padding-inline: var(--rind-space-2) var(--rind-space-2);
+    padding-inline-start: calc(
+      var(--rind-space-1) +
+      (var(--rind-tree-view-level, 1) - 1) *
+      var(--rind-tree-view-indent, 1.25rem)
+    );
+    border-radius: var(--rind-tree-view-item-radius, var(--rind-radius-sm));
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-hover]),
+  :where([data-scope="tree-view"][data-part="item"][data-highlighted]) {
+    background: var(--rind-tree-view-item-hover-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-highlighted]) {
+    background: var(--rind-tree-view-item-highlight-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-selected]) {
+    background: var(--rind-tree-view-item-selected-bg, var(--rind-color-accent-soft));
+    color: var(--rind-tree-view-item-selected-text, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-selected][data-highlighted]) {
+    background: var(--rind-tree-view-item-selected-bg, var(--rind-color-accent-soft-hover));
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-current]) {
+    color: var(--rind-tree-view-current-text, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-disabled]) {
+    color: var(--rind-tree-view-item-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-tone="danger"]) {
+    color: var(--rind-tree-view-item-danger-text, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="tree-view"][data-part="item-text"]) {
+    flex: 1 0 auto;
+  }
+
+  /* A 24px hit area around a small mark; it rotates open and mirrors in right-to-left. */
+  :where([data-scope="tree-view"][data-part="item-indicator"]) {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--rind-tree-view-indicator-hit, var(--rind-hit-area));
+    block-size: var(--rind-tree-view-indicator-hit, var(--rind-hit-area));
+    margin-inline: calc(
+      (
+        var(--rind-tree-view-indicator-size, 1em) -
+        var(--rind-tree-view-indicator-hit, var(--rind-hit-area))
+      ) /
+      2
+    );
+    font-size: var(--rind-tree-view-indicator-size, 1em);
+    line-height: 1;
+    color: var(--rind-color-text-muted);
+    transition: rotate var(--rind-duration-fast, 120ms) var(--rind-ease-out);
+  }
+
+  :where([data-scope="tree-view"][data-part="item-indicator"][data-state="open"]) {
+    rotate: 90deg;
+  }
+
+  :where([data-scope="tree-view"][data-part="item-indicator"][data-state="closed"]:dir(rtl)) {
+    scale: -1 1;
+  }
+
+  :where([data-scope="tree-view"][data-part="item-indicator"][data-loading]) {
+    opacity: 0.6;
+  }
+
+  :where([data-scope="tree-view"][data-part="item-checkbox"]) {
+    flex: none;
+    box-sizing: border-box;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--rind-tree-view-checkbox-size, 1rem);
+    block-size: var(--rind-tree-view-checkbox-size, 1rem);
+    border: var(--rind-border-width) solid
+      var(--rind-tree-view-checkbox-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-radius-sm);
+    font-size: 0;
+  }
+
+  :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="checked"]),
+  :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="indeterminate"]) {
+    border-color: var(--rind-tree-view-checkbox-checked-bg, var(--rind-color-accent-solid));
+    background: var(--rind-tree-view-checkbox-checked-bg, var(--rind-color-accent-solid));
+  }
+
+  /* The marks are drawn, so they survive forced colors (no glyph needed in the markup). */
+  :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="checked"])::after {
+    content: "";
+    inline-size: 0.3em;
+    block-size: 0.55em;
+    margin-block-start: -0.1em;
+    border: solid var(--rind-color-accent-on-solid);
+    border-width: 0 0.12em 0.12em 0;
+    rotate: 45deg;
+    font-size: var(--rind-tree-view-checkbox-size, 1rem);
+  }
+
+  :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="indeterminate"])::after {
+    content: "";
+    inline-size: 0.55em;
+    block-size: 0.12em;
+    background: var(--rind-color-accent-on-solid);
+    font-size: var(--rind-tree-view-checkbox-size, 1rem);
+  }
+
+  :where([data-scope="tree-view"][data-part="loading"]) {
+    display: block;
+    padding-block: calc(var(--rind-space-1) / 2);
+    padding-inline-start: calc(
+      var(--rind-space-1) +
+      var(--rind-tree-view-level, 1) *
+      var(--rind-tree-view-indent, 1.25rem)
+    );
+    color: var(--rind-tree-view-loading-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="tree-view"][data-part="empty"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-tree-view-empty-text, var(--rind-color-text-muted));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="tree-view"][data-part="item-indicator"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="tree-view"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope="tree-view"][data-part="item"][data-selected]) {
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="tree-view"][data-part="item"][data-focus-visible]) {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    :where([data-scope="tree-view"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+
+    :where([data-scope="tree-view"][data-part="item-checkbox"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="checked"]),
+    :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="indeterminate"]) {
+      background: Highlight;
+      border-color: Highlight;
+    }
+  }
+}
