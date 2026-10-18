@@ -45,6 +45,10 @@ changed the QR encoder or the QR Code component (add-qr-code 6.4):
    *Workflow permissions*: *Read and write* and tick *Allow GitHub Actions to create and approve
    pull requests*. Then the same two settings in the repository (*Settings* → *Actions* →
    *General*). The version pull request needs it.
+5. **Discord announcements (optional).** In the Discord channel: *Edit Channel* → *Integrations*
+   → *Webhooks* → *New Webhook*, then *Copy Webhook URL*. Add it as the repository secret
+   `DISCORD_WEBHOOK`. Every publish then posts "rind-ui x.y.z is out." with that version's
+   changelog. Without the secret the step does nothing.
 
 ## Later: provenance and trusted publishing
 
