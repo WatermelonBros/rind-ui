@@ -70,8 +70,6 @@
 .skin {
   position: absolute;
   inset: 0;
-  /* peel from the bottom-right corner toward the top-left */
-  clip-path: polygon(0 0, calc(200% - var(--p1) * 200%) 0, 0 calc(200% - var(--p1) * 200%));
 }
 .skin .component[data-skin="crisp"] {
   background: #d4ff3a;
@@ -82,21 +80,27 @@
   background: #e9e2ff;
   box-shadow: 0 6px 0 #c9bdf2;
 }
-/* the folded-back corner riding the peel line */
-.curl {
+/* The flap: the peeled corner reflected across the fold (peel.tsx sets its clip and matrix). Its
+   face is the back of the skin: a watermelon rind, pale with stripes, lit along the fold. */
+.flap {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    135deg,
-    transparent calc(100% - var(--p1) * 100% - 6%),
-    #0002 calc(100% - var(--p1) * 100% - 1%),
-    #fff calc(100% - var(--p1) * 100%),
-    #f0f0f0 calc(100% - var(--p1) * 100% + 7%),
-    transparent calc(100% - var(--p1) * 100% + 7.5%)
-  );
-  opacity: calc(var(--p1) * (1 - var(--p1)) * 4);
   border-radius: 18px;
+  transform-origin: 0 0;
+  pointer-events: none;
+  background:
+    linear-gradient(315deg, #fff9 0%, #fff0 40%),
+    repeating-linear-gradient(100deg, #e9f6c9 0 14px, #d8eda6 14px 22px);
+  filter: drop-shadow(-3px -3px 6px #0b0b0c38);
+}
+.flap[data-skin="crisp"] {
+  outline: 3px solid #0b0b0c;
+  outline-offset: -3px;
+}
+.flap[data-skin="juicy"] {
+  background:
+    linear-gradient(315deg, #fff9 0%, #fff0 40%),
+    repeating-linear-gradient(100deg, #f4fbe4 0 14px, #e3f3c2 14px 22px);
 }
 
 .attrs {
