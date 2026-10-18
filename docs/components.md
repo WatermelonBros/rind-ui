@@ -67,7 +67,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done | Includes Autocomplete (free text) and Command (inline) |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
-| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
+| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | done | RAC: TokenField (unverified) |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | wip | Missing in Ark |
