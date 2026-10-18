@@ -47,8 +47,6 @@ export interface CalendarConnectInput extends Omit<CalendarProps, "view"> {
   readonly view: CalendarView
   /** `view` is controlled and never changes: the heading is plain text. */
   readonly viewFixed: boolean
-  /** The month view's cell text (default "short"). */
-  readonly monthFormat?: "short" | "long" | "narrow" | "numeric" | undefined
   readonly instance: string
   readonly value: CalendarValue
   readonly focused: CalendarDate
@@ -350,7 +348,10 @@ export function calendarConnect(input: CalendarConnectInput) {
         : sel && (outOfRange(date) || isUnavailable(date))
       const inPreview = !placeholder && within(date, preview)
       const ranged = !placeholder && isRange
-      const formatted = name(date)
+      const formatted = days ? fullDate(date, input.formatLocale, input.calendar) : ""
+      const text = days
+        ? dayText(date, input.formatLocale, input.calendar)
+        : periodText(date, view, input.formatLocale, input.calendar)
       return {
         ...scopeAttrs("calendar", "cell", input.instance),
         role: "gridcell",
@@ -363,7 +364,9 @@ export function calendarConnect(input: CalendarConnectInput) {
             : isFocused
               ? 0
               : -1,
-        "aria-label": input.messages.cellLabel({ date, formatted, today, view }),
+        // Period cells are named by their visible text alone (WCAG 2.5.3, every locale); the
+        // year is in the grid's name (its heading).
+        "aria-label": days ? input.messages.cellLabel({ date, formatted, today }) : undefined,
         "aria-selected": sel ? "true" : "false",
         "aria-disabled": disabled || cellUnavailable ? "true" : undefined,
         "aria-describedby": isRange && isFocused && input.ids.prompt ? input.ids.prompt : undefined,
@@ -392,9 +395,7 @@ export function calendarConnect(input: CalendarConnectInput) {
         "data-preview-end": dataFlag(
           ranged && preview !== null && inPreview && isSameDay(date, preview.end),
         ),
-        children: days
-          ? dayText(date, input.formatLocale, input.calendar)
-          : periodText(date, view, input.formatLocale, input.calendar, input.monthFormat),
+        children: text,
       }
     },
     isSelectable: (date: CalendarDate) => isSelectable(date, input, anchor, view),

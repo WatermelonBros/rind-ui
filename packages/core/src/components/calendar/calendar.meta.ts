@@ -203,11 +203,6 @@ export const calendarMeta = {
       default: "4",
       description: "Cells per row in the month and year views.",
     },
-    monthFormat: {
-      type: '"short" | "long" | "narrow" | "numeric"',
-      default: '"short"',
-      description: "The month cells' text.",
-    },
     isMonthUnavailable: {
       type: "(month) => boolean",
       description: "Month view: told the month's first day; never derived from its days.",

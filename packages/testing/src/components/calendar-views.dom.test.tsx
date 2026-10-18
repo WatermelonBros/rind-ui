@@ -11,6 +11,7 @@ import type { CalendarValue, CalendarView } from "@rind-ui/core"
 import { Calendar, type CalendarRootProps, Dialog, RindProvider } from "@rind-ui/react"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
+import { computeAccessibleName } from "dom-accessibility-api"
 import { useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { getCalendar, installAnnouncementLog } from "../index"
@@ -23,7 +24,7 @@ const at = (iso: string) =>
   document.querySelector<HTMLElement>(`[data-part="cell"][data-value="${iso}"]`) as HTMLElement
 const attr = (iso: string, name: string) => at(iso).hasAttribute(name)
 const texts = () => screen.getAllByRole("gridcell").map((c) => c.textContent)
-const names = () => screen.getAllByRole("gridcell").map((c) => c.getAttribute("aria-label"))
+const names = () => screen.getAllByRole("gridcell").map((c) => computeAccessibleName(c))
 const iso = (v: unknown) => String(v)
 const log = () => installAnnouncementLog().map((a) => a.message)
 
@@ -60,22 +61,25 @@ describe("Calendar month view", () => {
     expect(screen.getAllByRole("grid")).toHaveLength(1)
     expect(screen.getAllByRole("row")).toHaveLength(3)
     for (const row of screen.getAllByRole("row")) expect(row.children).toHaveLength(4)
-    expect(names()[0]).toBe("January 2026")
-    expect(names()[11]).toBe("December 2026")
-    expect(texts()).toEqual([
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
       "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ])
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ]
+    expect(texts()).toEqual(months)
+    expect(names()).toEqual(months)
+    expect(screen.getByRole("grid", { name: "2026" })).toBeTruthy()
+    for (const c of screen.getAllByRole("gridcell"))
+      expect(c.hasAttribute("aria-label")).toBe(false)
     expect(await cal().heading()).toBe("2026")
     expect(screen.getByRole("button", { name: "Previous year" })).toBeTruthy()
     expect(screen.getByRole("button", { name: "Next year" })).toBeTruthy()
@@ -260,7 +264,7 @@ describe("Calendar month view", () => {
 
   it("Virtual focus does not select (months view)", async () => {
     render(<Months />)
-    act(() => cell("October 2026").focus())
+    act(() => cell("October").focus())
     expect(await cal().value()).toEqual([])
     await waitFor(async () => expect(await cal().focusedDate()).toBe("2026-10-01"))
   })
@@ -270,13 +274,13 @@ describe("Calendar month view", () => {
     const { unmount } = render(
       <Months onValueChange={onValueChange} isMonthUnavailable={(m) => m.month === 8} />,
     )
-    act(() => cell("October 2026").click())
+    act(() => cell("October").click())
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(await cal().value()).toEqual(["2026-10-01"])
     await cal().via("keyboard").select("2026-11")
     expect(await cal().value()).toEqual(["2026-11-01"])
     // Unavailable: both do nothing.
-    act(() => cell("August 2026").click())
+    act(() => cell("August").click())
     await cal().via("keyboard").focusDate("2026-08")
     await cal().press("Enter")
     expect(await cal().value()).toEqual(["2026-11-01"])
@@ -317,14 +321,14 @@ describe("Calendar month view", () => {
 
   it("Disabled keeps the selection (react-spectrum#8542) (months view)", () => {
     render(<Months disabled defaultValue={d(2026, 10, 14)} />)
-    expect(cell("October 2026").getAttribute("aria-selected")).toBe("true")
+    expect(cell("October").getAttribute("aria-selected")).toBe("true")
   })
 
   it("Read-only pages (months view)", async () => {
     render(<Months readOnly />)
     await cal().nextPage()
     expect(await cal().heading()).toBe("2027")
-    act(() => cell("March 2027").click())
+    act(() => cell("March").click())
     expect(await cal().value()).toEqual([])
   })
 
@@ -359,15 +363,22 @@ describe("Calendar month view", () => {
 
   it("Name and state of the current, selected month (months view)", () => {
     render(<Months defaultValue={d(2026, 10, 14)} />)
-    const c = cell("October 2026")
+    const c = cell("October")
     expect(c.getAttribute("aria-selected")).toBe("true")
     expect(c.getAttribute("aria-current")).toBe("date")
   })
 
   it("Locale names (months view)", () => {
     render(<Months locale="de-DE" />)
-    const c = cell("Oktober 2026")
-    expect(c.textContent).toBe("Okt")
+    expect(cell("Oktober").textContent).toBe("Oktober")
+  })
+
+  it("Italian month cells are named by their visible text; the grid carries the year", () => {
+    render(<Months locale="it-IT" defaultFocusedValue={d(2027, 1, 10)} />)
+    const c = at("2027-01-01")
+    expect(c.textContent).toBe("gennaio")
+    expect(computeAccessibleName(c)).toBe("gennaio")
+    expect(computeAccessibleName(c.closest('[role="grid"]') as Element)).toContain("2027")
   })
 
   it("Explicit unselected state (months view)", () => {
@@ -805,7 +816,7 @@ describe("Calendar view drill-down", () => {
   it('A fixed view selects there (view="months", no minView)', async () => {
     const onValueChange = vi.fn()
     render(<Cal view="months" onValueChange={onValueChange} />)
-    act(() => cell("March 2026").click())
+    act(() => cell("March").click())
     expect(iso(onValueChange.mock.calls[0]?.[0])).toBe("2026-03-01")
     expect(await cal().view()).toBe("months")
     await cal().via("keyboard").focusDate("2026-05")

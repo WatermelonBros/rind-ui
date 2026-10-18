@@ -148,8 +148,6 @@ export type CalendarRootProps = Omit<
   readonly yearsPerPage?: number
   /** Cells per row in the month and year views (default 4). */
   readonly columns?: number
-  /** The month cells' text (default "short"). */
-  readonly monthFormat?: "short" | "long" | "narrow" | "numeric"
   /** Month view availability, told the month's first day. */
   readonly isMonthUnavailable?: (month: CalendarDate) => boolean
   /** Year view availability, told the year's first day. */
@@ -200,7 +198,6 @@ function Root({
   maxView = "years",
   yearsPerPage,
   columns,
-  monthFormat,
   isMonthUnavailable,
   isYearUnavailable,
   children,
@@ -316,7 +313,6 @@ function Root({
     ...nav,
     ...range,
     ...periods,
-    monthFormat,
     view: viewIn(view.values.view, periods),
     // Controlled and never changed: the heading is plain text (spec "View Drill-Down").
     viewFixed: fixedView !== undefined,

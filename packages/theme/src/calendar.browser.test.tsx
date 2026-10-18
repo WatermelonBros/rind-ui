@@ -142,9 +142,9 @@ describe("Calendar stylesheet", () => {
     expect(style(host, "preview").backgroundColor).toBe(style(host, "plain").backgroundColor)
   })
 
-  it("month view: four short-month columns fit 320 px; the view trigger has a hit area and a ring", () => {
+  it("month view: four long-month columns fit 320 px; the view trigger has a hit area and a ring", () => {
     sheet()
-    const months = ["Jan", "Feb", "Mar", "Apr"]
+    const months = ["September", "February", "November", "December"]
       .map((m, i) => `<td ${a("cell", `id="m${i}"`)}>${m}</td>`)
       .join("")
     const host =

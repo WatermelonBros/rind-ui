@@ -182,15 +182,16 @@
   }
 
   /*
-   * Month and year cells: wide enough for a short month name; four columns fit 320 px. The
-   * range band runs along each row as in the days view.
+   * Month and year cells: wide enough for a long month name ("September"); four columns fit
+   * 320 px. The range band runs along each row as in the days view.
    */
   :where(
     [data-scope="calendar"][data-part="grid"]:is([data-view="months"], [data-view="years"])
       [data-part="cell"]
   ) {
-    inline-size: var(--rind-calendar-period-cell-size, 4rem);
-    padding-inline: var(--rind-space-1);
+    inline-size: var(--rind-calendar-period-cell-size, 4.75rem);
+    padding-inline: 2px;
+    font-size: var(--rind-text-sm);
     white-space: nowrap;
   }
 

@@ -179,17 +179,18 @@ export function periodName(
   }).format(formatDate(date))
 }
 
-/** The month a month cell shows ("Oct"), or the year part a year cell shows ("2569"). */
+/** The month a month cell shows ("October"), or the year part a year cell shows ("2569"). */
 export function periodText(
   date: CalendarDate,
   view: "months" | "years",
   locale: string,
   calendar: Calendar,
-  monthFormat: "short" | "long" | "narrow" | "numeric" = "short",
 ): string {
+  // A year cell is named by its text alone: it carries the era where a year is ambiguous.
+  if (view === "years" && eraOption(date, calendar)) return periodName(date, view, locale, calendar)
   const type = view === "months" ? "month" : "year"
   const f = dateFormatter(locale, {
-    ...(view === "months" ? { month: monthFormat } : { year: "numeric" }),
+    ...(view === "months" ? { month: "long" } : { year: "numeric" }),
     calendar: calendar.identifier,
     timeZone: "UTC",
   })
