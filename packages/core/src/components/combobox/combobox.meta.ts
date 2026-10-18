@@ -312,6 +312,8 @@ export const comboboxMeta = {
       removeChip: ["pointer", "keyboard", "virtual"],
       backspace: ["keyboard"],
       clear: ["pointer", "keyboard", "virtual"],
+      run: ["pointer", "keyboard", "virtual"],
+      back: ["keyboard"],
     },
     queries: [
       "side",
@@ -328,6 +330,7 @@ export const comboboxMeta = {
       "value",
       "hasFocus",
       "chips",
+      "page",
     ],
     traits: [
       "composite-activedescendant",

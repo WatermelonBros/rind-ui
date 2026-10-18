@@ -6,9 +6,11 @@ import {
   type Chip as ChipData,
   type Collection,
   type CollectionKey,
+  type ComboboxActionDetails,
   type ComboboxApi,
   type ComboboxFilter,
   type ComboboxMessages,
+  type ComboboxPage,
   type ComboboxValue,
   chipsOf,
   comboboxConnect,
@@ -20,6 +22,7 @@ import {
   type FormInputCapability,
   focusSafely,
   hiddenFormInput,
+  inlineComboboxMachine,
   isEmptyState,
   isExposed,
   isStale,
@@ -62,6 +65,8 @@ import { usePresence } from "../use-presence"
 import { usePress } from "../use-press"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
+
+declare const process: { env: { NODE_ENV?: string } }
 
 /** One option of a data-driven combobox. */
 export interface ComboboxItemData {
@@ -138,16 +143,43 @@ interface Common {
   /** Submits the visible text under this name too. */
   readonly inputName?: string
   readonly form?: string
+  /** Runs an item (inline), or follows a choice (free text). */
+  readonly onAction?: (key: string, details: ComboboxActionDetails) => void
+  /**
+   * The list in place, always shown, items run `onAction` (a command palette). Fixed for the
+   * instance's life. Implies `selectionMode="none"`.
+   */
+  readonly inline?: boolean
+  /** Inline: the current page (`depth` 0: the root page). */
+  readonly page?: ComboboxPage
+  /** Inline: Backspace on an empty query above the root page. */
+  readonly onBack?: () => void
+  /** Free text: Escape on a closed popup clears the text (default false). */
+  readonly clearOnEscape?: boolean
+  /** Free text: Enter on a highlighted suggestion fills, then submits the form. */
+  readonly submitOnChoose?: boolean
+  /** Free text: the input's native `autocomplete` (default "off"). */
+  readonly formAutoComplete?: string
 }
 
 type Selection =
   | {
+      /** Free text (an autocomplete): the text is the value, suggestions only fill it. */
+      readonly selectionMode: "none"
+      readonly multiple?: false
+      readonly value?: never
+      readonly defaultValue?: never
+      readonly onValueChange?: never
+    }
+  | {
+      readonly selectionMode?: "single" | "multiple"
       readonly multiple?: false
       readonly value?: string | null
       readonly defaultValue?: string | null
       readonly onValueChange?: (value: string | null, details: ComboboxChangeDetails) => void
     }
   | {
+      readonly selectionMode?: "single" | "multiple"
       readonly multiple: true
       readonly value?: readonly string[]
       readonly defaultValue?: readonly string[]
@@ -172,6 +204,8 @@ interface ComboboxHost extends ListboxHost {
   readonly setPresent: (present: boolean) => void
   /** The positioner joins the top layer (the engine has the Popover API). */
   readonly topLayer: boolean
+  readonly inline: boolean
+  readonly freeText: boolean
 }
 
 const HostContext = createContext<ComboboxHost | null>(null)
@@ -228,7 +262,20 @@ function Root(all: ComboboxRootProps) {
   const full = given ?? data ?? registered ?? EMPTY
   useCollectionIdentityWarning(full, "Combobox")
   const multiple = all.multiple === true
-  const selectionMode = multiple ? "multiple" : "single"
+  // Fixed for the instance's life: the machine definition (states from props, design §1).
+  const [inline] = useState(() => all.inline === true)
+  if (process.env.NODE_ENV !== "production" && inline !== (all.inline === true)) {
+    console.warn("[rind-ui] Combobox: `inline` cannot change after mount; remount instead.")
+  }
+  const freeText = inline || all.selectionMode === "none"
+  if (
+    process.env.NODE_ENV !== "production" &&
+    inline &&
+    (multiple || all.selectionMode === "single")
+  ) {
+    console.error('[rind-ui] Combobox: `inline` implies selectionMode "none".')
+  }
+  const selectionMode = freeText ? "none" : multiple ? "multiple" : "single"
   const ids = useMemo(() => comboboxIds(instance), [instance])
   const locale = env.locale.locale()
   const messages = useMemo(() => ({ ...comboboxMessages, ...all.messages }), [all.messages])
@@ -272,7 +319,8 @@ function Root(all: ComboboxRootProps) {
   const stale = isStale({ itemsQuery: all.itemsQuery, query })
 
   const { service } = useMachine(
-    comboboxMachine,
+    // Sound: both definitions come from one setup (same props, events, context and values).
+    (inline ? inlineComboboxMachine : comboboxMachine) as typeof comboboxMachine,
     {
       items: full,
       collection: results,
@@ -296,8 +344,16 @@ function Root(all: ComboboxRootProps) {
       openOnArrow: all.openOnArrow,
       openOnInputPress: all.openOnInputPress,
       openOnFocus: all.openOnFocus,
-      autoHighlight: all.autoHighlight,
-      keepHighlight: all.keepHighlight,
+      autoHighlight: all.autoHighlight ?? (inline ? true : undefined),
+      keepHighlight: all.keepHighlight ?? (inline ? true : undefined),
+      clearOnEscape: all.clearOnEscape,
+      onAction: (k, d) => latest.current.onAction?.(k, d),
+      page: all.page,
+      onBack: all.onBack ? () => latest.current.onBack?.() : undefined,
+      requestClose:
+        inline && all.onOpenChange
+          ? () => latest.current.onOpenChange?.(false, { reason: "escape" })
+          : undefined,
       autoComplete: all.autoComplete,
       locale,
       messages,
@@ -317,11 +373,21 @@ function Root(all: ComboboxRootProps) {
         const cb = latest.current.onValueChange as ((v: unknown, d: unknown) => void) | undefined
         cb?.(v, { reason: reasonOf(d.event.type) })
       },
-      onInputValueChange: (t, d) =>
-        latest.current.onInputValueChange?.(t, {
-          reason: reasonOf(d.event.type),
-          signal: nextSignal(),
-        }),
+      onInputValueChange: (t, d) => {
+        const reason = reasonOf(d.event.type)
+        latest.current.onInputValueChange?.(t, { reason, signal: nextSignal() })
+        // Free text: a field is a change of its value (field-control "Reporting Changes").
+        if (freeText && !inline) {
+          binding?.report({ type: "change", value: t, user: true, composing: false })
+        }
+        // Submit on choose: after the filled text is rendered into the input.
+        if (freeText && !inline && reason === "enter" && latest.current.submitOnChoose) {
+          env.scheduler.setTimeout(() => {
+            const el = env.dom.getById(ids.input) as HTMLInputElement | null
+            el?.form?.requestSubmit()
+          }, 0)
+        }
+      },
       onOpenChange: (o, d) => {
         // Closing the popup is a commit (field-control "Reporting Changes").
         if (!o) {
@@ -346,12 +412,24 @@ function Root(all: ComboboxRootProps) {
           const el = env.dom.getById(ids.input) as HTMLElement | null
           if (el) void focusSafely(el, env, "programmatic", m)
         },
-        validityElement: () => constraint.current,
-        value: () => service.view().values.value,
+        // Free text: the visible input is the form control and its own validity element.
+        validityElement: () =>
+          freeText ? (env.dom.getById(ids.input) as HTMLInputElement | null) : constraint.current,
+        value: () => (freeText ? service.view().values.inputValue : service.view().values.value),
       },
       ids.input,
     )
-  }, [register, ids.input, env, service])
+  }, [register, ids.input, env, service, freeText])
+  // Free text: a form reset restores the default text (no hidden input carries it).
+  useEffect(() => {
+    if (!freeText || inline || typeof document === "undefined") return
+    const onReset = (e: Event) => {
+      const el = env.dom.getById(ids.input) as HTMLInputElement | null
+      if (el && e.target === el.form && !e.defaultPrevented) service.send({ type: "RESET" })
+    }
+    document.addEventListener("reset", onReset)
+    return () => document.removeEventListener("reset", onReset)
+  }, [freeText, inline, env, ids.input, service])
   const view = service.view()
   const open = view.matches("open")
   const [present, setPresent] = useState(false)
@@ -360,10 +438,24 @@ function Root(all: ComboboxRootProps) {
   useEffect(() => {
     setTopLayer(typeof HTMLElement !== "undefined" && "showPopover" in HTMLElement.prototype)
   }, [])
-  const [mounted, setMounted] = useState({ label: false, empty: false })
+  const [mounted, setMounted] = useState<{
+    label: boolean
+    empty: boolean
+    descriptions: ReadonlySet<CollectionKey>
+  }>({ label: false, empty: false, descriptions: new Set() })
   const [mount] = useState(
     () => (part: "label" | "empty", on: boolean) =>
       setMounted((m) => (m[part] === on ? m : { ...m, [part]: on })),
+  )
+  const [mountDescription] = useState(
+    () => (key: CollectionKey, on: boolean) =>
+      setMounted((m) => {
+        if (m.descriptions.has(key) === on) return m
+        const next = new Set(m.descriptions)
+        if (on) next.add(key)
+        else next.delete(key)
+        return { ...m, descriptions: next }
+      }),
   )
   const focused = view.context.focused
   const modality = useModality(env.modality, focused)
@@ -395,7 +487,7 @@ function Root(all: ComboboxRootProps) {
       open,
       exposed: isExposed(exposure),
       empty: isEmptyState(exposure),
-      present: present || open,
+      present: inline || present || open,
       results,
       context: view.context,
       selection: selectionOf(value),
@@ -413,10 +505,21 @@ function Root(all: ComboboxRootProps) {
       modality,
       dir: env.locale.dir(),
       messages,
-      mounted,
+      mounted: {
+        label: mounted.label,
+        empty: mounted.empty,
+        description: (key) => mounted.descriptions.has(key),
+      },
       topLayer,
-      name: field.name,
-      inputName: all.inputName,
+      // Free text: the visible input carries the name (no hidden input).
+      name: freeText ? undefined : field.name,
+      inputName: freeText && !inline ? (all.inputName ?? field.name) : all.inputName,
+      inline,
+      pageKey: all.page?.key,
+      canBack: all.onBack !== undefined && (all.page?.depth ?? 0) > 0,
+      escapeCloses: inline && all.onOpenChange !== undefined,
+      clearOnEscape: all.clearOnEscape,
+      formAutoComplete: all.formAutoComplete,
       form: all.form,
       keys,
       chips,
@@ -434,7 +537,7 @@ function Root(all: ComboboxRootProps) {
     registry: given || data ? null : registry,
     listed: (key: CollectionKey) => results.has(key),
     mount,
-    mountDescription: () => {},
+    mountDescription,
     requestLoadMore: () => {
       if ((all.loading ?? "idle") !== "idle" || loadedFor.current === full) return
       loadedFor.current = full
@@ -472,7 +575,25 @@ function Root(all: ComboboxRootProps) {
     open,
     setPresent,
     topLayer,
+    inline,
+    freeText,
   }
+  // Inline: a new query or page starts the list at the top (dip/cmdk#389), in the same update.
+  const inputNow = view.values.inputValue as string
+  useIsoLayoutEffect(() => {
+    if (!inline) return
+    // The list's own scroller (the list, or the nearest scrolling ancestor), never the page's.
+    let el = env.dom.getById(ids.list) as HTMLElement | null
+    const doc = el?.ownerDocument
+    while (el && el !== doc?.body && el !== doc?.documentElement) {
+      const overflow = el.ownerDocument.defaultView?.getComputedStyle(el).overflowY ?? ""
+      if (/auto|scroll/.test(overflow)) {
+        el.scrollTop = 0
+        return
+      }
+      el = el.parentElement
+    }
+  }, [inline, inputNow, all.page?.key])
   return <HostContext value={host}>{children}</HostContext>
 }
 
@@ -499,22 +620,25 @@ function Label({ render, ...rest }: Own<"label">) {
 
 function Control({ render, children, ...rest }: Own<"div">) {
   const host = useLive("Control")
-  const { formInput, pending, keys, reset, autofill } = host
+  const { formInput, pending, keys, reset, autofill, freeText } = host
   const latest = useRef(keys)
   latest.current = keys
   // After every commit the constraint input mirrors the selection; a user change dispatches.
   useIsoLayoutEffect(() => {
+    if (freeText) return
     formInput.sync({ values: keys }, { dispatch: pending.current })
     pending.current = false
   })
   useEffect(
     () =>
-      formInput.track({
-        onReset: reset,
-        current: () => ({ values: latest.current }),
-        onNativeInput: (input) => autofill(input.value),
-      }),
-    [formInput, reset, autofill],
+      freeText
+        ? undefined
+        : formInput.track({
+            onReset: reset,
+            current: () => ({ values: latest.current }),
+            onNativeInput: (input) => autofill(input.value),
+          }),
+    [formInput, reset, autofill, freeText],
   )
   const props = mergeProps(normalizeProps(host.api.control()), rest)
   return renderPart(
@@ -526,10 +650,14 @@ function Control({ render, children, ...rest }: Own<"div">) {
           {children}
           <span {...normalizeProps(host.api.chipsSummaryNode())}>{host.api.chipsSummary}</span>
           {/* Inside the Control: the browser's validation message is anchored near it. */}
-          <input {...normalizeProps(host.api.hiddenInput())} ref={host.constraint} />
-          {host.api.carriers().map((p) => (
-            <input key={String(p["value"])} {...normalizeProps(p)} />
-          ))}
+          {freeText ? null : (
+            <>
+              <input {...normalizeProps(host.api.hiddenInput())} ref={host.constraint} />
+              {host.api.carriers().map((p) => (
+                <input key={String(p["value"])} {...normalizeProps(p)} />
+              ))}
+            </>
+          )}
         </>
       ),
     },
@@ -574,9 +702,20 @@ function Input({ render, ref, ...rest }: Own<"input">) {
   )
 }
 
+/** Inline: popup parts render nothing (combobox "Anatomy"). */
+function useInlineWarning(host: ComboboxHost, part: string) {
+  useEffect(() => {
+    if (host.inline && process.env.NODE_ENV !== "production") {
+      console.warn(`[rind-ui] Combobox: an inline combobox renders no ${part}.`)
+    }
+  }, [host.inline, part])
+}
+
 function Trigger({ render, ...rest }: Own<"button">) {
   const host = useLive("Trigger")
+  useInlineWarning(host, "Trigger")
   const press = useLabelAwarePress(host.api.pressTrigger, host.disabled)
+  if (host.inline) return null
   return renderPart(
     "button",
     mergeProps(joinHandlers(normalizeProps(host.api.trigger()), press.props), rest),
@@ -597,6 +736,7 @@ function ClearTrigger({ render, ...rest }: Own<"button">) {
 
 function Positioner({ render, ref, children, ...rest }: Own<"div">) {
   const host = useLive("Positioner")
+  useInlineWarning(host, "Positioner")
   const node = useRef<HTMLElement | null>(null)
   // It holds the popup: it stays while the popup's exit animations run.
   const { mounted } = usePresence(host.open, node, { keepMounted: host.keepMounted, subtree: true })
@@ -622,7 +762,7 @@ function Positioner({ render, ref, children, ...rest }: Own<"div">) {
       }
     }
   }, [mounted, topLayer])
-  if (!mounted) return null
+  if (!mounted || host.inline) return null
   const own = normalizeProps(host.api.positioner())
   const props = mergeProps(
     {
@@ -637,9 +777,10 @@ function Positioner({ render, ref, children, ...rest }: Own<"div">) {
 
 function Popup({ render, ref, ...rest }: Own<"div">) {
   const host = useLive("Popup")
+  useInlineWarning(host, "Popup")
   const node = useRef<HTMLElement | null>(null)
   const { mounted, state } = usePresence(host.open, node, { keepMounted: host.keepMounted })
-  if (!mounted) return null
+  if (!mounted || host.inline) return null
   const exiting = !host.open && state === "exiting"
   return renderPart(
     "div",
@@ -718,6 +859,12 @@ function ChipRemove({ render, children, ...rest }: Own<"button">) {
 
 const list = createListboxParts(useComboboxHost)
 
+/** Loading content: a sibling of the List, shown while loading, with no live role. */
+function Loading({ render, ...rest }: Own<"div">) {
+  const host = useLive("Loading")
+  return renderPart("div", mergeProps(normalizeProps(host.api.loading()), rest), render, undefined)
+}
+
 export const Combobox = {
   Root,
   Label,
@@ -733,10 +880,12 @@ export const Combobox = {
   List: list.List,
   Item: list.Item,
   ItemText: list.ItemText,
+  ItemDescription: list.ItemDescription,
   ItemIndicator: list.ItemIndicator,
   Group: list.Section,
   Separator: list.Separator,
   Empty: list.Empty,
   LoadMore: list.LoadMore,
+  Loading,
   Items: list.Items,
 }
