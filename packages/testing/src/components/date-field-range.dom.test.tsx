@@ -1,11 +1,7 @@
 // Date Field range mode (date-field spec "Range Mode — …"): jsdom and real browsers.
 import { CalendarDate, isWeekend } from "@internationalized/date"
 import { type DateRangeFieldValue, domEnvironment } from "@rind-ui/core"
-<<<<<<< HEAD
-import { DateField, RindProvider } from "@rind-ui/react"
-=======
 import { DateField, Field, RindProvider } from "@rind-ui/react"
->>>>>>> date-field-range
 import { render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
@@ -156,10 +152,6 @@ describe("Date Field range", () => {
 
   it("inside a Field: one control, no second-control warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
-<<<<<<< HEAD
-    render(<Stay />)
-    expect(warn.mock.calls.some((c) => String(c[0]).includes("second control"))).toBe(false)
-=======
     render(
       <RindProvider environment={{ dateClock: clock }}>
         <Field.Root>
@@ -216,7 +208,6 @@ describe("Date Field range", () => {
     await waitFor(() =>
       expect(spin("year Start date Stay").getAttribute("aria-valuenow")).toBeNull(),
     )
->>>>>>> date-field-range
   })
 
   it("Backspace in one segment of the start leaves the end alone (bits-ui#1348)", async () => {

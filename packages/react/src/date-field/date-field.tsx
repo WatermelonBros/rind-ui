@@ -355,10 +355,6 @@ function SingleRoot({
     value,
     defaultValue,
     onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) => {
-<<<<<<< HEAD
-      if (details.event.type === "CLEAR_ALL") latest.current.onClearAll?.()
-=======
->>>>>>> date-field-range
       latest.current.onValueChange?.(v, {
         reason: publicReason(details.event.type),
         modality: (details.event as { modality?: string }).modality,
@@ -593,11 +589,7 @@ function RangeEnd({
   if (!ctx) throw new Error("DateField.Start / End must be inside a range DateField.Root")
   // The group registers with the Field; an end only reads its label's id.
   const binding = useFieldBindingPeek()
-<<<<<<< HEAD
-  const api = ctx.api(binding?.ids.label)
-=======
   const api = ctx.api(binding)
->>>>>>> date-field-range
   const env = useEnvironment()
   const EDGE = edge === "start" ? "START" : "END"
   const value = edge === "start" ? ctx.view.context.startValue : ctx.view.context.endValue
@@ -631,12 +623,9 @@ function RangeEnd({
             ctx.send({ type: `${EDGE}.VALIDITY`, flags, message })
           }
           labelledBy={labelledBy}
-<<<<<<< HEAD
-=======
           // The pair's validity and the Field's description reach the ends' segments.
           invalid={api.invalid}
           describedBy={api.endDescribedBy(edge)}
->>>>>>> date-field-range
           segmentScope={ctx.inputEl}
           // Focus between ends (spec "Range Mode — Focus Between Ends").
           onBoundary={(b) => {
@@ -669,14 +658,7 @@ function Separator(props: ComponentPropsWithRef<"span">) {
   if (!ctx) throw new Error("DateField.Separator must be inside a range DateField.Root")
   return (
     <span
-<<<<<<< HEAD
-      {...mergeProps(
-        normalizeProps(ctx.api(undefined).separator()),
-        props as Record<string, unknown>,
-      )}
-=======
       {...mergeProps(normalizeProps(ctx.api(null).separator()), props as Record<string, unknown>)}
->>>>>>> date-field-range
     />
   )
 }

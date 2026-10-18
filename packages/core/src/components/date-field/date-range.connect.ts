@@ -88,11 +88,6 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
     const v = input.start ?? input.end ?? input.minValue ?? null
     return v ? valueKind(v) : "date"
   }
-<<<<<<< HEAD
-  return {
-    ids: id,
-    description,
-=======
   const fieldIds = field["aria-describedby"]?.split(" ") ?? []
   return {
     ids: id,
@@ -105,7 +100,6 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
      */
     endDescribedBy: (edge: DateRangeEdge): readonly string[] =>
       edge === "start" || invalid ? fieldIds : [],
->>>>>>> date-field-range
     root: (): PartProps => ({
       "data-range": "",
       "data-invalid": dataFlag(invalid),

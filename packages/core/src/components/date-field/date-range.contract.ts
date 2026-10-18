@@ -21,9 +21,6 @@ type E = Env<P>
 type Edge = "start" | "end"
 
 /** The ISO values a model step types into each end (set by a model test). */
-<<<<<<< HEAD
-export const dateRangeArgs: { current: { readonly start: string; readonly end: string } } = {
-=======
 export const dateRangeArgs: {
   current: {
     readonly start: string
@@ -32,7 +29,6 @@ export const dateRangeArgs: {
     readonly initial?: { readonly start: string; readonly end: string }
   }
 } = {
->>>>>>> date-field-range
   current: { start: "2026-10-14", end: "2026-10-16" },
 }
 
@@ -66,11 +62,6 @@ const hiddenValue = async (env: E, edge: Edge) => {
   return ""
 }
 
-<<<<<<< HEAD
-/** Pair invariants (spec "Range Mode — Pair Invariants") read from the page. */
-export const dateRangeInvariants: readonly Invariant<P, string>[] = [
-  {
-=======
 /** An end's shown date as ISO (Gregorian day segments), "" while any segment is empty. */
 async function shownIso(env: E, edge: Edge): Promise<string | null> {
   const n: Partial<Record<DateSegmentType, number>> = {}
@@ -129,7 +120,6 @@ export const dateRangeInvariants: readonly Invariant<P, string>[] = [
     },
   },
   {
->>>>>>> date-field-range
     name: "date-range-two-hidden-inputs",
     check: async ({ env }) => {
       const n = (await env.part("hidden-input").all()).length

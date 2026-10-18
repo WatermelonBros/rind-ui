@@ -11,10 +11,7 @@ import {
   dateFieldMessages,
   dateRangeConnect,
   dateRangeFieldMachine,
-<<<<<<< HEAD
-=======
   type FieldControlBinding,
->>>>>>> date-field-range
   type FieldMessages,
   focusSafely,
   hiddenFormInput,
@@ -116,12 +113,8 @@ interface RangeCtx {
   }
   readonly inputEl: { current: HTMLDivElement | null }
   readonly hidden: Record<DateRangeEdge, { current: HTMLInputElement | null }>
-<<<<<<< HEAD
-  readonly api: (labelledBy: string | undefined) => ReturnType<typeof dateRangeConnect>
-=======
   /** The pair's api with the Field binding the part sees (the Root's own Field inside it). */
   readonly api: (binding: FieldControlBinding | null) => ReturnType<typeof dateRangeConnect>
->>>>>>> date-field-range
   readonly state: ReturnType<typeof rangeStateOf>
 }
 
@@ -185,11 +178,7 @@ export function DateRangeFieldRoot({
   const startHidden = useRef<HTMLInputElement | null>(null)
   const endHidden = useRef<HTMLInputElement | null>(null)
   const [focusWithin, setFocusWithin] = useState(false)
-<<<<<<< HEAD
-  const api = (labelledBy: string | undefined) =>
-=======
   const api = (binding: FieldControlBinding | null) =>
->>>>>>> date-field-range
     dateRangeConnect({
       instance,
       state,
@@ -201,15 +190,9 @@ export function DateRangeFieldRoot({
       messages,
       field: mergeFieldProps(
         { role: "group", labelable: false, disabled, readOnly, required },
-<<<<<<< HEAD
-        enclosing,
-      ),
-      labelledBy,
-=======
         binding ?? enclosing,
       ),
       labelledBy: binding?.ids.label,
->>>>>>> date-field-range
       startName,
       endName,
       form,
@@ -217,11 +200,7 @@ export function DateRangeFieldRoot({
       maxValue,
       focusWithin,
     })
-<<<<<<< HEAD
-  const own = api(undefined)
-=======
   const own = api(null)
->>>>>>> date-field-range
   // The pair's own validity on the start hidden input (the registered validity element).
   useIsoLayoutEffect(() => {
     if (startHidden.current) setControlValidity(startHidden.current, state.message)
@@ -321,11 +300,7 @@ export function DateRangeInput({
   if (!ctx) throw new Error("DateField.Input must be inside DateField.Root")
   const env = useEnvironment()
   const binding = useFieldControl()
-<<<<<<< HEAD
-  const api = ctx.api(binding?.ids.label)
-=======
   const api = ctx.api(binding)
->>>>>>> date-field-range
   const firstSegment = () =>
     ctx.inputEl.current?.querySelector<HTMLElement>('[data-edge="start"] input[data-editable]') ??
     null
