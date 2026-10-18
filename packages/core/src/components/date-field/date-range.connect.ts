@@ -8,6 +8,7 @@ import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import { visuallyHiddenStyle } from "../../dom/visually-hidden"
 import { dateFormatter } from "../../i18n/date"
+import { partId } from "../../ids"
 import type { DateGranularity } from "../date-segments"
 import type { FieldControlProps } from "../shared/field-control"
 import { valueKind } from "./date-field.connect"
@@ -89,9 +90,35 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
     return v ? valueKind(v) : "date"
   }
   const fieldIds = field["aria-describedby"]?.split(" ") ?? []
+  // The Popover's ids (partId keeps the instance as given): the trigger and content match.
+  const pickerId = (part: string) => partId("date-field", input.instance, part)
   return {
     ids: id,
     description,
+    /** A range picker's trigger (spec "Picker — Range: Names"); the Popover adds the rest. */
+    trigger: (_o: { readonly range?: boolean } = {}): PartProps => ({
+      ...scope("trigger"),
+      id: pickerId("trigger"),
+      "aria-label": input.messages.rangeTrigger,
+      "aria-labelledby": [pickerId("trigger"), input.labelledBy].filter(Boolean).join(" "),
+      "aria-describedby": description ? id.description : undefined,
+      "aria-disabled": field.readOnly && !field.disabled ? "true" : undefined,
+      "data-disabled": dataFlag(field.disabled),
+      "data-readonly": dataFlag(field.readOnly),
+    }),
+    contentLabelledBy: (): string =>
+      [pickerId("trigger"), input.labelledBy].filter(Boolean).join(" "),
+    clearTrigger: (): PartProps => ({
+      ...scope("clear-trigger"),
+      type: "button",
+      id: pickerId("clear-trigger"),
+      "aria-label": input.messages.clear,
+      "aria-labelledby": [pickerId("clear-trigger"), input.labelledBy].filter(Boolean).join(" "),
+      disabled: field.disabled || undefined,
+      "aria-disabled": field.readOnly && !field.disabled ? "true" : undefined,
+      "data-disabled": dataFlag(field.disabled),
+      "data-empty": dataFlag(input.start === null && input.end === null),
+    }),
     /** The pair is invalid (each end's segments carry it). */
     invalid,
     /**

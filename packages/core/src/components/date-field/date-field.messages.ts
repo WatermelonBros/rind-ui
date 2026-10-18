@@ -27,6 +27,12 @@ export type DateFieldMessages = {
   readonly placeholder: (type: DateSegmentType) => string
   /** The group's description of the whole value. */
   readonly valueDescription: (args: { readonly formatted: string }) => string
+  /** The picker trigger's name (with the Label's). */
+  readonly trigger: string
+  /** The range picker trigger's name (with the Label's). */
+  readonly rangeTrigger: string
+  /** The clear trigger's name (with the Label's). */
+  readonly clear: string
   readonly incomplete: string
   readonly impossible: string
   readonly rangeUnderflow: (args: { readonly min: string }) => string
@@ -69,6 +75,9 @@ export const dateFieldMessages: DateFieldMessages = {
   empty: "Empty",
   placeholder: defaultPlaceholder,
   valueDescription: ({ formatted }) => `Selected date: ${formatted}`,
+  trigger: "Choose date",
+  rangeTrigger: "Choose dates",
+  clear: "Clear",
   incomplete: "Enter a complete date",
   impossible: "Enter a valid date",
   rangeUnderflow: ({ min }) => `Value must be ${min} or later`,

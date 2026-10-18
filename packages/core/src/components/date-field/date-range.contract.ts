@@ -6,6 +6,7 @@ import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
 import type { DateSegmentType } from "../date-segments"
 import { keysFor } from "./date-field.contract"
+import { datePickerActions, datePickerInvariants, datePickerQueries } from "./date-picker.contract"
 import { dateRangeFieldMachine } from "./date-range.machine"
 
 type P =
@@ -146,9 +147,22 @@ export const dateRangeInvariants: readonly Invariant<P, string>[] = [
 
 export const dateRangeFieldContract = contract("date-field", {
   machine: dateRangeFieldMachine,
-  anatomy: ["root", "label", "error-message", "input", "start", "end", "separator", "hidden-input"],
+  anatomy: [
+    "root",
+    "label",
+    "error-message",
+    "input",
+    "start",
+    "end",
+    "separator",
+    "hidden-input",
+    "trigger",
+    "clear-trigger",
+    "content",
+  ],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "group", name }),
   actions: {
+    ...datePickerActions,
     /** Both ends typed in the locale's order, start first (focus moves to the end). */
     fill: {
       keyboard: async (env, range: { start: string; end: string }) => {
@@ -252,6 +266,7 @@ export const dateRangeFieldContract = contract("date-field", {
     isInvalid: async (env: E) => (await env.part("root").attr("data-invalid")) !== null,
     invalidEdge: async (env: E) => env.part("root").attr("data-invalid-edge"),
     isComplete: async (env: E) => (await env.part("root").attr("data-complete")) !== null,
+    ...datePickerQueries,
   },
   states: { idle: {} },
   events: {
@@ -270,10 +285,11 @@ export const dateRangeFieldContract = contract("date-field", {
     "VALUE.SYNC": { skip: "a parent's value: the coordinator and DOM tests" },
     "$props:value": { skip: "a parent's value: the coordinator and DOM tests" },
     CLEAR: "clear",
+    PICK: { skip: "a picker's calendar range: the picker tests" },
     RESET: { skip: "a form reset: the DOM tests" },
   },
   traits: ["field-associated"],
   // The hidden inputs forward focus to the first segment (hidden-form-input), by design.
   commitsOnFocus: [{ part: "hidden-input", state: "idle" }],
-  invariants: dateRangeInvariants,
+  invariants: [...dateRangeInvariants, ...datePickerInvariants],
 })

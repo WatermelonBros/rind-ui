@@ -1,0 +1,7 @@
+- text: Departure
+- group "Departure":
+  - spinbutton "month Departure": "10"
+  - spinbutton "day Departure": "14"
+  - spinbutton "year Departure": "2026"
+  - button "Clear Departure"
+  - button "Choose date Departure"

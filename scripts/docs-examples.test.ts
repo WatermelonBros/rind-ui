@@ -35,6 +35,8 @@ const ROOT_ALIASES: Readonly<Record<string, string | readonly string[]>> = {
   "ContextMenu.Root": ["ContextMenu", "Menu"],
   // A menubar's menu is a Menu root level inside the bar: Menu and Menubar parts go in it.
   "Menubar.Menu": ["Menu", "Menubar"],
+  // A date picker's Calendar is a Calendar root bound to the field.
+  "DateField.Calendar": ["Calendar", "DateField"],
 }
 
 /** Problems in one example: parts used outside an open Root of their component. */

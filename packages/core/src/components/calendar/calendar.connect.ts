@@ -118,9 +118,9 @@ export function calendarConnect(input: CalendarConnectInput) {
       (!input.allowsNonContiguousRanges && crossesUnavailable(range, isUnavailable)) ||
       (input.minRangeLength !== undefined && rangeLength(range) < input.minRangeLength) ||
       (input.maxRangeLength !== undefined && rangeLength(range) > input.maxRangeLength))
-  const invalid = isRange
-    ? rangeInvalid
-    : selected.some((v) => outOfRange(show(v)) || isUnavailable(show(v)))
+  const invalid =
+    input.invalid === true ||
+    (isRange ? rangeInvalid : selected.some((v) => outOfRange(show(v)) || isUnavailable(show(v))))
   const state = {
     "data-disabled": dataFlag(input.disabled === true),
     "data-readonly": dataFlag(input.readOnly === true),

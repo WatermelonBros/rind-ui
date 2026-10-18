@@ -29,7 +29,12 @@ export function dateFieldStepInvariants(
             const stops = Array.from(root.querySelectorAll<HTMLElement>(TABBABLE)).filter(
               (el) => el.tabIndex >= 0 && !(el as HTMLInputElement).disabled,
             )
-            const extra = stops.filter((el) => !el.hasAttribute("data-editable"))
+            // A picker's trigger and clear trigger are tab stops too (spec "Picker — Opening").
+            const extra = stops.filter(
+              (el) =>
+                !el.hasAttribute("data-editable") &&
+                !["trigger", "clear-trigger"].includes(el.getAttribute("data-part") ?? ""),
+            )
             if (extra.length > 0) {
               return `tab stops besides the segments: ${extra.map((el) => el.getAttribute("data-part") ?? el.tagName).join(", ")}`
             }

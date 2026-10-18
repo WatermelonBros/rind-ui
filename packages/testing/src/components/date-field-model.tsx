@@ -2,7 +2,7 @@
 // date-field.model.dom.test.tsx and date-field.broken.dom.test.tsx.
 import { CalendarDate, type DateValue, GregorianCalendar } from "@internationalized/date"
 import { type DateFieldProps, dateFieldContract, platforms } from "@rind-ui/core"
-import { DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
+import { Calendar, DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
 import { currentRun, fixedDateClock } from "../index"
@@ -21,6 +21,8 @@ export const a11y = async () => {
 export type Config = Partial<DateFieldRootProps> & {
   readonly inField?: boolean
   readonly platform?: (typeof platforms)[keyof typeof platforms]
+  /** Render the picker parts (the popover closed, or open from the start). */
+  readonly picker?: "closed" | "open"
 }
 
 /** The oracle runs the real machine with the props it reads (gregorian display). */
@@ -51,11 +53,16 @@ export function Story({
   readonly onValueChange?: () => void
   readonly children?: ReactNode
 }) {
-  const { inField, platform, ...root } = cfg
+  const { inField, platform, picker, ...root } = cfg
   const field = (
-    <DateField.Root name="date" {...root} {...(onValueChange ? { onValueChange } : {})}>
+    <DateField.Root
+      name="date"
+      {...root}
+      {...(onValueChange ? { onValueChange } : {})}
+      {...(picker === "open" ? { defaultOpen: true } : {})}
+    >
       {inField ? null : <DateField.Label>Birthday</DateField.Label>}
-      <DateField.Input />
+      {picker ? <PickerParts /> : <DateField.Input />}
     </DateField.Root>
   )
   return (
@@ -80,6 +87,34 @@ export function Story({
       </form>
       {children}
     </RindProvider>
+  )
+}
+
+/** The picker parts around the Input: a Control, a trigger and the Calendar in a popover. */
+function PickerParts() {
+  return (
+    <>
+      <DateField.Control>
+        <DateField.Input />
+        <DateField.Trigger>
+          <span aria-hidden="true">▾</span>
+        </DateField.Trigger>
+      </DateField.Control>
+      <DateField.Portal>
+        <DateField.Positioner>
+          <DateField.Content>
+            <DateField.Calendar>
+              <Calendar.Header>
+                <Calendar.PrevTrigger />
+                <Calendar.Heading />
+                <Calendar.NextTrigger />
+              </Calendar.Header>
+              <Calendar.Grid />
+            </DateField.Calendar>
+          </DateField.Content>
+        </DateField.Positioner>
+      </DateField.Portal>
+    </>
   )
 }
 

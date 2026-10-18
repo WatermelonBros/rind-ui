@@ -1,0 +1,10 @@
+- text: Stay
+- group "Stay":
+  - spinbutton "month Start date Stay": "10"
+  - spinbutton "day Start date Stay": "12"
+  - spinbutton "year Start date Stay": "2026"
+  - spinbutton "month End date Stay": "10"
+  - spinbutton "day End date Stay": "16"
+  - spinbutton "year End date Stay": "2026"
+- button "Clear Stay"
+- button "Choose dates Stay"

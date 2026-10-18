@@ -257,3 +257,27 @@ describe("Calendar", () => {
     expect(await cal().heading()).toBe("November 2026")
   })
 })
+
+describe("host hooks", () => {
+  it("onDateSelect runs for the selected date pressed again; the value is unchanged", async () => {
+    const onDateSelect = vi.fn()
+    const onValueChange = vi.fn()
+    render(
+      <Cal
+        defaultValue={new CalendarDate(2026, 10, 14)}
+        onDateSelect={onDateSelect}
+        onValueChange={onValueChange}
+      />,
+    )
+    await cal().select("2026-10-14")
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(onDateSelect).toHaveBeenCalledTimes(1)
+    expect(String(onDateSelect.mock.calls[0]?.[0])).toBe("2026-10-14")
+  })
+
+  it("invalid: the root is data-invalid with a valid value", () => {
+    render(<Cal invalid defaultValue={new CalendarDate(2026, 10, 14)} />)
+    const root = document.querySelector('[data-scope="calendar"][data-part="root"]')
+    expect(root?.hasAttribute("data-invalid")).toBe(true)
+  })
+})

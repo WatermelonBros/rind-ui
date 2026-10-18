@@ -14,6 +14,7 @@ import {
   type DateSegmentType,
   type DateValidityFlags,
   type DateValue,
+  type DayOfWeek,
   dateFieldConnect,
   dateFieldKey,
   dateFieldMachine,
@@ -45,10 +46,12 @@ import {
   type ClipboardEvent,
   type ComponentPropsWithRef,
   createContext,
+  type Dispatch,
   type FocusEvent,
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
+  type SetStateAction,
   useContext,
   useEffect,
   useId,
@@ -62,10 +65,27 @@ import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
+import { Popover } from "../popover"
+import { usePopoverControls } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
 import { useModality } from "../use-modality"
+import {
+  calendarTabStop,
+  controlElement,
+  type DatePickerCloseReason,
+  type DatePickerProps,
+  PickerCalendar,
+  PickerClearTrigger,
+  PickerContent,
+  PickerControl,
+  PickerPortal,
+  PickerPositioner,
+  PickerTrigger,
+  SinglePicker,
+  useInControl,
+} from "./date-picker"
 import {
   DateRangeFieldRoot,
   type DateRangeFieldRootProps,
@@ -97,7 +117,10 @@ function publicReason(type: string): DateFieldReason {
       return "PASTE"
     case "BACKSPACE":
     case "CLEAR_ALL":
+    case "CLEAR":
       return "CLEAR"
+    case "PICK":
+      return "CALENDAR"
     case "RESET":
       return "RESET"
     default:
@@ -125,7 +148,7 @@ type Api = ReturnType<typeof dateFieldConnect>
 type ConnectInput = Parameters<typeof dateFieldConnect>[0]
 type BaseInput = Omit<ConnectInput, "field" | "fieldData" | "labelledBy">
 
-interface Ctx {
+export interface Ctx {
   readonly instance: string
   readonly view: Machine["view"]
   readonly send: Machine["send"]
@@ -140,6 +163,15 @@ interface Ctx {
     readonly labelledBy: string | undefined
   }
   readonly embedded: boolean
+  /** The picker parts' options (date-field "Picker Parts"). */
+  readonly picker: {
+    readonly closeOnSelect: boolean
+    readonly firstDayOfWeek: DayOfWeek | undefined
+    readonly placeholder: DateValue
+    readonly cancelled: { current: boolean }
+    readonly triggers: number
+    readonly setTriggers: Dispatch<SetStateAction<number>>
+  }
   /** Embedded: select all + Backspace cleared this field (the host clears its pair). */
   readonly onClearAll: () => void
   readonly disabled: boolean
@@ -153,7 +185,7 @@ interface Ctx {
 }
 
 /** The api of a part, with the Field binding merged (none when embedded). */
-function useApi(ctx: Ctx): Api {
+export function useApi(ctx: Ctx): Api {
   const peeked = useFieldBindingPeek()
   const binding = ctx.embedded ? null : peeked
   const { own } = ctx
@@ -178,7 +210,7 @@ function useApi(ctx: Ctx): Api {
 }
 
 const DateFieldContext = createContext<Ctx | null>(null)
-function useDateField(part: string): Ctx {
+export function useDateField(part: string): Ctx {
   const ctx = useContext(DateFieldContext)
   if (!ctx) throw new Error(`DateField.${part} must be inside DateField.Root`)
   return ctx
@@ -240,7 +272,7 @@ export type DateFieldRootProps = Omit<
   readonly fieldMessages?: MessageOverrides<FieldMessages>
   /** `"range"` selects a start and an end (DateRangeFieldRootProps). */
   readonly selectionMode?: "single"
-}
+} & DatePickerProps
 
 /** Single mode (default), or a range of two ends with `selectionMode="range"`. */
 function Root(props: DateFieldRootProps | DateRangeFieldRootProps) {
@@ -281,6 +313,16 @@ function SingleRoot({
   children,
   id,
   selectionMode: _single,
+  open,
+  defaultOpen,
+  onOpenChange,
+  closeOnSelect = true,
+  modal,
+  initialFocus,
+  finalFocus,
+  positioning,
+  persistentElements,
+  firstDayOfWeek,
   ...fieldProps
 }: DateFieldRootProps) {
   void _single
@@ -332,6 +374,12 @@ function SingleRoot({
       env,
     ),
   )
+  // A consumer's details.cancel() of the last change (a refused pick keeps the popover open).
+  const cancelled = useRef(false)
+  // Picker triggers rendered: Alt+ArrowDown opens only a picker.
+  const [triggers, setTriggers] = useState(0)
+  const latestOpen = useRef(onOpenChange)
+  latestOpen.current = onOpenChange
   const latest = useRef({ onValueChange, onBoundary, onDraftChange, onClearAll, segmentScope, dir })
   latest.current = { onValueChange, onBoundary, onDraftChange, onClearAll, segmentScope, dir }
   const [machineEnv] = useState(() => ({
@@ -355,10 +403,14 @@ function SingleRoot({
     value,
     defaultValue,
     onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) => {
+      cancelled.current = false
       latest.current.onValueChange?.(v, {
         reason: publicReason(details.event.type),
         modality: (details.event as { modality?: string }).modality,
-        cancel: details.cancel,
+        cancel: () => {
+          cancelled.current = true
+          details.cancel()
+        },
       })
     },
     placeholderValue: placeholder,
@@ -466,6 +518,14 @@ function SingleRoot({
     formInput,
     selectAll,
     state,
+    picker: {
+      closeOnSelect,
+      firstDayOfWeek,
+      placeholder,
+      cancelled,
+      triggers,
+      setTriggers,
+    },
   }
   const rootData = normalizeProps(api.root())
   if (embedded) {
@@ -498,10 +558,35 @@ function SingleRoot({
       {...(ownFieldMessages ? { messages: ownFieldMessages } : {})}
       {...rootData}
     >
-      <DateFieldContext value={ctx}>
-        {children}
-        <HiddenInput />
-      </DateFieldContext>
+      <Popover.Root
+        id={instance}
+        scope="date-field"
+        disabled={disabled}
+        {...(open === undefined ? {} : { open })}
+        {...(defaultOpen === undefined ? {} : { defaultOpen })}
+        onOpenChange={(next, details) => {
+          // Read-only: the trigger stays focusable but never opens.
+          if (next && readOnly) return details.cancel()
+          latestOpen.current?.(next, {
+            reason: next ? "trigger" : (details.reason as DatePickerCloseReason),
+            cancel: details.cancel,
+          })
+        }}
+        {...(modal === undefined ? {} : { modal })}
+        initialFocus={initialFocus === undefined ? calendarTabStop(instance) : initialFocus}
+        {...(finalFocus === undefined ? {} : { finalFocus })}
+        {...(positioning === undefined ? {} : { positioning })}
+        // The Control (field and triggers) is inside the picker for dismissal.
+        persistentElements={() => {
+          const control = controlElement(instance)
+          return [...(control ? [control] : []), ...(persistentElements?.() ?? [])]
+        }}
+      >
+        <DateFieldContext value={ctx}>
+          <SinglePicker>{children}</SinglePicker>
+          <HiddenInput />
+        </DateFieldContext>
+      </Popover.Root>
     </FieldHost>
   )
 }
@@ -722,9 +807,10 @@ function SingleInput({ children, render, ref, ...rest }: InputProps) {
       ? children(ctx.state.segments)
       : (children ?? ctx.state.segments.map((s) => <Segment key={s.key} segment={s} />))
   const description = api.valueDescription()
+  const inControl = useInControl()
   const props = mergeProps(
     {
-      ...joinHandlers(normalizeProps(api.input()), handlers),
+      ...joinHandlers(normalizeProps(api.input({ inControl })), handlers),
       ref: composeRefs(ctx.inputEl, ref),
       children: (
         <>
@@ -825,6 +911,8 @@ function EditableSegment({
 }) {
   const ctx = useDateField("Segment")
   const env = useEnvironment()
+  const popover = usePopoverControls()
+  const rangeHost = useDateRange()
   const type = segment.type as DateSegmentType
   const el = useRef<HTMLInputElement | null>(null)
   const latest = useRef(ctx)
@@ -865,6 +953,15 @@ function EditableSegment({
       })
       if (event === "select-all") {
         ctx.selectAll.current = true
+        return
+      }
+      if (event === "open-picker") {
+        // Only a picker opens; otherwise the key is the browser's.
+        // A range's ends are embedded: their host's triggers count.
+        const triggers = ctx.embedded ? (rangeHost?.triggers ?? 0) : ctx.picker.triggers
+        if (triggers === 0 || !popover || popover.open) return
+        e.preventDefault()
+        popover.send({ type: "trigger", modality: "keyboard" })
         return
       }
       ctx.selectAll.current = false
@@ -946,4 +1043,11 @@ export const DateField = {
   Start,
   End,
   Separator,
+  Control: PickerControl,
+  Trigger: PickerTrigger,
+  ClearTrigger: PickerClearTrigger,
+  Portal: PickerPortal,
+  Positioner: PickerPositioner,
+  Content: PickerContent,
+  Calendar: PickerCalendar,
 }

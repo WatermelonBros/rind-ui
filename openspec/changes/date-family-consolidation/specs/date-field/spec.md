@@ -508,8 +508,9 @@ part's own. The picker's and the Calendar's data props SHALL be one shared props
 
 The picker SHALL own one controllable value; the embedded field, the calendar and the hidden input SHALL be views of it. A
 change from any source (field commit, calendar selection, clear, reset, autofill adoption) SHALL pass through one commit path
-that calls `onValueChange(value, details)` once per change, with `details.reason` (`FIELD`, `CALENDAR`, `CLEAR`, `RESET`,
-`ADOPT`), `modality` and `cancel()`. A controlled change SHALL update all views and SHALL NOT call `onValueChange`.
+that calls `onValueChange(value, details)` once per change, with `details.reason` (the field's own reasons
+`SEGMENT.COMMIT`, `STEP`, `PASTE`, `CLEAR`, `RESET`, and `CALENDAR` for a pick), `modality` and `cancel()`. The
+field's machine is that owner: a pick is its `PICK` event, the Clear trigger its `CLEAR` event. A controlled change SHALL update all views and SHALL NOT call `onValueChange`.
 
 #### Scenario: Field edit reaches the calendar (reka-ui#736)
 

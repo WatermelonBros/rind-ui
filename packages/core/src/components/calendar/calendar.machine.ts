@@ -63,6 +63,15 @@ export type CalendarEvent =
   | { readonly type: "VALUE.SYNC" }
 
 export interface CalendarProps extends NavigationOptions {
+  /** Shown invalid whatever the value (a host field's own validity). */
+  readonly invalid?: boolean | undefined
+  /**
+   * A date was chosen (single mode) or a range completed (range mode), also when the value
+   * did not change: a picker closes on it. Not called for a refused or unselectable date.
+   */
+  readonly onDateSelect?:
+    | ((date: CalendarDate, details: { readonly modality: Modality }) => void)
+    | undefined
   readonly value?: CalendarValue | undefined
   readonly defaultValue?: CalendarValue | undefined
   /** Translated by the adapter into `(value, { reason, modality, cancel })`. */
@@ -228,8 +237,12 @@ function rangeStep(args: Args, date: CalendarDate) {
 
 function select(args: Args, date: CalendarDate) {
   const { props, values } = args
+  const modality: Modality = args.event.type === "CELL.PRESS" ? args.event.modality : "keyboard"
   if (props.selectionMode === "range") {
+    const anchored = anchorOf(args) !== null
     rangeStep(args, date)
+    // The second end closed a range (its value may equal the current one).
+    if (anchored && anchorOf(args) === null) props.onDateSelect?.(date, { modality })
     return
   }
   const current = valuesOf(values.value)
@@ -244,9 +257,9 @@ function select(args: Args, date: CalendarDate) {
     args.set("value", next)
     return
   }
-  // Pressing the selected date again keeps it selected.
-  if (current[0] && isSameDay(current[0], date)) return
-  args.set("value", emitted)
+  // Pressing the selected date again keeps it selected (a host still sees the choice).
+  if (!(current[0] && isSameDay(current[0], date))) args.set("value", emitted)
+  props.onDateSelect?.(date, { modality })
 }
 
 export const calendarMachine = setup({
