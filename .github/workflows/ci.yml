@@ -135,7 +135,7 @@ jobs:
           # after each file, but only when /tmp has less free space than the threshold; the huge
           # threshold makes it run always (peak fds ~16k -> ~150). Undocumented Vitest internals,
           # recheck on upgrade: maybeCollectChromiumGarbage in vitest/dist/chunks/index.*.js
-          # (vitest 5.0.4: lines 4766-4828). Chromium and Playwright only; a no-op elsewhere.
+          # (vitest 5.0.4: lines 4765-4827). Chromium and Playwright only; a no-op elsewhere.
           VITEST_CHROMIUM_GC_FORCE: "1"
           VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB: "1000"
       - if: always()
