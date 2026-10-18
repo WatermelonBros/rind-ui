@@ -278,7 +278,6 @@ export const dateFieldContract = contract("date-field", {
     },
   },
   queries: {
-    ...datePickerQueries,
     /** The hidden input's value (ISO, or "" while empty, incomplete or impossible). */
     value: async (env) => env.part("hidden-input").value(),
     segments: async (env) => {
@@ -320,6 +319,7 @@ export const dateFieldContract = contract("date-field", {
       const first = (await editable(env))[0]
       return first ? (await first.part.attr("readonly")) !== null : false
     },
+    ...datePickerQueries,
   },
   states: {
     idle: { isFocused: false, isComposing: false },

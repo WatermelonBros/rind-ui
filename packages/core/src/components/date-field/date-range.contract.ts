@@ -236,7 +236,6 @@ export const dateRangeFieldContract = contract("date-field", {
     },
   },
   queries: {
-    ...datePickerQueries,
     /** The two hidden inputs' values ("" unless the pair is a valid range). */
     range: async (env: E) => ({
       start: await hiddenValue(env, "start"),
@@ -267,6 +266,7 @@ export const dateRangeFieldContract = contract("date-field", {
     isInvalid: async (env: E) => (await env.part("root").attr("data-invalid")) !== null,
     invalidEdge: async (env: E) => env.part("root").attr("data-invalid-edge"),
     isComplete: async (env: E) => (await env.part("root").attr("data-complete")) !== null,
+    ...datePickerQueries,
   },
   states: { idle: {} },
   events: {
