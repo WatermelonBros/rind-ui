@@ -28,7 +28,7 @@ export function warnForeignFocusables(row: Element, scope: string): void {
     const nested = el.closest(NESTED)
     if (nested && nested !== row && row.contains(nested)) continue
     console.warn(
-      `[rind-ui] ${scope}: a <${el.tagName.toLowerCase()}> in row "${row.getAttribute("data-key")}" is focusable but not an item-control; render it through the ItemControl part.`,
+      `[rind-ui] ${scope}: a <${el.tagName.toLowerCase()}> "${(el.textContent ?? "").trim()}" in row "${row.getAttribute("data-key")}" is focusable but not an item-control; render it through the ItemControl part.`,
     )
   }
 }

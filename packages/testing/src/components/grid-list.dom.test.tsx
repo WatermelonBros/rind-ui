@@ -376,7 +376,9 @@ describe("selection and action", () => {
       </GridList.Root>,
     )
     row("Zero").focus()
-    await user.keyboard("{Control>}a{/Control}")
+    // platform-convention: select all is ⌘A on Apple, Ctrl+A elsewhere
+    const mod = domEnvironment().platform.apple ? "Meta" : "Control"
+    await user.keyboard(`{${mod}>}a{/${mod}}`)
     expect((await gl().selected()).length).toBe(3)
   })
 
@@ -427,7 +429,8 @@ describe("links", () => {
         e.preventDefault()
       }
     }
-    document.addEventListener("click", onClick)
+    // Capture: the synthetic anchor of a link row stops its click from bubbling.
+    document.addEventListener("click", onClick, true)
     try {
       render(
         <People
@@ -443,7 +446,7 @@ describe("links", () => {
       expect(row("Ada").hasAttribute("aria-selected")).toBe(false)
       expect(await gl().selected()).toEqual([])
     } finally {
-      document.removeEventListener("click", onClick)
+      document.removeEventListener("click", onClick, true)
     }
   })
 })

@@ -9,7 +9,9 @@ export type KeyOwner = "row" | "control" | "editable" | "nested" | "other"
 /** The child navigation of a grid's rows: arrows into the controls, or Tab through them. */
 export type ChildNavigation = "arrow" | "tab"
 
-const EDITABLE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])'
+// A checkbox, radio or button input has no caret: arrows are the grid's, not the input's.
+const EDITABLE =
+  'input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"], [type="image"]), textarea, select, [contenteditable]:not([contenteditable="false"])'
 const CONTROL = '[data-part="item-control"], [data-part="item-checkbox"]'
 const NESTED = '[role="grid"], [role="listbox"], [role="tree"], [role="menu"], [role="toolbar"]'
 

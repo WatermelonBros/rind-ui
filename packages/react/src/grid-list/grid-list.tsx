@@ -305,15 +305,22 @@ function Label({ render, ...rest }: Own<"span">) {
 function List({ render, children, ...rest }: Own<"div">) {
   const host = useHost("List")
   useSelector(host.service, (v) => v)
+  const env = useEnvironment()
+  // The modality is tracked from mount: the first press on a row is seen as a pointer press.
+  useEffect(() => env.modality.subscribe(() => {}), [env])
   const el = useRef<HTMLDivElement | null>(null)
+  // After the re-render a Label's registration causes (a layout effect), not on the first commit.
   useEffect(() => {
     const node = el.current
     if (process.env.NODE_ENV === "production" || !node) return
-    if (!node.hasAttribute("aria-label") && !node.hasAttribute("aria-labelledby")) {
-      console.warn(
-        "[rind-ui] GridList: the list has no accessible name; render a Label or pass aria-label / aria-labelledby.",
-      )
-    }
+    queueMicrotask(() => {
+      if (!node.isConnected) return
+      if (!node.hasAttribute("aria-label") && !node.hasAttribute("aria-labelledby")) {
+        console.warn(
+          "[rind-ui] GridList: the list has no accessible name; render a Label or pass aria-label / aria-labelledby.",
+        )
+      }
+    })
   }, [])
   const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
   const props = mergeProps({ ...normalizeProps(host.parts.list(naming)), ref: el }, rest)
@@ -346,6 +353,10 @@ function Item({
   const host = useHost("Item")
   const key = toKey(value)
   const ref = useRef<HTMLDivElement | null>(null)
+  // Development: a focusable the grid cannot reach (not an ItemControl) is named once mounted.
+  useEffect(() => {
+    if (ref.current) warnForeignFocusables(ref.current, "GridList")
+  }, [])
   // The row's text is its ItemText, not its controls' labels (typeahead, announcements).
   const [ownText, setOwnText] = useState<string | undefined>(undefined)
   useIsoLayoutEffect(() => {
@@ -483,7 +494,13 @@ function LoadMore({ render, children, ...rest }: Own<"div">) {
   const props = mergeProps({ ...normalizeProps(host.parts.loadMore()), ref }, rest)
   return renderPart(
     "div",
-    { ...props, children: <div role="gridcell">{children}</div> },
+    {
+      ...props,
+      // The row's one cell (a row holds cells); the row itself is the focus target.
+      // biome-ignore lint/a11y/useFocusableInteractive: a gridcell inside a focusable row
+      // biome-ignore lint/a11y/useSemanticElements: an ARIA grid, not a table
+      children: <div role="gridcell">{children}</div>,
+    },
     render,
     undefined,
   )
