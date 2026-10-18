@@ -176,7 +176,7 @@ export function ScreenReaderView() {
             strokeLinejoin="round"
           />
         </svg>
-        Screen reader view
+        <span className={styles.label}>Screen reader view</span>
       </ToggleGroup.Item>
       {/* the captions repeat what the voice says: sighted readers see it, assistive technology
           already hears the page itself, so they are hidden from it */}

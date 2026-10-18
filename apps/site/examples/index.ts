@@ -59,6 +59,7 @@ import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
+import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as toast from "./toast"
@@ -124,6 +125,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   label,
   link,
   listbox,
+  "tag-group": tagGroup,
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,

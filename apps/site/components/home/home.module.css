@@ -627,8 +627,23 @@
 .wallGroup li a:hover {
   background-size: 100% 100%;
 }
+/* on touch, every component link is a comfortable target (WCAG 2.5.8: 24px; here 44px rows) */
+@media (pointer: coarse) {
+  .wallGroup li {
+    padding: 0;
+    min-block-size: 44px;
+    align-items: center;
+  }
+  .wallGroup li a {
+    display: inline-block;
+    padding-block: 12px;
+    /* the underline stays under the text, not at the bottom of the padded target */
+    background-origin: content-box;
+    background-clip: content-box;
+  }
+}
 .wallGroup small {
-  font: 600 10px var(--mono);
+  font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.65;
@@ -648,8 +663,85 @@
   padding: 120px 56px 32px;
 }
 .outroTitle {
+  --mx: -400px;
+  --my: -400px;
+  position: relative;
+  display: grid;
   font: 900 clamp(44px, 8vw, 128px) / 0.92 var(--display);
   letter-spacing: -0.04em;
+}
+/* the outline and its filled copy share one grid cell, so they overlap exactly */
+.outroOutline,
+.outroFill {
+  grid-area: 1 / 1;
+}
+/* the unpeeled title: faint, so the filled copy reads as the rind coming off */
+.outroOutline {
+  color: color-mix(in oklab, var(--bg) 20%, transparent);
+}
+/* filled in a circle around the pointer: the rind peeled where you point */
+.outroFill {
+  color: var(--bg);
+  clip-path: circle(150px at var(--mx) var(--my));
+  transition: clip-path 0.08s linear;
+  pointer-events: none;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .outroFill {
+    clip-path: none;
+  }
+}
+
+/* the easter egg: seeds fall once, the note pops */
+.seeds {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  overflow: hidden;
+}
+.seed {
+  position: absolute;
+  top: -24px;
+  left: var(--x);
+  width: 10px;
+  height: 16px;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: #1a1410;
+  rotate: var(--r);
+  animation: fall 2.4s cubic-bezier(0.4, 0, 0.6, 1) var(--d) forwards;
+}
+.seedsNote {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  translate: -50% -50%;
+  padding: 14px 22px;
+  border-radius: 99px;
+  background: #ff3d8b;
+  color: #fff;
+  font: 800 22px var(--display);
+  animation: pop 0.5s var(--spring);
+}
+@keyframes fall {
+  to {
+    translate: 0 calc(100vh + 48px);
+    rotate: calc(var(--r) + 220deg);
+  }
+}
+@keyframes pop {
+  from {
+    scale: 0.6;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seed {
+    display: none;
+  }
+  .seedsNote {
+    animation: none;
+  }
 }
 .outroCtas {
   display: flex;

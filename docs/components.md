@@ -68,7 +68,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done |  |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
-| Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
+| Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Command |  |  |  |  |  |  |  | ● |  | 1 | 2 | spec | Missing in Ark |

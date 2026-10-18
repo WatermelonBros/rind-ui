@@ -71,6 +71,28 @@
 :global([data-phase="juicy"]) .badge {
   background: #ff8fb1;
 }
+/* narrow screens: an icon in the corner, so the pill never covers the content; the name stays
+   for assistive technology */
+@media (max-width: 960px) {
+  .view {
+    justify-items: end;
+    padding-inline: 16px;
+  }
+  .toggle {
+    padding: 11px;
+  }
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .caption {
+    justify-self: center;
+  }
+}
 @keyframes rise {
   from {
     opacity: 0;
