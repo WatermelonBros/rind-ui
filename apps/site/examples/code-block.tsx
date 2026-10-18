@@ -82,6 +82,7 @@ export function Files() {
       <Tabs.List aria-label="Files">
         <Tabs.Tab value="app">app.tsx</Tabs.Tab>
         <Tabs.Tab value="css">styles.css</Tabs.Tab>
+        <Tabs.Indicator />
       </Tabs.List>
       <Tabs.Panel value="app">
         <Block code={sample} />
