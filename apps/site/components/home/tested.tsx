@@ -72,8 +72,8 @@ export function Tested() {
             The tests come in the box.
           </h2>
           <p className={styles.lead}>
-            Every component ships a driver: the actions and questions a user has. The same test runs
-            in Testing Library and in Playwright, and never touches your DOM structure.
+            Every component ships a driver: what a user does and asks. One test runs in Testing
+            Library and in Playwright, and never reaches into your markup.
           </p>
         </Reveal>
         <Reveal className={styles.testPanel}>

@@ -27,8 +27,8 @@ export function Wall() {
             {ready} ready. {items.length - ready} on the way.
           </h2>
           <p className={styles.lead}>
-            The goal is every component any headless library ships, plus the AI-UI primitives none
-            of them do. They land one at a time, each with its spec, tests, driver and docs.
+            Every component you would reach for, plus the AI-UI primitives nobody ships yet. Each
+            lands complete: spec, tests, driver and docs.
           </p>
         </Reveal>
         <div className={styles.wall}>
