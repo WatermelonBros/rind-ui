@@ -69,11 +69,16 @@
     box-shadow: inset 0 0 0 var(--rind-border-width) var(--rind-color-border-strong);
   }
 
-  :where([data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])[data-current]) {
+  :where(
+    [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])[data-current]
+  ) {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.3em;
-    color: var(--nm-current, var(--rind-navigation-menu-current-color, var(--rind-color-accent-text)));
+    color: var(
+      --nm-current,
+      var(--rind-navigation-menu-current-color, var(--rind-color-accent-text))
+    );
   }
 
   :where([data-scope="navigation-menu"][data-part="trigger"]:is([data-disabled], :disabled)) {
@@ -88,7 +93,8 @@
 
   :where([data-scope="navigation-menu"][data-part="viewport"]),
   :where(
-    [data-scope="navigation-menu"][data-part="item"] > [data-scope="navigation-menu"][data-part="content"]
+    [data-scope="navigation-menu"][data-part="item"]
+      > [data-scope="navigation-menu"][data-part="content"]
   ) {
     padding: var(--rind-navigation-menu-padding, var(--rind-space-3));
     border: var(--rind-border-width) solid
@@ -106,9 +112,9 @@
     block-size: var(--rind-navigation-menu-viewport-height, auto);
     transition:
       inline-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
-        var(--rind-ease-out),
+      var(--rind-ease-out),
       block-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
-        var(--rind-ease-out),
+      var(--rind-ease-out),
       opacity var(--rind-navigation-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out);
   }
 
@@ -128,7 +134,7 @@
 
   /* A positioned panel never outgrows the space next to its trigger: it scrolls. */
   :where([data-scope="navigation-menu"][data-part="positioner"])
-    > :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"])) {
+  > :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"])) {
     max-block-size: var(--rind-available-height, 100vh);
     overflow: auto;
   }
@@ -167,13 +173,16 @@
     left: var(--rind-indicator-left);
     inline-size: var(--rind-indicator-width);
     block-size: var(--rind-navigation-menu-indicator-size, 2px);
-    background: var(--nm-indicator, var(--rind-navigation-menu-indicator-color, var(--rind-color-accent-solid)));
+    background: var(
+      --nm-indicator,
+      var(--rind-navigation-menu-indicator-color, var(--rind-color-accent-solid))
+    );
     list-style: none;
     pointer-events: none;
     transition:
       left var(--rind-navigation-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out),
       inline-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
-        var(--rind-ease-out);
+      var(--rind-ease-out);
   }
 
   :where([data-scope="navigation-menu"][data-part="indicator"][data-resizing]) {

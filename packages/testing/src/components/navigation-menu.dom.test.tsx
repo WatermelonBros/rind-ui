@@ -1,7 +1,6 @@
 // Navigation Menu scenarios (openspec add-navigation-menu), in jsdom and in real browsers,
 // through the navigation menu driver where possible. Delays run on vi fake timers advanced
 // through the adapter and user-event, so no real time passes.
-import type { NavigationMenuChangeDetails } from "@rind-ui/core"
 import { NavigationMenu, type NavigationMenuRootProps, RindProvider } from "@rind-ui/react"
 import { act, cleanup, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
@@ -239,9 +238,7 @@ describe("NavigationMenu: hover", () => {
     const menu = getNavigationMenu(env())
     await menu.via("pointer").hover("Products")
     expect(await menu.openItem()).toBe("Products")
-    expect((onValueChange.mock.calls[0]?.[1] as NavigationMenuChangeDetails).reason).toBe(
-      "trigger-hover",
-    )
+    expect(onValueChange.mock.calls[0]?.[1]).toMatchObject({ reason: "trigger-hover" })
   })
 
   it("openOnHover={false}: hovering opens nothing", async () => {

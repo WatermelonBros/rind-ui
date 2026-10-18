@@ -48,7 +48,10 @@ function make(over: Partial<NavigationMenuProps> = {}, transit = { on: false }) 
 
 const hover = (item: string): NavigationMenuEvent => ({ type: "HOVER.START", item })
 const leave = (item: string | null): NavigationMenuEvent => ({ type: "HOVER.END", item })
-const press = (item: string, modality: "pointer" | "keyboard" = "pointer"): NavigationMenuEvent => ({
+const press = (
+  item: string,
+  modality: "pointer" | "keyboard" = "pointer",
+): NavigationMenuEvent => ({
   type: "PRESS",
   item,
   modality,
@@ -268,7 +271,10 @@ describe("navigation menu tree", () => {
       close: () => order.push("root"),
       openOnHover: () => false,
     })
-    const child = navigationMenuLevel(root, { close: () => order.push("child"), openOnHover: () => true })
+    const child = navigationMenuLevel(root, {
+      close: () => order.push("child"),
+      openOnHover: () => true,
+    })
     root.add(child)
     const grandchild = navigationMenuLevel(child, {
       close: () => order.push("grandchild"),

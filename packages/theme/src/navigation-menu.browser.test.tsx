@@ -79,7 +79,9 @@ describe("Navigation Menu stylesheet", () => {
   })
 
   it("reduced motion and forced colors", () => {
-    expect(navigationMenu).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*transition: none/)
+    expect(navigationMenu).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*transition: none/,
+    )
     expect(navigationMenu).toMatch(/@media \(forced-colors: active\)[\s\S]*outline/)
   })
 })

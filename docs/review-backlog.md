@@ -291,6 +291,17 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 | date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| add-navigation-menu | 2.2 | Connect unit tests per "Data Attributes" row; the absence of `aria-orientation`, `aria-haspopup`, `aria-owns` and menu roles is covered by the DOM tests and a per-contract invariant only |
+| add-navigation-menu | 3.3 (rest) | SSR: hydrate test, Suspense inside a trigger, no `document` during render (server HTML with `hidden` panels is tested) |
+| add-navigation-menu | 4.2 (rest) | The same driver test through the Playwright adapter against the site's examples |
+| add-navigation-menu | 5.1 (rest) | Model classes for nested levels and RTL (pointer, keyboard, touch, virtual × both `closedContent` modes × `openOnHover` run) |
+| add-navigation-menu | 5.2 | One browser test per listed regression in three engines; today the DOM suite covers the core scenarios in jsdom and Chromium |
+| add-navigation-menu | 5.3 | Tab-order equality inline vs viewport vs portal, viewport size under fast switching and items without content, window resize while open |
+| add-navigation-menu | 5.4 (rest) | ARIA snapshots for open-by-hover, open-by-press and nested-open examples (closed and open exist) |
+| add-navigation-menu | 6.2 (rest) | Examples: client-router links with the current page, a 320 px layout, driver usage |
+| add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
+| add-navigation-menu | design | Links in a Sub level's own list mark the parent item's trigger `data-current`; a current link deeper in a Sub panel marks only the Sub trigger |
+| add-navigation-menu | design | A press on a top-level link that is not a layer element counts as an outside press before the link activation (both close; reason `outside-press` instead of `link-activate`) |
 
 ## Resolved
 

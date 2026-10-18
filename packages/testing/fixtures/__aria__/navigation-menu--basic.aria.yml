@@ -1,0 +1,9 @@
+- navigation "Docs":
+  - list:
+    - listitem:
+      - button "Components"
+    - listitem:
+      - button "Guides"
+    - listitem:
+      - link "All docs":
+        - /url: /docs/

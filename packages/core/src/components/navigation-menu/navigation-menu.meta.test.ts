@@ -17,6 +17,8 @@ describe("navigation-menu meta matches the code", () => {
     expect(navigationMenuMeta.contract.actions).toEqual(actions)
     expect(navigationMenuMeta.contract.queries).toEqual(Object.keys(navigationMenuContract.queries))
     expect(navigationMenuMeta.contract.traits).toEqual(navigationMenuContract.traits)
-    expect(Object.keys(navigationMenuMeta.states)).toEqual(Object.keys(navigationMenuMachine.def.states))
+    expect(Object.keys(navigationMenuMeta.states)).toEqual(
+      Object.keys(navigationMenuMachine.def.states),
+    )
   })
 })

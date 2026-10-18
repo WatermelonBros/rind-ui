@@ -7,8 +7,6 @@ import {
   type NavigationMenuLevel,
   type NavigationMenuMessages,
   type NavigationMenuProps,
-  type PositioningProps,
-  type Service,
   navigationMenuConnect,
   navigationMenuIds,
   navigationMenuLayerId,
@@ -16,11 +14,12 @@ import {
   navigationMenuMachine,
   navigationMenuMessages,
   navigationMenuPositioning,
+  type PositioningProps,
+  type Service,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
   createContext,
-  type ReactNode,
   type RefObject,
   useCallback,
   useContext,
@@ -304,9 +303,7 @@ function Root({
   )
   const labelledBy = rest["aria-labelledby"]
   const props = mergeProps(normalizeProps(ctx.api.root({ labelledBy })), { ...rest, children })
-  return (
-    <LevelContext value={ctx}>{renderPart("nav", props, render, undefined)}</LevelContext>
-  )
+  return <LevelContext value={ctx}>{renderPart("nav", props, render, undefined)}</LevelContext>
 }
 
 export type NavigationMenuSubProps = Omit<Own<"div">, "defaultValue"> & LevelProps
@@ -337,9 +334,7 @@ function Sub({
     parent,
   )
   const props = mergeProps(normalizeProps(ctx.api.sub()), { ...rest, children })
-  return (
-    <LevelContext value={ctx}>{renderPart("div", props, render, undefined)}</LevelContext>
-  )
+  return <LevelContext value={ctx}>{renderPart("div", props, render, undefined)}</LevelContext>
 }
 
 /** The level's items. */
@@ -619,7 +614,13 @@ export type NavigationMenuPositionerProps = Own<"div"> & {
 }
 
 /** Places the Viewport (or a Content) next to the open trigger. */
-function Positioner({ anchor = "trigger", positioning, render, ref, ...rest }: NavigationMenuPositionerProps) {
+function Positioner({
+  anchor = "trigger",
+  positioning,
+  render,
+  ref,
+  ...rest
+}: NavigationMenuPositionerProps) {
   const ctx = useLevel("Positioner")
   const el = useRef<HTMLElement | null>(null)
   const open = ctx.value !== null
@@ -627,7 +628,6 @@ function Positioner({ anchor = "trigger", positioning, render, ref, ...rest }: N
   const exiting = !open && presence.state === "exiting"
   const { setPositioner } = ctx
   const key = JSON.stringify(positioning ?? null)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `key` stands for `positioning`
   useIsoLayoutEffect(() => {
     setPositioner({ anchor, positioning })
     return () => setPositioner(null)

@@ -18,7 +18,13 @@ import { nextIndicator } from "../../dom/selection-indicator"
 import type { ClockEnv } from "../../env/capabilities"
 import type { DomEnvironment } from "../../env/dom-environment"
 import type { HoverIntentEnv } from "../../env/hover-intent"
-import type { Align, PositionEnv, PositioningOptions, PositioningProps, Side } from "../../env/position"
+import type {
+  Align,
+  PositionEnv,
+  PositioningOptions,
+  PositioningProps,
+  Side,
+} from "../../env/position"
 import { itemId, partId } from "../../ids"
 import { session } from "../../machine/session"
 import { setup, type } from "../../machine/setup"
@@ -60,7 +66,11 @@ export type NavigationMenuEvent =
   | { readonly type: "VALUE.SYNC" }
   /** The `disabled` prop or an item's disabled state changed. */
   | { readonly type: "DISABLED" }
-  | { readonly type: "INDICATOR.MEASURE"; readonly box: IndicatorBox | null; readonly cause: IndicatorCause }
+  | {
+      readonly type: "INDICATOR.MEASURE"
+      readonly box: IndicatorBox | null
+      readonly cause: IndicatorCause
+    }
   | {
       readonly type: "POSITION.PLACED"
       readonly side: Side
@@ -174,8 +184,7 @@ const inTransit = (env: Env) => {
   return env.hoverIntent.isInTransit("body" in node ? node : node.ownerDocument)
 }
 
-const ITEM =
-  '[data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])'
+const ITEM = '[data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])'
 const BOX = '[data-scope="navigation-menu"]:is([data-part="content"], [data-part="root"])'
 
 /** The triggers and links that arrow keys move between with `el`: same panel, or the bar. */
@@ -225,7 +234,8 @@ export const navigationMenuMachine = setup({
     leftPending: ({ event, context }) =>
       event.type === "HOVER.END" && event.item !== null && event.item === context.pending,
     patient: ({ context, props, env }) =>
-      context.openedBy === "hover" && env.clock.now() - context.openedAt < (props.patientClick ?? 500),
+      context.openedBy === "hover" &&
+      env.clock.now() - context.openedAt < (props.patientClick ?? 500),
     zoneLeft: ({ event, context }) =>
       event.type === "HOVER.END" && event.item === null && context.openedBy === "hover",
     /** Focus is in the open content or the viewport: a hover close waits for it to leave. */
@@ -247,7 +257,16 @@ export const navigationMenuMachine = setup({
     open: ({ event, context, env, props, set }) => {
       const item = itemOf(event) ?? context.pending
       if (item === null) return
-      set("openedBy", event.type === "PRESS" ? (event.modality === "keyboard" ? "keyboard" : "press") : event.type === "OPEN" ? "api" : "hover")
+      set(
+        "openedBy",
+        event.type === "PRESS"
+          ? event.modality === "keyboard"
+            ? "keyboard"
+            : "press"
+          : event.type === "OPEN"
+            ? "api"
+            : "hover",
+      )
       set("openedAt", env.clock.now())
       set("pending", null)
       set("previous", null)
@@ -262,7 +281,10 @@ export const navigationMenuMachine = setup({
       const item = itemOf(event)
       if (item === null || item === values.value) return
       set("previous", values.value)
-      set("openedBy", event.type === "HOVER.START" ? "hover" : event.type === "OPEN" ? "api" : "press")
+      set(
+        "openedBy",
+        event.type === "HOVER.START" ? "hover" : event.type === "OPEN" ? "api" : "press",
+      )
       set("openedAt", env.clock.now())
       set("instant", true)
       set("value", item)
@@ -526,7 +548,12 @@ export const navigationMenuMachine = setup({
       entry: ["startOpen"],
       on: {
         "HOVER.START": { guard: "hoverable", target: "opening", actions: ["setPending"] },
-        PRESS: { guard: "canOpen", target: "open", reason: pressReason, actions: ["delayedOpen", "open"] },
+        PRESS: {
+          guard: "canOpen",
+          target: "open",
+          reason: pressReason,
+          actions: ["delayedOpen", "open"],
+        },
         OPEN: { guard: "canOpen", target: "open", reason: "api", actions: ["delayedOpen", "open"] },
       },
     },
@@ -539,7 +566,12 @@ export const navigationMenuMachine = setup({
           reason: "trigger-hover",
           actions: ["warmOpen", "open"],
         },
-        PRESS: { guard: "canOpen", target: "open", reason: pressReason, actions: ["delayedOpen", "open"] },
+        PRESS: {
+          guard: "canOpen",
+          target: "open",
+          reason: pressReason,
+          actions: ["delayedOpen", "open"],
+        },
         OPEN: { guard: "canOpen", target: "open", reason: "api", actions: ["delayedOpen", "open"] },
       },
     },
@@ -552,8 +584,17 @@ export const navigationMenuMachine = setup({
           { guard: "isPending" },
           { guard: "hoverable", target: "opening", reenter: true, actions: ["setPending"] },
         ],
-        "HOVER.END": { guard: "leftPending", target: "closed", actions: ["clearPending", "clearSuppress"] },
-        PRESS: { guard: "canOpen", target: "open", reason: pressReason, actions: ["delayedOpen", "open"] },
+        "HOVER.END": {
+          guard: "leftPending",
+          target: "closed",
+          actions: ["clearPending", "clearSuppress"],
+        },
+        PRESS: {
+          guard: "canOpen",
+          target: "open",
+          reason: pressReason,
+          actions: ["delayedOpen", "open"],
+        },
         OPEN: { guard: "canOpen", target: "open", reason: "api", actions: ["delayedOpen", "open"] },
         CLOSE: { target: "closed", actions: ["clearPending"] },
         DISABLED: { target: "closed", actions: ["clearPending"] },
@@ -584,7 +625,13 @@ export const navigationMenuMachine = setup({
             reason: pressReason,
             actions: ["setCloseReason", "suppress", "close"],
           },
-          { guard: "canOpen", target: "open", reenter: true, reason: pressReason, actions: ["switchTo"] },
+          {
+            guard: "canOpen",
+            target: "open",
+            reenter: true,
+            reason: pressReason,
+            actions: ["switchTo"],
+          },
         ],
         OPEN: [
           { guard: "isOpenItem" },

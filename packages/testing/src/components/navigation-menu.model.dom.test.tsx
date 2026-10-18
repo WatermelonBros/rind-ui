@@ -86,7 +86,13 @@ async function failures(ui: () => ReactElement) {
     },
     target: () => domEnv({ timeout: 200 }),
     anchor: [{ name: "Main" }] as never,
-    props: { root: "oracle", disabled: undefined, openOnHover: undefined, isItemDisabled: () => false, patientClick: 500 } as never,
+    props: {
+      root: "oracle",
+      disabled: undefined,
+      openOnHover: undefined,
+      isItemDisabled: () => false,
+      patientClick: 500,
+    } as never,
     modalities: ["keyboard"],
     clock,
   })

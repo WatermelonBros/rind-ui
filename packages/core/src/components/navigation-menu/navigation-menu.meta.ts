@@ -67,7 +67,7 @@ export const navigationMenuMeta = {
       part: "positioner",
       element: "div",
       description:
-        "Optional: places the `Viewport` (or a `Content`) next to the open trigger (`anchor=\"list\"`: the list).",
+        'Optional: places the `Viewport` (or a `Content`) next to the open trigger (`anchor="list"`: the list).',
     },
     {
       name: "NavigationMenu.Sub",
@@ -157,7 +157,10 @@ export const navigationMenuMeta = {
     indicator: { "data-state": '"visible" or "hidden".' },
   },
   keyboard: [
-    ["Tab / Shift+Tab", "Every top-level trigger and link is a tab stop; an open panel follows its trigger."],
+    [
+      "Tab / Shift+Tab",
+      "Every top-level trigger and link is a tab stop; an open panel follows its trigger.",
+    ],
     ["Enter / Space", "On a trigger: toggles its panel; focus stays."],
     ["Escape", "Closes the innermost open panel; focus returns to its trigger if it was inside."],
     [

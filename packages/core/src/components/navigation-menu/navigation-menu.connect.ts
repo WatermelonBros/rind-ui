@@ -10,8 +10,8 @@ import type { Modality } from "../../contract/env"
 import type { LinkEnv } from "../../dom/link"
 import { type PlacementState, positionerProps } from "../../dom/position/connect"
 import type { MeasuredIndicator } from "../../dom/selection-indicator"
-import { indicatorProps } from "../shared/indicator"
 import { buttonLikeProps } from "../shared/button-like"
+import { indicatorProps } from "../shared/indicator"
 import {
   type NavigationMenuEvent,
   type NavigationMenuFocusMove,
@@ -92,7 +92,11 @@ export function navigationMenuConnect(
   const backward = input.dir === "rtl" ? "ArrowRight" : "ArrowLeft"
 
   /** Arrow, Home and End on a trigger or link: in the bar along its axis, in a panel down. */
-  const keyMove = (e: KeyLike, inPanel: boolean, trigger: boolean): NavigationMenuFocusMove | null => {
+  const keyMove = (
+    e: KeyLike,
+    inPanel: boolean,
+    trigger: boolean,
+  ): NavigationMenuFocusMove | null => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.nativeEvent?.isComposing || e.keyCode === 229)
       return null
     if (e.key === "Home") return "first"

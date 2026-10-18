@@ -6,7 +6,7 @@ A persistent, named row (or column) of menu items, each opening a [Menu](menu.md
 
 - **Use it for** an application's own menu bar (File, Edit, View…) in a desktop-style web app, where commands are grouped under a few always-visible headings.
 - **Over a row of buttons that open menus**: there is no native menubar element. It adds `role="menubar"` with `menuitem` items, one roving tab stop, arrow keys, Home, End and typeahead along the bar, one open menu at a time, switching menus by hover or by the arrow keys inside a menu, and focus returning to the bar item on Escape.
-- **Don't use it for** site navigation (links to pages): use a Navigation Menu (planned). A single button with a list of actions is a [Menu](menu.md); a row of buttons and toggles is a [Toolbar](toolbar.md). An app that runs inside a desktop shell with a system menu bar (macOS) should put its commands there.
+- **Don't use it for** site navigation (links to pages): use a [Navigation Menu](navigation-menu.md). A single button with a list of actions is a [Menu](menu.md); a row of buttons and toggles is a [Toolbar](toolbar.md). An app that runs inside a desktop shell with a system menu bar (macOS) should put its commands there.
 
 ```tsx
 import { Menu, Menubar } from "@rind-ui/react"

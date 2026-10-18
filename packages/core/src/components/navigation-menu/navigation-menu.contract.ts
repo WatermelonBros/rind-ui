@@ -31,7 +31,8 @@ const link = async (env: E, name: Name): Promise<Part> => {
 /** The content an item's trigger controls (by its key). */
 const contentOf = async (env: E, name: Name): Promise<Part | null> => {
   const key = await (await trigger(env, name)).attr("data-value")
-  for (const c of await env.part("content").all()) if ((await c.attr("data-value")) === key) return c
+  for (const c of await env.part("content").all())
+    if ((await c.attr("data-value")) === key) return c
   return null
 }
 
@@ -123,7 +124,8 @@ export const navigationMenuInvariants: readonly Invariant<P, string>[] = [
         if ((await c.attr("aria-hidden")) !== null) return "a content carries aria-hidden"
         if ((await c.attr("data-state")) === "closed" && (await c.exists())) {
           // Exiting content is inert while its animation runs.
-          if (!(await c.isInert())) return `closed content "${await c.attr("data-value")}" is visible`
+          if (!(await c.isInert()))
+            return `closed content "${await c.attr("data-value")}" is visible`
         }
       }
       return undefined
