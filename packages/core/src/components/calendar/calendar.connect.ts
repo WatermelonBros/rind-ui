@@ -14,7 +14,7 @@ import { type KeyDescription, toLogicalKey } from "../../a11y/keys"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import type { PlatformFlags } from "../../env/capabilities"
-import { dateFormatter, dayText, fullDate } from "../../i18n/date"
+import { dateFormatter, dayText, fullDate, periodName, periodText } from "../../i18n/date"
 import { inMonth } from "./calendar.grid"
 import {
   type CalendarEvent,
@@ -22,14 +22,31 @@ import {
   type CalendarValue,
   isSelectable,
   rangeOf,
+  rangePeriod,
   unavailable,
   valuesOf,
 } from "./calendar.machine"
+import { viewMessage } from "./calendar.messages"
 import { type CalendarMove, canPage, clamp } from "./calendar.navigation"
-import { visibleRangeText } from "./calendar.pieces"
+import {
+  type CalendarView,
+  canPagePeriod,
+  columnsOf,
+  type PeriodMove,
+  pageOf,
+  periodAllowed,
+  periodStart,
+  viewRank,
+  viewStep,
+} from "./calendar.period"
+import { viewHeadingText } from "./calendar.pieces"
 import { crossesUnavailable, makeRange, rangeEnds, rangeLength } from "./calendar.range"
 
-export interface CalendarConnectInput extends CalendarProps {
+export interface CalendarConnectInput extends Omit<CalendarProps, "view"> {
+  /** The shown view (already inside [minView, maxView]). */
+  readonly view: CalendarView
+  /** `view` is controlled and never changes: the heading is plain text. */
+  readonly viewFixed: boolean
   readonly instance: string
   readonly value: CalendarValue
   readonly focused: CalendarDate
@@ -61,10 +78,25 @@ export function calendarKey(
   k: KeyDescription,
   dir: "ltr" | "rtl",
   platform: PlatformFlags,
+  view: CalendarView = "days",
 ): CalendarEvent | null {
   if (k.alt || k.ctrl || k.meta) return null
   if (k.key === "Enter" || k.key === " ") return { type: "SELECT_FOCUSED", composing: k.composing }
   const logical = toLogicalKey(k, { dir, orientation: "grid", platform })
+  if (view !== "days") {
+    const periodMoves: Partial<Record<NonNullable<typeof logical>, PeriodMove>> = {
+      NEXT: "next",
+      PREV: "previous",
+      NEXT_ROW: "next-row",
+      PREV_ROW: "previous-row",
+      FIRST: "first",
+      LAST: "last",
+      PAGE_NEXT: "next-page",
+      PAGE_PREV: "previous-page",
+    }
+    const m = logical ? periodMoves[logical] : undefined
+    return m ? { type: "NAVIGATE", move: m, composing: k.composing } : null
+  }
   const moves: Partial<Record<NonNullable<typeof logical>, CalendarMove>> = {
     NEXT: "next-day",
     PREV: "previous-day",
@@ -86,16 +118,36 @@ export function calendarConnect(input: CalendarConnectInput) {
   const isRange = input.selectionMode === "range"
   const show = (v: import("@internationalized/date").DateValue) =>
     toCalendar(v, input.calendar) as CalendarDate
+  const view = input.view
+  const days = view === "days"
+  // Month and year views: every date is compared at its period's first day.
+  const at = (d: CalendarDate) => periodStart(d, view)
+  // The value's own unit: validity, length and contiguity are judged in minView, whatever the
+  // shown view; above minView (drilling) no anchor rules or preview apply.
+  const minView = input.minView ?? "days"
+  const drilling = viewRank(view) > viewRank(minView)
+  const atMin = (d: CalendarDate) => periodStart(d, minView)
   const committed = rangeOf(input.value)
-  const range = committed ? makeRange(show(committed.start), show(committed.end)) : null
-  const anchor = isRange ? input.anchor : null
+  const range = committed ? makeRange(at(show(committed.start)), at(show(committed.end))) : null
+  const valueRange = committed
+    ? makeRange(atMin(show(committed.start)), atMin(show(committed.end)))
+    : null
+  const anchor = isRange && input.anchor && !drilling ? at(input.anchor) : null
   const selected = isRange ? [] : valuesOf(input.value)
   const isSelected = (date: CalendarDate) =>
-    isRange ? within(date, range) : selected.some((v) => isSameDay(v, date))
-  const outOfRange = (date: CalendarDate) => !isSameDay(clamp(date, input), date)
+    isRange ? within(date, range) : selected.some((v) => isSameDay(at(show(v)), date))
+  const outOfRange = (date: CalendarDate) =>
+    days ? !isSameDay(clamp(date, input), date) : !periodAllowed(at(date), view, input)
   // A controlled focusedValue outside min/max (also at mount) focuses the nearest bound.
-  const focusedDate = clamp(input.focused, input)
-  const isUnavailable = (date: CalendarDate) => unavailable(input, date, anchor)
+  const focusedDate = at(clamp(input.focused, input))
+  const isUnavailable = (date: CalendarDate) => unavailable(input, at(date), anchor, view)
+  const period = rangePeriod(view)
+  const minPeriod = rangePeriod(minView)
+  const outOfMin = (date: CalendarDate) =>
+    minView === "days"
+      ? !isSameDay(clamp(date, input), date)
+      : !periodAllowed(atMin(date), minView, input)
+  const unavailableMin = (date: CalendarDate) => unavailable(input, atMin(date), null, minView)
   // The preview: from the anchor to the hovered date, else the focused one while focus is in
   // a grid (spec "Range Preview": nothing once the pointer and focus are both elsewhere).
   const previewEnd = input.hovered ?? (input.gridFocused ? focusedDate : null)
@@ -107,28 +159,42 @@ export function calendarConnect(input: CalendarConnectInput) {
         maxRangeLength: input.maxRangeLength,
         isUnavailable: (d) => isUnavailable(d),
         allowsNonContiguousRanges: input.allowsNonContiguousRanges,
+        period,
       })
     : null
+  const r = valueRange
   const rangeInvalid =
-    range !== null &&
-    (outOfRange(range.start) ||
-      outOfRange(range.end) ||
-      isUnavailable(range.start) ||
-      isUnavailable(range.end) ||
-      (!input.allowsNonContiguousRanges && crossesUnavailable(range, isUnavailable)) ||
-      (input.minRangeLength !== undefined && rangeLength(range) < input.minRangeLength) ||
-      (input.maxRangeLength !== undefined && rangeLength(range) > input.maxRangeLength))
+    r !== null &&
+    (outOfMin(r.start) ||
+      outOfMin(r.end) ||
+      unavailableMin(r.start) ||
+      unavailableMin(r.end) ||
+      (!input.allowsNonContiguousRanges && crossesUnavailable(r, unavailableMin, minPeriod)) ||
+      (input.minRangeLength !== undefined && rangeLength(r, minPeriod) < input.minRangeLength) ||
+      (input.maxRangeLength !== undefined && rangeLength(r, minPeriod) > input.maxRangeLength))
   const invalid =
     input.invalid === true ||
-    (isRange ? rangeInvalid : selected.some((v) => outOfRange(show(v)) || isUnavailable(show(v))))
+    (isRange ? rangeInvalid : selected.some((v) => outOfMin(show(v)) || unavailableMin(show(v))))
   const state = {
     "data-disabled": dataFlag(input.disabled === true),
     "data-readonly": dataFlag(input.readOnly === true),
     "data-invalid": dataFlag(invalid),
-    "data-anchored": dataFlag(anchor !== null),
+    "data-anchored": dataFlag(isRange && input.anchor != null),
+    "data-view": view,
     ...focusAttrs(input.gridFocused, input.modality),
   }
-  const visible = visibleRangeText(input.visibleStart, input)
+  const visible = viewHeadingText(view, input.visibleStart, focusedDate, input)
+  const above = viewStep(view, 1)
+  // The heading drills up while a higher view exists (spec "View Drill-Down").
+  const canViewUp =
+    !input.viewFixed &&
+    above !== null &&
+    viewRank(view) < viewRank(input.maxView ?? "years") &&
+    input.disabled !== true
+  const name = (date: CalendarDate) =>
+    days
+      ? fullDate(date, input.formatLocale, input.calendar)
+      : periodName(date, view, input.formatLocale, input.calendar)
   const month = (offset: number) => input.visibleStart.add({ months: offset })
   const monthName = (offset: number) =>
     input.messages.monthLabel({
@@ -147,9 +213,25 @@ export function calendarConnect(input: CalendarConnectInput) {
         ),
       ),
     })
-  const gridIds = Array.from({ length: input.visibleMonths }, (_, i) => input.ids.grid(i)).join(" ")
+  // The month and year views have one grid.
+  const gridIds = Array.from({ length: days ? input.visibleMonths : 1 }, (_, i) =>
+    input.ids.grid(i),
+  ).join(" ")
+  /** The month and year views' rows: the page in rows of `columns`. */
+  const periodRows = (): CalendarDate[][] => {
+    if (days) return []
+    const page = pageOf(focusedDate, view, input)
+    const c = columnsOf(input)
+    return Array.from({ length: Math.ceil(page.length / c) }, (_, r) =>
+      page.slice(r * c, r * c + c),
+    )
+  }
   return {
     visibleRange: visible,
+    view,
+    periodRows,
+    /** Escape moves one view down (and is consumed) in a view above `minView`. */
+    escapeGoesDown: !input.viewFixed && viewRank(view) > viewRank(input.minView ?? "days"),
     root: (): PartProps => ({
       ...scopeAttrs("calendar", "root", input.instance),
       ...state,
@@ -161,9 +243,29 @@ export function calendarConnect(input: CalendarConnectInput) {
     header: (): PartProps => scopeAttrs("calendar", "header", input.instance),
     heading: (): PartProps => ({
       ...scopeAttrs("calendar", "heading", input.instance),
-      id: input.ids.heading,
-      children: visible,
+      // With a higher view the heading's text is in its button (viewTrigger), and the root
+      // and grid are named by that text alone (not the button's action).
+      id: canViewUp ? undefined : input.ids.heading,
+      children: canViewUp ? undefined : visible,
     }),
+    /** The heading text inside the view trigger: what the root and grid are named by. */
+    viewTriggerText: (): PartProps => ({ id: input.ids.heading, children: visible }),
+    /** The heading's button one view up, or null when the heading is plain text. */
+    viewTrigger: (
+      focus: { readonly focused: boolean; readonly modality: Modality } = {
+        focused: false,
+        modality: "keyboard",
+      },
+    ): PartProps | null =>
+      canViewUp && above !== "days" && above !== null
+        ? {
+            ...scopeAttrs("calendar", "view-trigger", input.instance),
+            type: "button",
+            "aria-label": `${visible}, ${input.messages.viewUp({ view: above })}`,
+            "data-view": view,
+            ...focusAttrs(focus.focused, focus.modality),
+          }
+        : null,
     /** `focus`: the trigger's own focus and the modality it came with (its ring). */
     trigger: (
       direction: 1 | -1,
@@ -172,11 +274,18 @@ export function calendarConnect(input: CalendarConnectInput) {
         modality: "keyboard",
       },
     ): PartProps => {
-      const off = input.disabled === true || !canPage(input.visibleStart, direction, input)
+      const off =
+        input.disabled === true ||
+        !(days
+          ? canPage(input.visibleStart, direction, input)
+          : canPagePeriod(focusedDate, view, direction, input))
       return {
         ...scopeAttrs("calendar", direction > 0 ? "next-trigger" : "prev-trigger", input.instance),
         type: "button",
-        "aria-label": direction > 0 ? input.messages.next : input.messages.previous,
+        "aria-label": viewMessage(
+          direction > 0 ? input.messages.next : input.messages.previous,
+          view,
+        ),
         // Focusable at the bound, so focus is never lost (spec "Triggers").
         "aria-disabled": off ? "true" : undefined,
         "data-disabled": dataFlag(off),
@@ -191,7 +300,7 @@ export function calendarConnect(input: CalendarConnectInput) {
       id: input.ids.grid(offset),
       role: "grid",
       "data-month": String(offset),
-      ...(input.visibleMonths === 1
+      ...(input.visibleMonths === 1 || !days
         ? { "aria-labelledby": input.ids.heading }
         : { "aria-label": monthName(offset) }),
       "aria-multiselectable": input.selectionMode !== "single" ? "true" : undefined,
@@ -221,16 +330,17 @@ export function calendarConnect(input: CalendarConnectInput) {
     gridBody: (): PartProps => scopeAttrs("calendar", "grid-body", input.instance),
     row: (): PartProps => scopeAttrs("calendar", "row", input.instance),
     cell: (date: CalendarDate, offset: number): PartProps => {
-      const placeholder = !inMonth(date, month(offset))
+      const placeholder = days && !inMonth(date, month(offset))
       const off =
-        !isUnavailable(date) && (!isSelectable(date, input) || (endsOk !== null && !endsOk(date)))
+        !isUnavailable(date) &&
+        (!isSelectable(date, input, null, view) || (endsOk !== null && !endsOk(date)))
       // While anchored, dates no range from the anchor may end on are disabled too.
       const disabled =
         placeholder || input.disabled === true || outOfRange(date) || (anchor !== null && off)
       const cellUnavailable = !disabled && isUnavailable(date)
       // Range mode: only selectable cells of the committed range are selected.
       const sel = !placeholder && isSelected(date) && (!isRange || (!disabled && !cellUnavailable))
-      const today = isSameDay(date, input.today)
+      const today = isSameDay(date, at(input.today))
       const isFocused = !placeholder && isSameDay(date, focusedDate)
       const focusHere = isFocused && input.gridFocused
       const cellInvalid = isRange
@@ -238,7 +348,10 @@ export function calendarConnect(input: CalendarConnectInput) {
         : sel && (outOfRange(date) || isUnavailable(date))
       const inPreview = !placeholder && within(date, preview)
       const ranged = !placeholder && isRange
-      const formatted = fullDate(date, input.formatLocale, input.calendar)
+      const formatted = days ? fullDate(date, input.formatLocale, input.calendar) : ""
+      const text = days
+        ? dayText(date, input.formatLocale, input.calendar)
+        : periodText(date, view, input.formatLocale, input.calendar)
       return {
         ...scopeAttrs("calendar", "cell", input.instance),
         role: "gridcell",
@@ -251,7 +364,9 @@ export function calendarConnect(input: CalendarConnectInput) {
             : isFocused
               ? 0
               : -1,
-        "aria-label": input.messages.cellLabel({ date, formatted, today }),
+        // Period cells are named by their visible text alone (WCAG 2.5.3, every locale); the
+        // year is in the grid's name (its heading).
+        "aria-label": days ? input.messages.cellLabel({ date, formatted, today }) : undefined,
         "aria-selected": sel ? "true" : "false",
         "aria-disabled": disabled || cellUnavailable ? "true" : undefined,
         "aria-describedby": isRange && isFocused && input.ids.prompt ? input.ids.prompt : undefined,
@@ -259,7 +374,7 @@ export function calendarConnect(input: CalendarConnectInput) {
         "aria-invalid": cellInvalid ? "true" : undefined,
         "data-selected": dataFlag(sel),
         "data-today": dataFlag(today && !placeholder),
-        "data-weekend": dataFlag(isWeekend(date, input.locale)),
+        "data-weekend": dataFlag(days && isWeekend(date, input.locale)),
         "data-outside-month": dataFlag(placeholder),
         "data-disabled": dataFlag(disabled),
         "data-unavailable": dataFlag(cellUnavailable),
@@ -280,21 +395,26 @@ export function calendarConnect(input: CalendarConnectInput) {
         "data-preview-end": dataFlag(
           ranged && preview !== null && inPreview && isSameDay(date, preview.end),
         ),
-        children: dayText(date, input.formatLocale, input.calendar),
+        children: text,
       }
     },
-    isSelectable: (date: CalendarDate) => isSelectable(date, input, anchor),
+    isSelectable: (date: CalendarDate) => isSelectable(date, input, anchor, view),
     /** Range mode: the visually hidden prompt for the focused cell. */
     prompt: (): PartProps => ({
       ...scopeAttrs("calendar", "prompt", input.instance),
       id: input.ids.prompt,
       children: anchor
         ? input.messages.endPrompt({
-            anchor: fullDate(anchor, input.formatLocale, input.calendar),
+            anchor: name(anchor),
             minRangeLength: input.minRangeLength,
             maxRangeLength: input.maxRangeLength,
             contiguous:
-              input.isDateUnavailable !== undefined && input.allowsNonContiguousRanges !== true,
+              (days
+                ? input.isDateUnavailable
+                : view === "months"
+                  ? input.isMonthUnavailable
+                  : input.isYearUnavailable) !== undefined &&
+              input.allowsNonContiguousRanges !== true,
           })
         : input.messages.startPrompt,
     }),

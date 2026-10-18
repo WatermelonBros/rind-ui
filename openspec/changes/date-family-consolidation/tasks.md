@@ -18,7 +18,7 @@
 
 ## 2. Calendar views (PR 2)
 
-- [ ] 2.1 Month and year views (`period-navigation`), controllable `view`, `minView` / `maxView`, drill-down, cell names, triggers, constraints; contract and model classes per view; theme, examples, snapshots, docs
+- [x] 2.1 Month and year views (`period-navigation`), controllable `view`, `minView` / `maxView`, drill-down, cell names, triggers, constraints; contract and model classes per view; theme, examples, snapshots, docs
 
 ## 3. Date Field time values and range (PR 3)
 

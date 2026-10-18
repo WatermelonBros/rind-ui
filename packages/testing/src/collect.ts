@@ -22,6 +22,8 @@ export interface ElementInfo {
   readonly inAriaHidden: boolean
   readonly inInert: boolean
   readonly focusable: boolean
+  /** A grid cell (the roving focus target itself) holding a focusable descendant. */
+  readonly focusableInside: boolean
   /** Finite animations running (or held) on the element: exit animations presence waits for. */
   readonly animations: number
   /** Its computed style animates (a transition or animation duration above zero). */
@@ -308,6 +310,7 @@ export function collectDom(arg: {
     inAriaHidden: el.closest("[aria-hidden=true]") !== null,
     inInert: el.closest("[inert]") !== null,
     focusable: focusable(el),
+    focusableInside: roleOf(el) === "gridcell" && [...el.querySelectorAll("*")].some(focusable),
     animations:
       typeof el.getAnimations === "function"
         ? el
