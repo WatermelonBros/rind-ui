@@ -139,12 +139,12 @@
     align-self: start;
   }
 }
-/* 20px box + 2px margin: a 24px target */
+/* 24px: the minimum target size (WCAG 2.5.8) */
 :is([data-skinned], [data-rind-theme^="skin-"])
 [data-scope="grid-list"][data-part="item-checkbox"] {
-  inline-size: 20px;
-  block-size: 20px;
-  margin: 2px;
+  inline-size: 24px;
+  block-size: 24px;
+  margin: 0;
   accent-color: var(--s-brand);
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="grid-list"][data-part="item-control"] {
