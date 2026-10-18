@@ -289,6 +289,30 @@ describe("inline (command palette)", () => {
     expect(onBack).toHaveBeenCalledTimes(1)
   })
 
+  it("a parent re-render with a literal page keeps the query and the highlight", async () => {
+    function Parent() {
+      const [, setTick] = useState(0)
+      return (
+        <>
+          <Palette page={{ key: "root", label: "Commands", depth: 0 }} />
+          <button type="button" onClick={() => setTick((t) => t + 1)}>
+            Rerender
+          </button>
+        </>
+      )
+    }
+    const log = installAnnouncementLog()
+    render(<Parent />)
+    await userEvent.click(search())
+    await userEvent.keyboard("se{ArrowDown}")
+    const highlight = highlightedText()
+    fireEvent.click(screen.getByRole("button", { name: "Rerender" }))
+    fireEvent.click(screen.getByRole("button", { name: "Rerender" }))
+    expect(search().value).toBe("se")
+    expect(highlightedText()).toBe(highlight)
+    expect(log.filter((a) => a.message === "Commands")).toHaveLength(0)
+  })
+
   it("Loading: a sibling of the listbox, aria-busy, Empty not shown", () => {
     render(<Palette loading="loading" items={[]} />)
     const loading = screen.getByText("Loading…")

@@ -276,6 +276,18 @@ function Root(all: ComboboxRootProps) {
     console.error('[rind-ui] Combobox: `inline` implies selectionMode "none".')
   }
   const selectionMode = freeText ? "none" : multiple ? "multiple" : "single"
+  // One object per page (key, label, depth): a literal `page={{…}}` re-rendered by the parent is
+  // no page change (the machine diffs the prop by identity).
+  const pageKey = all.page?.key
+  const pageLabel = all.page?.label
+  const pageDepth = all.page?.depth
+  const page = useMemo(
+    () =>
+      pageKey === undefined
+        ? undefined
+        : { key: pageKey, label: pageLabel ?? "", depth: pageDepth ?? 0 },
+    [pageKey, pageLabel, pageDepth],
+  )
   const ids = useMemo(() => comboboxIds(instance), [instance])
   const locale = env.locale.locale()
   const messages = useMemo(() => ({ ...comboboxMessages, ...all.messages }), [all.messages])
@@ -348,7 +360,7 @@ function Root(all: ComboboxRootProps) {
       keepHighlight: all.keepHighlight ?? (inline ? true : undefined),
       clearOnEscape: all.clearOnEscape,
       onAction: (k, d) => latest.current.onAction?.(k, d),
-      page: all.page,
+      page,
       onBack: all.onBack ? () => latest.current.onBack?.() : undefined,
       requestClose:
         inline && all.onOpenChange
