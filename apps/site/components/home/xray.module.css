@@ -1,0 +1,52 @@
+/* The x-ray label: fixed to the viewport, placed by translate from the pointer (xray.tsx). */
+.xray {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 70;
+  display: grid;
+  gap: 2px;
+  max-width: 300px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #0b0b0c;
+  color: #f5f5ee;
+  font: 600 11px / 1.45 var(--mono);
+  box-shadow: 0 10px 30px #0004;
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.92;
+  transform-origin: top left;
+  transition:
+    opacity 0.18s ease-out,
+    scale 0.18s ease-out;
+}
+.xray[data-shown] {
+  opacity: 1;
+  scale: 1;
+}
+.name {
+  color: #d4ff3a;
+  letter-spacing: 0.02em;
+}
+.attr {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #c9c9c2;
+}
+.attr b {
+  color: #f5f5ee;
+  font-weight: 600;
+}
+:global([data-phase="juicy"]) .xray {
+  background: #2a1d5c;
+}
+:global([data-phase="juicy"]) .name {
+  color: #ff8fb1;
+}
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .xray {
+    display: none;
+  }
+}

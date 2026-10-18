@@ -89,7 +89,11 @@ shows iOS VoiceOver focusing and editing an `<input role="spinbutton">`". Its re
 test SHALL show the condition over the platform presets and SHALL point to the device
 check in the manual protocol, since the failure is only observable with VoiceOver on a
 device. The Number Input code that renders the input without the `spinbutton` role and its
-value attributes (add-number-input) SHALL be gated by this entry.
+value attributes (add-number-input) SHALL be gated by this entry. The entry SHALL also cover
+date and time segments, which are the same element (an `<input role="spinbutton">`): the Date
+Field code that renders segments without the `spinbutton` role and value attributes
+(add-date-field) SHALL be gated by this entry, and the entry's reproducing test SHALL gain a
+date-segment case.
 
 #### Scenario: iPhone
 
@@ -100,6 +104,17 @@ value attributes (add-number-input) SHALL be gated by this entry.
 
 - **WHEN** it is evaluated for a macOS platform and for an Android platform
 - **THEN** it is false in both
+
+#### Scenario: Date segment on iPhone
+
+- **WHEN** a Date Field renders its segments for an iOS platform
+- **THEN** the entry is active and no segment carries `role="spinbutton"`, `aria-valuenow`,
+  `aria-valuemin` or `aria-valuemax`
+
+#### Scenario: Date segment on macOS
+
+- **WHEN** a Date Field renders its segments for a macOS platform
+- **THEN** the entry is inactive and each editable segment has `role="spinbutton"`
 
 ### Requirement: Keypad Decimal Separator Entry
 

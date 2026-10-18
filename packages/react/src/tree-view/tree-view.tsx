@@ -371,10 +371,13 @@ function Tree({
   useSelector(host.service, (v) => v)
   const ref = useRef<HTMLDivElement | null>(null)
   const { checkable, selectionMode } = host.options
-  useEffect(
-    () => checkTreeView(ref.current, { checkable, selectionMode }),
-    [checkable, selectionMode],
-  )
+  // After the re-render a Label's registration causes (a layout effect), not on the first commit.
+  useEffect(() => {
+    const node = ref.current
+    queueMicrotask(() => {
+      if (node?.isConnected) checkTreeView(node, { checkable, selectionMode })
+    })
+  }, [checkable, selectionMode])
   const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
   const props = mergeProps({ ...normalizeProps(host.parts.tree(naming)), ref }, rest)
   const rows = host.visibleKeys.map((key) => {
