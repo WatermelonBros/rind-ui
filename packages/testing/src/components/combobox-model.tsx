@@ -4,9 +4,11 @@ import {
   type ComboboxProps,
   comboboxContract,
   comboboxIds,
+  comboboxInvariants,
   comboboxMessages,
   comboboxTraits,
   createListCollection,
+  inlineComboboxContract,
   platforms,
 } from "@rind-ui/core"
 import { Combobox, type ComboboxRootProps, RindProvider } from "@rind-ui/react"
@@ -30,15 +32,28 @@ const itemsOf = (items: readonly Item[]) =>
 type Config = Pick<
   ComboboxProps,
   "autoHighlight" | "allowCustomValue" | "selectOnTab" | "readOnly" | "autoComplete"
-> & { readonly multiple?: boolean; readonly items?: readonly Item[] }
+> & {
+  readonly multiple?: boolean
+  readonly items?: readonly Item[]
+  /** `selectionMode="none"`: the text is the value (an autocomplete). */
+  readonly freeText?: boolean
+  /** The inline machine (a command palette); `closable`: the host closes on Escape. */
+  readonly inline?: boolean
+  readonly closable?: boolean
+}
 
 /** Registers the model test of one props class (one file per class: smaller browser runs). */
 export function config(name: string, cfg: Config) {
-  const { items = CITIES, multiple, ...rest } = cfg
-  const contract = {
-    ...comboboxContract,
-    traits: comboboxTraits({ selectionMode: multiple ? "multiple" : "single" }),
-  } as unknown as typeof comboboxContract
+  const { items = CITIES, multiple, freeText, inline, closable, ...rest } = cfg
+  const selectionMode = inline || freeText ? "none" : multiple ? "multiple" : "single"
+  // Sound: each variant's contract over the same machine setup (states from props).
+  const contract = (inline
+    ? inlineComboboxContract
+    : {
+        ...comboboxContract,
+        traits: comboboxTraits({ selectionMode }),
+        invariants: comboboxInvariants({ selectionMode }),
+      }) as unknown as typeof comboboxContract
   const collection = itemsOf(items)
   describe(`combobox model: ${name}`, () => {
     testMachine(contract, {
@@ -47,26 +62,48 @@ export function config(name: string, cfg: Config) {
       setup: () =>
         render(
           <RindProvider environment={{ platform: currentRun()?.platform ?? platforms.linux }}>
-            <Combobox.Root
-              items={items}
-              filter={null}
-              {...(rest as object)}
-              {...((multiple ? { multiple: true } : {}) as ComboboxRootProps)}
-            >
-              <Combobox.Label>City</Combobox.Label>
-              <Combobox.Control>
-                <Combobox.Chips />
-                <Combobox.Input />
-                <Combobox.Trigger />
-              </Combobox.Control>
-              <Combobox.Positioner>
-                <Combobox.Popup>
-                  <Combobox.List>
-                    <Combobox.Items />
-                  </Combobox.List>
-                </Combobox.Popup>
-              </Combobox.Positioner>
-            </Combobox.Root>
+            {inline ? (
+              <Combobox.Root
+                inline
+                items={items}
+                filter={null}
+                {...(closable ? { onOpenChange: () => {} } : {})}
+                {...(rest as object)}
+              >
+                <Combobox.Label>City</Combobox.Label>
+                <Combobox.Control>
+                  <Combobox.Input />
+                </Combobox.Control>
+                <Combobox.List>
+                  <Combobox.Items />
+                </Combobox.List>
+              </Combobox.Root>
+            ) : (
+              <Combobox.Root
+                items={items}
+                filter={null}
+                {...(rest as object)}
+                {...((multiple
+                  ? { multiple: true }
+                  : freeText
+                    ? { selectionMode: "none" }
+                    : {}) as ComboboxRootProps)}
+              >
+                <Combobox.Label>City</Combobox.Label>
+                <Combobox.Control>
+                  <Combobox.Chips />
+                  <Combobox.Input />
+                  <Combobox.Trigger />
+                </Combobox.Control>
+                <Combobox.Positioner>
+                  <Combobox.Popup>
+                    <Combobox.List>
+                      <Combobox.Items />
+                    </Combobox.List>
+                  </Combobox.Popup>
+                </Combobox.Positioner>
+              </Combobox.Root>
+            )}
             <button type="button">After</button>
           </RindProvider>,
         ),
@@ -77,7 +114,7 @@ export function config(name: string, cfg: Config) {
         collection,
         ids: comboboxIds("oracle"),
         strategy: "active-descendant",
-        selectionMode: multiple ? "multiple" : "single",
+        selectionMode,
         locale: "en-US",
         messages: comboboxMessages,
         root: "oracle",
@@ -90,8 +127,13 @@ export function config(name: string, cfg: Config) {
         openOnFocus: undefined,
         closeOnSelect: undefined,
         selectOnTab: undefined,
-        keepHighlight: undefined,
+        keepHighlight: inline ? true : undefined,
+        autoHighlight: inline ? true : undefined,
         removeOnBackspace: undefined,
+        clearOnEscape: undefined,
+        page: undefined,
+        onBack: undefined,
+        requestClose: closable ? () => {} : undefined,
         ...rest,
       } as never,
       modalities: ["pointer", "keyboard", "touch", "virtual"],

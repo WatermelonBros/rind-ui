@@ -301,6 +301,31 @@
     font-size: var(--rind-text-sm);
   }
 
+  /*
+   * Inline mode (a command palette): the list is the body, in place. Nothing marks it, so it is
+   * the list with no popup above it. It scrolls on its own and wears no popup shadow.
+   */
+  :where([data-scope="combobox"][data-part="list"]:not(:where([data-part="popup"]) *)) {
+    max-block-size: var(--rind-combobox-list-max-height, 20rem);
+    overflow: auto;
+    box-shadow: none;
+  }
+
+  :where([data-scope="combobox"][data-part="item"][data-tone="danger"]) {
+    color: var(--rind-combobox-item-danger-text, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="combobox"][data-part="item-description"]) {
+    color: var(--rind-combobox-item-description-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+  }
+
+  :where([data-scope="combobox"][data-part="loading"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-combobox-loading-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
   :where([data-scope="combobox"][data-part="load-more"]) {
     min-block-size: 1px;
   }
@@ -412,6 +437,14 @@
     }
 
     :where([data-scope="combobox"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where(
+        [data-scope="combobox"][data-part="list"]:not(:where([data-part="popup"]) *)
+          [data-part="item"][data-highlighted]
+      ) {
       outline: 2px solid Highlight;
       outline-offset: -2px;
     }

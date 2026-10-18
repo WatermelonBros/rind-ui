@@ -11,6 +11,8 @@ export type ComboboxMessages = InputChipsMessages & {
   readonly loading: string
   readonly focusAnnouncement: (item: string, selected: boolean, section?: string) => string
   readonly selectedAnnouncement: (item: string) => string
+  /** Inline: a page change, announced politely. */
+  readonly pageAnnouncement: (label: string) => string
 }
 
 export const comboboxMessages: ComboboxMessages = {
@@ -25,4 +27,5 @@ export const comboboxMessages: ComboboxMessages = {
   focusAnnouncement: (item, selected, section) =>
     [section, item, selected ? "selected" : undefined].filter(Boolean).join(", "),
   selectedAnnouncement: (item) => `${item}, selected`,
+  pageAnnouncement: (label) => label,
 }
