@@ -38,9 +38,9 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="pin-input"][data-part="slot"][data-active][data-focus-visible] {
-  outline: 2px solid var(--s-brand);
+  outline: 2px solid var(--s-focus);
   outline-offset: 2px;
-  border-color: var(--s-brand);
+  border-color: var(--s-focus);
 }
 /* The caret of the empty active slot. */
 :is([data-skinned], [data-rind-theme^="skin-"])

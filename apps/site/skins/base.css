@@ -28,6 +28,8 @@
   --s-brand: var(--s-ink);
   --s-brand-text: var(--s-on);
   --s-brand-deep: var(--s-ink);
+  /* focus ring: ≥3:1 on lime, white, muted and ink (WCAG 1.4.11, 2.4.11) */
+  --s-focus: var(--s-acc-deep);
 }
 [data-skin="juicy"],
 [data-rind-theme="skin-juicy"] {
@@ -53,6 +55,8 @@
   --s-brand: var(--s-acc);
   --s-brand-text: var(--s-ink);
   --s-brand-deep: var(--s-acc-deep);
+  /* focus ring: the pink is under 3:1 on white; this violet is ≥3:1 on lavender, white and pink */
+  --s-focus: #5b3fd1;
 }
 [data-skin="bare"],
 [data-rind-theme="skin-bare"] {
@@ -78,6 +82,8 @@
   --s-brand: var(--s-ink);
   --s-brand-text: #ffffff;
   --s-brand-deep: #000000;
+  /* focus ring: ≥3:1 on white, the page and ink */
+  --s-focus: var(--s-acc);
 }
 /* portalled content (dialogs, popovers) keeps its skin through the portal host's data-rind-theme */
 [data-skinned],
@@ -150,13 +156,18 @@
   border-color: var(--s-brand);
   color: var(--s-brand-text);
 }
+/* every ring inside a skin takes the skin's focus colour, also where only the site's own
+   :focus-visible rule draws it; component rules set their width and offset */
+:is([data-skinned], [data-rind-theme^="skin-"]) :focus-visible {
+  outline-color: var(--s-focus);
+}
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) :focus-visible {
-  outline: 2px solid var(--s-acc);
+  outline: 2px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"])
   :is([data-scope="text-field"][data-part="input"], .native):focus {
-  border-color: var(--s-acc);
+  border-color: var(--s-focus);
   box-shadow: 0 0 0 3px #2563eb33;
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="fieldset"][data-part="legend"] {

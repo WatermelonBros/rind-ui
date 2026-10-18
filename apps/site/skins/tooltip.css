@@ -27,7 +27,7 @@
   box-shadow: var(--s-lift);
 }
 [data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"]:focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 [data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="trigger"][aria-disabled="true"] {

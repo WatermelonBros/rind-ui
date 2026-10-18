@@ -42,7 +42,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="text-field"][data-part="visibility-trigger"][data-focus-visible] {
-  outline: 2px solid var(--s-brand);
+  outline: 2px solid var(--s-focus);
   outline-offset: 0;
 }
 /* The Indicator follows data-state: the open eye while hidden, the crossed one while shown. */
