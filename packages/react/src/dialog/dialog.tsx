@@ -54,9 +54,11 @@ declare module "../provider" {
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
 interface Ctx {
-  /** The family member: `dialog` or `alert-dialog` (scope, layer kind, names). */
+  /** The family member: `dialog` or `drawer` (scope, names). */
   readonly scope: string
+  /** The layer kind: `alertdialog` for a `role="alertdialog"` dialog. */
   readonly kind: "dialog" | "alertdialog" | "drawer"
+  readonly role: "dialog" | "alertdialog"
   readonly service: Service<typeof dialogMachine>
   readonly root: string
   readonly modal: boolean
@@ -76,7 +78,7 @@ type Rendered = { readonly title?: string | undefined; readonly description?: st
 export const DialogContext = createContext<Ctx | null>(null)
 export function useDialog(part: string): Ctx {
   const ctx = useContext(DialogContext)
-  if (!ctx) throw new Error(`${part} must be inside its Dialog or AlertDialog Root`)
+  if (!ctx) throw new Error(`${part} must be inside its Dialog or Drawer Root`)
   return ctx
 }
 
@@ -121,6 +123,7 @@ export function useApi(
     api: dialogConnect(
       {
         scope: ctx.scope,
+        role: ctx.role,
         instance: ctx.root,
         open,
         modal: ctx.modal,
@@ -144,7 +147,10 @@ export interface DialogActions {
   close(): void
 }
 
-export type DialogRootProps = Omit<DialogProps, "root" | "parent"> & {
+type DialogRootBase = Omit<
+  DialogProps,
+  "root" | "parent" | "role" | "modal" | "closeOnInteractOutside"
+> & {
   readonly id?: string
   /** Content, backdrop and positioner stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
@@ -153,13 +159,36 @@ export type DialogRootProps = Omit<DialogProps, "root" | "parent"> & {
   readonly children?: ReactNode
 }
 
+/** The content's role: a dialog, or a confirmation that interrupts. */
+export type DialogRole = "dialog" | "alertdialog"
+
+/**
+ * A dialog's Root props. With `role="alertdialog"` (a confirmation: always modal, never
+ * closed by an outside press) `modal` and `closeOnInteractOutside` do not exist; the role is
+ * inferred from the JSX attribute, so `<Dialog.Root role="alertdialog" modal={false}>` does
+ * not compile.
+ */
+export type DialogRootProps<R extends DialogRole = "dialog"> = DialogRootBase & {
+  readonly role?: R
+} & (R extends "alertdialog"
+    ? { readonly modal?: never; readonly closeOnInteractOutside?: never }
+    : {
+        readonly modal?: DialogProps["modal"]
+        readonly closeOnInteractOutside?: DialogProps["closeOnInteractOutside"]
+      })
+
+/** What a Root receives at runtime (either role). */
+type AnyDialogRootProps = DialogRootBase & {
+  readonly role?: DialogRole
+  readonly modal?: DialogProps["modal"]
+  readonly closeOnInteractOutside?: DialogProps["closeOnInteractOutside"]
+}
+
 /** The Root of a dialog-family member: its machine, scope and layer kind. */
 export function createDialogRoot(family: {
   readonly scope: string
-  readonly kind: "dialog" | "alertdialog" | "drawer"
+  readonly kind: "dialog" | "drawer"
   readonly machine: typeof dialogMachine
-  /** Always modal (the Alert Dialog): the props cannot turn it off. */
-  readonly alwaysModal?: boolean
 }) {
   return function Root({
     id,
@@ -168,7 +197,7 @@ export function createDialogRoot(family: {
     actionsRef,
     children,
     ...props
-  }: DialogRootProps) {
+  }: AnyDialogRootProps) {
     const root = useRootId(id)
     const parent = useParentLayer(DIALOG_PARENT_KINDS)
     const messages = useMessages("dialog", dialogMessages, ownMessages)
@@ -181,11 +210,14 @@ export function createDialogRoot(family: {
     const [contentMounted, setContentMounted] = useState(false)
     const [titleLevel, setTitleLevel] = useState<HeadingLevel>(2)
     const [rendered, setRendered] = useState<Rendered>({})
-    const modal = family.alwaysModal === true || props.modal !== false
+    const role = props.role ?? "dialog"
+    // A confirmation is always modal.
+    const modal = role === "alertdialog" || props.modal !== false
     const initialFocus = props.initialFocus
     const ctx: Ctx = {
       scope: family.scope,
-      kind: family.kind,
+      kind: role === "alertdialog" ? "alertdialog" : family.kind,
+      role,
       service,
       root,
       modal,
@@ -203,7 +235,12 @@ export function createDialogRoot(family: {
   }
 }
 
-const Root = createDialogRoot({ scope: "dialog", kind: "dialog", machine: dialogMachine })
+const RootImpl = createDialogRoot({ scope: "dialog", kind: "dialog", machine: dialogMachine })
+/** Generic over the role, so a confirmation's props are checked against it. */
+const Root = <R extends DialogRole = "dialog">(props: DialogRootProps<R>) => (
+  // Sound: every DialogRootProps<R> is an AnyDialogRootProps (the role only narrows it).
+  <RootImpl {...(props as AnyDialogRootProps)} />
+)
 
 type Own<T extends keyof React.JSX.IntrinsicElements, S = undefined> = ComponentPropsWithRef<T> & {
   readonly render?: RenderProp<S>
@@ -412,6 +449,57 @@ function Description({ render, ...rest }: Own<"p">) {
   return renderPart("p", props, render, undefined)
 }
 
+/** Cancel and Action: press-activated buttons that close with their own reason. */
+function useCloseButton(part: "cancel" | "action", id: string | undefined, disabled: boolean) {
+  const ctx = useDialog(part === "cancel" ? "Cancel" : "Action")
+  const { api } = useApi(ctx)
+  const env = useEnvironment()
+  // The modality tracker must see the pointerdown that comes before focus.
+  useEffect(() => env.modality.subscribe(() => {}), [env])
+  const generated = useId()
+  const own = id ?? partId(ctx.scope, ctx.root, `${part}-${generated.replace(/:/g, "")}`)
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  const press = usePress({
+    env,
+    send: (e) => {
+      if (e.type !== "PRESS") return
+      if (part === "cancel") api.pressCancel(e.modality)
+      else api.pressAction(own, e.modality)
+    },
+    disabled: () => disabled,
+  })
+  const props = normalizeProps(
+    api[part]({ id: own, focused, modality, pressed: press.pressed, disabled }),
+  )
+  return joinHandlers(props, press.props, {
+    onFocus: () => setFocused(true),
+    onBlur: () => setFocused(false),
+  })
+}
+
+type ButtonProps = Own<"button">
+
+function Cancel({ id, disabled = false, render, ref, ...rest }: ButtonProps) {
+  const props = useCloseButton("cancel", id, disabled)
+  return renderPart(
+    "button",
+    mergeProps({ ...props, ...(disabled ? { disabled: true } : {}), ref }, rest),
+    render,
+    undefined,
+  )
+}
+
+function Action({ id, disabled = false, render, ref, ...rest }: ButtonProps) {
+  const props = useCloseButton("action", id, disabled)
+  return renderPart(
+    "button",
+    mergeProps({ ...props, ...(disabled ? { disabled: true } : {}), ref }, rest),
+    render,
+    undefined,
+  )
+}
+
 function CloseTrigger({ id, render, ref, ...rest }: Own<"button">) {
   const ctx = useDialog("CloseTrigger")
   const { api } = useApi(ctx)
@@ -492,4 +580,6 @@ export const Dialog = {
   Title,
   Description,
   CloseTrigger,
+  Cancel,
+  Action,
 }

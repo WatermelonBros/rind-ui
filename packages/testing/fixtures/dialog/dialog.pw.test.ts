@@ -207,6 +207,7 @@ describe("testMachine through Playwright (400ms exit)", () => {
       closeOnEscape: undefined,
       closeOnInteractOutside: undefined,
       modal: undefined,
+      role: undefined,
       root: "oracle",
     },
   })

@@ -6,19 +6,19 @@
  * never sets pointer-events on it.
  */
 @layer rind.components {
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="backdrop"][data-state] {
+  [data-scope="dialog"][data-part="backdrop"][data-state] {
     background: var(--rind-dialog-backdrop, var(--rind-color-overlay));
     transition: opacity var(--rind-dialog-duration, var(--rind-duration-normal))
       var(--rind-ease-out);
   }
 
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="positioner"] {
+  [data-scope="dialog"][data-part="positioner"] {
     overflow: auto;
     overscroll-behavior: contain;
     padding: var(--rind-dialog-inset, var(--rind-space-4));
   }
 
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"] {
+  [data-scope="dialog"][data-part="content"] {
     box-sizing: border-box;
     inline-size: 100%;
     max-inline-size: var(--rind-dialog-max-width, 32rem);
@@ -35,15 +35,15 @@
   }
 
   /* A dialog opened over another: the parent dims further only through the nested backdrop. */
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="backdrop"][data-nested] {
+  [data-scope="dialog"][data-part="backdrop"][data-nested] {
     background: var(--rind-dialog-nested-backdrop, transparent);
   }
 
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"][data-has-nested] {
+  [data-scope="dialog"][data-part="content"][data-has-nested] {
     transform: scale(var(--rind-dialog-parent-scale, 0.98));
   }
 
-  :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="close-trigger"] {
+  [data-scope="dialog"][data-part="close-trigger"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -52,17 +52,65 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :is([data-scope="dialog"], [data-scope="alert-dialog"]):is(
-        [data-part="backdrop"],
-        [data-part="content"]
-      ) {
+    [data-scope="dialog"]:is([data-part="backdrop"], [data-part="content"]) {
       transition: none;
     }
   }
 
   @media (forced-colors: active) {
-    :is([data-scope="dialog"], [data-scope="alert-dialog"])[data-part="content"] {
+    [data-scope="dialog"][data-part="content"] {
       border-color: CanvasText;
+    }
+  }
+}
+
+/*
+ * Confirmations (`role="alertdialog"`): narrower, the message first and Cancel and Action as
+ * an end-aligned row under it. --rind-alert-dialog-* override the --rind-dialog-* tokens.
+ */
+@layer rind.components {
+  [data-scope="dialog"][data-part="content"][role="alertdialog"] {
+    max-inline-size: var(--rind-alert-dialog-max-width, var(--rind-dialog-max-width, 28rem));
+    background: var(
+      --rind-alert-dialog-bg,
+      var(--rind-dialog-bg, var(--rind-color-surface-raised))
+    );
+    color: var(--rind-alert-dialog-color, var(--rind-dialog-color, var(--rind-color-text)));
+    padding: var(--rind-alert-dialog-padding, var(--rind-dialog-padding, var(--rind-space-6)));
+    border-color: var(
+      --rind-alert-dialog-border,
+      var(--rind-dialog-border, var(--rind-color-border-strong))
+    );
+    border-radius: var(
+      --rind-alert-dialog-radius,
+      var(--rind-dialog-radius, var(--rind-radius-panel))
+    );
+    box-shadow: var(--rind-alert-dialog-shadow, var(--rind-dialog-shadow, var(--rind-shadow-lg)));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--rind-alert-dialog-gap, var(--rind-space-3));
+  }
+
+  [data-scope="dialog"][data-part="content"][role="alertdialog"]
+    > :not([data-part="cancel"], [data-part="action"]) {
+    flex: 1 0 100%;
+    margin: 0;
+  }
+
+  /* Cancel and Action, in a confirmation or any dialog. */
+  [data-scope="dialog"]:is([data-part="cancel"], [data-part="action"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-block-size: var(--rind-hit-area);
+    min-inline-size: var(--rind-hit-area);
+  }
+
+  @media (forced-colors: active) {
+    [data-scope="dialog"]:is([data-part="cancel"], [data-part="action"])[data-focus-visible] {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
     }
   }
 }

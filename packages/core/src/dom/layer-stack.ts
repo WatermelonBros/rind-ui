@@ -26,7 +26,7 @@ export type LayerKind =
 export interface LayerOptions {
   readonly id: LayerId
   readonly kind: LayerKind
-  /** Layers of one family count as nested in each other (Dialog and Alert Dialog: "dialog"). */
+  /** Layers of one family count as nested in each other (a Dialog in either role: "dialog"). */
   readonly family?: string | undefined
   readonly modal: boolean
   /** The parent layer, from the adapter's layer context. */

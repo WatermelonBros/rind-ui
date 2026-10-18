@@ -459,11 +459,11 @@ describe("nameCheck reads the content at the frame", () => {
 
 describe("buildDialogMachine", () => {
   it("builds machines of another kind from the same graph", () => {
-    const other = buildDialogMachine({ scope: "alert-dialog", kind: "alertdialog" })
+    const other = buildDialogMachine({ scope: "sheet", kind: "drawer" })
     expect(Object.keys(other.def.states)).toEqual(Object.keys(dialogMachine.def.states))
     const s = createService(other, { root: "a", defaultOpen: true } as never, quietEnv as never)
     s.start()
-    expect(lastOptions()).toMatchObject({ kind: "alertdialog", id: "alert-dialog-a" })
+    expect(lastOptions()).toMatchObject({ kind: "drawer", id: "sheet-a" })
     s.stop()
   })
 })

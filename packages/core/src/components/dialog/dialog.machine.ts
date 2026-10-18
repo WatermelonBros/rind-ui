@@ -1,6 +1,7 @@
 // Dialog (design §1): two states and a controllable `open`; the only DOM-touching effect is
 // the overlay effect (layer, dismiss, inert, scroll lock, focus in and out). One builder
-// makes the Dialog and the Alert Dialog machines, so the two never drift apart.
+// makes the Dialog and the Drawer machines; `role="alertdialog"` is a Dialog whose props
+// fix its confirmation behaviour, never a second machine (reka-ui#2702).
 
 import type { Modality } from "../../contract/env"
 import type { DismissReason, DismissRequest } from "../../dom/dismiss"
@@ -35,7 +36,7 @@ export type DialogEvent =
   /** A trigger was activated (`trigger`: its element id, the opener). */
   | { readonly type: "TRIGGER_PRESS"; readonly trigger: string; readonly modality: Modality }
   | { readonly type: "CLOSE_TRIGGER_PRESS"; readonly modality: Modality }
-  /** Alert Dialog: its Cancel and Action parts (`action`: the pressed action's id). */
+  /** Cancel and Action parts (`action`: the pressed action's id). */
   | { readonly type: "CANCEL_PRESS"; readonly modality: Modality }
   | { readonly type: "ACTION_PRESS"; readonly action: string; readonly modality: Modality }
   | Dismissal<"ESCAPE_KEY">
@@ -75,6 +76,11 @@ export interface DismissEvent {
 }
 
 export interface DialogProps {
+  /**
+   * `"alertdialog"`: a confirmation that interrupts. Always modal, an outside press never
+   * closes it, focus starts on Cancel, and a missing description warns.
+   */
+  readonly role?: "dialog" | "alertdialog" | undefined
   readonly open?: boolean | undefined
   readonly defaultOpen?: boolean | undefined
   readonly onOpenChange?: ((open: boolean, details: DialogChangeDetails) => void) | undefined
@@ -153,20 +159,15 @@ type ClosePart = "CLOSE_TRIGGER_PRESS" | "CANCEL_PRESS" | "ACTION_PRESS"
 
 export interface DialogMachineConfig {
   readonly scope: string
-  readonly kind: "dialog" | "alertdialog" | "drawer"
-  /** Nesting metadata counts this family only (default "dialog": Dialog and Alert Dialog). */
+  readonly kind: "dialog" | "drawer"
+  /** Nesting metadata counts this family only (default "dialog": Dialog in both roles). */
   readonly family?: string
-  /** Default: the Dialog's close trigger. The Alert Dialog: Cancel and Action. */
+  /** The parts whose press closes it (default: the close trigger). */
   readonly closeParts?: readonly ClosePart[]
-  /** Always modal, whatever the props (the Alert Dialog). */
-  readonly alwaysModal?: boolean
-  /** Default for `closeOnInteractOutside` (else: `modal`). */
-  readonly closeOnInteractOutside?: boolean
-  /** Default for `initialFocus` (else: the overlay's rule). */
-  readonly initialFocus?: DialogProps["initialFocus"]
-  /** A missing description warns too (the Alert Dialog's message). */
-  readonly describe?: boolean
 }
+
+/** `role="alertdialog"`: the confirmation's fixed behaviour (spec "Alert Dialog Role"). */
+export const isAlertDialog = (props: Pick<DialogProps, "role">) => props.role === "alertdialog"
 
 /** The overlay's `initialFocus` option for the prop (none: the overlay's default rule). */
 function initialFocusOf(
@@ -192,18 +193,16 @@ function initialFocusOf(
 }
 
 /**
- * The dialog family's machine pieces (Dialog, Alert Dialog, Drawer): guards, actions,
+ * The dialog family's machine pieces (Dialog, Drawer): guards, actions,
  * effects and both states' transitions, so a member composes them with its own (the Drawer)
  * instead of copying the graph. `buildDialogMachine` assembles them as they are.
  */
 export function dialogPieces(config: DialogMachineConfig) {
   const { scope, kind } = config
   const closeParts = config.closeParts ?? ["CLOSE_TRIGGER_PRESS"]
-  const isModal = (props: DialogProps) => config.alwaysModal === true || props.modal !== false
+  const isModal = (props: DialogProps) => isAlertDialog(props) || props.modal !== false
   const closeOnOutside = (props: DialogProps) =>
-    config.alwaysModal === true
-      ? (config.closeOnInteractOutside ?? true)
-      : (props.closeOnInteractOutside ?? config.closeOnInteractOutside ?? isModal(props))
+    isAlertDialog(props) ? false : (props.closeOnInteractOutside ?? isModal(props))
   const guards = {
     isNonModal: ({ props }) => !isModal(props),
     // The overlay sends these only when enabled; the guards make the graph say so too.
@@ -248,7 +247,7 @@ export function dialogPieces(config: DialogMachineConfig) {
       const final = a.props.finalFocus
       const stop = overlayEffect(env, {
         id: layerIdOf(scope, a.props.root),
-        kind,
+        kind: isAlertDialog(a.props) ? "alertdialog" : kind,
         family: config.family ?? "dialog",
         modal,
         parent: a.props.parent,
@@ -262,7 +261,7 @@ export function dialogPieces(config: DialogMachineConfig) {
         container: content,
         modality: env.modality.modality(),
         ...(initialFocusOf(
-          initial === undefined ? config.initialFocus : initial,
+          initial === undefined && isAlertDialog(a.props) ? "cancel" : initial,
           content,
           () => byId("title") as HTMLElement | null,
         ) ?? {}),
@@ -306,15 +305,14 @@ export function dialogPieces(config: DialogMachineConfig) {
       const frame = env.scheduler.requestAnimationFrame(() => {
         const el = env.dom.getById(partId(scope, props.root, "content"))
         if (!el) return
-        const name =
-          scope === "alert-dialog" ? "AlertDialog" : scope === "drawer" ? "Drawer" : "Dialog"
+        const name = scope === "drawer" ? "Drawer" : "Dialog"
         // The content's own attributes: its title (aria-labelledby) or a label.
         if (!el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby")) {
           console.warn(
             `[rind-ui] ${scope}: #${el.id} has no accessible name; render ${name}.Title or pass aria-label`,
           )
         }
-        if (config.describe && !el.getAttribute("aria-describedby")) {
+        if (isAlertDialog(props) && !el.getAttribute("aria-describedby")) {
           console.warn(
             `[rind-ui] ${scope}: #${el.id} has no description; render ${name}.Description with the alert message`,
           )
@@ -398,5 +396,10 @@ export function buildDialogMachine(config: DialogMachineConfig) {
 /** The layer id of a dialog-family instance. */
 export const layerIdOf = (scope: string, root: string) => `${scope}-${root}` as LayerId
 
-export const dialogMachine = buildDialogMachine({ scope: "dialog", kind: "dialog" })
+export const dialogMachine = buildDialogMachine({
+  scope: "dialog",
+  kind: "dialog",
+  // Cancel and Action are Dialog parts: a confirmation uses them, any dialog may.
+  closeParts: ["CLOSE_TRIGGER_PRESS", "CANCEL_PRESS", "ACTION_PRESS"],
+})
 export type DialogMachine = typeof dialogMachine

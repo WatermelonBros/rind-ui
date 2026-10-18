@@ -1,14 +1,45 @@
-# alert-dialog Specification
+## ADDED Requirements
 
-## Purpose
-Defines rind-ui's Alert Dialog: a modal dialog that asks the user to confirm or
-cancel a consequential action. It behaves as the `dialog` capability
-(`add-dialog`) specifies, except where this capability says otherwise; layer
-mechanics come from `add-overlay-infrastructure` and are not restated.
-## Requirements
-### Requirement: Same Behaviour As Dialog Unless Stated
+### Requirement: Alert Dialog Role
 
-The Alert Dialog SHALL meet every requirement of the `dialog` capability — open state
+`Dialog.Root` SHALL accept `role` (`"dialog"`, the default, or `"alertdialog"`). With
+`role="alertdialog"` the dialog is a confirmation: its content SHALL have role
+`alertdialog`, its layer kind SHALL be `alertdialog`, it SHALL be modal whatever the
+props, an outside press SHALL never close it, its initial focus SHALL default to the
+`cancel` part, and a missing description SHALL log a development warning. `modal` and
+`closeOnInteractOutside` SHALL NOT be props of a `role="alertdialog"` Root (a type error).
+Every other behaviour SHALL be the Dialog's; the parts SHALL keep `data-scope="dialog"`.
+There SHALL be no separate Alert Dialog component or machine.
+
+#### Scenario: A confirmation from Dialog parts
+
+- **WHEN** `<Dialog.Root role="alertdialog">` renders a trigger, a title, a description,
+  `Dialog.Cancel` and `Dialog.Action`, and the trigger is pressed
+- **THEN** an `alertdialog` named by the title and described by the description opens,
+  modal, with focus on Cancel, and a press on the backdrop leaves it open
+
+#### Scenario: The role cannot be weakened
+
+- **WHEN** a consumer writes `<Dialog.Root role="alertdialog" modal={false}>`
+- **THEN** it does not compile
+
+### Requirement: Cancel And Action Parts
+
+The Dialog SHALL provide `cancel` (`button`) and `action` (`button`) parts, usable in
+either role. A press on `cancel` SHALL request a close with reason `cancel`; a press on an
+`action` SHALL request a close with reason `action` (the event carries the action's id),
+cancellable through `details.cancel()`. Both SHALL default to `type="button"` and carry
+`data-scope="dialog"`, their `data-part`, `data-focus`, `data-focus-visible`,
+`data-pressed` and `data-disabled`. Any number of actions MAY be rendered.
+
+#### Scenario: Cancel in a plain dialog
+
+- **WHEN** a dialog with the default role renders `Dialog.Cancel` and the user presses it
+- **THEN** it closes and `onOpenChange` reports reason `cancel`
+
+### Requirement: Alert Dialog Role — Same Behaviour As Dialog Unless Stated
+
+A Dialog with `role="alertdialog"` (a confirmation) SHALL meet every requirement of the `dialog` capability — open state
 and controlled mode, parent layer, nesting, forms, mounting, server rendering,
 final focus, roles of the trigger, merging of consumer ids — except the ones this
 capability replaces: modality, dismissal defaults, initial focus, role, naming,
@@ -18,12 +49,12 @@ machine definition as the Dialog, not from a copy.
 #### Scenario: Shared fix
 
 - **WHEN** a bug in focus restore is fixed in the Dialog machine
-- **THEN** the Alert Dialog's model-based tests exercise the fixed code path without
-  any change to the Alert Dialog (regression: reka-ui#2702)
+- **THEN** a confirmation's model-based tests exercise the fixed code path without
+  any change to a confirmation (regression: reka-ui#2702)
 
-### Requirement: Anatomy
+### Requirement: Alert Dialog Role — Anatomy
 
-The Alert Dialog SHALL consist of `root`, `trigger`, `backdrop`, `positioner`,
+A Dialog with `role="alertdialog"` (a confirmation) SHALL consist of `root`, `trigger`, `backdrop`, `positioner`,
 `content`, `title`, `description`, `cancel` (`button`) and `action` (`button`).
 `cancel` and `action` SHALL default to `type="button"`; any number of `action`
 parts MAY be rendered.
@@ -35,9 +66,9 @@ parts MAY be rendered.
 - **THEN** an `alertdialog` named "Delete project?" and described by the description
   is shown, and "Cancel" is focused
 
-### Requirement: Always Modal
+### Requirement: Alert Dialog Role — Always Modal
 
-The Alert Dialog SHALL always be a modal layer of kind `alertdialog` and SHALL NOT
+A Dialog with `role="alertdialog"` (a confirmation) SHALL always be a modal layer of kind `alertdialog` and SHALL NOT
 accept a `modal` prop. Its content SHALL have `role="alertdialog"` and
 `aria-modal="true"`.
 
@@ -47,10 +78,10 @@ accept a `modal` prop. Its content SHALL have `role="alertdialog"` and
 - **THEN** the page behind is inert and scroll-locked, Tab stays inside, and the
   content has `role="alertdialog"` and `aria-modal="true"`
 
-### Requirement: Dismissal
+### Requirement: Alert Dialog Role — Dismissal
 
 An outside press, including a press on the backdrop or positioner, SHALL NOT close
-the Alert Dialog, and it SHALL NOT accept a `closeOnInteractOutside` prop. Escape
+a confirmation, and it SHALL NOT accept a `closeOnInteractOutside` prop. Escape
 SHALL close it with reason `escape-key` unless `closeOnEscape={false}` or the
 consumer vetoes the request.
 
@@ -73,7 +104,7 @@ consumer vetoes the request.
 - **THEN** the dialog stays open (native `<dialog>` cannot guarantee this:
   native-platform.md §1; regression: radix#2227)
 
-### Requirement: Cancel And Action
+### Requirement: Alert Dialog Role — Cancel And Action
 
 Pressing `cancel` SHALL request closing with reason `cancel`. Pressing an
 `action` SHALL request closing with reason `action`; the dialog SHALL close
@@ -105,7 +136,7 @@ Dialog's rule that the form's `submit` event fires before the content unmounts.
   from `escape-key` and `action` (regression: react-spectrum#8139,
   react-spectrum#1773)
 
-### Requirement: Initial Focus
+### Requirement: Alert Dialog Role — Initial Focus
 
 By default, on open, focus SHALL move to the `cancel` part, whatever the modality
 (a button does not open the on-screen keyboard), else to the content.
@@ -131,9 +162,9 @@ element that is no longer connected.
 - **WHEN** an alert dialog renders only an "OK" action
 - **THEN** the content is focused
 
-### Requirement: Naming And Description
+### Requirement: Alert Dialog Role — Naming And Description
 
-An open Alert Dialog SHALL have an accessible name (as the Dialog) and an accessible
+An open confirmation SHALL have an accessible name (as the Dialog) and an accessible
 description that conveys the alert message. When the title (or `aria-label` /
 `aria-labelledby`) is missing, or the description (or a consumer
 `aria-describedby`) is missing, it SHALL emit one development warning per missing
@@ -145,9 +176,9 @@ item and SHALL NOT throw.
 - **THEN** one development warning names the missing description, and the content
   has no `aria-describedby` attribute (regression: react-spectrum#9916)
 
-### Requirement: Nested Alert Dialogs
+### Requirement: Alert Dialog Role — Nested Alert Dialogs
 
-An Alert Dialog opened from a Dialog, or a Dialog opened from an Alert Dialog, SHALL be
+A confirmation opened from a Dialog, or a Dialog opened from a confirmation, SHALL be
 a child layer of it, with the stacking metadata of the Dialog's Nested Dialogs
 requirement; closing the child SHALL NOT close the parent.
 
@@ -159,7 +190,7 @@ requirement; closing the child SHALL NOT close the parent.
   then, and focus returns to the edit dialog's "Close" button that opened it
   (regression: radix#1858, mui/base-ui#1165)
 
-### Requirement: Title Heading Level
+### Requirement: Alert Dialog Role — Title Heading Level
 
 The `title` part SHALL render `h{level}`, with `level` = the Title's `level` prop ?? 2,
 so it stays `h2` by default; its heading attributes SHALL come from add-heading's shared
@@ -184,9 +215,9 @@ children in a `Heading.Level` set to the title's level + 1 (3 by default), so a
 - **WHEN** the title is rendered with `render={<div />}`
 - **THEN** the element has `role="heading"` and `aria-level="2"`
 
-### Requirement: Data Attributes
+### Requirement: Alert Dialog Role — Data Attributes
 
-Every part SHALL carry `data-scope="alert-dialog"`, `data-part` (`trigger`,
+Every part SHALL carry `data-scope="dialog"`, `data-part` (`trigger`,
 `backdrop`, `positioner`, `content`, `title`, `description`, `cancel`, `action`) and
 `data-instance`, and the same state, focus, press, nesting and close-reason
 attributes as the corresponding Dialog part. `data-modal` SHALL always be present on
@@ -199,26 +230,53 @@ attributes as the corresponding Dialog part. `data-modal` SHALL always be presen
 - **THEN** during its exit animation the content has `data-state="closed"` and
   `data-close-reason="action"`
 
-### Requirement: Alert Dialog Contract
+### Requirement: Alert Dialog Role — Alert Dialog Contract
 
-The `alert-dialog` contract SHALL locate an instance as the Dialog contract does, through
-its trigger (role `button`, exact name `trigger` defaulting to the dialog's `name`), since
-a closed dialog has no content to locate; it SHALL declare the traits `layer`, `modal`, `restores-focus` and
-`presence`, and SHALL declare the Dialog contract's actions and queries except
-`close`, plus `cancel()` and `confirm(name?)` (press the action with that accessible
-name, or the only action), each with pointer and keyboard implementations. Its
-`pressOutside` action SHALL complete when the dialog is still open. The event map
-SHALL map `CANCEL_PRESS` to `cancel` and `ACTION_PRESS` to `confirm`.
+The confirmation's contract variant (`alertDialogRoleContract`, which
+`getDialog(target, { name, role: "alertdialog" })` uses) SHALL locate an instance as the
+Dialog contract does, through its trigger (role `button`, exact name `trigger` defaulting
+to the dialog's `name`), since a closed dialog has no content to locate; it SHALL declare
+the traits `modal` and `presence`, and the Dialog contract's actions and queries, which
+include `cancel()` and `confirm(name?)` (press the action with that accessible name, or
+the only action), each with pointer and keyboard implementations. Its `pressOutside`
+action SHALL complete when the dialog is still open. The event map SHALL map
+`CANCEL_PRESS` to `cancel`, `ACTION_PRESS` to `confirm`, and `CLOSE_TRIGGER_PRESS` to a
+skip (a confirmation has Cancel and Action).
 
 #### Scenario: Driver
 
-- **WHEN** a test runs `const a = getAlertDialog(screen, { name: "Delete project?" })`,
+- **WHEN** a test runs `const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" })`,
   `await a.open()`, `await a.confirm("Delete")`
 - **THEN** both resolve, and `await a.closeReason()` is `"action"`
 
 #### Scenario: Model run
 
-- **WHEN** `testMachine(alertDialogContract, …)` runs in every modality
+- **WHEN** `testMachine(alertDialogRoleContract, …)` runs in every modality
 - **THEN** every transition is covered, outside-press steps expect the dialog to stay
   open, and every generic, accessibility and overlay invariant passes
 
+## MODIFIED Requirements
+
+### Requirement: Anatomy
+
+The Dialog SHALL consist of these parts: `root` (renders no element), `trigger`
+(`button`), `backdrop` (`div`), `positioner` (`div`), `content` (`div`), `title`
+(`h2`), `description` (`p`), `close-trigger` (`button`), `cancel` (`button`) and
+`action` (`button`). Only `root` and `content` SHALL be required. Any number of
+`trigger`, `close-trigger` and `action` parts MAY be rendered. The content, backdrop
+and positioner SHALL work the same whether they are rendered inline or inside the shared
+`Portal` part. Every part SHALL accept the props of the element it renders and SHALL
+support element substitution without a change in behaviour.
+
+#### Scenario: Minimal dialog
+
+- **WHEN** a dialog renders only a root and a content with `aria-label="Settings"`
+  and is opened programmatically
+- **THEN** a `dialog` named "Settings" is shown, focused and modal
+
+#### Scenario: Ark-shaped markup
+
+- **WHEN** Reado's `Modal` (root, portal, backdrop, positioner, content with
+  `aria-label`) is rewritten with rind-ui parts of the same names
+- **THEN** it opens, traps focus, closes on Escape and on a backdrop press, and
+  returns focus, with no other change to its markup

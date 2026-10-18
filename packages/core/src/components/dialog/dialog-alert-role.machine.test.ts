@@ -1,4 +1,5 @@
-// The Alert Dialog machine in Node (openspec add-alert-dialog 1.3): every transition,
+// The Dialog machine with `role="alertdialog"` in Node (openspec
+// merge-alert-dialog-into-dialog, formerly add-alert-dialog 1.3): every transition,
 // Cancel and Action as close parts, controlled refusal, cancel() on an action, no outside
 // press transition, initial focus resolved from the live content, the description warning.
 // The overlay effect is replaced by a recorder, as in the Dialog machine tests.
@@ -15,8 +16,7 @@ vi.mock("../../dom/overlay", () => ({
   },
 }))
 
-import type { DialogEvent, DialogProps } from "../dialog/dialog.machine"
-import { alertDialogMachine } from "./alert-dialog.machine"
+import { type DialogEvent, type DialogProps, dialogMachine } from "./dialog.machine"
 
 const lastOptions = () => overlay.calls[overlay.calls.length - 1] as OverlayEffectOptions
 
@@ -28,8 +28,8 @@ const quietEnv = {
 
 function make(over: Partial<DialogProps> = {}, env: object = quietEnv) {
   const onOpenChange = vi.fn()
-  let props: DialogProps = { root: "r", onOpenChange, ...over }
-  const s = createService(alertDialogMachine, props as never, env as never)
+  let props: DialogProps = { root: "r", role: "alertdialog", onOpenChange, ...over }
+  const s = createService(dialogMachine, props as never, env as never)
   s.start()
   return {
     s,
@@ -97,10 +97,11 @@ describe("transitions", () => {
     expect(m.onOpenChange).not.toHaveBeenCalled()
   })
 
-  it("CLOSE_TRIGGER_PRESS is not a close part of the alert dialog", () => {
+  it("a close trigger in a confirmation closes it with its own reason (Dialog parts work in both)", () => {
     const m = make({ defaultOpen: true })
     m.send({ type: "CLOSE_TRIGGER_PRESS", modality: "pointer" })
-    expect(m.state()).toBe("open")
+    expect(m.state()).toBe("closed")
+    expect(m.onOpenChange.mock.calls.at(-1)?.[1].reason).toBe("close-trigger")
   })
 
   it("the trigger never toggles it closed (always modal)", () => {
@@ -199,7 +200,7 @@ describe("overlay effect wiring", () => {
   it("is an alertdialog layer, always modal, with the dialog family and parent kinds", () => {
     make({ defaultOpen: true, parent: "p" as never })
     expect(lastOptions()).toMatchObject({
-      id: "alert-dialog-r",
+      id: "dialog-r",
       kind: "alertdialog",
       family: "dialog",
       modal: true,
@@ -243,14 +244,14 @@ describe("overlay effect wiring", () => {
 
 describe("initialFocus", () => {
   const contentWith = (cancel: object | null) => ({
-    id: "alert-dialog-r-content",
+    id: "dialog-r-content",
     getAttribute: () => null,
     // The machine asks for an enabled Cancel (disabled ones cannot take focus).
     querySelector: (sel: string) => (sel.startsWith('[data-part="cancel"]') ? cancel : null),
   })
   const envWith = (content: () => unknown) => ({
     ...quietEnv,
-    dom: { getById: (id: string) => (id === "alert-dialog-r-content" ? content() : null) },
+    dom: { getById: (id: string) => (id === "dialog-r-content" ? content() : null) },
   })
 
   it('defaults to "cancel": the Cancel element inside the content', () => {
@@ -303,10 +304,10 @@ describe("initialFocus", () => {
 describe("nameCheck: title and description", () => {
   function withContent(attrs: Record<string, string>) {
     const frames: (() => void)[] = []
-    const el = { id: "alert-dialog-r-content", getAttribute: (n: string) => attrs[n] ?? null }
+    const el = { id: "dialog-r-content", getAttribute: (n: string) => attrs[n] ?? null }
     const env = {
       ...quietEnv,
-      dom: { getById: (id: string) => (id === "alert-dialog-r-content" ? el : null) },
+      dom: { getById: (id: string) => (id === "dialog-r-content" ? el : null) },
       scheduler: {
         requestAnimationFrame: (cb: () => void) => frames.push(cb),
         cancelAnimationFrame: () => {},

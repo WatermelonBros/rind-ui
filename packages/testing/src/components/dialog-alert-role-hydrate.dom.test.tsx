@@ -1,7 +1,7 @@
 // Alert Dialog server markup (it follows the Dialog's "Server Rendering"): an inline alert dialog
 // with `defaultOpen` renders open with the client's ids; hydration is silent, inerts the page and
 // focuses Cancel.
-import { AlertDialog } from "@rind-ui/react"
+import { Dialog } from "@rind-ui/react"
 import { act, waitFor } from "@testing-library/react"
 import { StrictMode } from "react"
 import { hydrateRoot } from "react-dom/client"
@@ -13,23 +13,23 @@ afterEach(() => vi.restoreAllMocks())
 const tree = () => (
   <>
     <button type="button">Page button</button>
-    <AlertDialog.Root defaultOpen id="d">
-      <AlertDialog.Trigger>Open</AlertDialog.Trigger>
-      <AlertDialog.Backdrop />
-      <AlertDialog.Positioner>
-        <AlertDialog.Content>
-          <AlertDialog.Title>Delete project?</AlertDialog.Title>
-          <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          <AlertDialog.Action>Delete</AlertDialog.Action>
-        </AlertDialog.Content>
-      </AlertDialog.Positioner>
-    </AlertDialog.Root>
+    <Dialog.Root role="alertdialog" defaultOpen id="d">
+      <Dialog.Trigger>Open</Dialog.Trigger>
+      <Dialog.Backdrop />
+      <Dialog.Positioner>
+        <Dialog.Content>
+          <Dialog.Title>Delete project?</Dialog.Title>
+          <Dialog.Description>This cannot be undone.</Dialog.Description>
+          <Dialog.Cancel>Cancel</Dialog.Cancel>
+          <Dialog.Action>Delete</Dialog.Action>
+        </Dialog.Content>
+      </Dialog.Positioner>
+    </Dialog.Root>
   </>
 )
 
 const ids = (root: ParentNode) =>
-  [...root.querySelectorAll("[id]")].map((e) => e.id).filter((id) => id.includes("alert-dialog"))
+  [...root.querySelectorAll("[id]")].map((e) => e.id).filter((id) => id.startsWith("dialog-"))
 
 describe("Alert Dialog hydration", () => {
   it("server markup: content open, parts carry ids derived from the root", () => {

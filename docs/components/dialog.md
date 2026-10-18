@@ -6,7 +6,7 @@ A window layered over the page. It is modal by default: everything outside is in
 
 - **Use it for** a window over the page that needs the user's attention: an edit form, a confirmation of details, a short task.
 - **Over a native `<dialog>`**: it adds inert content behind, scroll lock, Tab kept inside, focus moved in on open and returned to the opener on close, a name from its title, and exit animations through `data-*` state.
-- **Don't use it for** a decision that must be answered before anything else: use an [Alert Dialog](alert-dialog.md). For a small non-modal panel anchored to a button, use a [Popover](popover.md). For a hint on hover, use a [Tooltip](tooltip.md).
+- **Don't use it for** a decision that must be answered before anything else: use a [confirmation](#confirmation-alert-dialog) (`role="alertdialog"`). For a small non-modal panel anchored to a button, use a [Popover](popover.md). For a hint on hover, use a [Tooltip](tooltip.md).
 
 ```tsx
 import { Dialog } from "@rind-ui/react"
@@ -68,6 +68,95 @@ Enter in a field submits the form natively; the dialog never handles Enter. A `D
 ## Nesting
 
 A dialog opened from inside another dialog is its child: Escape and a press on the child's backdrop close only the child, focus returns to the button that opened it, and closing the parent closes the child first with `PARENT_DISMISSED`. Parent content has `data-has-nested`, the child `data-nested`, and both expose `--layer-index` and `--nested-layer-count`. A dialog rendered inside a menu item is not the menu's child, so it survives the menu closing.
+
+## Confirmation (alert dialog)
+
+`role="alertdialog"` makes the dialog a confirmation: a question the user must answer before going on. `Dialog.Cancel` and `Dialog.Action` are its buttons.
+
+```tsx
+<Dialog.Root role="alertdialog">
+  <Dialog.Trigger>Delete project</Dialog.Trigger>
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Positioner>
+      <Dialog.Content>
+        <Dialog.Title>Delete project?</Dialog.Title>
+        <Dialog.Description>This cannot be undone.</Dialog.Description>
+        <Dialog.Cancel>Cancel</Dialog.Cancel>
+        <Dialog.Action>Delete</Dialog.Action>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+### When to use
+
+- **Use it for** a decision the user must take before anything else: confirm a deletion, discard changes, acknowledge an error. It interrupts the workflow, so a press outside never dismisses it by accident.
+- **Over a plain dialog**: the content is `role="alertdialog"`, it is always modal, an outside press never closes it, focus starts on Cancel (the least destructive choice, and a button never opens the on-screen keyboard), and a missing description warns in development. `modal` and `closeOnInteractOutside` are not props of a confirmation (a type error), so it cannot be weakened by accident.
+- **Don't use it for** anything the user may walk away from (forms, settings, details): use a plain dialog. A message that needs no answer is an [Alert](alert.md) or a [Toast](toast.md).
+
+### Cancel and Action
+
+`Dialog.Cancel` closes with reason `cancel`; `Dialog.Action` with reason `action` (render several for several choices; `confirm(name)` in tests picks one). Both default to `type="button"`, and both work in a plain dialog too. An `Action type="submit"` inside a form runs the form's `submit` while it is still connected, then closes; an invalid form stays open.
+
+### Escape, naming and focus
+
+Escape closes the topmost confirmation with reason `escape-key`; turn it off with `closeOnEscape={false}` for a choice that must be explicit, or decide per request with `onEscapeKeyDown` and `event.preventDefault()`. A press on the backdrop or the positioner does nothing and calls no `onOpenChange`.
+
+It needs a name (`Dialog.Title`, or `aria-label` / `aria-labelledby`) and a description of the message (`Dialog.Description`, or `aria-describedby`); each missing one logs a development warning. Focus moves to Cancel on open, looked up when focus moves; with no Cancel, the content takes focus. `initialFocus` takes `"cancel"` (the default here), `"content"`, `"title"`, a function, or `false`.
+
+### Async confirm
+
+An action closes the dialog unless the request is cancelled. For work that takes time, cancel the close, show progress and close it yourself when the work is done:
+
+```tsx
+const actions = useRef<DialogActions>(null)
+const [pending, setPending] = useState(false)
+
+<Dialog.Root
+  role="alertdialog"
+  actionsRef={actions}
+  onOpenChange={(open, details) => {
+    if (open || details.reason !== "action") return
+    details.cancel()
+    setPending(true)
+    remove().finally(() => {
+      setPending(false)
+      actions.current?.close()
+    })
+  }}
+>
+  …
+  <Dialog.Action disabled={pending}>{pending ? "Deleting" : "Delete"}</Dialog.Action>
+</Dialog.Root>
+```
+
+While it runs the dialog stays open, the page behind stays inert and Cancel keeps working.
+
+### Styling and testing
+
+`dialog.css` styles a confirmation narrower, with Cancel and Action as an end-aligned row under the message (render them as direct children of the Content), and reads `--rind-alert-dialog-*` tokens that fall back to `--rind-dialog-*`.
+
+```tsx
+const confirm = getDialog(screen, { name: "Delete project?", role: "alertdialog" })
+await confirm.open()
+await confirm.confirm("Delete")
+expect(await confirm.closeReason()).toBe("action")
+```
+
+With `role: "alertdialog"`, `pressOutside()` completes with the dialog still open; `cancel()` and `confirm(name?)` press its buttons.
+
+<!-- aria:dialog--confirmation-open -->
+```yaml
+- button "Delete project"
+- alertdialog "Delete project?":
+  - heading "Delete project?" [level=2]
+  - paragraph: This cannot be undone.
+  - button "Cancel"
+  - button "Delete"
+```
+<!-- /aria -->
 
 ## Migrating from Reado / Ark
 

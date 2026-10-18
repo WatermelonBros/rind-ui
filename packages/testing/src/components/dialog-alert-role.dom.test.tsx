@@ -1,21 +1,17 @@
-// Alert Dialog scenarios (add-alert-dialog tasks 3.2, 5.1, A.1): every implementable spec
-// scenario and cited regression, in jsdom and in real browsers.
+// Dialog with role="alertdialog" (merge-alert-dialog-into-dialog; formerly add-alert-dialog
+// tasks 3.2, 5.1, A.1): every implementable spec scenario and cited regression, in jsdom and in
+// real browsers.
 //
-// Not covered here: the model run lives in alert-dialog.model.dom.test.tsx, server rendering
-// in alert-dialog-hydrate.dom.test.tsx, the reading order in alert-dialog.reading-order.dom.test.tsx,
-// "Shared fix" (reka-ui#2702) is structural: alertDialogMachine is built by buildDialogMachine.
-import {
-  AlertDialog,
-  type AlertDialogRootProps,
-  Dialog,
-  type DialogActions,
-  Heading,
-} from "@rind-ui/react"
+// Not covered here: the model run lives in dialog-alert-role.model.dom.test.tsx, server
+// rendering in dialog-alert-role-hydrate.dom.test.tsx, the reading order in
+// dialog-alert-role.reading-order.dom.test.tsx. "Shared fix" (reka-ui#2702) is structural: a
+// confirmation is the Dialog machine with a role, never a second machine.
+import { Dialog, type DialogActions, type DialogRootProps, Heading } from "@rind-ui/react"
 import { act, cleanup, render, screen, within } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { createRef, type ReactNode, type RefObject, useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getAlertDialog } from "../index"
+import { getDialog } from "../index"
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -29,7 +25,7 @@ const frames = (count = 6) =>
   })
 const active = () => document.activeElement
 
-interface FullProps extends Partial<AlertDialogRootProps> {
+interface FullProps extends Omit<DialogRootProps<"alertdialog">, "role"> {
   readonly title?: string | null
   readonly description?: string | null
   readonly cancel?: boolean
@@ -47,26 +43,24 @@ function Full({
   ...root
 }: FullProps) {
   return (
-    <AlertDialog.Root {...root}>
-      <AlertDialog.Trigger>{label}</AlertDialog.Trigger>
-      <AlertDialog.Portal>
-        <AlertDialog.Backdrop />
-        <AlertDialog.Positioner style={{ position: "fixed", inset: 0 }}>
-          <AlertDialog.Content>
-            {title === null ? null : <AlertDialog.Title>{title}</AlertDialog.Title>}
-            {description === null ? null : (
-              <AlertDialog.Description>{description}</AlertDialog.Description>
-            )}
+    <Dialog.Root role="alertdialog" {...root}>
+      <Dialog.Trigger>{label}</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner style={{ position: "fixed", inset: 0 }}>
+          <Dialog.Content>
+            {title === null ? null : <Dialog.Title>{title}</Dialog.Title>}
+            {description === null ? null : <Dialog.Description>{description}</Dialog.Description>}
             {children ?? (
               <>
-                {cancel ? <AlertDialog.Cancel>Cancel</AlertDialog.Cancel> : null}
-                <AlertDialog.Action>Delete</AlertDialog.Action>
+                {cancel ? <Dialog.Cancel>Cancel</Dialog.Cancel> : null}
+                <Dialog.Action>Delete</Dialog.Action>
               </>
             )}
-          </AlertDialog.Content>
-        </AlertDialog.Positioner>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
@@ -111,16 +105,16 @@ describe("Anatomy", () => {
     expect(button("Cancel").getAttribute("type")).toBe("button")
     expect(button("Delete").getAttribute("type")).toBe("button")
     for (const p of ["backdrop", "positioner", "content", "title", "description", "cancel"])
-      expect(part(p)?.getAttribute("data-scope"), p).toBe("alert-dialog")
+      expect(part(p)?.getAttribute("data-scope"), p).toBe("dialog")
   })
 
   it("Any number of actions", async () => {
     const user = userEvent.setup()
     render(
       <Full>
-        <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-        <AlertDialog.Action>Archive</AlertDialog.Action>
-        <AlertDialog.Action>Delete</AlertDialog.Action>
+        <Dialog.Cancel>Cancel</Dialog.Cancel>
+        <Dialog.Action>Archive</Dialog.Action>
+        <Dialog.Action>Delete</Dialog.Action>
       </Full>,
     )
     await openByClick(user)
@@ -262,7 +256,8 @@ describe("Cancel and action", () => {
       const [pending, setPending] = useState(false)
       return (
         <div id="app">
-          <AlertDialog.Root
+          <Dialog.Root
+            role="alertdialog"
             actionsRef={actions}
             onOpenChange={(open, details) => {
               if (open || details.reason !== "action") return
@@ -276,21 +271,21 @@ describe("Cancel and action", () => {
               })
             }}
           >
-            <AlertDialog.Trigger>Delete project?</AlertDialog.Trigger>
-            <AlertDialog.Portal>
-              <AlertDialog.Backdrop />
-              <AlertDialog.Positioner style={{ position: "fixed", inset: 0 }}>
-                <AlertDialog.Content>
-                  <AlertDialog.Title>Delete project?</AlertDialog.Title>
-                  <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-                  <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-                  <AlertDialog.Action disabled={pending}>
+            <Dialog.Trigger>Delete project?</Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Backdrop />
+              <Dialog.Positioner style={{ position: "fixed", inset: 0 }}>
+                <Dialog.Content>
+                  <Dialog.Title>Delete project?</Dialog.Title>
+                  <Dialog.Description>This cannot be undone.</Dialog.Description>
+                  <Dialog.Cancel>Cancel</Dialog.Cancel>
+                  <Dialog.Action disabled={pending}>
                     {pending ? "Deleting" : "Delete"}
-                  </AlertDialog.Action>
-                </AlertDialog.Content>
-              </AlertDialog.Positioner>
-            </AlertDialog.Portal>
-          </AlertDialog.Root>
+                  </Dialog.Action>
+                </Dialog.Content>
+              </Dialog.Positioner>
+            </Dialog.Portal>
+          </Dialog.Root>
         </div>
       )
     }
@@ -322,8 +317,8 @@ describe("Cancel and action", () => {
             connected.push(e.currentTarget.isConnected)
           }}
         >
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          <AlertDialog.Action type="submit">Delete</AlertDialog.Action>
+          <Dialog.Cancel>Cancel</Dialog.Cancel>
+          <Dialog.Action type="submit">Delete</Dialog.Action>
         </form>
       </Full>,
     )
@@ -374,8 +369,8 @@ describe("Cancel and action", () => {
     const user = userEvent.setup()
     render(
       <Full>
-        <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-        <AlertDialog.Action disabled>Delete</AlertDialog.Action>
+        <Dialog.Cancel>Cancel</Dialog.Cancel>
+        <Dialog.Action disabled>Delete</Dialog.Action>
       </Full>,
     )
     await openByClick(user)
@@ -412,19 +407,19 @@ describe("Initial focus", () => {
       const [version, set] = useState(0)
       setVersion = set
       return (
-        <AlertDialog.Root actionsRef={actions}>
-          <AlertDialog.Trigger>Delete project?</AlertDialog.Trigger>
-          <AlertDialog.Portal>
-            <AlertDialog.Positioner>
-              <AlertDialog.Content key={version}>
-                <AlertDialog.Title>Delete project?</AlertDialog.Title>
-                <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-                <AlertDialog.Cancel data-version={version}>Cancel</AlertDialog.Cancel>
-                <AlertDialog.Action>Delete</AlertDialog.Action>
-              </AlertDialog.Content>
-            </AlertDialog.Positioner>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+        <Dialog.Root role="alertdialog" actionsRef={actions}>
+          <Dialog.Trigger>Delete project?</Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Positioner>
+              <Dialog.Content key={version}>
+                <Dialog.Title>Delete project?</Dialog.Title>
+                <Dialog.Description>This cannot be undone.</Dialog.Description>
+                <Dialog.Cancel data-version={version}>Cancel</Dialog.Cancel>
+                <Dialog.Action>Delete</Dialog.Action>
+              </Dialog.Content>
+            </Dialog.Positioner>
+          </Dialog.Portal>
+        </Dialog.Root>
       )
     }
     render(<Replaced />)
@@ -440,7 +435,7 @@ describe("Initial focus", () => {
     const user = userEvent.setup()
     render(
       <Full cancel={false}>
-        <AlertDialog.Action>OK</AlertDialog.Action>
+        <Dialog.Action>OK</Dialog.Action>
       </Full>,
     )
     await openByClick(user)
@@ -496,11 +491,11 @@ describe("Naming and description", () => {
     render(
       <>
         <p id="hint">Hint</p>
-        <AlertDialog.Root defaultOpen>
-          <AlertDialog.Content aria-label="Sure?" aria-describedby="hint">
-            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-          </AlertDialog.Content>
-        </AlertDialog.Root>
+        <Dialog.Root role="alertdialog" defaultOpen>
+          <Dialog.Content aria-label="Sure?" aria-describedby="hint">
+            <Dialog.Cancel>Cancel</Dialog.Cancel>
+          </Dialog.Content>
+        </Dialog.Root>
       </>,
     )
     await frames()
@@ -516,20 +511,20 @@ describe("Nested alert dialogs", () => {
           <Dialog.Backdrop />
           <Dialog.Positioner>
             <Dialog.Content aria-label="Edit">
-              <AlertDialog.Root>
-                <AlertDialog.Trigger>Discard</AlertDialog.Trigger>
-                <AlertDialog.Portal>
-                  <AlertDialog.Backdrop />
-                  <AlertDialog.Positioner>
-                    <AlertDialog.Content>
-                      <AlertDialog.Title>Discard changes?</AlertDialog.Title>
-                      <AlertDialog.Description>Edits will be lost.</AlertDialog.Description>
-                      <AlertDialog.Cancel>Keep editing</AlertDialog.Cancel>
-                      <AlertDialog.Action>Discard</AlertDialog.Action>
-                    </AlertDialog.Content>
-                  </AlertDialog.Positioner>
-                </AlertDialog.Portal>
-              </AlertDialog.Root>
+              <Dialog.Root role="alertdialog">
+                <Dialog.Trigger>Discard</Dialog.Trigger>
+                <Dialog.Portal>
+                  <Dialog.Backdrop />
+                  <Dialog.Positioner>
+                    <Dialog.Content>
+                      <Dialog.Title>Discard changes?</Dialog.Title>
+                      <Dialog.Description>Edits will be lost.</Dialog.Description>
+                      <Dialog.Cancel>Keep editing</Dialog.Cancel>
+                      <Dialog.Action>Discard</Dialog.Action>
+                    </Dialog.Content>
+                  </Dialog.Positioner>
+                </Dialog.Portal>
+              </Dialog.Root>
             </Dialog.Content>
           </Dialog.Positioner>
         </Dialog.Portal>
@@ -570,17 +565,17 @@ describe("Nested alert dialogs", () => {
   it("A Dialog opened from an alert dialog is its child", async () => {
     const user = userEvent.setup()
     render(
-      <AlertDialog.Root defaultOpen>
-        <AlertDialog.Content aria-label="Sure?" aria-describedby="x">
-          <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+      <Dialog.Root role="alertdialog" defaultOpen>
+        <Dialog.Content aria-label="Sure?" aria-describedby="x">
+          <Dialog.Cancel>Cancel</Dialog.Cancel>
           <Dialog.Root>
             <Dialog.Trigger>More</Dialog.Trigger>
             <Dialog.Content aria-label="Details">
               <Dialog.CloseTrigger>Close details</Dialog.CloseTrigger>
             </Dialog.Content>
           </Dialog.Root>
-        </AlertDialog.Content>
-      </AlertDialog.Root>,
+        </Dialog.Content>
+      </Dialog.Root>,
     )
     await settle()
     await press(user, screen.getByRole("button", { name: "More" }))
@@ -614,11 +609,11 @@ describe("Data attributes", () => {
 describe("Title heading level", () => {
   it("Title defaults to h2 with data-level 2", async () => {
     render(
-      <AlertDialog.Root defaultOpen>
-        <AlertDialog.Content>
-          <AlertDialog.Title>T</AlertDialog.Title>
-        </AlertDialog.Content>
-      </AlertDialog.Root>,
+      <Dialog.Root role="alertdialog" defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title>T</Dialog.Title>
+        </Dialog.Content>
+      </Dialog.Root>,
     )
     await settle()
     const title = screen.getByRole("heading", { name: "T" })
@@ -628,12 +623,12 @@ describe("Title heading level", () => {
 
   it("A Heading inside the content is one level deeper than the title", async () => {
     render(
-      <AlertDialog.Root defaultOpen>
-        <AlertDialog.Content aria-label="X">
-          <AlertDialog.Title level={3}>T</AlertDialog.Title>
+      <Dialog.Root role="alertdialog" defaultOpen>
+        <Dialog.Content aria-label="X">
+          <Dialog.Title level={3}>T</Dialog.Title>
           <Heading>Inner</Heading>
-        </AlertDialog.Content>
-      </AlertDialog.Root>,
+        </Dialog.Content>
+      </Dialog.Root>,
     )
     await settle()
     expect(screen.getByRole("heading", { name: "Inner" }).tagName).toBe("H4")
@@ -641,11 +636,11 @@ describe("Title heading level", () => {
 
   it("A substituted title keeps role heading and aria-level 2", async () => {
     render(
-      <AlertDialog.Root defaultOpen>
-        <AlertDialog.Content>
-          <AlertDialog.Title render={<div />}>T</AlertDialog.Title>
-        </AlertDialog.Content>
-      </AlertDialog.Root>,
+      <Dialog.Root role="alertdialog" defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title render={<div />}>T</Dialog.Title>
+        </Dialog.Content>
+      </Dialog.Root>,
     )
     await settle()
     const title = screen.getByRole("heading", { name: "T" })
@@ -660,7 +655,9 @@ describe("Driver", () => {
     "Round trip in %s: open, confirm Delete, closeReason action",
     async (modality) => {
       render(<Full />)
-      const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
+      const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" }).via(
+        modality as never,
+      )
       await a.open()
       expect(await a.isOpen()).toBe(true)
       expect(await a.isModal()).toBe(true)
@@ -675,7 +672,9 @@ describe("Driver", () => {
     "Cancel in %s: closeReason cancel",
     async (modality) => {
       render(<Full />)
-      const a = getAlertDialog(screen, { name: "Delete project?" }).via(modality as never)
+      const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" }).via(
+        modality as never,
+      )
       await a.open()
       await a.cancel()
       expect(await a.isOpen()).toBe(false)
@@ -685,7 +684,7 @@ describe("Driver", () => {
 
   it("pressOutside completes with the dialog still open; Escape closes it", async () => {
     render(<Full />)
-    const a = getAlertDialog(screen, { name: "Delete project?" })
+    const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" })
     await a.open()
     await a.pressOutside()
     expect(await a.isOpen()).toBe(true)
@@ -698,10 +697,10 @@ describe("Driver", () => {
   it("confirm() with a single action needs no name", async () => {
     render(
       <Full>
-        <AlertDialog.Action>OK</AlertDialog.Action>
+        <Dialog.Action>OK</Dialog.Action>
       </Full>,
     )
-    const a = getAlertDialog(screen, { name: "Delete project?" })
+    const a = getDialog(screen, { name: "Delete project?", role: "alertdialog" })
     await a.open()
     await a.confirm()
     expect(await a.isOpen()).toBe(false)
@@ -712,19 +711,19 @@ describe("review fixes (add-alert-dialog r1)", () => {
   it("a disabled Cancel at open: focus goes to the content, inside the dialog", async () => {
     const actions: RefObject<DialogActions | null> = createRef()
     render(
-      <AlertDialog.Root actionsRef={actions}>
-        <AlertDialog.Trigger>Delete project?</AlertDialog.Trigger>
-        <AlertDialog.Portal>
-          <AlertDialog.Positioner>
-            <AlertDialog.Content>
-              <AlertDialog.Title>Delete project?</AlertDialog.Title>
-              <AlertDialog.Description>This cannot be undone.</AlertDialog.Description>
-              <AlertDialog.Cancel disabled>Cancel</AlertDialog.Cancel>
-              <AlertDialog.Action>Delete</AlertDialog.Action>
-            </AlertDialog.Content>
-          </AlertDialog.Positioner>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>,
+      <Dialog.Root role="alertdialog" actionsRef={actions}>
+        <Dialog.Trigger>Delete project?</Dialog.Trigger>
+        <Dialog.Portal>
+          <Dialog.Positioner>
+            <Dialog.Content>
+              <Dialog.Title>Delete project?</Dialog.Title>
+              <Dialog.Description>This cannot be undone.</Dialog.Description>
+              <Dialog.Cancel disabled>Cancel</Dialog.Cancel>
+              <Dialog.Action>Delete</Dialog.Action>
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Dialog.Portal>
+      </Dialog.Root>,
     )
     act(() => actions.current?.open())
     await frames()

@@ -1,7 +1,7 @@
-// add-alert-dialog 6.1: the Alert Dialog stylesheet on top of dialog.css: its own tokens that
-// fall back to the dialog ones, an end-aligned actions row, reduced motion and forced colors.
+// Confirmations in dialog.css (merge-alert-dialog-into-dialog, formerly add-alert-dialog 6.1):
+// --rind-alert-dialog-* tokens that fall back to the dialog ones, an end-aligned actions row,
+// reduced motion and forced colors.
 import { afterEach, describe, expect, it } from "vitest"
-import alertDialog from "./alert-dialog.css?inline"
 import dialog from "./dialog.css?inline"
 import { cleanup, files, inject, mount, q } from "./test-css"
 
@@ -9,12 +9,12 @@ afterEach(cleanup)
 
 const sheet = () =>
   inject(
-    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.overlay}\n${files.positioner}\n${dialog}\n${alertDialog}`,
+    `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${files.calm}\n${files.base}\n${files.overlay}\n${files.positioner}\n${dialog}`,
   )
 
-const markup = `<div data-scope="alert-dialog" data-part="backdrop" data-state="open" aria-hidden="true"></div><div data-scope="alert-dialog" data-part="positioner" data-state="open"><div role="alertdialog" aria-label="A" data-scope="alert-dialog" data-part="content" data-state="open"><h2 data-scope="alert-dialog" data-part="title">Delete?</h2><p data-scope="alert-dialog" data-part="description">Cannot be undone.</p><button data-scope="alert-dialog" data-part="cancel">Cancel</button><button data-scope="alert-dialog" data-part="action">Delete</button></div></div>`
+const markup = `<div data-scope="dialog" data-part="backdrop" data-state="open" aria-hidden="true"></div><div data-scope="dialog" data-part="positioner" data-state="open"><div role="alertdialog" aria-label="A" data-scope="dialog" data-part="content" data-state="open"><h2 data-scope="dialog" data-part="title">Delete?</h2><p data-scope="dialog" data-part="description">Cannot be undone.</p><button data-scope="dialog" data-part="cancel">Cancel</button><button data-scope="dialog" data-part="action">Delete</button></div></div>`
 
-describe("Alert Dialog stylesheet", () => {
+describe("dialog.css: role=alertdialog", () => {
   it("is a bordered, rounded, centred surface (shared with the dialog sheet)", () => {
     sheet()
     const host = mount(markup)
@@ -70,11 +70,11 @@ describe("Alert Dialog stylesheet", () => {
   })
 
   it("has reduced-motion and forced-colors rules (border and focus ring)", () => {
-    expect(alertDialog).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*transition: none/)
-    expect(alertDialog).toMatch(/@media \(forced-colors: active\)[\s\S]*border-color: CanvasText/)
-    expect(alertDialog).toMatch(
+    expect(dialog).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*transition: none/)
+    expect(dialog).toMatch(/@media \(forced-colors: active\)[\s\S]*border-color: CanvasText/)
+    expect(dialog).toMatch(
       /@media \(forced-colors: active\)[\s\S]*data-focus-visible[\s\S]*outline: 2px solid Highlight/,
     )
-    expect(alertDialog).not.toMatch(/data-(variant|size|tone)/)
+    expect(dialog).not.toMatch(/data-(variant|size|tone)/)
   })
 })
