@@ -6,6 +6,8 @@
   margin-bottom: 6px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="listbox"][data-part="list"] {
+  /* focusable even when empty: never a sliver of a target */
+  min-block-size: 24px;
   display: flex;
   flex-direction: column;
   gap: 2px;
