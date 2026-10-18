@@ -59,9 +59,14 @@ See CLAUDE.md "Review rules".
 | add-combobox (impl) | — | packages/testing/src/components | Task 6.3: no virtualized combobox test (10,000 options, End/wrap to index 9999) |
 | add-combobox (impl) | — | packages/testing/src/components | Task 6.4: no virtual screen-reader log test (open, arrow, choose, empty results) |
 | add-combobox (impl) | — | packages/theme/src/combobox.css | Task 7.2: no Playwright forced-colors captures |
-| add-combobox (impl) | — | packages/core/src/components/combobox | Task A.5: `patternEffects` / `patternConnect` / `optionsNeverSelected` not extracted (one host); do it with Autocomplete or Command |
 | add-combobox (impl) | — | packages/core/src/components/combobox | Separator stays visible between two groups when one is filtered out |
-| add-tags-input (impl) | — | packages/core/src/components/tags-input | Task 1.6 / "Suggestions": not implemented; with the combobox-pattern extraction (Autocomplete is the third host) |
+| tags-input-suggestions (impl) | — | packages/react/src/tags-input/tags-input.tsx | Suggestions are data-driven only (`items` / `collection`): static `<TagsInput.Item>` children do not register (the host's `registry` is null), unlike Combobox |
+| tags-input-suggestions (review) | — | packages/react/src/tags-input/tags-input.tsx | `results` uses the stale frozen list whenever the popup is closed: use `openNow \|\| !present ? live : frozen.current` |
+| tags-input-suggestions (review) | — | packages/core/src/components/tags-input/tags-input.machine.ts | `tagSuggestions` hides chosen options by exact match while the duplicate check uses `compare` |
+| tags-input-suggestions (review) | — | packages/core/src/components/tags-input/tags-input.machine.ts | A refusal of a chosen option announces its raw key, not its label |
+| tags-input-suggestions (review) | — | packages/testing/src/components/tags-input-suggestions.dom.test.tsx | Missing tests: aria-activedescendant on arrows, ArrowDown opening on the first option, Escape inside a Dialog, Backspace on an empty draft with the popup open, Enter in pointer modality |
+| tags-input-suggestions (review) | — | packages/react/src/tags-input/tags-input.tsx | No dev warning for static Items rendered without `items` / `collection` |
+| tags-input-suggestions (impl) | — | packages/testing/fixtures/examples.pw.test.ts | `tags-input:suggesting` is listed as transient (no prop opens the popup): no static state example; its ARIA is covered by the suggestions DOM tests |
 | add-tags-input (impl) | — | packages/testing/src/components | Tasks 5.1/5.2: no browser IME replays (Japanese, Pinyin, Korean, Safari commit Enter), no Android keyCode 229 delimiter test, no modal dialog host test |
 | add-tags-input (impl) | — | packages/theme/src/tags-input.css | Task 6.2: no Playwright forced-colors captures |
 | add-tags-input (impl) | — | packages/testing/src/components | Task 5.3: no RTL model run |

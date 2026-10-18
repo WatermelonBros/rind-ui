@@ -61,8 +61,8 @@ import { useCollectionIdentityWarning, useCollectionItems } from "../use-collect
 import { useRootId } from "../use-ids"
 import { useMachine, useSelector } from "../use-machine"
 import { useModality } from "../use-modality"
-import { usePresence } from "../use-presence"
 import { usePress } from "../use-press"
+import { createPopupParts } from "./popup-parts"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -746,68 +746,7 @@ function ClearTrigger({ render, ...rest }: Own<"button">) {
   )
 }
 
-function Positioner({ render, ref, children, ...rest }: Own<"div">) {
-  const host = useLive("Positioner")
-  useInlineWarning(host, "Positioner")
-  const node = useRef<HTMLElement | null>(null)
-  // It holds the popup: it stays while the popup's exit animations run.
-  const { mounted } = usePresence(host.open, node, { keepMounted: host.keepMounted, subtree: true })
-  const { setPresent, topLayer } = host
-  useIsoLayoutEffect(() => {
-    setPresent(mounted)
-  }, [mounted, setPresent])
-  // Into the top layer while mounted (`popover="manual"`): above every stacking context of
-  // the page, with no portal. Engines without the Popover API keep it in place.
-  useIsoLayoutEffect(() => {
-    const el = node.current as (HTMLElement & { showPopover?: () => void }) | null
-    if (!mounted || !topLayer || !el || typeof el.showPopover !== "function") return
-    try {
-      if (!el.matches(":popover-open")) el.showPopover()
-    } catch {
-      // Already shown, or not connected yet: the next commit retries.
-    }
-    return () => {
-      try {
-        if (el.matches(":popover-open")) el.hidePopover()
-      } catch {
-        // Removed with its subtree.
-      }
-    }
-  }, [mounted, topLayer])
-  if (!mounted || host.inline) return null
-  const own = normalizeProps(host.api.positioner())
-  const props = mergeProps(
-    {
-      ...own,
-      hidden: own["hidden"] === true || (!host.open && host.keepMounted) || undefined,
-      ref: composeRefs(node, ref),
-    },
-    { ...rest, children },
-  )
-  return renderPart("div", props, render, undefined)
-}
-
-function Popup({ render, ref, ...rest }: Own<"div">) {
-  const host = useLive("Popup")
-  useInlineWarning(host, "Popup")
-  const node = useRef<HTMLElement | null>(null)
-  const { mounted, state } = usePresence(host.open, node, { keepMounted: host.keepMounted })
-  if (!mounted || host.inline) return null
-  const exiting = !host.open && state === "exiting"
-  return renderPart(
-    "div",
-    mergeProps(
-      {
-        ...normalizeProps(host.api.popup()),
-        ...(exiting ? { inert: true } : {}),
-        ref: composeRefs(node, ref),
-      },
-      rest,
-    ),
-    render,
-    undefined,
-  )
-}
+const popup = createPopupParts(useLive)
 
 const ChipCtx = createContext<string | null>(null)
 
@@ -887,8 +826,8 @@ export const Combobox = {
   ChipRemove,
   Trigger,
   ClearTrigger,
-  Positioner,
-  Popup,
+  Positioner: popup.Positioner,
+  Popup: popup.Popup,
   List: list.List,
   Item: list.Item,
   ItemText: list.ItemText,

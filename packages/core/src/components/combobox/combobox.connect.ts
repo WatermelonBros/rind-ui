@@ -1,24 +1,22 @@
 // Combobox parts (combobox + combobox-pattern specs): the input owns the keyboard and keeps
-// focus; the list and items are the reusable listbox parts under scope "combobox", with
-// their own tab stop and keyboard removed (active descendant through the input).
+// focus; the list, items and popup are the pattern's (`patternConnect`) under scope
+// "combobox", with their own tab stop and keyboard removed (active descendant through the input).
 
 import { focusAttrs } from "../../a11y/focus"
 import type { CompositeEnv } from "../../collection/composite"
 import type { CollectionKey } from "../../collection/key"
 import type { Collection } from "../../collection/list"
 import type { LoadingStatus } from "../../collection/machine"
-import { isSelected, type SelectionValue } from "../../collection/selection"
+import type { SelectionValue } from "../../collection/selection"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
-import { contentPlacementProps, positionerProps } from "../../dom/position/connect"
 import { type Chip, inputChipsConnect } from "../input-chips/input-chips"
-import type { ListboxEvent } from "../listbox/listbox.machine"
-import { listboxParts } from "../listbox/listbox.parts"
 import type { FieldControlProps } from "../shared/field-control"
 import type { ComboboxContext, ComboboxEvent } from "./combobox.machine"
 import { comboboxIds } from "./combobox.machine"
 import type { ComboboxMessages } from "./combobox.messages"
+import { patternConnect } from "./pattern/connect"
 
 export interface ComboboxConnectView {
   readonly instance: string
@@ -94,41 +92,6 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
   // The input and trigger say what aria-expanded says: closed in the empty state.
   const exposedState = v.exposed ? "open" : "closed"
   const composing = () => c.composing
-  // Composite events become the combobox's: a press is a choice, nothing else selects.
-  const list = listboxParts(
-    {
-      scope: "combobox",
-      instance: v.instance,
-      collection: v.results,
-      context: c,
-      selection: v.selection,
-      selectionMode: v.selectionMode,
-      selectionBehavior: "toggle",
-      orientation: "vertical",
-      strategy: "active-descendant",
-      disabled: v.disabled,
-      loading: v.loading,
-      typingAhead: () => false,
-      actions: false,
-      focused: false,
-      modality: v.modality,
-      mounted: {
-        label: v.mounted.label,
-        empty: v.mounted.empty,
-        description: v.mounted.description ?? (() => false),
-      },
-      send: (e: ListboxEvent) => {
-        // Presses on a closing popup choose nothing (Results While Closing).
-        if (!v.open) return
-        if (e.type === "SELECT") {
-          // A link item navigates natively: its press is the browser's, not a choice.
-          if (linkOf(e.key)) return
-          send({ type: "ITEM.CHOOSE", key: e.key, modality: e.modality })
-        } else if (e.type === "POINTER_MOVE" || (v.inline && e.type === "HIGHLIGHT")) send(e)
-      },
-    },
-    env,
-  )
   /** The rendered item element when it is a link (`<a href>` through `render`). */
   function linkOf(key: CollectionKey): HTMLAnchorElement | null {
     const el = env.dom.getById(ids.item(key))
@@ -137,7 +100,6 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       : null
   }
   const loadingNow = v.loading === "loading" || v.loading === "loading-more"
-  const lagging = c.typingLag !== null && c.highlightSource === "typing"
   const shownText = c.completion ?? v.inputValue
   const common = (part: string): PartProps => ({
     ...scopeAttrs("combobox", part, v.instance),
@@ -152,11 +114,39 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     const input = env.dom.getById(ids.input) as HTMLElement | null
     input?.focus({ preventScroll: true })
   }
-  // A mouse press on the component's own surfaces never takes focus from the input.
-  const keepFocus = (event: unknown) => {
-    const e = event as MouseEvent
-    if (e.button === 0) e.preventDefault()
-  }
+  const pattern = patternConnect(
+    {
+      scope: "combobox",
+      instance: v.instance,
+      open: v.open,
+      exposed: v.exposed,
+      empty: v.empty,
+      present: v.present,
+      results: v.results,
+      context: c,
+      selection: v.selection,
+      selectionMode: v.selectionMode,
+      disabled: v.disabled,
+      loading: v.loading,
+      modality: v.modality,
+      dir: v.dir,
+      autoComplete: v.autoComplete,
+      messages: v.messages,
+      mounted: v.mounted,
+      topLayer: v.topLayer,
+      common,
+      choose: (key, modality) => {
+        // A link item navigates natively: its press is the browser's, not a choice.
+        if (linkOf(key)) return
+        send({ type: "ITEM.CHOOSE", key, modality })
+      },
+      blur: () => send({ type: "INPUT.BLUR" }),
+      forwardHighlight: v.inline,
+      send,
+    },
+    env,
+  )
+  const { keepFocus, insideControl } = pattern
 
   const chips = inputChipsConnect(
     {
@@ -173,13 +163,6 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     },
     env,
   )
-  // Focus moving to a chip, a chip remove button, the trigger or the popup stays inside.
-  const insideControl = (target: unknown) =>
-    target !== null &&
-    [ids.control, ids.positioner].some(
-      (id) => env.dom.getById(id)?.contains(target as Node | null) === true,
-    )
-
   return {
     ids,
     chipsSummary: chips.summaryText,
@@ -218,10 +201,9 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
     }),
     input: (): PartProps => ({
       ...common("input"),
-      "data-state": exposedState,
+      ...pattern.input(),
       ...focusAttrs(c.focused, v.modality),
       id: ids.input,
-      role: "combobox",
       type: "text",
       value: shownText,
       disabled: v.disabled || undefined,
@@ -229,12 +211,6 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       autoComplete: (v.selectionMode === "none" && v.formAutoComplete) || "off",
       // Free text: the visible input is the form control (natively required).
       required: (v.selectionMode === "none" && !v.inline && v.required) || undefined,
-      autoCorrect: "off",
-      autoCapitalize: "none",
-      spellCheck: "false",
-      "aria-autocomplete": v.autoComplete,
-      "aria-expanded": String(v.exposed),
-      "aria-controls": v.present ? ids.list : undefined,
       "aria-labelledby": v.mounted.label ? ids.label : v.field?.["aria-labelledby"],
       "aria-describedby":
         [v.field?.["aria-describedby"], chips.describedBy].filter(Boolean).join(" ") || undefined,
@@ -243,11 +219,6 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       "aria-errormessage": v.field?.["aria-errormessage"],
       name: v.inputName,
       form: v.inputName !== undefined ? v.form : undefined,
-      "aria-activedescendant":
-        v.exposed && !lagging && c.highlightedKey !== null && v.results.has(c.highlightedKey)
-          ? ids.item(c.highlightedKey)
-          : undefined,
-      [CRITICAL]: ["aria-expanded", "aria-activedescendant"],
       onChange: (event: unknown) => {
         const e = event as { target: HTMLInputElement; nativeEvent?: InputEvent }
         const el = e.target
@@ -407,118 +378,19 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
         focusInput(modality)
       },
     }),
-    positioner: (): PartProps => {
-      const placed = positionerProps(
-        c.placement,
-        { positioner: ids.positioner, anchor: ids.control },
-        { dir: v.dir },
-      )
-      return {
-        ...common("positioner"),
-        ...placed,
-        // The top layer (the adapter calls showPopover): above every page stacking context,
-        // while staying in place in the DOM (reading and swipe order). The UA's popover box
-        // rules are reset; positioning resolves a fixed strategy for an open popover.
-        ...(v.topLayer
-          ? {
-              popover: "manual",
-              // The reset first: the placement's own top / left / position come after it.
-              style: {
-                inset: "auto",
-                margin: "0",
-                border: "0",
-                padding: "0",
-                background: "transparent",
-                color: "inherit",
-                overflow: "visible",
-                ...(placed["style"] as Record<string, string>),
-              },
-            }
-          : {}),
-        "data-empty": dataFlag(v.empty),
-        "data-loading": dataFlag(v.loading === "loading" || v.loading === "loading-more"),
-        // Without an Empty part the whole surface hides in the empty state.
-        hidden: v.empty && !v.mounted.empty ? true : undefined,
-      }
-    },
-    popup: (): PartProps => ({
-      ...common("popup"),
-      ...contentPlacementProps(c.placement),
-      id: ids.popup,
-      // A scrolling region must be focusable (axe scrollable-region-focusable): by script
-      // only, never in the tab order; a mouse press never focuses it (keepFocus).
-      tabindex: -1,
-      onBlur: (event: unknown) => {
-        if (!insideControl((event as FocusEvent).relatedTarget)) send({ type: "INPUT.BLUR" })
-      },
-      "data-empty": dataFlag(v.empty),
-      "data-loading": dataFlag(v.loading === "loading" || v.loading === "loading-more"),
-      onMouseDown: keepFocus,
-    }),
-    list: (): PartProps => {
-      const {
-        onKeyDown: _k,
-        onFocusIn: _f,
-        onFocusOut: _o,
-        tabindex: _t,
-        "aria-activedescendant": _a,
-        ...own
-      } = list.list(v.mounted.label ? {} : { "aria-label": v.messages.listboxLabel })
-      return {
-        ...own,
-        "aria-label": v.mounted.label ? undefined : v.messages.listboxLabel,
-        "aria-labelledby": v.mounted.label ? ids.label : undefined,
-        "aria-describedby": undefined,
-        // Focusable by script only, should a skin make the list the scrolling region.
-        tabindex: -1,
-        onPointerLeave: (event: unknown) => {
-          if ((event as PointerEvent).pointerType !== "touch") send({ type: "LIST.POINTER_LEAVE" })
-        },
-        // The empty state hides the listbox (it is not exposed), never unmounts it.
-        hidden: v.present && !v.exposed ? true : undefined,
-      }
-    },
-    item: (key: CollectionKey): PartProps => {
-      const own = list.item(key)
-      return {
-        ...own,
-        "data-state":
-          v.selectionMode === "none"
-            ? undefined
-            : isSelected(v.results, v.selection, key)
-              ? "checked"
-              : "unchecked",
-        // Nothing can be selected: explicitly never selected (optionsNeverSelected).
-        ...(v.selectionMode === "none" ? { "aria-selected": "false" } : {}),
-        // A typing highlight (inline mount, a new query) shows the ring under the keyboard,
-        // never after a pointer interaction.
-        ...(c.highlightSource === "typing" && c.highlightedKey === key
-          ? { "data-focus-visible": dataFlag(v.modality === "keyboard") }
-          : {}),
-        // Roving focus never applies: the input keeps focus.
-        onFocus: undefined,
-      }
-    },
-    itemText: list.itemText,
-    itemDescription: list.itemDescription,
-    /** Loading content: a sibling of the listbox, never inside it, no live role. */
-    loading: (): PartProps => ({
-      ...common("loading"),
-      hidden: loadingNow ? undefined : true,
-    }),
-    itemIndicator: (key: CollectionKey): PartProps => ({
-      ...list.itemIndicator(key),
-      "data-state": isSelected(v.results, v.selection, key) ? "checked" : "unchecked",
-    }),
-    section: list.section,
-    sectionLabel: list.sectionLabel,
-    separator: list.separator,
-    empty: (): PartProps => ({
-      ...common("empty"),
-      id: ids.empty,
-      hidden: v.empty ? undefined : true,
-    }),
-    loadMore: list.loadMore,
+    positioner: pattern.positioner,
+    popup: pattern.popup,
+    list: pattern.list,
+    item: pattern.item,
+    itemText: pattern.itemText,
+    itemDescription: pattern.itemDescription,
+    loading: pattern.loading,
+    itemIndicator: pattern.itemIndicator,
+    section: pattern.section,
+    sectionLabel: pattern.sectionLabel,
+    separator: pattern.separator,
+    empty: pattern.empty,
+    loadMore: pattern.loadMore,
     /**
      * The constraint input (hidden-form-input): no name, empty exactly when nothing is
      * selected, so `required` is validated natively next to the Control.

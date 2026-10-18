@@ -289,7 +289,118 @@
     display: none;
   }
 
+  /*
+   * Suggestions: the Combobox's popup (the same listbox parts), reading the --rind-combobox-*
+   * popup and item tokens. Options are never selected: the highlight is the only item state.
+   */
+  :where([data-scope="tags-input"][data-part="popup"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-anchor-width, auto);
+    max-inline-size: var(--rind-available-width, 100vw);
+    max-block-size: min(
+      var(--rind-combobox-popup-max-height, 20rem),
+      var(--rind-available-height, 100vh)
+    );
+    overflow: auto;
+    padding: var(--rind-combobox-popup-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid
+      var(--rind-combobox-popup-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-combobox-popup-radius, var(--rind-radius-md));
+    background: var(--rind-combobox-popup-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-combobox-popup-shadow, var(--rind-shadow-sm));
+    color: var(--rind-color-text);
+    transform-origin: var(--rind-transform-origin);
+    transition:
+      opacity var(--rind-duration-normal) var(--rind-ease-out),
+      transform var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  :where([data-scope="tags-input"][data-part="popup"][data-state="open"]) {
+    opacity: 1;
+    transform: none;
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+
+  :where([data-scope="tags-input"][data-part="popup"][data-state="closed"]) {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  :where([data-scope="tags-input"][data-part="list"]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-combobox-gap, var(--rind-space-1));
+    margin: 0;
+    padding: 0;
+  }
+
+  :where([data-scope="tags-input"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    min-block-size: var(--rind-combobox-item-height, var(--rind-hit-area));
+    padding: var(--rind-combobox-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-radius-sm);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where([data-scope="tags-input"][data-part="item"][data-highlighted]) {
+    background: var(--rind-combobox-item-highlight-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-combobox-item-highlight-text, var(--rind-color-text));
+  }
+
+  :where([data-scope="tags-input"][data-part="item"][data-disabled]) {
+    color: var(--rind-combobox-item-disabled-text, var(--rind-color-text-disabled));
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="tags-input"][data-part="section-label"]) {
+    padding: var(--rind-space-1) var(--rind-space-2);
+    color: var(--rind-combobox-group-label-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    letter-spacing: var(--rind-tracking-label);
+  }
+
+  :where([data-scope="tags-input"][data-part="separator"]) {
+    margin: var(--rind-space-1) 0;
+    border: 0;
+    background: var(--rind-combobox-separator, var(--rind-color-border));
+    block-size: var(--rind-border-width);
+  }
+
+  :where([data-scope="tags-input"][data-part="empty"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-combobox-empty-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="tags-input"][data-part="popup"]) {
+      transition: none;
+    }
+  }
+
   @media (forced-colors: active) {
+    :where([data-scope="tags-input"][data-part="popup"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="tags-input"][data-part="item"][data-highlighted]) {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    :where([data-scope="tags-input"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+
     :where([data-scope="tags-input"][data-part="control"]) {
       background: Field;
       color: FieldText;

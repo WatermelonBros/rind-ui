@@ -1,11 +1,30 @@
-// Tags Input (design §1): flat `idle | typing | editing`. One creation path, `createTags`,
-// serves Enter, delimiters, paste, blur `add` and `ADD`, so the rules cannot drift between
-// entry paths. Chips are `input-chips`; tags are keyed per design §2.
+// Tags Input (design §1): flat `idle | typing | suggesting | editing`. One creation path,
+// `createTags`, serves Enter, delimiters, paste, blur `add`, a chosen suggestion and `ADD`, so
+// the rules cannot drift between entry paths. Chips are `input-chips`; tags are keyed per
+// design §2. With `items` (suggestions) the input is the combobox-pattern's: `suggesting`
+// hosts the popup, and the pattern's pieces are spread in.
 
+import type { CollectionKey } from "../../collection/key"
+import { toKey } from "../../collection/key"
+import type { Collection } from "../../collection/list"
+import {
+  type CollectionEnv,
+  collectionPieces,
+  initialCollectionContext,
+} from "../../collection/machine"
 import type { Modality } from "../../contract/env"
-import type { AnnouncerEnv } from "../../env/capabilities"
+import type { DomEnvironment } from "../../env/dom-environment"
+import type { PositionEnv } from "../../env/position"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
+import {
+  initialPatternContext,
+  type PatternContext,
+  type PatternEvent,
+  type PatternProps,
+  patternPieces,
+  popupOverlay,
+} from "../combobox/pattern/machine"
 import {
   type Chip,
   type InputChipsContext,
@@ -25,6 +44,9 @@ import type { TagRefusalReason, TagsInputMessages } from "./tags-input.messages"
 
 export type TagsInputEvent =
   | InputChipsEvent
+  | PatternEvent
+  /** A press on a suggestion. */
+  | { readonly type: "ITEM.CHOOSE"; readonly key: CollectionKey; readonly modality: Modality }
   | {
       readonly type: "INPUT.CHANGE"
       readonly text: string
@@ -60,7 +82,13 @@ export interface TagRefusal {
   readonly text: string
 }
 
-export interface TagsInputProps {
+export interface TagsInputProps extends PatternProps {
+  /** Every suggestion; given, the input is a combobox over the listed `collection`. */
+  readonly items?: Collection<unknown> | undefined
+  /** Suggestions: choosing one closes the popup (default false). */
+  readonly closeOnSelect?: boolean | undefined
+  /** Suggestions: typed text may become a tag (default true); false refuses it as `invalid`. */
+  readonly allowCustom?: boolean | undefined
   readonly value?: readonly string[] | undefined
   readonly defaultValue?: readonly string[] | undefined
   readonly onValueChange?:
@@ -102,9 +130,7 @@ export interface TagsInputProps {
   readonly messages: TagsInputMessages
 }
 
-export interface TagsInputContext extends InputChipsContext {
-  readonly focused: boolean
-  readonly composing: boolean
+export interface TagsInputContext extends InputChipsContext, PatternContext {
   /** The draft's refusal, until the draft next changes. */
   readonly refusal: TagRefusal | null
   /** The draft a creation cleared (restored when the parent refuses the value). */
@@ -119,7 +145,7 @@ export interface TagsInputContext extends InputChipsContext {
 type Types = {
   props: TagsInputProps
   events: TagsInputEvent
-  env: AnnouncerEnv
+  env: DomEnvironment & PositionEnv & CollectionEnv
   context: TagsInputContext
   values: "value" | "inputValue"
 }
@@ -140,7 +166,10 @@ export function tagKeys(value: readonly string[], allowDuplicates: boolean): rea
 
 /** The chips of the tags. */
 export function tagChips(
-  p: Pick<TagsInputProps, "allowDuplicates" | "disabledKeys" | "textOf" | "disabled" | "readOnly">,
+  p: Pick<
+    TagsInputProps,
+    "allowDuplicates" | "disabledKeys" | "textOf" | "items" | "disabled" | "readOnly"
+  >,
   value: readonly string[],
 ): readonly Chip[] {
   const keys = tagKeys(value, p.allowDuplicates === true)
@@ -150,7 +179,7 @@ export function tagChips(
     const key = keys[i] ?? tag
     return {
       key,
-      text: p.textOf?.(tag) ?? tag,
+      text: textOf(p, tag),
       disabled: locked || p.disabledKeys?.has(key) === true,
     }
   })
@@ -159,7 +188,9 @@ export function tagChips(
 const interactive = (p: TagsInputProps) => p.disabled !== true && p.readOnly !== true
 const normalizeOf = (p: TagsInputProps) => p.normalize ?? ((t: string) => t.trim())
 const delimitersOf = (p: TagsInputProps) => p.delimiter ?? ","
-const textOf = (p: TagsInputProps, tag: string) => p.textOf?.(tag) ?? tag
+/** A tag's text: the consumer's, else its suggestion's (a tag is the option's key). */
+const textOf = (p: Pick<TagsInputProps, "textOf" | "items">, tag: string) =>
+  p.textOf?.(tag) ?? p.items?.get(toKey(tag))?.textValue ?? tag
 
 function refuse(a: Args, refusal: TagRefusal, where: "draft" | "edit") {
   a.set(where === "draft" ? "refusal" : "editRefusal", refusal)
@@ -172,10 +203,25 @@ function refuse(a: Args, refusal: TagRefusal, where: "draft" | "edit") {
 }
 
 /**
- * The one creation path: normalise, drop empty, max, duplicates (within the batch too),
- * validate; one value proposal; the first refusal reported. Returns the refused texts.
+ * The listed suggestions: the results without the options already chosen as tags (unless
+ * duplicates are allowed). A derivation, never stored.
  */
-function createTags(a: Args, texts: readonly string[]) {
+export function tagSuggestions(
+  results: Collection<unknown>,
+  value: readonly string[],
+  allowDuplicates: boolean,
+): Collection<unknown> {
+  if (allowDuplicates || value.length === 0) return results
+  const tags = new Set(value)
+  return results.filter((n) => !tags.has(String(n.key)))
+}
+
+/**
+ * The one creation path: normalise, drop empty, max, duplicates (within the batch too),
+ * custom text (`allowCustom`), validate; one value proposal; the first refusal reported.
+ * Returns the refused texts. `fromOption`: the texts are chosen suggestions' keys.
+ */
+function createTags(a: Args, texts: readonly string[], fromOption = false) {
   const { props } = a
   const norm = normalizeOf(props)
   const compare = props.compare ?? ((x: string, y: string) => x === y)
@@ -184,13 +230,16 @@ function createTags(a: Args, texts: readonly string[]) {
   const refused: string[] = []
   let first: TagRefusal | null = null
   for (const raw of texts) {
-    const text = norm(raw)
+    // A chosen option's key is the tag as is (Suggestions: the value is the option's key).
+    const text = fromOption ? raw : norm(raw)
     if (text === "") continue
     const all = [...value, ...accepted]
     let why: TagRefusalReason | null = null
     if (props.max !== undefined && all.length >= props.max) why = "max"
     else if (!props.allowDuplicates && all.some((t) => compare(t, text))) why = "duplicate"
-    else {
+    else if (!fromOption && props.items !== undefined && props.allowCustom === false) {
+      why = "invalid"
+    } else {
       const v = props.validate?.(text, all) ?? true
       if (v !== true) why = v
     }
@@ -271,10 +320,37 @@ function editOutcome(
 const chipsOf = (a: Pick<Args, "props" | "values">) =>
   tagChips(a.props, a.values.value as readonly string[])
 
+/** Choosing a suggestion: a tag from the option's key, the draft cleared (Suggestions). */
+function choose(a: Args, key: CollectionKey) {
+  const node = a.props.collection.get(key) ?? a.props.items?.get(key)
+  if (!node || node.disabled) return
+  a.set("armedChip", null)
+  const { accepted } = createTags(a, [String(key)], true)
+  if (accepted.length === 0) return
+  a.set("dirty", false)
+  clearDraft(a)
+}
+
+// Options are never selected: choosing one makes a tag and hides it.
+const pieces = collectionPieces({})
+const pattern = patternPieces({
+  scope: "tags-input",
+  selected: () => [],
+  collection: pieces.actions,
+})
+
 export const tagsInputMachine = setup({
   types: type<Types>(),
   guards: {
+    ...pattern.guards,
     interactive: ({ props }) => interactive(props),
+    /** Suggestions are given and the input can open them (a composition's commit opens). */
+    suggests: ({ props, event, context }) =>
+      props.items !== undefined &&
+      props.disabled !== true &&
+      (event.type === "COMPOSITION.END" || !context.composing) &&
+      !("composing" in event && event.composing === true),
+    closesOnSelect: ({ props }) => props.closeOnSelect === true,
     notComposing: ({ event, context }) =>
       !context.composing && !("composing" in event && event.composing === true),
     draftNotEmpty: ({ props, values }) => normalizeOf(props)(values.inputValue) !== "",
@@ -303,6 +379,8 @@ export const tagsInputMachine = setup({
     blurClears: ({ props }) => props.blurBehavior === "clear",
   },
   actions: {
+    ...pieces.actions,
+    ...pattern.actions,
     ...inputChipsActions,
     setFocused: ({ set }) => set("focused", true),
     leave: ({ set }) => {
@@ -311,7 +389,6 @@ export const tagsInputMachine = setup({
       set("focusedChip", null)
       set("focusedChipModality", null)
     },
-    startComposition: ({ set }) => set("composing", true),
     /** Typing: the draft, then complete segments when a delimiter was typed at the end. */
     typed: (a) => {
       const e = a.event
@@ -320,6 +397,10 @@ export const tagsInputMachine = setup({
       a.set("refusal", null)
       a.set("armedChip", null)
       a.set("clearedDraft", null)
+      a.set("dirty", true)
+      // A text change clears the highlight (auto highlight re-applies on the new results).
+      a.set("highlightedKey", null)
+      a.set("highlightSource", null)
       const composing = e.type === "INPUT.CHANGE" && (e.composing || a.context.composing)
       if (composing || !e.caretAtEnd || !interactive(a.props)) return setDraft(a, e.text)
       const { complete, rest } = splitDelimited(e.text, delimitersOf(a.props))
@@ -334,7 +415,13 @@ export const tagsInputMachine = setup({
     enter: (a) => {
       a.set("armedChip", null)
       const { accepted } = createTags(a, [a.values.inputValue])
-      if (accepted.length > 0) clearDraft(a)
+      if (accepted.length === 0) return
+      a.set("dirty", false)
+      clearDraft(a)
+    },
+    choose: (a) => {
+      if (a.event.type === "ITEM.CHOOSE") choose(a, a.event.key)
+      else if (a.context.highlightedKey !== null) choose(a, a.context.highlightedKey)
     },
     paste: (a) => {
       if (a.event.type !== "PASTE") return
@@ -447,13 +534,18 @@ export const tagsInputMachine = setup({
       set("editRefusal", null)
     },
   },
+  effects: {
+    /** The suggestions' non-modal listbox layer and positioning (combobox-pattern). */
+    overlay: (a) => popupOverlay(a, "tags-input", a.props.root),
+  },
 }).machine({
   id: "tags-input",
   initial: "idle",
-  context: () => ({
+  context: (props) => ({
+    ...initialCollectionContext(),
     ...initialInputChipsContext(),
-    focused: false,
-    composing: false,
+    ...initialPatternContext(),
+    lastCollection: props.collection,
     refusal: null,
     clearedDraft: null,
     editingKey: null,
@@ -465,8 +557,9 @@ export const tagsInputMachine = setup({
     value: { fallback: EMPTY as string[] },
     inputValue: { fallback: "" },
   },
-  onProps: { value: "VALUE.SYNC" },
+  onProps: { value: "VALUE.SYNC", collection: "COLLECTION.CHANGE", loading: "LOADING.SYNC" },
   on: {
+    "COLLECTION.CHANGE": { actions: ["repairCollection"] },
     $reverted: { actions: ["revert"] },
     "VALUE.SYNC": { actions: ["checkMax"] },
     "FORM.RESET": { target: "idle", actions: ["reset"] },
@@ -484,16 +577,30 @@ export const tagsInputMachine = setup({
       entry: ["checkMax"],
       on: {
         "INPUT.FOCUS": { target: "typing", actions: ["setFocused"] },
-        "INPUT.CHANGE": { target: "typing", actions: ["setFocused", "typed"] },
+        "INPUT.CHANGE": [
+          { guard: "suggests", target: "suggesting", actions: ["setFocused", "typed"] },
+          { target: "typing", actions: ["setFocused", "typed"] },
+        ],
         "COMPOSITION.START": { target: "typing", actions: ["setFocused", "startComposition"] },
         PASTE: { guard: "pasteTakenOver", target: "typing", actions: ["setFocused", "paste"] },
       },
     },
     typing: {
       on: {
-        "INPUT.CHANGE": { actions: ["typed"] },
+        "INPUT.CHANGE": [
+          { guard: "suggests", target: "suggesting", actions: ["typed"] },
+          { actions: ["typed"] },
+        ],
         "COMPOSITION.START": { actions: ["startComposition"] },
-        "COMPOSITION.END": { actions: ["typed"] },
+        "COMPOSITION.END": [
+          { guard: "suggests", target: "suggesting", actions: ["typed"] },
+          { actions: ["typed"] },
+        ],
+        ARROW: {
+          guard: { and: ["keyable", "suggests"] },
+          target: "suggesting",
+          actions: ["highlightOnArrowOpen", "announceHighlight"],
+        },
         PASTE: { guard: { and: ["notComposing", "pasteTakenOver"] }, actions: ["paste"] },
         ENTER: {
           guard: { and: ["notComposing", "interactive", "draftNotEmpty"] },
@@ -518,6 +625,76 @@ export const tagsInputMachine = setup({
           },
           { target: "idle", actions: ["leave"] },
         ],
+      },
+    },
+    /** Typing with the suggestions popup open (combobox-pattern). */
+    suggesting: {
+      // The count, highlight or not: the list is exposed and its results do not re-list on open.
+      entry: ["announceCount"],
+      exit: ["clearHighlight", "endLag", "resetPlacement"],
+      effects: ["overlay"],
+      on: {
+        "INPUT.CHANGE": { actions: ["typed"] },
+        "COMPOSITION.START": { actions: ["startComposition"] },
+        "COMPOSITION.END": { actions: ["typed"] },
+        PASTE: { guard: { and: ["notComposing", "pasteTakenOver"] }, actions: ["paste"] },
+        ARROW: { guard: "keyable", actions: ["arrow"] },
+        NAVIGATE: { actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlight"] },
+        HIGHLIGHT: { actions: ["endLag", "highlight"] },
+        POINTER_MOVE: { actions: ["endLag", "pointerMove"] },
+        "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
+        CARET: { actions: ["disarm", "clearHighlight"] },
+        "ITEM.CHOOSE": [
+          {
+            guard: { and: ["interactive", "closesOnSelect"] },
+            target: "typing",
+            actions: ["choose"],
+          },
+          { guard: "interactive", actions: ["choose"] },
+        ],
+        ENTER: [
+          {
+            guard: { and: ["keyable", "hasHighlight", "interactive", "closesOnSelect"] },
+            target: "typing",
+            actions: ["choose"],
+          },
+          { guard: { and: ["keyable", "hasHighlight", "interactive"] }, actions: ["choose"] },
+          // No highlight: the draft is free text (pattern: the commit, then close).
+          {
+            guard: { and: ["notComposing", "interactive", "draftNotEmpty"] },
+            target: "typing",
+            actions: ["enter"],
+          },
+          { guard: "notComposing", target: "typing" },
+        ],
+        ESCAPE: { guard: "notComposing", target: "typing" },
+        OUTSIDE_PRESS: { target: "typing" },
+        BACKSPACE_EMPTY: [
+          { guard: { and: ["notComposing", "armedRemovable"] }, actions: ["removeArmed"] },
+          { guard: { and: ["notComposing", "armsOnBackspace"] }, actions: ["arm"] },
+        ],
+        // Chip navigation, removal and typing on a chip are inside: the popup stays.
+        "CHIP.NAVIGATE": { actions: ["setFocused", "focusChip"] },
+        "CHIP.TYPE": { guard: "interactive", actions: ["setFocused", "chipType"] },
+        "CLEAR.PRESS": { guard: "interactive", actions: ["setFocused", "clearAll"] },
+        "TAG.EDIT": { guard: "editable", target: "editing", actions: ["startEdit"] },
+        "FOCUS.LEAVE": [
+          {
+            guard: { and: ["blurAdds", "interactive", "draftNotEmpty"] },
+            target: "idle",
+            actions: ["leave", "blurAdd"],
+          },
+          {
+            guard: { and: ["blurClears", "interactive"] },
+            target: "idle",
+            actions: ["leave", "blurClear"],
+          },
+          { target: "idle", actions: ["leave"] },
+        ],
+        "COLLECTION.CHANGE": { actions: ["results"] },
+        "LOADING.SYNC": { actions: ["announceLoading"] },
+        "POSITION.PLACED": { actions: ["placed"] },
+        "ACTIVEDESCENDANT.FLUSH": { actions: ["flush"] },
       },
     },
     editing: {

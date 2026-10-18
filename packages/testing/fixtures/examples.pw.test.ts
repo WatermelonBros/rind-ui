@@ -312,9 +312,11 @@ const TRANSIENT = new Set([
   "number-input:pressing",
   "number-input:spinning",
   "pin-input:composing",
-  // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
+  // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
+  // arrowing in the focused input (the suggestions popup; no prop opens it).
   "tags-input:typing",
   "tags-input:editing",
+  "tags-input:suggesting",
   // Focus inside the group (a tag focused): its ARIA is covered by the Tag Group DOM tests.
   "tag-group:focused",
   // A submenu level waiting for its hover delay (a root menu never enters it).
