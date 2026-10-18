@@ -116,21 +116,28 @@ export type RadioGroupRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue"
 > & {
+  /** The group's parts (Label, Items, Description, ErrorMessage). */
   readonly children?: ReactNode
   readonly value?: string | null
   readonly defaultValue?: string | null
   readonly onValueChange?: (value: string | null, details: ChangeDetails<RadioGroupEvent>) => void
   /** Only `aria-orientation` and `data-orientation`: every arrow key moves. */
   readonly orientation?: "vertical" | "horizontal"
+  /** Disables every radio. */
   readonly disabled?: boolean
   /** A disabled group stays discoverable: the root is one tab stop. */
   readonly focusableWhenDisabled?: boolean
+  /** Navigable, never changes. */
   readonly readOnly?: boolean
+  /** Valid with one radio checked. */
   readonly required?: boolean
+  /** Marks the group invalid; shows the ErrorMessage. */
   readonly invalid?: boolean
   /** Default: derived from the root id (two groups never form one browser group). */
   readonly name?: string
+  /** The id of the form the hidden inputs belong to. */
   readonly form?: string
+  /** Another element or a render function receiving the props and the group's state. */
   readonly render?: RenderProp<RadioGroupState>
 }
 
@@ -366,6 +373,7 @@ type PartProps<
   T extends keyof React.JSX.IntrinsicElements,
   S = undefined,
 > = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<S>
 }
 
@@ -402,6 +410,7 @@ export interface RadioItemState {
 export type RadioGroupItemProps = PartProps<"div", RadioItemState> & {
   /** The item's value: what the group's value and the form submit. */
   readonly value: string
+  /** Disables this radio only. */
   readonly disabled?: boolean
   /** The text for the collection (defaults to the item's text content). */
   readonly textValue?: string

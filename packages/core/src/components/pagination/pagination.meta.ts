@@ -104,7 +104,7 @@ export const paginationMeta = {
       type: "Partial<PaginationMessages>",
       description: "`label`, `page(n)`, `first`, `previous`, `next`, `last`.",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description:
         "On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`.",

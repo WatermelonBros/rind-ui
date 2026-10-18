@@ -142,6 +142,7 @@ export type NumberInputRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The number input's parts: label, control, input, triggers, description and error message. */
   readonly children?: ReactNode
   readonly value?: number | null
   /** Read at creation (default empty); a later change only changes what a form reset restores. */
@@ -172,10 +173,15 @@ export type NumberInputRootProps = Omit<
   readonly readOnly?: boolean
   readonly required?: boolean
   readonly invalid?: boolean
+  /** External errors (server): shown at once, cleared by the next change. */
   readonly errors?: readonly string[]
+  /** Runs after native constraints pass. */
   readonly validate?: Validate
+  /** When errors are displayed. Default: the enclosing Form's, else `"submit"`. */
   readonly validationMode?: ValidationMode
+  /** Whether an invalid Field blocks submission. Default: the enclosing Form's, else `"native"`. */
   readonly validationBehavior?: ValidationBehavior
+  /** Delays `validate` in `change` mode (ms). Default: 0. */
   readonly validationDebounce?: number
   readonly fieldMessages?: MessageOverrides<FieldMessages>
 }
@@ -425,7 +431,10 @@ function HiddenInput() {
 function Control({
   render,
   ...rest
-}: ComponentPropsWithRef<"div"> & { readonly render?: RenderProp<NumberInputState> }) {
+}: ComponentPropsWithRef<"div"> & {
+  /** Another element or a render function receiving the props and the number input's state. */
+  readonly render?: RenderProp<NumberInputState>
+}) {
   const ctx = useNumberInput("Control")
   const api = useApi(ctx, useFieldBindingPeek())
   return renderPart("div", mergeProps(normalizeProps(api.control()), rest), render, stateOf(ctx))
@@ -447,6 +456,7 @@ function Input({
   inputMode,
   ...rest
 }: Omit<ComponentPropsWithRef<"input">, "value" | "defaultValue"> & {
+  /** Another element or a render function receiving the props and the number input's state. */
   readonly render?: RenderProp<NumberInputState>
 }) {
   const ctx = useNumberInput("Input")
@@ -640,6 +650,7 @@ function useTrigger(t: NumberInputTrigger, part: string) {
 }
 
 type TriggerProps = ComponentPropsWithRef<"button"> & {
+  /** Another element or a render function receiving the props and the number input's state. */
   readonly render?: RenderProp<NumberInputState>
 }
 

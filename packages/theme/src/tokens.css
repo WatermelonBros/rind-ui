@@ -103,6 +103,27 @@
       0 1px 2px light-dark(rgb(16 20 28 / 0.12), rgb(0 0 0 / 0.45));
     --rind-shadow-key-pressed:
       inset 0 1px 2px light-dark(rgb(16 20 28 / 0.18), rgb(0 0 0 / 0.5)), 0 0 0 transparent;
+
+    /*
+     * Code Block's syntax palette: fixed, not derived from the brand. Light values for a light
+     * block on the surface, dark ones for the default dark block (the site's look); each is at
+     * least 4.5:1 on its block and on a highlighted line.
+     */
+    --rind-color-code-bg: light-dark(var(--rind-color-surface), #0b0b0c);
+    --rind-color-code-text: light-dark(var(--rind-color-text), #e8e8e3);
+    --rind-color-code-keyword: light-dark(oklch(0.45 0.17 330), #ff7ab0);
+    --rind-color-code-string: light-dark(oklch(0.45 0.13 150), #d4ff3a);
+    --rind-color-code-comment: light-dark(oklch(0.48 0.02 255), #b4b4ac);
+    --rind-color-code-number: light-dark(oklch(0.45 0.14 60), #ffd84d);
+    --rind-color-code-function: light-dark(oklch(0.45 0.16 265), #9be7ff);
+    --rind-color-code-type: light-dark(oklch(0.45 0.11 200), #9be7ff);
+    --rind-color-code-tag: light-dark(oklch(0.45 0.16 25), #9be7ff);
+    --rind-color-code-attr: light-dark(oklch(0.45 0.13 85), #d4ff3a);
+    --rind-color-code-property: light-dark(oklch(0.45 0.12 230), #d4ff3a);
+    --rind-color-code-variable: light-dark(oklch(0.45 0.14 300), #9be7ff);
+    --rind-color-code-regex: light-dark(oklch(0.45 0.15 15), #d4ff3a);
+    --rind-color-code-punctuation: light-dark(oklch(0.45 0.02 255), #c9c9c2);
+    --rind-color-code-operator: light-dark(oklch(0.45 0.03 255), #c9c9c2);
   }
 
   /*

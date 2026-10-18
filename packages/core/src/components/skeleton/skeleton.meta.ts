@@ -62,7 +62,7 @@ export const skeletonMeta = {
       type: "{ loading?: string; loaded?: string }",
       description: "Root: overrides the English defaults (also through the provider).",
     },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element (Content as a `ul`, say).",
     },

@@ -31,6 +31,7 @@ export type FieldHostProps = FieldRootProps & {
   readonly scope: string
   /** Inside a Field: the root's `data-part` (default `root`; a host's part names its own). */
   readonly rootPart?: string
+  /** The host's parts. */
   readonly children?: ReactNode
 }
 

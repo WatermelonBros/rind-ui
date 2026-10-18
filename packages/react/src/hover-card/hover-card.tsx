@@ -104,10 +104,12 @@ export interface HoverCardActions {
 }
 
 export type HoverCardRootProps = Omit<HoverCardProps, "root" | "parent" | "getTrigger"> & {
+  /** Base for the ids of the hover card's parts. Default: generated. */
   readonly id?: string
   /** Positioner and content stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
   readonly actionsRef?: Ref<HoverCardActions>
+  /** The hover card's parts (Root renders no element). */
   readonly children?: ReactNode
 }
 

@@ -73,27 +73,27 @@ export const breadcrumbsMeta = {
       type: "Partial<BreadcrumbsMessages>",
       description: "`label` and `showCollapsed(count)` (Root).",
     },
-    value: { type: "string", description: "The Item's key, stable across renders (Item)." },
-    current: {
+    "*.value": { type: "string", description: "The Item's key, stable across renders (Item)." },
+    "*.current": {
       type: "boolean",
       description:
         "`true` makes the Item current; `false` on the last Item opts out of the default (Item).",
     },
-    disabled: {
+    "*.disabled": {
       type: "boolean",
       default: "false",
       description: "Disables the Item's Link (Item).",
     },
-    textValue: {
+    "*.textValue": {
       type: "string",
       description: "The Item's text in the ellipsis menu; default its Link's text (Item).",
     },
-    href: { type: "Href", description: "Where the crumb goes (Link)." },
-    routerOptions: {
+    "*.href": { type: "Href", description: "Where the crumb goes (Link)." },
+    "*.routerOptions": {
       type: "RouterOptions",
       description: "Passed unchanged to the router's `navigate` (Link).",
     },
-    render: {
+    "*.render": {
       type: "ReactElement | (props, state) => ReactNode",
       description: "Another element, on every part.",
     },

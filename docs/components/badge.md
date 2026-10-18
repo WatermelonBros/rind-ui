@@ -34,11 +34,11 @@ Badge is stateless: it has no machine.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `label` | `string` | — | The text assistive technology gets: the visible content is hidden from it and the label rendered visually hidden. |
-| `id` | `string` | — | Default: generated. A host that keeps an `aria-label` lists it in `aria-describedby`. |
-| `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element. |
+| Part | Prop | Type | Default | Description |
+|---|---|---|---|---|
+| `Badge.Root` | `label` | `string` | — | The text assistive technology gets: the visible content is hidden from it and the label rendered visually hidden. |
+| `Badge.Root` | `id` | `string` | — | Default: generated. A host that keeps an `aria-label` lists it in `aria-describedby`. |
+| `Badge.Root` | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

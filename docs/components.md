@@ -67,7 +67,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Combobox | ● |  | ● | ● | ● | ● | ● | ● | ● | 8 | 2 | done | Includes Autocomplete (free text) and Command (inline) |
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
-| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
+| Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | done | RAC: TokenField (unverified) |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark |
@@ -137,7 +137,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
+| Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | spec | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |

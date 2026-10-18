@@ -11,6 +11,7 @@ export const linkMeta = {
   scope: "link",
   name: "Link",
   stateless: true,
+  exports: ["Link", "RouterProvider"],
   parts: [{ name: "Link", part: "link", element: "a", description: "The link itself." }],
   props: {
     href: { type: "Href", description: "Where it goes. Typed by an augmented `RouterConfig`." },

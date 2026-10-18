@@ -79,7 +79,7 @@ export const segmentedControlMeta = {
     invalid: { type: "boolean", default: "false", description: "Marks the control invalid." },
     name: { type: "string", description: "The submitted name (default: derived from the id)." },
     form: { type: "string", description: "The id of the form the hidden inputs belong to." },
-    render: {
+    "*.render": {
       type: "element | (props, state) => element",
       description: "Substitutes the rendered element without changing behaviour.",
     },

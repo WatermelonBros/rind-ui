@@ -151,11 +151,13 @@ type DialogRootBase = Omit<
   DialogProps,
   "root" | "parent" | "role" | "modal" | "closeOnInteractOutside"
 > & {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
   /** Content, backdrop and positioner stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
   readonly messages?: MessageOverrides<DialogMessages>
   readonly actionsRef?: Ref<DialogActions>
+  /** The dialog's parts. */
   readonly children?: ReactNode
 }
 
@@ -169,6 +171,7 @@ export type DialogRole = "dialog" | "alertdialog"
  * not compile.
  */
 export type DialogRootProps<R extends DialogRole = "dialog"> = DialogRootBase & {
+  /** `alertdialog`: a confirmation. Always modal, an outside press never closes it, focus starts on Cancel, a missing description warns. */
   readonly role?: R
 } & (R extends "alertdialog"
     ? { readonly modal?: never; readonly closeOnInteractOutside?: never }

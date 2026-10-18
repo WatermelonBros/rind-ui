@@ -187,13 +187,16 @@ export function ExampleFrame({
           ))}
           <SegmentedControl.Indicator className={styles.viewIndicator} />
         </SegmentedControl.Root>
-        <ToggleGroup.Item
-          className={styles.getCode}
-          pressed={tab !== null}
-          onPressedChange={(on) => setTab(on ? "react" : null)}
-        >
-          {"</>"} Get code
-        </ToggleGroup.Item>
+        {/* no source (a stale build): no button that would open nothing */}
+        {source.code[shownName]?.raw && (
+          <ToggleGroup.Item
+            className={styles.getCode}
+            pressed={tab !== null}
+            onPressedChange={(on) => setTab(on ? "react" : null)}
+          >
+            {"</>"} Get code
+          </ToggleGroup.Item>
+        )}
       </div>
 
       <div

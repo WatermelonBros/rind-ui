@@ -139,7 +139,10 @@ export function VisibilityTrigger({
   render,
   ref,
   ...rest
-}: ComponentPropsWithRef<"button"> & { readonly render?: RenderProp<{ visible: boolean }> }) {
+}: ComponentPropsWithRef<"button"> & {
+  /** Another element or a render function receiving the props and `{ visible }`. */
+  readonly render?: RenderProp<{ visible: boolean }>
+}) {
   const ctx = useTextFieldHost("TextField.VisibilityTrigger")
   const env = useEnvironment()
   // Peek, never claim: the Input is the Field's one control.
@@ -232,7 +235,9 @@ export function VisibilityIndicator({
   render,
   ...rest
 }: Omit<ComponentPropsWithRef<"span">, "children"> & {
+  /** The icon; style it by `data-state` (`aria-hidden`). */
   readonly children?: ReactNode
+  /** Another element or a render function receiving the props and `{ visible }`. */
   readonly render?: RenderProp<{ visible: boolean }>
 }) {
   const ctx = useTextFieldHost("TextField.VisibilityIndicator")
