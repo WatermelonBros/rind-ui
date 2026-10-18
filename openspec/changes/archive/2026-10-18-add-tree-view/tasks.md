@@ -1,7 +1,7 @@
 ## 0. Prerequisites and prototype
 
 - [x] 0.1 Confirm `add-foundations`, `add-a11y-foundations` (archived), `add-collections`, `add-listbox`, `add-link` and `add-theme-system` are applied
-- [x] 0.2 PENDING a manual pass on real assistive technology (backlog row; coordinator, 2026-10-18). Was: Real-AT prototype of flat versus nested (`group`) DOM (VoiceOver macOS/iOS with Safari and Chrome, NVDA + Firefox/Chrome, JAWS, TalkBack): expand/collapse announcement, level/position, busy; record in docs/research/tree-view.md and the support matrix; freeze the DOM shape before 1.x — not done: needs real assistive technology (VoiceOver, NVDA, JAWS, TalkBack); the flat DOM ships as designed, connect alone changes if it fails
+- [ ] 0.2 DEFERRED: PENDING a manual pass on real assistive technology (backlog row; coordinator, 2026-10-18). Was: Real-AT prototype of flat versus nested (`group`) DOM (VoiceOver macOS/iOS with Safari and Chrome, NVDA + Firefox/Chrome, JAWS, TalkBack): expand/collapse announcement, level/position, busy; record in docs/research/tree-view.md and the support matrix; freeze the DOM shape before 1.x — not done: needs real assistive technology (VoiceOver, NVDA, JAWS, TalkBack); the flat DOM ships as designed, connect alone changes if it fails
 
 ## 1. Machine (`core/components/tree-view`)
 
@@ -32,7 +32,7 @@
 
 - [x] 5.1 One browser test per scenario; issue-citing ones reproduce the issue first (react-spectrum#9918, #9546, #8111, #10659, #10660, #10645, #7552, #8263, #9991, #1525, #10720; zag#1751, #1874, #2028, #2760, #1787, #1627, #2582; reka-ui#1458; headless-tree#171; react-arborist#233, #303, #325)
 - [x] 5.2 `testMachine` over the props classes, all modalities incl. `virtual`, RTL, axe per state
-- [x] 5.3 MOVED to the follow-up change `tree-view-virtualization` (coordinator, 2026-10-18). Was: Virtualized fixture: End at 10,000 nodes, expand/collapse keeps ids, two-item re-render on a highlight move, 70k-node build benchmark — not done: TreeView.Tree renders every visible node (no scrollToIndex/virtualizer wiring yet); deferred
+- [ ] 5.3 DEFERRED: MOVED to the follow-up change `tree-view-virtualization` (coordinator, 2026-10-18). Was: Virtualized fixture: End at 10,000 nodes, expand/collapse keeps ids, two-item re-render on a highlight move, 70k-node build benchmark — not done: TreeView.Tree renders every visible node (no scrollToIndex/virtualizer wiring yet); deferred
 - [x] 5.4 Virtual screen-reader reading-order test (tree name, level/position, expanded, checked)
 
 ## 6. Theme (`packages/theme/src/tree-view.css`)
@@ -47,6 +47,6 @@
 ## 8. Docs and closing
 
 - [x] 8.1 Docs page (generated API facts + guide: Tree vs Grid List vs Table, why no controls inside items, lazy loading recipe, checked values are leaves, Reado migration notes)
-- [x] 8.2 PENDING a manual pass on real assistive technology (backlog row; record in docs/accessibility/tested-with.json when run). Was: Manual tier-1 pass on real AT; record in "Tested with" — not done: manual pass on real assistive technology
+- [ ] 8.2 DEFERRED: PENDING a manual pass on real assistive technology (backlog row; record in docs/accessibility/tested-with.json when run). Was: Manual tier-1 pass on real AT; record in "Tested with" — not done: manual pass on real assistive technology
 - [x] 8.3 Set Tree View to `wip`/`done` in `docs/components.md`; archive when approved — main session (status, archive)
 - [x] 8.4 `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` green; changeset — main session (full gate, changeset)

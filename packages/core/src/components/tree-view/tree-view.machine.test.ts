@@ -6,7 +6,12 @@ import { toKey } from "../../collection/key"
 import { createTreeCollection } from "../../collection/tree"
 import { platforms } from "../../dom/platform"
 import { createService } from "../../machine/service"
-import { type TreeViewProps, type TreeViewValue, treeViewMachine } from "./tree-view.machine"
+import {
+  type TreeViewProps,
+  type TreeViewValue,
+  treeSelectionOf,
+  treeViewMachine,
+} from "./tree-view.machine"
 
 interface Row {
   readonly id: string
@@ -209,6 +214,15 @@ describe("activation", () => {
     expect(t.expanded()).toEqual(["src"])
   })
 
+  it("Enter in none mode with onAction runs the action, then toggles the branch", () => {
+    const onAction = vi.fn()
+    const t = make({ selectionMode: "none", onAction })
+    t.focus()
+    t.send({ type: "ACTION", key: toKey("src"), modality: "keyboard" })
+    expect(onAction).toHaveBeenCalledTimes(1)
+    expect(t.expanded()).toEqual(["src"])
+  })
+
   it("Enter selects in a selectable tree, onAction first", () => {
     const calls: string[] = []
     const t = make({
@@ -288,6 +302,15 @@ describe("selection", () => {
     t.focus()
     t.send({ type: "SELECT", key: toKey("docs"), modality: "keyboard", shift: false, mod: false })
     expect(t.value()).toBe("docs")
+  })
+
+  it("single mode reads a controlled list as its first key", () => {
+    const t = make({ value: ["src", "docs"] as never })
+    expect(treeSelectionOf(["src", "docs"], "single")).toEqual(new Set(["src"]))
+    t.focus()
+    // "docs" is not selected (only "src" counts), so selecting it selects it alone.
+    t.send({ type: "SELECT", key: toKey("docs"), modality: "keyboard", shift: false, mod: false })
+    expect(t.onValueChange.mock.calls.at(-1)?.[0]).toBe("docs")
   })
 
   it("select all is the visible items, as a key list", () => {

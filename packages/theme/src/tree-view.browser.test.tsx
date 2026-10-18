@@ -1,6 +1,7 @@
 // add-tree-view 6.1: the Tree View stylesheet alone: indentation from the level, 24px rows
 // and indicator hit area, no flex tree, fit-content rows, selected cue beyond colour, the
-// indicator rotating open and mirroring in right-to-left, forced-colors rules.
+// indicator rotating open and mirroring in right-to-left. Forced colors are checked on the
+// computed style under emulation in fixtures/tree-view/tree-view.pw.test.ts.
 import { afterEach, describe, expect, it } from "vitest"
 import { cleanup, files, inject, mount, q } from "./test-css"
 import tree from "./tree-view.css?inline"
@@ -75,10 +76,5 @@ describe("Tree View stylesheet", () => {
     expect(
       getComputedStyle(q(rtl, '[data-part="item-indicator"][data-state="closed"]')).scale,
     ).toBe("-1 1")
-  })
-
-  it("has forced-colors rules for selection and focus", () => {
-    expect(tree).toMatch(/@media \(forced-colors: active\)[\s\S]*SelectedItem/)
-    expect(tree).toMatch(/data-focus-visible[\s\S]*outline: 3px solid Highlight/)
   })
 })

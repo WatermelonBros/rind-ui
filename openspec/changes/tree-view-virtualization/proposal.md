@@ -16,7 +16,7 @@ virtualized rendering that design left for this follow-up (coordinator decision,
 
 ### Modified Capabilities
 
-- `tree-view`: virtualized rendering (the requirement text stays as specified in add-tree-view).
+- `tree-view`: the Virtualization and Collection Changes requirements regain the virtualized rendering and constant-cost highlight SHALLs that add-tree-view deferred.
 
 ## Impact
 

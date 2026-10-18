@@ -109,10 +109,17 @@ export interface TreeViewContext extends CollectionContext {
 // ---------------------------------------------------------------------------------------
 // Value shapes
 
-/** The value as a selection. */
-export function treeSelectionOf(value: TreeViewValue | undefined): SelectionValue {
+/**
+ * The value as a selection. In single mode it holds at most one key, even when a controlled
+ * value passes a list (the first key).
+ */
+export function treeSelectionOf(
+  value: TreeViewValue | undefined,
+  selectionMode?: "single" | "multiple" | "none",
+): SelectionValue {
   if (value === null || value === undefined) return new Set()
-  return new Set((typeof value === "string" ? [value] : value).map(toKey))
+  const keys = typeof value === "string" ? [value] : value
+  return new Set((selectionMode === "single" ? keys.slice(0, 1) : keys).map(toKey))
 }
 
 /** Keys as a set (expanded, checked). */
@@ -157,7 +164,8 @@ type TreeArgsProps = CollectionProps & TreeViewProps
 
 const pieces = collectionPieces({
   selection: {
-    read: (values) => treeSelectionOf(values["value"] as TreeViewValue | undefined),
+    read: (values, props) =>
+      treeSelectionOf(values["value"] as TreeViewValue | undefined, mode(props as TreeArgsProps)),
     // Keys in tree order; select-all (the visible selectable items) as an explicit list.
     write: (s, collection, props) => {
       const p = props as TreeArgsProps
@@ -349,7 +357,7 @@ export const treeViewMachine = setup({
         collection: p.collection,
         highlightedKey: null,
         highlightSource: null,
-        selection: treeSelectionOf(a.values.value),
+        selection: treeSelectionOf(a.values.value, mode(a.props)),
         selectionMode: mode(a.props),
         focusableWhenDisabled: a.props.focusableWhenDisabled,
         tree: a.props.tree,
@@ -446,7 +454,8 @@ export const treeViewMachine = setup({
       a.props.onAction?.(e.key, { modality: e.modality, via: "enter" })
       if (mode(a.props) !== "none") {
         a.send({ type: "SELECT", key: e.key, modality: "keyboard", shift: false, mod: false })
-      } else if (!a.props.onAction) {
+      } else if (!a.props.checkable || !a.props.onAction) {
+        // Not selectable: a branch toggles after the action (a checkable tree only without one).
         toggleExpansion(a, e.key)
       }
     },
@@ -467,7 +476,7 @@ export const treeViewMachine = setup({
         const p = args(a).props
         const r = selectKeys(
           p.collection,
-          treeSelectionOf(a.values.value),
+          treeSelectionOf(a.values.value, mode(a.props)),
           a.context.anchor,
           { key: e.key, modality: e.modality, shift: e.shift, mod: e.mod },
           {
@@ -478,7 +487,7 @@ export const treeViewMachine = setup({
           },
         )
         a.set("anchor", r.anchor)
-        if (r.value !== treeSelectionOf(a.values.value)) {
+        if (r.value !== treeSelectionOf(a.values.value, mode(a.props))) {
           const keys = inTreeOrder(a.props.tree, selectedKeys(p.collection, r.value))
           a.set("value", mode(a.props) === "multiple" ? keys : (keys[0] ?? EMPTY))
         }

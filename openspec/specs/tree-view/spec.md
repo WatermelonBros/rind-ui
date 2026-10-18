@@ -385,8 +385,8 @@ Keys `"0"` and `""` SHALL be valid and SHALL never be dropped or treated as abse
 Filtering a tree collection SHALL keep ancestors of matching nodes as branches (with
 `children` retained even when empty) so `aria-expanded` and expandability survive
 (zag#2582, react-spectrum#10664). The highlight SHALL repair per collections when its
-node disappears. Large trees SHALL keep a highlight move at constant cost: only the two
-affected items re-render.
+node disappears. A constant-cost highlight move in large trees is specified by the change
+`tree-view-virtualization`.
 
 #### Scenario: Filter keeps ancestors
 
@@ -395,17 +395,15 @@ affected items re-render.
 
 ### Requirement: Virtualization
 
-A virtualized tree SHALL use the collections contract over the visible items: the
-scroll-to-index callback receives the index in the visible list, persisted keys include the
-highlighted key, `aria-level`/`aria-setsize`/`aria-posinset` come from the data, and
-expanding or collapsing SHALL NOT change the identity (element id) of any item that stays
-visible.
+`aria-level`, `aria-setsize` and `aria-posinset` SHALL come from the tree data (the node's
+depth and its position among its siblings), not from the rendered rows. Virtualized rendering
+(only the rows near the viewport in the DOM, scroll-to-index, stable ids across expand and
+collapse) is specified by the change `tree-view-virtualization`.
 
-#### Scenario: End in a big tree
+#### Scenario: Metadata from the data
 
-- **WHEN** End is pressed in a virtualized tree of 10,000 visible nodes
-- **THEN** the last node is highlighted, `scrollToIndex` receives index 9999, and its
-  metadata is correct once mounted
+- **WHEN** "index.ts" is the second of three children of "src" and is rendered
+- **THEN** it has `aria-posinset="2"` and `aria-setsize="3"` from the tree data
 
 ### Requirement: Right To Left
 

@@ -254,7 +254,10 @@ function Root(all: TreeViewRootProps) {
   const visible = visibleOf(tree, expandedKeys)
   const expanded = keySetOf(expandedKeys)
   const checked = keySetOf(view.values.checkedValue as readonly string[] | undefined)
-  const selection = treeSelectionOf(view.values.value as TreeViewValue | undefined)
+  const selection = treeSelectionOf(
+    view.values.value as TreeViewValue | undefined,
+    all.checkable ? "none" : selectionMode,
+  )
   const ctx = view.context
   const parts = treeViewConnect(
     {
@@ -368,7 +371,10 @@ function Tree({
   useSelector(host.service, (v) => v)
   const ref = useRef<HTMLDivElement | null>(null)
   const { checkable, selectionMode } = host.options
-  useEffect(() => checkTreeView(ref.current, { checkable, selectionMode }))
+  useEffect(
+    () => checkTreeView(ref.current, { checkable, selectionMode }),
+    [checkable, selectionMode],
+  )
   const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
   const props = mergeProps({ ...normalizeProps(host.parts.tree(naming)), ref }, rest)
   const rows = host.visibleKeys.map((key) => {
