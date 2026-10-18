@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| add-color-picker (site report) | — | packages/core/src/components/color-picker | The hue ChannelSlider track is drawn at the current saturation/brightness: with a near-black value (#0B0B0C) the whole hue track is black and the hue cannot be picked by eye. Draw the hue track at full saturation and brightness (the Area shows the S/B) |
 | add-date-field (impl) | — | packages/theme/src/date-field.css | Task 8.2: no Playwright captures (forced colors, RTL ar-AE, invalid, placeholder state) |
 | add-date-field (impl) | — | openspec/changes/archive/*-add-date-field | Spec "Error shown after leaving" says default validation, but the Field defaults to submit mode: the test uses validationMode="blur"; decide whether Date Field should default to blur |
 | add-date-field (impl) | — | packages/core/src/components/date-field/date-field.connect.ts | `data-validity` on the hidden input (contract query `validity`) is not in the spec's data-attribute list; add it to the spec or replace the query |

@@ -106,6 +106,25 @@ const [value, setValue] = useState<CalendarValue>(new CalendarDate(2026, 10, 14)
 
 `focusedValue`, `defaultFocusedValue` and `onFocusChange(date)` control which date holds focus and therefore which month is visible. `onVisibleRangeChange({ start, end })` reports every change of the visible range.
 
+## Date ranges
+
+`selectionMode="range"` selects a range in two steps. The first press (or Enter or Space) sets the **anchor**; the second ends the range and calls `onValueChange` once with `{ start, end }` in date order. Pressing the same date twice gives a one-day range, and after a commit the next press always starts a new anchor. Each end keeps its own type and time of day.
+
+```tsx
+const [stay, setStay] = useState<CalendarValue>(null)
+
+<Calendar.Root aria-label="Stay" selectionMode="range" value={stay} onValueChange={setStay}>
+```
+
+- **Preview.** While anchored, the days from the anchor to the hovered date (or the focused date, so the arrow keys move it) carry `data-preview`. They are not selected: `aria-selected` stays on the committed range.
+- **Cancel and leave.** Escape drops the range in progress and is consumed; with no anchor it reaches an enclosing dialog. Leaving the Calendar while anchored, by focus or a press outside, applies `commitOnBlur`: `"reset"` (default) keeps the value, `"select"` commits the preview, `"clear"` clears the value. Header controls, and popups opened from inside, count as inside. Paging keeps the anchor.
+- **Length.** `minRangeLength` and `maxRangeLength` (in days, ends included) disable the dates no range from the anchor may end on.
+- **Unavailable dates.** A range never crosses an unavailable date, unless `allowsNonContiguousRanges`. `isDateUnavailable(date, { anchor })` is told the anchor, so availability can depend on it (for example "at most a week after the start"). A committed range that crosses an unavailable date, or breaks the length rules, marks the Calendar invalid.
+- **Controlled anchor.** `anchor`, `defaultAnchor` and `onAnchorChange(date | null)` control the range in progress: setting `anchor` to a half-entered range's start lets the next press complete it. A new `value` from the parent drops the anchor.
+- **Screen readers.** The focused cell is described by "Press Enter to start a range", then "Press Enter to end the range starting {date}"; cell names stay the plain date. "Range starts {date}" and "Selected {start} to {end}" are announced politely. All four strings are in `messages` (`startPrompt`, `endPrompt`, `anchorSet`, `rangeSelected`).
+
+The range is drawn with `data-in-range`, `data-range-start`, `data-range-end`, `data-anchor`, `data-preview`, `data-preview-start` and `data-preview-end` on the cells, and `data-anchored` on the root. `calendar.css` draws it as one band per week row, with a dashed preview. The helpers it uses, `makeRange`, `rangeLength`, `availableBounds`, `lengthBounds`, `crossesUnavailable` and `canEndRange`, are exported for your own range logic.
+
 ## Calendar systems and locale
 
 `locale` and `dir` default to the provider's. The Calendar shows the locale's calendar system. For a system other than Gregorian pass `createCalendar` from `@internationalized/date`; without it a non-Gregorian locale falls back to Gregorian with a warning in development.
@@ -177,7 +196,7 @@ Style the `data-*` attributes above. The theme reads `--rind-calendar-*` tokens 
 
 ## Testing
 
-`getCalendar(screen, { name })` locates the Calendar by its group role and accessible name. Actions: `select` (pages to the month if needed; by pointer or keyboard), `focusDate`, `nextPage`, `previousPage`, `press` (a key in the grid). Queries: `value`, `focusedDate`, `heading`, `visibleMonths`, `isSelected`, `isUnavailable`, `isDisabled`, `today`, `isInvalid`, `isFocused`. Dates are ISO strings (`"2026-10-20"`).
+`getCalendar(screen, { name })` locates the Calendar by its group role and accessible name. Actions: `select` (pages to the month if needed; by pointer or keyboard), `focusDate`, `nextPage`, `previousPage`, `press` (a key in the grid). Queries: `value`, `focusedDate`, `heading`, `visibleMonths`, `isSelected`, `isUnavailable`, `isDisabled`, `today`, `isInvalid`, `isFocused`. In range mode, the actions `selectRange(start, end)`, `startRange(date)` and `cancel()`, and the queries `range()` (the committed range's visible ends), `anchor()`, `preview()` and `isAnchored()`. Dates are ISO strings (`"2026-10-20"`).
 
 ```tsx
 import { getCalendar } from "@rind-ui/testing"
@@ -190,6 +209,10 @@ await departure.via("keyboard").focusDate("2026-11-10")
 await departure.press("Enter")
 expect(await departure.isSelected("2026-11-10")).toBe(true)
 expect(await departure.isUnavailable("2026-11-14")).toBe(true)
+
+const stay = getCalendar(screen, { name: "Stay" })
+await stay.selectRange("2026-10-10", "2026-10-14")
+expect(await stay.range()).toEqual({ start: "2026-10-10", end: "2026-10-14" })
 ```
 
 To test the machine without a DOM, `testMachine(calendarMachine, props)` from `@rind-ui/testing` walks the state graph against the contract's oracle.

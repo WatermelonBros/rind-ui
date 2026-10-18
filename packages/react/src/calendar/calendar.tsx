@@ -2,6 +2,7 @@
 // range; connect every attribute and the key mapping; navigation is pure core logic.
 
 import {
+  type CalendarCommitOnBlur,
   type CalendarDate,
   type CalendarMessages,
   type CalendarSelectionMode,
@@ -26,6 +27,8 @@ import {
   todayZone,
   valuesOf,
   visibleEnd,
+  visuallyHiddenStyle,
+  watchLeave,
   firstDayOfWeek as weekStart,
 } from "@rind-ui/core"
 import {
@@ -94,7 +97,22 @@ export type CalendarRootProps = Omit<
   readonly onVisibleRangeChange?: (range: { start: CalendarDate; end: CalendarDate }) => void
   readonly minValue?: DateValue | null
   readonly maxValue?: DateValue | null
-  readonly isDateUnavailable?: (date: CalendarDate) => boolean
+  /** `anchor`: in range mode, the first end while a range is being selected, else null. */
+  readonly isDateUnavailable?: (
+    date: CalendarDate,
+    details: { readonly anchor: CalendarDate | null },
+  ) => boolean
+  /** Range mode: the first end while a range is being selected (controllable). */
+  readonly anchor?: CalendarDate | null
+  readonly defaultAnchor?: CalendarDate | null
+  readonly onAnchorChange?: (anchor: CalendarDate | null) => void
+  /** Range mode: length bounds in days, both ends included. */
+  readonly minRangeLength?: number
+  readonly maxRangeLength?: number
+  /** Range mode: a range may contain unavailable dates (default false). */
+  readonly allowsNonContiguousRanges?: boolean
+  /** Range mode: what leaving while anchored does (default "reset"). */
+  readonly commitOnBlur?: CalendarCommitOnBlur
   readonly visibleMonths?: number
   readonly pageBehavior?: "visible" | "single"
   readonly fixedWeeks?: boolean
@@ -122,6 +140,13 @@ function Root({
   minValue = null,
   maxValue = null,
   isDateUnavailable,
+  anchor,
+  defaultAnchor,
+  onAnchorChange,
+  minRangeLength,
+  maxRangeLength,
+  allowsNonContiguousRanges = false,
+  commitOnBlur = "reset",
   visibleMonths = 1,
   pageBehavior = "visible",
   fixedWeeks = false,
@@ -155,7 +180,7 @@ function Root({
     firstDayOfWeek: firstDay,
   }
   const current = value === undefined ? defaultValue : value
-  const today = todayOf(env.dateClock, todayZone(timeZone, current))
+  const today = todayOf(env.dateClock, todayZone(timeZone, valuesOf(current ?? null)))
   // The first focus: the given one, else the value, else today (calendar-navigation).
   const [initial] = useState(
     () =>
@@ -164,8 +189,14 @@ function Root({
         .focused,
   )
   const pendingFocus = useRef<{ date: CalendarDate; modality: string | undefined } | null>(null)
-  const latest = useRef({ onValueChange, onFocusChange })
-  latest.current = { onValueChange, onFocusChange }
+  const latest = useRef({ onValueChange, onFocusChange, onAnchorChange })
+  latest.current = { onValueChange, onFocusChange, onAnchorChange }
+  const range = {
+    minRangeLength,
+    maxRangeLength,
+    allowsNonContiguousRanges,
+    commitOnBlur,
+  }
   const { view, send } = useMachine(calendarMachine, {
     ...nav,
     value,
@@ -181,6 +212,10 @@ function Root({
     focusedValue: show(focusedValue) ?? undefined,
     defaultFocusedValue: initial,
     onFocusedValueChange: (date) => latest.current.onFocusChange?.(date),
+    ...(anchor !== undefined ? { anchor: show(anchor) } : {}),
+    ...(defaultAnchor !== undefined ? { defaultAnchor: show(defaultAnchor) } : {}),
+    onAnchorChange: (a) => latest.current.onAnchorChange?.(a),
+    ...range,
     selectionMode,
     isDateUnavailable,
     disabled,
@@ -197,8 +232,11 @@ function Root({
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const gridFocused = view.matches("focused")
   const modality = useModality(env.modality, gridFocused)
+  const anchored = selectionMode === "range" ? (view.values.anchor ?? null) : null
   const api = calendarConnect({
     ...nav,
+    ...range,
+    anchor: anchored ? display(anchored, calendar) : null,
     selectionMode,
     isDateUnavailable,
     disabled,
@@ -220,6 +258,7 @@ function Root({
     ids: {
       heading: `calendar-${instance}-heading`.replace(/:/g, ""),
       grid: (m) => `calendar-${instance}-grid-${m}`.replace(/:/g, ""),
+      prompt: `calendar-${instance}-prompt`.replace(/:/g, ""),
     },
   })
   // After the step is rendered: DOM focus to the focused cell (keyboard and props only).
@@ -240,6 +279,14 @@ function Root({
       )
     }
   })
+  // Range mode: leaving the Calendar while anchored applies commitOnBlur (spec "Range Cancel And
+  // Leave"); inside is the root's subtree and the layers opened from it.
+  const isAnchored = anchored !== null
+  useEffect(() => {
+    const el = root.current
+    if (!isAnchored || !el) return
+    return watchLeave(el, () => send({ type: "LEAVE" }))
+  }, [isAnchored, send])
   // Every change of the visible range is reported.
   const start = view.context.visibleStart
   const reported = useRef<string | null>(null)
@@ -258,9 +305,27 @@ function Root({
     grid: (offset) => monthGrid(start.add({ months: offset }), locale, firstDay, fixedWeeks),
   }
   const props = mergeProps({ ...normalizeProps(api.root()), ref: root }, rest)
+  // Range mode: the focused cell's prompt, read as its description.
+  const prompt =
+    selectionMode === "range" ? (
+      <span {...normalizeProps({ ...api.prompt(), style: visuallyHiddenStyle })} />
+    ) : null
   return (
     <CalendarContext value={ctx}>
-      {renderPart("div", { ...props, children }, render, undefined)}
+      {renderPart(
+        "div",
+        {
+          ...props,
+          children: (
+            <>
+              {children}
+              {prompt}
+            </>
+          ),
+        },
+        render,
+        undefined,
+      )}
     </CalendarContext>
   )
 }
@@ -345,6 +410,13 @@ function Grid({
       if (!inside) send({ type: "GRID.BLUR" })
     },
     onKeyDown: (e: KeyboardEvent & { nativeEvent: KeyboardEvent }) => {
+      // Escape cancels a range in progress and is consumed; with no anchor it bubbles.
+      if (e.key === "Escape" && ctx.api.root()["data-anchored"] !== undefined) {
+        e.preventDefault()
+        e.stopPropagation()
+        send({ type: "CANCEL" })
+        return
+      }
       const event = calendarKey(
         describeKey(e.nativeEvent, env),
         ctx.api.root()["dir"] === "rtl" ? "rtl" : "ltr",

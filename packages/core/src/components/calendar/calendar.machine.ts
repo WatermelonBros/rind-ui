@@ -13,7 +13,7 @@ import {
 } from "@internationalized/date"
 import type { Modality } from "../../contract/env"
 import type { AnnouncerEnv } from "../../env/capabilities"
-import { toEmitted } from "../../i18n/date"
+import { fullDate, toEmitted } from "../../i18n/date"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs } from "../../machine/types"
 import type { CalendarMessages } from "./calendar.messages"
@@ -32,9 +32,14 @@ import {
   prepareAnnouncer,
   requestCellFocus,
 } from "./calendar.pieces"
+import { canEndRange, type DateRange, makeRange } from "./calendar.range"
 
-export type CalendarSelectionMode = "single" | "multiple"
-export type CalendarValue = DateValue | readonly DateValue[] | null
+export type CalendarSelectionMode = "single" | "multiple" | "range"
+/** A committed range: `start ≤ end`, each end keeping its own type, calendar and time. */
+export type CalendarRangeValue = DateRange<DateValue>
+export type CalendarValue = DateValue | readonly DateValue[] | CalendarRangeValue | null
+/** What leaving the Calendar while anchored does (spec "Range Cancel And Leave"). */
+export type CalendarCommitOnBlur = "reset" | "select" | "clear"
 
 export type CalendarEvent =
   | { readonly type: "NAVIGATE"; readonly move: CalendarMove; readonly composing: boolean }
@@ -50,6 +55,12 @@ export type CalendarEvent =
   | { readonly type: "FOCUS.SYNC" }
   /** `minValue` / `maxValue` changed (onProps): the focus is clamped. */
   | { readonly type: "CONSTRAINTS" }
+  /** Escape while anchored (range mode): the anchor and preview go, the value stays. */
+  | { readonly type: "CANCEL" }
+  /** Focus or a press left the Calendar while anchored: `commitOnBlur` applies. */
+  | { readonly type: "LEAVE" }
+  /** The parent changed `value` (onProps): a range in progress is dropped. */
+  | { readonly type: "VALUE.SYNC" }
 
 export interface CalendarProps extends NavigationOptions {
   readonly value?: CalendarValue | undefined
@@ -60,7 +71,20 @@ export interface CalendarProps extends NavigationOptions {
   readonly defaultFocusedValue?: CalendarDate | undefined
   readonly onFocusedValueChange?: ((date: CalendarDate, details: unknown) => void) | undefined
   readonly selectionMode: CalendarSelectionMode
-  readonly isDateUnavailable?: ((date: CalendarDate) => boolean) | undefined
+  /** `anchor`: the range's first end while one is being selected (range mode), else null. */
+  readonly isDateUnavailable?:
+    | ((date: CalendarDate, details: { readonly anchor: CalendarDate | null }) => boolean)
+    | undefined
+  readonly anchor?: CalendarDate | null | undefined
+  readonly defaultAnchor?: CalendarDate | null | undefined
+  readonly onAnchorChange?: ((anchor: CalendarDate | null, details: unknown) => void) | undefined
+  /** Range length bounds in days, both ends included. */
+  readonly minRangeLength?: number | undefined
+  readonly maxRangeLength?: number | undefined
+  /** A range may contain unavailable dates (default false). */
+  readonly allowsNonContiguousRanges?: boolean | undefined
+  /** Default "reset". */
+  readonly commitOnBlur?: CalendarCommitOnBlur | undefined
   readonly disabled?: boolean | undefined
   readonly readOnly?: boolean | undefined
   readonly calendar: Calendar
@@ -82,13 +106,27 @@ type Types = {
   events: CalendarEvent
   env: AnnouncerEnv
   context: CalendarContext
-  values: "value" | "focusedValue"
+  values: "value" | "focusedValue" | "anchor"
 }
 type Args = ActionArgs<Types>
 
-/** Values as a list (single: zero or one). */
-export const valuesOf = (value: CalendarValue | undefined): readonly DateValue[] =>
-  value == null ? [] : Array.isArray(value) ? value : [value as DateValue]
+/** A committed range value (range mode), else null. */
+export const rangeOf = (value: CalendarValue | undefined): CalendarRangeValue | null =>
+  value != null && !Array.isArray(value) && "start" in (value as object)
+    ? (value as CalendarRangeValue)
+    : null
+
+/** Values as a list (single: zero or one; range: its two ends). */
+export const valuesOf = (value: CalendarValue | undefined): readonly DateValue[] => {
+  if (value == null) return []
+  if (Array.isArray(value)) return value
+  const range = rangeOf(value)
+  return range ? [range.start, range.end] : [value as DateValue]
+}
+
+/** Anchors equal by day (null equals null). */
+const sameAnchor = (a: CalendarDate | null, b: CalendarDate | null) =>
+  a === null || b === null ? a === b : isSameDay(a, b)
 
 /** Same days in the same order: a new object for the same day is equal (reka-ui#2960). */
 export function sameDays(a: CalendarValue, b: CalendarValue): boolean {
@@ -107,15 +145,42 @@ export function sameDays(a: CalendarValue, b: CalendarValue): boolean {
 export const display = (date: DateValue, calendar: Calendar): CalendarDate =>
   toCalendar(toCalendarDate(date), calendar)
 
-/** Whether a date can be chosen: enabled, inside the constraints, available. */
-export function isSelectable(date: CalendarDate, props: CalendarProps): boolean {
+/** The consumer's availability, told the current anchor. */
+export const unavailable = (
+  props: Pick<CalendarProps, "isDateUnavailable">,
+  date: CalendarDate,
+  anchor: CalendarDate | null = null,
+) => props.isDateUnavailable?.(date, { anchor }) === true
+
+/**
+ * Whether a date can be chosen: enabled, inside the constraints, available; while anchored
+ * (range mode) also a valid end for the anchor (length bounds, no unavailable date inside).
+ */
+export function isSelectable(
+  date: CalendarDate,
+  props: CalendarProps,
+  anchor: CalendarDate | null = null,
+): boolean {
   if (props.disabled || props.readOnly) return false
   if (!isSameDay(clamp(date, props), date)) return false
-  return props.isDateUnavailable?.(date) !== true
+  if (unavailable(props, date, anchor)) return false
+  if (props.selectionMode !== "range" || anchor === null) return true
+  return canEndRange(anchor, date, {
+    minRangeLength: props.minRangeLength,
+    maxRangeLength: props.maxRangeLength,
+    isUnavailable: (d) => unavailable(props, d, anchor),
+    allowsNonContiguousRanges: props.allowsNonContiguousRanges,
+  })
 }
+
+/** The anchor in the display calendar, or null. */
+const anchorOf = (args: Pick<Args, "values" | "props">): CalendarDate | null =>
+  args.values.anchor ? toCalendar(args.values.anchor, args.props.calendar) : null
 
 /** null as the runtime's fallback: no selection (a controlled null is a value). */
 const EMPTY = null as unknown as DateValue
+/** null as the anchor's fallback: no range in progress. */
+const NO_ANCHOR = null as unknown as CalendarDate
 /** The adapter always passes `defaultFocusedValue` (initialFocus with the clock's today). */
 const EPOCH = new CalendarDate(1970, 1, 1)
 
@@ -128,8 +193,45 @@ function focus(args: Args, date: CalendarDate, visibleStart: CalendarDate) {
   args.set("visibleStart", visibleStart)
 }
 
+/** One step of a range selection: the first sets the anchor, the second commits. */
+function rangeStep(args: Args, date: CalendarDate) {
+  const { props, values, env } = args
+  const anchor = anchorOf(args)
+  if (anchor === null) {
+    args.set("anchor", date)
+    env.announcer.announce({
+      message: props.messages.anchorSet({
+        anchor: fullDate(date, props.formatLocale, props.calendar),
+      }),
+      priority: "polite",
+      key: `calendar-${props.id}-range`,
+    })
+    return
+  }
+  const { start, end } = makeRange(anchor, date)
+  const current = rangeOf(values.value)
+  const fallback = rangeOf(props.defaultValue)
+  args.set("value", {
+    start: toEmitted(start, current?.start ?? fallback?.start ?? null),
+    end: toEmitted(end, current?.end ?? fallback?.end ?? null),
+  })
+  args.set("anchor", NO_ANCHOR)
+  env.announcer.announce({
+    message: props.messages.rangeSelected({
+      start: fullDate(start, props.formatLocale, props.calendar),
+      end: fullDate(end, props.formatLocale, props.calendar),
+    }),
+    priority: "polite",
+    key: `calendar-${props.id}-range`,
+  })
+}
+
 function select(args: Args, date: CalendarDate) {
   const { props, values } = args
+  if (props.selectionMode === "range") {
+    rangeStep(args, date)
+    return
+  }
   const current = valuesOf(values.value)
   const base = current[0] ?? valuesOf(props.defaultValue)[0] ?? null
   const emitted = toEmitted(date, base)
@@ -153,7 +255,8 @@ export const calendarMachine = setup({
     interactive: ({ props }) => props.disabled !== true,
     notComposing: ({ event }) =>
       !((event.type === "NAVIGATE" || event.type === "SELECT_FOCUSED") && event.composing),
-    focusedSelectable: (args) => isSelectable(focusedOf(args), args.props),
+    focusedSelectable: (args) => isSelectable(focusedOf(args), args.props, anchorOf(args)),
+    anchored: (args) => anchorOf(args) !== null,
     // A press (pointer, touch, or a key on the focused trigger) has moved focus to the
     // trigger; a screen reader's click (virtual) has not, so the grid keeps focus and
     // repairs it after paging.
@@ -199,7 +302,10 @@ export const calendarMachine = setup({
       requestCellFocus(args.props, args.event.date, args.event.modality)
     },
     selectPressed: (args) => {
-      if (args.event.type === "CELL.PRESS" && isSelectable(args.event.date, args.props)) {
+      if (
+        args.event.type === "CELL.PRESS" &&
+        isSelectable(args.event.date, args.props, anchorOf(args))
+      ) {
         select(args, args.event.date)
       }
     },
@@ -208,6 +314,27 @@ export const calendarMachine = setup({
       if (event.type === "CELL.HOVER") set("hovered", event.date)
     },
     clearHovered: ({ set }) => set("hovered", null),
+    /** Escape, a parent's value, or leaving with "reset": the range in progress is dropped. */
+    clearAnchor: (args) => {
+      if (anchorOf(args) !== null) args.set("anchor", NO_ANCHOR)
+      args.set("hovered", null)
+    },
+    /** Leaving while anchored: `commitOnBlur`. */
+    leave: (args) => {
+      const anchor = anchorOf(args)
+      if (anchor === null) return
+      const mode = args.props.commitOnBlur ?? "reset"
+      if (mode === "select") {
+        const end = args.context.hovered ?? focusedOf(args)
+        if (isSelectable(end, args.props, anchor)) {
+          rangeStep(args, end)
+          return
+        }
+      }
+      if (mode === "clear") args.set("value", null as unknown as DateValue)
+      args.set("anchor", NO_ANCHOR)
+      args.set("hovered", null)
+    },
     /** A parent's focusedValue: clamped, the range realigned, announced from outside the grid. */
     syncFocus: (args) => {
       const date = clamp(focusedOf(args), args.props)
@@ -245,14 +372,25 @@ export const calendarMachine = setup({
   values: {
     value: { fallback: EMPTY, equal: sameDays },
     focusedValue: focusedValueControllable(EPOCH),
+    anchor: { fallback: NO_ANCHOR, equal: sameAnchor },
   },
   effects: ["prepareAnnouncer"],
-  onProps: { focusedValue: "FOCUS.SYNC", minValue: "CONSTRAINTS", maxValue: "CONSTRAINTS" },
+  onProps: {
+    focusedValue: "FOCUS.SYNC",
+    minValue: "CONSTRAINTS",
+    maxValue: "CONSTRAINTS",
+    value: "VALUE.SYNC",
+  },
   on: {
     "CELL.HOVER": { actions: ["setHovered"] },
     "GRID.HOVER_END": { actions: ["clearHovered"] },
     "FOCUS.SYNC": { actions: ["syncFocus"] },
     CONSTRAINTS: { actions: ["constrain"] },
+    // A parent's value (including null) drops a range in progress.
+    "VALUE.SYNC": { guard: "anchored", actions: ["clearAnchor"] },
+    // Consumed only while anchored (the connect sends it then); no anchor: it bubbles.
+    CANCEL: { guard: "anchored", actions: ["clearAnchor"] },
+    LEAVE: { guard: "anchored", actions: ["leave"] },
   },
   states: {
     idle: {

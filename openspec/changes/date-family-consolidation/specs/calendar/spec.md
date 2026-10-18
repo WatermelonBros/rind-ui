@@ -10,7 +10,9 @@ offset (0 for the first), and inside each grid a `grid-header` (`thead`), `heade
 (Month And Year Views) there SHALL be one grid per page, with no `grid-header` row. The grid
 parts SHALL be renderable from a render function receiving the weeks of the month (the rows of
 periods in the month and year views), or automatically. Every part SHALL accept element
-substitution and forward its element's attributes. A trigger part MAY be rendered more than
+substitution and forward its element's attributes. In range mode the root SHALL also render a
+visually hidden `prompt` part (`span`) that describes the focused cell (Range Prompts And
+Announcements). A trigger part MAY be rendered more than
 once (for example a second next trigger after the grid for touch screen-reader users); each
 instance behaves the same.
 
@@ -110,12 +112,14 @@ accessible name, with anatomy as above and:
   (pointer: two clicks; keyboard: navigate and Enter twice; touch: two taps; virtual: two bare
   clicks), `startRange(date)`, `cancel()` (Escape), and from phase 1b `dragRange(start, end)`
   (pointer and pen; keyboard declared as `selectRange`);
-- queries: `value()` (ISO dates of cells with `aria-selected="true"`), `range()`, `anchor()`,
-  `preview()`, `focusedDate()`, `heading()`, `visibleMonths()`, `isSelected(date)`,
+- queries: `value()` (ISO dates of cells with `aria-selected="true"`), `range()` (the visible
+  `data-range-start` and `data-range-end` cells, or null), `anchor()`, `preview()`,
+  `isAnchored()`, `focusedDate()`, `heading()`, `visibleMonths()`, `isSelected(date)`,
   `isUnavailable(date)`, `isDisabled(date)`, `today()` (the cell with `aria-current="date"`),
   `isInvalid()`, `announcements()`;
-- states `idle`, `focused`, and in range mode `anchored` (and from phase 1b `dragging`),
-  observed through `data-focus`, `data-anchored` and `data-dragging` on the root;
+- states `idle` and `focused`, observed through `data-focus` on the root; the range in
+  progress is not a machine state (it exists in both) and is observed through `data-anchored`
+  and the `isAnchored()` query (from phase 1b, a drag through `data-dragging`);
 - events: `CELL.PRESS` and `SELECT_FOCUSED` map to `select` (`selectRange` / `startRange` in
   range mode), `NAVIGATE` to `press`, `PAGE` to `nextPage`/`previousPage`, `CANCEL` to `cancel`,
   `CELL.FOCUS`, `GRID.BLUR`, `CELL.HOVER` and `LEAVE` `skip` ("covered by every action"), prop
