@@ -18,7 +18,7 @@ import { move, navigableWhen } from "../../collection/navigation"
 import type { Modality } from "../../contract/env"
 import type { DismissRequest } from "../../dom/dismiss"
 import { deepActiveElement, focusInitial } from "../../dom/focus-scope"
-import { getLayerStack, type LayerId, layerId } from "../../dom/layer-stack"
+import { getLayerStack, type LayerId, type LayerKind, layerId } from "../../dom/layer-stack"
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
@@ -240,6 +240,15 @@ export const menuIds = (levelId: string) => ({
   group: (key: string) => itemId("menu", levelId, "group", key),
   groupLabel: (key: string) => itemId("menu", levelId, "group-label", key),
 })
+
+/** What a menubar's menu may nest in through its opener: anything but another menu. */
+const MENUBAR_PARENT_KINDS = [
+  "dialog",
+  "alertdialog",
+  "drawer",
+  "popover",
+  "tour",
+] as const satisfies readonly LayerKind[]
 
 export const menuLayerId = (levelId: string) => layerId(`menu-${levelId}`)
 
@@ -642,6 +651,11 @@ export const menuMachine = setup({
         parent: a.props.parent,
         // A region is no opener: focus returns to what had it when the menu opened.
         ...(a.props.region ? {} : { opener: a.props.getTrigger }),
+        // A menubar's menus are siblings: the bar sits in the open menu's layer, so the
+        // next menu's opener would otherwise make it that menu's child (add-menubar).
+        ...(root && env.menuTree.parentKind() === "menubar"
+          ? { parentKinds: MENUBAR_PARENT_KINDS }
+          : {}),
         // The trigger is inside: it stays out of the inert set (its name labels the menu)
         // and pressing it toggles, never dismisses and reopens. A hosting menubar too. A
         // region is the page: inert under a modal menu, a press on it is outside.

@@ -387,7 +387,7 @@ function Trigger({ render, ref, disabled = false, ...rest }: Own<"button", MenuT
     send: (e) => {
       if (e.type !== "PRESS") return
       // A menubar opens its menus itself (one open menu per bar).
-      if (ctx.inMenubar && host?.key !== undefined) ctx.tree.parentPress(host.key)
+      if (ctx.inMenubar && host?.key !== undefined) ctx.tree.parentPress(host.key, e.modality)
       else api.pressTrigger(e.modality)
     },
     disabled: () => disabled,

@@ -51,10 +51,12 @@ foreign element SHALL be inserted among them.
 
 Which menu is open SHALL be a controllable value (`value`, `defaultValue`,
 `onValueChange`), the open menu's key or `null`, `null` by default. Each change SHALL
-carry one of these reasons: `TRIGGER_PRESS`, `TRIGGER_KEY`, `TRIGGER_HOVER`,
-`MENU_NAVIGATE`, the close reason of the menu that closed (`ITEM_SELECT`, `ESCAPE_KEY`,
-`TAB_KEY`, `OUTSIDE_PRESS`, `OUTSIDE_FOCUS`, `WINDOW_BLUR`), `OPEN` or `CLOSE`
-(programmatic). At most one menu SHALL be open. A menu's own open state SHALL be derived
+carry one of these reasons (kebab case, like every other component's): `trigger` (a
+press on an item, Enter or Space included), `trigger-key` (an arrow key that opens),
+`hover`, `menu-navigate`, the close reason of the menu that closed (`item-select`,
+`escape-key`, `tab-key`, `outside-press`, `outside-focus`, `window-blur`), or `api`
+(programmatic). An initial `value` or `defaultValue` SHALL open its menu once the menus
+are mounted. At most one menu SHALL be open. A menu's own open state SHALL be derived
 from this value; `Menubar.Menu` SHALL NOT accept its own `open` props. Keys SHALL be
 strings compared by value.
 
@@ -62,7 +64,7 @@ strings compared by value.
 
 - **WHEN** "File" is open in a controlled menubar and the user hovers "Edit"
 - **THEN** `onValueChange("edit", details)` is called once with `details.reason ===
-  "TRIGGER_HOVER"`, and only "Edit" is open after the parent accepts it
+  "hover"`, and only "Edit" is open after the parent accepts it
 
 #### Scenario: Programmatic open
 
@@ -155,13 +157,15 @@ touch); and an arrow key that the open menu does not use (see Arrow Keys Inside 
 Menu). The newly opened menu SHALL take focus by the `menu` capability's
 focus-by-modality rule. Disabled items SHALL be skipped when switching by keyboard and
 SHALL do nothing when hovered or pressed. A press on the item whose menu is open SHALL
-close it. When the last open menu closes, for any reason, open mode SHALL end, and
+close it, except the pointer press that completes a hover switch onto that item (the
+pointer arriving to click it): that press SHALL keep the menu the hover opened. When the last open menu closes, for any reason, open mode SHALL end, and
 hover SHALL no longer open menus.
 
 #### Scenario: One press switches modal menus
 
 - **WHEN** a modal "File" menu is open and the user clicks "Edit"
-- **THEN** File closes and Edit opens with that one click (regression: ariakit#4023,
+- **THEN** File closes and Edit opens with that one click, and Edit stays open when the
+  click lands after the pointer's hover already switched to it (regression: ariakit#4023,
   kobaltedev/kobalte#544)
 
 #### Scenario: Hover switches
@@ -225,7 +229,7 @@ nothing. Up and Down inside a menu SHALL always stay in the menu.
 Closing a menubar menu SHALL follow the `menu` capability: Escape closes the innermost
 menu and, at a menu's top level, closes it and focuses its menubar item; activating an
 item closes the menu (unless the item keeps it open); Tab and Shift+Tab close it and
-leave the menubar; an outside press, outside focus (non-modal) or the window losing
+leave the menubar, from inside the menu or from its bar item; an outside press, outside focus (non-modal) or the window losing
 focus close it. Each SHALL set the menubar value to `null` with the menu's close reason
 and end open mode.
 
@@ -318,13 +322,17 @@ through roles and states as focus moves.
 
 ### Requirement: Data Attributes
 
-Every part SHALL carry `data-scope="menubar"` (Menu parts inside a menu keep
-`data-scope="menu"`), `data-part` and `data-instance`. Additionally:
+The root SHALL carry `data-scope="menubar"`, `data-part="root"` and `data-instance`. A
+`trigger` is the menu's trigger and SHALL keep the menu's `data-scope="menu"`,
+`data-part="trigger"` and the menu's `data-instance` (the menu's parts and contract
+resolve through it), and SHALL carry `data-host="menubar"`, which marks it as a bar
+item. Menu parts inside a menu keep `data-scope="menu"`. Additionally:
 
 - `root`: `data-orientation`, `data-state` (`open` while a menu is open, else
   `closed`), `data-disabled` when disabled, `data-modal` when modal.
-- `trigger`: `data-key`, `data-state` (`open` | `closed`), `data-highlighted` while it
-  has focus, `data-focus-visible`, `data-disabled`, `data-orientation`, `data-pressed`.
+- `trigger`: `data-host="menubar"`, `data-key`, `data-state` (`open` | `closed`),
+  `data-highlighted` while it has focus, `data-focus-visible`, `data-disabled`,
+  `data-orientation`, `data-pressed`.
 
 All parts SHALL forward `data-variant`, `data-size` and `data-tone` unchanged.
 
@@ -340,15 +348,21 @@ The `menubar` contract SHALL locate an instance by role `menubar` and exact acce
 name and include the collection contract fragment's queries. It SHALL declare the
 actions `tabIn()`, `moveTo(name)` (keyboard: bar arrows; no pointer implementation, with
 the stated reason that pointer focus is a press), `openMenu(name)` (pointer: click;
-touch: tap; keyboard: `moveTo` then Enter), `openMenuOnLast(name)` (keyboard: `moveTo`
-then ArrowUp; horizontal only), `switchTo(name)` (pointer: hover the item; keyboard:
-the expand / collapse key inside the open menu until the named menu is open),
-`closeMenu()` (Escape), `typeahead(text)` and `tabOut()`, each with a postcondition, and
-the queries `items()`, `openMenu()` (name or null), `focusedItem()`, `tabStop()` and
-`isDisabled(name)`. `menu(name)` SHALL return the `menu` driver of that item's menu. It
-SHALL declare the traits `composite-roving` and `directional`; each menu keeps the
-`menu` contract's traits. Programmatic `OPEN` / `CLOSE` and `FOCUS_MENUBAR` SHALL map to
-`{ skip: reason }` or the `focus` path; `$sync:value` SHALL map to a prop step.
+touch: tap; keyboard: `moveTo` then Enter, or, with a menu open, focus the item then
+Enter; on the open item it closes it), `openMenuOnLast(name)` (keyboard: `moveTo` then
+ArrowUp; a vertical bar has no such key and uses its expand key), `switchTo(name)`
+(pointer: hover the item; touch: tap it; keyboard: the expand key inside the open menu
+until the named menu is open, or in a vertical bar Escape, the bar's arrows and Enter),
+`closeMenu()` (Escape), `typeahead(text)` and `tabOut()`, each with a postcondition, the
+model-step actions `focusItem(name)`, `arrowNext()` and `leave()`, and the queries
+`items()`, `currentMenu()` (the open menu's item name or null; `openMenu` is the
+action), `focusedItem()`, `tabStop()`, `isDisabled(name)` and `orientation()`. The
+testing package's `getMenubar(…).menu(name)` SHALL return the `menu` driver of that
+item's menu, located through the item (role `menuitem`). It SHALL declare the trait
+`directional`; each menu keeps the `menu` contract's traits. Programmatic `OPEN` /
+`CLOSE`, `FOCUS_MENUBAR`, `TYPEAHEAD` (the typeahead action and DOM tests),
+`MENU_NAVIGATE` (switchTo's keyboard path) and the `value` prop (`VALUE.SYNC`,
+`$props:value`) SHALL map to `{ skip: reason }`.
 
 #### Scenario: Driver round trip
 
@@ -356,7 +370,7 @@ SHALL declare the traits `composite-roving` and `directional`; each menu keeps t
   `await bar.openMenu("File")`, `await bar.switchTo("Edit")`,
   `await bar.menu("Edit").choose("Find…")`
 - **THEN** each action resolves after its postcondition, the item's `onSelect` ran once
-  and `await bar.openMenu()` is null
+  and `await bar.currentMenu()` is null
 
 #### Scenario: Same test in Playwright
 
@@ -376,3 +390,4 @@ and SHALL pass every generic, accessibility, collection and overlay invariant.
 - **WHEN** a consumer wrapper renders menubar items as plain buttons without
   `role="menuitem"` and runs `testMachine`
 - **THEN** the first step fails, naming the `menubar` with no menu items
+  (`menubar-one-tab-stop: the menubar has no menu items`)

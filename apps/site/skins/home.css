@@ -13,5 +13,8 @@
 @import "./toggle-group.css";
 @import "./tabs.css";
 @import "./segmented-control.css";
+@import "./slider.css";
+@import "./color.css";
+@import "./popover.css";
 @import "./text-field.css";
 @import "./tooltip.css";

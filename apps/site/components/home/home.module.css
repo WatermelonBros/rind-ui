@@ -275,9 +275,9 @@
 .lookControls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  padding: 12px 16px;
+  align-items: end;
+  gap: 18px 24px;
+  padding: 16px 18px;
   border-bottom: var(--bw) solid var(--line);
   font: 600 13px var(--mono);
 }
@@ -330,33 +330,36 @@
     translate 0.45s var(--spring),
     width 0.45s var(--spring);
 }
-.tune {
+/* the builder's controls: rind components in the bare skin, laid out here */
+.tuneSlider {
+  display: grid;
+  gap: 6px;
+  inline-size: 150px;
+}
+.tuneHead {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.tune input[type="color"] {
-  width: 34px;
-  height: 26px;
-  padding: 0;
-  border: 2px solid var(--ink);
-  border-radius: 6px;
-  background: none;
-  cursor: pointer;
-}
-.tune input[type="range"] {
-  accent-color: var(--acc);
-  width: 120px;
-}
-.reset {
-  margin-left: auto;
+  justify-content: space-between;
   font: 600 12px var(--mono);
-  padding: 6px 12px;
-  border-radius: 99px;
-  border: 2px solid var(--ink);
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+}
+.tuneValue {
+  opacity: 0.7;
+}
+.tuneChoice {
+  display: grid;
+  gap: 6px;
+}
+.tuneLabel {
+  font: 600 12px var(--mono);
+}
+.tuneColor {
+  display: grid;
+  gap: 6px;
+}
+.tuneActions {
+  display: flex;
+  gap: 8px;
+  margin-inline-start: auto;
+  align-self: end;
 }
 .lookStage {
   padding: 48px clamp(20px, 5vw, 64px);
@@ -376,6 +379,47 @@
   grid-template-columns: 1fr 1.2fr;
   gap: 40px;
   align-items: start;
+}
+
+.lookCode {
+  border-top: var(--bw) solid var(--line);
+  background: #0b0b0c;
+  color: #e8e8e3;
+}
+.lookCodeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font: 600 12px var(--mono);
+  color: #d4ff3a;
+}
+.lookCode .lookPre {
+  color: #e8e8e3;
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 4px 16px 16px;
+  font: 500 12px / 1.6 var(--mono);
+  white-space: pre;
+}
+:global([data-phase="juicy"]) .lookCode {
+  background: #2a1d5c;
+}
+/* the stage's components ease between looks instead of jumping */
+.lookStage
+:is(
+  [data-part="root"],
+  [data-part="control"],
+  [data-part="trigger"],
+  [data-part="item"],
+  [data-part="input"]
+) {
+  transition:
+    border-radius 0.35s var(--spring),
+    border-width 0.35s var(--spring),
+    box-shadow 0.35s var(--spring),
+    background-color 0.35s var(--spring);
 }
 
 /* ── tested: a driver test that plays itself ─────────────────────────────────────────── */

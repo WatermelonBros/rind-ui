@@ -143,9 +143,11 @@ export interface TransitionDef<S extends string, A extends string, G extends str
   readonly reenter?: boolean
   /**
    * Reported as `details.reason` of the controllable change this transition makes, instead
-   * of the event type (a delayed open is a "hover", not an `after:` event).
+   * of the event type (a delayed open is a "hover", not an `after:` event). A function
+   * reads it from the event (a menubar passes on the reason its menu closed with); its
+   * parameter is the machine's event union, which the definition's own type checks.
    */
-  readonly reason?: string
+  readonly reason?: string | ((event: never) => string)
 }
 
 /** A target, one transition, or guarded alternatives (the first whose guard passes wins). */
