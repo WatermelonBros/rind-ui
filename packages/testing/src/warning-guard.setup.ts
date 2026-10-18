@@ -1,4 +1,5 @@
-// The repository's own setup (jsdom and browser projects), after `./setup.ts`: a test that
+// The repository's own setup (the jsdom project; not the browser one yet, see
+// docs/review-backlog.md), after `./setup.ts`: a test that
 // logs a `[rind-ui]` warning or error it did not declare with `expectRindWarning` fails.
 // Not part of the public `@rind-ui/testing/setup`, so consumers' tests are unaffected.
 

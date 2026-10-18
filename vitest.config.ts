@@ -149,7 +149,8 @@ export default defineConfig({
           // A no-op in real browsers; listed so that is tested.
           setupFiles: [
             "packages/testing/src/setup.ts",
-            // BISECT (temporary): guard off in the browser project to test the Chromium crash
+            // the [rind-ui] warning guard is jsdom-only for now: in the browser project it set off
+            // Chromium connection drops (docs/review-backlog.md)
           ],
         },
       },

@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| test-warning-guard (#103) | — | vitest.config.ts | Warning guard in the browser project: re-enable after the Chromium connection-drop root cause (console/task.meta traffic suspected; with the guard, browser-chromium-1 dropped 2/2 runs, without it passed) |
 | add-date-field (impl) | — | packages/theme/src/date-field.css | Task 8.2: no Playwright captures (forced colors, RTL ar-AE, invalid, placeholder state) |
 | add-date-field (impl) | — | openspec/changes/archive/*-add-date-field | Spec "Error shown after leaving" says default validation, but the Field defaults to submit mode: the test uses validationMode="blur"; decide whether Date Field should default to blur |
 | add-date-field (impl) | — | packages/core/src/components/date-field/date-field.connect.ts | `data-validity` on the hidden input (contract query `validity`) is not in the spec's data-attribute list; add it to the spec or replace the query |
