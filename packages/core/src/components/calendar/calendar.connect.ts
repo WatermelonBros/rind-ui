@@ -124,9 +124,17 @@ export function calendarConnect(input: CalendarConnectInput) {
   const days = view === "days"
   // Month and year views: every date is compared at its period's first day.
   const at = (d: CalendarDate) => periodStart(d, view)
+  // The value's own unit: validity, length and contiguity are judged in minView, whatever the
+  // shown view; above minView (drilling) no anchor rules or preview apply.
+  const minView = input.minView ?? "days"
+  const drilling = viewRank(view) > viewRank(minView)
+  const atMin = (d: CalendarDate) => periodStart(d, minView)
   const committed = rangeOf(input.value)
   const range = committed ? makeRange(at(show(committed.start)), at(show(committed.end))) : null
-  const anchor = isRange && input.anchor ? at(input.anchor) : null
+  const valueRange = committed
+    ? makeRange(atMin(show(committed.start)), atMin(show(committed.end)))
+    : null
+  const anchor = isRange && input.anchor && !drilling ? at(input.anchor) : null
   const selected = isRange ? [] : valuesOf(input.value)
   const isSelected = (date: CalendarDate) =>
     isRange ? within(date, range) : selected.some((v) => isSameDay(at(show(v)), date))
@@ -136,6 +144,12 @@ export function calendarConnect(input: CalendarConnectInput) {
   const focusedDate = at(clamp(input.focused, input))
   const isUnavailable = (date: CalendarDate) => unavailable(input, at(date), anchor, view)
   const period = rangePeriod(view)
+  const minPeriod = rangePeriod(minView)
+  const outOfMin = (date: CalendarDate) =>
+    minView === "days"
+      ? !isSameDay(clamp(date, input), date)
+      : !periodAllowed(atMin(date), minView, input)
+  const unavailableMin = (date: CalendarDate) => unavailable(input, atMin(date), null, minView)
   // The preview: from the anchor to the hovered date, else the focused one while focus is in
   // a grid (spec "Range Preview": nothing once the pointer and focus are both elsewhere).
   const previewEnd = input.hovered ?? (input.gridFocused ? focusedDate : null)
@@ -150,23 +164,24 @@ export function calendarConnect(input: CalendarConnectInput) {
         period,
       })
     : null
+  const r = valueRange
   const rangeInvalid =
-    range !== null &&
-    (outOfRange(range.start) ||
-      outOfRange(range.end) ||
-      isUnavailable(range.start) ||
-      isUnavailable(range.end) ||
-      (!input.allowsNonContiguousRanges && crossesUnavailable(range, isUnavailable, period)) ||
-      (input.minRangeLength !== undefined && rangeLength(range, period) < input.minRangeLength) ||
-      (input.maxRangeLength !== undefined && rangeLength(range, period) > input.maxRangeLength))
+    r !== null &&
+    (outOfMin(r.start) ||
+      outOfMin(r.end) ||
+      unavailableMin(r.start) ||
+      unavailableMin(r.end) ||
+      (!input.allowsNonContiguousRanges && crossesUnavailable(r, unavailableMin, minPeriod)) ||
+      (input.minRangeLength !== undefined && rangeLength(r, minPeriod) < input.minRangeLength) ||
+      (input.maxRangeLength !== undefined && rangeLength(r, minPeriod) > input.maxRangeLength))
   const invalid =
     input.invalid === true ||
-    (isRange ? rangeInvalid : selected.some((v) => outOfRange(show(v)) || isUnavailable(show(v))))
+    (isRange ? rangeInvalid : selected.some((v) => outOfMin(show(v)) || unavailableMin(show(v))))
   const state = {
     "data-disabled": dataFlag(input.disabled === true),
     "data-readonly": dataFlag(input.readOnly === true),
     "data-invalid": dataFlag(invalid),
-    "data-anchored": dataFlag(anchor !== null),
+    "data-anchored": dataFlag(isRange && input.anchor != null),
     "data-view": view,
     ...focusAttrs(input.gridFocused, input.modality),
   }

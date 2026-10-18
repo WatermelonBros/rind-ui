@@ -248,9 +248,11 @@ function Root({
     allowsNonContiguousRanges,
     commitOnBlur,
   }
+  // A fixed view (controlled, no onViewChange) is the only view: the value is chosen there.
+  const fixedView = viewProp !== undefined && onViewChange === undefined ? viewProp : undefined
   const periods = {
-    minView,
-    maxView,
+    minView: fixedView ?? minView,
+    maxView: fixedView ?? maxView,
     yearsPerPage,
     columns,
     isMonthUnavailable,
@@ -317,7 +319,7 @@ function Root({
     monthFormat,
     view: viewIn(view.values.view, periods),
     // Controlled and never changed: the heading is plain text (spec "View Drill-Down").
-    viewFixed: viewProp !== undefined && onViewChange === undefined,
+    viewFixed: fixedView !== undefined,
     anchor: anchored ? display(anchored, calendar) : null,
     selectionMode,
     isDateUnavailable,

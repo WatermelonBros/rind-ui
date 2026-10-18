@@ -284,6 +284,7 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 | date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| date-family-consolidation | 2.1 (#152) | Calendar view trigger: its name joins the heading and the action ("October 2026, Choose month") with a hard-coded ", " that cannot be localised, and the h2 takes the action text. Name the button by its visible text plus aria-describedby, or pass the heading to \`viewUp({ view, heading })\` (needs a spec tweak) |
 
 ## Resolved
 

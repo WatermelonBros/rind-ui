@@ -802,6 +802,40 @@ describe("Calendar view drill-down", () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
+  it('A fixed view selects there (view="months", no minView)', async () => {
+    const onValueChange = vi.fn()
+    render(<Cal view="months" onValueChange={onValueChange} />)
+    act(() => cell("March 2026").click())
+    expect(iso(onValueChange.mock.calls[0]?.[0])).toBe("2026-03-01")
+    expect(await cal().view()).toBe("months")
+    await cal().via("keyboard").focusDate("2026-05")
+    await cal().press("Enter")
+    expect(iso(onValueChange.mock.calls[1]?.[0])).toBe("2026-05-01")
+    expect(await cal().view()).toBe("months")
+  })
+
+  it("A valid day range stays valid in the months and years views", async () => {
+    render(
+      <Cal
+        label="Stay"
+        selectionMode="range"
+        minRangeLength={3}
+        defaultValue={{ start: d(2026, 10, 1), end: d(2026, 10, 5) }}
+      />,
+    )
+    const c = cal("Stay")
+    expect(await c.isInvalid()).toBe(false)
+    await c.startRange("2026-10-20")
+    for (const view of ["months", "years"]) {
+      await c.viewUp()
+      expect(await c.view()).toBe(view)
+      expect(await c.isInvalid()).toBe(false)
+      expect(document.querySelector('[data-part="cell"][aria-invalid]')).toBeNull()
+      expect(document.querySelector('[data-part="cell"][data-disabled]')).toBeNull()
+      expect(document.querySelector('[data-part="cell"][data-preview]')).toBeNull()
+    }
+  })
+
   it("maxView bounds the heading; a fixed view's heading is text", () => {
     const { unmount } = render(<Cal label="Departure" maxView="days" />)
     expect(document.querySelector('[data-part="view-trigger"]')).toBeNull()
