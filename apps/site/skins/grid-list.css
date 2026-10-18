@@ -66,10 +66,17 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="grid-list"][data-part="item-checkbox"] {
-  inline-size: 16px;
-  block-size: 16px;
+  /* 24px: the minimum target size (WCAG 2.5.8) */
+  inline-size: 24px;
+  block-size: 24px;
   margin: 0;
   accent-color: var(--s-brand);
+}
+/* a text field inside an item is a target too */
+:is([data-skinned], [data-rind-theme^="skin-"])
+input[data-scope="grid-list"][data-part="item-control"] {
+  min-block-size: 28px;
+  box-sizing: border-box;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   button[data-scope="grid-list"][data-part="item-control"] {
