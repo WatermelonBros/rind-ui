@@ -332,6 +332,10 @@ const TRANSIENT = new Set([
   "navigation-menu:opening",
   "navigation-menu:closing",
   "navigation-menu:warm",
+  // A copy in flight, and its feedback after a press (2 s): entered by pressing Copy.
+  "code-block:copying",
+  "code-block:copied",
+  "code-block:error",
   // A toast not yet started by a region, and one exiting: both last for moments.
   "toast:idle",
   "toast:dismissed",
