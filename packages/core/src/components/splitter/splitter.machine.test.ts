@@ -140,3 +140,22 @@ describe("constraints", () => {
     expect(m.onSizesChange).not.toHaveBeenCalled()
   })
 })
+
+describe("controlled proposals", () => {
+  it("a refused proposal (details.cancel) commits nothing", () => {
+    const m = make({ sizes: [50, 50] })
+    m.onSizesChange.mockImplementation((_s, details) => details.cancel())
+    m.send({ type: "STEP", handle: 0, direction: 1 })
+    expect(m.sizes()).toEqual([50, 50])
+    expect(m.onSizesCommit).not.toHaveBeenCalled()
+  })
+
+  it("an applied proposal commits once", () => {
+    const m = make({ sizes: [50, 50] })
+    m.onSizesChange.mockImplementation((s) => m.setProps({ sizes: s }))
+    m.send({ type: "STEP", handle: 0, direction: 1 })
+    expect(m.sizes()).toEqual([55, 45])
+    expect(m.onSizesCommit).toHaveBeenCalledTimes(1)
+    expect(m.onSizesCommit).toHaveBeenCalledWith([55, 45], { reason: "STEP" })
+  })
+})

@@ -11,6 +11,9 @@ describe("resolveSizes / validateSizes", () => {
     expect(near(resolveSizes(undefined, undefined, [{}, {}, {}]))).toEqual([33.333, 33.333, 33.333])
     expect(resolveSizes([10], [25, 75], [{}, {}])).toEqual([25, 75])
     expect(resolveSizes([Number.NaN, 50], undefined, [{}, {}])).toEqual([50, 50])
+    // All zero cannot be scaled: never 0-width panels.
+    expect(resolveSizes([0, 0], [30, 70], [{}, {}])).toEqual([30, 70])
+    expect(resolveSizes([0, 0], [0, 0], [{}, {}])).toEqual([50, 50])
   })
 
   it("scales to 100 and clamps, giving the rest to who accepts it (Ark#2967)", () => {

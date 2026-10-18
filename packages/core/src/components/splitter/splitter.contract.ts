@@ -288,6 +288,7 @@ export const splitterContract = contract("splitter", {
       event: () => ({ handle: 0, edge: "max" }),
     },
     TOGGLE: { action: "toggleCollapse", args: (() => [0]) as never, event: keyEvent },
+    "SIZES.COMMIT": { skip: "internal: queued by a key step in the same send" },
     "LAYOUT.SYNCED": { skip: "a constraint change: the parent's prop (a group resize)" },
     FOCUS: { skip: "not a user event: focus alone changes no size" },
     BLUR: { skip: "not a user event" },

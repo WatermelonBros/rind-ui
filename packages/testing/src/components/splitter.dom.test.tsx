@@ -3,7 +3,7 @@
 import { domEnvironment } from "@rind-ui/core"
 import { RindProvider, Splitter, type SplitterRootProps } from "@rind-ui/react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
-import type { ReactNode } from "react"
+import { type ReactNode, useState } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -255,6 +255,35 @@ describe("Keyboard", () => {
     await drv().toggleCollapse(0)
     expect(await drv().sizes()).toEqual([50, 50])
     expect(onSizesCommit).not.toHaveBeenCalled()
+  })
+})
+
+describe("Controlled", () => {
+  it("a refused proposal (details.cancel) commits nothing", async () => {
+    const onSizesCommit = vi.fn()
+    render(
+      <S
+        sizes={[50, 50]}
+        onSizesChange={(_s, details) => details.cancel()}
+        onSizesCommit={onSizesCommit}
+      />,
+    )
+    key(handles()[0] as HTMLElement, "ArrowRight")
+    expect(await drv().sizes()).toEqual([50, 50])
+    expect(onSizesCommit).not.toHaveBeenCalled()
+  })
+
+  it("a parent applying the proposal on its next render gets one commit", async () => {
+    const onSizesCommit = vi.fn()
+    function Parent() {
+      const [sizes, setSizes] = useState<readonly number[]>([50, 50])
+      return <S sizes={sizes} onSizesChange={setSizes} onSizesCommit={onSizesCommit} />
+    }
+    render(<Parent />)
+    key(handles()[0] as HTMLElement, "ArrowRight")
+    expect(await drv().sizes()).toEqual([55, 45])
+    expect(onSizesCommit).toHaveBeenCalledTimes(1)
+    expect(onSizesCommit).toHaveBeenCalledWith([55, 45], { reason: "STEP" })
   })
 })
 

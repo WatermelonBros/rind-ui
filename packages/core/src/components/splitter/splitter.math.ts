@@ -83,7 +83,11 @@ export function resolveSizes(
 ): number[] {
   const n = panels.length
   const fits = (v: readonly number[] | undefined): v is readonly number[] =>
-    v !== undefined && v.length === n && v.every((s) => Number.isFinite(s) && s >= 0)
+    v !== undefined &&
+    v.length === n &&
+    v.every((s) => Number.isFinite(s) && s >= 0) &&
+    // All zero cannot be scaled to 100.
+    v.some((s) => s > 0)
   const given = fits(value) ? value : fits(defaults) ? defaults : Array<number>(n).fill(100 / n)
   return validateSizes(given, panels)
 }

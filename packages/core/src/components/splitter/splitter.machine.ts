@@ -32,6 +32,8 @@ export type SplitterEvent =
   | { readonly type: "TOGGLE"; readonly handle: number }
   /** The constraints changed (a resize re-resolved pixel ones): sizes are clamped again. */
   | { readonly type: "LAYOUT.SYNCED" }
+  /** Internal, queued by a key step: commits it unless the change was refused meanwhile. */
+  | { readonly type: "SIZES.COMMIT" }
   | (FocusEvent & { readonly handle: number })
   | (BlurEvent & { readonly handle: number })
 
@@ -86,6 +88,8 @@ export interface SplitterContext {
   start: readonly number[] | null
   /** Each collapsible panel's size before it last collapsed (restored by Enter). */
   expanded: readonly (number | undefined)[]
+  /** A key step's commit, waiting for `SIZES.COMMIT`; a refusal (`$reverted`) drops it. */
+  commit: { readonly sizes: readonly number[]; readonly reason: SplitterReason } | null
 }
 
 type Args = ActionArgs<{
@@ -103,9 +107,13 @@ export const splitterSizes = (props: SplitterMachineProps, value: readonly numbe
 const current = (args: Pick<Args, "props" | "values">) =>
   splitterSizes(args.props, args.values.sizes)
 
-/** The one write: remembers what collapsed, proposes `next`, commits an accepted change. */
+/**
+ * The one write: remembers what collapsed, proposes `next`, and queues the commit. A refusal
+ * (details.cancel(), either mode) queues `$reverted` first, which drops it: a controlled
+ * parent applies its state later (a React re-render), so the value cannot tell.
+ */
 function write(args: Args, next: readonly number[], commit: SplitterReason | null) {
-  const { props, set, context } = args
+  const { props, set, context, send } = args
   const before = current(args)
   if (sameSizes(before, next)) return
   const expanded = props.panels.map((c, i) =>
@@ -113,9 +121,9 @@ function write(args: Args, next: readonly number[], commit: SplitterReason | nul
   )
   set("expanded", expanded)
   set("sizes", next)
-  // Refused through details.cancel() (uncontrolled): nothing changed, nothing to commit.
-  if (props.sizes === undefined && !sameSizes(current(args), next)) return
-  if (commit !== null) props.onSizesCommit?.(next, { reason: commit })
+  if (commit === null) return
+  set("commit", { sizes: next, reason: commit })
+  send({ type: "SIZES.COMMIT" })
 }
 
 function resizeBy(args: Args, handle: number, delta: number, trigger: ResizeTrigger) {
@@ -214,6 +222,14 @@ export const splitterMachine = setup({
       const next = current(args)
       if (raw.length > 0 && !sameSizes(raw, next)) args.set("sizes", next)
     },
+    flushCommit: ({ context, props, set }) => {
+      const c = context.commit
+      set("commit", null)
+      if (c) props.onSizesCommit?.(c.sizes, { reason: c.reason })
+    },
+    dropCommit: ({ event, set }) => {
+      if (event.type === "$reverted" && event.key === "sizes") set("commit", null)
+    },
     setFocused: ({ event, set }) => {
       if (event.type === "FOCUS") set("focused", event.handle)
     },
@@ -232,7 +248,7 @@ export const splitterMachine = setup({
 }).machine({
   id: "splitter",
   initial: "idle",
-  context: () => ({ focused: null, handle: null, start: null, expanded: [] }),
+  context: () => ({ focused: null, handle: null, start: null, expanded: [], commit: null }),
   values: { sizes: { fallback: [], equal: sameSizes } },
   onProps: {
     panels: { event: "LAYOUT.SYNCED", equal: sameConstraints },
@@ -242,6 +258,8 @@ export const splitterMachine = setup({
     FOCUS: { actions: ["setFocused"] },
     BLUR: { actions: ["clearFocused"] },
     "LAYOUT.SYNCED": { actions: ["revalidate"] },
+    "SIZES.COMMIT": { actions: ["flushCommit"] },
+    $reverted: { actions: ["dropCommit"] },
   },
   states: {
     idle: {
