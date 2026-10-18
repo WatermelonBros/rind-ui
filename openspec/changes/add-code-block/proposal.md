@@ -28,8 +28,8 @@ press, messages, Announcer), `tabs` (multi-file blocks) and `react-adapter`.
   and an `execCommand("copy")` fallback inserted next to `near` (inside its layer); a fake for
   tests.
 - A `code-block` component (machine, connect, contract) and React parts: `Root`, `Header`,
-  `Title`, `CopyTrigger`, `WrapTrigger`, `CollapseTrigger`, `Content` (the `pre`), `Code`,
-  `Line`, and `Files` / `File` (a Tabs composition for multi-file blocks).
+  `Title`, `CopyTrigger`, `WrapTrigger`, `CollapseTrigger`, `Content` (the `pre` and its `code`)
+  and `Line`. Several files are a Tabs composition (one block per panel), documented, not a part.
 - Highlighter-agnostic input: `code` (the source, always), plus either `lines` (tokens, rendered
   as spans) or `html` (pre-highlighted HTML, a branded `TrustedCodeHtml` made with
   `trustedCodeHtml()`); no highlighter dependency.
@@ -65,4 +65,4 @@ press, messages, Announcer), `tabs` (multi-file blocks) and `react-adapter`.
   `getCodeBlock` in `@rind-ui/testing` (+ fake clipboard in the test environment),
   `packages/theme/src/code-block.css`, site examples, a docs page.
 - No new runtime dependency.
-- `docs/components.md`: Code Block status → `spec`.
+- `docs/components.md`: Code Block status → `done` on archive.

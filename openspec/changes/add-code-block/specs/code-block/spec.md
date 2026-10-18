@@ -4,22 +4,23 @@
 
 A Code Block SHALL consist of `Root` (a `div`), an optional `Header` holding an optional
 `Title` and the optional `CopyTrigger`, `WrapTrigger` and `CollapseTrigger` buttons, and
-`Content` (a `pre`) holding `Code` (a `code`) with one `Line` per source line. `Files` and
-`File` SHALL compose several blocks as Tabs (a Tabs Root, one Tabs Trigger named by the file
-and one Tabs Panel holding a block per file). Every part SHALL accept the `render` prop and the
-props of the element it renders.
+`Content` (a `pre`), which renders a `code` element holding one `Line` per source line,
+separated by newline text, or the consumer's `children(line)` per line. Several files SHALL be
+composed with the existing Tabs (one block per Tabs Panel); there is no separate files part.
+Every part SHALL accept the `render` prop and the props of the element it renders.
 
 #### Scenario: Minimal block
 
-- **WHEN** `<CodeBlock.Root code={"const a = 1\nconst b = 2"}><CodeBlock.Content><CodeBlock.Code /></CodeBlock.Content></CodeBlock.Root>` is rendered
-- **THEN** a `pre` containing one `code` with two lines and the text "const a = 1\nconst b = 2" is rendered, with no role on the `pre`
+- **WHEN** `<CodeBlock.Root code={"const a = 1\nconst b = 2"}><CodeBlock.Content /></CodeBlock.Root>` is rendered
+- **THEN** a `pre` containing one `code` with two lines and the text "const a = 1\nconst b = 2" is rendered, with no role on the `pre` while it fits
 
 ### Requirement: Highlighter-Agnostic Input
 
 `Root` SHALL take the source as `code: string` (required) and MAY take highlighted content as
 either `lines` (an array, one entry per source line, of token lists `{ text, className?, style? }`,
 rendered as text spans) or `html` (a `TrustedCodeHtml` value, created only by
-`trustedCodeHtml(value)` from a string or one string per line, injected as HTML). A plain
+`trustedCodeHtml(value)` from a string or one string per line, injected as HTML; a single string
+is split per line and an element spanning lines is closed and reopened on each line). A plain
 string SHALL NOT be assignable to `html` (compile error). Without `lines` and `html`, the
 lines SHALL render the source as text. The component SHALL NOT call or depend on a
 highlighter.
@@ -39,7 +40,8 @@ highlighter.
 The source SHALL be split into lines on `\n` after normalising `\r\n` and `\r` to `\n`; a
 trailing newline SHALL NOT produce an extra empty last line; an empty line SHALL render with
 the height of a line and SHALL count in the numbering. Line numbers in every API
-(`highlightLines`, `startLineNumber`, `data-line`) SHALL be 1-based; `highlightLines` SHALL
+(`highlightLines`, `data-line`, the drawn number) SHALL be the displayed numbers: 1-based,
+starting at `startLineNumber`; `highlightLines` SHALL
 accept numbers and inclusive ranges (`[3, [5, 7]]`).
 
 #### Scenario: Empty lines keep their place (regression: rehype-pretty-code#157)
@@ -95,8 +97,10 @@ scroll width.
 ### Requirement: Scrollable Content
 
 `Content` SHALL render `dir="ltr"`, SHALL be its own scroll container, and SHALL be a keyboard
-tab stop (`tabindex="0"`) exactly while its content overflows; it SHALL be named by the
-`Title` when present (`aria-labelledby`), else by `messages.label` ("Code"). Overflow SHALL be
+tab stop (`tabindex="0"`) exactly while its content overflows on an axis the user can scroll;
+while it is a tab stop it SHALL have `role="group"` (a generic `pre` may not be named) and be
+named by the `Title` when present (`aria-labelledby`), else by `messages.label` ("Code");
+otherwise it SHALL carry no role and no name. Overflow SHALL be
 measured on the client and re-measured on resize, on wrap changes and on expand changes; the
 server HTML SHALL NOT carry `tabindex`.
 
@@ -108,7 +112,7 @@ server HTML SHALL NOT carry `tabindex`.
 #### Scenario: Scrolling block is reachable (axe scrollable-region-focusable)
 
 - **WHEN** a block with a line wider than its container is rendered
-- **THEN** the `pre` is a tab stop named by the Title and the arrow keys scroll it
+- **THEN** the `pre` is a tab stop, a group named by the Title, and the arrow keys scroll it
 
 #### Scenario: Code stays left-to-right
 
@@ -185,16 +189,16 @@ DOM, so copy, find-in-page and screen readers reach every line. A block not long
 - **WHEN** a 40-line block with `maxLines={10}` is collapsed and copied
 - **THEN** the clipboard holds all 40 lines
 
-### Requirement: Files
+### Requirement: Several Files
 
-`Files` SHALL be a Tabs Root whose `File` children each render a Tabs Trigger (named by the
-file's `title`) and a Tabs Panel holding a Code Block; keyboard, selection and naming SHALL be
-Tabs'. Each file's copy button SHALL copy that file's code.
+Several files SHALL be shown as a Tabs composition: one Code Block per Tabs Panel, the tabs
+naming the files; keyboard, selection and naming SHALL be Tabs'. Each block's copy button SHALL
+copy that block's code, and the driver SHALL locate the only block inside a panel.
 
 #### Scenario: Two files
 
-- **WHEN** `Files` holds `File title="app.tsx"` and `File title="styles.css"`
-- **THEN** a tablist with tabs "app.tsx" and "styles.css" is rendered, and the visible panel's copy button copies that file's code
+- **WHEN** a Tabs has tabs "app.tsx" and "styles.css", each panel holding a block
+- **THEN** after selecting "styles.css", the visible panel's copy button copies that file's code
 
 ### Requirement: Server Rendering
 
@@ -219,7 +223,8 @@ Every part SHALL carry `data-scope="code-block"`, its `data-part` and `data-inst
 SHALL carry `data-copy-state` (`idle | copying | copied | error`), `data-wrapped`,
 `data-expanded`, `data-collapsible` and `data-scrollable` (present-empty or absent); Content
 `data-line-numbers` and `data-scrollable`; Line `data-line` and `data-highlighted`; CopyTrigger
-`data-state` (the copy state). Consumer `data-variant` / `data-size` / `data-tone` SHALL pass
+`data-state` (the copy state); WrapTrigger `data-state` (`on | off`); CollapseTrigger
+`data-state` (`open | closed`); the triggers `data-focus` and `data-focus-visible`. Consumer `data-variant` / `data-size` / `data-tone` SHALL pass
 through.
 
 #### Scenario: Copy state styling hook
@@ -230,7 +235,7 @@ through.
 ### Requirement: Messages
 
 Every AT-facing string SHALL come from the code-block `messages` (`label`, `copy`, `copied`,
-`copyFailed`, `wrap`, `expand`, `highlighted({ lines })`), overridable per instance and through
+`copyFailed`, `wrap`, `expand`, `highlighted(runs)`), overridable per instance and through
 the provider.
 
 #### Scenario: Localised copy feedback
@@ -240,13 +245,16 @@ the provider.
 
 ### Requirement: Code Block Contract
 
-The `code-block` contract SHALL locate a block by Content's name or by `data-instance` inside a
-container; declare the actions `copy`, `toggleWrap`, `toggleExpanded`, and for `Files`
-`selectFile(title)`; the queries `text` (the source), `lineCount`, `highlightedLines`,
-`isWrapped`, `isExpanded`, `isScrollable` and `copyState`; and map the copy events to the
-injected fake clipboard. The driver SHALL expose the announcements made since it was created.
+The `code-block` contract SHALL locate a block by its Title's text, or as the only block in the
+driver's target; declare the actions `copy`, `settleCopy` (waits until the write settled,
+advancing fake time when the test uses it), `setWrapped(on)` and `setExpanded(on)`; the queries
+`text` (the code's text, whitespace collapsed as adapters read text), `lineCount`,
+`highlightedLines`, `isWrapped`, `isExpanded`, `isScrollable` and `copyState`; and map
+`COPY.DONE` / `COPY.FAILED` to `settleCopy`, the outcome being the injected fake clipboard's.
+`@rind-ui/testing` SHALL export `fakeClipboard({ mode, scheduler?, latency? })`. The driver SHALL
+expose the announcements made since it was created.
 
 #### Scenario: Driver copies and reads the result
 
-- **WHEN** a test runs `await getCodeBlock(screen, { name: "app.tsx" }).copy()`
-- **THEN** it resolves after the copy settles, `copyState()` is `"copied"`, and the announcement log has "Copied"
+- **WHEN** a test runs `copy()` then `settleCopy()` on `getCodeBlock(screen, { title: "app.tsx" })` with a succeeding fake clipboard
+- **THEN** `copyState()` is `"copied"`, the fake holds the code, and "Copied" was announced

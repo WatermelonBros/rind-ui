@@ -1,6 +1,7 @@
 export { accessibleNameOf } from "./accname"
 export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
+export { copyWithSelection, domClipboard } from "./clipboard"
 export { collectionLayout } from "./collection-layout"
 export {
   type ConstraintElement,
@@ -117,6 +118,7 @@ export { describedByHint, longPressMessages } from "./long-press"
 export { modalityTracker } from "./modality"
 export { motionPreference } from "./motion"
 export { type NonModalTabOrderOptions, trackNonModalTabOrder } from "./non-modal-tab-order"
+export { type OverflowWatch, overflows, watchOverflow } from "./overflow"
 export { type OverlayEffectOptions, overlayEffect } from "./overlay"
 export { warnDuplicateLandmark } from "./pagination-landmark"
 export {

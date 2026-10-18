@@ -33,8 +33,9 @@ packages/core/src/components/code-block/
 ├─ code-block.contract.ts
 ├─ code-block.messages.ts
 └─ code-block.meta.ts
+packages/core/src/dom/overflow.ts             overflow watch (ResizeObserver, remeasure)
 packages/react/src/code-block/                Root, Header, Title, CopyTrigger, WrapTrigger,
-                                              CollapseTrigger, Content, Code, Line, Files, File
+                                              CollapseTrigger, Content, Line
 packages/theme/src/code-block.css
 ```
 
@@ -42,7 +43,8 @@ packages/theme/src/code-block.css
 
 ### 2. Machine
 
-Parallel regions in one machine (the runtime's existing pattern for independent flags):
+The runtime has no parallel regions: the states are the copy's; wrap and expanded are
+controllable values beside them (no state mapping); scrollable is context:
 
 ```
 copy:      idle ──COPY──► copying ──COPY.DONE──► copied ──after feedback──► idle
@@ -79,10 +81,33 @@ variable (`--rind-code-block-start`). Line: `data-line`, `data-highlighted`. Tri
 via `buttonLikeProps`, WrapTrigger `aria-pressed`, CollapseTrigger `aria-expanded` +
 `aria-controls`, hidden (`hidden`) when not collapsible.
 
-### 5. Files
+### 5. Several files
 
-`Files` renders `Tabs.Root` with `Tabs.List`; `File` renders a `Tabs.Trigger` (title) and a
-`Tabs.Panel` whose children are the block. No new keyboard code.
+A Tabs composition, documented and tested: one block per `Tabs.Panel`; the driver takes the
+only block in a panel. No files part (granularity: Tabs already is the part).
+
+### 5b. Content naming
+
+A generic `pre` may not carry `aria-label` (ARIA prohibits naming `generic`). While Content
+overflows it gets `tabindex="0"`, `role="group"` and its name; a block that fits has none of
+them. The highlighted-lines description (`aria-describedby`) is always present when lines are
+highlighted.
+
+### 5c. Lines as inline blocks
+
+Lines are separated by newline text nodes inside `code`, so the text content, a selection and
+copy are the source with or without a stylesheet. The theme makes each line an inline block of
+at least the scroll width (highlight background on scroll), numbers a `::before` counter with
+`user-select: none`, absolutely placed at the line's first row (aligned under wrap).
+
+### 5d. Contract and the copy outcome
+
+The contract's `copy` presses the trigger; `settleCopy` waits (advancing fake time) until the
+write settled; `COPY.DONE` and `COPY.FAILED` both map to it, and which one happens is the fake
+clipboard's choice: the model test runs once with a succeeding and once with a rejecting fake,
+each skipping the other edge. `fakeClipboard({ scheduler, latency })` keeps `copying`
+observable on a virtual clock. The copy states are transient for the examples harness (no
+static page holds them).
 
 ### 6. Theme
 
@@ -102,8 +127,9 @@ contrast of the trigger buttons checked against the code surface.
 - [New Environment capability] → small, injected, faked; reusable by a later Clipboard
   component.
 
-## Open Questions
+## Open Questions (answered)
 
-1. Confirm the `clipboard` Environment capability (shared infrastructure).
-2. Diff/focus lines: `data-*` hooks only (proposed) or a text alternative per line?
-3. Keep `Files` / `File` as parts (proposed, per the brief) or document a Tabs composition.
+1. `clipboard` Environment capability: yes (`DomEnvironmentOptions.clipboard`, faked in tests).
+2. Diff/focus lines: no built-in; `Content`'s `children(line)` lets the consumer put `data-*`
+   (and a text alternative) on each `Line`.
+3. Several files: a documented Tabs composition, not parts.

@@ -1,0 +1,176 @@
+/*
+ * Code Block (family: decoration): a surface for code. The lines are inline blocks separated by the
+ * newline text the component writes, so the copied and selected text is the source with or
+ * without this sheet. Each line is at least the scroll width, so a highlighted line's background
+ * reaches the end of a scrolled line (chakra-ui#10239). Numbers are a counter drawn by
+ * `::before`: never text, never selected, and aligned with a wrapped line's first row
+ * (docusaurus#7907). A highlighted line also gets an inline-start border, kept under forced
+ * colors, so the emphasis is not colour alone. Collapsed, the content clips to `maxLines` lines.
+ */
+@layer rind.components {
+  :where([data-scope="code-block"][data-part="root"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    border: var(--rind-border-width) solid var(--rind-code-block-border, var(--rind-color-border));
+    border-radius: var(--rind-code-block-radius, var(--rind-radius-panel));
+    background: var(--rind-code-block-bg, var(--rind-color-surface));
+    color: var(--rind-code-block-text, var(--rind-color-text));
+    overflow: hidden;
+  }
+
+  :where([data-scope="code-block"][data-part="header"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    padding-block: var(--rind-space-1);
+    padding-inline: var(--rind-space-3) var(--rind-space-1);
+    border-block-end: var(--rind-border-width) solid
+      var(--rind-code-block-border, var(--rind-color-border));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="code-block"][data-part="title"]) {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--rind-font-mono);
+    color: var(--rind-code-block-title, var(--rind-color-text-muted));
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    min-block-size: var(--rind-size-sm);
+    padding-inline: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  ):hover {
+    background: var(--rind-color-neutral-soft-hover);
+  }
+
+  :where([data-scope="code-block"][data-part="wrap-trigger"][aria-pressed="true"]) {
+    background: var(--rind-color-accent-soft);
+    color: var(--rind-color-accent-text);
+  }
+
+  :where([data-scope="code-block"][data-part="copy-trigger"][data-state="error"]) {
+    color: var(--rind-color-danger-text);
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  )[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="code-block"][data-part="content"]) {
+    box-sizing: border-box;
+    margin: 0;
+    padding-block: var(--rind-space-3);
+    overflow: auto;
+    font-family: var(--rind-font-mono);
+    font-size: var(--rind-code-block-font-size, var(--rind-text-sm));
+    line-height: var(--rind-code-block-leading, var(--rind-leading-normal));
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-collapsible]:not([data-expanded])) {
+    max-block-size: calc(var(--rind-code-block-max-lines) * 1lh + 2 * var(--rind-space-3));
+    overflow-y: hidden;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-wrapped]) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  :where([data-scope="code-block"][data-part="content"]):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(-1 * var(--rind-focus-width));
+  }
+
+  :where([data-scope="code-block"][data-part="code"]) {
+    display: inline-block;
+    min-inline-size: 100%;
+    font: inherit;
+    counter-reset: rind-code-line var(--rind-code-block-start, 0);
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-wrapped])
+    :where([data-scope="code-block"][data-part="code"]) {
+    display: block;
+  }
+
+  :where([data-scope="code-block"][data-part="line"]) {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-block;
+    min-inline-size: 100%;
+    min-block-size: 1lh;
+    vertical-align: top;
+    padding-inline: var(--rind-space-3);
+    border-inline-start: 3px solid transparent;
+    counter-increment: rind-code-line;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-line-numbers])
+    :where([data-scope="code-block"][data-part="line"]) {
+    padding-inline-start: calc(var(--rind-code-block-gutter, 3.5ch) + var(--rind-space-3));
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-line-numbers])
+    :where([data-scope="code-block"][data-part="line"])::before {
+    content: counter(rind-code-line);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    inline-size: var(--rind-code-block-gutter, 3.5ch);
+    text-align: end;
+    color: var(--rind-code-block-gutter-text, var(--rind-color-text-muted));
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+  }
+
+  :where([data-scope="code-block"][data-part="line"][data-highlighted]) {
+    background: var(--rind-code-block-highlight-bg, var(--rind-color-accent-soft));
+    border-inline-start-color: var(
+      --rind-code-block-highlight-border,
+      var(--rind-color-accent-solid)
+    );
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="code-block"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="code-block"][data-part="line"][data-highlighted]) {
+      border-inline-start-color: Highlight;
+    }
+  }
+}
