@@ -1,0 +1,39 @@
+## 0. Prerequisites
+
+- [ ] 0.1 Coordinator answers design.md's open questions (clipboard capability, diff lines, Files parts) before section 1
+
+## 1. Clipboard capability
+
+- [ ] 1.1 `core/env/clipboard.ts`: the interface on the Environment, a fake (log, reject, absent) for node and DOM tests
+- [ ] 1.2 `core/dom/clipboard.ts`: Clipboard API checked at call time, fallback node next to `near`, selection and focus restored, reject without throwing; tests for every `clipboard` scenario (insecure context, modal `<dialog>`, restore, both fail)
+
+## 2. Lines and machine
+
+- [ ] 2.1 `code-block.lines.ts`: `splitLines` (CRLF, `\r`, trailing newline, empty lines), `parseRanges` (1-based inclusive, numbers and ranges), `trustedCodeHtml` + `TrustedCodeHtml` brand (type test: a raw string is rejected); node tests incl. rehype-pretty-code#157, #180, #238
+- [ ] 2.2 `code-block.machine.ts`: copy region (`idle | copying | copied | error`, feedback delay, restart on press), wrap and expanded bound to their controllable props, `scrollable` from `OVERFLOW.CHANGE`; announcements and `onCopy`; node tests with the fake clipboard and fake time (Zag "copied before the write" regression)
+- [ ] 2.3 Overflow measurement effect in `core/dom` (ResizeObserver, re-measure on wrap/expand); browser test
+
+## 3. Connect, messages, meta
+
+- [ ] 3.1 `code-block.connect.ts` per design §4; `code-block.messages.ts` (`label`, `copy`, `copied`, `copyFailed`, `wrap`, `expand`, `highlighted`); `code-block.meta.ts` + meta test; unit tests for every attribute in the spec
+
+## 4. React parts
+
+- [ ] 4.1 `CodeBlock.Root`, `Header`, `Title`, `CopyTrigger`, `WrapTrigger`, `CollapseTrigger`, `Content`, `Code`, `Line`, `Files`, `File`; `render` on each; tokens rendered as text spans, `html` injected per line
+- [ ] 4.2 SSR + hydration tests (no mismatch with `html`, Strict Mode), no-JS reading test (server HTML complete), RTL page (`dir="ltr"` on Content)
+
+## 5. Contract and driver
+
+- [ ] 5.1 `code-block.contract.ts` (locate, actions `copy` / `toggleWrap` / `toggleExpanded` / `selectFile`, queries, fake-clipboard event mapping) and `getCodeBlock` in `@rind-ui/testing` with the announcement log; driver tests in jsdom, browser and through Playwright
+
+## 6. Tests
+
+- [ ] 6.1 Model-based walk (`testMachine`) over copy (success / failure through the fake), wrap and expand, pointer / keyboard / virtual
+- [ ] 6.2 Browser tests: tab stop only when scrolling (and after resize/wrap), numbers not copied (select-all + copy), numbers aligned under wrap (docusaurus#7907), highlight across horizontal scroll (chakra-ui#10239), copy inside a modal `<dialog>` with the fallback (docusaurus#11109), indentation kept (#11414); 3 engines
+
+## 7. Theme, site examples, docs
+
+- [ ] 7.1 `packages/theme/src/code-block.css` per design §6, imported from `index.css`, family row in `families.ts`; theme browser test (numbers `user-select: none`, highlight cue under forced colors, collapse clip, trigger contrast)
+- [ ] 7.2 Site examples (`apps/site/examples/code-block.tsx`): plain, tokens, a highlight.js adapter example (`trustedCodeHtml`), line numbers, highlighted lines, wrap, collapse, multi-file `Files`, RTL page, copy failure (fake), driver example; `states` for every contract state; ARIA snapshots for the state examples
+- [ ] 7.3 Docs page `docs/components/code-block.md` (generated API facts + guide: input forms and why HTML is "trusted", line numbers, copy and its failure modes, SSR without JS, adapters); no other library named
+- [ ] 7.4 Mark `docs/research/code-block.md` done on archive; set Code Block `done` in `docs/components.md`; changeset for core, react, testing, theme; `pnpm lint`, `pnpm typecheck`, `pnpm docs:check` green
