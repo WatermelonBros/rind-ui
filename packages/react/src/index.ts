@@ -67,6 +67,7 @@ export * from "./toggle-group"
 export * from "./toolbar"
 export * from "./tooltip"
 export * from "./tour"
+export * from "./tree-view"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

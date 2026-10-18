@@ -67,6 +67,7 @@ export { getToggleGroup } from "./components/toggle-group"
 export { getToolbar } from "./components/toolbar"
 export { getTooltip } from "./components/tooltip"
 export { getTour } from "./components/tour"
+export { getTreeView } from "./components/tree-view"
 export { fixedDateClock } from "./date-clock"
 export {
   type FakeDelayGroup,
