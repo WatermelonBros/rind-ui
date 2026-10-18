@@ -36,9 +36,12 @@ import { DateField } from "@rind-ui/react"
 `DateField.Input` renders the segments by itself. For your own markup give it a render function over the segments:
 
 ```tsx
-<DateField.Input>
-  {(segments) => segments.map((segment, i) => <DateField.Segment key={i} segment={segment} />)}
-</DateField.Input>
+<DateField.Root>
+  <DateField.Label>Birthday</DateField.Label>
+  <DateField.Input>
+    {(segments) => segments.map((s) => <DateField.Segment key={s.key} segment={s} />)}
+  </DateField.Input>
+</DateField.Root>
 ```
 
 ## API
