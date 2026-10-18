@@ -1,9 +1,10 @@
 // Date Field picker parts (date-field spec "Picker Parts", "Picker — …"): single and range.
-import { CalendarDate, CalendarDateTime, isWeekend } from "@internationalized/date"
+import { CalendarDate, CalendarDateTime, type DateValue, isWeekend } from "@internationalized/date"
 import { Calendar, DateField, Dialog, RindProvider } from "@rind-ui/react"
 import { render, screen, waitFor } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import type { ReactNode } from "react"
+import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { fixedDateClock, getDateField } from "../index"
 
@@ -276,6 +277,72 @@ describe("Date Field picker (single)", () => {
   })
 })
 
+describe("Date Field picker (single, review)", () => {
+  it("after a refused pick, picking the selected date again closes", async () => {
+    let refuse = true
+    render(
+      <Birthday
+        defaultValue={d(10, 14)}
+        onValueChange={(_v: unknown, x: { cancel(): void }) => {
+          if (refuse) x.cancel()
+        }}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog")
+    await user.click(pressCell(20))
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(screen.getByRole("dialog")).toBeTruthy()
+    refuse = false
+    await user.click(pressCell(14))
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  })
+
+  it("an outside press closes without committing", async () => {
+    const onValueChange = vi.fn()
+    render(<Birthday defaultValue={d(10, 14)} onValueChange={onValueChange} />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog")
+    await user.click(screen.getByRole("button", { name: "After" }))
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("disabled: the trigger is disabled and never opens", async () => {
+    render(<Birthday disabled />)
+    const t = trigger()
+    expect((t as HTMLButtonElement).disabled).toBe(true)
+    await userEvent.setup().click(t)
+    expect(screen.queryByRole("dialog")).toBeNull()
+  })
+
+  it("an unavailable day cannot be picked: the popover stays open, the value unchanged", async () => {
+    const onValueChange = vi.fn()
+    render(
+      <Birthday
+        defaultValue={d(10, 14)}
+        isDateUnavailable={(date: DateValue) => isWeekend(date, "en-US")}
+        onValueChange={onValueChange}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog")
+    await user.click(pressCell(17))
+    expect(screen.getByRole("dialog")).toBeTruthy()
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("server render: closed, trigger not expanded, no dialog", () => {
+    const html = renderToString(<Birthday defaultValue={d(10, 14)} />)
+    expect(html).toContain('aria-expanded="false"')
+    expect(html).not.toContain('role="dialog"')
+  })
+})
+
 describe("Date Field picker (range)", () => {
   it("one group, six spinbuttons and a trigger named Choose dates", () => {
     render(<Stay />)
@@ -336,5 +403,61 @@ describe("Date Field picker driver (single)", () => {
     expect(await birthday.value()).toBe("2026-10-20")
     await birthday.clearPicker()
     expect(await birthday.value()).toBe("")
+  })
+})
+
+describe("Date Field picker (range, review)", () => {
+  it("typing a range while open moves and selects the calendar", async () => {
+    render(<Stay />)
+    const user = userEvent.setup()
+    await user.click(trigger("Choose dates Stay"))
+    const dialog = await screen.findByRole("dialog")
+    await user.click(screen.getByRole("spinbutton", { name: "month Start date Stay" }))
+    await user.keyboard("03052027")
+    await user.keyboard("03082027")
+    await waitFor(() => expect(dialog.textContent).toContain("March 2027"))
+    await waitFor(() => expect(cell(5).getAttribute("aria-selected")).toBe("true"))
+    expect(cell(8).getAttribute("aria-selected")).toBe("true")
+    expect(screen.getByRole("dialog")).toBeTruthy()
+  })
+
+  it("resume: a typed start is the anchor; one press sets the end", async () => {
+    const onValueChange = vi.fn()
+    render(<Stay onValueChange={onValueChange} />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole("spinbutton", { name: "month Start date Stay" }))
+    await user.keyboard("10122026")
+    await user.click(trigger("Choose dates Stay"))
+    await screen.findByRole("dialog")
+    await user.click(pressCell(16))
+    await waitFor(() => expect(onValueChange).toHaveBeenCalledTimes(1))
+    const v = onValueChange.mock.calls[0]?.[0] as { start: CalendarDate; end: CalendarDate }
+    expect(`${v.start}..${v.end}`).toBe("2026-10-12..2026-10-16")
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  })
+
+  it("an outside press drops a half range and commits nothing", async () => {
+    const onValueChange = vi.fn()
+    render(<Stay onValueChange={onValueChange} />)
+    const user = userEvent.setup()
+    await user.click(trigger("Choose dates Stay"))
+    await screen.findByRole("dialog")
+    await user.click(pressCell(12))
+    await user.click(document.body)
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("Escape twice: the first drops the anchor, the second closes", async () => {
+    render(<Stay />)
+    const user = userEvent.setup()
+    await user.click(trigger("Choose dates Stay"))
+    await screen.findByRole("dialog")
+    await user.click(pressCell(12))
+    await user.keyboard("{Escape}")
+    expect(screen.getByRole("dialog")).toBeTruthy()
+    expect(document.querySelector('[data-scope="calendar"][data-anchored]')).toBeNull()
+    await user.keyboard("{Escape}")
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
   })
 })

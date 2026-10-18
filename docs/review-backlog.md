@@ -274,6 +274,8 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
 | date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
+| date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
+| date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
 
 ## Resolved
 

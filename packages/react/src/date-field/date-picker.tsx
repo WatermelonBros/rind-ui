@@ -13,6 +13,8 @@ import {
   type Modality,
   partId,
   pickedValue,
+  today as todayOf,
+  todayZone,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -232,7 +234,12 @@ function SingleCalendar(props: DatePickerCalendarProps) {
     if (v) return setFocused(dayOf(v))
     setFocused((f) => draftFocus(h, f) ?? f)
   }, [valueKey, hint.year, hint.month])
+  // A pick that changed nothing (the selected date again) never ran onValueChange: an
+  // earlier refusal must not keep the popover open.
+  const changed = useRef(false)
   const close = (modality: Modality) => {
+    if (!changed.current) ctx.picker.cancelled.current = false
+    changed.current = false
     // After the field's onValueChange ran: a refused pick keeps the popover open.
     queueMicrotask(() => {
       if (!ctx.picker.cancelled.current && ctx.picker.closeOnSelect) {
@@ -246,6 +253,7 @@ function SingleCalendar(props: DatePickerCalendarProps) {
       value={value}
       onValueChange={(v, details) => {
         if (v === null || Array.isArray(v) || !("calendar" in v) || "start" in v) return
+        changed.current = true
         ctx.send({
           type: "PICK",
           value: pickedValue(
@@ -277,13 +285,55 @@ function RangeCalendar(props: DatePickerCalendarProps) {
   if (!range) throw new Error("unreachable: RangeCalendar outside a range Root")
   const ctx = range
   const value = ctx.view.values.value ?? null
+  const start = (ctx.view.context.startValue as DateValue | null) ?? null
+  const end = (ctx.view.context.endValue as DateValue | null) ?? null
+  // Resume (spec "Picker — Range: Resume"): a committed start without a valid end is the
+  // anchor when the popover opens (the content mounts per open), so a press sets the end.
+  const [anchor] = useState(() =>
+    start !== null && (end === null || ctx.state.invalidEdge === "end") ? dayOf(start) : null,
+  )
+  // Typing while open (spec "Picker — Range: Typing And Clearing"): the calendar shows the
+  // range's start, else the end last typed.
+  const env = useEnvironment()
+  const [focused, setFocused] = useState<CalendarDate>(() => {
+    if (value) return dayOf(value.start as DateValue)
+    if (start) return dayOf(start)
+    // Today (or the placeholder), within minValue / maxValue.
+    const today = dayOf(ctx.placeholderValue ?? todayOf(env.dateClock, todayZone(undefined, null)))
+    const min = ctx.end.minValue ? dayOf(ctx.end.minValue) : null
+    const max = ctx.end.maxValue ? dayOf(ctx.end.maxValue) : null
+    return min && today.compare(min) < 0 ? min : max && today.compare(max) > 0 ? max : today
+  })
+  const keys = `${value ? `${value.start}..${value.end}` : ""}|${start ?? ""}|${end ?? ""}`
+  const follow = useRef({ value, start, end })
+  const previous = useRef(follow.current)
+  follow.current = { value, start, end }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs when the value or an end changes
+  useEffect(() => {
+    const now = follow.current
+    const before = previous.current
+    previous.current = now
+    const moved = now.value
+      ? (now.value.start as DateValue)
+      : now.end && now.end !== before.end
+        ? now.end
+        : now.start && now.start !== before.start
+          ? now.start
+          : null
+    if (moved) setFocused(dayOf(moved))
+  }, [keys])
+  const changed = useRef(false)
   return (
     <Calendar.Root
       {...props}
       selectionMode="range"
       value={value as never}
+      {...(anchor ? { defaultAnchor: anchor } : {})}
+      focusedValue={focused}
+      onFocusChange={setFocused}
       onValueChange={(v) => {
         if (v === null || !("start" in (v as object))) return
+        changed.current = true
         const r = v as { start: DateValue; end: DateValue }
         // Each end keeps its own type, time of day and zone (spec "Picker — Select").
         const end = (day: DateValue, current: unknown) =>
@@ -299,13 +349,15 @@ function RangeCalendar(props: DatePickerCalendarProps) {
           end: end(r.end, ctx.view.context.endValue),
         })
       }}
-      onDateSelect={(_d, d) =>
+      onDateSelect={(_d, d) => {
+        if (!changed.current) ctx.cancelled.current = false
+        changed.current = false
         queueMicrotask(() => {
           if (!ctx.cancelled.current && ctx.closeOnSelect) {
             popover?.send({ type: "select", modality: d.modality })
           }
         })
-      }
+      }}
       // The picker forces "reset": leaving the calendar never commits half a range.
       commitOnBlur="reset"
       minValue={ctx.end.minValue ?? null}
