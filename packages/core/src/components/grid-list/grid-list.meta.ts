@@ -192,6 +192,10 @@ export const gridListMeta = {
       check: ["pointer", "keyboard", "virtual"],
       focusControl: ["pointer", "keyboard", "virtual"],
       pressControl: ["pointer", "keyboard", "virtual"],
+      space: ["keyboard"],
+      enter: ["keyboard"],
+      pressRow: ["pointer", "virtual"],
+      arrowIn: ["keyboard"],
     },
     queries: [
       "items",

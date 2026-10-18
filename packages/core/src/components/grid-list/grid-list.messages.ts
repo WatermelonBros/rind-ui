@@ -10,6 +10,8 @@ export interface GridListMessages {
   readonly selectedCountAnnouncement: (count: number) => string
   /** The checkbox's name: "Select Ada" (the checkbox's own label part plus the row's text). */
   readonly checkboxLabel: string
+  /** The select-all checkbox's name. */
+  readonly selectAllLabel: string
 }
 
 export const gridListMessages: GridListMessages = {
@@ -19,4 +21,5 @@ export const gridListMessages: GridListMessages = {
   selectedCountAnnouncement: (count) =>
     plural("en", count, { one: "# row selected", other: "# rows selected" }),
   checkboxLabel: "Select",
+  selectAllLabel: "Select all",
 }

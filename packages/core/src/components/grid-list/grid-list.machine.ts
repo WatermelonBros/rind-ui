@@ -33,7 +33,8 @@ export interface GridListActionDetails {
 
 export type GridListEvent =
   | CollectionEvent
-  | { readonly type: "FOCUS"; readonly modality?: Modality }
+  /** Focus entered the list; `inner`: on a control, field or nested composite of a row. */
+  | { readonly type: "FOCUS"; readonly modality?: Modality; readonly inner?: boolean }
   | {
       readonly type: "ACTION"
       readonly key: CollectionKey
@@ -85,6 +86,8 @@ export interface GridListProps extends CollectionProps {
 export interface GridListContext extends CollectionContext {
   /** 0: the row has focus; 1..n: one of its controls. */
   readonly childIndex: number
+  /** How often each row's action ran (`data-action-count`: drivers check a press's effect). */
+  readonly actionCounts: Readonly<Record<string, number>>
 }
 
 export function gridSelectionOf(value: GridListValue | undefined): SelectionValue {
@@ -123,6 +126,10 @@ const EMPTY = null as unknown as string
 const mode = (p: GridListProps) => p.selectionMode ?? "none"
 const enabled = (p: GridListProps, key: CollectionKey) =>
   p.disabled !== true && p.collection.get(key)?.disabled !== true
+/** `disabledBehavior="selection"`: a disabled row is not selectable but still acts. */
+const actionable = (p: GridListProps, key: CollectionKey) =>
+  p.disabled !== true &&
+  (p.disabledBehavior === "selection" || p.collection.get(key)?.disabled !== true)
 
 export const gridListMachine = setup({
   types: type<{
@@ -154,11 +161,18 @@ export const gridListMachine = setup({
       set("scrollReason", null)
     },
     /** Selection And Action: the checkbox, mode and behaviour rules for a press on a row. */
-    pressRow: ({ event, props, values, send }) => {
-      if (event.type !== "PRESS_ROW" || !enabled(props, event.key)) return
+    pressRow: ({ event, props, values, send, context, set }) => {
+      const countAction = (k: string) =>
+        set("actionCounts", { ...context.actionCounts, [k]: (context.actionCounts[k] ?? 0) + 1 })
+      if (event.type !== "PRESS_ROW" || !actionable(props, event.key)) return
       const { key, modality } = event
-      const act = () => props.onAction?.(key, { modality, via: "press" })
-      if (props.checkboxes?.has(key) || mode(props) === "none") return act()
+      const act = () => {
+        if (props.onAction) countAction(key)
+        props.onAction?.(key, { modality, via: "press" })
+      }
+      if (props.checkboxes?.has(key) || mode(props) === "none" || !enabled(props, key)) {
+        return act()
+      }
       const empty = gridSelectionOf(values.value)
       const nothingSelected = empty !== "all" && empty.size === 0
       if (props.onAction && (props.selectionBehavior ?? "toggle") === "toggle" && nothingSelected) {
@@ -166,8 +180,12 @@ export const gridListMachine = setup({
       }
       send({ type: "SELECT", key, modality, shift: event.shift, mod: event.mod })
     },
-    act: ({ event, props }) => {
-      if (event.type !== "ACTION" || !enabled(props, event.key)) return
+    act: ({ event, props, context, set }) => {
+      if (event.type !== "ACTION" || !actionable(props, event.key)) return
+      if (props.onAction) {
+        const k = event.key
+        set("actionCounts", { ...context.actionCounts, [k]: (context.actionCounts[k] ?? 0) + 1 })
+      }
       props.onAction?.(event.key, { modality: event.modality, via: event.via })
     },
     /** The row and child the DOM focus is on (a click on a control, Tab in tab mode). */
@@ -192,9 +210,24 @@ export const gridListMachine = setup({
       ;(target as HTMLElement | undefined)?.focus()
     },
     resetChild: ({ set }) => set("childIndex", 0),
+    /** The highlighted row was removed: its controls went with it. */
+    resetChildIfRemoved: ({ context, props, set }) => {
+      if (context.highlightedKey !== null && !props.collection.has(context.highlightedKey)) {
+        set("childIndex", 0)
+      }
+    },
+    /** Keeps focus in the list, unless it is still on a control inside a row. */
+    keepFocusUnlessInRow: (a) => {
+      const active = a.env.dom.activeElement()
+      const list = a.env.dom.getById(a.props.ids.list)
+      const row = active?.closest('[role="row"]')
+      if (active?.isConnected && row && list?.contains(row) && row !== active) return
+      pieces.actions.keepFocusInside(a)
+    },
     /** Entering the list: the highlighted row takes focus unless a control of it already has. */
     enterFocus: (a) => {
-      if (a.context.childIndex > 0) return
+      // Focus that landed inside a row (a nested Tag Group, a field) stays there.
+      if (a.context.childIndex > 0 || (a.event.type === "FOCUS" && a.event.inner)) return
       pieces.actions.focusHighlighted(a)
     },
     /** Up/Down in a wrapped layout: the measured item, else collection order. */
@@ -212,7 +245,14 @@ export const gridListMachine = setup({
       const messages = { ...gridListMessages, ...props.messages }
       const s = gridSelectionOf(values.value)
       let message: string | null = null
-      if (event.type === "SELECT") {
+      const range =
+        (event.type === "SELECT" && event.shift) || (event.type === "NAVIGATE" && event.extend)
+      if (range) {
+        // A range: the count, when more than the pressed row is selected.
+        const count = selectedKeys(props.collection, s).length
+        if (count > 1) message = messages.selectedCountAnnouncement(count)
+      }
+      if (message === null && event.type === "SELECT") {
         const name = props.collection.get(event.key)?.textValue ?? event.key
         message = isSelected(props.collection, s, event.key)
           ? messages.selectedAnnouncement(name)
@@ -241,6 +281,7 @@ export const gridListMachine = setup({
     ...initialCollectionContext(),
     lastCollection: props.collection,
     childIndex: 0,
+    actionCounts: {},
   }),
   values: { value: { fallback: EMPTY, equal: sameGridValue as never } },
   onProps: { collection: "COLLECTION.CHANGE" },
@@ -250,6 +291,9 @@ export const gridListMachine = setup({
     ACTION: { actions: ["act"] },
     FOCUS_CHILD: { actions: ["focusChild"] },
     SELECT: { guard: "selectable", actions: ["select", "announceSelection"] },
+    // The select-all checkbox may sit outside the list (focus is then not in it).
+    SELECT_ALL: { actions: ["selectAll", "announceSelection"] },
+    CLEAR_SELECTION: { actions: ["clearSelection"] },
   },
   states: {
     idle: {
@@ -262,10 +306,18 @@ export const gridListMachine = setup({
       exit: ["resetTypeahead", "resetChild"],
       on: {
         "COMPOSITE.BLUR": "idle",
-        "COLLECTION.CHANGE": { actions: ["repairCollection", "resetChild", "keepFocusInside"] },
+        "COLLECTION.CHANGE": {
+          actions: ["resetChildIfRemoved", "repairCollection", "keepFocusUnlessInRow"],
+        },
         FOCUS: {},
         NAVIGATE: {
-          actions: ["resetChild", "navigate", "scrollToHighlighted", "focusHighlighted"],
+          actions: [
+            "resetChild",
+            "navigate",
+            "scrollToHighlighted",
+            "focusHighlighted",
+            "announceSelection",
+          ],
         },
         NAVIGATE_CHILD: { actions: ["navigateChild"] },
         NAVIGATE_SPATIAL: { actions: ["navigateSpatial"] },
@@ -275,8 +327,6 @@ export const gridListMachine = setup({
         TYPEAHEAD: {
           actions: ["resetChild", "typeahead", "scrollToHighlighted", "focusHighlighted"],
         },
-        SELECT_ALL: { actions: ["selectAll", "announceSelection"] },
-        CLEAR_SELECTION: { actions: ["clearSelection"] },
         DESELECT: { actions: ["deselect"] },
       },
     },

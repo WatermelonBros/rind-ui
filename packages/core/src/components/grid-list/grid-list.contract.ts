@@ -64,6 +64,38 @@ const focusInside = async (env: E) => {
   return false
 }
 
+/** A row's selection and its action count (`data-action-count`, written per action). */
+const rowState = async (env: E, name: string) => ({
+  selected: await row(env, name).attr("aria-selected"),
+  acted: await row(env, name).attr("data-action-count"),
+})
+let before: { selected: string | null; acted: string | null } = { selected: null, acted: null }
+const remember = async (env: E, name: string) => {
+  before = await rowState(env, name)
+}
+
+/** The highlighted row's text (else the first row's), for steps that act on it. */
+const highlightedName = (view: unknown) => {
+  const v = view as {
+    context: {
+      highlightedKey: string | null
+      lastCollection: {
+        get(k: string): { textValue: string } | undefined
+        firstKey(): string | null
+      }
+    }
+  }
+  const c = v.context.lastCollection
+  const key = v.context.highlightedKey ?? c.firstKey()
+  return key === null ? "" : (c.get(key)?.textValue ?? key)
+}
+const highlightedKey = (view: unknown) => {
+  const v = view as {
+    context: { highlightedKey: string | null; lastCollection: { firstKey(): string | null } }
+  }
+  return v.context.highlightedKey ?? v.context.lastCollection.firstKey() ?? ""
+}
+
 /**
  * The row's children (spec "row-children"): arrow mode never makes a control tabbable; tab
  * mode only on the highlighted row; a disabled row's controls are disabled and not tabbable;
@@ -193,14 +225,44 @@ export const gridListContract = contract("grid-list", {
       done: async (env: E, name: string, controlName: string) =>
         (await control(env, name, controlName)).isFocused(),
     },
-    /** Presses a control; its row's selection and action are untouched. */
+    /**
+     * Presses a control; its row's selection and action are untouched (the row's
+     * `aria-selected` and `data-action-count`, read before the press, are unchanged).
+     */
     pressControl: {
-      pointer: async (env: E, name: string, controlName: string) =>
-        (await control(env, name, controlName)).click(),
+      pointer: async (env: E, name: string, controlName: string) => {
+        await remember(env, name)
+        await (await control(env, name, controlName)).click()
+      },
       keyboard: async (env: E, name: string, controlName: string) => {
+        await remember(env, name)
         await (await control(env, name, controlName)).focus()
         await env.keyboard("Enter")
       },
+      done: async (env: E, name: string) => {
+        const now = await rowState(env, name)
+        return now.selected === before.selected && now.acted === before.acted
+      },
+    },
+    /** Space on the focused row: toggles it (every behaviour; never the action). */
+    space: {
+      keyboard: (env: E) => env.keyboard("Space"),
+      done: async () => true,
+    },
+    /** Enter on the focused row: the action (a link: followed). */
+    enter: {
+      keyboard: (env: E) => env.keyboard("Enter"),
+      done: async () => true,
+    },
+    /** A pointer press on the highlighted row. */
+    pressRow: {
+      pointer: (env: E, name: string) => row(env, name).click(),
+      none: { keyboard: "a row press is a pointer gesture; Enter is the action step" },
+      done: async () => true,
+    },
+    /** ArrowRight on the focused row: into its first control (arrow mode). */
+    arrowIn: {
+      keyboard: (env: E) => env.keyboard("ArrowRight"),
       done: async () => true,
     },
   },
@@ -212,18 +274,65 @@ export const gridListContract = contract("grid-list", {
     HIGHLIGHT: { skip: "sent by row focus and presses; covered by the driver tests" },
     POINTER_MOVE: { skip: "rows do not highlight on hover" },
     TYPEAHEAD: { skip: "typeahead over rows: scenario tests" },
-    SELECT: { skip: "Space, presses and checkboxes per the selection rules: scenario tests" },
-    SELECT_ALL: "selectAll",
+    SELECT: {
+      from: {
+        idle: { skip: "a selection gesture needs focus on a row: taken from focused" },
+        focused: {
+          action: "space",
+          event: (view) => ({
+            key: highlightedKey(view),
+            modality: "keyboard",
+            shift: false,
+            mod: true,
+          }),
+        },
+      },
+    },
+    SELECT_ALL: {
+      from: {
+        idle: { skip: "from outside the list: the select-all checkbox (its own DOM tests)" },
+        focused: "selectAll",
+      },
+    },
     CLEAR_SELECTION: { skip: "programmatic only" },
     DESELECT: { skip: "programmatic only" },
-    ACTION: { skip: "Enter, presses and double presses per the rules: scenario tests" },
-    PRESS_ROW: { skip: "a row press per the selection rules: scenario tests" },
+    ACTION: {
+      from: {
+        idle: { skip: "Enter needs focus on a row: taken from focused" },
+        focused: {
+          action: "enter",
+          event: (view) => ({ key: highlightedKey(view), modality: "keyboard", via: "enter" }),
+        },
+      },
+    },
+    PRESS_ROW: {
+      from: {
+        idle: { skip: "a press focuses the list first: taken from focused" },
+        focused: {
+          action: "pressRow",
+          args: (view) => [highlightedName(view)],
+          event: (view) => ({
+            key: highlightedKey(view),
+            modality: "pointer",
+            shift: false,
+            mod: false,
+          }),
+        },
+      },
+    },
     FOCUS_CHILD: { skip: "mirrors DOM focus; covered by focusControl" },
-    NAVIGATE_CHILD: { skip: "arrows and Escape between a row and its controls: scenario tests" },
+    NAVIGATE_CHILD: {
+      from: {
+        idle: { skip: "arrows need focus on a row: taken from focused" },
+        // `count`: the highlighted row's controls; a model class with controls sets it.
+        focused: { action: "arrowIn", event: () => ({ direction: "next", count: 0 }) },
+      },
+    },
     NAVIGATE_SPATIAL: { skip: "measured layout: browser tests" },
     "COLLECTION.CHANGE": { skip: "sent by the $props:collection edge (a prop step)" },
     "$props:collection": { skip: "the consumer's data: scenario tests" },
-    "$sync:value": { skip: "a parent-controlled selection: scenario tests" },
+    // A parent clearing a controlled selection (a model class with `rerender` runs it).
+    "$sync:value": { props: () => ({ value: null }) },
     EXPAND: { skip: "rows are flat" },
     COLLAPSE: { skip: "rows are flat" },
   },

@@ -535,3 +535,165 @@ describe("driver", () => {
     expect(await gl().selected()).toEqual(["Ada"])
   })
 })
+
+describe("review fixes", () => {
+  it("focus moved straight into a nested Tag Group stays there", async () => {
+    render(
+      <People
+        buttons={false}
+        extra={(k) =>
+          k === "Ada" ? (
+            <TagGroup.Root selectionMode="single">
+              <TagGroup.Label>Labels of Ada</TagGroup.Label>
+              <TagGroup.List>
+                <TagGroup.Tag value="math">
+                  <TagGroup.TagText>math</TagGroup.TagText>
+                </TagGroup.Tag>
+              </TagGroup.List>
+            </TagGroup.Root>
+          ) : null
+        }
+      />,
+    )
+    const tag = screen.getByRole("row", { name: "math" })
+    tag.focus()
+    await waitFor(() => expect(document.activeElement).toBe(tag))
+    await new Promise<void>((r) => queueMicrotask(r))
+    expect(document.activeElement).toBe(tag)
+  })
+
+  it('layout="grid": Left/Right move cards, Tab reaches the card\'s controls', async () => {
+    const user = userEvent.setup()
+    render(<People layout="grid" />)
+    expect(screen.getByRole("grid").getAttribute("data-child-navigation")).toBe("tab")
+    row("Ada").focus()
+    await user.keyboard("{ArrowRight}")
+    expect(document.activeElement).toBe(row("Grace"))
+    await user.tab()
+    expect(document.activeElement?.textContent).toBe("Edit")
+  })
+
+  it("a row added while a control has focus leaves focus on the control", async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<People />)
+    row("Ada").focus()
+    await user.keyboard("{ArrowRight}")
+    const edit = document.activeElement
+    expect(edit?.textContent).toBe("Edit")
+    rerender(<People people={["Ada", "Grace", "Alan", "Barbara"]} />)
+    await new Promise<void>((r) => queueMicrotask(r))
+    expect(document.activeElement).toBe(edit)
+  })
+
+  it('disabledBehavior="selection": a disabled row still acts; its controls stay enabled', async () => {
+    const user = userEvent.setup()
+    const onAction = vi.fn()
+    render(
+      <People
+        selectionMode="multiple"
+        disabledBehavior="selection"
+        onAction={onAction}
+        people={["Ada", { key: "Grace", disabled: true }, "Alan"]}
+      />,
+    )
+    const edit = row("Grace").querySelector('[data-part="item-control"]') as HTMLElement
+    expect(edit.getAttribute("aria-disabled")).toBeNull()
+    row("Grace").focus()
+    await user.keyboard("{Enter}")
+    expect(onAction).toHaveBeenCalledWith("Grace", expect.anything())
+    await user.keyboard(" ")
+    expect(await gl().selected()).toEqual([])
+  })
+
+  it("a Shift range announces the count on Safari", async () => {
+    const log = installAnnouncementLog()
+    const user = userEvent.setup()
+    render(
+      <RindProvider environment={{ platform: platforms.apple }}>
+        <People selectionMode="multiple" buttons={false} />
+      </RindProvider>,
+    )
+    row("Ada").focus()
+    await user.keyboard(" ")
+    await user.keyboard("{Shift>}{ArrowDown}{ArrowDown}{/Shift}")
+    await waitFor(() => expect(log.map((a) => a.message).at(-1)).toMatch(/3/))
+  })
+
+  it("a mouse press selects on pointer down; selectOnPressUp waits for pointer up", async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<People selectionMode="multiple" buttons={false} />)
+    await user.pointer({ keys: "[MouseLeft>]", target: row("Grace") })
+    expect(await gl().selected()).toEqual(["Grace"])
+    await user.pointer({ keys: "[/MouseLeft]", target: row("Grace") })
+    expect(await gl().selected()).toEqual(["Grace"])
+    unmount()
+    render(<People selectionMode="multiple" buttons={false} selectOnPressUp />)
+    await user.pointer({ keys: "[MouseLeft>]", target: row("Grace") })
+    expect(await gl().selected()).toEqual([])
+    await user.pointer({ keys: "[/MouseLeft]", target: row("Grace") })
+    expect(await gl().selected()).toEqual(["Grace"])
+  })
+
+  it("autoFocus focuses the selected row", async () => {
+    render(<People selectionMode="single" defaultValue="Alan" autoFocus />)
+    await waitFor(() => expect(document.activeElement).toBe(row("Alan")))
+  })
+
+  it("an Item's own onAction runs for that row", async () => {
+    const user = userEvent.setup()
+    const onRow = vi.fn()
+    render(
+      <GridList.Root>
+        <GridList.Label>People</GridList.Label>
+        <GridList.List>
+          <GridList.Item value="Ada" onAction={onRow}>
+            <GridList.ItemText>Ada</GridList.ItemText>
+          </GridList.Item>
+          <GridList.Item value="Grace">
+            <GridList.ItemText>Grace</GridList.ItemText>
+          </GridList.Item>
+        </GridList.List>
+      </GridList.Root>,
+    )
+    row("Ada").focus()
+    await user.keyboard("{Enter}")
+    expect(onRow).toHaveBeenCalledTimes(1)
+    row("Grace").focus()
+    await user.keyboard("{Enter}")
+    expect(onRow).toHaveBeenCalledTimes(1)
+  })
+
+  it("the select-all checkbox: unchecked, mixed, checked; it selects all, then clears", async () => {
+    const user = userEvent.setup()
+    render(
+      <GridList.Root selectionMode="multiple">
+        <GridList.ItemCheckbox all />
+        <GridList.Label>People</GridList.Label>
+        <GridList.List>
+          {["Ada", "Grace"].map((p) => (
+            <GridList.Item key={p} value={p}>
+              <GridList.ItemCheckbox />
+              <GridList.ItemText>{p}</GridList.ItemText>
+            </GridList.Item>
+          ))}
+        </GridList.List>
+      </GridList.Root>,
+    )
+    const all = screen.getByRole("checkbox", { name: "Select all" }) as HTMLInputElement
+    expect(all.checked).toBe(false)
+    await user.click(screen.getByRole("checkbox", { name: "Select Ada" }))
+    expect(all.indeterminate).toBe(true)
+    await user.click(all)
+    expect(await gl().selected()).toEqual(["Ada", "Grace"])
+    expect(all.checked).toBe(true)
+    await user.click(all)
+    expect(await gl().selected()).toEqual([])
+  })
+
+  it("pressControl leaves the row's selection and action untouched", async () => {
+    const onAction = vi.fn()
+    render(<People selectionMode="multiple" onAction={onAction} />)
+    await gl("pointer").pressControl("Ada", "Edit")
+    expect(onAction).not.toHaveBeenCalled()
+  })
+})

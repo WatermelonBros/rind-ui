@@ -17,7 +17,7 @@
 
 ## 3. Connect and messages
 
-- [x] 3.1 `grid-list.connect.ts`: roles, names, empty `group`, set metadata, virtualized `aria-rowcount`/`aria-rowindex`, tab order of controls, keymap through `owner()`, checkbox and control props, `data-*` per spec
+- [ ] 3.1 `grid-list.connect.ts`: roles, names, empty `group`, set metadata, virtualized `aria-rowcount`/`aria-rowindex`, tab order of controls, keymap through `owner()`, checkbox and control props, `data-*` per spec — done except virtualization (`aria-rowcount`/`aria-rowindex`), moved to the backlog
 - [x] 3.2 `grid-list.messages.ts`; quirk entry consumer (`a11y-quirks` delta in this change) with a local test double until the entry lands
 - [x] 3.3 Unit tests for every attribute (stack/grid, arrow/tab, disabled rows with controls, empty) (in `grid-list.dom.test.tsx`: roles and names, empty group, disabled rows with controls, tab order of controls; arrow vs tab in the model classes)
 

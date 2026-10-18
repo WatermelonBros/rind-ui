@@ -30,7 +30,8 @@ import {
   useRef,
   useState,
 } from "react"
-import { mergeProps } from "../merge-props"
+import { joinHandlers } from "../join-handlers"
+import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { type RenderProp, renderPart } from "../render"
@@ -85,6 +86,10 @@ type Common = {
   readonly items?: readonly GridListItemData[]
   readonly collection?: Collection<unknown>
   readonly onAction?: (key: string, details: GridListActionDetails) => void
+  /** Presses select on pointer up (lists inside popups: react-spectrum#7887). Default false. */
+  readonly selectOnPressUp?: boolean
+  /** Focus the selected row (else the first) on mount. */
+  readonly autoFocus?: boolean
   readonly onLoadMore?: () => void
   readonly messages?: Partial<GridListMessages>
 }
@@ -119,6 +124,10 @@ interface Host {
   readonly mountDescription: (key: CollectionKey, on: boolean) => void
   readonly mountLink: (key: CollectionKey, href: string | null) => void
   readonly mountCheckbox: (key: CollectionKey, on: boolean) => void
+  readonly mountRowAction: (
+    key: CollectionKey,
+    fn: ((details: GridListActionDetails) => void) | null,
+  ) => void
   readonly hover: (key: CollectionKey | null) => void
   readonly press: (key: CollectionKey | null) => void
   readonly requestLoadMore: () => void
@@ -171,6 +180,18 @@ function Root(all: GridListRootProps) {
     return out
   }, [items, staticLinks])
   const [checkboxes, setCheckboxes] = useState<ReadonlySet<CollectionKey>>(new Set())
+  // Per-row actions (Item `onAction`): any of them makes the list actionable.
+  const rowActions = useRef(new Map<CollectionKey, (details: GridListActionDetails) => void>())
+  const [rowActionCount, setRowActionCount] = useState(0)
+  const [mountRowAction] = useState(
+    () => (key: CollectionKey, fn: ((details: GridListActionDetails) => void) | null) => {
+      const had = rowActions.current.has(key)
+      if (fn) rowActions.current.set(key, fn)
+      else rowActions.current.delete(key)
+      if (had !== (fn !== null)) setRowActionCount(rowActions.current.size)
+    },
+  )
+  const actionable = all.onAction !== undefined || rowActionCount > 0
   const latest = useRef({
     onValueChange: p["onValueChange"] as ((v: unknown, d: unknown) => void) | undefined,
     onAction: all.onAction,
@@ -201,8 +222,20 @@ function Root(all: GridListRootProps) {
       const e = details.event as { type: string; key?: string }
       latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
     },
-    onAction: all.onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
+    onAction: actionable
+      ? (key, d) => {
+          rowActions.current.get(toKey(key))?.(d)
+          latest.current.onAction?.(key, d)
+        }
+      : undefined,
   })
+  // autoFocus: the selected row, else the first (the machine's tab stop), once rows exist.
+  const autoFocused = useRef(false)
+  useEffect(() => {
+    if (!all.autoFocus || autoFocused.current || collection.size === 0) return
+    autoFocused.current = true
+    service.send({ type: "FOCUS", modality: env.modality.modality() })
+  }, [all.autoFocus, collection, service, env])
   const view = service.view()
   const [label, setLabel] = useState(false)
   const [descriptions, setDescriptions] = useState<ReadonlySet<CollectionKey>>(new Set())
@@ -251,7 +284,8 @@ function Root(all: GridListRootProps) {
       selectionBehavior,
       childNavigation,
       layout,
-      actions: all.onAction !== undefined,
+      actions: actionable,
+      selectOnPressUp: all.selectOnPressUp === true,
       links,
       disabled,
       focusableWhenDisabled: all.focusableWhenDisabled,
@@ -281,6 +315,7 @@ function Root(all: GridListRootProps) {
     mountDescription,
     mountLink,
     mountCheckbox,
+    mountRowAction,
     hover: setHovered,
     press: setPressed,
     requestLoadMore: () => {
@@ -338,10 +373,11 @@ function Item({
   disabled,
   href,
   current,
+  onAction,
   render,
   children,
   ...rest
-}: Own<"div"> & {
+}: Omit<Own<"div">, "onAction"> & {
   /** The row key. */
   readonly value: string
   readonly textValue?: string | undefined
@@ -349,9 +385,20 @@ function Item({
   /** A link row: Enter and a press follow it (role stays `row`). */
   readonly href?: string | undefined
   readonly current?: GridListItemOptions["current"]
+  /** This row's action (with the Root's `onAction`, both run). */
+  readonly onAction?: (details: GridListActionDetails) => void
 }) {
   const host = useHost("Item")
   const key = toKey(value)
+  const { mountRowAction } = host
+  const rowAction = useRef(onAction)
+  rowAction.current = onAction
+  const hasAction = onAction !== undefined
+  useIsoLayoutEffect(() => {
+    if (!hasAction) return
+    mountRowAction(key, (d) => rowAction.current?.(d))
+    return () => mountRowAction(key, null)
+  }, [mountRowAction, key, hasAction])
   const ref = useRef<HTMLDivElement | null>(null)
   // Development: a focusable the grid cannot reach (not an ItemControl) is named once mounted.
   useEffect(() => {
@@ -383,13 +430,15 @@ function Item({
   })
   const props = mergeProps(
     {
-      ...normalizeProps(own),
+      // Connect's own pointer-down (the press commit) runs with the pressed-state tracking.
+      ...joinHandlers(normalizeProps(own), {
+        onPointerEnter: () => hover(key),
+        onPointerLeave: () => hover(null),
+        onPointerDown: () => press(key),
+        onPointerUp: () => press(null),
+        onPointerCancel: () => press(null),
+      }),
       ref,
-      onPointerEnter: () => hover(key),
-      onPointerLeave: () => hover(null),
-      onPointerDown: () => press(key),
-      onPointerUp: () => press(null),
-      onPointerCancel: () => press(null),
     },
     rest,
   )
@@ -428,9 +477,46 @@ function ItemDescription({ render, ...rest }: Own<"span">) {
   )
 }
 
-function ItemCheckbox({ render, ...rest }: Own<"input">) {
+/**
+ * The row's selection checkbox; with `all` (outside the rows, multiple mode) the select-all
+ * checkbox: checked, mixed or unchecked from the selection.
+ */
+function ItemCheckbox({ all, ...props }: Own<"input"> & { readonly all?: boolean }) {
+  return all ? <SelectAllCheckbox {...props} /> : <RowCheckbox {...props} />
+}
+
+function SelectAllCheckbox({ render, ref, ...rest }: Own<"input">) {
+  const host = useHost("ItemCheckbox")
+  const own = normalizeProps(host.parts.selectAllCheckbox()) as Record<string, unknown>
+  const mixed = own["aria-checked"] === "mixed"
+  const el = useRef<HTMLInputElement | null>(null)
+  // `indeterminate` is a DOM property, not an attribute.
+  useIsoLayoutEffect(() => {
+    if (el.current) el.current.indeterminate = mixed
+  })
+  return renderPart(
+    "input",
+    mergeProps({ ...own, ref: composeRefs(el, ref) }, rest),
+    render,
+    undefined,
+  )
+}
+
+/** A control's focus and modality (its ring). */
+function useControlFocus() {
+  const env = useEnvironment()
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  return {
+    state: { focused, modality },
+    handlers: { onFocus: () => setFocused(true), onBlur: () => setFocused(false) },
+  }
+}
+
+function RowCheckbox({ render, ...rest }: Own<"input">) {
   const host = useHost("ItemCheckbox")
   const key = useItemKey("ItemCheckbox")
+  const focus = useControlFocus()
   const { mountCheckbox } = host
   useIsoLayoutEffect(() => {
     mountCheckbox(key, true)
@@ -438,7 +524,10 @@ function ItemCheckbox({ render, ...rest }: Own<"input">) {
   }, [mountCheckbox, key])
   return renderPart(
     "input",
-    mergeProps(normalizeProps(host.parts.itemCheckbox(key)), rest),
+    mergeProps(
+      { ...normalizeProps(host.parts.itemCheckbox(key, focus.state)), ...focus.handlers },
+      rest,
+    ),
     render,
     undefined,
   )
@@ -448,13 +537,15 @@ function ItemCheckbox({ render, ...rest }: Own<"input">) {
 function ItemControl({ render, ...rest }: Own<"button">) {
   const host = useHost("ItemControl")
   const key = useItemKey("ItemControl")
+  const focus = useControlFocus()
   return renderPart(
     "button",
     // `type="button"` only for the default element: a rendered field keeps its own type.
     mergeProps(
       {
         ...(render === undefined ? { type: "button" } : {}),
-        ...normalizeProps(host.parts.itemControl(key)),
+        ...normalizeProps(host.parts.itemControl(key, focus.state)),
+        ...focus.handlers,
       },
       rest,
     ),

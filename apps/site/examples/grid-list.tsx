@@ -40,7 +40,7 @@ export function Candidates() {
 /** `layout="grid"`: cards in columns; ArrowUp/Down move by the measured column. */
 export function Cards() {
   return (
-    <GridList.Root layout="grid" selectionMode="single">
+    <GridList.Root layout="grid" childNavigation="tab" selectionMode="single">
       <GridList.Label>Projects</GridList.Label>
       <GridList.List>
         {["Atlas", "Borealis", "Cirrus", "Dune", "Ember", "Fjord"].map((name) => (
@@ -140,7 +140,7 @@ export function Rtl() {
   )
 }
 
-/** A Tag Group inside a row handles its own keys; arrows leave it at its edges. */
+/** A Tag Group inside a row keeps its own arrow keys. */
 export function NestedTags() {
   return (
     <GridList.Root>
@@ -169,7 +169,7 @@ export function NestedTags() {
   )
 }
 
-/** In a Popover: rows with actions, the popover stays open while the list is used. */
+/** In a Popover: `selectOnPressUp` commits on pointer up (the press never reaches below). */
 export function InPopover() {
   return (
     <Popover.Root>
@@ -177,7 +177,7 @@ export function InPopover() {
       <Popover.Portal>
         <Popover.Positioner>
           <Popover.Content aria-label="Recent files">
-            <GridList.Root onAction={() => {}}>
+            <GridList.Root onAction={() => {}} selectOnPressUp>
               <GridList.Label>Recent</GridList.Label>
               <GridList.List>
                 {["notes.md", "plan.pdf", "logo.svg"].map((f) => (
@@ -203,7 +203,7 @@ export const variants: Variants = {
   },
   Cards: {
     title: "Cards grid",
-    description: '`layout="grid"`: columns; ArrowUp and ArrowDown move by column.',
+    description: '`layout="grid"`: arrows move between cards; Tab reaches a card\'s buttons.',
   },
   TabMode: {
     title: "Tab through fields",
@@ -218,7 +218,7 @@ export const variants: Variants = {
   Rtl: { title: "Right to left", description: "Arrows mirror: ArrowLeft enters the controls." },
   NestedTags: {
     title: "Nested Tag Group",
-    description: "The nested group handles its own keys; arrows leave it at its edges.",
+    description: "The nested Tag Group keeps its own arrow keys; Tab and Escape leave it.",
   },
   InPopover: { title: "In a Popover", description: "A short list of rows inside a popover." },
 }
