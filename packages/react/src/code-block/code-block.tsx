@@ -373,7 +373,10 @@ function Content({ render, ref, children, ...rest }: CodeBlockContentProps) {
   )
 }
 
-export type CodeBlockLineProps = PartProps<"span"> & { readonly line: CodeBlockLine }
+export type CodeBlockLineProps = PartProps<"span"> & {
+  /** The line to render: one entry of the tokens from `Root` (number, text and token spans). */
+  readonly line: CodeBlockLine
+}
 
 function Line({ line, render, children, ...rest }: CodeBlockLineProps) {
   const ctx = useCodeBlock("Line")
