@@ -120,15 +120,18 @@ buttons SHALL meet a 24×24 CSS px target.
 
 ### Requirement: Free-Text Mode
 
-With `selectionMode: "none"` the Combobox SHALL be an autocomplete: the value SHALL be the
-input text (`inputValue`); there SHALL be no selection (options carry
+With `selectionMode: "none"` and without `inline` (Free-Text Mode, Free-Text Forms and
+Free-Text Escape And Clear apply only to this configuration) the Combobox SHALL be an
+autocomplete: the value SHALL be the input text, reported through `onInputValueChange(text,
+details)`; `onValueChange` SHALL never be called; there SHALL be no selection (options carry
 `aria-selected="false"`, no `aria-multiselectable`, no `data-selected`); every text change by
 the user SHALL propose `inputValue` with reason `input-change`; blur, Tab, an outside press,
 closing the popup and a change of the suggestions SHALL NOT change it. Choosing a suggestion
 (Enter on the highlight, or a press) SHALL set `inputValue` to the suggestion's text value
 with reason `item-press` or `enter`, carry the chosen key in the change details, place the
 caret at the end, close the popup (`closeOnSelect`, default true), keep focus in the input
-and then call `onAction(key, details)` when given. A suggestion rendered as a link SHALL
+and then call `onAction(key, details)` when given. `onAction`'s details SHALL be the same in
+every configuration: `{ modality, modifiers: { shift, alt, ctrl, meta, mod } }`. A suggestion rendered as a link SHALL
 navigate natively instead of filling. `autoComplete` SHALL be `list` (default: suggestions
 filtered by the text) or `both` (filtered and completed inline); a completion SHALL be shown
 but SHALL NOT be proposed as `inputValue` until accepted (Enter, Tab with `selectOnTab`, or
@@ -156,6 +159,11 @@ blur) or typed on.
   "nada" selected
 - **THEN** `inputValue` is "ca", and after Enter it is "Canada"
 
+#### Scenario: No announcer gap (adobe/react-spectrum#10326)
+
+- **WHEN** on Safari on macOS the user arrows to a suggestion of a free-text combobox
+- **THEN** the same focus announcement as a selecting combobox is made
+
 #### Scenario: Same IME rule as selection
 
 - **WHEN** a user composing Japanese presses Enter to accept a candidate while a suggestion
@@ -165,7 +173,7 @@ blur) or typed on.
 
 ### Requirement: Free-Text Forms
 
-In free-text mode the visible input SHALL be the form control: it SHALL carry `name`,
+In free-text mode (not inline) the visible input SHALL be the form control: it SHALL carry `name`,
 `form`, `required`, `disabled`, `readOnly` and `formAutoComplete` as its native
 `autocomplete` attribute when given (`off` otherwise), and SHALL take part in submission,
 constraint validation, reset and implicit submission natively, with no hidden input. Enter
@@ -193,7 +201,7 @@ highlight SHALL close the popup and SHALL NOT prevent submission. A form reset S
 
 ### Requirement: Free-Text Escape And Clear
 
-In free-text mode Escape SHALL follow `combobox-pattern` while the popup is open; a closed
+In free-text mode (not inline) Escape SHALL follow `combobox-pattern` while the popup is open; a closed
 popup has nothing to revert: with `clearOnEscape` (default false) Escape SHALL clear the
 text (reason `escape`) and be handled, otherwise it SHALL be left unhandled. The
 ClearTrigger SHALL clear the text with reason `clear` and keep focus in the input.
@@ -214,14 +222,19 @@ ClearTrigger SHALL clear the text with reason `clear` and keep focus in the inpu
 
 With `inline` the Combobox SHALL be a command palette: the List SHALL be rendered in place
 of a popup and always shown, satisfying `combobox-pattern` "Usable Without A Popup". The
-machine SHALL start open and SHALL never close; there SHALL be no trigger, positioning,
-dismissal, overlay or commit. `inline` SHALL imply `selectionMode: "none"`; combining it with
+states SHALL be derived from the props: an inline Combobox SHALL run a machine definition with
+the single state `open` and no closed state, no open or close transitions (the same actions,
+guards and context as the popup machine, from one shared setup); there SHALL be no trigger,
+positioning, dismissal, overlay or commit. `inline` SHALL imply `selectionMode: "none"`; combining it with
 `single` or `multiple` SHALL be a development error. The input's `aria-expanded` SHALL be
 `true` whenever the listbox is exposed and `false` while the empty state hides it. Home, End,
 Left and Right SHALL edit the text and SHALL NOT move the highlight; keys SHALL be handled
 only when the input is the event target. The input SHALL be named by the Label or a consumer
 `aria-label` (development warning after mount when neither exists); its description SHALL be
-a Field's Description or the consumer's `aria-describedby`.
+a Field's Description or the consumer's `aria-describedby`. Root and Control `data-state`
+SHALL follow the input's `aria-expanded` (`open` while the listbox is exposed, `closed` while
+the empty state hides it). The API SHALL expose `navigate(move)` and `highlight(key)`, and the
+Combobox SHALL bind no keys beyond those specified, so an application adds its own bindings.
 
 #### Scenario: Always expanded while there are results
 
@@ -240,6 +253,22 @@ a Field's Description or the consumer's `aria-describedby`.
 - **WHEN** the input contains "open file", the third item is highlighted and the user
   presses Home
 - **THEN** the caret moves to the start and the third item stays highlighted
+
+#### Scenario: Click keeps the highlight (huntabyte/bits-ui#2063)
+
+- **WHEN** the user clicks the fourth item of an inline combobox and then presses ArrowDown
+- **THEN** the fifth item is highlighted
+
+#### Scenario: Active descendant matches the highlight (dip/cmdk#413, dip/cmdk#373)
+
+- **WHEN** the user arrows to "Profile", types "pro", then clears the query
+- **THEN** after the typing pause `aria-activedescendant` names the highlighted first item, the
+  item Enter runs
+
+#### Scenario: Two palettes (dip/cmdk#368)
+
+- **WHEN** two inline comboboxes are rendered and the user types into the second
+- **THEN** focus stays in the second input
 
 #### Scenario: Enter from another control (dip/cmdk#353)
 
@@ -362,6 +391,24 @@ SHALL be `role="none"`; the listbox SHALL contain only options and groups.
 - **WHEN** an item with key "cmd-42" and text "Toggle theme" exists and the user types "theme"
 - **THEN** it is listed, and typing "cmd-42" lists nothing
 
+#### Scenario: Accents (dip/cmdk#173)
+
+- **WHEN** the locale is `fr` and the user types "ecran"
+- **THEN** the item "Écran partagé" is listed
+
+#### Scenario: Large lists (dip/cmdk#191)
+
+- **WHEN** an inline combobox has 10,000 static items and the user deletes the query one
+  character at a time
+- **THEN** each change renders the new results without re-rendering items whose visibility and
+  highlight did not change
+
+#### Scenario: Valid listbox children (dip/cmdk#179)
+
+- **WHEN** an inline combobox with two groups, a separator between them and a visible Loading
+  part is checked with axe
+- **THEN** there is no `aria-required-children` or `aria-required-parent` violation
+
 #### Scenario: Ranked by the consumer
 
 - **WHEN** `filter` is `null` and the consumer passes, for each query, a collection ranked by
@@ -384,11 +431,11 @@ part SHALL NOT render its content.
 
 ### Requirement: Pages
 
-In inline mode the Combobox SHALL accept `page` (`{ key, label }`) as a read-only binding
-and `onBack()`. When `page.key` changes, it SHALL clear the query (reason `page`), reset the
+In inline mode the Combobox SHALL accept `page` (`{ key, label, depth }`, `depth` 0 for the
+root page) as a read-only binding and `onBack()`. When `page.key` changes, it SHALL clear the query (reason `page`), reset the
 list's scroll to the top, highlight the first navigable item and announce
 `pageAnnouncement(label)` ("{label}"). Backspace SHALL call `onBack` and be prevented when
-`onBack` is given, the query is empty, the caret is at the start with no selected text and
+`onBack` is given, the page's `depth` is greater than 0, the query is empty, the caret is at the start with no selected text and
 no composition is in progress; otherwise Backspace SHALL edit the text.
 
 #### Scenario: Back from a nested page
@@ -396,6 +443,11 @@ no composition is in progress; otherwise Backspace SHALL edit the text.
 - **WHEN** the user is on the page "Projects" with an empty query and presses Backspace
 - **THEN** `onBack` is called once, and after the consumer sets `page` to the root page the
   query is empty, its first item is highlighted and the root page's label is announced
+
+#### Scenario: Backspace on the root page
+
+- **WHEN** the page's `depth` is 0, the query is empty and Backspace is pressed
+- **THEN** `onBack` is not called
 
 #### Scenario: Backspace edits text
 
@@ -415,6 +467,11 @@ a Title (visually hidden by default) and map `onOpenChange(false)` to closing th
 - **WHEN** the user opens the documented palette dialog with the keyboard
 - **THEN** focus is in the input, the dialog is named by its Title, and the input by its Label
 
+#### Scenario: Dialog has a name (dip/cmdk#393)
+
+- **WHEN** the documented composition is rendered and opened
+- **THEN** no missing-name development warning is logged by the dialog
+
 #### Scenario: Touch open does not raise the keyboard (dip/cmdk#127)
 
 - **WHEN** the palette dialog is opened by a tap
@@ -423,15 +480,17 @@ a Title (visually hidden by default) and map `onOpenChange(false)` to closing th
 ### Requirement: Variant Model Coverage
 
 `testMachine` SHALL run `comboboxContract` over free-text configurations (static
-suggestions, `autoComplete="both"`, in a form with `submitOnChoose`, inside a Field) and
-inline configurations (static items, data items with keywords, groups with separators,
-`filter: null` with consumer-ranked collections, async loading and empty results, pages with
-`onBack`, link items, inside a modal dialog), in every modality, in RTL and with IME replays,
-with an axe check per state; and Tags Input's model tests SHALL include a configuration with
-suggestions.
+suggestions, `autoComplete="both"`, in a form with `submitOnChoose`, inside a Field) and inline
+configurations (static items, data items with keywords, groups with separators, `filter: null`
+with consumer-ranked collections and `itemsQuery`, async loading and empty results, pages with
+`onBack`, link items, inside a modal dialog, virtualized), in every modality including
+`virtual`, in RTL, on emulated Apple/WebKit, Apple/Blink and Windows platforms, and with IME
+replays, with an axe check per state; and Tags Input's model tests SHALL include a configuration
+with suggestions. The inline configurations SHALL walk the inline machine definition, whose only
+state is `open`.
 
 #### Scenario: Generated paths for the palette
 
-- **WHEN** the model runner walks the Combobox graph for the inline grouped configuration
-- **THEN** every reachable transition is covered, the `closed` state is reported unreachable
-  (not failed), and the generic invariants hold after each step
+- **WHEN** the model runner walks the inline grouped configuration
+- **THEN** every transition of the inline machine is covered, no `closed` state or open/close
+  edge exists in its graph, and the generic invariants hold after each step

@@ -16,17 +16,21 @@ decision that Command is a Combobox variant settles that the other way: one mach
 | Autocomplete | `selectionMode="none"` | the text (`inputValue`) | yes |
 | Command | `inline` (implies `selectionMode="none"`) | none; items run `onAction` | no |
 
-- **`inline`** starts the machine in `open` and guards every transition to `closed`
-  (`notInline`). The list is "exposed" whenever it has results. `closed` stays in the graph
-  but is unreachable under `inline`; model configurations with `inline` start in `open` and
-  the runner only walks reachable paths. A development error is reported when `inline` is
-  combined with `selectionMode` `single` or `multiple` (an always-open selecting list is a
-  Listbox with a filter, out of scope).
-- **`onAction(key, details)`** runs on ITEM.CHOOSE in inline mode (details: modality,
-  modifiers). Under `selectionMode="none"` with a popup it is also called, after the text is
+- **States from props.** One `setup()` (actions, guards, context, effects) builds two machine
+  definitions: `comboboxMachine` (`closed | open`) and `inlineComboboxMachine` (the single state
+  `open`, no closed node and no open/close transitions). The React Root picks the definition by
+  `inline` (fixed for the instance's life; a change warns in development). The contract takes
+  the configuration's machine, so the model graph of an inline configuration has no `closed`
+  node to cover. This replaces a guarded `closed` state, which add-command's design had already
+  rejected. The list is "exposed" whenever it has results. A development error is reported when
+  `inline` is combined with `selectionMode` `single` or `multiple` (an always-open selecting
+  list is a Listbox with a filter, out of scope).
+- **`onAction(key, details)`** runs on ITEM.CHOOSE in inline mode (details, the same in every
+  configuration: `{ modality, modifiers }`). Under `selectionMode="none"` with a popup it is also called, after the text is
   filled, so an autocomplete can react to a choice without diffing text.
-- **Pages:** `page` (`{ key, label }`, read-only binding, `onProps` → `PAGE.CHANGE`) and
-  `onBack()`. `BACKSPACE_EMPTY` already exists (chips): in inline mode it calls `onBack`.
+- **Pages:** `page` (`{ key, label, depth }`, read-only binding, `onProps` → `PAGE.CHANGE`) and
+  `onBack()`. `BACKSPACE_EMPTY` already exists (chips): in inline mode it calls `onBack` when
+  `depth > 0`.
 - **Escape inline:** with a query, Escape clears it (reason `escape`, prevented). Without one,
   it calls `onOpenChange(false, { reason: "escape" })` and is prevented, so the host decides
   (a dialog host closes its dialog). If no `onOpenChange` is given, Escape is left unhandled,
@@ -89,7 +93,18 @@ tests are the regression check.
 The driver stays `getCombobox`. The contract helper that builds a configuration's traits is
 exported, so the model tests declare each variant once.
 
-### 6. Where the retired requirements went
+### 6. Renames
+
+| Before | After | Why |
+|---|---|---|
+| Tags Input `closeOnChoose` (tags-input Suggestions) | `closeOnSelect` | one name for every host of the shared pattern (Combobox already ships `closeOnSelect`) |
+| retired Autocomplete `closeOnChoose` | `closeOnSelect` | same |
+| retired Autocomplete `value` (the text) | `inputValue` / `onInputValueChange` | one text value per Combobox; `onValueChange` never fires in free-text mode |
+| retired Autocomplete `mode` | `autoComplete` (`list` / `both`) | Combobox's existing prop |
+| retired Command `Command.*` parts | `Combobox.*` with `inline` | no separate exports |
+| retired Command `page` `{ key, label }` | `{ key, label, depth }` | Backspace goes back only above the root page |
+
+### 7. Where the retired requirements went
 
 | Retired requirement | Now |
 |---|---|
@@ -112,11 +127,23 @@ exported, so the model tests declare each variant once.
 | autocomplete: Escape And Clear | Free-Text Escape And Clear |
 | autocomplete: Data Attributes, Contract, Theme | the modified combobox requirements |
 | autocomplete: Field Control Binding | combobox Field Control Binding (unchanged: the Input is the validity element in free-text mode) |
+| autocomplete: Modes `inline` (completion without filtering) | dropped: backlog (no user asks for it) |
+| autocomplete: Modes `none` (a static list, no completion) | carried: `autoComplete="list"` with `filter: null` |
+| autocomplete: No announcer gap (adobe/react-spectrum#10326) | Free-Text Mode scenario |
+| command: `navigate(move)` / `highlight(key)` API | Inline Mode |
+| command: Large lists (dip/cmdk#191), Accents (dip/cmdk#173) | Filtering Without Reordering scenarios |
+| command: Dialog has a name (dip/cmdk#393) | Inside A Dialog scenario |
+| command: Two palettes (dip/cmdk#368), Click keeps the highlight (huntabyte/bits-ui#2063), Active descendant (dip/cmdk#413, dip/cmdk#373) | Inline Mode scenarios |
+| command: Valid listbox children with axe (dip/cmdk#179) | Filtering Without Reordering scenario |
+| command: App shortcut is not a navigation key (huntabyte/bits-ui#1067), Korean ArrowDown (dip/cmdk#348), Japanese Enter in Safari (dip/cmdk#206) | combobox-pattern (IME Composition, Enter, Escape And Tab: unchanged, already specified there) |
+| command: Shortcut hints described (mui/base-ui#4248), Localised list name (dip/cmdk#196) | Inline Mode (Field Description / `aria-describedby`); pattern Roles And Relations (`listboxLabel`) |
+| command: Messages `pageAnnouncement` | Pages |
+| coverage: virtualized, `itemsQuery`, `virtual` modality, Apple/WebKit, Apple/Blink and Windows emulations | Variant Model Coverage |
 
 ## Risks / Trade-offs
 
-- [An unreachable `closed` state under `inline`] → the runner walks reachable paths only, and
-  an invariant checks `aria-expanded` against `exposed`, not against `open`.
+- [Two machine definitions from one setup] → they share every action, guard and effect; only
+  the state map differs, and each configuration's model graph is the one that runs.
 - [Escape calling `onOpenChange(false)` while the machine stays open] → the callback is a
   request to the host, as in a controlled `open` that the parent refuses. The machine never
   leaves `open` under `inline`.

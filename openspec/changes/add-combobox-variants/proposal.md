@@ -47,9 +47,10 @@ requirement), `add-collections` (keywords), `add-dialog` (the palette's containe
     - the dialog composition.
   - Anatomy gains `Loading` and `ItemDescription`. Data attributes, contract (`run`, `back`,
     `page`, `items`) and theme cover both modes.
-- **`tags-input`:** no new requirements. Its Suggestions requirement is implemented on the
-  pattern actions, guards and connect helpers extracted from the Combobox machine into
-  `combobox/pattern`.
+- **`tags-input` (modified):** the suggestion list parts are the reusable listbox parts (no
+  copy), and `closeOnChoose` becomes `closeOnSelect` (one name across the pattern's hosts). Its
+  Suggestions requirement is implemented on the pattern actions, guards and connect helpers
+  extracted from the Combobox machine into `combobox/pattern`.
 - **Retired:** `openspec/changes/add-command` and `openspec/changes/add-autocomplete` are
   removed. The inventory rows "Autocomplete" and "Command" merge into "Combobox".
 
@@ -61,6 +62,8 @@ None.
 
 ### Modified Capabilities
 
+- `tags-input`: Anatomy (suggestion parts reuse the listbox parts), Suggestions
+  (`closeOnSelect`).
 - `combobox`: Anatomy, Combobox Data Attributes, Combobox Contract and Theme are modified.
   Added: Free-Text Mode, Free-Text Forms, Free-Text Escape And Clear, Inline Mode, Running
   Actions, Inline Escape, Inline Highlight And Scrolling, Filtering Without Reordering,
@@ -69,8 +72,9 @@ None.
 ## Non-goals
 
 - Separate `Autocomplete` / `Command` exports, drivers or stylesheets.
-- Inline completion without a list (`mode: "inline"` and `"none"` of the retired
-  Autocomplete spec). Recorded in docs/review-backlog.md.
+- The retired Autocomplete mode `inline` (completion without filtering). Recorded in
+  docs/review-backlog.md. Its mode `none` (a static list, no completion) is
+  `autoComplete="list"` with `filter: null`.
 - Fuzzy ranking or reordering inside the component; global ⌘K shortcuts; a `Dialog` part for
   the palette; grid palettes; selection in the inline mode.
 - Framework adapters other than React; fx.
