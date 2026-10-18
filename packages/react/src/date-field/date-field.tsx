@@ -501,7 +501,12 @@ function HiddenInput() {
   const value = ctx.view.values.value ?? null
   const latest = useRef(value)
   latest.current = value
-  const [mirror] = useState(() => () => ({ value: formValueOf(latest.current) }))
+  const granularity = ctx.base.granularity
+  const latestGranularity = useRef(granularity)
+  latestGranularity.current = granularity
+  const [mirror] = useState(() => () => ({
+    value: formValueOf(latest.current, latestGranularity.current),
+  }))
   useIsoLayoutEffect(() => {
     formInput.sync(mirror(), { dispatch: false })
   })

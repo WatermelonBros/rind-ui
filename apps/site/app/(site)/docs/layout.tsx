@@ -2,6 +2,8 @@ import type { ReactNode } from "react"
 import { type NavGroup, Sidebar } from "@/components/sidebar"
 import { pages } from "@/lib/docs"
 import styles from "./docs.module.css"
+// every component's skin (the landing loads only its own: skins/home.css)
+import "@/skins/index.css"
 
 /** "hidden-until-found" → "Hidden until found": guide titles are sentences, the nav wants names. */
 const shortLabel = (slug: string) => {

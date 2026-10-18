@@ -224,21 +224,33 @@ export function draftValue(draft: Draft, props: DateFieldProps, value: DateValue
 }
 
 /**
- * The hidden input's value for a value: its ISO text, as the native input normalises it (a
- * `datetime-local` drops zero seconds and every fraction).
+ * The one form-value normaliser (hidden input value, `min`, `max`): ISO text, a date-time
+ * truncated to the field's granularity so it never fails the input's `step`, and written as
+ * the native `datetime-local` normalises it (no zero seconds, no fractions). A date bound of a
+ * date-time field is its midnight.
  */
-export function formValueOf(v: DateValue | null): string {
-  if (v === null) return ""
-  if (v instanceof CalendarDateTime) {
-    const s = v.toString().slice(0, 19)
-    return v.second === 0 && v.millisecond === 0 ? s.slice(0, 16) : s
-  }
-  return v.toString()
+export function formValueOf(
+  v: DateValue | null | undefined,
+  granularity: DateGranularity = "second",
+  kind?: "date" | "datetime" | "zoned",
+): string {
+  if (v === null || v === undefined) return ""
+  if (v instanceof ZonedDateTime) return v.toString()
+  const time = v instanceof CalendarDateTime ? v : null
+  if (!time && kind !== "datetime") return v.toString()
+  const date = v.toString().slice(0, 10)
+  const two = (n: number) => String(n).padStart(2, "0")
+  const hour = two(time?.hour ?? 0)
+  const minute = granularity === "hour" ? "00" : two(time?.minute ?? 0)
+  const second = granularity === "second" ? (time?.second ?? 0) : 0
+  return `${date}T${hour}:${minute}${second === 0 ? "" : `:${two(second)}`}`
 }
-const iso = formValueOf
+/** The value as the hidden input holds it, at the field's granularity. */
+const iso = (args: Args, v: DateValue | null) =>
+  formValueOf(v, formatFor(args.props, v).options.granularity)
 
 function syncHidden(args: Args, v: DateValue | null, dispatch: boolean) {
-  args.env.formInput?.sync({ value: iso(v) }, { dispatch })
+  args.env.formInput?.sync({ value: iso(args, v) }, { dispatch })
 }
 
 function reportHint(args: Args) {

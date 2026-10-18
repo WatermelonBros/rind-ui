@@ -28,7 +28,7 @@ import {
   validityFlags,
 } from "../date-segments"
 import type { FieldControlProps } from "../shared/field-control"
-import type { DateFieldEvent } from "./date-field.machine"
+import { type DateFieldEvent, formValueOf } from "./date-field.machine"
 import { type DateFieldMessages, defaultPlaceholder } from "./date-field.messages"
 
 export type DateFieldPart =
@@ -368,14 +368,8 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
     /** The native input: name, value (ISO or ""), constraints, validity, reset, autofill. */
     hiddenInput: (): PartProps => {
       const native = input.kind !== "zoned"
-      const iso = (v: DateValue | null | undefined) => {
-        if (!v) return undefined
-        const s = v.toString()
-        if (input.kind !== "datetime") return s
-        // A date bound of a date-time field is its midnight; seconds only at second granularity.
-        const full = s.includes("T") ? s : `${s}T00:00:00`
-        return input.granularity === "second" ? full : full.slice(0, 16)
-      }
+      const iso = (v: DateValue | null | undefined) =>
+        v ? formValueOf(v, input.granularity, input.kind) : undefined
       return {
         ...part("hidden-input"),
         type:
@@ -391,7 +385,9 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
         required: field.required || undefined,
         disabled: field.disabled || undefined,
         autocomplete: input.autoComplete,
-        defaultValue: iso(input.defaultValue) ?? "",
+        // The current value: a controlled value is in the server's HTML, so a submit before
+        // hydration posts it (a reset is restored by the machine).
+        defaultValue: iso(input.value) ?? "",
         // The control's own validity reason, for drivers (contract query `validity`).
         "data-validity": reason ?? undefined,
         style: hiddenFormInputStyle,
