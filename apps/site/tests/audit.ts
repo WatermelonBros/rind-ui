@@ -125,6 +125,86 @@ async function targets(frame: Locator, url: string, where: string) {
   for (const t of small) report(url, "target-size", `${where}: ${t}`)
 }
 
+/**
+ * The focus ring of an example's first focusable element is at least 3:1 against the background
+ * it sits on (WCAG 1.4.11, 2.4.11). Real keyboard focus: Tab from the stage itself, so both
+ * :focus-visible and the parts' own data-focus-visible apply.
+ */
+async function focusRing(page: Page, frame: Locator, url: string, where: string) {
+  const stage = frame.locator("[data-skin]").first()
+  await stage.evaluate((s) => {
+    s.setAttribute("tabindex", "-1")
+    s.focus()
+  })
+  await page.keyboard.press("Tab")
+  await settled(page, url)
+  const result = await stage.evaluate((s) => {
+    s.removeAttribute("tabindex")
+    const active = document.activeElement
+    if (!(active instanceof HTMLElement) || !s.contains(active) || active === s) return null
+    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true })
+    /** Any CSS colour → [r, g, b, a] in sRGB, through the canvas (oklab, color-mix…). */
+    const rgba = (c: string): number[] => {
+      if (!ctx) return [0, 0, 0, 0]
+      ctx.clearRect(0, 0, 1, 1)
+      ctx.fillStyle = c
+      ctx.fillRect(0, 0, 1, 1)
+      const d = ctx.getImageData(0, 0, 1, 1).data
+      return [d[0] ?? 0, d[1] ?? 0, d[2] ?? 0, (d[3] ?? 0) / 255]
+    }
+    const lum = ([r = 0, g = 0, b = 0]: number[]) => {
+      const f = (v: number) => {
+        const x = v / 255
+        return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+      }
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+    }
+    /** The opaque background under an element: its own and its ancestors' fills, blended. */
+    const backdrop = (from: Element | null): number[] => {
+      const layers: number[][] = []
+      for (let n = from; n; n = n.parentElement) {
+        const c = rgba(getComputedStyle(n).backgroundColor)
+        if ((c[3] ?? 0) > 0) layers.push(c)
+        if ((c[3] ?? 0) >= 1) break
+      }
+      let out = [255, 255, 255]
+      for (const [r = 0, g = 0, b = 0, a = 0] of layers.reverse())
+        out = [
+          r * a + (out[0] ?? 0) * (1 - a),
+          g * a + (out[1] ?? 0) * (1 - a),
+          b * a + (out[2] ?? 0) * (1 - a),
+        ]
+      return out
+    }
+    // the ring is on the focused element or the part around it (a control, an item)
+    for (let n: HTMLElement | null = active; n && s.contains(n); n = n.parentElement) {
+      const cs = getComputedStyle(n)
+      let ring = ""
+      let inside = false
+      if (cs.outlineStyle !== "none" && Number.parseFloat(cs.outlineWidth) > 0) {
+        ring = cs.outlineColor
+        inside = Number.parseFloat(cs.outlineOffset) < 0
+      } else if (cs.boxShadow !== "none") {
+        ring = /(?:rgba?|oklab|oklch|color)\([^)]*\)/.exec(cs.boxShadow)?.[0] ?? ""
+        inside = cs.boxShadow.includes("inset")
+      }
+      if (!ring || (rgba(ring)[3] ?? 0) === 0) continue
+      const bg = backdrop(inside ? n : n.parentElement)
+      const [a, b] = [lum(rgba(ring)), lum(bg)]
+      const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+      const name = `${n.tagName.toLowerCase()}[data-part=${n.dataset["part"] ?? ""}]`
+      return { name, ring, bg: `rgb(${bg.map(Math.round).join(", ")})`, ratio }
+    }
+    return null
+  })
+  if (result && result.ratio < 3)
+    report(
+      url,
+      "focus-contrast",
+      `${where}: ${result.name} ring ${result.ring} on ${result.bg} is ${result.ratio.toFixed(2)}:1`,
+    )
+}
+
 async function exercise(page: Page, url: string) {
   const frames = page.locator("section[data-example]")
   for (let i = 0; i < (await frames.count()); i++) {
@@ -136,6 +216,7 @@ async function exercise(page: Page, url: string) {
     for (const skin of ["juicy", "bare", "crisp"]) {
       await frame.getByRole("radio", { name: skin, exact: true }).click()
       await targets(frame, url, `example ${i} ${skin}`)
+      await focusRing(page, frame, url, `example ${i} ${skin}`)
     }
     await frame.getByRole("button", { name: /Get code/ }).click()
     if ((await frame.locator("pre").count()) === 0) report(url, "code", `example ${i} has no code`)

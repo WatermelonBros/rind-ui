@@ -7,6 +7,7 @@
 import { execFileSync } from "node:child_process"
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { basename, join } from "node:path"
+import ts from "typescript"
 import type { ComponentMeta } from "../../../packages/core/src/components/meta.ts"
 import { llms, renderApi } from "../../../scripts/docs-gen.ts"
 // @ts-expect-error plain .mjs script, no types
@@ -127,29 +128,137 @@ writeFileSync(join(out, "llms.txt"), llms(tokens))
 const examplesDir = join(import.meta.dirname, "../examples")
 const skinsDir = join(import.meta.dirname, "../skins")
 
-/** `export function Name() {` … the first line that is exactly `}`. */
-function exampleSources(source: string): Record<string, string> {
-  const rind = /import \{([^}]+)\} from "@rind-ui\/react"/.exec(source)?.[1]?.split(",") ?? []
-  const out: Record<string, string> = {}
-  for (const m of source.matchAll(/^export function (\w+)\(\)[^\n]*\{\n[\s\S]*?\n\}$/gm)) {
-    // the guides' AttributeReadout is a site helper around the example: not part of its code
-    const lines: string[] = []
-    let inside = false
-    for (const line of m[0].replace(/^export /, "").split("\n")) {
-      if (/<AttributeReadout>/.test(line)) inside = true
-      else if (/<\/AttributeReadout>/.test(line)) inside = false
-      else lines.push(inside ? line.replace(/^ {2}/, "") : line)
+/** The guides' AttributeReadout is a site helper around the example: not part of its code. */
+function withoutReadout(text: string): string {
+  const lines: string[] = []
+  let inside = false
+  for (const line of text.split("\n")) {
+    if (/<AttributeReadout>/.test(line)) inside = true
+    else if (/<\/AttributeReadout>/.test(line)) inside = false
+    else lines.push(inside ? line.replace(/^ {2}/, "") : line)
+  }
+  return lines.join("\n")
+}
+
+/** Names a node reads (not property keys, member names or JSX attribute names). */
+function references(node: ts.Node, names: ReadonlySet<string>): Set<string> {
+  const found = new Set<string>()
+  const visit = (n: ts.Node): void => {
+    if (ts.isIdentifier(n) && names.has(n.text)) {
+      const p = n.parent
+      const key =
+        (ts.isPropertyAccessExpression(p) && p.name === n) ||
+        (ts.isQualifiedName(p) && p.right === n) ||
+        ((ts.isPropertyAssignment(p) ||
+          ts.isPropertySignature(p) ||
+          ts.isPropertyDeclaration(p) ||
+          ts.isMethodDeclaration(p) ||
+          ts.isMethodSignature(p) ||
+          ts.isJsxAttribute(p)) &&
+          p.name === n) ||
+        (ts.isBindingElement(p) && p.propertyName === n)
+      if (!key) found.add(n.text)
     }
-    const body = lines.join("\n")
-    const used = rind.map((s) => s.trim()).filter((n) => n && new RegExp(`\\b${n}\\b`).test(body))
-    const hooks = ["useState", "useRef", "useEffect"].filter((h) =>
-      new RegExp(`\\b${h}[(<]`).test(body),
+    n.forEachChild(visit)
+  }
+  visit(node)
+  return found
+}
+
+/**
+ * Each exported `function Name()` with what it needs to run as is: the imports it uses and
+ * every module-level declaration it references, transitively, in source order. Site-only
+ * imports (relative paths) are never shown; the guard below fails on any name left undefined.
+ */
+function exampleSources(file: string, source: string): Record<string, string> {
+  const sf = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  const imported = new Map<
+    string,
+    { module: string; text: string; kind: "named" | "default" | "ns" }
+  >()
+  const declared = new Map<string, ts.Statement>()
+  for (const s of sf.statements) {
+    if (ts.isImportDeclaration(s) && ts.isStringLiteral(s.moduleSpecifier) && s.importClause) {
+      const module = s.moduleSpecifier.text
+      const clause = s.importClause
+      const typeOnly = clause.isTypeOnly ? "type " : ""
+      if (clause.name)
+        imported.set(clause.name.text, { module, text: clause.name.text, kind: "default" })
+      const b = clause.namedBindings
+      if (b && ts.isNamespaceImport(b))
+        imported.set(b.name.text, { module, text: b.name.text, kind: "ns" })
+      if (b && ts.isNamedImports(b))
+        for (const e of b.elements)
+          imported.set(e.name.text, { module, text: typeOnly + e.getText(), kind: "named" })
+      continue
+    }
+    const names: string[] = []
+    if (
+      (ts.isFunctionDeclaration(s) ||
+        ts.isClassDeclaration(s) ||
+        ts.isInterfaceDeclaration(s) ||
+        ts.isTypeAliasDeclaration(s) ||
+        ts.isEnumDeclaration(s)) &&
+      s.name
     )
-    const imports = [
-      used.length ? `import { ${used.join(", ")} } from "@rind-ui/react"` : "",
-      hooks.length ? `import { ${hooks.join(", ")} } from "react"` : "",
-    ].filter(Boolean)
-    out[m[1] ?? ""] = `${imports.join("\n")}\n\nexport ${body}\n`
+      names.push(s.name.text)
+    if (ts.isVariableStatement(s))
+      for (const d of s.declarationList.declarations)
+        if (ts.isIdentifier(d.name)) names.push(d.name.text)
+    for (const n of names) declared.set(n, s)
+  }
+  const all = new Set([...imported.keys(), ...declared.keys()])
+  const isExported = (s: ts.Statement) =>
+    ts.canHaveModifiers(s) &&
+    !!ts.getModifiers(s)?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  const out: Record<string, string> = {}
+  for (const main of sf.statements) {
+    if (
+      !ts.isFunctionDeclaration(main) ||
+      !main.name ||
+      !isExported(main) ||
+      main.parameters.length
+    )
+      continue
+    const keep = new Set<ts.Statement>([main])
+    const used = new Set<string>()
+    const queue: ts.Statement[] = [main]
+    for (let s = queue.pop(); s; s = queue.pop()) {
+      for (const n of references(s, all)) {
+        if (n === "AttributeReadout") continue
+        used.add(n)
+        const d = declared.get(n)
+        if (d && !keep.has(d)) {
+          keep.add(d)
+          queue.push(d)
+        }
+      }
+    }
+    const modules = new Map<string, { named: string[]; head: string[] }>()
+    for (const [name, i] of imported) {
+      if (!used.has(name) || /^\.\.?\//.test(i.module)) continue
+      const m = modules.get(i.module) ?? { named: [], head: [] }
+      if (i.kind === "named") m.named.push(i.text)
+      else m.head.push(i.kind === "ns" ? `* as ${i.text}` : i.text)
+      modules.set(i.module, m)
+    }
+    const imports = [...modules].map(([module, m]) => {
+      const parts = [...m.head, ...(m.named.length ? [`{ ${m.named.join(", ")} }`] : [])]
+      return `import ${parts.join(", ")} from "${module}"`
+    })
+    const body = sf.statements
+      .filter((s) => keep.has(s))
+      .map((s) => {
+        // a helper keeps its comment; lint suppressions are the site's own
+        const comments = s === main ? "" : source.slice(s.getFullStart(), s.getStart()).trim()
+        const text = s === main ? s.getText() : s.getText().replace(/^export /, "")
+        return withoutReadout(
+          [comments.replace(/^\s*\/\/ biome-ignore.*$\n?/gm, "").trim(), text]
+            .filter(Boolean)
+            .join("\n"),
+        )
+      })
+    out[main.name.text] = `${imports.join("\n")}\n\n${body.join("\n\n")}\n`
   }
   return out
 }
@@ -181,9 +290,46 @@ const examples: Record<string, { code: Record<string, string>; css: string }> = 
 for (const f of readdirSync(examplesDir).filter((f) => f.endsWith(".tsx"))) {
   const slug = basename(f, ".tsx")
   examples[slug] = {
-    code: exampleSources(readFileSync(join(examplesDir, f), "utf8")),
+    code: exampleSources(f, readFileSync(join(examplesDir, f), "utf8")),
     css: skinCss(slug),
   }
+}
+// Guard: copied code runs as is. Every name a shown snippet reads must be defined or imported
+// in it. Imports are not resolved (the packages may not be built yet): only free names count.
+{
+  const snippets = new Map<string, string>()
+  for (const [slug, { code }] of Object.entries(examples))
+    for (const [name, text] of Object.entries(code))
+      snippets.set(join(examplesDir, "__shown__", slug, `${name}.tsx`), text)
+  const options: ts.CompilerOptions = {
+    noResolve: true,
+    types: ["react"],
+    lib: ["lib.esnext.d.ts", "lib.dom.d.ts", "lib.dom.iterable.d.ts"],
+    jsx: ts.JsxEmit.Preserve,
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    noEmit: true,
+  }
+  const host = ts.createCompilerHost(options)
+  const read = host.getSourceFile.bind(host)
+  host.getSourceFile = (file, lang, ...rest) => {
+    const text = snippets.get(file)
+    return text === undefined ? read(file, lang, ...rest) : ts.createSourceFile(file, text, lang)
+  }
+  const program = ts.createProgram([...snippets.keys()], options, host)
+  // cannot find name / namespace, did you mean, shorthand property with no value in scope
+  const free = new Set([2304, 2503, 2552, 18004])
+  const problems = [...snippets.keys()].flatMap((file) =>
+    program
+      .getSemanticDiagnostics(program.getSourceFile(file))
+      .filter((d) => free.has(d.code))
+      .map(
+        (d) =>
+          `examples/${file.split("__shown__/")[1]}: ${ts.flattenDiagnosticMessageText(d.messageText, " ")}`,
+      ),
+  )
+  if (problems.length)
+    throw new Error(`shown example code is not self-contained:\n${problems.join("\n")}`)
 }
 writeFileSync(join(out, "examples.json"), `${JSON.stringify(examples, null, 2)}\n`)
 

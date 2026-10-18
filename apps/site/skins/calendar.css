@@ -96,7 +96,7 @@
   )[data-focus-visible],
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-focus-visible] {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="calendar"][data-part="grid"] {
