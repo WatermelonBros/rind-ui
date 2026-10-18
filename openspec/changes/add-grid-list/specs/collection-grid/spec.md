@@ -25,7 +25,10 @@ controls SHALL have only position 0.
 
 ### Requirement: Navigation Behaviours
 
-A grid component SHALL accept `childNavigation` `arrow` (default) or `tab`.
+A grid component SHALL accept `childNavigation` `arrow` (default) or `tab`. With
+`layout="grid"` the child navigation SHALL be `tab` whatever the prop (ArrowLeft and
+ArrowRight move between the items there, so the controls are reached with Tab), and
+`data-child-navigation` SHALL say so.
 
 With `arrow`: every control SHALL have `tabIndex=-1`; ArrowRight on a row (mirrored under
 `dir="rtl"`) SHALL focus its first control and on a control the next control; ArrowLeft the
@@ -159,3 +162,9 @@ SHALL receive logical events only.
 - **WHEN** `NAVIGATE_CHILD next` is sent in a node-environment test with a row that has
   two controls registered
 - **THEN** `childIndex` becomes 1 and the effect requests focus on the first control
+
+#### Scenario: Grid layout reaches the controls with Tab
+
+- **WHEN** a `layout="grid"` list with `childNavigation="arrow"` has a card with a button and the card is focused
+- **THEN** ArrowRight moves to the next card, the list has `data-child-navigation="tab"`, and Tab focuses the card's button
+

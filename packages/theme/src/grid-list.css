@@ -1,0 +1,146 @@
+/*
+ * Grid List: rows with their own controls (family `collection item`). Tier-3 tokens are read
+ * with semantic fallbacks, never declared. A selected row carries a background, a heavier
+ * weight AND its checkbox or state (WCAG 1.4.1: never colour alone). The highlight is the
+ * roving row; a row whose control has keyboard focus shows it as `data-focus-visible-within`.
+ * `data-layout="grid"` lays rows out in columns (`--rind-grid-list-columns`); the list and
+ * the rows are never `display: contents` (their roles must stay in the tree).
+ */
+@layer rind.components {
+  :where([data-scope="grid-list"][data-part="list"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-grid-list-gap, var(--rind-space-1));
+    margin: 0;
+    padding: var(--rind-grid-list-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid var(--rind-grid-list-border, var(--rind-color-border));
+    border-radius: var(--rind-grid-list-radius, var(--rind-radius-control));
+    background: var(--rind-grid-list-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font: inherit;
+    overflow: auto;
+  }
+
+  :where([data-scope="grid-list"][data-part="list"][data-layout="grid"]) {
+    display: grid;
+    grid-template-columns: var(
+        --rind-grid-list-columns,
+        repeat(auto-fill, minmax(var(--rind-grid-list-column-min, 12rem), 1fr))
+      );
+  }
+
+  :where([data-scope="grid-list"][data-part="label"]) {
+    display: block;
+    margin-block-end: var(--rind-space-1);
+    font-size: var(--rind-text-sm);
+    font-weight: 580;
+  }
+
+  :where([data-scope="grid-list"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-grid-list-item-min-height, var(--rind-hit-area));
+    padding: var(--rind-grid-list-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border: var(--rind-border-width) solid var(--rind-grid-list-item-border, transparent);
+    border-radius: var(--rind-grid-list-item-radius, var(--rind-radius-sm));
+    cursor: default;
+    user-select: none;
+  }
+
+  :where([data-scope="grid-list"][data-part="item"][data-hover]) {
+    background: var(--rind-grid-list-item-hover-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="grid-list"][data-part="item"][data-highlighted]) {
+    background: var(--rind-grid-list-item-highlight-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="grid-list"][data-part="item"][data-state="selected"]) {
+    background: var(--rind-grid-list-item-selected-bg, var(--rind-color-accent-soft));
+    color: var(--rind-grid-list-item-selected-text, var(--rind-color-accent-text));
+    font-weight: 600;
+  }
+
+  :where([data-scope="grid-list"][data-part="item"][data-focus-visible-within]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-width) * -1);
+  }
+
+  :where([data-scope="grid-list"][data-part="item"][data-disabled]) {
+    color: var(--rind-grid-list-item-disabled-text, var(--rind-color-text-disabled));
+  }
+
+  :where([data-scope="grid-list"][data-part="item"]:is([href], [data-current])) {
+    cursor: pointer;
+  }
+
+  :where([data-scope="grid-list"][data-part="item-text"]) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+  }
+
+  :where([data-scope="grid-list"][data-part="item-description"]) {
+    color: var(--rind-grid-list-description-text, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="grid-list"][data-part="item-checkbox"]) {
+    flex: none;
+    inline-size: var(--rind-grid-list-checkbox-size, 1rem);
+    block-size: var(--rind-grid-list-checkbox-size, 1rem);
+    margin: 0;
+    accent-color: var(--rind-color-accent);
+  }
+
+  /* Controls keep a 24px target and their own ring. */
+  :where([data-scope="grid-list"][data-part="item-control"]) {
+    flex: none;
+    min-inline-size: 24px;
+    min-block-size: 24px;
+  }
+
+  :where([data-scope="grid-list"][data-part="empty"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-grid-list-empty-text, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="grid-list"][data-part="load-more"]) {
+    padding: var(--rind-space-2);
+    color: var(--rind-color-text-muted);
+    text-align: center;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="grid-list"][data-part="list"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="grid-list"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+
+    :where([data-scope="grid-list"][data-part="item"][data-state="selected"]) {
+      background: SelectedItem;
+      color: SelectedItemText;
+      forced-color-adjust: none;
+    }
+
+    :where(
+        [data-scope="grid-list"][data-part="item"]:is(
+          [data-focus-visible],
+          [data-focus-visible-within]
+        )
+      ) {
+      outline: 3px solid Highlight;
+      outline-offset: -3px;
+    }
+
+    :where([data-scope="grid-list"][data-part="item"][data-disabled]) {
+      color: GrayText;
+    }
+  }
+}
