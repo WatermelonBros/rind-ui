@@ -1,0 +1,9 @@
+- menubar "Application (open)":
+  - menuitem "File"
+  - menuitem "Edit" [expanded]
+  - menuitem "View"
+- menu "Edit":
+  - menuitem "Undo"
+  - menuitem "Redo" [disabled]
+  - separator
+  - menuitem "Find…"

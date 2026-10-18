@@ -390,6 +390,16 @@ export function collectDom(arg: {
 
   const active = doc.activeElement
   const activePart = active?.closest(selector)
+  // A popup the instance controls (a menubar item's open menu, portalled elsewhere) is the
+  // component's too: focus moving into it has not left.
+  const inControlled =
+    active != null &&
+    elements.some((el) =>
+      (el.getAttribute("aria-controls") ?? "")
+        .split(/\s+/)
+        .filter(Boolean)
+        .some((id) => doc.getElementById(id)?.contains(active) === true),
+    )
   const fieldRoot = partEls[0]?.closest('[data-scope="field"][data-part="root"]') ?? null
   const fieldPart = (part: string) =>
     fieldRoot
@@ -424,7 +434,7 @@ export function collectDom(arg: {
     focus: {
       onBody: active === null || active === doc.body,
       part: activePart?.getAttribute("data-part") ?? null,
-      inInstance: activePart != null,
+      inInstance: activePart != null || inControlled,
       element: active && active !== doc.body ? info(active) : null,
     },
     html: attrsOf(doc.documentElement),

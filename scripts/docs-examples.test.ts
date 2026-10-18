@@ -33,6 +33,8 @@ const ROOT_ALIASES: Readonly<Record<string, string | readonly string[]>> = {
   "Avatar.Group": "Avatar",
   // A context menu's root is the Menu's root level: Menu parts go inside it.
   "ContextMenu.Root": ["ContextMenu", "Menu"],
+  // A menubar's menu is a Menu root level inside the bar: Menu and Menubar parts go in it.
+  "Menubar.Menu": ["Menu", "Menubar"],
 }
 
 /** Problems in one example: parts used outside an open Root of their component. */

@@ -1,0 +1,103 @@
+/* ── Tag Group: inked stickers in crisp, soft candy pills in juicy ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="root"] {
+  display: grid;
+  gap: 6px;
+  font: 500 14px / 1.3 var(--s-font);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="label"] {
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"]:is([data-part="description"], [data-part="empty"]) {
+  color: var(--s-ink);
+  opacity: 0.75;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="list"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border-radius: var(--s-r-sm);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="item"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background: var(--s-muted);
+  color: var(--s-ink);
+  white-space: nowrap;
+  cursor: default;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item"]:is([data-link], [data-hover]) {
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item"][data-selected] {
+  background: var(--s-ink);
+  color: var(--s-on);
+  border-color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item"][data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="item-cell"] {
+  display: contents;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="item-text"] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+  text-decoration: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="tag-group"][data-part="item-remove"] {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-inline-end: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item-remove"]::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tag-group"][data-part="item-remove"]:hover {
+  background: color-mix(in oklab, currentColor 15%, transparent);
+}
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="tag-group"][data-part="item"] {
+  border-color: var(--s-ink);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="tag-group"][data-part="item"] {
+  background: var(--s-acc);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="tag-group"][data-part="item"][data-selected] {
+  background: var(--s-ink);
+  color: var(--s-on);
+}

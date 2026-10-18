@@ -188,6 +188,39 @@ To `add-theme-system` (`theme-variants`, Family Matrix):
 
 5. **APPLIED (coordinator, 2026-10-14) — `toggle item` row only; the Menubar root in `panel` was not in the approved scope.** Add "Menubar trigger" to the `toggle item` row, and the Menubar root to `panel`.
 
+## Implementation notes
+
+Where the implementation settled details this design left open or changed:
+
+- **The menus port.** The machine drives its menus through a `menus` prop (`open(key,
+  { modality, edge })`, `close(key, { switching })`) that the React Root implements over
+  each menu level's service: `switching` sends `TREE.SIBLING_OPENED` (no focus restore),
+  otherwise `CLOSE`. The port is idempotent, so a parent's `value` repeating what already
+  happened changes nothing. A menu's own close reaches the bar as `MENU_CLOSED` from its
+  `onOpenChange`; closes the bar caused are not reported back.
+- **Not bound to a state.** `value` is any string, so the state is not a `values.states`
+  binding: a parent's value arrives as `VALUE.SYNC` (`onProps`) and a refused proposal as
+  `$reverted`, both re-syncing the menus. An initial value opens its menu on mount.
+- **Reasons are kebab case** (`trigger`, `trigger-key`, `hover`, `menu-navigate`, `api`,
+  and the menu's close reason). One `MENU_CLOSED` transition passes the menu's reason
+  through: the runtime now accepts a transition `reason` computed from the event.
+- **Enter and Space are the trigger's press** (`TRIGGER_PRESS` with keyboard modality),
+  not `TRIGGER_KEY`; the item's own keydown handles only the arrows that open.
+- **A press right after a hover switch keeps the menu.** A real click on another item
+  hovers it first (switching), then presses it; the press completes the hover instead of
+  closing what it just opened (`hoverOpened` context).
+- **Tab on a bar item while a menu is open** closes it (`CLOSE` with `tab-key`).
+- **Sibling menus are not parent and child.** The bar is inside the open menu's layer, so
+  the next menu's opener would make it the closing menu's child (and dismissed with it). A
+  root level hosted by a menubar declares `parentKinds` without `menu`.
+- **`MenuTreeHost.press(key, modality)`**: the bar needs the press's modality.
+- **The trigger keeps the menu's scope** (`data-scope="menu"`, the menu's instance) and
+  carries `data-host="menubar"`; the menu contract gains a variant located by role
+  `menuitem` (`menubarMenuContract`) for `getMenubar(…).menu(name)`.
+- **Testing: focus in a controlled popup is inside.** The generic focus invariant counts
+  an element referenced by `aria-controls` from inside the instance (the open, portalled
+  menu) as the component's.
+
 ## Risks / Trade-offs
 
 - [Keyboard switching focuses the first item, APG's second option] → it needs no new

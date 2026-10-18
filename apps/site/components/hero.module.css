@@ -226,7 +226,20 @@
     grid-template-columns: 1fr;
     padding: 96px 20px 64px;
   }
+  /* the specimens follow the copy: in flow, wrapped, keeping their tilt */
   .stage {
-    display: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 28px 18px;
+    min-height: 0;
+    margin-top: 40px;
+  }
+  .card,
+  .float {
+    position: relative;
+    /* biome-ignore lint/complexity/noImportantStyles: the desktop layout places each specimen with inline top/left; in flow they must not apply */
+    inset: auto !important;
   }
 }

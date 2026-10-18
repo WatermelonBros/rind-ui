@@ -148,8 +148,8 @@ describe("createMenuTree", () => {
     expect(tree.parentElements()).toEqual([el])
     tree.parentNavigate({ from: id("root"), direction: "expand" })
     expect(host.navigate).toHaveBeenCalledWith({ from: id("root"), direction: "expand" })
-    tree.parentPress(key)
-    expect(host.press).toHaveBeenCalledWith(key)
+    tree.parentPress(key, "pointer")
+    expect(host.press).toHaveBeenCalledWith(key, "pointer")
   })
 
   it("parent* default to null, [] and no-ops without a host", () => {
@@ -157,6 +157,6 @@ describe("createMenuTree", () => {
     expect(tree.parentKind()).toBeNull()
     expect(tree.parentElements()).toEqual([])
     expect(() => tree.parentNavigate({ from: id("root"), direction: "collapse" })).not.toThrow()
-    expect(() => tree.parentPress(collectionKey("k"))).not.toThrow()
+    expect(() => tree.parentPress(collectionKey("k"), "keyboard")).not.toThrow()
   })
 })
