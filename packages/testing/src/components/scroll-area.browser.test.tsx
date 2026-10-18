@@ -5,9 +5,13 @@ import { Dialog, ScrollArea, type ScrollAreaRootProps } from "@rind-ui/react"
 import { cleanup, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import type { CSSProperties, ReactNode } from "react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
-import { getScrollArea } from "../index"
+import { allowRindWarning, getScrollArea } from "../index"
+
+// The fixture's Viewport is unnamed unless a test passes `label`: with text-only overflowing
+// content it is a tab stop, and the name check logs (the naming tests assert it themselves).
+beforeEach(() => allowRindWarning(/scroll-area: the Viewport is a tab stop .* but has no name/))
 
 afterEach(() => {
   cleanup()

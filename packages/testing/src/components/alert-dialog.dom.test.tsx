@@ -629,6 +629,8 @@ describe("Title heading level", () => {
   })
 
   it("A Heading inside the content is one level deeper than the title", async () => {
+    // a title-only fixture: the description check logs in some engines
+    allowRindWarning(/alert-dialog: .* has no description/)
     render(
       <AlertDialog.Root defaultOpen>
         <AlertDialog.Content aria-label="X">
