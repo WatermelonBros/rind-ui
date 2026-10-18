@@ -5,12 +5,12 @@
 
 ## 1. Calendar range (PR 1)
 
-- [ ] 1.1 Machine: `selectionMode="range"`, anchor, preview, cancel and leave, `minRangeLength` / `maxRangeLength`, unavailable dates in ranges (`allowsNonContiguousRanges`)
-- [ ] 1.2 Connect: range data attributes (`data-range-start`, `data-range-end`, `data-in-range`, `data-preview`, anchor), prompts, polite announcements, messages
-- [ ] 1.3 Reusable range helpers exported
-- [ ] 1.4 Contract range actions and queries, range invariants; model classes: single, range, range with min/max length, range with unavailable dates (contiguous and not), RTL, every modality
-- [ ] 1.5 React parts and tests (dom, browser, hydrate, reading order) for every range scenario and cited regression
-- [ ] 1.6 Theme: range band in `calendar.css` (start, end, in-range, preview dashed, forced colors); site skin; examples, state examples, ARIA snapshots; docs section
+- [x] 1.1 Machine: `selectionMode="range"`, anchor, preview, cancel and leave, `minRangeLength` / `maxRangeLength`, unavailable dates in ranges (`allowsNonContiguousRanges`)
+- [x] 1.2 Connect: range data attributes (`data-range-start`, `data-range-end`, `data-in-range`, `data-preview`, anchor), prompts, polite announcements, messages
+- [x] 1.3 Reusable range helpers exported
+- [x] 1.4 Contract range actions and queries, range invariants; model classes: single, range, range with min/max length, range with unavailable dates (contiguous and not), RTL, every modality
+- [x] 1.5 React parts and tests (dom, browser, hydrate, reading order) for every range scenario and cited regression
+- [x] 1.6 Theme: range band in `calendar.css` (start, end, in-range, preview dashed, forced colors); site skin; examples, state examples, ARIA snapshots; docs section
 
 ## 1b. Drag selection (PR 1b)
 

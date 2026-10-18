@@ -63,7 +63,8 @@ export function toGraph(machine: AnyMachine): MachineGraph {
       }
     }
   }
-  for (const [prop, event] of Object.entries(def.onProps ?? {})) {
+  for (const [prop, entry] of Object.entries(def.onProps ?? {})) {
+    const event = typeof entry === "string" ? entry : entry.event
     for (const edge of edges.filter((e) => e.event === event)) {
       edges.push({ ...edge, event: `$props:${prop}` })
     }

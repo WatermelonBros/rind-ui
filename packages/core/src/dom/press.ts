@@ -346,6 +346,10 @@ export function createPress(options: PressOptions): PressHandle {
     // A descendant overflowing the box (an extended tap area) is the part too (mui/base-ui#3184).
     const at = e.target as Node | null
     if (at && "nodeType" in at && target.contains(at)) return true
+    // Inside a shadow root a document listener sees the host as the target: the composed
+    // path still holds the part (react-spectrum#10330).
+    const path = (e as { composedPath?: () => EventTarget[] }).composedPath?.()
+    if (path?.includes(target)) return true
     const rect = target.getBoundingClientRect()
     if (rect.width === 0 && rect.height === 0) return true
     const dx = (e.width || 0) / 2
