@@ -224,6 +224,8 @@ for (const url of urls) {
   page.on("pageerror", (e) => report(url, "pageerror", e.message))
   // a step that throws (a click that times out, a wait past its deadline) is a finding with
   // its page, not a crash that hides which page and step failed
+  // AUDIT_TRACE=1 names each page as it starts, to find one that stalls
+  if (process.env["AUDIT_TRACE"]) console.error(`… ${url}`)
   try {
     // deadlines, not delays: a slow CI runner gets 60 s to parse and 60 s to hydrate
     await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })

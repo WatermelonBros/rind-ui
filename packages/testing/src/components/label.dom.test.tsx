@@ -2,7 +2,7 @@ import { Label } from "@rind-ui/react"
 import { fireEvent, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { domEnv, getLabel, navigationLog } from "../index"
+import { domEnv, expectRindWarning, getLabel, navigationLog } from "../index"
 
 describe("Label smoke", () => {
   it("for an input: names it, click focuses, double click selects nothing", async () => {
@@ -56,6 +56,8 @@ afterEach(() => {
 
 describe("Label anatomy and association", () => {
   it("renders a native label with for and the scope attributes", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/label "Email": for="email" points at no element/)
     render(<Label htmlFor="email">Email</Label>)
     const el = screen.getByText("Email")
     expect(el.tagName).toBe("LABEL")
@@ -92,6 +94,8 @@ describe("Label anatomy and association", () => {
   })
 
   it("forwards every label attribute and keeps a consumer id", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/label "T": for="x" points at no element/)
     render(
       <Label id="mine" htmlFor="x" className="c" data-extra="1">
         T

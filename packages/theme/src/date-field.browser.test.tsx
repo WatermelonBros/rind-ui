@@ -119,4 +119,27 @@ describe("Date Field stylesheet", () => {
     )
     expect(css).not.toMatch(/row-reverse|(?<![-\w])order:/)
   })
+
+  it("range mode: one bordered group; the ends' inputs draw nothing; the separator is muted", () => {
+    sheet()
+    render(
+      <RindProvider
+        locale="en-US"
+        environment={{ dateClock: fixedDateClock("2026-10-17T12:00:00Z", "UTC") }}
+      >
+        <DateField.Root selectionMode="range">
+          <DateField.Label>Stay</DateField.Label>
+          <DateField.Input />
+        </DateField.Root>
+      </RindProvider>,
+    )
+    const groups = document.querySelectorAll<HTMLElement>('[data-part="input"]')
+    const outer = groups[0] as HTMLElement
+    expect(Number.parseFloat(getComputedStyle(outer).borderTopWidth)).toBeGreaterThan(0)
+    for (const inner of Array.from(groups).slice(1)) {
+      expect(getComputedStyle(inner).borderTopWidth).toBe("0px")
+    }
+    const sep = document.querySelector<HTMLElement>('[data-part="separator"]') as HTMLElement
+    expect(getComputedStyle(sep).color).not.toBe(getComputedStyle(outer).color)
+  })
 })

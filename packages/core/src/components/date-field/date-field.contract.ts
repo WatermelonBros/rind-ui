@@ -42,7 +42,7 @@ async function editable(env: E): Promise<readonly { type: DateSegmentType; part:
 }
 
 /** The digits (or letter) to type into each segment for an ISO date or date-time. */
-function keysFor(type: DateSegmentType, iso: string, twelveHour: boolean): string {
+export function keysFor(type: DateSegmentType, iso: string, twelveHour: boolean): string {
   const [date = "", time = ""] = iso.split("T")
   const [y = "", m = "", d = ""] = date.split("-")
   const [h = "0", min = "0", s = "0"] = time.split(":")

@@ -136,6 +136,28 @@ import { createCalendar } from "@internationalized/date"
 <DateField.Root locale="ja-JP-u-ca-japanese" createCalendar={createCalendar}>
 ```
 
+## Date ranges
+
+`selectionMode="range"` makes one field of two ends: a `start` and an `end` group of segments with a separator, inside one group named by the Label. The value is `{ start, end }` or `null`.
+
+```tsx
+<DateField.Root selectionMode="range" startName="from" endName="to">
+  <DateField.Label>Stay</DateField.Label>
+  <DateField.Input />
+  <DateField.ErrorMessage />
+</DateField.Root>
+```
+
+- **One value, once.** The value is the range only while both ends are complete, in order and valid. A partial range is `null`. `onValueChange` is called once each time the range changes, never while one end is half-typed.
+- **The ends never edit each other.** An end typed before the start is kept as typed and reported invalid ("End date must be on or after the start date"); nothing is moved or clamped. Each end's own problem is named after it ("Start date: Enter a valid date").
+- **Unavailable dates.** With `isDateUnavailable`, a range containing an unavailable day is invalid ("The range includes an unavailable date"), unless `allowsNonContiguousRanges`.
+- **Focus.** Typing past the start's last segment moves to the end; Backspace in an empty first end segment goes back to the start; the arrows move across both ends as they are shown (mirrored in right-to-left).
+- **Names.** Each segment is named by its segment name, the end ("Start date", "End date") and the Label. The group is described by "Selected range: … to …".
+- **Forms.** Two hidden inputs, `startName` and `endName`, hold the ends' ISO values only while the range is valid, else empty strings. A form reset restores the default range; select all and Backspace clears both ends; a browser autofill of either input is adopted.
+- **Parts.** Render `DateField.Start`, `DateField.Separator` and `DateField.End` inside `DateField.Input` to lay them out yourself.
+
+The strings are in `messages`: `startDate`, `endDate`, `separator`, `rangeDescription`, `endProblem`, `endBeforeStart`, `containsUnavailable`.
+
 ## Field integration
 
 The Root is a Field when alone and joins the enclosing Field or [Fieldset](fieldset.md) otherwise: `disabled`, `required`, `invalid`, `errors`, `validate`, `validationMode` and `fieldMessages` work as on [Text Field](text-field.md). Inside a Field, use that Field's Label, Description and ErrorMessage.
@@ -164,6 +186,8 @@ const birthday = getDateField(screen, { name: "Birthday" })
 await birthday.fill("1990-12-01")
 expect(await birthday.value()).toBe("1990-12-01")
 ```
+
+In range mode, `getDateField(screen, { name: "Stay", selectionMode: "range" })` returns a driver with `fill({ start, end })`, `fillStart(date)`, `fillEnd(date)`, `typeSegment(edge, type, text)`, `clear()` and `resetForm()`, and the queries `range()` (both hidden inputs), `segments(edge)`, `isInvalid()`, `invalidEdge()` and `isComplete()`.
 
 ## Tested with
 

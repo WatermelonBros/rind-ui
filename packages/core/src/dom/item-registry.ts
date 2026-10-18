@@ -29,6 +29,34 @@ export interface ItemRegistry {
   flush(): void
 }
 
+/**
+ * The text of an item with no visible text (an icon button, a field): its accessible name from
+ * aria-label, aria-labelledby, its labels, a named control inside it or title, so typeahead and
+ * announcements still have one.
+ */
+function nameOf(element: Element): string {
+  const label = element.getAttribute("aria-label")?.trim()
+  if (label) return label
+  const doc = element.ownerDocument
+  const byIds = (element.getAttribute("aria-labelledby") ?? "")
+    .split(/\s+/)
+    .map((id) => (id ? (doc.getElementById(id)?.textContent?.trim() ?? "") : ""))
+    .filter(Boolean)
+    .join(" ")
+  if (byIds) return byIds
+  // A labelable control (an input in a toolbar) named by its <label>.
+  const labels = (element as Element & { labels?: NodeListOf<HTMLLabelElement> | null }).labels
+  const labelled = [...(labels ?? [])]
+    .map((l) => l.textContent?.trim() ?? "")
+    .join(" ")
+    .trim()
+  if (labelled) return labelled
+  // An item wrapping its named control (a radio group's item around its ItemControl).
+  const inner = element.querySelector("[aria-label]")?.getAttribute("aria-label")?.trim()
+  if (inner) return inner
+  return element.getAttribute("title")?.trim() ?? ""
+}
+
 const inDocumentOrder = (a: Element, b: Element) =>
   a === b ? 0 : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
 
@@ -59,7 +87,7 @@ export function createItemRegistry(
     emitted = list
     onChange(
       list.map((it) => {
-        const text = it.textValue ?? it.element.textContent?.trim() ?? ""
+        const text = it.textValue ?? (it.element.textContent?.trim() || nameOf(it.element))
         if (it.textValue === undefined && text === "" && process.env.NODE_ENV !== "production") {
           if (!warned.has(it.key)) {
             warned.add(it.key)

@@ -10,7 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { FieldInput } from "../../fixtures/field/field-input"
 // The shared host helper is not part of the public barrel (Number/Pin/Password/Search use it).
 import { composeInPage } from "../adapters/compose"
-import { getButton, getTextField, installAnnouncementLog } from "../index"
+import { expectRindWarning, getButton, getTextField, installAnnouncementLog } from "../index"
 
 const platform = domEnvironment().platform
 const inJsdom = navigator.userAgent.includes("jsdom")
@@ -103,6 +103,8 @@ describe("TextField anatomy", () => {
   })
 
   it("dev error for zero and for two controls", () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/field: a second control .* is inside one Field/)
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     const none = render(
       <TextField.Root>

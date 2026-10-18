@@ -83,15 +83,19 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     const host = useHost("List")
     useSelector(host.service, (v) => v)
     const el = useRef<HTMLDivElement | null>(null)
-    // Development: a list needs a name (mui/base-ui#5569).
+    // Development: a list needs a name (mui/base-ui#5569). Checked after the re-render a
+    // Label's mount causes (its layout effect), not on the first commit.
     useEffect(() => {
       const node = el.current
       if (process.env.NODE_ENV === "production" || !node) return
-      if (!node.hasAttribute("aria-label") && !node.hasAttribute("aria-labelledby")) {
-        console.warn(
-          `[rind-ui] ${host.name}: the list has no accessible name; render a Label or pass aria-label / aria-labelledby.`,
-        )
-      }
+      queueMicrotask(() => {
+        if (!node.isConnected) return
+        if (!node.hasAttribute("aria-label") && !node.hasAttribute("aria-labelledby")) {
+          console.warn(
+            `[rind-ui] ${host.name}: the list has no accessible name; render a Label or pass aria-label / aria-labelledby.`,
+          )
+        }
+      })
     }, [host.name])
     const naming = {
       "aria-label": rest["aria-label"],

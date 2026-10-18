@@ -66,6 +66,12 @@ import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"
 import { useModality } from "../use-modality"
+import {
+  DateRangeFieldRoot,
+  type DateRangeFieldRootProps,
+  DateRangeInput,
+  useDateRange,
+} from "./date-range-field"
 
 declare module "../provider" {
   interface RindMessageScopes {
@@ -214,6 +220,8 @@ export type DateFieldRootProps = Omit<
   readonly onBoundary?: (boundary: DateFieldBoundary) => void
   /** The committed year, month and day (a host following the typed date). */
   readonly onDraftChange?: (hint: DateFieldDraftHint) => void
+  /** Embedded: select all + Backspace cleared the field (a range clears both ends). */
+  readonly onClearAll?: () => void
   /** Arrows move across every field's segments inside this element (paired fields). */
   readonly segmentScope?: { readonly current: HTMLElement | null }
   // Field props (the Root is a Field when not inside one).
@@ -228,9 +236,20 @@ export type DateFieldRootProps = Omit<
   readonly validationBehavior?: ValidationBehavior
   readonly validationDebounce?: number
   readonly fieldMessages?: MessageOverrides<FieldMessages>
+  /** `"range"` selects a start and an end (DateRangeFieldRootProps). */
+  readonly selectionMode?: "single"
 }
 
-function Root({
+/** Single mode (default), or a range of two ends with `selectionMode="range"`. */
+function Root(props: DateFieldRootProps | DateRangeFieldRootProps) {
+  return props.selectionMode === "range" ? (
+    <DateRangeFieldRoot {...props} />
+  ) : (
+    <SingleRoot {...props} />
+  )
+}
+
+function SingleRoot({
   value,
   defaultValue = null,
   onValueChange,
@@ -254,12 +273,15 @@ function Root({
   onValidityChange,
   onBoundary,
   onDraftChange,
+  onClearAll,
   segmentScope,
   fieldMessages: ownFieldMessages,
   children,
   id,
+  selectionMode: _single,
   ...fieldProps
 }: DateFieldRootProps) {
+  void _single
   const env = useEnvironment()
   const generated = useId()
   const instance = id ?? generated
@@ -308,8 +330,8 @@ function Root({
       env,
     ),
   )
-  const latest = useRef({ onValueChange, onBoundary, onDraftChange, segmentScope, dir })
-  latest.current = { onValueChange, onBoundary, onDraftChange, segmentScope, dir }
+  const latest = useRef({ onValueChange, onBoundary, onDraftChange, onClearAll, segmentScope, dir })
+  latest.current = { onValueChange, onBoundary, onDraftChange, onClearAll, segmentScope, dir }
   const [machineEnv] = useState(() => ({
     formInput: embedded ? undefined : formInput,
     navigation: {
@@ -330,12 +352,14 @@ function Root({
   const machineProps = {
     value,
     defaultValue,
-    onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) =>
+    onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) => {
+      if (details.event.type === "CLEAR_ALL") latest.current.onClearAll?.()
       latest.current.onValueChange?.(v, {
         reason: publicReason(details.event.type),
         modality: (details.event as { modality?: string }).modality,
         cancel: details.cancel,
-      }),
+      })
+    },
     placeholderValue: placeholder,
     locale: formatLocale,
     calendar,
@@ -531,11 +555,118 @@ type InputProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   readonly render?: RenderProp<DateFieldState>
 }
 
+/** The group: one field's segments, or in range mode both ends with a separator. */
+function Input(props: InputProps) {
+  const single = useContext(DateFieldContext)
+  const range = useDateRange()
+  if (!single && range) {
+    // The range group renders no per-field state: a state render prop does not apply.
+    const { children, render: _render, ...rest } = props
+    void _render
+    return (
+      <DateRangeInput
+        {...rest}
+        {...(typeof children === "function" || children === undefined ? {} : { children })}
+        renderEnd={(edge) => <RangeEnd edge={edge} />}
+      />
+    )
+  }
+  return <SingleInput {...props} />
+}
+
+/** One end of a range: an embedded field named by the end and the Label. */
+function RangeEnd({
+  edge,
+  render,
+  ...rest
+}: Omit<ComponentPropsWithRef<"div">, "children"> & {
+  readonly edge: "start" | "end"
+  readonly render?: RenderProp<undefined>
+}) {
+  const ctx = useDateRange()
+  if (!ctx) throw new Error("DateField.Start / End must be inside a range DateField.Root")
+  // The group registers with the Field; an end only reads its label's id.
+  const binding = useFieldBindingPeek()
+  const api = ctx.api(binding?.ids.label)
+  const env = useEnvironment()
+  const EDGE = edge === "start" ? "START" : "END"
+  const value = edge === "start" ? ctx.view.context.startValue : ctx.view.context.endValue
+  const editable = (which: "start" | "end") =>
+    Array.from(
+      ctx.inputEl.current?.querySelectorAll<HTMLElement>(
+        `[data-edge="${which}"] input[data-editable]`,
+      ) ?? [],
+    )
+  const labelledBy = [
+    edge === "start" ? api.ids.startName : api.ids.endName,
+    binding?.ids.label,
+  ].filter((x): x is string => x !== undefined)
+  const props = mergeProps(normalizeProps(api.edge(edge)), rest)
+  return renderPart(
+    "div",
+    {
+      ...props,
+      children: (
+        <SingleRoot
+          {...ctx.end}
+          embedded
+          // Sound: a range Root's ends are DateValues (Time ends come with time values).
+          value={(value as DateValue | null) ?? null}
+          onValueChange={(v, details) =>
+            ctx.send({ type: `${EDGE}.COMMIT`, value: v, reason: details.reason })
+          }
+          // Select all + Backspace in either end clears the pair (both ends).
+          onClearAll={() => ctx.send({ type: "CLEAR" })}
+          onValidityChange={(flags, message) =>
+            ctx.send({ type: `${EDGE}.VALIDITY`, flags, message })
+          }
+          labelledBy={labelledBy}
+          segmentScope={ctx.inputEl}
+          // Focus between ends (spec "Range Mode — Focus Between Ends").
+          onBoundary={(b) => {
+            const target =
+              edge === "start" && b.direction === "next" && b.reason === "advance"
+                ? editable("end")[0]
+                : edge === "end" && b.direction === "previous" && b.reason === "backspace"
+                  ? editable("start").at(-1)
+                  : undefined
+            if (target) void focusSafely(target, env, "programmatic", "keyboard")
+          }}
+        >
+          <SingleInput />
+        </SingleRoot>
+      ),
+    },
+    render,
+    undefined,
+  )
+}
+
+function Start(props: Omit<ComponentPropsWithRef<"div">, "children">) {
+  return <RangeEnd edge="start" {...props} />
+}
+function End(props: Omit<ComponentPropsWithRef<"div">, "children">) {
+  return <RangeEnd edge="end" {...props} />
+}
+function Separator(props: ComponentPropsWithRef<"span">) {
+  const ctx = useDateRange()
+  if (!ctx) throw new Error("DateField.Separator must be inside a range DateField.Root")
+  return (
+    <span
+      {...mergeProps(
+        normalizeProps(ctx.api(undefined).separator()),
+        props as Record<string, unknown>,
+      )}
+    />
+  )
+}
+
 /** The group of segments, its hidden segment names and value description. */
-function Input({ children, render, ref, ...rest }: InputProps) {
+function SingleInput({ children, render, ref, ...rest }: InputProps) {
   const ctx = useDateField("Input")
   const env = useEnvironment()
-  const binding = useFieldControl()
+  // An embedded field is not the Field's control (its host is): it claims nothing.
+  const binding = useFieldControl({ skip: ctx.embedded })
   const api = useApi(ctx)
   const { instance } = ctx
   const first = api.segments().find((s) => s.editable)
@@ -767,26 +898,47 @@ function warnEmbedded(part: string) {
   }
 }
 
-function Label(props: ComponentPropsWithRef<typeof HostLabel>) {
-  const ctx = useDateField("Label")
-  useEffect(() => {
-    if (ctx.embedded) warnEmbedded("Label")
-  }, [ctx.embedded])
-  return ctx.embedded ? null : <HostLabel {...props} />
-}
-function Description(props: ComponentPropsWithRef<typeof HostDescription>) {
-  const ctx = useDateField("Description")
-  useEffect(() => {
-    if (ctx.embedded) warnEmbedded("Description")
-  }, [ctx.embedded])
-  return ctx.embedded ? null : <HostDescription {...props} />
-}
-function ErrorMessage(props: ComponentPropsWithRef<typeof HostErrorMessage>) {
-  const ctx = useDateField("ErrorMessage")
-  useEffect(() => {
-    if (ctx.embedded) warnEmbedded("ErrorMessage")
-  }, [ctx.embedded])
-  return ctx.embedded ? null : <HostErrorMessage {...props} />
+/** Whether a Label-like part is inside an embedded field (it then renders nothing). */
+function useHostPart(part: string): boolean {
+  const single = useContext(DateFieldContext)
+  const range = useDateRange()
+  if (!single && !range) throw new Error(`DateField.${part} must be inside DateField.Root`)
+  return single?.embedded === true
 }
 
-export const DateField = { Root, Label, Description, ErrorMessage, Input, Segment }
+function Label(props: ComponentPropsWithRef<typeof HostLabel>) {
+  // A range Root is the Field: its Label is the Field's (no single-field context there).
+  const embedded = useHostPart("Label")
+  useEffect(() => {
+    if (embedded) warnEmbedded("Label")
+  }, [embedded])
+  return embedded ? null : <HostLabel {...props} />
+}
+function Description(props: ComponentPropsWithRef<typeof HostDescription>) {
+  // A range Root is the Field: its Label is the Field's (no single-field context there).
+  const embedded = useHostPart("Description")
+  useEffect(() => {
+    if (embedded) warnEmbedded("Description")
+  }, [embedded])
+  return embedded ? null : <HostDescription {...props} />
+}
+function ErrorMessage(props: ComponentPropsWithRef<typeof HostErrorMessage>) {
+  // A range Root is the Field: its Label is the Field's (no single-field context there).
+  const embedded = useHostPart("ErrorMessage")
+  useEffect(() => {
+    if (embedded) warnEmbedded("ErrorMessage")
+  }, [embedded])
+  return embedded ? null : <HostErrorMessage {...props} />
+}
+
+export const DateField = {
+  Root,
+  Label,
+  Description,
+  ErrorMessage,
+  Input,
+  Segment,
+  Start,
+  End,
+  Separator,
+}

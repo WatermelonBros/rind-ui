@@ -8,7 +8,13 @@ import { userEvent } from "@testing-library/user-event"
 import axe from "axe-core"
 import type { ReactNode } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { fakeRouter, getBreadcrumbs, interceptNativeNavigation, navigationLog } from "../index"
+import {
+  expectRindWarning,
+  fakeRouter,
+  getBreadcrumbs,
+  interceptNativeNavigation,
+  navigationLog,
+} from "../index"
 
 beforeEach(() => {
   interceptNativeNavigation(window)
@@ -378,6 +384,8 @@ describe("contract invariants", () => {
   })
 
   it("a wrapper that renders separators as list items fails, naming the element", async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/breadcrumbs: the current item "\/" has no element with aria-current/)
     render(
       <Breadcrumbs.Root>
         <Breadcrumbs.List>

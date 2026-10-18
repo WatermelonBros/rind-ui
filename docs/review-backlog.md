@@ -8,6 +8,7 @@ See CLAUDE.md "Review rules".
 | Change | Reado id | File | Finding |
 |---|---|---|---|
 | merge-alert-dialog-into-dialog (review) | — | packages/testing/src/components/dialog-alert-role.dom.test.tsx | `frames(6)` waits (pre-existing from add-alert-dialog): wait on a postcondition instead of a frame count |
+| test-warning-guard (#103) | — | vitest.config.ts | Warning guard in the browser project: re-enable after the Chromium connection-drop root cause (console/task.meta traffic suspected; with the guard, browser-chromium-1 dropped 2/2 runs, without it passed) |
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
 | add-color-picker (site report) | — | packages/core/src/components/color-picker | The hue ChannelSlider track is drawn at the current saturation/brightness: with a near-black value (#0B0B0C) the whole hue track is black and the hue cannot be picked by eye. Draw the hue track at full saturation and brightness (the Area shows the S/B) |
 | add-tag-group (r1) | — | packages/react/src/tag-group/tag-group.tsx | Link-only static Tag Group: the server HTML renders `role="list"` until the layout effect runs (registration at commit); the `tags` data form is correct on the server |

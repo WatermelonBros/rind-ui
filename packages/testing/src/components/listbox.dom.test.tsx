@@ -164,7 +164,7 @@ describe("Listbox", () => {
     expect(o.hasAttribute("aria-labelledby")).toBe(false)
   })
 
-  it("Unnamed list warns", () => {
+  it("Unnamed list warns", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     render(
       <Listbox.Root>
@@ -173,7 +173,10 @@ describe("Listbox", () => {
         </Listbox.List>
       </Listbox.Root>,
     )
-    expect(warn.mock.calls.some((c) => String(c[0]).includes("no accessible name"))).toBe(true)
+    // checked after the Label's mount re-render (a microtask)
+    await vi.waitFor(() =>
+      expect(warn.mock.calls.some((c) => String(c[0]).includes("no accessible name"))).toBe(true),
+    )
   })
 
   it("Button inside an option warns", () => {
