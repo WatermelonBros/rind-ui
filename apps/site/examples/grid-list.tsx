@@ -4,7 +4,7 @@ import { GridList, Popover, RindProvider, TagGroup } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = { "grid-list": { idle: "Candidates" } }
+export const states: States = { "grid-list": { idle: "Candidates", focused: "Candidates" } }
 
 const PEOPLE = [
   { key: "ada", name: "Ada Lovelace", role: "Analyst" },
