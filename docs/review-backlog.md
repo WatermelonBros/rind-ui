@@ -297,3 +297,10 @@ Passes that need real assistive technology or devices; automated tests cannot st
 The six add-foundations warnings first recorded here (10e5b, 10e6c, 1394b, 1394d,
 1394e, 1394f) were fixed by the implementer in the same round, before the move;
 verified at round 3 (2026-10-14).
+
+## add-grid-list: deferred tasks (archived 2026-10-18)
+
+- 0.2 / 9.2: real-AT pass (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack). Record it in "Tested with".
+- 3.1 / 6.3: virtualization (`aria-rowcount`/`aria-rowindex`), plus a virtualized fixture and measured spatial moves in three columns.
+- 4.3: React tests for Strict Mode, SSR + hydration tab stop, nested Tag Group, static vs data items.
+- 6.4: virtual screen-reader reading-order test.
