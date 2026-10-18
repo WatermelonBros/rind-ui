@@ -103,7 +103,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"]):focus-visible {
-  outline: 3px solid var(--s-acc);
+  outline: 3px solid var(--s-focus);
   outline-offset: 2px;
 }
 
