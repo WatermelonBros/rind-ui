@@ -37,10 +37,12 @@ export { patternContract } from "./pattern/contract"
 export { optionsNeverSelected } from "./pattern/invariants"
 export {
   initialPatternContext,
+  type PatternArgs,
   type PatternContext,
   type PatternEvent,
   type PatternMessages,
   type PatternProps,
+  type PatternReadArgs,
   patternIds,
   patternMessages,
   patternPieces,
