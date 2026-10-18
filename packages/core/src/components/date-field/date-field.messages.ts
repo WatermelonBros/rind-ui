@@ -32,6 +32,21 @@ export type DateFieldMessages = {
   readonly rangeUnderflow: (args: { readonly min: string }) => string
   readonly rangeOverflow: (args: { readonly max: string }) => string
   readonly unavailable: string
+  /** Range mode: the start end's name (after each segment's name). */
+  readonly startDate: string
+  /** Range mode: the end's name. */
+  readonly endDate: string
+  /** Range mode: the visible separator between the ends. */
+  readonly separator: string
+  /** Range mode: the group's description of the whole range. */
+  readonly rangeDescription: (args: { readonly start: string; readonly end: string }) => string
+  /** Range mode: an end's own problem, prefixed with the end's name. */
+  readonly endProblem: (args: { readonly edge: string; readonly message: string }) => string
+  readonly endBeforeStart: string
+  readonly endBeforeStartTime: string
+  readonly containsUnavailable: string
+  /** Range mode with `allowsOvernight`: the end on the next day, in the description. */
+  readonly overnight: (args: { readonly end: string }) => string
 }
 
 const PLACEHOLDERS: Readonly<Record<DateSegmentType, string>> = {
@@ -59,4 +74,13 @@ export const dateFieldMessages: DateFieldMessages = {
   rangeUnderflow: ({ min }) => `Value must be ${min} or later`,
   rangeOverflow: ({ max }) => `Value must be ${max} or earlier`,
   unavailable: "This date is unavailable",
+  startDate: "Start date",
+  endDate: "End date",
+  separator: "–",
+  rangeDescription: ({ start, end }) => `Selected range: ${start} to ${end}`,
+  endProblem: ({ edge, message }) => `${edge}: ${message}`,
+  endBeforeStart: "End date must be on or after the start date",
+  endBeforeStartTime: "End time must be after the start time",
+  containsUnavailable: "The range includes an unavailable date",
+  overnight: ({ end }) => `${end} the next day`,
 }
