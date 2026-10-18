@@ -92,7 +92,7 @@ type Common = {
   /** A collection built by the consumer (wins over `items` and Item parts). */
   readonly collection?: Collection<unknown>
   readonly onAction?: (key: string, details: GridListActionDetails) => void
-  /** Presses select on pointer up (lists inside popups: react-spectrum#7887). Default false. */
+  /** Presses select on pointer up (for lists inside popups). Default false. */
   readonly selectOnPressUp?: boolean
   /** Focus the selected row (else the first) on mount. */
   readonly autoFocus?: boolean

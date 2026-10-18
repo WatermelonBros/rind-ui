@@ -505,6 +505,11 @@ export async function apiMetas(): Promise<{ metas: Map<string, ComponentMeta>; g
         )
     const rows = propRows(meta, parts)
     gaps.push(...rows.gaps)
+    // the site never names another component library (apps/site/tests/audit.ts): fail here, before CI
+    for (const [key, p] of Object.entries(rows.props)) {
+      const named = String((p as { description?: unknown }).description ?? "").match(otherLibraries)
+      if (named) gaps.push(`${meta.name}: prop \`${key}\` description names "${named[0]}"`)
+    }
     metas.set(scope, { ...meta, props: rows.props })
   }
   return { metas, gaps }
@@ -580,6 +585,10 @@ const readAria = (id: string) => {
 
 /** Every generated file: path → expected content. */
 /** Every prop a consumer can pass is documented, or nothing is generated. */
+/** Names the site must never show (kept in step with apps/site/tests/audit.ts). */
+const otherLibraries =
+  /\b(?:Radix|Reka|Bits UI|Bits'|Ark UI|Ark|Zag|React Aria|React Spectrum|Base UI|Headless UI|Melt UI|Kobalte|Ariakit|Reach UI|Chakra|MUI|shadcn|Mantine|PrimeReact)\b|\b(?:radix|ariakit|chakra-ui|react-aria|react-spectrum|ark-ui)\b/
+
 export class PropGaps extends Error {
   readonly gaps: readonly string[]
   constructor(gaps: readonly string[]) {
