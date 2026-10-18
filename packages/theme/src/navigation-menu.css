@@ -1,0 +1,221 @@
+/*
+ * Navigation Menu: a bar of disclosure triggers and links (toggle item family, ghost by
+ * default) and panels (panel family). The open trigger draws an inset edge as well as a
+ * background (never colour alone, WCAG 1.4.1); the current link and the trigger of the
+ * current section are underlined. A shared viewport animates its size from the
+ * --rind-navigation-menu-viewport-* properties the component writes (px while moving, auto at
+ * rest); content without a viewport uses --rind-navigation-menu-content-*. `data-instant`
+ * (a switch or a warm open) and reduced motion skip the transitions; `data-motion` slides a
+ * switched panel in from the side it came from. The focus ring comes from base.css.
+ */
+@layer rind.components {
+  :where([data-scope="navigation-menu"][data-part="root"]) {
+    position: relative;
+    box-sizing: border-box;
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="list"]) {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-navigation-menu-gap, var(--rind-space-1));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where([data-scope="navigation-menu"][data-part="list"][data-orientation="vertical"]) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :where([data-scope="navigation-menu"][data-part="item"]) {
+    position: relative;
+  }
+
+  :where([data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: max(
+      var(--rind-navigation-menu-trigger-height, var(--rind-hit-area)),
+      var(--rind-hit-area)
+    );
+    min-inline-size: var(--rind-hit-area);
+    padding-inline: var(--rind-navigation-menu-trigger-padding, var(--rind-space-3));
+    border: 0;
+    border-radius: var(--rind-navigation-menu-trigger-radius, var(--rind-radius-sm));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  :where([data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])[data-hover]) {
+    background: var(--rind-color-accent-soft-hover);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="trigger"][data-pressed]) {
+    background: var(--rind-color-accent-soft);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="trigger"][data-state="open"]) {
+    background: var(--rind-navigation-menu-trigger-open-bg, var(--rind-color-accent-soft));
+    box-shadow: inset 0 0 0 var(--rind-border-width) var(--rind-color-border-strong);
+  }
+
+  :where([data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])[data-current]) {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+    color: var(--nm-current, var(--rind-navigation-menu-current-color, var(--rind-color-accent-text)));
+  }
+
+  :where([data-scope="navigation-menu"][data-part="trigger"]:is([data-disabled], :disabled)) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* Panels: in flow by default (a vertical menu is a list of disclosures). */
+  :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"])) {
+    box-sizing: border-box;
+  }
+
+  :where([data-scope="navigation-menu"][data-part="viewport"]),
+  :where(
+    [data-scope="navigation-menu"][data-part="item"] > [data-scope="navigation-menu"][data-part="content"]
+  ) {
+    padding: var(--rind-navigation-menu-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid
+      var(--rind-navigation-menu-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-navigation-menu-radius, var(--rind-radius-md));
+    background: var(--rind-navigation-menu-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-navigation-menu-shadow, var(--rind-shadow-sm));
+  }
+
+  /* Content inside a viewport has no frame of its own: the viewport is the panel. */
+  :where([data-scope="navigation-menu"][data-part="viewport"]) {
+    position: relative;
+    overflow: hidden;
+    inline-size: var(--rind-navigation-menu-viewport-width, auto);
+    block-size: var(--rind-navigation-menu-viewport-height, auto);
+    transition:
+      inline-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
+        var(--rind-ease-out),
+      block-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
+        var(--rind-ease-out),
+      opacity var(--rind-navigation-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="viewport"][data-state="open"]) {
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  :where([data-scope="navigation-menu"][data-part="viewport"][data-state="closed"]) {
+    opacity: 0;
+  }
+
+  :where([data-scope="navigation-menu"][data-part="viewport"][data-instant]) {
+    transition: none;
+  }
+
+  /* A positioned panel never outgrows the space next to its trigger: it scrolls. */
+  :where([data-scope="navigation-menu"][data-part="positioner"])
+    > :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"])) {
+    max-block-size: var(--rind-available-height, 100vh);
+    overflow: auto;
+  }
+
+  :where([data-scope="navigation-menu"][data-part="positioner"]) {
+    z-index: var(--rind-navigation-menu-z, 50);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="content"][data-motion^="from-"]) {
+    animation: rind-navigation-menu-enter
+      var(--rind-navigation-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="content"][data-motion="from-start"]) {
+    --nm-from: calc(-1 * var(--rind-navigation-menu-slide, 24px));
+  }
+
+  :where([data-scope="navigation-menu"][data-part="content"][data-motion="from-end"]) {
+    --nm-from: var(--rind-navigation-menu-slide, 24px);
+  }
+
+  :where([dir="rtl"]) :where([data-scope="navigation-menu"][data-part="content"][data-motion]) {
+    --nm-dir: -1;
+  }
+
+  @keyframes rind-navigation-menu-enter {
+    from {
+      opacity: 0;
+      translate: calc(var(--nm-from, 0px) * var(--nm-dir, 1)) 0;
+    }
+  }
+
+  :where([data-scope="navigation-menu"][data-part="indicator"]) {
+    position: absolute;
+    inset-block-end: 0;
+    left: var(--rind-indicator-left);
+    inline-size: var(--rind-indicator-width);
+    block-size: var(--rind-navigation-menu-indicator-size, 2px);
+    background: var(--nm-indicator, var(--rind-navigation-menu-indicator-color, var(--rind-color-accent-solid)));
+    list-style: none;
+    pointer-events: none;
+    transition:
+      left var(--rind-navigation-menu-duration, var(--rind-duration-normal)) var(--rind-ease-out),
+      inline-size var(--rind-navigation-menu-duration, var(--rind-duration-normal))
+        var(--rind-ease-out);
+  }
+
+  :where([data-scope="navigation-menu"][data-part="indicator"][data-resizing]) {
+    transition: none;
+  }
+
+  :where([data-scope="navigation-menu"][data-tone="danger"]) {
+    --nm-indicator: var(--rind-color-danger-solid);
+    --nm-current: var(--rind-color-danger-text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="indicator"])) {
+      transition: none;
+    }
+
+    :where([data-scope="navigation-menu"][data-part="content"]) {
+      animation: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])) {
+      color: LinkText;
+    }
+
+    /* box-shadow is dropped in forced colours: the open trigger's edge is an outline. */
+    :where([data-scope="navigation-menu"][data-part="trigger"][data-state="open"]) {
+      outline: var(--rind-border-width) solid CanvasText;
+      outline-offset: calc(-1 * var(--rind-border-width));
+    }
+
+    :where([data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"])) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="navigation-menu"][data-part="indicator"]) {
+      background: Highlight;
+    }
+
+    :where([data-scope="navigation-menu"][data-part="trigger"]:is([data-disabled], :disabled)) {
+      color: GrayText;
+    }
+  }
+}
