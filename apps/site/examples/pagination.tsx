@@ -1,6 +1,6 @@
 "use client"
 
-import { Pagination, type PaginationRootProps } from "@rind-ui/react"
+import { Button, Pagination, type PaginationRootProps } from "@rind-ui/react"
 import { useId, useState } from "react"
 import type { States, Variants } from "./types"
 
@@ -146,9 +146,7 @@ export function Loading() {
         aria-label="Search results"
         onPageChange={() => setLoading(true)}
       />
-      <button type="button" className="note" onClick={() => setLoading(false)}>
-        Finish loading
-      </button>
+      <Button onPress={() => setLoading(false)}>Finish loading</Button>
     </div>
   )
 }
