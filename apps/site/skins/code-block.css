@@ -107,6 +107,15 @@
   outline: 2px solid var(--cb-mark);
   outline-offset: -2px;
 }
+/* a pressed Wrap fills with --cb-mark: the ring sits outside, on the bar */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="code-block"]:is(
+    [data-part="copy-trigger"],
+    [data-part="wrap-trigger"],
+    [data-part="collapse-trigger"]
+  ):focus-visible {
+  outline-offset: 2px;
+}
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="content"] {
   margin: 0;
   padding-block: 16px 20px;
