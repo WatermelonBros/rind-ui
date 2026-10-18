@@ -452,7 +452,9 @@ paging never cleared an anchor.
 
 `view` SHALL be `"days"` (default), `"months"` (a grid of the months of one year) or `"years"`
 (a grid of `yearsPerPage` years, default 12), in rows of `columns` cells (default 4), paged as
-`period-navigation` defines. Every requirement of the Calendar SHALL apply to the month and year
+`period-navigation` defines. `view` SHALL be controllable (`view`, `defaultView`,
+`onViewChange(view, details)`, reasons `heading`, `select`, `escape-key`, `api`), and `minView` /
+`maxView` (default `"days"` / `"years"`) SHALL bound it. Every requirement of the Calendar SHALL apply to the month and year
 views with the period as the unit, except where this requirement differs. The value SHALL be
 period-granular: two dates in the same period are the same value and `onValueChange` SHALL NOT
 be called when the chosen period equals the value's. Choosing a month SHALL emit the current
@@ -535,3 +537,32 @@ the period.
 
 - **WHEN** the locale is `th-TH` with `createCalendar` in the year view
 - **THEN** the cell for 2026 reads "2569" and its `data-value` is "2026-01-01"
+
+
+### Requirement: View Drill-Down
+
+When `maxView` is above the current view, the heading SHALL be a button (named by the heading
+text and `messages.viewUp`, default "Choose month" / "Choose year") that moves up one view: days →
+months → years, keeping the focused period. Selecting a period in a view above `minView` SHALL
+move down one view, focusing the first day (or month) of the chosen period without changing the
+value unless that view is the Calendar's `minView`; selecting in `minView` SHALL select the value.
+Escape in a view above `minView` SHALL move down one view before any outer layer handles it. A
+view change SHALL move focus to the new view's tab stop and be announced politely with the new
+heading. With `view` fixed (controlled and never changed), the heading SHALL be plain text.
+
+#### Scenario: Day to year and back
+
+- **WHEN** the days view shows October 2026 and the user presses the heading twice, picks 2031,
+  then March
+- **THEN** the views go days → months → years → months → days, the days view shows March 2031,
+  and the value changed only when a day was picked
+
+#### Scenario: Month picker
+
+- **WHEN** a Calendar has `minView="months"` and `defaultView="months"` and the user picks March
+- **THEN** the value's month is March and the view stays months
+
+#### Scenario: Escape goes down
+
+- **WHEN** the years view is open inside a picker and Escape is pressed
+- **THEN** the Calendar shows the months view and the picker stays open
