@@ -10,12 +10,15 @@ import {
 } from "@internationalized/date"
 import { describe, expect, it, vi } from "vitest"
 import { recordingFormInput } from "../../dom/hidden-input"
+import { platforms } from "../../dom/platform"
 import { createService } from "../../machine/service"
 import type { DateSegmentType } from "../date-segments"
+import { dateFieldKey } from "./date-field.connect"
 import {
   type DateFieldEvent,
   type DateFieldProps,
   dateFieldMachine,
+  formValueOf,
   type SegmentNavigation,
 } from "./date-field.machine"
 
@@ -238,11 +241,46 @@ describe("Stepping", () => {
     expect(g.value()).toBeNull()
   })
 
-  it("Enter is no step key: the machine has no Enter event (reka-ui#1993)", () => {
-    const f = make({ defaultValue: new CalendarDate(2026, 10, 14) })
-    f.focus("day")
-    // Enter is left to the browser (implicit submission); nothing reaches the machine.
-    expect(f.value()?.toString()).toBe("2026-10-14")
+  it("Enter is no step key (reka-ui#1993): the keydown path leaves it to the browser", () => {
+    const k = (key: string) => ({
+      key,
+      code: "",
+      shift: false,
+      alt: false,
+      ctrl: false,
+      meta: false,
+      repeat: false,
+      composing: false,
+    })
+    const o = { dir: "ltr", platform: platforms.windows, selectAll: false } as const
+    // Implicit submission: no machine event, so nothing prevents the browser's default.
+    expect(dateFieldKey(k("Enter"), "minute", o)).toBeNull()
+    expect(dateFieldKey(k("ArrowUp"), "minute", o)).toMatchObject({ type: "INCREASE" })
+  })
+
+  it("one form-value normaliser, truncated to the granularity", () => {
+    const t = new CalendarDateTime(2026, 10, 14, 9, 30, 15)
+    expect(formValueOf(t, "minute")).toBe("2026-10-14T09:30")
+    expect(formValueOf(t, "hour")).toBe("2026-10-14T09:00")
+    expect(formValueOf(t, "second")).toBe("2026-10-14T09:30:15")
+    expect(formValueOf(new CalendarDateTime(2026, 10, 14, 9, 30), "second")).toBe(
+      "2026-10-14T09:30",
+    )
+    expect(formValueOf(new CalendarDate(2026, 12, 31), "minute", "datetime")).toBe(
+      "2026-12-31T00:00",
+    )
+    expect(formValueOf(new CalendarDate(2026, 12, 31))).toBe("2026-12-31")
+    expect(formValueOf(null)).toBe("")
+  })
+
+  it("the hidden input gets the truncated value at minute granularity", () => {
+    const f = make({
+      defaultValue: new CalendarDateTime(2026, 10, 14, 9, 30, 15),
+      granularity: "minute",
+    })
+    f.focus("minute")
+    f.key("INCREASE")
+    expect(f.rec.calls.at(-1)?.value).toEqual({ value: "2026-10-14T09:31" })
   })
 
   it("month step across DST keeps 09:44 (react-spectrum#10776)", () => {

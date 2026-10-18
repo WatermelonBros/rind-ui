@@ -99,6 +99,14 @@ describe("Date Field server render", () => {
     await h.done()
   })
 
+  it("a controlled value is in the server's hidden input (a submit before hydration posts it)", () => {
+    const box = document.createElement("div")
+    box.innerHTML = renderToString(tree({ value: new CalendarDate(2027, 3, 1) }))
+    expect([...new FormData(box.querySelector("form") as HTMLFormElement)]).toEqual([
+      ["d", "2027-03-01"],
+    ])
+  })
+
   it("iPhone hydration: no mismatch, then segments without the spinbutton role", async () => {
     const h = await hydrate(tree({}, platforms.ios))
     expect(h.calls).toEqual([])

@@ -80,8 +80,8 @@ between segments SHALL NOT count as leaving the Field. Its contract SHALL declar
 
 #### Scenario: Error shown after leaving (react-spectrum#3328)
 
-- **WHEN** in a Field with default validation the user types 02/31/2026 and tabs out of the
-  last segment
+- **WHEN** in a Field with `validationMode="blur"` the user types 02/31/2026 and tabs out of
+  the last segment
 - **THEN** the Field shows "Enter a valid date", every segment has `aria-invalid="true"`, and
   the error was announced once
 
