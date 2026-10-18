@@ -6,7 +6,7 @@ An on/off setting that takes effect immediately (APG Switch). The Control is a r
 
 - **Use it for** an on/off setting that takes effect immediately, such as "Airplane mode" or "Wi-Fi".
 - **Over a native `<input type="checkbox">`**: it exposes `role="switch"` and `aria-checked`, a thumb and label as styleable parts, `data-state`, and still submits through a hidden checkbox. A plain checkbox is enough when the choice is committed later with a form.
-- **Don't use it for** a choice that is saved with a Save button, or that can be mixed: use a [Checkbox](checkbox.md). Don't use it for a button that stays pressed, such as "Bold": use a [Toggle](toggle.md).
+- **Don't use it for** a choice that is saved with a Save button, or that can be mixed: use a [Checkbox Group](checkbox-group.md). Don't use it for a button that stays pressed, such as "Bold": use a [Toggle Group](toggle-group.md).
 
 ```tsx
 import { Switch } from "@rind-ui/react"
@@ -47,8 +47,8 @@ import { Switch } from "@rind-ui/react"
 ## Switch, Checkbox or Toggle?
 
 - **Switch**: a setting that applies at once ("Airplane mode"). No indeterminate state.
-- **[Checkbox](checkbox.md)**: a choice that is committed later, with a form or a Save button, or that can be mixed.
-- **[Toggle](toggle.md)**: a button that stays pressed (a toolbar "Bold"); its name does not describe a setting.
+- **[Checkbox Group](checkbox-group.md)**: a choice that is committed later, with a form or a Save button, or that can be mixed.
+- **[Toggle Group](toggle-group.md)**: a button that stays pressed (a toolbar "Bold"); its name does not describe a setting.
 
 ## Accessibility notes
 
@@ -59,7 +59,7 @@ import { Switch } from "@rind-ui/react"
 
 ## Form participation
 
-`name` and `value` (default `"on"`) are submitted while checked; `uncheckedValue` submits that value while unchecked and enabled. `required`, `form` and reset work as for [Checkbox](checkbox.md).
+`name` and `value` (default `"on"`) are submitted while checked; `uncheckedValue` submits that value while unchecked and enabled. `required`, `form` and reset work as for [Checkbox Group](checkbox-group.md).
 
 ## Styling
 

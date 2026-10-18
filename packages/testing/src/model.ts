@@ -16,7 +16,7 @@ import {
   type Step,
   withEngine,
 } from "@rind-ui/core"
-import type { AdapterEnv, Direction } from "./adapter"
+import { type AdapterEnv, type Direction, hostedPartName } from "./adapter"
 import { installErrorLog } from "./adapters/dom"
 import { isPage, watchPageErrors } from "./adapters/playwright"
 import type { DomSnapshot, ElementInfo } from "./collect"
@@ -690,7 +690,13 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
     let env = envs.get(m)
     if (!env) {
       env = directed(
-        factory.create({ scope: contract.scope, anchor, modality: m, platform }),
+        factory.create({
+          scope: contract.scope,
+          ...hostedPartName(contract),
+          anchor,
+          modality: m,
+          platform,
+        }),
         direction,
       )
       envs.set(m, env)
@@ -819,7 +825,9 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
       0,
       ...Object.values(impl.delays ?? {}).map((d) => {
         try {
-          return Number(d({ props: oracle.props })) || 0
+          return (
+            Number(d({ props: oracle.props, context: oracle.service.getSnapshot().context })) || 0
+          )
         } catch {
           return 0
         }
@@ -1168,7 +1176,11 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         const announcedBefore = (await base.announcements()).length
         let stepMod: Modality | null = null
         if (mapping?.kind === "delay") {
-          const ms = impl.delays?.[edge.event.slice(6)]?.({ props: oracle.props }) ?? 0
+          const ms =
+            impl.delays?.[edge.event.slice(6)]?.({
+              props: oracle.props,
+              context: oracle.service.getSnapshot().context,
+            }) ?? 0
           const valuesBefore = formValues()
           send(edge.event)
           // A value changed by a timer of a held gesture (a stepper's repeat) is the user's.
@@ -1239,6 +1251,14 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           ) {
             userChanges += 1
           }
+          // A closing step's exit is armed before the action: it cannot end before the hold
+          // below however slow the round trip (Playwright on a loaded CI runner).
+          const willClose =
+            edge !== notTaken &&
+            edge.target !== null &&
+            expectations(contract, from, null).open &&
+            !expectations(contract, edge.target, null).open
+          if (contract.traits.includes("presence") && willClose) await base.armHold?.()
           try {
             await runAction(
               contract,

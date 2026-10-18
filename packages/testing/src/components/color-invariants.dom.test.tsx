@@ -156,7 +156,7 @@ describe("broken colour wrappers fail readably (8.2)", { timeout: 60_000 }, () =
   it("area: an input's value disagrees with aria-valuenow", async () => {
     const out = await failures(
       colorAreaContract as never,
-      area((r) => setAttr(q(r, 'input[data-part="input"]'), "aria-valuenow", "99")),
+      area((r) => setAttr(q(r, 'input[data-part="area-input"]'), "aria-valuenow", "99")),
       areaProps,
       "Fill",
     )
@@ -166,7 +166,7 @@ describe("broken colour wrappers fail readably (8.2)", { timeout: 60_000 }, () =
   it("area: tabindex=0 on the y input is an extra tab stop", async () => {
     const out = await failures(
       colorAreaContract as never,
-      area((r) => setAttr(r.querySelectorAll('input[data-part="input"]')[1], "tabindex", "0")),
+      area((r) => setAttr(r.querySelectorAll('input[data-part="area-input"]')[1], "tabindex", "0")),
       areaProps,
       "Fill",
     )
@@ -177,7 +177,11 @@ describe("broken colour wrappers fail readably (8.2)", { timeout: 60_000 }, () =
     const out = await failures(
       colorAreaContract as never,
       area((r) =>
-        setVar(q(r, '[data-scope="color-area"][data-part="thumb"]'), "--rind-color-area-x", "NaN"),
+        setVar(
+          q(r, '[data-scope="color-picker"][data-part="area-thumb"]'),
+          "--rind-color-area-x",
+          "NaN",
+        ),
       ),
       areaProps,
       "Fill",
@@ -189,7 +193,7 @@ describe("broken colour wrappers fail readably (8.2)", { timeout: 60_000 }, () =
     const out = await failures(
       colorSliderContract as never,
       slider((r) => {
-        const t = q(r, '[data-scope="slider"][data-part="track"]')
+        const t = q(r, '[data-scope="color-picker"][data-part="channel-slider-track"]')
         if (t && t.style.backgroundImage !== "none") t.style.backgroundImage = "none"
       }),
       sliderProps,

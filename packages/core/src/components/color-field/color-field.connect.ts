@@ -6,6 +6,7 @@ import type { KeyDescription } from "../../a11y/keys"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
+import { COLOR_PICKER_SCOPE, colorFieldPart } from "../color-picker/color-picker.naming"
 import type { Color } from "../shared/color/color"
 import { canonicalHex } from "../shared/color/format"
 import { type ColorMessages, colorMessages } from "../shared/color/messages"
@@ -50,7 +51,8 @@ export interface ColorFieldConnectInput {
 export function colorFieldConnect(input: ColorFieldConnectInput) {
   const { field } = input
   const invalid = field.invalid || input.invalidDraft
-  const part = (name: string) => scopeAttrs("color-field", name, input.instance)
+  const part = (name: Parameters<typeof colorFieldPart>[0]) =>
+    scopeAttrs(COLOR_PICKER_SCOPE, colorFieldPart(name), input.instance)
   const state = {
     "data-disabled": dataFlag(field.disabled),
     "data-readonly": dataFlag(field.readOnly),

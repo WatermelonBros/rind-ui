@@ -5,7 +5,13 @@
 
 import { focusAttrs } from "../../a11y/focus"
 import type { KeyDescription } from "../../a11y/keys"
-import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
+import {
+  CRITICAL,
+  dataFlag,
+  type PartNaming,
+  type PartProps,
+  scopeAttrs,
+} from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import type { LinkEnv } from "../../dom/link"
@@ -121,6 +127,8 @@ export function inputModeOf(
 
 export interface NumberInputConnectInput {
   readonly instance: string
+  /** Rendered as another component's part: the host's scope and part names (default its own). */
+  readonly naming?: PartNaming<NumberInputPart> | undefined
   readonly value: number | null
   readonly text: string
   readonly defaultValue: number | null
@@ -156,7 +164,11 @@ export interface NumberInputConnectInput {
 
 export function numberInputConnect(input: NumberInputConnectInput, env: LinkEnv) {
   const { field, value } = input
-  const part = (name: NumberInputPart) => scopeAttrs("number-input", name, input.instance)
+  const naming = input.naming
+  const part = (name: NumberInputPart) =>
+    naming
+      ? scopeAttrs(naming.scope, naming.part(name), input.instance)
+      : scopeAttrs("number-input", name, input.instance)
   const fieldState = {
     ...input.fieldData,
     "data-disabled": dataFlag(field.disabled),

@@ -12,7 +12,8 @@ export interface InputChipsMessages {
   readonly chipsLabel: string
   /** Same key and default as Tag Group's. */
   readonly removeLabel: (text: string) => string
-  readonly tagsSummary: (texts: readonly string[]) => string
+  /** The input's description; `locale` for plural rules. */
+  readonly tagsSummary: (texts: readonly string[], locale?: string) => string
   /** Same key and default as Tag Group's. */
   readonly removedAnnouncement: (text: string) => string
 }
@@ -97,6 +98,9 @@ export interface InputChipsView {
   readonly context: InputChipsContext
   readonly dir: "ltr" | "rtl"
   readonly messages: InputChipsMessages
+  readonly locale?: string | undefined
+  /** The summary describes the input also with no chips ("No tags"). */
+  readonly describeEmpty?: boolean | undefined
   /** The host's input and control ids (removal focus, inside test). */
   readonly inputId: string
   readonly controlId: string
@@ -148,7 +152,7 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
   return {
     ids,
     /** The input's description: the summary node, while there are chips. */
-    describedBy: v.chips.length > 0 ? ids.summary : undefined,
+    describedBy: v.chips.length > 0 || v.describeEmpty ? ids.summary : undefined,
     /**
      * The input's keys that belong to the chips; true when handled (the host then stops).
      * `atStart`: the caret is at 0 with no selection.
@@ -185,8 +189,14 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
         "data-disabled": dataFlag(chip?.disabled === true),
         "data-highlighted": dataFlag(focused || v.context.armedChip === key),
         "data-armed": dataFlag(v.context.armedChip === key),
-        "data-focus-visible": dataFlag(focused && v.context.focusedChipModality === "keyboard"),
-        onFocus: () => {
+        // Armed by Backspace is a keyboard highlight too.
+        "data-focus-visible": dataFlag(
+          (focused && v.context.focusedChipModality === "keyboard") || v.context.armedChip === key,
+        ),
+        onFocus: (event: unknown) => {
+          // Focus on the chip itself (its remove button's focus bubbles here in React).
+          const e = event as FocusEvent
+          if (e.target !== e.currentTarget) return
           if (v.context.focusedChip !== key) {
             v.send({ type: "CHIP.NAVIGATE", key, modality: env.modality.modality() })
           }
@@ -208,6 +218,19 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
           } else if (e.key === next) {
             e.preventDefault()
             goTo(step(key, 1), "keyboard")
+          } else if (e.key === "Home" || e.key === "End") {
+            // Toolbar keys: the first / last chip; never the page's scroll.
+            e.preventDefault()
+            const to = e.key === "Home" ? enabled[0] : enabled.at(-1)
+            if (to) goTo(to.key, "keyboard")
+          } else if (
+            e.key === "ArrowUp" ||
+            e.key === "ArrowDown" ||
+            e.key === "PageUp" ||
+            e.key === "PageDown"
+          ) {
+            // A horizontal toolbar: vertical keys do nothing (and never scroll the page).
+            e.preventDefault()
           } else if (e.key === "Backspace" || e.key === "Delete") {
             e.preventDefault()
             remove(key)
@@ -252,10 +275,13 @@ export function inputChipsConnect(v: InputChipsView, env: InputChipsEnv) {
     summary: (): PartProps => ({
       ...scoped("chips-summary"),
       id: ids.summary,
-      hidden: v.chips.length === 0 ? true : undefined,
+      hidden: v.chips.length === 0 && !v.describeEmpty ? true : undefined,
       style: visuallyHiddenStyle,
     }),
-    summaryText: v.messages.tagsSummary(v.chips.map((c) => c.text)),
+    summaryText: v.messages.tagsSummary(
+      v.chips.map((c) => c.text),
+      v.locale,
+    ),
   }
 }
 

@@ -189,7 +189,9 @@ export function formatVisibleRange(
   const a = formatDate(start)
   if (start.year === end.year && start.month === end.month && start.era === end.era)
     return f.format(a)
-  return f.formatRange(a, formatDate(end))
+  // Engines differ in the spaces around the range dash (thin, narrow no-break): one text on
+  // the server and in every browser, so a hydrated heading matches.
+  return f.formatRange(a, formatDate(end)).replace(/[\u2009\u202f]/g, " ")
 }
 
 /**

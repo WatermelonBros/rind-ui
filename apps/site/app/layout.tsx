@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 import type { ReactNode } from "react"
+import { HydrationMark } from "@/components/hydration-mark"
 
 // Self-hosted (OFL, licences in fonts/): the build must work with no network.
 const unbounded = localFont({
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      lang="en"
+      lang="en-US"
       data-phase="crisp"
       className={`${unbounded.variable} ${inter.variable} ${fredoka.variable} ${mono.variable}`}
       suppressHydrationWarning
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         {/* The site chrome lives in app/(site)/layout.tsx; app/examples has none. */}
         {children}
+        <HydrationMark />
       </body>
     </html>
   )

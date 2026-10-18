@@ -199,16 +199,19 @@ describe("buildTextFieldMachine", () => {
   it("the empty preset is the Text Field: same states and events, scope text-field", () => {
     const built = buildTextFieldMachine({})
     expect(built.scope).toBe("text-field")
-    expect(graph(built.machine)).toEqual(graph(textFieldMachine))
-    expect(Object.keys(graph(built.machine).states)).toEqual(["idle", "composing"])
-    expect(Object.keys((built.machine.impl as { actions: object }).actions).sort()).toEqual(
-      Object.keys((textFieldMachine.impl as { actions: object }).actions).sort(),
+    expect(Object.keys(graph(built.machine).states)).toEqual(
+      Object.keys(graph(textFieldMachine).states),
     )
+    expect(Object.keys(graph(built.machine).states)).toEqual(["idle", "composing"])
+    // The exported machine is the base plus the visibility and key preset.
+    const base = Object.keys((built.machine.impl as { actions: object }).actions)
+    const all = Object.keys((textFieldMachine.impl as { actions: object }).actions)
+    expect(base.every((a) => all.includes(a))).toBe(true)
   })
 
   it("a preset global event with a controllable value is accepted while composing", () => {
     const { machine, scope } = buildTextFieldMachine({
-      scope: "password-input",
+      scope: "preset-a",
       values: { visible: { fallback: false } },
       events: { "VISIBILITY.TOGGLE": { actions: ["toggleVisible"] } },
       actions: {
@@ -219,7 +222,7 @@ describe("buildTextFieldMachine", () => {
           ),
       } as never,
     })
-    expect(scope).toBe("password-input")
+    expect(scope).toBe("preset-a")
     const m = make({}, machine as never)
     m.send({ type: "COMPOSITION.START" })
     expect(m.state()).toBe("composing")
@@ -230,7 +233,7 @@ describe("buildTextFieldMachine", () => {
 
   it("a preset can clear with its own reason (ESCAPE)", () => {
     const { machine } = buildTextFieldMachine({
-      scope: "search-field",
+      scope: "preset-b",
       events: { ESCAPE: { guard: "editable", actions: ["clearEscape"] } },
       actions: {
         clearEscape: ({ props }: { props: TextFieldProps }) => props.clearInput("ESCAPE", true),

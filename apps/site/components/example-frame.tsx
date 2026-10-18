@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, Heading, SegmentedControl, Tabs, Toggle } from "@rind-ui/react"
+import { Button, Heading, SegmentedControl, Tabs, ToggleGroup } from "@rind-ui/react"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples, heroName } from "@/examples"
@@ -10,13 +10,18 @@ import { usePhase } from "./phase"
 type Skin = "crisp" | "juicy" | "bare" | "parts"
 
 /** The parts an example renders: those in its stage, plus the ones it portalled elsewhere
- * (same `data-instance`), such as an open popover's content. */
+ * (same `data-instance`), such as an open popover's content, and every part nested in those
+ * (a component of its own inside the content: a field, a slider, a nested menu). */
 function anatomy(stage: HTMLElement): HTMLElement[] {
   const inside = [...stage.querySelectorAll<HTMLElement>("[data-part]")]
   const ids = new Set(inside.map((el) => el.dataset["instance"]).filter(Boolean))
-  const outside = [
+  const portalled = [
     ...stage.ownerDocument.querySelectorAll<HTMLElement>("[data-part][data-instance]"),
   ].filter((el) => !stage.contains(el) && ids.has(el.dataset["instance"]))
+  const outside = new Set(portalled)
+  for (const el of portalled) {
+    for (const nested of el.querySelectorAll<HTMLElement>("[data-part]")) outside.add(nested)
+  }
   return [...inside, ...outside]
 }
 type Tab = "react" | "css"
@@ -77,10 +82,27 @@ export function ExampleFrame({
   const [inspect, setInspect] = useState<string | null>(null)
   // a closed overlay renders its popup parts only once opened
   const [closed, setClosed] = useState(false)
+  // parts view: the stage height an open portalled popup needs (0 when none is open)
+  const [reach, setReach] = useState(0)
   const [tags, setTags] = useState<readonly { x: number; y: number }[]>([])
   useEffect(() => {
     const root = stage.current
     if (skin !== "parts" || !root) return
+    // an open popup is portalled, so the stage cannot grow around it: reach below the opener by
+    // the popup's height, so the popup never covers the parts legend. Anchored popups only: a
+    // modal one is centred on the screen, not below the opener.
+    const popups = () =>
+      anatomy(root)
+        .filter((el) => !root.contains(el) && /^(content|popup)$/.test(el.dataset["part"] ?? ""))
+        .filter((el) => el.getAttribute("aria-modal") !== "true")
+    const measure = () => {
+      const opener = root.querySelector<HTMLElement>('[aria-expanded="true"]')
+      const popup = Math.max(0, ...popups().map((el) => el.getBoundingClientRect().height))
+      const top = root.getBoundingClientRect().top
+      setReach(opener && popup ? opener.getBoundingClientRect().bottom - top + popup + 48 : 0)
+    }
+    // the popup gets its size after it mounts (positioned, then laid out)
+    const sizes = new ResizeObserver(measure)
     // portalled parts (a popover's content) live outside the stage: re-list them as they mount
     const list = () => {
       const found = new Set<string>()
@@ -93,6 +115,9 @@ export function ExampleFrame({
         if (!root.contains(el)) el.dataset["anatomyPart"] = ""
       }
       setClosed(root.querySelector('[aria-haspopup][aria-expanded="false"]') !== null)
+      sizes.disconnect()
+      for (const el of popups()) sizes.observe(el)
+      measure()
       setParts((was) =>
         was.length === found.size && was.every((p) => found.has(p)) ? was : [...found],
       )
@@ -102,6 +127,8 @@ export function ExampleFrame({
     watch.observe(root.ownerDocument.body, { childList: true, subtree: true })
     return () => {
       watch.disconnect()
+      sizes.disconnect()
+      setReach(0)
       for (const el of root.ownerDocument.querySelectorAll("[data-anatomy-part]")) {
         delete (el as HTMLElement).dataset["anatomyPart"]
       }
@@ -157,13 +184,13 @@ export function ExampleFrame({
           ))}
           <SegmentedControl.Indicator className={styles.viewIndicator} />
         </SegmentedControl.Root>
-        <Toggle.Root
+        <ToggleGroup.Item
           className={styles.getCode}
           pressed={tab !== null}
           onPressedChange={(on) => setTab(on ? "react" : null)}
         >
           {"</>"} Get code
-        </Toggle.Root>
+        </ToggleGroup.Item>
       </div>
 
       <div
@@ -174,6 +201,7 @@ export function ExampleFrame({
         data-skin={skin === "parts" ? "bare" : skin}
         data-rind-theme={`skin-${skin === "parts" ? "bare" : skin}`}
         data-inspecting={inspect ? "" : undefined}
+        style={skin === "parts" && reach ? { minHeight: Math.ceil(reach) } : undefined}
       >
         {tags.map((t) => (
           <span key={`${t.x}-${t.y}`} className={styles.tag} style={{ left: t.x, top: t.y }}>

@@ -44,7 +44,6 @@ import * as numberInput from "./number-input"
 import * as numberParsing from "./number-parsing"
 import * as overlays from "./overlays"
 import * as pagination from "./pagination"
-import * as passwordInput from "./password-input"
 import * as pinInput from "./pin-input"
 import * as popover from "./popover"
 import * as positioning from "./positioning"
@@ -53,7 +52,6 @@ import * as progress from "./progress"
 import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
-import * as searchField from "./search-field"
 import * as segmentedControl from "./segmented-control"
 import * as select from "./select"
 import * as separator from "./separator"
@@ -61,8 +59,9 @@ import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
+import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
-import * as toggle from "./toggle"
+import * as toast from "./toast"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
@@ -117,7 +116,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "keyboard-and-rtl": keyboardAndRtl,
   overlays,
   pagination,
-  "password-input": passwordInput,
   "pin-input": pinInput,
   popover,
   positioning,
@@ -128,7 +126,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
-  "search-field": searchField,
   "segmented-control": segmentedControl,
   select,
   separator,
@@ -138,10 +135,11 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   switch: switchEx,
   tabs,
+  "tags-input": tagsInput,
   "text-field": textField,
-  toggle,
   "toggle-group": toggleGroup,
   toolbar,
+  toast,
   tour,
   tooltip,
 }

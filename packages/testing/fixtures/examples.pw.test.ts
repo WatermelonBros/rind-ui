@@ -70,8 +70,10 @@ async function pool<T>(
           await context.close()
           context = await browser.newContext()
           page = await context.newPage()
+          // Another worker may have taken the last items while this one recycled.
+          if (next >= items.length) break
         }
-        const item = items[next++] as T // bounded by the loop condition
+        const item = items[next++] as T // bounded: checked just above, no await in between
         await job(page, item)
       }
       await context.close()
@@ -309,9 +311,10 @@ const TRANSIENT = new Set([
   "number-input:composing",
   "number-input:pressing",
   "number-input:spinning",
-  "password-input:composing",
   "pin-input:composing",
-  "search-field:composing",
+  // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
+  "tags-input:typing",
+  "tags-input:editing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
   // Pointer interactions: scrollbars shown while scrolling or hovered, a thumb dragged.
@@ -321,6 +324,9 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // A toast not yet started by a region, and one exiting: both last for moments.
+  "toast:idle",
+  "toast:dismissed",
 ])
 
 /**

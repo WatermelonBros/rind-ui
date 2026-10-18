@@ -10,6 +10,6 @@ The shared behaviour that lets a control that is not a native form field (Checkb
 - **Implicit submission.** Enter on the Control submits its form through the form's default button, as for a native checkbox.
 - **Server render.** The input is always rendered, so submission works before hydration.
 
-Used by: [Checkbox](../components/checkbox.md), [Switch](../components/switch.md), [Checkbox Group](../components/checkbox-group.md) and [Radio Group](../components/radio-group.md) (their items).
+Used by: [Switch](../components/switch.md), [Checkbox Group](../components/checkbox-group.md) and [Radio Group](../components/radio-group.md) (their items).
 
 Caveat: React's synthetic `<form onChange>` does not see these changes; use the component's `onCheckedChange` or a native `change` listener.

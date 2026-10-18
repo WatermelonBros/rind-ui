@@ -3,8 +3,10 @@ export {
   type RadioGroupPart,
   type RadioItemState,
   type RadioNaming,
+  type RadioPart,
   radioGroupConnect,
   radioGroupIds,
+  radioPartName,
 } from "./radio-group.connect"
 export { radioGroupArgs, radioGroupContract, radioGroupInvariants } from "./radio-group.contract"
 export {

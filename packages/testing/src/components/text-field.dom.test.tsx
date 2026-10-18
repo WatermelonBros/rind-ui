@@ -125,13 +125,13 @@ describe("TextField anatomy", () => {
 describe("Shared Field host", () => {
   it("standalone: the host's Label is the Field's under its own scope", async () => {
     render(
-      <FieldHost scope="search-field">
+      <FieldHost scope="text-field">
         <HostLabel>Search</HostLabel>
         <FieldInput />
       </FieldHost>,
     )
     const label = document.querySelector("label")
-    expect(label?.getAttribute("data-scope")).toBe("search-field")
+    expect(label?.getAttribute("data-scope")).toBe("text-field")
     expect(label?.getAttribute("for")).toBe(control().id)
     expect(screen.getByRole("textbox", { name: "Search" })).toBe(control())
   })
@@ -141,17 +141,17 @@ describe("Shared Field host", () => {
     render(
       <Field.Root>
         <Field.Label>Query</Field.Label>
-        <FieldHost scope="search-field">
+        <FieldHost scope="text-field">
           <HostLabel>Search</HostLabel>
           <FieldInput />
         </FieldHost>
       </Field.Root>,
     )
-    expect(document.querySelector('label[data-scope="search-field"]')).toBeNull()
+    expect(document.querySelector('label[data-scope="text-field"]')).toBeNull()
     expect(screen.queryByText("Search")).toBeNull()
     expect(screen.getByRole("textbox", { name: "Query" })).toBe(control())
     expect(warn).toHaveBeenCalled()
-    expect(document.querySelector('[data-scope="search-field"][data-part="root"]')).not.toBeNull()
+    expect(document.querySelector('[data-scope="text-field"][data-part="root"]')).not.toBeNull()
   })
 })
 

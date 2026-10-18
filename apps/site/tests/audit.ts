@@ -124,7 +124,23 @@ async function exercise(page: Page, url: string) {
         .catch((e: Error) => report(url, "click", `example ${i} control ${k}: ${e.message}`))
       await closeModals(page, url)
     }
+    await dismissToasts(page)
   }
+}
+
+/**
+ * Toasts left open (an action, a promise, a stack the pointer paused) sit in the viewport corner,
+ * over the next example's bar: close them all (a virtual click on each close button, as a screen
+ * reader does), then wait for none to be open (a condition, with a deadline).
+ */
+async function dismissToasts(page: Page) {
+  const open = '[data-scope="toast"][data-part="root"][data-state="open"]'
+  await page.$$eval(`${open} [data-part="close-trigger"]`, (buttons) => {
+    for (const b of buttons) (b as HTMLElement).click()
+  })
+  await page
+    .waitForFunction((sel) => document.querySelector(sel) === null, open, { timeout: 5000 })
+    .catch(() => {})
 }
 
 /**
@@ -209,7 +225,9 @@ for (const url of urls) {
   // a step that throws (a click that times out, a wait past its deadline) is a finding with
   // its page, not a crash that hides which page and step failed
   try {
-    await page.goto(base + url, { waitUntil: "networkidle" })
+    // deadlines, not delays: a slow CI runner gets 60 s to parse and 60 s to hydrate
+    await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })
+    await page.waitForSelector("html[data-hydrated]", { state: "attached", timeout: 60_000 })
     await exercise(page, url)
     // the site never names another component library (user rule): reword the doc if it does
     const named = await page.evaluate(
