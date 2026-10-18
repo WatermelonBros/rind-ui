@@ -25,6 +25,8 @@ const browsers = (process.env["RIND_BROWSERS"] ?? "chromium").split(",")
 const classicScrollbars = {
   launchOptions: {
     ignoreDefaultArgs: ["--hide-scrollbars"],
+    // TEMPORARY (crash-repro): extra Chromium flags.
+    args: process.env["RIND_CHROMIUM_ARGS"]?.split(" ") ?? [],
     firefoxUserPrefs: {
       "ui.useOverlayScrollbars": 0,
       "widget.gtk.overlay-scrollbars.enabled": false,

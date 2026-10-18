@@ -49,12 +49,14 @@ jobs:
           sudo tcpdump -i lo -nn -tttt -U -w tcp.pcap '(ip6 and ip6[6] == 6 and ip6[53] & 0x05 != 0) or (ip6 and ip6[6] == 6 and ip6[53] & 0x12 == 0x02) or (ip and tcp[tcpflags] & (tcp-fin|tcp-rst|tcp-syn) != 0)' > tcpdump.out 2>&1 &
           node -v
           for i in 1 2 3; do
+            rm -f debug-prev.log.gz; [ -f "debug-$((i-1)).log" ] && gzip "debug-$((i-1)).log"
             pnpm exec vitest run --project 'browser (chromium)' --shard=1/2 --reporter=dot > "run-$i.log" 2> "debug-$i.log" || true
             tail -5 "run-$i.log"
             if grep -q "Browser connection was closed\|page crashed" "run-$i.log" "debug-$i.log"; then
               echo "::error::dropped on run $i"
               grep -n "crash\|disconnected\|Received signal\|Fatal\|OOM\|out of memory\|heartbeat\|reload\|optimiz\|navigat\|close" "debug-$i.log" | grep -v "pw:api" | tail -80
               tail -40 disk.log
+              grep -n "frameNavigated\|frameDetached\|targetCrashed\|detachedFromTarget\|webSocketClosed\|targetDestroyed\|frameStartedNavigating\|Inspector\.\|ERROR:\|WARNING:\|VERBOSE" "debug-$i.log" | grep -v "Runtime.consoleAPICalled" | cut -c1-400 > "events-$i.log" || true
               exit 1
             fi
           done
@@ -63,12 +65,14 @@ jobs:
           CI: "true"
           RIND_BROWSERS: chromium
           RIND_MAX_WORKERS: 2
-          DEBUG: "pw:browser*,vitest:browser:*,vite:deps"
+          DEBUG: "pw:browser*,pw:protocol,vitest:browser:*"
+          RIND_CHROMIUM_ARGS: "--vmodule=*websocket*=1,*network_context*=1,*render_frame_host*=1,*render_process_host*=1,*navigation_request*=1"
       - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.rep }}
           path: |
             *.log
+            *.log.gz
             tcp.pcap
           retention-days: 3
