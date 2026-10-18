@@ -228,6 +228,13 @@
   color: var(--s-ink);
   font: 600 14px var(--font-mono, monospace);
 }
+/* juicy has no borders: the fields' inset ring, so a white field shows on the white panel */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+[data-scope="color-picker"]:is([data-part="channel-input"], [data-part="format-select"]) {
+  box-shadow:
+    inset 0 0 0 2px #d6ccf7,
+    0 3px 0 #d6ccf7;
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="color-picker"][data-part="channel-input-root"][data-channel]
   [data-part="channel-input"] {

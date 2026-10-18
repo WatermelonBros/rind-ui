@@ -273,7 +273,20 @@ export function collectDom(arg: {
   const groupOf = (el: Element) => {
     const parent = el.parentElement
     if (!parents.has(parent)) parents.set(parent, parents.size)
-    return `${parents.get(parent)}|${el.getAttribute("aria-level") ?? ""}`
+    const level = el.getAttribute("aria-level")
+    // A flat tree (sibling rows of every level): the set is the rows under the same tree
+    // parent, the nearest previous row with a lower level.
+    let owner = ""
+    if (level !== null) {
+      for (let p = el.previousElementSibling; p; p = p.previousElementSibling) {
+        const l = p.getAttribute("aria-level")
+        if (l !== null && Number(l) < Number(level)) {
+          owner = p.id
+          break
+        }
+      }
+    }
+    return `${parents.get(parent)}|${level ?? ""}|${owner}`
   }
   const own = (el: Element) =>
     el.getAttribute("data-instance") === arg.instance && el.getAttribute("data-scope") === arg.scope
