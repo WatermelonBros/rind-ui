@@ -25,6 +25,16 @@ mirrored, and ArrowUp SHALL always increase.
 - **WHEN** ArrowLeft is pressed on a horizontal slider with `dir="rtl"`
 - **THEN** the machine receives `INCREASE`
 
+#### Scenario: Calendar grid in RTL
+
+- **WHEN** ArrowLeft is pressed in a `"grid"` composite with `dir="rtl"`
+- **THEN** the machine receives `NEXT`
+
+#### Scenario: Grid rows are not mirrored
+
+- **WHEN** ArrowDown is pressed in a `"grid"` composite with `dir="rtl"`
+- **THEN** the machine receives `NEXT_ROW`
+
 #### Scenario: Segment in RTL
 
 - **WHEN** ArrowLeft is pressed on a `value: "vertical"` control with `dir="rtl"`
