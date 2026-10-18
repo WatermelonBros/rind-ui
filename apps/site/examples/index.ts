@@ -18,6 +18,7 @@ import * as colorPicker from "./color-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as controlLabel from "./control-label"
+import * as dateField from "./date-field"
 import * as dialog from "./dialog"
 import * as drawer from "./drawer"
 import * as field from "./field"
@@ -64,6 +65,7 @@ import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
 import * as tour from "./tour"
+import * as treeView from "./tree-view"
 import type { Variants } from "./types"
 import * as visuallyHidden from "./visually-hidden"
 
@@ -98,6 +100,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   combobox,
   collections,
   "context-menu": contextMenu,
+  "date-field": dateField,
   dialog,
   drawer,
   field,
@@ -137,6 +140,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   toolbar,
   toast,
   tour,
+  "tree-view": treeView,
   tooltip,
 }
 

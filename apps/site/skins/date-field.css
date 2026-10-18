@@ -1,0 +1,54 @@
+/* ── Date Field: the group is the box, segments are borderless inputs ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="label"] {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="input"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 10px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  font: 500 15px var(--s-font);
+  color: var(--s-ink);
+  font-variant-numeric: tabular-nums;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="input"][data-focus-visible] {
+  outline: 2px solid var(--s-brand);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="input"][data-invalid] {
+  border-color: var(--s-acc-deep);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="date-field"][data-part="segment"] {
+  field-sizing: content;
+  min-inline-size: 1ch;
+  padding: 2px 3px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  outline: none;
+  caret-color: transparent;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="segment"][data-placeholder] {
+  color: color-mix(in srgb, var(--s-ink) 55%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="segment"][data-focus] {
+  background: var(--s-brand);
+  color: #fff;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="date-field"][data-part="segment"][data-invalid]:not([data-focus]) {
+  color: var(--s-error);
+}

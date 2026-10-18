@@ -70,7 +70,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Autocomplete |  |  | ● | ● |  |  | ● |  |  | 3 | 2 | spec | Missing in Ark |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | spec | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | wip | RAC: TokenField (unverified) |
-| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | spec | RAC/Reka: Tree |
+| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
 | Command |  |  |  |  |  |  |  | ● |  | 1 | 2 | spec | Missing in Ark |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark |
@@ -114,7 +114,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip |  |
-| Date Field | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: Date Input |
+| Date Field | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip | Ark: Date Input |
 | Date Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec |  |
 | Date Range Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: range mode of Date Picker |
 | Time Field |  |  | ● |  |  |  | ● | ● | ● | 4 | 3 | spec |  |

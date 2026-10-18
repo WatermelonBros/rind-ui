@@ -23,7 +23,8 @@ const a11y = async () => {
 }
 
 // Press-and-hold delays (`after:*` edges) run on a virtual clock: the runner advances it,
-// no real time passes.
+// no real time passes. They are walked in browser mode only: jsdom has no layout, so its
+// runs skip PRESS.START and every hold after it.
 const clock = virtualClock()
 
 type PartLike = {

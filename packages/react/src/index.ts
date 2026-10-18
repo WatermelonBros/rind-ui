@@ -13,6 +13,7 @@ export * from "./color-picker"
 export * from "./combobox"
 export { CompositeHostContext, useCompositeHost, useHostItem } from "./composite-host"
 export * from "./context-menu"
+export * from "./date-field"
 export * from "./dialog"
 export * from "./drawer"
 export * from "./field"
@@ -67,6 +68,7 @@ export * from "./toggle-group"
 export * from "./toolbar"
 export * from "./tooltip"
 export * from "./tour"
+export * from "./tree-view"
 export {
   useCollectionIdentityWarning,
   useCollectionItems,

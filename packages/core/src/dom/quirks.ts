@@ -187,7 +187,7 @@ export const quirks = defineQuirks([
   {
     id: "ios-vo-spinbutton-input",
     // VoiceOver on iOS cannot focus or edit an <input role="spinbutton">; React Aria drops the
-    // role there. The Number Input change (add-number-input) gates on this entry.
+    // role there. Number Input and the Date Field's segments (the same element) gate on it.
     when: (p) => p.ios,
     links: [
       "https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts",
