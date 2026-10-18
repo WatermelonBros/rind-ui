@@ -19,7 +19,7 @@
   height: 30px;
   padding: 0;
   border-radius: 99px;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   background: var(--s-muted);
   cursor: pointer;
   transition: background 0.35s var(--s-ease);
@@ -73,7 +73,7 @@
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="switch"][data-part="control"] {
   background: #d6ccf7;
-  box-shadow: inset 0 2px 0 #c4b7f0;
+  box-shadow: inset 0 0 0 2px var(--s-field-line);
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 3px 0 #d8d0f5;
@@ -85,7 +85,7 @@
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="switch"][data-part="control"] {
   background: #e4e4e7;
-  border-color: #d4d4d8;
+  border-color: var(--s-field-line);
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 1px 2px #0003;

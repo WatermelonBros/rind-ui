@@ -6,7 +6,7 @@
 import { readFileSync, statSync } from "node:fs"
 import { createServer } from "node:http"
 import { extname, join } from "node:path"
-import { chromium, type Page } from "playwright"
+import { chromium, type Locator, type Page } from "playwright"
 
 const root = join(import.meta.dirname, "..")
 const outDir = join(root, "out")
@@ -98,6 +98,33 @@ async function axe(page: Page, url: string, phase: string) {
   for (const v of violations) report(url, `axe/${phase}`, v)
 }
 
+/** Every interactive part of an example is at least a 24 by 24 px target (WCAG 2.5.8). Inline
+ * links in a sentence, hidden inputs and plain native inputs (the user agent's controls) are exempt. */
+async function targets(frame: Locator, url: string, where: string) {
+  const small = await frame
+    .locator("[data-skin]")
+    .first()
+    .evaluate((stage) => {
+      const out: string[] = []
+      const interactive =
+        "button, a[href], select, textarea, input[data-scope]:not([type=hidden], [data-part=hidden-input], [data-part=area-input]), [role=button], [role=checkbox], [role=radio], [role=switch], [role=tab], [role=option], [tabindex='0']"
+      for (const el of stage.querySelectorAll<HTMLElement>(interactive)) {
+        const r = el.getBoundingClientRect()
+        if (!r.width || !r.height || el.closest("[aria-hidden='true'], [data-rind-portal]"))
+          continue
+        const cs = getComputedStyle(el)
+        if (cs.visibility === "hidden" || (el.matches("a[href]") && cs.display === "inline"))
+          continue
+        if (r.width < 23.5 || r.height < 23.5)
+          out.push(
+            `${el.tagName.toLowerCase()}[data-part=${el.dataset["part"] ?? ""}] ${Math.round(r.width)}x${Math.round(r.height)}`,
+          )
+      }
+      return [...new Set(out)]
+    })
+  for (const t of small) report(url, "target-size", `${where}: ${t}`)
+}
+
 async function exercise(page: Page, url: string) {
   const frames = page.locator("section[data-example]")
   for (let i = 0; i < (await frames.count()); i++) {
@@ -108,6 +135,7 @@ async function exercise(page: Page, url: string) {
     if (await legend.count()) await legend.first().hover()
     for (const skin of ["juicy", "bare", "crisp"]) {
       await frame.getByRole("radio", { name: skin, exact: true }).click()
+      await targets(frame, url, `example ${i} ${skin}`)
     }
     await frame.getByRole("button", { name: /Get code/ }).click()
     if ((await frame.locator("pre").count()) === 0) report(url, "code", `example ${i} has no code`)
@@ -249,6 +277,14 @@ for (const url of urls) {
       } catch {}
       if (!found) report(url, "broken-link", href)
     }
+    // every in-page link of the page's own text (not an example's demo data) has its target
+    for (const id of await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLAnchorElement>("a[href^='#']")]
+        .filter((a) => !a.closest("[data-skin]") && a.hash.length > 1)
+        .map((a) => decodeURIComponent(a.hash.slice(1)))
+        .filter((id) => !document.getElementById(id)),
+    ))
+      report(url, "broken-anchor", `#${id}`)
     // every section the reader can scroll to must be visible once scrolled into view
     const height = await page.evaluate(() => document.body.scrollHeight)
     for (let y = 0; y < height; y += 600) {
