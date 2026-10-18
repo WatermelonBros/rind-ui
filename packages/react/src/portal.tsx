@@ -23,7 +23,9 @@ export type PortalProps = ComponentPropsWithRef<"div"> & {
    * part that is closed passes false: applied once, no observer.
    */
   readonly observe?: boolean | undefined
+  /** Another element or a render function receiving the props, in place of the host `div`. */
   readonly render?: RenderProp
+  /** The content rendered into the portal host. */
   readonly children?: ReactNode
 }
 

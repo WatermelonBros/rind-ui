@@ -93,6 +93,7 @@ export type DateRangeFieldRootProps = Omit<
     readonly allowsNonContiguousRanges?: boolean
     /** The hidden inputs' names. */
     readonly startName?: string
+    /** The end date's hidden input name. */
     readonly endName?: string
     readonly form?: string
     readonly messages?: MessageOverrides<DateFieldMessages>

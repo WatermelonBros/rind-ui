@@ -130,6 +130,7 @@ export type ColorPickerRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir" | "color"
 > & {
+  /** The picker parts. */
   readonly children?: ReactNode
   readonly value?: ColorInput
   /** Default `#000000`. */
@@ -146,19 +147,28 @@ export type ColorPickerRootProps = Omit<
   readonly inline?: boolean
   readonly closeOnSelect?: boolean
   readonly modal?: boolean
+  /** The Popover's positioning: side, align, offsets, flip, shift, size, arrow and mode. */
   readonly positioning?: PopoverProps["positioning"]
+  /** Where focus goes once the Popover is placed: a function, or the overlay's rule. */
   readonly initialFocus?: PopoverProps["initialFocus"]
+  /** Elements whose presses and focus count as inside the Popover (a toast region). */
   readonly persistentElements?: PopoverProps["persistentElements"]
   readonly name?: string
+  /** The id of the form the hidden input belongs to. */
   readonly form?: string
   /** The submitted text's format (default the canonical hex). */
   readonly formFormat?: ColorFormat
   readonly disabled?: boolean
   readonly readOnly?: boolean
+  /** Marks the picker required (Field state, `data-required` on the hidden input). */
   readonly required?: boolean
+  /** Marks the picker invalid (`data-invalid`, the Field's error state). */
   readonly invalid?: boolean
+  /** A fixed name or a function replacing the computed colour name (Trigger label, value texts, announcements). */
   readonly colorName?: ColorNameProp
+  /** Formats the colour name and the numbers. Default: the provider's. */
   readonly locale?: string
+  /** Reading direction; mirrors the area and sliders. Default: the provider's. */
   readonly dir?: "ltr" | "rtl"
   readonly messages?: MessageOverrides<ColorPickerMessages>
 }
@@ -394,6 +404,7 @@ function HiddenInput() {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the picker's state. */
   readonly render?: RenderProp<ColorPickerState>
 }
 

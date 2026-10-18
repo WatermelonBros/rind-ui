@@ -68,6 +68,11 @@ derived from the trail on every render.
 | `href` | `Href` | — | Where the crumb goes (Link). |
 | `routerOptions` | `RouterOptions` | — | Passed unchanged to the router's `navigate` (Link). |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, on every part. |
+| `children` | `ReactNode \| ((state: BreadcrumbsItemState) => ReactNode)` | — | Nodes, or a function of the Item's state (a non-link control sets `aria-current`). |
+| `download` | `boolean \| string` | — | Download instead of navigating (the browser handles it); a string names the file. |
+| `referrerPolicy` | `ComponentPropsWithRef<"a">["referrerPolicy"]` | — | Passed to the anchor. |
+| `focusableWhenDisabled` | `boolean` | — | Keeps a disabled link in the Tab order (it stays `aria-disabled`). |
+| `onActivate` | `LinkInput["onActivate"]` | — | Once per activation that is not disabled or prevented, with where it opened. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

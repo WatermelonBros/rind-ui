@@ -75,14 +75,17 @@ type Common = Omit<ComponentPropsWithRef<"div">, "defaultValue" | "onChange"> & 
   readonly focusableWhenDisabled?: boolean
   /** Arrow keys wrap around. Default true. */
   readonly loop?: boolean
+  /** How long typed characters build one typeahead search (ms). Default: 1000. */
   readonly typeaheadTimeout?: number
   /** Data tags. Without them (and without `collection`), Tag parts register themselves. */
   readonly items?: readonly TagGroupItemData[]
+  /** A collection built by the consumer, used instead of `items`. */
   readonly collection?: Collection<unknown>
   /** Tags are removable: drop the keys from your data, or keep them (nothing happens). */
   readonly onRemove?: (keys: readonly string[], details: TagGroupRemoveDetails) => void
   readonly onAction?: (key: string, details: TagGroupActionDetails) => void
   readonly messages?: Partial<TagGroupMessages>
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -93,6 +96,7 @@ type Selection =
       readonly value?: string | null
       readonly defaultValue?: string | null
       readonly onValueChange?: (value: string | null, details: TagGroupChangeDetails) => void
+      /** No user action leaves the selection empty. */
       readonly disallowEmptySelection?: boolean
     }
   | {
@@ -100,6 +104,7 @@ type Selection =
       readonly value?: readonly string[]
       readonly defaultValue?: readonly string[]
       readonly onValueChange?: (value: readonly string[], details: TagGroupChangeDetails) => void
+      /** No user action leaves the selection empty. */
       readonly disallowEmptySelection?: boolean
     }
 
@@ -132,6 +137,7 @@ const TagContext = createContext<{
 const ListContext = createContext(false)
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -357,6 +363,7 @@ function Tag({
 }: Own<"div"> & {
   /** The tag key. */
   readonly value: string
+  /** The tag's text for typeahead and the remove button's name. */
   readonly textValue?: string | undefined
   readonly disabled?: boolean | undefined
   /** A link tag: TagText renders an anchor to it. */
@@ -457,7 +464,12 @@ function Empty({ render, ...rest }: Own<"div">) {
 }
 
 /** Data mode: every tag of `items`, with its text and (removable) its remove button. */
-function Tags({ children }: { readonly children?: (label: string, key: string) => ReactNode }) {
+function Tags({
+  children,
+}: {
+  /** Renders one tag's content from its label and key; default: TagText and TagRemove. */
+  readonly children?: (label: string, key: string) => ReactNode
+}) {
   const host = useHost("Tags")
   const out: ReactNode[] = []
   for (const node of host.collection) {

@@ -160,11 +160,13 @@ export interface PopoverActions {
 }
 
 export type PopoverRootProps = Omit<PopoverProps, "root" | "parent" | "anchored"> & {
+  /** Base for the ids of the popover's parts. Default: generated. */
   readonly id?: string
   /** Positioner and content stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
   readonly messages?: MessageOverrides<PopoverMessages>
   readonly actionsRef?: Ref<PopoverActions>
+  /** The popover's parts: its trigger, anchor, portal, positioner and content. */
   readonly children?: ReactNode
 }
 
@@ -217,6 +219,7 @@ function Root({
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements, S = undefined> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<S>
 }
 

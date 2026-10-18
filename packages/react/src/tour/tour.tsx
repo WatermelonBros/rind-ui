@@ -90,6 +90,7 @@ export type UseTourProps = Omit<
   TourProps,
   "root" | "parent" | "steps" | "messages" | "onOpenChange" | "stepId" | "onStepIdChange"
 > & {
+  /** Base for the ids of the tour's parts. Default: generated. */
   readonly id?: string
   readonly steps: readonly TourStepDef[]
   readonly stepId?: string | null | undefined
@@ -326,7 +327,10 @@ function useApi(
 export type TourRootProps = (
   | ({ readonly tour: TourHandle } & { readonly [K in keyof UseTourProps]?: never })
   | (UseTourProps & { readonly tour?: never })
-) & { readonly children?: ReactNode }
+) & {
+  /** The tour's parts. */
+  readonly children?: ReactNode
+}
 
 function Provider({ tour, children }: { tour: TourHandle; children?: ReactNode }) {
   const [contentMounted, setContentMounted] = useState(false)
@@ -638,6 +642,7 @@ function ProgressText({ render, children, ...rest }: Own<"span">) {
 function Actions({
   children,
 }: {
+  /** Renders the shown step's actions. */
   readonly children: (actions: readonly TourAction<ReactNode>[]) => ReactNode
 }) {
   const ctx = useTourCtx("Actions")

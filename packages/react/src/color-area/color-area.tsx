@@ -99,6 +99,7 @@ export type ColorAreaRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir" | "color"
 > & {
+  /** The area's parts (Background, Thumb). */
   readonly children?: ReactNode
   readonly value?: ColorInput
   /** Default `hsb(0, 0%, 100%)`; a later change only changes what a form reset restores. */
@@ -108,17 +109,26 @@ export type ColorAreaRootProps = Omit<
   readonly onValueCommit?: (color: Color, details: ColorCommitDetails<ColorAreaReason>) => void
   /** The space of the axes (default: the first colour's space, else `hsb`). */
   readonly colorSpace?: ColorSpace
+  /** The horizontal channel. Default: saturation (hsb, hsl), red (rgb). */
   readonly xChannel?: ColorChannel
+  /** The vertical channel. Default: brightness (hsb), lightness (hsl), green (rgb). */
   readonly yChannel?: ColorChannel
+  /** Submits the x channel under this name. */
   readonly xName?: string
+  /** Submits the y channel under this name. */
   readonly yName?: string
+  /** The id of the form the inputs belong to. */
   readonly form?: string
   readonly disabled?: boolean
   readonly readOnly?: boolean
+  /** Replaces the colour name in the value text. */
   readonly colorName?: ColorNameProp
+  /** Formats the value text. Default: the provider's locale. */
   readonly locale?: string
+  /** Mirrors the x axis. Default: the provider's direction. */
   readonly dir?: "ltr" | "rtl"
   readonly messages?: MessageOverrides<ColorAreaMessages>
+  /** Another element or a render function receiving the props and the area's state. */
   readonly render?: RenderProp<ColorAreaState>
 }
 
@@ -305,6 +315,7 @@ function Root({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the area's state. */
   readonly render?: RenderProp<ColorAreaState>
 }
 

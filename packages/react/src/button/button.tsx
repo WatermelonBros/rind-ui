@@ -58,9 +58,13 @@ export type ButtonProps = Omit<ComponentPropsWithRef<"button">, "type" | "disabl
    * Focus": an editor toolbar's Bold keeps the editor focused).
    */
   readonly focusOnPress?: boolean
+  /** Once per activation, with `modality` and the modifier keys. */
   readonly onPress?: (details: ButtonPressDetails) => void
+  /** A press starts. */
   readonly onPressStart?: (details: ButtonPressDetails) => void
+  /** A press ends, also when cancelled or released outside. */
   readonly onPressEnd?: (details: ButtonPressDetails) => void
+  /** Overrides the announced texts. Default: `pending: "Loading"`. */
   readonly messages?: MessageOverrides<ButtonMessages>
   /** Another element; `<a href>` keeps link semantics and routes like a Link. */
   readonly render?: RenderProp<ButtonState>

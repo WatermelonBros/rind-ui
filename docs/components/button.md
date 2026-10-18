@@ -36,6 +36,7 @@ import { Button } from "@rind-ui/react"
 | `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
 | `messages` | `{ pending?: string }` | — | Overrides; default `pending: "Loading"`. |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element: `<a href>` stays a link and routes like a Link; anything else gets `role="button"` and `tabIndex`. |
+| `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

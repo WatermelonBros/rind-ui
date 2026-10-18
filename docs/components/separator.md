@@ -40,6 +40,7 @@ Separator is stateless: it has no machine.
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Its own orientation; wins over the container's default (a toolbar's separators are vertical). |
 | `decorative` | `boolean` | `false` | Purely visual: `role="none"`, removed from the accessibility tree. |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element, for example `<hr />` (rendered without children). |
+| `children` | `ComponentPropsWithRef<"div">["children"]` | — | Ignored when the rendered element is void (`<hr>`). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

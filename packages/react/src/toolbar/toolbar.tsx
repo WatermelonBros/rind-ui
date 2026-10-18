@@ -61,6 +61,7 @@ export interface ToolbarState {
 }
 
 export type ToolbarRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
+  /** The toolbar's controls and separators. */
   readonly children?: ReactNode
   readonly orientation?: "horizontal" | "vertical"
   /** Arrow moves wrap at both ends (default true). */

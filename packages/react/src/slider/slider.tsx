@@ -141,6 +141,7 @@ export type SliderRootProps<V extends SliderValue = SliderValue> = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue" | "onChange" | "dir"
 > & {
+  /** The slider's parts: label, control, thumbs, markers, value text and description. */
   readonly children?: ReactNode
   readonly value?: V
   /** Read at creation (default `min`); a later change only changes what a form reset restores. */
@@ -155,19 +156,26 @@ export type SliderRootProps<V extends SliderValue = SliderValue> = Omit<
   readonly largeStep?: number
   readonly minStepsBetweenThumbs?: number
   readonly thumbCollision?: ThumbCollision
+  /** `contain` keeps thumbs inside the track; set `--rind-slider-thumb-size` to the thumb size. Default: `center`. */
   readonly thumbAlignment?: ThumbAlignment
+  /** The axis. Default: `horizontal`. */
   readonly orientation?: SliderOrientation
   readonly disabled?: boolean
   readonly readOnly?: boolean
   /** `data-required` only: a range input always has a value. */
   readonly required?: boolean
+  /** Sets `aria-invalid` and `data-invalid`. */
   readonly invalid?: boolean
   readonly name?: string
+  /** The id of the form the inputs belong to. */
   readonly form?: string
   readonly formatOptions?: Intl.NumberFormatOptions
+  /** Locale for formatting. Default: the provider's. */
   readonly locale?: string
+  /** Reading direction; mirrors a horizontal Slider. Default: the provider's. */
   readonly dir?: "ltr" | "rtl"
   readonly messages?: Partial<SliderMessages>
+  /** Another element or a render function receiving the props and the slider's state. */
   readonly render?: RenderProp<SliderState>
 }
 
@@ -479,6 +487,7 @@ function Root<V extends SliderValue>({
 }
 
 type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the slider's state. */
   readonly render?: RenderProp<SliderState>
 }
 
@@ -549,6 +558,7 @@ export type SliderThumbProps = Omit<PartProps<"div">, "children"> & {
   readonly disabled?: boolean
   /** Submitted under this name instead of the Root's. */
   readonly name?: string
+  /** The thumb's visible content, rendered before its native range input. */
   readonly children?: ReactNode
 }
 

@@ -95,6 +95,7 @@ export interface MenubarState {
 }
 
 export type MenubarRootProps = Omit<ComponentPropsWithRef<"div">, "children" | "defaultValue"> & {
+  /** The bar's `Menubar.Menu` entries. */
   readonly children?: ReactNode
   /** The open menu's value, or null. */
   readonly value?: string | null
@@ -342,6 +343,7 @@ function MenubarMenu({
 }
 
 export type MenubarTriggerProps = ComponentPropsWithRef<"div"> & {
+  /** The typeahead text of the bar item. Default: the text content. */
   readonly textValue?: string
   readonly render?: RenderProp<{ readonly open: boolean }>
 }

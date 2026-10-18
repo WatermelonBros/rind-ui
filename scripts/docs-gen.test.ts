@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest"
+import type { ComponentMeta } from "../packages/core/src/components/meta"
 import {
+  extractParts,
   fillBlocks,
   fillTestedWith,
+  type OwnProp,
+  type PartProps,
+  propGaps,
   renderAria,
   renderLlms,
   renderQuirks,
   renderTestedWith,
   type TestedWith,
+  withExtractedProps,
 } from "./docs-gen"
 
 const pass: TestedWith = {
@@ -93,5 +99,64 @@ describe("docs generator", () => {
       fillBlocks("<!-- aria:x--open -->\n<!-- /aria -->", "aria", (id) => renderAria(id, read)),
     ).toBe('<!-- aria:x--open -->\n```yaml\n- button "Details" [expanded]\n```\n<!-- /aria -->')
     expect(() => renderAria("x--closed", read)).toThrow(/no ARIA snapshot for story x--closed/)
+  })
+})
+
+describe("props from the types", () => {
+  const meta: ComponentMeta = {
+    scope: "x",
+    name: "X",
+    stateless: true,
+    parts: [],
+    props: {
+      value: { type: "string", description: "From the meta." },
+      "Item.value": { type: "string", description: "The item's." },
+      gone: { type: "string", description: "No part has it." },
+    },
+    dataAttributes: {},
+    keyboard: [],
+    contract: { actions: {}, queries: [], traits: [] },
+  }
+  const own = (description: string): OwnProp => ({ type: "boolean", description, at: "x.tsx:1" })
+  const parts: PartProps[] = [
+    {
+      part: "X.Root",
+      own: new Map([
+        ["value", own("")],
+        ["open", own("JSDoc.")],
+        ["bare", own("")],
+      ]),
+      all: new Set(["value", "open", "bare", "id"]),
+    },
+    { part: "X.Item", own: new Map([["value", own("")]]), all: new Set(["value"]) },
+  ]
+
+  it("names the component, part and prop of every undescribed prop, and every stale meta prop", () => {
+    expect(propGaps(meta, parts)).toEqual([
+      "X: X.Root prop `bare` has no description (add JSDoc at x.tsx:1)",
+      "X: x.meta.ts prop `gone` is accepted by no part",
+    ])
+  })
+
+  it("lists a JSDoc-described prop the meta lacks, after the meta's", () => {
+    expect(Object.keys(withExtractedProps(meta, parts).props)).toEqual([
+      "value",
+      "Item.value",
+      "gone",
+      "open",
+    ])
+  })
+
+  it("reads own props from every source type, never the element's DOM props", () => {
+    const [root] = extractParts(["badge"]).get("badge") ?? []
+    expect(root?.part).toBe("Badge.Root")
+    expect([...(root?.own.keys() ?? [])].sort()).toEqual(["label", "render"])
+    expect(root?.own.get("label")?.description).toMatch(/assistive technology/)
+    expect(root?.all.has("onClick")).toBe(true)
+    // Single and multiple selection are a union of prop sets: both variants' props count.
+    const listbox = extractParts(["listbox"])
+      .get("listbox")
+      ?.find((p) => p.part === "Listbox.Root")
+    expect(listbox?.own.has("onValueChange")).toBe(true)
   })
 })

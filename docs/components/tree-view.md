@@ -66,6 +66,21 @@ import { TreeView } from "@rind-ui/react"
 | `onAction` | `(key, { modality, via }) => void` | — | Enter, and a press when the selection does not consume it. |
 | `onLoadChildren` | `(key, { signal }) => Promise \| void` | — | Called once per unloaded branch when first expanded. |
 | `disabled` | `boolean` | `false` | No Tab stop, no keys or presses. |
+| `id` | `string` | — | Base of the parts' generated ids (default: a `useId`). |
+| `children` | `ReactNode` | — | The tree's parts (Label, Tree, Empty). |
+| `collection` | `TreeCollection<unknown>` | — | A tree collection you built, used instead of `items`. |
+| `focusableWhenDisabled` | `boolean` | — | Disabled items (and a disabled tree) stay focusable and reachable by arrows; nothing toggles. |
+| `loop` | `boolean` | — | Arrow moves wrap at both ends. Default: false. |
+| `typeaheadTimeout` | `number` | — | Typeahead reset delay in ms. Default: 1000. |
+| `messages` | `Partial<TreeViewMessages>` | — | Overrides for the loading announcements and the Empty and Loading default texts. |
+| `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
+| `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
+| `rel` | `string \| undefined` | — | With `href`: passed to the anchor. |
+| `href` | `Href \| undefined` | — | Renders a native `<a role="treeitem">` (link navigation). |
+| `target` | `string \| undefined` | — | With `href`: passed to the anchor; not `_self` opens elsewhere. |
+| `current` | `LinkCurrent \| undefined` | — | With `href`: sets `aria-current` and `data-current`; the link still navigates. |
+| `routerOptions` | `RouterOptions \| undefined` | — | With `href`: passed unchanged to the router's `navigate`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

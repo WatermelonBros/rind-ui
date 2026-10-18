@@ -83,6 +83,12 @@ export const toastMeta = {
       default: '{ regionLabel: "Notifications (F6)", close: "Dismiss notification", … }',
       description: "On `Toaster`: the assistive-technology strings.",
     },
+    render: {
+      type: "element | (props, toast) => element",
+      description: "Substitutes the rendered element without changing behaviour.",
+    },
+  },
+  options: {
     placement: {
       type: '"top" | "bottom" + "-start" | "-center" | "-end"',
       default: '"bottom-end"',
@@ -129,10 +135,6 @@ export const toastMeta = {
       type: "(reason: ToastDismissReason) => void",
       description:
         "On a toast: `reason` is `close-trigger`, `action`, `escape-key`, `swipe`, `timeout` or `api`.",
-    },
-    render: {
-      type: "element | (props, toast) => element",
-      description: "Substitutes the rendered element without changing behaviour.",
     },
   },
   dataAttributes: {

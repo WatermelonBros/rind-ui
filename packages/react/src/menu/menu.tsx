@@ -203,11 +203,17 @@ function useApi(ctx: Level, extra: { dir?: "ltr" | "rtl" } = {}) {
 }
 
 type LevelOptions = {
+  /** Arrow navigation wraps from the last item to the first and back. Default: true. */
   readonly loop?: boolean | undefined
+  /** Disabled items stay reachable by navigation (they still cannot be activated). Default: true. */
   readonly focusableWhenDisabled?: boolean | undefined
+  /** Milliseconds of idle time that end a typeahead search. Default: 1000. */
   readonly typeaheadTimeout?: number | undefined
+  /** Side, align, offsets, flip, shift, size, arrow and mode (`manual` for CSS anchor positioning). Default: the dropdown preset (submenu or pointer preset for a submenu or context menu). */
   readonly positioning?: PositioningProps | undefined
+  /** Milliseconds the pointer rests on a submenu trigger before it opens. Default: 100. */
   readonly submenuOpenDelay?: number | undefined
+  /** Milliseconds the pointer may rest inside the grace area towards an open submenu before it closes. Default: 300. */
   readonly submenuGraceTimeout?: number | undefined
 }
 
@@ -300,6 +306,7 @@ export interface MenuActions {
 }
 
 export type MenuRootProps = LevelOptions & {
+  /** Base for the ids of the menu's parts. Default: generated. */
   readonly id?: string
   readonly open?: boolean
   readonly defaultOpen?: boolean
@@ -309,6 +316,7 @@ export type MenuRootProps = LevelOptions & {
   /** Positioner and content stay mounted (hidden) while closed. */
   readonly keepMounted?: boolean
   readonly actionsRef?: Ref<MenuActions>
+  /** The menu's parts: its trigger, portal, positioner and content. */
   readonly children?: ReactNode
 }
 
@@ -568,9 +576,13 @@ export type MenuItemProps = Omit<Own<"div", MenuItemRenderState>, "onSelect"> &
     readonly closeOnSelect?: boolean
     /** A link item (rendered as `<a>`). */
     readonly href?: LinkInput["href"]
+    /** The link's `target`; a target other than `_self` leaves navigation to the browser. */
     readonly target?: string
+    /** The link's `rel`. */
     readonly rel?: string
+    /** The link's `download`: `true` or a file name; the browser downloads instead of navigating. */
     readonly download?: boolean | string
+    /** Passed unchanged to the router's `navigate`. */
     readonly routerOptions?: LinkInput["routerOptions"]
   }
 
@@ -642,7 +654,9 @@ function Item({
 export type MenuCheckboxItemProps = Omit<Own<"div", MenuItemRenderState>, "onSelect"> &
   ItemBase & {
     readonly checked?: boolean
+    /** Initial checked state while uncontrolled. Default: false. */
     readonly defaultChecked?: boolean
+    /** Called with the new checked state each time the item is toggled. */
     readonly onCheckedChange?: (checked: boolean) => void
     /** Default false: the menu stays open while options are toggled. */
     readonly closeOnSelect?: boolean
@@ -711,6 +725,7 @@ const RadioGroupContext = createContext<{
 
 export type MenuRadioGroupProps = Omit<Own<"div">, "defaultValue"> & {
   readonly value?: string | null
+  /** Initial selected value while uncontrolled. Default: null. */
   readonly defaultValue?: string | null
   readonly onValueChange?: (value: string | null) => void
   readonly disabled?: boolean
@@ -880,6 +895,7 @@ const SubmenuContext = createContext<{
 
 export type MenuSubmenuProps = Omit<LevelOptions, "loop"> & {
   readonly loop?: boolean
+  /** The submenu's parts: its `Menu.SubmenuTrigger` and its portal, positioner and content. */
   readonly children?: ReactNode
 }
 

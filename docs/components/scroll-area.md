@@ -54,6 +54,7 @@ import { ScrollArea } from "@rind-ui/react"
 | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Scrollbar: its axis. |
 | `actionsRef` | `Ref<{ measure(): void }>` | — | Root: call `measure()` after a change the observers cannot see (a deep descendant resized). |
 | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `children` | `ReactNode` | — | The Viewport, Scrollbars and Corner. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

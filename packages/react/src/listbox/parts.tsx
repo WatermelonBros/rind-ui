@@ -54,6 +54,7 @@ export interface ListboxHost {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 
@@ -116,8 +117,10 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
   }: Own<"div"> & {
     /** The item key. */
     readonly value: string
+    /** Used by typeahead, filtering, announcements and form labels (default: the text content). */
     readonly textValue?: string
     readonly disabled?: boolean
+    /** Extra filter terms (synonyms); never typeahead, announcements or labels. */
     readonly keywords?: readonly string[]
   }) {
     const host = useHost("Item")
@@ -203,7 +206,10 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     keepMounted = false,
     render,
     ...rest
-  }: Own<"span"> & { readonly keepMounted?: boolean }) {
+  }: Own<"span"> & {
+    /** Rendered while not selected too (hidden by CSS on `data-state`). */
+    readonly keepMounted?: boolean
+  }) {
     const host = useHost("ItemIndicator")
     const key = useItemKey("ItemIndicator")
     const own = host.parts.itemIndicator(key)
@@ -218,9 +224,11 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
     render,
     ...rest
   }: Omit<Own<"div">, "children"> & {
+    /** The section's key and label; the label names it and is the default heading. */
     readonly section: { readonly key: string; readonly label: string }
     /** The section label part (default: the label text). */
     readonly label?: ReactNode
+    /** The section's items. */
     readonly children?: ReactNode
   }) {
     const host = useHost("Section")
@@ -311,7 +319,12 @@ export function createListboxParts(useHost: (part: string) => ListboxHost) {
   }
 
   /** Data mode: every section and item of the collection, in render order. */
-  function Items({ children }: { readonly children?: (label: string, key: string) => ReactNode }) {
+  function Items({
+    children,
+  }: {
+    /** Each item's content from its label and key (default: an ItemText with the label). */
+    readonly children?: (label: string, key: string) => ReactNode
+  }) {
     const host = useHost("Items")
     const c = host.collection
     const groups: { section: SectionNode | null; keys: CollectionKey[] }[] = []

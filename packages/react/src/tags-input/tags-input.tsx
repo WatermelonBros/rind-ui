@@ -47,7 +47,9 @@ export interface TagsInputChangeDetails {
 }
 
 export interface TagsInputRootProps {
+  /** The base of the generated part ids. Default: a generated id. */
   readonly id?: string
+  /** The Tags Input parts (Root renders no element). */
   readonly children?: ReactNode
   readonly value?: readonly string[]
   readonly defaultValue?: readonly string[]
@@ -75,6 +77,7 @@ export interface TagsInputRootProps {
   readonly required?: boolean
   readonly name?: string
   readonly inputName?: string
+  /** The id of the form the submitted tags (and the named text input) belong to. */
   readonly form?: string
   readonly messages?: Partial<TagsInputMessages>
 }
@@ -274,6 +277,7 @@ function Root(all: TagsInputRootProps) {
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }
 

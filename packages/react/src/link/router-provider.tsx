@@ -7,6 +7,7 @@ export interface RouterProviderProps {
   readonly navigate: Router["navigate"]
   /** The rendered href (basename): a plain function, never a hook. */
   readonly href?: ((href: Href) => string) | undefined
+  /** The tree whose link parts route through `navigate`. */
   readonly children?: ReactNode
 }
 

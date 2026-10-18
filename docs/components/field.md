@@ -56,6 +56,10 @@ One Field wraps **one** control. To group several controls under one name, use a
 | `errorMessageAttribute` | `"describedby" \| "both"` | `"describedby"` | `both` adds `aria-errormessage`. |
 | `messages` | `{ errorAnnouncement?, invalid?, valueMissing?, … }` | — | Announcement and per-constraint messages. |
 | `match` | `ValidityKey` | — | On ErrorMessage: rendered only when this key is the cause. |
+| `children` | `ReactNode` | — | The form control and the Field's parts. |
+| `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `scope` | `string` | — | For Field hosts (Text Field, …): the scope the Field's parts carry, so a host's Label is `data-scope="text-field"`. Default `field`. |
+| `rootPart` | `string` | — | For a Field host that is another component's part: its root's part name. Default `root`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

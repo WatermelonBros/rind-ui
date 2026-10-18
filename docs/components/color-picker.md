@@ -83,6 +83,34 @@ import { ColorPicker } from "@rind-ui/react"
 | `disabled` | `boolean` | `false` | Disables every part and closes. |
 | `readOnly` | `boolean` | `false` | Focusable, changes nothing. |
 | `messages` | `Partial<ColorPickerMessages>` | — | Every string of the picker and its children. |
+| `children` | `ReactNode` | — | The picker parts. |
+| `positioning` | `PopoverProps["positioning"]` | — | The Popover's positioning: side, align, offsets, flip, shift, size, arrow and mode. |
+| `initialFocus` | `PopoverProps["initialFocus"]` | — | Where focus goes once the Popover is placed: a function, or the overlay's rule. |
+| `persistentElements` | `PopoverProps["persistentElements"]` | — | Elements whose presses and focus count as inside the Popover (a toast region). |
+| `form` | `string` | — | The id of the form the hidden input belongs to. |
+| `required` | `boolean` | — | Marks the picker required (Field state, `data-required` on the hidden input). |
+| `invalid` | `boolean` | — | Marks the picker invalid (`data-invalid`, the Field's error state). |
+| `colorName` | `ColorNameProp` | — | A fixed name or a function replacing the computed colour name (Trigger label, value texts, announcements). |
+| `locale` | `string` | — | Formats the colour name and the numbers. Default: the provider's. |
+| `dir` | `"ltr" \| "rtl"` | — | Reading direction; mirrors the area and sliders. Default: the provider's. |
+| `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
+| `container` | `Element \| ShadowRoot \| null \| undefined` | — | Where to render (default: resolved from the logical parent, then `body`). |
+| `logicalParent` | `(() => Element \| null) \| undefined` | — | The element the content belongs to (its trigger): target resolution and dir/lang/theme. |
+| `observe` | `boolean \| undefined` | — | Follow the logical parent's attributes as they change (default true). An always-mounted part that is closed passes false: applied once, no observer. |
+| `colorSpace` | `ColorSpace` | — | The space of the axes (default: the first colour's space, else `hsb`). |
+| `xChannel` | `ColorChannel` | — | The horizontal channel. Default: saturation (hsb, hsl), red (rgb). |
+| `yChannel` | `ColorChannel` | — | The vertical channel. Default: brightness (hsb), lightness (hsl), green (rgb). |
+| `xName` | `string` | — | Submits the x channel under this name. |
+| `yName` | `string` | — | Submits the y channel under this name. |
+| `thumbAlignment` | `ThumbAlignment` | — | `contain` keeps thumbs inside the track; set `--rind-slider-thumb-size` to the thumb size. Default: `center`. |
+| `orientation` | `SliderOrientation` | — | The axis. Default: `horizontal`. |
+| `channel` | `ColorChannel` | — | The edited channel: red, green, blue, hue, saturation, lightness, brightness or alpha. |
+| `alpha` | `boolean` | — | Accept and show 8-digit hex (default: when the colour has alpha below 1). |
+| `focusableWhenDisabled` | `boolean` | — | A disabled group stays discoverable: the root is one tab stop. |
+| `color` | `ColorInput` | — | The swatch's colour: a colour, or a string `parseColor` reads. |
+| `respectAlpha` | `boolean` | — | `false`: the opaque colour (default true). |
+| `scope` | `string` | — | The `data-scope` it carries (default `"color-swatch"`). |
+| `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

@@ -45,6 +45,7 @@ A [Field](field.md) works in a plain `<form>` too; Form adds what needs the whol
 | `actionsRef` | `Ref<{ validate(name?): void }>` | — | The imperative `validate`: displays errors, focuses nothing. |
 | `messages` | `{ invalidSummary?: (count) => string }` | — | The failed-attempt summary. |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element. |
+| `children` | `ReactNode` | — | The form's content (its Fields and controls). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

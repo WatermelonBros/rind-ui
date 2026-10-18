@@ -78,6 +78,7 @@ export type SegmentedControlRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue"
 > & {
+  /** The control's parts: its label, items and indicator. */
   readonly children?: ReactNode
   readonly value?: string | null
   readonly defaultValue?: string | null

@@ -167,12 +167,12 @@ export const menuMeta = {
     },
     loop: {
       type: "boolean",
-      default: "false",
+      default: "true",
       description: "Arrow navigation wraps from the last item to the first and back.",
     },
     focusableWhenDisabled: {
       type: "boolean",
-      default: "false",
+      default: "true",
       description: "Disabled items stay reachable by navigation (they still cannot be activated).",
     },
     typeaheadTimeout: {

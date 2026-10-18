@@ -69,6 +69,14 @@ import { Pagination } from "@rind-ui/react"
 | `focusableWhenDisabled` | `boolean` | `true` | Unavailable controls keep focus (`aria-disabled`); `false` uses native disabled. |
 | `messages` | `Partial<PaginationMessages>` | — | `label`, `page(n)`, `first`, `previous`, `next`, `last`. |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | On every part; Root's state is `page`, `pageSize`, `totalPages`, `pages`, `range`. |
+| `children` | `ReactNode \| ((state: PaginationRootState) => ReactNode)` | — | The parts, or a function of the state (to map `pages`). |
+| `type` | `"page" \| "ellipsis" \| "trigger"` | — | What the item holds (`data-type`). Default `"page"`. |
+| `value` | `number` | — | The page number it goes to; `aria-current="page"` when it is the current page. |
+| `pending` | `boolean` | — | Ignores activation, keeps focus, announces `messages.pending` when focused. |
+| `focusOnPress` | `boolean` | — | `false`: a press activates without moving focus (press-interactions "Press Without Focus": an editor toolbar's Bold keeps the editor focused). |
+| `onPressStart` | `(details: ButtonPressDetails) => void` | — | A press starts. |
+| `onPressEnd` | `(details: ButtonPressDetails) => void` | — | A press ends, also when cancelled or released outside. |
+| `position` | `"start" \| "end"` | — | Which gap it stands for, before or after the current page (`data-position`). Default: "end". |
 
 Every attribute of the rendered element is accepted and forwarded.
 

@@ -89,15 +89,19 @@ export type ColorSliderRootProps = Omit<
   | "minStepsBetweenThumbs"
   | "thumbCollision"
 > & {
+  /** The edited channel: red, green, blue, hue, saturation, lightness, brightness or alpha. */
   readonly channel: ColorChannel
   readonly value?: ColorInput
   /** Default `hsb(0, 100%, 100%)`. */
   readonly defaultValue?: ColorInput
   readonly onValueChange?: (color: Color, details: ColorChangeDetails) => void
   readonly onValueCommit?: (color: Color, details: ColorCommitDetails) => void
+  /** The working space. Default: the colour's when it has the channel. */
   readonly colorSpace?: ColorSpace
+  /** Replaces the colour name in the value text. */
   readonly colorName?: ColorNameProp
   readonly messages?: MessageOverrides<ColorSliderMessages>
+  /** The parts: Label, ValueText, Control, Track, Thumb, Description. */
   readonly children?: ReactNode
 }
 

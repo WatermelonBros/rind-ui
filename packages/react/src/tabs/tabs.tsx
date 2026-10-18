@@ -73,6 +73,7 @@ export interface TabsState {
 }
 
 export type TabsRootProps = Omit<ComponentPropsWithRef<"div">, "children" | "defaultValue"> & {
+  /** The tabs' parts (List with its Tabs, Panels). */
   readonly children?: ReactNode
   /** Controlled selected tab; `null` selects none. */
   readonly value?: string | null
@@ -220,6 +221,7 @@ export type TabsTabProps = Omit<ComponentPropsWithRef<"button">, "value"> & {
   /** The key pairing this tab with its panel. */
   readonly value: string
   readonly disabled?: boolean
+  /** The text for the collection (defaults to the tab's text content). */
   readonly textValue?: string
   readonly render?: RenderProp<TabsTabState>
 }

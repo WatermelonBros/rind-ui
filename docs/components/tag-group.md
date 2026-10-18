@@ -59,6 +59,14 @@ The list needs an accessible name: render a `TagGroup.Label`, or pass `aria-labe
 | `loop` | `boolean` | `true` | Arrow keys wrap around. |
 | `items` | `{ key, label, disabled?, href? }[]` | — | Data tags (else Tag parts register). |
 | `messages` | `Partial<TagGroupMessages>` | — | removeLabel, removeHint, removedAnnouncement, removedCountAnnouncement. |
+| `focusableWhenDisabled` | `boolean` | — | Disabled tags stay reachable (announced as dimmed). Default true. |
+| `typeaheadTimeout` | `number` | — | How long typed characters build one typeahead search (ms). Default: 1000. |
+| `collection` | `Collection<unknown>` | — | A collection built by the consumer, used instead of `items`. |
+| `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `disallowEmptySelection` | `boolean` | — | No user action leaves the selection empty. |
+| `textValue` | `string \| undefined` | — | The tag's text for typeahead and the remove button's name. |
+| `href` | `string \| undefined` | — | A link tag: TagText renders an anchor to it. |
+| `children` | `(label: string, key: string) => ReactNode` | — | Renders one tag's content from its label and key; default: TagText and TagRemove. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

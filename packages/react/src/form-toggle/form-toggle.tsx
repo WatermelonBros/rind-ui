@@ -213,15 +213,20 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultChecked"
 > & {
+  /** The toggle parts (Control, Label, Description). */
   readonly children?: ReactNode
+  /** Controlled value. */
   readonly checked?: V
   /** Read at creation; a later change only changes what a form reset restores. */
   readonly defaultChecked?: V
+  /** Every user-caused change (toggle or form reset); never called for a parent change. */
   readonly onCheckedChange?: (checked: V, details: D) => void
   readonly disabled?: boolean
+  /** Disabled but still in the Tab order (`aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
   readonly readOnly?: boolean
   readonly required?: boolean
+  /** Marks the toggle invalid (`aria-invalid`, `data-invalid`). */
   readonly invalid?: boolean
   readonly name?: string
   /** Submitted while checked (default "on"). */
@@ -229,6 +234,7 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
   readonly form?: string
   /** Submitted while unchecked (and enabled); unchecked submits nothing without it. */
   readonly uncheckedValue?: string
+  /** Another element or a render function receiving the props and the toggle's state. */
   readonly render?: RenderProp<FormToggleState<V>>
 }
 
@@ -441,6 +447,7 @@ export function createFormToggle<V extends CheckedState, D>(config: FormToggleCo
   }
 
   type PartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+    /** Another element or a render function receiving the props and the toggle's state. */
     readonly render?: RenderProp<FormToggleState<V>>
   }
 
@@ -592,5 +599,6 @@ export type FormToggleIndicatorProps<V extends CheckedState = CheckedState> = Om
   readonly children?:
     | ReactNode
     | ((state: { checked: boolean; indeterminate: boolean }) => ReactNode)
+  /** Another element or a render function receiving the props and the toggle's state. */
   readonly render?: RenderProp<FormToggleState<V>>
 }

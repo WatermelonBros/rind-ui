@@ -116,6 +116,7 @@ export type RadioGroupRootProps = Omit<
   ComponentPropsWithRef<"div">,
   "children" | "defaultValue"
 > & {
+  /** The group's parts (Label, Items, Description, ErrorMessage). */
   readonly children?: ReactNode
   readonly value?: string | null
   readonly defaultValue?: string | null
@@ -126,11 +127,15 @@ export type RadioGroupRootProps = Omit<
   /** A disabled group stays discoverable: the root is one tab stop. */
   readonly focusableWhenDisabled?: boolean
   readonly readOnly?: boolean
+  /** Valid with one radio checked. */
   readonly required?: boolean
+  /** Marks the group invalid; shows the ErrorMessage. */
   readonly invalid?: boolean
   /** Default: derived from the root id (two groups never form one browser group). */
   readonly name?: string
+  /** The id of the form the hidden inputs belong to. */
   readonly form?: string
+  /** Another element or a render function receiving the props and the group's state. */
   readonly render?: RenderProp<RadioGroupState>
 }
 
@@ -366,6 +371,7 @@ type PartProps<
   T extends keyof React.JSX.IntrinsicElements,
   S = undefined,
 > = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<S>
 }
 

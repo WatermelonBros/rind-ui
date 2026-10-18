@@ -45,6 +45,8 @@ Navigation Menu links) uses the same rules, from `linkProps` in `@rind-ui/core`.
 | `current` | `boolean \| "page" \| "step" \| "location" \| "date" \| "time"` | — | Sets `aria-current` and `data-current`; the link still navigates. |
 | `onActivate` | `(details: LinkActivation) => void` | — | Once per activation, with `href`, `modality` and `disposition` (`"same-tab"` or `"elsewhere"`). |
 | `render` | `ReactElement \| (props, state) => ReactNode` | — | Another element (`<div />` gets the `role="link"` fallback) or a component, such as a router's Link, which then navigates itself. |
+| `navigate` | `Router["navigate"]` | — | Client navigation, e.g. react-router's `navigate` or Next.js `router.push`. |
+| `children` | `ReactNode` | — | The tree whose link parts route through `navigate`. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

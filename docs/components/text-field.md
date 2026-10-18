@@ -57,6 +57,19 @@ import { TextField } from "@rind-ui/react"
 | `autosize` | `boolean` | `false` | On Textarea: grows with its content (native `field-sizing` where supported). |
 | `max` | `number` | — | On CharacterCount: a soft limit (an error past it, never a truncation). |
 | `count` | `(value) => number` | — | On CharacterCount: replaces the counter. |
+| `children` | `ReactNode` | — | The parts: Label, Input or Textarea, Description, ErrorMessage and the triggers. |
+| `name` | `string` | — | The control's `name` when it has none; the key of `validate`'s values. |
+| `disabled` | `boolean` | — | Disables the control; no validity is displayed. Also inherited from an enclosing Field. |
+| `readOnly` | `boolean` | — | Makes the control read-only. Also inherited from an enclosing Field. |
+| `required` | `boolean` | — | Native `required` (`aria-required` in `aria` behaviour). |
+| `invalid` | `boolean` | — | `true` forces invalid, `false` valid; `undefined` validates. |
+| `errors` | `readonly string[]` | — | External errors (server): shown at once, cleared by the next change. |
+| `validate` | `Validate` | — | Runs after native constraints pass. |
+| `validationMode` | `ValidationMode` | — | When errors are displayed. Default: `"submit"`. |
+| `validationBehavior` | `ValidationBehavior` | — | Whether an invalid Field blocks submission. Default: `"native"`. |
+| `validationDebounce` | `number` | — | Delays `validate` in `change` mode (ms). Default: 0. |
+| `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
+| `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
 
 Every attribute of the rendered element is accepted and forwarded.
 

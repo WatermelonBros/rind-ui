@@ -5,7 +5,15 @@
 // llms.txt is not committed: the site build renders it with `llms()` (apps/site/scripts/content.ts).
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join, relative } from "node:path"
-import type { ComponentMeta } from "../packages/core/src/components/meta.ts"
+import {
+  API,
+  SignatureKind,
+  SymbolFlags,
+  type Type,
+  TypeFlags,
+  type UnionType,
+} from "typescript/unstable/sync"
+import type { ComponentMeta, PropMeta } from "../packages/core/src/components/meta.ts"
 import { quirks } from "../packages/core/src/dom/quirks.ts"
 
 const repo = join(import.meta.dirname, "..")
@@ -147,6 +155,17 @@ const table = (head: readonly string[], rows: readonly (readonly string[])[]) =>
     ...rows.map((r) => `| ${r.map(cell).join(" | ")} |`),
   ].join("\n")
 
+const propTable = (head: string, props: ComponentMeta["props"]) =>
+  table(
+    [head, "Type", "Default", "Description"],
+    Object.entries(props).map(([name, p]) => [
+      `\`${name}\``,
+      `\`${p.type}\``,
+      p.default === undefined ? "—" : `\`${p.default}\``,
+      p.description,
+    ]),
+  )
+
 /** A component's API facts, from its `<scope>.meta.ts`. */
 export function renderApi(meta: ComponentMeta): string {
   const { actions, queries, traits } = meta.contract
@@ -165,18 +184,11 @@ export function renderApi(meta: ComponentMeta): string {
     "",
     "### Props",
     "",
-    table(
-      ["Prop", "Type", "Default", "Description"],
-      Object.entries(meta.props).map(([name, p]) => [
-        `\`${name}\``,
-        `\`${p.type}\``,
-        p.default === undefined ? "—" : `\`${p.default}\``,
-        p.description,
-      ]),
-    ),
+    propTable("Prop", meta.props),
     "",
     "Every attribute of the rendered element is accepted and forwarded.",
     "",
+    ...(meta.options ? ["### Options", "", propTable("Option", meta.options), ""] : []),
     "### Data attributes",
     "",
     table(
@@ -237,6 +249,175 @@ async function loadMetas(): Promise<Map<string, ComponentMeta>> {
     if (meta) out.set(scope, meta)
   }
   return out
+}
+
+/** A prop declared in our source (the part's, a core machine's, a shared type's). */
+export interface OwnProp extends PropMeta {
+  /** `file:line` of the declaration (where its JSDoc goes). */
+  readonly at: string
+}
+/** One exported React part: its own props, and every prop it accepts (DOM ones included). */
+export interface PartProps {
+  readonly part: string
+  readonly own: ReadonlyMap<string, OwnProp>
+  readonly all: ReadonlySet<string>
+}
+
+/**
+ * Every exported part of each scope's React entry (`packages/react/src/<scope>/index.ts`), with
+ * the props the consumer sees, read from the TypeScript types: whatever type a prop comes from,
+ * it is found here. Props declared only in `node_modules` (the element's DOM props) are not own.
+ */
+export function extractParts(scopes: Iterable<string>): Map<string, PartProps[]> {
+  const api = new API({ cwd: repo })
+  try {
+    const project = api
+      .updateSnapshot({ openProjects: [join(repo, "packages/react/tsconfig.json")] })
+      .getProjects()[0]
+    if (!project) throw new Error("packages/react/tsconfig.json: no project")
+    const { checker, program } = project
+    const out = new Map<string, PartProps[]>()
+    for (const scope of scopes) {
+      const entry = `packages/react/src/${scope}/index.ts`
+      const file = program.getSourceFile(join(repo, entry))
+      const mod = file && checker.getSymbolAtLocation(file)
+      if (!mod) throw new Error(`${entry}: not in the react project`)
+      const parts: PartProps[] = []
+      const read = (part: string, type: Type): boolean => {
+        const sig = checker.getSignaturesOfType(type, SignatureKind.Call)[0]
+        if (!sig) return false
+        const own = new Map<string, OwnProp>()
+        const all = new Set<string>()
+        const param = checker.getParameterType(sig, 0)
+        // A union of prop sets (the `selectionMode` variants): every variant's props are accepted.
+        const variants =
+          param && param.flags & TypeFlags.Union
+            ? (param as UnionType).getTypes() // the Union flag makes it a UnionType
+            : param
+              ? [param]
+              : []
+        for (const prop of variants.flatMap((v) => checker.getPropertiesOfType(v))) {
+          if (all.has(prop.name)) continue
+          all.add(prop.name)
+          const decls = prop.declarations.filter((d) => !d.path.includes("/node_modules/"))
+          let found: OwnProp | undefined
+          for (const decl of decls) {
+            const node = decl.resolve()
+            const name = node && "name" in node ? (node.name as typeof node) : undefined
+            const sym = name && checker.getSymbolAtLocation(name)
+            if (!node || !sym) continue
+            const typeNode = "type" in node ? (node.type as typeof node | undefined) : undefined
+            const symType = checker.getTypeOfSymbol(sym)
+            const typeText = typeNode
+              ? node.getSourceFile().text.slice(typeNode.pos, typeNode.end)
+              : symType
+                ? checker.typeToString(symType)
+                : "unknown"
+            const def = checker.getJsDocTagsOfSymbol(sym).find((t) => t.name === "default")
+            const description = checker.getDocumentationCommentOfSymbol(sym).trim()
+            const source = node.getSourceFile()
+            const line = source.text.slice(0, node.getStart()).split("\n").length
+            found = {
+              at: `${relative(repo, source.fileName)}:${line}`,
+              type: typeText.replace(/\s+/g, " ").trim(),
+              description: description.replace(/\s*\n\s*/g, " "),
+              ...(def?.text ? { default: def.text.trim() } : {}),
+            }
+            if (description) break
+          }
+          if (found) own.set(prop.name, found)
+        }
+        parts.push({ part, own, all })
+        return true
+      }
+      for (const exp of checker.getExportsOfModule(mod)) {
+        const sym = exp.flags & SymbolFlags.Alias ? checker.getAliasedSymbol(exp) : exp
+        const type =
+          /^[A-Z]/.test(exp.name) && sym.flags & SymbolFlags.Value && checker.getTypeOfSymbol(sym)
+        if (!type || read(exp.name, type)) continue
+        // A namespace object (`Dialog = { Root, Trigger, … }`): each capitalised member is a part.
+        for (const member of checker.getPropertiesOfType(type)) {
+          const t = /^[A-Z]/.test(member.name) && checker.getTypeOfSymbol(member)
+          if (t) read(`${exp.name}.${member.name}`, t)
+        }
+      }
+      out.set(scope, parts)
+    }
+    return out
+  } finally {
+    api.close()
+  }
+}
+
+/** A `props` key names a prop (`value`), or one part's (`Item.value`, `item.value`, `Thumb name`). */
+const keyMatches = (key: string, part: string, prop: string) => {
+  const dot = Math.max(key.lastIndexOf("."), key.lastIndexOf(" "))
+  if (dot < 0) return key === prop
+  return (
+    key.slice(dot + 1) === prop &&
+    key.slice(0, dot).toLowerCase() === (part.split(".").pop() ?? "").toLowerCase()
+  )
+}
+
+/**
+ * Why the docs would miss a prop: an own prop of a part that neither the meta nor its JSDoc
+ * describes, or a meta prop that no part accepts. Empty when every prop is documented.
+ */
+export function propGaps(meta: ComponentMeta, parts: readonly PartProps[]): string[] {
+  const keys = Object.keys(meta.props)
+  const gaps: string[] = []
+  for (const { part, own } of parts) {
+    for (const [prop, p] of own) {
+      const described = keys.some((k) => keyMatches(k, part, prop) && meta.props[k]?.description)
+      if (!described && !p.description)
+        gaps.push(
+          `${meta.name}: ${part} prop \`${prop}\` has no description (add JSDoc at ${p.at})`,
+        )
+    }
+  }
+  for (const key of keys) {
+    if (!parts.some(({ part, all }) => [...all].some((prop) => keyMatches(key, part, prop))))
+      gaps.push(`${meta.name}: ${meta.scope}.meta.ts prop \`${key}\` is accepted by no part`)
+  }
+  return gaps
+}
+
+/** The meta with every own prop it does not list appended, described by its JSDoc. */
+export function withExtractedProps(
+  meta: ComponentMeta,
+  parts: readonly PartProps[],
+): ComponentMeta {
+  const props: Record<string, ComponentMeta["props"][string]> = { ...meta.props }
+  const keys = Object.keys(meta.props)
+  for (const { part, own } of parts) {
+    for (const [prop, p] of own) {
+      if (prop in props || keys.some((k) => keyMatches(k, part, prop)) || !p.description) continue
+      props[prop] = {
+        type: p.type,
+        description: p.description,
+        ...(p.default ? { default: p.default } : {}),
+      }
+    }
+  }
+  return { ...meta, props }
+}
+
+/** Every meta with its extracted props (what the docs, llms.txt and the site render), and the gaps. */
+export async function apiMetas(): Promise<{ metas: Map<string, ComponentMeta>; gaps: string[] }> {
+  const raw = await loadMetas()
+  const metas = new Map<string, ComponentMeta>()
+  const gaps: string[] = []
+  const scopes = [...raw.keys()].filter((s) =>
+    existsSync(join(repo, `packages/react/src/${s}/index.ts`)),
+  )
+  for (const [scope, parts] of extractParts(scopes)) {
+    const meta = raw.get(scope)
+    if (!meta) continue
+    gaps.push(...propGaps(meta, parts))
+    metas.set(scope, withExtractedProps(meta, parts))
+  }
+  for (const [scope, meta] of raw) if (!metas.has(scope)) metas.set(scope, meta)
+  return { metas, gaps }
 }
 
 /** llms.txt: one line per guide, from its `# Title` and first paragraph. */
@@ -309,7 +490,12 @@ const readAria = (id: string) => {
 
 /** Every generated file: path → expected content. */
 export async function generate(): Promise<Map<string, string>> {
-  const metas = await loadMetas()
+  const { metas, gaps } = await apiMetas()
+  if (gaps.length) {
+    // Every prop a consumer can pass is documented, or nothing is generated (docs:check fails).
+    console.error(`props missing from the docs (${gaps.length}):\n  ${gaps.join("\n  ")}`)
+    process.exit(1)
+  }
   const out = new Map<string, string>()
   out.set("docs/accessibility/quirks.md", renderQuirks(quirks, quirkUsage()))
   const records = JSON.parse(
