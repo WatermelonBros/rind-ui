@@ -1,6 +1,13 @@
 export { accessibleNameOf } from "./accname"
 export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
+export {
+  type CellDrag,
+  type CellDragMessage,
+  type CellDragOptions,
+  type CellDragPointerEvent,
+  createCellDrag,
+} from "./cell-drag"
 export { collectionLayout } from "./collection-layout"
 export {
   type ConstraintElement,
@@ -143,6 +150,7 @@ export {
   pointerFraction,
   pointerPoint,
   startDrag,
+  trackPointer,
 } from "./pointer-drag"
 export { pointerMoved } from "./pointer-guard"
 export {

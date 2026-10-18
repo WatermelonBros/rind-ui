@@ -82,6 +82,18 @@ export type CalendarEvent =
   | { readonly type: "LEAVE" }
   /** The parent changed `value` (onProps): a range in progress is dropped. */
   | { readonly type: "VALUE.SYNC" }
+  /** A press (or a held touch) on a selectable date starts a drag: the anchor (range mode). */
+  | { readonly type: "DRAG.START"; readonly date: CalendarDate; readonly modality: Modality }
+  /** The dragging pointer moved onto another date: the preview follows. */
+  | { readonly type: "DRAG.MOVE"; readonly date: CalendarDate }
+  /** Released: `date` is the last date moved onto (null: none, the press stays an anchor). */
+  | {
+      readonly type: "DRAG.END"
+      readonly date: CalendarDate | null
+      readonly modality: Modality
+    }
+  /** The browser took the pointer (pointercancel, a hidden page): the range in progress goes. */
+  | { readonly type: "DRAG.CANCEL" }
   /** The heading button: one view up (days → months → years). */
   | { readonly type: "VIEW.UP"; readonly modality: Modality }
   /** Escape in a view above `minView`: one view down. */
@@ -145,6 +157,8 @@ export interface CalendarContext {
   /** The first day of the first visible month. */
   visibleStart: CalendarDate
   hovered: CalendarDate | null
+  /** A drag selection is in progress (range mode, days view). */
+  dragging: boolean
 }
 
 type Types = {
@@ -239,6 +253,21 @@ export function isSelectable(
   })
 }
 
+/**
+ * Whether a press on `date` starts a drag selection (spec "Drag Selection"): range mode, the days
+ * view, no anchor yet (a press while anchored ends the range by click), a selectable date.
+ */
+export const canStartDrag = (
+  date: CalendarDate,
+  props: CalendarProps,
+  anchor: CalendarDate | null,
+  view: CalendarView,
+) =>
+  props.selectionMode === "range" &&
+  view === "days" &&
+  anchor === null &&
+  isSelectable(date, props, null, view)
+
 /** The anchor in the display calendar, or null. */
 const anchorOf = (args: Pick<Args, "values" | "props">): CalendarDate | null =>
   args.values.anchor ? toCalendar(args.values.anchor, args.props.calendar) : null
@@ -327,7 +356,9 @@ function atPeriod(base: CalendarDate | null, period: CalendarDate, view: PeriodV
 function select(args: Args, date: CalendarDate) {
   const { props, values } = args
   const view = viewOf(args)
-  const modality: Modality = args.event.type === "CELL.PRESS" ? args.event.modality : "keyboard"
+  const e = args.event
+  const modality: Modality =
+    e.type === "CELL.PRESS" || e.type === "DRAG.END" ? e.modality : "keyboard"
   if (props.selectionMode === "range") {
     const anchored = anchorOf(args) !== null
     rangeStep(args, date)
@@ -390,6 +421,11 @@ export const calendarMachine = setup({
       !((event.type === "NAVIGATE" || event.type === "SELECT_FOCUSED") && event.composing),
     focusedSelectable: (args) => canChoose(args, focusedOf(args)),
     anchored: (args) => anchorOf(args) !== null,
+    canDrag: (args) =>
+      args.event.type === "DRAG.START" &&
+      canStartDrag(args.event.date, args.props, anchorOf(args), viewOf(args)),
+    dragging: ({ context }) => context.dragging,
+    notDragging: ({ context }) => !context.dragging,
     // A press (pointer, touch, or a key on the focused trigger) has moved focus to the
     // trigger; a screen reader's click (virtual) has not, so the grid keeps focus and
     // repairs it after paging.
@@ -463,7 +499,8 @@ export const calendarMachine = setup({
         )
     },
     setFocused: (args) => {
-      if (args.event.type !== "CELL.FOCUS" && args.event.type !== "CELL.PRESS") return
+      const t = args.event.type
+      if (t !== "CELL.FOCUS" && t !== "CELL.PRESS" && t !== "DRAG.START") return
       const date = clamp(args.event.date, args.props)
       // A period's cell keeps the focused date when it is already inside that period.
       const same = isSameDay(periodStart(date, viewOf(args)), focusedOf(args))
@@ -471,7 +508,7 @@ export const calendarMachine = setup({
       focus(args, date, align(date, args.context.visibleStart, args.props))
     },
     pressFocus: (args) => {
-      if (args.event.type !== "CELL.PRESS") return
+      if (args.event.type !== "CELL.PRESS" && args.event.type !== "DRAG.START") return
       // A pointer press focuses the cell without a focus ring.
       requestCellFocus(args.props, args.event.date, args.event.modality)
     },
@@ -498,15 +535,36 @@ export const calendarMachine = setup({
       if (event.type === "CELL.HOVER") set("hovered", event.date)
     },
     clearHovered: ({ set }) => set("hovered", null),
+    /** The press sets the anchor; the preview starts on it. */
+    dragStart: (args) => {
+      if (args.event.type !== "DRAG.START") return
+      args.set("dragging", true)
+      args.set("hovered", args.event.date)
+      rangeStep(args, args.event.date)
+    },
+    dragMove: ({ event, set }) => {
+      if (event.type === "DRAG.MOVE") set("hovered", event.date)
+    },
+    /** A release on another valid end commits; on the anchor (or nowhere new) it stays. */
+    dragEnd: (args) => {
+      if (args.event.type !== "DRAG.END") return
+      args.set("dragging", false)
+      const date = args.event.date
+      const anchor = anchorOf(args)
+      if (date === null || anchor === null || isSameDay(date, anchor)) return
+      if (isSelectable(date, args.props, anchor, viewOf(args))) select(args, date)
+    },
     /** Escape, a parent's value, or leaving with "reset": the range in progress is dropped. */
     clearAnchor: (args) => {
       if (anchorOf(args) !== null) args.set("anchor", NO_ANCHOR)
       args.set("hovered", null)
+      args.set("dragging", false)
     },
     /** Leaving while anchored: `commitOnBlur`. */
     leave: (args) => {
       const anchor = anchorOf(args)
       if (anchor === null) return
+      args.set("dragging", false)
       const mode = args.props.commitOnBlur ?? "reset"
       if (mode === "select") {
         const end = args.context.hovered ?? focusedOf(args)
@@ -555,7 +613,11 @@ export const calendarMachine = setup({
     )
     // The initial focus is clamped like every later one (a controlled value may be outside).
     const clamped = clamp(focused, props)
-    return { visibleStart: align(clamped, clamped.set({ day: 1 }), props), hovered: null }
+    return {
+      visibleStart: align(clamped, clamped.set({ day: 1 }), props),
+      hovered: null,
+      dragging: false,
+    }
   },
   values: {
     value: { fallback: EMPTY, equal: sameDays },
@@ -573,7 +635,11 @@ export const calendarMachine = setup({
   },
   on: {
     "CELL.HOVER": { actions: ["setHovered"] },
-    "GRID.HOVER_END": { actions: ["clearHovered"] },
+    // A drag out of the grid keeps the last date (spec "Drag Selection").
+    "GRID.HOVER_END": { guard: "notDragging", actions: ["clearHovered"] },
+    "DRAG.MOVE": { guard: "dragging", actions: ["dragMove"] },
+    "DRAG.END": { guard: "dragging", actions: ["dragEnd"] },
+    "DRAG.CANCEL": { guard: "dragging", actions: ["clearAnchor"] },
     "FOCUS.SYNC": { actions: ["syncFocus"] },
     CONSTRAINTS: { actions: ["constrain"] },
     // A parent's value (including null) drops a range in progress.
@@ -597,6 +663,11 @@ export const calendarMachine = setup({
           target: "focused",
           actions: ["setFocused", "pressFocus", "selectPressed"],
         },
+        "DRAG.START": {
+          guard: "canDrag",
+          target: "focused",
+          actions: ["setFocused", "pressFocus", "dragStart"],
+        },
       },
     },
     focused: {
@@ -608,6 +679,7 @@ export const calendarMachine = setup({
         // Focus alone never selects (cause C).
         "CELL.FOCUS": { actions: ["setFocused"] },
         "CELL.PRESS": { actions: ["setFocused", "selectPressed"] },
+        "DRAG.START": { guard: "canDrag", actions: ["setFocused", "dragStart"] },
         SELECT_FOCUSED: {
           guard: { and: ["notComposing", "focusedSelectable"] },
           actions: ["selectFocused"],

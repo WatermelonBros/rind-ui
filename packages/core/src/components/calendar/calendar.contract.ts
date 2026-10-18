@@ -222,6 +222,51 @@ async function cellsWith(env: E, attr: string): Promise<string[]> {
   return out
 }
 
+/** A committed range from `start` to `end` (either order), its anchor gone. */
+async function rangeDone(env: E, start: string, end: string) {
+  const [x, y] = [await cellIso(env, start), await cellIso(env, end)]
+  const [a, b] = x <= y ? [x, y] : [y, x]
+  const from = await cellsWith(env, "data-range-start")
+  const to = await cellsWith(env, "data-range-end")
+  // An end on another page is not visible: the anchor is gone either way.
+  return (
+    (await env.part("root").attr("data-anchored")) === null &&
+    (from.length === 0 || from[0] === a) &&
+    (to.length === 0 || to[0] === b)
+  )
+}
+
+/** The keyboard range: Enter on each end. */
+async function keyRange(env: E, start: string, end: string) {
+  await keyTo(env, start)
+  await env.keyboard("Enter")
+  await keyTo(env, end)
+  await env.keyboard("Enter")
+}
+
+const CENTRE = { x: 0.5, y: 0.5 }
+
+/**
+ * A press on `start`, a move onto `end`, a release there (both visible). A touch is held until
+ * the drag starts (`dragDelay`: the environment's time, then the root's `data-dragging`).
+ */
+async function dragBetween(env: E, start: string, end: string, pointerType: "mouse" | "touch") {
+  await pageTo(env, start)
+  const from = await cellOf(env, start)
+  const to = await cellOf(env, end)
+  if (!from || !to) throw new Error(`calendar: ${start} and ${end} must both be visible to drag`)
+  await from.pointer("down", { at: CENTRE, pointerType })
+  if (pointerType === "touch") {
+    await env.advance(200)
+    await env.until(
+      () => env.part("root").attr("data-dragging"),
+      (v) => v !== null,
+    )
+  }
+  await to.pointer("move", { at: CENTRE, pointerType })
+  await to.pointer("up", { at: CENTRE, pointerType })
+}
+
 /** The Calendar's contract (spec "Contract"). */
 export const calendarContract = contract("calendar", {
   machine: calendarMachine,
@@ -287,24 +332,18 @@ export const calendarContract = contract("calendar", {
         await pageTo(env, end)
         await (await cellOf(env, end))?.tap()
       },
-      keyboard: async (env: E, start: string, end: string) => {
-        await keyTo(env, start)
-        await env.keyboard("Enter")
-        await keyTo(env, end)
-        await env.keyboard("Enter")
-      },
-      done: async (env: E, start: string, end: string) => {
-        const [x, y] = [await cellIso(env, start), await cellIso(env, end)]
-        const [a, b] = x <= y ? [x, y] : [y, x]
-        const from = await cellsWith(env, "data-range-start")
-        const to = await cellsWith(env, "data-range-end")
-        // An end on another page is not visible: the anchor is gone either way.
-        return (
-          (await env.part("root").attr("data-anchored")) === null &&
-          (from.length === 0 || from[0] === a) &&
-          (to.length === 0 || to[0] === b)
-        )
-      },
+      keyboard: keyRange,
+      done: rangeDone,
+    },
+    /**
+     * Range mode: a drag from `start` to `end` (spec "Drag Selection"); the keyboard has no
+     * drag, its twin is `selectRange`'s.
+     */
+    dragRange: {
+      pointer: (env: E, start: string, end: string) => dragBetween(env, start, end, "mouse"),
+      touch: (env: E, start: string, end: string) => dragBetween(env, start, end, "touch"),
+      keyboard: keyRange,
+      done: rangeDone,
     },
     /** Range mode: the first selection only. */
     startRange: {
@@ -468,6 +507,10 @@ export const calendarContract = contract("calendar", {
     "GRID.BLUR": { skip: "covered by every action" },
     "CELL.HOVER": { skip: "hover is a scenario test" },
     "GRID.HOVER_END": { skip: "hover is a scenario test" },
+    "DRAG.START": { skip: "drag selection: dragRange and the browser drag tests" },
+    "DRAG.MOVE": { skip: "drag selection: dragRange and the browser drag tests" },
+    "DRAG.END": { skip: "drag selection: dragRange and the browser drag tests" },
+    "DRAG.CANCEL": { skip: "a pointercancel during a drag: the browser drag tests" },
     "FOCUS.SYNC": { skip: "a parent's focusedValue: machine and scenario tests" },
     CONSTRAINTS: { skip: "a changed minimum: machine tests" },
     "$props:focusedValue": { skip: "a parent's focusedValue: machine and scenario tests" },

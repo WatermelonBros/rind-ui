@@ -89,16 +89,21 @@ export function startDrag(
   })
 }
 
-/** One pointer's drag lifecycle; `move` maps each pointer position to a message (or none). */
-function trackPointer<M extends { readonly type: string }>(
+/**
+ * One pointer's drag lifecycle; `move` maps each pointer move to a message (or none). Returns
+ * the function that stops tracking. `capture: false` leaves the pointer uncaptured, so the
+ * press's own target keeps its mouse events (and the focus a mousedown gives it).
+ */
+export function trackPointer<M extends { readonly type: string }>(
   surface: Element,
   id: number,
   send: (m: M | { readonly type: "up" } | { readonly type: "cancel" }) => void,
-  move: (p: PointerLike) => M | null,
+  move: (p: PointerEvent) => M | null,
+  capture = true,
 ): () => void {
   const doc = surface.ownerDocument
   try {
-    surface.setPointerCapture?.(id)
+    if (capture) surface.setPointerCapture?.(id)
   } catch {
     // An already released pointer (a synthetic event): moves still reach the document.
   }

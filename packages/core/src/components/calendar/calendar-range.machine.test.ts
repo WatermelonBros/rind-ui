@@ -220,3 +220,90 @@ describe("announcements", () => {
     expect(new Set(m.log.map((a) => a.key))).toEqual(new Set(["calendar-c-range"]))
   })
 })
+
+describe("drag selection (spec Drag Selection)", () => {
+  type M = ReturnType<typeof make>
+  const start = (m: M, date: CalendarDate) =>
+    m.s.send({ type: "DRAG.START", date, modality: "pointer" })
+  const move = (m: M, date: CalendarDate) => m.s.send({ type: "DRAG.MOVE", date })
+  const end = (m: M, date: CalendarDate | null) =>
+    m.s.send({ type: "DRAG.END", date, modality: "pointer" })
+  const dragging = (m: M) => m.s.view().context.dragging
+
+  it("mouse drag: press anchors, moves preview, release commits once", () => {
+    const m = make()
+    start(m, d(10, 10))
+    expect(m.anchor()).toBe("2026-10-10")
+    expect(dragging(m)).toBe(true)
+    for (const day of [11, 12, 13, 14]) move(m, d(10, day))
+    expect(m.s.view().context.hovered?.toString()).toBe("2026-10-14")
+    end(m, d(10, 14))
+    expect(m.range()).toBe("2026-10-10..2026-10-14")
+    expect(m.onValueChange).toHaveBeenCalledTimes(1)
+    expect(dragging(m)).toBe(false)
+    expect(m.log.at(-1)?.message).toBe(
+      "Selected Saturday, October 10, 2026 to Wednesday, October 14, 2026",
+    )
+  })
+
+  it("a release on the anchor, or with no move, keeps the anchor (a click)", () => {
+    const m = make()
+    start(m, d(10, 10))
+    end(m, null)
+    expect(m.anchor()).toBe("2026-10-10")
+    expect(m.onValueChange).not.toHaveBeenCalled()
+    m.press(d(10, 12))
+    expect(m.range()).toBe("2026-10-10..2026-10-12")
+  })
+
+  it("no drag while anchored, on an unavailable date, or read-only", () => {
+    const m = make()
+    m.press(d(10, 5))
+    start(m, d(10, 8))
+    expect(dragging(m)).toBe(false)
+    expect(m.anchor()).toBe("2026-10-05")
+    const u = make({ isDateUnavailable: (date) => date.day === 20 })
+    start(u, d(10, 20))
+    expect(u.anchor()).toBeNull()
+    const r = make({ readOnly: true })
+    start(r, d(10, 10))
+    expect(r.anchor()).toBeNull()
+  })
+
+  it("a release on an end the rules refuse keeps the anchor", () => {
+    const m = make({ maxRangeLength: 3 })
+    start(m, d(10, 10))
+    end(m, d(10, 20))
+    expect(m.anchor()).toBe("2026-10-10")
+    expect(m.range()).toBeNull()
+  })
+
+  it("Escape and a cancel drop the drag; a later release does nothing", () => {
+    const m = make()
+    start(m, d(10, 10))
+    move(m, d(10, 12))
+    m.s.send({ type: "CANCEL" })
+    expect(m.anchor()).toBeNull()
+    end(m, d(10, 12))
+    expect(m.range()).toBeNull()
+    start(m, d(10, 10))
+    m.s.send({ type: "DRAG.CANCEL" })
+    expect(m.anchor()).toBeNull()
+    expect(dragging(m)).toBe(false)
+  })
+
+  it("leaving the grid keeps the last date while dragging", () => {
+    const m = make()
+    start(m, d(10, 10))
+    move(m, d(10, 13))
+    m.s.send({ type: "GRID.HOVER_END" })
+    expect(m.s.view().context.hovered?.toString()).toBe("2026-10-13")
+  })
+
+  it("no drag in single mode", () => {
+    const m = make({ selectionMode: "single" })
+    start(m, d(10, 10))
+    expect(dragging(m)).toBe(false)
+    expect(m.onValueChange).not.toHaveBeenCalled()
+  })
+})
