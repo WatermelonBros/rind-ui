@@ -55,7 +55,7 @@
   font: 500 15px var(--s-font);
   color: var(--s-ink);
   background: var(--s-card);
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   padding: 11px 13px;
   outline: none;
@@ -103,7 +103,7 @@
   ) {
   background: #fff;
   box-shadow:
-    inset 0 0 0 2px #d6ccf7,
+    inset 0 0 0 2px var(--s-field-line),
     0 3px 0 #d6ccf7;
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
@@ -160,4 +160,19 @@
   :where(button:not([data-scope], [class])):focus-visible {
   outline: 3px solid var(--s-acc);
   outline-offset: 2px;
+}
+/* juicy draws no borders (--s-bw is 0): every field boundary gets the inset ring instead, so a
+   white field on the lavender page still reads at 3:1 (WCAG 1.4.11) */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+:is(
+  [data-scope="pin-input"][data-part="slot"],
+  [data-scope="select"][data-part="trigger"],
+  [data-scope="number-input"][data-part="control"],
+  [data-scope="combobox"][data-part="control"],
+  [data-scope="date-field"][data-part="input"],
+  [data-scope="tags-input"][data-part="control"]
+) {
+  box-shadow:
+    inset 0 0 0 2px var(--s-field-line),
+    var(--s-lift-lo);
 }

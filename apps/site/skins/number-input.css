@@ -9,7 +9,7 @@
   display: inline-flex;
   align-items: stretch;
   inline-size: min(100%, 14rem);
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
   overflow: hidden;

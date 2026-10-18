@@ -17,7 +17,7 @@
   font: 500 15px var(--s-font);
   color: var(--s-ink);
   background: var(--s-card);
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   box-shadow: var(--s-lift-lo);
   cursor: pointer;
@@ -45,7 +45,7 @@
 }
 [data-rind-theme="skin-juicy"] [data-scope="select"][data-part="trigger"] {
   border-radius: 999px;
-  border: 2px solid #e2d9fb;
+  border: 2px solid var(--s-field-line);
 }
 [data-rind-theme^="skin-"] [data-scope="select"][data-part="indicator"] {
   font-size: 12px;

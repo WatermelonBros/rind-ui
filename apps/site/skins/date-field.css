@@ -10,7 +10,7 @@
   align-items: center;
   gap: 1px;
   padding: 8px 10px;
-  border: var(--s-bw) solid var(--s-line);
+  border: var(--s-bw) solid var(--s-field-line);
   border-radius: var(--s-r-sm);
   background: var(--s-card);
   font: 500 15px var(--s-font);
