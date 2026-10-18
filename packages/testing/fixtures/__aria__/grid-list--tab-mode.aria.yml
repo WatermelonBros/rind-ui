@@ -1,0 +1,14 @@
+- text: Shopping list
+- grid "Shopping list":
+  - row "Bread":
+    - gridcell "Bread 1":
+      - text: Bread
+      - textbox "Quantity of Bread": "1"
+  - row "Milk":
+    - gridcell "Milk 1":
+      - text: Milk
+      - textbox "Quantity of Milk": "1"
+  - row "Apples":
+    - gridcell "Apples 1":
+      - text: Apples
+      - textbox "Quantity of Apples": "1"

@@ -65,3 +65,11 @@
   border-color: var(--s-ink);
   background: transparent;
 }
+/* outline wins over a tone's fill: a danger outline keeps a transparent fill, so its text and
+   edge take the danger colour, never the on-fill colour it would vanish in */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="badge"][data-part="root"][data-variant="outline"][data-tone="danger"] {
+  border-color: var(--s-error);
+  background: transparent;
+  color: var(--s-error);
+}

@@ -169,10 +169,29 @@
   [data-scope="select"][data-part="trigger"],
   [data-scope="number-input"][data-part="control"],
   [data-scope="combobox"][data-part="control"],
-  [data-scope="date-field"][data-part="input"],
+  [data-scope="date-field"][data-part="control"],
+  [data-scope="date-field"][data-part="input"]:not([data-part="control"] *),
   [data-scope="tags-input"][data-part="control"]
 ) {
   box-shadow:
     inset 0 0 0 2px var(--s-field-line),
+    var(--s-lift-lo);
+}
+/* juicy: an invalid field shows it with a ring in the error colour, since it has no border to
+   recolour (more than colour: the doubled ring is thicker than the plain one) */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+:is(
+  [data-scope="pin-input"][data-part="slot"],
+  [data-scope="select"][data-part="trigger"],
+  [data-scope="number-input"][data-part="control"],
+  [data-scope="combobox"][data-part="control"],
+  [data-scope="date-field"][data-part="control"],
+  [data-scope="date-field"][data-part="input"]:not([data-part="control"] *),
+  [data-scope="tags-input"][data-part="control"],
+  [data-scope="color-picker"][data-part="channel-input"],
+  [data-scope="text-field"]:is([data-part="input"], [data-part="textarea"])
+):is([data-invalid], [aria-invalid="true"]) {
+  box-shadow:
+    inset 0 0 0 3px var(--s-error),
     var(--s-lift-lo);
 }
