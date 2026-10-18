@@ -57,7 +57,24 @@ export interface ComboboxConnectView {
   readonly modality: Modality
   readonly dir: "ltr" | "rtl"
   readonly messages: ComboboxMessages
-  readonly mounted: { readonly label: boolean; readonly empty: boolean }
+  readonly mounted: {
+    readonly label: boolean
+    readonly empty: boolean
+    /** Items with a rendered ItemDescription (their option is described by it). */
+    readonly description?: ((key: CollectionKey) => boolean) | undefined
+  }
+  /** Inline mode: the list in place, always shown; items run `onAction`. */
+  readonly inline?: boolean | undefined
+  /** Inline: the current page's key. */
+  readonly pageKey?: string | undefined
+  /** Inline: Backspace on an empty query goes back (`onBack`, above the root page). */
+  readonly canBack?: boolean | undefined
+  /** Inline: Escape on an empty query asks the host to close. */
+  readonly escapeCloses?: boolean | undefined
+  /** Free text: Escape on a closed popup clears the text. */
+  readonly clearOnEscape?: boolean | undefined
+  /** Free text: the visible input's native `autocomplete` (default "off"). */
+  readonly formAutoComplete?: string | undefined
   /** The engine has the Popover API (known after mount): the positioner joins the top layer. */
   readonly topLayer?: boolean | undefined
   readonly send: (event: ComboboxEvent) => void
@@ -72,7 +89,8 @@ export type ComboboxConnectEnv = CompositeEnv & {
 export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv) {
   const ids = comboboxIds(v.instance)
   const { send, context: c } = v
-  const dataState = v.open ? "open" : "closed"
+  // Inline, Root and Control follow aria-expanded like the input (the machine never closes).
+  const dataState = v.inline ? (v.exposed ? "open" : "closed") : v.open ? "open" : "closed"
   // The input and trigger say what aria-expanded says: closed in the empty state.
   const exposedState = v.exposed ? "open" : "closed"
   const composing = () => c.composing
@@ -94,16 +112,31 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       actions: false,
       focused: false,
       modality: v.modality,
-      mounted: { label: v.mounted.label, empty: v.mounted.empty, description: () => false },
+      mounted: {
+        label: v.mounted.label,
+        empty: v.mounted.empty,
+        description: v.mounted.description ?? (() => false),
+      },
       send: (e: ListboxEvent) => {
         // Presses on a closing popup choose nothing (Results While Closing).
         if (!v.open) return
-        if (e.type === "SELECT") send({ type: "ITEM.CHOOSE", key: e.key, modality: e.modality })
-        else if (e.type === "POINTER_MOVE") send(e)
+        if (e.type === "SELECT") {
+          // A link item navigates natively: its press is the browser's, not a choice.
+          if (linkOf(e.key)) return
+          send({ type: "ITEM.CHOOSE", key: e.key, modality: e.modality })
+        } else if (e.type === "POINTER_MOVE" || (v.inline && e.type === "HIGHLIGHT")) send(e)
       },
     },
     env,
   )
+  /** The rendered item element when it is a link (`<a href>` through `render`). */
+  function linkOf(key: CollectionKey): HTMLAnchorElement | null {
+    const el = env.dom.getById(ids.item(key))
+    return el !== null && el.tagName === "A" && el.hasAttribute("href")
+      ? (el as HTMLAnchorElement)
+      : null
+  }
+  const loadingNow = v.loading === "loading" || v.loading === "loading-more"
   const lagging = c.typingLag !== null && c.highlightSource === "typing"
   const shownText = c.completion ?? v.inputValue
   const common = (part: string): PartProps => ({
@@ -161,7 +194,15 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       ...v.fieldData,
       ...common("root"),
       "data-focus": dataFlag(c.focused),
-      "data-empty-value": dataFlag(!v.hasValue),
+      "data-empty-value": dataFlag(v.selectionMode === "none" ? v.inputValue === "" : !v.hasValue),
+      ...(v.inline
+        ? {
+            "data-inline": "",
+            "data-empty": dataFlag(v.results.size === 0),
+            "data-loading": dataFlag(loadingNow),
+            "data-page": v.pageKey,
+          }
+        : {}),
     }),
     label: (): PartProps => ({
       ...common("label"),
@@ -173,7 +214,7 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       ...common("control"),
       id: ids.control,
       "data-focus": dataFlag(c.focused),
-      "data-empty-value": dataFlag(!v.hasValue),
+      "data-empty-value": dataFlag(v.selectionMode === "none" ? v.inputValue === "" : !v.hasValue),
     }),
     input: (): PartProps => ({
       ...common("input"),
@@ -185,7 +226,9 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       value: shownText,
       disabled: v.disabled || undefined,
       readOnly: v.readOnly || undefined,
-      autoComplete: "off",
+      autoComplete: (v.selectionMode === "none" && v.formAutoComplete) || "off",
+      // Free text: the visible input is the form control (natively required).
+      required: (v.selectionMode === "none" && !v.inline && v.required) || undefined,
       autoCorrect: "off",
       autoCapitalize: "none",
       spellCheck: "false",
@@ -255,18 +298,57 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
             })
             e.preventDefault()
             return
-          case "Enter":
+          case "Enter": {
             if (ime) return
-            // Prevented only when it chooses: otherwise the form submits with the same Enter.
-            if (v.open && c.highlightedKey !== null && v.results.has(c.highlightedKey))
+            const key = c.highlightedKey
+            const chooses = v.open && key !== null && v.results.has(key)
+            const modifiers = {
+              shift: e.shiftKey,
+              alt: e.altKey,
+              ctrl: e.ctrlKey,
+              meta: e.metaKey,
+              mod: e.metaKey || e.ctrlKey,
+            }
+            // A link item: one native activation with the Enter's modifiers (new tab, window).
+            const link = chooses && key !== null ? linkOf(key) : null
+            if (link) {
               e.preventDefault()
-            send({ type: "ENTER", composing: false })
+              link.dispatchEvent(
+                new MouseEvent("click", {
+                  bubbles: true,
+                  cancelable: true,
+                  shiftKey: e.shiftKey,
+                  altKey: e.altKey,
+                  ctrlKey: e.ctrlKey,
+                  metaKey: e.metaKey,
+                }),
+              )
+              return
+            }
+            // Prevented only when it chooses: otherwise the form submits with the same Enter.
+            if (chooses) e.preventDefault()
+            send({ type: "ENTER", composing: false, modifiers })
             return
+          }
           case "Escape": {
             if (ime) return
-            const acts = c.completion !== null || v.open || c.dirty
+            const acts = v.inline
+              ? v.inputValue !== "" || v.escapeCloses === true
+              : v.selectionMode === "none"
+                ? c.completion !== null ||
+                  v.open ||
+                  (v.clearOnEscape === true && v.inputValue !== "")
+                : c.completion !== null || v.open || c.dirty
             send({ type: "ESCAPE", composing: false })
             if (acts) e.preventDefault()
+            return
+          }
+          case "Backspace": {
+            if (ime || !v.inline) return
+            const el = e.currentTarget as HTMLInputElement
+            if (el.value !== "" || el.selectionStart !== 0 || el.selectionEnd !== 0) return
+            send({ type: "BACKSPACE_EMPTY" })
+            if (v.canBack) e.preventDefault()
             return
           }
           case "Tab":
@@ -400,12 +482,30 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
       const own = list.item(key)
       return {
         ...own,
-        "data-state": isSelected(v.results, v.selection, key) ? "checked" : "unchecked",
+        "data-state":
+          v.selectionMode === "none"
+            ? undefined
+            : isSelected(v.results, v.selection, key)
+              ? "checked"
+              : "unchecked",
+        // Nothing can be selected: explicitly never selected (optionsNeverSelected).
+        ...(v.selectionMode === "none" ? { "aria-selected": "false" } : {}),
+        // A typing highlight (inline mount, a new query) shows the ring under the keyboard,
+        // never after a pointer interaction.
+        ...(c.highlightSource === "typing" && c.highlightedKey === key
+          ? { "data-focus-visible": dataFlag(v.modality === "keyboard") }
+          : {}),
         // Roving focus never applies: the input keeps focus.
         onFocus: undefined,
       }
     },
     itemText: list.itemText,
+    itemDescription: list.itemDescription,
+    /** Loading content: a sibling of the listbox, never inside it, no live role. */
+    loading: (): PartProps => ({
+      ...common("loading"),
+      hidden: loadingNow ? undefined : true,
+    }),
     itemIndicator: (key: CollectionKey): PartProps => ({
       ...list.itemIndicator(key),
       "data-state": isSelected(v.results, v.selection, key) ? "checked" : "unchecked",

@@ -412,7 +412,8 @@ BITS, KB). Autocomplete-specific rows are in [autocomplete.md](autocomplete.md#b
 ## Decisions
 
 - **One shared capability, `combobox-pattern`** (specified in `add-combobox`, reused by
-  `add-autocomplete` and later Command, Tags Input, Mentions): input + listbox popup,
+  the Combobox's free-text and inline modes (Autocomplete and Command, `add-combobox-variants`),
+  Tags Input and later Mentions): input + listbox popup,
   open triggers, highlight while typing, inline completion, IME, async/stale results,
   empty state, announcements, virtualization, popup placement in the DOM. **Combobox**
   adds the selection value, text/selection reconciliation, custom values, multiple

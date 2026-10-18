@@ -6,6 +6,7 @@ A text input with a popup list of options: the user types to narrow the list, mo
 
 - **Use it for** picking one option from a long list by typing to narrow it, free text with suggestions (`allowCustomValue`), and lists filtered by a server.
 - **Over a native `<select>`**: a `<select>` cannot be filtered by typing. Combobox adds the text input, the filtered popup, inline completion, grouped and disabled options, and `aria-activedescendant` announcement while focus stays in the input.
+- **An autocomplete and a command palette are this component's modes**: free text (`selectionMode="none"`) and inline (`inline`). They have their own sections below and no separate exports.
 - **Don't use it for** a short list that needs no search: use a [Select](select.md). For a list that is always visible, use a [Listbox](listbox.md). For plain text with no options, use a [Text Field](text-field.md).
 
 ```tsx
@@ -138,6 +139,103 @@ The popup opens on typing and on Arrow Down or Up. `openOnFocus` opens it when t
 ## Empty and loading
 
 Render `Combobox.Empty` inside the Popup: it shows while no option is listed and the status is `idle`. While `loading` is not `idle` the popup carries `data-loading`, and Empty stays hidden. The count of results and the empty state are announced politely; the texts come from `messages`.
+
+## Autocomplete (free text)
+
+Use it for a search field or any input whose answer is text, with suggestions that help the user type. Set `selectionMode="none"`: there is no selected key, the text is the value. Choosing a suggestion fills the input; `onValueChange` never runs, so listen with `onInputValueChange(text, { reason })`. `onAction(key, details)` runs after a choice, so you can react without comparing text.
+
+```tsx
+<form onSubmit={search}>
+  <Combobox.Root items={suggestions} selectionMode="none" name="q">
+    <Combobox.Label>Search</Combobox.Label>
+    <Combobox.Control>
+      <Combobox.Input />
+      <Combobox.ClearTrigger />
+    </Combobox.Control>
+    <Combobox.Positioner>
+      <Combobox.Popup>
+        <Combobox.List>
+          <Combobox.Items>{(label) => <Combobox.ItemText>{label}</Combobox.ItemText>}</Combobox.Items>
+        </Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Positioner>
+  </Combobox.Root>
+</form>
+```
+
+- **Forms.** `name`, `form` and `required` go on the visible input; there is no hidden input. Enter with no highlighted suggestion is not prevented, so the form submits. With a highlight, Enter fills the text; `submitOnChoose` makes it submit too. A form reset restores `defaultInputValue`. `formAutoComplete` sets the input's native `autocomplete` (default `"off"`).
+- **Completion.** `autoComplete="list"` (default) only lists; `"both"` also completes the text inline. `filter={null}` lists exactly the items you give.
+- **Escape.** With the popup open, Escape closes it. With it closed, Escape clears the text when `clearOnEscape` is set (default false); otherwise it is left to the page.
+
+## Command palette (inline)
+
+Use it for a searchable list of actions. Set `inline`: the list is always shown in place, there is no popup and no selection, and an item runs `onAction(key, { modality, modifiers })`. `inline` is fixed for the life of the instance. `Positioner`, `Popup` and `Trigger` render nothing; put `List` directly inside `Root`.
+
+```tsx
+<Combobox.Root items={commands} inline onAction={(key) => run(key)}>
+  <Combobox.Control>
+    <Combobox.Input aria-label="Search commands" />
+  </Combobox.Control>
+  <Combobox.List>
+    <Combobox.Items>
+      {(label, key) => (
+        <>
+          <Combobox.ItemText>{label}</Combobox.ItemText>
+          <Combobox.ItemDescription>{shortcutOf(key)}</Combobox.ItemDescription>
+        </>
+      )}
+    </Combobox.Items>
+  </Combobox.List>
+  <Combobox.Empty>No commands</Combobox.Empty>
+</Combobox.Root>
+```
+
+- **Groups and order.** Give items a `section` to group them under a label. Filtering removes items; it never reorders them. Add `data-tone="danger"` (or any `data-*`) to an item for the theme to style.
+- **Descriptions.** `Combobox.ItemDescription` inside an item is the option's description, wired by `aria-describedby`; use it for shortcut hints. A hint for the whole input comes from a Field description or your `aria-describedby`.
+- **Loading.** `Combobox.Loading` is a sibling of the List, shown while `loading` is not `idle`; it has no live role.
+- **Pages.** Pass `page={{ key, label, depth }}` and swap `items` when the user enters a page; `depth` 0 is the root. `onBack()` runs on Backspace in an empty query when `depth` is above 0. Entering a page resets the highlight to the first item and announces the page label.
+- **Keyboard.** Arrow keys move the highlight; Home and End edit the text. Enter runs the highlighted item. Escape clears the query; with an empty query it calls `onOpenChange(false, { reason: "escape" })` and is prevented, so the host decides. Without an `onOpenChange`, Escape is left to an enclosing layer.
+- **Count.** The number of results is announced politely after each query change, never at mount.
+
+### In a dialog
+
+The Dialog supplies the modal layer, the Combobox the list. Give the Dialog a Title (visually hidden is fine) so it has a name, and close it from both callbacks:
+
+```tsx
+<Dialog.Root open={open} onOpenChange={(next) => setOpen(next)}>
+  <Dialog.Portal>
+    <Dialog.Backdrop />
+    <Dialog.Positioner>
+      <Dialog.Content>
+        <Dialog.Title className="visually-hidden">Command palette</Dialog.Title>
+        <Combobox.Root
+          items={commands}
+          inline
+          onOpenChange={(o) => !o && setOpen(false)}
+          onAction={(key) => {
+            run(key)
+            setOpen(false)
+          }}
+        >
+          {/* parts as above */}
+        </Combobox.Root>
+      </Dialog.Content>
+    </Dialog.Positioner>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+The first Escape clears the query; the second asks the host to close, which closes the dialog.
+
+### Testing the variants
+
+`getCombobox` is the same driver. Pass `{ inline: true }` for a palette: `open()` and `close()` are skipped, and `run(name)` and `back()` are added. `items()` and `page()` read the list and the current page.
+
+```tsx
+const palette = getCombobox(screen, { name: "Search commands" }, { inline: true })
+await palette.type("theme")
+await palette.run("Toggle theme")
+```
 
 ## Accessibility notes
 

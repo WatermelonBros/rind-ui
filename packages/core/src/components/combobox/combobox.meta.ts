@@ -101,6 +101,12 @@ export const comboboxMeta = {
       description: "The option's text.",
     },
     {
+      name: "Combobox.ItemDescription",
+      part: "item-description",
+      element: "span",
+      description: "Describes its option (`aria-describedby`), e.g. a shortcut.",
+    },
+    {
       name: "Combobox.ItemIndicator",
       part: "item-indicator",
       element: "span",
@@ -123,6 +129,12 @@ export const comboboxMeta = {
       part: "empty",
       element: "div",
       description: "Shown, outside the listbox, while no option is listed.",
+    },
+    {
+      name: "Combobox.Loading",
+      part: "loading",
+      element: "div",
+      description: "Shown, outside the listbox, while loading; no live role.",
     },
     {
       name: "Combobox.LoadMore",
@@ -232,6 +244,43 @@ export const comboboxMeta = {
       type: "Partial<ComboboxMessages>",
       description: "Every string reaching assistive technology.",
     },
+    selectionMode: {
+      type: '"single" | "multiple" | "none"',
+      description:
+        '`"none"`: free text (an autocomplete): the text is the value (`onInputValueChange`), suggestions only fill it.',
+    },
+    inline: {
+      type: "boolean",
+      default: "false",
+      description:
+        "A command palette: the list in place, always shown, items run `onAction`. Fixed for the instance's life.",
+    },
+    onAction: {
+      type: "(key, { modality, modifiers }) => void",
+      description: "Inline: runs an item. Free text: follows a choice.",
+    },
+    page: {
+      type: "{ key, label, depth }",
+      description: "Inline: the current page (`depth` 0 is the root); a change is announced.",
+    },
+    onBack: {
+      type: "() => void",
+      description: "Inline: Backspace on an empty query above the root page.",
+    },
+    clearOnEscape: {
+      type: "boolean",
+      default: "false",
+      description: "Free text: Escape on a closed popup clears the text.",
+    },
+    submitOnChoose: {
+      type: "boolean",
+      default: "false",
+      description: "Free text: Enter on a highlighted suggestion fills, then submits the form.",
+    },
+    formAutoComplete: {
+      type: "string",
+      description: 'Free text: the input\'s native `autocomplete` (default "off").',
+    },
   },
   dataAttributes: {
     control: {
@@ -312,6 +361,8 @@ export const comboboxMeta = {
       removeChip: ["pointer", "keyboard", "virtual"],
       backspace: ["keyboard"],
       clear: ["pointer", "keyboard", "virtual"],
+      run: ["pointer", "keyboard", "virtual"],
+      back: ["keyboard"],
     },
     queries: [
       "side",
@@ -328,6 +379,7 @@ export const comboboxMeta = {
       "value",
       "hasFocus",
       "chips",
+      "page",
     ],
     traits: [
       "composite-activedescendant",
