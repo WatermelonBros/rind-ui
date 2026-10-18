@@ -1,12 +1,12 @@
 // Model-based tests: the range Date Field's pair contract over the coordinator's graph
 // (date-field "Range Mode — Pair Invariants"), every modality the actions declare.
 import { parseDate } from "@internationalized/date"
-import { dateFieldMessages, dateRangeArgs, dateRangeFieldContract } from "@rind-ui/core"
+import { dateFieldMessages, dateRangeArgs, dateRangeFieldContract, platforms } from "@rind-ui/core"
 import { DateField, RindProvider } from "@rind-ui/react"
 import { render, screen } from "@testing-library/react"
 import { useLayoutEffect } from "react"
 import { describe, expect, it } from "vitest"
-import { dateRangeStepInvariants, domEnv, fixedDateClock, testMachine } from "../index"
+import { currentRun, dateRangeStepInvariants, domEnv, fixedDateClock, testMachine } from "../index"
 
 const clock = fixedDateClock("2026-10-17T12:00:00Z", "UTC")
 
@@ -22,7 +22,10 @@ function Stay({
   readonly initial?: Iso | undefined
 }) {
   return (
-    <RindProvider environment={{ dateClock: clock }}>
+    // The run's platform: the driver's select-all key is the page's (⌘A on Apple, else Ctrl+A).
+    <RindProvider
+      environment={{ dateClock: clock, platform: currentRun()?.platform ?? platforms.linux }}
+    >
       {children}
       <DateField.Root
         selectionMode="range"
