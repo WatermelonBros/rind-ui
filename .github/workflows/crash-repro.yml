@@ -46,7 +46,8 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: |
           ( while true; do echo "$(date +%T) $(df -B1M --output=avail /tmp | tail -1)MB /tmp-shm=$(ls /tmp | grep -c '^\.org\.chromium') /dev/shm=$(df -B1M --output=used /dev/shm | tail -1)MB mem=$(free -m | awk '/Mem/{print $7}')MB"; sleep 5; done ) > disk.log 2>&1 &
-          df -h
+          sudo tcpdump -i lo -nn -tttt -U -w tcp.pcap 'tcp[tcpflags] & (tcp-fin|tcp-rst) != 0 or (tcp[tcpflags] & tcp-syn != 0 and tcp[tcpflags] & tcp-ack == 0)' > tcpdump.out 2>&1 &
+          node -v
           for i in 1 2 3; do
             pnpm exec vitest run --project 'browser (chromium)' --shard=1/2 --reporter=dot > "run-$i.log" 2> "debug-$i.log" || true
             tail -5 "run-$i.log"
@@ -67,5 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: logs-${{ matrix.rep }}
-          path: "*.log"
+          path: |
+            *.log
+            tcp.pcap
           retention-days: 3
