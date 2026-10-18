@@ -6,9 +6,9 @@ import { getDialog } from "./dialog"
 // role="alertdialog" (merge-alert-dialog-into-dialog; formerly add-alert-dialog 1.3).
 // @ts-expect-error an alert dialog is always modal
 const modal: DialogRootProps<"alertdialog"> = { role: "alertdialog", modal: false }
-// @ts-expect-error an outside press never closes an alert dialog
 const outside: DialogRootProps<"alertdialog"> = {
   role: "alertdialog",
+  // @ts-expect-error an outside press never closes an alert dialog
   closeOnInteractOutside: true,
 }
 const ok: DialogRootProps<"alertdialog"> = {
