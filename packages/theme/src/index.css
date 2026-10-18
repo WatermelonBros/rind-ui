@@ -36,6 +36,7 @@
 @import "./toggle.css";
 @import "./toggle-group.css";
 @import "./tabs.css";
+@import "./tag-group.css";
 @import "./listbox.css";
 @import "./combobox.css";
 @import "./tags-input.css";
@@ -58,6 +59,7 @@
 @import "./hover-card.css";
 @import "./menu.css";
 @import "./context-menu.css";
+@import "./menubar.css";
 @import "./select.css";
 @import "./tooltip.css";
 @import "./tree-view.css";

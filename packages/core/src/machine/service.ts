@@ -241,7 +241,12 @@ export function createService<M extends AnyMachine>(
     return []
   }
 
-  const take = (event: Event, t: RawTransition, sync: boolean) => {
+  const take = (event: Event, t0: RawTransition, sync: boolean) => {
+    // Sound: the definition typed the function's parameter as this machine's events.
+    const t =
+      typeof t0.reason === "function"
+        ? { ...t0, reason: (t0.reason as (e: Event) => string)(event) }
+        : (t0 as RawTransition & { readonly reason?: string })
     const source = snap.state
     const target = t.target
     const ran: string[] = []

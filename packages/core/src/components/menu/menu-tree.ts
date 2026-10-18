@@ -4,6 +4,7 @@
 // Machines call it only from actions; the root adapter creates it and injects it.
 
 import type { CollectionKey } from "../../collection/key"
+import type { Modality } from "../../contract/env"
 
 export type MenuLevelId = string & { readonly __brand: "MenuLevelId" }
 export const menuLevelId = (id: string): MenuLevelId => id as MenuLevelId
@@ -45,8 +46,8 @@ export interface MenuTreeHost {
   elements(): readonly HTMLElement[]
   /** An expand or collapse key the level did not consume. */
   navigate(input: { readonly from: MenuLevelId; readonly direction: "expand" | "collapse" }): void
-  /** The root trigger's press, delegated to the bar. */
-  press(key: CollectionKey): void
+  /** The root trigger's press, delegated to the bar (with its modality). */
+  press(key: CollectionKey, modality: Modality): void
 }
 
 export interface MenuTree {
@@ -67,7 +68,7 @@ export interface MenuTree {
     readonly from: MenuLevelId
     readonly direction: "expand" | "collapse"
   }): void
-  parentPress(key: CollectionKey): void
+  parentPress(key: CollectionKey, modality: Modality): void
 }
 
 export function createMenuTree(
@@ -118,6 +119,6 @@ export function createMenuTree(
     parentKind: () => options.parentKind ?? null,
     parentElements: () => options.host?.elements() ?? [],
     parentNavigate: (input) => options.host?.navigate(input),
-    parentPress: (key) => options.host?.press(key),
+    parentPress: (key, modality) => options.host?.press(key, modality),
   }
 }

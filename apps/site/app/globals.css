@@ -128,3 +128,16 @@ html.unstyled body {
     transition: none !important;
   }
 }
+
+/* Home → docs: the clicked component name morphs into the page title (components/morph-link.tsx). */
+[data-page-title] {
+  view-transition-name: page-title;
+}
+::view-transition-group(page-title) {
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}

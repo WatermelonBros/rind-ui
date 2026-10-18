@@ -107,7 +107,7 @@ export const familyMatrix = [
   },
   {
     family: "status",
-    components: ["badge", "tag", "alert", "toast"],
+    components: ["badge", "tag-group", "alert", "toast"],
     variants: ["soft", "solid", "outline"],
     size: "own",
     sizes,

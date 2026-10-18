@@ -50,12 +50,14 @@ async function open(options: Parameters<Browser["newContext"]>[0] = {}, fakeCloc
   const page = await context.newPage()
   pages.push(page)
   // Deterministic time for holds: the page's timers advance only when the test says so.
-  if (fakeClock) await page.clock.install()
+  if (fakeClock) await page.clock.install({ time: 1_000_000 })
   await page.setContent(html)
   await page.getByRole("link", { name: "Jane Doe" }).waitFor()
   // An installed clock still flows with real time: paused, the page's time moves only through
   // `runFor` (the adapter's advance), never with polling or load.
-  if (fakeClock) await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1)
+  // A fixed target far ahead of the install time: reading the page clock and then pausing just past it
+  // raced the still-flowing clock ("Cannot fast-forward to the past" in WebKit).
+  if (fakeClock) await page.clock.pauseAt(2_000_000)
   return page
 }
 
