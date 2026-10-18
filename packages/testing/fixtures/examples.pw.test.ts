@@ -70,8 +70,10 @@ async function pool<T>(
           await context.close()
           context = await browser.newContext()
           page = await context.newPage()
+          // Another worker may have taken the last items while this one recycled.
+          if (next >= items.length) break
         }
-        const item = items[next++] as T // bounded by the loop condition
+        const item = items[next++] as T // bounded: checked just above, no await in between
         await job(page, item)
       }
       await context.close()
@@ -292,6 +294,8 @@ describe("ARIA snapshot per state example", () => {
  * `static` state is the component itself, covered by any of its examples.
  */
 const TRANSIENT = new Set([
+  // Focus in the grid: entered by focusing a cell.
+  "calendar:focused",
   "field:validating",
   "form:validating",
   "form:awaiting-server",
@@ -304,14 +308,12 @@ const TRANSIENT = new Set([
   "number-input:composing",
   "number-input:pressing",
   "number-input:spinning",
-  "password-input:composing",
   "pin-input:composing",
   // Focus-driven: entered by focusing the input or a chip, or by editing a chip.
   "tags-input:typing",
   "tags-input:editing",
   // Focus inside the group (a tag focused): its ARIA is covered by the Tag Group DOM tests.
   "tag-group:focused",
-  "search-field:composing",
   // A submenu level waiting for its hover delay (a root menu never enters it).
   "menu:opening",
   // Pointer interactions: scrollbars shown while scrolling or hovered, a thumb dragged.
@@ -321,6 +323,9 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // A toast not yet started by a region, and one exiting: both last for moments.
+  "toast:idle",
+  "toast:dismissed",
 ])
 
 /**

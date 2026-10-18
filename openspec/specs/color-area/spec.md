@@ -306,6 +306,8 @@ without a commit. The channel values submitted are the numbers of the Area's `co
 
 ### Requirement: Data Attributes And Variables
 
+The area's parts SHALL carry `data-scope="color-picker"` with the `data-part` names `area` (Root), `area-background`, `area-thumb` and `area-input` (each range input).
+
 `Root`, `Background` and `Thumb` SHALL carry `data-disabled`, `data-readonly` and `data-dragging` while applicable; `Root` and `Thumb`
 `data-focus` and `data-focus-visible` for focus of either input. `Root` SHALL carry the CSS variable `--rind-color` (the current
 colour, CSS string) and `--rind-color-opaque`; `Background` the inline `background-image` from the model's `areaGradient`

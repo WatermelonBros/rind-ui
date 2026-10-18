@@ -1,7 +1,7 @@
 // The Slider's step invariants (add-slider "Slider Invariants") that need the DOM or a
 // count across a step: no focus or blur on a thumb input during a key step (BU#5296), no
 // other slider or focusable element inside the Slider, and one commit per committing step.
-import type { sliderContract } from "@rind-ui/core"
+import type { PartNaming, SliderPart, sliderContract } from "@rind-ui/core"
 import type { ConsumerInvariant } from "./model"
 
 export interface SliderStepInvariants {
@@ -10,7 +10,6 @@ export interface SliderStepInvariants {
   reset(): void
 }
 
-const THUMB_INPUT = '[data-scope="slider"][data-part="hidden-input"]'
 const FOCUSABLE =
   'a[href], button, input, select, textarea, [tabindex], [contenteditable="true"], [role="slider"]'
 
@@ -19,8 +18,17 @@ const FOCUSABLE =
  * oracle's did (pass a spy as the oracle's `onValueCommit` prop).
  */
 export function sliderStepInvariants(
-  options: { readonly commits?: () => number; readonly expectedCommits?: () => number } = {},
+  options: {
+    readonly commits?: () => number
+    readonly expectedCommits?: () => number
+    /** A Slider rendered as another component's part: the host's scope and part names. */
+    readonly naming?: PartNaming<SliderPart>
+  } = {},
 ): SliderStepInvariants {
+  const scope = options.naming?.scope ?? "slider"
+  const name = (part: SliderPart) => options.naming?.part(part) ?? part
+  const THUMB_INPUT = `[data-scope="${scope}"][data-part="${name("hidden-input")}"]`
+  const ROOT = `[data-scope="${scope}"][data-part="${name("root")}"]`
   let refocused: string[] = []
   let inKey = false
   const doc = globalThis.document
@@ -55,9 +63,7 @@ export function sliderStepInvariants(
         name: "slider-only-thumb-inputs-focusable",
         check: async () => {
           if (!doc) return undefined
-          for (const root of Array.from(
-            doc.querySelectorAll('[data-scope="slider"][data-part="root"]'),
-          )) {
+          for (const root of Array.from(doc.querySelectorAll(ROOT))) {
             const extra = Array.from(root.querySelectorAll(FOCUSABLE)).filter(
               (el) => !el.matches(THUMB_INPUT),
             )

@@ -20,42 +20,42 @@ const base = (part: string) => ({
 
 export const checkboxMeta = {
   scope: "checkbox",
-  name: "Checkbox",
+  name: "CheckboxGroup.Item",
   stateless: false,
   parts: [
     {
-      name: "Checkbox.Root",
+      name: "CheckboxGroup.Item",
       part: "root",
       element: "div",
       description: "Owns the checked state and the hidden input.",
     },
     {
-      name: "Checkbox.Control",
+      name: "CheckboxGroup.ItemControl",
       part: "control",
       element: "button",
       description:
         'The focusable box (`role="checkbox"`, `aria-checked` always explicit); named by its Label.',
     },
     {
-      name: "Checkbox.Indicator",
+      name: "CheckboxGroup.ItemIndicator",
       part: "indicator",
       element: "span",
       description: 'A decorative check or dash slot; `aria-hidden="true"`.',
     },
     {
-      name: "Checkbox.Label",
+      name: "CheckboxGroup.ItemLabel",
       part: "label",
       element: "label",
       description: "The visible name; pressing it toggles the Control.",
     },
     {
-      name: "Checkbox.Description",
+      name: "CheckboxGroup.ItemDescription",
       part: "description",
       element: "div",
       description: "Help text, referenced by `aria-describedby`.",
     },
     {
-      name: "Checkbox.HiddenInput",
+      name: "CheckboxGroup.ItemHiddenInput",
       part: "hidden-input",
       element: "input",
       description: "The native checkbox that carries name, value, validity and form reset.",

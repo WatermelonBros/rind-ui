@@ -18,7 +18,12 @@ import {
   useLayoutEffect,
   useRef,
 } from "react"
-import { Checkbox, type CheckboxRootProps } from "../checkbox/checkbox"
+import {
+  Checkbox,
+  type CheckboxIndicatorProps,
+  type CheckboxRootProps,
+  type CheckboxState,
+} from "../checkbox/checkbox"
 import { useFieldControl } from "../field/field"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import {
@@ -352,4 +357,34 @@ function Parent(props: Omit<CheckboxRootProps, "checked" | "defaultChecked" | "o
   )
 }
 
-export const CheckboxGroup = { Root, Label, Description, ErrorMessage, Parent }
+/**
+ * A checkbox: inside `CheckboxGroup.Root` one of the group's (its `value` joins the group's
+ * value); alone, a single two- or three-state checkbox with its own `checked`.
+ */
+const Item = Checkbox.Root
+/** Its check mark (or the indeterminate dash), rendered while checked. */
+const ItemIndicator = Checkbox.Indicator
+
+export type CheckboxGroupItemProps = CheckboxRootProps
+export type CheckboxGroupItemIndicatorProps = CheckboxIndicatorProps
+export type CheckboxGroupItemState = CheckboxState
+
+/** The item's (or the Parent's) focusable box. The group's own Label/Description are separate. */
+const ItemControl = Checkbox.Control
+/** The item's label; names its Control. */
+const ItemLabel = Checkbox.Label
+/** The item's description, wired into `aria-describedby`. */
+const ItemDescription = Checkbox.Description
+
+export const CheckboxGroup = {
+  Root,
+  Label,
+  Description,
+  ErrorMessage,
+  Parent,
+  Item,
+  ItemControl,
+  ItemIndicator,
+  ItemLabel,
+  ItemDescription,
+}

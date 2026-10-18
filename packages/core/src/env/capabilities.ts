@@ -121,6 +121,21 @@ export interface StyleEnv {
   readonly style: StyleInjection
 }
 
+// --- Page visibility (add-toast) ---
+
+/**
+ * Whether the document is hidden (a background tab, a minimised window), never window focus:
+ * an iframe taking focus is not a hidden page (radix#1362). Machines read it only here.
+ */
+export interface PageVisibility {
+  hidden(): boolean
+  /** Called on each change with the new state; returns the unsubscribe. */
+  subscribe(listener: (hidden: boolean) => void): () => void
+}
+export interface VisibilityEnv {
+  readonly visibility: PageVisibility
+}
+
 // --- Collection capabilities (add-collections) ---
 
 /** Monotonic time in milliseconds (typeahead timeouts without timers). */
@@ -129,6 +144,17 @@ export interface Clock {
 }
 export interface ClockEnv {
   readonly clock: Clock
+}
+
+/** The current instant and the viewer's time zone, for "today" (date-values). Tests fix both. */
+export interface DateClock {
+  /** Epoch milliseconds. */
+  now(): number
+  /** An IANA zone ("Pacific/Auckland"). */
+  timeZone(): string
+}
+export interface DateClockEnv {
+  readonly dateClock: DateClock
 }
 
 /** Measured layout of a collection's items, for page moves. */

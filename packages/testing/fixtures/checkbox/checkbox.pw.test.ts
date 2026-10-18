@@ -25,7 +25,7 @@ async function open(id: string, options: Parameters<Browser["newContext"]>[0] = 
   const context = await browser.newContext(options)
   const page = await context.newPage()
   pages.push(page)
-  await openExample(page, site.base, "checkbox", id)
+  await openExample(page, site.base, "checkbox-group", `alone-${id}`)
   await page.locator('[data-scope="checkbox"]').first().waitFor()
   return page
 }
@@ -116,7 +116,7 @@ describe("Enter submits the form", () => {
       }
       try {
         const page = await (await own.newContext()).newPage()
-        await openExample(page, site.base, "checkbox", "in-form-story")
+        await openExample(page, site.base, "checkbox-group", "alone-in-form-story")
         await page.locator('[data-scope="checkbox"]').first().waitFor()
         await page.evaluate(() => {
           const form = document.querySelector("form") as HTMLFormElement

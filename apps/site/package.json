@@ -11,6 +11,7 @@
     "audit": "node scripts/content.ts && next build && node tests/audit.ts"
   },
   "dependencies": {
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/core": "workspace:*",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/theme": "workspace:*",

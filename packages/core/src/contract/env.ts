@@ -17,6 +17,7 @@ export type Key =
   | "ArrowRight"
   | "Backspace"
   | "Delete"
+  | "F6"
   | "F10"
   | "ContextMenu"
   /** The letter A, for the select-all shortcut (mod+A). */

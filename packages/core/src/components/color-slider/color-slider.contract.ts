@@ -3,6 +3,7 @@
 
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env } from "../../contract/env"
+import { COLOR_PICKER_SCOPE, channelSliderNaming } from "../color-picker/color-picker.naming"
 import { cssColorOf } from "../color-swatch/color-swatch.contract"
 import type { ColorFormat } from "../shared/color/color"
 import { formatColor } from "../shared/color/format"
@@ -50,8 +51,9 @@ export const colorSliderInvariants: readonly Invariant<P, string>[] = [
  * `getColorSlider`'s contract: a Slider with the colour queries (the driver adds `setChannel`
  * as `setValue(0, value)`).
  */
-export const colorSliderContract = contract("slider", {
+export const colorSliderContract = contract(COLOR_PICKER_SCOPE, {
   ...sliderContract,
+  partName: channelSliderNaming.part,
   queries: {
     ...sliderContract.queries,
     channel: async (env) => (await env.part("root").attr("data-channel")) ?? "",

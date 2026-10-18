@@ -1,0 +1,81 @@
+/* ── Text Field password and search options: icons inside the input's edges ──
+   The input itself is skinned in field.css; here the wrapper, the room and the triggers. */
+:is([data-skinned], [data-rind-theme^="skin-"]) .adorned {
+  position: relative;
+  display: block;
+  inline-size: min(100%, 320px);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  .adorned
+  [data-scope="text-field"][data-part="input"] {
+  inline-size: 100%;
+  max-inline-size: none;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* Room for the trigger so text never runs under it (and a password manager's badge). */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="text-field"][data-part="input"][data-custom-reveal] {
+  padding-inline-end: 48px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  :is([data-scope="text-field"][data-part="visibility-trigger"], .adorn-end) {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 4px;
+  inline-size: 40px;
+  display: inline-grid;
+  place-items: center;
+  margin: auto 0;
+  block-size: 36px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="text-field"][data-part="visibility-trigger"][aria-pressed="true"] {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="text-field"][data-part="visibility-trigger"][data-focus-visible] {
+  outline: 2px solid var(--s-brand);
+  outline-offset: 0;
+}
+/* The Indicator follows data-state: the open eye while hidden, the crossed one while shown. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="text-field"][data-part="visibility-indicator"] {
+  display: inline-grid;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="text-field"][data-part="visibility-indicator"][data-state="hidden"]
+  .eye-off,
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="text-field"][data-part="visibility-indicator"][data-state="visible"]
+  .eye-on {
+  display: none;
+}
+/* Search: the leading icon and the round clear trigger. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="text-field"][data-part="input"][type="search"] {
+  padding-inline: 40px 44px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .adorn-start {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 13px;
+  margin: auto 0;
+  color: var(--s-ink);
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="text-field"][data-part="clear-trigger"].adorn-end {
+  inset-inline-end: 6px;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 99px;
+  background: var(--s-muted);
+}

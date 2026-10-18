@@ -1,6 +1,5 @@
 import {
   autosize as attachAutosize,
-  buildTextFieldMachine,
   defaultCount,
   type FieldMessages,
   focusSafely,
@@ -10,8 +9,9 @@ import {
   type TextFieldDetails,
   type TextFieldMessages,
   type TextFieldReason,
+  type TextFieldSubmitDetails,
   textFieldConnect,
-  textFieldMessages,
+  type textFieldMachine,
   type Validate,
   type ValidationBehavior,
   type ValidationMode,
@@ -28,7 +28,7 @@ import {
   useState,
 } from "react"
 import { useFieldBindingPeek, useFieldControl } from "../field/field"
-import { FieldHost, HostDescription, HostErrorMessage, HostLabel } from "../field/use-field-host"
+import { FieldHost } from "../field/use-field-host"
 import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
@@ -48,7 +48,6 @@ declare module "../provider" {
 }
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
-const { machine: textFieldMachine } = buildTextFieldMachine({})
 
 /**
  * What a Text Field preset (Password Input, Search Field) adds to the shared host: its scope,
@@ -61,7 +60,7 @@ export interface TextFieldHostConfig {
   readonly machine: typeof textFieldMachine
   /** Message defaults (Text Field's merged with the preset's). */
   readonly messages: TextFieldMessages
-  /** Names the parts in errors ("PasswordInput"). */
+  /** Names the parts in errors ("TextField"). */
   readonly label: string
   /** The preset's own Root props: kept from the Field, passed to `machineProps`. */
   readonly ownProps?: readonly string[]
@@ -136,8 +135,40 @@ function useTextField(part: string): Ctx {
 /** A preset part's access to its host (`part` names it in the error). */
 export const useTextFieldHost = (part: string): TextFieldHostContext => useTextField(part)
 
-export type TextFieldRootProps = Omit<ComponentPropsWithRef<"div">, "children" | "defaultValue"> & {
+export type TextFieldVisibilityReason = "PRESS" | "SUBMIT" | "RESET"
+
+export interface TextFieldVisibilityDetails {
+  readonly reason: TextFieldVisibilityReason
+}
+
+/** The Root props the host splits off for its configuration (`ownProps`). */
+type TextFieldOwnRootProp =
+  | "type"
+  | "visible"
+  | "defaultVisible"
+  | "onVisibleChange"
+  | "escapeClears"
+  | "onSubmit"
+
+export type TextFieldRootProps = Omit<
+  ComponentPropsWithRef<"div">,
+  "children" | "defaultValue" | "onSubmit"
+> & {
   readonly children?: ReactNode
+  /**
+   * The Input's native type. `"password"`: the visibility parts and rules (hidden on submit
+   * and reset, caret kept, privacy attributes); `"search"`: a searchbox, "Clear search",
+   * Escape clears.
+   */
+  readonly type?: string
+  /** `type="password"`: controlled visibility. */
+  readonly visible?: boolean
+  readonly defaultVisible?: boolean
+  readonly onVisibleChange?: (visible: boolean, details: TextFieldVisibilityDetails) => void
+  /** Escape clears a non-empty editable value (default: true for `type="search"`). */
+  readonly escapeClears?: boolean
+  /** Enter (not composing). The form still submits unless `details.event` is prevented. */
+  readonly onSubmit?: (value: string, details: TextFieldSubmitDetails) => void
   readonly value?: string | null
   readonly defaultValue?: string
   readonly onValueChange?: (value: string, details: TextFieldDetails) => void
@@ -161,9 +192,7 @@ export type TextFieldRootProps = Omit<ComponentPropsWithRef<"div">, "children" |
 }
 
 /** A Root on the shared host: Text Field's, or a preset's (`config`). */
-export function createTextFieldRoot<P extends Omit<TextFieldRootProps, "onSubmit">>(
-  config: TextFieldHostConfig,
-) {
+export function createTextFieldRoot<P extends TextFieldRootProps>(config: TextFieldHostConfig) {
   return function Root(props: P) {
     // Sound: a preset's own props (`config.ownProps`) are split off before Text Field's are
     // read, so the rest is Text Field's Root props.
@@ -193,7 +222,8 @@ function HostRoot({
     children,
     id,
     ...fieldProps
-  } = passed as TextFieldRootProps
+    // Sound: the own props (`config.ownProps`) were split off into `own` above.
+  } = passed as Omit<TextFieldRootProps, TextFieldOwnRootProp>
   const scope = config.scope
   const env = useEnvironment()
   const generated = useId()
@@ -444,7 +474,7 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
       countId: ctx.countId,
       limit: ctx.limit,
       count: ctx.count,
-      clearLabel: ctx.messages.clear,
+      clearLabel: ctx.own["type"] === "search" ? ctx.messages.clearSearch : ctx.messages.clear,
     },
     {
       send: ctx.send,
@@ -526,7 +556,7 @@ function ClearTrigger({
     "data-part": "clear-trigger",
     "data-instance": ctx.instance,
     type: "button",
-    "aria-label": ctx.messages.clear,
+    "aria-label": ctx.own["type"] === "search" ? ctx.messages.clearSearch : ctx.messages.clear,
     tabindex: -1,
   })
   return renderPart("button", mergeProps({ ...own, ...press.props }, rest), render, undefined)
@@ -577,23 +607,5 @@ function CharacterCount({
   )
 }
 
-/** Text Field: the host with the empty preset. */
-const textFieldConfig: TextFieldHostConfig = {
-  scope: "text-field",
-  machine: textFieldMachine,
-  messages: textFieldMessages,
-  label: "TextField",
-}
-const Root = createTextFieldRoot<TextFieldRootProps>(textFieldConfig)
-
-export const TextField = {
-  Root,
-  Label: HostLabel,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
-  Input,
-  Textarea,
-  ClearTrigger,
-  CharacterCount,
-}
 export type { TextFieldDetails }
+export { CharacterCount, ClearTrigger, Input, Textarea }

@@ -1,5 +1,5 @@
 import { domEnvironment } from "@rind-ui/core"
-import { Fieldset, Toggle } from "@rind-ui/react"
+import { Fieldset, ToggleGroup } from "@rind-ui/react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
@@ -10,7 +10,7 @@ const platform = domEnvironment().platform
 describe("Toggle smoke", () => {
   it("toggles by every modality; aria-pressed explicit", async () => {
     const onPressedChange = vi.fn()
-    render(<Toggle.Root onPressedChange={onPressedChange}>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item onPressedChange={onPressedChange}>Bold</ToggleGroup.Item>)
     const t = getToggle(screen, { name: "Bold" }, { platform })
     const el = screen.getByRole("button", { name: "Bold" })
     expect(el.getAttribute("aria-pressed")).toBe("false")
@@ -27,7 +27,9 @@ describe("Toggle smoke", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     function Mute() {
       return (
-        <Toggle.Root render={(p, s) => <button {...p}>{s.pressed ? "Unmute" : "Mute"}</button>} />
+        <ToggleGroup.Item
+          render={(p, s) => <button {...p}>{s.pressed ? "Unmute" : "Mute"}</button>}
+        />
       )
     }
     render(<Mute />)
@@ -46,9 +48,9 @@ describe("substitution and composition", () => {
   it("disabled <span>: data-disabled, aria-disabled, role button, no disabled (base-ui#1084)", async () => {
     const onPressedChange = vi.fn()
     render(
-      <Toggle.Root render={<span />} disabled onPressedChange={onPressedChange}>
+      <ToggleGroup.Item render={<span />} disabled onPressedChange={onPressedChange}>
         Bold
-      </Toggle.Root>,
+      </ToggleGroup.Item>,
     )
     const el = screen.getByRole("button", { name: "Bold" })
     expect(el.tagName).toBe("SPAN")
@@ -68,9 +70,9 @@ describe("substitution and composition", () => {
     const onClick = vi.fn()
     const onPressedChange = vi.fn()
     render(
-      <Toggle.Root onClick={onClick} onPressedChange={onPressedChange}>
+      <ToggleGroup.Item onClick={onClick} onPressedChange={onPressedChange}>
         Bold
-      </Toggle.Root>,
+      </ToggleGroup.Item>,
     )
     await driver("Bold").setPressed(true)
     expect(onClick).toHaveBeenCalledTimes(1)
@@ -79,9 +81,9 @@ describe("substitution and composition", () => {
 
   it("an element that writes its own data-state keeps aria-pressed right (radix#602)", async () => {
     render(
-      <Toggle.Root render={<span data-state="open" />} defaultPressed>
+      <ToggleGroup.Item render={<span data-state="open" />} defaultPressed>
         Bold
-      </Toggle.Root>,
+      </ToggleGroup.Item>,
     )
     const t = driver("Bold")
     expect(await t.isPressed()).toBe(true)
@@ -96,7 +98,7 @@ describe("activation", () => {
     const onSubmit = vi.fn((e: Event) => e.preventDefault())
     render(
       <form onSubmit={(e) => onSubmit(e.nativeEvent)}>
-        <Toggle.Root>Bold</Toggle.Root>
+        <ToggleGroup.Item>Bold</ToggleGroup.Item>
       </form>,
     )
     const t = driver("Bold")
@@ -108,7 +110,7 @@ describe("activation", () => {
 
   it("held Space toggles once, on release", async () => {
     const onPressedChange = vi.fn()
-    render(<Toggle.Root onPressedChange={onPressedChange}>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item onPressedChange={onPressedChange}>Bold</ToggleGroup.Item>)
     screen.getByRole("button").focus()
     await userEvent.keyboard("{ }")
     expect(onPressedChange).toHaveBeenCalledTimes(1)
@@ -118,7 +120,7 @@ describe("activation", () => {
 
   it("Enter and Space each toggle once (ark#2946)", async () => {
     const onPressedChange = vi.fn()
-    render(<Toggle.Root onPressedChange={onPressedChange}>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item onPressedChange={onPressedChange}>Bold</ToggleGroup.Item>)
     screen.getByRole("button").focus()
     await userEvent.keyboard("{Enter}")
     expect(onPressedChange).toHaveBeenLastCalledWith(true, expect.anything())
@@ -129,7 +131,7 @@ describe("activation", () => {
 
   it("a bare click (detail 0) toggles once, as virtual", async () => {
     const onPressedChange = vi.fn()
-    render(<Toggle.Root onPressedChange={onPressedChange}>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item onPressedChange={onPressedChange}>Bold</ToggleGroup.Item>)
     fireEvent.click(screen.getByRole("button"), { detail: 0 })
     expect(onPressedChange).toHaveBeenCalledTimes(1)
     expect(onPressedChange.mock.calls[0]?.[1].event).toMatchObject({
@@ -139,7 +141,7 @@ describe("activation", () => {
   })
 
   it("programmatic focus does not toggle", () => {
-    render(<Toggle.Root>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item>Bold</ToggleGroup.Item>)
     const el = screen.getByRole("button")
     act(() => el.focus())
     expect(aria(el)).toBe("false")
@@ -148,9 +150,9 @@ describe("activation", () => {
   it("focusableWhenDisabled: Tab reaches it, aria-disabled, Space does not toggle (base-ui#5834)", async () => {
     const onPressedChange = vi.fn()
     render(
-      <Toggle.Root disabled focusableWhenDisabled onPressedChange={onPressedChange}>
+      <ToggleGroup.Item disabled focusableWhenDisabled onPressedChange={onPressedChange}>
         Bold
-      </Toggle.Root>,
+      </ToggleGroup.Item>,
     )
     const el = screen.getByRole("button")
     await userEvent.tab()
@@ -165,7 +167,7 @@ describe("activation", () => {
   it("no announcement is recorded when toggling", async () => {
     const log = installAnnouncementLog()
     log.length = 0
-    render(<Toggle.Root>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item>Bold</ToggleGroup.Item>)
     await driver("Bold").via("keyboard").setPressed(true)
     expect(log).toEqual([])
     expect(aria(screen.getByRole("button"))).toBe("true")
@@ -173,11 +175,11 @@ describe("activation", () => {
 
   it("icon swap through Indicator keeps the name", async () => {
     render(
-      <Toggle.Root aria-label="Mute">
-        <Toggle.Indicator fallback={<span data-testid="off">🔊</span>}>
+      <ToggleGroup.Item aria-label="Mute">
+        <ToggleGroup.ItemIndicator fallback={<span data-testid="off">🔊</span>}>
           <span data-testid="on">🔇</span>
-        </Toggle.Indicator>
-      </Toggle.Root>,
+        </ToggleGroup.ItemIndicator>
+      </ToggleGroup.Item>,
     )
     expect(screen.queryByTestId("off")).toBeTruthy()
     await driver("Mute").setPressed(true)
@@ -192,10 +194,10 @@ describe("activation", () => {
       <>
         <Fieldset.Root disabled>
           <Fieldset.Legend>Group</Fieldset.Legend>
-          <Toggle.Root onPressedChange={onPressedChange}>Rind</Toggle.Root>
+          <ToggleGroup.Item onPressedChange={onPressedChange}>Rind</ToggleGroup.Item>
         </Fieldset.Root>
         <fieldset disabled>
-          <Toggle.Root onPressedChange={onPressedChange}>Native</Toggle.Root>
+          <ToggleGroup.Item onPressedChange={onPressedChange}>Native</ToggleGroup.Item>
         </fieldset>
       </>,
     )
@@ -209,7 +211,7 @@ describe("activation", () => {
 
 describe("every action in every modality", () => {
   it.each(["pointer", "touch", "keyboard", "virtual"] as const)("setPressed via %s", async (m) => {
-    render(<Toggle.Root>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item>Bold</ToggleGroup.Item>)
     const t = driver("Bold").via(m)
     await t.setPressed(true)
     expect(await t.isPressed()).toBe(true)
@@ -220,7 +222,7 @@ describe("every action in every modality", () => {
   })
 
   it("activateWithEnter", async () => {
-    render(<Toggle.Root>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item>Bold</ToggleGroup.Item>)
     const t = driver("Bold").via("keyboard")
     await t.activateWithEnter(true)
     expect(await t.isPressed()).toBe(true)
@@ -229,14 +231,14 @@ describe("every action in every modality", () => {
   })
 
   it("isDisabled", async () => {
-    render(<Toggle.Root disabled>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item disabled>Bold</ToggleGroup.Item>)
     expect(await driver("Bold").isDisabled()).toBe(true)
   })
 })
 
 describe("data-pressed", () => {
   it("only while the pointer is held; data-state stays on", async () => {
-    render(<Toggle.Root defaultPressed>Bold</Toggle.Root>)
+    render(<ToggleGroup.Item defaultPressed>Bold</ToggleGroup.Item>)
     const el = screen.getByRole("button")
     const user = userEvent.setup()
     expect(el.hasAttribute("data-pressed")).toBe(false)

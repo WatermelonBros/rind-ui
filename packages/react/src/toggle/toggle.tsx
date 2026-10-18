@@ -143,7 +143,7 @@ export type ToggleIndicatorProps = ComponentPropsWithRef<"span"> & {
 
 function Indicator({ fallback, render, children, ...rest }: ToggleIndicatorProps) {
   const ctx = useContext(ToggleContext)
-  if (!ctx) throw new Error("Toggle.Indicator must be inside Toggle.Root")
+  if (!ctx) throw new Error("ToggleGroup.ItemIndicator must be inside ToggleGroup.Item")
   const props = mergeProps(normalizeProps(ctx.api.indicator()), rest)
   return renderPart(
     "span",

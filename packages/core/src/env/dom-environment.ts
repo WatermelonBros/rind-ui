@@ -10,6 +10,8 @@ import type {
   AnnouncerEnv,
   ClockEnv,
   CollectionLayoutEnv,
+  DateClock,
+  DateClockEnv,
   DomEnv,
   DomRoot,
   Engine,
@@ -18,11 +20,13 @@ import type {
   ModalityEnv,
   ModalitySource,
   MotionEnv,
+  PageVisibility,
   PlatformFlags,
   PlatformInfo,
   Scheduler,
   SchedulerEnv,
   StyleEnv,
+  VisibilityEnv,
 } from "./capabilities"
 import type { Router, RouterCapability } from "./router"
 
@@ -36,9 +40,11 @@ export type DomEnvironment = SchedulerEnv &
   LocaleEnv &
   AnnouncerEnv &
   ClockEnv &
+  DateClockEnv &
   CollectionLayoutEnv &
   RouterCapability &
-  ValidityEnv
+  ValidityEnv &
+  VisibilityEnv
 
 /** Native constraint validity, for machines that validate a form control (Field). */
 export interface ValidityEnv {
@@ -65,8 +71,12 @@ export interface DomEnvironmentOptions {
   readonly dir?: "ltr" | "rtl"
   /** An announcer, or the built-in backend to use (default: live regions). */
   readonly announcer?: Announcer | "live-region" | "aria-notify"
+  /** Page visibility (default: the document's `visibilityState`). Tests pass a fake. */
+  readonly visibility?: PageVisibility
   /** Client routing for every link part below (default: none, the browser navigates). */
   readonly router?: Router
+  /** The date clock (default: `Date.now()` and the platform's resolved time zone). */
+  readonly dateClock?: DateClock
 }
 
 /**
@@ -134,6 +144,26 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
         : liveAnnouncer({ scheduler, dom }, { backend: options.announcer ?? "live-region" }),
     // Looked up at call time, like the timers, so fake clocks installed later drive it.
     clock: { now: () => globalThis.performance?.now() ?? Date.now() },
+    // Read at call time, never at module scope or on import (no server-render "now").
+    dateClock: options.dateClock ?? {
+      now: () => Date.now(),
+      timeZone: () => new Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
     layout: collectionLayout(dom),
+    visibility: options.visibility ?? documentVisibility(documentOf),
+  }
+}
+
+/** The document's visibility state; `visibilitychange` only (never focus or blur). */
+function documentVisibility(documentOf: () => Document | undefined): PageVisibility {
+  return {
+    hidden: () => documentOf()?.visibilityState === "hidden",
+    subscribe(listener) {
+      const doc = documentOf()
+      if (!doc) return () => {}
+      const onChange = () => listener(doc.visibilityState === "hidden")
+      doc.addEventListener("visibilitychange", onChange)
+      return () => doc.removeEventListener("visibilitychange", onChange)
+    },
   }
 }

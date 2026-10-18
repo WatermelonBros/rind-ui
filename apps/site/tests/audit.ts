@@ -124,7 +124,23 @@ async function exercise(page: Page, url: string) {
         .catch((e: Error) => report(url, "click", `example ${i} control ${k}: ${e.message}`))
       await closeModals(page, url)
     }
+    await dismissToasts(page)
   }
+}
+
+/**
+ * Toasts left open (an action, a promise, a stack the pointer paused) sit in the viewport corner,
+ * over the next example's bar: close them all (a virtual click on each close button, as a screen
+ * reader does), then wait for none to be open (a condition, with a deadline).
+ */
+async function dismissToasts(page: Page) {
+  const open = '[data-scope="toast"][data-part="root"][data-state="open"]'
+  await page.$$eval(`${open} [data-part="close-trigger"]`, (buttons) => {
+    for (const b of buttons) (b as HTMLElement).click()
+  })
+  await page
+    .waitForFunction((sel) => document.querySelector(sel) === null, open, { timeout: 5000 })
+    .catch(() => {})
 }
 
 /**

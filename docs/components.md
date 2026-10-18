@@ -10,7 +10,7 @@ Sources (collected 2026-10-14): Ark UI, Radix Primitives, React Aria Components
 `llms.txt` files and component folders on GitHub. Rows marked *unverified* were
 seen in docs or source but not confirmed as public, stable API.
 
-**90 components** in 10 categories, plus 11 AI-UI primitives no library ships.
+**88 components** in 10 categories, plus 11 AI-UI primitives no library ships.
 
 ## How to read this
 
@@ -31,7 +31,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | HUI: in source, not in public docs |
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
-| Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | spec |  |
+| Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | done |  |
 | Alert Dialog |  | ● |  | ● |  |  | ● | ● | ● | 5 | 1 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
@@ -76,16 +76,14 @@ seen in docs or source but not confirmed as public, stable API.
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark |
 | Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |
 
-## Boolean & toggles (6)
+## Boolean & toggles (4)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Checkbox | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Used by Reado |
 | Radio Group | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Switch | ● | ● | ● | ● | ● |  | ● | ● | ● | 8 | 1 | done |  |
-| Toggle | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC/Kobalte: Toggle Button |
-| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: ToggleButtonGroup |
-| Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | done | Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |
+| Toggle Group | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: ToggleButtonGroup · a lone Item is the single Toggle (RAC/Kobalte: Toggle Button) |
+| Checkbox Group | ● |  | ● | ● |  | ● | ● | ● |  | 6 | 2 | done | A lone Item is the single Checkbox (used by Reado) · Ark: Checkbox.Group · Ariakit: CheckboxProvider with an array value · Reka: CheckboxGroupRoot · Bits: Checkbox.Group (verified in source, 2026-10-14) |
 
 ## Inputs (12)
 
@@ -96,11 +94,9 @@ seen in docs or source but not confirmed as public, stable API.
 | Number Input | ● |  | ● | ● |  |  | ● |  | ● | 5 | 2 | done | Number Field |
 | Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | todo | Rating Group |
-| Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field |
+| Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field; Password Input (`type="password"`, Radix: Password Toggle Field) and Search Field (`type="search"`) are its parts |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
 | Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Password Input | ● | ● |  |  |  |  |  |  |  | 2 | 2 | done | Radix: Password Toggle Field |
-| Search Field |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
@@ -117,7 +113,7 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec |  |
+| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip |  |
 | Date Field | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: Date Input |
 | Date Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec |  |
 | Date Range Picker | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | spec | Ark: range mode of Date Picker |

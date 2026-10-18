@@ -1,6 +1,6 @@
 // Checkbox Group server markup: a defaultValue renders checked on the server and hydrates
 // cleanly (bits-ui#1249).
-import { Checkbox, CheckboxGroup } from "@rind-ui/react"
+import { CheckboxGroup } from "@rind-ui/react"
 import { act } from "@testing-library/react"
 import { hydrateRoot } from "react-dom/client"
 import { renderToString } from "react-dom/server"
@@ -13,10 +13,10 @@ const tree = (
     <CheckboxGroup.Root name="t" defaultValue={["b"]}>
       <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
       {["a", "b", "c"].map((v) => (
-        <Checkbox.Root key={v} value={v}>
-          <Checkbox.Control />
-          <Checkbox.Label>{v.toUpperCase()}</Checkbox.Label>
-        </Checkbox.Root>
+        <CheckboxGroup.Item key={v} value={v}>
+          <CheckboxGroup.ItemControl />
+          <CheckboxGroup.ItemLabel>{v.toUpperCase()}</CheckboxGroup.ItemLabel>
+        </CheckboxGroup.Item>
       ))}
     </CheckboxGroup.Root>
   </form>

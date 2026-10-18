@@ -1,5 +1,99 @@
 # @rind-ui/testing
 
+## 0.3.0
+
+### Minor Changes
+
+- 0cdaff3: Add Alert Dialog: the Dialog's machine, always modal with `role="alertdialog"`, closed only by Escape, Cancel or an action (an outside press never closes it), focus starting on Cancel, a warning for a missing description, the `getAlertDialog` driver and `alert-dialog.css`.
+- 2ceeef6: Add Calendar: a month grid on `@internationalized/date` (calendar systems via `createCalendar`, locale week starts, `today` from an injected clock). Single and multiple selection, a focused date with roving focus and APG keys (days, weeks, Home/End, months, years with Shift), several visible months with `pageBehavior`, min/max (disabled) and unavailable dates, read-only and disabled, triggers that stay focusable at the bounds, polite range announcements from outside the grid. The `getCalendar` driver, `fixedDateClock`, and `calendar.css`. The keyboard layer gains the `grid` orientation.
+- a966aa7: **Breaking for themes (unreleased; a minor bump while on 0.x).** Every Color Picker part carries `data-scope="color-picker"` with its own part name: `area`, `area-background`, `area-thumb`, `area-input`; `channel-slider`, `channel-slider-label`, `channel-slider-value-text`, `channel-slider-control`, `channel-slider-track`, `channel-slider-thumb`; `channel-input`, `channel-input-root` (with `data-channel`); `swatch-group`, `swatch-item`, `swatch-trigger`, `swatch-indicator`; `swatch`, `value-swatch`, `transparency-grid` (a part's form input keeps `hidden-input`). `data-color-swatch-picker` is gone. The theme's six colour sheets are merged into `color-picker.css`, which styles the channel slider and the inputs itself. Slider, Number Input and Radio Group gain an optional hosted naming (the host's scope and part names; defaults unchanged), contracts an optional `partName` (the test adapters locate parts through it), `Field.Root` an optional `rootPart`, and `sliderStepInvariants` an optional `naming`.
+- f982235: Add Combobox: a text input with a listbox popup. Filtering (locale-aware, or off with `filter: null`), auto highlight with a typing pause before the active descendant, inline completion, IME-safe keys, Enter/Escape/Tab and the commit rules for typed text (exact match, empty, custom values), async results with `itemsQuery` and an abort signal per text change, the empty state, multiple selection with chips (the shared `input-chips` helpers), forms (hidden inputs, reset, autofill, required), Field binding and label activation. The `getCombobox` driver, `comboboxTraits`, and `combobox.css`. The machine runtime now processes an event an action sends after its step (a scheduler callback) at once; `FormInputDecl.values` names the values a hidden input mirrors.
+- 631011b: **Breaking (unreleased; a minor bump while on 0.x).** Add Color Picker, the one colour component. A trigger and a popover, or an inline panel (`inline`), holding the parts you choose: `Area` (two channels as a 2D surface, keyboard and pointer), `ChannelSlider` (one channel on a Slider), `ChannelInput` (a hex or CSS field, or a number field per channel), `SwatchGroup` / `SwatchTrigger` / `SwatchIndicator` (a palette with one centred selected mark: a ringed dot, or your glyph), `Swatch` / `ValueSwatch`, `EyeDropperTrigger` (where the browser has one), `FormatSelect` / `FormatTrigger` / `View`, `ValueText` and form participation. The popover is positioned next to its control. There are no standalone Color Area, Color Slider, Color Field, Color Channel Field, Color Swatch or Color Swatch Picker exports: they are the picker's parts (their machines live in the internal `@rind-ui/core/internal` entry, not public API). `@rind-ui/core` exports the colour model (`Color`, `parseColor`, `formatColor`, channels, names); `@rind-ui/testing` exports `getColorPicker` with its parts' drivers (`area`, `slider`, `input`, `swatches`, `swatch`). `pointer-drag` gains a 2D mode; Field gains `FieldControlBoundary`. Stylesheets for every part, with a checkerboard for transparency.
+- 09f2445: Add Context Menu: a Menu opened from a region by right click, Control+click, long press (touch and pen) or the context-menu key, anchored at the point, re-anchored by a second right click in the region, with `openAt` for programmatic opening, the `getContextMenu` driver and `context-menu.css`. Press interactions: a long press can set a movement tolerance and a second pointer cancels it. Testing: parts gain `contextMenu()` and `longPress()`, and the DOM adapter takes `advanceClock` (a virtual clock for explicit waits only).
+- 4ddc47f: Add Dialog: modal by default (outside inert, scroll locked, Tab contained) or non-modal, named by its title, with initial and final focus rules, controllable open state with reasons, nested dialogs, submit-type close triggers, the `getDialog` driver and `dialog.css`.
+- adc1270: Add Badge, Skeleton and Avatar. Badge: static status text that is never a live region, a `label` for assistive technology and a development check for a host whose `aria-label` hides the count; `getBadge`, `badge.css`. Skeleton: one busy region per loading area, hidden and inert placeholders, a loading text outside the region, an optional completion announcement and a CSS shimmer that stops under reduced motion; `getSkeleton`, `skeleton.css`. Avatar: the shared `image-loading-status` machine read from the rendered `<img>` (no probe, cached and server-rendered images never flash the fallback), one stable name on Root, fallback timing, Avatar Group with an overflow label; `getAvatar`, `avatar.css`. Aspect Ratio is documented as a recipe on the native CSS property: there is no component.
+- 9e5c536: Add Image, Progress, Meter and Alert. Image: the shared image-status machine with one stable name in every status (the `<img>`'s own `alt` while it shows, Root's when it is gone) and a lazy-safe server render; `getImage`, `image.css`. Progress and Meter: the shared `range-value` model, determinate/indeterminate progress with completion announcements, meter zones from low/high/optimum; `getProgress`, `getMeter`, stylesheets. Alert: an inline message announced through the Announcer (never its own live region), dismissable with focus moved past it; `getAlert`, `alert.css`. Contracts can declare `absentIn` (states where the component is unmounted) for the model runner.
+- a1c4bd8: Drawer: a Dialog at an edge of the viewport, swipeable away and between snap points (with a handle that cycles them), nested drawers with background indent metadata, a keyboard inset, the `drawer` contract and `getDrawer` driver, and the theme stylesheet. New shared pieces:
+  - `trackSwipe` (the `swipe-gesture` capability: discrete events, movement as CSS variables);
+  - `Part.drag` in both test adapters;
+  - `dialogPieces`, so dialog-family machines compose the Dialog's graph.
+  
+  A transition's declared `reason` now also names the controllable changes its actions write.
+  
+  Behaviour changes:
+  - `DialogCloseReason` gains `"swipe"` (the Drawer's).
+  - A transition's declared reason now also applies to the controllable writes of its actions. Dialog and Alert Dialog keep their `details.reason` for every close path (covered by their machine tests).
+  - Press: a pointer press no longer cancels when focus moves to an ancestor of the pressed part. This is WebKit's mousedown on a focused button.
+- 480fb80: Add Hover Card: a link's non-modal preview opened after a delay by hover or keyboard focus (never by touch), kept open by focus inside, a keyboard-focused trigger or a child layer, in the Tab order right after its trigger, with kebab-case reasons, the `getHoverCard` driver and `hover-card.css`. Tooltip's open ↔ closing session is now a shared module. The restores-focus invariant no longer treats a closed → opening step as a close.
+- 216adc6: Add Listbox: single, multiple and no selection, toggle and replace behaviours (selection follows focus, mod to move only), actions, sections, descriptions, empty and load-more, horizontal and RTL, all built on the collection pieces. The listbox parts are reusable under another scope (`listboxParts`, `createListboxParts`) for Select and Combobox. The `getListbox` driver, `listboxTraits`, and `listbox.css`.
+- 257cea5: Add Menu: a dropdown menu with items, checkbox and radio items, link items, groups, separators and nested submenus (one machine per level linked by a menu tree), opening by modality, submenu pointer intent with a grace area and rest timeout, Tab and window-blur closing, kebab-case close reasons, the `getMenu` driver and `menu.css`. Hover intent: an exit near a corner counts the side facing the target when the pointer moves towards it. The DOM adapter's outside press stays inside the viewport's client area. Press interactions count a release on a descendant that overflows the part (an extended tap area) as inside.
+- 12a2ce9: Breaking (unreleased): one component per control. `Checkbox` and `Toggle` are no longer exported.
+  - `Checkbox.Root`, `Control`, `Indicator`, `Label` and `Description` become `CheckboxGroup.Item`, `ItemControl`, `ItemIndicator`, `ItemLabel` and `ItemDescription`.
+  - `Toggle.Root` and `Indicator` become `ToggleGroup.Item` and `ItemIndicator`.
+  - An Item outside any Root is the single control: no group wrapper and no roving.
+  - The item machines, contracts and drivers (`getCheckbox`, `getToggle`) are unchanged.
+- ee5958d: Add Breadcrumbs and Pagination. Breadcrumbs: a named navigation landmark with an ordered list, the current page marked with `aria-current="page"` (a span when it has no `href`), separators hidden from assistive technology, and collapsing with an Ellipsis; `getBreadcrumbs`, `breadcrumbs.css`. Pagination: a page-range model with boundaries and siblings, controls as buttons or real links (`getPageHref`), a page clamped when the count shrinks, page-size changes that keep the first item visible; `getPagination`, `pagination.css`.
+- 5297d71: Add Number Input: a locale-aware `spinbutton` whose value changes only at commit points (blur, Enter, keys, steppers, wheel, paste), with press-and-hold steppers that take no focus, a hidden number input for forms and validity, Field integration, quiet announcements, the shared `number-parsing` capability (on `@internationalized/number`), the `getNumberInput` driver and `number-input.css`.
+- 48a3000: Add Pin Input: one native input over presentational slots, so typing, paste, SMS and password-manager autofill, IME and screen readers work as for one field. Insertions are planned before they apply (filtering, NFKC, `sanitize`, separators dropped from pastes, a full paste replaces), the caret never leaves holes, `onValueComplete` and `autoSubmit` without focus moves, the input is the form control (`pattern`, `required`). The `getPinInput` driver, `Part.paste` in both adapters, and `pin-input.css`.
+- 7552c8a: Add Popover: an anchored, non-modal-by-default `dialog` with the non-modal Tab order (content right after its trigger), optional modal mode, naming from the title, the consumer or the trigger, positioning with arrow, controllable open state with reasons, nesting, the `getPopover` driver and `popover.css`.
+- 10d8ef0: Add QR Code: an own encoder (`@rind-ui/core/qr`, versions 1–40, all levels and masks, no dependency) rendered as one SVG path with an accessible name, an optional overlay sized within the error-correction budget, a value text, and a download trigger (SVG or PNG); `getQrCode` with an independent decoder in `@rind-ui/testing`, differential fixtures, `qr-code.css`.
+- a060b0c: Add Scroll Area: native scrolling with custom scrollbars drawn over it, a Viewport that is a keyboard tab stop only when it scrolls and holds nothing focusable, scrollbars hidden from assistive technology, thumb drag through the shared pointer-drag module, `hover` / `scroll` / `auto` / `always` visibility, the `scroll-metrics` DOM module (batched reads, no layout thrash), `getScrollArea`, `scroll-area.css`.
+- af6d9d0: Select: a `combobox` trigger with a listbox popup, single and multiple values, closed-trigger typeahead, a hidden form input (submission, reset, required, autofill), Field integration, the `select` contract and `getSelect` driver, and the theme stylesheet. Modal containment no longer wraps Tab for layers that close on Tab (select, menu).
+- a755718: Add Slider: single and multi-thumb values with one native range input per thumb (keyboard, track press, drag with pointer capture and cancel, assistive-technology adjustment), decimal-safe steps, neighbour bounds and `stop` / `push` / `swap` collisions, one commit per interaction, form reset and Field binding, the shared `pointer-drag` module, `getSlider`, adapter pointer steps (`box`, `pointer`, `fill`), the `valued` invariant for value lists, and `slider.css`.
+- 72b23f2: Add Tags Input: a text input whose typed or pasted text becomes string tags. One creation path for Enter, delimiters (strings literal, RegExps, lists; caret at the end), paste splitting, blur `add` and `ADD`, with normalising, duplicates, `max` and `validate` (refusal keeps the draft, `data-refused`, `onRefuse`, an announcement); IME-safe keys; chips from the shared `input-chips` helpers with per-tag `disabled`; editing a tag in place; Clear; forms (one entry per tag, required, reset) and Field binding. The `getTagsInput` driver and `tags-input.css`. Suggestions come later, with Autocomplete.
+- 78d35f6: **Breaking:** `PasswordInput` and `SearchField` (and their core machines, contracts, messages and metas), `getPasswordInput` and `getSearchField`, and the `password-input.css` and `search-field.css` stylesheets are removed. Use `TextField.Root type="password"` with `TextField.VisibilityTrigger` / `TextField.VisibilityIndicator`, `TextField.Root type="search"`, and `getTextField`; `searchFieldStepInvariants` is now `textFieldKeyStepInvariants`.
+  
+  Text Field gains passwords and search. `type="password"` adds `VisibilityTrigger` and `VisibilityIndicator` (a toggle with `aria-pressed` and one name in both states, caret kept across the reveal, hidden again on every form submit and unprevented reset, spellcheck and autocorrect off) and `visible` / `defaultVisible` / `onVisibleChange`. `type="search"` makes the input a searchbox with "Clear search" and one clear control. `escapeClears` (default on for search) clears with Escape only when there is something to clear, so an enclosing Dialog still closes on an empty field; `onSubmit` runs on Enter and never while an IME composes. The driver `getTextField` covers it all, located by the control's name (`{ label }`), with `textFieldKeyStepInvariants`; the styles are in `text-field.css`.
+- 561f947: Toast:
+  - a `createToaster()` store usable from any module, with `Toaster` and `Toast.*` parts;
+  - lifetimes that pause on hover, focus, a hidden page, a swipe, while no region is mounted, beyond the limit, or by the API;
+  - announcements through the announcer, with no live regions;
+  - the F6 hotkey into the region and back, swipe to dismiss, promise toasts;
+  - the `toaster` and `toast` contracts with the `getToaster` and `getToast` drivers, and the theme stylesheet.
+  
+  New capability: `PageVisibility` (`env.visibility`), with `fakeVisibility` in `@rind-ui/testing`. The contract `Key` gains `F6`.
+- 485e59a: Add Tooltip: a hover-and-focus `tooltip` (description or label) with open and close delays, a hoverable safe area, Escape and press dismissal, a shared delay group, positioning with arrow, the `getTooltip` driver and `tooltip.css`. Adds the `hover-intent` and `delay-group` capabilities.
+- 73ca011: Add Tour: a sequence of steps anchored to elements (or centred), with a spotlight cut out of an optional backdrop, steps that wait for their target to appear, modal or non-modal steps with the target in the Tab order, progress and navigation parts, and `onStepChange` / completion / dismissal reasons; `useTour`, `getTour`, `tour.css`, and the `wait-for-element` and `step-effect` DOM modules.
+
+### Patch Changes
+
+- 77f8580: The DOM adapter waits up to 3000 ms by default in a real browser (1000 ms in jsdom): on a CPU-starved page the first animation frame, which an overlay's initial focus waits for, can arrive after more than a second.
+- 0300df8: Delay functions receive the context as well as the props. Number Input has one hold delay (`spinDelay`, 600 ms for a touch hold), and its model test walks press-and-hold again on a virtual clock.
+- 93b0abe: `testMachine` through Playwright: a step that closes a presence layer arms the animation hold before the action (Chromium freezes the page's animations through CDP; other engines start CSS animations paused), so the reopen-during-exit check always sees the exit, however slow the round trip.
+- f32220d: `testMachine` holds the running animations while it reopens a layer during its exit, so a slow run can no longer see the exit end first and report a new content element; adapters gain `holdAnimations()`.
+- Updated dependencies [0cdaff3]
+- Updated dependencies [2ceeef6]
+- Updated dependencies [a966aa7]
+- Updated dependencies [b83e04e]
+- Updated dependencies [f982235]
+- Updated dependencies [631011b]
+- Updated dependencies [09f2445]
+- Updated dependencies [6c14cb9]
+- Updated dependencies [4ddc47f]
+- Updated dependencies [adc1270]
+- Updated dependencies [9e5c536]
+- Updated dependencies [a1c4bd8]
+- Updated dependencies [480fb80]
+- Updated dependencies [216adc6]
+- Updated dependencies [257cea5]
+- Updated dependencies [12a2ce9]
+- Updated dependencies [ee5958d]
+- Updated dependencies [0300df8]
+- Updated dependencies [5297d71]
+- Updated dependencies [48a3000]
+- Updated dependencies [7552c8a]
+- Updated dependencies [10d8ef0]
+- Updated dependencies [a060b0c]
+- Updated dependencies [af6d9d0]
+- Updated dependencies [a755718]
+- Updated dependencies [72b23f2]
+- Updated dependencies [78d35f6]
+- Updated dependencies [561f947]
+- Updated dependencies [7ca7ea2]
+- Updated dependencies [485e59a]
+- Updated dependencies [73ca011]
+  - @rind-ui/core@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
