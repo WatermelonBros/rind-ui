@@ -304,6 +304,7 @@ const TRANSIENT = new Set([
   "form:awaiting-server",
   "text-field:composing",
   "slider:dragging",
+  "splitter:dragging",
   "color-area:dragging",
   "color-field:editing",
   "tooltip:opening",

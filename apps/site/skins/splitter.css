@@ -1,0 +1,146 @@
+/* ── Splitter: panels in one card; each handle is a 24px strip with a line and a grip in its
+   middle. Core sizes the panels inline (flex-grow); this sheet paints the card and handles. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="splitter"][data-part="root"] {
+  inline-size: min(100%, 34rem);
+  block-size: 200px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 14px var(--s-font);
+  overflow: hidden;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="root"][data-orientation="vertical"] {
+  block-size: 260px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="splitter"][data-part="panel"] {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="panel"]:has(> [data-scope="splitter"]) {
+  display: flex;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="panel"][data-state="collapsed"] {
+  visibility: hidden;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="splitter"][data-part="handle"] {
+  --s-splitter-line: var(--s-line);
+  inline-size: 24px;
+  border: 0;
+  outline-offset: -3px;
+  cursor: col-resize;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-orientation="vertical"] {
+  inline-size: auto;
+  block-size: 24px;
+  cursor: row-resize;
+}
+/* the line, across the whole strip */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="splitter"][data-part="handle"]::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(50% - 1px);
+  inline-size: 2px;
+  background: var(--s-splitter-line);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-orientation="vertical"]::after {
+  inset-inline: 0;
+  inset-block: calc(50% - 1px) auto;
+  inline-size: auto;
+  block-size: 2px;
+}
+/* the grip, in the middle of the line */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="splitter"][data-part="handle"]::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-block-start: calc(50% - 14px);
+  inset-inline-start: calc(50% - 4px);
+  inline-size: 8px;
+  block-size: 28px;
+  border: var(--s-bw) solid var(--s-splitter-line);
+  border-radius: 99px;
+  background: var(--s-card);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-orientation="vertical"]::before {
+  inset-block-start: calc(50% - 4px);
+  inset-inline-start: calc(50% - 14px);
+  inline-size: 28px;
+  block-size: 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"]:not([data-disabled]):is(:hover, [data-dragging]) {
+  --s-splitter-line: var(--s-brand);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-focus-visible] {
+  outline: 3px solid var(--s-focus);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-disabled] {
+  cursor: default;
+  opacity: 0.5;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="handle"][data-disabled]::before {
+  display: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="root"][data-dragging][data-orientation="horizontal"] {
+  cursor: col-resize;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="root"][data-dragging][data-orientation="vertical"] {
+  cursor: row-resize;
+}
+
+/* crisp: an inked frame and line, a square grip with a hard shadow */
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"]) [data-scope="splitter"][data-part="root"] {
+  border-color: var(--s-ink);
+  box-shadow: 3px 3px 0 var(--s-ink);
+}
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="splitter"][data-part="handle"] {
+  --s-splitter-line: var(--s-ink);
+}
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="splitter"][data-part="handle"]::before {
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 var(--s-ink);
+}
+
+/* A Splitter inside a panel fills it, without a second card. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="splitter"][data-part="panel"]
+  > [data-scope="splitter"][data-part="root"] {
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* juicy: a soft line and a candy grip */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+[data-scope="splitter"][data-part="handle"]::before {
+  border: 0;
+  background: var(--s-acc);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="splitter"][data-part="handle"]:not([data-disabled]):is(
+    :hover,
+    [data-dragging]
+  )::before {
+  background: var(--s-brand);
+}

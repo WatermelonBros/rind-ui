@@ -123,12 +123,14 @@ export interface TagsInputRootProps {
   /** The draft the given suggestions answer (async): another draft's are stale. */
   readonly itemsQuery?: string
   readonly loading?: LoadingStatus
+  /** The LoadMore sentinel came into view: load the next page of suggestions. */
   readonly onLoadMore?: () => void
   /** Choosing a suggestion closes the popup (default false). */
   readonly closeOnSelect?: boolean
   /** With suggestions, typed text may become a tag (default true). */
   readonly allowCustom?: boolean
   readonly autoHighlight?: boolean
+  /** Milliseconds a typing highlight waits before it reaches `aria-activedescendant`. Default: 500. */
   readonly typingPause?: number
   readonly positioning?: PositioningProps
   readonly keepMounted?: boolean
