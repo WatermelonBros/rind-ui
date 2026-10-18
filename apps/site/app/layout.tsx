@@ -30,6 +30,8 @@ const fredoka = localFont({
   ],
   variable: "--font-fredoka",
   display: "swap",
+  // juicy only: not on the first paint of the default (crisp) page
+  preload: false,
 })
 const mono = localFont({
   src: [
@@ -39,6 +41,8 @@ const mono = localFont({
   ],
   variable: "--font-mono",
   display: "swap",
+  // small labels: they can swap in a moment later without delaying the first paint
+  preload: false,
 })
 
 export const metadata: Metadata = {
