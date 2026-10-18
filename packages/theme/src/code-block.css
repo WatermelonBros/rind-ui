@@ -169,6 +169,20 @@
       border-color: CanvasText;
     }
 
+    :where(
+        [data-scope="code-block"][data-part="copy-trigger"],
+        [data-scope="code-block"][data-part="wrap-trigger"],
+        [data-scope="code-block"][data-part="collapse-trigger"]
+      ) {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    :where([data-scope="code-block"][data-part="wrap-trigger"][aria-pressed="true"]) {
+      background: Highlight;
+      color: HighlightText;
+    }
+
     :where([data-scope="code-block"][data-part="line"][data-highlighted]) {
       border-inline-start-color: Highlight;
     }

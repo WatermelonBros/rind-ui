@@ -291,3 +291,10 @@ Passes that need real assistive technology or devices; automated tests cannot st
 The six add-foundations warnings first recorded here (10e5b, 10e6c, 1394b, 1394d,
 1394e, 1394f) were fixed by the implementer in the same round, before the move;
 verified at round 3 (2026-10-14).
+
+## Code Block (#151)
+
+- warning: `parseRanges` builds every line of a huge finite range (`[1, 1e9]`). Clamp ranges to the line count.
+- warning: no non-colour cue for `[data-state="copied"]` / `[data-state="error"]` on the copy trigger (WCAG 1.4.1), and the example keeps the "Copy" text. Add an icon or text swap.
+- warning: the model test covers only the collapsible block. Add a variant without `maxLines`, or skip EXPAND.TOGGLE when the trigger is hidden.
+- warning: the `code-block--basic` ARIA snapshot leaves out `button "Wrap"` and the code content.

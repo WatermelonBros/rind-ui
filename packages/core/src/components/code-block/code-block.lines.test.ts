@@ -31,6 +31,11 @@ describe("parseRanges", () => {
     expect([...parseRanges([3, [7, 5]])].sort()).toEqual([3, 5, 6, 7])
     expect(parseRanges(undefined).size).toBe(0)
   })
+  it("skips a range with a non-integer end instead of looping", () => {
+    expect([...parseRanges([[1, Number.POSITIVE_INFINITY], [Number.NaN, 2], [1, 1.5], 4])]).toEqual(
+      [4],
+    )
+  })
   it("runs and the description", () => {
     const runs = lineRuns(parseRanges([3, [5, 7]]))
     expect(runs).toEqual([

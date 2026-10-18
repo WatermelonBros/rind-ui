@@ -19,6 +19,8 @@ export function parseRanges(ranges: LineRanges | undefined): ReadonlySet<number>
       if (Number.isInteger(r)) out.add(r)
       continue
     }
+    // A non-integer end (Infinity, NaN, 1.5) would loop forever or name no line.
+    if (!Number.isInteger(r[0]) || !Number.isInteger(r[1])) continue
     const lo = Math.min(r[0], r[1])
     const hi = Math.max(r[0], r[1])
     for (let n = lo; n <= hi; n++) out.add(n)
