@@ -1,18 +1,17 @@
 "use client"
 
-import { formatColor } from "@rind-ui/core"
 import {
   Accordion,
   Button,
   CheckboxGroup,
-  ColorPicker,
   SegmentedControl,
   Slider,
   Switch,
   TextField,
   Toggle,
 } from "@rind-ui/react"
-import { type ReactNode, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
+import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -354,52 +353,10 @@ function Choice<T extends string>(props: {
   )
 }
 
-/** A labelled colour of the builder: a swatch that opens a picker. */
-function Colour(props: {
-  readonly label: string
-  readonly value: string
-  readonly swatches: readonly string[]
-  readonly onChange: (hex: string) => void
-}) {
-  return (
-    <ColorPicker.Root
-      className={styles.tuneColor}
-      value={props.value}
-      onValueChange={(c) => props.onChange(formatColor(c, "hex"))}
-    >
-      <ColorPicker.Label>{props.label}</ColorPicker.Label>
-      <ColorPicker.Control>
-        <ColorPicker.Trigger>
-          <ColorPicker.ValueSwatch />
-        </ColorPicker.Trigger>
-        <ColorPicker.ValueText />
-      </ColorPicker.Control>
-      <ColorPicker.Portal>
-        <ColorPicker.Positioner>
-          <ColorPicker.Content>
-            <ColorPicker.Area>
-              <ColorPicker.AreaBackground />
-              <ColorPicker.AreaThumb />
-            </ColorPicker.Area>
-            <ColorPicker.ChannelSlider channel="hue">
-              <ColorPicker.ChannelSliderTrack>
-                <ColorPicker.ChannelSliderThumb />
-              </ColorPicker.ChannelSliderTrack>
-            </ColorPicker.ChannelSlider>
-            <ColorPicker.SwatchGroup>
-              {props.swatches.map((c) => (
-                <ColorPicker.SwatchTrigger key={c} color={c}>
-                  <ColorPicker.Swatch color={c} aria-hidden="true" />
-                  <ColorPicker.SwatchIndicator />
-                </ColorPicker.SwatchTrigger>
-              ))}
-            </ColorPicker.SwatchGroup>
-            <ColorPicker.ChannelInput channel="hex" />
-          </ColorPicker.Content>
-        </ColorPicker.Positioner>
-      </ColorPicker.Portal>
-    </ColorPicker.Root>
-  )
+/** The real picker once its module has loaded, its look-alike until then. */
+function LazyColour(props: ColourProps & { readonly picker: ColourComponent | null }) {
+  const { picker: Picker, ...rest } = props
+  return Picker ? <Picker {...rest} /> : <ColourPlaceholder label={rest.label} value={rest.value} />
 }
 
 /**
@@ -414,9 +371,40 @@ export function AnyLook() {
     setCopied(false)
   }
   const css = skinCss(look)
+  const section = useRef<HTMLElement>(null)
+  const [picker, setPicker] = useState<ColourComponent | null>(null)
+  // load the picker a screen before the builder shows up (or at once without IntersectionObserver)
+  useEffect(() => {
+    const el = section.current
+    if (!el) return
+    let gone = false
+    const load = () => {
+      import("./colour").then((m) => {
+        if (!gone) setPicker(() => m.Colour)
+      })
+    }
+    if (typeof IntersectionObserver === "undefined") {
+      load()
+      return
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect()
+          load()
+        }
+      },
+      { rootMargin: "600px 0px" },
+    )
+    io.observe(el)
+    return () => {
+      gone = true
+      io.disconnect()
+    }
+  }, [])
 
   return (
-    <section className={styles.section} aria-labelledby="look-title">
+    <section ref={section} className={styles.section} aria-labelledby="look-title">
       <Reveal>
         <h2 id="look-title" className={styles.h2}>
           Same components. Any skin.
@@ -435,16 +423,18 @@ export function AnyLook() {
           data-skin="bare"
           data-rind-theme="skin-bare"
         >
-          <Colour
+          <LazyColour
             label="Brand"
             value={look.brand}
             swatches={SWATCHES}
+            picker={picker}
             onChange={(brand) => set({ brand })}
           />
-          <Colour
+          <LazyColour
             label="Surface"
             value={look.surface}
             swatches={SURFACES}
+            picker={picker}
             onChange={(surface) => set({ surface })}
           />
           <Tune label="Radius" value={look.radius} max={28} onChange={(v) => set({ radius: v })} />
