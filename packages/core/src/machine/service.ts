@@ -375,8 +375,15 @@ export function createService<M extends AnyMachine>(
     }
     sync()
     for (const key in def.onProps) {
-      const type = def.onProps[key]
-      if (type && !Object.is(prev[key], next[key])) queue.push({ type })
+      const entry = def.onProps[key]
+      if (!entry) continue
+      const type = typeof entry === "string" ? entry : entry.event
+      // Sound: `equal` was typed against this prop by the definition.
+      const same =
+        typeof entry === "string"
+          ? Object.is(prev[key], next[key])
+          : (entry.equal as (a: unknown, b: unknown) => boolean)(prev[key], next[key])
+      if (!same) queue.push({ type })
     }
   }
 
