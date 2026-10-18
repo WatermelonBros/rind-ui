@@ -1,0 +1,49 @@
+- group "Departure":
+  - button "Previous month"
+  - heading "October 2026" [level=2]
+  - button "Next month"
+  - grid "October 2026":
+    - rowgroup:
+      - row "Sunday, September 27, 2026 Monday, September 28, 2026 Tuesday, September 29, 2026 Wednesday, September 30, 2026 Thursday, October 1, 2026 Friday, October 2, 2026 Saturday, October 3, 2026":
+        - gridcell "Sunday, September 27, 2026" [disabled]: "27"
+        - gridcell "Monday, September 28, 2026" [disabled]: "28"
+        - gridcell "Tuesday, September 29, 2026" [disabled]: "29"
+        - gridcell "Wednesday, September 30, 2026" [disabled]: "30"
+        - gridcell "Thursday, October 1, 2026": "1"
+        - gridcell "Friday, October 2, 2026": "2"
+        - gridcell "Saturday, October 3, 2026": "3"
+      - row "Sunday, October 4, 2026 Monday, October 5, 2026 Tuesday, October 6, 2026 Wednesday, October 7, 2026 Thursday, October 8, 2026 Friday, October 9, 2026 Saturday, October 10, 2026":
+        - gridcell "Sunday, October 4, 2026": "4"
+        - gridcell "Monday, October 5, 2026": "5"
+        - gridcell "Tuesday, October 6, 2026": "6"
+        - gridcell "Wednesday, October 7, 2026": "7"
+        - gridcell "Thursday, October 8, 2026": "8"
+        - gridcell "Friday, October 9, 2026": "9"
+        - gridcell "Saturday, October 10, 2026": "10"
+      - row "Sunday, October 11, 2026 Monday, October 12, 2026 Tuesday, October 13, 2026 Wednesday, October 14, 2026 Thursday, October 15, 2026 Friday, October 16, 2026 Saturday, October 17, 2026":
+        - gridcell "Sunday, October 11, 2026": "11"
+        - gridcell "Monday, October 12, 2026": "12"
+        - gridcell "Tuesday, October 13, 2026": "13"
+        - gridcell "Wednesday, October 14, 2026": "14"
+        - gridcell "Thursday, October 15, 2026": "15"
+        - gridcell "Friday, October 16, 2026": "16"
+        - gridcell "Saturday, October 17, 2026": "17"
+      - row "Sunday, October 18, 2026 Monday, October 19, 2026 Tuesday, October 20, 2026 Wednesday, October 21, 2026 Thursday, October 22, 2026 Friday, October 23, 2026 Saturday, October 24, 2026":
+        - gridcell "Sunday, October 18, 2026": "18"
+        - gridcell "Monday, October 19, 2026": "19"
+        - gridcell "Tuesday, October 20, 2026": "20"
+        - gridcell "Wednesday, October 21, 2026": "21"
+        - gridcell "Thursday, October 22, 2026": "22"
+        - gridcell "Friday, October 23, 2026": "23"
+        - gridcell "Saturday, October 24, 2026": "24"
+      - row "Sunday, October 25, 2026 Monday, October 26, 2026 Tuesday, October 27, 2026 Wednesday, October 28, 2026 Thursday, October 29, 2026 Friday, October 30, 2026 Saturday, October 31, 2026":
+        - gridcell "Sunday, October 25, 2026": "25"
+        - gridcell "Monday, October 26, 2026": "26"
+        - gridcell "Tuesday, October 27, 2026": "27"
+        - gridcell "Wednesday, October 28, 2026": "28"
+        - gridcell "Thursday, October 29, 2026": "29"
+        - gridcell "Friday, October 30, 2026": "30"
+        - gridcell "Saturday, October 31, 2026": "31"
+- text: "selected: none"
+- log
+- log

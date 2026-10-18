@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Framework-agnostic state machines, DOM utilities and component contracts for rind-ui.",
   "license": "MIT",
   "author": "Watermelon Bros",
@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
+    "@internationalized/date": "3.12.4",
     "@internationalized/number": "^3.6.8"
   },
   "publishConfig": {

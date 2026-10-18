@@ -6,7 +6,7 @@ A button that reports each activation once, from every input (mouse, touch, Ente
 
 - **Use it for** any action the user triggers: submit a form, open something, run a command, including actions that take time (the pending state keeps focus and announces itself).
 - **Over `<button>`**: it reports each activation once through `onPress` with its input modality, keeps focus while pending, and behaves the same when rendered as another element. A plain `<button>` is enough when you only need a click handler.
-- **Don't use it for** navigation to another URL: use [Link](link.md). For an on/off state, use [Toggle](toggle.md) or [Switch](switch.md).
+- **Don't use it for** navigation to another URL: use [Link](link.md). For an on/off state, use [Toggle Group](toggle-group.md) or [Switch](switch.md).
 
 ```tsx
 import { Button } from "@rind-ui/react"

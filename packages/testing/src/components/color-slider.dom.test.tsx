@@ -55,7 +55,7 @@ describe("anatomy and names", () => {
 
   it("data-channel and data-space on the parts; the gradient on the track", () => {
     render(<Hue defaultValue="#FF0000" />)
-    const track = document.querySelector<HTMLElement>('[data-part="track"]')
+    const track = document.querySelector<HTMLElement>('[data-part="channel-slider-track"]')
     expect(track?.getAttribute("data-channel")).toBe("hue")
     expect(track?.getAttribute("data-space")).toBe("hsb")
     expect(track?.style.backgroundImage).toContain("linear-gradient(to right")

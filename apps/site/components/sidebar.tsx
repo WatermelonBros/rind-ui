@@ -1,6 +1,6 @@
 "use client"
 
-import { Collapsible, TextField, Toggle, Tooltip } from "@rind-ui/react"
+import { Collapsible, TextField, ToggleGroup, Tooltip } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -49,7 +49,7 @@ export function Sidebar({ groups }: { groups: readonly NavGroup[] }) {
                 <Tooltip.Root key={f.name} disabled={f.ready}>
                   <Tooltip.Trigger
                     render={
-                      <Toggle.Root
+                      <ToggleGroup.Item
                         className={styles.fw}
                         pressed={f.ready}
                         disabled={!f.ready}

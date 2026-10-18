@@ -16,6 +16,11 @@
     align-items: stretch;
   }
 
+  /* An item's indicator, as a lone toggle's (toggle.css). */
+  :where([data-scope="toggle-group"][data-part="item-indicator"]) {
+    display: inline-flex;
+  }
+
   :where([data-scope="toggle-group"][data-part="item"]) {
     box-sizing: border-box;
     display: inline-flex;

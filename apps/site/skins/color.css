@@ -1,20 +1,22 @@
-/* ── Colour components: a square area, gradient tracks, chips and a compact picker. Core draws
-   every colour inline (gradients, positions, the thumb's colour); this sheet sizes and rings. ── */
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="root"] {
+/* ── Color Picker: a square area, gradient tracks, chips and a compact picker. Every part carries
+   data-scope="color-picker"; core draws every colour inline (gradients, positions, the thumb's
+   colour); this sheet sizes, places and rings (it inherits nothing from the slider skin). ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="area"] {
   inline-size: min(100%, 14rem);
   aspect-ratio: 1;
   border-radius: var(--s-r-sm);
   box-shadow: 0 0 0 var(--s-bw) var(--s-ink);
   cursor: crosshair;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="background"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="area-background"] {
   position: absolute;
   inset: 0;
   border-radius: inherit;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-area"][data-part="thumb"],
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="slider"][data-channel][data-part="thumb"] {
+  [data-scope="color-picker"]:is([data-part="area-thumb"], [data-part="channel-slider-thumb"]) {
+  box-sizing: border-box;
   inline-size: 20px;
   block-size: 20px;
   border: 0;
@@ -25,34 +27,118 @@
     0 0 0 4px var(--s-ink);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="color-area"][data-part="thumb"][data-focus-visible],
+  [data-scope="color-picker"]:is(
+    [data-part="area-thumb"],
+    [data-part="channel-slider-thumb"]
+  )::before {
+  content: "";
+  position: absolute;
+  inset: min(0px, calc((100% - 40px) / 2));
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="slider"][data-channel][data-part="thumb"][data-focus-visible] {
+  [data-scope="color-picker"]:is(
+    [data-part="area-thumb"],
+    [data-part="channel-slider-thumb"]
+  )[data-focus-visible] {
   outline: 3px solid var(--s-acc);
   outline-offset: 5px;
 }
+
+/* the channel slider: a gradient track centred in a touch-sized control, the thumb across it */
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="slider"][data-channel][data-part="root"] {
+[data-scope="color-picker"][data-part="channel-slider"] {
   --s-slider-track: 14px;
+  --s-slider-thumb: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
   inline-size: min(100%, 14rem);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="slider"][data-channel][data-part="root"][data-orientation="vertical"] {
+  [data-scope="color-picker"][data-part="channel-slider"][data-orientation="vertical"] {
+  grid-template-columns: auto;
   inline-size: auto;
+  justify-items: center;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="slider"][data-channel][data-part="track"] {
+  [data-scope="color-picker"][data-part="channel-slider-label"] {
+  font-weight: 600;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-value-text"] {
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  opacity: 0.8;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"]:is(
+    [data-part="channel-slider-control"],
+    [data-part="channel-slider-track"]
+  ) {
+  grid-column: 1 / -1;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-control"] {
+  display: flex;
+  align-items: center;
+  block-size: 32px;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-control"][data-orientation="vertical"] {
+  flex-direction: column;
+  justify-content: center;
+  inline-size: 32px;
+  block-size: 10rem;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-track"] {
+  position: relative;
+  flex: 1;
+  block-size: var(--s-slider-track);
+  border-radius: 99px;
   background-color: transparent;
   box-shadow: inset 0 0 0 var(--s-bw) var(--s-ink);
-  overflow: visible;
+  cursor: pointer;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-part="transparency-grid"] {
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-track"][data-orientation="vertical"] {
+  inline-size: var(--s-slider-track);
+  block-size: 10rem;
+  align-self: center;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-thumb"] {
+  inset-block-start: 50%;
+  margin-block-start: calc(var(--s-slider-thumb) / -2);
+  transition:
+    inset-inline-start 0.2s var(--s-ease),
+    bottom 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-thumb"][data-orientation="vertical"] {
+  inset-block-start: auto;
+  margin-block-start: 0;
+  inset-inline-start: 50%;
+  margin-inline-start: calc(var(--s-slider-thumb) / -2);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-slider-thumb"][data-dragging] {
+  transition: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="transparency-grid"] {
   border-radius: inherit;
   background-color: #ffffff;
   background-image: conic-gradient(#d4d4d8 25%, transparent 0 50%, #d4d4d8 0 75%, transparent 0);
   background-size: 8px 8px;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-swatch"][data-part="root"] {
+
+/* swatches: chips named by their colour; a transparent one over the checkerboard */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="color-picker"]:is([data-part="swatch"], [data-part="value-swatch"]) {
   display: inline-grid;
   place-items: center;
   inline-size: 32px;
@@ -62,7 +148,10 @@
   color: #ffffff;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="color-swatch"][data-part="root"][data-transparent] {
+  [data-scope="color-picker"]:is(
+    [data-part="swatch"],
+    [data-part="value-swatch"]
+  )[data-transparent] {
   background-image:
     linear-gradient(var(--rind-color), var(--rind-color)),
     conic-gradient(#d4d4d8 25%, #ffffff 0 50%, #d4d4d8 0 75%, #ffffff 0);
@@ -71,13 +160,13 @@
     8px 8px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="radio-group"][data-part="root"][data-color-swatch-picker] {
+  [data-scope="color-picker"][data-part="swatch-group"] {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker] {
+  [data-scope="color-picker"][data-part="swatch-trigger"] {
   position: relative;
   display: inline-grid;
   place-items: center;
@@ -91,20 +180,19 @@
   cursor: pointer;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-state="checked"] {
+  [data-scope="color-picker"][data-part="swatch-trigger"][data-state="checked"] {
   box-shadow:
     0 0 0 2px var(--s-card),
     0 0 0 4px var(--s-ink);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="radio-group"][data-part="item-control"][data-color-swatch-picker][data-focus-visible] {
+  [data-scope="color-picker"][data-part="swatch-trigger"][data-focus-visible] {
   outline: 3px solid var(--s-acc);
   outline-offset: 5px;
 }
-/* The one selected mark, centred: a ringed dot, or the Indicator's own glyph (no dot). It
-   replaces the radio dot the Radio Group skin draws. */
+/* The one selected mark, centred: a ringed dot, or the indicator's own glyph (no dot). */
 :is([data-skinned], [data-rind-theme^="skin-"])
-[data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker] {
+[data-scope="color-picker"][data-part="swatch-indicator"] {
   position: absolute;
   inset: 0;
   display: grid;
@@ -112,26 +200,24 @@
   margin: auto;
   inline-size: 100%;
   block-size: 100%;
-  border-radius: 0;
-  background: none;
   color: #ffffff;
   font-weight: 800;
   line-height: 1;
   text-shadow: 0 0 2px #000000;
   pointer-events: none;
-  animation: none;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="radio-group"][data-part="item-indicator"][data-color-swatch-picker]:empty {
+  [data-scope="color-picker"][data-part="swatch-indicator"]:empty {
   inline-size: 12px;
   block-size: 12px;
   border-radius: 50%;
   background: #ffffff;
   box-shadow: 0 0 0 2px #000000;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-field"][data-part="input"],
+
+/* the hex, CSS and channel inputs, and the format select */
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="color-picker"][data-part="format-select"] {
+[data-scope="color-picker"]:is([data-part="channel-input"], [data-part="format-select"]) {
   box-sizing: border-box;
   inline-size: 8rem;
   min-block-size: 36px;
@@ -142,14 +228,25 @@
   color: var(--s-ink);
   font: 600 14px var(--font-mono, monospace);
 }
+/* juicy has no borders: the fields' inset ring, so a white field shows on the white panel */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+[data-scope="color-picker"]:is([data-part="channel-input"], [data-part="format-select"]) {
+  box-shadow:
+    inset 0 0 0 2px #d6ccf7,
+    0 3px 0 #d6ccf7;
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="color-field"][data-part="input"][data-invalid] {
+  [data-scope="color-picker"][data-part="channel-input-root"][data-channel]
+  [data-part="channel-input"] {
+  inline-size: 5rem;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-picker"][data-part="channel-input"][data-invalid] {
   border-style: dashed;
   border-color: var(--s-acc-deep);
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="number-input"][data-channel] input {
-  inline-size: 5rem;
-}
+
+/* the picker: its control, trigger, value text and panel */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="control"] {
   display: inline-flex;
   align-items: center;
@@ -198,9 +295,7 @@
   cursor: pointer;
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
-  [data-scope="color-area"][data-part="root"],
-:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
-  [data-scope="color-picker"][data-part="content"] {
+  [data-scope="color-picker"]:is([data-part="area"], [data-part="content"]) {
   border-radius: var(--s-r);
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="label"] {

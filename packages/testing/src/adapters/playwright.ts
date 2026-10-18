@@ -4,8 +4,15 @@
 // adapter imports (`dist/inpage.iife.js`, injected once per document).
 
 import type { Announcement, By, ClickOptions, Key, KeyOptions, Part } from "@rind-ui/core"
-import type { Frame, FrameLocator, Locator, Page } from "playwright"
-import { type AdapterEnv, describeBy, type EnvFactory, type EnvOptions, poll } from "../adapter"
+import type { CDPSession, Frame, FrameLocator, Locator, Page } from "playwright"
+import {
+  type AdapterEnv,
+  describeBy,
+  type EnvFactory,
+  type EnvOptions,
+  poll,
+  renamedSnapshot,
+} from "../adapter"
 import type { DomSnapshot } from "../collect"
 import type { InPage } from "../inpage"
 import { type AxNode, axNodeOf } from "./chromium-tree"
@@ -155,6 +162,9 @@ export function watchPageErrors(page: Page): string[] {
 }
 
 /** The Playwright adapter. */
+/** Per page: the CDP session holding its animation rate at 0 (an armed hold, Chromium). */
+const armedHolds = new WeakMap<Page, CDPSession>()
+
 export function playwrightEnv(
   target: PlaywrightTarget,
   options: PlaywrightAdapterOptions = {},
@@ -181,7 +191,7 @@ export function playwrightEnv(
 
 function createPlaywrightEnv(
   getBase: () => Promise<Base>,
-  { scope, anchor, modality, platform }: EnvOptions,
+  { scope, anchor, modality, platform, partName, anatomyName }: EnvOptions,
   options: PlaywrightAdapterOptions,
 ): AdapterEnv {
   const apple = platform?.apple
@@ -220,7 +230,7 @@ function createPlaywrightEnv(
       : "label" in by
         ? root.getByLabel(by.label, { exact: true })
         : "part" in by
-          ? root.locator(`[data-scope="${scope}"][data-part="${by.part}"]`)
+          ? root.locator(`[data-scope="${scope}"][data-part="${partName?.(by.part) ?? by.part}"]`)
           : root.getByText(by.text, { exact: true })
 
   const describeAll = (l: Locator) =>
@@ -700,7 +710,7 @@ function createPlaywrightEnv(
     const { root } = await getBase()
     const id = await instance()
     const parts = root.locator(
-      `[data-scope="${scope}"][data-part="${name}"][data-instance="${id}"]`,
+      `[data-scope="${scope}"][data-part="${partName?.(name) ?? name}"][data-instance="${id}"]`,
     )
     return by ? parts.and(byLocator(root, by)) : parts
   }
@@ -763,9 +773,12 @@ function createPlaywrightEnv(
       const { root } = await getBase()
       await ensureInPage(root)
       const arg = { scope, instance: await instance() }
-      return root.evaluate(
-        (a) => (globalThis as InPageWindow).__rindTesting?.collectDom(a) as DomSnapshot,
-        arg,
+      return renamedSnapshot(
+        await root.evaluate(
+          (a) => (globalThis as InPageWindow).__rindTesting?.collectDom(a) as DomSnapshot,
+          arg,
+        ),
+        anatomyName,
       )
     },
     announcements: async () => {
@@ -789,14 +802,44 @@ function createPlaywrightEnv(
       ])
     },
     takeErrors: async () => watchPageErrors((await getBase()).page).splice(0),
+    armHold: async () => {
+      const { page } = await getBase()
+      if (page.context().browser()?.browserType().name() === "chromium") {
+        // Every animation and transition, existing or starting, frozen at its current time.
+        const cdp = await page.context().newCDPSession(page)
+        armedHolds.set(page, cdp)
+        await cdp.send("Animation.enable")
+        await cdp.send("Animation.setPlaybackRate", { playbackRate: 0 })
+        return
+      }
+      // Elsewhere: CSS animations start paused (transitions are only held by the hold).
+      await page.evaluate(() => {
+        const style = document.createElement("style")
+        style.setAttribute("data-rind-hold", "")
+        style.textContent = "*,*::before,*::after{animation-play-state:paused!important}"
+        document.head.append(style)
+      })
+    },
     holdAnimations: async () => {
       const { page } = await getBase()
-      // The held animations stay in the page under a global key until resumed.
+      // The held animations stay in the page under a global key until resumed. An armed
+      // hold ends here: the animations are paused one by one, which the rate does not undo.
       await page.evaluate(() => {
-        const held = document.getAnimations().filter((a) => a.playState === "running")
+        // An armed style paused the animations that started since: they are held too.
+        const style = document.querySelector("style[data-rind-hold]")
+        const held = document
+          .getAnimations()
+          .filter((a) => a.playState === "running" || (style !== null && a.playState === "paused"))
         for (const a of held) a.pause()
         Reflect.set(globalThis, Symbol.for("rind-ui.held-animations"), held)
+        style?.remove()
       })
+      const cdp = armedHolds.get(page)
+      if (cdp) {
+        armedHolds.delete(page)
+        await cdp.send("Animation.setPlaybackRate", { playbackRate: 1 })
+        await cdp.detach()
+      }
       return async () => {
         await page.evaluate(() => {
           const key = Symbol.for("rind-ui.held-animations")

@@ -1,7 +1,14 @@
 /*
- * Color Picker (control and trigger: family field; content: family panel). The colour surfaces
- * are styled by their own stylesheets; this sheet lays out the trigger, the content and the
- * row of inputs.
+ * Color Picker (family: field for the control and trigger, panel for the content, range for
+ * the area and the channel sliders, decoration for the swatches). Every part carries
+ * `data-scope="color-picker"`: this one sheet styles them all, the channel slider's track and
+ * thumb and the inputs included (it inherits nothing from slider.css or number-input.css).
+ * The colours, gradients and positions are inline from core; this sheet sizes and paints.
+ * Thumbs have a double ring (surface inside, text outside) that keeps 3:1 against any point
+ * of a gradient; a transparent colour sits on the checkerboard; tokens are read, never
+ * declared: --rind-color-picker-*, --rind-color-area-*, --rind-color-slider-*,
+ * --rind-color-field-*, --rind-color-swatch-*, --rind-color-swatch-picker-*,
+ * --rind-color-checker-*.
  */
 @layer rind.components {
   :where([data-scope="color-picker"][data-part="control"]) {
@@ -106,9 +113,413 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* ── The checkerboard under colours with transparency ── */
+  :where([data-scope="color-picker"][data-part="transparency-grid"]) {
+    background-color: var(--rind-color-checker-light, var(--rind-color-surface));
+    background-image: conic-gradient(
+      var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 25%,
+      transparent 0 50%,
+      var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 0 75%,
+      transparent 0
+    );
+    background-size: var(--rind-color-checker-size, 0.5rem) var(--rind-color-checker-size, 0.5rem);
+    border-radius: inherit;
+  }
+
+  /* ── Swatches: the colour inline, a ring from the text role (3:1 on any page) ── */
+  :where([data-scope="color-picker"]:is([data-part="swatch"], [data-part="value-swatch"])) {
+    box-sizing: border-box;
+    display: inline-block;
+    flex: none;
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-md));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-md));
+    border-radius: var(--rind-color-swatch-radius, var(--rind-radius-sm));
+    box-shadow: inset 0 0 0 var(--rind-border-width)
+      var(--rind-color-swatch-border, color-mix(in oklab, var(--rind-color-text) 45%, transparent));
+    vertical-align: middle;
+  }
+
+  :where(
+    [data-scope="color-picker"]:is(
+      [data-part="swatch"],
+      [data-part="value-swatch"]
+    )[data-transparent]
+  ) {
+    background-image:
+      linear-gradient(var(--rind-color), var(--rind-color)),
+      conic-gradient(
+        var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 25%,
+        var(--rind-color-checker-light, var(--rind-color-surface)) 0 50%,
+        var(--rind-color-checker-dark, var(--rind-color-neutral-soft)) 0 75%,
+        var(--rind-color-checker-light, var(--rind-color-surface)) 0
+      );
+    background-size:
+      100% 100%,
+      var(--rind-color-checker-size, 0.5rem) var(--rind-color-checker-size, 0.5rem);
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="swatch"], [data-part="value-swatch"])[data-size="sm"]
+  ) {
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-sm));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-sm));
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="swatch"], [data-part="value-swatch"])[data-size="lg"]
+  ) {
+    inline-size: var(--rind-color-swatch-size, var(--rind-size-lg));
+    block-size: var(--rind-color-swatch-size, var(--rind-size-lg));
+  }
+
+  /* ── The area: a surface with a double-ringed thumb; at least the hit area ── */
+  :where([data-scope="color-picker"][data-part="area"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-area-size, 12rem);
+    aspect-ratio: var(--rind-color-area-aspect-ratio, 1);
+    border-radius: var(--rind-color-area-radius, var(--rind-radius-md));
+    cursor: var(--rind-color-area-cursor, crosshair);
+  }
+
+  :where([data-scope="color-picker"][data-part="area-background"]) {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  :where([data-scope="color-picker"][data-part="area"][data-variant="solid"]) {
+    box-shadow: 0 0 0 var(--rind-border-width)
+      var(--rind-color-area-border, var(--rind-color-border-strong));
+  }
+
+  :where([data-scope="color-picker"][data-part="area"][data-tone="danger"]) {
+    box-shadow: 0 0 0 var(--rind-border-width) var(--rind-color-danger-border);
+  }
+
+  :where([data-scope="color-picker"][data-part="area"][data-size="sm"]) {
+    inline-size: var(--rind-color-area-size, 9rem);
+  }
+
+  :where([data-scope="color-picker"][data-part="area"][data-size="lg"]) {
+    inline-size: var(--rind-color-area-size, 16rem);
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="area-thumb"], [data-part="channel-slider-thumb"])
+  ) {
+    box-sizing: border-box;
+    border: 0;
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color);
+    box-shadow:
+      0 0 0 2px var(--rind-color-area-thumb-inner, var(--rind-color-surface)),
+      0 0 0 3px var(--rind-color-area-thumb-outer, var(--rind-color-text));
+  }
+
+  :where([data-scope="color-picker"][data-part="area-thumb"]) {
+    inline-size: var(--rind-color-area-thumb-size, 1.25rem);
+    block-size: var(--rind-color-area-thumb-size, 1.25rem);
+    transition:
+      left var(--rind-duration-fast),
+      bottom var(--rind-duration-fast);
+  }
+
+  /* A thumb's hit area: at least --rind-hit-area, centred, invisible. */
+  :where(
+    [data-scope="color-picker"]:is([data-part="area-thumb"], [data-part="channel-slider-thumb"])
+  )::before {
+    content: "";
+    position: absolute;
+    inset: min(0px, calc((100% - var(--rind-hit-area)) / 2));
+  }
+
+  :where(
+    [data-scope="color-picker"]:is(
+      [data-part="area-thumb"],
+      [data-part="channel-slider-thumb"]
+    )[data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) + 3px);
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="area"], [data-part="area-thumb"])[data-dragging]
+  ) {
+    transition: none;
+    cursor: grabbing;
+  }
+
+  :where(
+    [data-scope="color-picker"]:is([data-part="area"], [data-part="channel-slider"])[data-disabled]
+  ) {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* ── The channel slider: a gradient track with no fill of its own ── */
+  :where([data-scope="color-picker"][data-part="channel-slider"]) {
+    --_track: var(--rind-color-slider-track-size, 0.75rem);
+    --_thumb: var(--rind-color-slider-thumb-size, 1.25rem);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--rind-space-2);
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider"][data-orientation="vertical"]) {
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider-value-text"]) {
+    color: var(--rind-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(
+    [data-scope="color-picker"]:is(
+      [data-part="channel-slider-control"],
+      [data-part="channel-slider-track"]
+    )
+  ) {
+    grid-column: 1 / -1;
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider-control"]) {
+    display: flex;
+    align-items: center;
+    inline-size: 100%;
+    block-size: var(--rind-hit-area);
+    cursor: pointer;
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider-track"]) {
+    position: relative;
+    flex: 1;
+    inline-size: 100%;
+    block-size: var(--_track);
+    border-radius: var(--rind-color-slider-track-radius, var(--rind-radius-full));
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="color-picker"][data-part="channel-slider-control"][data-orientation="vertical"]
+  ) {
+    flex-direction: column;
+    inline-size: var(--rind-hit-area);
+    block-size: var(--rind-color-slider-length, 10rem);
+  }
+
+  :where(
+    [data-scope="color-picker"][data-part="channel-slider-track"][data-orientation="vertical"]
+  ) {
+    inline-size: var(--_track);
+    block-size: var(--rind-color-slider-length, 10rem);
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider-thumb"]) {
+    inset-block-start: 50%;
+    margin-block-start: calc(var(--_thumb) / -2);
+    inline-size: var(--_thumb);
+    block-size: var(--_thumb);
+    transition:
+      inset-inline-start var(--rind-duration-fast),
+      bottom var(--rind-duration-fast);
+  }
+
+  :where(
+    [data-scope="color-picker"][data-part="channel-slider-thumb"][data-orientation="vertical"]
+  ) {
+    inset-block-start: auto;
+    margin-block-start: 0;
+    inset-inline-start: 50%;
+    margin-inline-start: calc(var(--_thumb) / -2);
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-slider-thumb"][data-dragging]),
+  :where(
+    [data-scope="color-picker"][data-part="channel-slider"][data-dragging]
+      [data-scope="color-picker"]
+  ) {
+    transition: none;
+  }
+
+  /* ── The hex, CSS and channel inputs: one field look, monospaced digits ── */
+  /* An input's wrapper (its root): the label, the input and the messages stacked. */
+  :where([data-scope="color-picker"][data-part="channel-input-root"]) {
+    display: grid;
+    gap: var(--rind-color-field-gap, var(--rind-space-1));
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-input"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-field-width, 8rem);
+    min-block-size: var(--rind-size-md);
+    padding-inline: var(--rind-color-field-padding-inline, var(--rind-space-2));
+    border: var(--rind-border-width) solid var(--rind-color-field-border, var(--rind-color-border));
+    border-radius: var(--rind-color-field-radius, var(--rind-radius-control));
+    background: var(--rind-color-field-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font-family: var(--rind-font-mono);
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-input"][data-variant="soft"]) {
+    background: var(--rind-color-field-bg, var(--rind-color-neutral-soft));
+    border-color: transparent;
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-input"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* An invalid draft changes the border's width and colour (never colour alone). */
+  :where(
+    [data-scope="color-picker"][data-part="channel-input"]:is([data-invalid], [data-tone="danger"])
+  ) {
+    border-color: var(--rind-color-field-border-invalid, var(--rind-color-danger-border));
+    border-width: calc(var(--rind-border-width) * 2);
+  }
+
+  :where([data-scope="color-picker"][data-part="channel-input"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  /* ── The swatch group: a wrapping row of swatches, each at least the hit area ── */
+  :where([data-scope="color-picker"][data-part="swatch-item"]) {
+    display: inline-grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    column-gap: var(--rind-color-swatch-picker-item-gap, var(--rind-space-2));
+    min-block-size: var(--rind-hit-area);
+  }
+
+  :where([data-scope="color-picker"][data-part="swatch-group"]) {
+    display: flex;
+    flex-flow: row wrap;
+    gap: var(--rind-color-swatch-picker-gap, var(--rind-space-2));
+  }
+
+  :where([data-scope="color-picker"][data-part="swatch-trigger"]) {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-color-swatch-picker-radius, var(--rind-radius-sm));
+    background: transparent;
+    color: var(--rind-color-text);
+    cursor: pointer;
+  }
+
+  :where([data-scope="color-picker"][data-part="swatch-trigger"][data-state="checked"]) {
+    box-shadow:
+      0 0 0 2px var(--rind-color-surface),
+      0 0 0 4px var(--rind-color-swatch-picker-ring, var(--rind-color-text));
+  }
+
+  :where([data-scope="color-picker"][data-part="swatch-trigger"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) + 4px);
+  }
+
+  /*
+   * The one selected mark, centred on the swatch (inset 0 + auto margins: an absolutely
+   * positioned child gets no grid alignment). Empty, it is a dot ringed to show on any colour;
+   * with content (a glyph or an icon) that content is the mark, centred, and no dot is drawn.
+   */
+  :where([data-scope="color-picker"][data-part="swatch-indicator"]) {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: auto;
+    inline-size: 100%;
+    block-size: 100%;
+    color: var(--rind-color-swatch-picker-mark, var(--rind-color-text));
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  :where([data-scope="color-picker"][data-part="swatch-indicator"]:empty) {
+    inline-size: var(--rind-color-swatch-picker-mark-size, 0.75rem);
+    block-size: var(--rind-color-swatch-picker-mark-size, 0.75rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color-surface);
+    box-shadow: 0 0 0 2px var(--rind-color-swatch-picker-mark, var(--rind-color-text));
+  }
+
   @media (forced-colors: active) {
     :where([data-scope="color-picker"]:is([data-part="trigger"], [data-part="content"])) {
       border-color: CanvasText;
+    }
+
+    :where([data-scope="color-picker"][data-part="transparency-grid"]) {
+      display: none;
+    }
+
+    :where([data-scope="color-picker"]:is([data-part="swatch"], [data-part="value-swatch"])) {
+      border: var(--rind-border-width) solid CanvasText;
+    }
+
+    :where(
+        [data-scope="color-picker"]:is([data-part="area-thumb"], [data-part="channel-slider-thumb"])
+      ) {
+      background: var(--rind-color);
+      box-shadow:
+        0 0 0 2px Canvas,
+        0 0 0 3px CanvasText;
+    }
+
+    :where(
+        [data-scope="color-picker"]:is(
+          [data-part="area-thumb"],
+          [data-part="channel-slider-thumb"]
+        )[data-focus-visible]
+      ) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="color-picker"][data-part="channel-slider-track"]) {
+      background-color: transparent;
+      forced-color-adjust: none;
+    }
+
+    :where([data-scope="color-picker"][data-part="channel-input"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="color-picker"][data-part="channel-input"][data-invalid]) {
+      border-style: dashed;
+    }
+
+    :where([data-scope="color-picker"][data-part="swatch-trigger"][data-state="checked"]) {
+      box-shadow: none;
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    /*
+     * base.css paints every [data-state="checked"] part Highlight with a double outline: the
+     * swatch item and its mark carry no outline of their own (the trigger's ring above does).
+     */
+    [data-scope="color-picker"]:is([data-part="swatch-item"], [data-part="swatch-indicator"]):not(
+        [data-focus-visible]
+      ) {
+      outline: none;
+    }
+
+    [data-scope="color-picker"][data-part="swatch-item"] {
+      background-color: transparent;
+      color: CanvasText;
     }
   }
 }

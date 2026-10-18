@@ -3,6 +3,7 @@
 
 import { contract } from "../../contract/contract"
 import type { Env } from "../../contract/env"
+import { COLOR_PICKER_SCOPE, colorFieldPart } from "../color-picker/color-picker.naming"
 import type { ColorFormat } from "../shared/color/color"
 import { formatColor } from "../shared/color/format"
 import { tryParseColor } from "../shared/color/parse"
@@ -25,7 +26,8 @@ async function replaceText(env: E, text: string) {
   if (text !== "") await input.type(text)
 }
 
-export const colorFieldContract = contract("color-field", {
+export const colorFieldContract = contract(COLOR_PICKER_SCOPE, {
+  partName: colorFieldPart,
   machine: colorFieldMachine,
   anatomy: ["root", "label", "description", "error-message", "input", "hidden-input"],
   locate: ({ name }: { readonly name: string | RegExp }) => ({ role: "textbox", name }),

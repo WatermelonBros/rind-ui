@@ -1,5 +1,5 @@
 // Checkbox server markup: the hidden input is rendered on the server and hydrates cleanly.
-import { Checkbox } from "@rind-ui/react"
+import { CheckboxGroup } from "@rind-ui/react"
 import { act } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { hydrateRoot } from "react-dom/client"
@@ -10,12 +10,12 @@ afterEach(() => vi.restoreAllMocks())
 
 const tree = (props: { defaultChecked?: boolean | "indeterminate"; name?: string } = {}) => (
   <form>
-    <Checkbox.Root name="terms" {...props}>
-      <Checkbox.Control>
-        <Checkbox.Indicator>✓</Checkbox.Indicator>
-      </Checkbox.Control>
-      <Checkbox.Label>Accept terms</Checkbox.Label>
-    </Checkbox.Root>
+    <CheckboxGroup.Item name="terms" {...props}>
+      <CheckboxGroup.ItemControl>
+        <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+      </CheckboxGroup.ItemControl>
+      <CheckboxGroup.ItemLabel>Accept terms</CheckboxGroup.ItemLabel>
+    </CheckboxGroup.Item>
   </form>
 )
 
@@ -75,9 +75,9 @@ describe("Checkbox hydration", () => {
   it("an unnamed Checkbox still renders an identified hidden input on the server", () => {
     const box = document.createElement("div")
     box.innerHTML = renderToString(
-      <Checkbox.Root>
-        <Checkbox.Control aria-label="x" />
-      </Checkbox.Root>,
+      <CheckboxGroup.Item>
+        <CheckboxGroup.ItemControl aria-label="x" />
+      </CheckboxGroup.Item>,
     )
     expect(box.querySelector("input")?.id).toBeTruthy()
   })
