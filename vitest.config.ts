@@ -100,7 +100,10 @@ export default defineConfig({
           // Globals let Testing Library and @rind-ui/testing/setup register afterEach.
           globals: true,
           include: dom,
-          setupFiles: ["packages/testing/src/setup.ts"],
+          setupFiles: [
+            "packages/testing/src/setup.ts",
+            "packages/testing/src/warning-guard.setup.ts",
+          ],
         },
       },
       {
@@ -144,7 +147,11 @@ export default defineConfig({
           retry: ciRetry,
           globals: true,
           // A no-op in real browsers; listed so that is tested.
-          setupFiles: ["packages/testing/src/setup.ts"],
+          setupFiles: [
+            "packages/testing/src/setup.ts",
+            // the [rind-ui] warning guard is jsdom-only for now: in the browser project it set off
+            // Chromium connection drops (docs/review-backlog.md)
+          ],
         },
       },
       {

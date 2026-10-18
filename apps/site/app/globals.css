@@ -73,15 +73,32 @@ a {
   border-radius: 6px;
 }
 
-/* Intro (components/intro.tsx): the page as the browser renders it with no CSS at all. */
-html.unstyled,
-html.unstyled body,
-html.unstyled body *:not([data-intro-drop], svg, svg *) {
-  /* biome-ignore lint/complexity/noImportantStyles: the raw page must beat every stylesheet, skins included */
-  all: revert !important;
+/* Intro (components/intro.tsx): until its copy of the page exists, nothing shows, so the styled
+   page never flashes first. A failsafe shows it anyway if the copy never comes. */
+html.intro:not([data-intro-ready]) body {
+  visibility: hidden;
+  animation: intro-failsafe 0s 2s forwards;
 }
-html.unstyled body {
-  margin: 8px;
+@keyframes intro-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+/* the page as the browser renders it with no CSS: a static copy over the real, styled page */
+#rind-intro-layer {
+  all: initial;
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  overflow: hidden;
+  padding: 8px;
+  background: Canvas;
+  color: CanvasText;
+  font: 16px serif;
+}
+#rind-intro-layer *:not(svg, svg *) {
+  /* biome-ignore lint/complexity/noImportantStyles: the raw copy must beat every stylesheet, skins included */
+  all: revert !important;
 }
 ::view-transition-old(root),
 ::view-transition-new(root) {

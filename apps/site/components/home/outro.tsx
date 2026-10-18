@@ -16,20 +16,35 @@ const SEEDS = 28
 export function Outro() {
   const footer = useRef<HTMLElement>(null)
   const title = useRef<HTMLParagraphElement>(null)
+  const fill = useRef<HTMLSpanElement>(null)
   const [egg, setEgg] = useState(0)
   const [said, setSaid] = useState("")
 
   useEffect(() => {
     const el = footer.current
     const t = title.current
-    if (!el || !t) return
-    const onMove = (e: PointerEvent) => {
+    const f = fill.current
+    if (!el || !t || !f) return
+    // one write per frame, straight on the filled copy: no transition chasing the pointer and
+    // no inherited custom property restyling the whole title on every move
+    let frame = 0
+    let x = 0
+    let y = 0
+    const paint = () => {
+      frame = 0
       const r = t.getBoundingClientRect()
-      t.style.setProperty("--mx", `${e.clientX - r.left}px`)
-      t.style.setProperty("--my", `${e.clientY - r.top}px`)
+      f.style.clipPath = `circle(150px at ${x - r.left}px ${y - r.top}px)`
+    }
+    const onMove = (e: PointerEvent) => {
+      x = e.clientX
+      y = e.clientY
+      if (!frame) frame = requestAnimationFrame(paint)
     }
     el.addEventListener("pointermove", onMove, { passive: true })
-    return () => el.removeEventListener("pointermove", onMove)
+    return () => {
+      el.removeEventListener("pointermove", onMove)
+      cancelAnimationFrame(frame)
+    }
   }, [])
 
   useEffect(() => {
@@ -65,7 +80,7 @@ export function Outro() {
             We did the rest.
           </span>
           {/* the filled copy only paints the peel: assistive technology reads the outline */}
-          <span className={styles.outroFill} aria-hidden="true">
+          <span ref={fill} className={styles.outroFill} aria-hidden="true">
             Build the look.
             <br />
             We did the rest.
@@ -78,6 +93,9 @@ export function Outro() {
           <a href="https://github.com/WatermelonBros/rind-ui" className={styles.outroGhost}>
             GitHub
           </a>
+          <a href="https://discord.gg/HHqT9ucXn4" className={styles.outroGhost}>
+            Discord
+          </a>
         </div>
       </Reveal>
       <div className={styles.outroBottom}>
@@ -85,7 +103,9 @@ export function Outro() {
         <a className={styles.builtWith} href="https://reado.watermelon-studio.it">
           Built using <b>Reado</b> ↗
         </a>
-        <span>MIT</span>
+        <span>
+          MIT · <Link href="/privacy/">Privacy</Link>
+        </span>
       </div>
       <p className={styles.visuallyHidden} role="status">
         {said}

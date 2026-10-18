@@ -42,6 +42,7 @@ const urls = [
   "/",
   "/docs/",
   "/404.html",
+  "/privacy/",
   ...docs.map((p) => `/docs/${p.slug}/`),
   ...["/theme/", "/theme/tokens/", "/theme/contrast/", "/theme/showcase/"],
 ]
@@ -224,6 +225,8 @@ for (const url of urls) {
   page.on("pageerror", (e) => report(url, "pageerror", e.message))
   // a step that throws (a click that times out, a wait past its deadline) is a finding with
   // its page, not a crash that hides which page and step failed
+  // AUDIT_TRACE=1 names each page as it starts, to find one that stalls
+  if (process.env["AUDIT_TRACE"]) console.error(`… ${url}`)
   try {
     // deadlines, not delays: a slow CI runner gets 60 s to parse and 60 s to hydrate
     await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })
@@ -309,19 +312,25 @@ for (const url of urls) {
   }
   await page.close()
 }
-// the intro itself: a first visit starts unstyled and ends styled
+// the intro itself: a first visit shows the raw copy over the page, then reveals the styled page
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))
   await page.goto(`${base}/`, { waitUntil: "domcontentloaded" })
-  const started = await page.evaluate(() => document.documentElement.classList.contains("unstyled"))
+  const started = await page.evaluate(
+    () => (document.getElementById("rind-intro-layer")?.childElementCount ?? 0) > 0,
+  )
   const ended = await page
-    .waitForFunction(() => !document.documentElement.classList.contains("unstyled"), undefined, {
-      timeout: 10_000,
-    })
+    .waitForFunction(
+      () =>
+        !document.getElementById("rind-intro-layer") &&
+        !document.documentElement.classList.contains("intro"),
+      undefined,
+      { timeout: 10_000 },
+    )
     .then(() => true)
     .catch(() => false)
-  if (!started) report("/ (intro)", "intro", "a first visit did not start unstyled")
+  if (!started) report("/ (intro)", "intro", "a first visit did not show the unstyled copy")
   if (!ended) report("/ (intro)", "intro", "the intro never revealed the styled page")
   await page.close()
 }

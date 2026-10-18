@@ -26,7 +26,9 @@
     inset-inline-end: var(--rind-scrollbar-width, 0px);
     display: grid;
     pointer-events: none;
-    overflow: hidden;
+    /* clip, not hidden: a hidden box is still a scroll container, and focus moving into the content
+       while it slides in from off the edge scrolls it (WebKit), so the panel jumps at the end */
+    overflow: clip;
     /* The on-screen keyboard (top and bottom drawers): the content stays above it. */
     padding-block-end: var(--rind-drawer-keyboard-inset, 0px);
   }

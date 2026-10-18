@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { type ReactElement, useState } from "react"
 import { describe, expect, it } from "vitest"
-import { currentRun, domEnv, switchStepInvariants, testMachine } from "../index"
+import { currentRun, domEnv, expectRindWarning, switchStepInvariants, testMachine } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -120,6 +120,8 @@ async function failures(ui: () => ReactElement) {
 
 describe("broken Switches fail readably (4.2)", () => {
   it("mixed slips in → switch-aria-checked names the attribute", { timeout: 60_000 }, async () => {
+    // the broken or partial setup this test exercises logs it
+    expectRindWarning(/switch.control: overriding "aria-checked"/)
     const out = await failures(() => (
       <form>
         <Switch.Root>

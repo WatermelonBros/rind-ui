@@ -10,13 +10,14 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <GooFilters />
-      <Intro />
       <PhaseProvider>
         <header>
           <Nav />
         </header>
         {children}
       </PhaseProvider>
+      {/* after the page: its inline script copies the parsed header and main */}
+      <Intro />
     </>
   )
 }

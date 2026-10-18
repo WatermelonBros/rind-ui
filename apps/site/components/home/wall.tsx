@@ -22,7 +22,6 @@ export function Wall() {
     <div className={styles.band} data-band="paper">
       <section className={styles.section} aria-labelledby="wall-title">
         <Reveal>
-          <p className={styles.kicker}>The whole set</p>
           <h2 id="wall-title" className={styles.h2}>
             {ready} ready. {items.length - ready} on the way.
           </h2>

@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  Button,
-  Combobox,
-  type ComboboxItemData,
-  type ComboboxRootProps,
-  Dialog,
-} from "@rind-ui/react"
+import { Combobox, type ComboboxItemData, type ComboboxRootProps, Dialog } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
@@ -265,8 +259,10 @@ export function CommandPaletteInDialog() {
   const [last, setLast] = useState<string | null>(null)
   return (
     <div className="stack">
-      <Button onClick={() => setOpen(true)}>Open palette</Button>
+      {/* the Trigger, not a plain button: it is the dialog's logical parent, so the portalled
+          palette inherits the theme (and dir) of where it was opened from */}
       <Dialog.Root open={open} onOpenChange={(next) => setOpen(next)}>
+        <Dialog.Trigger>Open palette</Dialog.Trigger>
         <Dialog.Portal>
           <Dialog.Backdrop />
           <Dialog.Positioner>
