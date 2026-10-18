@@ -627,8 +627,23 @@
 .wallGroup li a:hover {
   background-size: 100% 100%;
 }
+/* on touch, every component link is a comfortable target (WCAG 2.5.8: 24px; here 44px rows) */
+@media (pointer: coarse) {
+  .wallGroup li {
+    padding: 0;
+    min-block-size: 44px;
+    align-items: center;
+  }
+  .wallGroup li a {
+    display: inline-block;
+    padding-block: 12px;
+    /* the underline stays under the text, not at the bottom of the padded target */
+    background-origin: content-box;
+    background-clip: content-box;
+  }
+}
 .wallGroup small {
-  font: 600 10px var(--mono);
+  font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   opacity: 0.65;
