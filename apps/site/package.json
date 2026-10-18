@@ -5,7 +5,7 @@
   "scripts": {
     "content": "node scripts/content.ts",
     "predev": "node scripts/content.ts",
-    "dev": "next dev -p 3300",
+    "dev": "node --watch-path=examples --watch-path=skins --watch-path=content/pages --watch-path=../../docs scripts/content.ts & next dev -p 3300",
     "build": "node scripts/content.ts && next build",
     "typecheck": "node scripts/content.ts && tsc --noEmit",
     "audit": "node scripts/content.ts && next build && node tests/audit.ts"

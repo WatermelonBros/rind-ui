@@ -43,6 +43,13 @@
   --cb-number: #8a4a00;
   --cb-comment: #5f6068;
 }
+/* filling a card (a tab panel): the block covers the card, border on border, so no card
+   background shows at the corners (an inner radius still leaves an anti-aliased fringe) */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tabs"][data-part="panel"]
+  > [data-scope="code-block"][data-part="root"] {
+  margin: calc(-1 * var(--s-bw));
+}
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="header"] {
   display: flex;
   align-items: center;

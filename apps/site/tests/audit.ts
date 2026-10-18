@@ -109,10 +109,26 @@ async function exercise(page: Page, url: string) {
     for (const skin of ["juicy", "bare", "crisp"]) {
       await frame.getByRole("radio", { name: skin, exact: true }).click()
     }
-    await frame.getByRole("button", { name: /Get code/ }).click()
-    if ((await frame.locator("pre").count()) === 0) report(url, "code", `example ${i} has no code`)
-    const css = frame.getByRole("tab", { name: "Our skin CSS" })
-    if (await css.count()) await css.click()
+    // the open code panel's text, not a <pre> or tab panel the example renders in its stage
+    const shownCode = async () => {
+      const pre = frame.locator('[role="tabpanel"]:visible pre:not([data-skin] pre)')
+      await pre
+        .first()
+        .waitFor({ timeout: 2000 })
+        .catch(() => {})
+      return (await pre.allTextContents()).join("").trim()
+    }
+    const getCode = frame.getByRole("button", { name: /Get code/ })
+    if (!(await getCode.count())) report(url, "code", `example ${i} has no Get code button`)
+    else {
+      await getCode.click()
+      if (!(await shownCode())) report(url, "code", `example ${i}: Get code shows no React code`)
+      const css = frame.getByRole("tab", { name: "Our skin CSS" })
+      if (await css.count()) {
+        await css.click()
+        if (!(await shownCode())) report(url, "code", `example ${i}: Get code shows no CSS`)
+      }
+    }
     // every enabled control of the example, once
     const controls = frame.locator(
       '[data-skin] :is(button, [role="switch"], [role="checkbox"], label, a[href^="#"]):not([disabled], [aria-disabled="true"], [data-disabled], [data-readonly])',
