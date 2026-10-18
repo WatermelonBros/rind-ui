@@ -1,0 +1,67 @@
+name: crash-repro (temporary)
+
+on:
+  push:
+    branches: [ci/chromium-drop-root-cause]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm turbo run build --filter='./packages/*'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: |
+            packages/*/dist
+            packages/theme/tokens.manifest.json
+            packages/theme/src/builder/components.generated.ts
+          retention-days: 1
+
+  repro:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rep: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: |
+          for i in 1 2 3; do
+            pnpm exec vitest run --project 'browser (chromium)' --shard=1/2 --reporter=dot > "run-$i.log" 2> "debug-$i.log" || true
+            tail -5 "run-$i.log"
+            if grep -q "Browser connection was closed\|page crashed" "run-$i.log" "debug-$i.log"; then
+              echo "::error::dropped on run $i"
+              grep -n "crash\|disconnected\|Received signal\|Fatal\|OOM\|out of memory\|heartbeat\|reload\|optimiz\|navigat\|close" "debug-$i.log" | grep -v "pw:api" | tail -80
+              exit 1
+            fi
+          done
+        env:
+          CI: "true"
+          RIND_BROWSERS: chromium
+          RIND_MAX_WORKERS: 2
+          DEBUG: "pw:browser*,vitest:browser:*,vite:deps"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.rep }}
+          path: "*.log"
+          retention-days: 3
