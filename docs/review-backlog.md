@@ -7,6 +7,10 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| color-picker (site, #103) | — | packages/react/src/color-slider/color-slider.tsx | The channel slider's `defaultValue` (`getChannel(defaultValue, channel)`) is not snapped to the step grid like `value` is (#81): alpha 0.50196… for #33669980 logs the slider warning; snap it, then remove #103's allowance in color-slider.model.dom.test |
+| add-tag-group (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |
+| add-tag-group (impl) | — | packages/core/src/components/tag-group/tag-group.contract.ts | Removal announcements are asserted through the announcement log in DOM tests (the contract's announcement kinds don't include removal); ACTIVATE and REMOVE are model-walk skips (DOM tests cover them) |
+| add-tag-group (impl) | — | packages/react/src/tag-group/tag-group.tsx | The hidden "Press Delete to remove" hint is one node per group, not one per document; hover/press state lives in React, not the machine |
 | add-drawer (impl) | — | packages/testing/src/components/drawer.dom.test.tsx | Task 8.1: not every cited regression issue has its own reproduction test |
 | add-drawer (impl) | — | packages/testing/fixtures/drawer | Task 9.3: forced-colors Playwright captures |
 | add-drawer (impl) | — | docs/components/drawer.md | Task 11.2: manual device pass (iOS Safari/Chrome, Android Chrome + TalkBack, VO iOS) |

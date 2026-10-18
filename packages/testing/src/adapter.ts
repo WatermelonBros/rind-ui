@@ -108,7 +108,7 @@ export const mirror = (key: Key, direction: Direction): Key =>
 
 export const describeBy = (by: By) =>
   "role" in by
-    ? `role "${by.role}"${by.name === undefined ? "" : ` named ${JSON.stringify(String(by.name))}`}`
+    ? `role "${[by.role].flat().join(" | ")}"${by.name === undefined ? "" : ` named ${JSON.stringify(String(by.name))}`}`
     : "label" in by
       ? `control labelled ${JSON.stringify(String(by.label))}`
       : "part" in by

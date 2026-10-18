@@ -292,11 +292,19 @@ function createDomEnv(
       const name = by.name
       // Exact names only: a string must equal the accessible name, never a substring.
       // Testing Library types the container as HTMLElement; it accepts any ParentNode.
-      return queryAllByRole(within as HTMLElement, by.role, {
-        ...(name === undefined
-          ? {}
-          : { name: typeof name === "string" ? (n: string) => normalize(n) === name : name }),
-      })
+      const found = new Set(
+        [by.role].flat().flatMap((role) =>
+          queryAllByRole(within as HTMLElement, role, {
+            ...(name === undefined
+              ? {}
+              : { name: typeof name === "string" ? (n: string) => normalize(n) === name : name }),
+          }),
+        ),
+      )
+      // A set of roles: every match in document order, so uniqueness spans all of them.
+      return [...found].sort((a, b) =>
+        a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+      )
     }
     if ("label" in by) {
       const { queryAllByLabelText } = await loadTL()

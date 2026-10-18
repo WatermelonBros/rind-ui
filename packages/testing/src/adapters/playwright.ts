@@ -213,9 +213,15 @@ function createPlaywrightEnv(
   // Exact names: Playwright matches substrings unless `exact: true`.
   const byLocator = (root: Page | Frame | Locator, by: By): Locator =>
     "role" in by
-      ? root.getByRole(by.role as Parameters<Page["getByRole"]>[0], {
-          ...(by.name === undefined ? {} : { name: by.name, exact: true }),
-        })
+      ? // A set of roles: one locator matching any of them, so uniqueness spans all.
+        [by.role]
+          .flat()
+          .map((role) =>
+            root.getByRole(role as Parameters<Page["getByRole"]>[0], {
+              ...(by.name === undefined ? {} : { name: by.name, exact: true }),
+            }),
+          )
+          .reduce((all, one) => all.or(one))
       : "label" in by
         ? root.getByLabel(by.label, { exact: true })
         : "part" in by

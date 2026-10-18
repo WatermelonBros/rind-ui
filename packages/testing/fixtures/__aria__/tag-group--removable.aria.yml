@@ -1,0 +1,18 @@
+- text: Cities
+- grid "Cities":
+  - row "Rome":
+    - gridcell "Rome Remove Rome":
+      - text: Rome
+      - button "Remove Rome"
+  - row "Paris":
+    - gridcell "Paris Remove Paris":
+      - text: Paris
+      - button "Remove Paris"
+  - row "Oslo":
+    - gridcell "Oslo Remove Oslo":
+      - text: Oslo
+      - button "Remove Oslo"
+  - row "Lima":
+    - gridcell "Lima Remove Lima":
+      - text: Lima
+      - button "Remove Lima"
