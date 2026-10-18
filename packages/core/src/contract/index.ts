@@ -35,6 +35,7 @@ export type {
   ClickOptions,
   DragOptions,
   Env,
+  FileSpec,
   Key,
   KeyOptions,
   Modality,

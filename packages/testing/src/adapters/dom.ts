@@ -740,6 +740,24 @@ function createDomEnv(
           input.dispatchEvent(new InputEvent("input", init))
         })
       },
+      async setFiles(specs) {
+        const el = await waitFor()
+        await act(() => {
+          const input = el as HTMLInputElement
+          const files = specs.map((f) => new File([f.content], f.name, { type: f.type }))
+          if (typeof DataTransfer === "function") {
+            const dt = new DataTransfer()
+            for (const f of files) dt.items.add(f)
+            input.files = dt.files
+          } else {
+            // jsdom has no DataTransfer: a FileList-shaped value on the property.
+            const list = Object.assign([...files], { item: (i: number) => files[i] ?? null })
+            Object.defineProperty(input, "files", { configurable: true, value: list })
+          }
+          input.dispatchEvent(new Event("input", { bubbles: true }))
+          input.dispatchEvent(new Event("change", { bubbles: true }))
+        })
+      },
       waitForDetach: async () => {
         await until(
           async () => (await resolve()).length,

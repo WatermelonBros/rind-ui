@@ -642,6 +642,12 @@ function createPlaywrightEnv(
           input.dispatchEvent(new InputEvent("input", init))
         }, text)
       },
+      async setFiles(specs) {
+        const l = await waitFor()
+        await l.setInputFiles(
+          specs.map((f) => ({ name: f.name, mimeType: f.type, buffer: Buffer.from(f.content) })),
+        )
+      },
       waitForDetach: async () => {
         await until(
           async () => (await locate()).count(),

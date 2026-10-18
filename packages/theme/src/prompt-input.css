@@ -1,0 +1,368 @@
+/*
+ * Prompt Input (family: field): the Root is a raised composer card that wraps, in order,
+ * the attachments, the Textarea (full width, content-sized up to a max block size, then it
+ * scrolls) and a row with AttachTrigger, the count and Submit at the end. Submit is a round
+ * accent key whose glyph follows data-action (send arrow, stop square); a blocked Submit is
+ * muted AND loses its fill (never colour alone). Over the limit doubles the danger border; a
+ * file drag shows a dashed outline. Heights never animate. Tier-3 --rind-prompt-input-* tokens
+ * are only read, with fallbacks to semantic tokens.
+ */
+@layer rind.components {
+  :where([data-scope="prompt-input"][data-part="root"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--rind-prompt-input-gap, var(--rind-space-2));
+    inline-size: 100%;
+    margin: 0;
+    padding: var(--rind-prompt-input-padding, var(--rind-space-3));
+    border: var(--rind-border-width) solid
+      var(--rind-prompt-input-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-prompt-input-radius, var(--rind-radius-panel));
+    background: var(--rind-prompt-input-bg, var(--rind-color-surface-raised));
+    color: var(--rind-prompt-input-fg, var(--rind-color-text));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-prompt-input-font-size, var(--rind-text-control, var(--rind-text-sm)));
+    box-shadow: var(--rind-prompt-input-shadow, var(--rind-shadow-sm));
+    cursor: text;
+  }
+
+  :where([data-scope="prompt-input"][data-part="root"][data-variant="soft"]) {
+    background: var(--rind-prompt-input-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  /* Focus in the draft or on an attachment rings the whole card. */
+  :where([data-scope="prompt-input"][data-part="root"][data-focus]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* A file drag over the card: a dashed outline (shape, not only colour). */
+  :where([data-scope="prompt-input"][data-part="root"][data-dragging]) {
+    outline: var(--rind-focus-width) dashed
+      var(--rind-prompt-input-drag-outline, var(--rind-color-accent-border));
+    outline-offset: var(--rind-focus-offset);
+    background: var(--rind-prompt-input-drag-bg, var(--rind-color-accent-soft));
+  }
+
+  :where(
+    [data-scope="prompt-input"][data-part="root"][data-over-limit],
+    [data-scope="prompt-input"][data-part="root"][data-tone="danger"]
+  ) {
+    border-width: calc(var(--rind-border-width) * 2);
+    border-color: var(--rind-prompt-input-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="prompt-input"][data-part="root"][data-disabled]) {
+    background: var(--rind-prompt-input-disabled-bg, var(--rind-color-surface));
+    border-color: var(--rind-prompt-input-disabled-border, var(--rind-color-border));
+    color: var(--rind-color-text-disabled);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="prompt-input"][data-part="label"]) {
+    flex-basis: 100%;
+    font-size: var(--rind-prompt-input-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-prompt-input-label-font-weight, 580);
+    color: var(--rind-prompt-input-label-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="prompt-input"][data-part="description"]) {
+    flex-basis: 100%;
+    order: 10;
+    margin: 0;
+    font-size: var(--rind-text-xs);
+    color: var(--rind-prompt-input-description-color, var(--rind-color-text-muted));
+  }
+
+  /* The draft: no box of its own; the card is the field. */
+  :where([data-scope="prompt-input"][data-part="textarea"]) {
+    box-sizing: border-box;
+    flex: 1 1 100%;
+    min-inline-size: 0;
+    min-block-size: calc(var(--rind-prompt-input-min-rows, 1) * 1lh);
+    max-block-size: var(--rind-prompt-input-max-block-size, 12lh);
+    margin: 0;
+    padding: var(--rind-space-1) var(--rind-space-1);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: var(--rind-leading-normal);
+    field-sizing: content;
+    resize: none;
+    overflow-y: auto;
+    outline: none;
+  }
+
+  :where([data-scope="prompt-input"][data-part="textarea"])::placeholder {
+    color: var(--rind-prompt-input-placeholder, var(--rind-color-text-muted));
+    opacity: 1;
+  }
+
+  :where([data-scope="prompt-input"][data-part="textarea"]:disabled) {
+    cursor: not-allowed;
+  }
+
+  /* iOS zooms into a focused field under 16px: never smaller on touch screens. */
+  @media (pointer: coarse) {
+    :where([data-scope="prompt-input"][data-part="textarea"]) {
+      font-size: max(16px, 1em);
+    }
+  }
+
+  /* The bottom row: attach at the start, then the count and Submit at the end. */
+  :where([data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"])) {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    flex: none;
+    inline-size: var(
+      --rind-prompt-input-button-size,
+      var(--rind-size-control, var(--rind-size-md))
+    );
+    block-size: var(--rind-prompt-input-button-size, var(--rind-size-control, var(--rind-size-md)));
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-prompt-input-button-radius, var(--rind-radius-full, 999px));
+    font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  :where(
+    [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"])
+  )::before {
+    content: "";
+    inline-size: var(--rind-prompt-input-icon-size, 1.15em);
+    block-size: var(--rind-prompt-input-icon-size, 1.15em);
+    background-color: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  /* A consumer glyph replaces the theme's. */
+  :where(
+    [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"]):not(:empty)
+  )::before {
+    content: none;
+  }
+
+  :where([data-scope="prompt-input"][data-part="attach-trigger"]) {
+    background: transparent;
+    color: var(--rind-prompt-input-attach-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="prompt-input"][data-part="attach-trigger"])::before {
+    mask-image: var(--rind-prompt-input-attach-icon, var(--rind-icon-paperclip));
+  }
+
+  :where([data-scope="prompt-input"][data-part="attach-trigger"]:hover:not(:disabled)) {
+    background: var(--rind-prompt-input-attach-hover-bg, var(--rind-color-neutral-soft-hover));
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="prompt-input"][data-part="character-count"]) {
+    margin-inline-start: auto;
+    font-size: var(--rind-text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-prompt-input-count-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="prompt-input"][data-part="character-count"][data-over-limit]) {
+    color: var(--rind-prompt-input-over-limit-text, var(--rind-color-danger-text));
+    font-weight: 650;
+  }
+
+  /* Submit sits at the end of the row, after the count if there is one. */
+  :where([data-scope="prompt-input"][data-part="submit"]) {
+    margin-inline-start: auto;
+    background: var(--rind-prompt-input-submit-bg, var(--rind-color-accent-solid));
+    color: var(--rind-prompt-input-submit-fg, var(--rind-color-accent-on-solid));
+    box-shadow: var(--rind-prompt-input-submit-shadow, var(--rind-shadow-key));
+  }
+
+  :where([data-scope="prompt-input"][data-part="character-count"] ~ [data-part="submit"]) {
+    margin-inline-start: 0;
+  }
+
+  :where([data-scope="prompt-input"][data-part="submit"])::before {
+    mask-image: var(--rind-prompt-input-send-icon, var(--rind-icon-arrow-up));
+  }
+
+  :where([data-scope="prompt-input"][data-part="submit"][data-action="stop"])::before {
+    mask-image: var(--rind-prompt-input-stop-icon, var(--rind-icon-stop));
+  }
+
+  :where([data-scope="prompt-input"][data-part="submit"]:hover:not([data-disabled])) {
+    background: var(--rind-prompt-input-submit-hover-bg, var(--rind-color-accent-solid-hover));
+  }
+
+  /* Nothing to send: an outlined, muted key (shape and colour change together). */
+  :where([data-scope="prompt-input"][data-part="submit"][data-disabled]) {
+    border-color: var(--rind-prompt-input-submit-disabled-border, var(--rind-color-border));
+    background: var(--rind-prompt-input-submit-disabled-bg, var(--rind-color-surface));
+    color: var(--rind-prompt-input-submit-disabled-fg, var(--rind-color-text-disabled));
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  :where(
+    [data-scope="prompt-input"]:is(
+      [data-part="attach-trigger"],
+      [data-part="submit"]
+    )[data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* Attachments: a wrapping row of pills above the draft. */
+  :where([data-scope="prompt-input"][data-part="chips"]) {
+    display: flex;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    gap: var(--rind-space-1);
+    cursor: default;
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip"]) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    max-inline-size: 100%;
+    padding-inline: var(--rind-prompt-input-chip-padding, var(--rind-space-2)) 0;
+    border: var(--rind-border-width) solid
+      var(--rind-prompt-input-chip-border, var(--rind-color-border));
+    border-radius: var(--rind-prompt-input-chip-radius, var(--rind-radius-md));
+    background: var(--rind-prompt-input-chip-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-xs);
+    line-height: 1.5;
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip-text"]) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip"][data-highlighted]) {
+    outline: var(--rind-focus-width) solid
+      var(--rind-prompt-input-chip-highlight-outline, var(--rind-color-accent-border));
+    outline-offset: 1px;
+    background: var(--rind-prompt-input-chip-highlight-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip"][data-focus-visible]) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip"][data-armed]) {
+    border-style: dashed;
+  }
+
+  /* Uploading: a dotted edge and muted text (not colour alone). */
+  :where([data-scope="prompt-input"][data-part="chip"][data-pending]) {
+    border-style: dotted;
+    color: var(--rind-color-text-muted);
+  }
+
+  /* 24x24 target (WCAG 2.5.8), always visible: on touch and on keyboard focus too. */
+  :where([data-scope="prompt-input"][data-part="chip-remove"]) {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-prompt-input-chip-remove-size, var(--rind-hit-area));
+    min-block-size: var(--rind-prompt-input-chip-remove-size, var(--rind-hit-area));
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip-remove"]):hover {
+    background: var(--rind-prompt-input-chip-remove-hover-bg, var(--rind-color-neutral-soft-hover));
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip-remove"]:focus-visible) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: -2px;
+  }
+
+  :where([data-scope="prompt-input"][data-part="chip-remove"][disabled]) {
+    display: none;
+  }
+
+  /* The summary is for assistive tech only. */
+  :where([data-scope="prompt-input"][data-part="chips-summary"]) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="prompt-input"][data-part="root"]) {
+      background: Field;
+      color: FieldText;
+      border-color: FieldText;
+    }
+
+    :where([data-scope="prompt-input"][data-part="root"][data-focus]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="prompt-input"][data-part="root"][data-dragging]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="prompt-input"][data-part="root"][data-disabled]) {
+      color: GrayText;
+      border-color: GrayText;
+    }
+
+    :where([data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"])) {
+      border-color: ButtonText;
+      background: ButtonFace;
+      color: ButtonText;
+    }
+
+    :where(
+        [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"])
+      )::before {
+      background-color: ButtonText;
+    }
+
+    :where([data-scope="prompt-input"][data-part="submit"][data-disabled]) {
+      border-color: GrayText;
+      color: GrayText;
+    }
+
+    :where([data-scope="prompt-input"][data-part="submit"][data-disabled])::before {
+      background-color: GrayText;
+    }
+
+    :where([data-scope="prompt-input"][data-part="chip"]) {
+      border-color: CanvasText;
+    }
+
+    :where([data-scope="prompt-input"][data-part="chip"][data-highlighted]) {
+      outline: 2px solid Highlight;
+    }
+  }
+}

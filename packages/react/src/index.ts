@@ -39,6 +39,7 @@ export * from "./pin-input"
 export * from "./popover"
 export { Portal, type PortalProps } from "./portal"
 export * from "./progress"
+export * from "./prompt-input"
 export {
   type RindMessageScopes,
   RindProvider,

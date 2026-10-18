@@ -49,6 +49,7 @@ import * as popover from "./popover"
 import * as positioning from "./positioning"
 import * as pressAndHover from "./press-and-hover"
 import * as progress from "./progress"
+import * as promptInput from "./prompt-input"
 import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
 import * as scrollArea from "./scroll-area"
@@ -113,6 +114,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   image,
   meter,
   progress,
+  "prompt-input": promptInput,
   "hidden-until-found": hiddenUntilFound,
   "keyboard-and-rtl": keyboardAndRtl,
   overlays,

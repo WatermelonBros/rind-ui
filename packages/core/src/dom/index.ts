@@ -32,6 +32,18 @@ export { type ElementInfo, elementInfo } from "./element-info"
 export { isEyeDropperSupported, pickScreenColor } from "./eye-dropper"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
+export {
+  dragHasFiles,
+  dragLeftRoot,
+  type FileLimits,
+  type FileRejection,
+  type FileRejectionReason,
+  filesFromClipboard,
+  filesFromDrop,
+  matchesAccept,
+  syncFileInput,
+  validateFiles,
+} from "./file-intake"
 export { focusPast } from "./focus-past"
 export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
