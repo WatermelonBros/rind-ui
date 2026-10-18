@@ -1,0 +1,277 @@
+/*
+ * Code Block (family: decoration): a surface for code. The lines are inline blocks separated by the
+ * newline text the component writes, so the copied and selected text is the source with or
+ * without this sheet. Each line is at least the scroll width, so a highlighted line's background
+ * reaches the end of a scrolled line (chakra-ui#10239). Numbers are a counter drawn by
+ * `::before`: never text, never selected, and aligned with a wrapped line's first row
+ * (docusaurus#7907). A highlighted line also gets an inline-start border, kept under forced
+ * colors, so the emphasis is not colour alone. Collapsed, the content clips to `maxLines` lines.
+ *
+ * The block is dark in both page schemes (`--rind-code-block-scheme: light` makes it light): the
+ * root sets `color-scheme`, so every `light-dark()` token inside it, the triggers' included,
+ * resolves for the block's own scheme. Token colours are one custom property per `data-token`
+ * (`--rind-code-token-keyword`, ...), each with a light and a dark default of at least 4.5:1
+ * on the block and on a highlighted line; override the property to pick a colour. The inline
+ * padding is on the lines, so a highlighted line still runs edge to edge.
+ */
+@layer rind.components {
+  :where([data-scope="code-block"][data-part="root"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    border: var(--rind-border-width) solid var(--rind-code-block-border, var(--rind-color-border));
+    border-radius: var(--rind-code-block-radius, var(--rind-radius-panel));
+    color-scheme: var(--rind-code-block-scheme, dark);
+    background: var(--rind-code-block-bg, var(--rind-color-code-bg));
+    color: var(--rind-code-block-text, var(--rind-color-code-text));
+    overflow: hidden;
+  }
+
+  :where([data-scope="code-block"][data-part="header"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    padding-block: var(--rind-space-1);
+    padding-inline: var(--rind-space-3) var(--rind-space-1);
+    border-block-end: var(--rind-border-width) solid
+      var(--rind-code-block-border, var(--rind-color-border));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="code-block"][data-part="title"]) {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--rind-font-mono);
+    color: var(--rind-code-block-title, var(--rind-color-text-muted));
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    min-block-size: var(--rind-size-sm);
+    padding-inline: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  /* The display above would beat the UA's [hidden] (a short block's CollapseTrigger). */
+  :where([data-scope="code-block"][data-part="collapse-trigger"][hidden]) {
+    display: none;
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  ):hover {
+    background: var(--rind-color-neutral-soft-hover);
+  }
+
+  :where([data-scope="code-block"][data-part="wrap-trigger"][aria-pressed="true"]) {
+    background: var(--rind-color-accent-soft);
+    color: var(--rind-color-accent-text);
+  }
+
+  :where([data-scope="code-block"][data-part="copy-trigger"][data-state="error"]) {
+    color: var(--rind-color-danger-text);
+  }
+
+  :where(
+    [data-scope="code-block"][data-part="copy-trigger"],
+    [data-scope="code-block"][data-part="wrap-trigger"],
+    [data-scope="code-block"][data-part="collapse-trigger"]
+  )[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="code-block"][data-part="content"]) {
+    box-sizing: border-box;
+    margin: 0;
+    padding-block: var(--rind-code-block-padding-block, var(--rind-space-4));
+    overflow: auto;
+    font-family: var(--rind-font-mono);
+    font-weight: 500;
+    font-size: var(--rind-code-block-font-size, var(--rind-text-sm));
+    line-height: var(--rind-code-block-leading, 1.6);
+    tab-size: 2;
+    white-space: pre;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-collapsible]:not([data-expanded])) {
+    max-block-size: calc(
+      var(--rind-code-block-max-lines) *
+      1lh +
+      2 *
+      var(--rind-code-block-padding-block, var(--rind-space-4))
+    );
+    overflow-y: hidden;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-wrapped]) {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  :where([data-scope="code-block"][data-part="content"]):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(-1 * var(--rind-focus-width));
+  }
+
+  :where([data-scope="code-block"][data-part="code"]) {
+    display: inline-block;
+    min-inline-size: 100%;
+    font: inherit;
+    counter-reset: rind-code-line var(--rind-code-block-start, 0);
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-wrapped])
+    :where([data-scope="code-block"][data-part="code"]) {
+    display: block;
+  }
+
+  :where([data-scope="code-block"][data-part="line"]) {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-block;
+    min-inline-size: 100%;
+    min-block-size: 1lh;
+    vertical-align: top;
+    padding-inline: var(--rind-code-block-padding-inline, calc(1.25 * var(--rind-space-4)));
+    border-inline-start: 3px solid transparent;
+    counter-increment: rind-code-line;
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-line-numbers])
+    :where([data-scope="code-block"][data-part="line"]) {
+    padding-inline-start: calc(
+      var(--rind-code-block-gutter, 3.5ch) +
+      var(--rind-code-block-padding-inline, calc(1.25 * var(--rind-space-4)))
+    );
+  }
+
+  :where([data-scope="code-block"][data-part="content"][data-line-numbers])
+    :where([data-scope="code-block"][data-part="line"])::before {
+    content: counter(rind-code-line);
+    position: absolute;
+    inset-inline-start: calc(
+      0.5 *
+      var(--rind-code-block-padding-inline, calc(1.25 * var(--rind-space-4)))
+    );
+    inset-block-start: 0;
+    inline-size: var(--rind-code-block-gutter, 3.5ch);
+    text-align: end;
+    color: var(--rind-code-block-gutter-text, var(--rind-color-text-muted));
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+  }
+
+  :where([data-scope="code-block"][data-part="line"][data-highlighted]) {
+    background: var(--rind-code-block-highlight-bg, var(--rind-color-accent-soft));
+    border-inline-start-color: var(
+      --rind-code-block-highlight-border,
+      var(--rind-color-accent-solid)
+    );
+  }
+
+  /* Token colours: the consumer's property, else the theme's palette. */
+  :where([data-scope="code-block"] [data-token="keyword"]) {
+    color: var(--rind-code-token-keyword, var(--rind-color-code-keyword));
+  }
+
+  :where([data-scope="code-block"] [data-token="string"]) {
+    color: var(--rind-code-token-string, var(--rind-color-code-string));
+  }
+
+  :where([data-scope="code-block"] [data-token="comment"]) {
+    color: var(--rind-code-token-comment, var(--rind-color-code-comment));
+  }
+
+  :where([data-scope="code-block"] [data-token="number"]) {
+    color: var(--rind-code-token-number, var(--rind-color-code-number));
+  }
+
+  :where([data-scope="code-block"] [data-token="function"]) {
+    color: var(--rind-code-token-function, var(--rind-color-code-function));
+  }
+
+  :where([data-scope="code-block"] [data-token="type"]) {
+    color: var(--rind-code-token-type, var(--rind-color-code-type));
+  }
+
+  :where([data-scope="code-block"] [data-token="tag"]) {
+    color: var(--rind-code-token-tag, var(--rind-color-code-tag));
+  }
+
+  :where([data-scope="code-block"] [data-token="attr"]) {
+    color: var(--rind-code-token-attr, var(--rind-color-code-attr));
+  }
+
+  :where([data-scope="code-block"] [data-token="property"]) {
+    color: var(--rind-code-token-property, var(--rind-color-code-property));
+  }
+
+  :where([data-scope="code-block"] [data-token="variable"]) {
+    color: var(--rind-code-token-variable, var(--rind-color-code-variable));
+  }
+
+  :where([data-scope="code-block"] [data-token="regex"]) {
+    color: var(--rind-code-token-regex, var(--rind-color-code-regex));
+  }
+
+  :where([data-scope="code-block"] [data-token="punctuation"]) {
+    color: var(--rind-code-token-punctuation, var(--rind-color-code-punctuation));
+  }
+
+  :where([data-scope="code-block"] [data-token="operator"]) {
+    color: var(--rind-code-token-operator, var(--rind-color-code-operator));
+  }
+
+  :where([data-scope="code-block"] [data-token="comment"]) {
+    font-style: italic;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="code-block"][data-part="root"]) {
+      border-color: CanvasText;
+    }
+
+    :where(
+        [data-scope="code-block"][data-part="copy-trigger"],
+        [data-scope="code-block"][data-part="wrap-trigger"],
+        [data-scope="code-block"][data-part="collapse-trigger"]
+      ) {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    :where([data-scope="code-block"][data-part="wrap-trigger"][aria-pressed="true"]) {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    :where([data-scope="code-block"][data-part="line"][data-highlighted]) {
+      border-inline-start-color: Highlight;
+    }
+
+    /* System colours replace the palette; the comment keeps its italic as the one cue. */
+    :where([data-scope="code-block"] [data-token]) {
+      color: CanvasText;
+    }
+  }
+}

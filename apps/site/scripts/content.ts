@@ -372,6 +372,10 @@ for (const [dir, files] of [
       if (!new RegExp(`^export function ${name}\\(\\)`, "m").test(source)) {
         throw new Error(`examples/${f}: variant ${name} has no exported function`)
       }
+      // its Get code panel shows this source: an example the extractor missed has none
+      if (dir === examplesDir && !examples[slug]?.code[name]?.includes(`function ${name}(`)) {
+        throw new Error(`examples/${f}: variant ${name} has no extracted source`)
+      }
       if (harness.some((e) => e.slug === slug && e.name === name)) {
         throw new Error(`examples/${f}: ${name} is already an example of "${slug}"`)
       }
