@@ -8,6 +8,7 @@ See CLAUDE.md "Review rules".
 | Change | Reado id | File | Finding |
 |---|---|---|---|
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
+| add-color-picker (site report) | — | packages/core/src/components/color-picker | The hue ChannelSlider track is drawn at the current saturation/brightness: with a near-black value (#0B0B0C) the whole hue track is black and the hue cannot be picked by eye. Draw the hue track at full saturation and brightness (the Area shows the S/B) |
 | add-tag-group (r1) | — | packages/react/src/tag-group/tag-group.tsx | Link-only static Tag Group: the server HTML renders `role="list"` until the layout effect runs (registration at commit); the `tags` data form is correct on the server |
 | color-picker (site, #103) | — | packages/react/src/color-slider/color-slider.tsx | The channel slider's `defaultValue` (`getChannel(defaultValue, channel)`) is not snapped to the step grid like `value` is (#81): alpha 0.50196… for #33669980 logs the slider warning; snap it, then remove #103's allowance in color-slider.model.dom.test |
 | add-tag-group (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT, recorded in "Tested with" (task 8.2) |

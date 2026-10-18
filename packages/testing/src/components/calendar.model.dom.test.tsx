@@ -30,5 +30,16 @@ config("min and max", {
 })
 config("weekends unavailable", { isDateUnavailable: (d) => isWeekend(d, "en-US") })
 config("read-only", { readOnly: true })
+config("range", { selectionMode: "range" })
+config("range, 2–7 days", { selectionMode: "range", minRangeLength: 2, maxRangeLength: 7 })
+config("range, weekends unavailable (contiguous)", {
+  selectionMode: "range",
+  isDateUnavailable: (d) => isWeekend(d, "en-US"),
+})
+config("range, weekends unavailable (non-contiguous)", {
+  selectionMode: "range",
+  isDateUnavailable: (d) => isWeekend(d, "en-US"),
+  allowsNonContiguousRanges: true,
+})
 // Display calendars: the oracle stays gregorian (paths and values are by day).
 void createCalendar

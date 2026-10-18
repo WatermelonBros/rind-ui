@@ -127,12 +127,67 @@ export function ControlledFocus() {
   )
 }
 
+export function Range() {
+  const [value, setValue] = useState<CalendarValue>(null)
+  const range =
+    value && "start" in (value as object) ? (value as { start: unknown; end: unknown }) : null
+  return (
+    <div className="stack">
+      <Cal
+        label="Stay"
+        months={2}
+        selectionMode="range"
+        value={value}
+        onValueChange={(v) => setValue(v)}
+        defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+      />
+      <span className="note">
+        range: {range ? `${String(range.start)} to ${String(range.end)}` : "none"}
+      </span>
+    </div>
+  )
+}
+
+export function RangeRules() {
+  return (
+    <Cal
+      label="Booking"
+      selectionMode="range"
+      maxRangeLength={7}
+      isDateUnavailable={(date) => isWeekend(date, "en-US")}
+      defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+    />
+  )
+}
+
+export function RangeShown() {
+  return (
+    <Cal
+      label="Trip"
+      selectionMode="range"
+      defaultValue={{ start: new CalendarDate(2026, 10, 12), end: new CalendarDate(2026, 10, 16) }}
+      defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+    />
+  )
+}
+
 export const variants: Variants = {
   Single: { title: "Single date", description: "Click or press Enter or Space to select." },
   Multiple: {
     title: "Multiple dates",
     description: '`selectionMode="multiple"` toggles each date.',
   },
+  Range: {
+    title: "Date range",
+    description:
+      '`selectionMode="range"`: the first date is the anchor, the second ends the range; Escape cancels.',
+  },
+  RangeRules: {
+    title: "Range rules",
+    description:
+      "`maxRangeLength={7}` and unavailable weekends: dates no range can end on are disabled while anchored.",
+  },
+  RangeShown: { title: "A committed range", hidden: true },
   TwoMonths: { title: "Two months", description: "`visibleMonths={2}`; paging moves both." },
   ThreeMonthsSinglePaging: {
     title: "Three months, one at a time",
