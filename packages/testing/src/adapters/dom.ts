@@ -206,6 +206,27 @@ export function installErrorLog(win: Window | null = globalThis.window ?? null):
 const isJsdom = () => (globalThis.navigator?.userAgent ?? "").includes("jsdom")
 
 /** The Testing Library adapter. */
+/** A data transfer holding `files`: the real one where it exists, else a reader of the same shape. */
+const transferOf = (win: Window & typeof globalThis, files: readonly File[]) => {
+  if (typeof win.DataTransfer === "function") {
+    const dt = new win.DataTransfer()
+    for (const f of files) dt.items.add(f)
+    return dt
+  }
+  return {
+    types: files.length ? ["Files"] : [],
+    files,
+    items: files.map((f) => ({ kind: "file", type: f.type, getAsFile: () => f })),
+    dropEffect: "none",
+    getData: () => "",
+  }
+}
+const fire = (el: Element, type: string, data: unknown) => {
+  const e = new Event(type, { bubbles: true, cancelable: true, composed: true })
+  Object.defineProperty(e, type === "paste" ? "clipboardData" : "dataTransfer", { value: data })
+  el.dispatchEvent(e)
+}
+
 export function domEnv(options: DomAdapterOptions = {}): EnvFactory {
   const timeout = options.timeout ?? (isJsdom() ? 1000 : 3000)
   const doc = (options.root as Node | undefined)?.ownerDocument ?? globalThis.document
@@ -757,6 +778,38 @@ function createDomEnv(
         await act(() => {
           ;(el as HTMLInputElement).setSelectionRange(start, end)
           el.dispatchEvent(new Event("select", { bubbles: true }))
+        })
+      },
+      async dropFiles(specs) {
+        const el = await waitFor()
+        await act(async () => {
+          const win = el.ownerDocument.defaultView as Window & typeof globalThis
+          const files = specs.map((f) => new win.File([f.content], f.name, { type: f.type }))
+          const data = transferOf(win, files)
+          fire(el, "dragenter", data)
+          fire(el, "dragover", data)
+          fire(el, "drop", data)
+          // The drop's files are read in a promise chain (folders): flush its microtasks.
+          for (let i = 0; i < 20; i++) await Promise.resolve()
+        })
+      },
+      async pasteFiles(specs) {
+        const el = await waitFor()
+        await act(async () => {
+          const win = el.ownerDocument.defaultView as Window & typeof globalThis
+          const files = specs.map((f) => new win.File([f.content], f.name, { type: f.type }))
+          fire(el, "paste", transferOf(win, files))
+        })
+      },
+      async dragFiles(phase) {
+        const el = await waitFor()
+        await act(() => {
+          const win = el.ownerDocument.defaultView as Window & typeof globalThis
+          const data = transferOf(win, [new win.File(["x"], "drag.txt", { type: "text/plain" })])
+          if (phase === "enter") {
+            fire(el, "dragenter", data)
+            fire(el, "dragover", data)
+          } else fire(el, "dragleave", data)
         })
       },
       async setFiles(specs) {

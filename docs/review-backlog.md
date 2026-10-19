@@ -374,3 +374,10 @@ verified at round 3 (2026-10-14).
 - warning: a clearing mouse press stays in `previewing` with the pressed star full until the pointer leaves. Drop the preview when a PRESS clears to 0.
 - warning: rating.contract.ts `as never` / `as number | undefined` casts have no soundness comment.
 - warning: on a controlled server render the range input has `value="0"` and the carrier `value=""` while `aria-valuenow` is the value, until hydration. The same pattern exists in Slider.
+
+## File Upload (add-file-upload)
+
+- warning: Prompt Input still tracks drags with `dragLeftRoot`. Move it to `dragPresence` so both components share one drag model (add-file-upload task 1.2).
+- warning: the model tests cover the drag and reset edges only. The file events (add, remove, clear) are the DOM tests'. A model with file stories would map them.
+- warning: the Playwright fixture runs in Chromium only. Firefox and WebKit `filechooser` and drop paths are covered by the Vitest browser project.
+- 9.x: manual tier-1 AT pass (VoiceOver, NVDA) of the Trigger name and summary.

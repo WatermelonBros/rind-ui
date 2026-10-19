@@ -42,10 +42,18 @@ export { isEyeDropperSupported, pickScreenColor } from "./eye-dropper"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
 export {
+  type DroppedFolder,
+  type DropSink,
+  type DropSource,
+  domDropSource,
   dragHasFiles,
   dragLeftRoot,
+  dragPresence,
+  filePath,
   filesFromClipboard,
+  filesFromDataTransfer,
   filesFromDrop,
+  isDroppedFolder,
   replaceText,
   syncFileInput,
 } from "./file-intake"

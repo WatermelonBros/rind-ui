@@ -1,0 +1,238 @@
+/*
+ * File Upload (family: field): the Dropzone is a dashed field surface that turns solid with the
+ * accent tint while a file drag is over it (shape, not only colour). The Trigger looks like an
+ * outline button; Remove and Clear are ghost icon buttons of at least 24 x 24 CSS px (WCAG
+ * 2.5.8), an empty Remove draws the x icon. Items are rows: preview, name, size, Remove at the
+ * end. `data-variant` (outline, soft) and `data-size` go on the Root.
+ */
+@layer rind.components {
+  :where([data-scope="file-upload"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-file-upload-gap, var(--rind-space-2));
+    color: var(--rind-file-upload-color, var(--rind-color-text));
+    font-family: var(--rind-font-sans);
+  }
+
+  :where([data-scope="file-upload"][data-part="label"]) {
+    font-size: var(--rind-file-upload-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-file-upload-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  :where([data-scope="file-upload"][data-part="dropzone"]) {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-file-upload-dropzone-height, calc(var(--rind-size-md) * 3));
+    padding: var(--rind-file-upload-padding, var(--rind-space-4));
+    border: var(--rind-border-width) dashed
+      var(--rind-file-upload-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-file-upload-radius, var(--rind-radius-panel));
+    background: var(--rind-file-upload-bg, var(--rind-color-surface-raised));
+    color: var(--rind-file-upload-hint-color, var(--rind-color-text-muted));
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    text-align: center;
+    cursor: pointer;
+    transition:
+      background-color var(--rind-duration-fast) ease,
+      border-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="file-upload"][data-part="root"][data-variant="soft"] [data-part="dropzone"]) {
+    background: var(--rind-file-upload-soft-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="file-upload"][data-part="dropzone"][data-dragging]) {
+    border-style: solid;
+    border-color: var(--rind-file-upload-drag-border, var(--rind-color-accent-border));
+    background: var(--rind-file-upload-drag-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="file-upload"][data-part="dropzone"][data-invalid]) {
+    border-color: var(--rind-file-upload-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="dropzone"][data-disabled],
+    [data-scope="file-upload"][data-part="dropzone"][data-readonly]
+  ) {
+    /* The background stays raised: muted hint text keeps its contrast on it. */
+    border-color: var(--rind-color-border);
+    cursor: default;
+  }
+
+  /* The hint keeps its muted colour: the Dropzone is not a form control, so the contrast
+     exemption for disabled controls does not apply to its text. */
+  :where([data-scope="file-upload"][data-part="dropzone"][data-disabled]) {
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="file-upload"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    box-sizing: border-box;
+    min-block-size: var(
+      --rind-file-upload-trigger-height,
+      var(--rind-size-control, var(--rind-size-md))
+    );
+    padding-inline: var(--rind-space-control, var(--rind-space-3));
+    border: var(--rind-border-width) solid
+      var(--rind-file-upload-trigger-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-file-upload-trigger-radius, var(--rind-radius-control));
+    background: var(--rind-file-upload-trigger-bg, var(--rind-color-surface-raised));
+    color: var(--rind-file-upload-trigger-color, var(--rind-color-text));
+    font: inherit;
+    font-weight: 560;
+    cursor: pointer;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="file-upload"][data-part="trigger"]):hover {
+    background: var(--rind-color-neutral-soft-hover);
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="trigger"],
+    [data-scope="file-upload"][data-part="item-remove"],
+    [data-scope="file-upload"][data-part="clear-trigger"]
+  ):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="trigger"][data-disabled],
+    [data-scope="file-upload"][data-part="trigger"][data-readonly]
+  ) {
+    background: var(--rind-color-surface);
+    border-color: var(--rind-color-border);
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="file-upload"][data-part="item-group"]) {
+    display: grid;
+    gap: var(--rind-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where([data-scope="file-upload"][data-part="item"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-inline-size: 0;
+    padding-block: var(--rind-space-1);
+    padding-inline: var(--rind-space-3) var(--rind-space-1);
+    border: var(--rind-border-width) solid
+      var(--rind-file-upload-item-border, var(--rind-color-border));
+    border-radius: var(--rind-file-upload-item-radius, var(--rind-radius-control));
+    background: var(--rind-file-upload-item-bg, var(--rind-color-surface-raised));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="file-upload"][data-part="item-preview"]) {
+    flex: none;
+    inline-size: var(--rind-file-upload-preview-size, 2.5rem);
+    block-size: var(--rind-file-upload-preview-size, 2.5rem);
+    border-radius: var(--rind-radius-control);
+    object-fit: cover;
+  }
+
+  :where([data-scope="file-upload"][data-part="item-name"]) {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :where([data-scope="file-upload"][data-part="item-size"]) {
+    flex: none;
+    color: var(--rind-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="item-remove"],
+    [data-scope="file-upload"][data-part="clear-trigger"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-space-1);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="file-upload"][data-part="clear-trigger"]) {
+    justify-self: start;
+    font-size: var(--rind-text-sm);
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="item-remove"],
+    [data-scope="file-upload"][data-part="clear-trigger"]
+  ):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+
+  :where(
+    [data-scope="file-upload"][data-part="item-remove"],
+    [data-scope="file-upload"][data-part="clear-trigger"]
+  ):disabled {
+    color: var(--rind-color-text-disabled);
+    background: transparent;
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="file-upload"][data-part="item-remove"]:empty)::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background-color: currentColor;
+    mask-image: var(--rind-file-upload-remove-icon, var(--rind-icon-x));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="file-upload"][data-part="dropzone"]) {
+      border-color: CanvasText;
+    }
+    :where([data-scope="file-upload"][data-part="dropzone"][data-dragging]) {
+      border-color: Highlight;
+    }
+    :where([data-scope="file-upload"][data-part="item-remove"]:empty)::before {
+      background-color: ButtonText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(
+        [data-scope="file-upload"][data-part="dropzone"],
+        [data-scope="file-upload"][data-part="trigger"],
+        [data-scope="file-upload"][data-part="item-remove"],
+        [data-scope="file-upload"][data-part="clear-trigger"]
+      ) {
+      transition: none;
+    }
+  }
+}

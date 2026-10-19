@@ -185,6 +185,16 @@ export interface Part {
    * input's `files` set, then bubbling `input` and `change`.
    */
   setFiles(files: readonly FileSpec[]): Promise<void>
+  /**
+   * A file drag ending in a drop on the part: `dragenter`, `dragover`, then `drop`, with a
+   * `DataTransfer` holding the files (browser), or an event carrying a `dataTransfer` reader
+   * with `types`, `files` and `items` (jsdom).
+   */
+  dropFiles(files: readonly FileSpec[]): Promise<void>
+  /** A `paste` on the part whose clipboard holds `files` (and no text). */
+  pasteFiles(files: readonly FileSpec[]): Promise<void>
+  /** A file drag entering the part (`dragenter`, `dragover`), or leaving it (`dragleave`). */
+  dragFiles(phase: "enter" | "leave"): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */

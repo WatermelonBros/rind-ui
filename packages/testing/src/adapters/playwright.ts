@@ -268,9 +268,17 @@ function createPlaywrightEnv(
         `${scope}: ${n} elements match the anchor (${describeBy(anchor)}):\n${await describeAll(a)}`,
       )
     }
-    const id = await a.evaluate((el) =>
-      el.closest("[data-instance]")?.getAttribute("data-instance"),
-    )
+    // Not waiting: an anchor that unmounts after the count is gone, not a 30 s wait.
+    const id = await a
+      .evaluate((el) => el.closest("[data-instance]")?.getAttribute("data-instance"), undefined, {
+        timeout: 1000,
+      })
+      .catch((e: unknown) => {
+        if (e instanceof Error && e.name === "TimeoutError") {
+          throw new Error(`${scope}: no element matches the anchor (${describeBy(anchor)})`)
+        }
+        throw e
+      })
     if (!id) throw new Error(`${scope}: the anchor has no data-instance`)
     return id
   }
@@ -284,6 +292,19 @@ function createPlaywrightEnv(
       return l
     }
     const now = async () => single(await locate())
+    // A read never waits: the element can unmount between `count()` and the read (an exit
+    // animation ending), and Playwright would wait its 30 s for it. Gone reads as not found.
+    const read = async <R>(get: (l: Locator, o: { timeout: number }) => Promise<R>) => {
+      const l = await now()
+      try {
+        return await get(l, { timeout: 1000 })
+      } catch (e) {
+        if (e instanceof Error && e.name === "TimeoutError") throw new Error(`${label}: not found`)
+        throw e
+      }
+    }
+    const readEval = <R>(fn: (el: SVGElement | HTMLElement) => R) =>
+      read((l, o) => l.evaluate(fn, undefined, o))
     const waitFor = async () => {
       const l = await locate()
       await until(
@@ -656,6 +677,47 @@ function createPlaywrightEnv(
           [start, end],
         )
       },
+      async dropFiles(specs) {
+        const l = await waitFor()
+        await l.evaluate((el, specs) => {
+          const dt = new DataTransfer()
+          for (const f of specs) dt.items.add(new File([f.content], f.name, { type: f.type }))
+          for (const type of ["dragenter", "dragover", "drop"]) {
+            el.dispatchEvent(
+              new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: dt }),
+            )
+          }
+        }, specs)
+      },
+      async pasteFiles(specs) {
+        const l = await waitFor()
+        await l.evaluate((el, specs) => {
+          const dt = new DataTransfer()
+          for (const f of specs) dt.items.add(new File([f.content], f.name, { type: f.type }))
+          const e = new ClipboardEvent("paste", {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: dt,
+          })
+          // Firefox ignores the constructor's clipboardData: attach it.
+          if (!e.clipboardData?.files.length)
+            Object.defineProperty(e, "clipboardData", { value: dt })
+          el.dispatchEvent(e)
+        }, specs)
+      },
+      async dragFiles(phase) {
+        const l = await waitFor()
+        await l.evaluate((el, phase) => {
+          const dt = new DataTransfer()
+          dt.items.add(new File(["x"], "drag.txt", { type: "text/plain" }))
+          const types = phase === "enter" ? ["dragenter", "dragover"] : ["dragleave"]
+          for (const type of types) {
+            el.dispatchEvent(
+              new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: dt }),
+            )
+          }
+        }, phase)
+      },
       async setFiles(specs) {
         const l = await waitFor()
         await l.setInputFiles(
@@ -668,9 +730,9 @@ function createPlaywrightEnv(
           (n) => n === 0,
         )
       },
-      isInert: async () => (await now()).evaluate((el) => el.closest("[inert]") !== null),
-      attr: async (name) => (await now()).getAttribute(name),
-      tagName: async () => (await now()).evaluate((el) => el.tagName.toLowerCase()),
+      isInert: async () => readEval((el) => el.closest("[inert]") !== null),
+      attr: async (name) => read((l, o) => l.getAttribute(name, o)),
+      tagName: async () => readEval((el) => el.tagName.toLowerCase()),
       scoped: (scope, partName) =>
         handle(`${scope}.${partName} in ${label}`, async () =>
           (await now()).locator(`[data-scope="${scope}"][data-part="${partName}"]`),
@@ -684,30 +746,29 @@ function createPlaywrightEnv(
       accessibleName: async () => {
         const { root } = await getBase()
         await ensureInPage(root)
-        return (await now()).evaluate(
+        return readEval(
           (el) => (globalThis as InPageWindow).__rindTesting?.accessibleName(el) ?? "",
         )
       },
       accessibleDescription: async () => {
         const { root } = await getBase()
         await ensureInPage(root)
-        return (await now()).evaluate(
+        return readEval(
           (el) => (globalThis as InPageWindow).__rindTesting?.accessibleDescription(el) ?? "",
         )
       },
       labelled: () =>
         handle(`the control of ${label}`, async () => {
-          const text = ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim()
+          const text = ((await read((l, o) => l.textContent(o))) ?? "").replace(/\s+/g, " ").trim()
           return (await getBase()).root.getByLabel(text, { exact: true })
         }),
       doubleClick: async () => (await waitFor()).dblclick(),
-      text: async () => ((await (await now()).textContent()) ?? "").replace(/\s+/g, " ").trim(),
-      value: async () => (await now()).inputValue(),
+      text: async () =>
+        ((await read((l, o) => l.textContent(o))) ?? "").replace(/\s+/g, " ").trim(),
+      value: async () => read((l, o) => l.inputValue(o)),
       // Properties, not attributes (the attribute is the default a reset restores).
-      checked: async () =>
-        (await now()).evaluate((el) => (el as HTMLInputElement).checked === true),
-      indeterminate: async () =>
-        (await now()).evaluate((el) => (el as HTMLInputElement).indeterminate === true),
+      checked: async () => readEval((el) => (el as HTMLInputElement).checked === true),
+      indeterminate: async () => readEval((el) => (el as HTMLInputElement).indeterminate === true),
       exists: async () => {
         await ensureInPage((await getBase()).root)
         return (await locate()).evaluateAll((els) =>
@@ -715,7 +776,7 @@ function createPlaywrightEnv(
         )
       },
       isFocused: async () =>
-        (await now()).evaluate((el) => {
+        readEval((el) => {
           const active = document.activeElement
           return (
             active === el ||
