@@ -1,0 +1,167 @@
+/*
+ * Clipboard (family: field): the Control is the recessed field surface holding the read-only
+ * Input and, at its inline end, the Trigger with the button's ghost look. Without a Control the
+ * Trigger is a standalone ghost icon button of at least 24 x 24 CSS px (WCAG 2.5.8). An empty
+ * Indicator draws a mask icon whose shape changes with the state (copy, check, x), so the
+ * result never depends on colour; `copied` takes the success tone, `error` the danger tone.
+ * `data-variant` (outline, soft) and `data-size` go on the Root.
+ */
+@layer rind.components {
+  :where([data-scope="clipboard"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-clipboard-gap, var(--rind-space-1));
+    justify-items: start;
+    color: var(--rind-clipboard-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="clipboard"][data-part="root"]:has([data-part="control"])) {
+    justify-items: stretch;
+  }
+
+  :where([data-scope="clipboard"][data-part="label"]) {
+    font-size: var(--rind-clipboard-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-clipboard-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  /* The field surface. */
+  :where([data-scope="clipboard"][data-part="control"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    min-inline-size: 0;
+    block-size: var(--rind-clipboard-height, var(--rind-size-control, var(--rind-size-md)));
+    padding-inline: var(--rind-space-control, var(--rind-space-3)) var(--rind-space-1);
+    border: var(--rind-border-width) solid
+      var(--rind-clipboard-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-clipboard-radius, var(--rind-radius-control));
+    background: var(--rind-clipboard-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-clipboard-shadow, var(--rind-shadow-key-pressed));
+  }
+
+  :where([data-scope="clipboard"][data-part="root"][data-variant="soft"] [data-part="control"]) {
+    background: var(--rind-clipboard-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  /* The ring sits on the surface while the Input inside it has keyboard focus. */
+  :where(
+    [data-scope="clipboard"][data-part="control"]:has([data-part="input"][data-focus-visible])
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="clipboard"][data-part="input"]) {
+    flex: 1;
+    /* The whole field height is the target (WCAG 2.5.8). */
+    align-self: stretch;
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: var(--rind-clipboard-font, var(--rind-font-mono));
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    text-overflow: ellipsis;
+    outline: none;
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-space-1);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-clipboard-trigger-radius, var(--rind-radius-control));
+    background: transparent;
+    color: var(--rind-clipboard-trigger-color, var(--rind-color-text-muted));
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"]):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"][data-state="copied"]) {
+    color: var(--rind-clipboard-copied-color, var(--rind-color-success-text));
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"][data-state="error"]) {
+    color: var(--rind-clipboard-error-color, var(--rind-color-danger-text));
+  }
+
+  :where([data-scope="clipboard"][data-part="trigger"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+    background: transparent;
+  }
+
+  :where([data-scope="clipboard"][data-part="root"][data-disabled] [data-part="control"]) {
+    background: var(--rind-color-surface);
+    border-color: var(--rind-color-border);
+    box-shadow: none;
+    color: var(--rind-color-text-disabled);
+  }
+
+  /* The icon: one shape per state. */
+  :where([data-scope="clipboard"][data-part="indicator"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :where([data-scope="clipboard"][data-part="indicator"]:empty)::before {
+    content: "";
+    inline-size: var(--rind-clipboard-icon-size, 1.125em);
+    block-size: var(--rind-clipboard-icon-size, 1.125em);
+    background-color: currentColor;
+    mask-image: var(--rind-clipboard-icon, var(--rind-icon-copy));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="clipboard"][data-part="indicator"][data-state="copied"]:empty)::before {
+    mask-image: var(--rind-clipboard-icon-copied, var(--rind-icon-check));
+  }
+
+  :where([data-scope="clipboard"][data-part="indicator"][data-state="error"]:empty)::before {
+    mask-image: var(--rind-clipboard-icon-error, var(--rind-icon-x));
+  }
+
+  :where([data-scope="clipboard"][data-part="value-text"]) {
+    font-family: var(--rind-clipboard-font, var(--rind-font-mono));
+    font-size: var(--rind-text-sm);
+    overflow-wrap: anywhere;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="clipboard"][data-part="indicator"]:empty)::before {
+      background-color: ButtonText;
+    }
+    :where([data-scope="clipboard"][data-part="control"]) {
+      border-color: CanvasText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="clipboard"][data-part="trigger"]) {
+      transition: none;
+    }
+  }
+}

@@ -1,0 +1,5 @@
+- text: API key
+- textbox "API key": sk-live-4f9a2c7e1b
+- button "Copy API key"
+- log
+- log

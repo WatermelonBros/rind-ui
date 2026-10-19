@@ -170,6 +170,17 @@ export interface Part {
    */
   paste(text: string): Promise<void>
   /**
+   * The user's copy of the current selection in the part (a text input): a cancelable,
+   * bubbling `copy` event at it (DOM adapter), or the platform copy chord (Playwright adapter).
+   * The DOM adapter writes nothing to the OS clipboard.
+   */
+  copySelection(): Promise<void>
+  /**
+   * Selects the characters `[start, end)` of a text input, as a drag-selection would: the
+   * selection set and a `select` event, with no key or pointer event.
+   */
+  selectRange(start: number, end: number): Promise<void>
+  /**
    * Selects `files` in a native `<input type="file">` (what the OS file chooser does): the
    * input's `files` set, then bubbling `input` and `change`.
    */

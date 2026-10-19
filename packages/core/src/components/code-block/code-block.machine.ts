@@ -6,6 +6,7 @@
 import type { AnnouncerEnv, ClipboardEnv, SchedulerEnv } from "../../env/capabilities"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
+import { announceCopy, writeClipboard } from "../clipboard/copy"
 import type { CodeBlockMessages } from "./code-block.messages"
 
 export type CodeBlockEvent =
@@ -83,27 +84,8 @@ export const codeBlockMachine = setup({
   effects: {
     prepareAnnouncer: ({ env }) => env.announcer.prepare(),
     /** One write per entry to `copying`; a result after leaving the state is dropped. */
-    writeClipboard: ({ props, env, send }) => {
-      let live = true
-      const near = props.getCopyAnchor?.() ?? undefined
-      let write: Promise<void>
-      try {
-        write = env.clipboard.writeText(props.code, near ? { near } : {})
-      } catch (error) {
-        write = Promise.reject(error)
-      }
-      write.then(
-        () => {
-          if (live) send({ type: "COPY.DONE" })
-        },
-        (error: unknown) => {
-          if (live) send({ type: "COPY.FAILED", error })
-        },
-      )
-      return () => {
-        live = false
-      }
-    },
+    writeClipboard: ({ props, env, send }) =>
+      writeClipboard(env, props.code, props.getCopyAnchor?.(), send),
   },
   delays: {
     feedback: ({ props }) => props.copyFeedbackDuration ?? DEFAULT_COPY_FEEDBACK_DURATION,
@@ -143,10 +125,5 @@ export type CodeBlockMachine = typeof codeBlockMachine
 export type CodeBlockCopyState = "idle" | "copying" | "copied" | "error"
 
 function announce(env: AnnouncerEnv, props: CodeBlockProps, message: string) {
-  env.announcer.announce({
-    message,
-    priority: "polite",
-    key: `code-block-${props.id}`,
-    ...(props.lang === undefined ? {} : { lang: props.lang }),
-  })
+  announceCopy(env, { scope: "code-block", id: props.id, message, lang: props.lang })
 }

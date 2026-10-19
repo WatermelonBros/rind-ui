@@ -80,6 +80,7 @@ export const familyMatrix = [
       "date-range-picker",
       "color-picker",
       "prompt-input",
+      "clipboard",
     ],
     variants: ["outline", "soft"],
     size: "own",

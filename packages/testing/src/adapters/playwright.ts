@@ -642,6 +642,20 @@ function createPlaywrightEnv(
           input.dispatchEvent(new InputEvent("input", init))
         }, text)
       },
+      async copySelection() {
+        const l = await waitFor()
+        await l.press("ControlOrMeta+C")
+      },
+      async selectRange(start, end) {
+        const l = await waitFor()
+        await l.evaluate(
+          (el, [a, b]) => {
+            ;(el as HTMLInputElement).setSelectionRange(a ?? 0, b ?? 0)
+            el.dispatchEvent(new Event("select", { bubbles: true }))
+          },
+          [start, end],
+        )
+      },
       async setFiles(specs) {
         const l = await waitFor()
         await l.setInputFiles(

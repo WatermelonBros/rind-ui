@@ -342,6 +342,9 @@ const TRANSIENT = new Set([
   "code-block:copying",
   "code-block:copied",
   "code-block:error",
+  "clipboard:copying",
+  "clipboard:copied",
+  "clipboard:error",
   // A toast not yet started by a region, and one exiting: both last for moments.
   "toast:idle",
   "toast:dismissed",
