@@ -1,0 +1,10 @@
+- group "Checkout":
+  - list:
+    - listitem: Cart (current)
+    - listitem: Shipping (not started)
+    - listitem: Payment (not started)
+    - listitem: Review (not started)
+  - 'region "Step 1 of 4: Cart"': Two items in your cart, 48 € in total.
+  - button "Previous" [disabled]
+  - text: Step 1 of 4
+  - button "Next"

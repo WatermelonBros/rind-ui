@@ -1,0 +1,145 @@
+/* ── Stepper: round number badges on the brand colour when current, a soft check when done,
+   joined by rounded rails. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="root"] {
+  color: var(--s-ink);
+  font: 500 14px / 1.4 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="list"] {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: s-step;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="list"][data-orientation="vertical"] {
+  flex-direction: column;
+  gap: 18px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="item"] {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+  counter-increment: s-step;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="item"][data-orientation="vertical"] {
+  flex: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="trigger"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 36px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  font: inherit;
+  text-align: start;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="trigger"]:is(button) {
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="trigger"][data-focus-visible] {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="indicator"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 30px;
+  block-size: 30px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 999px;
+  background: var(--s-card);
+  font: 700 13px var(--s-font);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="indicator"][data-status="upcoming"]::before {
+  content: counter(s-step);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="indicator"][data-status="current"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="indicator"][data-status="current"]::before {
+  content: counter(s-step);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="indicator"][data-status="completed"] {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="indicator"][data-status="completed"]::before {
+  content: "✓";
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="description"] {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="separator"] {
+  flex: 1;
+  min-inline-size: 12px;
+  block-size: 4px;
+  border-radius: 999px;
+  background: var(--s-line);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="separator"][data-status="completed"] {
+  background: var(--s-brand);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="separator"][data-orientation="vertical"] {
+  display: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="content"] {
+  /* No card: the step's fields line up with the list and the buttons. */
+  border-radius: var(--s-r-sm);
+  outline: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"][data-part="content"][data-focus-visible] {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="progress"] {
+  align-self: center;
+  font-size: 13px;
+}
+
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"]:is([data-part="prev-trigger"], [data-part="next-trigger"]) {
+  min-block-size: 38px;
+  padding: 0 18px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 999px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+  box-shadow: var(--s-lift-lo);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="stepper"][data-part="next-trigger"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"]:is([data-part="prev-trigger"], [data-part="next-trigger"]):disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="stepper"]:is([data-part="prev-trigger"], [data-part="next-trigger"]):focus-visible {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}

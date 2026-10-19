@@ -1,0 +1,219 @@
+/*
+ * Stepper (family: decoration): numbered circles joined by separators, horizontal (a row,
+ * titles under the circles) or vertical (a column, titles beside); the current step in the
+ * accent colour; a completed step draws a check (shape, not only colour) when its Indicator
+ * is empty. Reachable steps are buttons with a focus ring; the rest are plain text.
+ */
+@layer rind.components {
+  :where([data-scope="stepper"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-stepper-gap, var(--rind-space-4));
+    color: var(--rind-stepper-color, var(--rind-color-text));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="stepper"][data-part="list"]) {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    /* Its own counter: a flex `li` is not a list-item, so counter(list-item) stays 0. */
+    counter-reset: rind-step;
+  }
+
+  :where([data-scope="stepper"][data-part="list"][data-orientation="vertical"]) {
+    flex-direction: column;
+  }
+
+  :where([data-scope="stepper"][data-part="item"]) {
+    counter-increment: rind-step;
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+    gap: var(--rind-space-2);
+    min-inline-size: 0;
+  }
+
+  :where([data-scope="stepper"][data-part="item"][data-orientation="vertical"]) {
+    flex: none;
+    padding-block-end: var(--rind-space-4);
+  }
+
+  :where([data-scope="stepper"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+  }
+
+  :where([data-scope="stepper"][data-part="trigger"]:is(button)) {
+    cursor: pointer;
+  }
+
+  :where([data-scope="stepper"][data-part="trigger"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="stepper"][data-part="trigger"][data-status="upcoming"]) {
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="stepper"][data-part="trigger"][data-status="current"]) {
+    font-weight: 600;
+  }
+
+  :where([data-scope="stepper"][data-part="indicator"]) {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--rind-stepper-indicator-size, 1.75rem);
+    block-size: var(--rind-stepper-indicator-size, 1.75rem);
+    border: var(--rind-border-width) solid var(--rind-color-border-strong);
+    border-radius: 999px;
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where([data-scope="stepper"][data-part="indicator"][data-status="current"]) {
+    border-color: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+    background: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+    color: var(--rind-stepper-on-accent, var(--rind-color-accent-on-solid));
+  }
+
+  :where([data-scope="stepper"][data-part="indicator"][data-status="completed"]) {
+    border-color: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+    color: var(--rind-color-accent-text);
+  }
+
+  /* An empty Indicator shows the step's number; completed, a check replaces it. */
+  :where([data-scope="stepper"][data-part="indicator"]:empty)::before {
+    content: counter(rind-step);
+  }
+
+  /* Completed: a check replaces the number (drawn when the consumer leaves it empty). */
+  :where([data-scope="stepper"][data-part="indicator"][data-status="completed"]:empty)::before {
+    content: "";
+    inline-size: 0.875em;
+    block-size: 0.875em;
+    background-color: currentColor;
+    mask-image: var(--rind-stepper-check-icon, var(--rind-icon-check));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="stepper"][data-part="title"]) {
+    overflow-wrap: anywhere;
+  }
+
+  :where([data-scope="stepper"][data-part="description"]) {
+    display: block;
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+    font-weight: 400;
+  }
+
+  :where([data-scope="stepper"][data-part="separator"]) {
+    flex: 1;
+    align-self: center;
+    min-inline-size: var(--rind-space-3);
+    block-size: 2px;
+    margin-inline: var(--rind-space-2);
+    background: var(--rind-color-border);
+  }
+
+  :where([data-scope="stepper"][data-part="separator"][data-status="completed"]) {
+    background: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+  }
+
+  :where([data-scope="stepper"][data-part="separator"][data-orientation="vertical"]) {
+    position: absolute;
+    inset-block: calc(var(--rind-stepper-indicator-size, 1.75rem) + var(--rind-space-2)) 0;
+    inset-inline-start: calc(var(--rind-stepper-indicator-size, 1.75rem) / 2 - 1px);
+    flex: none;
+    inline-size: 2px;
+    block-size: auto;
+    min-inline-size: 0;
+    margin: 0;
+  }
+
+  :where([data-scope="stepper"][data-part="content"]) {
+    outline: none;
+  }
+
+  :where([data-scope="stepper"][data-part="content"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where(
+    [data-scope="stepper"][data-part="prev-trigger"],
+    [data-scope="stepper"][data-part="next-trigger"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-block-size: var(--rind-size-control, var(--rind-size-md));
+    padding-inline: var(--rind-space-control, var(--rind-space-3));
+    border: var(--rind-border-width) solid var(--rind-color-border-strong);
+    border-radius: var(--rind-radius-control);
+    background: var(--rind-color-surface-raised);
+    color: var(--rind-color-text);
+    font: inherit;
+    font-weight: 560;
+    cursor: pointer;
+  }
+
+  :where([data-scope="stepper"][data-part="next-trigger"]) {
+    border-color: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+    background: var(--rind-stepper-accent, var(--rind-color-accent-solid));
+    color: var(--rind-stepper-on-accent, var(--rind-color-accent-on-solid));
+  }
+
+  :where(
+    [data-scope="stepper"][data-part="prev-trigger"],
+    [data-scope="stepper"][data-part="next-trigger"]
+  ):disabled {
+    border-color: var(--rind-color-border);
+    background: var(--rind-color-surface);
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where(
+    [data-scope="stepper"][data-part="prev-trigger"],
+    [data-scope="stepper"][data-part="next-trigger"]
+  )[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="stepper"][data-part="progress"]) {
+    align-self: center;
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="stepper"][data-part="indicator"][data-status="current"]) {
+      background: Highlight;
+      color: HighlightText;
+    }
+    :where([data-scope="stepper"][data-part="indicator"][data-status="completed"]:empty)::before {
+      background-color: CanvasText;
+    }
+  }
+}
