@@ -1,0 +1,69 @@
+/* ── Message Thread: a conversation framed like the Prompt Input below it, the user's bubbles on the brand colour at the
+   inline end, a pill "jump to latest" floating over the bottom edge. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="message-thread"][data-part="root"] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 360px;
+  inline-size: 100%;
+  /* The same frame as the Prompt Input below it, so the two read as one chat. */
+  border: max(var(--s-bw), 1px) solid var(--s-field-line);
+  border-radius: calc(var(--s-r) + 4px);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 400 15px / 1.55 var(--s-font);
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="viewport"] {
+  flex: 1;
+  min-block-size: 0;
+  padding: 16px;
+  border-radius: inherit;
+  outline: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"]:is(
+    [data-part="viewport"],
+    [data-part="message"]
+  )[data-focus-visible] {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="message-thread"][data-part="message"] {
+  max-inline-size: 85%;
+  margin-block-end: 12px;
+  border-radius: var(--s-r-sm);
+  outline: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="message"][data-from="user"] {
+  margin-inline-start: auto;
+  padding: 8px 14px;
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="jump-to-latest"] {
+  position: absolute;
+  inset-block-end: 12px;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  padding: 6px 14px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 999px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 13px var(--s-font);
+  box-shadow: var(--s-lift);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="jump-to-latest"]:empty::before {
+  content: "↓ Latest";
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="jump-to-latest"]:focus-visible {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}

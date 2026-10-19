@@ -1,0 +1,13 @@
+- feed "Conversation":
+  - article "You": "Question 1: how does the thread behave?"
+  - article "Assistant": Sure. A thread follows the newest message while you are at the bottom, and lets go the moment you scroll back to read.
+  - article "You": "Question 2: how does the thread behave?"
+  - article "Assistant": While you read back, new messages are counted on the jump button instead of moving the page under you. Press it to return; by keyboard, focus lands on the latest message.
+  - article "You": "Question 3: how does the thread behave?"
+  - article "Assistant": Page Down and Page Up move between messages, and Control+End leaves the thread for the prompt.
+  - article "You": "Question 4: how does the thread behave?"
+  - article "Assistant": Sure. A thread follows the newest message while you are at the bottom, and lets go the moment you scroll back to read.
+- text: Message
+- textbox "Message":
+  - /placeholder: Ask about the thread
+- button "Send message" [disabled]

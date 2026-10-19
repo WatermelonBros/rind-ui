@@ -393,3 +393,10 @@ verified at round 3 (2026-10-14).
 - warning: the reveal ticks on 16 ms `setTimeout`s, not animation frames; in a background tab timers are throttled and the reveal slows. Catching up on visibility (`PageVisibility`) would fix it.
 - warning: the model reaches `settling` only from `streaming`; `complete → settling` (a new text after completion) is reported not taken.
 - 8.x: manual tier-1 AT pass (VoiceOver, NVDA): whether `aria-busy` holds or drops reading, and the lifecycle announcements.
+
+## Message Thread (add-message-thread)
+
+- warning: keyboard scrolling of the viewport (arrows, Home, End) is the browser's; the model maps reading back and returning to pointer wheel only, because synthetic keys do not scroll. A Playwright test with real keys would cover it.
+- warning: the model's message events (`COUNT.SYNCED`) are the DOM tests'; a model story adding messages would map them.
+- warning: feed vs `role="log"` with `aria-live="off"` needs the tier-1 AT pass (NVDA, VoiceOver); a prop for the fallback if feed reads badly.
+- warning: growth is followed instantly (no spring); a smooth follow like use-stick-to-bottom's is polish.

@@ -159,7 +159,7 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 |---|---|---|
 | Prompt Input | IME-safe submit, autosize, attachments, submit/stop state | done |
 | Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | todo |
-| Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | todo |
+| Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | done |
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
 | Reasoning | Collapsible with a streaming state | todo |
 | Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | todo |

@@ -42,6 +42,7 @@ import * as listbox from "./listbox"
 import * as marquee from "./marquee"
 import * as menu from "./menu"
 import * as menubar from "./menubar"
+import * as messageThread from "./message-thread"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
 import * as navigationMenu from "./navigation-menu"
@@ -126,6 +127,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   form,
   heading,
   image,
+  "message-thread": messageThread,
   meter,
   progress,
   "prompt-input": promptInput,

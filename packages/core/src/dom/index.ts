@@ -234,6 +234,14 @@ export {
   selectionIndicator,
 } from "./selection-indicator"
 export {
+  atBottom,
+  observeTop,
+  type StickBehavior,
+  type StickController,
+  type StickOptions,
+  stickToBottom,
+} from "./stick-to-bottom"
+export {
   damp,
   lockAxis,
   measureRelease,
@@ -252,7 +260,7 @@ export {
   swipeDirectionOf,
   trackSwipe,
 } from "./swipe"
-export { hasTabbable, observeTabbable } from "./tabbable-content"
+export { hasTabbable, observeTabbable, TABBABLE } from "./tabbable-content"
 export { domTableMetrics } from "./table-metrics"
 export { isTextField, textFieldCaret } from "./text-field"
 export { textSelection } from "./text-selection"
