@@ -1,0 +1,58 @@
+/* ── Image Cropper: a rounded stage on the card colour, the crop outlined in white with a
+   brand ring on focus, round handles. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="image-cropper"][data-part="viewport"] {
+  border: max(var(--s-bw), 1px) solid var(--s-field-line);
+  border-radius: calc(var(--s-r) + 4px);
+  background: var(--s-muted);
+  box-shadow: var(--s-lift);
+  cursor: grab;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="viewport"][data-panning] {
+  cursor: grabbing;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="selection"] {
+  border: 2px solid var(--s-card);
+  box-shadow: 0 0 0 100vmax color-mix(in oklab, var(--s-ink) 50%, transparent);
+  cursor: move;
+  outline: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="selection"][data-shape="circle"] {
+  border-radius: 50%;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="selection"][data-focus-visible] {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="image-cropper"][data-part="grid"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="grid"][data-axis="horizontal"] {
+  border-block: 1px solid var(--s-card);
+  inset-block: 33.333%;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="grid"][data-axis="vertical"] {
+  border-inline: 1px solid var(--s-card);
+  inset-inline: 33.333%;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="handle"]::before {
+  content: "";
+  position: absolute;
+  inset: calc(50% - 7px);
+  border-radius: 999px;
+  background: var(--s-card);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="image-cropper"][data-part="handle"][data-disabled] {
+  display: none;
+}

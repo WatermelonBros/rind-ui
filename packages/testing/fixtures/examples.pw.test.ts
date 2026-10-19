@@ -331,6 +331,10 @@ const TRANSIENT = new Set([
   "message-thread:detached",
   // The second before the automatic close: the Live example.
   "reasoning:closing",
+  // While the user drags or a keyboard change waits to be announced; loading before layout.
+  "image-cropper:loading",
+  "image-cropper:dragging",
+  "image-cropper:settling",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
   // arrowing in the focused input (the suggestions popup; no prop opens it).
   "tags-input:typing",

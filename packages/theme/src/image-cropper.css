@@ -1,0 +1,105 @@
+/*
+ * Image Cropper (family: decoration): a neutral stage; outside the crop the image is dimmed by
+ * a large shadow tinted from the text colour; the crop has a light border, a thirds grid and
+ * square handles (12 px visible inside the 24 px hit area the connect sets); a circle shape.
+ * The crop area shows the focus ring; nothing animates while dragging.
+ */
+@layer rind.components {
+  :where([data-scope="image-cropper"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-space-3);
+  }
+
+  :where([data-scope="image-cropper"][data-part="viewport"]) {
+    inline-size: 100%;
+    block-size: var(--rind-image-cropper-height, 20rem);
+    border-radius: var(--rind-image-cropper-radius, var(--rind-radius-panel));
+    background: var(--rind-image-cropper-bg, var(--rind-color-surface));
+    cursor: grab;
+  }
+
+  :where([data-scope="image-cropper"][data-part="viewport"][data-panning]) {
+    cursor: grabbing;
+  }
+
+  :where([data-scope="image-cropper"][data-part="selection"]) {
+    border: 1px solid var(--rind-image-cropper-border, var(--rind-color-surface-raised));
+    box-shadow: 0 0 0 100vmax
+      color-mix(in oklab, var(--rind-color-text) var(--rind-image-cropper-dim, 55%), transparent);
+    cursor: move;
+    outline: none;
+  }
+
+  :where([data-scope="image-cropper"][data-part="selection"][data-shape="circle"]) {
+    border-radius: 50%;
+  }
+
+  :where([data-scope="image-cropper"][data-part="selection"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="image-cropper"][data-part="grid"]) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  :where([data-scope="image-cropper"][data-part="grid"][data-axis="horizontal"]) {
+    border-block: 1px solid var(--rind-image-cropper-border, var(--rind-color-surface-raised));
+    inset-block: 33.333%;
+  }
+
+  :where([data-scope="image-cropper"][data-part="grid"][data-axis="vertical"]) {
+    border-inline: 1px solid var(--rind-image-cropper-border, var(--rind-color-surface-raised));
+    inset-inline: 33.333%;
+  }
+
+  :where([data-scope="image-cropper"][data-part="handle"])::before {
+    content: "";
+    position: absolute;
+    inset: calc(50% - 6px);
+    border: 1px solid var(--rind-color-border-strong);
+    border-radius: 2px;
+    background: var(--rind-image-cropper-handle, var(--rind-color-surface-raised));
+  }
+
+  :where(
+    [data-scope="image-cropper"][data-part="handle"]:is([data-position="n"], [data-position="s"])
+  ) {
+    cursor: ns-resize;
+  }
+
+  :where(
+    [data-scope="image-cropper"][data-part="handle"]:is([data-position="e"], [data-position="w"])
+  ) {
+    cursor: ew-resize;
+  }
+
+  :where(
+    [data-scope="image-cropper"][data-part="handle"]:is([data-position="ne"], [data-position="sw"])
+  ) {
+    cursor: nesw-resize;
+  }
+
+  :where(
+    [data-scope="image-cropper"][data-part="handle"]:is([data-position="nw"], [data-position="se"])
+  ) {
+    cursor: nwse-resize;
+  }
+
+  :where([data-scope="image-cropper"][data-part="handle"][data-disabled]) {
+    display: none;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="image-cropper"][data-part="selection"]) {
+      border-color: Highlight;
+    }
+    :where([data-scope="image-cropper"][data-part="handle"])::before {
+      background: Canvas;
+      border-color: CanvasText;
+    }
+  }
+}
