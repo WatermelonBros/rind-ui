@@ -10,6 +10,7 @@ import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
 import * as calendar from "./calendar"
 import * as checkboxGroup from "./checkbox-group"
+import * as clipboard from "./clipboard"
 import * as codeBlock from "./code-block"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
@@ -103,6 +104,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   button,
   calendar,
   "checkbox-group": checkboxGroup,
+  clipboard,
   "code-block": codeBlock,
   collapsible,
   "color-picker": colorPicker,

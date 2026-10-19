@@ -740,6 +740,25 @@ function createDomEnv(
           input.dispatchEvent(new InputEvent("input", init))
         })
       },
+      async copySelection() {
+        const el = await waitFor()
+        await act(() => {
+          // jsdom has no ClipboardEvent: a cancelable copy Event (the component reads the
+          // selection, never clipboardData).
+          const copy =
+            typeof ClipboardEvent === "function"
+              ? new ClipboardEvent("copy", { bubbles: true, cancelable: true, composed: true })
+              : new Event("copy", { bubbles: true, cancelable: true, composed: true })
+          el.dispatchEvent(copy)
+        })
+      },
+      async selectRange(start, end) {
+        const el = await waitFor()
+        await act(() => {
+          ;(el as HTMLInputElement).setSelectionRange(start, end)
+          el.dispatchEvent(new Event("select", { bubbles: true }))
+        })
+      },
       async setFiles(specs) {
         const el = await waitFor()
         await act(() => {
