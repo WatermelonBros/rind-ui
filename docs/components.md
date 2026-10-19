@@ -36,7 +36,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Reado has TourCard/TourScrim |
 
-## Menus & navigation (11)
+## Menus & navigation (12)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -51,6 +51,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Steps | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo | Reka: Stepper |
 | Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Command Palette |  |  |  |  |  |  |  | ● |  | 1 | 2 | todo | Bits: Command · Dialog + filtered list, groups, shortcuts; Reado has Palette |
 
 ## Disclosure (2)
 
@@ -59,7 +60,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Collapsible | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC/HUI/Ariakit: Disclosure |
 | Accordion | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | RAC: DisclosureGroup |
 
-## Selection & collections (11)
+## Selection & collections (12)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -68,10 +69,11 @@ seen in docs or source but not confirmed as public, stable API.
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | done | RAC: TokenField (unverified) |
-| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree |
+| Drag and Drop / Sortable |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | RAC: useDragAndDrop · reorder lists and tabs, keyboard and AT drag; Reado has pointerReorder |
+| Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree · todo: drag and drop of nodes (a Tree View option, on top of Drag and Drop / Sortable; Reado file tree) |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark |
-| Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | Missing in Ark; data-grid semantics |
+| Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark; data-grid semantics |
 
 ## Boolean & toggles (4)
 
@@ -92,7 +94,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | done | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field; Password Input (`type="password"`, Radix: Password Toggle Field) and Search Field (`type="search"`) are its parts |
-| File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | todo | RAC: DropZone + FileTrigger · Kobalte: File Field |
+| File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | spec | RAC: DropZone + FileTrigger · Kobalte: File Field |
 | Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
 | Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
@@ -121,7 +123,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Color Picker | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | One component: area, channel sliders, hex and channel inputs (field), swatch group and swatches are its parts |
 | Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
 
-## Display & feedback (19)
+## Display & feedback (22)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -136,14 +138,17 @@ seen in docs or source but not confirmed as public, stable API.
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Zoom and pan, keyboard and pinch; Reado has ImageView |
+| Kbd |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Keyboard shortcut display, platform-aware modifiers; Reado has Kbd |
+| Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec |  |
 | QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
+| Timeline |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Ordered events list; Reado has TimelinePanel |
 
 ## AI-UI primitives (11)
 
