@@ -55,6 +55,7 @@ export {
 } from "./provider"
 export * from "./qr-code"
 export * from "./radio-group"
+export * from "./rating"
 export { type RenderProp, renderPart } from "./render"
 export * from "./scroll-area"
 export * from "./segmented-control"

@@ -1,0 +1,140 @@
+/* ── Rating: a row of stars. Each Item draws its star: ::before the outline (always there, so
+   an empty star reads by shape), ::after the solid star, whole for data-state full and from the
+   reading start for half. The Control carries the keyboard ring. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="root"] {
+  --s-rating-star: 32px;
+  --s-rating-fill: #b86e00; /* ≥3:1 on white: a full star covers its outline */
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="label"] {
+  font-weight: 600;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="control"] {
+  border-radius: 8px;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="control"][data-focus-visible] {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"] {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  inline-size: var(--s-rating-star);
+  block-size: var(--s-rating-star);
+  transition: scale 0.25s var(--s-pop);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::before,
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::before {
+  background: var(--s-field-line);
+  clip-path: polygon(
+    evenodd,
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%,
+    50% 0%,
+    43.2% 41.5%,
+    20.2% 41.5%,
+    38.8% 55.1%,
+    32% 76.2%,
+    50% 63.2%,
+    68% 76.2%,
+    61.2% 55.1%,
+    79.8% 41.5%,
+    56.8% 41.5%,
+    50% 19.8%,
+    43.2% 41.5%
+  );
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::after {
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+  transition: background-color 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="item"][data-state="full"]::after {
+  background: var(--s-rating-fill);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="item"][data-state="half"]::after {
+  background: linear-gradient(to right, var(--s-rating-fill) 50%, transparent 50%);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="item"][data-state="half"]:dir(rtl)::after {
+  background: linear-gradient(to left, var(--s-rating-fill) 50%, transparent 50%);
+}
+/* the preview: the brand colour, and the hovered stars lift a little */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="rating"][data-part="item"][data-previewed] {
+  --s-rating-fill: var(--s-brand);
+  scale: 1.06;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-readonly]:is([data-part="control"], [data-part="item"]) {
+  cursor: default;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-disabled]:is([data-part="control"], [data-part="item"]) {
+  cursor: not-allowed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="root"][data-disabled] {
+  opacity: 0.5;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="rating"][data-part="item"][data-invalid]::before {
+  background: #d62f4b;
+}
+
+/* crisp: an ink outline */
+[data-rind-theme="skin-crisp"] [data-scope="rating"][data-part="item"]::before {
+  background: var(--s-ink);
+}
+/* juicy: bigger, rounder stars */
+[data-rind-theme="skin-juicy"] [data-scope="rating"][data-part="root"] {
+  --s-rating-star: 36px;
+}
+
+@media (forced-colors: active) {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"] {
+    forced-color-adjust: none;
+    --s-rating-fill: Highlight;
+  }
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::before {
+    background: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"],
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="item"]::after {
+    transition: none;
+  }
+}

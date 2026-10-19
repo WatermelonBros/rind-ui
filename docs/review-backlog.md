@@ -363,3 +363,13 @@ verified at round 3 (2026-10-14).
 - warning: `replaceText` lives in dom/file-intake.ts. Move it to a text-edit module.
 - warning: a sync throw from onSubmit through `requestSubmit` is reported by the listener, not to the `control.submit()` caller.
 - 9.2: manual tier-1 AT pass and IME pass.
+
+## Rating (#172)
+
+- warning: some scenarios have no rendered test: the ring on the Control and the input after Tab (the dom test at :80 never presses Tab), focusing the carrier focuses the range input (the dom test at :238 asserts no focus), `aria-invalid` on the input, and `input`/`change` dispatch on the carrier for a rate vs a controlled change or a reset.
+- warning: rating.tsx `lastReason` is not cleared when a controlled parent refuses a change, so the parent's next programmatic change is reported to the Field as `user: true` with a commit.
+- warning: rating.tsx `onPointerUp` commits a macOS Control+click. Guard it with `isContextMenuClick(e, env.platform)`.
+- warning: rating.tsx `released` stays true when the click after a pointerup lands on an ancestor, which swallows the next bare AT click. Reset it on `pointerdown`.
+- warning: a clearing mouse press stays in `previewing` with the pressed star full until the pointer leaves. Drop the preview when a PRESS clears to 0.
+- warning: rating.contract.ts `as never` / `as number | undefined` casts have no soundness comment.
+- warning: on a controlled server render the range input has `value="0"` and the carrier `value=""` while `aria-valuenow` is the value, until hydration. The same pattern exists in Slider.

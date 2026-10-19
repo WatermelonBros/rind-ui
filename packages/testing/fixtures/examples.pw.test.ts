@@ -304,6 +304,8 @@ const TRANSIENT = new Set([
   "form:awaiting-server",
   "text-field:composing",
   "slider:dragging",
+  // A pointer hovering the stars: entered by the driver's `hover`.
+  "rating:previewing",
   "splitter:dragging",
   "color-area:dragging",
   "color-field:editing",
