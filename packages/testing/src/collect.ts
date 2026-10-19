@@ -20,6 +20,8 @@ export interface ElementInfo {
   /** Not visible: see `isVisible`. */
   readonly hidden: boolean
   readonly inAriaHidden: boolean
+  /** Inside a hidden copy (`aria-hidden` + `data-copy`): a Marquee's repeated content. */
+  readonly inCopy: boolean
   readonly inInert: boolean
   readonly focusable: boolean
   /** A grid cell (the roving focus target itself) holding a focusable descendant. */
@@ -308,6 +310,7 @@ export function collectDom(arg: {
     attrs: attrsOf(el),
     hidden: !isVisible(el),
     inAriaHidden: el.closest("[aria-hidden=true]") !== null,
+    inCopy: el.closest("[aria-hidden=true][data-copy]") !== null,
     inInert: el.closest("[inert]") !== null,
     focusable: focusable(el),
     focusableInside: roleOf(el) === "gridcell" && [...el.querySelectorAll("*")].some(focusable),

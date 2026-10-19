@@ -381,3 +381,9 @@ verified at round 3 (2026-10-14).
 - warning: the model tests cover the drag and reset edges only. The file events (add, remove, clear) are the DOM tests'. A model with file stories would map them.
 - warning: the Playwright fixture runs in Chromium only. Firefox and WebKit `filechooser` and drop paths are covered by the Vitest browser project.
 - 9.x: manual tier-1 AT pass (VoiceOver, NVDA) of the Trigger name and summary.
+## Marquee (add-marquee)
+
+- warning: the model does not check `idle`: any wait between steps may run the first frame's measurement, so the DOM leaves `idle` before the oracle's `measure` step. The machine tests cover `idle`.
+- warning: reduced motion is not a model configuration (it applies on mount, before the first step); the DOM tests cover it.
+- warning: the home band's Viewport is `aria-hidden` and the names are in the nav; check with the site that the PauseTrigger alone is a fine announcement there.
+- 8.x: manual tier-1 AT pass (VoiceOver, NVDA) of the copies and the PauseTrigger.

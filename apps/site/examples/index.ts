@@ -39,6 +39,7 @@ import * as label from "./label"
 import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
+import * as marquee from "./marquee"
 import * as menu from "./menu"
 import * as menubar from "./menubar"
 import * as messagesAndProvider from "./messages-and-provider"
@@ -93,6 +94,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "field-control": fieldControl,
   labels: labels,
   "visually-hidden": visuallyHidden,
+  marquee,
   menu,
   menubar,
   "navigation-menu": navigationMenu,

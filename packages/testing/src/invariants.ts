@@ -361,7 +361,10 @@ const hiddenFocus: GenericInvariant = (f) => {
       el.attrs["data-scope"] !== undefined &&
       el.attrs["data-part"] === "hidden-input" &&
       el.attrs["tabindex"] === "-1"
-    if (el.focusable && el.inAriaHidden && !el.hidden && !formInput) {
+    // A hidden copy (Marquee) stays clickable by design (not inert), so its links are
+    // focusable by pointer; what it must not be is a tab stop.
+    const copy = el.inCopy && el.attrs["tabindex"] === "-1"
+    if (el.focusable && el.inAriaHidden && !el.hidden && !formInput && !copy) {
       out.push(`${el.describe} is focusable inside aria-hidden`)
     }
   }

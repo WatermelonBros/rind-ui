@@ -19,6 +19,7 @@ const el = (part: string | null, id: string, rect: Rect, attrs: Record<string, s
     attrs,
     hidden: false,
     inAriaHidden: false,
+    inCopy: false,
     inInert: false,
     focusable: false,
     focusableInside: false,

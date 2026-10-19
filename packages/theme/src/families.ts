@@ -193,6 +193,7 @@ export const familyMatrix = [
       "code-block",
       "splitter",
       "table",
+      "marquee",
     ],
     variants: [],
     size: "none",
