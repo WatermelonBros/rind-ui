@@ -1,0 +1,6 @@
+- text: Message
+- textbox "Message":
+  - /placeholder: Ask anything
+  - text: Next question
+- button "Attach files"
+- button "Stop response"

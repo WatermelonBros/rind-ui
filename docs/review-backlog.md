@@ -264,6 +264,15 @@ See CLAUDE.md "Review rules".
 | add-menu (r1) | — | packages/testing/src/components/menu.dom.test.tsx | "Dialog from an item" checks the focus only after a keyboard choose: add a pointer variant |
 | add-menu (r1) | — | packages/core/src/components/menu/menu.connect.ts | arrow keys read the direction from `env.locale` while the portalled positioner reads the trigger's DOM `dir` |
 | add-menu (r1) | — | openspec/changes/add-menu/specs/menu/spec.md:616 | the content orientation text (`aria-orientation` only for horizontal) needs rewording |
+| add-prompt-input (pending) | — | docs/accessibility/tested-with.json | Manual tier-1 pass on real AT and the IME pass (macOS Japanese/Chinese/Korean, MS-IME, Fcitx5, Gboard), recorded in "Tested with" (task 9.2) |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.contract.ts | No `paste(files)` / `drop(files)` contract actions (the environment has no file paste or drop): browser scenario tests cover them |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.connect.ts | History in a multi-line draft: browsing recalled entries steps on any caret, so ArrowUp inside a recalled multi-line prompt recalls instead of moving the caret; step only from the first / last line |
+| add-prompt-input (r1) | — | openspec/changes/add-prompt-input/specs/prompt-input/spec.md | Touch focus: a press on AttachmentRemove keeps focus off the Textarea on touch (`input-chips`), the spec's focus rule does not say so |
+| add-prompt-input (r1) | — | packages/core/src/dom/file-intake.ts | A file copied in a file manager pastes as `text/plain` (its name) plus the file: text wins, so it is not attached |
+| add-prompt-input (r1) | — | packages/react/src/prompt-input/prompt-input.tsx | `props as never` into `useMachine`: say why the cast is sound (or type the machine props) |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.connect.ts | The connect view's documentation (top of the file) does not list which values are derived here and which come from the adapter |
+| add-prompt-input (r1) | — | packages/core/src/components/prompt-input/prompt-input.contract.ts | RECALL from `stopped` is a model skip: after a pointer stop the jsdom walk's keyboard recall finds the Textarea without `data-focus-visible` although a real Tab turns the ring on |
+| add-prompt-input (r1) | — | packages/react/src/prompt-input/prompt-input.tsx | Inside an enclosing Field the over-limit state is not reported to that Field (the Root's own Field gets `invalid`); `aria-invalid` still follows the limit |
 
 ## Site: open items (docs-site handoff, 2026-10-18)
 
@@ -319,3 +328,11 @@ verified at round 3 (2026-10-14).
 - 3.1 / 6.3: virtualization (`aria-rowcount`/`aria-rowindex`), plus a virtualized fixture and measured spatial moves in three columns.
 - 4.3: React tests for Strict Mode, SSR + hydration tab stop, nested Tag Group, static vs data items.
 - 6.4: virtual screen-reader reading-order test.
+
+## add-prompt-input: verification (2026-10-18)
+
+- warning: `settleSend` clears `snapshot` only when `context.pending` is set. A send with no promise and no `status` keeps the pasted image blobs until the next submit. Also clear it when `props.status === undefined`.
+- warning: the DOM test presses Stop only once. Add a second press in `stopped` (or a `detail: 2` click) and assert that `onStop` is still called once.
+- warning: `replaceText` lives in dom/file-intake.ts. Move it to a text-edit module.
+- warning: a sync throw from onSubmit through `requestSubmit` is reported by the listener, not to the `control.submit()` caller.
+- 9.2: manual tier-1 AT pass and IME pass.

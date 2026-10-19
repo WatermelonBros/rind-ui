@@ -86,6 +86,15 @@ export interface PointerStepOptions {
   readonly pointerType?: "mouse" | "pen" | "touch"
 }
 
+/** A file a test hands to a file input (serialisable: it crosses into a Playwright page). */
+export interface FileSpec {
+  readonly name: string
+  /** MIME type. */
+  readonly type: string
+  /** The file's text content. */
+  readonly content: string
+}
+
 export interface DragOptions {
   /** Default "mouse". */
   readonly pointerType?: "mouse" | "pen" | "touch"
@@ -160,6 +169,11 @@ export interface Part {
    * either was prevented, the native insertion and its `input` event. No OS clipboard.
    */
   paste(text: string): Promise<void>
+  /**
+   * Selects `files` in a native `<input type="file">` (what the OS file chooser does): the
+   * input's `files` set, then bubbling `input` and `change`.
+   */
+  setFiles(files: readonly FileSpec[]): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */

@@ -24,6 +24,9 @@ export type IconName =
   | "arrow-left"
   | "arrow-right"
   | "copy"
+  | "arrow-up"
+  | "stop"
+  | "paperclip"
 
 /** Icon components by name, as accepted by `RindProvider icons`. */
 export type RindIcons = Partial<Record<IconName, ComponentType>>

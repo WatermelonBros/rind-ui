@@ -33,6 +33,14 @@ export { type ElementInfo, elementInfo } from "./element-info"
 export { isEyeDropperSupported, pickScreenColor } from "./eye-dropper"
 export { type FieldsetScope, legendScope, scopeDisabled } from "./fieldset-context"
 export { isFieldsetDisabled, watchFieldsetDisabled } from "./fieldset-disabled"
+export {
+  dragHasFiles,
+  dragLeftRoot,
+  filesFromClipboard,
+  filesFromDrop,
+  replaceText,
+  syncFileInput,
+} from "./file-intake"
 export { focusPast } from "./focus-past"
 export { captureFocus, type FocusReturn } from "./focus-restore"
 export { focusSafely } from "./focus-safely"
@@ -117,7 +125,7 @@ export {
 } from "./live-announcer"
 export { describedByHint, longPressMessages } from "./long-press"
 export { modalityTracker } from "./modality"
-export { motionPreference } from "./motion"
+export { motionPreference, pointerPreference } from "./motion"
 export { type NonModalTabOrderOptions, trackNonModalTabOrder } from "./non-modal-tab-order"
 export { type OverflowWatch, overflows, watchOverflow } from "./overflow"
 export { type OverlayEffectOptions, overlayEffect } from "./overlay"

@@ -1,0 +1,314 @@
+/* ── Prompt Input: a chat composer card; the draft on top, attach · count · send below ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="root"] {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  inline-size: min(100%, 36rem);
+  padding: 12px 12px 10px 16px;
+  border: max(var(--s-bw), 1px) solid var(--s-field-line);
+  border-radius: calc(var(--s-r) + 4px);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 500 16px var(--s-font);
+  box-shadow: var(--s-lift);
+  cursor: text;
+  transition:
+    box-shadow 0.3s var(--s-ease),
+    border-color 0.2s;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="root"][data-focus] {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+  box-shadow: var(--s-lift-hi);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="root"][data-dragging] {
+  outline: 3px dashed var(--s-acc);
+  outline-offset: 2px;
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="root"][data-over-limit] {
+  border-color: var(--s-error);
+  box-shadow: inset 0 0 0 1px var(--s-error);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="label"] {
+  flex-basis: 100%;
+  font-weight: 650;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  opacity: 0.8;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="description"] {
+  flex-basis: 100%;
+  order: 10;
+  margin: 2px 0 0;
+  font-size: 13px;
+  opacity: 0.86;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="textarea"] {
+  box-sizing: border-box;
+  flex: 1 1 100%;
+  min-inline-size: 0;
+  min-block-size: 1lh;
+  max-block-size: 10lh;
+  margin: 0;
+  padding: 4px 2px 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.5;
+  field-sizing: content;
+  resize: none;
+  overflow-y: auto;
+  outline: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="textarea"]::placeholder {
+  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"]) {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 38px;
+  block-size: 38px;
+  padding: 0;
+  border: var(--s-bw) solid transparent;
+  border-radius: 99px;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    translate 0.35s var(--s-ease),
+    scale 0.35s var(--s-pop),
+    background 0.2s,
+    box-shadow 0.35s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="attach-trigger"] {
+  margin-inline-start: -6px;
+  background: transparent;
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="attach-trigger"]:hover:not(:disabled) {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="character-count"] {
+  margin-inline-start: auto;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="character-count"][data-over-limit] {
+  color: var(--s-error);
+  font-weight: 700;
+  opacity: 1;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="submit"] {
+  margin-inline-start: auto;
+  border-color: var(--s-line);
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="character-count"]
+  ~ [data-part="submit"] {
+  margin-inline-start: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="submit"]:hover:not([data-disabled]) {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="submit"]:active:not([data-disabled]) {
+  translate: 0 1px;
+  scale: 0.94;
+  box-shadow: none;
+}
+/* Stop: the accent key, so the change of action is seen, not only the glyph. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="prompt-input"][data-part="submit"][data-action="stop"] {
+  background: var(--s-acc);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"]):focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="submit"][data-action="stop"]:focus-visible {
+  outline-color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="chips"] {
+  display: flex;
+  flex-wrap: wrap;
+  flex-basis: 100%;
+  gap: 6px;
+  cursor: default;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="chip"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-inline-size: 100%;
+  padding-inline-start: 10px;
+  border: max(var(--s-bw), 1px) solid var(--s-field-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-muted);
+  font-size: 14px;
+  font-weight: 550;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip"]::before {
+  content: "" / "";
+  inline-size: 8px;
+  block-size: 8px;
+  margin-inline-end: 6px;
+  border-radius: 2px;
+  background: var(--s-acc);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip"][data-pending] {
+  border-style: dashed;
+  opacity: 0.75;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip"][data-pending]::before {
+  background: transparent;
+  border: 2px solid var(--s-acc);
+  border-radius: 99px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip"][data-highlighted] {
+  outline: 3px solid var(--s-acc);
+  outline-offset: 1px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="chip-text"] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip-remove"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip-remove"]:hover {
+  background: color-mix(in oklab, var(--s-ink) 10%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chip-remove"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: -2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="chips-summary"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* crisp: hard edges, the ink shadow lifts the card */
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+[data-scope="prompt-input"][data-part="root"] {
+  border-radius: var(--s-r);
+}
+:is([data-skin="crisp"], [data-rind-theme="skin-crisp"])
+  [data-scope="prompt-input"][data-part="submit"] {
+  border-radius: var(--s-r-sm);
+}
+/* juicy: soft and bouncy; the field edge stays 3:1 */
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+[data-scope="prompt-input"][data-part="root"] {
+  border-width: 2px;
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="prompt-input"][data-part="submit"] {
+  box-shadow: 0 4px 0 var(--s-brand-deep);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="prompt-input"][data-part="chip"] {
+  border-radius: 99px;
+}
+/* bare: a quiet field with a neutral key */
+:is([data-skin="bare"], [data-rind-theme="skin-bare"])
+[data-scope="prompt-input"][data-part="root"][data-focus] {
+  outline-width: 2px;
+}
+
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="prompt-input"][data-part="field"] {
+  display: contents;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="prompt-input"][data-part="error-message"] {
+  flex-basis: 100%;
+  order: 11;
+  margin: 0;
+  font-size: 13px;
+  color: var(--s-error);
+}
+
+/* ── the chat example: a short log above the composer ── */
+.chat {
+  display: grid;
+  gap: 14px;
+  inline-size: min(100%, 36rem);
+}
+.chat-log {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chat-log:empty {
+  display: none;
+}
+.chat-log li {
+  max-inline-size: 85%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.chat-log li[data-role="user"] {
+  justify-self: end;
+  background: color-mix(in oklab, currentColor 12%, transparent);
+}
+.chat-log li[data-role="assistant"] {
+  justify-self: start;
+  border: 1px solid color-mix(in oklab, currentColor 22%, transparent);
+}
+.chat-log li[data-role="assistant"]:empty::after {
+  content: "…";
+}
+.chat-files {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+}

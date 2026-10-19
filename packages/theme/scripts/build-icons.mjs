@@ -26,6 +26,9 @@ const NAMES = [
   "arrow-left",
   "arrow-right",
   "copy",
+  "arrow-up",
+  "stop",
+  "paperclip",
 ]
 
 const args = process.argv.slice(2)
