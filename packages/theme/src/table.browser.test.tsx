@@ -124,6 +124,27 @@ describe("Table stylesheet", () => {
     expect(new Set(shapes).size).toBe(3)
   })
 
+  it("pinned cells stick at their edge; the expanded frame covers the viewport", () => {
+    sheet()
+    const host = mount(`
+      <div ${a("frame", "data-expanded")}>
+        <div ${a("header")}><button type="button" ${a("expand-trigger", "data-expanded")}></button></div>
+        <div ${a("root")}><table ${a("table")}><tbody><tr ${a("row")}>
+          <td ${a("cell")} data-pinned="start" style="--rind-table-pin-offset: 40px">a</td>
+          <td ${a("cell")} data-pinned="end" style="--rind-table-pin-offset: 0px">b</td>
+        </tr></tbody></table></div>
+      </div>`)
+    const start = getComputedStyle(q(host, '[data-pinned="start"]'))
+    expect(start.position).toBe("sticky")
+    expect(start.insetInlineStart).toBe("40px")
+    expect(getComputedStyle(q(host, '[data-pinned="end"]')).insetInlineEnd).toBe("0px")
+    const frame = getComputedStyle(q(host, '[data-part="frame"]'))
+    expect(frame.position).toBe("fixed")
+    const trigger = q(host, '[data-part="expand-trigger"]').getBoundingClientRect()
+    expect(trigger.width).toBeGreaterThanOrEqual(24)
+    expect(trigger.height).toBeGreaterThanOrEqual(24)
+  })
+
   it("forced colors use system colours; logical directions only", () => {
     expect(table).toMatch(/@media \(forced-colors: active\)[\s\S]*CanvasText[\s\S]*Highlight/)
     expect(table).not.toMatch(/(margin|padding|border|inset)-(left|right)\b/)

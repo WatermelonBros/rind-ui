@@ -4,7 +4,7 @@
 // follows the Scroll Area rule from discrete measurements a DOM capability sends.
 
 import type { Modality } from "../../contract/env"
-import type { AnnouncerEnv } from "../../env/capabilities"
+import type { AnnouncerEnv, SchedulerEnv } from "../../env/capabilities"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
 import type { AxisFlags, EdgeFlags } from "../scroll-area/scroll-area.machine"
@@ -35,6 +35,10 @@ export type TableEvent =
       readonly tabbable: boolean
     }
   | { readonly type: "ROOT.FOCUS" | "ROOT.BLUR" }
+  /** `rowCount` or `rowRange` changed (onProps): announced after a quiet period. */
+  | { readonly type: "ROWS.CHANGED" }
+  /** A RowTrigger: open or close the row's details. */
+  | { readonly type: "ROW.TOGGLE"; readonly row: string }
 
 /** What the measuring effect reaches the DOM through (injected; faked in tests). */
 export interface TableMetricsCapability {
@@ -59,7 +63,47 @@ export interface TableProps {
     | undefined
   /** A press on the sorted column at the opposite of its first direction clears the sort. */
   readonly allowUnsorted?: boolean | undefined
+  /** Column ids pinned at the inline start and end edges (controllable). */
+  readonly pinnedColumns?: PinnedColumns | undefined
+  readonly defaultPinnedColumns?: PinnedColumns | undefined
+  readonly onPinnedColumnsChange?:
+    | ((pinned: PinnedColumns, details: ChangeDetails<TableEvent>) => void)
+    | undefined
+  /** Row ids whose details are open (controllable). */
+  readonly expandedRows?: readonly string[] | undefined
+  readonly defaultExpandedRows?: readonly string[] | undefined
+  readonly onExpandedRowsChange?:
+    | ((rows: readonly string[], details: ChangeDetails<TableEvent>) => void)
+    | undefined
+  /** Several rows open at once (default); `false`: opening one closes the others. */
+  readonly multiple?: boolean | undefined
+  /** The rows the consumer shows (after filters): announced when it changes. */
+  readonly rowCount?: number | undefined
+  /** With pagination: the rows shown of the total, announced instead of the count. */
+  readonly rowRange?: RowRange | undefined
 }
+
+export interface PinnedColumns {
+  readonly start: readonly string[]
+  readonly end: readonly string[]
+}
+
+export interface RowRange {
+  readonly from: number
+  readonly to: number
+  readonly total: number
+}
+
+const samePinned = (a: PinnedColumns, b: PinnedColumns) =>
+  a.start.length === b.start.length &&
+  a.end.length === b.end.length &&
+  a.start.every((c, i) => b.start[i] === c) &&
+  a.end.every((c, i) => b.end[i] === c)
+const sameRange = (a: RowRange | undefined, b: RowRange | undefined) =>
+  a === b || (!!a && !!b && a.from === b.from && a.to === b.to && a.total === b.total)
+
+/** The quiet period before a changed row count is announced (typing announces once). */
+export const ROW_COUNT_QUIET_MS = 400
 
 export interface TableContext {
   /** A controlled proposal not yet answered, with the column's text for the announcement. */
@@ -76,9 +120,9 @@ export interface TableContext {
 type Types = {
   props: TableProps
   events: TableEvent
-  env: AnnouncerEnv & TableMetricsEnv
+  env: AnnouncerEnv & SchedulerEnv & TableMetricsEnv
   context: TableContext
-  values: "sort"
+  values: "sort" | "pinnedColumns" | "expandedRows"
 }
 type Args = ActionArgs<Types>
 
@@ -140,11 +184,38 @@ export const tableMachine = setup({
       set("tabbableContent", event.tabbable)
       set("tabStop", tableTabStopRule(next) || (context.focused && context.tabStop))
     },
+    toggleRow: ({ event, props, values, set }) => {
+      if (event.type !== "ROW.TOGGLE") return
+      const open = values.expandedRows
+      const next = open.includes(event.row)
+        ? open.filter((r) => r !== event.row)
+        : props.multiple === false
+          ? [event.row]
+          : [...open, event.row]
+      set("expandedRows", next)
+    },
+    announceRows: ({ env, props }) => {
+      const message = props.rowRange
+        ? props.messages.rowRange(props.rowRange.from, props.rowRange.to, props.rowRange.total)
+        : props.rowCount !== undefined
+          ? props.messages.rowCount(props.rowCount)
+          : null
+      if (message === null) return
+      env.announcer.announce({
+        message,
+        priority: "polite",
+        key: `table-rows-${props.root}`,
+        ...(props.lang === undefined ? {} : { lang: props.lang }),
+      })
+    },
     rootFocus: ({ set }) => set("focused", true),
     rootBlur: ({ context, set }) => {
       set("focused", false)
       set("tabStop", tableTabStopRule(context))
     },
+  },
+  delays: {
+    quiet: () => ROW_COUNT_QUIET_MS,
   },
   effects: {
     prepareAnnouncer: ({ env }) => env.announcer.prepare(),
@@ -164,9 +235,18 @@ export const tableMachine = setup({
     tabStop: false,
   }),
   // By content: the React Root wraps the descriptor in a new box per render.
-  values: { sort: { fallback: { value: null }, equal: sameBox } },
+  values: {
+    sort: { fallback: { value: null }, equal: sameBox },
+    pinnedColumns: { fallback: { start: [], end: [] }, equal: samePinned },
+    expandedRows: {
+      fallback: [],
+      equal: (a, b) => a.length === b.length && a.every((r, i) => b[i] === r),
+    },
+  },
   onProps: {
     sort: { event: "SORT.SYNCED", equal: (a, b) => a === b || (!!a && !!b && sameBox(a, b)) },
+    rowCount: "ROWS.CHANGED",
+    rowRange: { event: "ROWS.CHANGED", equal: sameRange },
   },
   effects: ["prepareAnnouncer", "track"],
   on: {
@@ -176,8 +256,16 @@ export const tableMachine = setup({
     MEASURED: { actions: ["measured"] },
     "ROOT.FOCUS": { actions: ["rootFocus"] },
     "ROOT.BLUR": { actions: ["rootBlur"] },
+    "ROW.TOGGLE": { actions: ["toggleRow"] },
   },
-  states: { idle: {} },
+  states: {
+    idle: { on: { "ROWS.CHANGED": "counting" } },
+    // A change restarts the quiet period; the last count is announced once.
+    counting: {
+      after: { quiet: { target: "idle", actions: ["announceRows"] } },
+      on: { "ROWS.CHANGED": { target: "counting", reenter: true } },
+    },
+  },
 })
 
 export type TableMachine = typeof tableMachine

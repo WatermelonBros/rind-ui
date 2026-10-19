@@ -153,3 +153,265 @@
     forced-color-adjust: none;
   }
 }
+
+/* ── Data table: the Frame is the card. Header row (title left, tools right), the table, and a
+   Footer row (pagination). The card clips its corners: the last row it holds gets the radius,
+   the Footer when there is one, else the table's last row. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="frame"] {
+  display: flex;
+  flex-direction: column;
+  inline-size: min(100%, 560px);
+  overflow: hidden;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift);
+}
+/* Inside the card the table is flat: the card draws the edge. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="frame"]
+  > [data-scope="table"][data-part="root"] {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  max-block-size: 360px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"]:is([data-part="header"], [data-part="footer"]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+  padding: 12px 16px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="footer"] {
+  border-block-start: 1px solid color-mix(in oklab, var(--s-ink) 14%, transparent);
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="title"] {
+  font-weight: 750;
+  font-size: 16px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .data-table-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  .data-table-tools
+  [data-scope="text-field"][data-part="root"] {
+  margin: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  .data-table-tools
+  [data-scope="text-field"][data-part="input"][type="search"] {
+  inline-size: 210px;
+  max-inline-size: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="frame"][data-expanded] {
+  position: fixed;
+  inset: 16px;
+  z-index: 60;
+  inline-size: auto;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="frame"][data-expanded]
+  > [data-part="root"] {
+  flex: 1;
+  max-block-size: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"]:is([data-part="expand-trigger"], [data-part="filter-trigger"]) {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 36px;
+  min-block-size: 36px;
+  padding: 0 8px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  cursor: pointer;
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="filter-trigger"] {
+  min-inline-size: 28px;
+  min-block-size: 28px;
+  padding: 0 4px;
+  border-width: 0;
+  box-shadow: none;
+  background: transparent;
+  vertical-align: middle;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="filter-trigger"][data-active] {
+  background: var(--s-acc);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"]:is(
+    [data-part="expand-trigger"],
+    [data-part="filter-trigger"]
+  ):focus-visible {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="column-header"]:has([data-part="filter-trigger"]) {
+  white-space: nowrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="column-header"]:has([data-part="filter-trigger"])
+  > [data-part="sort-trigger"] {
+  display: inline-flex;
+  inline-size: auto;
+  padding-inline-end: 4px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="sort-indicator"]:not(:empty) {
+  clip-path: none;
+  background: none;
+  inline-size: auto;
+  block-size: auto;
+  opacity: 0.45;
+  display: inline-grid;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="sort-indicator"]:not(:empty):not([data-direction="none"]) {
+  opacity: 1;
+}
+/* Pinned columns: opaque, sticky at their edge; a divider while content scrolls under them. */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"] [data-pinned] {
+  position: sticky;
+  z-index: 1;
+  background: var(--s-card);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"] [data-pinned="start"] {
+  inset-inline-start: var(--rind-table-pin-offset, 0);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"] [data-pinned="end"] {
+  inset-inline-end: var(--rind-table-pin-offset, 0);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="head"]
+  [data-scope="table"][data-pinned] {
+  z-index: 3;
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="root"][data-overflow-x-start]
+  [data-pinned="start"][data-pinned-edge] {
+  box-shadow: 8px 0 8px -8px color-mix(in oklab, var(--s-ink) 35%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="root"][data-overflow-x-end]
+  [data-pinned="end"][data-pinned-edge] {
+  box-shadow: -8px 0 8px -8px color-mix(in oklab, var(--s-ink) 35%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .data-table .status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  border: 1px solid var(--s-line);
+  font-size: 12.5px;
+  font-weight: 650;
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .data-table .status[data-status="done"] {
+  background: color-mix(in oklab, var(--s-acc) 30%, var(--s-card));
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="filter-content"].filter-panel {
+  padding: 14px 16px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift);
+}
+
+/* Expandable rows: a chevron that turns while open; the details sit on the muted surface. */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="row-trigger"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-trigger"]:hover {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-trigger"]:focus-visible {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-trigger"]:empty::before {
+  content: "";
+  inline-size: 16px;
+  block-size: 16px;
+  background: currentColor;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  transition: rotate 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-trigger"][data-expanded]:empty::before {
+  rotate: 90deg;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="row-details"] > td {
+  padding: 14px 16px;
+  /* From the outer table's visible width (a nested table writes its own on its Root). */
+  --_details-width: calc(var(--rind-table-viewport-width, 100%) - 32px);
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-details"]
+  [data-scope="table"][data-part="root"] {
+  max-block-size: none;
+  box-shadow: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .detail-card {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 12px 14px;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="table"][data-part="row-trigger"]:empty::before {
+    transition: none;
+  }
+}
+
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"][data-part="row-details"]
+  > td
+  > * {
+  position: sticky;
+  inset-inline-start: 16px;
+  box-sizing: border-box;
+  max-inline-size: var(--_details-width, 100%);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table"]
+  td:has(> [data-part="row-trigger"]:only-child) {
+  inline-size: 1%;
+  white-space: nowrap;
+}

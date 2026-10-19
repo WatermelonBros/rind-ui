@@ -154,3 +154,92 @@ describe("Table scroll container", () => {
     expect(root().hasAttribute("data-overflow-x-start")).toBe(false)
   })
 })
+
+// table-columns-and-toolbar "Pinned Columns": measured offsets, both edges, right to left.
+function Pinned({ dir }: { readonly dir?: "rtl" }) {
+  const cols = ["select", "name", "a", "b", "c", "d", "e", "actions"]
+  return (
+    <RindProvider>
+      <Table.Root
+        dir={dir}
+        pinnedColumns={{ start: ["select", "name"], end: ["actions"] }}
+        style={{ inlineSize: 320, overflow: "auto" }}
+        data-testid="pinned"
+      >
+        <Table.Table style={{ borderSpacing: 0 }}>
+          <Table.Caption>Pinned</Table.Caption>
+          <Table.Head>
+            <Table.Row>
+              {cols.map((c) => (
+                <Table.ColumnHeader
+                  key={c}
+                  id={c}
+                  style={{ minInlineSize: 90, background: "white" }}
+                >
+                  {c}
+                </Table.ColumnHeader>
+              ))}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {[0, 1].map((r) => (
+              <Table.Row key={r}>
+                {cols.map((c) => (
+                  <Table.Cell
+                    key={c}
+                    style={{ whiteSpace: "nowrap", paddingInline: 30, background: "white" }}
+                  >
+                    {c}
+                    {r}
+                  </Table.Cell>
+                ))}
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Table>
+      </Table.Root>
+    </RindProvider>
+  )
+}
+
+/** The theme's rule for pinned cells (the component writes the flags and the offsets). */
+const PIN_CSS = `
+[data-scope="table"] [data-pinned="start"] { position: sticky; inset-inline-start: var(--rind-table-pin-offset, 0); z-index: 1 }
+[data-scope="table"] [data-pinned="end"] { position: sticky; inset-inline-end: var(--rind-table-pin-offset, 0); z-index: 1 }`
+
+describe("Table pinned columns", () => {
+  for (const dir of [undefined, "rtl"] as const) {
+    it(`pinned cells stay at their edges while scrolled (${dir ?? "ltr"})`, async () => {
+      const style = document.createElement("style")
+      style.textContent = PIN_CSS
+      document.head.append(style)
+      try {
+        render(<Pinned {...(dir ? { dir } : {})} />)
+        const r = screen.getByTestId("pinned")
+        await expect.poll(() => r.querySelectorAll('tbody [data-pinned="start"]').length).toBe(4)
+        const cell = (row: number, col: number) =>
+          r.querySelectorAll("tbody tr")[row]?.children[col] as HTMLElement
+        expect(cell(0, 7).getAttribute("data-pinned")).toBe("end")
+        expect(cell(0, 1).hasAttribute("data-pinned-edge")).toBe(true)
+        // The second start column is offset by the first one's width.
+        const firstWidth = (r.querySelector("thead th") as HTMLElement).offsetWidth
+        expect(cell(1, 1).style.getPropertyValue("--rind-table-pin-offset")).toBe(`${firstWidth}px`)
+        r.scrollLeft = dir === "rtl" ? -(r.scrollWidth / 2) : r.scrollWidth / 2
+        await new Promise<void>((done) => requestAnimationFrame(() => done()))
+        const box = r.getBoundingClientRect()
+        const start = cell(1, 0).getBoundingClientRect()
+        const end = cell(1, 7).getBoundingClientRect()
+        if (dir === "rtl") {
+          expect(Math.abs(start.right - box.right)).toBeLessThan(3)
+          expect(Math.abs(end.left - box.left)).toBeLessThan(3)
+        } else {
+          expect(Math.abs(start.left - box.left)).toBeLessThan(3)
+          expect(Math.abs(end.right - (box.left + r.clientWidth))).toBeLessThan(3)
+        }
+        expect(r.style.getPropertyValue("--rind-table-pinned-start-width")).not.toBe("0px")
+      } finally {
+        style.remove()
+      }
+    })
+  }
+})

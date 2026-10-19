@@ -29,6 +29,11 @@ const NAMES = [
   "arrow-up",
   "stop",
   "paperclip",
+  "caret-up-down",
+  "funnel",
+  "funnel-simple",
+  "arrows-out",
+  "arrows-in",
 ]
 
 const args = process.argv.slice(2)

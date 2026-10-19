@@ -466,3 +466,48 @@ measured offsets; a `FilterTrigger` per column composing Popover, with `filterIt
 `facetValues`; sort and filter indicators that take any node per state; a table header area
 (`Table.Header`, outside the scroll container) for a search field, actions and a full-page
 toggle; `sortItems` comparators per column; a TanStack recipe in the docs.
+
+## Columns, filters and the table's header (2026-10-19, for `table-columns-and-toolbar`)
+
+Requested by the user: pinned columns at either edge, a filter icon per column opening a
+popover, sort icons that change with the state, a header above the table for controls (a
+search field, a full-page view, actions), and pagination. Everything customisable; the site
+shows the most the component can do.
+
+**Pinned columns.** TanStack keeps `{ start: string[], end: string[] }` and computes offsets
+from fixed column sizes. Native auto layout has no fixed sizes, so offsets are measured: the
+leaf header cells (last head row) of pinned columns are measured, and every cell at the same
+visual column gets `position: sticky` plus an inline-start (or -end) offset, written by the
+measuring module as a CSS variable. RA#10518 (sticky column breaks under virtualization) does
+not apply: native layout. Grouped headers spanning a pinned and an unpinned column are not
+pinned (documented). The scroll padding includes the pinned widths at each edge, so focus is
+never hidden under them (WCAG 2.4.11).
+
+**Filter in a header.** Two lessons: a header's accessible name must stay its text
+(MUI-X#19239: "ID 1 active filter Sort"), and filter controls must stay reachable with no rows
+(RA#10121). So the column header carries `aria-label` set to its text when it holds controls;
+the filter trigger is a separate button named "Filter {column}" (`messages.filter`), with
+`aria-haspopup="dialog"`, `aria-expanded`, and, while the column is filtered, a description
+("Filtered") and `data-active`. The popover is the Popover component re-scoped to `table`
+(as the Date Field picker re-scopes it), so dismissal, focus and nesting come for free.
+
+**Icons by state.** SortIndicator takes a node per direction (`ascending`, `descending`,
+`none` props), falls back to the provider's icons (`caret-up`, `caret-down`, a new
+`caret-up-down`), then to the theme's CSS shapes. FilterIndicator takes `active` / `children`.
+
+**The table's header and full page.** The Root must stay the scroller with the table as its
+only child, so controls live in a new outer part, `Table.Frame`, holding `Table.Header`,
+the Root and `Table.Footer`. Full page is a controllable `expanded` on the Frame: the Frame
+covers the viewport as a modal layer (the overlay stack: outside inert, scroll locked, Escape
+exits, focus stays inside), `role="dialog"` with `aria-modal` named by the caption while
+expanded only. `Table.ExpandTrigger` is a toggle button (`aria-pressed`). No Fullscreen API:
+it is refused in iframes and on iOS for non-video elements, and it changes the window.
+
+**Search and result counts.** The search field is the consumer's Text Field in the Header;
+`filterItems(items, { filters, query, getValue })` does the work. When the number of rows the
+consumer passes (`rowCount` on the Root) changes after mount, the count is announced politely
+("12 rows", `messages.rowCount`), debounced on the scheduler so typing announces once.
+
+**Pagination.** The Pagination component in the Footer; `paginateItems(items, page,
+pageSize)`; the page change keeps focus on the pagination control and the row-count
+announcement covers the new page ("Rows 11 to 20 of 87").

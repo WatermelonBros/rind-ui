@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { platforms } from "../../dom/platform"
 import { quirkActive } from "../../dom/quirks"
-import { type TableConnectInput, tableConnect } from "./table.connect"
+import { type TableConnectInput, tableConnect, tableFrameConnect } from "./table.connect"
 import { tableContract } from "./table.contract"
 import { tableMachine } from "./table.machine"
 import { tableMessages } from "./table.messages"
@@ -22,6 +22,8 @@ const input = (over: Partial<TableConnectInput> = {}): TableConnectInput => ({
   captionId: "cap",
   tableLabel: undefined,
   describeSort: true,
+  pinned: { start: ["name"], end: [] },
+  expandedRows: ["r1"],
   ...over,
 })
 
@@ -56,18 +58,101 @@ describe("table meta matches the code", () => {
       head: a.head(),
       body: a.body(),
       foot: a.foot(),
-      row: a.row(),
-      "column-header": a.columnHeader({ sortable: "name" }),
+      row: a.row("r1"),
+      "row-trigger": a.rowTrigger("r1", {
+        text: "R",
+        named: false,
+        focused: true,
+        modality: "keyboard",
+      }),
+      "row-details": a.rowDetails("r1"),
+      "column-header": a.columnHeader({ column: "name", sortable: true }),
       "row-header": a.rowHeader({}),
       cell: a.cell(),
       "sort-trigger": a.sortTrigger("name", { focused: true, modality: "keyboard" }),
       "sort-indicator": a.sortIndicator("name"),
       empty: a.empty(),
+      "filter-trigger": a.filterTrigger("name", { text: "Name", active: true, named: false }),
+      "filter-indicator": a.filterIndicator(true),
     }
     for (const [part, props] of Object.entries(parts)) {
       const meta = tableMeta.dataAttributes[part as keyof typeof tableMeta.dataAttributes]
       expect(Object.keys(meta).sort(), part).toEqual(dataKeys(props))
     }
+  })
+})
+
+describe("table connect: columns, filters, frame", () => {
+  it("pinned headers carry their side and column", () => {
+    const a = tableConnect(input({ pinned: { start: ["name"], end: ["actions"] } }))
+    expect(a.columnHeader({ column: "name" })).toMatchObject({
+      "data-column": "name",
+      "data-pinned": "start",
+    })
+    expect(a.columnHeader({ column: "actions" })["data-pinned"]).toBe("end")
+    expect(a.columnHeader({ column: "price" })["data-pinned"]).toBeUndefined()
+  })
+  it("a header holding a filter is named by its text (MUI-X#19239)", () => {
+    const a = tableConnect(input())
+    expect(a.columnHeader({ column: "name", controls: true, text: "Name" })["aria-label"]).toBe(
+      "Name",
+    )
+    expect(a.columnHeader({ column: "name", text: "Name" })["aria-label"]).toBeUndefined()
+  })
+  it("filter trigger: Filter {column}, described while active", () => {
+    const a = tableConnect(input())
+    const on = a.filterTrigger("name", { text: "Name", active: true, named: false })
+    expect(on).toMatchObject({ "aria-label": "Filter Name", "data-active": "" })
+    expect(on["aria-describedby"]).toBe(a.filterState("name", true)?.id)
+    expect(a.filterState("name", true)?.text).toBe("Filtered")
+    const off = a.filterTrigger("name", { text: "Name", active: false, named: false })
+    expect(off["aria-describedby"]).toBeUndefined()
+    expect(a.filterIndicator(true)).toMatchObject({ "aria-hidden": "true", "data-active": "" })
+  })
+  it("the frame is a named modal dialog only while expanded", () => {
+    const f = (expanded: boolean) =>
+      tableFrameConnect({
+        instance: "t",
+        expanded,
+        messages: tableMessages,
+        captionId: "cap",
+        ids: { frame: "fr", expandTrigger: "ex" },
+      })
+    expect(f(true).frame()).toMatchObject({
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-labelledby": "cap",
+      "data-expanded": "",
+    })
+    expect(f(false).frame()["role"]).toBeUndefined()
+    const t = { named: false, focused: false, modality: "pointer" as const }
+    expect(f(true).expandTrigger(t)).toMatchObject({
+      type: "button",
+      "aria-pressed": "true",
+      "aria-label": "Full page",
+    })
+  })
+})
+
+describe("table connect: expandable rows", () => {
+  it("trigger controls the details; hidden while collapsed", () => {
+    const a = tableConnect(input({ expandedRows: [] }))
+    const t = a.rowTrigger("r", {
+      text: "Alpha",
+      named: false,
+      focused: false,
+      modality: "pointer",
+    })
+    expect(t).toMatchObject({
+      type: "button",
+      "aria-expanded": "false",
+      "aria-label": "Show details Alpha",
+    })
+    expect(t["aria-controls"]).toBe(a.rowDetails("r")["id"])
+    expect(a.rowDetails("r")["hidden"]).toBe(true)
+    const open = tableConnect(input({ expandedRows: ["r"] }))
+    expect(open.rowDetails("r")["hidden"]).toBeUndefined()
+    expect(open.row("r")["data-expanded"]).toBe("")
   })
 })
 
@@ -95,8 +180,8 @@ describe("table connect", () => {
     expect(a.columnHeader({ colSpan: 3 })["scope"]).toBe("colgroup")
     expect(a.rowHeader({})["scope"]).toBe("row")
     expect(a.rowHeader({ rowSpan: 2 })["scope"]).toBe("rowgroup")
-    expect(a.columnHeader({ sortable: "name" })["aria-sort"]).toBe("descending")
-    expect(a.columnHeader({ sortable: "price" })["aria-sort"]).toBeUndefined()
+    expect(a.columnHeader({ column: "name", sortable: true })["aria-sort"]).toBe("descending")
+    expect(a.columnHeader({ column: "price", sortable: true })["aria-sort"]).toBeUndefined()
     expect(a.columnHeader({})["aria-sort"]).toBeUndefined()
     for (const part of [
       a.table({ loading: false }),

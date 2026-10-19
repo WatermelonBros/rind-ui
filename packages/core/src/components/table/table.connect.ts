@@ -26,6 +26,15 @@ export type TablePart =
   | "sort-trigger"
   | "sort-indicator"
   | "empty"
+  | "frame"
+  | "title"
+  | "header"
+  | "footer"
+  | "expand-trigger"
+  | "filter-trigger"
+  | "filter-indicator"
+  | "row-trigger"
+  | "row-details"
 
 export interface TableConnectInput {
   readonly instance: string
@@ -49,6 +58,22 @@ export interface TableConnectInput {
   readonly tableLabel: string | undefined
   /** The `talkback-aria-sort` quirk is active: the sorted trigger carries its state. */
   readonly describeSort: boolean
+  /** Column ids pinned at each edge. */
+  readonly pinned?: { readonly start: readonly string[]; readonly end: readonly string[] }
+  /** Row ids whose details are open. */
+  readonly expandedRows?: readonly string[]
+}
+
+/** A header's column and what it holds (its name stays its text when it holds controls). */
+export interface ColumnHeaderInput {
+  readonly colSpan?: number | undefined
+  /** The column id (any column; required for sorting and pinning). */
+  readonly column?: string | undefined
+  readonly sortable?: boolean | undefined
+  /** It holds a control besides one SortTrigger (a filter): named by `text`. */
+  readonly controls?: boolean | undefined
+  /** The column's text (the SortTrigger's visible text, else the header's own). */
+  readonly text?: string | undefined
 }
 
 export type SortTriggerDirection = "ascending" | "descending" | "none"
@@ -86,19 +111,64 @@ export function tableConnect(input: TableConnectInput) {
     head: (): PartProps => base("head"),
     body: (): PartProps => base("body"),
     foot: (): PartProps => base("foot"),
-    row: (): PartProps => base("row"),
-    columnHeader: (h: {
-      readonly colSpan?: number | undefined
-      /** The column id when sortable. */
-      readonly sortable?: string | undefined
-    }): PartProps => {
-      const sorted = h.sortable !== undefined && input.sort?.column === h.sortable
+    /** `id`: the row's id when it can expand. */
+    row: (id?: string): PartProps => ({
+      ...base("row"),
+      "data-row": id,
+      "data-expanded": dataFlag(id !== undefined && (input.expandedRows ?? []).includes(id)),
+    }),
+    rowTrigger: (
+      row: string,
+      t: {
+        readonly text: string
+        readonly named: boolean
+        readonly focused: boolean
+        readonly modality: Modality
+      },
+    ): PartProps => {
+      const open = (input.expandedRows ?? []).includes(row)
+      return {
+        ...base("row-trigger"),
+        ...focusAttrs(t.focused, t.modality),
+        type: "button",
+        "aria-expanded": String(open),
+        "aria-controls": itemId("table", input.instance, "row-details", row),
+        "aria-label": t.named ? undefined : input.messages.rowDetails(t.text),
+        "data-expanded": dataFlag(open),
+        [CRITICAL]: ["aria-expanded", "aria-controls"],
+      }
+    },
+    rowDetails: (row: string): PartProps => {
+      const open = (input.expandedRows ?? []).includes(row)
+      return {
+        ...base("row-details"),
+        id: itemId("table", input.instance, "row-details", row),
+        "data-row": row,
+        "data-expanded": dataFlag(open),
+        hidden: open ? undefined : true,
+      }
+    },
+    columnHeader: (h: ColumnHeaderInput): PartProps => {
+      const sortable = h.sortable === true && h.column !== undefined
+      const sorted = sortable && input.sort?.column === h.column
+      const side =
+        h.column === undefined
+          ? undefined
+          : input.pinned?.start.includes(h.column)
+            ? "start"
+            : input.pinned?.end.includes(h.column)
+              ? "end"
+              : undefined
       return {
         ...base("column-header"),
         scope: (h.colSpan ?? 1) > 1 ? "colgroup" : "col",
-        "data-sortable": dataFlag(h.sortable !== undefined),
+        "data-column": h.column,
+        "data-pinned": side,
+        "data-sortable": dataFlag(sortable),
         "aria-sort": sorted ? input.sort?.direction : undefined,
         "data-sort": sorted ? input.sort?.direction : undefined,
+        // MUI-X#19239: with a filter button inside, the header's name is still its text.
+        "aria-label": h.controls && h.text ? h.text : undefined,
         [CRITICAL]: ["scope", "aria-sort"],
       }
     },
@@ -136,5 +206,70 @@ export function tableConnect(input: TableConnectInput) {
       "data-direction": direction(column),
     }),
     empty: (): PartProps => base("empty"),
+    filterTrigger: (
+      column: string,
+      f: { readonly text: string; readonly active: boolean; readonly named: boolean },
+    ): PartProps => ({
+      "data-part": "filter-trigger",
+      "data-column": column,
+      "data-active": dataFlag(f.active),
+      "aria-label": f.named ? undefined : input.messages.filter(f.text),
+      "aria-describedby": f.active
+        ? itemId("table", input.instance, "filtered", column)
+        : undefined,
+    }),
+    /** The hidden "Filtered" an active FilterTrigger is described by; null when inactive. */
+    filterState: (column: string, active: boolean) =>
+      active
+        ? { id: itemId("table", input.instance, "filtered", column), text: input.messages.filtered }
+        : null,
+    filterIndicator: (active: boolean): PartProps => ({
+      ...base("filter-indicator"),
+      "aria-hidden": "true",
+      "data-active": dataFlag(active),
+    }),
+  }
+}
+
+export interface TableFrameConnectInput {
+  readonly instance: string
+  readonly expanded: boolean
+  readonly messages: TableMessages
+  /** What names the expanded Frame: the Caption, else the Title, when rendered. */
+  readonly captionId: string | undefined
+  readonly ids: { readonly frame: string; readonly expandTrigger: string }
+}
+
+/** The Frame around Header, Root and Footer: a modal dialog only while expanded (full page). */
+export function tableFrameConnect(input: TableFrameConnectInput) {
+  const base = (part: TablePart) => ({
+    ...scopeAttrs("table", part, input.instance),
+    "data-expanded": dataFlag(input.expanded),
+  })
+  return {
+    frame: (): PartProps => ({
+      ...base("frame"),
+      id: input.ids.frame,
+      role: input.expanded ? "dialog" : undefined,
+      "aria-modal": input.expanded ? "true" : undefined,
+      "aria-labelledby": input.expanded ? input.captionId : undefined,
+    }),
+    header: (): PartProps => base("header"),
+    /** Names the table and the full-page view when there is no Caption. */
+    title: (id: string): PartProps => ({ ...base("title"), id }),
+    footer: (): PartProps => base("footer"),
+    expandTrigger: (t: {
+      readonly named: boolean
+      readonly focused: boolean
+      readonly modality: Modality
+    }): PartProps => ({
+      ...base("expand-trigger"),
+      ...focusAttrs(t.focused, t.modality),
+      id: input.ids.expandTrigger,
+      type: "button",
+      "aria-pressed": String(input.expanded),
+      "aria-label": t.named ? undefined : input.messages.expand,
+      [CRITICAL]: ["aria-pressed"],
+    }),
   }
 }

@@ -34,6 +34,11 @@ const NAMES = [
   "arrow-up",
   "stop",
   "paperclip",
+  "caret-up-down",
+  "funnel",
+  "funnel-simple",
+  "arrows-out",
+  "arrows-in",
 ]
 const tokens = (css: string) =>
   [...css.matchAll(/--rind-icon-([a-z-]+): (url\("data:image\/svg\+xml,[^"]+"\));/g)].map(

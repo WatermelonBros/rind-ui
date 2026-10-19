@@ -66,22 +66,114 @@ function compareValues(a: unknown, b: unknown, collator: Intl.Collator): number 
  * ("item 2" before "item 10", case-insensitive); numbers, bigints, dates and booleans by
  * value; `null`, `undefined`, `NaN` and `""` go last in both directions (TanStack/table#6086).
  */
+export interface SortItemsOptions {
+  readonly locale?: string | undefined
+  /** A comparator per column (ascending order); the default compares values naturally. */
+  readonly compare?: Readonly<Record<string, (a: unknown, b: unknown) => number>> | undefined
+  /** Where empty values go, in both directions. Default `last`. */
+  readonly empty?: "last" | "first" | undefined
+}
+
 export function sortItems<T>(
   items: readonly T[],
   sort: SortDescriptor | null,
   getValue: (item: T, column: string) => unknown,
-  options: { readonly locale?: string | undefined } = {},
+  options: SortItemsOptions = {},
 ): T[] {
   if (sort === null) return [...items]
   const collator = new Intl.Collator(options.locale, { numeric: true, sensitivity: "base" })
   const sign = sort.direction === "ascending" ? 1 : -1
+  const own = options.compare?.[sort.column]
+  const compare = own ?? ((a: unknown, b: unknown) => compareValues(a, b, collator))
+  const emptyFirst = options.empty === "first" ? -1 : 1
   return items
     .map((item, index) => ({ item, index, value: getValue(item, sort.column) }))
     .sort((a, b) => {
       const ea = isEmpty(a.value)
       const eb = isEmpty(b.value)
-      if (ea || eb) return ea && eb ? a.index - b.index : ea ? 1 : -1
-      return sign * compareValues(a.value, b.value, collator) || a.index - b.index
+      if (ea || eb) return ea && eb ? a.index - b.index : ea ? emptyFirst : -emptyFirst
+      return sign * compare(a.value, b.value) || a.index - b.index
     })
     .map((e) => e.item)
+}
+
+const fold = (collator: Intl.Collator) => (a: string, b: string) => {
+  // Containment with the collator's base sensitivity (case and accents ignored): slide a window.
+  if (b === "") return true
+  for (let i = 0; i + b.length <= a.length; i++) {
+    if (collator.compare(a.slice(i, i + b.length), b) === 0) return true
+  }
+  return false
+}
+
+export interface FilterItemsOptions<T> {
+  /** One predicate per column; a row passes every one. */
+  readonly filters?: Readonly<Record<string, (value: unknown, item: T) => boolean>> | undefined
+  /** Kept when a searched column's value contains it (case- and accent-insensitive). */
+  readonly query?: string | undefined
+  readonly getValue: (item: T, column: string) => unknown
+  /** The columns the query searches. Default: the filters' columns. */
+  readonly searchColumns?: readonly string[] | undefined
+  readonly locale?: string | undefined
+}
+
+/** A new array of the rows that pass every column filter and, with a query, match it. */
+export function filterItems<T>(items: readonly T[], options: FilterItemsOptions<T>): T[] {
+  const filters = Object.entries(options.filters ?? {})
+  const query = options.query?.trim() ?? ""
+  const columns = options.searchColumns ?? filters.map(([c]) => c)
+  const contains = fold(new Intl.Collator(options.locale, { sensitivity: "base", usage: "search" }))
+  return items.filter((item) => {
+    for (const [column, keep] of filters) {
+      if (!keep(options.getValue(item, column), item)) return false
+    }
+    if (query === "") return true
+    return columns.some((c) => {
+      const v = options.getValue(item, c)
+      return !isEmpty(v) && contains(String(v), query)
+    })
+  })
+}
+
+/** Each distinct value of `column` with its count, in first-seen order (filter options). */
+export function facetValues<T>(
+  items: readonly T[],
+  column: string,
+  getValue: (item: T, column: string) => unknown,
+): { readonly value: unknown; readonly count: number }[] {
+  const counts = new Map<unknown, number>()
+  for (const item of items) {
+    const v = getValue(item, column)
+    counts.set(v, (counts.get(v) ?? 0) + 1)
+  }
+  return [...counts].map(([value, count]) => ({ value, count }))
+}
+
+export interface Page<T> {
+  readonly items: T[]
+  /** The page shown, clamped to `1..pageCount`. */
+  readonly page: number
+  readonly pageCount: number
+  /** 1-based positions of the first and last row shown; 0 when there is none. */
+  readonly from: number
+  readonly to: number
+  readonly total: number
+}
+
+/** The rows of `page` (1-based), the page clamped to the ones that exist. */
+export function paginateItems<T>(items: readonly T[], page: number, pageSize: number): Page<T> {
+  const size = Math.max(1, Math.floor(pageSize))
+  const total = items.length
+  const pageCount = Math.max(1, Math.ceil(total / size))
+  const p = Math.min(pageCount, Math.max(1, Math.floor(page)))
+  const start = (p - 1) * size
+  const shown = items.slice(start, start + size)
+  return {
+    items: shown,
+    page: p,
+    pageCount,
+    from: shown.length ? start + 1 : 0,
+    to: start + shown.length,
+    total,
+  }
 }
