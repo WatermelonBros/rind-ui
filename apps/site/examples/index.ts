@@ -64,6 +64,7 @@ import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as splitter from "./splitter"
 import * as switchEx from "./switch"
+import * as table from "./table"
 import * as tabs from "./tabs"
 import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
@@ -149,6 +150,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   switch: switchEx,
+  table,
   tabs,
   "tags-input": tagsInput,
   "text-field": textField,

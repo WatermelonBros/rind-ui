@@ -262,6 +262,31 @@ export const quirks = defineQuirks([
       "NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases",
     verified: "2026-10-16",
   },
+  {
+    id: "talkback-aria-sort",
+    // TalkBack does not read aria-sort on a column header: the sorted column's SortTrigger
+    // carries a visually hidden "sorted ascending" description (Table).
+    when: (p) => p.android,
+    links: [
+      "https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/table/useTableColumnHeader.ts",
+    ],
+    test: "packages/core/src/components/table/table.connect.test.ts",
+    removeWhen:
+      "a device test shows TalkBack reading the sort direction of a column header with aria-sort (manual protocol)",
+    verified: "2026-10-19",
+  },
+  {
+    id: "firefox-scroller-tab-stop",
+    // Firefox makes an overflowing scroll container a tab stop even when it holds focusable
+    // controls; the Table takes its Root out of the order (tabindex -1) while it holds them, so
+    // Tab goes straight to the sort buttons. Harmless elsewhere: always on.
+    when: () => true,
+    links: ["https://bugzilla.mozilla.org/show_bug.cgi?id=1069739"],
+    test: "packages/testing/src/components/table.browser.test.tsx",
+    removeWhen:
+      "Firefox skips a scroll container that holds focusable descendants in sequential focus",
+    verified: "2026-10-19",
+  },
 ])
 
 export type QuirkId = (typeof quirks)[number]["id"]

@@ -28,6 +28,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/meter/meter.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
+| `packages/react/src/table/table.tsx` | `talkback-aria-sort` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 
 ## `webkit-grid-selection-not-announced`
@@ -200,3 +201,19 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 - Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`
 - Last verified: 2026-10-16
 - Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases
+
+## `talkback-aria-sort`
+
+- Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/table/useTableColumnHeader.ts>
+- Repro test: `packages/core/src/components/table/table.connect.test.ts`
+- Checked in: `packages/react/src/table/table.tsx`
+- Last verified: 2026-10-19
+- Remove when: a device test shows TalkBack reading the sort direction of a column header with aria-sort (manual protocol)
+
+## `firefox-scroller-tab-stop`
+
+- Bugs: <https://bugzilla.mozilla.org/show_bug.cgi?id=1069739>
+- Repro test: `packages/testing/src/components/table.browser.test.tsx`
+- Checked in: component code (none yet)
+- Last verified: 2026-10-19
+- Remove when: Firefox skips a scroll container that holds focusable descendants in sequential focus
