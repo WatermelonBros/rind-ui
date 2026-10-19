@@ -18,9 +18,10 @@ export interface ContentSize {
 
 type Axis = "height" | "width"
 
-export function contentSize(el: HTMLElement, prefix: string): ContentSize {
+/** `part`: the properties' middle name (a shared viewport writes `--{prefix}-viewport-*`). */
+export function contentSize(el: HTMLElement, prefix: string, part = "content"): ContentSize {
   const win = (el.ownerDocument.defaultView ?? globalThis) as Window & typeof globalThis
-  const prop = (axis: Axis) => `--${prefix}-content-${axis}`
+  const prop = (axis: Axis) => `--${prefix}-${part}-${axis}`
   const write = (height: string, width: string) => {
     el.style.setProperty(prop("height"), height)
     el.style.setProperty(prop("width"), width)

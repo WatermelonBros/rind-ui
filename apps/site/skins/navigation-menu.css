@@ -1,0 +1,394 @@
+/* ── Navigation Menu: a bar of disclosure triggers and links, panels below them ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="navigation-menu"][data-part="root"] {
+  position: relative;
+  display: inline-block;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="navigation-menu"][data-part="list"] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="root"]
+  > [data-scope="navigation-menu"][data-part="list"] {
+  border-radius: calc(var(--s-r-sm) + 4px);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="list"][data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+  inline-size: 220px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="navigation-menu"][data-part="item"] {
+  position: relative;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="item"][data-split] {
+  display: flex;
+  align-items: center;
+}
+
+/* triggers and bar links: flat items that light up (low specificity: states win) */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  :where([data-scope="navigation-menu"][data-part="list"] > [data-part="item"])
+  > [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 32px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  font: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--s-ease),
+    color 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="list"][data-orientation="vertical"]
+  > [data-part="item"]
+  > :is([data-part="trigger"], [data-part="link"]) {
+  inline-size: 100%;
+  justify-content: space-between;
+}
+/* the trigger's chevron, turned when open */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="navigation-menu"][data-part="trigger"]::after {
+  content: "";
+  inline-size: 6px;
+  block-size: 6px;
+  /* physical edges: a chevron points down in either direction */
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -2px;
+  transition: rotate 0.25s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="trigger"][data-state="open"]::after {
+  rotate: 225deg;
+  translate: 0 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"]):is(
+    [data-hover],
+    :focus-visible
+  ) {
+  background: color-mix(in oklab, var(--s-ink) 8%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="trigger"][data-state="open"] {
+  background: color-mix(in oklab, var(--s-acc) 18%, transparent);
+  box-shadow: inset 0 0 0 var(--s-bw) var(--s-line);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"])[data-current] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"]:is([data-part="trigger"], [data-part="link"]):focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+
+/* panels: the viewport, or a content in place below its item */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"]) {
+  box-sizing: border-box;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  :where([data-part="item"])
+  > [data-scope="navigation-menu"][data-part="content"] {
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-hi);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  :where(
+    [data-scope="navigation-menu"][data-part="root"]:not([data-orientation="vertical"])
+      > [data-part="list"]
+      > [data-part="item"]
+  )
+  > [data-scope="navigation-menu"][data-part="content"] {
+  position: absolute;
+  inset-block-start: calc(100% + 10px);
+  inset-inline-start: 0;
+  z-index: 20;
+  min-inline-size: 200px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"] {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+  transform-origin: top left;
+  transition:
+    opacity 0.2s var(--s-ease),
+    scale 0.3s var(--s-pop);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"][data-state="closed"] {
+  opacity: 0;
+  scale: 0.96;
+}
+/* a nested level's panel sits inside its parent panel */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="sub"]
+  [data-part="item"]
+  > [data-scope="navigation-menu"][data-part="content"] {
+  margin-block-start: 4px;
+  box-shadow: none;
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="sub"]
+  > [data-part="list"] {
+  padding: 0;
+  display: grid;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="sub"]
+  [data-part="trigger"] {
+  justify-content: space-between;
+  inline-size: 100%;
+}
+
+/* panel links: a row each, a title and a line of description in a mega menu */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"]
+  [data-part="link"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="sub"]
+  [data-part="trigger"] {
+  display: grid;
+  gap: 2px;
+  min-block-size: 32px;
+  align-content: center;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  font: 500 14px var(--s-font);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="sub"]
+  [data-part="trigger"] {
+  display: flex;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"]
+  [data-part="link"]
+  span {
+  font-weight: 500;
+  font-size: 13px;
+  color: color-mix(in oklab, var(--s-ink) 72%, var(--s-card));
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"][data-layout="grid"] {
+  grid-template-columns: repeat(2, minmax(0, 220px));
+  gap: 4px;
+}
+
+/* the shared viewport: its size follows the open panel */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="navigation-menu"][data-part="viewport"] {
+  position: relative;
+  overflow: hidden;
+  width: var(--rind-navigation-menu-viewport-width);
+  height: var(--rind-navigation-menu-viewport-height);
+  transition:
+    width 0.3s var(--s-ease),
+    height 0.3s var(--s-ease),
+    opacity 0.2s var(--s-ease),
+    scale 0.3s var(--s-pop);
+  transform-origin: top left;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"][data-state="open"] {
+  @starting-style {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"][data-state="closed"] {
+  opacity: 0;
+  scale: 0.96;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"][data-instant] {
+  transition:
+    width 0.3s var(--s-ease),
+    height 0.3s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"]
+  > [data-part="content"] {
+  inline-size: max-content;
+  transition: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"]
+  > [data-part="content"][data-motion="from-end"] {
+  animation: s-nav-from-end 0.3s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="viewport"]
+  > [data-part="content"][data-motion="from-start"] {
+  animation: s-nav-from-start 0.3s var(--s-ease);
+}
+@keyframes s-nav-from-end {
+  from {
+    opacity: 0;
+    translate: 24px 0;
+  }
+}
+@keyframes s-nav-from-start {
+  from {
+    opacity: 0;
+    translate: -24px 0;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="positioner"] {
+  z-index: 62;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="positioner"][data-anchor-hidden] {
+  visibility: hidden;
+}
+
+/* the indicator: a bar under the open trigger */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="navigation-menu"][data-part="indicator"] {
+  position: absolute;
+  inset-block-end: -2px;
+  left: var(--rind-indicator-left);
+  width: var(--rind-indicator-width);
+  height: 4px;
+  border-radius: 4px;
+  background: var(--s-acc);
+  list-style: none;
+  pointer-events: none;
+  transition:
+    left 0.3s var(--s-ease),
+    width 0.3s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="indicator"][data-resizing] {
+  transition: none;
+}
+
+/* crisp: hard offset shadows */
+[data-rind-theme="skin-crisp"]
+[data-scope="navigation-menu"]:is([data-part="viewport"], [data-part="content"]) {
+  box-shadow: 5px 5px 0 var(--s-ink);
+}
+[data-rind-theme="skin-crisp"]
+  [data-scope="navigation-menu"][data-part="sub"]
+  [data-part="content"] {
+  box-shadow: none;
+}
+/* juicy: a soft ring keeps the white panel off the lavender */
+[data-rind-theme="skin-juicy"]
+[data-scope="navigation-menu"]:is(
+  [data-part="viewport"],
+  [data-part="item"] > [data-part="content"]
+) {
+  outline: 2px solid #e2d9fb;
+  outline-offset: -2px;
+}
+
+/* the Portalled example's clipping header */
+[data-clip] {
+  overflow: hidden;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="navigation-menu"]:is(
+      [data-part="viewport"],
+      [data-part="content"],
+      [data-part="indicator"],
+      [data-part="trigger"]
+    ) {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* closed panels keep `hidden`: no display rule above may show them */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="navigation-menu"][hidden] {
+  display: none;
+}
+
+/* panel rows light up like the bar's items */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"]:is([data-part="content"], [data-part="sub"])
+  [data-scope="navigation-menu"]:is([data-part="link"], [data-part="trigger"]):is(
+    [data-hover],
+    :focus-visible,
+    [data-state="open"]
+  ) {
+  background: color-mix(in oklab, var(--s-ink) 8%, transparent);
+}
+
+/* a vertical menu's panels open in flow, as an indented list */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="root"][data-orientation="vertical"]
+  [data-scope="navigation-menu"][data-part="content"][data-state] {
+  margin: 2px 0 6px 14px;
+  padding: 4px 4px 4px 12px;
+  border: 0;
+  border-inline-start: var(--s-bw, 1px) solid var(--s-line);
+  border-radius: 0;
+  box-shadow: none;
+  outline: 0;
+  background: transparent;
+}
+[data-rind-theme="skin-juicy"]
+  [data-scope="navigation-menu"][data-part="root"][data-orientation="vertical"]
+  [data-scope="navigation-menu"][data-part="content"][data-state] {
+  border-inline-start: 3px solid #e2d9fb;
+}
+
+/* the current page inside a panel: underlined like the bar's */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="navigation-menu"][data-part="content"]
+  [data-scope="navigation-menu"][data-part="link"][data-current] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}

@@ -305,6 +305,16 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 | date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| add-navigation-menu | 2.2 | Connect unit tests per "Data Attributes" row; the absence of `aria-orientation`, `aria-haspopup`, `aria-owns` and menu roles is covered by the DOM tests and a per-contract invariant only |
+| add-navigation-menu | 3.3 (rest) | SSR: hydrate test, Suspense inside a trigger, no `document` during render (server HTML with `hidden` panels is tested) |
+| add-navigation-menu | 5.2 | One browser test per listed regression in three engines; today the DOM suite covers the core scenarios in jsdom and Chromium |
+| add-navigation-menu | 5.3 | Tab-order equality inline vs viewport vs portal, viewport size under fast switching and items without content, window resize while open |
+| add-navigation-menu | 5.4 (rest) | ARIA snapshots for open-by-hover, open-by-press and nested-open examples (closed and open exist) |
+| add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
+| add-navigation-menu | #163 review (warning) | `navigation-menu-no-menu-semantics` scans only root, list, triggers and contents: scan every part (links, viewport, positioner, indicator, Sub roots) |
+| add-navigation-menu | #163 review (warning) | `navigationSet` (the arrow-key set from the DOM) belongs in `core/dom`, not the machine module |
+| add-navigation-menu | #163 review (warning) | A shared `useContentSize` hook for Collapsible, Accordion and Navigation Menu (each adapter runs the size sequence itself today) |
+| add-navigation-menu | #163 review | Model walk of a controlled menu: the `$props:value` / `$sync:value` prop steps are mapped, but a parent that accepts proposals is not modelled by the oracle, so no controlled config runs them |
 | docs-props-guard | #159 review (warning) | scripts/docs-gen.ts | A prop that two union variants declare (`selectionMode` single/multiple) shows the first variant's type only: join the variants' types in the Type column |
 | docs-props-guard | #159 review (warning) | packages/core/src/components/toast/toast.meta.ts | The Options table (`createToaster`, toast options) is not checked against the types like props are; it also misses the toast options `id`, `type`, `title`, `description` and `meta` |
 | docs-props-guard | #159 review (warning) | packages/react/src (JSDoc) | `dir` props: the precise default is "the locale's, else the provider's"; several JSDoc comments say "the provider's" only |

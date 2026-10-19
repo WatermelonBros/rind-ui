@@ -41,6 +41,7 @@ import * as menu from "./menu"
 import * as menubar from "./menubar"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
+import * as navigationMenu from "./navigation-menu"
 import * as numberInput from "./number-input"
 import * as numberParsing from "./number-parsing"
 import * as overlays from "./overlays"
@@ -89,6 +90,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "visually-hidden": visuallyHidden,
   menu,
   menubar,
+  "navigation-menu": navigationMenu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
