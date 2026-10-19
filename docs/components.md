@@ -30,7 +30,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Dialog | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | RAC: Dialog + Modal |
 | Popover | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
 | Tooltip | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | HUI: in source, not in public docs |
-| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | wip | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
+| Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | done | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
 | Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
@@ -42,8 +42,8 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Menu | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done | Radix/Reka/Bits/Kobalte: Dropdown Menu |
 | Tabs | ● | ● | ● | ● | ● | ● | ● | ● | ● | 9 | 1 | done |  |
-| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | wip | Ark: Menu context trigger · RAC: useContextMenu |
-| Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | wip | Reado has MenuBar |
+| Context Menu | ● | ● | ● | ● |  |  | ● | ● | ● | 7 | 1 | done | Ark: Menu context trigger · RAC: useContextMenu |
+| Menubar |  | ● |  | ● |  | ● | ● | ● | ● | 6 | 2 | done | Reado has MenuBar |
 | Navigation Menu | ● | ● |  | ● |  |  | ● | ● | ● | 6 | 2 | spec |  |
 | Toolbar |  | ● | ● | ● |  | ● | ● | ● |  | 6 | 2 | done |  |
 | Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | done |  |
