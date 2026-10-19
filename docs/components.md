@@ -94,7 +94,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Pin Input | ● | ● |  | ● |  |  | ● | ● |  | 5 | 2 | done | Radix/Base: OTP Field |
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | done | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field; Password Input (`type="password"`, Radix: Password Toggle Field) and Search Field (`type="search"`) are its parts |
-| File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | spec | RAC: DropZone + FileTrigger · Kobalte: File Field |
+| File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | done | RAC: DropZone + FileTrigger · Kobalte: File Field |
 | Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
 | Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |

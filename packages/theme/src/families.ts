@@ -81,6 +81,7 @@ export const familyMatrix = [
       "color-picker",
       "prompt-input",
       "clipboard",
+      "file-upload",
     ],
     variants: ["outline", "soft"],
     size: "own",

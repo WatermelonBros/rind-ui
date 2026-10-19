@@ -320,6 +320,8 @@ const TRANSIENT = new Set([
   "prompt-input:stopped",
   // The row-count announcement waits for the count to settle: entered by changing the rows.
   "table:counting",
+  // A file drag over the Dropzone: entered by the driver's `dragEnter`.
+  "file-upload:dragging",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
   // arrowing in the focused input (the suggestions popup; no prop opens it).
   "tags-input:typing",

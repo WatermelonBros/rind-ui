@@ -1,0 +1,5 @@
+- text: CV PDF, up to 5 MB
+- button "CV Choose file": Choose file
+- text: No file chosen
+- log
+- log

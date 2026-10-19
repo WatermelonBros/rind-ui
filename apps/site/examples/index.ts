@@ -25,6 +25,7 @@ import * as drawer from "./drawer"
 import * as field from "./field"
 import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
+import * as fileUpload from "./file-upload"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
 import * as gridList from "./grid-list"
@@ -118,6 +119,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   field,
   "focus-and-modality": focusAndModality,
   fieldset,
+  "file-upload": fileUpload,
   form,
   heading,
   image,

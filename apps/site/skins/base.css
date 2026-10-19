@@ -107,6 +107,9 @@
 ):is(:disabled, [aria-disabled="true"], [data-disabled]):not(
   [data-scope="accordion"][data-part="trigger"]
 ):not(
+  /* its hint is text, not a control: the Trigger dims instead (skins/file-upload.css) */
+  [data-scope="file-upload"][data-part="root"]
+):not(
   /* only the outermost disabled element dims: nested dimming would compound */
   :is(:disabled, [aria-disabled="true"], [data-disabled]) *
 ) {
