@@ -1,6 +1,14 @@
 export { accessibleNameOf } from "./accname"
 export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
+export { type CalendarDragOptions, calendarCellAt, createCalendarDrag } from "./calendar-drag"
+export {
+  type CellDrag,
+  type CellDragMessage,
+  type CellDragOptions,
+  type CellDragPointerEvent,
+  createCellDrag,
+} from "./cell-drag"
 export { copyWithSelection, domClipboard } from "./clipboard"
 export { collectionLayout } from "./collection-layout"
 export {
@@ -153,6 +161,7 @@ export {
   pointerFraction,
   pointerPoint,
   startDrag,
+  trackPointer,
 } from "./pointer-drag"
 export { pointerMoved } from "./pointer-guard"
 export {

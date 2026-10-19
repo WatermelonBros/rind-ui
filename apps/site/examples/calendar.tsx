@@ -150,6 +150,28 @@ export function Range() {
   )
 }
 
+/** Drag selection: press a day, drag, release; a touch holds `dragDelay` first. */
+export function RangeDrag() {
+  const [value, setValue] = useState<CalendarValue>(null)
+  const range =
+    value && "start" in (value as object) ? (value as { start: unknown; end: unknown }) : null
+  return (
+    <div className="stack">
+      <Cal
+        label="Holiday"
+        selectionMode="range"
+        dragDelay={300}
+        value={value}
+        onValueChange={(v) => setValue(v)}
+        defaultFocusedValue={new CalendarDate(2026, 10, 14)}
+      />
+      <span className="note">
+        range: {range ? `${String(range.start)} to ${String(range.end)}` : "none"}
+      </span>
+    </div>
+  )
+}
+
 export function RangeRules() {
   return (
     <Cal
@@ -233,6 +255,11 @@ export const variants: Variants = {
     title: "Date range",
     description:
       '`selectionMode="range"`: the first date is the anchor, the second ends the range; Escape cancels.',
+  },
+  RangeDrag: {
+    title: "Drag a range",
+    description:
+      "Press a day, drag over the others and release; on touch, hold still `dragDelay` (here 300 ms) first. Escape cancels.",
   },
   RangeRules: {
     title: "Range rules",

@@ -20,6 +20,7 @@ import {
   type CalendarEvent,
   type CalendarProps,
   type CalendarValue,
+  canStartDrag,
   isSelectable,
   rangeOf,
   rangePeriod,
@@ -54,6 +55,8 @@ export interface CalendarConnectInput extends Omit<CalendarProps, "view"> {
   readonly hovered: CalendarDate | null
   /** Range mode: the anchor while a range is being selected (display calendar). */
   readonly anchor: CalendarDate | null
+  /** A drag selection is in progress (`data-dragging`). */
+  readonly dragging: boolean
   /** Focus is inside a grid (state `focused`). */
   readonly gridFocused: boolean
   readonly modality: Modality
@@ -180,6 +183,7 @@ export function calendarConnect(input: CalendarConnectInput) {
     "data-readonly": dataFlag(input.readOnly === true),
     "data-invalid": dataFlag(invalid),
     "data-anchored": dataFlag(isRange && input.anchor != null),
+    "data-dragging": dataFlag(isRange && input.dragging),
     "data-view": view,
     ...focusAttrs(input.gridFocused, input.modality),
   }
@@ -395,10 +399,16 @@ export function calendarConnect(input: CalendarConnectInput) {
         "data-preview-end": dataFlag(
           ranged && preview !== null && inPreview && isSameDay(date, preview.end),
         ),
+        // A drag never selects the days' text (headless: no stylesheet needed).
+        ...(isRange && input.dragging
+          ? { style: { "user-select": "none", "-webkit-user-select": "none" } }
+          : {}),
         children: text,
       }
     },
     isSelectable: (date: CalendarDate) => isSelectable(date, input, anchor, view),
+    /** Whether a press on `date` starts a drag selection (spec "Drag Selection"). */
+    canDrag: (date: CalendarDate) => canStartDrag(date, input, anchor, view),
     /** Range mode: the visually hidden prompt for the focused cell. */
     prompt: (): PartProps => ({
       ...scopeAttrs("calendar", "prompt", input.instance),

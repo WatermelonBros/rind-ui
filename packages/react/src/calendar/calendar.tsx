@@ -13,6 +13,7 @@ import {
   calendarKey,
   calendarMachine,
   calendarMessages,
+  createCalendarDrag,
   type DateValue,
   type DayOfWeek,
   describeKey,
@@ -63,7 +64,8 @@ declare module "../provider" {
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
 export interface CalendarChangeDetails {
-  readonly reason: "CELL.PRESS" | "KEY"
+  /** A cell's press, a key, or the release of a drag selection. */
+  readonly reason: "CELL.PRESS" | "KEY" | "DRAG"
   readonly modality: string | undefined
   cancel(): void
 }
@@ -76,6 +78,8 @@ interface Ctx {
   readonly api: ReturnType<typeof calendarConnect>
   readonly grid: (offset: number) => MonthGrid
   readonly instance: string
+  /** Range mode: a press that dragged has already been handled. */
+  readonly dragConsumes: (press: { readonly pointerType: string }) => boolean
 }
 const CalendarContext = createContext<Ctx | null>(null)
 function useCalendar(part: string): Ctx {
@@ -121,6 +125,11 @@ export type CalendarRootProps = Omit<
   readonly allowsNonContiguousRanges?: boolean
   /** Range mode: what leaving while anchored does (default "reset"). */
   readonly commitOnBlur?: CalendarCommitOnBlur
+  /**
+   * Range mode, touch: how long (ms) a touch is held still before it starts a drag selection
+   * (default 200). A shorter touch is a tap; one that moves first scrolls.
+   */
+  readonly dragDelay?: number
   /** Months shown side by side. Default: 1. */
   readonly visibleMonths?: number
   /** A trigger pages by all visible months, or by one. Default: "visible". */
@@ -190,6 +199,7 @@ function Root({
   maxRangeLength,
   allowsNonContiguousRanges = false,
   commitOnBlur = "reset",
+  dragDelay = 200,
   visibleMonths = 1,
   pageBehavior = "visible",
   fixedWeeks = false,
@@ -277,7 +287,12 @@ function Root({
     onValueChange: (v, details) => {
       const d = details as { event: { type: string; modality?: string }; cancel(): void }
       latest.current.onValueChange?.(v, {
-        reason: d.event.type === "CELL.PRESS" ? "CELL.PRESS" : "KEY",
+        reason:
+          d.event.type === "CELL.PRESS"
+            ? "CELL.PRESS"
+            : d.event.type === "DRAG.END"
+              ? "DRAG"
+              : "KEY",
         modality: d.event.modality ?? "keyboard",
         cancel: d.cancel,
       })
@@ -319,6 +334,7 @@ function Root({
       pendingFocus.current = { date, modality }
     },
   })
+  const drag = useCellDrag(env, instance, calendar, dragDelay, send)
   // The modality is tracked from mount: a pointer press that focuses a cell is seen as one.
   useEffect(() => env.modality.subscribe(() => {}), [env])
   const gridFocused = view.matches("focused")
@@ -346,6 +362,7 @@ function Root({
     focused: view.values.focusedValue,
     visibleStart: view.context.visibleStart,
     hovered: view.context.hovered,
+    dragging: view.context.dragging,
     gridFocused,
     modality,
     today: display(today, calendar),
@@ -393,11 +410,18 @@ function Root({
     reported.current = key
     if (!first) onVisibleRangeChange?.({ start, end: visibleEnd(start, nav) })
   })
+  drag.canStart.current = api.canDrag
+  // While dragging, a touch does not scroll the page (a native non-passive listener).
+  useEffect(() => {
+    const el = root.current
+    return el ? drag.handle.attach(el) : undefined
+  }, [drag.handle])
   const ctx: Ctx = {
     view,
     send,
     api,
     instance,
+    dragConsumes: drag.handle.consumes,
     grid: (offset) => monthGrid(start.add({ months: offset }), locale, firstDay, fixedWeeks),
   }
   const props = mergeProps(
@@ -412,6 +436,7 @@ function Root({
         e.stopPropagation()
         send(isAnchored ? { type: "CANCEL" } : { type: "VIEW.DOWN" })
       },
+      onPointerDown: (e: PointerEvent) => drag.handle.pointerDown(e.currentTarget as Element, e),
       ref: root,
     },
     rest,
@@ -439,6 +464,32 @@ function Root({
       )}
     </CalendarContext>
   )
+}
+
+/** Range mode's drag selection (spec "Drag Selection"): one per Root, wired to the machine. */
+function useCellDrag(
+  env: ReturnType<typeof useEnvironment>,
+  instance: string,
+  calendar: ReturnType<typeof resolveCalendar>["calendar"],
+  dragDelay: number,
+  send: Machine["send"],
+) {
+  const canStart = useRef<(date: CalendarDate) => boolean>(() => false)
+  const latest = useRef({ env, instance, calendar, dragDelay, send })
+  latest.current = { env, instance, calendar, dragDelay, send }
+  const [handle] = useState(() =>
+    createCalendarDrag({
+      get env() {
+        return latest.current.env
+      },
+      target: () => latest.current,
+      canStart: (date) => canStart.current(date),
+      delay: () => latest.current.dragDelay,
+      send: (e) => latest.current.send(e),
+    }),
+  )
+  useEffect(() => () => handle.dispose(), [handle])
+  return { handle, canStart }
 }
 
 type PartP<T extends keyof HTMLElementTagNameMap> = ComponentPropsWithRef<T> & {
@@ -652,7 +703,14 @@ function Cell({
       // A placeholder never selects (react-spectrum#3257); release, not press, selects.
       // Enter and Space are the grid's keys (SELECT_FOCUSED): a key press here would select
       // twice (a multiple selection toggles back).
-      if (e.type === "PRESS" && e.pointerType !== "keyboard" && !placeholder && !disabled) {
+      // A press that dragged was handled by the drag (its release is not a second click).
+      if (
+        e.type === "PRESS" &&
+        e.pointerType !== "keyboard" &&
+        !placeholder &&
+        !disabled &&
+        !ctx.dragConsumes(e)
+      ) {
         ctx.send({ type: "CELL.PRESS", date, modality: e.modality })
       }
     },

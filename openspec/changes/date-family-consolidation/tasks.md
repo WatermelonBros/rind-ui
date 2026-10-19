@@ -14,7 +14,7 @@
 
 ## 1b. Drag selection (PR 1b)
 
-- [ ] 1b.1 Mouse / pen drag and touch long-press drag (`dragDelay`), no scroll while dragging; browser tests in three engines
+- [x] 1b.1 Mouse / pen drag and touch long-press drag (`dragDelay`), no scroll while dragging; browser tests in three engines
 
 ## 2. Calendar views (PR 2)
 
