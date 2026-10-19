@@ -15,6 +15,7 @@ const state = {
   "data-focus": "Focus is in the grid.",
   "data-focus-visible": "Keyboard focus is in the grid.",
   "data-anchored": "Range mode: an anchor is set (a range is being selected).",
+  "data-dragging": "Range mode: a drag selection is in progress.",
   "data-view": '`"days"`, `"months"` or `"years"`: the shown view.',
 }
 
@@ -139,6 +140,12 @@ export const calendarMeta = {
       default: '"reset"',
       description:
         "Range mode: leaving while anchored keeps the value, commits the preview, or clears it.",
+    },
+    dragDelay: {
+      type: "number",
+      default: "200",
+      description:
+        "Range mode, touch: ms a touch is held still before it drags; shorter is a tap, moving first scrolls.",
     },
     focusedValue: { type: "DateValue", description: "Controlled focused date (pages to show it)." },
     defaultFocusedValue: {
@@ -268,6 +275,7 @@ export const calendarMeta = {
       nextPage: ["pointer", "keyboard", "virtual"],
       previousPage: ["pointer", "keyboard", "virtual"],
       selectRange: ["pointer", "keyboard", "touch", "virtual"],
+      dragRange: ["pointer", "keyboard", "touch", "virtual"],
       startRange: ["pointer", "keyboard", "virtual"],
       cancel: ["keyboard"],
       viewUp: ["pointer", "keyboard", "virtual"],

@@ -306,6 +306,7 @@ const TRANSIENT = new Set([
   "slider:dragging",
   // A pointer hovering the stars: entered by the driver's `hover`.
   "rating:previewing",
+  "splitter:dragging",
   "color-area:dragging",
   "color-field:editing",
   "tooltip:opening",
@@ -333,6 +334,10 @@ const TRANSIENT = new Set([
   // The open and close delays (a hover or focus in progress).
   "hover-card:opening",
   "hover-card:closing",
+  // Hover delays and the warm window after a close (Navigation Menu).
+  "navigation-menu:opening",
+  "navigation-menu:closing",
+  "navigation-menu:warm",
   // A copy in flight, and its feedback after a press (2 s): entered by pressing Copy.
   "code-block:copying",
   "code-block:copied",

@@ -28,6 +28,7 @@
 @import "./dialog.css";
 @import "./drawer.css";
 @import "./slider.css";
+@import "./splitter.css";
 @import "./color.css";
 @import "./progress.css";
 @import "./prompt-input.css";
@@ -50,5 +51,6 @@
 @import "./menu.css";
 @import "./context-menu.css";
 @import "./menubar.css";
+@import "./navigation-menu.css";
 @import "./hover-card.css";
 @import "./select.css";

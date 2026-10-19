@@ -1,0 +1,13 @@
+- navigation "Docs (open)":
+  - list:
+    - listitem:
+      - button "Components" [expanded]
+      - link "Button":
+        - /url: /docs/button/
+      - link "Dialog":
+        - /url: /docs/dialog/
+      - link "Tabs":
+        - /url: /docs/tabs/
+    - listitem:
+      - link "All docs":
+        - /url: /docs/

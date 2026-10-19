@@ -350,7 +350,9 @@ holds inside shadow roots. Paging with the triggers, the keyboard or a controlle
 In range mode a primary mouse or pen press on a selectable date SHALL set the anchor on press
 start; moving the pressed pointer over other cells SHALL update the preview; releasing over
 another selectable date SHALL commit; releasing over the anchor SHALL keep the anchor (so a
-click starts a range). A touch press SHALL start a drag only after `dragDelay` (default 200 ms)
+click starts a range). While dragging, the preview SHALL only reach dates a range from the
+anchor may end on; a release over any other date SHALL commit the preview's last valid end. A
+touch press SHALL start a drag only after `dragDelay` (default 200 ms)
 without movement, and while dragging the page SHALL NOT scroll; a touch that scrolls before the
 delay SHALL be cancelled and change nothing; a tap SHALL behave as a press. A release with no
 pointer movement over another cell (the calendar moved under a still pointer) SHALL behave as a
@@ -376,6 +378,15 @@ click. An assistive-technology activation SHALL act as exactly one press.
 
 - **WHEN** a screen reader activates 10 October and then 14 October with bare clicks
 - **THEN** the value is 10–14 October
+
+#### Scenario: Release over a refused day commits the last valid end
+
+- **GIVEN** `maxRangeLength` is 3
+- **WHEN** the user presses on 10 October, moves over 12 October, then onto 20 October (a day no
+  range from the anchor may end on) and releases there
+- **THEN** the preview stayed on 10–12 October and the value is 10–12 October
+- Covered by `packages/core/src/components/calendar/calendar-range.machine.test.ts` ("a move
+  onto an end the rules refuse keeps the preview; the release commits it")
 
 ### Requirement: Range Length
 

@@ -41,6 +41,7 @@ import * as menu from "./menu"
 import * as menubar from "./menubar"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
+import * as navigationMenu from "./navigation-menu"
 import * as numberInput from "./number-input"
 import * as numberParsing from "./number-parsing"
 import * as overlays from "./overlays"
@@ -60,6 +61,7 @@ import * as select from "./select"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
+import * as splitter from "./splitter"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as tagGroup from "./tag-group"
@@ -90,6 +92,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "visually-hidden": visuallyHidden,
   menu,
   menubar,
+  "navigation-menu": navigationMenu,
   "messages-and-provider": messagesAndProvider,
   accordion,
   alert,
@@ -142,6 +145,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "scroll-area": scrollArea,
   skeleton,
   slider,
+  splitter,
   switch: switchEx,
   tabs,
   "tags-input": tagsInput,

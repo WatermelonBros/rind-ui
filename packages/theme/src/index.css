@@ -50,6 +50,7 @@
 @import "./radio-group.css";
 @import "./rating.css";
 @import "./slider.css";
+@import "./splitter.css";
 @import "./color-picker.css";
 @import "./progress.css";
 @import "./prompt-input.css";
@@ -64,6 +65,7 @@
 @import "./menu.css";
 @import "./context-menu.css";
 @import "./menubar.css";
+@import "./navigation-menu.css";
 @import "./select.css";
 @import "./tooltip.css";
 @import "./tree-view.css";

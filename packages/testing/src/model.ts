@@ -298,6 +298,8 @@ const oracleEnv = {
   announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
   // Nothing to position (the oracle never starts effects; actions may ask to reposition).
   position: { track: () => ({ stop: () => {} }), reposition: () => {} },
+  // Nothing hovered: no grace area to be in transit through.
+  hoverIntent: { isInTransit: () => false, track: () => () => {}, triggerProps: () => ({}) },
   // A menu tree with one level: the root closes itself, nothing else is open.
   menuTree: {
     register: () => () => {},

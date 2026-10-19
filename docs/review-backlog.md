@@ -305,6 +305,20 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
 | date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
 | date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| add-navigation-menu | 2.2 | Connect unit tests per "Data Attributes" row; the absence of `aria-orientation`, `aria-haspopup`, `aria-owns` and menu roles is covered by the DOM tests and a per-contract invariant only |
+| add-navigation-menu | 3.3 (rest) | SSR: hydrate test, Suspense inside a trigger, no `document` during render (server HTML with `hidden` panels is tested) |
+| add-navigation-menu | 5.2 | One browser test per listed regression in three engines; today the DOM suite covers the core scenarios in jsdom and Chromium |
+| add-navigation-menu | 5.3 | Tab-order equality inline vs viewport vs portal, viewport size under fast switching and items without content, window resize while open |
+| add-navigation-menu | 5.4 (rest) | ARIA snapshots for open-by-hover, open-by-press and nested-open examples (closed and open exist) |
+| add-navigation-menu | design | `data-motion` stays on a panel after its switch animation; clear it once the panel settles |
+| add-navigation-menu | #163 review (warning) | `navigation-menu-no-menu-semantics` scans only root, list, triggers and contents: scan every part (links, viewport, positioner, indicator, Sub roots) |
+| add-navigation-menu | #163 review (warning) | `navigationSet` (the arrow-key set from the DOM) belongs in `core/dom`, not the machine module |
+| add-navigation-menu | #163 review (warning) | A shared `useContentSize` hook for Collapsible, Accordion and Navigation Menu (each adapter runs the size sequence itself today) |
+| add-navigation-menu | #163 review | Model walk of a controlled menu: the `$props:value` / `$sync:value` prop steps are mapped, but a parent that accepts proposals is not modelled by the oracle, so no controlled config runs them |
+| add-navigation-menu | #163 verification (warning) | Per-item `positioning`: the machine reads the Positioner registered for the last render's value, so an item whose `positioning` differs from the previous item's is placed with the previous one's for one switch; pass a per-key getter to the machine |
+| add-navigation-menu | #163 verification (warning) | Controlled model runs: `$props:value` / `$sync:value` are mapped and the fixture has a `controlled` config, but none runs until the oracle models a parent that accepts proposals |
+| add-navigation-menu | #163 verification (warning) | `navigation-menu-at-most-one-open` per level is not exercised: the model walk only opens Products, and no test runs the invariant with a parent and a nested item open together (a counting-across-levels regression would pass) |
+| add-navigation-menu | #163 verification (warning) | "a hover or leave close never moves focus" passes without the finalFocus fix (focus starts outside the menu, where finalFocus never acts): start it with focus in the panel, then hover-close |
 | docs-props-guard | #159 review (warning) | scripts/docs-gen.ts | A prop that two union variants declare (`selectionMode` single/multiple) shows the first variant's type only: join the variants' types in the Type column |
 | docs-props-guard | #159 review (warning) | packages/core/src/components/toast/toast.meta.ts | The Options table (`createToaster`, toast options) is not checked against the types like props are; it also misses the toast options `id`, `type`, `title`, `description` and `meta` |
 | docs-props-guard | #159 review (warning) | packages/react/src (JSDoc) | `dir` props: the precise default is "the locale's, else the provider's"; several JSDoc comments say "the provider's" only |
@@ -322,6 +336,19 @@ verified at round 3 (2026-10-14).
 - warning: no non-colour cue for `[data-state="copied"]` / `[data-state="error"]` on the copy trigger (WCAG 1.4.1), and the example keeps the "Copy" text. Add an icon or text swap.
 - warning: the model test covers only the collapsible block. Add a variant without `maxLines`, or skip EXPAND.TOGGLE when the trigger is hidden.
 - warning: the `code-block--basic` ARIA snapshot leaves out `button "Wrap"` and the code content.
+## Splitter (#166)
+
+- warning: `splitter.css:25`: the handle's `outline-offset` inside `:where()` loses to `base.css` `[data-focus-visible]`.
+- warning: `splitter.tsx:247`: the ResizeObserver only watches the handles present at mount.
+- warning: `splitter.tsx:316`: the Handle reads `data-disabled` in the parts; the machine guard should decide alone.
+- warning: `splitter.contract.ts:34-46`: the contract's geometry uses the Root's border box, not its content box.
+- warning: `splitter.contract.ts:205`: `toggleCollapse.done` is always true.
+- warning: uncommented assertions: `as 1 | -1` (`splitter.connect.ts:105`), `as never` (`splitter.contract.ts:269-290`).
+- warning: unprefixed public exports: `HandleOwn`, `clampSize`, `isCollapsed`, `resizeAt`, `sameSizes`, `validateSizes`, `resolveSizes`, `handleBounds`.
+- warning: no test for "a second pointer SHALL not start another drag".
+- warning: `splitter.machine.ts:187`: `step <= 0` is not validated.
+- warning: `SIZES.COMMIT` is internal but in the exported `SplitterEvent` union: mark it `@internal` or move it to a private type.
+
 ## add-grid-list: deferred tasks (archived 2026-10-18)
 
 - 0.2 / 9.2: real-AT pass (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack). Record it in "Tested with".
