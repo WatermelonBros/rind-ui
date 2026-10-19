@@ -1,0 +1,111 @@
+/*
+ * Message Thread (family: decoration): a bordered card of its own height whose viewport scrolls;
+ * messages stack
+ * with a gap, the user's at the inline end; JumpToLatest floats over the bottom edge as a
+ * round key of at least 24 x 24 CSS px with a down arrow when empty. Focus rings on the
+ * viewport and on articles (Page Down / Page Up). `scroll-behavior` is the component's.
+ */
+@layer rind.components {
+  /* A card with its own height, so the viewport scrolls inside it; a prompt placed below at
+     the same width lines up with it. */
+  :where([data-scope="message-thread"][data-part="root"]) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--rind-message-thread-height, 24rem);
+    min-block-size: 0;
+    border: var(--rind-border-width) solid
+      var(--rind-message-thread-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-message-thread-radius, var(--rind-radius-panel));
+    background: var(--rind-message-thread-bg, var(--rind-color-surface-raised));
+    color: var(--rind-message-thread-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="message-thread"][data-part="viewport"]) {
+    flex: 1;
+    min-block-size: 0;
+    padding: var(--rind-message-thread-padding, var(--rind-space-3));
+    border-radius: inherit;
+    outline: none;
+  }
+
+  :where([data-scope="message-thread"][data-part="viewport"])[data-focus-visible],
+  :where([data-scope="message-thread"][data-part="message"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="message-thread"][data-part="message"]) {
+    max-inline-size: var(--rind-message-thread-message-width, 80%);
+    margin-block-end: var(--rind-message-thread-gap, var(--rind-space-3));
+    border-radius: var(--rind-radius-control);
+    outline: none;
+  }
+
+  :where([data-scope="message-thread"][data-part="message"][data-from="user"]) {
+    margin-inline-start: auto;
+    padding: var(--rind-space-2) var(--rind-space-3);
+    background: var(--rind-message-thread-user-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="message-thread"][data-part="message"][data-from="system"]) {
+    max-inline-size: none;
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-sm);
+    text-align: center;
+  }
+
+  :where([data-scope="message-thread"][data-part="jump-to-latest"]) {
+    position: absolute;
+    inset-block-end: var(--rind-space-3);
+    inset-inline-start: 50%;
+    translate: -50% 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: var(--rind-space-1) var(--rind-space-2);
+    border: var(--rind-border-width) solid var(--rind-color-border-strong);
+    border-radius: 999px;
+    background: var(--rind-message-thread-jump-bg, var(--rind-color-surface-raised));
+    color: var(--rind-color-text);
+    font: inherit;
+    font-size: var(--rind-text-sm);
+    box-shadow: var(--rind-shadow-sm);
+    cursor: pointer;
+  }
+
+  :where([data-scope="message-thread"][data-part="jump-to-latest"]):dir(rtl) {
+    translate: 50% 0;
+  }
+
+  :where([data-scope="message-thread"][data-part="jump-to-latest"]):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="message-thread"][data-part="jump-to-latest"]:empty)::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background-color: currentColor;
+    mask-image: var(--rind-message-thread-jump-icon, var(--rind-icon-arrow-down));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="message-thread"][data-part="jump-to-latest"]:empty)::before {
+      background-color: ButtonText;
+    }
+    :where([data-scope="message-thread"][data-part="message"][data-from="user"]) {
+      border: 1px solid CanvasText;
+    }
+  }
+}

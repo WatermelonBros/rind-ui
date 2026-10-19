@@ -32,6 +32,7 @@ const NAMES = [
   "arrow-right",
   "copy",
   "arrow-up",
+  "arrow-down",
   "stop",
   "paperclip",
   "caret-up-down",

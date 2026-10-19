@@ -195,6 +195,11 @@ export interface Part {
   pasteFiles(files: readonly FileSpec[]): Promise<void>
   /** A file drag entering the part (`dragenter`, `dragover`), or leaving it (`dragleave`). */
   dragFiles(phase: "enter" | "leave"): Promise<void>
+  /**
+   * A mouse wheel over the part (`deltaY` px; negative is up): a `wheel` event, then the
+   * scroll the browser would make on the part itself (a real wheel in Playwright).
+   */
+  wheel(deltaY: number): Promise<void>
   /** Resolves once no element matches the part (exit animations finished). */
   waitForDetach(): Promise<void>
   /** The part is inside an `inert` subtree (computed from its ancestors). */

@@ -705,6 +705,12 @@ function createPlaywrightEnv(
           el.dispatchEvent(e)
         }, specs)
       },
+      async wheel(deltaY) {
+        const l = await waitFor()
+        await l.hover()
+        const { page } = await getBase()
+        await page.mouse.wheel(0, deltaY)
+      },
       async dragFiles(phase) {
         const l = await waitFor()
         await l.evaluate((el, phase) => {

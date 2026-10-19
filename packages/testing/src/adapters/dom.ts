@@ -801,6 +801,17 @@ function createDomEnv(
           fire(el, "paste", transferOf(win, files))
         })
       },
+      async wheel(deltaY) {
+        const el = await waitFor()
+        await act(async () => {
+          const win = el.ownerDocument.defaultView as Window & typeof globalThis
+          const e = new win.WheelEvent("wheel", { deltaY, bubbles: true, cancelable: true })
+          el.dispatchEvent(e)
+          if (!e.defaultPrevented) el.scrollTop += deltaY
+          // The scroll event fires on the next frame in browsers.
+          await new Promise<void>((r) => win.requestAnimationFrame(() => r()))
+        })
+      },
       async dragFiles(phase) {
         const el = await waitFor()
         await act(() => {
