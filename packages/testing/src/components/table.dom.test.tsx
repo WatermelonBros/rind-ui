@@ -166,7 +166,7 @@ describe("table structure", () => {
     expect(document.getSelection()?.toString()).toBe("str")
   })
 
-  it("a table without a name warns in development", () => {
+  it("a table without a name warns in development", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     setup(
       <Table.Root id="nameless">
@@ -179,7 +179,7 @@ describe("table structure", () => {
         </Table.Table>
       </Table.Root>,
     )
-    expect(warn.mock.calls.flat().join(" ")).toMatch(/table needs a name/)
+    await waitFor(() => expect(warn.mock.calls.flat().join(" ")).toMatch(/table needs a name/))
   })
 })
 

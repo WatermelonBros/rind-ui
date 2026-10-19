@@ -198,6 +198,208 @@
     color: var(--rind-color-text-muted);
   }
 
+  /* Pinned columns: the component writes `data-pinned` and the offset of every such cell. */
+  :where([data-scope="table"] [data-pinned]) {
+    position: sticky;
+    z-index: 1;
+    background: var(--rind-table-header-bg, var(--rind-color-surface));
+  }
+  :where([data-scope="table"] [data-pinned="start"]) {
+    inset-inline-start: var(--rind-table-pin-offset, 0);
+  }
+  :where([data-scope="table"] [data-pinned="end"]) {
+    inset-inline-end: var(--rind-table-pin-offset, 0);
+  }
+  :where([data-scope="table"][data-part="head"] [data-pinned]) {
+    z-index: 3;
+  }
+  /* A divider on the inner side of the innermost pinned cell, while content scrolls under it. */
+  :where(
+    [data-scope="table"][data-part="root"][data-overflow-x-start]
+      [data-pinned="start"][data-pinned-edge]
+  ) {
+    box-shadow: 8px 0 8px -8px
+      var(--rind-table-shadow, color-mix(in oklab, var(--rind-color-text) 30%, transparent));
+  }
+  :where(
+    [data-scope="table"][data-part="root"][data-overflow-x-end]
+      [data-pinned="end"][data-pinned-edge]
+  ) {
+    box-shadow: -8px 0 8px -8px
+      var(--rind-table-shadow, color-mix(in oklab, var(--rind-color-text) 30%, transparent));
+  }
+  :where([data-scope="table"][data-part="root"]) {
+    scroll-padding-inline-end: var(--rind-table-pinned-end-width, 0);
+  }
+  :where([data-scope="table"][data-part="root"]:not([data-sticky-first-column])) {
+    scroll-padding-inline-start: var(--rind-table-pinned-start-width, 0);
+  }
+
+  /*
+   * Frame, Header, Footer: the Frame is the card. The Header (title at the start, tools at the
+   * end) and the Footer (pagination) are rows of it; the table inside is flat. The card clips its
+   * corners, so the radius lands on the last row it holds: the Footer, else the table's last row.
+   */
+  :where([data-scope="table"][data-part="frame"]) {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    overflow: hidden;
+    border: var(--rind-border-width) solid var(--rind-table-border, var(--rind-color-border));
+    border-radius: var(--rind-table-radius, var(--rind-radius-panel));
+    background: var(--rind-table-bg, var(--rind-color-surface-raised));
+  }
+  :where([data-scope="table"][data-part="frame"] > [data-scope="table"][data-part="root"]) {
+    border: 0;
+    border-radius: 0;
+  }
+  :where([data-scope="table"]:is([data-part="header"], [data-part="footer"])) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--rind-space-2) var(--rind-space-3);
+    padding: var(--rind-space-2) var(--rind-space-3);
+  }
+  :where([data-scope="table"][data-part="footer"]) {
+    border-block-start: var(--rind-border-width) solid
+      var(--rind-table-border, var(--rind-color-border));
+    background: var(--rind-table-header-bg, var(--rind-color-surface));
+  }
+  :where([data-scope="table"][data-part="title"]) {
+    font-weight: 650;
+    font-size: var(--rind-text-md, 1rem);
+  }
+  :where([data-scope="table"][data-part="frame"][data-expanded]) {
+    position: fixed;
+    inset: var(--rind-space-4);
+    z-index: var(--rind-z-overlay, 50);
+  }
+  :where([data-scope="table"][data-part="frame"][data-expanded] > [data-part="root"]) {
+    flex: 1;
+    min-block-size: 0;
+  }
+  :where([data-scope="table"]:is([data-part="expand-trigger"], [data-part="filter-trigger"])) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-space-1);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+  :where(
+    [data-scope="table"]:is([data-part="expand-trigger"], [data-part="filter-trigger"])
+  ):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+  :where(
+    [data-scope="table"]:is([data-part="expand-trigger"], [data-part="filter-trigger"])
+  )[data-focus-visible],
+  :where([data-scope="table"][data-part="filter-trigger"]):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+  :where([data-scope="table"][data-part="filter-trigger"][data-active]) {
+    color: var(--rind-color-accent-text);
+    background: var(--rind-color-accent-soft);
+  }
+  /* A header with a filter: the sort trigger and the filter side by side. */
+  :where([data-scope="table"][data-part="column-header"]:has([data-part="filter-trigger"])) {
+    white-space: nowrap;
+  }
+  :where(
+    [data-scope="table"][data-part="column-header"]:has([data-part="filter-trigger"])
+      > [data-part="sort-trigger"]
+  ) {
+    display: inline-flex;
+    inline-size: auto;
+  }
+  /* Icons drawn by the theme when the indicators are empty. */
+  :where(
+    [data-scope="table"]:is([data-part="filter-indicator"], [data-part="expand-trigger"]):empty
+  )::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background: currentColor;
+    mask: var(--rind-icon-funnel-simple) center / contain no-repeat;
+  }
+  :where([data-scope="table"][data-part="filter-indicator"][data-active]:empty)::before {
+    mask-image: var(--rind-icon-funnel);
+  }
+  :where([data-scope="table"][data-part="expand-trigger"]:empty)::before {
+    mask-image: var(--rind-icon-arrows-out);
+  }
+  :where([data-scope="table"][data-part="expand-trigger"][data-expanded]:empty)::before {
+    mask-image: var(--rind-icon-arrows-in);
+  }
+
+  /* Expandable rows: a chevron that turns down while open; the details row is its own surface. */
+  :where([data-scope="table"][data-part="row-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    cursor: pointer;
+  }
+  :where([data-scope="table"][data-part="row-trigger"]):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+  :where([data-scope="table"][data-part="row-trigger"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+  :where([data-scope="table"][data-part="row-trigger"]:empty)::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background: currentColor;
+    mask: var(--rind-icon-caret-right) center / contain no-repeat;
+    transition: rotate var(--rind-duration-fast) ease;
+  }
+  :where([dir="rtl"] [data-scope="table"][data-part="row-trigger"]:empty)::before {
+    scale: -1 1;
+  }
+  :where([data-scope="table"][data-part="row-trigger"][data-expanded]:empty)::before {
+    rotate: 90deg;
+  }
+  :where([data-scope="table"][data-part="row"][data-expanded]) > * {
+    border-block-end-color: transparent;
+  }
+  :where([data-scope="table"][data-part="row-details"]) > td > * {
+    /* The details stay in the visible part while a wide table scrolls sideways. */
+    position: sticky;
+    inset-inline-start: var(--rind-space-3);
+    box-sizing: border-box;
+    max-inline-size: var(--_details-width, 100%);
+  }
+  :where([data-scope="table"] td:has(> [data-part="row-trigger"]:only-child)) {
+    inline-size: 1%;
+    white-space: nowrap;
+  }
+  :where([data-scope="table"][data-part="row-details"]) > td {
+    /* From the outer table's visible width (a nested table writes its own on its Root). */
+    --_details-width: calc(var(--rind-table-viewport-width, 100%) - 2 * var(--rind-space-3));
+    padding: var(--rind-space-3);
+    background: var(--rind-table-details-bg, var(--rind-color-surface));
+  }
+
   @media (forced-colors: active) {
     :where(
         [data-scope="table"]:is(
@@ -209,7 +411,13 @@
       ) {
       border-color: CanvasText;
     }
-    :where([data-scope="table"][data-part="sort-indicator"]:empty)::before {
+    :where(
+        [data-scope="table"]:is(
+          [data-part="sort-indicator"],
+          [data-part="filter-indicator"],
+          [data-part="expand-trigger"]
+        ):empty
+      )::before {
       background: CanvasText;
       forced-color-adjust: none;
     }

@@ -17,6 +17,14 @@ type P =
   | "sort-trigger"
   | "sort-indicator"
   | "empty"
+  | "frame"
+  | "header"
+  | "footer"
+  | "expand-trigger"
+  | "filter-trigger"
+  | "filter-indicator"
+  | "row-trigger"
+  | "row-details"
 type E = Env<P>
 
 const TABLE_TAGS = new Set(["table", "caption", "thead", "tbody", "tfoot", "tr", "th", "td"])
@@ -27,6 +35,30 @@ async function leafHeaders(env: E): Promise<readonly Part[]> {
   const last = rows.at(-1)
   return last ? last.scoped("table", "column-header").all() : []
 }
+
+async function header(env: E, column: string): Promise<Part> {
+  for (const h of await env.part("column-header").all()) {
+    if ((await h.accessibleName()) === column) return h
+  }
+  throw new Error(`table: no column "${column}"`)
+}
+
+const filterTrigger = async (env: E, column: string) =>
+  (await header(env, column)).scoped("table", "filter-trigger")
+
+/** The trigger of the body row whose RowHeader reads `row`. */
+async function rowTrigger(env: E, row: string): Promise<Part> {
+  for (const r of await env.part("body").scoped("table", "row").all()) {
+    const header = r.scoped("table", "row-header")
+    if ((await header.exists()) && (await header.accessibleName()) === row) {
+      return r.scoped("table", "row-trigger")
+    }
+  }
+  throw new Error(`table: no row "${row}"`)
+}
+
+const isExpanded = async (env: E) =>
+  (await env.part("frame").exists()) && (await env.part("frame").attr("data-expanded")) !== null
 
 async function trigger(env: E, column: string): Promise<Part> {
   for (const h of await env.part("column-header").all()) {
@@ -119,6 +151,14 @@ export const tableContract = contract("table", {
     "sort-trigger",
     "sort-indicator",
     "empty",
+    "frame",
+    "header",
+    "footer",
+    "expand-trigger",
+    "filter-trigger",
+    "filter-indicator",
+    "row-trigger",
+    "row-details",
   ],
   locate: (anchor?: { readonly name: string | RegExp }) =>
     anchor ? { role: "table", name: anchor.name } : { part: "table" },
@@ -128,6 +168,40 @@ export const tableContract = contract("table", {
       touch: async (env, column: string) => (await trigger(env, column)).tap(),
       keyboard: async (env, column: string) => {
         const t = await trigger(env, column)
+        await t.focus()
+        await t.press("Enter")
+      },
+      done: async () => true,
+    },
+    openFilter: {
+      pointer: async (env, column: string) => (await filterTrigger(env, column)).click(),
+      keyboard: async (env, column: string) => {
+        const t = await filterTrigger(env, column)
+        await t.focus()
+        await t.press("Enter")
+      },
+      done: async (env, column: string) =>
+        (await (await filterTrigger(env, column)).attr("aria-expanded")) === "true",
+    },
+    closeFilter: {
+      keyboard: async (env) => env.keyboard("Escape"),
+      done: async () => true,
+    },
+    setExpanded: {
+      pointer: async (env, on: boolean) => {
+        if ((await isExpanded(env)) !== on) await env.part("expand-trigger").click()
+      },
+      keyboard: async (env, on: boolean) => {
+        if ((await isExpanded(env)) === on) return
+        if (on) await env.part("expand-trigger").press("Enter")
+        else await env.keyboard("Escape")
+      },
+      done: async (env, on: boolean) => (await isExpanded(env)) === on,
+    },
+    toggleRow: {
+      pointer: async (env, row: string) => (await rowTrigger(env, row)).click(),
+      keyboard: async (env, row: string) => {
+        const t = await rowTrigger(env, row)
         await t.focus()
         await t.press("Enter")
       },
@@ -174,11 +248,34 @@ export const tableContract = contract("table", {
       return out
     },
     sort,
+    /** Pinned column names at each edge, from the headers. */
+    pinned: async (env: E) => {
+      const out: { start: string[]; end: string[] } = { start: [], end: [] }
+      for (const h of await env.part("column-header").all()) {
+        const side = await h.attr("data-pinned")
+        if (side === "start" || side === "end") out[side].push(await h.accessibleName())
+      }
+      return out
+    },
+    isExpanded,
+    /** The RowHeader text of each body row whose details are open. */
+    expandedRows: async (env: E) => {
+      const out: string[] = []
+      for (const r of await env.part("body").scoped("table", "row").all()) {
+        if ((await r.attr("data-part")) !== "row" || (await r.attr("data-expanded")) === null)
+          continue
+        const header = r.scoped("table", "row-header")
+        if (await header.exists()) out.push(await header.accessibleName())
+      }
+      return out
+    },
+    isFilterActive: async (env: E, column: string) =>
+      (await (await filterTrigger(env, column)).attr("data-active")) !== null,
     isScrollStop: async (env: E) => (await env.part("root").attr("tabindex")) === "0",
     isEmpty: async (env: E) => (await env.part("table").attr("data-empty")) !== null,
     isLoading: async (env: E) => (await env.part("table").attr("aria-busy")) === "true",
   },
-  states: { idle: {} },
+  states: { idle: {}, counting: {} },
   events: {
     SORT: { skip: "the column is the story's: the model tests map it" },
     "SORT.SYNCED": { skip: "the parent's prop change: the controlled configurations" },
@@ -186,6 +283,12 @@ export const tableContract = contract("table", {
     "ROOT.FOCUS": { skip: "a scroll stop needs layout: the browser tests" },
     "ROOT.BLUR": { skip: "a scroll stop needs layout: the browser tests" },
     "$props:sort": { skip: "the parent's prop change: the controlled DOM tests" },
+    "$props:pinnedColumns": { skip: "the parent's prop change: the pinned DOM tests" },
+    "ROWS.CHANGED": { skip: "the parent's row count: the announcement DOM tests" },
+    "$props:rowCount": { skip: "the parent's row count: the announcement DOM tests" },
+    "ROW.TOGGLE": { skip: "the row is the story's: the expandable-row DOM tests" },
+    "$props:expandedRows": { skip: "the parent's prop change: the expandable-row DOM tests" },
+    "$props:rowRange": { skip: "the parent's row range: the announcement DOM tests" },
   },
   traits: [],
   invariants,

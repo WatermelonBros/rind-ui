@@ -3,13 +3,19 @@ import {
   domTableMetrics,
   itemId,
   type MessageOverrides,
+  type PinnedColumns,
   quirkActive,
+  type RowRange,
   type SortDescriptor,
   type SortDirection,
   type TableEvent,
+  type TableFrameEvent,
   type TableMessages,
   type TableSortValue,
   tableConnect,
+  tableFrameConnect,
+  tableFrameIds,
+  tableFrameMachine,
   tableMachine,
   tableMessages,
   visibleText,
@@ -17,6 +23,7 @@ import {
 import {
   type ComponentPropsWithRef,
   createContext,
+  type ReactNode,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -24,9 +31,12 @@ import {
   useRef,
   useState,
 } from "react"
+import { useIconChildren } from "../icons"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
+import { Popover, type PopoverRootProps } from "../popover"
+import { ScopedPopoverRoot } from "../popover/popover"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import {
@@ -67,6 +77,8 @@ interface Ctx {
   readonly captionId: string
   readonly registry: PartRegistry<"caption">
   readonly captioned: boolean
+  /** The Frame around the Root, when there is one (the Caption names it while expanded). */
+  readonly frame: FrameCtx | null
   /** Sortable column ids, for the duplicate check. */
   readonly columns: Set<string>
   readonly setEmpty: (delta: 1 | -1) => void
@@ -82,6 +94,11 @@ function useTable(part: string): Ctx {
 interface ColumnCtx {
   readonly id: string
   readonly firstDirection: SortDirection
+  readonly sortable: boolean
+  /** The column's text (measured after mount; the id until then). */
+  readonly text: string
+  /** A Filter registers while mounted. */
+  readonly addFilter: () => () => void
 }
 const ColumnContext = createContext<ColumnCtx | null>(null)
 
@@ -97,6 +114,26 @@ export type TableRootProps = ComponentPropsWithRef<"div"> & {
   readonly allowUnsorted?: boolean
   /** `data-sticky-first-column` on the Root (the theme pins the first cell of each row). */
   readonly stickyFirstColumn?: boolean
+  /** Column ids pinned at the inline start and end (controllable). */
+  readonly pinnedColumns?: PinnedColumns
+  readonly defaultPinnedColumns?: PinnedColumns
+  readonly onPinnedColumnsChange?: (
+    pinned: PinnedColumns,
+    details: ChangeDetails<TableEvent>,
+  ) => void
+  /** Row ids whose details are open (controllable). */
+  readonly expandedRows?: readonly string[]
+  readonly defaultExpandedRows?: readonly string[]
+  readonly onExpandedRowsChange?: (
+    rows: readonly string[],
+    details: ChangeDetails<TableEvent>,
+  ) => void
+  /** Several rows open at once (default); `false`: opening one closes the others. */
+  readonly multiple?: boolean
+  /** The rows shown (after filters): announced when it changes. */
+  readonly rowCount?: number
+  /** With pagination: the rows shown of the total, announced instead of the count. */
+  readonly rowRange?: RowRange
   readonly messages?: MessageOverrides<TableMessages>
   /** Default: the provider's locale (the announcement's language). */
   readonly locale?: string
@@ -109,6 +146,15 @@ function Root({
   onSortChange,
   allowUnsorted,
   stickyFirstColumn = false,
+  pinnedColumns,
+  defaultPinnedColumns,
+  onPinnedColumnsChange,
+  rowCount,
+  rowRange,
+  expandedRows,
+  defaultExpandedRows,
+  onExpandedRowsChange,
+  multiple,
   messages: ownMessages,
   locale: ownLocale,
   render,
@@ -117,7 +163,9 @@ function Root({
   children,
   ...rest
 }: TableRootProps) {
-  const instance = useRootId(id)
+  // Inside a Frame the Root shares its instance: every part of the table is one instance.
+  const frameCtx = useContext(FrameContext)
+  const instance = useRootId(id ?? frameCtx?.instance)
   const env = useEnvironment()
   const messages = useMessages("table", tableMessages, ownMessages)
   const { locale } = useLocale(ownLocale)
@@ -139,9 +187,19 @@ function Root({
       defaultSort: initial,
       onSortChange: onSortChange ? (s, details) => onSortChange(s.value, details) : undefined,
       allowUnsorted,
+      pinnedColumns,
+      defaultPinnedColumns,
+      onPinnedColumnsChange,
+      rowCount,
+      rowRange,
+      expandedRows,
+      defaultExpandedRows,
+      onExpandedRowsChange,
+      multiple,
     },
     tableEnv,
   )
+  const frame = frameCtx
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   const [emptyCount, setEmptyCount] = useState(0)
@@ -168,9 +226,11 @@ function Root({
     modality,
     stickyFirstColumn,
     empty: emptyCount > 0,
-    captionId,
+    captionId: captionId ?? frame?.titleId,
     tableLabel: tableLabel.current,
     describeSort: mounted && quirkActive("talkback-aria-sort", env),
+    pinned: view.values.pinnedColumns,
+    expandedRows: view.values.expandedRows,
   })
   const ctx: Ctx = {
     api,
@@ -180,6 +240,7 @@ function Root({
     captionId: `table-${instance}-caption`,
     registry,
     captioned: captionId !== undefined,
+    frame,
     columns,
     setEmpty: (d) => setEmptyCount((n) => n + d),
     tableLabel,
@@ -227,13 +288,30 @@ function TableElement({ render, loading = false, ref, ...rest }: TableTableProps
   // After commit: the Caption, or a label, names the table (spec "Name").
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return
-    const t = el.current
-    if (!t || t.caption || t.hasAttribute("aria-label") || t.hasAttribute("aria-labelledby")) return
-    warnOnce(ctx.instance, "a table needs a name: render Table.Caption or pass aria-label")
+    // After the re-render a Caption or a Title causes when it registers.
+    queueMicrotask(() => {
+      const t = el.current
+      if (!t?.isConnected) return
+      if (t.caption || t.hasAttribute("aria-label") || t.hasAttribute("aria-labelledby")) return
+      warnOnce(
+        ctx.instance,
+        "a table needs a name: render Table.Caption, Table.Title or aria-label",
+      )
+    })
   })
+  // No Caption and no label of its own: the Frame's Title names it.
+  const titled =
+    !ctx.captioned &&
+    rest["aria-label"] === undefined &&
+    rest["aria-labelledby"] === undefined &&
+    ctx.frame?.titleId !== undefined
   return renderPart(
     "table",
-    mergeProps(normalizeProps(ctx.api.table({ loading })), { ref: composeRefs(el, ref) }, rest),
+    mergeProps(
+      normalizeProps(ctx.api.table({ loading })),
+      { ref: composeRefs(el, ref), ...(titled ? { "aria-labelledby": ctx.frame?.titleId } : {}) },
+      rest,
+    ),
     render,
     ctx.state,
   )
@@ -251,6 +329,11 @@ function Caption({ render, id, ...rest }: PartProps<"caption">) {
   const ctx = useTable("Caption")
   const own = id ?? ctx.captionId
   useRegisterPart(ctx.registry, "caption", own)
+  const setCaption = ctx.frame?.setCaption
+  useIsoLayoutEffect(() => {
+    setCaption?.(own)
+    return () => setCaption?.(undefined)
+  }, [own, setCaption])
   return renderPart(
     "caption",
     mergeProps(normalizeProps(ctx.api.caption(own)), rest),
@@ -274,15 +357,128 @@ function Foot({ render, ...rest }: PartProps<"tfoot">) {
   return renderPart("tfoot", mergeProps(normalizeProps(ctx.api.foot()), rest), render, ctx.state)
 }
 
-function Row({ render, ...rest }: PartProps<"tr">) {
+export type TableRowProps = PartProps<"tr"> & {
+  /** The row id: needed to expand it (`expandedRows`, RowTrigger, RowDetails). */
+  readonly id?: string
+}
+
+interface RowCtx {
+  readonly id: string
+  /** The RowHeader's text (measured after mount; the id until then). */
+  readonly text: string
+}
+const RowContext = createContext<RowCtx | null>(null)
+
+/** The leaf columns' count, read from the head after mount (Empty, RowDetails). */
+function useLeafColumns(row: { current: HTMLTableRowElement | null }, given: number | undefined) {
+  const [counted, setCounted] = useState<number | undefined>(undefined)
+  useIsoLayoutEffect(() => {
+    if (given !== undefined) return
+    const table = row.current?.closest("table")
+    const last = table?.tHead?.rows[(table.tHead?.rows.length ?? 1) - 1]
+    if (!last) return
+    let n = 0
+    for (const cell of Array.from(last.cells)) n += cell.colSpan || 1
+    if (n !== counted) setCounted(n)
+  })
+  return given ?? counted
+}
+
+function Row({ render, id, ref, ...rest }: TableRowProps) {
   const ctx = useTable("Row")
-  return renderPart("tr", mergeProps(normalizeProps(ctx.api.row()), rest), render, ctx.state)
+  const el = useRef<HTMLTableRowElement | null>(null)
+  const [text, setText] = useState<string | undefined>(undefined)
+  useIsoLayoutEffect(() => {
+    if (id === undefined) return
+    const header = el.current?.querySelector<HTMLElement>(':scope > [data-part="row-header"]')
+    const next = header ? visibleText(header) : undefined
+    if (next !== text) setText(next)
+  })
+  const domId = id === undefined ? undefined : itemId("table", ctx.instance, "row", id)
+  const tr = renderPart(
+    "tr",
+    mergeProps(
+      normalizeProps(ctx.api.row(id)),
+      { ref: composeRefs(el, ref), ...(domId ? { id: domId } : {}) },
+      rest,
+    ),
+    render,
+    ctx.state,
+  )
+  return id === undefined ? tr : <RowContext value={{ id, text: text ?? id }}>{tr}</RowContext>
+}
+
+function RowTrigger({ render, ref, children, ...rest }: PartProps<"button">) {
+  const ctx = useTable("RowTrigger")
+  const row = useContext(RowContext)
+  if (!row) throw new Error("Table.RowTrigger must be inside a Table.Row with an `id`")
+  const env = useEnvironment()
+  useEffect(() => env.modality.subscribe(() => {}), [env])
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  const named = rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined
+  const props = mergeProps(
+    {
+      ...joinHandlers(
+        normalizeProps(ctx.api.rowTrigger(row.id, { text: row.text, named, focused, modality })),
+        {
+          onClick: () => ctx.send({ type: "ROW.TOGGLE", row: row.id }),
+          onFocus: () => setFocused(true),
+          onBlur: () => setFocused(false),
+        },
+      ),
+      ref,
+    },
+    rest,
+  )
+  return renderPart("button", { ...props, children }, render, ctx.state)
+}
+
+export type TableRowDetailsProps = PartProps<"tr"> & {
+  /** The id of the Row these details belong to (render it right after that Row). */
+  readonly rowId: string
+  /** The cell's span; default: the leaf columns counted after mount. */
+  readonly colSpan?: number
+  /** Props of the one cell spanning the row. */
+  readonly cellProps?: ComponentPropsWithRef<"td">
+}
+
+function RowDetails({
+  render,
+  rowId,
+  colSpan,
+  cellProps,
+  children,
+  ref,
+  ...rest
+}: TableRowDetailsProps) {
+  const ctx = useTable("RowDetails")
+  const row = useRef<HTMLTableRowElement | null>(null)
+  const span = useLeafColumns(row, colSpan)
+  const props = mergeProps(
+    normalizeProps(ctx.api.rowDetails(rowId)),
+    { ref: composeRefs(row, ref) },
+    rest,
+  )
+  return renderPart(
+    "tr",
+    {
+      ...props,
+      children: (
+        <td colSpan={span} {...cellProps}>
+          {children}
+        </td>
+      ),
+    },
+    render,
+    ctx.state,
+  )
 }
 
 export type TableColumnHeaderProps = PartProps<"th"> & {
   /** Holds a SortTrigger; needs `id`. */
   readonly sortable?: boolean
-  /** The column id: unique in the table, what `sort.column` holds. */
+  /** The column id: unique in the table, what `sort.column` and `pinnedColumns` hold. */
   readonly id?: string
   /** The direction of a first press on this column. Default `ascending`. */
   readonly firstDirection?: SortDirection
@@ -294,31 +490,62 @@ function ColumnHeader({
   id,
   firstDirection = "ascending",
   colSpan,
+  ref,
   ...rest
 }: TableColumnHeaderProps) {
   const ctx = useTable("ColumnHeader")
   if (sortable && (id === undefined || id === "")) {
     throw new Error("Table.ColumnHeader: a sortable column needs a non-empty `id`")
   }
-  const column = sortable ? id : undefined
   useIsoLayoutEffect(() => {
-    if (column === undefined) return
-    if (process.env.NODE_ENV !== "production" && ctx.columns.has(column)) {
-      console.error(`[rind-ui] table: two sortable columns have the id "${column}"`)
+    if (id === undefined) return
+    if (process.env.NODE_ENV !== "production" && ctx.columns.has(id)) {
+      console.error(`[rind-ui] table: two columns have the id "${id}"`)
     }
-    ctx.columns.add(column)
+    ctx.columns.add(id)
     return () => {
-      ctx.columns.delete(column)
+      ctx.columns.delete(id)
     }
-  }, [column, ctx.columns])
-  const api = normalizeProps(ctx.api.columnHeader({ colSpan, sortable: column }))
+  }, [id, ctx.columns])
+  // A Filter inside: the header is named by its text alone (MUI-X#19239); the text is read
+  // after mount, without the filter's own button.
+  const el = useRef<HTMLTableCellElement | null>(null)
+  const [filters, setFilters] = useState(0)
+  const [text, setText] = useState<string | undefined>(undefined)
+  useIsoLayoutEffect(() => {
+    const th = el.current
+    if (!th || filters === 0) return
+    const copy = th.cloneNode(true) as HTMLElement
+    for (const n of Array.from(copy.querySelectorAll('[data-part="filter-trigger"]'))) n.remove()
+    const next = visibleText(copy)
+    if (next !== text) setText(next)
+  })
+  const api = normalizeProps(
+    ctx.api.columnHeader({ colSpan, column: id, sortable, controls: filters > 0, text }),
+  )
   const domId = id === undefined ? undefined : itemId("table", ctx.instance, "column", id)
-  const props = mergeProps(api, { colSpan, ...(domId ? { id: domId } : {}) }, rest)
+  const props = mergeProps(
+    api,
+    { colSpan, ref: composeRefs(el, ref), ...(domId ? { id: domId } : {}) },
+    rest,
+  )
   const th = renderPart("th", props, render, ctx.state)
-  return column === undefined ? (
-    th
-  ) : (
-    <ColumnContext value={{ id: column, firstDirection }}>{th}</ColumnContext>
+  if (id === undefined) return th
+  return (
+    <ColumnContext
+      value={{
+        id,
+        firstDirection,
+        sortable,
+        text: text ?? id,
+        addFilter: () => {
+          setFilters((n) => n + 1)
+          return () => setFilters((n) => n - 1)
+        },
+      }}
+    >
+      {th}
+    </ColumnContext>
   )
 }
 
@@ -340,7 +567,9 @@ function Cell({ render, ...rest }: PartProps<"td">) {
 function SortTrigger({ render, ref, children, ...rest }: PartProps<"button">) {
   const ctx = useTable("SortTrigger")
   const column = useContext(ColumnContext)
-  if (!column) throw new Error("Table.SortTrigger must be inside a sortable Table.ColumnHeader")
+  if (!column?.sortable) {
+    throw new Error("Table.SortTrigger must be inside a sortable Table.ColumnHeader")
+  }
   const env = useEnvironment()
   const el = useRef<HTMLButtonElement | null>(null)
   useEffect(() => env.modality.subscribe(() => {}), [env])
@@ -387,13 +616,302 @@ function SortTrigger({ render, ref, children, ...rest }: PartProps<"button">) {
   )
 }
 
-function SortIndicator({ render, ...rest }: PartProps<"span">) {
+export type TableSortIndicatorProps = PartProps<"span"> & {
+  /** Rendered while sorted ascending (else `children`). */
+  readonly ascending?: ReactNode
+  /** Rendered while sorted descending (else `children`). */
+  readonly descending?: ReactNode
+  /** Rendered while not sorted (else `children`). */
+  readonly none?: ReactNode
+}
+
+function SortIndicator({
+  render,
+  ascending,
+  descending,
+  none,
+  children,
+  ...rest
+}: TableSortIndicatorProps) {
   const ctx = useTable("SortIndicator")
   const column = useContext(ColumnContext)
-  if (!column) throw new Error("Table.SortIndicator must be inside a sortable Table.ColumnHeader")
+  if (!column?.sortable) {
+    throw new Error("Table.SortIndicator must be inside a sortable Table.ColumnHeader")
+  }
+  const sort = ctx.state.sort
+  const direction = sort?.column === column.id ? sort.direction : "none"
+  const own =
+    direction === "ascending"
+      ? (ascending ?? children)
+      : direction === "descending"
+        ? (descending ?? children)
+        : (none ?? children)
+  // Else the provider's icon for the direction; else nothing (the theme draws the shape).
+  const shown = useIconChildren(
+    direction === "ascending"
+      ? "caret-up"
+      : direction === "descending"
+        ? "caret-down"
+        : "caret-up-down",
+    own,
+  )
   return renderPart(
     "span",
-    mergeProps(normalizeProps(ctx.api.sortIndicator(column.id)), rest),
+    { ...mergeProps(normalizeProps(ctx.api.sortIndicator(column.id)), rest), children: shown },
+    render,
+    ctx.state,
+  )
+}
+
+// ── Frame, Header, Footer and the full-page view (table-columns-and-toolbar design §4) ──
+
+interface FrameCtx {
+  readonly instance: string
+  readonly api: ReturnType<typeof tableFrameConnect>
+  readonly send: (event: TableFrameEvent) => void
+  readonly expanded: boolean
+  readonly setCaption: (id: string | undefined) => void
+  /** The Title's id: names the table and the full-page view when there is no Caption. */
+  readonly titleId: string | undefined
+  readonly setTitle: (id: string | undefined) => void
+}
+const FrameContext = createContext<FrameCtx | null>(null)
+function useFrame(part: string): FrameCtx {
+  const ctx = useContext(FrameContext)
+  if (!ctx) throw new Error(`Table.${part} must be inside Table.Frame`)
+  return ctx
+}
+
+export interface TableFrameRenderState {
+  readonly expanded: boolean
+}
+
+export type TableFrameProps = ComponentPropsWithRef<"div"> & {
+  /** Full page: the Frame covers the viewport as a modal dialog (controllable). */
+  readonly expanded?: boolean
+  readonly defaultExpanded?: boolean
+  readonly onExpandedChange?: (expanded: boolean, details: ChangeDetails<TableFrameEvent>) => void
+  /** Overrides the strings ("Full page"); also through the provider. */
+  readonly messages?: MessageOverrides<TableMessages>
+  /** Another element or a render function receiving the props and `{ expanded }`. */
+  readonly render?: RenderProp<TableFrameRenderState>
+}
+
+function Frame({
+  expanded,
+  defaultExpanded,
+  onExpandedChange,
+  messages: ownMessages,
+  render,
+  id,
+  ref,
+  children,
+  ...rest
+}: TableFrameProps) {
+  const instance = useRootId(id)
+  const messages = useMessages("table", tableMessages, ownMessages)
+  const { view, send } = useMachine(tableFrameMachine, {
+    root: instance,
+    expanded,
+    defaultExpanded,
+    onExpandedChange,
+  })
+  const [captionId, setCaption] = useState<string | undefined>(undefined)
+  const [titleId, setTitle] = useState<string | undefined>(undefined)
+  const isExpanded = view.values.expanded
+  const api = tableFrameConnect({
+    instance,
+    expanded: isExpanded,
+    messages,
+    captionId: captionId ?? titleId,
+    ids: tableFrameIds(instance),
+  })
+  const ctx: FrameCtx = {
+    instance,
+    api,
+    send,
+    expanded: isExpanded,
+    setCaption,
+    titleId,
+    setTitle,
+  }
+  const props = mergeProps({ ...normalizeProps(api.frame()), ref }, rest)
+  return (
+    <FrameContext value={ctx}>
+      {renderPart("div", { ...props, children }, render, { expanded: isExpanded })}
+    </FrameContext>
+  )
+}
+
+type FramePartProps<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and `{ expanded }`. */
+  readonly render?: RenderProp<TableFrameRenderState>
+}
+
+function Header({ render, ...rest }: FramePartProps<"div">) {
+  const f = useFrame("Header")
+  return renderPart("div", mergeProps(normalizeProps(f.api.header()), rest), render, {
+    expanded: f.expanded,
+  })
+}
+
+function Footer({ render, ...rest }: FramePartProps<"div">) {
+  const f = useFrame("Footer")
+  return renderPart("div", mergeProps(normalizeProps(f.api.footer()), rest), render, {
+    expanded: f.expanded,
+  })
+}
+
+function Title({ render, id, ...rest }: FramePartProps<"div">) {
+  const f = useFrame("Title")
+  const own = id ?? `table-${f.instance}-title`
+  const { setTitle } = f
+  useIsoLayoutEffect(() => {
+    setTitle(own)
+    return () => setTitle(undefined)
+  }, [own, setTitle])
+  return renderPart("div", mergeProps(normalizeProps(f.api.title(own)), rest), render, {
+    expanded: f.expanded,
+  })
+}
+
+export type TableExpandTriggerProps = FramePartProps<"button"> & {
+  /** Rendered while full page (else `children`). */
+  readonly expanded?: ReactNode
+  /** Rendered while in place (else `children`). */
+  readonly collapsed?: ReactNode
+}
+
+function ExpandTrigger({
+  render,
+  expanded,
+  collapsed,
+  children,
+  ref,
+  ...rest
+}: TableExpandTriggerProps) {
+  const f = useFrame("ExpandTrigger")
+  const env = useEnvironment()
+  useEffect(() => env.modality.subscribe(() => {}), [env])
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  const own = f.expanded ? (expanded ?? children) : (collapsed ?? children)
+  const named = children !== undefined && children !== null && children !== false
+  const shown = useIconChildren(f.expanded ? "arrows-in" : "arrows-out", own)
+  const props = mergeProps(
+    {
+      ...joinHandlers(normalizeProps(f.api.expandTrigger({ named, focused, modality })), {
+        onClick: () => f.send({ type: "TOGGLE" }),
+        onFocus: () => setFocused(true),
+        onBlur: () => setFocused(false),
+      }),
+      ref,
+    },
+    rest,
+  )
+  return renderPart("button", { ...props, children: shown }, render, { expanded: f.expanded })
+}
+
+// ── Filters: a Popover scoped to the table, inside a ColumnHeader (design §2) ──
+
+interface FilterCtx {
+  readonly column: ColumnCtx
+  readonly active: boolean
+}
+const FilterContext = createContext<FilterCtx | null>(null)
+function useFilter(part: string): FilterCtx {
+  const ctx = useContext(FilterContext)
+  if (!ctx) throw new Error(`Table.${part} must be inside Table.Filter`)
+  return ctx
+}
+
+export interface TableFilterProps {
+  /** The column is filtered: the trigger is marked and described "Filtered". */
+  readonly active?: boolean
+  /** Controlled open state of the filter popover. */
+  readonly open?: boolean
+  /** Uncontrolled initial open state. */
+  readonly defaultOpen?: boolean
+  /** The popover proposes opening or closing. */
+  readonly onOpenChange?: PopoverRootProps["onOpenChange"]
+  /** The FilterTrigger and the FilterContent. */
+  readonly children?: ReactNode
+}
+
+function Filter({ active = false, children, ...rest }: TableFilterProps) {
+  const column = useContext(ColumnContext)
+  if (!column) throw new Error("Table.Filter must be inside a Table.ColumnHeader with an `id`")
+  const { addFilter } = column
+  useIsoLayoutEffect(() => addFilter(), [addFilter])
+  return (
+    <FilterContext value={{ column, active }}>
+      <ScopedPopoverRoot scope="table" {...rest}>
+        {children}
+      </ScopedPopoverRoot>
+    </FilterContext>
+  )
+}
+
+function FilterTrigger({ children, ...rest }: ComponentPropsWithRef<typeof Popover.Trigger>) {
+  const ctx = useTable("FilterTrigger")
+  const f = useFilter("FilterTrigger")
+  const own = rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined
+  const api = normalizeProps(
+    ctx.api.filterTrigger(f.column.id, { text: f.column.text, active: f.active, named: own }),
+  )
+  const state = ctx.api.filterState(f.column.id, f.active)
+  return (
+    <Popover.Trigger {...(api as object)} {...rest}>
+      {children}
+      {state ? (
+        <VisuallyHidden id={state.id} aria-hidden="true">
+          {state.text}
+        </VisuallyHidden>
+      ) : null}
+    </Popover.Trigger>
+  )
+}
+
+export type TableFilterContentProps = ComponentPropsWithRef<typeof Popover.Content> & {
+  /** Props of the Positioner around the content. */
+  readonly positionerProps?: ComponentPropsWithRef<typeof Popover.Positioner>
+}
+
+function FilterContent({ positionerProps, ...rest }: TableFilterContentProps) {
+  const ctx = useTable("FilterContent")
+  const f = useFilter("FilterContent")
+  return (
+    <Popover.Portal>
+      <Popover.Positioner data-part="filter-positioner" {...positionerProps}>
+        <Popover.Content
+          data-part="filter-content"
+          aria-label={
+            ctx.api.filterTrigger(f.column.id, {
+              text: f.column.text,
+              active: false,
+              named: false,
+            })["aria-label"] as string
+          }
+          {...rest}
+        />
+      </Popover.Positioner>
+    </Popover.Portal>
+  )
+}
+
+export type TableFilterIndicatorProps = PartProps<"span"> & {
+  /** Rendered while the column is filtered (else `children`). */
+  readonly active?: ReactNode
+}
+
+function FilterIndicator({ render, active, children, ...rest }: TableFilterIndicatorProps) {
+  const ctx = useTable("FilterIndicator")
+  const f = useFilter("FilterIndicator")
+  const own = f.active ? (active ?? children) : children
+  const shown = useIconChildren(f.active ? "funnel" : "funnel-simple", own)
+  return renderPart(
+    "span",
+    { ...mergeProps(normalizeProps(ctx.api.filterIndicator(f.active)), rest), children: shown },
     render,
     ctx.state,
   )
@@ -432,6 +950,15 @@ function Empty({ render, colSpan, children, ref, ...rest }: TableEmptyProps) {
 }
 
 export const Table = {
+  Frame,
+  Header,
+  Footer,
+  Title,
+  ExpandTrigger,
+  Filter,
+  FilterTrigger,
+  FilterContent,
+  FilterIndicator,
   Root,
   Table: TableElement,
   Caption,
@@ -439,6 +966,8 @@ export const Table = {
   Body,
   Foot,
   Row,
+  RowTrigger,
+  RowDetails,
   ColumnHeader,
   RowHeader,
   Cell,

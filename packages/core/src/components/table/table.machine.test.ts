@@ -1,6 +1,6 @@
 // The sort write path and the scroll tab stop, in Node: a recording announcer, no DOM.
 import { describe, expect, it } from "vitest"
-import type { Announcement } from "../../env"
+import type { Announcement, Scheduler } from "../../env"
 import { createService } from "../../machine/service"
 import { type TableEvent, type TableProps, tableMachine } from "./table.machine"
 import { tableMessages } from "./table.messages"
@@ -12,7 +12,35 @@ import {
   type TableSortValue,
 } from "./table.sort"
 
+function manualScheduler() {
+  let now = 0
+  const timers = new Map<number, { at: number; fn: () => void }>()
+  let next = 1
+  const scheduler: Scheduler = {
+    setTimeout: (fn, ms) => {
+      timers.set(next, { at: now + ms, fn })
+      return next++
+    },
+    clearTimeout: (h) => {
+      timers.delete(h as number)
+    },
+    requestAnimationFrame: () => 0,
+    cancelAnimationFrame: () => {},
+  }
+  const advance = (ms: number) => {
+    now += ms
+    for (const [id, t] of [...timers]) {
+      if (t.at <= now) {
+        timers.delete(id)
+        t.fn()
+      }
+    }
+  }
+  return { scheduler, advance }
+}
+
 function make(over: Partial<TableProps> = {}) {
+  const time = manualScheduler()
   const log: Announcement[] = []
   const changes: (SortDescriptor | null)[] = []
   let props: TableProps = {
@@ -22,6 +50,7 @@ function make(over: Partial<TableProps> = {}) {
     ...over,
   }
   const env = {
+    scheduler: time.scheduler,
     announcer: {
       announce: (a: Announcement) => {
         log.push(a)
@@ -38,7 +67,7 @@ function make(over: Partial<TableProps> = {}) {
     props = { ...props, ...next }
     s.setProps(props)
   }
-  return { s, log, changes, sort, ctx, setProps }
+  return { s, log, changes, sort, ctx, setProps, advance: time.advance }
 }
 
 const press = (column: string, name = column, firstDirection: SortDirection = "ascending") =>
@@ -167,6 +196,7 @@ describe("table machine: scroll tab stop", () => {
       tableMachine,
       { root: "t9", messages: tableMessages },
       {
+        scheduler: manualScheduler().scheduler,
         announcer: { announce: () => {}, prepare: () => () => {}, cancel: () => {} },
         tableMetrics: {
           track: (r) => {
@@ -182,6 +212,55 @@ describe("table machine: scroll tab stop", () => {
     expect(root).toBe("t9")
     s.stop()
     expect(stopped).toBe(true)
+  })
+})
+
+describe("table machine: expandable rows", () => {
+  const toggle = (row: string) => ({ type: "ROW.TOGGLE", row }) as TableEvent
+  const open = (s: ReturnType<typeof make>["s"], props: TableProps) =>
+    s.view(props as never).values.expandedRows
+  it("toggles; several open by default", () => {
+    const m = make()
+    m.s.send(toggle("a"))
+    m.s.send(toggle("b"))
+    expect(open(m.s, {} as TableProps)).toEqual(["a", "b"])
+    m.s.send(toggle("a"))
+    expect(open(m.s, {} as TableProps)).toEqual(["b"])
+  })
+  it("multiple={false}: opening one closes the others", () => {
+    const m = make({ multiple: false })
+    m.s.send(toggle("a"))
+    m.s.send(toggle("b"))
+    expect(open(m.s, {} as TableProps)).toEqual(["b"])
+  })
+})
+
+describe("table machine: row count", () => {
+  it("announced once after the quiet period; the first render is silent", () => {
+    const { log, setProps, advance } = make({ rowCount: 87 })
+    advance(1000)
+    expect(log).toEqual([])
+    setProps({ rowCount: 40 })
+    advance(200)
+    setProps({ rowCount: 12 })
+    advance(399)
+    expect(log).toEqual([])
+    advance(1)
+    expect(said(log)).toEqual(["12 rows"])
+  })
+
+  it("a row range is announced instead of the count", () => {
+    const { log, setProps, advance } = make({ rowRange: { from: 1, to: 10, total: 87 } })
+    setProps({ rowRange: { from: 11, to: 20, total: 87 } })
+    advance(400)
+    expect(said(log)).toEqual(["Rows 11 to 20 of 87"])
+  })
+
+  it("an equal range is no change", () => {
+    const { log, setProps, advance } = make({ rowRange: { from: 1, to: 10, total: 87 } })
+    setProps({ rowRange: { from: 1, to: 10, total: 87 } })
+    advance(400)
+    expect(log).toEqual([])
   })
 })
 

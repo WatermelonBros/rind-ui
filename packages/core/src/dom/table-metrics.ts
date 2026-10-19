@@ -44,6 +44,71 @@ const same = (a: Measured | null, b: Measured) =>
   a.edges.yStart === b.edges.yStart &&
   a.edges.yEnd === b.edges.yEnd
 
+type Side = "start" | "end"
+
+/** The cells of a row by visual column (a colspan covers several columns). */
+function cellsByColumn(row: HTMLTableRowElement): (HTMLTableCellElement | undefined)[] {
+  const out: (HTMLTableCellElement | undefined)[] = []
+  for (const cell of Array.from(row.cells)) {
+    for (let i = 0; i < (cell.colSpan || 1); i++) out.push(i === 0 ? cell : undefined)
+  }
+  return out
+}
+
+/**
+ * Pinned columns (table-columns-and-toolbar design §1): the last head row's headers carry
+ * `data-pinned` (connect); every cell at those visual columns gets the same flag and its offset
+ * at its edge; the innermost at each edge gets `data-pinned-edge`. Returns the cells it marked.
+ */
+function pin(root: HTMLElement, marked: Set<HTMLElement>): { start: number; end: number } {
+  const table = root.querySelector<HTMLTableElement>(":scope > table")
+  const leaf = table?.tHead?.rows[table.tHead.rows.length - 1]
+  const width = { start: 0, end: 0 }
+  const columns = new Map<number, { side: Side; offset: number; edge: boolean }>()
+  if (table && leaf) {
+    const heads = cellsByColumn(leaf)
+    const pinned = (side: Side) =>
+      heads
+        .map((h, index) => ({ h, index }))
+        .filter((c) => c.h?.getAttribute("data-pinned") === side)
+    for (const side of ["start", "end"] as const) {
+      const list = side === "start" ? pinned(side) : pinned(side).reverse()
+      let offset = 0
+      list.forEach((c, i) => {
+        columns.set(c.index, { side, offset, edge: i === list.length - 1 })
+        offset += c.h?.offsetWidth ?? 0
+      })
+      width[side] = offset
+    }
+  }
+  const now = new Set<HTMLElement>()
+  if (table && columns.size > 0) {
+    for (const row of Array.from(table.rows)) {
+      // The leaf headers are connect's: only their offset is written here.
+      cellsByColumn(row).forEach((cell, index) => {
+        const c = columns.get(index)
+        if (!cell || !c) return
+        if (row !== leaf) cell.setAttribute("data-pinned", c.side)
+        if (c.edge) cell.setAttribute("data-pinned-edge", "")
+        else cell.removeAttribute("data-pinned-edge")
+        cell.style.setProperty("--rind-table-pin-offset", `${c.offset}px`)
+        now.add(cell)
+      })
+    }
+  }
+  for (const cell of marked) {
+    if (now.has(cell)) continue
+    if (cell.closest("thead")?.querySelector("tr:last-child") !== cell.parentElement) {
+      cell.removeAttribute("data-pinned")
+    }
+    cell.removeAttribute("data-pinned-edge")
+    cell.style.removeProperty("--rind-table-pin-offset")
+  }
+  marked.clear()
+  for (const cell of now) marked.add(cell)
+  return width
+}
+
 export function domTableMetrics(env: DomEnv & SchedulerEnv): TableMetricsCapability {
   return {
     track(instance, send) {
@@ -55,8 +120,16 @@ export function domTableMetrics(env: DomEnv & SchedulerEnv): TableMetricsCapabil
       if (!root || !win) return () => {}
       let last: Measured | null = null
       let frame: unknown = null
+      const marked = new Set<HTMLElement>()
       const run = () => {
         frame = null
+        const pinned = pin(root, marked)
+        root.style.setProperty("--rind-table-pinned-start-width", `${pinned.start}px`)
+        root.style.setProperty("--rind-table-pinned-end-width", `${pinned.end}px`)
+        // The visible width: a details row's content stays inside it while the table scrolls.
+        root.style.setProperty("--rind-table-viewport-width", `${root.clientWidth}px`)
+        // Our own writes are not changes to react to.
+        mutations?.takeRecords()
         const head = root.querySelector<HTMLElement>(":scope > table > thead")
         const first = head?.querySelector<HTMLElement>("tr > th")
         root.style.setProperty("--rind-table-head-height", `${head?.offsetHeight ?? 0}px`)
@@ -79,6 +152,9 @@ export function domTableMetrics(env: DomEnv & SchedulerEnv): TableMetricsCapabil
         if (head) resize?.observe(head)
         const first = head?.querySelector("tr > th")
         if (first) resize?.observe(first)
+        // Pinned columns' widths set the offsets of the ones after them.
+        for (const h of Array.from(head?.querySelectorAll("[data-pinned]") ?? []))
+          resize?.observe(h)
       }
       // Rows, cells and controls come and go: the layout to observe and the tabbable answer.
       const mutations = win.MutationObserver
@@ -91,7 +167,15 @@ export function domTableMetrics(env: DomEnv & SchedulerEnv): TableMetricsCapabil
         subtree: true,
         childList: true,
         attributes: true,
-        attributeFilter: ["tabindex", "disabled", "href", "contenteditable", "hidden", "inert"],
+        attributeFilter: [
+          "tabindex",
+          "disabled",
+          "href",
+          "contenteditable",
+          "hidden",
+          "inert",
+          "data-pinned",
+        ],
       })
       observeLayout()
       root.addEventListener("scroll", schedule, { passive: true })
@@ -103,6 +187,13 @@ export function domTableMetrics(env: DomEnv & SchedulerEnv): TableMetricsCapabil
         root.removeEventListener("scroll", schedule)
         root.style.removeProperty("--rind-table-head-height")
         root.style.removeProperty("--rind-table-first-column-width")
+        root.style.removeProperty("--rind-table-pinned-start-width")
+        root.style.removeProperty("--rind-table-pinned-end-width")
+        root.style.removeProperty("--rind-table-viewport-width")
+        for (const cell of marked) {
+          cell.removeAttribute("data-pinned-edge")
+          cell.style.removeProperty("--rind-table-pin-offset")
+        }
       }
     },
   }
