@@ -60,6 +60,7 @@ import * as select from "./select"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
+import * as splitter from "./splitter"
 import * as switchEx from "./switch"
 import * as tabs from "./tabs"
 import * as tagGroup from "./tag-group"
@@ -142,6 +143,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "scroll-area": scrollArea,
   skeleton,
   slider,
+  splitter,
   switch: switchEx,
   tabs,
   "tags-input": tagsInput,

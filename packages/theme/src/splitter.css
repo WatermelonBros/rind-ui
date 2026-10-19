@@ -1,0 +1,88 @@
+/*
+ * Splitter (family: decoration): core lays the panels out inline (flex-grow from the sizes),
+ * so this sheet only draws the handles. A handle is a thin line drawn as a border (it
+ * survives forced colors) with an invisible hit area of at least --rind-hit-area centred on
+ * it; the cursor follows the axis, also over the panels while a drag lasts. No transitions,
+ * as a resize follows the pointer and a collapse is instant.
+ */
+@layer rind.components {
+  :where([data-scope="splitter"][data-part="root"]) {
+    min-inline-size: 0;
+    min-block-size: 0;
+  }
+
+  :where([data-scope="splitter"][data-part="root"][data-dragging][data-orientation="horizontal"]) {
+    cursor: var(--rind-splitter-cursor, col-resize);
+  }
+
+  :where([data-scope="splitter"][data-part="root"][data-dragging][data-orientation="vertical"]) {
+    cursor: var(--rind-splitter-cursor-vertical, row-resize);
+  }
+
+  :where([data-scope="splitter"][data-part="handle"]) {
+    box-sizing: border-box;
+    color: var(--rind-splitter-handle-color, var(--rind-color-border));
+    outline-offset: calc(var(--rind-focus-width) * -1);
+  }
+
+  :where([data-scope="splitter"][data-part="handle"][data-orientation="horizontal"]) {
+    inline-size: var(--rind-splitter-handle-size, 1px);
+    border-inline-start: var(--rind-splitter-handle-size, 1px) solid currentColor;
+    cursor: var(--rind-splitter-cursor, col-resize);
+  }
+
+  :where([data-scope="splitter"][data-part="handle"][data-orientation="vertical"]) {
+    block-size: var(--rind-splitter-handle-size, 1px);
+    border-block-start: var(--rind-splitter-handle-size, 1px) solid currentColor;
+    cursor: var(--rind-splitter-cursor-vertical, row-resize);
+  }
+
+  /* The hit area: at least --rind-hit-area across the line, invisible, above the panels. */
+  :where([data-scope="splitter"][data-part="handle"])::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    inset-block: 0;
+    inset-inline: min(0px, calc((100% - var(--rind-hit-area)) / 2));
+  }
+
+  :where([data-scope="splitter"][data-part="handle"][data-orientation="vertical"])::before {
+    inset-inline: 0;
+    inset-block: min(0px, calc((100% - var(--rind-hit-area)) / 2));
+  }
+
+  :where([data-scope="splitter"][data-part="handle"]:not([data-disabled])):is(
+    :hover,
+    [data-dragging],
+    [data-focus-visible]
+  ) {
+    color: var(--rind-splitter-handle-active-color, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="splitter"][data-part="handle"][data-disabled]) {
+    cursor: var(--rind-splitter-disabled-cursor, default);
+    opacity: var(--rind-splitter-disabled-opacity, 0.6);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="splitter"][data-part="handle"]) {
+      color: CanvasText;
+    }
+
+    :where([data-scope="splitter"][data-part="handle"]:not([data-disabled])):is(
+        :hover,
+        [data-dragging]
+      ) {
+      color: Highlight;
+    }
+
+    :where([data-scope="splitter"][data-part="handle"][data-focus-visible]) {
+      outline-color: Highlight;
+    }
+
+    :where([data-scope="splitter"][data-part="handle"][data-disabled]) {
+      color: GrayText;
+      opacity: 1;
+    }
+  }
+}

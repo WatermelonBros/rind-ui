@@ -132,7 +132,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Meter |  |  | ● | ● |  |  |  | ● | ● | 4 | 2 | done |  |
 | Aspect Ratio |  | ● |  |  |  |  | ● | ● |  | 3 | 3 | done | Recipe (native CSS `aspect-ratio`), no component — docs/components/aspect-ratio.md |
 | Heading |  |  | ● |  |  | ● |  |  |  | 2 | 2 | done |  |
-| Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
+| Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done |  |
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
