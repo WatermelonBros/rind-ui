@@ -320,6 +320,9 @@ const TRANSIENT = new Set([
   "prompt-input:stopped",
   // The row-count announcement waits for the count to settle: entered by changing the rows.
   "table:counting",
+  // While a response arrives, and while the reveal catches up after it: the Stream example.
+  "streaming-message:streaming",
+  "streaming-message:settling",
   // A file drag over the Dropzone: entered by the driver's `dragEnter`.
   "file-upload:dragging",
   // Until the first measurement after hydration: the server render.

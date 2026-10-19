@@ -24,7 +24,8 @@ export interface AnnouncementStream {
 }
 
 const segmenters = new Map<string, Intl.Segmenter>()
-function sentences(locale: string, text: string): string[] {
+/** The locale's sentence segments of `text` (the last one may still be growing). */
+export function splitSentences(locale: string, text: string): string[] {
   let segmenter = segmenters.get(locale)
   if (!segmenter) {
     segmenter = new Intl.Segmenter(locale, { granularity: "sentence" })
@@ -55,7 +56,7 @@ export function streamAnnouncement(announcer: Announcer, o: StreamOptions): Anno
   }
   const announceSentences = (final: boolean) => {
     const rest = text.slice(announced)
-    const parts = sentences(o.locale, rest)
+    const parts = splitSentences(o.locale, rest)
     // The last segment may still be growing, unless the stream is complete.
     const complete = final ? parts : parts.slice(0, -1)
     for (const part of complete) {

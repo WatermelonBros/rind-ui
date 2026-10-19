@@ -1,0 +1,47 @@
+/* ── Streaming Message: an assistant bubble with relaxed reading type and a soft, accent caret
+   that blinks while the answer grows. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="streaming-message"][data-part="root"] {
+  inline-size: min(100%, 560px);
+  min-block-size: 48px;
+  padding: 14px 18px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 400 15px / 1.6 var(--s-font);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="streaming-message"][data-part="content"]
+  p {
+  margin: 0 0 10px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="streaming-message"][data-part="caret"] {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 1.1em;
+  margin-inline-start: 2px;
+  vertical-align: text-bottom;
+  border-radius: 2px;
+  background: var(--s-brand);
+  animation: s-caret 1s steps(1) infinite;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="streaming-message"][data-part="root"]:is(
+    [data-state="cancelled"],
+    [data-state="error"]
+  ) {
+  border-style: dashed;
+}
+@keyframes s-caret {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="streaming-message"][data-part="caret"] {
+    animation: none;
+  }
+}

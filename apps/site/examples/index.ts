@@ -65,6 +65,7 @@ import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as splitter from "./splitter"
+import * as streamingMessage from "./streaming-message"
 import * as switchEx from "./switch"
 import * as table from "./table"
 import * as tabs from "./tabs"
@@ -153,6 +154,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   skeleton,
   slider,
   splitter,
+  "streaming-message": streamingMessage,
   switch: switchEx,
   table,
   tabs,

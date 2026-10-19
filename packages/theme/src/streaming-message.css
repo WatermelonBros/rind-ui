@@ -1,0 +1,47 @@
+/*
+ * Streaming Message (family: decoration): the Content's reading typography; the Caret is a
+ * thin bar after the text that blinks (steps, no fade) only while the message is busy, and
+ * holds still under reduced motion. Tier-3 --rind-streaming-message-* tokens are only read.
+ */
+@layer rind.components {
+  @keyframes rind-streaming-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  :where([data-scope="streaming-message"][data-part="root"]) {
+    color: var(--rind-streaming-message-color, var(--rind-color-text));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-streaming-message-font-size, var(--rind-text-md));
+    line-height: var(--rind-streaming-message-leading, var(--rind-leading-normal));
+  }
+
+  :where([data-scope="streaming-message"][data-part="content"]) {
+    display: inline;
+    overflow-wrap: anywhere;
+  }
+
+  :where([data-scope="streaming-message"][data-part="caret"]) {
+    display: inline-block;
+    inline-size: var(--rind-streaming-message-caret-width, 0.5em);
+    block-size: 1.1em;
+    margin-inline-start: 0.125em;
+    vertical-align: text-bottom;
+    background: var(--rind-streaming-message-caret-color, currentColor);
+    border-radius: 1px;
+    animation: rind-streaming-caret 1s steps(1) infinite;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="streaming-message"][data-part="caret"]) {
+      background: CanvasText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="streaming-message"][data-part="caret"]) {
+      animation: none;
+    }
+  }
+}

@@ -1,0 +1,1 @@
+- article "Assistant, complete": "A headless component owns behaviour and accessibility, and leaves the look to you. This one paces bursty chunks so they read evenly, marks the text busy while it grows, and announces the start and the end of the response, never each chunk. Your renderer gets the displayed text: plain, markdown, anything."

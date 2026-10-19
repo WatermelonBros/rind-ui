@@ -23,4 +23,9 @@ export {
   toLogicalKey,
   toLogicalKeyEvent,
 } from "./keys"
-export { type AnnouncementStream, type StreamOptions, streamAnnouncement } from "./stream"
+export {
+  type AnnouncementStream,
+  type StreamOptions,
+  splitSentences,
+  streamAnnouncement,
+} from "./stream"

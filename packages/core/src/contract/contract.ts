@@ -208,11 +208,15 @@ export interface ContractDef<
   }
   /**
    * Machine event → the action that produces it; `$sync:<value>` / `$props:<prop>` edges →
-   * the props a re-render applies (the target state is passed in). Unmapped events and
-   * prop edges are reported as uncovered and fail the coverage test.
+   * the props a re-render applies (the target state is passed in). A machine event the
+   * parent's props drive (an internal routing event after a prop change) takes props too.
+   * Unmapped events and prop edges are reported as uncovered and fail the coverage test.
    */
   readonly events: {
-    readonly [E in EventOf<M>["type"]]?: EventMapping<NoInfer<A>> | ByState<NoInfer<A>, StateOf<M>>
+    readonly [E in EventOf<M>["type"]]?:
+      | EventMapping<NoInfer<A>>
+      | ByState<NoInfer<A>, StateOf<M>>
+      | PropStep<MachinePropsOf<M>, StateOf<M>>
   } & {
     readonly [E in `$sync:${string}` | `$props:${string}`]?:
       | Skip
