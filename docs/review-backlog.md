@@ -336,6 +336,18 @@ verified at round 3 (2026-10-14).
 - warning: no non-colour cue for `[data-state="copied"]` / `[data-state="error"]` on the copy trigger (WCAG 1.4.1), and the example keeps the "Copy" text. Add an icon or text swap.
 - warning: the model test covers only the collapsible block. Add a variant without `maxLines`, or skip EXPAND.TOGGLE when the trigger is hidden.
 - warning: the `code-block--basic` ARIA snapshot leaves out `button "Wrap"` and the code content.
+## Splitter (#166)
+
+- warning: `splitter.css:25`: the handle's `outline-offset` inside `:where()` loses to `base.css` `[data-focus-visible]`.
+- warning: `splitter.tsx:247`: the ResizeObserver only watches the handles present at mount.
+- warning: `splitter.tsx:316`: the Handle reads `data-disabled` in the parts; the machine guard should decide alone.
+- warning: `splitter.contract.ts:34-46`: the contract's geometry uses the Root's border box, not its content box.
+- warning: `splitter.contract.ts:205`: `toggleCollapse.done` is always true.
+- warning: uncommented assertions: `as 1 | -1` (`splitter.connect.ts:105`), `as never` (`splitter.contract.ts:269-290`).
+- warning: unprefixed public exports: `HandleOwn`, `clampSize`, `isCollapsed`, `resizeAt`, `sameSizes`, `validateSizes`, `resolveSizes`, `handleBounds`.
+- warning: no test for "a second pointer SHALL not start another drag".
+- warning: `splitter.machine.ts:187`: `step <= 0` is not validated.
+
 ## add-grid-list: deferred tasks (archived 2026-10-18)
 
 - 0.2 / 9.2: real-AT pass (VoiceOver macOS/iOS, NVDA, JAWS, TalkBack). Record it in "Tested with".
