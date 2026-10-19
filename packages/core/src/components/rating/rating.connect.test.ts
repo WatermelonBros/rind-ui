@@ -119,3 +119,31 @@ describe("rating connect", () => {
     expect(ratingFraction({ left: 0, width: 0 }, 5, "ltr")).toBe(1)
   })
 })
+
+describe("Data Attributes on every part", () => {
+  it("disabled, read-only, required, invalid and previewing reach all six parts", () => {
+    const api = ratingConnect({
+      ...base,
+      preview: 2,
+      field: { ...field, disabled: true, readOnly: true, required: true, invalid: true },
+    })
+    for (const props of [
+      api.root(),
+      api.label(),
+      api.control(),
+      api.item(1),
+      api.input(),
+      api.hiddenInput(),
+    ]) {
+      for (const flag of [
+        "data-disabled",
+        "data-readonly",
+        "data-required",
+        "data-invalid",
+        "data-previewing",
+      ]) {
+        expect(props[flag], `${String(props["data-part"])} ${flag}`).toBe("")
+      }
+    }
+  })
+})

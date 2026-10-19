@@ -131,6 +131,7 @@ export function ratingConnect(input: RatingConnectInput) {
     /** The range input: the Rating's only focusable element, role slider. */
     input: (): PartProps => ({
       ...part("input"),
+      ...shared,
       ...focus,
       type: "range",
       id: input.ids.input,
@@ -167,6 +168,7 @@ export function ratingConnect(input: RatingConnectInput) {
     /** The form carrier: the value ("" unrated), `required`, reset; focus goes to the input. */
     hiddenInput: (): PartProps => ({
       ...part("hidden-input"),
+      ...shared,
       id: input.ids.hiddenInput,
       "aria-hidden": "true",
       tabindex: -1,

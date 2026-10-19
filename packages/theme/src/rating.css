@@ -122,6 +122,10 @@
 
   :where([data-scope="rating"][data-disabled]:is([data-part="control"], [data-part="item"])) {
     cursor: var(--rind-rating-disabled-cursor, not-allowed);
+  }
+
+  /* On the Control only: the Items sit inside it, so theirs would compound (0.6 × 0.6). */
+  :where([data-scope="rating"][data-part="control"][data-disabled]) {
     opacity: var(--rind-rating-disabled-opacity, 0.6);
   }
 

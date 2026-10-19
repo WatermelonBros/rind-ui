@@ -34,6 +34,9 @@ async function spot(env: E, v: number) {
 const press = (kind: "mouse" | "touch") => async (env: E, v: number) => {
   const { star, at } = await spot(env, v === 0 ? await value(env) : v)
   const box = await star.box()
+  const placeless = env.modality === "virtual" || !box || box.width === 0
+  if (placeless && !Number.isInteger(v))
+    throw new Error("rate: a half-star press needs layout, which this environment does not have")
   // Assistive technology activates with a bare click: a whole star, with no position.
   if (env.modality === "virtual") return star.click()
   if (!box || box.width === 0) return kind === "touch" ? star.tap() : star.click()

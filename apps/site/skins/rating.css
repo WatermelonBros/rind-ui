@@ -3,7 +3,7 @@
    reading start for half. The Control carries the keyboard ring. ── */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="rating"][data-part="root"] {
   --s-rating-star: 32px;
-  --s-rating-fill: #f5a623;
+  --s-rating-fill: #b86e00; /* ≥3:1 on white: a full star covers its outline */
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;

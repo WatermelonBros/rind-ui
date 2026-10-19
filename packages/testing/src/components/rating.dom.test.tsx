@@ -157,6 +157,11 @@ describe("Pointer", () => {
     expect(await drv().valueText()).toBe("No rating")
   })
 
+  it.runIf(inJsdom)("without layout a half-star press fails: it needs layout", async () => {
+    render(<R allowHalf />)
+    await expect(drv().rate(2.5)).rejects.toThrow(/needs layout/)
+  })
+
   browserIt("half stars: the first half of a star is a half value, mirrored in RTL", async () => {
     const { unmount } = render(<R allowHalf />)
     await drv().rate(2.5)

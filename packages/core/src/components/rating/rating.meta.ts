@@ -116,8 +116,8 @@ export const ratingMeta = {
       "data-state": '"full", "half" or "empty", from the value or the hover preview.',
       "data-previewed": "Inside the hover preview.",
     },
-    input: { ...base("input"), ...focus },
-    "hidden-input": base("hidden-input"),
+    input: { ...shared("input"), ...focus },
+    "hidden-input": shared("hidden-input"),
   },
   keyboard: [
     [
