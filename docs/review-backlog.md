@@ -343,6 +343,7 @@ verified at round 3 (2026-10-14).
 - warning: unprefixed public exports: `HandleOwn`, `clampSize`, `isCollapsed`, `resizeAt`, `sameSizes`, `validateSizes`, `resolveSizes`, `handleBounds`.
 - warning: no test for "a second pointer SHALL not start another drag".
 - warning: `splitter.machine.ts:187`: `step <= 0` is not validated.
+- warning: `SIZES.COMMIT` is internal but in the exported `SplitterEvent` union: mark it `@internal` or move it to a private type.
 
 ## add-grid-list: deferred tasks (archived 2026-10-18)
 
