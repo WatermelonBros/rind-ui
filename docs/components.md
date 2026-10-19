@@ -73,7 +73,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree · todo: drag and drop of nodes (a Tree View option, on top of Drag and Drop / Sortable; Reado file tree) |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark |
-| Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | spec | Missing in Ark; data-grid semantics |
+| Table |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark; data-grid semantics |
 
 ## Boolean & toggles (4)
 

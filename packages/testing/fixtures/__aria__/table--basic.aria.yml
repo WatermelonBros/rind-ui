@@ -1,0 +1,32 @@
+- table "Clipboard props":
+  - caption: Clipboard props
+  - rowgroup:
+    - row "Prop Type Default Notes":
+      - columnheader "Prop"
+      - columnheader "Type"
+      - columnheader "Default"
+      - columnheader "Notes"
+  - rowgroup:
+    - row "value string — What a press copies.":
+      - rowheader "value":
+        - code: value
+      - cell "string":
+        - code: string
+      - cell "—"
+      - cell "What a press copies."
+    - row "disabled boolean false No presses, no copy.":
+      - rowheader "disabled":
+        - code: disabled
+      - cell "boolean":
+        - code: boolean
+      - cell "false"
+      - cell "No presses, no copy."
+    - row "copyFeedbackDuration number 2000 Milliseconds.":
+      - rowheader "copyFeedbackDuration":
+        - code: copyFeedbackDuration
+      - cell "number":
+        - code: number
+      - cell "2000"
+      - cell "Milliseconds."
+- log
+- log

@@ -237,12 +237,14 @@ export {
   trackSwipe,
 } from "./swipe"
 export { hasTabbable, observeTabbable } from "./tabbable-content"
+export { domTableMetrics } from "./table-metrics"
 export { isTextField, textFieldCaret } from "./text-field"
 export { textSelection } from "./text-selection"
 export { type ToastRegion, type ToastRegionOptions, trackToastRegion } from "./toast-region"
 export { measureToast } from "./toast-stack"
 export { injectTouchAction, TOUCH_ACTION_RULE } from "./touch-action"
 export { supportsUntilFound, type UntilFoundOptions, untilFound } from "./until-found"
+export { visibleText } from "./visible-text"
 export {
   applyVisuallyHidden,
   hiddenInputProps,

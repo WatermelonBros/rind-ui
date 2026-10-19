@@ -191,6 +191,7 @@ export const familyMatrix = [
       "qr-code",
       "code-block",
       "splitter",
+      "table",
     ],
     variants: [],
     size: "none",

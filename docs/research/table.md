@@ -441,3 +441,28 @@ Drag and Drop and a treegrid research pass.
   after a sort? If so, the polite announcement may be dropped on Windows. Manual protocol.
 - Phase 2: cell focus or row focus by default? Grid List focuses rows. APG's data grid
   focuses cells. RA offers both. The answer goes in `add-table-grid` after a prototype on VO.
+
+## TanStack Table review: what it does better (2026-10-19)
+
+Read again against phase 1, at `TanStack/table` `packages/table-core/src/features/*`
+(row-sorting, column-filtering, global-filtering, column-faceting, column-pinning,
+column-sizing, column-visibility, column-ordering, row-pagination). TanStack is a data model
+with no markup and no accessibility; rind-ui's Table is the accessible view. They do not
+compete: the right shape is rind's parts rendering TanStack's state when a team uses it, and
+rind's own small helpers when it does not.
+
+| Area | TanStack | rind-ui phase 1 | Verdict |
+|---|---|---|---|
+| Sort state | `SortingState` is an array: multi-column sort (`isMultiSortEvent`, Shift+click by default; `maxMultiSortColCount`) | one `{ column, direction }` | Adopt as an option later (`multiple`): `aria-sort` stays on the primary column only (APG), the others are described ("sorted second, descending") |
+| Comparators | `sortingFn` per column (`alphanumeric`, `text`, `datetime`, `basic`, custom), `sortUndefined: "first" \| "last" \| 1 \| -1`, `invertSorting`, `sortDescFirst` | `sortItems` with one natural comparator; empties last; `firstDirection` | Adopt: `sortItems` options `compare` (per column) and `empty: "last" \| "first"`; `invertSorting` is a comparator |
+| Pipeline | row models: filtered → sorted → paginated, memoized; `getFacetedUniqueValues` / min-max for filter UIs; global filter with `filterFns` | the consumer sorts | Adopt as pure helpers next to `sortItems`: `filterItems` (per-column filters + a global query) and `facetValues` (unique values with counts) for filter popovers. No row-model engine in the component |
+| Columns as data | `columnHelper.accessor`, `accessorKey` / `accessorFn`, header and cell renderers | JSX per part | Keep JSX parts; document the data-driven pattern (map a column list) and a TanStack recipe |
+| Pinning | `columnPinning: { start: string[], end: string[] }`, logical start/end, offsets from column sizes (`getStart`, `getAfter`) | `stickyFirstColumn` only, measured | Adopt the state shape and logical start/end. Keep measuring widths (TanStack needs fixed sizes; native auto layout does not), so any column can be pinned at either edge |
+| Visibility / ordering | `columnVisibility` record, `columnOrder` | none | Consumer state; the toolbar recipe shows a "Columns" menu. No component state needed: hidden columns are not rendered |
+| Accessibility | none (`getAriaSort` helper only) | native semantics, sort button, one `aria-sort`, announcements, scroll stop, focus not obscured, SSR | rind-ui is ahead; keep it |
+
+Decisions for the next change (`table-columns-and-toolbar`): pinned columns at start/end with
+measured offsets; a `FilterTrigger` per column composing Popover, with `filterItems` /
+`facetValues`; sort and filter indicators that take any node per state; a table header area
+(`Table.Header`, outside the scroll container) for a search field, actions and a full-page
+toggle; `sortItems` comparators per column; a TanStack recipe in the docs.

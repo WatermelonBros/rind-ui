@@ -1,5 +1,8 @@
-## ADDED Requirements
+# table Specification
 
+## Purpose
+TBD - created by archiving change add-table. Update Purpose after archive.
+## Requirements
 ### Requirement: Anatomy
 
 A Table SHALL consist of `Root` (a `div`, the scroll container), `Table` (a `table`, the
@@ -79,7 +82,9 @@ content changes.
 #### Scenario: Sort buttons are the way in
 
 - **WHEN** an overflowing Table has sortable columns
-- **THEN** the Root has no `tabindex`, and Tab goes directly to the first sort button
+- **THEN** the Root is not in the sequential focus order (`tabindex="-1"`: Firefox would
+  otherwise make the scroll container a tab stop), and Tab goes directly to the first sort
+  button
 
 #### Scenario: Fits, no stop
 
@@ -329,3 +334,4 @@ sheet SHALL use logical directions only and SHALL NOT change the `display` of `t
 
 - **WHEN** a themed Table with `stickyFirstColumn` and `dir="rtl"` is scrolled to its end
 - **THEN** the row headers stay at the right edge of the Root
+
