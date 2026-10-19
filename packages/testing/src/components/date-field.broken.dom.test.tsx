@@ -1,10 +1,10 @@
 // Broken consumer wrappers fail readably (task 6.2): each mutation of the rendered Date Field
 // is caught by its invariant, and the correct component passes.
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react"
+import { cleanup, render } from "@testing-library/react"
 import { useLayoutEffect } from "react"
 import { describe, expect, it } from "vitest"
 import { dateFieldStepInvariants, domEnv, testMachine } from "../index"
-import { type Config, modelContract, oracle, Story } from "./date-field-model"
+import { type Config, modelContract, oracle, Story, settle } from "./date-field-model"
 
 /** Re-applies `mutate` after every DOM change (a wrapper that keeps breaking the markup). */
 function Breaker({ mutate }: { readonly mutate: () => void }) {
@@ -64,13 +64,7 @@ async function failuresOf(mutate: (() => void) | null, cfg: Config = {}) {
     test: (name: string, fn: () => Promise<void>) => tests.push({ name, fn }),
     setup: async () => {
       const view = render(<Story cfg={cfg}>{mutate ? <Breaker mutate={mutate} /> : null}</Story>)
-      // An open picker settles (first placement, initial focus) before the first step; the
-      // model starts with nothing focused.
-      if (cfg.picker === "open") {
-        const content = await screen.findByRole("dialog")
-        await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
-        act(() => (document.activeElement as HTMLElement | null)?.blur())
-      }
+      await settle(cfg)
       return view
     },
     target: () => domEnv({ timeout: 300 }),

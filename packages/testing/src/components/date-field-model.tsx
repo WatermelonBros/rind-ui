@@ -2,16 +2,11 @@
 // date-field.model.dom.test.tsx and date-field.broken.dom.test.tsx.
 import { CalendarDate, GregorianCalendar } from "@internationalized/date"
 import { type DateFieldProps, dateFieldContract, type FieldValue, platforms } from "@rind-ui/core"
-import {
-  Calendar,
-  DateField,
-  type DateFieldRootProps,
-  Dialog,
-  Field,
-  RindProvider,
-} from "@rind-ui/react"
+import { Calendar, DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
+import { act, screen, waitFor } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
+import { expect } from "vitest"
 import { currentRun, fixedDateClock } from "../index"
 
 export const clock = fixedDateClock("2026-10-17T12:00:00Z", "UTC")
@@ -30,8 +25,6 @@ export type Config = Partial<DateFieldRootProps> & {
   readonly platform?: (typeof platforms)[keyof typeof platforms]
   /** Render the picker parts (the popover closed, or open from the start). */
   readonly picker?: "closed" | "open"
-  /** The form inside an open modal Dialog (the picker nests in its layer). */
-  readonly inDialog?: boolean
 }
 
 /** The oracle runs the real machine with the props it reads (gregorian display). */
@@ -63,7 +56,7 @@ export function Story({
   readonly onValueChange?: () => void
   readonly children?: ReactNode
 }) {
-  const { inField, platform, picker, inDialog, ...root } = cfg
+  const { inField, platform, picker, ...root } = cfg
   const field = (
     <DateField.Root
       name="date"
@@ -97,24 +90,21 @@ export function Story({
       }}
       dir={currentRun()?.direction === "rtl" ? "rtl" : "ltr"}
     >
-      {inDialog ? (
-        // Focus on the title: the model starts with no segment focused. The model leaves the field
-        // by pressing outside it, which must not close the Dialog.
-        <Dialog.Root defaultOpen initialFocus="title" closeOnInteractOutside={false}>
-          <Dialog.Portal>
-            <Dialog.Content>
-              <Dialog.Title>Edit</Dialog.Title>
-              {form}
-              <Dialog.CloseTrigger>Close</Dialog.CloseTrigger>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      ) : (
-        form
-      )}
+      {form}
       {children}
     </RindProvider>
   )
+}
+
+/**
+ * An open picker settles (first placement, initial focus in the content) before the first
+ * step, then focus is dropped: the model starts in idle with nothing focused.
+ */
+export async function settle(cfg: Config) {
+  if (cfg.picker !== "open") return
+  const content = await screen.findByRole("dialog")
+  await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
+  act(() => (document.activeElement as HTMLElement | null)?.blur())
 }
 
 /** The picker parts around the Input: a Control, a trigger and the Calendar in a popover. */

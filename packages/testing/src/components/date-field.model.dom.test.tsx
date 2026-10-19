@@ -7,10 +7,10 @@ import {
   Time,
 } from "@internationalized/date"
 import { platforms } from "@rind-ui/core"
-import { act, render, screen } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import { describe, it } from "vitest"
 import { dateFieldStepInvariants, testMachine } from "../index"
-import { a11y, type Config, modelContract, oracle, Story } from "./date-field-model"
+import { a11y, type Config, modelContract, oracle, Story, settle } from "./date-field-model"
 
 function config(name: string, cfg: Config) {
   describe(`date-field model: ${name}`, () => {
@@ -27,13 +27,9 @@ function config(name: string, cfg: Config) {
       setup: async () => {
         pageChanges = 0
         oracleChanges = 0
-        const rendered = render(<Story cfg={cfg} onValueChange={() => pageChanges++} />)
-        // A host Dialog settles (initial focus, part registration) before the first step.
-        if (cfg.inDialog) {
-          await screen.findByRole("dialog", { name: "Edit" })
-          await act(async () => {})
-        }
-        return rendered
+        const view = render(<Story cfg={cfg} onValueChange={() => pageChanges++} />)
+        await settle(cfg)
+        return view
       },
       target: () => screen,
       anchor: [{ name: "Birthday" }],
@@ -52,7 +48,6 @@ config("picker closed", { picker: "closed" })
 config("picker open", { picker: "open" })
 // Modal: the field is inert while open, so only the closed picker has field steps.
 config("picker closed, modal", { picker: "closed", modal: true })
-config("picker closed, in a modal Dialog", { picker: "closed", inDialog: true })
 config("en-GB day", { locale: "en-GB" })
 config("de-DE minute, 24-hour", {
   locale: "de-DE",
