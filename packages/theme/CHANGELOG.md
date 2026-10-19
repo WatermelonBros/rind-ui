@@ -1,5 +1,74 @@
 # @rind-ui/theme
 
+## 0.4.0
+
+### Minor Changes
+
+- 7b8c78f: Grid List: a list of rows that hold their own controls (a selection checkbox, buttons, fields, links, a nested Tag Group).
+  
+  - **Navigation.** One Tab stop, arrows between rows, ArrowRight into a row's controls (or Tab with `childNavigation="tab"`), and `layout="grid"` for cards.
+  - **Selection and actions.** The selection and action rules follow the selection behaviour, the checkbox and link rows; a press on a control never reaches its row.
+  - **Accessibility.** Each row is named by its text only. A quirk entry announces the selection on Apple WebKit.
+  - **Core infrastructure.** `collection-grid` (`grid.ts`, `grid-layout`, `row-controls`).
+  - **Contract and driver.** `getGridList`.
+  - **Theme.** `grid-list.css`.
+- 42578ce: Navigation Menu: site navigation following the disclosure navigation pattern, a named `nav` landmark whose triggers open panels of links.
+  
+  - **Opening.** Press, Enter or Space toggle; a mouse or pen resting on a trigger opens it after `openDelay`, with a grace area towards the panel, immediate switching while open, a warm window after a close, and the press that follows a hover open keeping it open. `openOnHover={false}` keeps press and keys only.
+  - **Closing and focus.** Escape closes the innermost level and returns focus to its trigger; an outside press, focus leaving the menu and a same-tab link activation close every level. The open panel follows its trigger in the Tab order wherever it renders.
+  - **Parts.** `Root`, `List`, `Item`, `Trigger`, `Content`, `Link`, `Indicator`, `Viewport`, `Positioner`, `Sub`. Closed panels stay in the document with `hidden` (`closedContent="unmount"` removes them). A shared `Viewport` animates its size between panels (`content-size` gains a part name for its properties).
+  - **Contract and driver.** `getNavigationMenu`.
+  - **Theme.** `navigation-menu.css`.
+- 4920e99: Splitter: resizable panels on one axis with a focusable `separator` between each pair (APG Window Splitter).
+  
+  - **Sizes before hydration.** Sizes and limits are declared on the Root (`panels`, `sizes` / `defaultSizes` in percent), and each panel is `flex-grow` on a zero basis, so the server renders the final layout.
+  - **Limits.** `min`, `max` and `collapsedSize` as percents or `"Npx"` strings, re-resolved whenever the Splitter resizes; `collapsible` panels snap at the halfway point.
+  - **Keyboard and pointer.** Arrows on the handle's axis (mirrored in RTL), Home / End, Enter to collapse or restore; drag through pointer-drag, with Escape and `pointercancel` restoring the press sizes. `onSizesCommit` once per interaction.
+  - **Contract and driver.** `getSplitter`.
+  - **Theme.** `splitter.css`.
+- 8664388: Calendar range mode (`selectionMode="range"`): an anchor then an end (`{ start, end }`, one `onValueChange` per commit), a hover/keyboard preview, Escape and leaving with `commitOnBlur`, `minRangeLength` / `maxRangeLength`, contiguous ranges around unavailable dates (`allowsNonContiguousRanges`), an anchor-aware `isDateUnavailable(date, { anchor })`, a controllable `anchor`, prompts and polite announcements, and exported range helpers. The driver adds `selectRange`, `startRange`, `cancel` and `range()` / `anchor()` / `preview()` / `isAnchored()`; `calendar.css` draws the range as a band with a dashed preview. `watchLeave` / `eventIsInside` are exported from the DOM utilities.
+- c5adfa3: Calendar month and year views with drill-down: a controllable `view` (`"days"`, `"months"`, `"years"`; `defaultView`, `onViewChange(view, { reason })`) bounded by `minView` / `maxView`, `yearsPerPage`, `columns`, `isMonthUnavailable` and `isYearUnavailable`. The heading becomes a button one view up (`messages.viewUp`), choosing a period above `minView` goes back down, and Escape goes down one view. With `minView="months"` or `"years"` the Calendar is a month or year picker: the day, time and zone of the value are kept, the day clamped. Single, multiple and range selection work at the period. The pure `period-navigation` helpers (`pageOf`, `movePeriod`, `canPagePeriod`, `periodAllowed`, …) are exported; `messages.previous` / `next` take a string or a function of the view. The driver adds `viewUp()`, `viewDown()` and `view()`, and accepts periods (`"2027-03"`, `"2031"`); the `composite-roving` invariant now fails on a focusable control inside a grid cell. `calendar.css` styles the view button and the wider period cells.
+- 716eb2e: Add Calendar: a month grid on `@internationalized/date` (calendar systems via `createCalendar`, locale week starts, `today` from an injected clock). Single and multiple selection, a focused date with roving focus and APG keys (days, weeks, Home/End, months, years with Shift), several visible months with `pageBehavior`, min/max (disabled) and unavailable dates, read-only and disabled, triggers that stay focusable at the bounds, polite range announcements from outside the grid. The `getCalendar` driver, `fixedDateClock`, and `calendar.css`. The keyboard layer gains the `grid` orientation.
+- fbd23de: Add Code Block: code readable as server HTML, highlighted in the component with `language` (ts/tsx/js/jsx, css, html, json, bash, or your own `CodeGrammar`; no dependency; `data-token` spans coloured by `--rind-code-token-*`), or from tokens or highlighter HTML (`trustedCodeHtml`, split per line with balanced tags); a copy button whose state follows the clipboard write and is announced politely ("Copied" / "Copy failed") with a constant name; line numbers as a CSS counter (never copied), highlighted lines with a description, soft wrap, a collapsed preview with `maxLines`, and a named tab stop only while the content scrolls. New `clipboard` environment capability (Clipboard API with a fallback next to the trigger), `fakeClipboard` and `getCodeBlock` in testing, `code-block.css`.
+- 0760dab: Combobox variants. These replace separate Autocomplete and Command components.
+  
+  - **Free text** (`selectionMode="none"`): an autocomplete. The text is the value (`onInputValueChange`), suggestions fill it, the visible input is the native form control, Enter with nothing highlighted submits, and `clearOnEscape` and `submitOnChoose` are available.
+  - **Inline** (`inline`): a command palette. The list is in place and always shown; the machine is the new `inlineComboboxMachine`, with the single state `open`. Items run `onAction(key, { modality, modifiers })`; pages use `page` and `onBack` (Backspace on an empty query); Escape clears the query, then calls `onOpenChange(false)`; link items open natively with modifiers.
+  - **New parts:** `Combobox.Loading` and `Combobox.ItemDescription`.
+  - **Contracts:** `inlineComboboxContract`, `comboboxInvariants` and `optionsNeverSelected`.
+  - **Driver:** `getCombobox(…, { inline: true })` with `run` and `back`.
+  - **Theme:** the inline list and danger items.
+- a00089b: Date Field picker parts, single and range. `DateField.Control`, `Trigger`, `ClearTrigger`, `Portal`, `Positioner`, `Content` and `Calendar` turn the field into a date picker, or a date range picker with `selectionMode="range"`.
+  
+  - **Value and closing.** The field owns the one value, and the calendar is a view of it. A pick keeps the value's type, time and zone; it closes the popover (reason `"select"`) and returns focus to the trigger.
+  - **Opening and typing.** Alt+ArrowDown opens the picker from a segment. Typing while open moves the calendar.
+  - **Range rules.** The range picker forces `commitOnBlur="reset"` and forwards min/max, unavailable dates and contiguity to the calendar.
+  - **Calendar.** New props `invalid` and `onDateSelect`.
+  - **Popover.** New close reason `"select"`.
+  - **Driver.** New actions `openPicker`, `pickDate`, `closePicker` and `clearPicker`.
+  - **Theme.** Picker rules in `date-field.css`.
+- cde940b: Date Field range mode (`selectionMode="range"`): two ends (embedded fields) in one group named by the Label. The value is `{ start, end }`, emitted once per change and never for a partial range. The ends never edit each other: an inverted range is kept as typed and invalid, a range across an unavailable day is invalid unless `allowsNonContiguousRanges`. Focus moves between the ends, segments are named by the end and the Label, there are two hidden inputs (`startName` / `endName`, autofill adopted), and select-all-and-Backspace clears both ends. New parts `DateField.Start`, `DateField.End`, `DateField.Separator`; `getDateField(…, { selectionMode: "range" })`; range rules in `date-field.css`.
+- 716eb2e: Add Date Field: a date (or date and time) typed segment by segment in the locale's order and digits, one native `<input role="spinbutton">` per segment. The value (`CalendarDate`, `CalendarDateTime`, `ZonedDateTime`) changes only at commit points. Impossible or incomplete entries are kept and reported invalid, never rewritten. It supports paste and copy, calendar systems and eras, time zones with wall-clock steps, the iOS VoiceOver quirk, Field and form integration through a typed hidden native input, and an embedded mode with boundary and draft callbacks for hosts. The shared segment model is exported as `date-segments`. Also added: the `getDateField` driver, `dateFieldStepInvariants` and `date-field.css`. The keyboard layer gains `value: "vertical"`.
+- a6e7210: Add Menubar: a named bar of menu items, one tab stop with arrow keys and typeahead, one open-menu `value` (`onValueChange` with kebab-case reasons), switching menus by press, hover and the arrow keys inside a menu, vertical bars, modal menus with the bar kept interactive, the `getMenubar` driver (`menu(name)` returns the item's Menu driver) and `menubar.css`. The runtime accepts a transition `reason` computed from the event; `MenuTreeHost.press` receives the press's modality.
+- 91191ed: **BREAKING** Alert Dialog folds into Dialog. `<Dialog.Root role="alertdialog">` is a confirmation with every former Alert Dialog default: always modal, never closed by an outside press, focus on Cancel, a warning for a missing description. `modal` and `closeOnInteractOutside` are type errors with that role. `Dialog.Cancel` and `Dialog.Action` are Dialog parts usable in any dialog. Migrate as follows:
+  
+  - `AlertDialog.*` → `Dialog.*` with `role="alertdialog"` on the Root.
+  - `getAlertDialog(t, a)` → `getDialog(t, { ...a, role: "alertdialog" })`.
+  - `alertDialogContract` → `alertDialogRoleContract`.
+  - `@rind-ui/theme/alert-dialog.css` → `dialog.css`, with the same `--rind-alert-dialog-*` tokens.
+  - Selectors on `data-scope="alert-dialog"` → `[data-scope="dialog"]` and `[role="alertdialog"]`.
+  
+  `alertDialogMachine`, `alertDialogConnect` and `alertDialogMeta` are removed.
+- f2e172a: Add Prompt Input, the first AI-UI primitive: a native form with a content-sized textarea, IME-safe Enter (Shift+Enter, Mod+Enter, `submitKey`, newline on phones), the send/stop lifecycle driven by `onSubmit` (a promise) and `status` with no model inside, one Submit button that becomes Stop and keeps focus, a failed send that restores the prompt, attachments from the file chooser, paste and drop with `accept` / `maxFiles` / `maxFileSize` and every refusal reported, history recall, a character or token limit, and announcements for stop, failure and files; `usePromptInput`, `getPromptInput`, `prompt-input.css`. Contract parts gain `setFiles(files)`; the theme gains the `arrow-up`, `stop` and `paperclip` icons; `core/dom` gains the file-intake helpers (`matchesAccept`, `validateFiles`, `filesFromClipboard`, `syncFileInput`, …).
+- 017c873: Add Rating: a row of stars backed by one visually hidden native `<input type="range">` (role `slider`, "3 of 5 stars"), with half stars by pointer position (`allowHalf`), a hover preview that never changes the value, clearing (`allowClear`), RTL, read-only and disabled, and form participation through a hidden input (`name`, `required`, reset, fieldset, Field). `ratingMachine`, `ratingConnect`, `ratingContract`, `Rating.Root` / `Label` / `Control` / `Item`, `getRating`, `rating.css` (stars drawn by the stylesheet, no icon).
+- 7ea8b6f: Add Tag Group: a grid of tags (or a named group when empty) with roving focus over both arrow pairs, selection, link tags, removal by the remove button or Delete/Backspace with focus moved to a neighbour and a polite announcement, a removal hint for keyboard and screen-reader users, and a data mode; `getTagGroup`, `tag-group.css`. Contracts can locate by a set of roles (`By.role([...])`).
+- 589a54f: Tags Input suggestions: with `items` (or a `collection`) the input is a combobox over the suggestions; choosing one creates a tag from its key (shown with its label), clears the draft and keeps the popup open (`closeOnSelect`); chosen suggestions leave the list unless `allowDuplicates`; `allowCustom={false}` refuses typed text. New parts `Positioner`, `Popup`, `List`, `Item`, `ItemText`, `Group`, `Separator`, `Empty`, `Items` (the listbox parts, as in Combobox). The combobox-pattern pieces (`patternPieces`, `patternConnect`, `patternContract`, `popupOverlay`, `patternMessages`) are exported for every input-driven listbox; Combobox uses them unchanged. The Tags Input driver locates `textbox` or `combobox` and gains the pattern's actions and queries.
+- c9ebf60: Add Tree View: the APG tree with expand and collapse, roving focus, typeahead, single or multiple selection, tri-state checking that updates parents and children both ways, lazily loaded branches, link items, and set metadata (`aria-level`, `aria-setsize`, `aria-posinset`); `getTreeView`, `tree-view.css`.
+
+### Patch Changes
+
+- e93c834: Drawer: the positioner clips (`overflow: clip`) instead of hiding, so it is no longer a scroll container. In WebKit, focus moving into a drawer while it slid in scrolled the positioner, and the panel jumped at the end of the animation.
+
 ## 0.3.0
 
 ### Minor Changes
