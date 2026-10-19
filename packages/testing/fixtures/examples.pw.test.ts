@@ -329,6 +329,8 @@ const TRANSIENT = new Set([
   "marquee:idle",
   // While the reader scrolls back: reached by scrolling a thread up.
   "message-thread:detached",
+  // The second before the automatic close: the Live example.
+  "reasoning:closing",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
   // arrowing in the focused input (the suggestions popup; no prop opens it).
   "tags-input:typing",

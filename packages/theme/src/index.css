@@ -59,6 +59,7 @@
 @import "./prompt-input.css";
 @import "./streaming-message.css";
 @import "./message-thread.css";
+@import "./reasoning.css";
 @import "./meter.css";
 @import "./switch.css";
 @import "./accordion.css";

@@ -11,6 +11,7 @@ import type {
   AnnouncerEnv,
   Clipboard,
   ClipboardEnv,
+  Clock,
   ClockEnv,
   CollectionLayoutEnv,
   DateClock,
@@ -74,6 +75,8 @@ export interface DomEnvironmentOptions {
   readonly nonce?: string
   /** Timers and frames (default: the window's). Tests pass a virtual clock. */
   readonly scheduler?: Scheduler
+  /** Monotonic time (default: `performance.now()`). Tests pass the virtual clock's. */
+  readonly clock?: Clock
   /** A locale (and optional direction), or a locale source (default: the document's). */
   readonly locale?: string | LocaleSource
   readonly dir?: "ltr" | "rtl"
@@ -154,7 +157,7 @@ export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironm
         ? options.announcer
         : liveAnnouncer({ scheduler, dom }, { backend: options.announcer ?? "live-region" }),
     // Looked up at call time, like the timers, so fake clocks installed later drive it.
-    clock: { now: () => globalThis.performance?.now() ?? Date.now() },
+    clock: options.clock ?? { now: () => globalThis.performance?.now() ?? Date.now() },
     // Read at call time, never at module scope or on import (no server-render "now").
     dateClock: options.dateClock ?? {
       now: () => Date.now(),

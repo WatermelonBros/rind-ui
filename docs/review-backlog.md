@@ -400,3 +400,8 @@ verified at round 3 (2026-10-14).
 - warning: the model's message events (`COUNT.SYNCED`) are the DOM tests'; a model story adding messages would map them.
 - warning: feed vs `role="log"` with `aria-live="off"` needs the tier-1 AT pass (NVDA, VoiceOver); a prop for the fallback if feed reads badly.
 - warning: growth is followed instantly (no spring); a smooth follow like use-stick-to-bottom's is polish.
+
+## Reasoning (add-reasoning)
+
+- warning: the model tests need 20 s per path in jsdom (axe after every step of three-step paths); a cheaper per-step a11y check would bring them back under the default.
+- warning: the content is unmounted while closed; a presence (exit animation) like Collapsible's is polish.

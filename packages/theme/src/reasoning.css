@@ -1,0 +1,112 @@
+/*
+ * Reasoning (family: decoration): a quiet trigger row (muted text and a caret that turns with
+ * data-state); while thinking the text shimmers (a moving highlight clipped to the text),
+ * still under reduced motion; the trace is muted, set off by an inline-start rule.
+ */
+@layer rind.components {
+  @keyframes rind-reasoning-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+
+  :where([data-scope="reasoning"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-space-2);
+    justify-items: start;
+    color: var(--rind-reasoning-color, var(--rind-color-text-muted));
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+    min-block-size: var(--rind-hit-area);
+    padding: 0 var(--rind-space-1);
+    border: 0;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"]):hover {
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"])::after {
+    content: "";
+    inline-size: 0.875em;
+    block-size: 0.875em;
+    background-color: currentColor;
+    mask-image: var(--rind-reasoning-icon, var(--rind-icon-caret-down));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    transition: rotate var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"][data-state="closed"])::after {
+    rotate: -90deg;
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"][data-state="closed"]):dir(rtl)::after {
+    rotate: 90deg;
+  }
+
+  :where([data-scope="reasoning"][data-part="trigger"][data-thinking]) {
+    background-image: linear-gradient(
+      90deg,
+      var(--rind-color-text-muted) 40%,
+      var(--rind-color-text) 50%,
+      var(--rind-color-text-muted) 60%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: rind-reasoning-shimmer 1.6s linear infinite;
+  }
+
+  /* The caret keeps its own colour while the text shimmers. */
+  :where([data-scope="reasoning"][data-part="trigger"][data-thinking])::after {
+    background-color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="reasoning"][data-part="content"]) {
+    padding-inline-start: var(--rind-space-3);
+    border-inline-start: 2px solid var(--rind-color-border);
+    white-space: pre-wrap;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="reasoning"][data-part="trigger"][data-thinking]) {
+      background: none;
+      color: CanvasText;
+    }
+    :where([data-scope="reasoning"][data-part="trigger"])::after {
+      background-color: ButtonText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="reasoning"][data-part="trigger"][data-thinking]) {
+      animation: none;
+      background: none;
+      color: inherit;
+    }
+    :where([data-scope="reasoning"][data-part="trigger"])::after {
+      transition: none;
+    }
+  }
+}

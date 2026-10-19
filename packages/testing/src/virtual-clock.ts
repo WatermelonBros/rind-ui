@@ -1,13 +1,16 @@
 // A virtual clock for the machines' delays: `setTimeout` runs only when the test advances
 // it, so a delayed transition (a tooltip's open delay, a stepper's repeat) never waits for
 // real time. Animation frames stay real: layout and presence still need them.
-// Pass `clock.scheduler` as `RindProvider environment={{ scheduler }}` and `clock` to
+// Pass `clock.scheduler` (and `clock.clock` for measured durations) as `RindProvider
+// environment={{ scheduler, clock }}`, and `clock` to
 // `testMachine({ clock })`.
 
-import type { Scheduler, TimerHandle } from "@rind-ui/core"
+import type { Clock, Scheduler, TimerHandle } from "@rind-ui/core"
 
 export interface VirtualClock {
   readonly scheduler: Scheduler
+  /** The same time as a monotonic clock: pass it as `environment={{ clock }}`. */
+  readonly clock: Clock
   /** Moves time forward by `ms`, running every timer that falls due, in order. */
   advance(ms: number): void
   /** Timers run so far: proves the page's machines use this clock. */
@@ -22,6 +25,7 @@ export function virtualClock(): VirtualClock {
   let fired = 0
   const timers = new Map<number, { at: number; callback: () => void }>()
   return {
+    clock: { now: () => now },
     scheduler: {
       setTimeout: (callback, ms) => {
         const id = ++seq
