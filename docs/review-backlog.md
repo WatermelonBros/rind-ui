@@ -387,3 +387,9 @@ verified at round 3 (2026-10-14).
 - warning: reduced motion is not a model configuration (it applies on mount, before the first step); the DOM tests cover it.
 - warning: the home band's Viewport is `aria-hidden` and the names are in the nav; check with the site that the PauseTrigger alone is a fine announcement there.
 - 8.x: manual tier-1 AT pass (VoiceOver, NVDA) of the copies and the PauseTrigger.
+
+## Streaming Message (add-streaming-message)
+
+- warning: the reveal ticks on 16 ms `setTimeout`s, not animation frames; in a background tab timers are throttled and the reveal slows. Catching up on visibility (`PageVisibility`) would fix it.
+- warning: the model reaches `settling` only from `streaming`; `complete → settling` (a new text after completion) is reported not taken.
+- 8.x: manual tier-1 AT pass (VoiceOver, NVDA): whether `aria-busy` holds or drops reading, and the lifecycle announcements.

@@ -194,6 +194,7 @@ export const familyMatrix = [
       "splitter",
       "table",
       "marquee",
+      "streaming-message",
     ],
     variants: [],
     size: "none",
