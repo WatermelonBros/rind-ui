@@ -15,7 +15,7 @@ afterEach(() => vi.restoreAllMocks())
 
 type RootProps = Parameters<typeof DateField.Root>[0]
 
-function Parts() {
+function Parts({ close = false }: { readonly close?: boolean }) {
   return (
     <>
       <DateField.Control>
@@ -26,6 +26,7 @@ function Parts() {
       <DateField.Portal>
         <DateField.Positioner>
           <DateField.Content>
+            {close ? <DateField.CloseTrigger>Close</DateField.CloseTrigger> : null}
             <DateField.Calendar>
               <Calendar.Header>
                 <Calendar.PrevTrigger />
@@ -41,12 +42,15 @@ function Parts() {
   )
 }
 
-function Birthday(props: Partial<RootProps> & { readonly children?: ReactNode }) {
+function Birthday({
+  close,
+  ...props
+}: Partial<RootProps> & { readonly children?: ReactNode; readonly close?: boolean }) {
   return (
     <RindProvider environment={{ dateClock: clock }}>
       <DateField.Root locale="en-US" name="birthday" {...(props as object)}>
         <DateField.Label>Birthday</DateField.Label>
-        <Parts />
+        <Parts close={close === true} />
       </DateField.Root>
       <button type="button">After</button>
     </RindProvider>
@@ -501,5 +505,285 @@ describe("Date Field picker (range, review)", () => {
     expect(document.querySelector('[data-scope="calendar"][data-anchored]')).toBeNull()
     await user.keyboard("{Escape}")
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull())
+  })
+})
+
+/** A tap with the element's coordinates (the press hit test needs them). */
+async function tap(user: ReturnType<typeof userEvent.setup>, el: Element) {
+  const r = el.getBoundingClientRect()
+  const coords = { clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }
+  await user.pointer([{ keys: "[TouchA]", target: el, coords }])
+}
+const pickerDialog = () => screen.queryByRole("dialog", { name: "Choose date Birthday" })
+
+describe("Date Field picker (modality, Field and form, touch)", () => {
+  it("modal: Tab wraps inside the content and the field is inert", async () => {
+    render(<Birthday modal close />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    expect(content.getAttribute("aria-modal")).toBe("true")
+    expect(content.hasAttribute("data-modal")).toBe(true)
+    const next = screen.getByRole("button", { name: /next/i })
+    next.focus()
+    await user.tab()
+    await user.tab()
+    expect(content.contains(document.activeElement)).toBe(true)
+    expect(screen.getByRole("group", { name: "Birthday" }).closest("[inert]")).not.toBeNull()
+  })
+
+  it("non-modal: the field stays operable while open", async () => {
+    render(<Birthday />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    const month = screen.getByRole("spinbutton", { name: "month Birthday" })
+    await user.click(month)
+    await user.keyboard("3")
+    expect(month.getAttribute("aria-valuenow")).toBe("3")
+    expect(pickerDialog()).not.toBeNull()
+  })
+
+  it("Tab from the content's last tabbable leaves and closes with reason outside-focus", async () => {
+    const onOpenChange = vi.fn()
+    render(<Birthday onOpenChange={onOpenChange} />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    const tabbables = content.querySelectorAll<HTMLElement>(
+      "button:not([disabled]), [tabindex='0']",
+    )
+    ;(tabbables[tabbables.length - 1] as HTMLElement).focus()
+    await user.tab()
+    await waitFor(() => expect(pickerDialog()).toBeNull())
+    expect(onOpenChange).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ reason: "outside-focus" }),
+    )
+    expect(content.contains(document.activeElement)).toBe(false)
+    expect(document.activeElement).not.toBe(document.body)
+  })
+
+  it("opening from the keyboard does not touch the Field (blur validation)", async () => {
+    const { Field } = await import("@rind-ui/react")
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <Field.Root validationMode="blur" data-testid="field">
+          <Field.Label>Birthday</Field.Label>
+          <DateField.Root locale="en-US">
+            <Parts />
+          </DateField.Root>
+        </Field.Root>
+      </RindProvider>,
+    )
+    const user = userEvent.setup()
+    await user.click(screen.getByRole("spinbutton", { name: "month Birthday" }))
+    await user.keyboard("{Alt>}{ArrowDown}{/Alt}")
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    // Initial focus waits for the popup's first placement.
+    await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
+    expect(screen.getByTestId("field").hasAttribute("data-touched")).toBe(false)
+  })
+
+  it("minute granularity submits a datetime-local value", async () => {
+    const submitted = vi.fn((e: SubmitEvent) => {
+      e.preventDefault()
+      return new FormData(e.target as HTMLFormElement).get("at")
+    })
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <form onSubmit={(e) => submitted(e.nativeEvent as SubmitEvent)}>
+          <DateField.Root
+            locale="en-US"
+            name="at"
+            granularity="minute"
+            defaultValue={new CalendarDateTime(2026, 10, 20, 9, 30)}
+          >
+            <DateField.Label>At</DateField.Label>
+            <Parts />
+          </DateField.Root>
+          <button type="submit">Send</button>
+        </form>
+      </RindProvider>,
+    )
+    const hidden = document.querySelector<HTMLInputElement>('input[name="at"]') as HTMLInputElement
+    expect(hidden.type).toBe("datetime-local")
+    expect(hidden.step).toBe("60")
+    await userEvent.setup().click(screen.getByRole("button", { name: "Send" }))
+    expect(submitted).toHaveReturnedWith("2026-10-20T09:30")
+  })
+
+  it("required and empty: submission is cancelled, focus on the first segment", async () => {
+    const onSubmit = vi.fn((e: { preventDefault(): void }) => e.preventDefault())
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <form onSubmit={onSubmit}>
+          <DateField.Root locale="en-US" name="d" required>
+            <DateField.Label>Birthday</DateField.Label>
+            <Parts />
+          </DateField.Root>
+          <button type="submit">Send</button>
+        </form>
+      </RindProvider>,
+    )
+    await userEvent.setup().click(screen.getByRole("button", { name: "Send" }))
+    expect(onSubmit).not.toHaveBeenCalled()
+    await waitFor(() =>
+      expect(document.activeElement).toBe(
+        screen.getByRole("spinbutton", { name: "month Birthday" }),
+      ),
+    )
+  })
+
+  it("an unavailable typed date makes the calendar invalid", async () => {
+    render(<Birthday isDateUnavailable={(v: DateValue) => isWeekend(v, "en-US")} />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole("spinbutton", { name: "month Birthday" }))
+    await user.keyboard("10182026")
+    await user.click(trigger())
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    expect(
+      content
+        .querySelector('[data-scope="calendar"][data-part="root"]')
+        ?.hasAttribute("data-invalid"),
+    ).toBe(true)
+  })
+
+  it("touch: tapping the trigger with a focused segment moves focus into the calendar", async () => {
+    render(<Birthday />)
+    const user = userEvent.setup()
+    const month = screen.getByRole("spinbutton", { name: "month Birthday" })
+    month.focus()
+    await tap(user, trigger())
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
+    expect(document.activeElement).not.toBe(month)
+  })
+
+  it("touch inside a Drawer: a tapped date is picked, the Drawer stays open", async () => {
+    const { Drawer } = await import("@rind-ui/react")
+    render(
+      <RindProvider environment={{ dateClock: clock }}>
+        <Drawer.Root defaultOpen>
+          <Drawer.Portal>
+            <Drawer.Positioner>
+              <Drawer.Content>
+                <Drawer.Title>Edit</Drawer.Title>
+                <DateField.Root locale="en-US">
+                  <DateField.Label>Birthday</DateField.Label>
+                  <Parts />
+                </DateField.Root>
+              </Drawer.Content>
+            </Drawer.Positioner>
+          </Drawer.Portal>
+        </Drawer.Root>
+      </RindProvider>,
+    )
+    const user = userEvent.setup()
+    await tap(user, trigger())
+    await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    await tap(user, pressCell(20))
+    await waitFor(() => expect(pickerDialog()).toBeNull())
+    expect(screen.getByRole("dialog", { name: "Edit" })).toBeTruthy()
+    expect(
+      screen.getByRole("spinbutton", { name: "day Birthday" }).getAttribute("aria-valuenow"),
+    ).toBe("20")
+  })
+
+  it("touch: a scroll that starts outside, then a tap inside, picks the date", async () => {
+    render(<Birthday />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    const after = screen.getByRole("button", { name: "After" })
+    // A scroll: the browser takes the gesture over (pointercancel) and fires no click.
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 7,
+      pointerType: "touch",
+      isPrimary: true,
+    }
+    after.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: 5, clientY: 300 }))
+    after.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: 5, clientY: 100 }))
+    after.dispatchEvent(new PointerEvent("pointercancel", init))
+    // A scroll gesture is not an outside press: the popover is still open.
+    expect(pickerDialog()).not.toBeNull()
+    await tap(user, pressCell(21))
+    await waitFor(() => expect(pickerDialog()).toBeNull())
+    expect(
+      screen.getByRole("spinbutton", { name: "day Birthday" }).getAttribute("aria-valuenow"),
+    ).toBe("21")
+  })
+
+  it("the positioner and content are re-scoped to date-field with the trigger's instance", async () => {
+    render(<Birthday />)
+    await userEvent.setup().click(trigger())
+    const content = await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    const instance = trigger().getAttribute("data-instance")
+    expect(content.getAttribute("data-scope")).toBe("date-field")
+    expect(content.getAttribute("data-instance")).toBe(instance)
+    const positioner = content.closest('[data-part="positioner"]')
+    expect(positioner?.getAttribute("data-scope")).toBe("date-field")
+    expect(positioner?.getAttribute("data-instance")).toBe(instance)
+  })
+})
+
+describe("Date Field picker nested in a Dialog: one gesture closes one layer", () => {
+  function Nested({
+    onDialog,
+    onPicker,
+  }: {
+    readonly onDialog?: (o: boolean, d: unknown) => void
+    readonly onPicker?: (o: boolean, d: unknown) => void
+  }) {
+    return (
+      <RindProvider environment={{ dateClock: clock }}>
+        <Dialog.Root
+          defaultOpen
+          initialFocus="title"
+          {...(onDialog ? { onOpenChange: onDialog } : {})}
+        >
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Edit</Dialog.Title>
+              <DateField.Root locale="en-US" {...(onPicker ? { onOpenChange: onPicker } : {})}>
+                <DateField.Label>Birthday</DateField.Label>
+                <Parts />
+              </DateField.Root>
+              <Dialog.CloseTrigger>Close</Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </RindProvider>
+    )
+  }
+
+  it("Escape from a segment closes the picker only", async () => {
+    render(<Nested />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    screen.getByRole("spinbutton", { name: "month Birthday" }).focus()
+    await user.keyboard("{Escape}")
+    await waitFor(() => expect(pickerDialog()).toBeNull())
+    expect(screen.getByRole("dialog", { name: "Edit" })).toBeTruthy()
+  })
+
+  it("a press outside both closes the picker only", async () => {
+    const onDialog = vi.fn()
+    const onPicker = vi.fn()
+    render(<Nested onDialog={onDialog} onPicker={onPicker} />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog", { name: "Choose date Birthday" })
+    await user.click(screen.getByRole("spinbutton", { name: "month Birthday" }))
+    // A press on the field is inside the picker (spec "Picker — Dismissal And Nesting").
+    expect(onPicker.mock.calls.map((c) => (c[1] as { reason: string }).reason)).toEqual(["trigger"])
+    expect(pickerDialog()).not.toBeNull()
+    await user.click(document.body)
+    expect(onDialog).not.toHaveBeenCalled()
+    await waitFor(() => expect(pickerDialog()).toBeNull())
+    expect(screen.getByRole("dialog", { name: "Edit" })).toBeTruthy()
   })
 })

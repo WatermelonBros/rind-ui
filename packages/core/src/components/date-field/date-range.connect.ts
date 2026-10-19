@@ -3,7 +3,7 @@
 // hidden names, the value description and the two hidden native inputs. The segments are the
 // embedded fields' own.
 
-import { type Calendar, type DateValue, Time } from "@internationalized/date"
+import { type Calendar, Time } from "@internationalized/date"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import { hiddenFormInputStyle } from "../../dom/hidden-input"
 import { visuallyHiddenStyle } from "../../dom/visually-hidden"
@@ -11,17 +11,23 @@ import { dateFormatter } from "../../i18n/date"
 import { partId } from "../../ids"
 import type { DateGranularity } from "../date-segments"
 import type { FieldControlProps } from "../shared/field-control"
-import { valueKind } from "./date-field.connect"
+import {
+  type DateValueKind,
+  hiddenInputType,
+  nativeBound,
+  STEP,
+  valueKind,
+} from "./date-field.connect"
 import { formValueOf } from "./date-field.machine"
 import type { DateFieldMessages } from "./date-field.messages"
-import type { DateRangeEdge, DateRangeState } from "./date-range"
+import type { DateRangeEdge, DateRangeEndValue, DateRangeState } from "./date-range"
 
 export interface DateRangeConnectInput {
   readonly instance: string
   readonly state: DateRangeState
   /** The ends' committed values (what they show). */
-  readonly start: DateValue | null
-  readonly end: DateValue | null
+  readonly start: DateRangeEndValue | null
+  readonly end: DateRangeEndValue | null
   readonly granularity: DateGranularity
   readonly locale: string
   readonly calendar: Calendar
@@ -31,8 +37,10 @@ export interface DateRangeConnectInput {
   readonly startName?: string | undefined
   readonly endName?: string | undefined
   readonly form?: string | undefined
-  readonly minValue?: DateValue | null | undefined
-  readonly maxValue?: DateValue | null | undefined
+  readonly minValue?: DateRangeEndValue | null | undefined
+  readonly maxValue?: DateRangeEndValue | null | undefined
+  /** The ends' value kind when neither has a value (a time range: `"time"`). */
+  readonly kind?: DateValueKind | undefined
   readonly focusWithin: boolean
 }
 
@@ -45,11 +53,12 @@ const ids = (instance: string) => ({
 })
 
 /** A full spoken date ("Wednesday, October 14, 2026"; with the time at a time granularity). */
-function spoken(value: DateValue | Time, input: DateRangeConnectInput): string {
+function spoken(value: DateRangeEndValue, input: DateRangeConnectInput): string {
   if (value instanceof Time) {
     return dateFormatter(input.locale, {
       hour: "numeric",
       minute: "2-digit",
+      ...(input.granularity === "second" ? { second: "2-digit" } : {}),
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2000, 0, 1, value.hour, value.minute, value.second)))
   }
@@ -75,19 +84,19 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
   const value = state.value
   const description = value
     ? input.messages.rangeDescription({
-        start: spoken(value.start as DateValue, input),
+        start: spoken(value.start, input),
         end: state.overnight
-          ? input.messages.overnight({ end: spoken(value.end as DateValue, input) })
-          : spoken(value.end as DateValue, input),
+          ? input.messages.overnight({ end: spoken(value.end, input) })
+          : spoken(value.end, input),
       })
     : null
   const iso = (edge: DateRangeEdge) => {
     const v = value?.[edge]
-    return v ? formValueOf(v as DateValue, input.granularity) : ""
+    return v ? formValueOf(v, input.granularity) : ""
   }
-  const kindOf = () => {
-    const v = input.start ?? input.end ?? input.minValue ?? null
-    return v ? valueKind(v) : "date"
+  const kindOf = (): DateValueKind => {
+    const v = input.start ?? input.end ?? null
+    return v ? valueKind(v) : (input.kind ?? "date")
   }
   const fieldIds = field["aria-describedby"]?.split(" ") ?? []
   // The Popover's ids (partId keeps the instance as given): the trigger and content match.
@@ -184,20 +193,18 @@ export function dateRangeConnect(input: DateRangeConnectInput) {
     /** Each end's hidden input: its ISO value only while the pair is a valid range. */
     hiddenInput: (edge: DateRangeEdge): PartProps => {
       const kind = kindOf()
-      const native = kind !== "zoned"
-      const bound = (v: DateValue | null | undefined) =>
-        v && native ? formValueOf(v, input.granularity) : undefined
       return {
         ...scope("hidden-input"),
         "data-edge": edge,
         id: id.hidden(edge),
-        type: kind === "date" ? "date" : kind === "datetime" ? "datetime-local" : "text",
+        type: hiddenInputType(kind),
         "aria-hidden": "true",
         tabindex: -1,
         name: edge === "start" ? input.startName : input.endName,
         form: input.form,
-        min: bound(input.minValue),
-        max: bound(input.maxValue),
+        min: nativeBound(input.minValue, kind, input.granularity),
+        max: nativeBound(input.maxValue, kind, input.granularity),
+        step: kind === "datetime" || kind === "time" ? STEP[input.granularity] : undefined,
         required: field.required || undefined,
         disabled: field.disabled || undefined,
         defaultValue: iso(edge),

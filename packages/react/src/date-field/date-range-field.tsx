@@ -14,6 +14,7 @@ import {
   dateRangeFieldMachine,
   type FieldControlBinding,
   type FieldMessages,
+  type FieldValue,
   focusSafely,
   hiddenFormInput,
   type MessageOverrides,
@@ -22,6 +23,7 @@ import {
   rangeStateOf,
   resolveCalendar,
   setControlValidity,
+  Time,
   type Validate,
   type ValidationBehavior,
   type ValidationMode,
@@ -64,13 +66,15 @@ export interface DateRangeFieldChangeDetails {
 
 /** The props both ends share (they are passed to each embedded field). */
 export interface DateRangeEndProps {
-  readonly placeholderValue?: DateValue
+  readonly placeholderValue?: FieldValue
   readonly granularity?: DateGranularity
+  /** `"hour"`: time ends (no date segments). Default: `"hour"` for `Time` ends. */
+  readonly maxGranularity?: "year" | "hour"
   readonly hourCycle?: 12 | 24
   readonly hideTimeZone?: boolean
   readonly shouldForceLeadingZeros?: boolean
-  readonly minValue?: DateValue | null
-  readonly maxValue?: DateValue | null
+  readonly minValue?: FieldValue | null
+  readonly maxValue?: FieldValue | null
   readonly isDateUnavailable?: (date: DateValue) => boolean
   readonly locale?: string
   readonly dir?: "ltr" | "rtl"
@@ -91,6 +95,8 @@ export type DateRangeFieldRootProps = Omit<
     ) => void
     /** A range may contain unavailable dates (default false). */
     readonly allowsNonContiguousRanges?: boolean
+    /** `Time` ends: an end before the start is the next day (default false). */
+    readonly allowsOvernight?: boolean
     /** The hidden inputs' names. */
     readonly startName?: string
     /** The end date's hidden input name. */
@@ -135,7 +141,7 @@ interface RangeCtx {
   readonly allowsNonContiguousRanges: boolean
   readonly firstDayOfWeek: DayOfWeek | undefined
   readonly granularity: DateGranularity | undefined
-  readonly placeholderValue: DateValue | undefined
+  readonly placeholderValue: FieldValue | undefined
 }
 
 /** `onOpenChange` with the picker's public reasons. */
@@ -159,12 +165,14 @@ export function DateRangeFieldRoot({
   defaultValue,
   onValueChange,
   allowsNonContiguousRanges = false,
+  allowsOvernight = false,
   startName,
   endName,
   form,
   messages: ownMessages,
   placeholderValue,
   granularity,
+  maxGranularity,
   hourCycle,
   hideTimeZone,
   shouldForceLeadingZeros,
@@ -194,7 +202,13 @@ export function DateRangeFieldRoot({
   const generated = useId()
   const instance = id ?? generated
   const { locale, dir } = useLocale(ownLocale, ownDir)
-  const messages = useMessages("date-field", dateFieldMessages, ownMessages)
+  const allMessages = useMessages("date-field", dateFieldMessages, ownMessages)
+  // Time ends: a time field per end, named "Start time" / "End time" (spec "Range Mode").
+  const sample = value?.start ?? defaultValue?.start ?? placeholderValue ?? null
+  const timeEnds = maxGranularity === "hour" || sample instanceof Time
+  const messages = timeEnds
+    ? { ...allMessages, startDate: allMessages.startTime, endDate: allMessages.endTime }
+    : allMessages
   const { calendar, formatLocale } = resolveCalendar(locale)
   const enclosing = useFieldBindingPeek()
   const fieldsetDisabled = useFieldsetDisabled()
@@ -227,6 +241,7 @@ export function DateRangeFieldRoot({
     },
     isDateUnavailable,
     allowsNonContiguousRanges,
+    allowsOvernight,
     required,
     messages,
   }
@@ -240,9 +255,12 @@ export function DateRangeFieldRoot({
     dateRangeConnect({
       instance,
       state,
-      start: (view.context.start.value as DateValue | null) ?? null,
-      end: (view.context.end.value as DateValue | null) ?? null,
-      granularity: granularity ?? "day",
+      start: view.context.start.value,
+      end: view.context.end.value,
+      // The ends' own default: minutes for a time or a date-time, else days.
+      granularity:
+        granularity ?? (timeEnds || (sample !== null && "hour" in sample) ? "minute" : "day"),
+      ...(sample === null && timeEnds ? { kind: "time" as const } : {}),
       locale: formatLocale,
       calendar,
       messages,
@@ -303,6 +321,7 @@ export function DateRangeFieldRoot({
     end: {
       ...(placeholderValue ? { placeholderValue } : {}),
       ...(granularity ? { granularity } : {}),
+      ...(maxGranularity ? { maxGranularity } : {}),
       ...(hourCycle ? { hourCycle } : {}),
       ...(hideTimeZone !== undefined ? { hideTimeZone } : {}),
       ...(shouldForceLeadingZeros !== undefined ? { shouldForceLeadingZeros } : {}),

@@ -59,7 +59,8 @@ export function planDigit(
   let next = `${buffer}${digit}`
   if (Number(next) > max) next = String(digit)
   const n = Number(next)
-  const value = n < min ? null : type === "hour" && f.hour12 ? n % 12 : n
+  // A 12-hour hour stores 12 as 0, so a "0" committed alone is 12 (date-segments "Typing").
+  const value = type === "hour" && f.hour12 ? n % 12 : n < min ? null : n
   return {
     kind: "accept",
     entry: { value, text: digitsText(next, f) },

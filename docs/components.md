@@ -110,8 +110,8 @@ seen in docs or source but not confirmed as public, stable API.
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | wip | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
-| Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | wip | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
+| Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | done | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
+| Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | done | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
 | Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 
 ## Color (2)

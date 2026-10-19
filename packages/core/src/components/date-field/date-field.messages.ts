@@ -25,8 +25,11 @@ export type DateFieldMessages = {
   readonly empty: string
   /** An empty segment's placeholder (an empty result keeps the default). */
   readonly placeholder: (type: DateSegmentType) => string
-  /** The group's description of the whole value. */
-  readonly valueDescription: (args: { readonly formatted: string }) => string
+  /** The group's description of the whole value (`time`: a time field, no date shown). */
+  readonly valueDescription: (args: {
+    readonly formatted: string
+    readonly time?: boolean | undefined
+  }) => string
   /** The picker trigger's name (with the Label's). */
   readonly trigger: string
   /** The range picker trigger's name (with the Label's). */
@@ -42,6 +45,10 @@ export type DateFieldMessages = {
   readonly startDate: string
   /** Range mode: the end's name. */
   readonly endDate: string
+  /** Range mode with time ends: the start's name. */
+  readonly startTime: string
+  /** Range mode with time ends: the end's name. */
+  readonly endTime: string
   /** Range mode: the visible separator between the ends. */
   readonly separator: string
   /** Range mode: the group's description of the whole range. */
@@ -74,7 +81,8 @@ export const dateFieldMessages: DateFieldMessages = {
   segmentValueText: ({ formatted }) => formatted,
   empty: "Empty",
   placeholder: defaultPlaceholder,
-  valueDescription: ({ formatted }) => `Selected date: ${formatted}`,
+  valueDescription: ({ formatted, time }) =>
+    time ? `Selected time: ${formatted}` : `Selected date: ${formatted}`,
   trigger: "Choose date",
   rangeTrigger: "Choose dates",
   clear: "Clear",
@@ -85,6 +93,8 @@ export const dateFieldMessages: DateFieldMessages = {
   unavailable: "This date is unavailable",
   startDate: "Start date",
   endDate: "End date",
+  startTime: "Start time",
+  endTime: "End time",
   separator: "–",
   rangeDescription: ({ start, end }) => `Selected range: ${start} to ${end}`,
   endProblem: ({ edge, message }) => `${edge}: ${message}`,

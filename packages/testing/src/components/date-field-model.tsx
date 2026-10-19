@@ -1,8 +1,15 @@
 // The Date Field model-test helper (task 7.1): the oracle props and the story, shared by
 // date-field.model.dom.test.tsx and date-field.broken.dom.test.tsx.
-import { CalendarDate, type DateValue, GregorianCalendar } from "@internationalized/date"
-import { type DateFieldProps, dateFieldContract, platforms } from "@rind-ui/core"
-import { Calendar, DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
+import { CalendarDate, GregorianCalendar } from "@internationalized/date"
+import { type DateFieldProps, dateFieldContract, type FieldValue, platforms } from "@rind-ui/core"
+import {
+  Calendar,
+  DateField,
+  type DateFieldRootProps,
+  Dialog,
+  Field,
+  RindProvider,
+} from "@rind-ui/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
 import { currentRun, fixedDateClock } from "../index"
@@ -23,17 +30,20 @@ export type Config = Partial<DateFieldRootProps> & {
   readonly platform?: (typeof platforms)[keyof typeof platforms]
   /** Render the picker parts (the popover closed, or open from the start). */
   readonly picker?: "closed" | "open"
+  /** The form inside an open modal Dialog (the picker nests in its layer). */
+  readonly inDialog?: boolean
 }
 
 /** The oracle runs the real machine with the props it reads (gregorian display). */
 export const oracle = (cfg: Config, onValueChange?: () => void): DateFieldProps => ({
   value: undefined,
-  defaultValue: (cfg.defaultValue as DateValue | null | undefined) ?? null,
+  defaultValue: cfg.defaultValue ?? null,
   onValueChange,
-  placeholderValue: (cfg.placeholderValue as DateValue | undefined) ?? PLACEHOLDER,
+  placeholderValue: (cfg.placeholderValue as FieldValue | undefined) ?? PLACEHOLDER,
   locale: cfg.locale ?? "en-US",
   calendar: new GregorianCalendar(),
   granularity: cfg.granularity,
+  maxGranularity: cfg.maxGranularity,
   hourCycle: cfg.hourCycle,
   hideTimeZone: cfg.hideTimeZone,
   shouldForceLeadingZeros: cfg.shouldForceLeadingZeros,
@@ -53,7 +63,7 @@ export function Story({
   readonly onValueChange?: () => void
   readonly children?: ReactNode
 }) {
-  const { inField, platform, picker, ...root } = cfg
+  const { inField, platform, picker, inDialog, ...root } = cfg
   const field = (
     <DateField.Root
       name="date"
@@ -65,6 +75,20 @@ export function Story({
       {picker ? <PickerParts /> : <DateField.Input />}
     </DateField.Root>
   )
+  const form = (
+    <form onSubmit={(e) => e.preventDefault()}>
+      {inField ? (
+        <Field.Root validationMode="change">
+          <Field.Label>Birthday</Field.Label>
+          {field}
+          <Field.ErrorMessage />
+        </Field.Root>
+      ) : (
+        field
+      )}
+      <button type="reset">Reset</button>
+    </form>
+  )
   return (
     <RindProvider
       environment={{
@@ -73,18 +97,21 @@ export function Story({
       }}
       dir={currentRun()?.direction === "rtl" ? "rtl" : "ltr"}
     >
-      <form onSubmit={(e) => e.preventDefault()}>
-        {inField ? (
-          <Field.Root validationMode="change">
-            <Field.Label>Birthday</Field.Label>
-            {field}
-            <Field.ErrorMessage />
-          </Field.Root>
-        ) : (
-          field
-        )}
-        <button type="reset">Reset</button>
-      </form>
+      {inDialog ? (
+        // Focus on the title: the model starts with no segment focused. The model leaves the field
+        // by pressing outside it, which must not close the Dialog.
+        <Dialog.Root defaultOpen initialFocus="title" closeOnInteractOutside={false}>
+          <Dialog.Portal>
+            <Dialog.Content>
+              <Dialog.Title>Edit</Dialog.Title>
+              {form}
+              <Dialog.CloseTrigger>Close</Dialog.CloseTrigger>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : (
+        form
+      )}
       {children}
     </RindProvider>
   )

@@ -1013,6 +1013,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
         stepModality: Modality | null
         props: Readonly<Record<string, unknown>>
         values: Readonly<Record<string, unknown>>
+        context: Readonly<Record<string, unknown>>
       }) => Promise<unknown>
     }[]
     for (const inv of own) {
@@ -1024,6 +1025,7 @@ async function runPath<C extends AnyContract, R, A extends unknown[]>(
           stepModality,
           props: oracle.props as Record<string, unknown>,
           values: oracle.service.view().values as Record<string, unknown>,
+          context: oracle.service.getSnapshot().context as Record<string, unknown>,
         })
         .catch((e: unknown) => (e instanceof Error ? e.message : String(e)))
       if (typeof result === "string" && result !== "") problems.push(`${inv.name}: ${result}`)

@@ -460,7 +460,7 @@ otherwise; date-time ends SHALL use the single field's mapping. `startName` and 
 
 The Date Field SHALL accept optional picker parts: `control` (`div`, the group and popover anchor
 around `input`), `trigger` (`button`), `clear-trigger` (`button`), `positioner`, `content` (`div`,
-`role="dialog"`) and `calendar` (a Calendar root bound to the field, inside which the Calendar's own
+`role="dialog"`), `close-trigger` (`button`, the Popover's, required with `modal`: touch screen readers have no Escape) and `calendar` (a Calendar root bound to the field, inside which the Calendar's own
 parts are rendered), with the shared `Portal` optional. Rendering a `trigger` makes the field a
 picker; there SHALL be no separate Date Picker or Date Range Picker component. In range mode the
 `calendar` part SHALL be the Calendar in `selectionMode="range"`. The requirements "Picker — …"

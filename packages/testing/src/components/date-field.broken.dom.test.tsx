@@ -1,10 +1,10 @@
 // Broken consumer wrappers fail readably (task 6.2): each mutation of the rendered Date Field
 // is caught by its invariant, and the correct component passes.
-import { render } from "@testing-library/react"
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react"
 import { useLayoutEffect } from "react"
 import { describe, expect, it } from "vitest"
 import { dateFieldStepInvariants, domEnv, testMachine } from "../index"
-import { modelContract, oracle, Story } from "./date-field-model"
+import { type Config, modelContract, oracle, Story } from "./date-field-model"
 
 /** Re-applies `mutate` after every DOM change (a wrapper that keeps breaking the markup). */
 function Breaker({ mutate }: { readonly mutate: () => void }) {
@@ -58,11 +58,21 @@ const variants: Record<string, () => void> = {
   },
 }
 
-async function failuresOf(mutate: (() => void) | null) {
+async function failuresOf(mutate: (() => void) | null, cfg: Config = {}) {
   const tests: { name: string; fn: () => Promise<void> }[] = []
   testMachine(modelContract(), {
     test: (name: string, fn: () => Promise<void>) => tests.push({ name, fn }),
-    setup: () => render(<Story cfg={{}}>{mutate ? <Breaker mutate={mutate} /> : null}</Story>),
+    setup: async () => {
+      const view = render(<Story cfg={cfg}>{mutate ? <Breaker mutate={mutate} /> : null}</Story>)
+      // An open picker settles (first placement, initial focus) before the first step; the
+      // model starts with nothing focused.
+      if (cfg.picker === "open") {
+        const content = await screen.findByRole("dialog")
+        await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
+        act(() => (document.activeElement as HTMLElement | null)?.blur())
+      }
+      return view
+    },
     target: () => domEnv({ timeout: 300 }),
     anchor: [{ name: "Birthday" }],
     props: oracle({}) as never,
@@ -77,7 +87,8 @@ async function failuresOf(mutate: (() => void) | null) {
       (e: Error) => e.message,
     )
     if (error) out.push(error)
-    document.body.innerHTML = ""
+    // Unmounts through React: a portalled popover cannot be wiped from under it.
+    cleanup()
   }
   return out
 }
@@ -101,4 +112,22 @@ describe("date-field broken variants fail readably", () => {
       expect(errors.some((e) => expected[name]?.test(e))).toBe(true)
     })
   }
+})
+
+// date-field "Picker — Picker Invariants": a picker that holds a picked date aside (its calendar
+// selects a day the field does not hold) fails on views-agree.
+describe("date-field picker broken variant", () => {
+  const heldAside = () => {
+    const cell = document.querySelector(
+      '[data-scope="calendar"][data-part="cell"][data-value="2026-10-21"]',
+    )
+    if (cell) set(cell, "aria-selected", "true")
+  }
+  it("the correct open picker passes", { timeout: 120_000 }, async () => {
+    expect(await failuresOf(null, { picker: "open" })).toEqual([])
+  })
+  it("a date held aside fails, naming date-picker-views-agree", { timeout: 120_000 }, async () => {
+    const errors = await failuresOf(heldAside, { picker: "open" })
+    expect(errors.some((e) => /date-picker-views-agree/.test(e))).toBe(true)
+  })
 })

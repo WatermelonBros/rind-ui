@@ -122,7 +122,9 @@ shown value. After each digit, focus SHALL advance to the next editable segment 
 when no further digit can keep the buffer within the segment's limit, or the buffer has the
 limit's digit count. A digit typed into a full buffer of the last segment SHALL be ignored.
 Typing the locale's separator literal (or "/", "-", ".", ":" and space) in a non-empty segment
-SHALL advance.
+SHALL advance. A 12-hour hour segment SHALL be typed as 1–12: "0" or "1" waits for a second
+digit, any other digit advances, and a "0" committed alone SHALL mean 12; a 24-hour hour waits
+after "0"–"2" and advances after any other digit.
 
 #### Scenario: Leading zero shown and advancing (react-spectrum#6004, react-spectrum#8637)
 
@@ -155,6 +157,21 @@ SHALL advance.
 
 - **WHEN** the year is complete and focused as the last segment and the user types "7"
 - **THEN** the year is unchanged
+
+#### Scenario: Two-digit 12-hour hour (bits-ui#1662)
+
+- **WHEN** the user types "1","1" into the hour of an `en-US` 12-hour field
+- **THEN** the hour is 11 and focus moved to the minutes only after the second "1"
+
+#### Scenario: Zero alone in 12-hour
+
+- **WHEN** the user types "0" into the hour of a 12-hour field and tabs to the minutes
+- **THEN** the hour shows 12
+
+#### Scenario: Zero-based 24-hour (bits-ui#914, reka-ui#1154)
+
+- **WHEN** the user types "0","0" into the hour of a 24-hour field
+- **THEN** the hour shows "00" and its value is 0
 
 ### Requirement: Day Period And Era Typing
 

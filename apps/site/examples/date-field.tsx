@@ -6,6 +6,7 @@ import {
   createCalendar,
   isWeekend,
   parseZonedDateTime,
+  Time as TimeValue,
 } from "@internationalized/date"
 import { Button, Calendar, DateField, type DateFieldRootProps, Field } from "@rind-ui/react"
 import type { States, Variants } from "./types"
@@ -146,6 +147,54 @@ export function DateTime24Hour() {
       hourCycle={24}
       locale="en-US"
     />
+  )
+}
+
+/** A time field: a `Time` value shows no date segments. */
+export function Time() {
+  return <Dates label="Alarm" name="alarm" defaultValue={new TimeValue(21, 30)} locale="en-US" />
+}
+
+export function Time24Hour() {
+  return (
+    <Dates
+      label="Departure"
+      defaultValue={new TimeValue(15, 30)}
+      granularity="second"
+      hourCycle={24}
+      locale="en-US"
+    />
+  )
+}
+
+export function TimeRange() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      startName="open"
+      endName="close"
+      locale="en-US"
+      defaultValue={{ start: new TimeValue(9), end: new TimeValue(17, 30) }}
+    >
+      <DateField.Label>Shift</DateField.Label>
+      <DateField.Input />
+      <DateField.ErrorMessage />
+    </DateField.Root>
+  )
+}
+
+export function TimeRangeOvernight() {
+  return (
+    <DateField.Root
+      selectionMode="range"
+      allowsOvernight
+      locale="en-US"
+      defaultValue={{ start: new TimeValue(22), end: new TimeValue(6) }}
+    >
+      <DateField.Label>Night shift</DateField.Label>
+      <DateField.Input />
+      <DateField.ErrorMessage />
+    </DateField.Root>
   )
 }
 
@@ -349,6 +398,22 @@ export const variants: Variants = {
     description: '`granularity="minute"` adds the time and the AM/PM segment.',
   },
   DateTime24Hour: { title: "Date and time, 24-hour", description: "`hourCycle={24}`." },
+  Time: {
+    title: "Time",
+    description: 'A `Time` value (or `maxGranularity="hour"`): hour, minute and AM/PM only.',
+  },
+  Time24Hour: {
+    title: "Time, 24-hour with seconds",
+    description: '`hourCycle={24}`, `granularity="second"`: the hidden input has `step="1"`.',
+  },
+  TimeRange: {
+    title: "Time range",
+    description: "`Time` ends: an end before the start is invalid.",
+  },
+  TimeRangeOvernight: {
+    title: "Overnight time range",
+    description: "`allowsOvernight`: an end before the start is the next day.",
+  },
   Zoned: { title: "Zoned", description: "A `ZonedDateTime` shows the zone name." },
   ZonedWithoutName: { title: "Zoned, no zone name", description: "`hideTimeZone`." },
   JapaneseEras: {

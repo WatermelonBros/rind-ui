@@ -209,11 +209,16 @@ export const popoverMachine = setup({
         opener: trigger,
         // The trigger and the anchor are inside: pressing the trigger toggles once
         // (headlessui#2713); another popover's trigger is outside (zag#2241).
-        // Modal: the trigger is inert with the rest of the page, so it is not inside.
+        // Modal: the trigger and the anchor are inert with the rest of the page, so they are
+        // not inside (a Date Field picker's anchor is the whole field: date-field spec
+        // "Picker — Modality").
         elements: () =>
-          [modal ? null : trigger(), byId(ids.anchor), byId(ids.positioner), content()].filter(
-            (e): e is HTMLElement => e !== null,
-          ),
+          [
+            modal ? null : trigger(),
+            modal ? null : byId(ids.anchor),
+            byId(ids.positioner),
+            content(),
+          ].filter((e): e is HTMLElement => e !== null),
         container: content,
         initialFocus: () => false,
         modality: env.modality.modality(),

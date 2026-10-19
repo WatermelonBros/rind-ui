@@ -1,0 +1,5 @@
+- text: Alarm
+- group "Alarm":
+  - spinbutton "hour Alarm": "9"
+  - spinbutton "minute Alarm": "30"
+  - spinbutton "AM/PM Alarm": PM

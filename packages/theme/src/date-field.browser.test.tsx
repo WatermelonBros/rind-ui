@@ -112,6 +112,25 @@ describe("Date Field stylesheet", () => {
     )
   })
 
+  it("a time field looks like a date field: same group, same segments (day period too)", () => {
+    const keys = ["borderTopWidth", "borderTopColor", "paddingTop", "height", "borderRadius"]
+    const look = () => {
+      const g = getComputedStyle(document.querySelector('[data-part="input"]') as HTMLElement)
+      return keys.map((k) => g.getPropertyValue(k.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)))
+    }
+    const date = mountField()
+    const dateLook = look()
+    date.view.unmount()
+    const time = mountField({ maxGranularity: "hour", granularity: "minute" })
+    expect(look()).toEqual(dateLook)
+    const period = time.q('[data-part="segment"][data-type="dayPeriod"]')
+    expect(period.getBoundingClientRect().height).toBeGreaterThanOrEqual(24)
+    expect(getComputedStyle(period).borderTopStyle).toBe("none")
+    expect(getComputedStyle(period).color).toBe(
+      getComputedStyle(time.q('[data-type="hour"]')).color,
+    )
+  })
+
   it("forced colors: boundary, ring and GrayText placeholder rules exist", () => {
     const css = dateField.replace(/\/\*[\s\S]*?\*\//g, "")
     expect(css).toMatch(

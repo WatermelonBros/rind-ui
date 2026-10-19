@@ -2,21 +2,29 @@
 // or the field's own formatted output in its locale, becomes the whole value. Pure.
 
 import {
-  type DateValue,
   parseDate,
   parseDateTime,
+  parseTime,
   parseZonedDateTime,
   toCalendar,
 } from "@internationalized/date"
-import { type Draft, type SegmentEntry, segmentText, toValue, type ValueShape } from "./draft"
+import {
+  type Draft,
+  type FieldValue,
+  type SegmentEntry,
+  segmentText,
+  toValue,
+  type ValueShape,
+} from "./draft"
 import type { DateSegmentType, SegmentFormat } from "./segments"
 import { digitOf, planName } from "./typing"
 
 /** ISO text of the field's value type, in the value's calendar; null when it is not one. */
-function parseIso(text: string, shape: ValueShape): DateValue | null {
+function parseIso(text: string, shape: ValueShape): FieldValue | null {
   // A date alone is not a date-time (parseDateTime would read it as midnight).
-  if (shape.kind !== "date" && !text.includes("T")) return null
+  if (shape.kind !== "date" && shape.kind !== "time" && !text.includes("T")) return null
   try {
+    if (shape.kind === "time") return parseTime(text)
     const value =
       shape.kind === "date"
         ? parseDate(text)
@@ -48,8 +56,8 @@ function parseOwnFormat(
   text: string,
   f: SegmentFormat,
   shape: ValueShape,
-  base: DateValue,
-): DateValue | null {
+  base: FieldValue,
+): FieldValue | null {
   const all = tokens(text, f)
   const numbers = all.filter((t) => t.digits).map((t) => Number(t.text))
   const words = all.filter((t) => !t.digits && t.text.trim() !== "").map((t) => t.text.trim())
@@ -78,8 +86,8 @@ export function parsePaste(
   text: string,
   f: SegmentFormat,
   shape: ValueShape,
-  base: DateValue,
-): DateValue | null {
+  base: FieldValue,
+): FieldValue | null {
   const t = text.trim()
   if (t === "") return null
   return parseIso(t, shape) ?? parseOwnFormat(t, f, shape, base)

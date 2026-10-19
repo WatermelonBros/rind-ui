@@ -2,10 +2,15 @@
 // order, steps, edges, clearing, paste and reset; queries read the hidden input (the ISO
 // value), each segment's text and `aria-valuenow`, and the root's state attributes.
 
-import type { DateValue } from "@internationalized/date"
+import { Time } from "@internationalized/date"
 import { contract, type Invariant } from "../../contract/contract"
 import type { Env, Part } from "../../contract/env"
-import { type DateSegmentType, type Draft, defaultValueText } from "../date-segments"
+import {
+  type DateSegmentType,
+  type Draft,
+  defaultValueText,
+  type FieldValue,
+} from "../date-segments"
 import {
   type DateFieldContext,
   type DateFieldProps,
@@ -45,9 +50,11 @@ async function editable(env: E): Promise<readonly { type: DateSegmentType; part:
   return out
 }
 
-/** The digits (or letter) to type into each segment for an ISO date or date-time. */
+/** The digits (or letter) to type into each segment for an ISO date, date-time or time. */
 export function keysFor(type: DateSegmentType, iso: string, twelveHour: boolean): string {
-  const [date = "", time = ""] = iso.split("T")
+  // A time alone ("21:05") has no date part.
+  const [date = "", time = ""] =
+    iso.includes("T") || !iso.includes(":") ? iso.split("T") : ["", iso]
   const [y = "", m = "", d = ""] = date.split("-")
   const [h = "0", min = "0", s = "0"] = time.split(":")
   const hour = Number(h)
@@ -58,8 +65,11 @@ export function keysFor(type: DateSegmentType, iso: string, twelveHour: boolean)
       return m.padStart(2, "0")
     case "day":
       return d.padStart(2, "0")
-    case "hour":
-      return String(twelveHour ? hour % 12 || 12 : hour).padStart(2, "0")
+    case "hour": {
+      // A 12-hour 2–9 advances alone and shows as typed ("9:05 PM"); others are two digits.
+      const h = twelveHour ? hour % 12 || 12 : hour
+      return twelveHour && h >= 2 && h <= 9 ? String(h) : String(h).padStart(2, "0")
+    }
     case "minute":
       return min.padStart(2, "0")
     case "second":
@@ -101,7 +111,7 @@ const props = (p: Readonly<Record<string, unknown>>) => p as unknown as DateFiel
 const ctx = (view: { context: unknown }) => view.context as DateFieldContext
 /** The oracle value as the hidden input holds it (granularity from the oracle's format). */
 const iso = (v: unknown, p?: Readonly<Record<string, unknown>>) => {
-  const value = (v as DateValue | null | undefined) ?? null
+  const value = (v as FieldValue | null | undefined) ?? null
   return formValueOf(value, p ? formatFor(props(p), value).options.granularity : "second")
 }
 
@@ -137,6 +147,22 @@ export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
     },
   },
   {
+    // date-field "Contract": no hour edit step changed the day period. The oracle never
+    // changes it on an hour edit (date-field "Time Values — Day Period"); the page shows the
+    // oracle's period after every step.
+    name: "date-field-day-period-kept",
+    check: async ({ env, context }) => {
+      const part = seg(env, "dayPeriod")
+      if (!context || (await part.count()) === 0) return undefined
+      const want = (context["draft"] as Draft | undefined)?.dayPeriod?.value ?? null
+      const now = await part.attr("aria-valuenow")
+      // The iOS quirk drops the value attributes: nothing to read.
+      if (now === null && (await part.attr("role")) !== "spinbutton") return undefined
+      const got = now === null ? null : Number(now)
+      return got === want ? undefined : `the day period is ${got}, the oracle's ${want}`
+    },
+  },
+  {
     name: "date-segment-hidden-never-focused",
     check: async ({ env }) => {
       const hidden = env.part("hidden-input")
@@ -150,13 +176,18 @@ export const dateSegmentInvariants: readonly Invariant<P, string>[] = [
 function oracleSegments(view: { context: unknown; values: Record<string, unknown> }, p: unknown) {
   const f = formatFor(
     props(p as Record<string, unknown>),
-    (view.values["value"] as DateValue | null) ?? null,
+    (view.values["value"] as FieldValue | null) ?? null,
   )
   const draft: Draft = ctx(view).draft
   return { f, draft }
 }
 
 /** The Date Field's contract (date-field "Contract"). */
+/** The picker's content is still mounted after a close (its exit). */
+const exiting = async (env: Env<string>) =>
+  (await env.part("content").exists()) &&
+  (await env.part("content").attr("data-state")) === "closed"
+
 export const dateFieldContract = contract("date-field", {
   machine: dateFieldMachine,
   anatomy: [
@@ -257,10 +288,16 @@ export const dateFieldContract = contract("date-field", {
       done: async () => true,
     },
     /** Leaves the field (focus outside). */
+    // With the picker open, a keyboard leave is Escape (focus returns to the trigger): a press
+    // outside would be a pointer step labelled keyboard. Done once no content is exiting, so the
+    // popover's exit never lands after the step.
     leave: {
       pointer: async (env) => env.pointerOutside(),
-      keyboard: async (env) => env.pointerOutside(),
-      done: async () => true,
+      keyboard: async (env) => {
+        if (await datePickerQueries.isOpen(env)) await (await active(env)).press("Escape")
+        else await env.pointerOutside()
+      },
+      done: async (env) => !(await exiting(env)),
     },
     composeOpen: {
       keyboard: async (env, text: string) =>
@@ -271,10 +308,23 @@ export const dateFieldContract = contract("date-field", {
       keyboard: async (env, committed: string) => (await active(env)).compose([], committed),
       done: { isComposing: false },
     },
+    /** The day period by its letter ("a" / "p", every locale: date-segments). */
+    setDayPeriod: {
+      keyboard: async (env, period: "am" | "pm") =>
+        seg(env, "dayPeriod").type(period === "am" ? "a" : "p"),
+      pointer: async (env, period: "am" | "pm") => {
+        const part = seg(env, "dayPeriod")
+        await part.click()
+        await part.type(period === "am" ? "a" : "p")
+      },
+      done: async () => true,
+    },
     resetForm: {
       pointer: async (env) => env.find({ role: "button", name: "Reset" }).click(),
       keyboard: async (env) => env.find({ role: "button", name: "Reset" }).press("Enter"),
-      done: async () => true,
+      // A press or focus on Reset closes an open picker (a bare click does not): done once no
+      // content is exiting.
+      done: async (env) => !(await exiting(env)),
     },
   },
   queries: {
@@ -463,9 +513,11 @@ function firstSegment(view: { context: unknown }): DateSegmentType {
 
 /** An ISO text of the oracle's kind to paste: its value a year later, else a fixed one. */
 function pasteFor(view: { values: Record<string, unknown>; context: unknown }): string {
-  const v = (view.values["value"] as DateValue | null | undefined) ?? null
+  const v = (view.values["value"] as FieldValue | null | undefined) ?? null
+  if (v instanceof Time) return v.add({ hours: 1 }).toString()
   if (v) return v.add({ years: 1 }).toString()
   const { options } = ctx(view).format
+  if (options.maxGranularity === "hour" && options.timeZone === "UTC") return "10:20"
   if (options.granularity === "day") return "2030-06-15"
   return options.timeZone === "UTC" ? "2030-06-15T10:20" : `2030-06-15T10:20[${options.timeZone}]`
 }

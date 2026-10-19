@@ -161,8 +161,6 @@ drift. When adding a component, make sure its docs page and site examples exist;
 
 ## Closing work (keep the board clean)
 
-Two sessions work on this repo: one writes specs and reviews, one implements.
-
 - **Reado review tasks**: resolve each with a command that proves the fix, so a
   passing check closes it automatically:
   `reado-cli task done <id> --verify "<targeted test command>"` (binary:

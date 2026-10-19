@@ -99,21 +99,30 @@ export const dateFieldMeta = {
     },
   ],
   props: {
-    value: { type: "DateValue | null", description: "Controlled value." },
-    defaultValue: { type: "DateValue | null", description: "Uncontrolled value." },
+    value: {
+      type: "DateValue | Time | null",
+      description:
+        "Controlled value (a `Time`: a time field; range mode: `{ start, end } | null`).",
+    },
+    defaultValue: { type: "DateValue | Time | null", description: "Uncontrolled value." },
     onValueChange: {
       type: "(value, { reason, modality }) => void",
       description:
         "At commit points only: `SEGMENT.COMMIT`, `STEP`, `PASTE`, `CLEAR`, `RESET`, `CALENDAR` (a picker's pick). Typing inside a segment never changes the value.",
     },
     placeholderValue: {
-      type: "DateValue",
+      type: "DateValue | Time",
       description:
-        "Where stepping an empty segment starts, and the value's type and zone (default: today at 00:00).",
+        "Where stepping an empty segment starts, and the value's type and zone (default: today at 00:00; a time field: `Time` 00:00).",
     },
     granularity: {
       type: '"day" | "hour" | "minute" | "second"',
-      description: "The smallest segment (default `day` for dates, `minute` for date-times).",
+      description: "The smallest segment (default `day` for dates, `minute` for times).",
+    },
+    maxGranularity: {
+      type: '"year" | "hour"',
+      description:
+        "`hour`: no date segments, a time field (a date-time keeps its date). Default `hour` for a `Time`.",
     },
     hourCycle: { type: "12 | 24", description: "Default: the locale's." },
     hideTimeZone: { type: "boolean", default: "false", description: "No zone name segment." },
@@ -122,8 +131,16 @@ export const dateFieldMeta = {
       default: "false",
       description: "Months, days and hours always two digits.",
     },
-    minValue: { type: "DateValue | null", description: "Earlier dates are invalid." },
-    maxValue: { type: "DateValue | null", description: "Later dates are invalid." },
+    minValue: {
+      type: "DateValue | Time | null",
+      description: "Earlier values are invalid (a `Time` compares on the value's own day).",
+    },
+    maxValue: { type: "DateValue | Time | null", description: "Later values are invalid." },
+    allowsOvernight: {
+      type: "boolean",
+      default: "false",
+      description: "Range mode with `Time` ends: an end before the start is the next day.",
+    },
     isDateUnavailable: { type: "(date) => boolean", description: "Such a date is invalid." },
     locale: { type: "string", description: "Default: the provider's." },
     createCalendar: {
@@ -220,6 +237,7 @@ export const dateFieldMeta = {
       clearSegment: ["keyboard"],
       clear: ["keyboard"],
       paste: ["keyboard"],
+      setDayPeriod: ["pointer", "keyboard", "virtual"],
       leave: ["pointer", "keyboard", "virtual"],
       composeOpen: ["keyboard"],
       composeEnd: ["keyboard"],
