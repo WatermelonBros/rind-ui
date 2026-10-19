@@ -1,16 +1,22 @@
 // Range mode's pair (date-field spec "Range Mode — Derived Value", "Ends Never Edit Each Other",
 // "Range Validity", "Time Ends And Overnight", "Controlled Value, Clear And Reset").
-import { CalendarDate, CalendarDateTime, isWeekend, Time } from "@internationalized/date"
+import {
+  CalendarDate,
+  CalendarDateTime,
+  isWeekend,
+  parseZonedDateTime,
+  Time,
+} from "@internationalized/date"
 import { describe, expect, it, vi } from "vitest"
 import { createService } from "../../machine/service"
 import { validityFlags } from "../date-segments"
 import { dateFieldMessages } from "./date-field.messages"
-import { deriveRange } from "./date-range"
+import { type DateRangeEndValue, deriveRange } from "./date-range"
 import { type DateRangeFieldProps, dateRangeFieldMachine } from "./date-range.machine"
 
 const d = (m: number, day: number) => new CalendarDate(2026, m, day)
 const VALID = validityFlags(null)
-const end = (value: CalendarDate | Time | null, message = "") => ({
+const end = (value: DateRangeEndValue | null, message = "") => ({
   value,
   message,
   flags: message ? validityFlags("impossible") : VALID,
@@ -71,6 +77,25 @@ describe("deriveRange", () => {
     const night = derive(end(new Time(22)), end(new Time(6)), { allowsOvernight: true })
     expect(night.value).toEqual({ start: new Time(22), end: new Time(6) })
     expect(night.overnight).toBe(true)
+  })
+
+  it("an equal time end is valid; date-time ends ignore allowsOvernight", () => {
+    expect(derive(end(new Time(9)), end(new Time(9))).message).toBe("")
+    const dt = (h: number) => end(new CalendarDateTime(2026, 10, 14, h))
+    const r = derive(dt(22), dt(6), { allowsOvernight: true })
+    expect(r.value).toBeNull()
+    expect(r.message).toBe("End date must be on or after the start date")
+  })
+
+  it("zoned ends across DST are ordered by instant", () => {
+    const first = parseZonedDateTime("2026-11-01T01:30-04:00[America/New_York]")
+    const second = parseZonedDateTime("2026-11-01T01:30-05:00[America/New_York]")
+    const start = parseZonedDateTime("2026-11-01T00:30[America/New_York]")
+    expect(derive(end(start), end(second)).message).toBe("")
+    // The second 01:30 is after the first: as end before start it is inverted.
+    expect(derive(end(second), end(first)).message).toBe(
+      "End date must be on or after the start date",
+    )
   })
 })
 

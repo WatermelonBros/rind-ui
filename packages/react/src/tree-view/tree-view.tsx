@@ -2,6 +2,7 @@
 // checking and lazy loads; the core connect owns every attribute and key.
 
 import {
+  type Collection,
   type CollectionKey,
   checkTreeView,
   createTreeCollection,
@@ -11,7 +12,9 @@ import {
   type LinkCurrent,
   type LinkEnv,
   linkProps,
+  type PartProps,
   type RouterOptions,
+  type ScrollToIndexDetails,
   type TreeCollection,
   type TreeViewActionDetails,
   type TreeViewMessages,
@@ -29,6 +32,7 @@ import {
   type ComponentPropsWithRef,
   createContext,
   Fragment,
+  memo,
   type ReactNode,
   useContext,
   useEffect,
@@ -36,13 +40,14 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
-import { useMachine, useSelector } from "../use-machine"
+import { useMachine } from "../use-machine"
 import { useModality } from "../use-modality"
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
@@ -127,11 +132,20 @@ export type TreeViewRootProps = {
   readonly typeaheadTimeout?: number
   /** Overrides for the loading announcements and the Empty and Loading default texts. */
   readonly messages?: Partial<TreeViewMessages>
+  /**
+   * Rows are windowed by the consumer (`TreeView.Tree` `indexes`): keyboard moves call
+   * `scrollToIndex`, never `scrollIntoView`.
+   */
+  readonly virtualized?: boolean
+  /** Scrolls the highlighted row into view; `index` is its position in the visible list. */
+  readonly scrollToIndex?: (details: ScrollToIndexDetails) => void
 } & Selection
 
 /** What a node render function receives (design §2). */
 export interface TreeViewNodeState {
   readonly key: string
+  /** The row's position in the visible list (what a virtualizer positions by). */
+  readonly index: number
   /** The node's data (a `TreeViewItemData` with `items`). */
   readonly value: unknown
   readonly label: string
@@ -152,8 +166,13 @@ export interface TreeViewNodeState {
 interface Host {
   readonly parts: TreeViewParts
   readonly tree: TreeCollection<unknown>
-  readonly visibleKeys: readonly CollectionKey[]
+  /** The visible nodes (memoised per tree and expanded keys: stable while they are). */
+  readonly visible: Collection<unknown>
+  readonly focused: boolean
+  readonly highlightedIndex: number | undefined
   readonly node: (key: CollectionKey) => TreeViewNodeState | undefined
+  /** What a row renders from: changes only for the rows a state change affects. */
+  readonly rowSignature: (key: CollectionKey) => string
   readonly messages: TreeViewMessages
   readonly env: LinkEnv
   readonly mountLabel: (on: boolean) => void
@@ -162,14 +181,72 @@ interface Host {
   readonly setHovered: (key: CollectionKey | null) => void
   readonly setPressed: (key: CollectionKey | null) => void
   readonly options: { readonly checkable: boolean; readonly selectionMode: string | undefined }
-  readonly service: Parameters<typeof useSelector>[0]
 }
 
-const HostContext = createContext<Host | null>(null)
-const useHost = (part: string): Host => {
-  const host = useContext(HostContext)
-  if (!host) throw new Error(`TreeView.${part} must be inside TreeView.Root`)
-  return host
+/**
+ * The context value: stable for the tree's life, so a Root render re-renders no part by
+ * itself. Each part subscribes to its own slice and re-renders only when that slice changes
+ * (a highlight move re-renders the two rows involved, not the whole tree).
+ */
+interface HostStore {
+  current: Host
+  readonly subscribe: (listener: () => void) => () => void
+  readonly notify: () => void
+}
+
+function createHostStore(host: Host): HostStore {
+  const listeners = new Set<() => void>()
+  return {
+    current: host,
+    subscribe: (listener) => {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    notify: () => {
+      for (const listener of listeners) listener()
+    },
+  }
+}
+
+const HostContext = createContext<HostStore | null>(null)
+/** The store, subscribed to `slice` of the latest host (re-renders when the slice changes). */
+const useHost = (part: string, slice: (host: Host) => string): HostStore => {
+  const store = useContext(HostContext)
+  if (!store) throw new Error(`TreeView.${part} must be inside TreeView.Root`)
+  const get = () => slice(store.current)
+  useSyncExternalStore(store.subscribe, get, get)
+  return store
+}
+
+const objectIds = new WeakMap<object, number>()
+let lastId = 0
+/** A stable number per object identity (primitives as themselves), for signatures. */
+const idOf = (value: unknown): unknown => {
+  if ((typeof value !== "object" && typeof value !== "function") || value === null) return value
+  let id = objectIds.get(value)
+  if (id === undefined) {
+    id = ++lastId
+    objectIds.set(value, id)
+  }
+  return id
+}
+
+/** A part's attributes as a string (handlers excluded: they never change what renders). */
+const attrs = (props: PartProps) =>
+  JSON.stringify(props, (_, v) => (typeof v === "function" ? undefined : v))
+
+/**
+ * The handlers call the latest render's: a part that skipped a re-render (its attributes did
+ * not change) never acts on the state of an older one.
+ */
+function live(props: PartProps, latest: () => PartProps): PartProps {
+  const out: Record<string | symbol, unknown> = { ...props }
+  for (const [name, value] of Object.entries(props)) {
+    if (typeof value !== "function") continue
+    out[name] = (...args: unknown[]) =>
+      (latest()[name] as ((...a: unknown[]) => unknown) | undefined)?.(...args)
+  }
+  return out as PartProps
 }
 const ItemContext = createContext<CollectionKey | null>(null)
 const useItemKey = (part: string) => {
@@ -235,6 +312,8 @@ function Root(all: TreeViewRootProps) {
     onLoadChildren: all.onLoadChildren
       ? (key, o) => latest.current.onLoadChildren?.(key, o)
       : undefined,
+    virtualized: all.virtualized,
+    scrollToIndex: all.scrollToIndex ? (d) => latest.current.scrollToIndex?.(d) : undefined,
   })
   const view = service.view()
   const [mounted, setMounted] = useState<{
@@ -303,15 +382,14 @@ function Root(all: TreeViewRootProps) {
     },
     env,
   )
-  const visibleKeys: CollectionKey[] = []
-  for (let i = 0; i < visible.size; i++) {
-    const node = visible.at(i)
-    if (node) visibleKeys.push(node.key)
-  }
+  const signatures = new Map<CollectionKey, string>()
   const host: Host = {
     parts,
     tree,
-    visibleKeys,
+    visible,
+    focused,
+    highlightedIndex:
+      ctx.highlightedKey === null ? undefined : visible.get(ctx.highlightedKey)?.index,
     node: (key) => {
       const node = tree.get(key)
       if (!node) return undefined
@@ -319,6 +397,7 @@ function Root(all: TreeViewRootProps) {
       const check = item["aria-checked"] as "true" | "false" | "mixed" | undefined
       return {
         key,
+        index: visible.get(key)?.index ?? -1,
         value: node.value,
         label: node.textValue,
         level: node.level + 1,
@@ -342,9 +421,24 @@ function Root(all: TreeViewRootProps) {
     setHovered,
     setPressed,
     options: { checkable: all.checkable === true, selectionMode: p["selectionMode"] as string },
-    service: service as unknown as Host["service"],
+    rowSignature: (key) => {
+      // Once per key per render: every part of a row asks.
+      let signature = signatures.get(key)
+      if (signature === undefined) {
+        const node = host.node(key)
+        signature = node
+          ? `${idOf(node.value)}|${idOf(messages)}|${JSON.stringify({ ...node, value: 0 })}|${attrs(parts.item(key))}`
+          : ""
+        signatures.set(key, signature)
+      }
+      return signature
+    },
   }
-  return <HostContext value={host}>{children}</HostContext>
+  const [store] = useState(() => createHostStore(host))
+  // Read during this render by the parts it renders; the others are notified after commit.
+  store.current = host
+  useIsoLayoutEffect(() => store.notify())
+  return <HostContext value={store}>{children}</HostContext>
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
@@ -353,7 +447,7 @@ type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T>
 }
 
 function Label({ render, ...rest }: Own<"span">) {
-  const host = useHost("Label")
+  const host = useHost("Label", (h) => attrs(h.parts.label())).current
   const { mountLabel } = host
   useIsoLayoutEffect(() => {
     mountLabel(true)
@@ -369,6 +463,7 @@ function Label({ render, ...rest }: Own<"span">) {
 function Tree({
   children,
   loading,
+  indexes,
   render,
   ...rest
 }: Omit<Own<"div">, "children"> & {
@@ -376,9 +471,15 @@ function Tree({
   readonly children: (node: TreeViewNodeState) => ReactNode
   /** Under a loading branch (default: the Loading part with the loading text). */
   readonly loading?: (node: TreeViewNodeState) => ReactNode
+  /**
+   * Virtualized: the visible-list indexes to render (a virtualizer's window plus
+   * `TreeView.useVisibleRows().persistedIndexes`). Default: every visible node.
+   */
+  readonly indexes?: readonly number[]
 }) {
-  const host = useHost("Tree")
-  useSelector(host.service, (v) => v)
+  const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
+  const store = useHost("Tree", (h) => `${idOf(h.visible)}|${attrs(h.parts.tree(naming))}`)
+  const host = store.current
   const ref = useRef<HTMLDivElement | null>(null)
   const { checkable, selectionMode } = host.options
   // After the re-render a Label's registration causes (a layout effect), not on the first commit.
@@ -388,25 +489,61 @@ function Tree({
       if (node?.isConnected) checkTreeView(node, { checkable, selectionMode })
     })
   }, [checkable, selectionMode])
-  const naming = { "aria-label": rest["aria-label"], "aria-labelledby": rest["aria-labelledby"] }
-  const props = mergeProps({ ...normalizeProps(host.parts.tree(naming)), ref }, rest)
-  const rows = host.visibleKeys.map((key) => {
-    const node = host.node(key)
-    if (!node) return null
-    return (
-      <Fragment key={key}>
-        {children(node)}
-        {node.loading ? (
-          loading ? (
-            loading(node)
-          ) : (
-            <Loading>{host.messages.loadingLabel}</Loading>
-          )
-        ) : null}
-      </Fragment>
-    )
-  })
+  const own = live(host.parts.tree(naming), () => store.current.parts.tree(naming))
+  const props = mergeProps({ ...normalizeProps(own), ref }, rest)
+  const { visible } = host
+  const rows: ReactNode[] = []
+  const add = (index: number) => {
+    const node = visible.at(index)
+    if (node) rows.push(<Row key={node.key} nodeKey={node.key} row={children} loading={loading} />)
+  }
+  if (indexes) for (const index of indexes) add(index)
+  else for (let index = 0; index < visible.size; index++) add(index)
   return renderPart("div", { ...props, children: rows }, render, undefined)
+}
+
+/** One visible node: re-renders only when its own signature changes. */
+const Row = memo(function Row({
+  nodeKey,
+  row,
+  loading,
+}: {
+  readonly nodeKey: CollectionKey
+  readonly row: (node: TreeViewNodeState) => ReactNode
+  readonly loading: ((node: TreeViewNodeState) => ReactNode) | undefined
+}) {
+  const host = useHost("Tree", (h) => h.rowSignature(nodeKey)).current
+  const node = host.node(nodeKey)
+  if (!node) return null
+  return (
+    <Fragment>
+      {row(node)}
+      {node.loading ? (
+        loading ? (
+          loading(node)
+        ) : (
+          <Loading>{host.messages.loadingLabel}</Loading>
+        )
+      ) : null}
+    </Fragment>
+  )
+})
+
+/**
+ * For a virtualizer inside `TreeView.Root`: the visible row count and the indexes it must keep
+ * rendered (the highlighted row, so focus and the keyboard never lose it).
+ */
+function useVisibleRows(): {
+  readonly count: number
+  readonly persistedIndexes: readonly number[]
+} {
+  const host = useHost("useVisibleRows", (h) => `${h.visible.size}|${h.highlightedIndex}`).current
+  const count = host.visible.size
+  const index = host.highlightedIndex
+  return useMemo(
+    () => ({ count, persistedIndexes: index === undefined ? [] : [index] }),
+    [count, index],
+  )
 }
 
 function Item({
@@ -435,10 +572,32 @@ function Item({
   /** With `href`: passed unchanged to the router's `navigate`. */
   readonly routerOptions?: RouterOptions | undefined
 }) {
-  const host = useHost("Item")
   const key = toKey(value)
-  const own = normalizeProps(host.parts.item(key))
+  const store = useHost("Item", (h) => h.rowSignature(key))
+  const host = store.current
+  const item = host.parts.item(key)
+  const own = normalizeProps(live(item, () => store.current.parts.item(key)))
   const { setHovered, setPressed } = host
+  const ref = useRef<HTMLElement | null>(null)
+  // Virtualized: a row highlighted by a key press mounts after the scroll. Focus left on the
+  // tree, on the previous row, or dropped to the body when that row unmounted moves to it.
+  const highlighted = item["data-highlighted"] !== undefined
+  const treeFocused = host.focused
+  useIsoLayoutEffect(() => {
+    const node = ref.current
+    if (!node || !highlighted || !treeFocused) return
+    const doc = node.ownerDocument
+    const active = doc.activeElement
+    if (active === node) return
+    const treeEl = node.closest('[role="tree"]')
+    const dropped = active === null || active === doc.body
+    const inTree =
+      active !== null &&
+      treeEl !== null &&
+      (active === treeEl ||
+        (active.getAttribute("role") === "treeitem" && active.closest('[role="tree"]') === treeEl))
+    if (dropped || inTree) node.focus({ preventScroll: true })
+  }, [highlighted])
   const wiring = {
     onPointerEnter: () => setHovered(key),
     onPointerLeave: () => setHovered(null),
@@ -462,14 +621,14 @@ function Item({
       ),
     )
     // The tree's roving tabindex and role win over the link's.
-    const props = mergeProps(link, own, wiring, rest)
+    const props = mergeProps(link, { ...own, ref }, wiring, rest)
     return (
       <ItemContext value={key}>
         {renderPart("a", { ...props, children }, render as RenderProp<undefined>, undefined)}
       </ItemContext>
     )
   }
-  const props = mergeProps(own, wiring, rest)
+  const props = mergeProps({ ...own, ref }, wiring, rest)
   return (
     <ItemContext value={key}>
       {renderPart("div", { ...props, children }, render, undefined)}
@@ -478,8 +637,8 @@ function Item({
 }
 
 function ItemText({ render, ...rest }: Own<"span">) {
-  const host = useHost("ItemText")
   const key = useItemKey("ItemText")
+  const host = useHost("ItemText", (h) => h.rowSignature(key)).current
   const { mountText } = host
   useIsoLayoutEffect(() => {
     mountText(key, true)
@@ -494,8 +653,8 @@ function ItemText({ render, ...rest }: Own<"span">) {
 }
 
 function ItemIndicator({ render, ...rest }: Own<"span">) {
-  const host = useHost("ItemIndicator")
   const key = useItemKey("ItemIndicator")
+  const host = useHost("ItemIndicator", (h) => h.rowSignature(key)).current
   return renderPart(
     "span",
     mergeProps(normalizeProps(host.parts.itemIndicator(key)), rest),
@@ -505,8 +664,8 @@ function ItemIndicator({ render, ...rest }: Own<"span">) {
 }
 
 function ItemCheckbox({ render, ...rest }: Own<"span">) {
-  const host = useHost("ItemCheckbox")
   const key = useItemKey("ItemCheckbox")
+  const host = useHost("ItemCheckbox", (h) => h.rowSignature(key)).current
   return renderPart(
     "span",
     mergeProps(normalizeProps(host.parts.itemCheckbox(key)), rest),
@@ -516,7 +675,7 @@ function ItemCheckbox({ render, ...rest }: Own<"span">) {
 }
 
 function Loading({ render, ...rest }: Own<"span">) {
-  const host = useHost("Loading")
+  const host = useHost("Loading", (h) => attrs(h.parts.loading())).current
   return renderPart(
     "span",
     mergeProps(normalizeProps(host.parts.loading()), rest),
@@ -526,7 +685,10 @@ function Loading({ render, ...rest }: Own<"span">) {
 }
 
 function Empty({ render, children, ...rest }: Own<"div">) {
-  const host = useHost("Empty")
+  const host = useHost(
+    "Empty",
+    (h) => `${h.parts.isEmpty}|${h.messages.emptyLabel}|${attrs(h.parts.empty())}`,
+  ).current
   const { mountEmpty } = host
   const shown = host.parts.isEmpty
   useIsoLayoutEffect(() => {
@@ -556,4 +718,5 @@ export const TreeView = {
   ItemCheckbox,
   Loading,
   Empty,
+  useVisibleRows,
 }

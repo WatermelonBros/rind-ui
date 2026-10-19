@@ -8,12 +8,25 @@ import {
   CalendarDate,
   CalendarDateTime,
   type DateValue,
+  Time,
   toCalendar,
   toCalendarDateTime,
   toZoned,
   ZonedDateTime,
 } from "@internationalized/date"
 import type { DateSegmentType, SegmentFormat } from "./segments"
+
+/** What a Date Field holds: a date, a date-time, a zoned date-time or a time of day. */
+export type FieldValue = DateValue | Time
+
+/** The fixed day a `Time` is placed on to share the date-time arithmetic (it is never shown). */
+const TIME_DAY = new CalendarDate(2001, 1, 1)
+
+/** A value as a `DateValue`: a `Time` on a fixed day (no zone: it never meets a `Date`). */
+export const onDay = (value: FieldValue): DateValue =>
+  value instanceof Time
+    ? new CalendarDateTime(2001, 1, 1, value.hour, value.minute, value.second, value.millisecond)
+    : value
 
 export interface SegmentEntry {
   /** null: empty, or typed text that is not yet a value ("0" in a month). */
@@ -27,13 +40,16 @@ export type Draft = Readonly<Partial<Record<DateSegmentType, SegmentEntry>>>
 
 /** The kind of value a field emits, from its value or placeholder. */
 export interface ValueShape {
-  readonly kind: "date" | "datetime" | "zoned"
+  readonly kind: "date" | "datetime" | "zoned" | "time"
   /** The value's own calendar (it may differ from the display calendar). */
   readonly calendar: Calendar
   readonly timeZone: string
 }
 
-export function shapeOf(value: DateValue): ValueShape {
+export function shapeOf(value: FieldValue): ValueShape {
+  if (value instanceof Time) {
+    return { kind: "time", calendar: TIME_DAY.calendar, timeZone: "UTC" }
+  }
   if (value instanceof ZonedDateTime) {
     return { kind: "zoned", calendar: value.calendar, timeZone: value.timeZone }
   }
@@ -78,8 +94,8 @@ const entry = (type: DateSegmentType, n: number, f: SegmentFormat): SegmentEntry
 })
 
 /** The wall-clock fields of a value in the display calendar. */
-function fieldsOf(value: DateValue, f: SegmentFormat) {
-  const shown = toCalendar(value, f.options.calendar)
+function fieldsOf(value: FieldValue, f: SegmentFormat) {
+  const shown = toCalendar(onDay(value), f.options.calendar)
   const time =
     shown instanceof CalendarDateTime || shown instanceof ZonedDateTime
       ? shown
@@ -98,14 +114,14 @@ function fieldsOf(value: DateValue, f: SegmentFormat) {
 }
 
 /** Every editable segment filled from a value; empty segments for null. */
-export function draftOf(value: DateValue | null, f: SegmentFormat): Draft {
+export function draftOf(value: FieldValue | null, f: SegmentFormat): Draft {
   if (value === null) return {}
   const fields = fieldsOf(value, f)
   return Object.fromEntries(f.editable.map((t) => [t, entry(t, fields[t], f)]))
 }
 
 /** One segment of a value (stepping an empty segment starts from the placeholder's part). */
-export function partOf(type: DateSegmentType, value: DateValue, f: SegmentFormat): SegmentEntry {
+export function partOf(type: DateSegmentType, value: FieldValue, f: SegmentFormat): SegmentEntry {
   return entry(type, fieldsOf(value, f)[type], f)
 }
 
@@ -211,7 +227,7 @@ export function stepZonedHour(value: ZonedDateTime, amount: number, f: SegmentFo
 
 export interface Conversion {
   readonly state: DraftState
-  readonly value: DateValue | null
+  readonly value: FieldValue | null
 }
 
 const impossible: Conversion = { state: "impossible", value: null }
@@ -225,8 +241,8 @@ export function toValue(
   d: Draft,
   f: SegmentFormat,
   shape: ValueShape,
-  base: DateValue,
-  previous: DateValue | null,
+  base: FieldValue,
+  previous: FieldValue | null,
 ): Conversion {
   const filled = draftState(d, f)
   if (filled === "empty") return { state: "empty", value: null }
@@ -249,6 +265,8 @@ export function toValue(
   const date = toCalendar(new CalendarDate(cal, era, year, month, day), shape.calendar)
   if (shape.kind === "date") return { state, value: date }
   const hour = f.hour12 ? (get("hour") % 12) + (get("dayPeriod") === 1 ? 12 : 0) : get("hour")
+  // A time of day: the date (from the fixed day) is dropped (spec "Time Values").
+  if (shape.kind === "time") return { state, value: new Time(hour, get("minute"), get("second")) }
   const time = new CalendarDateTime(
     date.calendar,
     date.era,
@@ -276,7 +294,7 @@ export function reformat(
   from: SegmentFormat,
   to: SegmentFormat,
   shape: ValueShape,
-  base: DateValue,
+  base: FieldValue,
 ): Draft {
   const whole = toValue(d, from, shape, base, null)
   if (whole.value !== null) return draftOf(whole.value, to)

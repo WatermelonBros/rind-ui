@@ -1,0 +1,8 @@
+- text: Shift
+- group "Shift":
+  - spinbutton "hour Start time Shift": "9"
+  - spinbutton "minute Start time Shift": "00"
+  - spinbutton "AM/PM Start time Shift": AM
+  - spinbutton "hour End time Shift": "5"
+  - spinbutton "minute End time Shift": "30"
+  - spinbutton "AM/PM End time Shift": PM

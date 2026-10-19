@@ -7,6 +7,7 @@ import {
   type DateValue,
   parseDate,
   parseDateTime,
+  parseTime,
   parseZonedDateTime,
   Time,
   toCalendarDate,
@@ -178,10 +179,11 @@ export function sameRange(
  * A hidden input's ISO text (a browser autofill) as an end value of the input's type, or null
  * when it does not parse (spec "Range Mode — Hidden Inputs And Form").
  */
-export function parseEndValue(text: string, type: string): DateValue | null {
+export function parseEndValue(text: string, type: string): DateRangeEndValue | null {
   try {
     if (text === "") return null
     if (type === "date") return parseDate(text)
+    if (type === "time") return parseTime(text)
     if (type === "datetime-local") return parseDateTime(text)
     return parseZonedDateTime(text)
   } catch {

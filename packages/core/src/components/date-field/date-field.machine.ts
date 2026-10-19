@@ -8,6 +8,7 @@ import type { Calendar, DateValue } from "@internationalized/date"
 import {
   type CalendarDate,
   CalendarDateTime,
+  Time,
   toCalendarDate,
   toCalendarDateTime,
   toZoned,
@@ -26,6 +27,7 @@ import {
   draftHint,
   draftOf,
   edgeEntry,
+  type FieldValue,
   isSeparator,
   limits,
   PAGE_STEP,
@@ -107,19 +109,19 @@ export interface DateFieldDraftHint {
 }
 
 export interface DateFieldProps {
-  readonly value?: DateValue | null | undefined
-  readonly defaultValue?: DateValue | null | undefined
+  readonly value?: FieldValue | null | undefined
+  readonly defaultValue?: FieldValue | null | undefined
   readonly onValueChange?:
-    | ((value: DateValue | null, details: ChangeDetails<DateFieldEvent>) => void)
+    | ((value: FieldValue | null, details: ChangeDetails<DateFieldEvent>) => void)
     | undefined
-  /** Resolved by the adapter: the prop, else today within the bounds at 00:00. */
-  readonly placeholderValue: DateValue
+  /** Resolved by the adapter: the prop, else today within the bounds at 00:00 (or a `Time`). */
+  readonly placeholderValue: FieldValue
   /** The format locale (`date-values`: forced to gregorian when a calendar is missing). */
   readonly locale: string
   /** The display calendar. */
   readonly calendar: Calendar
   readonly granularity?: DateGranularity | undefined
-  /** `hour` for a Time Field. */
+  /** `hour`: no date segments (a time field; default for a `Time` value). */
   readonly maxGranularity?: "year" | "hour" | undefined
   readonly hourCycle?: 12 | 24 | undefined
   readonly hideTimeZone?: boolean | undefined
@@ -160,7 +162,7 @@ export interface DateFieldContext {
   /** The last draft hint reported (called only when it changes). */
   hint: DateFieldDraftHint
   /** The value this field proposed and the parent has not answered yet (controlled). */
-  proposed: { readonly value: DateValue | null } | null
+  proposed: { readonly value: FieldValue | null } | null
   /** The format the draft's texts are in (a prop change reformats from it). */
   format: SegmentFormat
 }
@@ -175,12 +177,15 @@ type Types = {
 type Args = ActionArgs<Types>
 
 /** null as the runtime's fallback: the empty value (a controlled null is a value). */
-const EMPTY = null as unknown as DateValue
+const EMPTY = null as unknown as FieldValue
 
 /** The same value: equal by `compare()` for its type, never a day-level check (zag#3117). */
-export function sameDateValue(a: DateValue | null, b: DateValue | null): boolean {
+export function sameDateValue(a: FieldValue | null, b: FieldValue | null): boolean {
   if (a === null || b === null) return a === b
   if (a.constructor !== b.constructor) return false
+  if (a instanceof Time || b instanceof Time) {
+    return a instanceof Time && b instanceof Time && a.compare(b) === 0
+  }
   if (a instanceof ZonedDateTime && b instanceof ZonedDateTime) {
     return a.compare(b) === 0 && a.timeZone === b.timeZone
   }
@@ -188,26 +193,28 @@ export function sameDateValue(a: DateValue | null, b: DateValue | null): boolean
   return a.calendar.identifier === b.calendar.identifier && a.compare(b as never) === 0
 }
 
-const isBc = (v: DateValue | null | undefined) =>
-  v != null && v.calendar.identifier === "gregory" && v.era === "BC"
+const isBc = (v: FieldValue | null | undefined) =>
+  v != null && !(v instanceof Time) && v.calendar.identifier === "gregory" && v.era === "BC"
 
 /** The value's kind and zone: the value, else the default, else the placeholder. */
-export function shapeFor(props: DateFieldProps, current: DateValue | null): ValueShape {
+export function shapeFor(props: DateFieldProps, current: FieldValue | null): ValueShape {
   return shapeOf(current ?? props.defaultValue ?? props.placeholderValue)
 }
 
 /** The field's segment format now (cached by value). */
-export function formatFor(props: DateFieldProps, current: DateValue | null): SegmentFormat {
+export function formatFor(props: DateFieldProps, current: FieldValue | null): SegmentFormat {
   const base = current ?? props.defaultValue ?? props.placeholderValue
   const zoned = base instanceof ZonedDateTime
+  const time = base instanceof Time
   const granularity =
     props.granularity ??
-    (base instanceof CalendarDateTime || base instanceof ZonedDateTime ? "minute" : "day")
+    (time || base instanceof CalendarDateTime || base instanceof ZonedDateTime ? "minute" : "day")
   return segmentFormat({
     locale: props.locale,
     calendar: props.calendar,
-    granularity,
-    maxGranularity: props.maxGranularity,
+    // A time of day has no date to show (spec "Time Values").
+    granularity: time && granularity === "day" ? "minute" : granularity,
+    maxGranularity: props.maxGranularity ?? (time ? "hour" : undefined),
     hourCycle: props.hourCycle,
     timeZone: zoned ? base.timeZone : "UTC",
     showTimeZone: zoned && props.hideTimeZone !== true,
@@ -216,44 +223,45 @@ export function formatFor(props: DateFieldProps, current: DateValue | null): Seg
   })
 }
 
-const current = (args: Pick<Args, "values">): DateValue | null => args.values.value ?? null
+const current = (args: Pick<Args, "values">): FieldValue | null => args.values.value ?? null
 const controlled = (props: DateFieldProps) => props.value !== undefined
 const fmt = (args: Args) => formatFor(args.props, current(args))
 const editable = (props: DateFieldProps) => props.disabled !== true && props.readOnly !== true
 
 /** The value the draft stands for now, with where it stands. */
-export function draftValue(draft: Draft, props: DateFieldProps, value: DateValue | null) {
+export function draftValue(draft: Draft, props: DateFieldProps, value: FieldValue | null) {
   const f = formatFor(props, value)
   return toValue(draft, f, shapeFor(props, value), value ?? props.placeholderValue, value)
 }
 
 /**
- * The one form-value normaliser (hidden input value, `min`, `max`): ISO text, a date-time
- * truncated to the field's granularity so it never fails the input's `step`, and written as
- * the native `datetime-local` normalises it (no zero seconds, no fractions). A date bound of a
- * date-time field is its midnight.
+ * The one form-value normaliser (hidden input value, `min`, `max`): ISO text, a date-time or a
+ * time truncated to the field's granularity so it never fails the input's `step`, and written
+ * as the native `datetime-local` / `time` inputs normalise it (no zero seconds, no fractions).
+ * A date bound of a date-time field is its midnight.
  */
 export function formValueOf(
-  v: DateValue | null | undefined,
+  v: FieldValue | null | undefined,
   granularity: DateGranularity = "second",
-  kind?: "date" | "datetime" | "zoned",
+  kind?: "date" | "datetime" | "zoned" | "time",
 ): string {
   if (v === null || v === undefined) return ""
   if (v instanceof ZonedDateTime) return v.toString()
-  const time = v instanceof CalendarDateTime ? v : null
-  if (!time && kind !== "datetime") return v.toString()
-  const date = v.toString().slice(0, 10)
+  const time = v instanceof CalendarDateTime || v instanceof Time ? v : null
   const two = (n: number) => String(n).padStart(2, "0")
   const hour = two(time?.hour ?? 0)
   const minute = granularity === "hour" ? "00" : two(time?.minute ?? 0)
   const second = granularity === "second" ? (time?.second ?? 0) : 0
-  return `${date}T${hour}:${minute}${second === 0 ? "" : `:${two(second)}`}`
+  const clock = `${hour}:${minute}${second === 0 ? "" : `:${two(second)}`}`
+  if (v instanceof Time) return clock
+  if (!time && kind !== "datetime") return v.toString()
+  return `${v.toString().slice(0, 10)}T${clock}`
 }
 /** The value as the hidden input holds it, at the field's granularity. */
-const iso = (args: Args, v: DateValue | null) =>
+const iso = (args: Args, v: FieldValue | null) =>
   formValueOf(v, formatFor(args.props, v).options.granularity)
 
-function syncHidden(args: Args, v: DateValue | null, dispatch: boolean) {
+function syncHidden(args: Args, v: FieldValue | null, dispatch: boolean) {
   args.env.formInput?.sync({ value: iso(args, v) }, { dispatch })
 }
 
@@ -425,7 +433,7 @@ function backspace(args: Args, type: DateSegmentType) {
     else {
       const n = Number(rest)
       const { min } = limits(type, context.draft, f)
-      const value = type === "hour" && f.hour12 ? (n === 0 ? null : n % 12) : n < min ? null : n
+      const value = type === "hour" && f.hour12 ? n % 12 : n < min ? null : n
       setEntry(args, type, { value, text: digitsText(rest, f) })
     }
     args.set("buffer", rest)
@@ -451,7 +459,7 @@ function settleActive(args: Args) {
 }
 
 /** ISO text of the hidden input as a value of the field's kind (null when not one). */
-function parseAdopted(text: string, props: DateFieldProps, value: DateValue | null) {
+function parseAdopted(text: string, props: DateFieldProps, value: FieldValue | null) {
   if (text === "") return null
   const f = formatFor(props, value)
   // The hidden input's ISO text is the field's own value format.
@@ -671,18 +679,23 @@ export type DateFieldMachine = typeof dateFieldMachine
 
 /**
  * The default `placeholderValue` (spec "Placeholders"): today, inside the bounds, at 00:00,
- * of the field's kind — a date-time when the granularity shows a time, zoned in `timeZone`.
+ * of the field's kind — a date-time when the granularity shows a time, zoned in `timeZone`;
+ * a `Time` (00:00) for a time field with no zone (`maxGranularity: "hour"`).
  */
 export function defaultPlaceholderValue(o: {
   readonly today: CalendarDate
   readonly granularity?: DateGranularity | undefined
+  readonly maxGranularity?: "year" | "hour" | undefined
   readonly timeZone?: string | undefined
-  readonly minValue?: DateValue | null | undefined
-  readonly maxValue?: DateValue | null | undefined
-}): DateValue {
+  readonly minValue?: FieldValue | null | undefined
+  readonly maxValue?: FieldValue | null | undefined
+}): FieldValue {
+  if (o.maxGranularity === "hour" && !o.timeZone) return new Time()
   let day = o.today
-  if (o.minValue && day.compare(toCalendarDate(o.minValue)) < 0) day = toCalendarDate(o.minValue)
-  if (o.maxValue && day.compare(toCalendarDate(o.maxValue)) > 0) day = toCalendarDate(o.maxValue)
+  const min = o.minValue instanceof Time ? null : o.minValue
+  const max = o.maxValue instanceof Time ? null : o.maxValue
+  if (min && day.compare(toCalendarDate(min)) < 0) day = toCalendarDate(min)
+  if (max && day.compare(toCalendarDate(max)) > 0) day = toCalendarDate(max)
   if (o.timeZone) return toZoned(toCalendarDateTime(day), o.timeZone)
   if (o.granularity && o.granularity !== "day") return toCalendarDateTime(day)
   return day

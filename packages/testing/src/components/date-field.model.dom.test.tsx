@@ -4,12 +4,13 @@ import {
   CalendarDateTime,
   isWeekend,
   parseZonedDateTime,
+  Time,
 } from "@internationalized/date"
 import { platforms } from "@rind-ui/core"
 import { render, screen } from "@testing-library/react"
 import { describe, it } from "vitest"
 import { dateFieldStepInvariants, testMachine } from "../index"
-import { a11y, type Config, modelContract, oracle, Story } from "./date-field-model"
+import { a11y, type Config, modelContract, oracle, Story, settle } from "./date-field-model"
 
 function config(name: string, cfg: Config) {
   describe(`date-field model: ${name}`, () => {
@@ -23,10 +24,12 @@ function config(name: string, cfg: Config) {
     testMachine(contract, {
       // Long keyboard paths: more than the 5 s default.
       test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
-      setup: () => {
+      setup: async () => {
         pageChanges = 0
         oracleChanges = 0
-        return render(<Story cfg={cfg} onValueChange={() => pageChanges++} />)
+        const view = render(<Story cfg={cfg} onValueChange={() => pageChanges++} />)
+        await settle(cfg)
+        return view
       },
       target: () => screen,
       anchor: [{ name: "Birthday" }],
@@ -42,6 +45,9 @@ function config(name: string, cfg: Config) {
 
 config("en-US day", {})
 config("picker closed", { picker: "closed" })
+config("picker open", { picker: "open" })
+// Modal: the field is inert while open, so only the closed picker has field steps.
+config("picker closed, modal", { picker: "closed", modal: true })
 config("en-GB day", { locale: "en-GB" })
 config("de-DE minute, 24-hour", {
   locale: "de-DE",
@@ -55,6 +61,17 @@ config("en-US minute, 12-hour", {
 config("zoned Europe/Lisbon", {
   granularity: "minute",
   defaultValue: parseZonedDateTime("2026-10-14T09:44[Europe/Lisbon]"),
+})
+// Time values (date-field "Time Values"): a Date Field with no date segments.
+config("time, 12-hour", {
+  maxGranularity: "hour",
+  placeholderValue: new Time(),
+  defaultValue: new Time(21, 30),
+})
+config("time, 24-hour, seconds", {
+  locale: "de-DE",
+  granularity: "second",
+  placeholderValue: new Time(),
 })
 config("required", { required: true })
 config("min and max", {

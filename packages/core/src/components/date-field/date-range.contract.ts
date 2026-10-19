@@ -63,7 +63,10 @@ const hiddenValue = async (env: E, edge: Edge) => {
   return ""
 }
 
-/** An end's shown date as ISO (Gregorian day segments), "" while any segment is empty. */
+/**
+ * An end's shown value as the hidden input writes it ("2026-10-14", "2026-10-14T09:30",
+ * "22:00"; Gregorian), "" while any segment is empty, null when it has an era (not read back).
+ */
 async function shownIso(env: E, edge: Edge): Promise<string | null> {
   const n: Partial<Record<DateSegmentType, number>> = {}
   for (const { type, part } of await editable(env, edge)) {
@@ -71,10 +74,15 @@ async function shownIso(env: E, edge: Edge): Promise<string | null> {
     if (v === null) return ""
     n[type] = Number(v)
   }
-  // Only Gregorian dates are read back (an era or a time segment: not checked).
-  if (Object.keys(n).some((t) => t !== "year" && t !== "month" && t !== "day")) return null
+  if (n.era !== undefined) return null
   const pad = (x: number | undefined, w: number) => String(x ?? 0).padStart(w, "0")
-  return `${pad(n.year, 4)}-${pad(n.month, 2)}-${pad(n.day, 2)}`
+  const date = n.year === undefined ? "" : `${pad(n.year, 4)}-${pad(n.month, 2)}-${pad(n.day, 2)}`
+  if (n.hour === undefined) return date
+  // A 12-hour hour's value is 0–11 with the day period beside it.
+  const hour = n.hour + (n.dayPeriod === 1 ? 12 : 0)
+  const second = n.second ? `:${pad(n.second, 2)}` : ""
+  const time = `${pad(hour, 2)}:${pad(n.minute, 2)}${second}`
+  return date === "" ? time : `${date}T${time}`
 }
 
 /** Pair invariants (spec "Range Mode — Pair Invariants") read from the page. */
@@ -103,7 +111,9 @@ export const dateRangeInvariants: readonly Invariant<P, string>[] = [
       if (s === null || e === null) return undefined
       // Unavailable dates and a required pair are the coordinator's own tests.
       if (props["isDateUnavailable"]) return undefined
-      const valid = s !== "" && e !== "" && s <= e
+      // Same-format ISO texts order as their values; times may wrap with allowsOvernight.
+      const overnight = props["allowsOvernight"] === true && !s.includes("-")
+      const valid = s !== "" && e !== "" && (s <= e || overnight)
       const want = valid ? { start: s, end: e } : { start: "", end: "" }
       const have = { start: await hiddenValue(env, "start"), end: await hiddenValue(env, "end") }
       return have.start === want.start && have.end === want.end
@@ -221,6 +231,15 @@ export const dateRangeFieldContract = contract("date-field", {
       },
       done: async () => true,
     },
+    /** An end's day period by its letter ("a" / "p", every locale). */
+    setDayPeriod: {
+      keyboard: async (env, edge: Edge, period: "am" | "pm") =>
+        env
+          .part(edge)
+          .withAttr("data-type", "dayPeriod")
+          .type(period === "am" ? "a" : "p"),
+      done: async () => true,
+    },
     /** Every segment of the end cleared with Backspace, last to first. */
     clearEnd: {
       keyboard: async (env) => {
@@ -289,7 +308,13 @@ export const dateRangeFieldContract = contract("date-field", {
     RESET: { skip: "a form reset: the DOM tests" },
   },
   traits: ["field-associated"],
-  // The hidden inputs forward focus to the first segment (hidden-form-input), by design.
-  commitsOnFocus: [{ part: "hidden-input", state: "idle" }],
+  // The hidden inputs forward focus to the first segment (hidden-form-input), by design. A
+  // picker's trigger and content are outside the segments: focus there leaves the end (the
+  // pair has one state, so a focused segment is idle too).
+  commitsOnFocus: [
+    { part: "hidden-input", state: "idle" },
+    { part: "trigger", state: "idle" },
+    { part: "content", state: "idle" },
+  ],
   invariants: [...dateRangeInvariants, ...datePickerInvariants],
 })

@@ -7,6 +7,7 @@ import {
   type DateValue,
   GregorianCalendar,
   parseZonedDateTime,
+  Time,
 } from "@internationalized/date"
 import { describe, expect, it, vi } from "vitest"
 import { recordingFormInput } from "../../dom/hidden-input"
@@ -18,6 +19,7 @@ import {
   type DateFieldEvent,
   type DateFieldProps,
   dateFieldMachine,
+  defaultPlaceholderValue,
   formValueOf,
   type SegmentNavigation,
 } from "./date-field.machine"
@@ -480,5 +482,179 @@ describe("Draft Hint", () => {
       { year: 2031, month: 3, day: null },
     ])
     expect(f.onValueChange).not.toHaveBeenCalled()
+  })
+})
+
+// date-field "Time Values" (Time Field is a Date Field with no date segments).
+describe("Time Values", () => {
+  const time = (over: Partial<DateFieldProps> = {}) =>
+    make({ placeholderValue: new Time(), maxGranularity: "hour", ...over })
+  const iso = (f: ReturnType<typeof make>) => (f.value() as unknown as Time | null)?.toString()
+
+  it("no date segments; a Time is emitted as a Time", () => {
+    const f = time({ hourCycle: 12 })
+    expect(f.s.getSnapshot().context.format.editable).toEqual(["hour", "minute", "dayPeriod"])
+    f.focus("hour")
+    f.type("930p")
+    expect(f.value()).toBeInstanceOf(Time)
+    expect(iso(f)).toBe("21:30:00")
+  })
+
+  it("a Time value alone makes a time field (no maxGranularity)", () => {
+    const f = make({ defaultValue: new Time(9, 30) })
+    expect(f.s.getSnapshot().context.format.editable).not.toContain("day")
+  })
+
+  it("hour not shifted by the viewer's zone (zag#3187)", () => {
+    const f = time({ hourCycle: 24 })
+    f.focus("hour")
+    f.type("0")
+    f.tabTo("minute")
+    f.type("00")
+    expect(iso(f)).toBe("00:00:00")
+  })
+
+  it("null shows placeholders, never 12:00 AM (reka-ui#1791)", () => {
+    const f = time({ value: new Time(9, 30) })
+    f.setProps({ value: null })
+    expect(f.s.getSnapshot().context.draft).toEqual({})
+  })
+
+  it("date kept: a date-time only changes its time", () => {
+    const f = make({
+      defaultValue: new CalendarDateTime(2026, 10, 14, 9, 30),
+      maxGranularity: "hour",
+    })
+    f.focus("hour")
+    f.type("1045a")
+    expect(f.value()?.toString()).toBe("2026-10-14T10:45:00")
+  })
+
+  it("24-hour prop in an en-US page (reka-ui#2463)", () => {
+    const f = time({ hourCycle: 24 })
+    f.focus("hour")
+    f.type("15")
+    expect(f.text("hour")).toBe("15")
+    f.type("00")
+    expect((f.value() as unknown as Time).hour).toBe(15)
+  })
+
+  it("zero-based 24-hour (bits-ui#914)", () => {
+    const f = time({ hourCycle: 24 })
+    f.focus("hour")
+    f.type("00")
+    expect(f.text("hour")).toBe("00")
+    expect(f.active()).toBe("minute")
+    f.type("00")
+    expect((f.value() as unknown as Time).hour).toBe(0)
+  })
+
+  it("two-digit 12-hour hour (bits-ui#1662)", () => {
+    const f = time({ hourCycle: 12 })
+    f.focus("hour")
+    f.type("1")
+    expect(f.active()).toBe("hour")
+    f.type("1")
+    expect(f.active()).toBe("minute")
+    expect(f.text("hour")).toBe("11")
+  })
+
+  it('zero alone in 12-hour is 12 (date-segments "Typing")', () => {
+    const f = time({ hourCycle: 12 })
+    f.focus("hour")
+    f.type("0")
+    f.tabTo("minute")
+    expect(f.text("hour")).toBe("12")
+  })
+
+  it("locale default 24-hour in nl-NL (bits-ui#1659)", () => {
+    const f = time({ locale: "nl-NL", defaultValue: new Time(12, 0) })
+    expect(f.s.getSnapshot().context.format.editable).not.toContain("dayPeriod")
+    f.focus("hour")
+    f.key("INCREASE")
+    expect(iso(f)).toBe("13:00:00")
+  })
+
+  it("clearing the hour keeps PM (react-spectrum#6793)", () => {
+    const f = time({ hourCycle: 12, defaultValue: new Time(18, 45) })
+    f.focus("hour")
+    f.backspace()
+    f.backspace()
+    expect(f.text("hour")).toBe("")
+    expect(f.text("dayPeriod")).toBe("PM")
+  })
+
+  it("stepping the hour across 11/12 keeps the day period", () => {
+    const f = time({ hourCycle: 12, defaultValue: new Time(23, 0) })
+    f.focus("hour")
+    f.key("INCREASE")
+    expect([f.text("hour"), f.text("dayPeriod")]).toEqual(["12", "PM"])
+    expect(iso(f)).toBe("12:00:00")
+  })
+
+  it("editing hour then minutes keeps PM (bits-ui#2145, reka-ui#2262, bits-ui#1985)", () => {
+    const f = time({ hourCycle: 12, defaultValue: new Time(21, 30) })
+    f.focus("hour")
+    f.type("11")
+    f.type("15")
+    expect(iso(f)).toBe("23:15:00")
+  })
+
+  it("Spanish day period (reka-ui#2956)", () => {
+    const f = time({ locale: "es-ES", hourCycle: 12, defaultValue: new Time(15, 30) })
+    expect(f.text("dayPeriod")).toMatch(/^p\.\sm\.$/)
+    f.focus("hour")
+    f.type("3")
+    f.blur()
+    expect(iso(f)).toBe("15:30:00")
+  })
+
+  it("repeated hour: both occurrences in order (zoned)", () => {
+    const f = make({
+      maxGranularity: "hour",
+      hourCycle: 12,
+      defaultValue: parseZonedDateTime("2026-11-01T00:30[America/New_York]"),
+    })
+    f.focus("hour")
+    f.key("INCREASE")
+    expect(f.value()?.toString()).toBe("2026-11-01T01:30:00-04:00[America/New_York]")
+    f.key("INCREASE")
+    expect(f.value()?.toString()).toBe("2026-11-01T01:30:00-05:00[America/New_York]")
+    expect([f.text("hour"), f.text("dayPeriod")]).toEqual(["1", "AM"])
+  })
+
+  it("a skipped hour resolves to the later valid time", () => {
+    const f = make({
+      maxGranularity: "hour",
+      hourCycle: 24,
+      defaultValue: parseZonedDateTime("2026-03-08T01:30[America/New_York]"),
+    })
+    f.focus("hour")
+    f.type("02")
+    expect(f.value()?.toString()).toBe("2026-03-08T03:30:00-04:00[America/New_York]")
+  })
+
+  it("form value: the ISO time at the granularity", () => {
+    expect(formValueOf(new Time(14, 30), "minute")).toBe("14:30")
+    expect(formValueOf(new Time(14, 30, 15), "second")).toBe("14:30:15")
+    expect(formValueOf(new Time(14, 30, 15), "hour")).toBe("14:00")
+    expect(formValueOf(null)).toBe("")
+  })
+
+  it("a partial entry submits an empty value (react-spectrum#9801)", () => {
+    const f = time({ hourCycle: 24, defaultValue: new Time(14, 30) })
+    f.focus("minute")
+    f.backspace()
+    f.backspace()
+    expect(f.value()).toBeNull()
+    expect(f.rec.calls.at(-1)?.value).toEqual({ value: "" })
+  })
+
+  it("the default placeholder of a time field is a Time", () => {
+    const today = new CalendarDate(2026, 10, 17)
+    expect(defaultPlaceholderValue({ today, maxGranularity: "hour" })).toEqual(new Time())
+    expect(
+      defaultPlaceholderValue({ today, maxGranularity: "hour", timeZone: "UTC" }),
+    ).not.toBeInstanceOf(Time)
   })
 })

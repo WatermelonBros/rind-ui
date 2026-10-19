@@ -142,6 +142,8 @@ export interface InvariantContext<P extends string = string, S extends string = 
   readonly props: Readonly<Record<string, unknown>>
   /** The oracle's resolved values after the step (a selection to compare the page with). */
   readonly values: Readonly<Record<string, unknown>>
+  /** The oracle's context after the step (what the page should show but not expose). */
+  readonly context?: Readonly<Record<string, unknown>> | undefined
 }
 /** Resolves when the invariant holds; rejects or returns a message when it does not. */
 export type Invariant<P extends string = string, S extends string = string> = {

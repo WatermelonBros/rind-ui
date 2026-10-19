@@ -1,7 +1,7 @@
 ## 0. Spec
 
-- [ ] 0.1 Draft reviewed by the coordinator; open questions settled (design.md)
-- [ ] 0.2 Merge `origin/main` once #113 (add-date-field) lands; re-validate
+- [x] 0.1 Draft reviewed by the coordinator; open questions settled (design.md)
+- [x] 0.2 Merge `origin/main` once #113 (add-date-field) lands; re-validate
 
 ## 1. Calendar range (PR 1)
 
@@ -22,19 +22,19 @@
 
 ## 3. Date Field time values and range (PR 3)
 
-- [ ] 3.1 Time values: `Time` type, hour cycles, day period, zones and DST, `type="time"` form value, `setDayPeriod`, the 12-hour "0" rule in `date-segments`
+- [x] 3.1 Time values: `Time` type, hour cycles, day period, zones and DST, `type="time"` form value, `setDayPeriod`, the 12-hour "0" rule in `date-segments`
 - [x] 3.2a Date ranges (date and date-time ends): coordinator, embedded ends, range validity, focus between ends, names and description, two hidden inputs with autofill, clear / reset / controlled value, contract range variant, pair invariants, model classes (in order, inverted), theme, examples, docs
-- [ ] 3.2 Range mode (time ends with 3.1): pair coordinator, derived value, ends never edit each other, range validity, focus between ends, names, two hidden inputs, controlled value / clear / reset, time ends and `allowsOvernight`; contract range variant and pair invariants; model classes (date, date-time, time, overnight, RTL)
-- [ ] 3.3 Theme, examples, snapshots, docs
+- [x] 3.2 Range mode (time ends with 3.1): pair coordinator, derived value, ends never edit each other, range validity, focus between ends, names, two hidden inputs, controlled value / clear / reset, time ends and `allowsOvernight`; contract range variant and pair invariants; model classes (date, date-time, time, overnight, RTL)
+- [x] 3.3 Theme, examples, snapshots, docs
 
 ## 4. Picker parts (PR 4)
 
 - [x] 4.1a Picker parts, single and range (range resume and range typing while open included): Control, Trigger, ClearTrigger, Portal, Positioner, Content, Calendar; one value owner (the field's machine: `PICK`, `CLEAR`); open state and reasons (Popover `select`); Alt+Arrow opening; initial focus on the calendar's tab stop; dismissal with the Control inside; select and close (type, time and zone kept; same date closes; refusal keeps it open); typing while open; names; clear; read-only; Calendar `invalid` and `onDateSelect`; the range picker forces `commitOnBlur="reset"`
-- [ ] 4.1 Picker parts in single and range mode (rest, in the backlog: touch-specific checks, state kept until exit, Field touched accounting, modal picker tests; range resume, range typing while open, outside press, Escape twice, disabled, unavailable day and SSR are in 4.1a): one value owner, open state and reasons, opening, modality, focus and restore, dismissal and nesting, select and close, typing while open, names, clear, Field and form participation, state kept until exit, touch, resume and committing a range
+- [x] 4.1 Picker parts in single and range mode (rest, in the backlog: touch-specific checks, state kept until exit, Field touched accounting, modal picker tests; range resume, range typing while open, outside press, Escape twice, disabled, unavailable day and SSR are in 4.1a): one value owner, open state and reasons, opening, modality, focus and restore, dismissal and nesting, select and close, typing while open, names, clear, Field and form participation, state kept until exit, touch, resume and committing a range
 - [x] 4.2a Driver actions `openPicker`, `pickDate`, `closePicker`, `clearPicker`; queries `isOpen`, `calendarSelection`; invariants expanded-is-open, content-is-named-dialog, views-agree; model class "picker closed"
-- [ ] 4.2 Contract picker variant and picker invariants; model classes (modal / non-modal, single / range, nested in a Dialog)
+- [x] 4.2 Contract picker variant and picker invariants; model classes (modal / non-modal, single / range, nested in a Dialog)
 - [x] 4.3 Theme (trigger icon, panel content), examples, snapshots, docs
 
 ## 5. Close
 
-- [ ] 5.1 Calendar and Date Field `done` in `docs/components.md`; archive once every phase is merged and approved
+- [x] 5.1 Calendar and Date Field `done` in `docs/components.md`; archive once every phase is merged and approved

@@ -1,10 +1,12 @@
 // The Date Field model-test helper (task 7.1): the oracle props and the story, shared by
 // date-field.model.dom.test.tsx and date-field.broken.dom.test.tsx.
-import { CalendarDate, type DateValue, GregorianCalendar } from "@internationalized/date"
-import { type DateFieldProps, dateFieldContract, platforms } from "@rind-ui/core"
+import { CalendarDate, GregorianCalendar } from "@internationalized/date"
+import { type DateFieldProps, dateFieldContract, type FieldValue, platforms } from "@rind-ui/core"
 import { Calendar, DateField, type DateFieldRootProps, Field, RindProvider } from "@rind-ui/react"
+import { act, screen, waitFor } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
+import { expect } from "vitest"
 import { currentRun, fixedDateClock } from "../index"
 
 export const clock = fixedDateClock("2026-10-17T12:00:00Z", "UTC")
@@ -28,12 +30,13 @@ export type Config = Partial<DateFieldRootProps> & {
 /** The oracle runs the real machine with the props it reads (gregorian display). */
 export const oracle = (cfg: Config, onValueChange?: () => void): DateFieldProps => ({
   value: undefined,
-  defaultValue: (cfg.defaultValue as DateValue | null | undefined) ?? null,
+  defaultValue: cfg.defaultValue ?? null,
   onValueChange,
-  placeholderValue: (cfg.placeholderValue as DateValue | undefined) ?? PLACEHOLDER,
+  placeholderValue: (cfg.placeholderValue as FieldValue | undefined) ?? PLACEHOLDER,
   locale: cfg.locale ?? "en-US",
   calendar: new GregorianCalendar(),
   granularity: cfg.granularity,
+  maxGranularity: cfg.maxGranularity,
   hourCycle: cfg.hourCycle,
   hideTimeZone: cfg.hideTimeZone,
   shouldForceLeadingZeros: cfg.shouldForceLeadingZeros,
@@ -65,6 +68,20 @@ export function Story({
       {picker ? <PickerParts /> : <DateField.Input />}
     </DateField.Root>
   )
+  const form = (
+    <form onSubmit={(e) => e.preventDefault()}>
+      {inField ? (
+        <Field.Root validationMode="change">
+          <Field.Label>Birthday</Field.Label>
+          {field}
+          <Field.ErrorMessage />
+        </Field.Root>
+      ) : (
+        field
+      )}
+      <button type="reset">Reset</button>
+    </form>
+  )
   return (
     <RindProvider
       environment={{
@@ -73,21 +90,21 @@ export function Story({
       }}
       dir={currentRun()?.direction === "rtl" ? "rtl" : "ltr"}
     >
-      <form onSubmit={(e) => e.preventDefault()}>
-        {inField ? (
-          <Field.Root validationMode="change">
-            <Field.Label>Birthday</Field.Label>
-            {field}
-            <Field.ErrorMessage />
-          </Field.Root>
-        ) : (
-          field
-        )}
-        <button type="reset">Reset</button>
-      </form>
+      {form}
       {children}
     </RindProvider>
   )
+}
+
+/**
+ * An open picker settles (first placement, initial focus in the content) before the first
+ * step, then focus is dropped: the model starts in idle with nothing focused.
+ */
+export async function settle(cfg: Config) {
+  if (cfg.picker !== "open") return
+  const content = await screen.findByRole("dialog")
+  await waitFor(() => expect(content.contains(document.activeElement)).toBe(true))
+  act(() => (document.activeElement as HTMLElement | null)?.blur())
 }
 
 /** The picker parts around the Input: a Control, a trigger and the Calendar in a popover. */

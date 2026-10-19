@@ -303,8 +303,9 @@ Passes that need real assistive technology or devices; automated tests cannot st
 | date-family-consolidation | #134 review (warning) | Range Date Field: a press on the separator or the group's padding should focus the last filled segment (a group press handler) |
 | date-family-consolidation | #134 review (warning) | `date-range.ts`: ranges longer than 366 days need the unavailable-day boundaries (as Calendar's `rangeEnds`), not a full scan per derive |
 | date-family-consolidation | #134 review (warning) | Range Date Field: add an ARIA snapshot of the range group (start, separator, end, value description) |
-| date-family-consolidation | 4.1 (rest) | Picker: touch checks (soft keyboard dismissed on open, unmount after the press completes, Drawer touch pick), state kept until exit (no flash on close), Field touched accounting while the popover is open, modal picker (Tab wraps, field inert) |
-| date-family-consolidation | 4.2 (rest) | Picker model classes with the popover open (the model's own Tab/Reset driving trips the generic focus checks while focus starts inside the content), and a broken variant that holds a picked date aside (fails on views-agree) |
+| date-family-consolidation | 4.1 | Picker touch: no dedicated test that the popover unmounts only after the press completes (the pick acts on the click, so the synthesised click lands on the cell); a browser test with an element under the cell |
+| date-family-consolidation | 4.1 | A picker with `defaultOpen` inside a Dialog that opens at the same mount closes at once (`outside-focus`): the Dialog's initial focus lands outside the child layer. Opening from the trigger is correct |
+| date-family-consolidation | 3.2 | Range group description speaks times in the locale's hour cycle, not the `hourCycle` prop (24-hour range in en-US read as "5:30 PM") |
 | add-navigation-menu | 2.2 | Connect unit tests per "Data Attributes" row; the absence of `aria-orientation`, `aria-haspopup`, `aria-owns` and menu roles is covered by the DOM tests and a per-contract invariant only |
 | add-navigation-menu | 3.3 (rest) | SSR: hydrate test, Suspense inside a trigger, no `document` during render (server HTML with `hidden` panels is tested) |
 | add-navigation-menu | 5.2 | One browser test per listed regression in three engines; today the DOM suite covers the core scenarios in jsdom and Chromium |

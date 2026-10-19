@@ -5,7 +5,7 @@
 // here so every adapter shares them.
 
 import type { DateValue } from "@internationalized/date"
-import { CalendarDateTime, ZonedDateTime } from "@internationalized/date"
+import { CalendarDateTime, Time, ZonedDateTime } from "@internationalized/date"
 import { focusAttrs } from "../../a11y/focus"
 import { isMod, type KeyDescription, toLogicalKey } from "../../a11y/keys"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
@@ -22,7 +22,9 @@ import {
   dateValidity,
   defaultValueText,
   draftState,
+  type FieldValue,
   limits,
+  onDay,
   type SegmentFormat,
   type SegmentType,
   validityFlags,
@@ -112,13 +114,39 @@ export function planSegmentInput(
 
 // ── Parts ───────────────────────────────────────────────────────────────────────────
 
-export type DateValueKind = "date" | "datetime" | "zoned"
+export type DateValueKind = "date" | "datetime" | "zoned" | "time"
 
-export const valueKind = (v: DateValue): DateValueKind =>
-  v instanceof ZonedDateTime ? "zoned" : v instanceof CalendarDateTime ? "datetime" : "date"
+export const valueKind = (v: FieldValue): DateValueKind =>
+  v instanceof Time
+    ? "time"
+    : v instanceof ZonedDateTime
+      ? "zoned"
+      : v instanceof CalendarDateTime
+        ? "datetime"
+        : "date"
 
-/** The hidden input's `step` for date-time granularities (reka-ui#3000). */
-const STEP: Readonly<Record<DateGranularity, number | undefined>> = {
+/** The hidden input's type for a value kind (spec "Form Participation"). */
+export const hiddenInputType = (kind: DateValueKind) =>
+  kind === "date"
+    ? "date"
+    : kind === "datetime"
+      ? "datetime-local"
+      : kind === "time"
+        ? "time"
+        : "text"
+
+/** A bound mirrored as a native `min`/`max` only when it is of the input's own kind. */
+export const nativeBound = (
+  v: FieldValue | null | undefined,
+  kind: DateValueKind,
+  granularity: DateGranularity,
+): string | undefined => {
+  if (!v || kind === "zoned" || v instanceof Time !== (kind === "time")) return undefined
+  return formValueOf(v, granularity, kind)
+}
+
+/** The hidden input's `step` for date-time and time granularities (reka-ui#3000). */
+export const STEP: Readonly<Record<DateGranularity, number | undefined>> = {
   day: undefined,
   hour: 3600,
   minute: 60,
@@ -129,8 +157,8 @@ export interface DateFieldConnectInput {
   readonly instance: string
   readonly format: SegmentFormat
   readonly draft: Draft
-  readonly value: DateValue | null
-  readonly defaultValue: DateValue | null
+  readonly value: FieldValue | null
+  readonly defaultValue: FieldValue | null
   readonly kind: DateValueKind
   readonly granularity: DateGranularity
   readonly active: DateSegmentType | null
@@ -140,8 +168,8 @@ export interface DateFieldConnectInput {
   readonly fieldData?: Readonly<Record<`data-${string}`, string | undefined>> | undefined
   /** The label ids segments and the group are named by (the Field's Label, or the host's). */
   readonly labelledBy: string | undefined
-  readonly minValue?: DateValue | null | undefined
-  readonly maxValue?: DateValue | null | undefined
+  readonly minValue?: FieldValue | null | undefined
+  readonly maxValue?: FieldValue | null | undefined
   readonly isDateUnavailable?: ((date: DateValue) => boolean) | undefined
   readonly required: boolean
   readonly messages: DateFieldMessages
@@ -198,7 +226,8 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
       required: input.embedded && input.required,
     },
   )
-  const formatted = (v: DateValue) => f.format(v.toDate(f.options.timeZone))
+  const formatted = (v: FieldValue) =>
+    v instanceof Time ? timeText(v, f) : f.format(onDay(v).toDate(f.options.timeZone))
   const message =
     reason === null || reason === "valueMissing"
       ? ""
@@ -419,25 +448,25 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
             } as PartProps,
             text: input.messages.valueDescription({
               formatted: fullValueText(input.value, f),
+              time: input.value instanceof Time || f.options.maxGranularity === "hour",
             }),
           },
     /** The native input: name, value (ISO or ""), constraints, validity, reset, autofill. */
     hiddenInput: (): PartProps => {
-      const native = input.kind !== "zoned"
-      const iso = (v: DateValue | null | undefined) =>
+      const iso = (v: FieldValue | null | undefined) =>
         v ? formValueOf(v, input.granularity, input.kind) : undefined
       return {
         ...part("hidden-input"),
-        type:
-          input.kind === "date" ? "date" : input.kind === "datetime" ? "datetime-local" : "text",
+        type: hiddenInputType(input.kind),
         id: id(input, "hidden-input"),
         "aria-hidden": "true",
         tabindex: -1,
         name: field.name,
         form: input.form,
-        min: native ? iso(input.minValue) : undefined,
-        max: native ? iso(input.maxValue) : undefined,
-        step: input.kind === "datetime" ? STEP[input.granularity] : undefined,
+        min: nativeBound(input.minValue, input.kind, input.granularity),
+        max: nativeBound(input.maxValue, input.kind, input.granularity),
+        step:
+          input.kind === "datetime" || input.kind === "time" ? STEP[input.granularity] : undefined,
         required: field.required || undefined,
         disabled: field.disabled || undefined,
         autocomplete: input.autoComplete,
@@ -455,17 +484,28 @@ export function dateFieldConnect(input: DateFieldConnectInput) {
   }
 }
 
+/** A time of day in the field's locale, cycle and granularity ("9:30 PM"). */
+function timeText(value: Time, f: SegmentFormat): string {
+  const g = f.options.granularity
+  return dateFormatter(f.options.locale, {
+    timeZone: "UTC",
+    hour: "numeric",
+    ...(g === "minute" || g === "second" ? { minute: "2-digit" } : {}),
+    ...(g === "second" ? { second: "2-digit" } : {}),
+    hourCycle: f.hour12 ? "h12" : "h23",
+  }).format(onDay(value).toDate("UTC"))
+}
+
 /** The whole value spoken by the group ("Wednesday, October 14, 2026, 9:30 AM"). */
-function fullValueText(value: DateValue, f: SegmentFormat): string {
+function fullValueText(value: FieldValue, f: SegmentFormat): string {
+  if (value instanceof Time) return timeText(value, f)
   const time = value instanceof CalendarDateTime || value instanceof ZonedDateTime
   const g = f.options.granularity
+  const dates = f.options.maxGranularity !== "hour"
   return dateFormatter(f.options.locale, {
     calendar: f.options.calendar.identifier,
     timeZone: f.options.timeZone,
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    ...(dates ? { weekday: "long", year: "numeric", month: "long", day: "numeric" } : {}),
     ...(time && g !== "day" ? { hour: "numeric" } : {}),
     ...(time && (g === "minute" || g === "second") ? { minute: "2-digit" } : {}),
     ...(time && g === "second" ? { second: "2-digit" } : {}),

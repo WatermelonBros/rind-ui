@@ -224,6 +224,14 @@ describe("Typing And Auto-Advance", () => {
     expect(typeInto("hour", "2", {}, h).plans[0]).toMatchObject({ advance: true })
   })
 
+  it('zero alone in 12-hour: "0" waits for a digit and alone stands for 12', () => {
+    const h = fmt("en-US", date("minute"))
+    const { draft, plans } = typeInto("hour", "0", {}, h)
+    expect(plans[0]).toMatchObject({ advance: false })
+    expect(draft.hour?.value).toBe(0)
+    expect(typeInto("hour", "05", {}, h).draft.hour?.value).toBe(5)
+  })
+
   it("separators (react-spectrum#5364): / - . : space and the locale's literals", () => {
     for (const c of ["/", "-", ".", ":", " "]) expect(isSeparator(c, f)).toBe(true)
     expect(isSeparator("1", f)).toBe(false)

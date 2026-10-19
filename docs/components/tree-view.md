@@ -73,11 +73,14 @@ import { TreeView } from "@rind-ui/react"
 | `TreeView.Root` | `loop` | `boolean` | `false` | Arrow moves wrap at both ends. |
 | `TreeView.Root` | `typeaheadTimeout` | `number` | `1000` | Typeahead reset delay in ms. |
 | `TreeView.Root` | `messages` | `Partial<TreeViewMessages>` | — | Overrides for the loading announcements and the Empty and Loading default texts. |
+| `TreeView.Root` | `virtualized` | `boolean` | — | Rows are windowed by the consumer (`TreeView.Tree` `indexes`): keyboard moves call `scrollToIndex`, never `scrollIntoView`. |
+| `TreeView.Root` | `scrollToIndex` | `(details: ScrollToIndexDetails) => void` | — | Scrolls the highlighted row into view; `index` is its position in the visible list. |
 | `TreeView.Root` | `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
 | `TreeView.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 | `TreeView.Tree` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 | `TreeView.Tree` | `children` | `(node: TreeViewNodeState) => ReactNode` | — | Called once per visible node with its state; returns its row (usually a `TreeView.Item`). |
 | `TreeView.Tree` | `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
+| `TreeView.Tree` | `indexes` | `readonly number[]` | `every visible node` | Virtualized: the visible-list indexes to render (a virtualizer's window plus `TreeView.useVisibleRows().persistedIndexes`). |
 | `TreeView.Item` | `rel` | `string \| undefined` | — | With `href`: passed to the anchor. |
 | `TreeView.Item` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 | `TreeView.Item` | `value` | `string` | — | The node key. |

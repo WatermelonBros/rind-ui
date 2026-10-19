@@ -22,6 +22,7 @@ import {
   defaultPlaceholderValue,
   describeKey,
   type FieldMessages,
+  type FieldValue,
   focusSafely,
   formatFor,
   formValueOf,
@@ -35,6 +36,7 @@ import {
   segmentAtPress,
   segmentId,
   setControlValidity,
+  Time,
   today as todayOf,
   todayZone,
   type Validate,
@@ -77,6 +79,7 @@ import {
   type DatePickerProps,
   PickerCalendar,
   PickerClearTrigger,
+  PickerCloseTrigger,
   PickerContent,
   PickerControl,
   PickerPortal,
@@ -134,7 +137,7 @@ export interface DateFieldChangeDetails {
 }
 
 export interface DateFieldState {
-  readonly value: DateValue | null
+  readonly value: FieldValue | null
   readonly segments: readonly SegmentPart[]
   readonly focusedSegment: DateSegmentType | null
   readonly composing: boolean
@@ -166,7 +169,7 @@ export interface Ctx {
   readonly picker: {
     readonly closeOnSelect: boolean
     readonly firstDayOfWeek: DayOfWeek | undefined
-    readonly placeholder: DateValue
+    readonly placeholder: FieldValue
     readonly cancelled: { current: boolean }
     readonly triggers: number
     readonly setTriggers: Dispatch<SetStateAction<number>>
@@ -221,18 +224,25 @@ export type DateFieldRootProps = Omit<
 > & {
   /** The parts: Label, Input, Description, ErrorMessage and, for a picker, its parts. */
   readonly children?: ReactNode
-  readonly value?: DateValue | null
+  /** A date, a date-time, a zoned date-time, or a `Time` (a time field). */
+  readonly value?: FieldValue | null
   /** Read at creation; a later change only changes what a form reset restores. */
-  readonly defaultValue?: DateValue | null
-  readonly onValueChange?: (value: DateValue | null, details: DateFieldChangeDetails) => void
+  readonly defaultValue?: FieldValue | null
+  readonly onValueChange?: (value: FieldValue | null, details: DateFieldChangeDetails) => void
   /** The value stepping starts from, and the type and zone without a value. */
-  readonly placeholderValue?: DateValue
+  readonly placeholderValue?: FieldValue
   readonly granularity?: DateGranularity
+  /**
+   * `"hour"`: no date segments (a time field). A date-time keeps its date; without a value
+   * or placeholder the field holds a `Time`. Default: `"hour"` for a `Time` value, else `"year"`.
+   */
+  readonly maxGranularity?: "year" | "hour"
   readonly hourCycle?: 12 | 24
   readonly hideTimeZone?: boolean
   readonly shouldForceLeadingZeros?: boolean
-  readonly minValue?: DateValue | null
-  readonly maxValue?: DateValue | null
+  /** A `Time` bound compares with a date-time value on the value's own day. */
+  readonly minValue?: FieldValue | null
+  readonly maxValue?: FieldValue | null
   readonly isDateUnavailable?: (date: DateValue) => boolean
   readonly locale?: string
   /** The Root's `dir` and which way Left/Right move between segments. Default: the locale's. */
@@ -297,6 +307,7 @@ function SingleRoot({
   onValueChange,
   placeholderValue,
   granularity,
+  maxGranularity,
   hourCycle,
   hideTimeZone,
   shouldForceLeadingZeros,
@@ -361,8 +372,12 @@ function SingleRoot({
     () =>
       placeholderValue ??
       defaultPlaceholderValue({
-        today: todayOf(env.dateClock, todayZone(undefined, current)),
+        today: todayOf(
+          env.dateClock,
+          todayZone(undefined, current instanceof Time ? null : current),
+        ),
         granularity,
+        maxGranularity,
         timeZone: current && "timeZone" in current ? current.timeZone : undefined,
         minValue,
         maxValue,
@@ -410,7 +425,7 @@ function SingleRoot({
   const machineProps = {
     value,
     defaultValue,
-    onValueChange: (v: DateValue | null, details: { event: { type: string }; cancel(): void }) => {
+    onValueChange: (v: FieldValue | null, details: { event: { type: string }; cancel(): void }) => {
       cancelled.current = false
       latest.current.onValueChange?.(v, {
         reason: publicReason(details.event.type),
@@ -425,6 +440,7 @@ function SingleRoot({
     locale: formatLocale,
     calendar,
     granularity,
+    maxGranularity,
     hourCycle,
     hideTimeZone,
     shouldForceLeadingZeros,
@@ -706,8 +722,7 @@ function RangeEnd({
         <SingleRoot
           {...ctx.end}
           embedded
-          // Sound: a range Root's ends are DateValues (Time ends come with time values).
-          value={(value as DateValue | null) ?? null}
+          value={value}
           onValueChange={(v, details) =>
             ctx.send({ type: `${EDGE}.COMMIT`, value: v, reason: details.reason })
           }
@@ -1060,5 +1075,6 @@ export const DateField = {
   Portal: PickerPortal,
   Positioner: PickerPositioner,
   Content: PickerContent,
+  CloseTrigger: PickerCloseTrigger,
   Calendar: PickerCalendar,
 }

@@ -3,16 +3,18 @@
 // state; the Calendar is a bound view whose pick commits through the field (`PICK`).
 
 import {
-  type CalendarDate,
+  CalendarDate,
   type DateValue,
   type DayOfWeek,
   dayOf,
   draftFocus,
   draftHint,
+  type FieldValue,
   focusSafely,
   type Modality,
   partId,
   pickedValue,
+  Time,
   today as todayOf,
   todayZone,
 } from "@rind-ui/core"
@@ -174,6 +176,8 @@ export function PickerClearTrigger({ render, ref, onClick, ...rest }: Own<"butto
 
 export const PickerPortal = Popover.Portal
 export const PickerPositioner = Popover.Positioner
+/** Closes without picking; a modal picker needs it (touch screen readers have no Escape). */
+export const PickerCloseTrigger = Popover.CloseTrigger
 
 /** The popover's dialog, named by the trigger's name and the Label unless named otherwise. */
 export function PickerContent({
@@ -220,14 +224,21 @@ export function PickerCalendar(props: DatePickerCalendarProps) {
   return range ? <RangeCalendar {...props} /> : <SingleCalendar {...props} />
 }
 
+/** A value the calendar can show: a time of day has no day (a time field has no picker). */
+const onCalendar = (v: FieldValue | null | undefined): DateValue | null =>
+  v == null || v instanceof Time ? null : v
+
 function SingleCalendar(props: DatePickerCalendarProps) {
   const ctx = useDateField("Calendar")
   const popover = usePopoverControls()
-  const value = ctx.view.values.value ?? null
+  const value = onCalendar(ctx.view.values.value)
   const api = useApi(ctx)
   const base = ctx.base
+  const placeholder = onCalendar(ctx.picker.placeholder)
   const hint = draftHint(ctx.view.context.draft)
-  const [focused, setFocused] = useState<CalendarDate>(() => dayOf(value ?? ctx.picker.placeholder))
+  const [focused, setFocused] = useState<CalendarDate>(() =>
+    dayOf(value ?? placeholder ?? new CalendarDate(2001, 1, 1)),
+  )
   // Typing while open: the value, or a draft's year and month, moves the calendar.
   const valueKey = value?.toString() ?? ""
   const follow = useRef({ value, hint })
@@ -260,20 +271,15 @@ function SingleCalendar(props: DatePickerCalendarProps) {
         changed.current = true
         ctx.send({
           type: "PICK",
-          value: pickedValue(
-            dayOf(v as DateValue),
-            value,
-            ctx.picker.placeholder,
-            base.granularity,
-          ),
+          value: pickedValue(dayOf(v as DateValue), value, placeholder, base.granularity),
           modality: details.modality as Modality,
         })
       }}
       onDateSelect={(_d, d) => close(d.modality)}
       focusedValue={focused}
       onFocusChange={setFocused}
-      minValue={base.minValue ?? null}
-      maxValue={base.maxValue ?? null}
+      minValue={onCalendar(base.minValue)}
+      maxValue={onCalendar(base.maxValue)}
       {...(base.isDateUnavailable ? { isDateUnavailable: base.isDateUnavailable } : {})}
       disabled={ctx.disabled}
       readOnly={ctx.readOnly}
@@ -303,9 +309,12 @@ function RangeCalendar(props: DatePickerCalendarProps) {
     if (value) return dayOf(value.start as DateValue)
     if (start) return dayOf(start)
     // Today (or the placeholder), within minValue / maxValue.
-    const today = dayOf(ctx.placeholderValue ?? todayOf(env.dateClock, todayZone(undefined, null)))
-    const min = ctx.end.minValue ? dayOf(ctx.end.minValue) : null
-    const max = ctx.end.maxValue ? dayOf(ctx.end.maxValue) : null
+    const today = dayOf(
+      onCalendar(ctx.placeholderValue) ?? todayOf(env.dateClock, todayZone(undefined, null)),
+    )
+    const [lo, hi] = [onCalendar(ctx.end.minValue), onCalendar(ctx.end.maxValue)]
+    const min = lo ? dayOf(lo) : null
+    const max = hi ? dayOf(hi) : null
     return min && today.compare(min) < 0 ? min : max && today.compare(max) > 0 ? max : today
   })
   const keys = `${value ? `${value.start}..${value.end}` : ""}|${start ?? ""}|${end ?? ""}`
@@ -344,7 +353,7 @@ function RangeCalendar(props: DatePickerCalendarProps) {
           pickedValue(
             dayOf(day),
             (current as DateValue | null) ?? null,
-            ctx.placeholderValue ?? null,
+            onCalendar(ctx.placeholderValue),
             ctx.granularity ?? "day",
           )
         ctx.send({
@@ -364,8 +373,8 @@ function RangeCalendar(props: DatePickerCalendarProps) {
       }}
       // The picker forces "reset": leaving the calendar never commits half a range.
       commitOnBlur="reset"
-      minValue={ctx.end.minValue ?? null}
-      maxValue={ctx.end.maxValue ?? null}
+      minValue={onCalendar(ctx.end.minValue)}
+      maxValue={onCalendar(ctx.end.maxValue)}
       {...(ctx.end.isDateUnavailable ? { isDateUnavailable: ctx.end.isDateUnavailable } : {})}
       allowsNonContiguousRanges={ctx.allowsNonContiguousRanges}
       disabled={ctx.end.disabled}

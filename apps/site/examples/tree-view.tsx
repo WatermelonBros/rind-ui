@@ -1,7 +1,8 @@
 "use client"
 
-import { TreeView, type TreeViewItemData } from "@rind-ui/react"
-import { useState } from "react"
+import { TreeView, type TreeViewItemData, type TreeViewNodeState } from "@rind-ui/react"
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual"
+import { type RefObject, useEffect, useRef, useState } from "react"
 import type { States, Variants } from "./types"
 
 /** `focused` needs real focus inside the tree: the driver reaches it from the same example. */
@@ -202,6 +203,83 @@ export function RightToLeft() {
   )
 }
 
+// 200 folders of 50 files: 10,200 nodes.
+const BIG: readonly TreeViewItemData[] = Array.from({ length: 200 }, (_, i) => ({
+  key: `folder-${i}`,
+  label: `folder-${i + 1}`,
+  children: Array.from({ length: 50 }, (_, j) => ({
+    key: `folder-${i}-file-${j}`,
+    label: `file-${j + 1}.ts`,
+  })),
+}))
+const ROW = 32
+
+/** Module-level (a stable identity): a highlight move re-renders only the two rows involved. */
+const bigRow = (node: TreeViewNodeState) => (
+  <TreeView.Item
+    value={node.key}
+    style={{
+      position: "absolute",
+      insetBlockStart: 0,
+      insetInlineStart: 0,
+      minInlineSize: "100%",
+      blockSize: ROW,
+      transform: `translateY(${node.index * ROW}px)`,
+    }}
+  >
+    {node.isBranch ? (
+      <TreeView.ItemIndicator>▸</TreeView.ItemIndicator>
+    ) : (
+      <span aria-hidden="true" className="tree-spacer" />
+    )}
+    <TreeView.ItemText>{node.label}</TreeView.ItemText>
+  </TreeView.Item>
+)
+
+/** Inside Root: the rows near the viewport, plus the highlighted one wherever it is. */
+function VirtualRows({ scrollTo }: { readonly scrollTo: RefObject<(index: number) => void> }) {
+  const { count, persistedIndexes } = TreeView.useVisibleRows()
+  const scroller = useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    count,
+    getScrollElement: () => scroller.current,
+    estimateSize: () => ROW,
+    overscan: 8,
+    rangeExtractor: (range) =>
+      [...new Set([...defaultRangeExtractor(range), ...persistedIndexes])].sort((a, b) => a - b),
+  })
+  useEffect(() => {
+    scrollTo.current = (index) => virtualizer.scrollToIndex(index)
+  }, [scrollTo, virtualizer])
+  return (
+    <div ref={scroller} style={{ blockSize: 320, overflow: "auto" }}>
+      <TreeView.Tree
+        indexes={virtualizer.getVirtualItems().map((row) => row.index)}
+        style={{ position: "relative", blockSize: virtualizer.getTotalSize(), overflow: "visible" }}
+      >
+        {bigRow}
+      </TreeView.Tree>
+    </div>
+  )
+}
+
+/** 10,200 nodes; only the rows near the viewport are in the DOM. */
+export function Virtualized() {
+  // The virtualizer lives in the child, inside Root: bridged through a ref.
+  const scrollTo = useRef<(index: number) => void>(() => {})
+  return (
+    <TreeView.Root
+      items={BIG}
+      defaultExpandedValue={["folder-0", "folder-1"]}
+      virtualized
+      scrollToIndex={({ index }) => scrollTo.current(index)}
+    >
+      <TreeView.Label>Repository</TreeView.Label>
+      <VirtualRows scrollTo={scrollTo} />
+    </TreeView.Root>
+  )
+}
+
 export const variants: Variants = {
   Basic: {
     title: "Basic",
@@ -231,5 +309,10 @@ export const variants: Variants = {
   RightToLeft: {
     title: "Right to left",
     description: "Left expands and Right collapses; the indicator mirrors.",
+  },
+  Virtualized: {
+    title: "Virtualized",
+    description:
+      "10,200 nodes: `TreeView.Tree indexes` renders a virtualizer's window, `scrollToIndex` follows the keys.",
   },
 }

@@ -1,8 +1,8 @@
 // date-segments "Validity": the control's own validity, from where the draft stands and the
 // committed value. An impossible or incomplete entry is reported, never changed. Pure.
 
-import type { DateValue } from "@internationalized/date"
-import type { DraftState } from "./draft"
+import { type DateValue, Time } from "@internationalized/date"
+import type { DraftState, FieldValue } from "./draft"
 
 /** Why the field is invalid, or null. Each key has a message in `messages`. */
 export type DateValidityReason =
@@ -14,8 +14,9 @@ export type DateValidityReason =
   | "unavailable"
 
 export interface DateConstraints {
-  readonly minValue?: DateValue | null | undefined
-  readonly maxValue?: DateValue | null | undefined
+  /** A `Time` bound compares with a date-time value on the value's own day. */
+  readonly minValue?: FieldValue | null | undefined
+  readonly maxValue?: FieldValue | null | undefined
   readonly isDateUnavailable?: ((date: DateValue) => boolean) | undefined
   readonly required?: boolean | undefined
 }
@@ -30,13 +31,23 @@ export interface DateValidityFlags {
   readonly customError: boolean
 }
 
-// Sound: every DateValue compares with every other through its `compare` (the library
-// converts across the three types); TypeScript cannot express that union of overloads.
-const compare = (a: DateValue, b: DateValue) => a.compare(b as never)
+const timeOf = (v: FieldValue) =>
+  v instanceof Time ? v : "hour" in v ? new Time(v.hour, v.minute, v.second, v.millisecond) : null
+
+/** A value against a bound; 0 (in bounds) when a date meets a `Time` bound or the reverse. */
+function compare(a: FieldValue, b: FieldValue): number {
+  if (a instanceof Time || b instanceof Time) {
+    const [x, y] = [timeOf(a), timeOf(b)]
+    return x && y ? x.compare(y) : 0
+  }
+  // Sound: every DateValue compares with every other through its `compare` (the library
+  // converts across the three types); TypeScript cannot express that union of overloads.
+  return a.compare(b as never)
+}
 
 export function dateValidity(
   state: DraftState,
-  value: DateValue | null,
+  value: FieldValue | null,
   c: DateConstraints,
 ): DateValidityReason | null {
   if (state === "incomplete") return "incomplete"
@@ -44,7 +55,7 @@ export function dateValidity(
   if (value === null) return c.required === true ? "valueMissing" : null
   if (c.minValue && compare(value, c.minValue) < 0) return "rangeUnderflow"
   if (c.maxValue && compare(value, c.maxValue) > 0) return "rangeOverflow"
-  if (c.isDateUnavailable?.(value) === true) return "unavailable"
+  if (!(value instanceof Time) && c.isDateUnavailable?.(value) === true) return "unavailable"
   return null
 }
 

@@ -1,6 +1,6 @@
 # Date Field
 
-A date, or a date and time, typed segment by segment: month, day, year, hour, minute and the rest, in the order and with the digits of the user's locale. Each segment is a native input with the `spinbutton` role, so the keyboard steps it, a screen reader names it, and the whole group submits a real date through a hidden native input. The Root is a Field, so labelling, description and validation work like any Field.
+A date, a date and time, or a time of day, typed segment by segment: month, day, year, hour, minute and the rest, in the order and with the digits of the user's locale. Each segment is a native input with the `spinbutton` role, so the keyboard steps it, a screen reader names it, and the whole group submits a real date through a hidden native input. The Root is a Field, so labelling, description and validation work like any Field.
 
 ## When to use
 
@@ -11,7 +11,7 @@ What it adds over a native `<input type="date">`:
 - The segment order and the digits of the locale, including non-Latin digits and right-to-left layouts.
 - Calendar systems other than the Gregorian one (Japanese eras, Buddhist, Islamic, and so on) and the era as a segment.
 - Time zones: a zoned value shows its zone name, and the value keeps its zone.
-- A typed value (`CalendarDate`, `CalendarDateTime`, `ZonedDateTime`), not a string.
+- A typed value (`CalendarDate`, `CalendarDateTime`, `ZonedDateTime`, `Time`), not a string.
 - The same behaviour and styling in every browser.
 - Form participation and validation through a hidden native input, with messages you can translate.
 
@@ -171,6 +171,7 @@ The hidden native input carries `name`, `form`, `required`, `disabled`, `autoCom
 | `CalendarDate` | `date` | `2026-10-14` |
 | `CalendarDateTime` | `datetime-local` | `2026-10-14T15:30` (with `step` for second granularity, so seconds do not mismatch) |
 | `ZonedDateTime` | `text` | `2026-10-14T15:30:00+02:00[Europe/Rome]` |
+| `Time` | `time` | `14:30`, or `14:30:15` at second granularity (`step` 3600, 60 or 1) |
 
 The value is always ISO and Gregorian, whatever the calendar shown. Nothing is submitted when empty, and a cleared field never leaves a stale value. `minValue` and `maxValue` are mirrored as `min` and `max` on the native types. A form reset restores the current `defaultValue`.
 
@@ -185,6 +186,27 @@ import { createCalendar } from "@internationalized/date"
 
 <DateField.Root locale="ja-JP-u-ca-japanese" createCalendar={createCalendar}>
 ```
+
+## Times
+
+There is no separate time field: a Date Field with no date segments is one. A `Time` value (from `@internationalized/date`) shows only the hour, the minute and, in a 12-hour locale, the day period; `maxGranularity="hour"` does the same for a date-time, whose date is then kept as it is.
+
+```tsx
+import { Time } from "@internationalized/date"
+
+<DateField.Root name="alarm" defaultValue={new Time(7, 30)}>
+  <DateField.Label>Alarm</DateField.Label>
+  <DateField.Input />
+</DateField.Root>
+```
+
+- **Hour cycle.** `hourCycle={12}` or `{24}` always wins over the locale; without it the locale's cycle is used (24-hour in `nl-NL`). In 12-hour, "0" or "1" waits for a second digit, and a "0" left alone means 12.
+- **Day period.** AM/PM is its own segment. Editing, stepping or clearing the hour never changes it (stepping from 11 to 12 stays in the same half of the day). Type "a" or "p" in any locale, or the locale's own names.
+- **Zones.** A `ZonedDateTime` steps its hour in its zone: on a fall-back day both 1:30 AMs are reached in order, and a spring-forward hour that does not exist resolves to the later time.
+- **Bounds.** `minValue` and `maxValue` can be `Time`s; for a date-time they compare on the value's own day.
+- **Never a `Date`.** The value never passes through the viewer's time zone: typing 00:00 in Rome gives `Time(0, 0)`. A `null` value shows placeholders, never 12:00 AM.
+
+The group is described by "Selected time: 9:30 PM" (`messages.valueDescription` receives `time: true`).
 
 ## Date ranges
 
@@ -206,7 +228,17 @@ import { createCalendar } from "@internationalized/date"
 - **Forms.** Two hidden inputs, `startName` and `endName`, hold the ends' ISO values only while the range is valid, else empty strings. A form reset restores the default range; select all and Backspace clears both ends; a browser autofill of either input is adopted.
 - **Parts.** Render `DateField.Start`, `DateField.Separator` and `DateField.End` inside `DateField.Input` to lay them out yourself.
 
-The strings are in `messages`: `startDate`, `endDate`, `separator`, `rangeDescription`, `endProblem`, `endBeforeStart`, `containsUnavailable`.
+- **Time ranges.** With `Time` ends (or `maxGranularity="hour"`) each end is a time field named "Start time" and "End time", and the hidden inputs are `type="time"`. An end before the start is invalid ("End time must be after the start time"), an equal end is valid. With `allowsOvernight` an end before the start is the next day: the value is the two times and the description says so ("6:00 AM the next day"). Each end keeps its own day period. Date-time and zoned ends are ordered by `compare()` (instants for zoned values) and ignore `allowsOvernight`.
+
+```tsx
+<DateField.Root selectionMode="range" allowsOvernight startName="from" endName="to"
+  defaultValue={{ start: new Time(22), end: new Time(6) }}>
+  <DateField.Label>Night shift</DateField.Label>
+  <DateField.Input />
+</DateField.Root>
+```
+
+The strings are in `messages`: `startDate`, `endDate`, `startTime`, `endTime`, `separator`, `rangeDescription`, `endProblem`, `endBeforeStart`, `endBeforeStartTime`, `containsUnavailable`, `overnight`.
 
 ## Field integration
 
@@ -226,7 +258,7 @@ Style the `data-*` attributes above, or import `@rind-ui/theme/date-field.css`. 
 
 ## Testing
 
-`getDateField(screen, { name })` locates the group by its role and accessible name. Actions: `fill`, `enter`, `typeSegment`, `typeFocused`, `step`, `toEdge`, `move`, `backspace`, `clearSegment`, `clear`, `paste`, `leave`, `composeOpen`, `composeEnd`, `resetForm`. Queries: `value`, `segments`, `focusedSegment`, `isInvalid`, `validity`, `isComplete`, `isFocused`, `isComposing`, `isDisabled`, `isReadOnly`.
+`getDateField(screen, { name })` locates the group by its role and accessible name. Actions: `fill`, `enter`, `typeSegment`, `typeFocused`, `step`, `toEdge`, `move`, `backspace`, `clearSegment`, `clear`, `paste`, `setDayPeriod`, `leave`, `composeOpen`, `composeEnd`, `resetForm`. `fill` takes an ISO date, date-time or time (`fill("21:05")` types 9, 05, p in `en-US`); `setDayPeriod("am" | "pm")` types the period's letter. Queries: `value`, `segments`, `focusedSegment`, `isInvalid`, `validity`, `isComplete`, `isFocused`, `isComposing`, `isDisabled`, `isReadOnly`.
 
 ```tsx
 import { getDateField } from "@rind-ui/testing"
@@ -237,7 +269,7 @@ await birthday.fill("1990-12-01")
 expect(await birthday.value()).toBe("1990-12-01")
 ```
 
-In range mode, `getDateField(screen, { name: "Stay", selectionMode: "range" })` returns a driver with `fill({ start, end })`, `fillStart(date)`, `fillEnd(date)`, `typeSegment(edge, type, text)`, `clear()` and `resetForm()`, and the queries `range()` (both hidden inputs), `segments(edge)`, `isInvalid()`, `invalidEdge()` and `isComplete()`.
+In range mode, `getDateField(screen, { name: "Stay", selectionMode: "range" })` returns a driver with `fill({ start, end })`, `fillStart(date)`, `fillEnd(date)`, `typeSegment(edge, type, text)`, `step(edge, type, direction)`, `paste(edge, text)`, `setDayPeriod(edge, period)`, `clear()`, `clearEnd()` and `resetForm()`, and the queries `range()` (both hidden inputs), `segments(edge)`, `isInvalid()`, `invalidEdge()` and `isComplete()`.
 
 ## Tested with
 
