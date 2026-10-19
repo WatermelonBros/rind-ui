@@ -1,0 +1,164 @@
+/*
+ * Rating (family: range): structural styles on data attributes only. Each Item draws its star
+ * itself, so a Rating needs no icon: ::before is the star's outline (always shown, the
+ * border-strong role at 3:1, so an empty star reads by shape), ::after the solid star painted
+ * for data-state full, and half of it (logical: the reading start) for half. The Control
+ * carries the keyboard ring around the stars. Under forced colors both layers keep their shape
+ * in system colours.
+ */
+@layer rind.components {
+  :where([data-scope="rating"][data-part="root"]) {
+    --_star: var(--rind-rating-star-size, 1.75rem);
+    --_fill: var(--rind-rating-fill, var(--rind-color-accent-solid));
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--rind-rating-gap, var(--rind-space-1));
+    color: var(--rind-rating-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="rating"][data-part="root"][data-size="sm"]) {
+    --_star: var(--rind-rating-star-size, 1.5rem);
+  }
+
+  :where([data-scope="rating"][data-part="root"][data-size="lg"]) {
+    --_star: var(--rind-rating-star-size, 2.25rem);
+  }
+
+  :where([data-scope="rating"][data-part="root"][data-variant="soft"]) {
+    --_fill: var(--rind-rating-fill, var(--rind-color-accent-border));
+  }
+
+  :where([data-scope="rating"][data-part="control"]) {
+    gap: var(--rind-rating-star-gap, 0);
+    border-radius: var(--rind-radius-sm);
+    cursor: var(--rind-rating-cursor, pointer);
+  }
+
+  :where([data-scope="rating"][data-part="item"]) {
+    position: relative;
+    display: inline-block;
+    inline-size: var(--_star);
+    block-size: var(--_star);
+    flex: none;
+  }
+
+  :where([data-scope="rating"][data-part="item"])::before,
+  :where([data-scope="rating"][data-part="item"])::after {
+    content: "";
+    position: absolute;
+    inset: 12%;
+  }
+
+  /* The outline: an outer star minus an inner one (evenodd). */
+  :where([data-scope="rating"][data-part="item"])::before {
+    background: var(--rind-rating-outline, var(--rind-color-border-strong));
+    clip-path: polygon(
+      evenodd,
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%,
+      50% 0%,
+      43.2% 41.5%,
+      20.2% 41.5%,
+      38.8% 55.1%,
+      32% 76.2%,
+      50% 63.2%,
+      68% 76.2%,
+      61.2% 55.1%,
+      79.8% 41.5%,
+      56.8% 41.5%,
+      50% 19.8%,
+      43.2% 41.5%
+    );
+  }
+
+  /* The fill: the solid star, painted by data-state. */
+  :where([data-scope="rating"][data-part="item"])::after {
+    --_paint: transparent;
+    background: var(--_paint);
+    clip-path: polygon(
+      50% 0%,
+      61% 35%,
+      98% 35%,
+      68% 57%,
+      79% 91%,
+      50% 70%,
+      21% 91%,
+      32% 57%,
+      2% 35%,
+      39% 35%
+    );
+    transition: background-color var(--rind-rating-duration, var(--rind-duration-fast));
+  }
+
+  :where([data-scope="rating"][data-part="item"][data-state="full"])::after {
+    --_paint: var(--_fill);
+  }
+
+  :where([data-scope="rating"][data-part="item"][data-state="half"])::after {
+    background: linear-gradient(to right, var(--_fill) 50%, transparent 50%);
+  }
+
+  :where([data-scope="rating"][data-part="item"][data-state="half"]:dir(rtl))::after {
+    background: linear-gradient(to left, var(--_fill) 50%, transparent 50%);
+  }
+
+  /* The preview: the same shapes, the hover tone. */
+  :where([data-scope="rating"][data-part="item"][data-previewed]) {
+    --_fill: var(--rind-rating-preview-fill, var(--rind-color-accent-solid-hover));
+  }
+
+  :where([data-scope="rating"][data-part="control"][data-readonly]) {
+    cursor: var(--rind-rating-readonly-cursor, default);
+  }
+
+  :where([data-scope="rating"][data-disabled]:is([data-part="control"], [data-part="item"])) {
+    cursor: var(--rind-rating-disabled-cursor, not-allowed);
+    opacity: var(--rind-rating-disabled-opacity, 0.6);
+  }
+
+  :where([data-scope="rating"][data-part="item"][data-invalid])::before {
+    background: var(
+      --rind-rating-outline-invalid,
+      var(--rind-color-danger-border, var(--rind-color-border-strong))
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="rating"][data-part="item"])::after {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="rating"][data-part="item"]) {
+      forced-color-adjust: none;
+      outline: none;
+    }
+
+    :where([data-scope="rating"][data-part="item"])::before {
+      background: CanvasText;
+    }
+
+    :where([data-scope="rating"][data-part="item"]) {
+      --_fill: Highlight;
+    }
+
+    :where([data-scope="rating"][data-part="item"][data-disabled])::before {
+      background: GrayText;
+    }
+
+    :where([data-scope="rating"][data-part="item"][data-disabled]) {
+      --_fill: GrayText;
+      opacity: 1;
+    }
+  }
+}

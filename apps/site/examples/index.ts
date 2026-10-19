@@ -53,6 +53,7 @@ import * as progress from "./progress"
 import * as promptInput from "./prompt-input"
 import * as qrCode from "./qr-code"
 import * as radioGroup from "./radio-group"
+import * as rating from "./rating"
 import * as scrollArea from "./scroll-area"
 import * as segmentedControl from "./segmented-control"
 import * as select from "./select"
@@ -133,6 +134,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "number-input": numberInput,
   "press-and-hover": pressAndHover,
   "radio-group": radioGroup,
+  rating,
   "segmented-control": segmentedControl,
   select,
   separator,
