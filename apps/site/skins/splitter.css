@@ -132,7 +132,12 @@
 
 /* juicy: a soft line and a candy grip */
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
-[data-scope="splitter"][data-part="handle"]::before {
+[data-scope="splitter"][data-part="handle"] {
+  /* juicy's --s-line is transparent; the field edge keeps the line visible (3:1) */
+  --s-splitter-line: var(--s-field-line);
+}
+:is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
+  [data-scope="splitter"][data-part="handle"]::before {
   border: 0;
   background: var(--s-acc);
   box-shadow: var(--s-lift-lo);
