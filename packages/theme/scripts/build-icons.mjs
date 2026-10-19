@@ -34,6 +34,8 @@ const NAMES = [
   "funnel-simple",
   "arrows-out",
   "arrows-in",
+  "pause",
+  "play",
 ]
 
 const args = process.argv.slice(2)

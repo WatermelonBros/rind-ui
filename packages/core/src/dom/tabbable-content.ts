@@ -1,7 +1,7 @@
 // tabbable-content: whether an element contains a tabbable descendant, reported on change
 // (a text-only tab panel is itself focusable; one with a form is not: ariakit#6332).
 
-const TABBABLE =
+export const TABBABLE =
   'a[href], area[href], button, input:not([type="hidden"]), select, textarea, iframe, [contenteditable=""], [contenteditable="true"], [tabindex]'
 
 export function hasTabbable(el: Element): boolean {

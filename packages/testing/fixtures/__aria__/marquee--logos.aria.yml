@@ -1,0 +1,18 @@
+- region "Customers":
+  - button "Pause animation"
+  - link "Acme":
+    - /url: "#acme"
+  - link "Globex":
+    - /url: "#globex"
+  - link "Initech":
+    - /url: "#initech"
+  - link "Umbrella":
+    - /url: "#umbrella"
+  - link "Hooli":
+    - /url: "#hooli"
+  - link "Stark":
+    - /url: "#stark"
+  - link "Wayne":
+    - /url: "#wayne"
+  - link "Tyrell":
+    - /url: "#tyrell"

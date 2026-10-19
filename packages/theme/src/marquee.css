@@ -1,0 +1,170 @@
+/*
+ * Marquee (family: decoration): each copy translates by -100% of its own size on the axis
+ * (mirrored in RTL), at --rind-marquee-duration, linear, infinite, only while
+ * data-state="running"; "paused" holds it where it is. The edges fade with a mask sized by
+ * --rind-marquee-fade (0 turns it off). The PauseTrigger is a ghost icon button of at least
+ * 24 x 24 CSS px whose empty content draws pause or play (shape, not colour).
+ */
+@layer rind.components {
+  @keyframes rind-marquee-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes rind-marquee-x-rtl {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes rind-marquee-y {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-100%);
+    }
+  }
+
+  :where([data-scope="marquee"][data-part="root"]) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-marquee-root-gap, var(--rind-space-2));
+    color: var(--rind-marquee-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="marquee"][data-part="viewport"]) {
+    flex: 1;
+    min-inline-size: 0;
+    --_fade: var(--rind-marquee-fade, 2rem);
+    /* A mask reads only alpha: any opaque colour, here the text role. */
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      var(--rind-color-text) var(--_fade),
+      var(--rind-color-text) calc(100% - var(--_fade)),
+      transparent
+    );
+  }
+
+  :where([data-scope="marquee"][data-part="viewport"][data-orientation="vertical"]) {
+    block-size: var(--rind-marquee-block-size, 12rem);
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      var(--rind-color-text) var(--_fade),
+      var(--rind-color-text) calc(100% - var(--_fade)),
+      transparent
+    );
+  }
+
+  :where([data-scope="marquee"][data-part="viewport"][data-state="static"]) {
+    block-size: auto;
+    mask-image: none;
+  }
+
+  :where([data-scope="marquee"][data-part="content"]) {
+    align-items: center;
+    /* Firefox and iOS flicker at the wrap without it. */
+    backface-visibility: hidden;
+    animation: rind-marquee-x var(--rind-marquee-duration, 20s) linear infinite;
+    animation-play-state: paused;
+  }
+
+  :where([data-scope="marquee"][data-part="content"]):dir(rtl) {
+    animation-name: rind-marquee-x-rtl;
+  }
+
+  :where([data-scope="marquee"][data-part="content"][data-orientation="vertical"]) {
+    animation-name: rind-marquee-y;
+  }
+
+  :where([data-scope="marquee"][data-part="content"][data-state="running"]) {
+    animation-play-state: running;
+  }
+
+  :where(
+    [data-scope="marquee"][data-part="content"][data-state="idle"],
+    [data-scope="marquee"][data-part="content"][data-state="static"]
+  ) {
+    animation: none;
+  }
+
+  :where([data-scope="marquee"][data-part="content"][data-reverse]) {
+    animation-direction: reverse;
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-space-1);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-marquee-trigger-radius, var(--rind-radius-control));
+    background: transparent;
+    color: var(--rind-marquee-trigger-color, var(--rind-color-text-muted));
+    font: inherit;
+    cursor: pointer;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"][hidden]) {
+    display: none;
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"]):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"]:empty)::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background-color: currentColor;
+    mask-image: var(--rind-marquee-pause-icon, var(--rind-icon-pause));
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+  }
+
+  :where([data-scope="marquee"][data-part="pause-trigger"][data-paused]:empty)::before {
+    mask-image: var(--rind-marquee-play-icon, var(--rind-icon-play));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="marquee"][data-part="pause-trigger"]:empty)::before {
+      background-color: ButtonText;
+    }
+    :where([data-scope="marquee"][data-part="pause-trigger"])[data-focus-visible] {
+      outline-color: Highlight;
+    }
+  }
+
+  /* No motion even before the script reads the preference. */
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="marquee"][data-part="content"]) {
+      animation: none;
+    }
+    :where([data-scope="marquee"][data-part="pause-trigger"]) {
+      transition: none;
+    }
+  }
+}

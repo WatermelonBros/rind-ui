@@ -140,6 +140,14 @@ export {
   PENDING_ANNOUNCEMENTS,
 } from "./live-announcer"
 export { describedByHint, longPressMessages } from "./long-press"
+export {
+  type MarqueeAxis,
+  mirror,
+  observeMarquee,
+  retime,
+  reveal,
+  untabbable,
+} from "./marquee-motion"
 export { modalityTracker } from "./modality"
 export { motionPreference, pointerPreference } from "./motion"
 export { type NonModalTabOrderOptions, trackNonModalTabOrder } from "./non-modal-tab-order"

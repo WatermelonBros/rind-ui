@@ -32,6 +32,8 @@ export type IconName =
   | "funnel-simple"
   | "arrows-out"
   | "arrows-in"
+  | "pause"
+  | "play"
 
 /** Icon components by name, as accepted by `RindProvider icons`. */
 export type RindIcons = Partial<Record<IconName, ComponentType>>

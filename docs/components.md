@@ -145,7 +145,7 @@ seen in docs or source but not confirmed as public, stable API.
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Zoom and pan, keyboard and pinch; Reado has ImageView |
 | Kbd |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Keyboard shortcut display, platform-aware modifiers; Reado has Kbd |
-| Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | spec |  |
+| Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Timeline |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Ordered events list; Reado has TimelinePanel |
