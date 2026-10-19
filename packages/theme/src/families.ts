@@ -196,6 +196,7 @@ export const familyMatrix = [
       "marquee",
       "streaming-message",
       "message-thread",
+      "reasoning",
     ],
     variants: [],
     size: "none",

@@ -1,10 +1,14 @@
 "use client"
 
-import { StreamingMessage, type StreamingMessageRootProps } from "@rind-ui/react"
+import { Button, StreamingMessage, type StreamingMessageRootProps } from "@rind-ui/react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import type { States, Variants } from "./types"
 
 /** `streaming` and `settling` last while a response arrives: reached by the Stream example. */
+/** Inline layout: theme pages do not load the site's helper classes. */
+const STACK = { display: "grid", gap: 16, inlineSize: "min(100%, 560px)" } as const
+const ROW = { display: "flex", flexWrap: "wrap", gap: 8 } as const
+
 export const states: States = {
   "streaming-message": {
     pending: "Pending",
@@ -76,18 +80,18 @@ export function Stream() {
   const { text, status, start, stop } = useFakeStream()
   const busy = status === "streaming"
   return (
-    <div className="stack">
+    <div style={STACK}>
       <Message text={text} status={status} />
-      <div className="row">
-        <button type="button" onClick={() => start()} disabled={busy}>
+      <div style={ROW}>
+        <Button onPress={() => start()} disabled={busy}>
           {status === "pending" ? "Ask" : "Ask again"}
-        </button>
-        <button type="button" onClick={() => stop("cancelled")} disabled={!busy}>
+        </Button>
+        <Button onPress={() => stop("cancelled")} disabled={!busy}>
           Stop
-        </button>
-        <button type="button" onClick={() => start(true)} disabled={busy}>
+        </Button>
+        <Button onPress={() => start(true)} disabled={busy}>
           Ask and fail
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -108,16 +112,16 @@ function Paragraphs({ text }: { readonly text: string }) {
 export function CustomRenderer() {
   const { text, status, start } = useFakeStream()
   return (
-    <div className="stack">
+    <div style={STACK}>
       <Message text={text} status={status} label="Assistant, paragraphs">
         <StreamingMessage.Content>
           {(shown) => <Paragraphs text={shown} />}
         </StreamingMessage.Content>
       </Message>
-      <div className="row">
-        <button type="button" onClick={() => start()} disabled={status === "streaming"}>
+      <div style={ROW}>
+        <Button onPress={() => start()} disabled={status === "streaming"}>
           Ask
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -126,12 +130,12 @@ export function CustomRenderer() {
 export function ReadAloud() {
   const { text, status, start } = useFakeStream()
   return (
-    <div className="stack">
+    <div style={STACK}>
       <Message text={text} status={status} announce="sentences" label="Assistant, read aloud" />
-      <div className="row">
-        <button type="button" onClick={() => start()} disabled={status === "streaming"}>
+      <div style={ROW}>
+        <Button onPress={() => start()} disabled={status === "streaming"}>
           Ask
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -161,7 +161,7 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 | Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | todo |
 | Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | done |
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
-| Reasoning | Collapsible with a streaming state | todo |
+| Reasoning | Collapsible with a streaming state | done |
 | Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | todo |
 | Citation | Keyboard-reachable hover card on inline references | todo |
 | Message Actions | Copy, regenerate, edit, feedback, branch navigation | todo |
