@@ -405,3 +405,8 @@ verified at round 3 (2026-10-14).
 
 - warning: the model tests need 20 s per path in jsdom (axe after every step of three-step paths); a cheaper per-step a11y check would bring them back under the default.
 - warning: the content is unmounted while closed; a presence (exit animation) like Collapsible's is polish.
+
+## Stepper (add-stepper)
+
+- warning: `ChangeDetails.reason` is typed as the event type while machines that set a transition `reason` report that string at runtime (File Upload's "add"/"remove", Reasoning's "auto"/"trigger"); Stepper publishes its own `StepperChangeDetails`. A typed transition reason in the runtime would fix it once for all.
+- warning: the model selects step 0 only; selecting other visited steps is the DOM tests'.

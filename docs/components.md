@@ -49,7 +49,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Pagination | ● |  |  |  |  |  | ● | ● | ● | 4 | 2 | done |  |
 | Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done | Reado has Breadcrumb |
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
-| Steps | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo | Reka: Stepper |
+| Stepper | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done | Zag: steps · Reka: Stepper |
 | Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Command Palette |  |  |  |  |  |  |  | ● |  | 1 | 2 | todo | Bits: Command · Dialog + filtered list, groups, shortcuts; Reado has Palette |
 
