@@ -72,7 +72,7 @@ function say(args: Args, message: string) {
   })
 }
 
-export const reasoningMachine = setup({
+export const reasoningMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     thinkingProp: ({ props }) => props.thinking,

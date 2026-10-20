@@ -1,3 +1,5 @@
+"use client"
+
 // Date Field picker parts (date-field spec "Picker Parts", "Picker — …"): wiring only. The
 // field's machine owns the one value; the Popover (re-scoped to `date-field`) owns the open
 // state; the Calendar is a bound view whose pick commits through the field (`PICK`).

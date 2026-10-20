@@ -1,3 +1,5 @@
+"use client"
+
 // Rating parts: wiring only. The machine owns the value, connect every attribute. Here the
 // range input and the form carrier are reached for property sync, reset and native adoption,
 // and a star's pointer position is measured into the fraction the machine reads.

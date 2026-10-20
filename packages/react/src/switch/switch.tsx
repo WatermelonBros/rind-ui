@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type ChangeDetails,
   type SwitchEvent,
@@ -30,10 +32,12 @@ const parts = createFormToggle<boolean, ChangeDetails<SwitchEvent>>({
 })
 
 /** An on/off switch (APG Switch), on a button with role switch. */
-export const Switch = {
+// A pure call around the object: reading `parts.Root` could run a getter as far as a bundler
+// knows, so a plain object literal would stay in every bundle that reaches this module.
+export const Switch = /* @__PURE__ */ (() => ({
   Root: parts.Root,
   Control: parts.Control,
   Thumb: parts.Indicator,
   Label: parts.Label,
   Description: parts.Description,
-}
+}))()

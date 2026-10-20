@@ -6,7 +6,7 @@ import { rolldown } from "rolldown"
 const BUDGET = 2.5 * 1024
 
 const bundle = await rolldown({
-  input: new URL("../dist/machine.mjs", import.meta.url).pathname,
+  input: new URL("../dist/machine/index.mjs", import.meta.url).pathname,
   transform: { define: { "process.env.NODE_ENV": '"production"' } },
 })
 const { output } = await bundle.generate({ minify: true, format: "esm" })

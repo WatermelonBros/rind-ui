@@ -77,7 +77,7 @@ export function marqueeDuration(size: MarqueeSize | null, speed: number | undefi
   return size ? size.content / marqueeSpeed(speed) : null
 }
 
-export const marqueeMachine = setup({
+export const marqueeMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     reduced: ({ context }) => context.reduced,

@@ -27,7 +27,7 @@ const resolved = (props: MeterProps) => {
   return r.value ?? r.min
 }
 
-export const meterMachine = setup({
+export const meterMachine = /* @__PURE__ */ setup({
   types: type<{ props: MeterProps; events: MeterEvent; env: object; context: MeterContext }>(),
   actions: {
     remember: ({ props, set }) => set("value", resolved(props)),

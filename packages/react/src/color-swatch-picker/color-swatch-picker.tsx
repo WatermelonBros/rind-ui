@@ -1,3 +1,5 @@
+"use client"
+
 // Color Swatch Picker parts (design §7): a Radio Group whose value is the key of the swatch
 // matching the colour. Wiring only: matching is core's `matchSwatch`, every keyboard, focus and
 // form rule is the Radio Group's.

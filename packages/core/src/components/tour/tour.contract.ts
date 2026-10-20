@@ -52,6 +52,7 @@ const arrowFor = async (env: E, direction: Direction) => {
   return (direction === "next") !== rtl ? "ArrowRight" : "ArrowLeft"
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 function tourContractWith(_modal: boolean) {
   return contract("tour", {
     machine: tourMachine,

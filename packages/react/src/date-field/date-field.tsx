@@ -1,3 +1,5 @@
+"use client"
+
 // Date Field parts: wiring only. The machine owns the draft and the value; connect every
 // attribute, the key mapping and the insertion plan; core/dom the segment layout. The Root
 // is a Field when not inside one (the shared Field host), or a plain element when embedded

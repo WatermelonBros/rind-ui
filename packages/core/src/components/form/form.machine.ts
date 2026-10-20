@@ -80,7 +80,7 @@ export function inTreeOrder<F extends { element(): Element | null }>(fields: rea
 const invalidFields = (props: FormProps) =>
   inTreeOrder(props.fields().filter((f) => f.status() === "invalid"))
 
-export const formMachine = setup({
+export const formMachine = /* @__PURE__ */ setup({
   types: type<{
     props: FormProps
     events: FormEvent

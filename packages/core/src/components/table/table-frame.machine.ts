@@ -30,7 +30,7 @@ export const tableFrameIds = (root: string) => ({
   expandTrigger: `table-frame-${root}-expand-trigger`,
 })
 
-export const tableFrameMachine = setup({
+export const tableFrameMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TableFrameProps
     events: TableFrameEvent

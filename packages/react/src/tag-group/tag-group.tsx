@@ -1,3 +1,5 @@
+"use client"
+
 // Tag Group: the Root hosting the parts (design §4). Wiring only: the machine owns highlight,
 // selection, activation and removal; connect owns every attribute. Tags come from `items`
 // data or from static Tag parts (collections registration); both render the same DOM.

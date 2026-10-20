@@ -1,3 +1,5 @@
+"use client"
+
 import type { Href, Router } from "@rind-ui/core"
 import { type ReactNode, useMemo } from "react"
 import { RindProvider } from "../provider"

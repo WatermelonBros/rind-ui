@@ -13,7 +13,7 @@ export interface PresenceEnv {
   }
 }
 
-export const presenceMachine = setup({
+export const presenceMachine = /* @__PURE__ */ setup({
   types: type<{ props: object; events: PresenceEvent; env: PresenceEnv }>(),
   effects: {
     waitForExit: ({ env, send }) => {

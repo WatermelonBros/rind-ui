@@ -35,6 +35,7 @@ const CENTRE: At = { x: 0.5, y: 0.5 }
 /** The oracle's payload for a gesture at a point (its position does not change the graph). */
 const GESTURE = { point: { x: 0, y: 0 }, target: null, virtual: false }
 
+/* @__NO_SIDE_EFFECTS__ */
 function contextMenuContractWith(modal: boolean) {
   const base = menuContract
   return contract("menu", {

@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type KbdItem,
   type KbdKeys,

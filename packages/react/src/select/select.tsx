@@ -1,3 +1,5 @@
+"use client"
+
 // Select: Root (service, hidden form input), Label, Trigger, ValueText, Indicator,
 // Description, Portal, Positioner, Content and the listbox parts bound to this host.
 // Wiring only: the machine owns opening, value and highlight; the core parts own every

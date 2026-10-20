@@ -1,3 +1,5 @@
+"use client"
+
 // Text Field visibility (`type="password"`): machine props, Root / Input attributes, the
 // caret restore after the `type` change, and the VisibilityTrigger / VisibilityIndicator.
 

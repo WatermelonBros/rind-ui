@@ -4,6 +4,7 @@ import type { Implementations, Machine, MachineDef, PropBinding, Types } from ".
  * Declares a machine's types and implementations; `.machine()` then takes the static
  * definition, whose state, action, guard, effect and delay names are checked against them.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function setup<T extends Types, const I extends Implementations<T>>(
   config: { readonly types: T } & I,
 ): {

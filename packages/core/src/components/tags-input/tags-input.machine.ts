@@ -339,7 +339,7 @@ const pattern = patternPieces({
   collection: pieces.actions,
 })
 
-export const tagsInputMachine = setup({
+export const tagsInputMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     ...pattern.guards,

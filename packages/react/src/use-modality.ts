@@ -1,3 +1,5 @@
+"use client"
+
 import type { Modality, ModalitySource } from "@rind-ui/core"
 import { useSyncExternalStore } from "react"
 

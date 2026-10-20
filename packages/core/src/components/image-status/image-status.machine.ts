@@ -58,7 +58,7 @@ const notify =
     })
   }
 
-export const imageStatusMachine = setup({
+export const imageStatusMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ImageStatusProps
     events: ImageStatusEvent

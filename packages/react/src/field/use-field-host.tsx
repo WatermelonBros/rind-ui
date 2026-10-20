@@ -1,3 +1,5 @@
+"use client"
+
 // The Root-as-Field helper (text-field design §3): a control's Root that is not inside a
 // Field becomes one (the Field's machine and parts, under the control's scope); inside a
 // Field it only joins it, and its own Label / Description / ErrorMessage render nothing.

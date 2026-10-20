@@ -153,7 +153,7 @@ type DialogArgs = Parameters<typeof pieces.actions.enterOpen>[0]
 const asDialog = (a: unknown) => a as DialogArgs
 type DialogEffectArgs = Parameters<typeof pieces.effects.overlay>[0]
 
-export const drawerMachine = setup({
+export const drawerMachine = /* @__PURE__ */ setup({
   types: type<{
     props: DrawerProps
     events: DrawerEvent

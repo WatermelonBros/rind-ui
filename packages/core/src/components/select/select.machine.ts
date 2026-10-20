@@ -218,7 +218,7 @@ function initialKey(
   )
 }
 
-export const selectMachine = setup({
+export const selectMachine = /* @__PURE__ */ setup({
   types: type<{
     props: SelectProps
     events: SelectEvent

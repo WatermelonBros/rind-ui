@@ -18,7 +18,7 @@ export interface ToggleProps {
     | undefined
 }
 
-export const toggleMachine = setup({
+export const toggleMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ToggleProps
     events: ToggleEvent

@@ -1,3 +1,5 @@
+"use client"
+
 // Toast: `Toaster` (the region of one store, rendered while it shows toasts) and the toast
 // parts. Wiring only: the store and machines own lifetime, pausing and announcements; the
 // connect owns every attribute; core/dom owns the hotkey, focus moves, measurement and the

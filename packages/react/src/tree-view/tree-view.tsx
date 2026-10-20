@@ -1,3 +1,5 @@
+"use client"
+
 // Tree View (design §2): wiring only. The machine owns highlight, expansion, selection,
 // checking and lazy loads; the core connect owns every attribute and key.
 

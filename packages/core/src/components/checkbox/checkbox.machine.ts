@@ -35,7 +35,7 @@ export interface CheckboxEnv {
   readonly formInput?: FormInputCapability | undefined
 }
 
-export const checkboxMachine = setup({
+export const checkboxMachine = /* @__PURE__ */ setup({
   types: type<{
     props: CheckboxProps
     events: CheckboxEvent

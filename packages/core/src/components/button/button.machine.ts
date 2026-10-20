@@ -36,7 +36,7 @@ const details = (e: PressEvent): ButtonPressDetails => ({
   altKey: e.altKey,
 })
 
-export const buttonMachine = setup({
+export const buttonMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ButtonProps
     events: ButtonEvent

@@ -84,7 +84,7 @@ const itemOf = (event: object): ItemKey => {
   return (e.item ?? e.from) as ItemKey // present on every event these guards and actions see
 }
 
-export const accordionMachine = setup({
+export const accordionMachine = /* @__PURE__ */ setup({
   types: type<{
     props: AccordionProps
     events: AccordionEvent

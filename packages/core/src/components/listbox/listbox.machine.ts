@@ -93,7 +93,7 @@ const EMPTY = null as unknown as string
 const behaviour = (props: ListboxProps) => props.selectionBehavior ?? "toggle"
 const mode = (props: ListboxProps) => props.selectionMode ?? "single"
 
-export const listboxMachine = setup({
+export const listboxMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ListboxProps
     events: ListboxEvent

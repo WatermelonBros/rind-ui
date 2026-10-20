@@ -55,7 +55,7 @@ export interface CodeBlockContext {
 
 export const DEFAULT_COPY_FEEDBACK_DURATION = 2000
 
-export const codeBlockMachine = setup({
+export const codeBlockMachine = /* @__PURE__ */ setup({
   types: type<{
     props: CodeBlockProps
     events: CodeBlockEvent

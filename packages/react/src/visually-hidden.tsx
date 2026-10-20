@@ -1,3 +1,5 @@
+"use client"
+
 import { visuallyHiddenStyle } from "@rind-ui/core"
 import { type ComponentPropsWithRef, useState } from "react"
 import { mergeProps } from "./merge-props"

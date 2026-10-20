@@ -1,3 +1,5 @@
+"use client"
+
 // Menubar parts (design §7): Root (the bar's service, its item registry and the port to
 // its menus), Menu (an ordinary Menu root level hosted by the bar) and Trigger (the menu's
 // trigger in menubar mode, plus the bar's roving wiring). Inside a menu, the Menu parts.

@@ -59,6 +59,7 @@ export function dateValidity(
   return null
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function validityFlags(reason: DateValidityReason | null): DateValidityFlags {
   return {
     valid: reason === null,

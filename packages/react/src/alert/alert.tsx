@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type AlertAnnounce,
   type AlertEvent,

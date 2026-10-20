@@ -1,3 +1,5 @@
+"use client"
+
 // Prompt Input (prompt-input spec): Root owns the machine and renders the form, a Field
 // (standalone, or joined to an enclosing one), the hidden file inputs and the attachments
 // summary; every other part is wiring. Derived state and keys live in core's connect.

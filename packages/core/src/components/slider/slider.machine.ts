@@ -214,7 +214,7 @@ function setFromFraction(args: Args, fraction: number, range: SliderRange) {
 const KEYS = ["INCREASE", "DECREASE", "PAGE_PREV", "PAGE_NEXT", "FIRST", "LAST"] as const
 const isKey = (t: string): t is SliderKey => (KEYS as readonly string[]).includes(t)
 
-export const sliderMachine = setup({
+export const sliderMachine = /* @__PURE__ */ setup({
   types: type<{
     props: SliderMachineProps
     events: SliderEvent

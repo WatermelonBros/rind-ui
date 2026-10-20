@@ -176,6 +176,7 @@ export function fromNodes<T>(
  * A list collection, optionally sectioned: items of one section are grouped where the
  * section first appears; sectionless items keep their place.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function createListCollection<T>(options: ListOptions<T>): Collection<T> {
   const groups: { section: CollectionKey | null; values: T[] }[] = []
   const byKey = new Map<CollectionKey, { section: CollectionKey | null; values: T[] }>()

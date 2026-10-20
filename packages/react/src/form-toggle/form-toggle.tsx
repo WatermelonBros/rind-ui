@@ -1,3 +1,5 @@
+"use client"
+
 // The parts every form toggle shares (Checkbox, Switch): a button-like Control with a
 // checkable role, Label/Description (control-label) and the hidden form input
 // (hidden-form-input), wired to the component's own machine through `useService`.
@@ -253,6 +255,7 @@ export type FormToggleRootProps<V extends CheckedState, D> = Omit<
 }
 
 /** The parts of one form toggle component, wired to its machine. */
+/* @__NO_SIDE_EFFECTS__ */
 export function createFormToggle<V extends CheckedState, D>(config: FormToggleConfig<V, D>) {
   // The shared parts read the service through CheckedState; V narrows it per component.
   const shared = config as unknown as FormToggleConfig<CheckedState, unknown>

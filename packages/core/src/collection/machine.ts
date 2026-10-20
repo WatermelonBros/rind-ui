@@ -213,6 +213,7 @@ export type CollectionPieces = ReturnType<typeof collectionPieces>
  * trees, its expanded keys. The visible collection of a tree is `props.collection` itself
  * (the component derives it with `tree.visible(expanded)`); `tree` is the full one.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function collectionPieces(options: {
   readonly selection?: SelectionPort
   readonly expansion?: ExpansionPort & {

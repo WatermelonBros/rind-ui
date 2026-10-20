@@ -168,6 +168,7 @@ export function announceCount(a: PatternArgs, scope: string) {
  * The guards and actions, bound to the host's scope (announcement keys) and to how it reads
  * the selected option keys (none for a host whose options are never selected).
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function patternPieces(options: {
   readonly scope: string
   readonly selected: (a: PatternReadArgs) => readonly string[]

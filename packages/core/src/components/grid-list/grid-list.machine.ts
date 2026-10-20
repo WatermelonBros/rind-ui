@@ -136,7 +136,7 @@ const actionable = (p: GridListProps, key: CollectionKey) =>
   p.disabled !== true &&
   (p.disabledBehavior === "selection" || p.collection.get(key)?.disabled !== true)
 
-export const gridListMachine = setup({
+export const gridListMachine = /* @__PURE__ */ setup({
   types: type<{
     props: GridListProps
     events: GridListEvent

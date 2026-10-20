@@ -1,3 +1,5 @@
+"use client"
+
 import { portalHostAttributes, resolvePortalTarget, syncPortalHost } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,

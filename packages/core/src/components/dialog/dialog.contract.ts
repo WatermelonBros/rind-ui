@@ -40,6 +40,7 @@ interface Variant {
   readonly alert?: boolean
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 function dialogContractWith(traits: DialogTraits, { modal, alert = false }: Variant) {
   return contract("dialog", {
     machine: dialogMachine,

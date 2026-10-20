@@ -169,7 +169,7 @@ const KEYS = ["INCREASE", "DECREASE", "PAGE_PREV", "PAGE_NEXT", "FIRST", "LAST"]
 const isKey = (t: string): t is RatingKey => (KEYS as readonly string[]).includes(t)
 const keyTransition = { guard: "canChange", target: "idle", actions: ["stepKey"] } as const
 
-export const ratingMachine = setup({
+export const ratingMachine = /* @__PURE__ */ setup({
   types: type<{
     props: RatingMachineProps
     events: RatingEvent

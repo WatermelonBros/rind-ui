@@ -1,3 +1,5 @@
+"use client"
+
 // Color Area parts: wiring only. The machine owns the colour, connect every attribute; here
 // the two axis inputs are reached for property sync, reset and native adoption, and the
 // Root's press is measured once by pointer-drag (2D).

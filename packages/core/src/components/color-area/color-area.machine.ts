@@ -171,7 +171,7 @@ function commit(args: Args, reason: ColorAreaReason) {
 const canChange = (props: ColorAreaMachineProps) =>
   props.disabled !== true && props.readOnly !== true
 
-export const colorAreaMachine = setup({
+export const colorAreaMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ColorAreaMachineProps
     events: ColorAreaEvent

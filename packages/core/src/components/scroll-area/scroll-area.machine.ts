@@ -118,7 +118,7 @@ const tabStopRule = (c: Pick<ScrollAreaContext, "measured" | "overflow" | "tabba
 
 const typeOf = (props: ScrollAreaProps): ScrollAreaType => props.type ?? "hover"
 
-export const scrollAreaMachine = setup({
+export const scrollAreaMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ScrollAreaProps
     events: ScrollAreaEvent

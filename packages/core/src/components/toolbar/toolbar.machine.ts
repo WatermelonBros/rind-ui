@@ -42,7 +42,7 @@ const stopOf = (props: ToolbarProps, highlighted: CollectionKey | null) =>
     focusableWhenDisabled: props.focusableWhenDisabled === true,
   })
 
-export const toolbarMachine = setup({
+export const toolbarMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ToolbarProps
     events: ToolbarEvent

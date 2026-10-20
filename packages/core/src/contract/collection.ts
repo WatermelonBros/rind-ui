@@ -21,6 +21,7 @@ export interface CollectionContractOptions {
   readonly naming?: "text" | "accessible"
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function collectionContract(o: CollectionContractOptions) {
   type E = Env<CollectionPart>
   const selectionAttr = o.selectionAttr ?? "aria-selected"

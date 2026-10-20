@@ -1,3 +1,5 @@
+"use client"
+
 import {
   droppedNameProps,
   type SeparatorContext,

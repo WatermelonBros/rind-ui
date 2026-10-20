@@ -86,7 +86,7 @@ function commit(args: Args) {
   if (!isEqualColor(emitted, now)) set("value", emitted)
 }
 
-export const colorFieldMachine = setup({
+export const colorFieldMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ColorFieldMachineProps
     events: ColorFieldEvent

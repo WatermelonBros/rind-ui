@@ -243,7 +243,7 @@ function commitTextNow(args: Args) {
 
 const directionOf = (t: Trigger | null): 1 | -1 => (t === "decrement" ? -1 : 1)
 
-export const numberInputMachine = setup({
+export const numberInputMachine = /* @__PURE__ */ setup({
   types: type<{
     props: NumberInputProps
     events: NumberInputEvent

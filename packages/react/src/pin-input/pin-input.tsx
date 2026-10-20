@@ -1,3 +1,5 @@
+"use client"
+
 // Pin Input parts: wiring only. The machine owns the value and the caret; edit-plan decides
 // every insertion; connect every attribute. Native listeners (not React's synthetic ones):
 // `beforeinput` to plan insertions, `input` so script fills are seen (input-otp#152).

@@ -1,3 +1,5 @@
+"use client"
+
 import { type ComponentType, createElement, type ReactNode } from "react"
 import { useIcon } from "./provider"
 

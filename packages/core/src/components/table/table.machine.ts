@@ -148,7 +148,7 @@ function announce(args: Args, sort: SortDescriptor | null, name: string) {
   })
 }
 
-export const tableMachine = setup({
+export const tableMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   actions: {
     /** The one write: a press proposes the next sort. */

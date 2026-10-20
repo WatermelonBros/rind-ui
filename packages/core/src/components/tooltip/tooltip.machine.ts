@@ -135,7 +135,7 @@ const isKeyboardIntent = (e: { readonly type: string }) =>
   e.modality === "keyboard" &&
   (e.cause === "key" || e.cause === "navigation")
 
-export const tooltipMachine = setup({
+export const tooltipMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TooltipProps
     events: TooltipEvent

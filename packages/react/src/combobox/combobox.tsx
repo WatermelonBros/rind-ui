@@ -1,3 +1,5 @@
+"use client"
+
 // Combobox (combobox + combobox-pattern specs): Root derives the listed results from the
 // snapshot (patternResults) and passes them as the machine's collection; the list parts are
 // the listbox parts under scope "combobox". Wiring only.
@@ -831,7 +833,9 @@ function Loading({ render, ...rest }: Own<"div">) {
   return renderPart("div", mergeProps(normalizeProps(host.api.loading()), rest), render, undefined)
 }
 
-export const Combobox = {
+// A pure call around the object: reading `list.Item` could run a getter as far as a bundler
+// knows, so a plain object literal would stay in every bundle that reaches this module.
+export const Combobox = /* @__PURE__ */ (() => ({
   Root,
   Label,
   Control,
@@ -854,4 +858,4 @@ export const Combobox = {
   LoadMore: list.LoadMore,
   Loading,
   Items: list.Items,
-}
+}))()

@@ -1,3 +1,5 @@
+"use client"
+
 import { type PresenceEnv, presenceMachine, waitForExit } from "@rind-ui/core"
 import { type RefObject, useEffect, useMemo, useRef, useState } from "react"
 import { flushSync } from "react-dom"

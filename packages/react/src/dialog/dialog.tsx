@@ -1,3 +1,5 @@
+"use client"
+
 import {
   DIALOG_PARENT_KINDS,
   type DialogMessages,
@@ -188,6 +190,7 @@ type AnyDialogRootProps = DialogRootBase & {
 }
 
 /** The Root of a dialog-family member: its machine, scope and layer kind. */
+/* @__NO_SIDE_EFFECTS__ */
 export function createDialogRoot(family: {
   readonly scope: string
   readonly kind: "dialog" | "drawer"

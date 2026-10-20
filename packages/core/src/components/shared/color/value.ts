@@ -94,7 +94,7 @@ export const colorValueOf = (props: ColorValueProps, value: Color | undefined): 
 export const workingOf = (props: ColorValueProps, context: ColorValueContext, value: Color) =>
   resolveWorking(value, context.working, props.space, context.memory)
 
-export const colorValueMachine = setup({
+export const colorValueMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ColorValueProps
     events: ColorValueEvent

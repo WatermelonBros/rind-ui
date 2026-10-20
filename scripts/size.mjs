@@ -1,0 +1,72 @@
+// Per-component bundle budgets for @rind-ui/react: what a consumer downloads when it imports
+// one component. Each public component is bundled the way an app bundler would (esbuild,
+// minified, production, React external), once from the package root and once from its
+// subpath, and the gzipped size is checked against size-budgets.json (every subpath needs
+// one). Runs after the react build (packages/react `build`); needs both packages built.
+// `node scripts/size.mjs --report` prints the sizes without failing.
+import { readdirSync, readFileSync, statSync } from "node:fs"
+import { gzipSync } from "node:zlib"
+import { build } from "esbuild"
+
+const reactDir = new URL("../packages/react/", import.meta.url).pathname
+const report = process.argv.includes("--report")
+const budgets = JSON.parse(readFileSync(new URL("size-budgets.json", import.meta.url), "utf8"))
+
+const pascal = (slug) => slug.replace(/(^|-)(\w)/g, (_, __, c) => c.toUpperCase())
+
+async function measure(contents) {
+  const result = await build({
+    stdin: { contents, resolveDir: reactDir, loader: "js" },
+    bundle: true,
+    minify: true,
+    format: "esm",
+    platform: "browser",
+    external: ["react", "react/*", "react-dom", "react-dom/*"],
+    define: { "process.env.NODE_ENV": '"production"' },
+    write: false,
+    logLevel: "silent",
+  })
+  const code = result.outputFiles[0]?.contents ?? new Uint8Array()
+  return { min: code.length, gz: gzipSync(code, { level: 9 }).length }
+}
+
+const kb = (bytes) => `${(bytes / 1024).toFixed(1)} kB`
+
+const pkg = JSON.parse(readFileSync(`${reactDir}package.json`, "utf8"))
+const components = readdirSync(`${reactDir}src`)
+  .filter((name) => statSync(`${reactDir}src/${name}`).isDirectory())
+  .filter((name) => pkg.exports[`./${name}`])
+  .sort()
+
+const all = await measure(`import * as R from "@rind-ui/react"; console.log(R)`)
+console.log(`everything: ${kb(all.min)} min, ${kb(all.gz)} gzip`)
+
+const failures = []
+for (const slug of components) {
+  const name = budgets.names?.[slug] ?? pascal(slug)
+  const root = await measure(`import { ${name} } from "@rind-ui/react"; console.log(${name})`)
+  const sub = await measure(
+    `import { ${name} } from "@rind-ui/react/${slug}"; console.log(${name})`,
+  )
+  if (budgets.components[slug] === undefined) {
+    failures.push(`${name}: no budget in scripts/size-budgets.json`)
+    continue
+  }
+  const budget = budgets.components[slug] * 1024
+  const worst = Math.max(root.gz, sub.gz)
+  const over = worst > budget
+  console.log(
+    `${over ? "✗" : " "} ${name.padEnd(22)} root ${kb(root.gz).padStart(9)}  subpath ${kb(sub.gz).padStart(9)}  budget ${kb(budget)}`,
+  )
+  if (over) failures.push(`${name}: ${kb(worst)} gzip, budget ${kb(budget)}`)
+}
+
+const button = await measure(`import { Button } from "@rind-ui/react"; console.log(Button)`)
+const ratio = button.gz / all.gz
+console.log(`Button / everything: ${(ratio * 100).toFixed(1)}% (limit 10%)`)
+if (ratio > 0.1) failures.push(`Button is ${(ratio * 100).toFixed(1)}% of the whole library`)
+
+if (failures.length > 0 && !report) {
+  console.error(`\nover budget:\n  ${failures.join("\n  ")}`)
+  process.exit(1)
+}

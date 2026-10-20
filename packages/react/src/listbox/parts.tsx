@@ -1,3 +1,5 @@
+"use client"
+
 // The listbox parts as React components, bound to a host's context (design §2): Listbox's
 // own Root, and Select's popup later. Wiring only: every attribute is the core parts'.
 
@@ -64,6 +66,7 @@ const ItemCtx = createContext<CollectionKey | null>(null)
 const INTERACTIVE =
   "a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1']), [contenteditable='true']"
 
+/* @__NO_SIDE_EFFECTS__ */
 export function createListboxParts(useHost: (part: string) => ListboxHost) {
   function Label({ render, ...rest }: Own<"span">) {
     const host = useHost("Label")

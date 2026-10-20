@@ -43,7 +43,7 @@ export interface ClipboardProps {
 
 export const DEFAULT_CLIPBOARD_FEEDBACK_DURATION = 2000
 
-export const clipboardMachine = setup({
+export const clipboardMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ClipboardProps
     events: ClipboardEvent

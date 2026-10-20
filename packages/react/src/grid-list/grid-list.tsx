@@ -1,3 +1,5 @@
+"use client"
+
 // Grid List: the Root hosting the parts (design §3). Wiring only: the machine owns the
 // highlight, the child position, selection and actions; connect owns every attribute and
 // the key-ownership rule. Rows come from `items` data or from static Item parts.

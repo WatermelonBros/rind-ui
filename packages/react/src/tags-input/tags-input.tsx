@@ -1,3 +1,5 @@
+"use client"
+
 // Tags Input (tags-input spec): Root owns the machine and the form inputs; the chips are
 // rendered from the value. With suggestions, Root derives the listed ones from the draft
 // (patternResults, without the chosen options) and the list parts are the listbox parts
@@ -619,7 +621,9 @@ function ClearTrigger({ render, ...rest }: Own<"button">) {
 const list = createListboxParts(useHost)
 const popup = createPopupParts(useLive)
 
-export const TagsInput = {
+// A pure call around the object: reading `list.Item` could run a getter as far as a bundler
+// knows, so a plain object literal would stay in every bundle that reaches this module.
+export const TagsInput = /* @__PURE__ */ (() => ({
   Root,
   Label,
   Control,
@@ -639,4 +643,4 @@ export const TagsInput = {
   Separator: list.Separator,
   Empty: list.Empty,
   Items: list.Items,
-}
+}))()

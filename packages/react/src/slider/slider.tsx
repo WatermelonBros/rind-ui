@@ -1,3 +1,5 @@
+"use client"
+
 // Slider parts: wiring only. The machine owns the value (always an array), connect every
 // attribute. Here the consumer's shape (`number` or array) is converted at the boundary, the
 // thumb inputs are reached for property sync, reset and native adoption, and the Control's

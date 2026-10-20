@@ -18,7 +18,7 @@ export interface MenuRadioGroupProps {
 // No item selected: the controllable is typed by its non-null value (as Tabs does).
 const NONE = null as unknown as string
 
-export const menuRadioGroupMachine = setup({
+export const menuRadioGroupMachine = /* @__PURE__ */ setup({
   types: type<{
     props: MenuRadioGroupProps
     events: MenuRadioGroupEvent

@@ -1,3 +1,5 @@
+"use client"
+
 // The nearest composite host (a Toolbar or one of its groups): hosted composites (Toggle
 // Group, Radio Group) and the toolbar's own controls join its roving focus through it.
 // Portals reset it: a component in a popup opened from a host control is standalone.

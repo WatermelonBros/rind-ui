@@ -1,3 +1,5 @@
+"use client"
+
 // Calendar parts: wiring only. The machine owns the value, the focused date and the visible
 // range; connect every attribute and the key mapping; navigation is pure core logic.
 

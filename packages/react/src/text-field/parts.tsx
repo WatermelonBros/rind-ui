@@ -1,3 +1,5 @@
+"use client"
+
 // Text Field: the host configured with visibility (`type="password"`) and the keys (Escape
 // clears, Enter submits, `type="search"` semantics), and the parts.
 

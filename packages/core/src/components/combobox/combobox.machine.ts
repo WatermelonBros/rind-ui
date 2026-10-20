@@ -335,7 +335,7 @@ const pattern = patternPieces({
 })
 
 /** One setup, two definitions: the popup combobox and the inline one (design §1). */
-const comboboxSetup = setup({
+const comboboxSetup = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     ...pattern.guards,
@@ -608,7 +608,7 @@ const initialInlineContext = (props: ComboboxProps): ComboboxContext => {
   }
 }
 
-export const comboboxMachine = comboboxSetup.machine({
+export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
   id: "combobox",
   initial: "closed",
   context: initialContext,
@@ -748,7 +748,7 @@ export type ComboboxMachine = typeof comboboxMachine
  * items run `onAction`; Escape clears the query, then asks the host to close; Backspace on an
  * empty query goes back a page.
  */
-export const inlineComboboxMachine = comboboxSetup.machine({
+export const inlineComboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
   id: "combobox",
   initial: "open",
   context: initialInlineContext,

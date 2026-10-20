@@ -142,7 +142,7 @@ function commit(args: Args, reason: ColorPickerReason) {
 const canOpen = (props: ColorPickerMachineProps) =>
   props.disabled !== true && props.readOnly !== true && props.inline !== true
 
-export const colorPickerMachine = setup({
+export const colorPickerMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ColorPickerMachineProps
     events: ColorPickerEvent

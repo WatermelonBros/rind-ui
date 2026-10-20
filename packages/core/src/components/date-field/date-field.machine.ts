@@ -466,7 +466,7 @@ function parseAdopted(text: string, props: DateFieldProps, value: FieldValue | n
   return parsePaste(text, f, shapeFor(props, value), value ?? props.placeholderValue)
 }
 
-export const dateFieldMachine = setup({
+export const dateFieldMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     editable: ({ props }) => editable(props),

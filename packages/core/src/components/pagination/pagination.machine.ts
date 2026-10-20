@@ -60,7 +60,7 @@ const total = ({ props, values }: Args) => totalPagesOf(props, values.pageSize)
 /** The page the view shows: the stored one clamped to the current total. */
 const resolved = (a: Args) => clamp(a.values.page, total(a))
 
-export const paginationMachine = setup({
+export const paginationMachine = /* @__PURE__ */ setup({
   types: type<{
     props: PaginationMachineProps
     events: PaginationEvent

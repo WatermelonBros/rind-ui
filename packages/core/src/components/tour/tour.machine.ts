@@ -290,7 +290,7 @@ function tabStopFor(env: DomEnvironment, target: Element | null): HTMLElement | 
   return inner.at(-1) ?? (target.tabIndex >= 0 ? target : null)
 }
 
-export const tourMachine = setup({
+export const tourMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TourProps
     events: TourEvent
