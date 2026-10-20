@@ -69,6 +69,7 @@ import * as select from "./select"
 import * as separator from "./separator"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
+import * as sortable from "./sortable"
 import * as splitter from "./splitter"
 import * as stepper from "./stepper"
 import * as streamingMessage from "./streaming-message"
@@ -167,6 +168,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  sortable,
   stepper,
   timeline,
   "table-of-contents": tableOfContents,

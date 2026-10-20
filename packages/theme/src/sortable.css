@@ -1,0 +1,141 @@
+/*
+ * Sortable: family `decoration`, no variant or size rules. An empty handle draws a grip of
+ * dots (two columns of three) with a grab cursor; the picked-up or dragged item is raised (a
+ * ring and a shadow) and the dragged one follows the pointer; the indicator is an
+ * accent line at the drop position. Items are laid out by the consumer's list markup.
+ */
+@layer rind.components {
+  :where([data-scope="sortable"][data-part="root"]) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where([data-scope="sortable"][data-part="item"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    padding: var(--rind-space-2);
+    border: 1px solid var(--rind-color-border);
+    border-radius: var(--rind-radius-md);
+    background: var(--rind-color-bg);
+  }
+
+  :where([data-scope="sortable"][data-part="item"][data-active]) {
+    box-shadow:
+      0 0 0 2px var(--rind-color-accent-solid),
+      0 6px 18px -8px color-mix(in oklab, var(--rind-color-text) 35%, transparent);
+  }
+
+  :where([data-scope="sortable"][data-part="item"][data-dragging]) {
+    cursor: grabbing;
+  }
+
+  :where([data-scope="sortable"][data-part="handle"]) {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-sm);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    cursor: grab;
+  }
+
+  /* The grip: two columns of three dots, drawn on an empty handle. */
+  :where([data-scope="sortable"][data-part="handle"]:empty)::before {
+    content: "";
+    inline-size: 0.5rem;
+    block-size: 0.8rem;
+    background:
+      radial-gradient(circle, currentColor 1.4px, transparent 1.6px) 0 0 / 0.25rem 0.27rem;
+  }
+
+  :where([data-scope="sortable"][data-part="handle"]:hover:not([data-disabled])) {
+    background: var(--rind-color-surface);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="sortable"][data-part="handle"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="sortable"][data-part="handle"][aria-pressed="true"]) {
+    background: var(--rind-color-accent-soft);
+    color: var(--rind-color-accent-text);
+  }
+
+  :where([data-scope="sortable"][data-part="handle"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  :where([data-scope="sortable"][data-part="indicator"]) {
+    inset-inline: 0;
+    top: var(--rind-sortable-indicator);
+    block-size: 2px;
+    margin-block-start: -1px;
+    border-radius: 2px;
+    background: var(--rind-color-accent-solid);
+    pointer-events: none;
+    list-style: none;
+  }
+
+  :where([data-scope="sortable"][data-part="indicator"][data-orientation="horizontal"]) {
+    inset-block: 0;
+    inset-inline-start: var(--rind-sortable-indicator);
+    inset-inline-end: auto;
+    top: auto;
+    inline-size: 2px;
+    block-size: auto;
+    margin-block-start: 0;
+    margin-inline-start: -1px;
+  }
+
+  :where([data-scope="sortable"][data-part="move-button"]) {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 1.75rem;
+    min-block-size: 1.75rem;
+    padding: 0;
+    border: 1px solid var(--rind-color-border);
+    border-radius: var(--rind-radius-sm);
+    background: var(--rind-color-bg);
+    color: var(--rind-color-text);
+    cursor: pointer;
+  }
+  :where([data-scope="sortable"][data-part="move-button"][data-direction="up"]:empty)::before {
+    content: "↑";
+  }
+  :where([data-scope="sortable"][data-part="move-button"][data-direction="down"]:empty)::before {
+    content: "↓";
+  }
+  /* Horizontal lists move left and right. */
+  :where(
+    [data-scope="sortable"][data-part="move-button"][data-orientation="horizontal"][data-direction="up"]:empty
+  )::before {
+    content: "←";
+  }
+  :where(
+    [data-scope="sortable"][data-part="move-button"][data-orientation="horizontal"][data-direction="down"]:empty
+  )::before {
+    content: "→";
+  }
+  :where([data-scope="sortable"][data-part="move-button"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="sortable"][data-part="item"][data-active]) {
+      outline: 2px solid Highlight;
+    }
+    :where([data-scope="sortable"][data-part="indicator"]) {
+      background: Highlight;
+    }
+  }
+}

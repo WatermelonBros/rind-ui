@@ -68,7 +68,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Listbox | ● |  | ● |  | ● |  | ● |  |  | 4 | 2 | done |  |
 | Tag Group |  |  | ● |  |  | ● | ● |  |  | 3 | 2 | done | Display/removal of chips |
 | Tags Input | ● |  | ● |  |  |  | ● |  |  | 3 | 2 | done | RAC: TokenField (unverified) |
-| Drag and Drop / Sortable |  |  | ● |  |  |  |  |  |  | 1 | 3 | todo | RAC: useDragAndDrop · reorder lists and tabs, keyboard and AT drag; Reado has pointerReorder |
+| Drag and Drop / Sortable |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | RAC: useDragAndDrop · Sortable: reorder lists (both orientations) by pointer, keyboard and AT, move buttons · todo: between lists, files, tabs; Reado has pointerReorder |
 | Tree View | ● |  | ● |  |  |  | ● |  |  | 3 | 3 | done | RAC/Reka: Tree · todo: drag and drop of nodes (a Tree View option, on top of Drag and Drop / Sortable; Reado file tree) |
 | Segmented Control | ● |  |  |  |  |  |  |  | ● | 2 | 1 | done | Ark: Segment Group · used by Reado |
 | Grid List |  |  | ● |  |  |  |  |  |  | 1 | 3 | done | Missing in Ark |

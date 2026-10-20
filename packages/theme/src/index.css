@@ -61,6 +61,7 @@
 @import "./message-thread.css";
 @import "./reasoning.css";
 @import "./stepper.css";
+@import "./sortable.css";
 @import "./image-cropper.css";
 @import "./image-viewer.css";
 @import "./table-of-contents.css";
