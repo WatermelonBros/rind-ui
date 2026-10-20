@@ -316,6 +316,41 @@ export const treeViewContract = contract("tree-view", {
       },
       done: async () => true,
     },
+    /** Alt+arrow on the row (add-tree-view-dnd): "up", "down", "in" or "out". */
+    moveNode: {
+      keyboard: async (env: E, item: TreeItemRef, direction: "up" | "down" | "in" | "out") => {
+        const row = await reveal(env, item)
+        if (row === undefined) return
+        await arrowTo(env, row)
+        const key = {
+          up: "ArrowUp",
+          down: "ArrowDown",
+          in: "ArrowRight",
+          out: "ArrowLeft",
+        } as const
+        await env.keyboard(key[direction], { alt: true })
+      },
+      done: async () => true,
+    },
+    /** A pointer drag of `item` onto `over`'s zone (before, inside or after). */
+    dragNode: {
+      pointer: async (
+        env: E,
+        item: TreeItemRef,
+        over: TreeItemRef,
+        zone: "before" | "inside" | "after",
+      ) => {
+        const from = await reveal(env, item)
+        const to = await reveal(env, over)
+        const a = await from?.part.box()
+        const b = await to?.part.box()
+        if (!from || !a || !b) return
+        const y = b.y + b.height * (zone === "before" ? 0.12 : zone === "inside" ? 0.5 : 0.88)
+        await from.part.drag({ x: 0, y: y - (a.y + a.height / 2) })
+      },
+      none: { keyboard: "Alt with the arrows is `moveNode`" },
+      done: async () => true,
+    },
   },
   states: { idle: { hasFocus: false }, focused: { hasFocus: true } },
   events: {
@@ -366,6 +401,11 @@ export const treeViewContract = contract("tree-view", {
     COLLAPSE_ALL: { skip: "programmatic" },
     "CHILDREN.SETTLED": { skip: "the lazy loader settles: scenario tests" },
     "TREE.CHANGE": { skip: "a new tree prop: scenario tests" },
+    "MOVE.KEY": { skip: "moving needs `movable`: the move DOM tests" },
+    "DRAG.START": { skip: "a pointer drag: the move DOM tests" },
+    "DRAG.OVER": { skip: "a pointer drag: the move DOM tests" },
+    "DRAG.END": { skip: "a pointer drag: the move DOM tests" },
+    "DRAG.CANCEL": { skip: "a pointer drag: the move DOM tests" },
     "COLLECTION.CHANGE": { skip: "a controlled expandedValue: scenario tests" },
     "$props:tree": { skip: "a new tree prop (lazy children arriving): scenario tests" },
     "$props:expandedValue": { skip: "a controlled expandedValue: scenario tests" },

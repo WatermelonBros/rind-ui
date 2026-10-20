@@ -43,11 +43,14 @@ import { TreeView } from "@rind-ui/react"
 | `TreeView.ItemCheckbox` | `item-checkbox` | `<span>` | `aria-hidden` check mark of a checkable tree; a press toggles the check. |
 | `TreeView.Loading` | `loading` | `<span>` | `aria-hidden` row under a loading branch (announced, not an item). |
 | `TreeView.Empty` | `empty` | `<div>` | After the tree while it has no nodes; describes it. |
+| `TreeView.DropIndicator` | `drop-indicator` | `<div>` | `aria-hidden` line at a pointer drag's target (`--rind-tree-drop-top`, `--rind-tree-drop-level`); render it inside `TreeView.Tree`'s positioned container. |
 
 ### Props
 
 | Part | Prop | Type | Default | Description |
 |---|---|---|---|---|
+| `TreeView.Root` | `movable` | `boolean \| (key) => boolean` | `false` | Nodes can move (Alt+arrows, pointer drags): all, or those the predicate allows. |
+| `TreeView.Root` | `onMove` | `(key, { parent, index, reason: "keyboard" \| "pointer" }) => void` | — | A node moved: apply it to `items` with `moveNode(items, key, details)`. |
 | `TreeView.Root` | `items` | `{ key, label, children?, isBranch?, disabled?, href? }[]` | — | The tree's data (or `collection`: a tree collection built by you). |
 | `TreeView.Root` | `selectionMode` | `"single" \| "multiple" \| "none"` | `"single"` | None: activation only. |
 | `TreeView.Root` | `selectionBehavior` | `"toggle" \| "replace"` | `"toggle"` | Replace: selection follows focus; mod+press toggles. |
@@ -77,6 +80,7 @@ import { TreeView } from "@rind-ui/react"
 | `TreeView.Root` | `scrollToIndex` | `(details: ScrollToIndexDetails) => void` | — | Scrolls the highlighted row into view; `index` is its position in the visible list. |
 | `TreeView.Root` | `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
 | `TreeView.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.DropIndicator` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 | `TreeView.Tree` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
 | `TreeView.Tree` | `children` | `(node: TreeViewNodeState) => ReactNode` | — | Called once per visible node with its state; returns its row (usually a `TreeView.Item`). |
 | `TreeView.Tree` | `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
@@ -128,6 +132,13 @@ Every attribute of the rendered element is accepted and forwarded.
 | `item` | `data-focus-visible` | Keyboard focus. |
 | `item` | `data-hover` | Under the pointer. |
 | `item` | `data-pressed` | Being pressed. |
+| `item` | `data-dragging` | Being dragged by a pointer. |
+| `item` | `data-drop-target` | A pointer drag would drop inside it. |
+| `drop-indicator` | `data-scope` | "tree-view" |
+| `drop-indicator` | `data-part` | "drop-indicator" |
+| `drop-indicator` | `data-instance` | The instance id. |
+| `drop-indicator` | `data-position` | before \| after \| inside. |
+| `drop-indicator` | `data-hidden` | No target. |
 | `item-indicator` | `data-scope` | "tree-view" |
 | `item-indicator` | `data-part` | "item-indicator" |
 | `item-indicator` | `data-instance` | The instance id. |
@@ -153,6 +164,8 @@ Every attribute of the rendered element is accepted and forwarded.
 | Shift+ArrowDown/Up, Shift+Space | Extend the range from the anchor (multiple). |
 | mod+A | Select the visible items (multiple). |
 | Characters | Typeahead over the visible items. |
+| Alt+ArrowUp, Alt+ArrowDown | Movable: move the item before / after its sibling. |
+| Alt+ArrowRight, Alt+ArrowLeft | Movable: into the branch above / out of its branch. |
 
 ### States
 
@@ -180,6 +193,8 @@ Every attribute of the rendered element is accepted and forwarded.
 | `enter` | keyboard |
 | `star` | keyboard |
 | `selectAll` | keyboard |
+| `moveNode` | keyboard |
+| `dragNode` | pointer, virtual |
 
 Queries: `items`, `isExpanded`, `expandedNames`, `isBusy`, `isEmpty`, `highlighted`, `selected`, `checked`, `hasFocus`. Traits: `composite-roving`, `set-metadata`, `selectable`.
 <!-- /api -->
@@ -234,6 +249,8 @@ A loader that does not return a promise works too: the load ends when a new `ite
 | Shift+ArrowDown / ArrowUp, Shift+Space | Extend the range from the anchor (multiple). |
 | Ctrl or Cmd + A | Select the visible rows (multiple). |
 | Characters | Typeahead over the visible rows. |
+| Alt + ArrowUp / ArrowDown | `movable`: move before / after the sibling. |
+| Alt + ArrowRight / ArrowLeft | `movable`: into the folder above / out of its folder. |
 
 Keys the tree does not use (F2, Delete, Ctrl+C) are left alone and never prevented, so a rename or clipboard handler in your `onKeyDown` on `TreeView.Tree` works. Your handler runs first and can `preventDefault()` to stop the tree. Keys typed in an editable element inside a row (an inline rename input) never reach the tree.
 
@@ -255,7 +272,7 @@ Rows indent from the `--rind-tree-view-level` custom property each row carries (
 
 ## Testing
 
-`getTreeView(screen, { name })` locates the tree by role and accessible name. Items are addressed by name, or by a name path when names repeat across folders. Actions: `expand`, `collapse`, `toggle`, `check`, `expandSiblings`, `act`, `expandAll` (actions on a hidden node expand its ancestors with the keyboard first). Queries: `items`, `isExpanded`, `expandedNames`, `isBusy`, `isEmpty`, `highlighted`, `selected`, `checked`, `hasFocus`.
+`getTreeView(screen, { name })` locates the tree by role and accessible name. Items are addressed by name, or by a name path when names repeat across folders. Actions: `expand`, `collapse`, `toggle`, `check`, `expandSiblings`, `act`, `expandAll` (actions on a hidden node expand its ancestors with the keyboard first), `moveNode(item, "up" | "down" | "in" | "out")` and `dragNode(item, over, "before" | "inside" | "after")`. Queries: `items`, `isExpanded`, `expandedNames`, `isBusy`, `isEmpty`, `highlighted`, `selected`, `checked`, `hasFocus`.
 
 ```tsx
 import { getTreeView } from "@rind-ui/testing"

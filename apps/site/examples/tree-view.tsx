@@ -1,5 +1,6 @@
 "use client"
 
+import { moveNode } from "@rind-ui/core"
 import { TreeView, type TreeViewItemData, type TreeViewNodeState } from "@rind-ui/react"
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual"
 import { type RefObject, useEffect, useRef, useState } from "react"
@@ -59,6 +60,28 @@ export function Basic() {
     <TreeView.Root items={FILES} defaultExpandedValue={["src"]} defaultValue="index.ts">
       <TreeView.Label>Files</TreeView.Label>
       <Rows />
+    </TreeView.Root>
+  )
+}
+
+export function Movable() {
+  const [items, setItems] = useState<TreeViewItemData[]>([
+    ...FILES,
+    { key: "archive", label: "archive", isBranch: true, children: [] },
+  ])
+  return (
+    <TreeView.Root
+      items={items}
+      defaultExpandedValue={["src", "docs"]}
+      movable
+      onMove={(key, target) => setItems((all) => moveNode(all, key, target))}
+    >
+      <TreeView.Label>Project</TreeView.Label>
+      {/* The drop line is positioned against this wrapper (the tree's top). */}
+      <div style={{ position: "relative" }}>
+        <Rows />
+        <TreeView.DropIndicator />
+      </div>
     </TreeView.Root>
   )
 }
@@ -284,6 +307,11 @@ export const variants: Variants = {
   Basic: {
     title: "Basic",
     description: "Arrow keys move; Right expands, Left collapses or climbs to the parent.",
+  },
+  Movable: {
+    title: "Moving items",
+    description:
+      "`movable`: drag a row before, after or into a folder (a closed folder opens when you hold over it). Alt with the arrows moves the focused item: up, down, into the folder above, out of its folder.",
   },
   Multiple: {
     title: "Multiple selection",

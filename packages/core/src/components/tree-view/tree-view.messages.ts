@@ -15,6 +15,17 @@ export interface TreeViewMessages {
   readonly emptyLabel: string
   /** The Loading part's default text. */
   readonly loadingLabel: string
+  /** The tree's description when items can be moved. */
+  readonly moveInstructions: string
+  /** Spoken after a move: "notes.md moved into docs, position 2 of 3". */
+  readonly movedAnnouncement: (
+    name: string,
+    parent: string | null,
+    position: number,
+    count: number,
+  ) => string
+  /** Spoken when an Alt+arrow has nowhere to go. */
+  readonly cannotMoveAnnouncement: (name: string) => string
 }
 
 export const treeViewMessages: TreeViewMessages = {
@@ -25,4 +36,9 @@ export const treeViewMessages: TreeViewMessages = {
   loadFailedAnnouncement: (name) => `${name} could not be loaded`,
   emptyLabel: "No items",
   loadingLabel: "Loading…",
+  moveInstructions:
+    "Alt with the arrow keys moves the item: up and down among its siblings, right into the folder above, left out of its folder.",
+  movedAnnouncement: (name, parent, position, count) =>
+    `${name} moved ${parent === null ? "to the top level" : `into ${parent}`}, position ${position} of ${count}`,
+  cannotMoveAnnouncement: (name) => `${name} cannot move that way`,
 }

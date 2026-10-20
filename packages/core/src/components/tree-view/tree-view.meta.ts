@@ -70,8 +70,25 @@ export const treeViewMeta = {
       element: "div",
       description: "After the tree while it has no nodes; describes it.",
     },
+    {
+      name: "TreeView.DropIndicator",
+      part: "drop-indicator",
+      element: "div",
+      description:
+        "`aria-hidden` line at a pointer drag's target (`--rind-tree-drop-top`, `--rind-tree-drop-level`); render it inside `TreeView.Tree`'s positioned container.",
+    },
   ],
   props: {
+    movable: {
+      type: "boolean | (key) => boolean",
+      default: "false",
+      description:
+        "Nodes can move (Alt+arrows, pointer drags): all, or those the predicate allows.",
+    },
+    onMove: {
+      type: '(key, { parent, index, reason: "keyboard" | "pointer" }) => void',
+      description: "A node moved: apply it to `items` with `moveNode(items, key, details)`.",
+    },
     items: {
       type: "{ key, label, children?, isBranch?, disabled?, href? }[]",
       description: "The tree's data (or `collection`: a tree collection built by you).",
@@ -160,6 +177,13 @@ export const treeViewMeta = {
       "data-focus-visible": "Keyboard focus.",
       "data-hover": "Under the pointer.",
       "data-pressed": "Being pressed.",
+      "data-dragging": "Being dragged by a pointer.",
+      "data-drop-target": "A pointer drag would drop inside it.",
+    },
+    "drop-indicator": {
+      ...base("drop-indicator"),
+      "data-position": "before | after | inside.",
+      "data-hidden": "No target.",
     },
     "item-indicator": {
       ...base("item-indicator"),
@@ -186,6 +210,8 @@ export const treeViewMeta = {
     ["Shift+ArrowDown/Up, Shift+Space", "Extend the range from the anchor (multiple)."],
     ["mod+A", "Select the visible items (multiple)."],
     ["Characters", "Typeahead over the visible items."],
+    ["Alt+ArrowUp, Alt+ArrowDown", "Movable: move the item before / after its sibling."],
+    ["Alt+ArrowRight, Alt+ArrowLeft", "Movable: into the branch above / out of its branch."],
   ],
   states: {
     idle: "Focus is outside the tree.",
@@ -208,6 +234,8 @@ export const treeViewMeta = {
       enter: ["keyboard"],
       star: ["keyboard"],
       selectAll: ["keyboard"],
+      moveNode: ["keyboard"],
+      dragNode: ["pointer", "virtual"],
     },
     queries: [
       "items",

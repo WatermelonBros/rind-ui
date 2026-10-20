@@ -424,3 +424,85 @@ describe("lazy children", () => {
     expect(onLoadChildren).toHaveBeenCalledTimes(1)
   })
 })
+
+describe("moving nodes (add-tree-view-dnd)", () => {
+  const moves = () => {
+    const onMove = vi.fn()
+    return { onMove }
+  }
+
+  it("off unless movable", () => {
+    const { onMove } = moves()
+    const t = make({ onMove })
+    t.focus()
+    t.send({ type: "MOVE.KEY", key: toKey("docs"), direction: "up" })
+    expect(onMove).not.toHaveBeenCalled()
+  })
+
+  it("Alt+arrows report the outliner targets and announce them", () => {
+    announce.mockClear()
+    const { onMove } = moves()
+    const t = make({ movable: true, onMove })
+    t.focus()
+    t.send({ type: "MOVE.KEY", key: toKey("docs"), direction: "up" })
+    expect(onMove).toHaveBeenLastCalledWith("docs", { parent: null, index: 0, reason: "keyboard" })
+    expect(announce.mock.calls.at(-1)?.[0].message).toBe(
+      "docs moved to the top level, position 1 of 2",
+    )
+    t.send({ type: "MOVE.KEY", key: toKey("index.ts"), direction: "out" })
+    expect(onMove).toHaveBeenLastCalledWith("index.ts", {
+      parent: null,
+      index: 1,
+      reason: "keyboard",
+    })
+  })
+
+  it("nowhere to go is announced, not reported", () => {
+    announce.mockClear()
+    const { onMove } = moves()
+    const t = make({ movable: true, onMove })
+    t.focus()
+    t.send({ type: "MOVE.KEY", key: toKey("src"), direction: "up" })
+    expect(onMove).not.toHaveBeenCalled()
+    expect(announce.mock.calls.at(-1)?.[0].message).toBe("src cannot move that way")
+  })
+
+  it("a predicate limits what moves", () => {
+    const { onMove } = moves()
+    const t = make({ movable: (k) => k !== "docs", onMove })
+    t.focus()
+    t.send({ type: "MOVE.KEY", key: toKey("docs"), direction: "up" })
+    expect(onMove).not.toHaveBeenCalled()
+  })
+
+  it("a pointer drag reports its last target once, on drop", () => {
+    const { onMove } = moves()
+    const t = make({ movable: true, onMove })
+    t.send({ type: "DRAG.START", key: toKey("readme.md") })
+    t.send({
+      type: "DRAG.OVER",
+      over: toKey("src"),
+      zone: "inside",
+      target: { parent: "src", index: 3 },
+    })
+    expect(onMove).not.toHaveBeenCalled()
+    t.send({ type: "DRAG.END" })
+    expect(onMove).toHaveBeenCalledOnce()
+    expect(onMove).toHaveBeenCalledWith("readme.md", { parent: "src", index: 3, reason: "pointer" })
+  })
+
+  it("a cancelled drag reports nothing", () => {
+    const { onMove } = moves()
+    const t = make({ movable: true, onMove })
+    t.send({ type: "DRAG.START", key: toKey("readme.md") })
+    t.send({
+      type: "DRAG.OVER",
+      over: toKey("src"),
+      zone: "inside",
+      target: { parent: "src", index: 3 },
+    })
+    t.send({ type: "DRAG.CANCEL" })
+    t.send({ type: "DRAG.END" })
+    expect(onMove).not.toHaveBeenCalled()
+  })
+})

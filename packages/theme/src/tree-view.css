@@ -171,6 +171,35 @@
     }
   }
 
+  /* ── Moving (add-tree-view-dnd): the dragged row fades, a branch to drop into is outlined,
+     the drop line sits at the target's level. ── */
+  :where([data-scope="tree-view"][data-part="item"][data-dragging]) {
+    opacity: 0.5;
+  }
+
+  :where([data-scope="tree-view"][data-part="item"][data-drop-target]) {
+    outline: 2px solid var(--rind-color-accent-solid);
+    outline-offset: -2px;
+    background: var(--rind-color-accent-soft);
+  }
+
+  :where([data-scope="tree-view"][data-part="drop-indicator"]) {
+    inset-inline: 0;
+    top: var(--rind-tree-drop-top);
+    block-size: 2px;
+    margin-block-start: -1px;
+    /* The tree's padding, then the row's own start padding at the target level. */
+    margin-inline-start: calc(
+      var(--rind-tree-view-padding, var(--rind-space-1)) +
+      var(--rind-space-1) +
+      (var(--rind-tree-drop-level, 1) - 1) *
+      var(--rind-tree-view-indent, 1.25rem)
+    );
+    border-radius: 2px;
+    background: var(--rind-color-accent-solid);
+    pointer-events: none;
+  }
+
   @media (forced-colors: active) {
     :where([data-scope="tree-view"][data-part="item"][data-highlighted]) {
       outline: 2px solid Highlight;
@@ -194,6 +223,14 @@
 
     :where([data-scope="tree-view"][data-part="item-checkbox"]) {
       border-color: CanvasText;
+    }
+
+    :where([data-scope="tree-view"][data-part="drop-indicator"]) {
+      background: Highlight;
+    }
+
+    :where([data-scope="tree-view"][data-part="item"][data-drop-target]) {
+      outline-color: Highlight;
     }
 
     :where([data-scope="tree-view"][data-part="item-checkbox"][data-state="checked"]),
