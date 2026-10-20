@@ -416,3 +416,8 @@ verified at round 3 (2026-10-14).
 - warning: the tainted-canvas test simulates the SecurityError; a real cross-origin image without CORS needs a second origin in the test server.
 - warning: the model covers keyboard nudges and zoom; pointer drags and pinch are the DOM tests'.
 - warning: zoom is clamped to [minZoom, maxZoom] except when coverage needs more (a rotation); the slider in a consumer's UI may then show a value above its max.
+
+## Table of Contents (add-table-of-contents)
+
+- warning: in the test harness, letting a click on `<a href="#missing">` inside `CheckboxGroup.ItemLabel` proceed (not cancelled) toggles the checkbox (a TOGGLE through the control's press), while real trusted clicks in Chromium, Firefox and WebKit do not forward the label. The harness now lets only jumps to existing elements through; find what forwards the untrusted click (`press.ts` `forwardedByLabel`?) and add a test.
+- warning: `readingPosition` measures on scroll and resize only; content that grows without either (images loading above the line) updates on the next scroll.

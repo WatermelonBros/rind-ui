@@ -33,6 +33,9 @@ beforeAll(async () => {
 afterAll(() => site?.close())
 
 const index = examplesIndex()
+/** RIND_EXAMPLES=slug,slug: axe scans only these components' examples (a local check). */
+const only = process.env["RIND_EXAMPLES"]?.split(",")
+const scanned = only ? index.filter((e) => only.includes(e.slug)) : index
 // All three by default; CI splits the playwright slice per engine with RIND_BROWSERS.
 const engines = [pw.chromium, pw.firefox, pw.webkit].filter((e) =>
   (process.env["RIND_BROWSERS"] ?? "chromium,firefox,webkit").split(",").includes(e.name()),
@@ -122,7 +125,7 @@ describe("axe on the theme pages", () => {
 describe("axe on every example", () => {
   // No stylesheet has no dark scheme: the browser's own dark defaults (blue links on a dark
   // canvas) are not the component's colours.
-  const runs = index.flatMap((e) =>
+  const runs = scanned.flatMap((e) =>
     skins.flatMap((skin) =>
       (skin === "none" ? (["light"] as const) : schemes).map((scheme) => ({ e, skin, scheme })),
     ),
@@ -335,6 +338,8 @@ const TRANSIENT = new Set([
   "image-cropper:loading",
   "image-cropper:dragging",
   "image-cropper:settling",
+  // A followed link's jump: entered by clicking a link.
+  "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
   // arrowing in the focused input (the suggestions popup; no prop opens it).
   "tags-input:typing",

@@ -1,0 +1,73 @@
+/* ── Table of Contents: a hairline rail with a brand pill sliding to the section being read;
+   the current link in ink and bold, the rest in a softer ink. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table-of-contents"][data-part="root"] {
+  color: var(--s-ink);
+  font: 500 13px / 1.4 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="title"] {
+  margin: 0 0 10px;
+  color: var(--s-ink);
+  font: 700 11px / 1.2 var(--s-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table-of-contents"][data-part="list"] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-inline-start: var(--s-bw) solid color-mix(in oklab, var(--s-ink) 14%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table-of-contents"][data-part="item"] {
+  padding-inline-start: 12px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="item"][data-depth="1"] {
+  padding-inline-start: 24px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table-of-contents"][data-part="link"] {
+  display: block;
+  min-block-size: 24px;
+  padding-block: 3px;
+  box-sizing: border-box;
+  color: color-mix(in oklab, var(--s-ink) 64%, transparent);
+  text-decoration: none;
+  border-radius: var(--s-r-sm);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="link"]:is(:hover, [data-visible]) {
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="link"][data-current] {
+  color: var(--s-ink);
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="link"]:focus-visible {
+  outline: 2px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="indicator"] {
+  inset-inline-start: calc(-1 * var(--s-bw) - 1px);
+  top: 0;
+  inline-size: calc(var(--s-bw) + 2px);
+  block-size: var(--rind-toc-indicator-height);
+  translate: 0 var(--rind-toc-indicator-top);
+  background: var(--s-brand);
+  border-radius: 999px;
+  transition:
+    translate 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    block-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="table-of-contents"][data-part="indicator"][data-hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="table-of-contents"][data-part="indicator"] {
+    transition: none;
+  }
+}

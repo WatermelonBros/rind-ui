@@ -1,0 +1,108 @@
+/*
+ * Table of Contents: family `decoration`, no variant or size rules. A list on a rail; the
+ * Indicator slides along the rail to the section being read; the current link stands out by
+ * weight and the indicator, not colour alone; visible sections read in the text colour, the
+ * rest muted; nested sections indent by `data-depth`.
+ */
+@layer rind.components {
+  :where([data-scope="table-of-contents"][data-part="root"]) {
+    font-size: var(--rind-toc-font-size, var(--rind-text-sm));
+  }
+
+  :where([data-scope="table-of-contents"][data-part="title"]) {
+    margin: 0 0 var(--rind-space-2);
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  :where([data-scope="table-of-contents"][data-part="list"]) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-inline-start: var(--rind-toc-rail-width, 2px) solid
+      var(--rind-toc-rail-color, var(--rind-color-border));
+  }
+
+  :where([data-scope="table-of-contents"][data-part="item"]) {
+    padding-inline-start: var(--rind-space-3);
+  }
+  :where([data-scope="table-of-contents"][data-part="item"][data-depth="1"]) {
+    padding-inline-start: calc(var(--rind-space-3) + var(--rind-toc-indent, var(--rind-space-3)));
+  }
+  :where([data-scope="table-of-contents"][data-part="item"][data-depth="2"]) {
+    padding-inline-start: calc(
+      var(--rind-space-3) +
+      2 *
+      var(--rind-toc-indent, var(--rind-space-3))
+    );
+  }
+  :where([data-scope="table-of-contents"][data-part="item"][data-depth="3"]) {
+    padding-inline-start: calc(
+      var(--rind-space-3) +
+      3 *
+      var(--rind-toc-indent, var(--rind-space-3))
+    );
+  }
+
+  :where([data-scope="table-of-contents"][data-part="link"]) {
+    display: block;
+    padding-block: var(--rind-space-1);
+    min-block-size: 24px;
+    box-sizing: border-box;
+    color: var(--rind-toc-link-color, var(--rind-color-text-muted));
+    text-decoration: none;
+    border-radius: var(--rind-radius-sm);
+    transition: color var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  :where([data-scope="table-of-contents"][data-part="link"]:hover),
+  :where([data-scope="table-of-contents"][data-part="link"][data-visible]) {
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="table-of-contents"][data-part="link"][data-current]) {
+    color: var(--rind-toc-current-color, var(--rind-color-accent-text));
+    font-weight: var(--rind-toc-current-weight, 600);
+  }
+
+  :where([data-scope="table-of-contents"][data-part="link"]:focus-visible) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="table-of-contents"][data-part="indicator"]) {
+    inset-inline-start: calc(-1 * var(--rind-toc-rail-width, 2px));
+    top: 0;
+    inline-size: var(--rind-toc-rail-width, 2px);
+    block-size: var(--rind-toc-indicator-height);
+    translate: 0 var(--rind-toc-indicator-top);
+    background: var(--rind-toc-indicator-color, var(--rind-color-accent-solid));
+    border-radius: var(--rind-toc-rail-width, 2px);
+    transition:
+      translate var(--rind-duration-slow) var(--rind-ease-out),
+      block-size var(--rind-duration-slow) var(--rind-ease-out);
+  }
+
+  :where([data-scope="table-of-contents"][data-part="indicator"][data-hidden]) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="table-of-contents"][data-part="indicator"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="table-of-contents"][data-part="indicator"]) {
+      background: Highlight;
+    }
+    :where([data-scope="table-of-contents"][data-part="link"][data-current]) {
+      color: LinkText;
+      text-decoration: underline;
+    }
+  }
+}

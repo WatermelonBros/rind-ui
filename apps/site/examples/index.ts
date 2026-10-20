@@ -72,6 +72,7 @@ import * as stepper from "./stepper"
 import * as streamingMessage from "./streaming-message"
 import * as switchEx from "./switch"
 import * as table from "./table"
+import * as tableOfContents from "./table-of-contents"
 import * as tabs from "./tabs"
 import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
@@ -162,6 +163,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   stepper,
+  "table-of-contents": tableOfContents,
   "streaming-message": streamingMessage,
   switch: switchEx,
   table,

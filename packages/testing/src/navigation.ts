@@ -65,6 +65,17 @@ function opensElsewhere(a: HTMLAnchorElement, e: MouseEvent): boolean {
   )
 }
 
+/** `a` points at an element of the current document (only the hash differs, and it exists). */
+function samePageFragment(win: Window, a: HTMLAnchorElement): boolean {
+  const here = new URL(win.location.href)
+  const to = new URL(a.href, here)
+  here.hash = ""
+  const hash = to.hash
+  to.hash = ""
+  if (hash === "" || to.href !== here.href) return false
+  return win.document.getElementById(decodeURIComponent(hash.slice(1))) !== null
+}
+
 const intercepted = new WeakSet<Window>()
 const handled = new WeakSet<Event>()
 
@@ -87,7 +98,11 @@ export function interceptNativeNavigation(win: Window & typeof globalThis): void
     const a = anchorOf(e)
     if (!a || e.defaultPrevented || handled.has(e)) return
     handled.add(e)
-    navigationLog().push({ href: a.href, newTab: opensElsewhere(a, e), via: "browser" })
+    const newTab = opensElsewhere(a, e)
+    navigationLog().push({ href: a.href, newTab, via: "browser" })
+    // A jump to an element of this same document never unloads it: the jump is the behaviour
+    // under test (a table of contents), so it happens.
+    if (!newTab && samePageFragment(win, a)) return
     e.preventDefault()
   }
   // The window is the last node a bubbling event reaches, whoever registered first.
