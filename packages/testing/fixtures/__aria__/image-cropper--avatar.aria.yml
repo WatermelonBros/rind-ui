@@ -1,0 +1,7 @@
+- group "Avatar":
+  - slider "Crop area"
+  - text: Arrow keys move the crop area; Shift or Control move it further. Alt with arrow keys resizes it. Plus and minus zoom.
+- group "Zoom":
+  - text: Zoom
+  - slider "Zoom": "1"
+- button "Crop"

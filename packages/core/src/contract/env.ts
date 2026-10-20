@@ -22,6 +22,9 @@ export type Key =
   | "ContextMenu"
   /** The letter A, for the select-all shortcut (mod+A). */
   | "A"
+  /** Plus and minus (zoom in and out). */
+  | "+"
+  | "-"
 
 export interface KeyOptions {
   readonly shift?: boolean

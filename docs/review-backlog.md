@@ -410,3 +410,9 @@ verified at round 3 (2026-10-14).
 
 - warning: `ChangeDetails.reason` is typed as the event type while machines that set a transition `reason` report that string at runtime (File Upload's "add"/"remove", Reasoning's "auto"/"trigger"); Stepper publishes its own `StepperChangeDetails`. A typed transition reason in the runtime would fix it once for all.
 - warning: the model selects step 0 only; selecting other visited steps is the DOM tests'.
+
+## Image Cropper (add-image-cropper)
+
+- warning: the tainted-canvas test simulates the SecurityError; a real cross-origin image without CORS needs a second origin in the test server.
+- warning: the model covers keyboard nudges and zoom; pointer drags and pinch are the DOM tests'.
+- warning: zoom is clamped to [minZoom, maxZoom] except when coverage needs more (a rotation); the slider in a consumer's UI may then show a value above its max.

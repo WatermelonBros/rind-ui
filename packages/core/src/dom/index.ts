@@ -28,6 +28,8 @@ export {
   type ValidityReading,
 } from "./constraint-validity"
 export { type ContentSize, contentSize } from "./content-size"
+export { type CropDragTarget, type CropGestureHandlers, cropGestures } from "./crop-gestures"
+export { CropError, type CropErrorCode, type CropImageOptions, cropImage } from "./crop-image"
 export { domDelayGroup } from "./delay-group"
 export {
   type DismissOptions,

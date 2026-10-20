@@ -141,7 +141,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
-| Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Ark: Image Cropper |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
 | Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Zoom and pan, keyboard and pinch; Reado has ImageView |
 | Kbd |  |  |  |  |  |  |  |  |  | 0 | 2 | todo | Keyboard shortcut display, platform-aware modifiers; Reado has Kbd |

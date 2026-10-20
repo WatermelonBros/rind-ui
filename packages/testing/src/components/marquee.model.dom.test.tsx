@@ -17,6 +17,19 @@ const a11y = async () => {
 }
 
 const jsdom = navigator.userAgent.includes("jsdom")
+// CI (Firefox on Linux): the real cursor, left where the previous test put it, rests over the
+// newly rendered marquee and pauses it on hover: park it in a corner the marquee never covers.
+beforeEach(async () => {
+  if (jsdom) return
+  const { userEvent } = await import("vitest/browser")
+  const park = document.createElement("div")
+  park.style.cssText = "position:fixed;right:0;bottom:0;width:24px;height:24px;z-index:2147483647"
+  document.body.append(park)
+  // force: no actionability wait (a parking spot, not a control under test)
+  await userEvent.hover(park, { force: true })
+  park.remove()
+})
+
 beforeEach(() => {
   if (!jsdom) return
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
