@@ -1,0 +1,26 @@
+/* ── Kbd: chunky rounded caps with a brand-tinted bottom edge; separators in soft ink. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="kbd"][data-part="root"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="kbd"][data-part="key"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="kbd"][data-part="root"]:not(:has([data-part="key"])) {
+  min-inline-size: 1.7em;
+  padding: 1px 7px;
+  box-sizing: border-box;
+  border: 1.5px solid color-mix(in oklab, var(--s-ink) 34%, transparent);
+  border-block-end: 3px solid color-mix(in oklab, var(--s-brand) 55%, var(--s-ink));
+  border-radius: 7px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 700 0.82em / 1.5 var(--s-font);
+  text-align: center;
+  white-space: nowrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="kbd"][data-part="separator"] {
+  color: color-mix(in oklab, var(--s-ink) 60%, transparent);
+  font-weight: 700;
+}

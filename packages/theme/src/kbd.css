@@ -1,0 +1,44 @@
+/*
+ * Kbd: family `decoration`, no variant or size rules. Each key is a small cap (border, a
+ * thicker bottom edge, the text font); the outer kbd only lays the keys out, with no cap of
+ * its own; separators sit between caps in the muted text colour.
+ */
+@layer rind.components {
+  :where([data-scope="kbd"][data-part="root"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-kbd-gap, 0.2em);
+    font: inherit;
+    vertical-align: baseline;
+  }
+
+  :where([data-scope="kbd"][data-part="key"]),
+  :where([data-scope="kbd"][data-part="root"]:not(:has([data-part="key"]))) {
+    min-inline-size: 1.6em;
+    padding: 0.1em 0.4em;
+    box-sizing: border-box;
+    border: 1px solid var(--rind-kbd-border, var(--rind-color-border));
+    border-block-end-width: 2px;
+    border-radius: var(--rind-radius-sm);
+    background: var(--rind-kbd-bg, var(--rind-color-surface));
+    color: var(--rind-kbd-color, var(--rind-color-text));
+    /* the text font: monospace fonts draw ⌘ ⇧ ⌥ far smaller than the letters */
+    font-family: inherit;
+    font-size: 0.85em;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  :where([data-scope="kbd"][data-part="separator"]) {
+    color: var(--rind-color-text-muted);
+    font-size: 0.85em;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="kbd"][data-part="key"]) {
+      border-color: CanvasText;
+    }
+  }
+}
