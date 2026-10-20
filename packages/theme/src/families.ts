@@ -200,6 +200,7 @@ export const familyMatrix = [
       "stepper",
       "image-cropper",
       "table-of-contents",
+      "kbd",
     ],
     variants: [],
     size: "none",
