@@ -244,6 +244,7 @@ export {
   type SelectionIndicatorOptions,
   selectionIndicator,
 } from "./selection-indicator"
+export { type SortableAxis, type SortableDragOptions, sortableDrag } from "./sortable-drag"
 export {
   atBottom,
   observeTop,

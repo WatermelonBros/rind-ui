@@ -1,0 +1,27 @@
+- list "Tasks":
+  - listitem:
+    - button "Reorder Read the issue trackers"
+    - text: Read the issue trackers
+    - button "Move Read the issue trackers up" [disabled]: ↑
+    - button "Move Read the issue trackers down": ↓
+  - listitem:
+    - button "Reorder Write the spec"
+    - text: Write the spec
+    - button "Move Write the spec up": ↑
+    - button "Move Write the spec down": ↓
+  - listitem:
+    - button "Reorder Build the machine"
+    - text: Build the machine
+    - button "Move Build the machine up": ↑
+    - button "Move Build the machine down": ↓
+  - listitem:
+    - button "Reorder Test through the driver"
+    - text: Test through the driver
+    - button "Move Test through the driver up": ↑
+    - button "Move Test through the driver down": ↓
+  - listitem:
+    - button "Reorder Write the docs page"
+    - text: Write the docs page
+    - button "Move Write the docs page up": ↑
+    - button "Move Write the docs page down" [disabled]: ↓
+- text: Space to pick up, arrow keys to move, Space to drop. Alt with an arrow moves one place.
