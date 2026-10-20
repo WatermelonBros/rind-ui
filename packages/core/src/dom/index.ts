@@ -214,6 +214,15 @@ export {
   quirkActive,
   quirks,
 } from "./quirks"
+export {
+  collectHeadings,
+  measureReading,
+  type ReadingOptions,
+  type ReadingPosition,
+  type ReadingWatch,
+  readingPosition,
+  type TocHeading,
+} from "./reading-position"
 export { registerReset } from "./resets"
 export { CONTROL as ROW_CONTROL, controlsOf, warnForeignFocusables } from "./row-controls"
 export { lockScroll, lockScrollForModals } from "./scroll-lock"

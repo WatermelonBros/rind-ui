@@ -20,16 +20,20 @@
   margin: 0;
   padding: 0 0 0 14px;
 }
-/* the marker slides along the rail to the section being read */
+/* the marker slides along the rail to the section being read (the Indicator's variables) */
 .marker {
-  position: absolute;
   left: -2px;
   top: 0;
   width: 2px;
+  height: var(--rind-toc-indicator-height);
+  translate: 0 var(--rind-toc-indicator-top);
   background: var(--ink);
   transition:
     translate 0.45s var(--spring),
     height 0.45s var(--spring);
+}
+.marker[data-hidden] {
+  display: none;
 }
 :global([data-phase="juicy"]) .marker {
   background: var(--acc);

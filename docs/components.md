@@ -50,7 +50,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Breadcrumbs |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done | Reado has Breadcrumb |
 | Link |  |  | ● |  |  |  |  |  | ● | 2 | 2 | done |  |
 | Stepper | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done | Zag: steps · Reka: Stepper |
-| Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Table of Contents | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Zag: toc |
 | Command Palette |  |  |  |  |  |  |  | ● |  | 1 | 2 | todo | Bits: Command · Dialog + filtered list, groups, shortcuts; Reado has Palette |
 
 ## Disclosure (2)

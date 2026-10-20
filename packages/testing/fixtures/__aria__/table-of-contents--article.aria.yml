@@ -1,0 +1,39 @@
+- region "Article":
+  - heading "Overview" [level=2]
+  - paragraph: A headless component gives you behaviour, accessibility and state; you bring the styles through data attributes.
+  - heading "Installation" [level=2]
+  - paragraph: "Add the React package and, if you want a starting point, the theme. Both are tree-shaken: you pay for what you import."
+  - heading "With npm" [level=3]
+  - paragraph: Run the install command in your project. The packages have no runtime dependency beyond React.
+  - heading "The theme" [level=3]
+  - paragraph: Import the stylesheet once. Every rule sits in a cascade layer, so your own styles win without specificity fights.
+  - heading "Usage" [level=2]
+  - paragraph: Compose the parts you need. Each part forwards the props of the element it renders, and can render another element instead.
+  - heading "Testing" [level=2]
+  - paragraph: "Each component ships a driver: the same actions your users take, by pointer, keyboard or screen reader."
+  - heading "FAQ" [level=2]
+  - paragraph: Short sections at the end still become current when you reach the bottom.
+- navigation "Contents":
+  - heading "Contents" [level=2]
+  - list:
+    - listitem:
+      - link "Overview":
+        - /url: "#toc-overview"
+    - listitem:
+      - link "Installation":
+        - /url: "#toc-install"
+    - listitem:
+      - link "With npm":
+        - /url: "#toc-npm"
+    - listitem:
+      - link "The theme":
+        - /url: "#toc-theme"
+    - listitem:
+      - link "Usage":
+        - /url: "#toc-usage"
+    - listitem:
+      - link "Testing":
+        - /url: "#toc-testing"
+    - listitem:
+      - link "FAQ":
+        - /url: "#toc-faq"
