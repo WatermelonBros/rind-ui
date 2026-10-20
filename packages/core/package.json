@@ -29,398 +29,398 @@
   "exports": {
     ".": {
       "@rind-ui/source": "./src/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/index.mjs"
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     },
     "./accordion": {
       "@rind-ui/source": "./src/components/accordion/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/accordion/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/accordion/index.mjs"
+      "types": "./dist/components/accordion/index.d.mts",
+      "default": "./dist/components/accordion/index.mjs"
     },
     "./alert": {
       "@rind-ui/source": "./src/components/alert/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/alert/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/alert/index.mjs"
+      "types": "./dist/components/alert/index.d.mts",
+      "default": "./dist/components/alert/index.mjs"
     },
     "./avatar": {
       "@rind-ui/source": "./src/components/avatar/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/avatar/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/avatar/index.mjs"
+      "types": "./dist/components/avatar/index.d.mts",
+      "default": "./dist/components/avatar/index.mjs"
     },
     "./badge": {
       "@rind-ui/source": "./src/components/badge/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/badge/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/badge/index.mjs"
+      "types": "./dist/components/badge/index.d.mts",
+      "default": "./dist/components/badge/index.mjs"
     },
     "./breadcrumbs": {
       "@rind-ui/source": "./src/components/breadcrumbs/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/breadcrumbs/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/breadcrumbs/index.mjs"
+      "types": "./dist/components/breadcrumbs/index.d.mts",
+      "default": "./dist/components/breadcrumbs/index.mjs"
     },
     "./button": {
       "@rind-ui/source": "./src/components/button/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/button/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/button/index.mjs"
+      "types": "./dist/components/button/index.d.mts",
+      "default": "./dist/components/button/index.mjs"
     },
     "./calendar": {
       "@rind-ui/source": "./src/components/calendar/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/calendar/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/calendar/index.mjs"
+      "types": "./dist/components/calendar/index.d.mts",
+      "default": "./dist/components/calendar/index.mjs"
     },
     "./checkbox": {
       "@rind-ui/source": "./src/components/checkbox/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox/index.mjs"
+      "types": "./dist/components/checkbox/index.d.mts",
+      "default": "./dist/components/checkbox/index.mjs"
     },
     "./checkbox-group": {
       "@rind-ui/source": "./src/components/checkbox-group/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox-group/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox-group/index.mjs"
+      "types": "./dist/components/checkbox-group/index.d.mts",
+      "default": "./dist/components/checkbox-group/index.mjs"
     },
     "./clipboard": {
       "@rind-ui/source": "./src/components/clipboard/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/clipboard/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/clipboard/index.mjs"
+      "types": "./dist/components/clipboard/index.d.mts",
+      "default": "./dist/components/clipboard/index.mjs"
     },
     "./code-block": {
       "@rind-ui/source": "./src/components/code-block/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/code-block/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/code-block/index.mjs"
+      "types": "./dist/components/code-block/index.d.mts",
+      "default": "./dist/components/code-block/index.mjs"
     },
     "./collapsible": {
       "@rind-ui/source": "./src/components/collapsible/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/collapsible/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/collapsible/index.mjs"
+      "types": "./dist/components/collapsible/index.d.mts",
+      "default": "./dist/components/collapsible/index.mjs"
     },
     "./color-picker": {
       "@rind-ui/source": "./src/components/color-picker/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/color-picker/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/color-picker/index.mjs"
+      "types": "./dist/components/color-picker/index.d.mts",
+      "default": "./dist/components/color-picker/index.mjs"
     },
     "./combobox": {
       "@rind-ui/source": "./src/components/combobox/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/combobox/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/combobox/index.mjs"
+      "types": "./dist/components/combobox/index.d.mts",
+      "default": "./dist/components/combobox/index.mjs"
     },
     "./context-menu": {
       "@rind-ui/source": "./src/components/context-menu/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/context-menu/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/context-menu/index.mjs"
+      "types": "./dist/components/context-menu/index.d.mts",
+      "default": "./dist/components/context-menu/index.mjs"
     },
     "./date-field": {
       "@rind-ui/source": "./src/components/date-field/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/date-field/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/date-field/index.mjs"
+      "types": "./dist/components/date-field/index.d.mts",
+      "default": "./dist/components/date-field/index.mjs"
     },
     "./date-segments": {
       "@rind-ui/source": "./src/components/date-segments/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/date-segments/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/date-segments/index.mjs"
+      "types": "./dist/components/date-segments/index.d.mts",
+      "default": "./dist/components/date-segments/index.mjs"
     },
     "./dialog": {
       "@rind-ui/source": "./src/components/dialog/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/dialog/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/dialog/index.mjs"
+      "types": "./dist/components/dialog/index.d.mts",
+      "default": "./dist/components/dialog/index.mjs"
     },
     "./drawer": {
       "@rind-ui/source": "./src/components/drawer/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/drawer/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/drawer/index.mjs"
+      "types": "./dist/components/drawer/index.d.mts",
+      "default": "./dist/components/drawer/index.mjs"
     },
     "./field": {
       "@rind-ui/source": "./src/components/field/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/field/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/field/index.mjs"
+      "types": "./dist/components/field/index.d.mts",
+      "default": "./dist/components/field/index.mjs"
     },
     "./fieldset": {
       "@rind-ui/source": "./src/components/fieldset/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/fieldset/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/fieldset/index.mjs"
+      "types": "./dist/components/fieldset/index.d.mts",
+      "default": "./dist/components/fieldset/index.mjs"
     },
     "./file-upload": {
       "@rind-ui/source": "./src/components/file-upload/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/file-upload/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/file-upload/index.mjs"
+      "types": "./dist/components/file-upload/index.d.mts",
+      "default": "./dist/components/file-upload/index.mjs"
     },
     "./form": {
       "@rind-ui/source": "./src/components/form/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/form/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/form/index.mjs"
+      "types": "./dist/components/form/index.d.mts",
+      "default": "./dist/components/form/index.mjs"
     },
     "./grid-list": {
       "@rind-ui/source": "./src/components/grid-list/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/grid-list/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/grid-list/index.mjs"
+      "types": "./dist/components/grid-list/index.d.mts",
+      "default": "./dist/components/grid-list/index.mjs"
     },
     "./heading": {
       "@rind-ui/source": "./src/components/heading/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/heading/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/heading/index.mjs"
+      "types": "./dist/components/heading/index.d.mts",
+      "default": "./dist/components/heading/index.mjs"
     },
     "./hover-card": {
       "@rind-ui/source": "./src/components/hover-card/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/hover-card/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/hover-card/index.mjs"
+      "types": "./dist/components/hover-card/index.d.mts",
+      "default": "./dist/components/hover-card/index.mjs"
     },
     "./image": {
       "@rind-ui/source": "./src/components/image/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image/index.mjs"
+      "types": "./dist/components/image/index.d.mts",
+      "default": "./dist/components/image/index.mjs"
     },
     "./image-cropper": {
       "@rind-ui/source": "./src/components/image-cropper/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-cropper/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-cropper/index.mjs"
+      "types": "./dist/components/image-cropper/index.d.mts",
+      "default": "./dist/components/image-cropper/index.mjs"
     },
     "./image-status": {
       "@rind-ui/source": "./src/components/image-status/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-status/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-status/index.mjs"
+      "types": "./dist/components/image-status/index.d.mts",
+      "default": "./dist/components/image-status/index.mjs"
     },
     "./image-viewer": {
       "@rind-ui/source": "./src/components/image-viewer/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-viewer/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-viewer/index.mjs"
+      "types": "./dist/components/image-viewer/index.d.mts",
+      "default": "./dist/components/image-viewer/index.mjs"
     },
     "./input-chips": {
       "@rind-ui/source": "./src/components/input-chips/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/input-chips/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/input-chips/index.mjs"
+      "types": "./dist/components/input-chips/index.d.mts",
+      "default": "./dist/components/input-chips/index.mjs"
     },
     "./kbd": {
       "@rind-ui/source": "./src/components/kbd/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/kbd/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/kbd/index.mjs"
+      "types": "./dist/components/kbd/index.d.mts",
+      "default": "./dist/components/kbd/index.mjs"
     },
     "./label": {
       "@rind-ui/source": "./src/components/label/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/label/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/label/index.mjs"
+      "types": "./dist/components/label/index.d.mts",
+      "default": "./dist/components/label/index.mjs"
     },
     "./link": {
       "@rind-ui/source": "./src/components/link/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/link/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/link/index.mjs"
+      "types": "./dist/components/link/index.d.mts",
+      "default": "./dist/components/link/index.mjs"
     },
     "./listbox": {
       "@rind-ui/source": "./src/components/listbox/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/listbox/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/listbox/index.mjs"
+      "types": "./dist/components/listbox/index.d.mts",
+      "default": "./dist/components/listbox/index.mjs"
     },
     "./marquee": {
       "@rind-ui/source": "./src/components/marquee/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/marquee/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/marquee/index.mjs"
+      "types": "./dist/components/marquee/index.d.mts",
+      "default": "./dist/components/marquee/index.mjs"
     },
     "./menu": {
       "@rind-ui/source": "./src/components/menu/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/menu/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/menu/index.mjs"
+      "types": "./dist/components/menu/index.d.mts",
+      "default": "./dist/components/menu/index.mjs"
     },
     "./menubar": {
       "@rind-ui/source": "./src/components/menubar/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/menubar/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/menubar/index.mjs"
+      "types": "./dist/components/menubar/index.d.mts",
+      "default": "./dist/components/menubar/index.mjs"
     },
     "./message-thread": {
       "@rind-ui/source": "./src/components/message-thread/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/message-thread/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/message-thread/index.mjs"
+      "types": "./dist/components/message-thread/index.d.mts",
+      "default": "./dist/components/message-thread/index.mjs"
     },
     "./meter": {
       "@rind-ui/source": "./src/components/meter/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/meter/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/meter/index.mjs"
+      "types": "./dist/components/meter/index.d.mts",
+      "default": "./dist/components/meter/index.mjs"
     },
     "./navigation-menu": {
       "@rind-ui/source": "./src/components/navigation-menu/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/navigation-menu/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/navigation-menu/index.mjs"
+      "types": "./dist/components/navigation-menu/index.d.mts",
+      "default": "./dist/components/navigation-menu/index.mjs"
     },
     "./number-input": {
       "@rind-ui/source": "./src/components/number-input/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/number-input/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/number-input/index.mjs"
+      "types": "./dist/components/number-input/index.d.mts",
+      "default": "./dist/components/number-input/index.mjs"
     },
     "./pagination": {
       "@rind-ui/source": "./src/components/pagination/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/pagination/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/pagination/index.mjs"
+      "types": "./dist/components/pagination/index.d.mts",
+      "default": "./dist/components/pagination/index.mjs"
     },
     "./pin-input": {
       "@rind-ui/source": "./src/components/pin-input/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/pin-input/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/pin-input/index.mjs"
+      "types": "./dist/components/pin-input/index.d.mts",
+      "default": "./dist/components/pin-input/index.mjs"
     },
     "./popover": {
       "@rind-ui/source": "./src/components/popover/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/popover/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/popover/index.mjs"
+      "types": "./dist/components/popover/index.d.mts",
+      "default": "./dist/components/popover/index.mjs"
     },
     "./progress": {
       "@rind-ui/source": "./src/components/progress/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/progress/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/progress/index.mjs"
+      "types": "./dist/components/progress/index.d.mts",
+      "default": "./dist/components/progress/index.mjs"
     },
     "./prompt-input": {
       "@rind-ui/source": "./src/components/prompt-input/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/prompt-input/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/prompt-input/index.mjs"
+      "types": "./dist/components/prompt-input/index.d.mts",
+      "default": "./dist/components/prompt-input/index.mjs"
     },
     "./qr-code": {
       "@rind-ui/source": "./src/components/qr-code/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/qr-code/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/qr-code/index.mjs"
+      "types": "./dist/components/qr-code/index.d.mts",
+      "default": "./dist/components/qr-code/index.mjs"
     },
     "./radio-group": {
       "@rind-ui/source": "./src/components/radio-group/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/radio-group/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/radio-group/index.mjs"
+      "types": "./dist/components/radio-group/index.d.mts",
+      "default": "./dist/components/radio-group/index.mjs"
     },
     "./rating": {
       "@rind-ui/source": "./src/components/rating/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/rating/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/rating/index.mjs"
+      "types": "./dist/components/rating/index.d.mts",
+      "default": "./dist/components/rating/index.mjs"
     },
     "./reasoning": {
       "@rind-ui/source": "./src/components/reasoning/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/reasoning/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/reasoning/index.mjs"
+      "types": "./dist/components/reasoning/index.d.mts",
+      "default": "./dist/components/reasoning/index.mjs"
     },
     "./scroll-area": {
       "@rind-ui/source": "./src/components/scroll-area/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/scroll-area/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/scroll-area/index.mjs"
+      "types": "./dist/components/scroll-area/index.d.mts",
+      "default": "./dist/components/scroll-area/index.mjs"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/components/segmented-control/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/segmented-control/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/segmented-control/index.mjs"
+      "types": "./dist/components/segmented-control/index.d.mts",
+      "default": "./dist/components/segmented-control/index.mjs"
     },
     "./select": {
       "@rind-ui/source": "./src/components/select/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/select/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/select/index.mjs"
+      "types": "./dist/components/select/index.d.mts",
+      "default": "./dist/components/select/index.mjs"
     },
     "./separator": {
       "@rind-ui/source": "./src/components/separator/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/separator/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/separator/index.mjs"
+      "types": "./dist/components/separator/index.d.mts",
+      "default": "./dist/components/separator/index.mjs"
     },
     "./skeleton": {
       "@rind-ui/source": "./src/components/skeleton/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/skeleton/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/skeleton/index.mjs"
+      "types": "./dist/components/skeleton/index.d.mts",
+      "default": "./dist/components/skeleton/index.mjs"
     },
     "./slider": {
       "@rind-ui/source": "./src/components/slider/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/slider/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/slider/index.mjs"
+      "types": "./dist/components/slider/index.d.mts",
+      "default": "./dist/components/slider/index.mjs"
     },
     "./sortable": {
       "@rind-ui/source": "./src/components/sortable/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/sortable/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/sortable/index.mjs"
+      "types": "./dist/components/sortable/index.d.mts",
+      "default": "./dist/components/sortable/index.mjs"
     },
     "./splitter": {
       "@rind-ui/source": "./src/components/splitter/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/splitter/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/splitter/index.mjs"
+      "types": "./dist/components/splitter/index.d.mts",
+      "default": "./dist/components/splitter/index.mjs"
     },
     "./stepper": {
       "@rind-ui/source": "./src/components/stepper/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/stepper/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/stepper/index.mjs"
+      "types": "./dist/components/stepper/index.d.mts",
+      "default": "./dist/components/stepper/index.mjs"
     },
     "./streaming-message": {
       "@rind-ui/source": "./src/components/streaming-message/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/streaming-message/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/streaming-message/index.mjs"
+      "types": "./dist/components/streaming-message/index.d.mts",
+      "default": "./dist/components/streaming-message/index.mjs"
     },
     "./switch": {
       "@rind-ui/source": "./src/components/switch/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/switch/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/switch/index.mjs"
+      "types": "./dist/components/switch/index.d.mts",
+      "default": "./dist/components/switch/index.mjs"
     },
     "./table": {
       "@rind-ui/source": "./src/components/table/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/table/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/table/index.mjs"
+      "types": "./dist/components/table/index.d.mts",
+      "default": "./dist/components/table/index.mjs"
     },
     "./table-of-contents": {
       "@rind-ui/source": "./src/components/table-of-contents/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/table-of-contents/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/table-of-contents/index.mjs"
+      "types": "./dist/components/table-of-contents/index.d.mts",
+      "default": "./dist/components/table-of-contents/index.mjs"
     },
     "./tabs": {
       "@rind-ui/source": "./src/components/tabs/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tabs/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tabs/index.mjs"
+      "types": "./dist/components/tabs/index.d.mts",
+      "default": "./dist/components/tabs/index.mjs"
     },
     "./tag-group": {
       "@rind-ui/source": "./src/components/tag-group/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tag-group/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tag-group/index.mjs"
+      "types": "./dist/components/tag-group/index.d.mts",
+      "default": "./dist/components/tag-group/index.mjs"
     },
     "./tags-input": {
       "@rind-ui/source": "./src/components/tags-input/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tags-input/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tags-input/index.mjs"
+      "types": "./dist/components/tags-input/index.d.mts",
+      "default": "./dist/components/tags-input/index.mjs"
     },
     "./text-field": {
       "@rind-ui/source": "./src/components/text-field/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/text-field/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/text-field/index.mjs"
+      "types": "./dist/components/text-field/index.d.mts",
+      "default": "./dist/components/text-field/index.mjs"
     },
     "./timeline": {
       "@rind-ui/source": "./src/components/timeline/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/timeline/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/timeline/index.mjs"
+      "types": "./dist/components/timeline/index.d.mts",
+      "default": "./dist/components/timeline/index.mjs"
     },
     "./toast": {
       "@rind-ui/source": "./src/components/toast/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toast/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toast/index.mjs"
+      "types": "./dist/components/toast/index.d.mts",
+      "default": "./dist/components/toast/index.mjs"
     },
     "./toggle": {
       "@rind-ui/source": "./src/components/toggle/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle/index.mjs"
+      "types": "./dist/components/toggle/index.d.mts",
+      "default": "./dist/components/toggle/index.mjs"
     },
     "./toggle-group": {
       "@rind-ui/source": "./src/components/toggle-group/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle-group/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle-group/index.mjs"
+      "types": "./dist/components/toggle-group/index.d.mts",
+      "default": "./dist/components/toggle-group/index.mjs"
     },
     "./toolbar": {
       "@rind-ui/source": "./src/components/toolbar/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toolbar/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toolbar/index.mjs"
+      "types": "./dist/components/toolbar/index.d.mts",
+      "default": "./dist/components/toolbar/index.mjs"
     },
     "./tooltip": {
       "@rind-ui/source": "./src/components/tooltip/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tooltip/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tooltip/index.mjs"
+      "types": "./dist/components/tooltip/index.d.mts",
+      "default": "./dist/components/tooltip/index.mjs"
     },
     "./tour": {
       "@rind-ui/source": "./src/components/tour/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tour/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tour/index.mjs"
+      "types": "./dist/components/tour/index.d.mts",
+      "default": "./dist/components/tour/index.mjs"
     },
     "./tree-view": {
       "@rind-ui/source": "./src/components/tree-view/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tree-view/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tree-view/index.mjs"
+      "types": "./dist/components/tree-view/index.d.mts",
+      "default": "./dist/components/tree-view/index.mjs"
     },
     "./internal": {
       "@rind-ui/source": "./src/internal.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/internal.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/internal.mjs"
+      "types": "./dist/internal.d.mts",
+      "default": "./dist/internal.mjs"
     },
     "./qr": {
       "@rind-ui/source": "./src/qr/index.ts",
-      "types": "./node_modules/.cache/rind-minified-Cy60T6/qr/index.d.mts",
-      "default": "./node_modules/.cache/rind-minified-Cy60T6/qr/index.mjs"
+      "types": "./dist/qr/index.d.mts",
+      "default": "./dist/qr/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -443,320 +443,320 @@
     "access": "public",
     "exports": {
       ".": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/index.mjs"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "./accordion": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/accordion/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/accordion/index.mjs"
+        "types": "./dist/components/accordion/index.d.mts",
+        "default": "./dist/components/accordion/index.mjs"
       },
       "./alert": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/alert/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/alert/index.mjs"
+        "types": "./dist/components/alert/index.d.mts",
+        "default": "./dist/components/alert/index.mjs"
       },
       "./avatar": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/avatar/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/avatar/index.mjs"
+        "types": "./dist/components/avatar/index.d.mts",
+        "default": "./dist/components/avatar/index.mjs"
       },
       "./badge": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/badge/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/badge/index.mjs"
+        "types": "./dist/components/badge/index.d.mts",
+        "default": "./dist/components/badge/index.mjs"
       },
       "./breadcrumbs": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/breadcrumbs/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/breadcrumbs/index.mjs"
+        "types": "./dist/components/breadcrumbs/index.d.mts",
+        "default": "./dist/components/breadcrumbs/index.mjs"
       },
       "./button": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/button/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/button/index.mjs"
+        "types": "./dist/components/button/index.d.mts",
+        "default": "./dist/components/button/index.mjs"
       },
       "./calendar": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/calendar/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/calendar/index.mjs"
+        "types": "./dist/components/calendar/index.d.mts",
+        "default": "./dist/components/calendar/index.mjs"
       },
       "./checkbox": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox/index.mjs"
+        "types": "./dist/components/checkbox/index.d.mts",
+        "default": "./dist/components/checkbox/index.mjs"
       },
       "./checkbox-group": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox-group/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/checkbox-group/index.mjs"
+        "types": "./dist/components/checkbox-group/index.d.mts",
+        "default": "./dist/components/checkbox-group/index.mjs"
       },
       "./clipboard": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/clipboard/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/clipboard/index.mjs"
+        "types": "./dist/components/clipboard/index.d.mts",
+        "default": "./dist/components/clipboard/index.mjs"
       },
       "./code-block": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/code-block/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/code-block/index.mjs"
+        "types": "./dist/components/code-block/index.d.mts",
+        "default": "./dist/components/code-block/index.mjs"
       },
       "./collapsible": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/collapsible/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/collapsible/index.mjs"
+        "types": "./dist/components/collapsible/index.d.mts",
+        "default": "./dist/components/collapsible/index.mjs"
       },
       "./color-picker": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/color-picker/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/color-picker/index.mjs"
+        "types": "./dist/components/color-picker/index.d.mts",
+        "default": "./dist/components/color-picker/index.mjs"
       },
       "./combobox": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/combobox/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/combobox/index.mjs"
+        "types": "./dist/components/combobox/index.d.mts",
+        "default": "./dist/components/combobox/index.mjs"
       },
       "./context-menu": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/context-menu/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/context-menu/index.mjs"
+        "types": "./dist/components/context-menu/index.d.mts",
+        "default": "./dist/components/context-menu/index.mjs"
       },
       "./date-field": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/date-field/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/date-field/index.mjs"
+        "types": "./dist/components/date-field/index.d.mts",
+        "default": "./dist/components/date-field/index.mjs"
       },
       "./date-segments": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/date-segments/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/date-segments/index.mjs"
+        "types": "./dist/components/date-segments/index.d.mts",
+        "default": "./dist/components/date-segments/index.mjs"
       },
       "./dialog": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/dialog/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/dialog/index.mjs"
+        "types": "./dist/components/dialog/index.d.mts",
+        "default": "./dist/components/dialog/index.mjs"
       },
       "./drawer": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/drawer/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/drawer/index.mjs"
+        "types": "./dist/components/drawer/index.d.mts",
+        "default": "./dist/components/drawer/index.mjs"
       },
       "./field": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/field/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/field/index.mjs"
+        "types": "./dist/components/field/index.d.mts",
+        "default": "./dist/components/field/index.mjs"
       },
       "./fieldset": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/fieldset/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/fieldset/index.mjs"
+        "types": "./dist/components/fieldset/index.d.mts",
+        "default": "./dist/components/fieldset/index.mjs"
       },
       "./file-upload": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/file-upload/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/file-upload/index.mjs"
+        "types": "./dist/components/file-upload/index.d.mts",
+        "default": "./dist/components/file-upload/index.mjs"
       },
       "./form": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/form/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/form/index.mjs"
+        "types": "./dist/components/form/index.d.mts",
+        "default": "./dist/components/form/index.mjs"
       },
       "./grid-list": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/grid-list/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/grid-list/index.mjs"
+        "types": "./dist/components/grid-list/index.d.mts",
+        "default": "./dist/components/grid-list/index.mjs"
       },
       "./heading": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/heading/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/heading/index.mjs"
+        "types": "./dist/components/heading/index.d.mts",
+        "default": "./dist/components/heading/index.mjs"
       },
       "./hover-card": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/hover-card/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/hover-card/index.mjs"
+        "types": "./dist/components/hover-card/index.d.mts",
+        "default": "./dist/components/hover-card/index.mjs"
       },
       "./image": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image/index.mjs"
+        "types": "./dist/components/image/index.d.mts",
+        "default": "./dist/components/image/index.mjs"
       },
       "./image-cropper": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-cropper/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-cropper/index.mjs"
+        "types": "./dist/components/image-cropper/index.d.mts",
+        "default": "./dist/components/image-cropper/index.mjs"
       },
       "./image-status": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-status/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-status/index.mjs"
+        "types": "./dist/components/image-status/index.d.mts",
+        "default": "./dist/components/image-status/index.mjs"
       },
       "./image-viewer": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/image-viewer/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/image-viewer/index.mjs"
+        "types": "./dist/components/image-viewer/index.d.mts",
+        "default": "./dist/components/image-viewer/index.mjs"
       },
       "./input-chips": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/input-chips/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/input-chips/index.mjs"
+        "types": "./dist/components/input-chips/index.d.mts",
+        "default": "./dist/components/input-chips/index.mjs"
       },
       "./kbd": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/kbd/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/kbd/index.mjs"
+        "types": "./dist/components/kbd/index.d.mts",
+        "default": "./dist/components/kbd/index.mjs"
       },
       "./label": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/label/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/label/index.mjs"
+        "types": "./dist/components/label/index.d.mts",
+        "default": "./dist/components/label/index.mjs"
       },
       "./link": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/link/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/link/index.mjs"
+        "types": "./dist/components/link/index.d.mts",
+        "default": "./dist/components/link/index.mjs"
       },
       "./listbox": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/listbox/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/listbox/index.mjs"
+        "types": "./dist/components/listbox/index.d.mts",
+        "default": "./dist/components/listbox/index.mjs"
       },
       "./marquee": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/marquee/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/marquee/index.mjs"
+        "types": "./dist/components/marquee/index.d.mts",
+        "default": "./dist/components/marquee/index.mjs"
       },
       "./menu": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/menu/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/menu/index.mjs"
+        "types": "./dist/components/menu/index.d.mts",
+        "default": "./dist/components/menu/index.mjs"
       },
       "./menubar": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/menubar/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/menubar/index.mjs"
+        "types": "./dist/components/menubar/index.d.mts",
+        "default": "./dist/components/menubar/index.mjs"
       },
       "./message-thread": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/message-thread/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/message-thread/index.mjs"
+        "types": "./dist/components/message-thread/index.d.mts",
+        "default": "./dist/components/message-thread/index.mjs"
       },
       "./meter": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/meter/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/meter/index.mjs"
+        "types": "./dist/components/meter/index.d.mts",
+        "default": "./dist/components/meter/index.mjs"
       },
       "./navigation-menu": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/navigation-menu/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/navigation-menu/index.mjs"
+        "types": "./dist/components/navigation-menu/index.d.mts",
+        "default": "./dist/components/navigation-menu/index.mjs"
       },
       "./number-input": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/number-input/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/number-input/index.mjs"
+        "types": "./dist/components/number-input/index.d.mts",
+        "default": "./dist/components/number-input/index.mjs"
       },
       "./pagination": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/pagination/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/pagination/index.mjs"
+        "types": "./dist/components/pagination/index.d.mts",
+        "default": "./dist/components/pagination/index.mjs"
       },
       "./pin-input": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/pin-input/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/pin-input/index.mjs"
+        "types": "./dist/components/pin-input/index.d.mts",
+        "default": "./dist/components/pin-input/index.mjs"
       },
       "./popover": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/popover/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/popover/index.mjs"
+        "types": "./dist/components/popover/index.d.mts",
+        "default": "./dist/components/popover/index.mjs"
       },
       "./progress": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/progress/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/progress/index.mjs"
+        "types": "./dist/components/progress/index.d.mts",
+        "default": "./dist/components/progress/index.mjs"
       },
       "./prompt-input": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/prompt-input/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/prompt-input/index.mjs"
+        "types": "./dist/components/prompt-input/index.d.mts",
+        "default": "./dist/components/prompt-input/index.mjs"
       },
       "./qr-code": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/qr-code/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/qr-code/index.mjs"
+        "types": "./dist/components/qr-code/index.d.mts",
+        "default": "./dist/components/qr-code/index.mjs"
       },
       "./radio-group": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/radio-group/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/radio-group/index.mjs"
+        "types": "./dist/components/radio-group/index.d.mts",
+        "default": "./dist/components/radio-group/index.mjs"
       },
       "./rating": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/rating/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/rating/index.mjs"
+        "types": "./dist/components/rating/index.d.mts",
+        "default": "./dist/components/rating/index.mjs"
       },
       "./reasoning": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/reasoning/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/reasoning/index.mjs"
+        "types": "./dist/components/reasoning/index.d.mts",
+        "default": "./dist/components/reasoning/index.mjs"
       },
       "./scroll-area": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/scroll-area/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/scroll-area/index.mjs"
+        "types": "./dist/components/scroll-area/index.d.mts",
+        "default": "./dist/components/scroll-area/index.mjs"
       },
       "./segmented-control": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/segmented-control/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/segmented-control/index.mjs"
+        "types": "./dist/components/segmented-control/index.d.mts",
+        "default": "./dist/components/segmented-control/index.mjs"
       },
       "./select": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/select/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/select/index.mjs"
+        "types": "./dist/components/select/index.d.mts",
+        "default": "./dist/components/select/index.mjs"
       },
       "./separator": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/separator/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/separator/index.mjs"
+        "types": "./dist/components/separator/index.d.mts",
+        "default": "./dist/components/separator/index.mjs"
       },
       "./skeleton": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/skeleton/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/skeleton/index.mjs"
+        "types": "./dist/components/skeleton/index.d.mts",
+        "default": "./dist/components/skeleton/index.mjs"
       },
       "./slider": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/slider/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/slider/index.mjs"
+        "types": "./dist/components/slider/index.d.mts",
+        "default": "./dist/components/slider/index.mjs"
       },
       "./sortable": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/sortable/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/sortable/index.mjs"
+        "types": "./dist/components/sortable/index.d.mts",
+        "default": "./dist/components/sortable/index.mjs"
       },
       "./splitter": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/splitter/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/splitter/index.mjs"
+        "types": "./dist/components/splitter/index.d.mts",
+        "default": "./dist/components/splitter/index.mjs"
       },
       "./stepper": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/stepper/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/stepper/index.mjs"
+        "types": "./dist/components/stepper/index.d.mts",
+        "default": "./dist/components/stepper/index.mjs"
       },
       "./streaming-message": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/streaming-message/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/streaming-message/index.mjs"
+        "types": "./dist/components/streaming-message/index.d.mts",
+        "default": "./dist/components/streaming-message/index.mjs"
       },
       "./switch": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/switch/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/switch/index.mjs"
+        "types": "./dist/components/switch/index.d.mts",
+        "default": "./dist/components/switch/index.mjs"
       },
       "./table": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/table/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/table/index.mjs"
+        "types": "./dist/components/table/index.d.mts",
+        "default": "./dist/components/table/index.mjs"
       },
       "./table-of-contents": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/table-of-contents/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/table-of-contents/index.mjs"
+        "types": "./dist/components/table-of-contents/index.d.mts",
+        "default": "./dist/components/table-of-contents/index.mjs"
       },
       "./tabs": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tabs/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tabs/index.mjs"
+        "types": "./dist/components/tabs/index.d.mts",
+        "default": "./dist/components/tabs/index.mjs"
       },
       "./tag-group": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tag-group/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tag-group/index.mjs"
+        "types": "./dist/components/tag-group/index.d.mts",
+        "default": "./dist/components/tag-group/index.mjs"
       },
       "./tags-input": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tags-input/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tags-input/index.mjs"
+        "types": "./dist/components/tags-input/index.d.mts",
+        "default": "./dist/components/tags-input/index.mjs"
       },
       "./text-field": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/text-field/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/text-field/index.mjs"
+        "types": "./dist/components/text-field/index.d.mts",
+        "default": "./dist/components/text-field/index.mjs"
       },
       "./timeline": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/timeline/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/timeline/index.mjs"
+        "types": "./dist/components/timeline/index.d.mts",
+        "default": "./dist/components/timeline/index.mjs"
       },
       "./toast": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toast/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toast/index.mjs"
+        "types": "./dist/components/toast/index.d.mts",
+        "default": "./dist/components/toast/index.mjs"
       },
       "./toggle": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle/index.mjs"
+        "types": "./dist/components/toggle/index.d.mts",
+        "default": "./dist/components/toggle/index.mjs"
       },
       "./toggle-group": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle-group/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toggle-group/index.mjs"
+        "types": "./dist/components/toggle-group/index.d.mts",
+        "default": "./dist/components/toggle-group/index.mjs"
       },
       "./toolbar": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/toolbar/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/toolbar/index.mjs"
+        "types": "./dist/components/toolbar/index.d.mts",
+        "default": "./dist/components/toolbar/index.mjs"
       },
       "./tooltip": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tooltip/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tooltip/index.mjs"
+        "types": "./dist/components/tooltip/index.d.mts",
+        "default": "./dist/components/tooltip/index.mjs"
       },
       "./tour": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tour/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tour/index.mjs"
+        "types": "./dist/components/tour/index.d.mts",
+        "default": "./dist/components/tour/index.mjs"
       },
       "./tree-view": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/components/tree-view/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/components/tree-view/index.mjs"
+        "types": "./dist/components/tree-view/index.d.mts",
+        "default": "./dist/components/tree-view/index.mjs"
       },
       "./internal": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/internal.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/internal.mjs"
+        "types": "./dist/internal.d.mts",
+        "default": "./dist/internal.mjs"
       },
       "./qr": {
-        "types": "./node_modules/.cache/rind-minified-Cy60T6/qr/index.d.mts",
-        "default": "./node_modules/.cache/rind-minified-Cy60T6/qr/index.mjs"
+        "types": "./dist/qr/index.d.mts",
+        "default": "./dist/qr/index.mjs"
       },
       "./package.json": "./package.json"
     }
