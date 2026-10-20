@@ -1,3 +1,5 @@
+"use client"
+
 // Date Field range mode (date-field spec "Range Mode"): wiring only. The coordinator machine
 // derives the pair's value and validity; each end is an embedded Date Field; connect owns the
 // group, the ends, the separator and the two hidden inputs.

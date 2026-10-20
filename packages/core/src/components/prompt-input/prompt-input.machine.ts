@@ -357,7 +357,7 @@ const startFromStatus = [
   { guard: "statusStreaming", target: "streaming" },
 ] as const
 
-export const promptInputMachine = setup({
+export const promptInputMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     submittable: (a) => derived(a).submittable,

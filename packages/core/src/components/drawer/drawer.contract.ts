@@ -51,6 +51,7 @@ export function drawerTraits(props: { readonly modal?: boolean | undefined }): r
     : ["layer", "restores-focus", "presence", "modal"]
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 function drawerContractWith(modal: boolean) {
   return contract("drawer", {
     machine: drawerMachine,

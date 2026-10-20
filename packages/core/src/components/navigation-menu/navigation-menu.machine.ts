@@ -242,7 +242,7 @@ const itemOf = (e: AnyEvent) =>
 const pressReason = (e: AnyEvent): NavigationMenuReason =>
   e.type === "PRESS" && e.modality === "keyboard" ? "trigger-key" : "trigger-press"
 
-export const navigationMenuMachine = setup({
+export const navigationMenuMachine = /* @__PURE__ */ setup({
   types: type<{
     props: NavigationMenuProps
     events: NavigationMenuEvent

@@ -115,7 +115,7 @@ function say(args: Args, message: string, priority: "polite" | "assertive") {
 
 const editable = (props: FileUploadProps) => props.disabled !== true && props.readOnly !== true
 
-export const fileUploadMachine = setup({
+export const fileUploadMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     editable: ({ props }) => editable(props),

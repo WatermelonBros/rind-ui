@@ -1,3 +1,5 @@
+"use client"
+
 import { partId } from "@rind-ui/core"
 import { useEffect, useId, useLayoutEffect, useMemo, useSyncExternalStore } from "react"
 

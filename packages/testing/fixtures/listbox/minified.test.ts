@@ -26,10 +26,14 @@ beforeAll(async () => {
   if (!built) {
     throw new Error("build @rind-ui/core first: pnpm --filter @rind-ui/core build")
   }
-  execFileSync("pnpm", ["exec", "tsdown", "--minify", "--no-dts", "--no-publint", "-d", out], {
-    cwd: coreDir,
-    stdio: "pipe",
-  })
+  execFileSync(
+    "pnpm",
+    ["exec", "tsdown", "--minify", "--no-dts", "--no-publint", "--no-exports", "-d", out],
+    {
+      cwd: coreDir,
+      stdio: "pipe",
+    },
+  )
   core = (await import(pathToFileURL(join(out, "index.mjs")).href)) as Core
 }, 60_000)
 

@@ -1,3 +1,5 @@
+"use client"
+
 import {
   autosize as attachAutosize,
   defaultCount,
@@ -203,6 +205,7 @@ export type TextFieldRootProps = Omit<
 }
 
 /** A Root on the shared host: Text Field's, or a preset's (`config`). */
+/* @__NO_SIDE_EFFECTS__ */
 export function createTextFieldRoot<P extends TextFieldRootProps>(config: TextFieldHostConfig) {
   return function Root(props: P) {
     // Sound: a preset's own props (`config.ownProps`) are split off before Text Field's are

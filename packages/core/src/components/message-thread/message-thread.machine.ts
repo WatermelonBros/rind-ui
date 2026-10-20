@@ -52,7 +52,7 @@ type Types = {
 const behavior = (reduced: boolean): ScrollBehaviorChoice => (reduced ? "instant" : "smooth")
 const top = (props: MessageThreadProps) => props.anchor === "top"
 
-export const messageThreadMachine = setup({
+export const messageThreadMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     leftBottom: ({ event }) =>

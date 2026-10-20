@@ -103,7 +103,7 @@ function commit(args: Args, zoom: number, anchor: Point, offset?: Point) {
   if (z !== values.zoom) set("zoom", z)
 }
 
-export const imageViewerMachine = setup({
+export const imageViewerMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     ready: ({ context }) => ready(context),

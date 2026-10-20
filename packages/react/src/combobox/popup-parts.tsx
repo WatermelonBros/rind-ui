@@ -1,3 +1,5 @@
+"use client"
+
 // The combobox-pattern popup parts (Positioner, Popup), shared by every host with a popup
 // (Combobox, Tags Input): presence with exit animations and the top layer. Wiring only.
 
@@ -40,6 +42,7 @@ function useInlineWarning(host: PopupHost, part: string) {
   }, [host.inline, host.name, part])
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function createPopupParts(useHost: (part: string) => PopupHost) {
   function Positioner({ render, ref, children, ...rest }: Own<"div">) {
     const host = useHost("Positioner")

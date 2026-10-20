@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type Announcer,
   DEFAULT_TYPEAHEAD_TIMEOUT,

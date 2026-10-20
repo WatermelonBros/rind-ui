@@ -126,7 +126,7 @@ function speakSentences(args: Args, final: boolean) {
   set("spoken", spoken)
 }
 
-export const streamingMessageMachine = setup({
+export const streamingMessageMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     cancelled: ({ props }) => props.status === "cancelled",

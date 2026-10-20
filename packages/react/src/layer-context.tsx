@@ -1,3 +1,5 @@
+"use client"
+
 import type { LayerId, LayerKind } from "@rind-ui/core"
 import { createContext, type ReactNode, useContext, useMemo } from "react"
 

@@ -424,7 +424,7 @@ function watchRegion(
   }
 }
 
-export const menuMachine = setup({
+export const menuMachine = /* @__PURE__ */ setup({
   types: type<{
     props: MenuProps
     events: MenuEvent

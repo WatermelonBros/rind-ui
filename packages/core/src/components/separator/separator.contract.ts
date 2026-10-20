@@ -6,6 +6,7 @@ import { staticContract } from "../../contract/contract"
  * capability's hosted form). A named separator is located by role and exact name; otherwise
  * the one separator part inside the driver's target (a container). No actions.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function separatorContractFor(scope: string) {
   const part = scope === "separator" ? "root" : "separator"
   return staticContract(scope, {

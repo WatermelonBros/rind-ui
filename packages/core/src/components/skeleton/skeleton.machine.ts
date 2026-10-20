@@ -20,7 +20,7 @@ export interface SkeletonProps {
 const announces = (props: SkeletonProps) =>
   props.announceOnLoad !== undefined && props.announceOnLoad !== false
 
-export const skeletonMachine = setup({
+export const skeletonMachine = /* @__PURE__ */ setup({
   types: type<{ props: SkeletonProps; events: never; env: AnnouncerEnv }>(),
   actions: {
     announceLoaded: ({ props, env, event }) => {

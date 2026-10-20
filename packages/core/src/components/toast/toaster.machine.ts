@@ -29,7 +29,7 @@ export interface ToasterContext {
   readonly swiping: boolean
 }
 
-export const toasterMachine = setup({
+export const toasterMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ToasterProps
     events: ToasterEvent

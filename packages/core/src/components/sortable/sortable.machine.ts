@@ -100,7 +100,7 @@ function commit(args: Args, key: string, to: number, reason: SortableReason): re
 
 const position = (order: readonly string[], key: string) => order.indexOf(key) + 1
 
-export const sortableMachine = setup({
+export const sortableMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     canPick: ({ props, event }) =>

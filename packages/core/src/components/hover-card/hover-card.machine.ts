@@ -172,7 +172,7 @@ const docOf = (env: Env) => {
   return "body" in node ? node : node.ownerDocument
 }
 
-export const hoverCardMachine = setup({
+export const hoverCardMachine = /* @__PURE__ */ setup({
   types: type<{
     props: HoverCardProps
     events: HoverCardEvent

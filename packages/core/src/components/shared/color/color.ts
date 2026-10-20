@@ -59,6 +59,7 @@ export const hasChannel = (space: ColorSpace, channel: ColorChannel): boolean =>
   channel === "alpha" || channelIndex(space, channel) >= 0
 
 /** Builds a colour; frozen in development so an accidental mutation throws. */
+/* @__NO_SIDE_EFFECTS__ */
 export function makeColor(
   space: ColorSpace,
   channels: readonly [number, number, number],

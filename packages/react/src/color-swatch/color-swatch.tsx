@@ -1,3 +1,5 @@
+"use client"
+
 // Color Swatch parts: wiring only; connect decides role, name and the inline colour.
 
 import type { Color, ColorInput, ColorNameProp, MessageOverrides } from "@rind-ui/core"

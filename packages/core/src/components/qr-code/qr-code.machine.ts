@@ -79,7 +79,7 @@ export const qrCodeIds = (root: string) => ({
   valueText: partId("qr-code", root, "value-text"),
 })
 
-export const qrCodeMachine = setup({
+export const qrCodeMachine = /* @__PURE__ */ setup({
   types: type<{
     props: QrCodeProps
     events: QrCodeEvent

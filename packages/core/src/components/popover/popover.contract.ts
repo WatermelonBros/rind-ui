@@ -21,6 +21,7 @@ const hasFocus = async (env: E) =>
   (await env.part("content").attr("data-focus-within")) !== null
 const closed = async (env: E) => !(await isOpen(env))
 
+/* @__NO_SIDE_EFFECTS__ */
 function popoverContractWith(modal: boolean) {
   return contract("popover", {
     machine: popoverMachine,

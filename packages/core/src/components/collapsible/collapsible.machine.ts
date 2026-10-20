@@ -25,7 +25,7 @@ export interface CollapsibleProps {
   readonly focusOutOfContent?: (() => void) | undefined
 }
 
-export const collapsibleMachine = setup({
+export const collapsibleMachine = /* @__PURE__ */ setup({
   types: type<{
     props: CollapsibleProps
     events: CollapsibleEvent

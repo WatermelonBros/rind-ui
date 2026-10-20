@@ -130,7 +130,7 @@ function resizeBy(args: Args, handle: number, delta: number, trigger: ResizeTrig
   return resizeAt(current(args), args.props.panels, handle, delta, trigger)
 }
 
-export const splitterMachine = setup({
+export const splitterMachine = /* @__PURE__ */ setup({
   types: type<{
     props: SplitterMachineProps
     events: SplitterEvent

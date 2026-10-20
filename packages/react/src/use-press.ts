@@ -1,3 +1,5 @@
+"use client"
+
 import { createHover, createPress, type HoverOptions, type PressOptions } from "@rind-ui/core"
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 

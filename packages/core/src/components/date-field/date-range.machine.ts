@@ -85,7 +85,7 @@ export const rangeStateOf = (
   props: DateRangeFieldProps,
 ): DateRangeState => deriveRange(context.start, context.end, props, props.messages)
 
-export const dateRangeFieldMachine = setup({
+export const dateRangeFieldMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     /** A parent's value that is not the one this pair just emitted. */

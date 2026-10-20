@@ -1,3 +1,5 @@
+"use client"
+
 // The colour props of every colour component (color-model "Controlled Colour Value" rule 1):
 // `string | Color`, parsed once per distinct string; an unparsable string is a development
 // error and the previous colour is kept.

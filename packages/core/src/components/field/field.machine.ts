@@ -150,7 +150,7 @@ export const fieldIsDirty = (
 ) => initial !== null && !same(c.value, initial.value)
 export const fieldIsFilled = (c: Pick<FieldContext, "value">) => !isEmpty(c.value)
 
-export const fieldMachine = setup({
+export const fieldMachine = /* @__PURE__ */ setup({
   types: type<{
     props: FieldProps
     events: FieldEvent

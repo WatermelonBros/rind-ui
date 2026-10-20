@@ -1,3 +1,5 @@
+"use client"
+
 // Drawer: the Dialog's parts with the drawer service, plus Handle, Indent and
 // IndentBackground. Wiring only: the drawer's own attributes come from `drawerExtras` and
 // are passed to the Dialog parts as props.

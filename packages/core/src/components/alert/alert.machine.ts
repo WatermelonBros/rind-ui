@@ -49,7 +49,7 @@ export interface AlertProps {
 const live = (props: AlertProps) => (props.announce ?? "polite") !== "off"
 const joined = (segments: readonly string[]) => segments.join("\u0000")
 
-export const alertMachine = setup({
+export const alertMachine = /* @__PURE__ */ setup({
   types: type<{
     props: AlertProps
     events: AlertEvent

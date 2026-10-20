@@ -94,7 +94,7 @@ function selection(
   return { key, direction }
 }
 
-export const tabsMachine = setup({
+export const tabsMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TabsProps
     events: TabsEvent

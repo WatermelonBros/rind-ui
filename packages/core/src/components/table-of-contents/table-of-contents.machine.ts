@@ -61,7 +61,7 @@ function observe({ event, context, set }: Args) {
   if (context.latest !== event.current) set("latest", event.current)
 }
 
-export const tableOfContentsMachine = setup({
+export const tableOfContentsMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   actions: {
     observe,

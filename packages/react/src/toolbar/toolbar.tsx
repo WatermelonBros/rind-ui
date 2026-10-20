@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type CompositeHost,
   type PartProps as CorePartProps,

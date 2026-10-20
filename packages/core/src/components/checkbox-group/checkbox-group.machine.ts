@@ -83,7 +83,7 @@ export function selectableNone(
 
 type Ctx = { cycle: Cycle; memory: readonly string[]; items: ReadonlyMap<string, GroupItem> }
 
-export const checkboxGroupMachine = setup({
+export const checkboxGroupMachine = /* @__PURE__ */ setup({
   types: type<{
     props: CheckboxGroupProps
     events: CheckboxGroupEvent

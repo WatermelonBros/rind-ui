@@ -145,7 +145,7 @@ const initialPlacement = (props: PopoverProps) => {
   return unplaced(side, o.align)
 }
 
-export const popoverMachine = setup({
+export const popoverMachine = /* @__PURE__ */ setup({
   types: type<{
     props: PopoverProps
     events: PopoverEvent

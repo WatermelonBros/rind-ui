@@ -40,6 +40,7 @@ function afterOperand(prev: HighlightPrev): boolean {
   return true
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 function jsGrammar(o: { readonly ts: boolean; readonly jsx: boolean }): CodeGrammar {
   const kind = (text: string, prev: HighlightPrev, called: boolean) => {
     if (prev?.text === "." || prev?.text === "?.") return called ? "function" : "property"

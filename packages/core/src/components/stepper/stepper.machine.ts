@@ -128,7 +128,7 @@ function move(args: Args, index: number) {
   if (args.values.step === index) land(args, index)
 }
 
-export const stepperMachine = setup({
+export const stepperMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     hasNext: ({ props, values }) => adjacentStep(props, values.step, 1) !== null,

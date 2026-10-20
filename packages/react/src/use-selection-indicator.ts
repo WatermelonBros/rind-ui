@@ -1,3 +1,5 @@
+"use client"
+
 // The selection indicator's effect (Tabs, Segmented Control): measures the selected item
 // relative to the indicator's parent and sends the box to the machine (state, never an
 // imperative style). The first measurement and layout changes never animate; a selection

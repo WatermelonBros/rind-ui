@@ -1,3 +1,5 @@
+"use client"
+
 import {
   displayedText,
   type MessageOverrides,

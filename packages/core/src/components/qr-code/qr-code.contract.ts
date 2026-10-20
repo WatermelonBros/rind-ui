@@ -27,6 +27,7 @@ async function matrix(env: Env<P>): Promise<boolean[][] | undefined> {
 }
 
 /** The QR Code contract, with the decode query and invariant when a decoder is given. */
+/* @__NO_SIDE_EFFECTS__ */
 export function qrCodeContractWith(decode?: QrMatrixDecoder) {
   const decoded = async (env: Env<P>): Promise<string | undefined> => {
     const m = await matrix(env)

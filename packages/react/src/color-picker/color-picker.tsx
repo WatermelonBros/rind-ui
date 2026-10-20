@@ -1,3 +1,5 @@
+"use client"
+
 // Color Picker parts (design §8): the coordinator machine owns the colour, the format and the
 // open state; the Popover is its controlled child (re-scoped to `color-picker`), and every
 // colour child (Area, Slider, Field, Channel Field, Swatch Picker, Swatch) is the component of

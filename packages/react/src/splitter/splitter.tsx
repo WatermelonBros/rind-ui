@@ -1,3 +1,5 @@
+"use client"
+
 // Splitter parts: wiring only. The machine owns the sizes (percent), connect every attribute.
 // Here the Root measures the panels' space for pixel constraints and the pointer scale, and a
 // Handle's press is measured once by pointer-drag on the Root, then each move fraction is

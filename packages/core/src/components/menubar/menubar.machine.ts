@@ -129,7 +129,7 @@ export interface MenubarTypes {
   values: "value"
 }
 
-export const menubarMachine = setup({
+export const menubarMachine = /* @__PURE__ */ setup({
   types: type<MenubarTypes>(),
   guards: {
     /** The pressed / keyed item can open (not disabled). */

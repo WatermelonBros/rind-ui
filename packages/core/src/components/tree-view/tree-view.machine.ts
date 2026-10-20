@@ -412,7 +412,7 @@ function checkKey(a: WriteArgs, key: CollectionKey) {
 /** null as the runtime's fallback: no selection (a controlled null is a value). */
 const EMPTY = null as unknown as string
 
-export const treeViewMachine = setup({
+export const treeViewMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TreeViewProps
     events: TreeViewEvent

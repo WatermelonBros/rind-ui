@@ -1,3 +1,5 @@
+"use client"
+
 import { isValidElement, type RefObject, useEffect, useLayoutEffect, useState } from "react"
 import type { RenderProp } from "./render"
 

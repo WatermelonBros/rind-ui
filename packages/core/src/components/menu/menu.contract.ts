@@ -81,6 +81,7 @@ const focusedItem = async (env: E) => {
 const focusInMenu = async (env: E) =>
   (await focusedItem(env)) !== null || (await env.part("content").isFocused())
 
+/* @__NO_SIDE_EFFECTS__ */
 function menuContractWith(modal: boolean, triggerRole: "button" | "menuitem" = "button") {
   return contract("menu", {
     machine: menuMachine,

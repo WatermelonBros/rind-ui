@@ -1,3 +1,5 @@
+"use client"
+
 import {
   domScrollMetrics,
   type ScrollAreaState as ScrollAreaActivity,

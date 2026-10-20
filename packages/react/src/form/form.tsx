@@ -1,3 +1,5 @@
+"use client"
+
 import {
   type FormErrors,
   type FormField,

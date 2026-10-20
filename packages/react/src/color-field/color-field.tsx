@@ -1,3 +1,5 @@
+"use client"
+
 // Color Field and Color Channel Field parts (design §6): wiring only. The Color Field's
 // machine owns the draft and the commit points; the text filter runs on the resulting text in
 // `beforeinput` and again in `input` (react-spectrum#3985). The Channel Field is a Number Input

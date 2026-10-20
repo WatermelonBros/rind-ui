@@ -107,7 +107,7 @@ const LIVE = {
   DISMISS: { target: "dismissed", actions: ["setDismissReason"] },
 } as const
 
-export const toastMachine = setup({
+export const toastMachine = /* @__PURE__ */ setup({
   types: type<{ props: ToastProps; events: ToastEvent; env: ToastEnv; context: ToastContext }>(),
   guards: {
     isPersistent: ({ context, props }) => persistent(context.data, props),

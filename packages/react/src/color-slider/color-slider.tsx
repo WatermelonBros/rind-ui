@@ -1,3 +1,5 @@
+"use client"
+
 // Color Slider parts (design §5): a Slider bound to one channel of a colour. The colour value
 // (Echo rule, hue memory, commits) is the shared colour-value machine; every Slider part is
 // rendered as it is, with the binding's props and appearance.

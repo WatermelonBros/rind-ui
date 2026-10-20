@@ -1,3 +1,5 @@
+"use client"
+
 // Listbox: the Root hosting the listbox parts. Wiring only: the machine owns highlight,
 // selection and typeahead; the core parts own every attribute.
 

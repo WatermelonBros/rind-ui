@@ -1,3 +1,5 @@
+"use client"
+
 import {
   checkRangeName,
   type MessageOverrides,

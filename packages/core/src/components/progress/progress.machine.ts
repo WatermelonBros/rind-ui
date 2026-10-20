@@ -28,7 +28,7 @@ export interface ProgressContext {
   readonly previous: number | null
 }
 
-export const progressMachine = setup({
+export const progressMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ProgressProps
     events: ProgressEvent

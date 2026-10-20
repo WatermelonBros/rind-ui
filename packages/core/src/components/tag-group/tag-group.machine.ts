@@ -121,7 +121,7 @@ const enabled = (props: TagGroupProps, key: CollectionKey) => {
   return node !== undefined && !node.disabled && props.disabled !== true
 }
 
-export const tagGroupMachine = setup({
+export const tagGroupMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TagGroupProps
     events: TagGroupEvent

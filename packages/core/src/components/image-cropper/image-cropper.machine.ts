@@ -171,7 +171,7 @@ function commit(args: Args, crop: Rect, p: CropPlacement) {
 
 const place = (args: Args) => cropPlacementOf(args.values, args.context)
 
-export const imageCropperMachine = setup({
+export const imageCropperMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     ready: ({ context }) => ready(context),

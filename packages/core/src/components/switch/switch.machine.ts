@@ -31,7 +31,7 @@ export interface SwitchEnv {
   readonly formInput?: FormInputCapability | undefined
 }
 
-export const switchMachine = setup({
+export const switchMachine = /* @__PURE__ */ setup({
   types: type<{
     props: SwitchProps
     events: SwitchEvent

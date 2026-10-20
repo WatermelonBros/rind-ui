@@ -1,3 +1,5 @@
+"use client"
+
 // Number Input parts: wiring only. The machine owns the value and the text; connect every
 // attribute, the insertion plan and the key mapping. The Root is a Field when not inside one
 // (the shared Field host); the hidden number input carries name, constraints and reset.

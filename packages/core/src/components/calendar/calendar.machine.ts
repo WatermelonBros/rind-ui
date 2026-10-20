@@ -412,7 +412,7 @@ function drillDown(args: Args, date: CalendarDate) {
   if (below) showView(args, below, clamp(date, args.props))
 }
 
-export const calendarMachine = setup({
+export const calendarMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     interactive: ({ props }) => props.disabled !== true,

@@ -1,3 +1,5 @@
+"use client"
+
 import { badgeConnect, badgeWarnings, checkBadgeHost } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,

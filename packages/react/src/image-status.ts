@@ -1,3 +1,5 @@
+"use client"
+
 // image-loading-status in React: the Root half (the shared machine, the source counter, the
 // image registration) and the image half (registration at commit, load/error events, `src`
 // last). Shared by Avatar and Image, which differ only in their connect.

@@ -117,7 +117,7 @@ export function renderedValue(
   return normaliseWrite(value, props) ?? ""
 }
 
-export const pinInputMachine = setup({
+export const pinInputMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
     editable: ({ props }) => editable(props),

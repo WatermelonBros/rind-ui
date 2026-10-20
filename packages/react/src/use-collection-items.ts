@@ -1,3 +1,5 @@
+"use client"
+
 // Static item parts → a collection: each part registers at commit time; the root receives
 // one collection per commit (and keeps the same instance when nothing changed, so the
 // machine sees no collection change).

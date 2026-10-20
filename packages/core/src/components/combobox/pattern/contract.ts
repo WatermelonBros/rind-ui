@@ -33,6 +33,7 @@ type Observed = {
   readonly inputValue?: unknown
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function patternContract(options: {
   /** The host's open state (not the listbox's exposure: open and empty is open). */
   readonly isOpen: (env: E) => Promise<boolean>

@@ -197,6 +197,7 @@ function initialFocusOf(
  * effects and both states' transitions, so a member composes them with its own (the Drawer)
  * instead of copying the graph. `buildDialogMachine` assembles them as they are.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function dialogPieces(config: DialogMachineConfig) {
   const { scope, kind } = config
   const closeParts = config.closeParts ?? ["CLOSE_TRIGGER_PRESS"]
@@ -384,6 +385,7 @@ export function dialogPieces(config: DialogMachineConfig) {
 }
 
 /** Builds a dialog-family machine (Dialog, Alert Dialog): same graph, its own kind. */
+/* @__NO_SIDE_EFFECTS__ */
 export function buildDialogMachine(config: DialogMachineConfig) {
   const pieces = dialogPieces(config)
   return setup({

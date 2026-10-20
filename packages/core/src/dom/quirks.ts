@@ -22,6 +22,7 @@ export interface Quirk<Id extends string = string> {
 }
 
 /** Declares the registry; entry ids become the `QuirkId` union. */
+/* @__NO_SIDE_EFFECTS__ */
 export function defineQuirks<const Q extends readonly Quirk[]>(entries: Q): Q {
   return entries
 }

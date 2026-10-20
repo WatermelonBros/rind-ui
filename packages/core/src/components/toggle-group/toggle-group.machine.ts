@@ -39,7 +39,7 @@ type Args = Parameters<typeof pieces.actions.navigate>[0]
 const sameKeys = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((k) => b.includes(k))
 
-export const toggleGroupMachine = setup({
+export const toggleGroupMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ToggleGroupProps
     events: ToggleGroupEvent

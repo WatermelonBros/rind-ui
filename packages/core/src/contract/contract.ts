@@ -395,6 +395,7 @@ export type CheckedAction<P extends string, X> = [Extract<keyof X, Modal>] exten
             : never
     }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function contract<
   const M extends AnyMachine,
   const P extends string,
@@ -418,7 +419,7 @@ export function contract<
 }
 
 /** The one-state machine behind every stateless component's contract (Link, Separator). */
-export const STATIC_MACHINE = setup({
+export const STATIC_MACHINE = /* @__PURE__ */ setup({
   types: type<{
     props: Record<never, never>
     events: { type: "$none" }
@@ -436,6 +437,7 @@ type StaticMachine = typeof STATIC_MACHINE
  * no machine). It carries the one-state STATIC_MACHINE, so every tool reading contracts
  * keeps one shape; there is no model-based test to run on it.
  */
+/* @__NO_SIDE_EFFECTS__ */
 export function staticContract<
   const P extends string,
   const L extends readonly unknown[],
