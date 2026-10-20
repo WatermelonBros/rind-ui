@@ -80,8 +80,6 @@ export interface NodeInit<T> {
   readonly hasChildren?: boolean | undefined
 }
 
-const dev = () => process.env.NODE_ENV !== "production"
-
 /**
  * The indexed collection over `inits` (render order) and `sections`. `rebuild` makes the
  * derivations: it receives the surviving values in item order.
@@ -96,7 +94,7 @@ export function fromNodes<T>(
   for (const init of inits) {
     const seen = indexOf.get(init.key)
     if (seen !== undefined) {
-      if (dev()) {
+      if (process.env.NODE_ENV !== "production") {
         throw new Error(
           `[rind-ui] duplicate collection key "${init.key}": items "${kept[seen]?.textValue}" (index ${seen}) and "${init.textValue}"`,
         )

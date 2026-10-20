@@ -44,13 +44,12 @@ export const percentFormat: Intl.NumberFormatOptions = { style: "percent" }
  * without it the call is silent (a machine guard re-reading the same props).
  */
 export function resolveRangeValue(input: RangeValueInput, scope?: string): RangeValue {
-  const dev = scope !== undefined && process.env.NODE_ENV !== "production"
   const rawMin = input.min ?? 0
   const rawMax = input.max ?? 100
   const min = Number.isFinite(rawMin) ? rawMin : 0
   const max = Number.isFinite(rawMax) ? rawMax : min
   const empty = !(max > min)
-  if (dev && empty) {
+  if (scope !== undefined && process.env.NODE_ENV !== "production" && empty) {
     console.warn(
       `[rind-ui] ${scope}: the range min=${rawMin} max=${rawMax} is empty or not finite; max must be greater than min`,
     )
@@ -60,7 +59,7 @@ export function resolveRangeValue(input: RangeValueInput, scope?: string): Range
     return { value: null, min, max, fraction: 0, percent: 0 }
   }
   const clamped = Math.min(Math.max(raw, min), Math.max(min, max))
-  if (dev && clamped !== raw) {
+  if (scope !== undefined && process.env.NODE_ENV !== "production" && clamped !== raw) {
     console.warn(`[rind-ui] ${scope}: value ${raw} is outside ${min}–${max}; it is clamped`)
   }
   const fraction = empty ? 0 : (clamped - min) / (max - min)

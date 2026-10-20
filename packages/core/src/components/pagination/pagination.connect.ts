@@ -89,8 +89,6 @@ export function paginationConnect(input: PaginationConnectInput) {
     }),
   }
 }
-
-const dev = () => process.env.NODE_ENV !== "production"
 const warn = (message: string) => console.warn(`[rind-ui] pagination: ${message}`)
 
 /** Development: inputs that are not non-negative integers (spec "Total Pages"). */
@@ -101,7 +99,7 @@ export function warnPaginationInputs(props: {
   readonly siblingCount?: number | undefined
   readonly boundaryCount?: number | undefined
 }): void {
-  if (!dev()) return
+  if (process.env.NODE_ENV === "production") return
   for (const [key, value] of Object.entries(props)) {
     if (typeof value === "number" && (!Number.isInteger(value) || value < 0)) {
       warn(`${key} ${value} is not a non-negative integer; using ${Math.max(0, Math.floor(value))}`)
@@ -115,7 +113,7 @@ export function warnControlledWithoutHandler(
   controlled: boolean,
   handled: boolean,
 ): void {
-  if (!dev() || !controlled || handled) return
+  if (process.env.NODE_ENV === "production" || !controlled || handled) return
   const handler = key === "page" ? "onPageChange" : "onPageSizeChange"
   warn(
     `${key} is controlled without ${handler}: the value only changes when you pass a new ${key}; use default${key === "page" ? "Page" : "PageSize"} to let the pagination own it`,
