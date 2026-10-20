@@ -6,8 +6,6 @@ import type { Href, RouterOptions } from "../../env/router"
 
 declare const process: { env: { NODE_ENV?: string } }
 
-const dev = () => process.env.NODE_ENV !== "production"
-
 export type BreadcrumbsCurrentValue = "page" | "location" | "date" | "time" | true
 
 /** One crumb of the trail, in order. */
@@ -147,7 +145,7 @@ const POPUP_ROLES = '[role="listbox"], [role="menu"], [role="combobox"]'
 
 /** Development: Breadcrumbs inside a listbox, menu or combobox popup (react-spectrum#7790). */
 export function warnBreadcrumbsInPopup(root: Element): void {
-  if (!dev() || !root.parentElement?.closest(POPUP_ROLES)) return
+  if (process.env.NODE_ENV === "production" || !root.parentElement?.closest(POPUP_ROLES)) return
   console.warn(
     `[rind-ui] breadcrumbs "${root.getAttribute("data-instance")}": rendered inside a listbox, menu or combobox popup, where a navigation landmark and its links are not reachable; render it outside the popup`,
   )
@@ -155,7 +153,12 @@ export function warnBreadcrumbsInPopup(root: Element): void {
 
 /** Development: the current Item contains no element with `aria-current`. */
 export function warnCurrentWithoutAria(item: Element): void {
-  if (!dev() || item.hasAttribute("aria-current") || item.querySelector("[aria-current]")) return
+  if (
+    process.env.NODE_ENV === "production" ||
+    item.hasAttribute("aria-current") ||
+    item.querySelector("[aria-current]")
+  )
+    return
   console.warn(
     `[rind-ui] breadcrumbs: the current item "${item.textContent?.trim() ?? ""}" has no element with aria-current; render Breadcrumbs.Link, or set aria-current on its control from the Item's render state`,
   )

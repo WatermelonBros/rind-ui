@@ -55,8 +55,6 @@ declare module "../provider" {
 }
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
-const dev = () => process.env.NODE_ENV !== "production"
-
 export interface PinInputChangeDetails {
   readonly reason: PinInputReason
 }
@@ -209,13 +207,18 @@ function Root(all: PinInputRootProps) {
   const controlled = "value" in all
   const shown = controlled ? renderedValue(rules, value) : undefined
   useEffect(() => {
-    if (!dev()) return
+    if (process.env.NODE_ENV === "production") return
     if (!Number.isInteger(length) || length < 1) {
       console.warn(`[rind-ui] pin-input: length must be a positive integer (got ${length}).`)
     }
   }, [length])
   useEffect(() => {
-    if (dev() && controlled && typeof value === "string" && value !== shown) {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      controlled &&
+      typeof value === "string" &&
+      value !== shown
+    ) {
       console.warn(
         `[rind-ui] pin-input: the controlled value "${value}" is rendered as "${shown}" (length ${length}, rejected characters dropped).`,
       )
@@ -258,7 +261,7 @@ function Root(all: PinInputRootProps) {
   })
   // Every rendered slot counts; the number must match `length`.
   useEffect(() => {
-    if (dev() && slots.current !== length) {
+    if (process.env.NODE_ENV !== "production" && slots.current !== length) {
       console.warn(
         `[rind-ui] pin-input: length is ${length} but ${slots.current} Slots are rendered.`,
       )
