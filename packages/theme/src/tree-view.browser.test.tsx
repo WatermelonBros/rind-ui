@@ -78,3 +78,24 @@ describe("Tree View stylesheet", () => {
     ).toBe("-1 1")
   })
 })
+
+describe("Tree View stylesheet: moving (add-tree-view-dnd)", () => {
+  it("the dragged row fades, a drop target is outlined, the line indents by level", () => {
+    sheet()
+    const host = mount(`
+<div style="position:relative">
+  <div data-scope="tree-view" data-part="tree" role="tree">
+    <div data-scope="tree-view" data-part="item" role="treeitem" data-dragging style="--rind-tree-view-level:1">a</div>
+    <div data-scope="tree-view" data-part="item" role="treeitem" data-drop-target style="--rind-tree-view-level:1">b</div>
+  </div>
+  <div data-scope="tree-view" data-part="drop-indicator" aria-hidden="true" style="position:absolute;--rind-tree-drop-top:20px;--rind-tree-drop-level:1"></div>
+  <div data-scope="tree-view" data-part="drop-indicator" aria-hidden="true" style="position:absolute;--rind-tree-drop-top:20px;--rind-tree-drop-level:3"></div>
+</div>`)
+    expect(Number(getComputedStyle(q(host, "[data-dragging]")).opacity)).toBeLessThan(1)
+    expect(getComputedStyle(q(host, "[data-drop-target]")).outlineStyle).toBe("solid")
+    const [l1, l3] = [...host.querySelectorAll<HTMLElement>('[data-part="drop-indicator"]')]
+    const x = (el: HTMLElement | undefined) => el?.getBoundingClientRect().left ?? 0
+    expect(x(l3)).toBeGreaterThan(x(l1))
+    expect(Math.round(l1?.getBoundingClientRect().height ?? 0)).toBe(2)
+  })
+})

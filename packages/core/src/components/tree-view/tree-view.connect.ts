@@ -12,9 +12,11 @@ import { isSelected, type SelectionValue } from "../../collection/selection"
 import type { TreeCollection } from "../../collection/tree"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
+import { visuallyHiddenStyle } from "../../dom/visually-hidden"
 import { itemId, partId } from "../../ids"
 import { type CheckPropagation, type CheckState, stateOf } from "./check"
-import type { TreeViewEvent } from "./tree-view.machine"
+import type { TreeMoveDirection } from "./tree-move"
+import type { TreeViewDrag, TreeViewEvent } from "./tree-view.machine"
 
 declare const process: { env: { NODE_ENV?: string } }
 
@@ -24,6 +26,7 @@ export const treeViewIds = (instance: string) => ({
   tree: partId(SCOPE, instance, "tree"),
   label: partId(SCOPE, instance, "label"),
   empty: partId(SCOPE, instance, "empty"),
+  moveInstructions: partId(SCOPE, instance, "move-instructions"),
   item: (key: CollectionKey) => itemId(SCOPE, instance, "item", key),
   itemText: (key: CollectionKey) => itemId(SCOPE, instance, "item-text", key),
 })
@@ -58,6 +61,19 @@ export interface TreeViewConnectView {
     readonly itemText: (key: CollectionKey) => boolean
   }
   readonly send: (event: TreeViewEvent) => void
+  /** Moving (add-tree-view-dnd): whether a node may move, and the pointer drag, if any. */
+  readonly canMove?: ((key: CollectionKey) => boolean) | undefined
+  /** Some node may move: the tree describes the Alt+arrow keys. */
+  readonly movable?: boolean | undefined
+  readonly drag?: TreeViewDrag | null | undefined
+  readonly moveInstructions?: string | undefined
+}
+
+const MOVES: Readonly<Record<string, TreeMoveDirection>> = {
+  ArrowUp: "up",
+  ArrowDown: "down",
+  ArrowRight: "in",
+  ArrowLeft: "out",
 }
 
 /** The consumer names the tree itself (the Label then does not). */
@@ -131,7 +147,10 @@ export function treeViewConnect(v: TreeViewConnectView, env: CompositeEnv) {
         "aria-orientation": undefined,
         "data-orientation": undefined,
         "aria-labelledby": named ? undefined : v.mounted.label ? ids.label : undefined,
-        "aria-describedby": empty && v.mounted.empty ? ids.empty : undefined,
+        "aria-describedby":
+          [empty && v.mounted.empty ? ids.empty : null, v.movable ? ids.moveInstructions : null]
+            .filter(Boolean)
+            .join(" ") || undefined,
         "data-selection-mode": v.selectionMode,
         "data-checkable": dataFlag(v.checkable),
         ...focusAttrs(v.focused, v.context.highlightSource === "pointer" ? "pointer" : v.modality),
@@ -159,6 +178,13 @@ export function treeViewConnect(v: TreeViewConnectView, env: CompositeEnv) {
           if (target !== e.currentTarget && target?.getAttribute?.("role") !== "treeitem") return
           if (target?.closest?.(EDITABLE)) return
           const key = v.context.highlightedKey
+          // Alt+arrows move the highlighted node (the outliner keys), when it may move.
+          const move = MOVES[e.key]
+          if (move && e.altKey && !e.ctrlKey && !e.metaKey && key !== null && v.canMove?.(key)) {
+            e.preventDefault()
+            v.send({ type: "MOVE.KEY", key, direction: move })
+            return
+          }
           if (e.key === "*" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
             if (key !== null) v.send({ type: "EXPAND_SIBLINGS", key })
             e.preventDefault()
@@ -173,6 +199,29 @@ export function treeViewConnect(v: TreeViewConnectView, env: CompositeEnv) {
             return
           }
           keyDown?.(event)
+        },
+      }
+    },
+    /** The visually hidden Alt+arrow instructions (in the tree's description when movable). */
+    moveInstructions: (): PartProps => ({ id: ids.moveInstructions, style: visuallyHiddenStyle }),
+    moveInstructionsText: v.moveInstructions ?? "",
+    /**
+     * The drop line: `top` (px from the tree's top) and `level` of the target, from the React
+     * part's measurement; hidden while there is no target.
+     */
+    dropIndicator: (at: { readonly top: number; readonly level: number } | null): PartProps => {
+      const drag = v.drag
+      const shown = at !== null && drag?.target !== null && drag?.target !== undefined
+      return {
+        ...scoped("drop-indicator"),
+        "aria-hidden": "true",
+        "data-position": shown ? (drag?.zone ?? undefined) : undefined,
+        "data-hidden": dataFlag(!shown),
+        style: {
+          position: "absolute",
+          "--rind-tree-drop-top": `${at?.top ?? 0}px`,
+          "--rind-tree-drop-level": String(at?.level ?? 1),
+          ...(shown ? {} : { display: "none" }),
         },
       }
     },
@@ -205,6 +254,10 @@ export function treeViewConnect(v: TreeViewConnectView, env: CompositeEnv) {
         "data-error": dataFlag(v.context.failed.has(key)),
         "data-hover": dataFlag(v.hovered === key),
         "data-pressed": dataFlag(v.pressed === key),
+        "data-dragging": dataFlag(v.drag?.key === key),
+        "data-drop-target": dataFlag(
+          v.drag?.over === key && v.drag.zone === "inside" && v.drag.target !== null,
+        ),
         style: level === undefined ? undefined : { "--rind-tree-view-level": String(level) },
         // Only the row's own focus highlights it (an inline editor inside keeps its focus).
         onFocus: (event: unknown) => {

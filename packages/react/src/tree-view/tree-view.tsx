@@ -8,19 +8,24 @@ import {
   createTreeCollection,
   expansionReason,
   type Href,
+  isMovable,
   keySetOf,
   type LinkCurrent,
   type LinkEnv,
   linkProps,
   type PartProps,
+  pointerTarget,
   type RouterOptions,
   type ScrollToIndexDetails,
   type TreeCollection,
+  type TreeDropZone,
   type TreeViewActionDetails,
   type TreeViewMessages,
+  type TreeViewMoveDetails,
   type TreeViewParts,
   type TreeViewValue,
   toKey,
+  treeDrag,
   treeSelectionOf,
   treeViewConnect,
   treeViewIds,
@@ -139,6 +144,10 @@ export type TreeViewRootProps = {
   readonly virtualized?: boolean
   /** Scrolls the highlighted row into view; `index` is its position in the visible list. */
   readonly scrollToIndex?: (details: ScrollToIndexDetails) => void
+  /** Nodes can be moved (Alt+arrows, pointer drags): all, or those the predicate allows. */
+  readonly movable?: boolean | ((key: string) => boolean)
+  /** A node moved: apply it to `items` with `moveNode(items, key, details)`. */
+  readonly onMove?: (key: string, details: TreeViewMoveDetails) => void
 } & Selection
 
 /** What a node render function receives (design §2). */
@@ -181,6 +190,11 @@ interface Host {
   readonly setHovered: (key: CollectionKey | null) => void
   readonly setPressed: (key: CollectionKey | null) => void
   readonly options: { readonly checkable: boolean; readonly selectionMode: string | undefined }
+  /** Moving (add-tree-view-dnd): whether a row may be dragged, and its pointer drag. */
+  readonly canMove: (key: CollectionKey) => boolean
+  readonly startDrag: (key: CollectionKey, event: React.PointerEvent) => void
+  /** The drop line's place (px from the tree's top, and the target level), or null. */
+  readonly dropAt: { readonly top: number; readonly level: number } | null
 }
 
 /**
@@ -314,6 +328,8 @@ function Root(all: TreeViewRootProps) {
       : undefined,
     virtualized: all.virtualized,
     scrollToIndex: all.scrollToIndex ? (d) => latest.current.scrollToIndex?.(d) : undefined,
+    movable: all.movable,
+    onMove: all.onMove ? (key, d) => latest.current.onMove?.(key, d) : undefined,
   })
   const view = service.view()
   const [mounted, setMounted] = useState<{
@@ -322,6 +338,9 @@ function Root(all: TreeViewRootProps) {
     texts: ReadonlySet<CollectionKey>
   }>({ label: false, empty: false, texts: new Set() })
   const [hovered, setHovered] = useState<CollectionKey | null>(null)
+  const [dropAt, setDropAt] = useState<Host["dropAt"]>(null)
+  const canMove = (key: CollectionKey) =>
+    isMovable({ movable: all.movable, disabled: all.disabled }, key)
   const [pressed, setPressed] = useState<CollectionKey | null>(null)
   const [mounts] = useState(() => ({
     label: (on: boolean) => setMounted((m) => (m.label === on ? m : { ...m, label: on })),
@@ -379,6 +398,10 @@ function Root(all: TreeViewRootProps) {
         itemText: (key) => mounted.texts.has(key),
       },
       send: service.send,
+      canMove,
+      movable: all.movable !== undefined && all.movable !== false,
+      drag: ctx.drag,
+      moveInstructions: messages.moveInstructions,
     },
     env,
   )
@@ -421,6 +444,73 @@ function Root(all: TreeViewRootProps) {
     setHovered,
     setPressed,
     options: { checkable: all.checkable === true, selectionMode: p["selectionMode"] as string },
+    canMove,
+    dropAt,
+    startDrag: (key, event) => {
+      const treeEl = (event.currentTarget as HTMLElement).closest<HTMLElement>('[role="tree"]')
+      if (!treeEl || (event.pointerType === "mouse" && event.button !== 0)) return
+      const send = service.send
+      let auto: { key: CollectionKey; timer: ReturnType<typeof env.scheduler.setTimeout> } | null =
+        null
+      const stopAuto = () => {
+        if (auto) env.scheduler.clearTimeout(auto.timer)
+        auto = null
+      }
+      treeDrag(event.nativeEvent, {
+        tree: treeEl,
+        onStart: () => send({ type: "DRAG.START", key }),
+        onOver: (row, fraction) => {
+          // The latest tree and expansion: a branch may have opened during the drag.
+          const h = store.current
+          const raw = row?.getAttribute("data-key")
+          const over = raw ? toKey(raw) : null
+          const node = over === null ? undefined : h.node(over)
+          if (over === null || !node || !row) {
+            stopAuto()
+            setDropAt(null)
+            send({ type: "DRAG.OVER", over: null, zone: null, target: null })
+            return
+          }
+          const zone: TreeDropZone =
+            fraction < 0.25
+              ? "before"
+              : fraction > 0.75
+                ? "after"
+                : node.isBranch
+                  ? "inside"
+                  : fraction < 0.5
+                    ? "before"
+                    : "after"
+          const target = pointerTarget(h.tree, key, over, zone, node.expanded)
+          send({ type: "DRAG.OVER", over, zone, target })
+          // A collapsed branch held over its middle opens (a drop inside it can then be aimed).
+          if (zone === "inside" && node.isBranch && !node.expanded && target) {
+            if (auto?.key !== over) {
+              stopAuto()
+              auto = {
+                key: over,
+                timer: env.scheduler.setTimeout(() => send({ type: "EXPAND", key: over }), 700),
+              }
+            }
+          } else stopAuto()
+          if (!target || zone === "inside") {
+            setDropAt(null)
+            return
+          }
+          const box = row.getBoundingClientRect()
+          const parent = target.parent === null ? undefined : h.node(toKey(target.parent))
+          setDropAt({
+            top: (zone === "before" ? box.top : box.bottom) - treeEl.getBoundingClientRect().top,
+            level: parent ? parent.level + 1 : 1,
+          })
+        },
+        onEnd: (drop) => {
+          stopAuto()
+          setDropAt(null)
+          send(drop ? { type: "DRAG.END" } : { type: "DRAG.CANCEL" })
+        },
+      })
+    },
     rowSignature: (key) => {
       // Once per key per render: every part of a row asks.
       let signature = signatures.get(key)
@@ -438,7 +528,14 @@ function Root(all: TreeViewRootProps) {
   // Read during this render by the parts it renders; the others are notified after commit.
   store.current = host
   useIsoLayoutEffect(() => store.notify())
-  return <HostContext value={store}>{children}</HostContext>
+  return (
+    <HostContext value={store}>
+      {children}
+      {all.movable ? (
+        <span {...normalizeProps(parts.moveInstructions())}>{parts.moveInstructionsText}</span>
+      ) : null}
+    </HostContext>
+  )
 }
 
 type Own<T extends keyof React.JSX.IntrinsicElements> = ComponentPropsWithRef<T> & {
@@ -601,7 +698,10 @@ function Item({
   const wiring = {
     onPointerEnter: () => setHovered(key),
     onPointerLeave: () => setHovered(null),
-    onPointerDown: () => setPressed(key),
+    onPointerDown: (e: React.PointerEvent) => {
+      setPressed(key)
+      if (store.current.canMove(key)) store.current.startDrag(key, e)
+    },
     onPointerUp: () => setPressed(null),
     onPointerCancel: () => setPressed(null),
   }
@@ -633,6 +733,18 @@ function Item({
     <ItemContext value={key}>
       {renderPart("div", { ...props, children }, render, undefined)}
     </ItemContext>
+  )
+}
+
+/** The drop line of a pointer drag: render it beside `TreeView.Tree` in a positioned wrapper. */
+function DropIndicator({ render, ...rest }: Own<"div">) {
+  const store = useHost("DropIndicator", (h) => JSON.stringify(h.dropAt))
+  const host = store.current
+  return renderPart(
+    "div",
+    mergeProps(normalizeProps(host.parts.dropIndicator(host.dropAt)), rest),
+    render,
+    undefined,
   )
 }
 
@@ -711,6 +823,7 @@ function Empty({ render, children, ...rest }: Own<"div">) {
 export const TreeView = {
   Root,
   Label,
+  DropIndicator,
   Tree,
   Item,
   ItemText,

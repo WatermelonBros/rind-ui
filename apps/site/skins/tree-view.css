@@ -137,3 +137,25 @@
     transition: none;
   }
 }
+/* Moving: the dragged row fades, a folder to drop into gets a brand ring, the line is a thick
+   rounded brand bar at the target's level. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="tree-view"][data-part="item"][data-dragging] {
+  opacity: 0.45;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tree-view"][data-part="item"][data-drop-target] {
+  box-shadow: inset 0 0 0 2px var(--s-brand);
+  background: color-mix(in oklab, var(--s-brand) 16%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tree-view"][data-part="drop-indicator"] {
+  inset-inline: 0;
+  top: var(--rind-tree-drop-top);
+  block-size: 4px;
+  margin-block-start: -2px;
+  margin-inline-start: calc(4px + (var(--rind-tree-drop-level, 1) - 1) * 18px);
+  border-radius: 4px;
+  background: var(--s-brand);
+  pointer-events: none;
+}

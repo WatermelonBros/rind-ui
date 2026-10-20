@@ -21,6 +21,12 @@ import type { TreeCollection } from "../../collection/tree"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
 import { type CheckPropagation, toggle } from "./check"
+import {
+  moveTarget,
+  type TreeDropZone,
+  type TreeMoveDirection,
+  type TreeMoveTarget,
+} from "./tree-move"
 import { type TreeViewMessages, treeViewMessages } from "./tree-view.messages"
 
 /** The selection: one key or null (single), keys (multiple). Never a select-all sentinel. */
@@ -56,6 +62,22 @@ export type TreeViewEvent =
   | { readonly type: "INDICATOR"; readonly key: CollectionKey }
   | { readonly type: "CHILDREN.SETTLED"; readonly key: CollectionKey; readonly ok: boolean }
   | { readonly type: "TREE.CHANGE" }
+  /** Alt+arrow on a movable row (add-tree-view-dnd). */
+  | {
+      readonly type: "MOVE.KEY"
+      readonly key: CollectionKey
+      readonly direction: TreeMoveDirection
+    }
+  | { readonly type: "DRAG.START"; readonly key: CollectionKey }
+  /** The pointer's target (null: none here, e.g. its own subtree). */
+  | {
+      readonly type: "DRAG.OVER"
+      readonly over: CollectionKey | null
+      readonly zone: TreeDropZone | null
+      readonly target: TreeMoveTarget | null
+    }
+  | { readonly type: "DRAG.END" }
+  | { readonly type: "DRAG.CANCEL" }
 
 export interface LoadChildrenOptions {
   /** Aborted when the branch collapses or the tree unmounts while loading. */
@@ -94,6 +116,23 @@ export interface TreeViewProps
     | undefined
   readonly disabled?: boolean | undefined
   readonly messages?: TreeViewMessages | undefined
+  /** Nodes can be moved (Alt+arrows, pointer drags): all, or those the predicate allows. */
+  readonly movable?: boolean | ((key: string) => boolean) | undefined
+  /** A node moved: apply it to your data (`moveNode`), as `items` are yours. */
+  readonly onMove?: ((key: string, details: TreeViewMoveDetails) => void) | undefined
+}
+
+/** Where a moved node goes, and how. */
+export interface TreeViewMoveDetails extends TreeMoveTarget {
+  readonly reason: "keyboard" | "pointer"
+}
+
+/** A pointer drag in progress. */
+export interface TreeViewDrag {
+  readonly key: CollectionKey
+  readonly over: CollectionKey | null
+  readonly zone: TreeDropZone | null
+  readonly target: TreeMoveTarget | null
 }
 
 export interface TreeViewContext extends CollectionContext {
@@ -104,6 +143,7 @@ export interface TreeViewContext extends CollectionContext {
   /** Branches whose load settled: never requested again. */
   readonly loaded: ReadonlySet<CollectionKey>
   readonly controllers: ReadonlyMap<CollectionKey, AbortController>
+  readonly drag: TreeViewDrag | null
 }
 
 // ---------------------------------------------------------------------------------------
@@ -242,6 +282,39 @@ function writeExpanded(a: WriteArgs, next: ReadonlySet<CollectionKey>) {
 
 function announce(a: WriteArgs, message: string, priority: "polite" | "assertive" = "polite") {
   a.env.announcer.announce({ message, priority, lang: a.env.locale.locale() })
+}
+
+/** Whether `key` may be moved. */
+export function isMovable(
+  props: Pick<TreeViewProps, "movable" | "disabled">,
+  key: CollectionKey,
+): boolean {
+  const m = props.movable
+  if (m === undefined || m === false || props.disabled === true) return false
+  return m === true || m(key)
+}
+
+/** Reports a move and announces where the node landed (position from the new sibling list). */
+function reportMove(
+  a: WriteArgs,
+  key: CollectionKey,
+  target: TreeMoveTarget,
+  reason: "keyboard" | "pointer",
+) {
+  const tree = a.props.tree
+  a.props.onMove?.(key, { ...target, reason })
+  const parent = target.parent === null ? null : toKey(target.parent)
+  // The root level is the children of null (the tree's own bookkeeping).
+  const count = tree.children(parent as CollectionKey).filter((k) => k !== key).length + 1
+  announce(
+    a,
+    messagesOf(a.props).movedAnnouncement(
+      nameOf(tree, key),
+      parent === null ? null : nameOf(tree, parent),
+      Math.min(target.index, count - 1) + 1,
+      count,
+    ),
+  )
 }
 
 /** Starts loading `key`: once until it settles or is aborted. */
@@ -508,6 +581,37 @@ export const treeViewMachine = setup({
       }
     },
     syncLoads: (a) => syncLoads(a),
+    /** Alt+arrow: the outliner move, or why not (add-tree-view-dnd). */
+    moveKey: (a) => {
+      if (a.event.type !== "MOVE.KEY") return
+      const { key, direction } = a.event
+      const target = moveTarget(a.props.tree, key, direction)
+      if (target) reportMove(a, key, target, "keyboard")
+      else announce(a, messagesOf(a.props).cannotMoveAnnouncement(nameOf(a.props.tree, key)))
+    },
+    dragStart: (a) => {
+      if (a.event.type === "DRAG.START") {
+        a.set("drag", { key: a.event.key, over: null, zone: null, target: null })
+      }
+    },
+    dragOver: (a) => {
+      const { event, context } = a
+      if (event.type !== "DRAG.OVER" || !context.drag) return
+      a.set("drag", { ...context.drag, over: event.over, zone: event.zone, target: event.target })
+    },
+    dragEnd: (a) => {
+      const drag = a.context.drag
+      a.set("drag", null)
+      if (drag?.target) reportMove(a, drag.key, drag.target, "pointer")
+    },
+    dragCancel: (a) => a.set("drag", null),
+    /** The dragged node hidden (an ancestor collapsed) or gone ends the drag (React Aria #10599). */
+    dragLost: (a) => {
+      const drag = a.context.drag
+      if (!drag) return
+      const visible = visibleOf(a.props.tree, a.values.expandedValue)
+      if (!visible.has(drag.key)) a.set("drag", null)
+    },
   },
   guards: {
     /** Replace: arrows (without mod) select; a screen reader's focus never does. */
@@ -524,6 +628,8 @@ export const treeViewMachine = setup({
     isCheckable: ({ props }) => props.checkable === true,
     noneMode: ({ props }) => mode(props) === "none",
     selectable: ({ event, props }) => event.type === "SELECT" && actionable(props, event.key),
+    movableKey: ({ event, props }) =>
+      (event.type === "MOVE.KEY" || event.type === "DRAG.START") && isMovable(props, event.key),
   },
   effects: {
     /** Unmount: every pending load is aborted. */
@@ -542,6 +648,7 @@ export const treeViewMachine = setup({
     failed: new Set(),
     loaded: new Set(),
     controllers: new Map(),
+    drag: null,
   }),
   values: {
     value: { fallback: EMPTY, equal: sameKeys as never },
@@ -556,8 +663,12 @@ export const treeViewMachine = setup({
       view.context.highlightedKey === null ? [] : [view.context.highlightedKey],
   },
   on: {
-    "TREE.CHANGE": { actions: ["settleArrived", "repairCollection", "syncLoads"] },
-    "COLLECTION.CHANGE": { actions: ["repairCollection", "syncLoads"] },
+    "TREE.CHANGE": { actions: ["settleArrived", "repairCollection", "syncLoads", "dragLost"] },
+    "COLLECTION.CHANGE": { actions: ["repairCollection", "syncLoads", "dragLost"] },
+    "DRAG.START": { guard: "movableKey", actions: ["dragStart"] },
+    "DRAG.OVER": { actions: ["dragOver"] },
+    "DRAG.END": { actions: ["dragEnd"] },
+    "DRAG.CANCEL": { actions: ["dragCancel"] },
     "CHILDREN.SETTLED": { actions: ["settle"] },
     EXPAND: { actions: ["expand", "repairCollection", "syncLoads"] },
     COLLAPSE: { actions: ["collapse", "repairCollection", "syncLoads"] },
@@ -579,9 +690,18 @@ export const treeViewMachine = setup({
       on: {
         "COMPOSITE.BLUR": "idle",
         "TREE.CHANGE": {
-          actions: ["settleArrived", "repairCollection", "syncLoads", "keepFocusInside"],
+          actions: [
+            "settleArrived",
+            "repairCollection",
+            "syncLoads",
+            "keepFocusInside",
+            "dragLost",
+          ],
         },
-        "COLLECTION.CHANGE": { actions: ["repairCollection", "syncLoads", "keepFocusInside"] },
+        "COLLECTION.CHANGE": {
+          actions: ["repairCollection", "syncLoads", "keepFocusInside", "dragLost"],
+        },
+        "MOVE.KEY": { guard: "movableKey", actions: ["moveKey"] },
         INDICATOR: {
           actions: ["indicator", "repairCollection", "syncLoads", "keepFocusInside"],
         },
