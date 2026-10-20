@@ -199,6 +199,7 @@ export const familyMatrix = [
       "reasoning",
       "stepper",
       "image-cropper",
+      "image-viewer",
       "table-of-contents",
       "kbd",
       "timeline",

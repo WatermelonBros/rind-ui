@@ -338,6 +338,9 @@ const TRANSIENT = new Set([
   "image-cropper:loading",
   "image-cropper:dragging",
   "image-cropper:settling",
+  "image-viewer:loading",
+  "image-viewer:panning",
+  "image-viewer:settling",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or

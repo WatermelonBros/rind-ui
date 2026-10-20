@@ -143,7 +143,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Ark: Image Cropper |
 | JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Zoom and pan, keyboard and pinch; Reado has ImageView |
+| Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | done | Zoom and pan, keyboard and pinch; Reado has ImageView |
 | Kbd |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Keyboard shortcut display, platform-aware modifiers; Reado has Kbd |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |

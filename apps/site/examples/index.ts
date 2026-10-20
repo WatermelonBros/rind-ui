@@ -35,6 +35,7 @@ import * as hiddenUntilFound from "./hidden-until-found"
 import * as hoverCard from "./hover-card"
 import * as image from "./image"
 import * as imageCropper from "./image-cropper"
+import * as imageViewer from "./image-viewer"
 import * as kbd from "./kbd"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
@@ -134,6 +135,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   heading,
   image,
   "image-cropper": imageCropper,
+  "image-viewer": imageViewer,
   "message-thread": messageThread,
   meter,
   progress,
