@@ -101,7 +101,7 @@ export const tableOfContentsMeta = {
     title: base("title"),
     list: base("list"),
     item: section("item"),
-    link: section("link"),
+    link: { ...section("link"), "data-focus": "Focused.", "data-focus-visible": "Keyboard focus." },
     indicator: { ...base("indicator"), "data-hidden": "No section is current." },
   },
   keyboard: [

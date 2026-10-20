@@ -1,5 +1,6 @@
 export {
   type TableOfContentsConnectInput,
+  type TableOfContentsFocus,
   type TableOfContentsItem,
   type TableOfContentsPart,
   tableOfContentsConnect,

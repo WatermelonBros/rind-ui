@@ -2,7 +2,9 @@
 // a list of anchor links; exactly one link is the current location. Ids come from the
 // instance, so no two parts share one (zag#3378).
 
+import { focusAttrs } from "../../a11y/focus"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
+import type { Modality } from "../../contract/env"
 import type { TableOfContentsMessages } from "./table-of-contents.messages"
 
 export type TableOfContentsPart = "root" | "title" | "list" | "item" | "link" | "indicator"
@@ -15,6 +17,13 @@ export interface TableOfContentsItem {
   /** Nesting under the shallowest heading (0, 1, …). */
   readonly depth: number
 }
+
+/** A link's own focus, for `data-focus` / `data-focus-visible`. */
+export interface TableOfContentsFocus {
+  readonly focused: boolean
+  readonly modality: Modality
+}
+const NONE: TableOfContentsFocus = { focused: false, modality: "pointer" }
 
 export interface TableOfContentsConnectInput {
   readonly instance: string
@@ -49,8 +58,9 @@ export function tableOfContentsConnect(input: TableOfContentsConnectInput) {
     title: (): PartProps => ({ ...part("title"), id: input.ids.title }),
     list: (): PartProps => ({ ...part("list"), style: { position: "relative" } }),
     item: (item: TableOfContentsItem): PartProps => sectionPart("item", item),
-    link: (item: TableOfContentsItem): PartProps => ({
+    link: (item: TableOfContentsItem, focus: TableOfContentsFocus = NONE): PartProps => ({
       ...sectionPart("link", item),
+      ...focusAttrs(focus.focused, focus.modality),
       href: `#${item.id}`,
       "aria-current": item.id === input.value ? "location" : undefined,
     }),

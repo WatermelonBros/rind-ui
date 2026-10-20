@@ -28,6 +28,7 @@ import { useEnvironment, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
+import { useModality } from "../use-modality"
 
 declare module "../provider" {
   interface RindMessageScopes {
@@ -249,12 +250,32 @@ function Item({ render, item, children, ...rest }: TableOfContentsItemProps) {
   )
 }
 
+/** The link's own focus, tracked from mount so the focusing key is already known. */
+function useFocusState() {
+  const env = useEnvironment()
+  useEffect(() => env.modality.subscribe(() => {}), [env])
+  const [focused, setFocused] = useState(false)
+  const modality = useModality(env.modality, focused)
+  return {
+    focus: { focused, modality },
+    onFocus: (e: React.FocusEvent) => {
+      if (e.target === e.currentTarget) setFocused(true)
+    },
+    onBlur: (e: React.FocusEvent) => {
+      if (e.target === e.currentTarget) setFocused(false)
+    },
+  }
+}
+
 function Link({ render, children, ...rest }: PartProps<"a">) {
   const ctx = useToc("Link")
   const item = useContext(ItemContext)
+  const { focus, onFocus, onBlur } = useFocusState()
   if (!item) throw new Error("TableOfContents.Link must be inside TableOfContents.Item")
   const props = mergeProps(
-    joinHandlers(normalizeProps(ctx.api.link(item)), {
+    joinHandlers(normalizeProps(ctx.api.link(item, focus)), {
+      onFocus,
+      onBlur,
       onClick: (e: React.MouseEvent) => {
         // New tab, new window, download: the browser's, not a jump on this page.
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return

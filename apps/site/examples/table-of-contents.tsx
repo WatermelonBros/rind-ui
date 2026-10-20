@@ -137,7 +137,12 @@ export function StickyHeader() {
           <Sections tall={false} margin={56} />
         </div>
       </section>
-      <TableOfContents.Root items={SECTIONS} scrollRoot={scroller} offset={48}>
+      <TableOfContents.Root
+        items={SECTIONS}
+        scrollRoot={scroller}
+        offset={48}
+        aria-label="Guide contents"
+      >
         <Contents />
       </TableOfContents.Root>
     </div>

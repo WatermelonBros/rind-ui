@@ -54,7 +54,7 @@ describe("table of contents meta matches the code", () => {
       title: a.title(),
       list: a.list(),
       item: a.item(intro),
-      link: a.link(intro),
+      link: a.link(intro, { focused: true, modality: "keyboard" }),
       indicator: tableOfContentsConnect(input({ marker: null })).indicator(),
     }
     for (const [part, props] of Object.entries(parts)) {
