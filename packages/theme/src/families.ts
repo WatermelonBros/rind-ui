@@ -201,6 +201,7 @@ export const familyMatrix = [
       "image-cropper",
       "table-of-contents",
       "kbd",
+      "timeline",
     ],
     variants: [],
     size: "none",

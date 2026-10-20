@@ -1,0 +1,150 @@
+/* ── Timeline: chunky brand dots on a rounded rail; the current dot glows, upcoming ones are
+   outlined, a running step pulses on a dashed rail. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="root"] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--s-ink);
+  font: 500 14px / 1.45 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="item"] {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-areas: "rail content";
+  column-gap: 12px;
+  padding-block-end: 20px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="indicator"] {
+  grid-area: rail;
+  justify-self: center;
+  z-index: 1;
+  inline-size: 16px;
+  block-size: 16px;
+  margin-block-start: 2px;
+  box-sizing: border-box;
+  border: 3px solid color-mix(in oklab, var(--s-ink) 30%, transparent);
+  border-radius: 999px;
+  background: var(--s-card);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="indicator"][data-status="completed"] {
+  border-color: var(--s-brand);
+  background: var(--s-brand);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="indicator"]:is(
+    [data-status="current"],
+    [data-status="pending"]
+  ) {
+  border-color: var(--s-brand);
+  box-shadow: 0 0 0 5px color-mix(in oklab, var(--s-brand) 25%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="connector"] {
+  position: absolute;
+  inset-block: 20px 2px;
+  inset-inline-start: 13px;
+  inline-size: 0;
+  border-inline-start: 3px solid color-mix(in oklab, var(--s-ink) 16%, transparent);
+  border-radius: 3px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="connector"][data-status="completed"] {
+  border-inline-start-color: var(--s-brand);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="connector"][data-status="pending"] {
+  border-inline-start-style: dashed;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="connector"][data-last] {
+  display: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="content"] {
+  grid-area: content;
+  display: grid;
+  gap: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timeline"][data-part="title"] {
+  font-weight: 800;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"]:is(
+    [data-part="description"],
+    [data-part="time"],
+    [data-part="opposite"]
+  ) {
+  color: color-mix(in oklab, var(--s-ink) 68%, transparent);
+  font-size: 13px;
+}
+/* alternate: the rail in the middle */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  > [data-part="item"] {
+  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  grid-template-areas: "opposite rail content";
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  > [data-part="item"][data-side="end"] {
+  grid-template-areas: "content rail opposite";
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  > [data-side="end"]
+  > [data-part="content"],
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  > [data-side="start"]
+  > [data-part="opposite"] {
+  text-align: end;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  [data-part="opposite"] {
+  grid-area: opposite;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-align="alternate"]
+  [data-part="connector"] {
+  inset-inline-start: calc(50% - 1.5px);
+}
+/* horizontal */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="timeline"][data-part="root"][data-orientation="horizontal"] {
+  display: flex;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-orientation="horizontal"]
+  > [data-part="item"] {
+  flex: 1;
+  grid-template-columns: auto;
+  grid-template-areas: "rail" "content";
+  row-gap: 8px;
+  padding: 0 12px 0 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-orientation="horizontal"]
+  [data-part="indicator"] {
+  justify-self: start;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-orientation="horizontal"]
+  [data-part="connector"] {
+  inset-block: 8.5px auto;
+  inset-inline: 22px 6px;
+  inline-size: auto;
+  block-size: 0;
+  border-inline-start: 0;
+  border-block-start: 3px solid color-mix(in oklab, var(--s-ink) 16%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-orientation="horizontal"]
+  [data-part="connector"][data-status="completed"] {
+  border-block-start-color: var(--s-brand);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timeline"][data-part="root"][data-orientation="horizontal"]
+  [data-part="connector"][data-status="pending"] {
+  border-block-start-style: dashed;
+}

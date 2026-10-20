@@ -78,6 +78,7 @@ import * as tabs from "./tabs"
 import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
+import * as timeline from "./timeline"
 import * as toast from "./toast"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
@@ -165,6 +166,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   splitter,
   kbd,
   stepper,
+  timeline,
   "table-of-contents": tableOfContents,
   "streaming-message": streamingMessage,
   switch: switchEx,

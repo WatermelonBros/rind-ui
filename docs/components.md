@@ -148,7 +148,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | QR Code | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Used by Reado |
 | Skeleton |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
-| Timeline |  |  |  |  |  |  |  |  |  | 0 | 3 | todo | Ordered events list; Reado has TimelinePanel |
+| Timeline |  |  |  |  |  |  |  |  |  | 0 | 3 | done | Ordered events list; Reado has TimelinePanel |
 
 ## AI-UI primitives (11)
 

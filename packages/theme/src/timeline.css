@@ -1,0 +1,220 @@
+/*
+ * Timeline: family `decoration`, no variant or size rules. Each item is a grid: a rail column
+ * (the dot, and the connector running down to the next item) beside the content. Statuses
+ * differ by shape as well as colour: completed is a filled dot on a solid line, current a
+ * ringed dot, pending a dashed line with a pulsing dot, upcoming a hollow muted dot.
+ * `alternate` puts the rail in the middle and items on `data-side`; horizontal lays items in
+ * a row with the connector to the right of the dot.
+ */
+@layer rind.components {
+  :where([data-scope="timeline"][data-part="root"]) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :where([data-scope="timeline"][data-part="item"]) {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--rind-timeline-rail, 1.5rem) minmax(0, 1fr);
+    grid-template-areas: "rail content";
+    column-gap: var(--rind-space-3);
+    padding-block-end: var(--rind-timeline-gap, var(--rind-space-4));
+  }
+
+  :where([data-scope="timeline"][data-part="indicator"]) {
+    grid-area: rail;
+    justify-self: center;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: var(--rind-timeline-dot-size, 0.75rem);
+    block-size: var(--rind-timeline-dot-size, 0.75rem);
+    margin-block-start: 0.3em;
+    box-sizing: border-box;
+    border: var(--rind-timeline-line-width, 2px) solid var(--rind-color-border-strong);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color-bg);
+    color: var(--rind-color-accent-text);
+  }
+
+  /* An icon inside the indicator: a bigger, borderless badge. */
+  :where([data-scope="timeline"][data-part="indicator"]:not(:empty)) {
+    inline-size: auto;
+    block-size: auto;
+    min-inline-size: 1.5rem;
+    min-block-size: 1.5rem;
+    margin-block-start: 0;
+    font-size: 0.8em;
+  }
+
+  :where([data-scope="timeline"][data-part="connector"]) {
+    position: absolute;
+    inset-block: calc(0.3em + var(--rind-timeline-dot-size, 0.75rem)) 0;
+    inset-inline-start: calc(
+      var(--rind-timeline-rail, 1.5rem) /
+      2 -
+      var(--rind-timeline-line-width, 2px) /
+      2
+    );
+    inline-size: 0;
+    border-inline-start: var(--rind-timeline-line-width, 2px) solid var(--rind-color-border);
+  }
+
+  :where([data-scope="timeline"][data-part="connector"][data-last]) {
+    display: none;
+  }
+
+  :where([data-scope="timeline"][data-part="content"]) {
+    grid-area: content;
+    display: grid;
+    gap: var(--rind-space-1);
+    min-inline-size: 0;
+  }
+
+  :where([data-scope="timeline"][data-part="title"]) {
+    color: var(--rind-color-text);
+    font-weight: 600;
+  }
+
+  :where([data-scope="timeline"][data-part="description"]),
+  :where([data-scope="timeline"][data-part="time"]),
+  :where([data-scope="timeline"][data-part="opposite"]) {
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-sm);
+  }
+
+  /* ── Statuses: shape and colour ── */
+  :where([data-scope="timeline"][data-part="indicator"][data-status="completed"]) {
+    border-color: var(--rind-color-accent-solid);
+    background: var(--rind-color-accent-solid);
+    color: var(--rind-color-accent-on-solid);
+  }
+  :where([data-scope="timeline"][data-part="connector"][data-status="completed"]) {
+    border-inline-start-color: var(--rind-color-accent-solid);
+  }
+  :where([data-scope="timeline"][data-part="indicator"][data-status="current"]) {
+    border-color: var(--rind-color-accent-solid);
+    box-shadow: 0 0 0 3px var(--rind-color-accent-soft);
+  }
+  :where([data-scope="timeline"][data-part="indicator"][data-status="pending"]) {
+    border-color: var(--rind-color-accent-solid);
+    animation: rind-timeline-pulse 1.4s var(--rind-ease-in-out) infinite;
+  }
+  :where([data-scope="timeline"][data-part="connector"][data-status="pending"]) {
+    border-inline-start-style: dashed;
+  }
+  :where([data-scope="timeline"][data-part="title"][data-status="upcoming"]) {
+    color: var(--rind-color-text-muted);
+    font-weight: 500;
+  }
+
+  @keyframes rind-timeline-pulse {
+    50% {
+      box-shadow: 0 0 0 4px var(--rind-color-accent-soft);
+    }
+  }
+
+  /* ── Alignment ── */
+  :where([data-scope="timeline"][data-part="root"][data-align="end"]) > :where([data-part="item"]) {
+    grid-template-columns: minmax(0, 1fr) var(--rind-timeline-rail, 1.5rem);
+    grid-template-areas: "content rail";
+    text-align: end;
+  }
+  :where([data-scope="timeline"][data-part="root"][data-align="end"])
+    :where([data-part="connector"]) {
+    inset-inline-start: auto;
+    inset-inline-end: calc(
+      var(--rind-timeline-rail, 1.5rem) /
+      2 -
+      var(--rind-timeline-line-width, 2px) /
+      2
+    );
+  }
+
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    > :where([data-part="item"]) {
+    grid-template-columns: minmax(0, 1fr) var(--rind-timeline-rail, 1.5rem) minmax(0, 1fr);
+    grid-template-areas: "opposite rail content";
+  }
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    > :where([data-part="item"][data-side="end"]) {
+    grid-template-areas: "content rail opposite";
+  }
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    > :where([data-part="item"][data-side="end"])
+    > :where([data-part="content"]),
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    > :where([data-part="item"][data-side="start"])
+    > :where([data-part="opposite"]) {
+    text-align: end;
+  }
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    :where([data-part="opposite"]) {
+    grid-area: opposite;
+  }
+  :where([data-scope="timeline"][data-part="root"][data-align="alternate"])
+    :where([data-part="connector"]) {
+    inset-inline-start: calc(50% - var(--rind-timeline-line-width, 2px) / 2);
+  }
+
+  /* ── Horizontal ── */
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"]) {
+    display: flex;
+    gap: 0;
+  }
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"])
+    > :where([data-part="item"]) {
+    flex: 1;
+    grid-template-columns: auto;
+    grid-template-areas: "rail" "content";
+    row-gap: var(--rind-space-2);
+    padding-block-end: 0;
+    padding-inline-end: var(--rind-space-3);
+  }
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"])
+    :where([data-part="indicator"]) {
+    justify-self: start;
+  }
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"])
+    :where([data-part="connector"]) {
+    inset-block: calc(
+        0.3em +
+        var(--rind-timeline-dot-size, 0.75rem) /
+        2 -
+        var(--rind-timeline-line-width, 2px) /
+        2
+      )
+      auto;
+    inset-inline: calc(var(--rind-timeline-dot-size, 0.75rem) + var(--rind-space-1))
+      var(--rind-space-1);
+    inline-size: auto;
+    block-size: 0;
+    border-inline-start: 0;
+    border-block-start: var(--rind-timeline-line-width, 2px) solid var(--rind-color-border);
+  }
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"])
+    :where([data-part="connector"][data-status="completed"]) {
+    border-block-start-color: var(--rind-color-accent-solid);
+  }
+  :where([data-scope="timeline"][data-part="root"][data-orientation="horizontal"])
+    :where([data-part="connector"][data-status="pending"]) {
+    border-block-start-style: dashed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="timeline"][data-part="indicator"][data-status="pending"]) {
+      animation: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="timeline"][data-part="indicator"][data-status="completed"]) {
+      background: CanvasText;
+    }
+    :where([data-scope="timeline"][data-part="indicator"][data-status="current"]) {
+      border-color: Highlight;
+      background: Highlight;
+    }
+  }
+}
