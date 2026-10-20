@@ -25,6 +25,8 @@ export type Key =
   /** Plus and minus (zoom in and out). */
   | "+"
   | "-"
+  /** The digit 0 (reset a zoom). */
+  | "0"
 
 export interface KeyOptions {
   readonly shift?: boolean

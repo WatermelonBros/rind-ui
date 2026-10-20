@@ -1,0 +1,113 @@
+/*
+ * Image Viewer: family `decoration`, no variant or size rules. The viewport is a rounded
+ * surface that shows a grab cursor once zoomed (grabbing while dragged) and a focus ring for
+ * keyboard focus; the buttons are a compact toolbar with the zoom text between them; an empty
+ * button draws its own glyph (+, −, ⤢) so the parts work without icons.
+ */
+@layer rind.components {
+  :where([data-scope="image-viewer"][data-part="root"]) {
+    display: grid;
+    grid-template-columns: auto auto auto auto 1fr;
+    align-items: center;
+    gap: var(--rind-space-2);
+  }
+
+  :where([data-scope="image-viewer"][data-part="viewport"]) {
+    grid-column: 1 / -1;
+    border-radius: var(--rind-radius-md);
+    background: var(--rind-color-surface);
+    outline: none;
+  }
+
+  :where([data-scope="image-viewer"][data-part="viewport"][data-zoomed]) {
+    cursor: grab;
+  }
+
+  :where([data-scope="image-viewer"][data-part="viewport"][data-panning]) {
+    cursor: grabbing;
+  }
+
+  :where([data-scope="image-viewer"][data-part="viewport"])[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where(
+    [data-scope="image-viewer"][data-part="zoom-in"],
+    [data-scope="image-viewer"][data-part="zoom-out"],
+    [data-scope="image-viewer"][data-part="reset"]
+  ) {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 2rem;
+    min-block-size: 2rem;
+    padding: 0 var(--rind-space-2);
+    border: 1px solid var(--rind-color-border);
+    border-radius: var(--rind-radius-control);
+    background: var(--rind-color-surface);
+    color: var(--rind-color-text);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  :where([data-scope="image-viewer"][data-part="zoom-in"]:empty)::before {
+    content: "+";
+    font-size: 1.15em;
+  }
+  :where([data-scope="image-viewer"][data-part="zoom-out"]:empty)::before {
+    content: "−";
+    font-size: 1.15em;
+  }
+  :where([data-scope="image-viewer"][data-part="reset"]:empty)::before {
+    content: "⤢";
+    font-size: 1.15em;
+  }
+
+  :where(
+    [data-scope="image-viewer"][data-part="zoom-in"],
+    [data-scope="image-viewer"][data-part="zoom-out"],
+    [data-scope="image-viewer"][data-part="reset"]
+  ):hover:not([data-disabled]) {
+    background: var(--rind-color-surface-raised);
+  }
+
+  :where(
+    [data-scope="image-viewer"][data-part="zoom-in"],
+    [data-scope="image-viewer"][data-part="zoom-out"],
+    [data-scope="image-viewer"][data-part="reset"]
+  ):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where(
+    [data-scope="image-viewer"][data-part="zoom-in"],
+    [data-scope="image-viewer"][data-part="zoom-out"],
+    [data-scope="image-viewer"][data-part="reset"]
+  )[data-disabled] {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  :where([data-scope="image-viewer"][data-part="zoom-text"]) {
+    min-inline-size: 3.5em;
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="image-viewer"][data-part="viewport"]) {
+      border: 1px solid CanvasText;
+    }
+    :where(
+        [data-scope="image-viewer"][data-part="zoom-in"],
+        [data-scope="image-viewer"][data-part="zoom-out"],
+        [data-scope="image-viewer"][data-part="reset"]
+      )[data-disabled] {
+      color: GrayText;
+    }
+  }
+}

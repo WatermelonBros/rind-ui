@@ -53,6 +53,7 @@ const PW_KEYS: Record<Key, string> = {
   // A bare "+" is Playwright's chord separator; the numpad keys produce the same `key`.
   "+": "NumpadAdd",
   "-": "NumpadSubtract",
+  "0": "Digit0",
 }
 const keyName = (key: Key, o: KeyOptions = {}, apple?: boolean) =>
   [

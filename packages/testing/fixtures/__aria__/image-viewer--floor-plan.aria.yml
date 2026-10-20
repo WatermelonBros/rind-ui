@@ -1,0 +1,5 @@
+- group "Floor plan of the flat"
+- button "Zoom out" [disabled]: −
+- button "Zoom in": +
+- button "Reset zoom" [disabled]: ⤢
+- text: Plus and minus zoom, arrow keys move the image, 0 resets.

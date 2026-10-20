@@ -294,3 +294,4 @@ export {
   waitForElement,
   waitForEvent,
 } from "./wait-for-element"
+export { type ZoomGestureHandlers, zoomGestures } from "./zoom-gestures"

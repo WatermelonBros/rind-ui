@@ -150,6 +150,7 @@ const KEY_NAMES: Record<Key, string> = {
   Delete: "{Delete}",
   "+": "+",
   "-": "-",
+  "0": "0",
   F6: "{F6}",
   F10: "{F10}",
   ContextMenu: "{ContextMenu}",
