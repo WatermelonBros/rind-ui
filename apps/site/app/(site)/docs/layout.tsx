@@ -1,5 +1,6 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
+import { type DocsStop, ScrollToNext } from "@/components/scroll-to-next"
 import { type NavGroup, Sidebar } from "@/components/sidebar"
 import { pages } from "@/lib/docs"
 import styles from "./docs.module.css"
@@ -33,6 +34,11 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
         .map(({ slug }) => ({ slug, label: shortLabel(slug) })),
     },
   ]
+  // The reading order: the components index, then every page in sidebar order.
+  const stops: DocsStop[] = [
+    { href: "/docs/", label: "Components" },
+    ...groups.flatMap((g) => g.entries.map((e) => ({ href: `/docs/${e.slug}/`, label: e.label }))),
+  ]
   return (
     <div className={styles.shell} data-surface="docs">
       <Sidebar groups={groups} />
@@ -46,6 +52,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
             Built using <b>Reado</b> ↗
           </a>
         </footer>
+        <ScrollToNext stops={stops} />
       </main>
     </div>
   )
