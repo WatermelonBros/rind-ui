@@ -60,12 +60,15 @@ export function Peel() {
   }, [])
 
   // the machine takes a transition on its own once the camera shows it
-  useEffect(() => setChecked(progress > 0.8), [progress])
+  useEffect(() => setChecked(progress > 0.75), [progress])
 
-  const p1 = clamp(progress / 0.32)
-  const p2 = clamp((progress - 0.34) / 0.25)
-  const p3 = clamp((progress - 0.62) / 0.25)
-  const act = progress < 0.33 ? 0 : progress < 0.62 ? 1 : 2
+  // The hero has already peeled the skin (skin-scene.tsx): this scene starts bare, with the
+  // attributes, then pulls back to the machine. Under reduced motion the hero shows the skinned
+  // component and this scene the bare one, so the comparison holds without motion.
+  const p1 = 1
+  const p2 = clamp(progress / 0.4)
+  const p3 = clamp((progress - 0.5) / 0.35)
+  const act = progress < 0.5 ? 1 : 2
   const vars = { "--p1": p1, "--p2": p2, "--p3": p3 } as CSSProperties
 
   // The peel, in two beats. First a 45° fold line x + y = d travels in from the bottom-right
