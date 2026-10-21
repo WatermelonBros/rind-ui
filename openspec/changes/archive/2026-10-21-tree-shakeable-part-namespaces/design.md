@@ -44,3 +44,28 @@ keeps only the referenced member. esbuild keeps both members through `export * a
   `scripts/lint-use-client.mjs` is extended to require it there.
 - [Consumers spreading the namespace (`{...Dialog}`) or iterating it] → still works (a module
   namespace is an object), only loses shaking.
+
+## Outcome (implementation)
+
+- **tsdown turns `export * as` into an object.** Rolldown's unbundled output builds the
+  namespace with `__exportAll({ … })` and re-exports that object, which defeats shaking (the
+  pilot measured no gain until fixed). `scripts/namespace-reexports.ts`, a `renderChunk` plugin in
+  `packages/react/tsdown.config.ts`, rewrites `export { x_exports as N } from "…"` and
+  `import { x_exports } from "…"` back into `export * as` / `import * as`; the `__exportAll`
+  object is then unused and, being `@__PURE__`, dropped.
+- **Bundlers checked** with a two-export fixture: Rolldown and webpack 5 (Next's copy; it
+  concatenates the modules and leaves the unused part dead for the minifier) drop the unused
+  member; esbuild keeps it. Turbopack not checked.
+- **Parts modules carry no `"use client"`**: they are barrels (no hooks), so
+  `scripts/lint-use-client.mjs` keeps them unmarked; the client boundary stays in the component
+  file.
+- **Doc row order**: Biome sorts export lists; parts modules whose docs order differs from the
+  alphabetical one carry a `biome-ignore assist/source/organizeImports` comment, so the generated
+  docs are unchanged.
+- **Not migrated**: Heading and Label (`Object.assign` on a component), and the colour internals
+  (Color Area, Slider, Swatch, Swatch Picker, Field, Channel Field), which have no subpath entry
+  and are read by the docs generator from their component file.
+- **Root-only budgets** replace a hand-picked "minimal composition" per component: `<Name>.Root`
+  alone, measured with Rolldown, for each of the 65 part namespaces. Examples (gzip): Dialog 23.5
+  (whole, esbuild) → 13.9 (root, Rolldown); Date Field 82.5 → 53.8; Popover 34.4 → 23.4;
+  Breadcrumbs 13.5 → 3.9; Color Picker with Root, Area and ChannelSlider 85.6 → 68.4.

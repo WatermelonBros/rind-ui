@@ -1,1 +1,2 @@
-export { Collapsible, type CollapsibleRootProps, type CollapsibleState } from "./collapsible"
+export type { CollapsibleRootProps, CollapsibleState } from "./collapsible"
+export * as Collapsible from "./collapsible.parts"

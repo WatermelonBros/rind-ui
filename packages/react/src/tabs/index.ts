@@ -1,10 +1,10 @@
-export {
-  Tabs,
-  type TabsIndicatorProps,
-  type TabsListProps,
-  type TabsPanelProps,
-  type TabsRootProps,
-  type TabsState,
-  type TabsTabProps,
-  type TabsTabState,
+export type {
+  TabsIndicatorProps,
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsState,
+  TabsTabProps,
+  TabsTabState,
 } from "./tabs"
+export * as Tabs from "./tabs.parts"

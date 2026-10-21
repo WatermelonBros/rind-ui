@@ -1,7 +1,7 @@
-export {
-  Timeline,
-  type TimelineItemProps,
-  type TimelineRenderState,
-  type TimelineRootProps,
-  type TimelineTimeProps,
+export type {
+  TimelineItemProps,
+  TimelineRenderState,
+  TimelineRootProps,
+  TimelineTimeProps,
 } from "./timeline"
+export * as Timeline from "./timeline.parts"

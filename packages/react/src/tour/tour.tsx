@@ -726,19 +726,20 @@ function CloseTrigger({ render, ref, ...rest }: Own<"button">) {
 }
 
 /** A guided tour over the page: steps that point at real elements, or centred dialogs. */
-export const Tour = {
-  Root,
-  Trigger,
-  Portal,
-  Backdrop,
-  Spotlight,
-  Positioner,
-  Content,
-  Arrow,
-  Title,
-  Description,
-  ProgressText,
+/** The parts, by name: `tour.parts.ts` re-exports them as the `Tour` namespace. */
+export {
   Actions,
   ActionTrigger,
+  Arrow,
+  Backdrop,
   CloseTrigger,
+  Content,
+  Description,
+  Portal,
+  Positioner,
+  ProgressText,
+  Root,
+  Spotlight,
+  Title,
+  Trigger,
 }

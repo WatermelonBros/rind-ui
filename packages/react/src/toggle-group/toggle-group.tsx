@@ -30,7 +30,8 @@ import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { type RenderProp, renderPart } from "../render"
-import { Toggle, type ToggleIndicatorProps, type ToggleRootProps } from "../toggle/toggle"
+import type { ToggleIndicatorProps, ToggleRootProps } from "../toggle/toggle"
+import * as Toggle from "../toggle/toggle.parts"
 import { useCollectionItems, useRegisterItem } from "../use-collection-items"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -312,4 +313,5 @@ function ItemIndicator(props: ToggleGroupItemIndicatorProps) {
   )
 }
 
-export const ToggleGroup = { Root, Item, ItemIndicator }
+/** The parts, by name: `toggle-group.parts.ts` re-exports them as the `ToggleGroup` namespace. */
+export { Item, ItemIndicator, Root }

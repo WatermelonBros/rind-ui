@@ -368,4 +368,5 @@ function Ellipsis({ children, render, ...rest }: BreadcrumbsEllipsisProps) {
 }
 
 /** A navigation landmark with the trail to the current location (openspec breadcrumbs). */
-export const Breadcrumbs = { Root, List, Item, Link: CrumbLink, Separator, Ellipsis }
+/** The parts, by name: `breadcrumbs.parts.ts` re-exports them as the `Breadcrumbs` namespace. */
+export { CrumbLink as Link, Ellipsis, Item, List, Root, Separator }

@@ -412,4 +412,5 @@ function JumpToLatest({ render, ref, children, ...rest }: PartProps<"button">) {
   return renderPart("button", { ...props, children }, render, ctx.state)
 }
 
-export const MessageThread = { Root, Viewport, Message, JumpToLatest }
+/** The parts, by name: `message-thread.parts.ts` re-exports them as the `MessageThread` namespace. */
+export { JumpToLatest, Message, Root, Viewport }

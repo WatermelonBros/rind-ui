@@ -420,13 +420,5 @@ function Line({ line, render, children, ...rest }: CodeBlockLineProps) {
   return renderPart("span", { ...mergeProps(own, rest), ...content }, render, ctx.state)
 }
 
-export const CodeBlock = {
-  Root,
-  Header,
-  Title,
-  CopyTrigger,
-  WrapTrigger,
-  CollapseTrigger,
-  Content,
-  Line,
-}
+/** The parts, by name: `code-block.parts.ts` re-exports them as the `CodeBlock` namespace. */
+export { CollapseTrigger, Content, CopyTrigger, Header, Line, Root, Title, WrapTrigger }

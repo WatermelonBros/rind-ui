@@ -31,13 +31,8 @@ import {
   useRef,
   useState,
 } from "react"
-import {
-  Menu,
-  type MenuHost,
-  MenuHostContext,
-  MenuLevelContext,
-  type MenuRootProps,
-} from "../menu/menu"
+import { type MenuHost, MenuHostContext, MenuLevelContext, type MenuRootProps } from "../menu/menu"
+import * as Menu from "../menu/menu.parts"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -373,4 +368,5 @@ function Trigger({ textValue, ref, ...rest }: MenubarTriggerProps) {
   return <Menu.Trigger {...props} disabled={disabled} />
 }
 
-export const Menubar = { Root, Menu: MenubarMenu, Trigger }
+/** The parts, by name: `menubar.parts.ts` re-exports them as the `Menubar` namespace. */
+export { MenubarMenu as Menu, Root, Trigger }

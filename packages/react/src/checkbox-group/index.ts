@@ -1,8 +1,8 @@
-export {
-  CheckboxGroup,
-  type CheckboxGroupItemIndicatorProps,
-  type CheckboxGroupItemProps,
-  type CheckboxGroupItemState,
-  type CheckboxGroupRootProps,
-  type CheckboxGroupState,
+export type {
+  CheckboxGroupItemIndicatorProps,
+  CheckboxGroupItemProps,
+  CheckboxGroupItemState,
+  CheckboxGroupRootProps,
+  CheckboxGroupState,
 } from "./checkbox-group"
+export * as CheckboxGroup from "./checkbox-group.parts"

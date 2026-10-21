@@ -1,8 +1,8 @@
-export {
-  ToggleGroup,
-  type ToggleGroupItemIndicatorProps,
-  type ToggleGroupItemProps,
-  type ToggleGroupItemState,
-  type ToggleGroupRootProps,
-  type ToggleGroupState,
+export type {
+  ToggleGroupItemIndicatorProps,
+  ToggleGroupItemProps,
+  ToggleGroupItemState,
+  ToggleGroupRootProps,
+  ToggleGroupState,
 } from "./toggle-group"
+export * as ToggleGroup from "./toggle-group.parts"

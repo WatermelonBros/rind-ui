@@ -1,7 +1,7 @@
-export {
-  HoverCard,
-  type HoverCardActions,
-  type HoverCardContentState,
-  type HoverCardRootProps,
-  type HoverCardTriggerState,
+export type {
+  HoverCardActions,
+  HoverCardContentState,
+  HoverCardRootProps,
+  HoverCardTriggerState,
 } from "./hover-card"
+export * as HoverCard from "./hover-card.parts"

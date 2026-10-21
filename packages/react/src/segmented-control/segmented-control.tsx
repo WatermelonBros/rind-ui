@@ -393,4 +393,5 @@ function Indicator({ render, ref, ...rest }: SegmentedControlIndicatorProps) {
   return renderPart("span", props, render, { visible: props["data-state"] === "visible" })
 }
 
-export const SegmentedControl = { Root, Label, Item, Indicator }
+/** The parts, by name: `segmented-control.parts.ts` re-exports them as the `SegmentedControl` namespace. */
+export { Indicator, Item, Label, Root }

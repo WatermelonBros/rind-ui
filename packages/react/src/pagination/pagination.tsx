@@ -355,14 +355,10 @@ function Ellipsis({ position = "end", children, render, ...rest }: PaginationEll
 }
 
 /** Navigation between the pages of a list (spec "Pagination"). */
-export const Pagination = {
-  Root,
-  List,
-  Item,
-  Page,
-  Ellipsis,
-  First: trigger("first"),
-  Previous: trigger("previous"),
-  Next: trigger("next"),
-  Last: trigger("last"),
-}
+const First = trigger("first")
+const Previous = trigger("previous")
+const Next = trigger("next")
+const Last = trigger("last")
+
+/** The parts, by name: `pagination.parts.ts` re-exports them as the `Pagination` namespace. */
+export { Ellipsis, First, Item, Last, List, Next, Page, Previous, Root }

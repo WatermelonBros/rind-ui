@@ -325,20 +325,17 @@ function ZoomText({ render, children, ...rest }: PartProps<"span">) {
   )
 }
 
-export const ImageViewer = {
-  Root,
-  Viewport,
-  Image,
-  ZoomIn: control("ZoomIn", (api) => api.zoomIn(), {
-    type: "ZOOM.STEP",
-    direction: 1,
-    source: "button",
-  }),
-  ZoomOut: control("ZoomOut", (api) => api.zoomOut(), {
-    type: "ZOOM.STEP",
-    direction: -1,
-    source: "button",
-  }),
-  Reset: control("Reset", (api) => api.reset(), { type: "RESET", source: "button" }),
-  ZoomText,
-}
+const ZoomIn = control("ZoomIn", (api) => api.zoomIn(), {
+  type: "ZOOM.STEP",
+  direction: 1,
+  source: "button",
+})
+const ZoomOut = control("ZoomOut", (api) => api.zoomOut(), {
+  type: "ZOOM.STEP",
+  direction: -1,
+  source: "button",
+})
+const Reset = control("Reset", (api) => api.reset(), { type: "RESET", source: "button" })
+
+/** The parts, by name: `image-viewer.parts.ts` re-exports them as the `ImageViewer` namespace. */
+export { Image, Reset, Root, Viewport, ZoomIn, ZoomOut, ZoomText }

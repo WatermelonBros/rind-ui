@@ -267,4 +267,32 @@ function Root(all: ListboxRootProps) {
 
 const parts = createListboxParts(useListboxHost)
 
-export const Listbox = { Root, ...parts }
+const {
+  Label,
+  List,
+  Item,
+  ItemText,
+  ItemDescription,
+  ItemIndicator,
+  Section,
+  Separator,
+  Empty,
+  LoadMore,
+  Items,
+} = parts
+
+/** The parts, by name: `listbox.parts.ts` re-exports them as the `Listbox` namespace. */
+export {
+  Empty,
+  Item,
+  ItemDescription,
+  ItemIndicator,
+  Items,
+  ItemText,
+  Label,
+  List,
+  LoadMore,
+  Root,
+  Section,
+  Separator,
+}

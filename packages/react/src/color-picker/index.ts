@@ -1,12 +1,12 @@
-export {
-  ColorPicker,
-  type ColorPickerAreaProps,
-  type ColorPickerChangeDetails,
-  type ColorPickerChannelInputProps,
-  type ColorPickerChannelSliderProps,
-  type ColorPickerRootProps,
-  type ColorPickerState,
-  type ColorPickerSwatchGroupProps,
-  type ColorPickerSwatchProps,
-  type ColorPickerSwatchTriggerProps,
+export type {
+  ColorPickerAreaProps,
+  ColorPickerChangeDetails,
+  ColorPickerChannelInputProps,
+  ColorPickerChannelSliderProps,
+  ColorPickerRootProps,
+  ColorPickerState,
+  ColorPickerSwatchGroupProps,
+  ColorPickerSwatchProps,
+  ColorPickerSwatchTriggerProps,
 } from "./color-picker"
+export * as ColorPicker from "./color-picker.parts"

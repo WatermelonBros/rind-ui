@@ -2,7 +2,8 @@
 // carries the host's scope, its radio name and part names; without a host it keeps its own.
 import { render } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
-import { RadioGroup, RadioGroupNaming } from "./radio-group"
+import { RadioGroupNaming } from "./radio-group"
+import * as RadioGroup from "./radio-group.parts"
 
 const parts = (root: HTMLElement) => [
   ...new Set(

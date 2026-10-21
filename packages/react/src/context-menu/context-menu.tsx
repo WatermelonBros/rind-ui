@@ -296,4 +296,5 @@ function Trigger({
   return renderPart("div", props, render, { open })
 }
 
-export const ContextMenu = { Root, Trigger }
+/** The parts, by name: `context-menu.parts.ts` re-exports them as the `ContextMenu` namespace. */
+export { Root, Trigger }

@@ -1,4 +1,3 @@
-export { TextField } from "./parts"
 export {
   createTextFieldRoot,
   type TextFieldDetails,
@@ -10,3 +9,4 @@ export {
   type TextFieldVisibilityReason,
   useTextFieldHost,
 } from "./text-field"
+export * as TextField from "./text-field.parts"

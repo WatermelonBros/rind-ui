@@ -593,4 +593,5 @@ function ErrorMessageShown({
   return renderPart("p", props, render, stateOf(ctx))
 }
 
-export const Field = { Root, Label, Description, ErrorMessage }
+/** The parts, by name: `field.parts.ts` re-exports them as the `Field` namespace. */
+export { Description, ErrorMessage, Label, Root }

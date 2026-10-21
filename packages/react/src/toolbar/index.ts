@@ -1,13 +1,13 @@
-export {
-  Toolbar,
-  type ToolbarActions,
-  type ToolbarButtonProps,
-  type ToolbarGroupProps,
-  type ToolbarGroupState,
-  type ToolbarItemProps,
-  type ToolbarItemState,
-  type ToolbarLinkProps,
-  type ToolbarRootProps,
-  type ToolbarSeparatorProps,
-  type ToolbarState,
+export type {
+  ToolbarActions,
+  ToolbarButtonProps,
+  ToolbarGroupProps,
+  ToolbarGroupState,
+  ToolbarItemProps,
+  ToolbarItemState,
+  ToolbarLinkProps,
+  ToolbarRootProps,
+  ToolbarSeparatorProps,
+  ToolbarState,
 } from "./toolbar"
+export * as Toolbar from "./toolbar.parts"

@@ -165,4 +165,5 @@ function Caret({ render, children, ...rest }: PartProps<"span">) {
   )
 }
 
-export const StreamingMessage = { Root, Content, Caret }
+/** The parts, by name: `streaming-message.parts.ts` re-exports them as the `StreamingMessage` namespace. */
+export { Caret, Content, Root }

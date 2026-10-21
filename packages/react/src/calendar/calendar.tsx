@@ -740,16 +740,17 @@ function Cell({
   })
 }
 
-export const Calendar = {
-  Root,
-  Header,
-  Heading,
-  PrevTrigger,
-  NextTrigger,
-  Grid,
-  GridHeader,
-  HeaderCell,
-  GridBody,
-  Row,
+/** The parts, by name: `calendar.parts.ts` re-exports them as the `Calendar` namespace. */
+export {
   Cell,
+  Grid,
+  GridBody,
+  GridHeader,
+  Header,
+  HeaderCell,
+  Heading,
+  NextTrigger,
+  PrevTrigger,
+  Root,
+  Row,
 }

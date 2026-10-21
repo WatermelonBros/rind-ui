@@ -339,11 +339,12 @@ function Header({ render, ref, ...rest }: PartProps<"h3">) {
   })
 }
 
-export const Accordion = {
-  Root,
-  Item,
+/** The parts, by name: `accordion.parts.ts` re-exports them as the `Accordion` namespace. */
+export {
+  CollapsibleContent as Content,
+  CollapsibleIndicator as Indicator,
+  CollapsibleTrigger as Trigger,
   Header,
-  Trigger: CollapsibleTrigger,
-  Content: CollapsibleContent,
-  Indicator: CollapsibleIndicator,
+  Item,
+  Root,
 }

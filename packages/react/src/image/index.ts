@@ -1,7 +1,2 @@
-export {
-  Image,
-  type ImageFallbackProps,
-  type ImageImgProps,
-  type ImageRootProps,
-  type ImageState,
-} from "./image"
+export type { ImageFallbackProps, ImageImgProps, ImageRootProps, ImageState } from "./image"
+export * as Image from "./image.parts"

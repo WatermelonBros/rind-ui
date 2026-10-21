@@ -206,4 +206,5 @@ function Corner({ render, ...rest }: ScrollAreaCornerProps) {
 }
 
 /** A native scroll container with custom-drawn scrollbars (native scrolling kept). */
-export const ScrollArea = { Root, Viewport, Content, Scrollbar, Thumb, Corner }
+/** The parts, by name: `scroll-area.parts.ts` re-exports them as the `ScrollArea` namespace. */
+export { Content, Corner, Root, Scrollbar, Thumb, Viewport }

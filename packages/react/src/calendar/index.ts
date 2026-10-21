@@ -1,8 +1,8 @@
-export {
-  Calendar,
-  type CalendarCellState,
-  type CalendarChangeDetails,
-  type CalendarGridState,
-  type CalendarRootProps,
-  type CalendarViewChangeDetails,
+export type {
+  CalendarCellState,
+  CalendarChangeDetails,
+  CalendarGridState,
+  CalendarRootProps,
+  CalendarViewChangeDetails,
 } from "./calendar"
+export * as Calendar from "./calendar.parts"

@@ -306,4 +306,5 @@ function Content({ render, ref, children, ...rest }: PartProps<"div">) {
   )
 }
 
-export const Marquee = { Root, PauseTrigger, Viewport, Content }
+/** The parts, by name: `marquee.parts.ts` re-exports them as the `Marquee` namespace. */
+export { Content, PauseTrigger, Root, Viewport }

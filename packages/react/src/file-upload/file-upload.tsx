@@ -655,16 +655,19 @@ function ClearTrigger({ render, ref, children, ...rest }: PartProps<"button">) {
   return renderPart("button", { ...props, children }, render, ctx.state)
 }
 
-export const FileUpload = {
-  Root: Root as <F extends FileLike = File>(props: FileUploadRootProps<F>) => ReactNode,
-  Label,
+const PublicRoot = Root as <F extends FileLike = File>(props: FileUploadRootProps<F>) => ReactNode
+
+/** The parts, by name: `file-upload.parts.ts` re-exports them as the `FileUpload` namespace. */
+export {
+  ClearTrigger,
   Dropzone,
-  Trigger,
-  ItemGroup,
   Item,
+  ItemGroup,
   ItemName,
-  ItemSize,
   ItemPreview,
   ItemRemove,
-  ClearTrigger,
+  ItemSize,
+  Label,
+  PublicRoot as Root,
+  Trigger,
 }

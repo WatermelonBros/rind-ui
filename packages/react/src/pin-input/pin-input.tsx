@@ -585,12 +585,13 @@ function Slot({
   })
 }
 
-export const PinInput = {
-  Root,
-  Label: HostLabel,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
+/** The parts, by name: `pin-input.parts.ts` re-exports them as the `PinInput` namespace. */
+export {
   Control,
+  HostDescription as Description,
+  HostErrorMessage as ErrorMessage,
+  HostLabel as Label,
   Input,
+  Root,
   Slot,
 }

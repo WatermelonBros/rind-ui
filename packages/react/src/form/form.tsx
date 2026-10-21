@@ -223,4 +223,5 @@ function Root({
 }
 
 /** Closes the context: a Form inside a Form (through a portal) starts fresh. */
-export const Form = { Root }
+/** The parts, by name: `form.parts.ts` re-exports them as the `Form` namespace. */
+export { Root }

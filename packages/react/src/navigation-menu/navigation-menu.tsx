@@ -715,15 +715,5 @@ function Positioner({
   return renderPart("div", props, render, undefined)
 }
 
-export const NavigationMenu = {
-  Root,
-  List,
-  Item,
-  Trigger,
-  Content,
-  Link: NavLink,
-  Indicator,
-  Viewport,
-  Positioner,
-  Sub,
-}
+/** The parts, by name: `navigation-menu.parts.ts` re-exports them as the `NavigationMenu` namespace. */
+export { Content, Indicator, Item, List, NavLink as Link, Positioner, Root, Sub, Trigger, Viewport }

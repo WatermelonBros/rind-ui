@@ -1,1 +1,2 @@
-export { Reasoning, type ReasoningRenderState, type ReasoningRootProps } from "./reasoning"
+export type { ReasoningRenderState, ReasoningRootProps } from "./reasoning"
+export * as Reasoning from "./reasoning.parts"

@@ -667,13 +667,14 @@ function DecrementTrigger({ render, children, ...rest }: TriggerProps) {
   return renderPart("button", { ...mergeProps(own, rest), children }, render, state)
 }
 
-export const NumberInput = {
-  Root,
-  Label: HostLabel,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
+/** The parts, by name: `number-input.parts.ts` re-exports them as the `NumberInput` namespace. */
+export {
   Control,
-  Input,
-  IncrementTrigger,
   DecrementTrigger,
+  HostDescription as Description,
+  HostErrorMessage as ErrorMessage,
+  HostLabel as Label,
+  IncrementTrigger,
+  Input,
+  Root,
 }

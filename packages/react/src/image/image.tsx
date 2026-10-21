@@ -113,4 +113,5 @@ function Fallback({ render, ...rest }: ImageFallbackProps) {
 }
 
 /** A content image with fallbacks; one accessible name (`alt`) in every status. */
-export const Image = { Root, Img, Fallback }
+/** The parts, by name: `image.parts.ts` re-exports them as the `Image` namespace. */
+export { Fallback, Img, Root }
