@@ -103,9 +103,10 @@ export function Peel() {
 
   return (
     <section ref={section} className={styles.peel} style={vars} aria-labelledby="peel-title">
-      <div className={styles.sticky}>
+      {/* each act owns the whole field: the skin on paper, the bare parts on ink, the machine on
+          the brand colour */}
+      <div className={styles.sticky} data-act={act}>
         <div className={styles.copy}>
-          <p className={styles.step}>{String(act + 1).padStart(2, "0")} / 03</p>
           <h2 id="peel-title" className={styles.title} key={act}>
             {ACTS[act]?.title}
           </h2>

@@ -8,18 +8,25 @@
   top: 0;
   height: 100vh;
   display: grid;
-  grid-template-columns: minmax(280px, 0.8fr) 1.2fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 40px;
-  padding: 0 56px;
+  padding: var(--bar-h) 56px 0;
   overflow: hidden;
+  background: var(--paper);
+  transition:
+    background-color 0.6s var(--spring),
+    color 0.6s var(--spring);
 }
-.step {
-  font: 600 13px var(--mono);
-  opacity: 0.75;
+.sticky[data-act="1"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.sticky[data-act="2"] {
+  background: var(--bg);
 }
 .title {
-  font: 900 clamp(40px, 5vw, 76px) / 0.95 var(--display);
+  font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
   letter-spacing: -0.035em;
   margin: 14px 0 16px;
   animation: in 0.6s var(--spring);
@@ -31,23 +38,23 @@
   }
 }
 .text {
-  font: 500 19px / 1.5 var(--text);
-  max-width: 380px;
+  font: 500 clamp(17px, 1.5vw, 22px) / 1.5 var(--text);
+  max-width: 26ch;
 }
 
 .scene {
   position: relative;
-  height: 70vh;
+  height: 80vh;
   display: grid;
   place-items: center;
 }
 /* the camera starts close on the component and pulls back for the machine */
 .camera {
-  --zoom: 1.9;
+  --zoom: 2;
   position: relative;
   display: grid;
   place-items: center;
-  scale: calc(var(--zoom) - var(--p3) * (var(--zoom) - 1.15));
+  scale: calc(var(--zoom) - var(--p3) * (var(--zoom) - 1.35));
   translate: 0 calc(var(--p3) * -70px);
 }
 
@@ -139,6 +146,14 @@
 :global([data-phase="juicy"]) .attrs b {
   color: #ff8fb1;
 }
+/* on the ink field the chips invert, so they read as labels on a blueprint */
+.sticky[data-act="1"] .attrs li {
+  background: var(--paper);
+  color: var(--ink);
+}
+.sticky[data-act="1"] .attrs b {
+  color: var(--acc-deep);
+}
 
 .graph {
   position: absolute;
@@ -190,10 +205,10 @@
     align-self: center;
   }
   .camera {
-    --zoom: 1.15;
+    --zoom: 1.2;
   }
   .graph {
-    width: 300px;
+    width: 260px;
   }
   /* two chips side by side fit a 360px screen */
   .attrs li {
