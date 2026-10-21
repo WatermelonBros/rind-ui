@@ -6,6 +6,7 @@ import {
   contextMenuMessages,
   contextMenuRegionProps,
   createMenuTree,
+  longPress,
   type MenuAnchorDetails,
   type MenuChangeDetails,
   type MenuPoint,
@@ -220,7 +221,8 @@ function Trigger({
   const start = useRef<MenuPoint>({ x: 0, y: 0 })
   const press = usePress({
     env,
-    longPress: { threshold: region.longPressDelay, moveTolerance: 10 },
+    // Read once, when the press is created (as before).
+    longPress: longPress({ threshold: region.longPressDelay, moveTolerance: 10 }),
     disabled: () => region.disabled || !region.longPress,
     send: (e) => {
       // Touch and pen only: a held mouse button is no long press.

@@ -141,7 +141,15 @@ export {
   MESSAGE_LIFETIME_MS,
   PENDING_ANNOUNCEMENTS,
 } from "./live-announcer"
-export { describedByHint, longPressMessages } from "./long-press"
+export {
+  describedByHint,
+  type LongPress,
+  type LongPressGesture,
+  type LongPressOptions,
+  type LongPressStart,
+  longPress,
+  longPressMessages,
+} from "./long-press"
 export {
   type MarqueeAxis,
   mirror,

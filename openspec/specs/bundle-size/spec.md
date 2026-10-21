@@ -60,6 +60,23 @@ none of its parts requests.
 - **THEN** the output contains the clipboard and announcer implementations and none of the
   other on-demand ones
 
+### Requirement: Long Press Is Shipped Only Where Used
+
+A pressable component that does not opt into long press SHALL NOT contain the long-press
+implementation in its bundle. Opting in SHALL keep every `press-interactions` long-press
+behaviour unchanged.
+
+#### Scenario: Switch
+
+- **WHEN** `Switch` is bundled from `@rind-ui/react/switch`
+- **THEN** the output does not contain the long-press module
+
+#### Scenario: Context Menu
+
+- **WHEN** `ContextMenu` is bundled and its trigger is held on touch for 500 ms
+- **THEN** the bundle contains the long-press module and the menu opens with no trailing press,
+  as before
+
 ### Requirement: Minimal Composition Budgets
 
 Every compound component exposed as a part namespace SHALL have a budget for its root part

@@ -128,6 +128,10 @@ const carries = (m, name) => m.modules.some((path) => path.endsWith(`/dom/${name
 const plain = await measure(`import { Switch } from "@rind-ui/react/switch"; console.log(Switch)`)
 const leaked = ON_DEMAND.filter((name) => carries(plain, name))
 if (leaked.length > 0) failures.push(`Switch carries on-demand capabilities: ${leaked.join(", ")}`)
+// Long press ships only with the parts that opt in (Context Menu), not with every pressable.
+if (carries(plain, "long-press")) failures.push("Switch carries the long-press module")
+const menu = await measure(`import { ContextMenu } from "@rind-ui/react"; console.log(ContextMenu)`)
+if (!carries(menu, "long-press")) failures.push("ContextMenu does not carry the long-press module")
 const copy = await measure(
   `import { Clipboard } from "@rind-ui/react/clipboard"; console.log(Clipboard)`,
 )

@@ -8,7 +8,7 @@ pressable component (Button, Toggle, Checkbox, Tabs, Menu items, …) ships it.
 ## What Changes
 
 - Long press becomes an extension module passed to `createPress` by the part that opts in
-  (`longPress: longPressExtension({ threshold, moveTolerance })`) instead of a plain options
+  (`longPress: longPress({ threshold, moveTolerance })`) instead of a plain options
   object read by code that is always bundled.
 - `createPress` exposes the few hooks the extension needs (pointer down/move/up/cancel,
   "suppress trailing press", "suppress touch context menu"); behaviour without the extension
@@ -36,7 +36,7 @@ Press) are unchanged: the same behaviour, opted into differently.
 
 ## Impact
 
-- `packages/core/src/dom/press.ts`, new `packages/core/src/dom/long-press.ts`.
+- `packages/core/src/dom/press.ts`, `packages/core/src/dom/long-press.ts` (beside the hint helpers).
 - `packages/react/src/context-menu/context-menu.tsx`, `packages/core/src/dom/index.ts` export.
 - **BREAKING** for direct `createPress` callers that passed `longPress: { … }` (core's DOM
-  utilities are public): they now pass `longPressExtension({ … })`. Changeset says so.
+  utilities are public): they now pass `longPress({ … })`. Changeset says so.
