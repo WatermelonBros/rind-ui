@@ -877,15 +877,27 @@
 }
 
 /* full-bleed bands alternate the surface under the sections */
-.band[data-band="paper"] {
-  background: var(--paper);
+/* each band's colour opens as a disc from its top edge while it enters the screen (band-reveal.tsx
+   drives --reveal), finished before its heading reaches the reading zone: no seams between bands */
+.band[data-band] {
+  position: relative;
+  isolation: isolate;
+  --band: var(--paper);
+}
+.band[data-band]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--band);
+  clip-path: circle(calc(var(--reveal, 1) * 160%) at 50% 0);
 }
 .band[data-band="ink"] {
-  background: #0b0b0c;
+  --band: #0b0b0c;
   color: #f5f5ee;
 }
 :global([data-phase="juicy"]) .band[data-band="ink"] {
-  background: #2a1d5c;
+  --band: #2a1d5c;
 }
 .band[data-band="ink"] .kicker {
   background: #d4ff3a;

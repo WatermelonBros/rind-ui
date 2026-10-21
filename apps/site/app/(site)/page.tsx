@@ -1,6 +1,7 @@
 import { Hero } from "@/components/hero"
 import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
+import { BandReveal } from "@/components/home/band-reveal"
 import { Outro } from "@/components/home/outro"
 import { Peel } from "@/components/home/peel"
 import { ScreenReaderView } from "@/components/home/sr-view"
@@ -39,6 +40,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED) }}
       />
       <SmoothScroll />
+      <BandReveal />
       <XRay />
       <ScreenReaderView />
       <Hero>
