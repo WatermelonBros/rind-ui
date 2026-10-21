@@ -22,6 +22,7 @@ export function GET() {
 ## Optional
 
 - [Full documentation](${site}/llms-full.txt): every page above in one file.
+- [MCP server](https://www.npmjs.com/package/@rind-ui/mcp): \`npx -y @rind-ui/mcp\` lists rind-ui's components and reads their docs for an agent.
 - [Agent skill](https://github.com/WatermelonBros/rind-ui/tree/main/skills/rind-ui): how to compose rind-ui and verify it with the drivers, in the Agent Skills format.
 - [rind-ui compared](${site}/compare.md): how rind-ui differs from other headless libraries, where they are ahead, and when to pick them instead.
 `

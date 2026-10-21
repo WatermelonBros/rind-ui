@@ -17,6 +17,7 @@ The API is generated from source. Read it before writing code:
 - One component as markdown: `https://rind.watermelon-studio.it/docs/<component>.md`
   (for example `docs/combobox.md`): parts, props, `data-*` attributes, keyboard, driver.
 - Everything in one file: https://rind.watermelon-studio.it/llms-full.txt
+- With MCP: `npx -y @rind-ui/mcp` gives you `list_components`, `get_component`, `search_docs`.
 
 ## Install
 
