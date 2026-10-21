@@ -844,6 +844,9 @@
 .outroGhost:hover {
   translate: 0 -2px;
 }
+.outroBottom > :last-child {
+  justify-self: end;
+}
 .builtWith {
   text-decoration: none;
   padding: 4px 10px;
@@ -861,11 +864,12 @@
   color: var(--ink);
 }
 .outroBottom {
-  display: flex;
-  flex-wrap: wrap;
+  /* three tracks, the outer two equal: the middle item sits on the page's true centre whatever
+     the width of its neighbours (space-between centres it only when they match) */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   gap: 12px;
   align-items: center;
-  justify-content: space-between;
   font: 500 13px var(--mono);
   opacity: 0.75;
   border-top: 1px solid color-mix(in oklab, var(--bg) 30%, transparent);
@@ -919,5 +923,15 @@
   }
   .reset {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .outroBottom {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+  .outroBottom > :last-child {
+    justify-self: start;
   }
 }
