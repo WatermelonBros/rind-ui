@@ -15,7 +15,7 @@
   overflow: hidden;
   /* the ground follows the scroll, no seams: the hero's colour turns to ink while the
      attributes come in, and back to the brand colour for the machine (--dark, peel.tsx) */
-  background: color-mix(in oklab, var(--ink) calc(var(--dark, 0) * 100%), var(--bg));
+  background: color-mix(in oklch, var(--ink) calc(var(--dark, 0) * 100%), var(--bg));
   transition: color 0.4s var(--spring);
 }
 /* text flips once the ground is more ink than brand colour */
@@ -193,24 +193,26 @@
   }
 }
 
-/* the hero's 3D object, bare, over this scene's control (peel.tsx); the control stays in the
-   DOM for its attributes, invisibly */
-.canvas {
-  position: absolute;
-  inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.6s var(--spring);
-}
-.canvas[data-on] {
-  opacity: 1;
-}
-.scene[data-gl] :is([data-part="control"], [data-part="thumb"], [data-part="indicator"], button) {
+/* the hero's 3D object stands over this scene's control (skin-scene.tsx): the control stays in
+   the DOM for its attributes, invisibly, and grows to the object's size; the card goes */
+.scene[data-gl] .under .component {
   background: transparent;
   border-color: transparent;
-  box-shadow: none;
-  color: transparent;
+}
+.scene[data-gl] [data-scope="switch"][data-part="control"] {
+  inline-size: 150px;
+  block-size: 70px;
+}
+.scene[data-gl] [data-scope="checkbox"][data-part="control"] {
+  inline-size: 84px;
+  block-size: 84px;
+}
+.scene[data-gl] button[data-scope="button"] {
+  inline-size: 170px;
+  block-size: 68px;
+}
+/* hidden by opacity (the skin never sets it), so the 3D object is the only control seen, even
+   while it is still travelling here */
+.scene[data-gl] .under .component :is([data-part="control"], button) {
+  opacity: 0;
 }

@@ -2,9 +2,15 @@
 
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
-import { type HeroKind, heroKind, useHeroOn } from "./hero-state"
+import {
+  type HeroKind,
+  heroKind,
+  setPeelOn,
+  setPeelTarget,
+  useHeroOn,
+  useSceneGl,
+} from "./hero-state"
 import styles from "./peel.module.css"
-import type { SkinHandle } from "./skin-gl"
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n))
 
@@ -46,46 +52,15 @@ export function Peel() {
   const [attrs, setAttrs] = useState<readonly string[]>([])
   useEffect(() => setKind(heroKind()), [])
 
-  // The same 3D object as the hero, bare: drawn over this scene's real control, so the story
-  // keeps one object in one material (skin-gl.ts; the same conditions as the hero's scene).
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const scene = useRef<SkinHandle | null>(null)
-  const [gl, setGl] = useState(false)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control to draw over
+  // The hero's 3D object travels here and stands over this scene's real control (skin-scene.tsx):
+  // hand it the control and its state; hide the control's own look while the object draws.
+  const gl = useSceneGl()
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control to hand over
   useEffect(() => {
-    const el = canvas.current
-    const at = control.current?.querySelector<HTMLElement>('[data-part="control"], button')
-    if (!el || !at) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    // sound: Network Information is optional and absent from lib.dom, so every field may be missing
-    const net = navigator as Navigator & { connection?: { saveData?: boolean } }
-    if (net.connection?.saveData) return
-    let cancelled = false
-    // only once the scene is close: the hero's context comes first
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting || scene.current) return
-        io.disconnect()
-        import("./skin-gl")
-          .then(({ mountSkin }) => {
-            if (cancelled) return
-            scene.current = mountSkin(el, at, kind, () => setGl(true), {
-              checked: onRef.current,
-              peel: 1,
-            })
-          })
-          .catch(() => {})
-      },
-      { rootMargin: "50% 0px" },
+    setPeelTarget(
+      control.current?.querySelector<HTMLElement>('[data-part="control"], button') ?? null,
     )
-    io.observe(el)
-    return () => {
-      cancelled = true
-      io.disconnect()
-      scene.current?.dispose()
-      scene.current = null
-      setGl(false)
-    }
+    return () => setPeelTarget(null)
   }, [kind])
 
   useEffect(() => {
@@ -115,12 +90,7 @@ export function Peel() {
   // to the other one (a button goes pending)
   const late = progress > 0.75
   const on = kind === "button" ? late : late ? !heroOn : heroOn
-  const onRef = useRef(on)
-  onRef.current = on
-  useEffect(() => {
-    if (kind === "button") scene.current?.setPress(on)
-    else scene.current?.setChecked(on)
-  }, [on, kind])
+  useEffect(() => setPeelOn(on), [on])
 
   // the chips are the control's real attributes, read from the DOM as they change
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control element to observe
@@ -163,7 +133,6 @@ export function Peel() {
 
         {/* the scene is an illustration of the text beside it: not focusable, not announced */}
         <div className={styles.scene} inert aria-hidden="true" data-gl={gl ? "" : undefined}>
-          <canvas ref={canvas} className={styles.canvas} data-on={gl ? "" : undefined} />
           <div className={styles.camera}>
             <div className={styles.layers} ref={control}>
               <div className={styles.under}>

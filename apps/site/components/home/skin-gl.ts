@@ -76,6 +76,8 @@ vec2 map(vec3 p) {
   float depth = bodyDepth() + swell;
   float body;
   float mark;
+  // a squashed space stretches the field: divide it back, or the march steps through the surface
+  float squash = 1.0;
   if (uKind < 0.5) {
     // Switch: a pill track; crisp lays a disc on it, juicy sinks a ball into it
     float h = 0.46 + swell;
@@ -98,7 +100,8 @@ vec2 map(vec3 p) {
   } else {
     // Button: a pill that sinks into its own shadow when pressed (crisp) or squashes (juicy)
     p.xy -= vec2(0.092, -0.092) * uPress * (1.0 - uPhase);
-    p.z *= 1.0 + 0.5 * uPress * uPhase;
+    squash = 1.0 + 0.5 * uPress * uPhase;
+    p.z *= squash;
     float h = 0.4 + swell;
     body = extrude(sdRoundRect(p.xy, vec2(1.0 + swell, h), h), p.z, depth, bevel(depth));
     vec2 tip = vec2(0.3, 0.0);
@@ -106,7 +109,7 @@ vec2 map(vec3 p) {
       min(sdSegment(p.xy, vec2(0.08, 0.2), tip), sdSegment(p.xy, vec2(0.08, -0.2), tip))) - 0.075;
     mark = onFace(arrow, p, depth);
   }
-  float d = mix(min(body, mark), smin(body, mark, 0.08), uPhase);
+  float d = mix(min(body, mark), smin(body, mark, 0.08), uPhase) / squash;
   return vec2(d, mark < body ? 1.0 : 0.0);
 }
 vec3 normalAt(vec3 p) {
@@ -252,16 +255,19 @@ export interface SkinHandle {
   readonly setPress: (pressed: boolean) => void
   /** 0 skin on, 1 skin off. */
   readonly setPeel: (peel: number) => void
+  /** The page scrolled: draw again if the component was off screen. */
+  readonly wake: () => void
   readonly dispose: () => void
 }
 
 /**
- * Mounts the component on `canvas`, drawn over `anchor` (the real control it stands in for).
+ * Mounts the component on `canvas` (fixed over the viewport), drawn wherever `rectAt` says.
  * Returns null when WebGL 2 is not available: the page keeps its plain version.
  */
 export function mountSkin(
   canvas: HTMLCanvasElement,
-  anchor: HTMLElement,
+  /** Where the component stands this frame, in viewport pixels (null: nowhere). */
+  rectAt: () => DOMRect | null,
   kind: Kind,
   onFirstFrame: () => void,
   initial: { checked: boolean; peel: number },
@@ -311,11 +317,15 @@ export function mountSkin(
   })
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-phase"] })
 
-  const stage = canvas.parentElement ?? canvas
+  // the canvas is fixed over the viewport; the component's rect comes from the page each frame,
+  // so it can travel from one place on the page to another
+  let present = true
   const place = () => {
     const dpr = renderer.dpr
-    const s = stage.getBoundingClientRect()
-    const a = anchor.getBoundingClientRect()
+    const s = canvas.getBoundingClientRect()
+    const a = rectAt()
+    present = Boolean(a && a.bottom > -a.height && a.top < s.height + a.height)
+    if (!a) return
     u.uCenter.value = [
       (a.left - s.left + a.width / 2) * dpr,
       (s.bottom - a.top - a.height / 2) * dpr,
@@ -323,14 +333,14 @@ export function mountSkin(
     u.uSize.value = (a.width / 2) * dpr
     u.uAspect.value = a.width / Math.max(a.height, 1)
   }
+  // the canvas covers the viewport: size it from the window (setSize writes its CSS size inline,
+  // so measuring the element would freeze it at whatever it measured first)
   const resize = () => {
-    renderer.setSize(stage.clientWidth, stage.clientHeight)
+    renderer.setSize(window.innerWidth, window.innerHeight)
     u.uRes.value = [gl.canvas.width, gl.canvas.height]
     place()
   }
-  const ro = new ResizeObserver(resize)
-  ro.observe(stage)
-  ro.observe(anchor)
+  window.addEventListener("resize", resize)
   resize()
 
   const tilt = [0, 0]
@@ -370,6 +380,7 @@ export function mountSkin(
     for (let i = 0; i < 3; i++) value[i] = (value[i] ?? 0) + ((to[i] ?? 0) - (value[i] ?? 0)) * k
   }
   let raf = 0
+  let asleep = false
   let slow = 0
   let first = true
   let last = performance.now()
@@ -412,6 +423,12 @@ export function mountSkin(
     t[0] = (t[0] ?? 0) + ((tilt[0] ?? 0) - (t[0] ?? 0)) * k
     t[1] = (t[1] ?? 0) + ((tilt[1] ?? 0) - (t[1] ?? 0)) * k
     place()
+    // off screen: clear once and sleep until the page scrolls it back (wake)
+    if (!present) {
+      gl.clear(gl.COLOR_BUFFER_BIT)
+      asleep = true
+      return
+    }
     renderer.render({ scene: mesh })
     if (first) {
       first = false
@@ -420,6 +437,7 @@ export function mountSkin(
     loop()
   }
   function loop() {
+    asleep = false
     if (!raf) raf = requestAnimationFrame(frame)
   }
   loop()
@@ -433,6 +451,9 @@ export function mountSkin(
       pressGoal = value ? 1 : 0
       loop()
     },
+    wake: () => {
+      if (asleep) loop()
+    },
     setPeel: (value) => {
       peelGoal = Math.min(1, Math.max(0, value))
       loop()
@@ -440,7 +461,7 @@ export function mountSkin(
     dispose: () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
-      ro.disconnect()
+      window.removeEventListener("resize", resize)
       io.disconnect()
       window.removeEventListener("pointermove", onMove)
       document.removeEventListener("visibilitychange", onVisibility)

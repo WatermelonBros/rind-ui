@@ -33,3 +33,40 @@ export function heroKind(): HeroKind {
   const picked = document.documentElement.dataset["hero"]
   return KINDS.find((k) => k === picked) ?? "switch"
 }
+
+// The scene after the hero hands the 3D object its own control and state: the object travels
+// from the hero to that control (skin-scene.tsx) and follows its state there.
+let peelTarget: HTMLElement | null = null
+let peelOn = true
+const peelListeners = new Set<() => void>()
+export const setPeelTarget = (el: HTMLElement | null) => {
+  peelTarget = el
+}
+export const getPeelTarget = () => peelTarget
+export function setPeelOn(value: boolean) {
+  if (value === peelOn) return
+  peelOn = value
+  for (const l of peelListeners) l()
+}
+export const getPeelOn = () => peelOn
+export const onPeelOn = (l: () => void) => {
+  peelListeners.add(l)
+  return () => peelListeners.delete(l)
+}
+
+// whether the 3D object is drawing: the controls it stands over hide their own look
+let sceneGl = false
+const glListeners = new Set<() => void>()
+export function setSceneGl(value: boolean) {
+  sceneGl = value
+  for (const l of glListeners) l()
+}
+export const useSceneGl = () =>
+  useSyncExternalStore(
+    (l) => {
+      glListeners.add(l)
+      return () => glListeners.delete(l)
+    },
+    () => sceneGl,
+    () => false,
+  )
