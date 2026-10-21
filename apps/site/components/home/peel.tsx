@@ -1,14 +1,13 @@
 "use client"
 
-import { Switch } from "@rind-ui/react"
+import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
-import { usePhase } from "../phase"
+import { type HeroKind, heroKind, useHeroOn } from "./hero-state"
 import styles from "./peel.module.css"
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n))
 
 const ACTS = [
-  { title: "Peel the skin.", text: "Every pixel on this page is a stylesheet laid on top." },
   {
     title: "This is what ships.",
     text: "Parts, state and ARIA, as attributes. Style them any way you like.",
@@ -16,25 +15,35 @@ const ACTS = [
   { title: "A machine underneath.", text: "Every interaction is a transition you can test." },
 ] as const
 
+// each machine as it really is: its two states and the event (or prop) between them
+const MACHINES: Record<HeroKind, { off: string; on: string; go: string; back: string }> = {
+  switch: { off: "unchecked", on: "checked", go: "TOGGLE", back: "TOGGLE" },
+  checkbox: { off: "unchecked", on: "checked", go: "TOGGLE", back: "TOGGLE" },
+  button: { off: "idle", on: "pending", go: "pending: true", back: "pending: false" },
+}
+
+// where the five attribute chips land around the component: two above, two below, one under
+const SLOTS = [
+  { x: "-6px", y: "-82px", ax: 1 },
+  { x: "6px", y: "-82px", ax: 0 },
+  { x: "-6px", y: "82px", ax: 1 },
+  { x: "6px", y: "82px", ax: 0 },
+  { x: "0px", y: "118px", ax: 0.5 },
+] as const
+
 /**
- * A pinned scroll scene: a skinned Switch peels away to the bare component, its attributes
- * appear, then the camera pulls back to the state machine driving it.
+ * A pinned scroll scene after the hero. The hero has already peeled the skin off its component
+ * (skin-scene.tsx): this scene shows the same component, bare and in the same state, its real
+ * attributes, then pulls back to the state machine driving it.
  */
 export function Peel() {
-  const { phase } = usePhase()
   const section = useRef<HTMLElement>(null)
+  const control = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
-  const [checked, setChecked] = useState(false)
-  // the skinned component's size: the fold geometry is in its pixels
-  const layers = useRef<HTMLDivElement>(null)
-  const [box, setBox] = useState({ w: 0, h: 0 })
-  useEffect(() => {
-    const el = layers.current
-    if (!el) return
-    const ro = new ResizeObserver(() => setBox({ w: el.offsetWidth, h: el.offsetHeight }))
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
+  const [kind, setKind] = useState<HeroKind>("switch")
+  const heroOn = useHeroOn()
+  const [attrs, setAttrs] = useState<readonly string[]>([])
+  useEffect(() => setKind(heroKind()), [])
 
   useEffect(() => {
     const el = section.current
@@ -59,56 +68,42 @@ export function Peel() {
     }
   }, [])
 
-  // the machine takes a transition on its own once the camera shows it
-  useEffect(() => setChecked(progress > 0.75), [progress])
+  // the machine takes a transition on its own once the camera shows it: from the hero's state
+  // to the other one (a button goes pending)
+  const late = progress > 0.75
+  const on = kind === "button" ? late : late ? !heroOn : heroOn
 
-  // The hero has already peeled the skin (skin-scene.tsx): this scene starts bare, with the
-  // attributes, then pulls back to the machine. Under reduced motion the hero shows the skinned
-  // component and this scene the bare one, so the comparison holds without motion.
-  const p1 = 1
+  // the chips are the control's real attributes, read from the DOM as they change
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control element to observe
+  useEffect(() => {
+    const host = control.current
+    const el = host?.querySelector<HTMLElement>('[data-part="control"], button')
+    if (!el) return
+    const read = () =>
+      setAttrs(
+        [...el.attributes]
+          .filter((a) =>
+            /^(role|aria-(checked|busy|disabled)|data-(scope|part|state|pending))$/.test(a.name),
+          )
+          .slice(0, SLOTS.length)
+          .map((a) => (a.value === "" ? a.name : `${a.name}="${a.value}"`)),
+      )
+    read()
+    const mo = new MutationObserver(read)
+    mo.observe(el, { attributes: true })
+    return () => mo.disconnect()
+  }, [kind])
+
   const p2 = clamp(progress / 0.4)
   const p3 = clamp((progress - 0.5) / 0.35)
-  const act = progress < 0.5 ? 1 : 2
-  const vars = { "--p1": p1, "--p2": p2, "--p3": p3 } as CSSProperties
-
-  // The peel, in two beats. First a 45° fold line x + y = d travels in from the bottom-right
-  // corner (d = w + h) until the corner is as deep as the short side: the skin keeps the part before the line, and the
-  // part beyond it is the flap, reflected across the line ((x, y) → (d − y, d − x)) so its back,
-  // the rind, lies on top. Then the skin and its flap lift together and slide away.
-  const eased = p1 * p1 * (3 - 2 * p1)
-  const fold = Math.min(1, eased / 0.6)
-  const lift = clamp((eased - 0.6) / 0.4)
-  // the fold stops at a corner as deep as the short side: the reflected flap stays on the skin
-  const d = box.w + box.h - fold * Math.min(box.w, box.h)
-  const far = box.w + box.h
-  const away = `translate(${-lift * 70}px, ${-lift * 90}px)`
-  const skinStyle = {
-    clipPath: `polygon(0 0, ${d}px 0, 0 ${d}px)`,
-    transform: away,
-    opacity: 1 - lift,
-  } as CSSProperties
-  const flapStyle = {
-    clipPath: `polygon(${d}px 0, ${far}px 0, ${far}px ${far}px, 0 ${far}px, 0 ${d}px)`,
-    transform: `${away} matrix(0, -1, -1, 0, ${d}, ${d})`,
-    opacity: fold > 0 ? 1 - lift : 0,
-  } as CSSProperties
-
-  const control = (skin: string) => (
-    <div className={styles.component} data-skinned="" data-skin={skin}>
-      <Switch.Root checked={checked} onCheckedChange={setChecked}>
-        <Switch.Control>
-          <Switch.Thumb />
-        </Switch.Control>
-        <Switch.Label>Wi-Fi</Switch.Label>
-      </Switch.Root>
-    </div>
-  )
+  const act = progress < 0.5 ? 0 : 1
+  const vars = { "--p1": 1, "--p2": p2, "--p3": p3 } as CSSProperties
+  const machine = MACHINES[kind]
 
   return (
     <section ref={section} className={styles.peel} style={vars} aria-labelledby="peel-title">
-      {/* each act owns the whole field: the skin on paper, the bare parts on ink, the machine on
-          the brand colour */}
-      <div className={styles.sticky} data-act={act}>
+      {/* each act owns the whole field: the bare parts on ink, the machine on the brand colour */}
+      <div className={styles.sticky} data-act={act + 1}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
             {ACTS[act]?.title}
@@ -119,55 +114,72 @@ export function Peel() {
         {/* the scene is an illustration of the text beside it: not focusable, not announced */}
         <div className={styles.scene} inert aria-hidden="true">
           <div className={styles.camera}>
-            <div className={styles.layers} ref={layers}>
-              <div className={styles.under}>{control("bare")}</div>
-              <div className={styles.skin} style={skinStyle}>
-                {control(phase)}
+            <div className={styles.layers} ref={control}>
+              <div className={styles.under}>
+                <div className={styles.component} data-skinned="" data-skin="bare">
+                  {kind === "switch" ? (
+                    <Switch.Root checked={on}>
+                      <Switch.Control>
+                        <Switch.Thumb />
+                      </Switch.Control>
+                      <Switch.Label>Wi-Fi</Switch.Label>
+                    </Switch.Root>
+                  ) : kind === "checkbox" ? (
+                    <CheckboxGroup.Item checked={on}>
+                      <CheckboxGroup.ItemControl>
+                        <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                      </CheckboxGroup.ItemControl>
+                      <CheckboxGroup.ItemLabel>Keyboard ready</CheckboxGroup.ItemLabel>
+                    </CheckboxGroup.Item>
+                  ) : (
+                    <Button pending={on}>Press me</Button>
+                  )}
+                </div>
               </div>
-              {/* the back of the peeled corner: the rind */}
-              <span className={styles.flap} data-skin={phase} style={flapStyle} />
             </div>
 
-            {/* two chips above, two below, one under them: each pair anchored to its own side of the
-                centre, so they never overlap whatever their width */}
             <ul className={styles.attrs}>
-              <li style={{ "--x": "-6px", "--y": "-82px", "--ax": 1 } as CSSProperties}>
-                data-scope=<b>"switch"</b>
-              </li>
-              <li style={{ "--x": "-6px", "--y": "82px", "--ax": 1 } as CSSProperties}>
-                role=<b>"switch"</b>
-              </li>
-              <li style={{ "--x": "6px", "--y": "-82px", "--ax": 0 } as CSSProperties}>
-                data-state=<b>"{checked ? "checked" : "unchecked"}"</b>
-              </li>
-              <li style={{ "--x": "6px", "--y": "82px", "--ax": 0 } as CSSProperties}>
-                aria-checked=<b>"{String(checked)}"</b>
-              </li>
-              <li style={{ "--x": "0px", "--y": "118px", "--ax": 0.5 } as CSSProperties}>
-                data-part=<b>"thumb"</b>
-              </li>
+              {attrs.map((a, i) => {
+                const slot = SLOTS[i] ?? SLOTS[0]
+                const eq = a.indexOf("=")
+                return (
+                  <li
+                    key={a.slice(0, eq < 0 ? undefined : eq)}
+                    style={{ "--x": slot.x, "--y": slot.y, "--ax": slot.ax } as CSSProperties}
+                  >
+                    {eq < 0 ? (
+                      a
+                    ) : (
+                      <>
+                        {a.slice(0, eq + 1)}
+                        <b>{a.slice(eq + 1)}</b>
+                      </>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
 
             <svg className={styles.graph} viewBox="0 0 420 150">
-              <title>Switch state machine</title>
+              <title>{`${kind} state machine`}</title>
               <path className={styles.edge} d="M118 58 C170 20 250 20 302 58" />
               <path className={styles.edge} d="M302 92 C250 130 170 130 118 92" />
               <text className={styles.event} x="210" y="22" textAnchor="middle">
-                TOGGLE
+                {machine.go}
               </text>
               <text className={styles.event} x="210" y="142" textAnchor="middle">
-                TOGGLE
+                {machine.back}
               </text>
-              <g data-on={checked ? undefined : ""}>
+              <g data-on={on ? undefined : ""}>
                 <rect x="10" y="50" width="120" height="50" rx="25" />
                 <text x="70" y="80" textAnchor="middle">
-                  unchecked
+                  {machine.off}
                 </text>
               </g>
-              <g data-on={checked ? "" : undefined}>
+              <g data-on={on ? "" : undefined}>
                 <rect x="290" y="50" width="120" height="50" rx="25" />
                 <text x="350" y="80" textAnchor="middle">
-                  checked
+                  {machine.on}
                 </text>
               </g>
             </svg>

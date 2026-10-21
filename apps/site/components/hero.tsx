@@ -16,7 +16,9 @@ export function Hero({ children }: { children?: ReactNode }) {
             <h1 className={styles.visuallyHidden}>rind</h1>
             <Wordmark />
             <p className={styles.lede}>
-              Behaviour, accessibility and state. <em>The look is yours.</em>
+              Behaviour, accessibility and state. {/* the line follows the hero's peel */}
+              <em className={styles.look}>The look is yours.</em>
+              <em className={styles.stays}>The behaviour stays.</em>
             </p>
             <div className={styles.ctas}>
               <Link href="/docs/get-started/" className={styles.primary}>

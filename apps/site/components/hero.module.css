@@ -77,6 +77,13 @@
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
+.stays,
+:global([data-bare]) .look {
+  display: none;
+}
+:global([data-bare]) .stays {
+  display: inline;
+}
 :global([data-phase="juicy"]) .lede em {
   background: var(--acc);
   color: var(--ink);

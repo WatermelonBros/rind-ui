@@ -2,6 +2,7 @@
 
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { setHeroOn } from "./hero-state"
 import type { Kind, SkinHandle } from "./skin-gl"
 import styles from "./skin-scene.module.css"
 
@@ -76,6 +77,8 @@ export function SkinScene() {
       if (peel > 0.55 !== shown) {
         shown = !shown
         setBare(shown)
+        // the rest of the hero (wordmark, lede) follows: hero.module.css, wordmark.module.css
+        hero?.toggleAttribute("data-bare", shown)
       }
     }
     const start = () => {
@@ -86,8 +89,8 @@ export function SkinScene() {
           onScroll()
           // a first hint that the skin comes off: it lifts a corner, then settles back
           if (peelAt() <= 0) {
-            scene.current?.setPeel(0.22)
-            hint = window.setTimeout(onScroll, 1100)
+            scene.current?.setPeel(0.4)
+            hint = window.setTimeout(onScroll, 1600)
           }
         })
         // decoration: a failed chunk leaves the CSS component in place
@@ -110,6 +113,7 @@ export function SkinScene() {
       if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle)
       clearTimeout(idle)
       clearTimeout(hint)
+      hero?.removeAttribute("data-bare")
       scene.current?.dispose()
       scene.current = null
     }
@@ -117,6 +121,7 @@ export function SkinScene() {
 
   const toggle = (value: boolean) => {
     setOn(value)
+    setHeroOn(value)
     scene.current?.setChecked(value)
   }
   const anchor = (kind: Kind) => (node: HTMLElement | null) => {

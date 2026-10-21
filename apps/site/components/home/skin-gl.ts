@@ -164,7 +164,8 @@ void main() {
     // the hard shadow's edge, anti-aliased over a pixel of the miss distance
     float hard = sh.x > 0.0 ? 1.0 : 1.0 - smoothstep(0.0, px * 0.5, sh.y);
     float soft = (1.0 - smoothstep(0.0, 0.3, sh.y)) * 0.6;
-    float shadow = mix(hard, soft, uPhase) * (1.0 - uPeel * 0.8);
+    // the shadow is part of the look: it comes off with the skin
+    float shadow = mix(hard, soft, uPhase) * (1.0 - uPeel);
     vec3 c = outline > shadow ? uInk : mix(uInk, uSoft, uPhase);
     color = vec4(c, max(outline, shadow));
     return;
