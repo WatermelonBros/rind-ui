@@ -1,0 +1,209 @@
+/* The canvas covers the whole hero, so the 3D component's shadow and tilt are never clipped. */
+.canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s var(--spring);
+}
+.canvas[data-on] {
+  opacity: 1;
+}
+
+.stage {
+  position: relative;
+  /* over the canvas: the real component takes the pointer and draws the focus ring on top */
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+  --w: min(38vw, 520px);
+}
+/* one component per visit, picked before paint (app/layout.tsx); the switch without a script */
+.variant {
+  display: none;
+  justify-items: center;
+  /* clear of the 3D shadow, which falls about 14px past the control */
+  gap: 36px;
+}
+:global(html:not([data-hero])) .variant[data-kind="switch"],
+:global(html[data-hero="switch"]) .variant[data-kind="switch"],
+:global(html[data-hero="checkbox"]) .variant[data-kind="checkbox"],
+:global(html[data-hero="button"]) .variant[data-kind="button"] {
+  display: grid;
+}
+.root {
+  display: grid;
+  justify-items: center;
+  gap: 40px;
+  cursor: pointer;
+}
+
+/* the CSS components: what renders before (and without) WebGL, in the page's own look */
+.switch,
+.checkbox,
+.button {
+  position: relative;
+  display: block;
+  border: 6px solid var(--ink);
+  background: var(--card);
+  color: var(--on);
+  box-shadow: 14px 14px 0 var(--ink);
+  transition:
+    background 0.3s var(--spring),
+    translate 0.15s var(--spring),
+    box-shadow 0.15s var(--spring);
+}
+.switch {
+  inline-size: var(--w);
+  aspect-ratio: 2.15;
+  border-radius: 999px;
+}
+.switch[data-state="checked"],
+.checkbox[data-state="checked"],
+.button {
+  background: var(--ink);
+}
+.thumb {
+  position: absolute;
+  inset-block: 9%;
+  inset-inline-start: 4.5%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ink);
+  transition:
+    translate 0.4s var(--spring-pop),
+    background 0.3s var(--spring);
+}
+.thumb[data-state="checked"] {
+  translate: calc(var(--w) * 0.53) 0;
+  background: var(--on);
+}
+.checkbox {
+  inline-size: calc(var(--w) * 0.5);
+  aspect-ratio: 1;
+  border-radius: 18%;
+  display: grid;
+  place-items: center;
+  font: 900 calc(var(--w) * 0.3) / 1 var(--text);
+}
+.button {
+  inline-size: calc(var(--w) * 0.9);
+  aspect-ratio: 2.5;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font: 900 calc(var(--w) * 0.18) / 1 var(--text);
+  cursor: pointer;
+}
+.button[data-pressed] {
+  translate: 14px 14px;
+  box-shadow: 0 0 0 var(--ink);
+}
+:global([data-phase="juicy"]) .switch,
+:global([data-phase="juicy"]) .checkbox,
+:global([data-phase="juicy"]) .button {
+  border: 0;
+  background: var(--card);
+  color: var(--card);
+  box-shadow: var(--shadow);
+}
+:global([data-phase="juicy"]) .switch[data-state="checked"],
+:global([data-phase="juicy"]) .checkbox[data-state="checked"],
+:global([data-phase="juicy"]) .button {
+  background: var(--acc);
+}
+:global([data-phase="juicy"]) .thumb {
+  background: var(--soft);
+}
+:global([data-phase="juicy"]) .thumb[data-state="checked"] {
+  background: var(--card);
+}
+:global([data-phase="juicy"]) .button[data-pressed] {
+  translate: 0 4px;
+  box-shadow: 0 2px 0 var(--soft);
+}
+
+/* WebGL draws the component: the CSS one stays for layout, focus and pointer, invisibly */
+.stage[data-gl] :is(.switch, .checkbox, .button, .thumb) {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: transparent;
+  translate: none;
+}
+:is(.switch, .checkbox, .button)[data-focus-visible] {
+  outline: 4px solid var(--acc);
+  outline-offset: 12px;
+}
+.label {
+  font: 900 clamp(22px, 2.2vw, 30px) var(--display);
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+.caption code {
+  font: 600 13px var(--mono);
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--bg);
+}
+.note {
+  font: 500 14px var(--text);
+  text-align: center;
+}
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .stage {
+    margin-top: 56px;
+    --w: min(78vw, 420px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thumb,
+  .switch,
+  .checkbox,
+  .button {
+    transition: none;
+  }
+}
+
+/* the skeleton's labels: the control's real attributes, typed in as the skin comes off */
+.attrs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-inline-size: calc(var(--w) * 1.2);
+  min-block-size: 64px;
+}
+.attrs li {
+  font: 600 13px var(--mono);
+  padding: 5px 10px;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--bg);
+  opacity: 0;
+  translate: 0 8px;
+  transition:
+    opacity 0.4s var(--spring),
+    translate 0.4s var(--spring);
+  transition-delay: calc(var(--i) * 60ms);
+}
+.attrs[data-shown] li {
+  opacity: 1;
+  translate: 0 0;
+}

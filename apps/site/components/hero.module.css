@@ -1,3 +1,14 @@
+/* desktop: 80vh of scroll during which the hero stays put and the skin peels (skin-scene.tsx) */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .run {
+    height: 180svh;
+  }
+  /* .run > .hero: over the plain .hero rule below, which sets position: relative */
+  .run > .hero {
+    position: sticky;
+    top: 0;
+  }
+}
 .hero {
   position: relative;
   min-height: 100svh;
@@ -65,6 +76,13 @@
   border-radius: 6px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+}
+.stays,
+:global([data-bare]) .look {
+  display: none;
+}
+:global([data-bare]) .stays {
+  display: inline;
 }
 :global([data-phase="juicy"]) .lede em {
   background: var(--acc);
@@ -149,97 +167,9 @@
   box-shadow: 0 5px 0 var(--soft);
 }
 
-/* specimens */
-.stage {
-  position: relative;
-  height: 100%;
-  min-height: 580px;
-}
-.card {
-  position: absolute;
-  background: var(--card);
-  border: var(--bw) solid var(--line);
-  border-radius: var(--r);
-  box-shadow: var(--shadow);
-  padding: 20px 22px;
-  font: 600 15px var(--text);
-  animation: float 7s ease-in-out infinite alternate;
-}
-.tag {
-  position: absolute;
-  top: -12px;
-  left: 16px;
-  font: 600 11px var(--mono);
-  background: var(--ink);
-  color: var(--bg);
-  padding: 4px 8px;
-  border-radius: 99px;
-  white-space: nowrap;
-}
-@keyframes float {
-  to {
-    translate: 0 -12px;
-  }
-}
-:global([data-phase="juicy"]) .card {
-  animation-name: squish;
-}
-@keyframes squish {
-  0%,
-  100% {
-    scale: 1;
-  }
-  50% {
-    scale: 1.015 0.985;
-    translate: 0 -10px;
-  }
-}
-.title {
-  font-size: 18px;
-}
-.body {
-  font-weight: 500;
-  font-size: 14px;
-  opacity: 0.7;
-  margin: 6px 0 14px;
-  max-width: 250px;
-}
-.acts {
-  display: flex;
-  justify-content: end;
-}
-/* a specimen without a card: the component's own skin is its surface */
-.float {
-  position: absolute;
-  animation: float 7s ease-in-out infinite alternate;
-}
-.float .tag {
-  top: -26px;
-  left: 6px;
-}
-:global([data-phase="juicy"]) .float {
-  animation-name: squish;
-}
-
 @media (max-width: 960px) {
   .hero {
     grid-template-columns: 1fr;
     padding: 96px 20px 64px;
-  }
-  /* the specimens follow the copy: in flow, wrapped, keeping their tilt */
-  .stage {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 28px 18px;
-    min-height: 0;
-    margin-top: 40px;
-  }
-  .card,
-  .float {
-    position: relative;
-    /* biome-ignore lint/complexity/noImportantStyles: the desktop layout places each specimen with inline top/left; in flow they must not apply */
-    inset: auto !important;
   }
 }

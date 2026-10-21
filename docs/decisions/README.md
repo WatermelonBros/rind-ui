@@ -16,6 +16,7 @@ by a new record that supersedes it, not by silently editing history.
 | [0009](0009-internationalized-number.md) | `@internationalized/number` as a runtime dependency | accepted |
 | [0010](0010-icons.md) | Icons: Phosphor glyphs as CSS tokens in the theme | accepted |
 | [0011](0011-site-examples.md) | Site examples replace Storybook (supersedes the Storybook half of 0004) | accepted |
+| [0012](0012-site-webgl-ogl.md) | OGL for the landing's WebGL scene (site only) | accepted |
 | [0008](0008-dom-accessibility-api.md) | `dom-accessibility-api` in @rind-ui/testing | accepted |
 
 Decisions say *why*. Behaviour — what a component SHALL do — is specified in
