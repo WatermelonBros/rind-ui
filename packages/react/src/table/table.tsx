@@ -322,6 +322,9 @@ function TableElement({ render, loading = false, ref, ...rest }: TableTableProps
 
 const warned = new Set<string>()
 function warnOnce(instance: string, message: string) {
+  // The guarded caller is dropped in production, but not this function: return first, so the
+  // minifier drops the message too.
+  if (process.env.NODE_ENV === "production") return
   const key = `${instance}:${message}`
   if (warned.has(key)) return
   warned.add(key)
