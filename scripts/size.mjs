@@ -39,6 +39,7 @@ async function measure(contents) {
     min: code.length,
     gz: gzipSync(code, { level: 9 }).length,
     quirkMeta: carriesQuirkMeta(file?.text ?? ""),
+    text: file?.text ?? "",
     // Modules with code in the output (the metafile's inputs also list tree-shaken ones).
     modules: Object.values(result.metafile.outputs).flatMap((out) =>
       Object.entries(out.inputs)
@@ -60,6 +61,21 @@ const all = await measure(`import * as R from "@rind-ui/react"; console.log(R)`)
 console.log(`everything: ${kb(all.min)} min, ${kb(all.gz)} gzip`)
 
 const failures = []
+// Development diagnostics are guarded by process.env.NODE_ENV and dropped in production
+// (openspec bundle-size). Only runtime failure reports stay: a consumer callback threw or
+// rejected. Thrown errors are not console calls and are not checked.
+const FAILURE_REPORTS = [
+  "tour: the effect of step", // a step's effect threw or rejected
+  "tour: the cleanup of step", // a step effect's cleanup threw
+]
+const diagnostics = [
+  ...all.text.matchAll(/console\.(?:warn|error)\(\s*[`"']\[rind-ui\] ([^`"'$]*)/g),
+]
+  .map((m) => m[1] ?? "")
+  .filter((message) => !FAILURE_REPORTS.some((report) => message.startsWith(report)))
+for (const message of diagnostics) {
+  failures.push(`production bundle keeps a development diagnostic: [rind-ui] ${message}`)
+}
 for (const slug of components) {
   const name = budgets.names?.[slug] ?? pascal(slug)
   const root = await measure(`import { ${name} } from "@rind-ui/react"; console.log(${name})`)
