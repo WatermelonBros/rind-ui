@@ -751,7 +751,7 @@
    as the rind coming off. Not a text-stroke: the variable display face draws its overlapping
    contours when stroked */
 .outroOutline {
-  color: color-mix(in oklab, var(--bg) 50%, var(--ink));
+  color: color-mix(in oklab, var(--bg) 72%, var(--ink));
 }
 /* filled in a circle around the pointer: the rind peeled where you point */
 .outroFill {

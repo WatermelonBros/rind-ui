@@ -131,19 +131,28 @@ export function SkinScene() {
       const last = lastLeg()
       if (last && last.y > last.s2) {
         const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
-        const to = last.look.getBoundingClientRect()
-        if (last.t >= 1) return to
-        // down the right-hand side first, then across at the builder's level: the heading and
-        // the lede sit top left, and the straight line would cut through them
+        const live = last.look.getBoundingClientRect()
+        if (last.t >= 1) return live
+        // the object never leaves the screen: it waits in a visible band while the builder
+        // rises to meet it, and reaches its preview component exactly on arrival
+        const top = window.innerHeight * 0.18
+        const bottom = window.innerHeight * 0.72 - live.height
+        const to = new DOMRect(
+          live.x,
+          Math.min(Math.max(live.y, top), bottom),
+          live.width,
+          live.height,
+        )
         const t = last.t
-        const ey = 1 - (1 - t) ** 3
-        const ex = t ** 3
-        const e = t * t * (3 - 2 * t)
+        const smooth = (a: number, b: number) => {
+          const k = Math.min(1, Math.max(0, (t - a) / (b - a)))
+          return k * k * (3 - 2 * k)
+        }
         return new DOMRect(
-          lerp(from.x, to.x, ex),
-          lerp(from.y, to.y, ey),
-          lerp(from.width, to.width, e),
-          lerp(from.height, to.height, e),
+          lerp(from.x, to.x, smooth(0.2, 0.85)),
+          lerp(from.y, to.y, smooth(0, 0.7)),
+          lerp(from.width, to.width, smooth(0.4, 0.85)),
+          lerp(from.height, to.height, smooth(0.4, 0.85)),
         )
       }
       const { next, y, s0, t } = travel()
@@ -170,10 +179,15 @@ export function SkinScene() {
     const alpha = () => {
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // on arrival it hands over to the real component
-        const dip =
-          window.innerWidth > 900 || last.t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * last.t) * 2.5)
-        return dip * (1 - last.fade)
+        // fades while the builder's heading passes under it, and into the real component on arrival
+        const heading = last.look.closest("section")?.querySelector("h2")?.getBoundingClientRect()
+        const me = target()
+        const overlap =
+          heading && me
+            ? Math.max(0, Math.min(heading.bottom, me.bottom) - Math.max(heading.top, me.top)) /
+              Math.max(1, me.height)
+            : 0
+        return (1 - Math.min(1, overlap * 1.5)) * (1 - last.fade)
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t
@@ -219,7 +233,12 @@ export function SkinScene() {
       }
       if (last && scene.current) {
         const colors = getLookColors()
-        scene.current.setLook(colors.brand, colors.surface, last.t * last.t * (3 - 2 * last.t))
+        // the re-skin happens in view, near the panel, as one event
+        const k = Math.min(1, Math.max(0, (last.t - 0.75) / 0.25))
+        scene.current.setLook(colors.brand, colors.surface, k * k * (3 - 2 * k))
+        // the machine scene's label does not stay behind alone
+        if (last.y > last.s2) setLanded(false)
+        else if (past) setLanded(true)
         last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
       }
     }
