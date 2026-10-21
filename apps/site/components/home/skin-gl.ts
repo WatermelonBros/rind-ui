@@ -142,7 +142,7 @@ void ray(vec2 frag, out vec3 ro, out vec3 rd) {
 void main() {
   vec2 frag = vUv * uRes;
   // outside the component's box (and its shadow) nothing can be hit: skip the march
-  if (any(greaterThan(abs(frag - uCenter), vec2(uSize * 1.35, uSize / uAspect * 1.35 + uSize * 0.15)))) {
+  if (any(greaterThan(abs(frag - uCenter), vec2(uSize * 1.4, uSize / uAspect * 1.4 + uSize * 0.4)))) {
     color = vec4(0.0);
     return;
   }
@@ -161,7 +161,8 @@ void main() {
     vec3 sro, srd;
     ray(frag - off, sro, srd);
     vec3 sh = march(sro, srd);
-    float hard = sh.x > 0.0 ? 1.0 : 0.0;
+    // the hard shadow's edge, anti-aliased over a pixel of the miss distance
+    float hard = sh.x > 0.0 ? 1.0 : 1.0 - smoothstep(0.0, px * 0.5, sh.y);
     float soft = (1.0 - smoothstep(0.0, 0.3, sh.y)) * 0.6;
     float shadow = mix(hard, soft, uPhase) * (1.0 - uPeel * 0.8);
     vec3 c = outline > shadow ? uInk : mix(uInk, uSoft, uPhase);
@@ -195,19 +196,24 @@ void main() {
   vec3 skin = mix(crisp, juicy, uPhase);
 
   // bare: the browser's own switch-ish grey, and the skeleton as blue contour lines
-  vec3 bareBody = uKind > 1.5 ? vec3(0.9, 0.9, 0.92) : mix(vec3(0.86, 0.86, 0.88), vec3(0.2, 0.45, 1.0), on * (uKind < 0.5 ? 1.0 : 0.0));
-  vec3 bareMark = uKind < 0.5 ? vec3(0.97) : uKind < 1.5 ? vec3(0.1, 0.4, 1.0) : vec3(0.25);
-  vec3 bareBase = isMark ? bareMark : bareBody;
-  vec3 bare = bareBase * (0.85 + 0.15 * max(ndl, 0.0));
+  // bare: no look at all. Neutral greys, a hairline where the faces turn, the state only as a
+  // darker grey; the skeleton shows as faint contour lines
+  vec3 bareBody = mix(vec3(0.9, 0.9, 0.91), vec3(0.7, 0.7, 0.73), uKind < 1.5 ? on : 0.0);
+  vec3 bareMark = uKind < 0.5 ? vec3(0.98) : vec3(0.3, 0.3, 0.33);
+  vec3 bare = (isMark ? bareMark : bareBody) * (0.9 + 0.1 * max(ndl, 0.0));
+  bare = mix(vec3(0.45, 0.45, 0.48), bare, smoothstep(0.08, 0.16, abs(n.z)));
   float lines = abs(fract(p.z * 10.0 + 0.5) - 0.5);
-  bare = mix(bare, vec3(0.05, 0.42, 1.0), (1.0 - smoothstep(0.0, 0.07, lines)) * 0.6);
+  bare = mix(bare, vec3(0.35, 0.4, 0.55), (1.0 - smoothstep(0.0, 0.05, lines)) * 0.25);
 
-  // the peel: a straight edge sweeps from top right to bottom left, its lip lit as it lifts
+  // the peel: a straight edge sweeps from top right to bottom left. The lifted lip catches the
+  // light, and the skin still on casts a short shadow onto the bare part beyond it
   float edge = dot(p.xy, normalize(vec2(1.0, 0.65))) - mix(1.7, -1.7, uPeel);
-  float skinned = 1.0 - smoothstep(-0.012, 0.012, edge);
-  float lip = (1.0 - smoothstep(0.0, 0.1, abs(edge))) * step(0.002, uPeel) * step(uPeel, 0.998);
-  vec3 c = mix(bare, skin, skinned);
-  c = mix(c, uCard, lip * 0.8);
+  float skinned = 1.0 - smoothstep(-0.008, 0.008, edge);
+  float peeling = step(0.002, uPeel) * step(uPeel, 0.998);
+  float lip = (1.0 - smoothstep(0.0, 0.07, abs(edge + 0.035))) * peeling;
+  float dusk = (1.0 - smoothstep(0.0, 0.22, edge)) * step(0.0, edge) * peeling;
+  vec3 c = mix(bare * (1.0 - 0.35 * dusk), skin, skinned);
+  c = mix(c, mix(uCard, vec3(1.0), 0.5), lip * 0.9);
   color = vec4(c, 1.0);
 }`
 

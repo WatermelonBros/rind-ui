@@ -1,3 +1,14 @@
+/* desktop: 80vh of scroll during which the hero stays put and the skin peels (skin-scene.tsx) */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .run {
+    height: 180svh;
+  }
+  /* .run > .hero: over the plain .hero rule below, which sets position: relative */
+  .run > .hero {
+    position: sticky;
+    top: 0;
+  }
+}
 .hero {
   position: relative;
   min-height: 100svh;
