@@ -60,12 +60,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
-        {/* Before paint: restore the phase (no crisp flash for a juicy visitor) and, on a first
-            visit of the landing, mark the intro (components/intro.tsx). */}
+        {/* Before paint: pick the landing's hero component for this visit (components/home/
+            skin-scene.tsx), restore the phase (no crisp flash for a juicy visitor) and, on a
+            first visit of the landing, mark the intro (components/intro.tsx). */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `try{var r=document.documentElement,p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
+            __html: `var r=document.documentElement;r.dataset.hero=["switch","checkbox","button"][Math.floor(Math.random()*3)];try{var p=localStorage.getItem("rind-phase");if(p==="juicy")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
           }}
         />
       </head>
