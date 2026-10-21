@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { CopyMarkdown } from "@/components/copy-markdown"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
 import { ReleaseSync } from "@/components/release"
@@ -55,6 +56,7 @@ export default async function DocPage({ params }: Props) {
           <h1 className={styles.title} data-page-title="">
             {page.title}
           </h1>
+          <CopyMarkdown slug={page.slug} />
         </header>
         {source && (
           <ExampleFrame

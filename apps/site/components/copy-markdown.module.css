@@ -1,0 +1,37 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+  font: 500 13px var(--mono);
+}
+.button {
+  font: inherit;
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.button[data-disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.button[data-focus-visible] {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+.link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
