@@ -2,7 +2,12 @@
 
 rind is a set of headless components. You get behaviour, keyboard support, accessibility and state. You do not get styles, so the look is entirely yours.
 
+<!-- pre-1.0 -->
 > rind is at {{version}}: the packages are on npm, and the API can still change before 1.0.
+<!-- /pre-1.0 -->
+<!-- 1.0+ -->
+> rind is at {{version}}, a stable release: see [Versioning](#versioning) for what can change and how.
+<!-- /1.0+ -->
 
 ## Packages
 
@@ -103,6 +108,19 @@ expect(await faq.expanded()).toEqual(["Shipping"])
 
 In Playwright, import from `@rind-ui/testing/playwright` and pass the `page`. Each component page documents its driver.
 
+<!-- 1.0+ -->
+## Versioning
+
+rind follows [semantic versioning](https://semver.org). The public API is everything you can see
+from outside: component and part names, props, the `data-*` and `aria-*` attributes parts
+render, CSS custom properties, messages, and each driver's actions and queries.
+
+- **Patch** fixes behaviour to match its spec; **minor** adds components, parts, props or
+  attributes. Neither breaks code or stylesheets written against the documented API.
+- **Major** is the only release that removes or renames something. Before that, the old name
+  keeps working with a development-only warning for at least one minor release.
+
+<!-- /1.0+ -->
 ## Frameworks
 
 rind's behaviour lives in `@rind-ui/core`, which has no framework in it. A framework package only wires parts, refs and props, so each one gets the same behaviour, accessibility and drivers.
