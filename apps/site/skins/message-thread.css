@@ -43,6 +43,13 @@
   background: var(--s-brand);
   color: var(--s-brand-text);
 }
+/* The assistant's answer sits on a tone step, not the thread's own card: in a borderless skin
+   (juicy) a card-on-card bubble would vanish, and the step is what says "a message". */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-thread"][data-part="message"]
+  [data-scope="streaming-message"][data-part="root"] {
+  background: var(--s-muted);
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="message-thread"][data-part="jump-to-latest"] {
   position: absolute;
