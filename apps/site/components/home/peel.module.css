@@ -13,17 +13,12 @@
   gap: 40px;
   padding: var(--bar-h) 56px 0;
   overflow: hidden;
-  background: var(--paper);
-  transition:
-    background-color 0.6s var(--spring),
-    color 0.6s var(--spring);
-}
-.sticky[data-act="1"] {
-  background: var(--ink);
-  color: var(--paper);
-}
-.sticky[data-act="2"] {
+  /* the ground follows the scroll, no seams: ink opens as a disc from the object while the
+     attributes come in, and closes again for the machine (--dark, peel.tsx). A disc, not a
+     blend: acid green blended into ink passes through olive in any colour space */
   background: var(--bg);
+  isolation: isolate;
+  transition: color 0.4s var(--spring);
 }
 .title {
   font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
@@ -91,34 +86,21 @@
   font: 600 11px var(--mono);
   padding: 5px 9px;
   border-radius: 99px;
-  background: #0b0b0c;
-  color: #f5f5ee;
+  /* light labels: they read on the brand colour and on the ink that opens behind them */
+  background: var(--paper);
+  color: var(--ink);
   /* from the centre to its slot: --ax is the chip's anchor (1 its right edge, 0 its left edge) */
   /* they reach their slots in the first half of act 2, then hold while it is read */
   --fly: min(1, var(--p2) * 2.5);
   translate: calc(-50% + (50% - var(--ax, 0.5) * 100% + var(--x)) * var(--fly))
     calc(-50% + var(--y) * var(--fly));
-  /* gone before the machine arrives: no chip ever fades over the graph */
-  opacity: calc(var(--p2) * 1.4 - var(--p3) * 4);
+  /* in only once the ink disc has reached them, and gone before the machine arrives */
+  opacity: min(calc(var(--p2) * 1.4 - var(--p3) * 4), calc((var(--dark, 0) - 0.22) * 6));
   scale: calc(0.6 + var(--fly) * 0.4);
 }
 .attrs b {
-  color: #d4ff3a;
-  font-weight: 600;
-}
-:global([data-phase="juicy"]) .attrs li {
-  background: #2a1d5c;
-}
-:global([data-phase="juicy"]) .attrs b {
-  color: #ff8fb1;
-}
-/* on the ink field the chips invert, so they read as labels on a blueprint */
-.sticky[data-act="1"] .attrs li {
-  background: var(--paper);
-  color: var(--ink);
-}
-.sticky[data-act="1"] .attrs b {
   color: var(--acc-deep);
+  font-weight: 600;
 }
 
 .graph {
@@ -193,5 +175,77 @@
     position: relative;
     height: auto;
     padding: 100px 56px 160px;
+  }
+}
+
+/* the hero's 3D object stands over this scene's control (skin-scene.tsx): the control stays in
+   the DOM for its attributes, invisibly, and grows to the object's size; the card goes */
+.scene[data-gl] .under .component {
+  background: transparent;
+  border-color: transparent;
+}
+.scene[data-gl] [data-scope="switch"][data-part="control"] {
+  inline-size: 190px;
+  block-size: 88px;
+}
+.scene[data-gl] [data-scope="checkbox"][data-part="control"] {
+  inline-size: 110px;
+  block-size: 110px;
+}
+.scene[data-gl] button[data-scope="button"] {
+  inline-size: 210px;
+  block-size: 84px;
+}
+/* the label arrives with the object, and reads on whatever ground is behind it */
+.scene[data-gl] [data-part="label"] {
+  opacity: 0;
+  transition: opacity 0.3s var(--spring);
+}
+.scene[data-gl][data-landed] [data-part="label"] {
+  opacity: 1;
+}
+.sticky[data-ink] .scene[data-gl] [data-part="label"] {
+  color: var(--paper);
+}
+/* hidden by opacity (the skin never sets it), so the 3D object is the only control seen, even
+   while it is still travelling here */
+.scene[data-gl] .under .component :is([data-part="control"], button) {
+  opacity: 0;
+}
+
+.sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+}
+/* the copy again, in paper, clipped by the same disc (peel.tsx) */
+.inkLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  padding: var(--bar-h) 56px 0;
+  color: var(--paper);
+  pointer-events: none;
+  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+}
+/* on a phone the disc opens from the object, low in the column */
+@media (max-width: 900px) {
+  .sticky::before,
+  .inkLayer {
+    clip-path: circle(calc(var(--dark, 0) * 150%) at 50% 62%);
+  }
+  .inkLayer {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: 10px;
+    padding: calc(var(--bar-h) + 24px) 20px 20px;
   }
 }

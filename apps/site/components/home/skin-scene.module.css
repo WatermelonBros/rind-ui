@@ -1,10 +1,11 @@
-/* The canvas covers the whole hero, so the 3D component's shadow and tilt are never clipped. */
+/* The canvas is fixed over the viewport, at the body's level: the object rests in the hero, then
+   travels over the marquee to the next scene's control. It draws only near the object. */
 .canvas {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  inline-size: 100%;
-  block-size: 100%;
-  z-index: 1;
+  inline-size: 100vw;
+  block-size: 100vh;
+  z-index: 30;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.8s var(--spring);
@@ -206,4 +207,12 @@
 .attrs[data-shown] li {
   opacity: 1;
   translate: 0 0;
+}
+
+/* the object is about to travel: its labels clear out first (skin-scene.tsx sets data-travel) */
+.stage :is(.label, .attrs, .note, .caption) {
+  transition: opacity 0.25s var(--spring);
+}
+.stage[data-travel] :is(.label, .attrs, .note, .caption) {
+  opacity: 0;
 }

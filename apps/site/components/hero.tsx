@@ -18,7 +18,7 @@ export function Hero({ children }: { children?: ReactNode }) {
             <p className={styles.lede}>
               Behaviour, accessibility and state. {/* the line follows the hero's peel */}
               <em className={styles.look}>The look is yours.</em>
-              <em className={styles.stays}>The behaviour stays.</em>
+              <em className={styles.stays}>Everything else stays.</em>
             </p>
             <div className={styles.ctas}>
               <Link href="/docs/get-started/" className={styles.primary}>

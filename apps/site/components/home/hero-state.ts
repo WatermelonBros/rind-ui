@@ -33,3 +33,71 @@ export function heroKind(): HeroKind {
   const picked = document.documentElement.dataset["hero"]
   return KINDS.find((k) => k === picked) ?? "switch"
 }
+
+// The scene after the hero hands the 3D object its own control and state: the object travels
+// from the hero to that control (skin-scene.tsx) and follows its state there.
+let peelTarget: HTMLElement | null = null
+let peelOn = true
+const peelListeners = new Set<() => void>()
+export const setPeelTarget = (el: HTMLElement | null) => {
+  peelTarget = el
+}
+export const getPeelTarget = () => peelTarget
+export function setPeelOn(value: boolean) {
+  if (value === peelOn) return
+  peelOn = value
+  for (const l of peelListeners) l()
+}
+export const getPeelOn = () => peelOn
+export const onPeelOn = (l: () => void) => {
+  peelListeners.add(l)
+  return () => peelListeners.delete(l)
+}
+
+// whether the 3D object is drawing: the controls it stands over hide their own look
+let sceneGl = false
+const glListeners = new Set<() => void>()
+export function setSceneGl(value: boolean) {
+  sceneGl = value
+  for (const l of glListeners) l()
+}
+export const useSceneGl = () =>
+  useSyncExternalStore(
+    (l) => {
+      glListeners.add(l)
+      return () => glListeners.delete(l)
+    },
+    () => sceneGl,
+    () => false,
+  )
+
+// whether the travelling object has landed on the next scene's control: its label shows then
+let landed = false
+const landedListeners = new Set<() => void>()
+export function setLanded(value: boolean) {
+  if (value === landed) return
+  landed = value
+  for (const l of landedListeners) l()
+}
+export const useLanded = () =>
+  useSyncExternalStore(
+    (l) => {
+      landedListeners.add(l)
+      return () => landedListeners.delete(l)
+    },
+    () => landed,
+    () => false,
+  )
+
+// The builder after the machine: the object's last stop is the preview component of its kind,
+// and on the way it takes the visitor's colours (any-look.tsx publishes both)
+let lookTarget: HTMLElement | null = null
+let lookColors: { brand: string; surface: string } = { brand: "#18181B", surface: "#FFFFFF" }
+export const setLookTarget = (el: HTMLElement | null) => {
+  lookTarget = el
+}
+export const getLookTarget = () => lookTarget
+export const setLookColors = (colors: { brand: string; surface: string }) => {
+  lookColors = colors
+}
+export const getLookColors = () => lookColors

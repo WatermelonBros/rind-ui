@@ -2,7 +2,15 @@
 
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
-import { type HeroKind, heroKind, useHeroOn } from "./hero-state"
+import {
+  type HeroKind,
+  heroKind,
+  setPeelOn,
+  setPeelTarget,
+  useHeroOn,
+  useLanded,
+  useSceneGl,
+} from "./hero-state"
 import styles from "./peel.module.css"
 
 const clamp = (n: number) => Math.min(1, Math.max(0, n))
@@ -45,6 +53,18 @@ export function Peel() {
   const [attrs, setAttrs] = useState<readonly string[]>([])
   useEffect(() => setKind(heroKind()), [])
 
+  // The hero's 3D object travels here and stands over this scene's real control (skin-scene.tsx):
+  // hand it the control and its state; hide the control's own look while the object draws.
+  const gl = useSceneGl()
+  const landed = useLanded()
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control to hand over
+  useEffect(() => {
+    setPeelTarget(
+      control.current?.querySelector<HTMLElement>('[data-part="control"], button') ?? null,
+    )
+    return () => setPeelTarget(null)
+  }, [kind])
+
   useEffect(() => {
     const el = section.current
     if (!el) return
@@ -72,6 +92,7 @@ export function Peel() {
   // to the other one (a button goes pending)
   const late = progress > 0.75
   const on = kind === "button" ? late : late ? !heroOn : heroOn
+  useEffect(() => setPeelOn(on), [on])
 
   // the chips are the control's real attributes, read from the DOM as they change
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new kind renders a new control element to observe
@@ -97,22 +118,39 @@ export function Peel() {
   const p2 = clamp(progress / 0.4)
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
-  const vars = { "--p1": 1, "--p2": p2, "--p3": p3 } as CSSProperties
+  const dark = p2 * (1 - p3)
+  const vars = { "--p1": 1, "--p2": p2, "--p3": p3, "--dark": dark } as CSSProperties
   const machine = MACHINES[kind]
 
   return (
     <section ref={section} className={styles.peel} style={vars} aria-labelledby="peel-title">
       {/* each act owns the whole field: the bare parts on ink, the machine on the brand colour */}
-      <div className={styles.sticky} data-act={act + 1}>
+      {/* the object's label turns light as soon as the ink disc reaches it */}
+      <div className={styles.sticky} data-act={act + 1} data-ink={dark > 0.15 ? "" : undefined}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
             {ACTS[act]?.title}
           </h2>
           <p className={styles.text}>{ACTS[act]?.text}</p>
         </div>
+        {/* the same copy in paper, clipped by the ink disc: every letter reads on both grounds */}
+        <div className={styles.inkLayer} aria-hidden="true">
+          <div className={styles.copy}>
+            <p className={styles.title} key={act}>
+              {ACTS[act]?.title}
+            </p>
+            <p className={styles.text}>{ACTS[act]?.text}</p>
+          </div>
+        </div>
 
         {/* the scene is an illustration of the text beside it: not focusable, not announced */}
-        <div className={styles.scene} inert aria-hidden="true">
+        <div
+          className={styles.scene}
+          inert
+          aria-hidden="true"
+          data-gl={gl ? "" : undefined}
+          data-landed={landed ? "" : undefined}
+        >
           <div className={styles.camera}>
             <div className={styles.layers} ref={control}>
               <div className={styles.under}>

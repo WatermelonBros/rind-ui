@@ -163,9 +163,31 @@ export function ScreenReaderView() {
     }
   }, [on])
 
+  // while the page scrolls, the toggle steps aside so it never sits on what is being read; it
+  // comes back once scrolling stops (and whenever it has focus: see the CSS)
+  const [scrolling, setScrolling] = useState(false)
+  useEffect(() => {
+    let rest = 0
+    const onScroll = () => {
+      setScrolling(true)
+      clearTimeout(rest)
+      rest = window.setTimeout(() => setScrolling(false), 700)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      clearTimeout(rest)
+    }
+  }, [])
+
   if (!supported) return null
   return (
-    <div className={styles.view} data-sr-view="" data-on={on ? "" : undefined}>
+    <div
+      className={styles.view}
+      data-sr-view=""
+      data-on={on ? "" : undefined}
+      data-scrolling={scrolling && !on ? "" : undefined}
+    >
       <ToggleGroup.Item className={styles.toggle} pressed={on} onPressedChange={setOn}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
           <path
