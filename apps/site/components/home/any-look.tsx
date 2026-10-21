@@ -12,6 +12,7 @@ import {
 } from "@rind-ui/react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
+import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -365,6 +366,21 @@ function LazyColour(props: ColourProps & { readonly picker: ColourComponent | nu
  */
 export function AnyLook() {
   const [look, setLook] = useState<Look>(BASE)
+  // the hero's travelling object lands on the preview component of its own kind (skin-scene.tsx)
+  const stage = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const selector = {
+      switch: '[data-scope="switch"][data-part="control"]',
+      checkbox: '[data-scope="checkbox"][data-part="control"]',
+      button: 'button[data-scope="button"]',
+    }[heroKind()]
+    setLookTarget(stage.current?.querySelector<HTMLElement>(selector) ?? null)
+    return () => setLookTarget(null)
+  }, [])
+  useEffect(
+    () => setLookColors({ brand: look.brand, surface: look.surface }),
+    [look.brand, look.surface],
+  )
   const [copied, setCopied] = useState(false)
   const set = (patch: Partial<Look>) => {
     setLook((l) => ({ ...l, ...patch }))
@@ -477,7 +493,7 @@ export function AnyLook() {
           </div>
         </div>
         <style>{scoped(css)}</style>
-        <div className={styles.lookStage} data-look="">
+        <div ref={stage} className={styles.lookStage} data-look="">
           <div className={styles.lookGrid}>
             <div className={styles.lookCol}>
               <TextField.Root name="handle">

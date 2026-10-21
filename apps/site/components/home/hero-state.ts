@@ -88,3 +88,16 @@ export const useLanded = () =>
     () => landed,
     () => false,
   )
+
+// The builder after the machine: the object's last stop is the preview component of its kind,
+// and on the way it takes the visitor's colours (any-look.tsx publishes both)
+let lookTarget: HTMLElement | null = null
+let lookColors: { brand: string; surface: string } = { brand: "#18181B", surface: "#FFFFFF" }
+export const setLookTarget = (el: HTMLElement | null) => {
+  lookTarget = el
+}
+export const getLookTarget = () => lookTarget
+export const setLookColors = (colors: { brand: string; surface: string }) => {
+  lookColors = colors
+}
+export const getLookColors = () => lookColors

@@ -3,7 +3,16 @@
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { getPeelOn, getPeelTarget, onPeelOn, setHeroOn, setLanded, setSceneGl } from "./hero-state"
+import {
+  getLookColors,
+  getLookTarget,
+  getPeelOn,
+  getPeelTarget,
+  onPeelOn,
+  setHeroOn,
+  setLanded,
+  setSceneGl,
+} from "./hero-state"
 import type { Kind, SkinHandle } from "./skin-gl"
 import styles from "./skin-scene.module.css"
 
@@ -101,7 +110,42 @@ export function SkinScene() {
       const k = (performance.now() - landedAt) / 260
       return k >= 1 ? 1 : 1 + 0.05 * Math.sin(k * Math.PI) * (1 - k)
     }
+    // Last leg: once the next scene lets go (its end), the object flies to the builder's preview
+    // component of its kind, taking the visitor's colours on the way; on arrival it fades into
+    // that real component, which fades in under it.
+    const lastLeg = () => {
+      const peelEl = getPeelTarget()
+      const look = getLookTarget()
+      const scene = peelEl?.closest("section")
+      if (!peelEl || !look || !scene) return null
+      const y = window.scrollY
+      const s2 = scene.getBoundingClientRect().bottom + y - window.innerHeight
+      const r = look.getBoundingClientRect()
+      const s3 = r.top + y + r.height / 2 - window.innerHeight * 0.5
+      const t = Math.min(1, Math.max(0, (y - s2) / Math.max(1, s3 - s2)))
+      // after arrival: a quarter of a screen to fade into the real component
+      const fade = Math.min(1, Math.max(0, (y - s3) / (window.innerHeight * 0.25)))
+      return { peelEl, look, y, s2, t, fade }
+    }
     const target = () => {
+      const last = lastLeg()
+      if (last && last.y > last.s2) {
+        const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
+        const to = last.look.getBoundingClientRect()
+        if (last.t >= 1) return to
+        // down the right-hand side first, then across at the builder's level: the heading and
+        // the lede sit top left, and the straight line would cut through them
+        const t = last.t
+        const ey = 1 - (1 - t) ** 3
+        const ex = t ** 3
+        const e = t * t * (3 - 2 * t)
+        return new DOMRect(
+          lerp(from.x, to.x, ex),
+          lerp(from.y, to.y, ey),
+          lerp(from.width, to.width, e),
+          lerp(from.height, to.height, e),
+        )
+      }
       const { next, y, s0, t } = travel()
       const from = at.getBoundingClientRect()
       if (!next || y <= s0) return from
@@ -124,22 +168,27 @@ export function SkinScene() {
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
     const alpha = () => {
+      const last = lastLeg()
+      if (last && last.y > last.s2) {
+        // on arrival it hands over to the real component
+        const dip =
+          window.innerWidth > 900 || last.t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * last.t) * 2.5)
+        return dip * (1 - last.fade)
+      }
       if (window.innerWidth > 900) return 1
       const t = travel().t
       // a short dip in the middle of the path only
       return t <= 0 || t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * t) * 2.5)
     }
     // on touchdown the object takes the next scene's state; before, the hero's
+    let leg = 0
     const follow = () => {
       const handle = scene.current
       if (!handle) return
-      if (past) {
-        if (kind === "button") handle.setPress(getPeelOn())
-        else handle.setChecked(getPeelOn())
-      } else {
-        if (kind === "button") handle.setPress(false)
-        else handle.setChecked(heroOnRef.current)
-      }
+      // the builder's preview starts on (its switch and checkbox are checked, its button idle)
+      const value = leg === 2 ? true : past ? getPeelOn() : heroOnRef.current
+      if (kind === "button") handle.setPress(leg === 1 && getPeelOn())
+      else handle.setChecked(value)
     }
     const onScroll = () => {
       const peel = Math.min(1, Math.max(0, peelAt()))
@@ -160,6 +209,18 @@ export function SkinScene() {
         landedAt = down ? performance.now() : 0
         setLanded(down)
         follow()
+      }
+      // the last leg: the builder's colours come on, the real component fades in under the object
+      const last = lastLeg()
+      const nextLeg = last && last.t > 0.5 ? 2 : past ? 1 : 0
+      if (nextLeg !== leg) {
+        leg = nextLeg
+        follow()
+      }
+      if (last && scene.current) {
+        const colors = getLookColors()
+        scene.current.setLook(colors.brand, colors.surface, last.t * last.t * (3 - 2 * last.t))
+        last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
       }
     }
     const offPeelOn = onPeelOn(follow)
@@ -207,6 +268,8 @@ export function SkinScene() {
       clearTimeout(idle)
       clearTimeout(hint)
       hero.removeAttribute("data-bare")
+      const look = getLookTarget()
+      if (look) look.style.opacity = ""
       setSceneGl(false)
       setLanded(false)
       scene.current?.dispose()

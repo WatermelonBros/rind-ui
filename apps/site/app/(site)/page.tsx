@@ -23,8 +23,9 @@ export default function Home() {
       <Hero>
         <Marquee items={pages.filter((p) => p.section === "components").map((p) => p.title)} />
         <Peel />
-        <Why />
+        {/* the bare object ends its trip here: it becomes a real component in the visitor's skin */}
         <AnyLook />
+        <Why />
         <Tested />
         <Agents />
         <Wall />

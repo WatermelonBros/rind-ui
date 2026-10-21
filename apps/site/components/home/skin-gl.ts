@@ -27,6 +27,9 @@ uniform float uAspect;  // its width / height
 uniform float uKind;    // 0 switch, 1 checkbox, 2 button
 uniform float uPress;   // 0 to 1: the button held down
 uniform float uAlpha;   // the whole object's opacity (a phone dissolves it mid-flight)
+uniform float uCustom;  // 0 to 1: how much it wears the visitor's skin from the builder
+uniform vec3 uBrand;    // the builder's brand colour
+uniform vec3 uSurface;  // the builder's surface colour
 uniform float uPhase;   // 0 crisp, 1 juicy
 uniform float uChecked; // 0 to 1, sprung by the script (it overshoots in juicy)
 uniform float uPeel;    // 0 skin on, 1 skin off
@@ -219,6 +222,12 @@ void main() {
   float dusk = (1.0 - smoothstep(0.0, 0.22, edge)) * step(0.0, edge) * peeling;
   vec3 c = mix(bare * (1.0 - 0.35 * dusk), skin, skinned);
   c = mix(c, mix(uCard, vec3(1.0), 0.5), lip * 0.9);
+
+  // the visitor's skin, from the builder: brand where the component is on, surface elsewhere
+  vec3 cBody = uKind > 1.5 ? uBrand : mix(uSurface, uBrand, on);
+  vec3 cMark = uKind < 0.5 ? mix(uBrand, uSurface, on) : uSurface;
+  vec3 custom = (isMark ? cMark : cBody) * (0.82 + 0.18 * max(ndl, 0.0));
+  c = mix(c, custom, uCustom);
   color = vec4(c, uAlpha);
 }`
 
@@ -258,6 +267,8 @@ export interface SkinHandle {
   readonly setPeel: (peel: number) => void
   /** The page scrolled: draw again if the component was off screen. */
   readonly wake: () => void
+  /** How much it wears the builder's skin (0 to 1), in the builder's two colours (hex). */
+  readonly setLook: (brand: string, surface: string, amount: number) => void
   readonly dispose: () => void
 }
 
@@ -294,6 +305,9 @@ export function mountSkin(
     uKind: { value: KINDS.indexOf(kind) },
     uPress: { value: 0 },
     uAlpha: { value: 1 },
+    uCustom: { value: 0 },
+    uBrand: { value: [0.09, 0.09, 0.11] },
+    uSurface: { value: [1, 1, 1] },
     uPhase: { value: start.phase },
     uChecked: { value: 0 },
     uPeel: { value: 0 },
@@ -453,6 +467,12 @@ export function mountSkin(
     },
     setPress: (value) => {
       pressGoal = value ? 1 : 0
+      loop()
+    },
+    setLook: (brand, surface, amount) => {
+      u.uBrand.value = hex(brand, [0.09, 0.09, 0.11])
+      u.uSurface.value = hex(surface, [1, 1, 1])
+      u.uCustom.value = Math.min(1, Math.max(0, amount))
       loop()
     },
     wake: () => {
