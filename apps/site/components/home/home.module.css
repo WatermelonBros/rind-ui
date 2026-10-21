@@ -498,7 +498,93 @@
   color: #9be7c4;
 }
 
-/* ── wall: the whole roadmap ─────────────────────────────────────────────────────────── */
+/* ── wall: six live specimens, then the whole roadmap on demand ───────────────────────── */
+.specimens {
+  list-style: none;
+  margin: 0 0 40px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 20px;
+}
+.specimen {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: var(--ink);
+  border: var(--bw) solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.specimenStage {
+  background: var(--card);
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  padding: 28px 24px;
+}
+.specimenStage > * {
+  inline-size: min(100%, 260px);
+}
+.specimenFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 12px 18px;
+  color: var(--paper);
+}
+.specimenFoot a {
+  font: 700 16px var(--text);
+  text-decoration: none;
+  /* a 44px row on touch without changing the foot's look */
+  padding-block: 10px;
+  margin-block: -10px;
+}
+.specimenFoot a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.specimenFoot code {
+  font: 500 13px var(--mono);
+  color: var(--bg);
+}
+.wallAll {
+  margin-top: 8px;
+}
+.wallAll > [data-part="trigger"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 18px var(--text);
+  padding: 14px 22px;
+  border-radius: var(--btn-r);
+  border: var(--bw) solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: translate 0.4s var(--spring);
+}
+:global([data-phase="juicy"]) .wallAll > [data-part="trigger"] {
+  border: 2px solid var(--soft);
+}
+.wallAll > [data-part="trigger"]:hover {
+  translate: 0 -2px;
+}
+.wallAll > [data-part="trigger"]:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 3px;
+}
+.wallAll [data-part="indicator"] {
+  transition: rotate 0.3s var(--spring);
+}
+.wallAll > [data-part="trigger"][aria-expanded="true"] [data-part="indicator"] {
+  rotate: 90deg;
+}
+.wallAll > [data-part="content"] {
+  padding-top: 36px;
+}
 .wall {
   columns: 4 260px;
   column-gap: 28px;
@@ -537,7 +623,8 @@
 .wallGroup li a {
   font-weight: 700;
   text-decoration: none;
-  background: linear-gradient(var(--acc), var(--acc)) 0 100% / 100% 3px no-repeat;
+  /* the accent only under the pointer: on 70 links at rest it would mean nothing */
+  background: linear-gradient(var(--acc), var(--acc)) 0 100% / 0 3px no-repeat;
   transition: background-size 0.4s var(--spring);
 }
 .wallGroup li a:hover {
