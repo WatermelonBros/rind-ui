@@ -75,7 +75,7 @@ function statesOf(el: HTMLElement): string[] {
 }
 
 /** What a screen reader would say on reaching `el`: name, role, states. */
-function utterance(el: HTMLElement): string {
+export function utterance(el: HTMLElement): string {
   return [nameOf(el), roleOf(el), ...statesOf(el)].filter(Boolean).join(", ")
 }
 
