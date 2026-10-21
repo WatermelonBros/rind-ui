@@ -43,6 +43,7 @@ const urls = [
   "/docs/",
   "/404.html",
   "/privacy/",
+  "/compare/",
   ...docs.map((p) => `/docs/${p.slug}/`),
   ...["/theme/", "/theme/tokens/", "/theme/contrast/", "/theme/showcase/"],
 ]

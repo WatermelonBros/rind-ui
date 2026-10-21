@@ -9,16 +9,19 @@
     "url": "git+https://github.com/WatermelonBros/rind-ui.git",
     "directory": "packages/theme"
   },
-  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "homepage": "https://rind.watermelon-studio.it",
   "bugs": {
     "url": "https://github.com/WatermelonBros/rind-ui/issues"
   },
   "keywords": [
     "theme",
-    "css",
-    "design-tokens",
     "white-label",
-    "oklch"
+    "design-tokens",
+    "css",
+    "oklch",
+    "headless",
+    "accessibility",
+    "contrast"
   ],
   "type": "module",
   "files": [

@@ -18,7 +18,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = pageBySlug((await params).slug)
-  return page ? { title: page.title, description: page.summary } : {}
+  return page
+    ? {
+        title: page.title,
+        description: page.summary,
+        // the same page as plain markdown, for agents (scripts/content.ts)
+        alternates: { types: { "text/markdown": `/docs/${page.slug}.md` } },
+      }
+    : {}
 }
 
 export default async function DocPage({ params }: Props) {

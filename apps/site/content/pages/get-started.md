@@ -118,3 +118,5 @@ rind's behaviour lives in `@rind-ui/core`, which has no framework in it. A frame
 ## Using rind with an AI assistant
 
 The whole API is generated from source into [`llms.txt`](/llms.txt), so an assistant can learn the library and write against it without guessing. The drivers let it check its own work.
+
+Every docs page also has a markdown twin at `/docs/<component>.md`, and [`llms-full.txt`](/llms-full.txt) holds the whole documentation in one file. For coding agents that load skills (the Agent Skills format), the repository ships one: [`skills/rind-ui`](https://github.com/WatermelonBros/rind-ui/tree/main/skills/rind-ui). It tells the agent where the API lives, how to compose parts and style attributes, and how to verify the result with the drivers.

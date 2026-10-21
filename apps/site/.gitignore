@@ -4,3 +4,7 @@ content/generated
 next-env.d.ts
 *.tsbuildinfo
 .next-dev
+# markdown twins and llms-full.txt, written by scripts/content.ts
+public/docs
+public/llms-full.txt
+public/compare.md

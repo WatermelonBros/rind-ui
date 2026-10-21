@@ -104,7 +104,7 @@ export function Outro() {
           Built using <b>Reado</b> ↗
         </a>
         <span>
-          MIT · <Link href="/privacy/">Privacy</Link>
+          <Link href="/compare/">Compare</Link> · MIT · <Link href="/privacy/">Privacy</Link>
         </span>
       </div>
       <p className={styles.visuallyHidden} role="status">
