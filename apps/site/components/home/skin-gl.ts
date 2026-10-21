@@ -26,6 +26,7 @@ uniform float uSize;    // its half width, in canvas pixels
 uniform float uAspect;  // its width / height
 uniform float uKind;    // 0 switch, 1 checkbox, 2 button
 uniform float uPress;   // 0 to 1: the button held down
+uniform float uAlpha;   // the whole object's opacity (a phone dissolves it mid-flight)
 uniform float uPhase;   // 0 crisp, 1 juicy
 uniform float uChecked; // 0 to 1, sprung by the script (it overshoots in juicy)
 uniform float uPeel;    // 0 skin on, 1 skin off
@@ -170,7 +171,7 @@ void main() {
     // the shadow is part of the look: it comes off with the skin
     float shadow = mix(hard, soft, uPhase) * (1.0 - uPeel);
     vec3 c = outline > shadow ? uInk : mix(uInk, uSoft, uPhase);
-    color = vec4(c, max(outline, shadow));
+    color = vec4(c, max(outline, shadow) * uAlpha);
     return;
   }
 
@@ -218,7 +219,7 @@ void main() {
   float dusk = (1.0 - smoothstep(0.0, 0.22, edge)) * step(0.0, edge) * peeling;
   vec3 c = mix(bare * (1.0 - 0.35 * dusk), skin, skinned);
   c = mix(c, mix(uCard, vec3(1.0), 0.5), lip * 0.9);
-  color = vec4(c, 1.0);
+  color = vec4(c, uAlpha);
 }`
 
 type Rgb = [number, number, number]
@@ -266,10 +267,11 @@ export interface SkinHandle {
  */
 export function mountSkin(
   canvas: HTMLCanvasElement,
-  /** Where the component stands this frame, in viewport pixels (null: nowhere). */
+  /** Where the component stands this frame, in viewport pixels (null: nowhere), and how opaque. */
   rectAt: () => DOMRect | null,
   kind: Kind,
   onFirstFrame: () => void,
+  alphaAt: () => number,
   initial: { checked: boolean; peel: number },
 ): SkinHandle | null {
   const renderer = new Renderer({
@@ -291,6 +293,7 @@ export function mountSkin(
     uAspect: { value: 2 },
     uKind: { value: KINDS.indexOf(kind) },
     uPress: { value: 0 },
+    uAlpha: { value: 1 },
     uPhase: { value: start.phase },
     uChecked: { value: 0 },
     uPeel: { value: 0 },
@@ -324,6 +327,7 @@ export function mountSkin(
     const dpr = renderer.dpr
     const s = canvas.getBoundingClientRect()
     const a = rectAt()
+    u.uAlpha.value = alphaAt()
     present = Boolean(a && a.bottom > -a.height && a.top < s.height + a.height)
     if (!a) return
     u.uCenter.value = [

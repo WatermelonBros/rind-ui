@@ -13,9 +13,11 @@
   gap: 40px;
   padding: var(--bar-h) 56px 0;
   overflow: hidden;
-  /* the ground follows the scroll, no seams: the hero's colour turns to ink while the
-     attributes come in, and back to the brand colour for the machine (--dark, peel.tsx) */
-  background: color-mix(in oklch, var(--ink) calc(var(--dark, 0) * 100%), var(--bg));
+  /* the ground follows the scroll, no seams: ink opens as a disc from the object while the
+     attributes come in, and closes again for the machine (--dark, peel.tsx). A disc, not a
+     blend: acid green blended into ink passes through olive in any colour space */
+  background: var(--bg);
+  isolation: isolate;
   transition: color 0.4s var(--spring);
 }
 /* text flips once the ground is more ink than brand colour */
@@ -88,8 +90,9 @@
   font: 600 11px var(--mono);
   padding: 5px 9px;
   border-radius: 99px;
-  background: #0b0b0c;
-  color: #f5f5ee;
+  /* light labels: they read on the brand colour and on the ink that opens behind them */
+  background: var(--paper);
+  color: var(--ink);
   /* from the centre to its slot: --ax is the chip's anchor (1 its right edge, 0 its left edge) */
   /* they reach their slots in the first half of act 2, then hold while it is read */
   --fly: min(1, var(--p2) * 2.5);
@@ -100,22 +103,8 @@
   scale: calc(0.6 + var(--fly) * 0.4);
 }
 .attrs b {
-  color: #d4ff3a;
-  font-weight: 600;
-}
-:global([data-phase="juicy"]) .attrs li {
-  background: #2a1d5c;
-}
-:global([data-phase="juicy"]) .attrs b {
-  color: #ff8fb1;
-}
-/* on the ink field the chips invert, so they read as labels on a blueprint */
-.sticky[data-dark] .attrs li {
-  background: var(--paper);
-  color: var(--ink);
-}
-.sticky[data-dark] .attrs b {
   color: var(--acc-deep);
+  font-weight: 600;
 }
 
 .graph {
@@ -200,19 +189,45 @@
   border-color: transparent;
 }
 .scene[data-gl] [data-scope="switch"][data-part="control"] {
-  inline-size: 150px;
-  block-size: 70px;
+  inline-size: 190px;
+  block-size: 88px;
 }
 .scene[data-gl] [data-scope="checkbox"][data-part="control"] {
-  inline-size: 84px;
-  block-size: 84px;
+  inline-size: 110px;
+  block-size: 110px;
 }
 .scene[data-gl] button[data-scope="button"] {
-  inline-size: 170px;
-  block-size: 68px;
+  inline-size: 210px;
+  block-size: 84px;
+}
+/* the label arrives with the object, and reads on whatever ground is behind it */
+.scene[data-gl] [data-part="label"] {
+  opacity: 0;
+  transition: opacity 0.3s var(--spring);
+}
+.scene[data-gl][data-landed] [data-part="label"] {
+  opacity: 1;
+}
+.sticky[data-ink] .scene[data-gl] [data-part="label"] {
+  color: var(--paper);
 }
 /* hidden by opacity (the skin never sets it), so the 3D object is the only control seen, even
    while it is still travelling here */
 .scene[data-gl] .under .component :is([data-part="control"], button) {
   opacity: 0;
+}
+
+.sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+}
+/* on a phone the heading sits on top: ink rises from the bottom instead, and reaches it last */
+@media (max-width: 900px) {
+  .sticky::before {
+    clip-path: inset(calc((1 - var(--dark, 0)) * 100%) 0 0 0);
+  }
 }

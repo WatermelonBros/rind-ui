@@ -3,7 +3,7 @@
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { getPeelOn, getPeelTarget, onPeelOn, setHeroOn, setSceneGl } from "./hero-state"
+import { getPeelOn, getPeelTarget, onPeelOn, setHeroOn, setLanded, setSceneGl } from "./hero-state"
 import type { Kind, SkinHandle } from "./skin-gl"
 import styles from "./skin-scene.module.css"
 
@@ -90,25 +90,45 @@ export function SkinScene() {
       const y = window.scrollY
       const s0 = run.getBoundingClientRect().bottom + y - window.innerHeight
       const s1 = scene ? scene.getBoundingClientRect().top + y : Number.POSITIVE_INFINITY
-      return { next, y, s0, s1, t: Math.min(1, Math.max(0, (y - s0) / Math.max(1, s1 - s0))) }
+      // land three quarters of the way, then ride along with the control into its scene
+      const land = s0 + (s1 - s0) * 0.75
+      return { next, y, s0, land, t: Math.min(1, Math.max(0, (y - s0) / Math.max(1, land - s0))) }
+    }
+    // a small overshoot when it touches down, so the landing reads as an event
+    let landedAt = 0
+    const settle = () => {
+      if (!landedAt) return 1
+      const k = (performance.now() - landedAt) / 260
+      return k >= 1 ? 1 : 1 + 0.05 * Math.sin(k * Math.PI) * (1 - k)
     }
     const target = () => {
-      const { next, y, s0, s1, t } = travel()
+      const { next, y, s0, t } = travel()
       const from = at.getBoundingClientRect()
       if (!next || y <= s0) return from
       const to = next.getBoundingClientRect()
-      if (y >= s1) return to
+      if (t >= 1) {
+        const g = settle()
+        const w = to.width * g
+        const h = to.height * g
+        return new DOMRect(to.x - (w - to.width) / 2, to.y - (h - to.height) / 2, w, h)
+      }
       const a = shift(from, y - s0)
-      const b = shift(to, -(s1 - y))
       const e = t * t * (3 - 2 * t)
       return new DOMRect(
-        lerp(a.x, b.x, e),
-        lerp(a.y, b.y, e),
-        lerp(a.width, b.width, e),
-        lerp(a.height, b.height, e),
+        lerp(a.x, to.x, e),
+        lerp(a.y, to.y, e),
+        lerp(a.width, to.width, e),
+        lerp(a.height, to.height, e),
       )
     }
-    // from halfway, the object takes the next scene's state
+    // on a phone the straight path would cross the next scene's heading: the object dissolves
+    // out and back in on the way instead
+    const alpha = () => {
+      if (window.innerWidth > 900) return 1
+      const t = travel().t
+      return t <= 0 || t >= 1 ? 1 : Math.abs(1 - 2 * t) ** 1.5
+    }
+    // on touchdown the object takes the next scene's state; before, the hero's
     const follow = () => {
       const handle = scene.current
       if (!handle) return
@@ -130,9 +150,14 @@ export function SkinScene() {
         // the rest of the hero (wordmark, lede) follows: hero.module.css, wordmark.module.css
         hero.toggleAttribute("data-bare", shown)
       }
-      const half = travel().t > 0.5
-      if (half !== past) {
-        past = half
+      const { t, y, s0 } = travel()
+      // the hero's labels clear out before the object leaves, so it never slides over them
+      stage.current?.toggleAttribute("data-travel", y > s0 - 80)
+      const down = t >= 1
+      if (down !== past) {
+        past = down
+        landedAt = down ? performance.now() : 0
+        setLanded(down)
         follow()
       }
     }
@@ -149,6 +174,7 @@ export function SkinScene() {
               setGl(true)
               setSceneGl(true)
             },
+            alpha,
             { checked: true, peel: 0 },
           )
           onScroll()
@@ -181,6 +207,7 @@ export function SkinScene() {
       clearTimeout(hint)
       hero.removeAttribute("data-bare")
       setSceneGl(false)
+      setLanded(false)
       scene.current?.dispose()
       scene.current = null
     }

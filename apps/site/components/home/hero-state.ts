@@ -70,3 +70,21 @@ export const useSceneGl = () =>
     () => sceneGl,
     () => false,
   )
+
+// whether the travelling object has landed on the next scene's control: its label shows then
+let landed = false
+const landedListeners = new Set<() => void>()
+export function setLanded(value: boolean) {
+  if (value === landed) return
+  landed = value
+  for (const l of landedListeners) l()
+}
+export const useLanded = () =>
+  useSyncExternalStore(
+    (l) => {
+      landedListeners.add(l)
+      return () => landedListeners.delete(l)
+    },
+    () => landed,
+    () => false,
+  )
