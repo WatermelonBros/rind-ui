@@ -16,7 +16,7 @@ import {
   initialCollectionContext,
 } from "../../collection/machine"
 import { isSelected, type SelectionValue, selectedKeys } from "../../collection/selection"
-import { quirkActive } from "../../dom/quirks"
+import { quirkActive } from "../../dom/quirk-conditions"
 import { controlsOf } from "../../dom/row-controls"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"

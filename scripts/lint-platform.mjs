@@ -1,5 +1,5 @@
 // Fails when code reads the user agent or a platform flag outside dom/platform.ts and
-// dom/quirks.ts (openspec a11y-quirks): workarounds go through quirk entries instead.
+// dom/quirk-conditions.ts (openspec a11y-quirks): workarounds go through quirk entries instead.
 // Flag reads are found by name in every form — `.ios`, `["ios"]`, `{ ios } = …`,
 // `({ ios }) =>` — on any value, which is stricter than a type-aware check (TypeScript 7's
 // compiler API is not stable yet). A deliberate platform convention (⌘ vs Control, Option
@@ -9,7 +9,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs"
 import { join, relative } from "node:path"
 
-const ALLOWED = ["core/src/dom/platform.ts", "core/src/dom/quirks.ts"]
+const ALLOWED = ["core/src/dom/platform.ts", "core/src/dom/quirk-conditions.ts"]
 const FLAGS = "apple|mac|ios|android|windows|webkit|chromium|firefox|engine"
 const PATTERNS = [
   /navigator\s*\.\s*userAgent\b/,
@@ -61,7 +61,7 @@ for (const dir of dirs) {
 
 if (problems.length > 0) {
   console.error(
-    "User agent / platform reads outside dom/platform.ts and dom/quirks.ts.\nGate the workaround with a quirk entry (quirkActive), or mark a deliberate convention with `// platform-convention: <why>`:",
+    "User agent / platform reads outside dom/platform.ts and dom/quirk-conditions.ts.\nGate the workaround with a quirk entry (quirkActive), or mark a deliberate convention with `// platform-convention: <why>`:",
   )
   for (const p of problems) console.error(`  ${p}`)
   process.exit(1)

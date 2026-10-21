@@ -23,7 +23,7 @@ import type {
 } from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
 import { isImeKey } from "./keyboard"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 import { textSelection } from "./text-selection"
 import { injectTouchAction } from "./touch-action"
 

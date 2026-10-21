@@ -20,7 +20,7 @@ import {
   type PlacementState,
   positionerProps,
 } from "../../dom/position/connect"
-import { quirkActive } from "../../dom/quirks"
+import { quirkActive } from "../../dom/quirk-conditions"
 import type { ModalityEnv, PlatformInfo } from "../../env/capabilities"
 import { separatorProps } from "../separator/separator.connect"
 import { buttonLikeProps } from "../shared/button-like"

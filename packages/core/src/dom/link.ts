@@ -10,7 +10,7 @@ import { dataFlag, type PartProps } from "../connect/props"
 import type { Modality } from "../contract/env"
 import type { DomEnv, ModalityEnv, PlatformInfo } from "../env/capabilities"
 import type { Href, RouterCapability, RouterOptions } from "../env/router"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 
 declare const process: { env: { NODE_ENV?: string } }
 

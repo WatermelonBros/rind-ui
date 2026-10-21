@@ -1,4 +1,4 @@
-import type { QuirksAffecting } from "../dom/quirks"
+import type { QuirksAffecting } from "../dom/quirk-meta"
 import { setup, type } from "../machine/setup"
 import type { AnyMachine, EventOf, MachinePropsOf, StateOf, View } from "../machine/types"
 import type { By, Env, Modality } from "./env"

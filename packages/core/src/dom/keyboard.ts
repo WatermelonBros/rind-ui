@@ -3,7 +3,7 @@
 
 import type { KeyDescription } from "../a11y/keys"
 import type { PlatformFlags, PlatformInfo, Scheduler, TimerHandle } from "../env/capabilities"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 
 interface NativeKey {
   readonly key: string
