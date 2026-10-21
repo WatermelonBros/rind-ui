@@ -297,4 +297,5 @@ function ValueText({ render, children, ...rest }: PartProps<"span">) {
   return renderPart("span", { ...props, children: children ?? ctx.state.value }, render, ctx.state)
 }
 
-export const Clipboard = { Root, Label, Control, Input, Trigger, Indicator, ValueText }
+/** The parts, by name: `clipboard.parts.ts` re-exports them as the `Clipboard` namespace. */
+export { Control, Indicator, Input, Label, Root, Trigger, ValueText }

@@ -1,11 +1,11 @@
-export {
-  ScrollArea,
-  type ScrollAreaActions,
-  type ScrollAreaContentProps,
-  type ScrollAreaCornerProps,
-  type ScrollAreaRootProps,
-  type ScrollAreaScrollbarProps,
-  type ScrollAreaState,
-  type ScrollAreaThumbProps,
-  type ScrollAreaViewportProps,
+export type {
+  ScrollAreaActions,
+  ScrollAreaContentProps,
+  ScrollAreaCornerProps,
+  ScrollAreaRootProps,
+  ScrollAreaScrollbarProps,
+  ScrollAreaState,
+  ScrollAreaThumbProps,
+  ScrollAreaViewportProps,
 } from "./scroll-area"
+export * as ScrollArea from "./scroll-area.parts"

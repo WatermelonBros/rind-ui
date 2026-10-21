@@ -1,7 +1,2 @@
-export {
-  Rating,
-  type RatingChangeDetails,
-  type RatingItemProps,
-  type RatingRootProps,
-  type RatingState,
-} from "./rating"
+export type { RatingChangeDetails, RatingItemProps, RatingRootProps, RatingState } from "./rating"
+export * as Rating from "./rating.parts"

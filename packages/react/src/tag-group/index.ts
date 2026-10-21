@@ -1,6 +1,2 @@
-export {
-  TagGroup,
-  type TagGroupChangeDetails,
-  type TagGroupItemData,
-  type TagGroupRootProps,
-} from "./tag-group"
+export type { TagGroupChangeDetails, TagGroupItemData, TagGroupRootProps } from "./tag-group"
+export * as TagGroup from "./tag-group.parts"

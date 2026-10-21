@@ -1,1 +1,2 @@
-export { Meter, type MeterRenderState, type MeterRootProps } from "./meter"
+export type { MeterRenderState, MeterRootProps } from "./meter"
+export * as Meter from "./meter.parts"

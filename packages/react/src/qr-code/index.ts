@@ -1,11 +1,11 @@
-export {
-  QrCode,
-  type QrCodeApi,
-  type QrCodeDownloadTriggerProps,
-  type QrCodeFrameProps,
-  type QrCodeOverlayProps,
-  type QrCodePatternProps,
-  type QrCodeRootProps,
-  type QrCodeState,
-  type QrCodeValueTextProps,
+export type {
+  QrCodeApi,
+  QrCodeDownloadTriggerProps,
+  QrCodeFrameProps,
+  QrCodeOverlayProps,
+  QrCodePatternProps,
+  QrCodeRootProps,
+  QrCodeState,
+  QrCodeValueTextProps,
 } from "./qr-code"
+export * as QrCode from "./qr-code.parts"

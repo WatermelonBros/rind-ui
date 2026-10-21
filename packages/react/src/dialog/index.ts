@@ -1,9 +1,9 @@
-export {
-  Dialog,
-  type DialogActions,
-  type DialogContentState,
-  type DialogRole,
-  type DialogRootProps,
-  type DialogTitleProps,
-  type DialogTriggerState,
+export type {
+  DialogActions,
+  DialogContentState,
+  DialogRole,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerState,
 } from "./dialog"
+export * as Dialog from "./dialog.parts"

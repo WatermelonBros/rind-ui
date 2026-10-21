@@ -366,4 +366,5 @@ function MoveButton({ render, direction, children, ...rest }: SortableMoveButton
   return renderPart("button", { ...props, children }, render, ctx.state)
 }
 
-export const Sortable = { Root, Item, Handle, Indicator, MoveButton }
+/** The parts, by name: `sortable.parts.ts` re-exports them as the `Sortable` namespace. */
+export { Handle, Indicator, Item, MoveButton, Root }

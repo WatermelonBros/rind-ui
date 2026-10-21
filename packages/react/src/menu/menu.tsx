@@ -1028,31 +1028,29 @@ function Portal(props: PortalProps) {
   return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
-export const Menu = {
-  Root,
-  Trigger,
-  Portal,
-  Positioner,
-  Content,
-  Arrow,
-  Item,
-  CheckboxItem,
-  RadioGroup,
-  RadioItem,
-  ItemIndicator,
-  ItemText,
-  Group,
-  GroupLabel,
-  Separator,
-  Submenu,
-  SubmenuTrigger,
-}
-
+/** The parts, by name: `menu.parts.ts` re-exports them as the `Menu` namespace. */
 // Internal: a context menu builds its root level from these (not public API).
 export {
+  Arrow,
+  CheckboxItem,
+  Content,
+  Group,
+  GroupLabel,
+  Item,
+  ItemIndicator,
+  ItemText,
   type Level as MenuLevel,
   LevelContext as MenuLevelContext,
   type LevelOptions as MenuLevelOptions,
+  Portal,
+  Positioner,
+  RadioGroup,
+  RadioItem,
+  Root,
+  Separator,
+  Submenu,
+  SubmenuTrigger,
+  Trigger,
   useApi as useMenuApi,
   useLevelService as useMenuLevelService,
 }

@@ -1,12 +1,12 @@
-export {
-  Breadcrumbs,
-  type BreadcrumbsCollapsedItem,
-  type BreadcrumbsEllipsisProps,
-  type BreadcrumbsEllipsisState,
-  type BreadcrumbsItemProps,
-  type BreadcrumbsLinkProps,
-  type BreadcrumbsListProps,
-  type BreadcrumbsRootProps,
-  type BreadcrumbsSeparatorProps,
-  type BreadcrumbsState,
+export type {
+  BreadcrumbsCollapsedItem,
+  BreadcrumbsEllipsisProps,
+  BreadcrumbsEllipsisState,
+  BreadcrumbsItemProps,
+  BreadcrumbsLinkProps,
+  BreadcrumbsListProps,
+  BreadcrumbsRootProps,
+  BreadcrumbsSeparatorProps,
+  BreadcrumbsState,
 } from "./breadcrumbs"
+export * as Breadcrumbs from "./breadcrumbs.parts"

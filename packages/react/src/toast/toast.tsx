@@ -382,4 +382,5 @@ function CloseTrigger({ render, ref, children, ...rest }: Own<"button">) {
   return renderPart("button", props, render, ctx.toast)
 }
 
-export const Toast = { Root, Title, Description, ActionTrigger, CloseTrigger }
+/** The parts, by name: `toast.parts.ts` re-exports them as the `Toast` namespace. */
+export { ActionTrigger, CloseTrigger, Description, Root, Title }

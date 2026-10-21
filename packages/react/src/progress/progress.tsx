@@ -237,13 +237,5 @@ function CircleIndicator({ render, ...rest }: PartProps<"circle">) {
 }
 
 /** A task's advance, determinate or indeterminate, as a bar or a ring. Never a live region. */
-export const Progress = {
-  Root,
-  Label,
-  ValueText,
-  Track,
-  Indicator,
-  Circle,
-  CircleTrack,
-  CircleIndicator,
-}
+/** The parts, by name: `progress.parts.ts` re-exports them as the `Progress` namespace. */
+export { Circle, CircleIndicator, CircleTrack, Indicator, Label, Root, Track, ValueText }

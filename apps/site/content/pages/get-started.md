@@ -23,6 +23,11 @@ pnpm add @rind-ui/react
 
 `@rind-ui/core` comes with it as a dependency. React 19 or newer is required.
 
+Your bundle carries only the components you import, from the package root or from a subpath
+(`@rind-ui/react/dialog`). Within a component, Vite, Rollup, Rolldown and webpack also drop the
+parts you never render: an app that uses `Dialog.Root`, `Dialog.Trigger` and `Dialog.Content`
+does not ship `Dialog.Backdrop`. esbuild keeps every part of a component you import.
+
 ## Your first component
 
 ```tsx

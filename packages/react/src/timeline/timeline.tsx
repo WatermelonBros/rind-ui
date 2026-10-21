@@ -206,14 +206,11 @@ function Time({ render, dateTime, children, ...rest }: TimelineTimeProps) {
   )
 }
 
-export const Timeline = {
-  Root,
-  Item,
-  Indicator: itemPart("indicator", "div"),
-  Connector: itemPart("connector", "div"),
-  Content: itemPart("content", "div"),
-  Title,
-  Description: itemPart("description", "div"),
-  Time,
-  Opposite: itemPart("opposite", "div"),
-}
+const Indicator = itemPart("indicator", "div")
+const Connector = itemPart("connector", "div")
+const Content = itemPart("content", "div")
+const Description = itemPart("description", "div")
+const Opposite = itemPart("opposite", "div")
+
+/** The parts, by name: `timeline.parts.ts` re-exports them as the `Timeline` namespace. */
+export { Connector, Content, Description, Indicator, Item, Opposite, Root, Time, Title }

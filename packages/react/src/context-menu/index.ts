@@ -1,7 +1,7 @@
-export {
-  ContextMenu,
-  type ContextMenuActions,
-  type ContextMenuChangeDetails,
-  type ContextMenuRootProps,
-  type ContextMenuTriggerState,
+export type {
+  ContextMenuActions,
+  ContextMenuChangeDetails,
+  ContextMenuRootProps,
+  ContextMenuTriggerState,
 } from "./context-menu"
+export * as ContextMenu from "./context-menu.parts"

@@ -445,10 +445,14 @@ function Indicator({ render, ...rest }: PartProps<"span">) {
   })
 }
 
-export const Collapsible = { Root, Trigger, Content, Indicator }
+/** The parts, by name: `collapsible.parts.ts` re-exports them as the `Collapsible` namespace. */
 /** The parts an Accordion item reuses (inside its own CollapsibleContext). */
 export {
+  Content,
   Content as CollapsibleContent,
+  Indicator,
   Indicator as CollapsibleIndicator,
+  Root,
+  Trigger,
   Trigger as CollapsibleTrigger,
 }

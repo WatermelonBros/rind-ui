@@ -1,10 +1,10 @@
-export {
-  Slider,
-  type SliderChangeDetails,
-  type SliderMarkerProps,
-  type SliderRootProps,
-  type SliderShaped,
-  type SliderState,
-  type SliderThumbProps,
-  type SliderValue,
+export type {
+  SliderChangeDetails,
+  SliderMarkerProps,
+  SliderRootProps,
+  SliderShaped,
+  SliderState,
+  SliderThumbProps,
+  SliderValue,
 } from "./slider"
+export * as Slider from "./slider.parts"

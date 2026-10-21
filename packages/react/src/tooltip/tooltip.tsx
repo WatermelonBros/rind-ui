@@ -315,4 +315,5 @@ function Portal(props: PortalProps) {
   return <PortalPart logicalParent={logicalParent} observe={open} {...props} />
 }
 
-export const Tooltip = { Root, Trigger, Portal, Positioner, Content, Arrow }
+/** The parts, by name: `tooltip.parts.ts` re-exports them as the `Tooltip` namespace. */
+export { Arrow, Content, Portal, Positioner, Root, Trigger }

@@ -759,16 +759,37 @@ function List(props: Parameters<typeof listParts.List>[0]) {
   return <listParts.List {...props} />
 }
 
-export const Select = {
-  ...listParts,
-  Root,
-  Label,
-  Trigger,
-  ValueText,
-  Indicator,
+const {
+  Item,
+  ItemText,
+  ItemDescription,
+  ItemIndicator,
+  Section,
+  Separator,
+  Empty,
+  LoadMore,
+  Items,
+} = listParts
+
+/** The parts, by name: `select.parts.ts` re-exports them as the `Select` namespace. */
+export {
+  Content,
   Description,
+  Empty,
+  Indicator,
+  Item,
+  ItemDescription,
+  ItemIndicator,
+  Items,
+  ItemText,
+  Label,
+  List,
+  LoadMore,
   Portal,
   Positioner,
-  Content,
-  List,
+  Root,
+  Section,
+  Separator,
+  Trigger,
+  ValueText,
 }

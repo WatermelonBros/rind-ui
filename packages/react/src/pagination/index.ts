@@ -1,11 +1,11 @@
-export {
-  Pagination,
-  type PaginationControlState,
-  type PaginationEllipsisProps,
-  type PaginationItemProps,
-  type PaginationListProps,
-  type PaginationPageProps,
-  type PaginationRootProps,
-  type PaginationRootState,
-  type PaginationTotal,
+export type {
+  PaginationControlState,
+  PaginationEllipsisProps,
+  PaginationItemProps,
+  PaginationListProps,
+  PaginationPageProps,
+  PaginationRootProps,
+  PaginationRootState,
+  PaginationTotal,
 } from "./pagination"
+export * as Pagination from "./pagination.parts"

@@ -828,16 +828,17 @@ function Empty({ render, children, ...rest }: Own<"div">) {
 }
 
 /** A hierarchy the user expands, navigates and selects or checks (openspec tree-view). */
-export const TreeView = {
-  Root,
-  Label,
+/** The parts, by name: `tree-view.parts.ts` re-exports them as the `TreeView` namespace. */
+export {
   DropIndicator,
-  Tree,
-  Item,
-  ItemText,
-  ItemIndicator,
-  ItemCheckbox,
-  Loading,
   Empty,
+  Item,
+  ItemCheckbox,
+  ItemIndicator,
+  ItemText,
+  Label,
+  Loading,
+  Root,
+  Tree,
   useVisibleRows,
 }

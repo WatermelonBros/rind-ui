@@ -1,8 +1,8 @@
-export {
-  Splitter,
-  type SplitterChangeDetails,
-  type SplitterHandleProps,
-  type SplitterPanelProps,
-  type SplitterRootProps,
-  type SplitterState,
+export type {
+  SplitterChangeDetails,
+  SplitterHandleProps,
+  SplitterPanelProps,
+  SplitterRootProps,
+  SplitterState,
 } from "./splitter"
+export * as Splitter from "./splitter.parts"

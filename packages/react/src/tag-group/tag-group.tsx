@@ -500,14 +500,5 @@ function Tags({
 }
 
 /** A collection of tags: browse with one Tab stop; select, act on, follow or remove them. */
-export const TagGroup = {
-  Root,
-  Label,
-  Description,
-  List,
-  Tag,
-  TagText,
-  TagRemove,
-  Empty,
-  Tags,
-}
+/** The parts, by name: `tag-group.parts.ts` re-exports them as the `TagGroup` namespace. */
+export { Description, Empty, Label, List, Root, Tag, TagRemove, Tags, TagText }

@@ -5,6 +5,7 @@
 // one). Runs after the react build (packages/react `build`); needs both packages built.
 // `node scripts/size.mjs --report` prints the sizes without failing.
 import { readdirSync, readFileSync, statSync } from "node:fs"
+import { createRequire } from "node:module"
 import { gzipSync } from "node:zlib"
 import { build } from "esbuild"
 import { quirkMeta } from "../packages/core/src/dom/quirk-meta.ts"
@@ -46,6 +47,29 @@ async function measure(contents) {
         .map(([path]) => path),
     ),
   }
+}
+
+// Rolldown (Vite's production bundler) shakes the members of a part namespace; esbuild does
+// not (it keeps every member of a re-exported namespace), so root-only sizes use Rolldown.
+const { rolldown } = createRequire(new URL("../packages/core/", import.meta.url))("rolldown")
+async function measureRolldown(contents) {
+  const bundle = await rolldown({
+    input: "virtual:entry",
+    cwd: reactDir,
+    external: [/^react($|\/)/, /^react-dom($|\/)/],
+    transform: { define: { "process.env.NODE_ENV": '"production"' } },
+    plugins: [
+      {
+        name: "entry",
+        resolveId: (id) => (id === "virtual:entry" ? id : null),
+        load: (id) => (id === "virtual:entry" ? contents : null),
+      },
+    ],
+    logLevel: "silent",
+  })
+  const { output } = await bundle.generate({ minify: true, format: "esm" })
+  const code = output.map((chunk) => ("code" in chunk ? chunk.code : "")).join("")
+  return gzipSync(code, { level: 9 }).length
 }
 
 const kb = (bytes) => `${(bytes / 1024).toFixed(1)} kB`
@@ -92,6 +116,28 @@ const copy = await measure(
   `import { Clipboard } from "@rind-ui/react/clipboard"; console.log(Clipboard)`,
 )
 if (!carries(copy, "clipboard")) failures.push("Clipboard does not carry the clipboard capability")
+
+// A part namespace's root alone ships without the parts it never references (openspec
+// bundle-size "Minimal Composition Budgets").
+for (const slug of components) {
+  const index = readFileSync(`${reactDir}dist/${slug}/index.mjs`, "utf8")
+  if (!index.includes(".parts.mjs")) continue
+  const name = budgets.names?.[slug] ?? pascal(slug)
+  const budget = budgets.roots?.[slug]
+  const size = await measureRolldown(
+    `import { ${name} } from "@rind-ui/react/${slug}"; console.log(${name}.Root)`,
+  )
+  if (budget === undefined) {
+    failures.push(`${name}.Root: no root budget in scripts/size-budgets.json`)
+    if (report) console.log(`  ${`${name}.Root`.padEnd(22)} ${kb(size).padStart(9)}  (no budget)`)
+    continue
+  }
+  const over = size > budget * 1024
+  console.log(
+    `${over ? "✗" : " "} ${`${name}.Root`.padEnd(22)} ${kb(size).padStart(9)}  budget ${kb(budget * 1024)}`,
+  )
+  if (over) failures.push(`${name}.Root: ${kb(size)} gzip, budget ${kb(budget * 1024)}`)
+}
 
 const button = await measure(`import { Button } from "@rind-ui/react"; console.log(Button)`)
 const ratio = button.gz / all.gz

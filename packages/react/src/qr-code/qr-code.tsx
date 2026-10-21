@@ -392,4 +392,5 @@ function DownloadTrigger({
 }
 
 /** A value rendered as a scannable QR code symbol, named, described and downloadable. */
-export const QrCode = { Root, Frame, Pattern, Overlay, ValueText, DownloadTrigger }
+/** The parts, by name: `qr-code.parts.ts` re-exports them as the `QrCode` namespace. */
+export { DownloadTrigger, Frame, Overlay, Pattern, Root, ValueText }

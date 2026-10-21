@@ -653,16 +653,17 @@ function Items({
 }
 
 /** Rows that are selected, acted on or followed, and may hold buttons, links and fields. */
-export const GridList = {
-  Root,
-  Label,
-  List,
+/** The parts, by name: `grid-list.parts.ts` re-exports them as the `GridList` namespace. */
+export {
+  Empty,
   Item,
-  ItemText,
-  ItemDescription,
   ItemCheckbox,
   ItemControl,
-  Empty,
-  LoadMore,
+  ItemDescription,
   Items,
+  ItemText,
+  Label,
+  List,
+  LoadMore,
+  Root,
 }

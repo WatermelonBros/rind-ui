@@ -160,4 +160,5 @@ function Item({ loading, animate, render, children, ...rest }: SkeletonItemProps
 }
 
 /** Placeholders for content that is loading, with the loading state exposed once. */
-export const Skeleton = { Root, Status, Content, Item }
+/** The parts, by name: `skeleton.parts.ts` re-exports them as the `Skeleton` namespace. */
+export { Content, Item, Root, Status }

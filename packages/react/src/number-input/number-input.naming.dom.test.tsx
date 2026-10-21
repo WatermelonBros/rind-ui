@@ -2,7 +2,8 @@
 // carries the host's scope and part names; without a host it keeps its own.
 import { render } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
-import { NumberInput, NumberInputNaming } from "./number-input"
+import { NumberInputNaming } from "./number-input"
+import * as NumberInput from "./number-input.parts"
 
 const parts = (root: HTMLElement) =>
   [...root.querySelectorAll("[data-scope]")].map(

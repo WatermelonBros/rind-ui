@@ -638,14 +638,15 @@ function ItemDescription({ render, ...rest }: PartProps<"p", RadioItemState>) {
   })
 }
 
-export const RadioGroup = {
-  Root,
-  Label,
+/** The parts, by name: `radio-group.parts.ts` re-exports them as the `RadioGroup` namespace. */
+export {
   Description,
   ErrorMessage,
   Item,
   ItemControl,
+  ItemDescription,
   ItemIndicator,
   ItemLabel,
-  ItemDescription,
+  Label,
+  Root,
 }

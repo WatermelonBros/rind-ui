@@ -1,9 +1,9 @@
-export {
-  Avatar,
-  type AvatarFallbackProps,
-  type AvatarGroupOverflowProps,
-  type AvatarGroupProps,
-  type AvatarImageProps,
-  type AvatarRootProps,
-  type AvatarState,
+export type {
+  AvatarFallbackProps,
+  AvatarGroupOverflowProps,
+  AvatarGroupProps,
+  AvatarImageProps,
+  AvatarRootProps,
+  AvatarState,
 } from "./avatar"
+export * as Avatar from "./avatar.parts"

@@ -1,1 +1,2 @@
-export { Marquee, type MarqueeRenderState, type MarqueeRootProps } from "./marquee"
+export type { MarqueeRenderState, MarqueeRootProps } from "./marquee"
+export * as Marquee from "./marquee.parts"

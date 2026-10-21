@@ -663,17 +663,18 @@ function CharacterCount({
   )
 }
 
-export const PromptInput = {
-  Root,
-  Label: HostLabel,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
-  Textarea,
-  Submit,
-  AttachTrigger,
-  Attachments,
+/** The parts, by name: `prompt-input.parts.ts` re-exports them as the `PromptInput` namespace. */
+export {
   Attachment,
   AttachmentName,
   AttachmentRemove,
+  Attachments,
+  AttachTrigger,
   CharacterCount,
+  HostDescription as Description,
+  HostErrorMessage as ErrorMessage,
+  HostLabel as Label,
+  Root,
+  Submit,
+  Textarea,
 }

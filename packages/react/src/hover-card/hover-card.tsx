@@ -328,4 +328,5 @@ function Portal(props: PortalProps) {
   return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
-export const HoverCard = { Root, Trigger, Portal, Positioner, Content, Arrow }
+/** The parts, by name: `hover-card.parts.ts` re-exports them as the `HoverCard` namespace. */
+export { Arrow, Content, Portal, Positioner, Root, Trigger }

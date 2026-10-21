@@ -66,4 +66,5 @@ function BadgeRoot({ label, render, id, ref, children, ...rest }: BadgeProps) {
 }
 
 /** Static status text (a count, a label, a dot): never interactive, never a live region. */
-export const Badge = { Root: BadgeRoot }
+/** The parts, by name: `badge.parts.ts` re-exports them as the `Badge` namespace. */
+export { BadgeRoot as Root }

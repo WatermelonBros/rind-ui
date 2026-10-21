@@ -92,15 +92,16 @@ function ClearTrigger(props: Parameters<typeof BaseClearTrigger>[0]) {
   return <BaseClearTrigger {...props} />
 }
 
-export const TextField = {
-  Root,
-  Label: HostLabel,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
-  Input,
-  Textarea,
-  ClearTrigger,
+/** The parts, by name: `text-field.parts.ts` re-exports them as the `TextField` namespace. */
+export {
   CharacterCount,
-  VisibilityTrigger,
+  ClearTrigger,
+  HostDescription as Description,
+  HostErrorMessage as ErrorMessage,
+  HostLabel as Label,
+  Input,
+  Root,
+  Textarea,
   VisibilityIndicator,
+  VisibilityTrigger,
 }

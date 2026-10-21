@@ -678,15 +678,16 @@ function Description({ render, ...rest }: PartProps<"div">) {
   return renderPart("div", props, render, ctx.state)
 }
 
-export const Slider = {
-  Root,
-  Label,
-  ValueText,
+/** The parts, by name: `slider.parts.ts` re-exports them as the `Slider` namespace. */
+export {
   Control,
-  Track,
-  Indicator,
-  Thumb,
-  MarkerGroup,
-  Marker,
   Description,
+  Indicator,
+  Label,
+  Marker,
+  MarkerGroup,
+  Root,
+  Thumb,
+  Track,
+  ValueText,
 }
