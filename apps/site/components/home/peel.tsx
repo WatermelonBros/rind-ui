@@ -51,14 +51,6 @@ export function Peel() {
   const [kind, setKind] = useState<HeroKind>("switch")
   const heroOn = useHeroOn()
   const [attrs, setAttrs] = useState<readonly string[]>([])
-  const [narrow, setNarrow] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 900px)")
-    const sync = () => setNarrow(mq.matches)
-    sync()
-    mq.addEventListener("change", sync)
-    return () => mq.removeEventListener("change", sync)
-  }, [])
   useEffect(() => setKind(heroKind()), [])
 
   // The hero's 3D object travels here and stands over this scene's real control (skin-scene.tsx):
@@ -133,19 +125,22 @@ export function Peel() {
   return (
     <section ref={section} className={styles.peel} style={vars} aria-labelledby="peel-title">
       {/* each act owns the whole field: the bare parts on ink, the machine on the brand colour */}
-      {/* the text flips once ink is behind it: the heading late (a disc opens from the object on
-          desktop, ink rises from the bottom on a phone), the object's label early */}
-      <div
-        className={styles.sticky}
-        data-act={act + 1}
-        data-dark={dark > (narrow ? 0.92 : 0.7) ? "" : undefined}
-        data-ink={dark > 0.15 ? "" : undefined}
-      >
+      {/* the object's label turns light as soon as the ink disc reaches it */}
+      <div className={styles.sticky} data-act={act + 1} data-ink={dark > 0.15 ? "" : undefined}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
             {ACTS[act]?.title}
           </h2>
           <p className={styles.text}>{ACTS[act]?.text}</p>
+        </div>
+        {/* the same copy in paper, clipped by the ink disc: every letter reads on both grounds */}
+        <div className={styles.inkLayer} aria-hidden="true">
+          <div className={styles.copy}>
+            <p className={styles.title} key={act}>
+              {ACTS[act]?.title}
+            </p>
+            <p className={styles.text}>{ACTS[act]?.text}</p>
+          </div>
         </div>
 
         {/* the scene is an illustration of the text beside it: not focusable, not announced */}

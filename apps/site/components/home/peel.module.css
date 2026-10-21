@@ -20,10 +20,6 @@
   isolation: isolate;
   transition: color 0.4s var(--spring);
 }
-/* text flips once the ground is more ink than brand colour */
-.sticky[data-dark] {
-  color: var(--paper);
-}
 .title {
   font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
   letter-spacing: -0.035em;
@@ -98,8 +94,8 @@
   --fly: min(1, var(--p2) * 2.5);
   translate: calc(-50% + (50% - var(--ax, 0.5) * 100% + var(--x)) * var(--fly))
     calc(-50% + var(--y) * var(--fly));
-  /* gone before the machine arrives: no chip ever fades over the graph */
-  opacity: calc(var(--p2) * 1.4 - var(--p3) * 4);
+  /* in only once the ink disc has reached them, and gone before the machine arrives */
+  opacity: min(calc(var(--p2) * 1.4 - var(--p3) * 4), calc((var(--dark, 0) - 0.22) * 6));
   scale: calc(0.6 + var(--fly) * 0.4);
 }
 .attrs b {
@@ -225,9 +221,31 @@
   background: var(--ink);
   clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
 }
-/* on a phone the heading sits on top: ink rises from the bottom instead, and reaches it last */
+/* the copy again, in paper, clipped by the same disc (peel.tsx) */
+.inkLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  padding: var(--bar-h) 56px 0;
+  color: var(--paper);
+  pointer-events: none;
+  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+}
+/* on a phone the disc opens from the object, low in the column */
 @media (max-width: 900px) {
-  .sticky::before {
-    clip-path: inset(calc((1 - var(--dark, 0)) * 100%) 0 0 0);
+  .sticky::before,
+  .inkLayer {
+    clip-path: circle(calc(var(--dark, 0) * 150%) at 50% 62%);
+  }
+  .inkLayer {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: 10px;
+    padding: calc(var(--bar-h) + 24px) 20px 20px;
   }
 }

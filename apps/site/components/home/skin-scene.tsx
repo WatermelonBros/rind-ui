@@ -126,7 +126,8 @@ export function SkinScene() {
     const alpha = () => {
       if (window.innerWidth > 900) return 1
       const t = travel().t
-      return t <= 0 || t >= 1 ? 1 : Math.abs(1 - 2 * t) ** 1.5
+      // a short dip in the middle of the path only
+      return t <= 0 || t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * t) * 2.5)
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     const follow = () => {

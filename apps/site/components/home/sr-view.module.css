@@ -5,7 +5,9 @@
   bottom: max(16px, env(safe-area-inset-bottom));
   z-index: 65;
   display: grid;
-  justify-items: center;
+  /* in the corner, out of the reading column */
+  justify-items: end;
+  padding-inline: 24px;
   gap: 10px;
   pointer-events: none;
 }
