@@ -5,10 +5,12 @@ Status: accepted · 2026-10-21
 ## Context
 
 The landing page (`apps/site`, home only) is being rebuilt around one continuous scroll story,
-"The Skin": a WebGL membrane stretched over a component's skeleton (its parts as a wireframe,
-its machine's states as nodes) that peels, re-forms and changes material with the crisp/juicy
-switch. Award-level library sites carry a scene like this; ours has to stay inside the site's
-performance budget (LCP under 1.5 s, CLS 0) and its accessibility rules.
+"The Skin": the hero shows one real rind component (a Switch, a Checkbox or a Button, a
+different one per visit) drawn in 3D in the site's look, over the real accessible control.
+Scrolling peels the skin off: the bare component and its real attributes are left, and the
+next scene carries the same component, in the same state, to its state machine. Award-level
+library sites carry a scene like this; ours has to stay inside the site's performance budget
+(LCP under 1.5 s, CLS 0) and its accessibility rules.
 
 0002 asks for a decision record before any new runtime dependency. This one is for the docs
 site only: no published package (`@rind-ui/*`) gains a dependency.
