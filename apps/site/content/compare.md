@@ -69,7 +69,9 @@ Ariakit is a careful, low-level toolkit for React and Solid. Reka UI (Vue), Bits
 
 ## When not to choose rind-ui yet
 
+<!-- pre-1.0 -->
 - You need a 1.0 with a frozen API: rind-ui is still in 0.x.
+<!-- /pre-1.0 -->
 - You need a long record in production: rind-ui's first production user is Reado, an IDE
   by the same author.
 - You need Vue, Svelte, Solid or Angular today.

@@ -72,6 +72,15 @@ function publishedVersion(): { version: string; source: "npm" | "workspace" } {
 const release = publishedVersion()
 console.log(`release: @rind-ui/react ${release.version} (${release.source})`)
 
+/** Text that holds only before or only after 1.0, chosen by the version npm serves at build
+ *  time: `<!-- pre-1.0 -->…<!-- /pre-1.0 -->` and `<!-- 1.0+ -->…<!-- /1.0+ -->`. */
+const stable = Number.parseInt(release.version, 10) >= 1
+const byRelease = (md: string) =>
+  md.replace(
+    /<!-- (pre-1\.0|1\.0\+) -->([\s\S]*?)<!-- \/\1 -->\n?/g,
+    (_, when: string, body: string) => ((when === "1.0+") === stable ? body : ""),
+  )
+
 // Site-owned pages (get started…) live with the site, not in the repo's docs/.
 const sitePages = join(import.meta.dirname, "../content/pages")
 const pages: DocPage[] = [
@@ -79,7 +88,7 @@ const pages: DocPage[] = [
     .filter((f) => f.endsWith(".md"))
     .map((f) => {
       // {{version}} in a site page: the released minor (0.2); ReleaseSync refreshes it from npm
-      const md = readFileSync(join(sitePages, f), "utf8")
+      const md = byRelease(readFileSync(join(sitePages, f), "utf8"))
       const v = release.version.replace(/\.\d+$/, "")
       return page(
         f,
@@ -486,9 +495,8 @@ const coverageTable = [
   `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | React (framework-free core) | every component | declared, with model-based tests | ${aiReady} ready |`,
   ...coverage,
 ].join("\n")
-const compare = readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8").replace(
-  "<!-- coverage -->",
-  coverageTable,
-)
+const compare = byRelease(
+  readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"),
+).replace("<!-- coverage -->", coverageTable)
 writeFileSync(join(out, "compare.md"), compare)
 writeFileSync(join(import.meta.dirname, "../public/compare.md"), compare)
