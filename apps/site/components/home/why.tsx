@@ -53,8 +53,55 @@ function Proof({
 /** The real keys light up as they reach the group. */
 function KeyboardProof() {
   const [lit, setLit] = useState("")
+  const [inside, setInside] = useState(false)
+  const group = useRef<HTMLDivElement>(null)
   const timer = useRef(0)
   useEffect(() => () => clearTimeout(timer.current), [])
+  useEffect(() => {
+    const el = group.current
+    if (!el) return
+    const stage = el.closest<HTMLElement>("[data-skinned]") ?? el
+    const focusGroup = () => {
+      const target =
+        el.querySelector<HTMLElement>('[aria-pressed="true"]') ?? el.querySelector("button")
+      target?.focus()
+    }
+    // a press anywhere on the panel lands in the group, so the keys have somewhere to go
+    const onDown = (e: PointerEvent) => {
+      if (e.target instanceof Element && e.target.closest("button")) return
+      e.preventDefault()
+      focusGroup()
+    }
+    // arrows with nothing focused, while the proof is on screen: they go where the page says
+    // they work. Never taken from another control: only from the page itself.
+    let seen = false
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        seen = entry?.isIntersecting ?? false
+      },
+      { threshold: 0.6 },
+    )
+    io.observe(stage)
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (!seen || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return
+      if (document.activeElement && document.activeElement !== document.body) return
+      e.preventDefault()
+      focusGroup()
+    }
+    const sync = () => setInside(el.contains(document.activeElement))
+    const onOut = () => requestAnimationFrame(sync)
+    stage.addEventListener("pointerdown", onDown)
+    document.addEventListener("keydown", onKey)
+    el.addEventListener("focusin", sync)
+    el.addEventListener("focusout", onOut)
+    return () => {
+      io.disconnect()
+      stage.removeEventListener("pointerdown", onDown)
+      document.removeEventListener("keydown", onKey)
+      el.removeEventListener("focusin", sync)
+      el.removeEventListener("focusout", onOut)
+    }
+  }, [])
   const onKeyDown = (e: KeyboardEvent) => {
     const key = e.key === " " ? "Space" : e.key
     if (!KEYS.some(([k]) => k === key)) return
@@ -66,7 +113,7 @@ function KeyboardProof() {
     <Proof
       title="Every key works."
       text="Tab in, arrows across, Home and End to the ends. The keyboard pattern is built in, not bolted on."
-      hint="Click Left, then press the arrow keys."
+      hint={inside ? "Focus is in. Try ← → Home End." : "Click the panel, or press ← →."}
       readout={
         <span className={styles.keys} aria-hidden="true">
           {KEYS.map(([k, label]) => (
@@ -78,7 +125,7 @@ function KeyboardProof() {
       }
     >
       {/* biome-ignore lint/a11y/noStaticElementInteractions: only listens to keys bubbling from the group, adds no behaviour */}
-      <div onKeyDown={onKeyDown}>
+      <div ref={group} onKeyDown={onKeyDown}>
         <ToggleGroup.Root aria-label="Alignment" defaultValue={["left"]}>
           <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
           <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
