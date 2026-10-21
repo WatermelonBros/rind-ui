@@ -4,6 +4,7 @@ import { Accordion, Button, CheckboxGroup, Heading, ToggleGroup } from "@rind-ui
 import Link from "next/link"
 import { type ReactNode, useState } from "react"
 import styles from "./hero.module.css"
+import { SkinScene } from "./home/skin-scene"
 import { usePhase } from "./phase"
 import { Wordmark } from "./wordmark"
 
@@ -103,6 +104,7 @@ export function Hero({ children }: { children?: ReactNode }) {
   return (
     <main>
       <div className={styles.hero}>
+        <SkinScene />
         <section className={styles.copy} aria-label="Introduction">
           <h1 className={styles.visuallyHidden}>rind</h1>
           <Wordmark />

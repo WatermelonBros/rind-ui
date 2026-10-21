@@ -1,0 +1,14 @@
+/* Fills its stage under the content; fades in on the first frame, so a late load never pops. */
+.scene {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s var(--spring);
+}
+.scene[data-on] {
+  opacity: 1;
+}
