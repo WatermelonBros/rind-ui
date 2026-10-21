@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { PlatformFlags } from "../env/capabilities"
 import { domEnvironment } from "../env/dom-environment"
+import { longPress } from "./long-press"
 import { platforms } from "./platform"
 import { createPress, type PressHandle } from "./press"
 
@@ -64,7 +65,9 @@ function setup(
     send: (e) =>
       events.push(`${e.type}:${e.pointerType}${"metaKey" in e && e.metaKey ? ":meta" : ""}`),
     disabled: () => extra.disabled === true,
-    ...(extra.longPress ? { longPress: extra.longPress === true ? {} : extra.longPress } : {}),
+    ...(extra.longPress
+      ? { longPress: longPress(extra.longPress === true ? {} : extra.longPress) }
+      : {}),
     ...(extra.suppressTouchContextMenu ? { suppressTouchContextMenu: true } : {}),
   })
   detach = attach(el, handle.props)

@@ -6,9 +6,9 @@ A pressable component that does not opt into long press SHALL NOT contain the lo
 implementation in its bundle. Opting in SHALL keep every `press-interactions` long-press
 behaviour unchanged.
 
-#### Scenario: Button
+#### Scenario: Switch
 
-- **WHEN** `Button` is bundled from `@rind-ui/react/button`
+- **WHEN** `Switch` is bundled from `@rind-ui/react/switch`
 - **THEN** the output does not contain the long-press module
 
 #### Scenario: Context Menu
