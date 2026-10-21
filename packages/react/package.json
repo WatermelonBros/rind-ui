@@ -1,7 +1,7 @@
 {
   "name": "@rind-ui/react",
   "version": "0.5.0",
-  "description": "React adapter for rind-ui headless components.",
+  "description": "Accessible headless React components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
   "license": "MIT",
   "author": "Watermelon Bros",
   "repository": {
@@ -9,16 +9,23 @@
     "url": "git+https://github.com/WatermelonBros/rind-ui.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "homepage": "https://rind.watermelon-studio.it",
   "bugs": {
     "url": "https://github.com/WatermelonBros/rind-ui/issues"
   },
   "keywords": [
     "react",
     "headless",
+    "headless-ui",
+    "react-components",
     "components",
     "accessibility",
     "a11y",
+    "wai-aria",
+    "state-machine",
+    "design-system",
+    "testing-library",
+    "playwright",
     "ui"
   ],
   "type": "module",

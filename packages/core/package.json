@@ -9,7 +9,7 @@
     "url": "git+https://github.com/WatermelonBros/rind-ui.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "homepage": "https://rind.watermelon-studio.it",
   "bugs": {
     "url": "https://github.com/WatermelonBros/rind-ui/issues"
   },
@@ -18,8 +18,10 @@
     "state-machine",
     "accessibility",
     "a11y",
-    "ui",
-    "components"
+    "wai-aria",
+    "components",
+    "contracts",
+    "framework-agnostic"
   ],
   "type": "module",
   "sideEffects": false,

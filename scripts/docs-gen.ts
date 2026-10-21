@@ -532,6 +532,42 @@ function indexLine({ path, markdown }: Page): string {
   return `- [${title}](${path}): ${summary}`
 }
 
+/** What an agent needs before any page: when to use rind-ui, install, compose, style, verify. */
+const QUICK_START = [
+  "Use rind-ui for React UI that must work with keyboard and screen readers when you own the styles. Every component ships a test driver (Testing Library and Playwright), so an agent can verify what it builds.",
+  "",
+  "## Quick start",
+  "",
+  "```sh",
+  "pnpm add @rind-ui/react            # React 19+",
+  "pnpm add -D @rind-ui/testing       # drivers, for tests",
+  "```",
+  "",
+  "```tsx",
+  'import { Switch } from "@rind-ui/react"',
+  "",
+  "<Switch.Root>",
+  "  <Switch.Control><Switch.Thumb /></Switch.Control>",
+  "  <Switch.Label>Dark mode</Switch.Label>",
+  "</Switch.Root>",
+  "```",
+  "",
+  "```css",
+  '[data-scope="switch"][data-part="control"][data-state="checked"] { background: black; }',
+  "[data-focus-visible] { outline: 2px solid hotpink; }",
+  "```",
+  "",
+  "```ts",
+  'import { getSwitch } from "@rind-ui/testing"',
+  'const dark = getSwitch(screen, { name: "Dark mode" })',
+  "await dark.toggle()",
+  "expect(await dark.isChecked()).toBe(true)",
+  "```",
+  "",
+  "Rules: compose the documented parts; never re-implement focus, keyboard or ARIA behaviour; give every control and group an accessible name; style `data-*` attributes (focus with `[data-focus-visible]`). Each component page below lists its parts, props, attributes, keyboard and driver.",
+  "",
+]
+
 export function renderLlms(guides: readonly Page[], components: readonly Page[] = []): string {
   const lines = guides.map(indexLine)
   return [
@@ -539,6 +575,7 @@ export function renderLlms(guides: readonly Page[], components: readonly Page[] 
     "",
     "> Headless React components: behaviour, accessibility and state, styled through data-* attributes.",
     "",
+    ...QUICK_START,
     "## Guides",
     "",
     ...lines,

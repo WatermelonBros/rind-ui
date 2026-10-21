@@ -5,7 +5,7 @@
 // Run: node scripts/content.ts → content/generated/{docs.json,llms.txt,tokens.md,…}
 
 import { execFileSync } from "node:child_process"
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { basename, join } from "node:path"
 import ts from "typescript"
 import { apiMetas, llms, renderApi } from "../../../scripts/docs-gen.ts"
@@ -99,6 +99,28 @@ mkdirSync(out, { recursive: true })
 writeFileSync(join(out, "docs.json"), `${JSON.stringify(pages, null, 2)}\n`)
 writeFileSync(join(out, "release.json"), `${JSON.stringify(release, null, 2)}\n`)
 console.log(`content: ${pages.length} pages`)
+
+// ── markdown twins: each docs page as plain markdown at /docs/<slug>.md, and every page in
+// one /llms-full.txt, for agents that read markdown. Served from public/, never committed. ──
+const site = "https://rind.watermelon-studio.it"
+const raw = "https://raw.githubusercontent.com/WatermelonBros/rind-ui/main/docs"
+/** Site-only markup out, links resolved: every docs page sits flat under /docs/. */
+const plain = (md: string) =>
+  md
+    .replace(/<span data-release="minor">([^<]*)<\/span>/g, "$1")
+    .replace(/\]\(\.\.\/(?:components|guides)\/([\w-]+)\.md/g, "]($1.md")
+    .replace(/\]\(\.\.\/theme\/([\w-]+\.md)/g, `](${raw}/theme/$1`)
+const twins = join(import.meta.dirname, "../public/docs")
+rmSync(twins, { recursive: true, force: true })
+mkdirSync(twins, { recursive: true })
+for (const p of pages) writeFileSync(join(twins, `${p.slug}.md`), plain(p.markdown))
+writeFileSync(
+  join(import.meta.dirname, "../public/llms-full.txt"),
+  [
+    "# rind-ui: the full documentation\n\n> Headless React components: behaviour, accessibility and state, styled through data-* attributes. Every component ships a test driver for Testing Library and Playwright.\n",
+    ...pages.map((p) => `<!-- ${site}/docs/${p.slug}/ -->\n\n${plain(p.markdown).trim()}\n`),
+  ].join("\n---\n\n"),
+)
 
 // ── llms.txt and the token reference: build outputs, never committed ──────────────────────
 // The token manifest is generated first: the tokens page and the reference both read it.
@@ -437,3 +459,36 @@ for (const line of readFileSync(join(repo, "docs/components.md"), "utf8").split(
   })
 }
 writeFileSync(join(out, "roadmap.json"), `${JSON.stringify(roadmap, null, 2)}\n`)
+
+// ── compare: content/compare.md with its coverage table filled in, for /compare and its
+// markdown twin /compare.md. The other libraries' counts come from docs/components.md's
+// "Coverage per library" table; rind-ui's from the roadmap above, so it is always current. ──
+const coverage: string[] = []
+let inCoverage = false
+for (const line of readFileSync(join(repo, "docs/components.md"), "utf8").split("\n")) {
+  if (line.startsWith("## ")) inCoverage = line.startsWith("## Coverage per library")
+  if (!inCoverage || !line.startsWith("| ") || line.startsWith("| Library")) continue
+  const [name, count, frameworks] = line
+    .slice(1, -1)
+    .split("|")
+    .map((c) => c.trim())
+  if (!name || !count || !frameworks) continue
+  // Ark is built on state machines (Zag.js); React Aria publishes testers for some components
+  const machines = name.startsWith("Ark") ? "yes (Zag.js)" : "no"
+  const drivers = name.startsWith("React Aria") ? "some components" : "no"
+  coverage.push(`| ${name} | ${count} | ${frameworks} | ${drivers} | ${machines} | none |`)
+}
+const ready = roadmap.filter((r) => r.status === "done")
+const aiReady = ready.filter((r) => r.wave === "AI").length
+const coverageTable = [
+  "| Library | Components | Frameworks | Test drivers | State machines | AI-UI primitives |",
+  "|---|---|---|---|---|---|",
+  `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | React (framework-free core) | every component | declared, with model-based tests | ${aiReady} ready |`,
+  ...coverage,
+].join("\n")
+const compare = readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8").replace(
+  "<!-- coverage -->",
+  coverageTable,
+)
+writeFileSync(join(out, "compare.md"), compare)
+writeFileSync(join(import.meta.dirname, "../public/compare.md"), compare)

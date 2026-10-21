@@ -80,8 +80,13 @@ import { Accordion } from "@rind-ui/react"
   min+gzip, enforced in CI.
 - **White-label theme, optional.** `@rind-ui/theme` derives a full, contrast-checked
   palette from a handful of brand inputs, per scope, in light and dark.
-- **Known to LLMs.** [`llms.txt`](https://rind.watermelon-studio.it/llms.txt) and per-component docs are generated from
-  the source, so they cannot drift from the code.
+- **Known to LLMs.** [`llms.txt`](https://rind.watermelon-studio.it/llms.txt),
+  [`llms-full.txt`](https://rind.watermelon-studio.it/llms-full.txt) and a markdown twin of every
+  docs page are generated from the source, so they cannot drift from the code. Coding agents can
+  load the [rind-ui skill](skills/rind-ui/SKILL.md) or the MCP server (`npx -y @rind-ui/mcp`).
+
+**Choosing a headless library?** [rind-ui compared](https://rind.watermelon-studio.it/compare/)
+says honestly where rind-ui is different, where other libraries are ahead, and when to pick them.
 
 ## Components
 
