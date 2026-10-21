@@ -12,7 +12,7 @@ import { trackNonModalTabOrder } from "../../dom/non-modal-tab-order"
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type {
   Align,
   PositionEnv,
@@ -149,7 +149,7 @@ export const popoverMachine = /* @__PURE__ */ setup({
   types: type<{
     props: PopoverProps
     events: PopoverEvent
-    env: DomEnvironment & PositionEnv
+    env: BaseDomEnvironment & PositionEnv
     context: PopoverContext
     values: "open"
   }>(),

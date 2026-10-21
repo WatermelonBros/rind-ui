@@ -2,6 +2,7 @@
 
 import {
   type AnyMachine,
+  type BaseDomEnvironment,
   createService,
   type EnvOf,
   type MachinePropsOf,
@@ -17,17 +18,27 @@ const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayo
 type ViewOf<M extends AnyMachine> = ReturnType<Service<M>["view"]>
 
 /**
+ * The environment argument: optional when the base environment satisfies the machine's `env`
+ * (or the machine declares none: `Record<string, never>`), required otherwise (pass
+ * `useEnvironment(…the capabilities it needs)`).
+ */
+type EnvArgument<M extends AnyMachine> = BaseDomEnvironment extends EnvOf<M>
+  ? [env?: EnvOf<M>]
+  : string extends keyof EnvOf<M>
+    ? [env?: EnvOf<M>]
+    : [env: EnvOf<M>]
+
+/**
  * Binds one service to a component instance: created once, fed the latest props on every
  * commit, started after mount and stopped on unmount. Never started on the server.
  */
 export function useMachine<M extends AnyMachine>(
   machine: M,
   props: MachinePropsOf<M>,
-  env?: EnvOf<M>,
+  ...[env]: EnvArgument<M>
 ): { readonly view: ViewOf<M>; readonly send: Service<M>["send"]; readonly service: Service<M> } {
-  // The provider's (or a default) domEnvironment() implements every capability core
-  // defines, so it satisfies any machine's declared `env`.
   const provided = useEnvironment()
+  // Without an `env` argument, EnvArgument<M> proved the base environment satisfies EnvOf<M>.
   const [service] = useState(() => createService(machine, props, env ?? (provided as EnvOf<M>)))
   useIsoLayoutEffect(() => service.setProps(props))
   useEffect(() => {

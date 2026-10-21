@@ -8,6 +8,7 @@ import {
   CalendarDate,
   type DateValue,
   type DayOfWeek,
+  dateClockCapability,
   dayOf,
   draftFocus,
   draftHint,
@@ -306,7 +307,7 @@ function RangeCalendar(props: DatePickerCalendarProps) {
   )
   // Typing while open (spec "Picker — Range: Typing And Clearing"): the calendar shows the
   // range's start, else the end last typed.
-  const env = useEnvironment()
+  const env = useEnvironment(dateClockCapability)
   const [focused, setFocused] = useState<CalendarDate>(() => {
     if (value) return dayOf(value.start as DateValue)
     if (start) return dayOf(start)

@@ -9,6 +9,7 @@ import {
   alertMessages,
   alertWarnings,
   announceableText,
+  announcerCapability,
   type ChangeDetails,
   focusPast,
   type MessageOverrides,
@@ -100,23 +101,27 @@ function Root({
   ...rest
 }: AlertRootProps) {
   const instance = useRootId(id)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const messages = useMessages("alert", alertMessages, ownMessages)
   const { locale } = useLocale()
   const el = useRef<HTMLElement | null>(null)
-  const { view, send } = useMachine(alertMachine, {
-    open,
-    defaultOpen,
-    onOpenChange,
-    announce,
-    announcement,
-    messages,
-    id: instance,
-    lang: locale,
-    moveFocusOut: () => {
-      if (el.current) focusPast(el.current, finalFocus?.(), env, "alert")
+  const { view, send } = useMachine(
+    alertMachine,
+    {
+      open,
+      defaultOpen,
+      onOpenChange,
+      announce,
+      announcement,
+      messages,
+      id: instance,
+      lang: locale,
+      moveFocusOut: () => {
+        if (el.current) focusPast(el.current, finalFocus?.(), env, "alert")
+      },
     },
-  })
+    env,
+  )
   const isOpen = view.state === "open"
   const presence = usePresence(isOpen, el)
   // The first render's value: a hydrated alert was present at load and stays silent.

@@ -8,7 +8,7 @@ import type { DismissReason, DismissRequest } from "../../dom/dismiss"
 import type { FocusTarget } from "../../dom/focus-scope"
 import type { LayerId, LayerKind } from "../../dom/layer-stack"
 import { overlayEffect } from "../../dom/overlay"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
 import type { ActionFn, ChangeDetails, EffectFn, GuardFn } from "../../machine/types"
@@ -19,7 +19,7 @@ declare const process: { env: { NODE_ENV?: string } }
 export interface DialogTypes {
   props: DialogProps
   events: DialogEvent
-  env: DomEnvironment
+  env: BaseDomEnvironment
   context: DialogContext
   values: "open"
 }

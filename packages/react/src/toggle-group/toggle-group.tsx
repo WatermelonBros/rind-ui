@@ -1,9 +1,11 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type CollectionKey,
   createListCollection,
+  layoutCapability,
   type ToggleGroupEvent,
   toggleGroupConnect,
   toggleGroupIds,
@@ -114,7 +116,7 @@ function Root({
   children,
   ...rest
 }: ToggleGroupRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   // Hosted by a Toolbar: its disabled state applies, its focusableWhenDisabled unless ours.
   const host = useCompositeHost()
   const focusableWhenDisabled = ownFocusable ?? host?.focusableWhenDisabled ?? false
@@ -124,19 +126,23 @@ function Root({
   const groupDisabled = disabled || fieldsetDisabled || host?.disabled === true
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
-  const { view, send } = useMachine(toggleGroupMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop,
-    selectionMode,
-    disallowEmptySelection,
-    focusableWhenDisabled,
-    value,
-    defaultValue,
-    onValueChange,
-    disabled: groupDisabled,
-  })
+  const { view, send } = useMachine(
+    toggleGroupMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop,
+      selectionMode,
+      disallowEmptySelection,
+      focusableWhenDisabled,
+      value,
+      defaultValue,
+      onValueChange,
+      disabled: groupDisabled,
+    },
+    env,
+  )
   const current = view.values.value ?? []
   const api = toggleGroupConnect(
     {

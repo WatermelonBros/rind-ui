@@ -13,7 +13,7 @@ import {
   initialCollectionContext,
 } from "../../collection/machine"
 import type { Modality } from "../../contract/env"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type { PositionEnv } from "../../env/position"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs, ChangeDetails } from "../../machine/types"
@@ -145,7 +145,7 @@ export interface TagsInputContext extends InputChipsContext, PatternContext {
 type Types = {
   props: TagsInputProps
   events: TagsInputEvent
-  env: DomEnvironment & PositionEnv & CollectionEnv
+  env: BaseDomEnvironment & PositionEnv & CollectionEnv
   context: TagsInputContext
   values: "value" | "inputValue"
 }

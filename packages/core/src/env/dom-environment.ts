@@ -1,184 +1,55 @@
-import { domClipboard } from "../dom/clipboard"
-import { collectionLayout } from "../dom/collection-layout"
-import { type ConstraintValidity, constraintValidity } from "../dom/constraint-validity"
-import { liveAnnouncer } from "../dom/live-announcer"
-import { modalityTracker } from "../dom/modality"
-import { motionPreference, pointerPreference } from "../dom/motion"
-import { readPlatform, withEngine } from "../dom/platform"
-import { documentLocale, fixedLocale } from "../i18n/locale"
+import type { ConstraintValidity } from "../dom/constraint-validity"
+import {
+  type BaseDomEnvironment,
+  baseDomEnvironment,
+  type DomEnvironmentOptions,
+} from "./base-environment"
 import type {
-  Announcer,
   AnnouncerEnv,
-  Clipboard,
   ClipboardEnv,
-  Clock,
-  ClockEnv,
   CollectionLayoutEnv,
-  DateClock,
   DateClockEnv,
-  DomEnv,
-  DomRoot,
-  Engine,
-  LocaleEnv,
-  LocaleSource,
-  ModalityEnv,
-  ModalitySource,
-  MotionEnv,
-  PageVisibility,
-  PlatformFlags,
-  PlatformInfo,
-  PointerEnv,
-  Scheduler,
-  SchedulerEnv,
-  StyleEnv,
   VisibilityEnv,
 } from "./capabilities"
-import type { Router, RouterCapability } from "./router"
+import {
+  announcerCapability,
+  clipboardCapability,
+  dateClockCapability,
+  extendEnvironment,
+  layoutCapability,
+  validityCapability,
+  visibilityCapability,
+} from "./dom-capabilities"
 
-/** Every capability core defines, implemented on the real DOM. */
-export type DomEnvironment = SchedulerEnv &
-  DomEnv &
-  PlatformInfo &
-  ModalityEnv &
-  MotionEnv &
-  PointerEnv &
-  StyleEnv &
-  LocaleEnv &
-  AnnouncerEnv &
-  ClockEnv &
-  DateClockEnv &
-  CollectionLayoutEnv &
-  RouterCapability &
-  ValidityEnv &
-  VisibilityEnv &
-  ClipboardEnv
+export type { BaseDomEnvironment, DomEnvironmentOptions } from "./base-environment"
 
 /** Native constraint validity, for machines that validate a form control (Field). */
 export interface ValidityEnv {
   readonly validity: ConstraintValidity
 }
 
-export interface DomEnvironmentOptions {
-  /** The document or shadow root the component lives in (default: `document`). */
-  readonly getRootNode?: () => Document | ShadowRoot
-  /** Platform flags (default: detected from the user agent on first read). */
-  readonly platform?: PlatformFlags
-  /** Overrides the (detected or given) platform's rendering engine. */
-  readonly engine?: Engine
-  /** Fixed reduced-motion preference (default: follows `prefers-reduced-motion`). */
-  readonly reducedMotion?: boolean
-  /** Fixed primary-pointer preference (default: follows `(pointer: coarse)`). */
-  readonly coarsePointer?: boolean
-  /** A modality source (default: the per-window tracker). */
-  readonly modality?: ModalitySource
-  /** CSP nonce for the style rules rind-ui injects. */
-  readonly nonce?: string
-  /** Timers and frames (default: the window's). Tests pass a virtual clock. */
-  readonly scheduler?: Scheduler
-  /** Monotonic time (default: `performance.now()`). Tests pass the virtual clock's. */
-  readonly clock?: Clock
-  /** A locale (and optional direction), or a locale source (default: the document's). */
-  readonly locale?: string | LocaleSource
-  readonly dir?: "ltr" | "rtl"
-  /** An announcer, or the built-in backend to use (default: live regions). */
-  readonly announcer?: Announcer | "live-region" | "aria-notify"
-  /** Page visibility (default: the document's `visibilityState`). Tests pass a fake. */
-  readonly visibility?: PageVisibility
-  /** Client routing for every link part below (default: none, the browser navigates). */
-  readonly router?: Router
-  /** The date clock (default: `Date.now()` and the platform's resolved time zone). */
-  readonly dateClock?: DateClock
-  /** The clipboard (default: the Clipboard API, with a fallback). Tests pass a fake. */
-  readonly clipboard?: Clipboard
-}
+/** Every capability core defines, implemented on the real DOM. */
+export type DomEnvironment = BaseDomEnvironment &
+  AnnouncerEnv &
+  DateClockEnv &
+  CollectionLayoutEnv &
+  ValidityEnv &
+  VisibilityEnv &
+  ClipboardEnv
 
 /**
- * The browser environment. Nothing touches globals at creation, so it is safe on the
- * server. Timers are looked up on `globalThis` at call time, so fake timers installed after
- * import (e.g. `vi.useFakeTimers()`) drive it.
+ * The complete browser environment: the base plus every on-demand capability, built now. For
+ * tests and non-React consumers; components build only the capabilities they use. Nothing
+ * touches globals at creation, so it is safe on the server.
  */
-/** The locale option, with an explicit `dir` winning over the locale's own direction. */
-function localeSource(
-  options: DomEnvironmentOptions,
-  documentOf: () => Document | undefined,
-): LocaleSource {
-  if (typeof options.locale === "string") return fixedLocale(options.locale, options.dir)
-  const source = options.locale ?? documentLocale(documentOf)
-  const dir = options.dir
-  if (!dir) return source
-  return { ...source, locale: () => source.locale(), dir: () => dir }
-}
-
 export function domEnvironment(options: DomEnvironmentOptions = {}): DomEnvironment {
-  const getRootNode = options.getRootNode ?? (() => document)
-  // Detected lazily (never on the server unless read).
-  let platform: PlatformFlags | undefined
-  const getPlatform = () => {
-    const base = options.platform ?? readPlatform()
-    // platform-convention: the caller's engine override option, not a platform read
-    platform ??= options.engine ? withEngine(base, options.engine) : base
-    return platform
-  }
-  const scheduler: Scheduler = options.scheduler ?? {
-    setTimeout: (callback, ms) => globalThis.setTimeout(callback, ms),
-    // The handle came from `setTimeout` above; the cast only restores its type.
-    clearTimeout: (handle) => globalThis.clearTimeout(handle as number),
-    requestAnimationFrame: (callback) => globalThis.requestAnimationFrame(callback),
-    cancelAnimationFrame: (handle) => globalThis.cancelAnimationFrame(handle as number),
-  }
-  const dom: DomRoot = {
-    getRootNode,
-    getById: (id) => {
-      const root = getRootNode()
-      return "getElementById" in root ? root.getElementById(id) : null
-    },
-    activeElement: () => getRootNode().activeElement,
-  }
-  const documentOf = () => {
-    if (typeof document === "undefined") return undefined
-    const root = getRootNode()
-    return "documentElement" in root ? root : root.ownerDocument
-  }
-  return {
-    scheduler,
-    dom,
-    router: options.router,
-    validity: constraintValidity,
-    get platform() {
-      return getPlatform()
-    },
-    modality: options.modality ?? modalityTracker(getRootNode, getPlatform),
-    motion: motionPreference(options.reducedMotion),
-    pointer: pointerPreference(options.coarsePointer),
-    style: options.nonce === undefined ? {} : { nonce: options.nonce },
-    locale: localeSource(options, documentOf),
-    announcer:
-      typeof options.announcer === "object"
-        ? options.announcer
-        : liveAnnouncer({ scheduler, dom }, { backend: options.announcer ?? "live-region" }),
-    // Looked up at call time, like the timers, so fake clocks installed later drive it.
-    clock: options.clock ?? { now: () => globalThis.performance?.now() ?? Date.now() },
-    // Read at call time, never at module scope or on import (no server-render "now").
-    dateClock: options.dateClock ?? {
-      now: () => Date.now(),
-      timeZone: () => new Intl.DateTimeFormat().resolvedOptions().timeZone,
-    },
-    layout: collectionLayout(dom),
-    visibility: options.visibility ?? documentVisibility(documentOf),
-    clipboard: options.clipboard ?? domClipboard(documentOf),
-  }
-}
-
-/** The document's visibility state; `visibilitychange` only (never focus or blur). */
-function documentVisibility(documentOf: () => Document | undefined): PageVisibility {
-  return {
-    hidden: () => documentOf()?.visibilityState === "hidden",
-    subscribe(listener) {
-      const doc = documentOf()
-      if (!doc) return () => {}
-      const onChange = () => listener(doc.visibilityState === "hidden")
-      doc.addEventListener("visibilitychange", onChange)
-      return () => doc.removeEventListener("visibilitychange", onChange)
-    },
-  }
+  const base = baseDomEnvironment(options)
+  return extendEnvironment(base, {
+    announcer: announcerCapability.create(base, options),
+    clipboard: clipboardCapability.create(base, options),
+    layout: layoutCapability.create(base, options),
+    validity: validityCapability.create(base, options),
+    visibility: visibilityCapability.create(base, options),
+    dateClock: dateClockCapability.create(base, options),
+  })
 }

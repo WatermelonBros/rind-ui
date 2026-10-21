@@ -6,6 +6,7 @@
 // attribute.
 
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   createListCollection,
@@ -14,6 +15,7 @@ import {
   getLayerStack,
   hiddenFormInput,
   type LayerMeta,
+  layoutCapability,
   mergeFieldProps,
   type SelectOpenChangeDetails,
   type SelectValue,
@@ -278,7 +280,7 @@ function Root(all: SelectRootProps) {
     autoComplete,
   } = all
   const p = all as Record<string, unknown>
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const parent = useParentLayer()
   const enclosing = useFieldBindingPeek()

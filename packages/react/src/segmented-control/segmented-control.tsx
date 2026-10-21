@@ -1,12 +1,14 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   createListCollection,
   type FormInputCapability,
   hiddenFormInput,
   implicitSubmit,
   isImeKey,
+  layoutCapability,
   type RadioGroupEvent,
   radioGroupMachine,
   segmentedControlConnect,
@@ -116,7 +118,7 @@ function Root({
   children,
   ...rest
 }: SegmentedControlRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const ids = useMemo(() => segmentedControlIds(instance), [instance])
   const fieldsetContext = useFieldsetDisabled()
@@ -125,23 +127,27 @@ function Root({
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
   const pending = useRef<string | null>(null)
-  const { view, send } = useMachine(radioGroupMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop: true,
-    selectionMode: "single",
-    focusableWhenDisabled,
-    value,
-    defaultValue,
-    // A user change (an arrow or a press) is dispatched on that segment's input after commit.
-    onValueChange: (next, details) => {
-      if (details.reason === "NAVIGATE" || details.reason === "PRESS") pending.current = next
-      onValueChange?.(next, details)
+  const { view, send } = useMachine(
+    radioGroupMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop: true,
+      selectionMode: "single",
+      focusableWhenDisabled,
+      value,
+      defaultValue,
+      // A user change (an arrow or a press) is dispatched on that segment's input after commit.
+      onValueChange: (next, details) => {
+        if (details.reason === "NAVIGATE" || details.reason === "PRESS") pending.current = next
+        onValueChange?.(next, details)
+      },
+      disabled: groupDisabled,
+      readOnly,
     },
-    disabled: groupDisabled,
-    readOnly,
-  })
+    env,
+  )
   const current = view.values.value ?? null
   // The Label is expected unless aria-label names the control: the server HTML then
   // already labels the root (base-ui#5597), and the dev warning sees it on first mount.

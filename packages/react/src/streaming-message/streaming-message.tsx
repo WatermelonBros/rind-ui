@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   displayedText,
   type MessageOverrides,
   type StreamingAnnounce,
@@ -79,7 +80,7 @@ function Root({
   children,
   ...rest
 }: StreamingMessageRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("streaming-message", streamingMessageMessages, ownMessages)
@@ -92,7 +93,7 @@ function Root({
     messages,
     lang: locale,
   }
-  const { view, send } = useMachine(streamingMessageMachine, machineProps)
+  const { view, send } = useMachine(streamingMessageMachine, machineProps, env)
   // Read after hydration, then followed: the server and the first client render agree.
   useEffect(() => {
     send({ type: "MOTION.CHANGED", reduced: env.motion.reducedMotion() })

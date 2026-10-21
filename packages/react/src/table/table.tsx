@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   domTableMetrics,
   itemId,
@@ -168,7 +169,7 @@ function Root({
   // Inside a Frame the Root shares its instance: every part of the table is one instance.
   const frameCtx = useContext(FrameContext)
   const instance = useRootId(id ?? frameCtx?.instance)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const messages = useMessages("table", tableMessages, ownMessages)
   const { locale } = useLocale(ownLocale)
   const registry = usePartRegistry<"caption">({ scope: "table", root: instance })
@@ -712,12 +713,17 @@ function Frame({
 }: TableFrameProps) {
   const instance = useRootId(id)
   const messages = useMessages("table", tableMessages, ownMessages)
-  const { view, send } = useMachine(tableFrameMachine, {
-    root: instance,
-    expanded,
-    defaultExpanded,
-    onExpandedChange,
-  })
+  const env = useEnvironment()
+  const { view, send } = useMachine(
+    tableFrameMachine,
+    {
+      root: instance,
+      expanded,
+      defaultExpanded,
+      onExpandedChange,
+    },
+    env,
+  )
   const [captionId, setCaption] = useState<string | undefined>(undefined)
   const [titleId, setTitle] = useState<string | undefined>(undefined)
   const isExpanded = view.values.expanded

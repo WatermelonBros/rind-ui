@@ -1,10 +1,12 @@
 "use client"
 
 import {
+  announcerCapability,
   type ClipboardCopyDetails,
   type ClipboardCopyState,
   type ClipboardEvent,
   type ClipboardMessages,
+  clipboardCapability,
   clipboardConnect,
   clipboardInputCopy,
   clipboardMachine,
@@ -98,21 +100,25 @@ function Root({
   ...rest
 }: ClipboardRootProps) {
   const instance = useRootId(id)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, clipboardCapability)
   const messages = useMessages("clipboard", clipboardMessages, ownMessages)
   const { locale } = useLocale(ownLocale)
   const registry = usePartRegistry<Optional>({ scope: "clipboard", root: instance })
   const copyAnchor = useRef<HTMLElement | null>(null)
-  const { view, send } = useMachine(clipboardMachine, {
-    value,
-    messages,
-    id: instance,
-    lang: locale,
-    copyFeedbackDuration,
-    disabled,
-    onCopy,
-    getCopyAnchor: () => copyAnchor.current,
-  })
+  const { view, send } = useMachine(
+    clipboardMachine,
+    {
+      value,
+      messages,
+      id: instance,
+      lang: locale,
+      copyFeedbackDuration,
+      disabled,
+      onCopy,
+      getCopyAnchor: () => copyAnchor.current,
+    },
+    env,
+  )
   const ids = {
     label: partId("clipboard", instance, "label"),
     input: partId("clipboard", instance, "input"),

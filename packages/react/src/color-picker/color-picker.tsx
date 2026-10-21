@@ -6,6 +6,7 @@
 // its own, bound to the picker's colour. Wiring only.
 
 import {
+  announcerCapability,
   type Color,
   type ColorChangeDetails,
   type ColorChannel,
@@ -734,7 +735,7 @@ function ValueText({ render, children, ...rest }: Own<"span">) {
 /** Opens the browser's eye dropper; hidden where there is none (ark#2764). */
 function EyeDropperTrigger({ render, children, ...rest }: Own<"button">) {
   const ctx = usePicker("EyeDropperTrigger")
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const [supported, setSupported] = useState(false)
   const focus = useFocusAttrs()
   // After mount: the server and the first client render agree (hidden).
@@ -812,7 +813,7 @@ function FormatSelect({ render, ...rest }: Own<"select">) {
 /** Cycles hex → rgb → hsl → hsb and announces the new format. */
 function FormatTrigger({ render, children, ...rest }: Own<"button">) {
   const ctx = usePicker("FormatTrigger")
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const next = nextFormat(ctx.format)
   const focus = useFocusAttrs()
   const props = mergeProps(

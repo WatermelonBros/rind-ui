@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type MessageOverrides,
   partId,
   type SortableMessages,
@@ -99,7 +100,7 @@ function Root({
   children,
   ...rest
 }: SortableRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("sortable", sortableMessages, ownMessages)

@@ -5,6 +5,7 @@
 // summary; every other part is wiring. Derived state and keys live in core's connect.
 
 import {
+  announcerCapability,
   autosize as attachAutosize,
   type FieldMessages,
   type FileRejection,
@@ -223,7 +224,7 @@ function Root(all: PromptInputRootProps) {
     fieldMessages,
     ...form
   } = all
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const ids = useMemo(() => promptInputIds(instance), [instance])
   const enclosing = useFieldBindingPeek()
@@ -284,7 +285,7 @@ function Root(all: PromptInputRootProps) {
       latest.current.onAttachmentsChange?.(v, { reason: promptAttachmentsReason(d.event) }),
   }
   // Sound: `props` is the machine's props (the React-only ones are split off above).
-  const { service } = useMachine(promptInputMachine, props as never, env as never)
+  const { service } = useMachine(promptInputMachine, props as never, env)
   const view = service.view()
   const value = (view.values.value as string | undefined) ?? ""
   const attachments = (view.values.attachments as readonly PromptAttachment[] | undefined) ?? EMPTY

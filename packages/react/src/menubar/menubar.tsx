@@ -5,8 +5,10 @@
 // trigger in menubar mode, plus the bar's roving wiring). Inside a menu, the Menu parts.
 
 import {
+  announcerCapability,
   type CollectionKey,
   createListCollection,
+  layoutCapability,
   type MenubarMenus,
   type MenubarOpening,
   type MenubarValueReason,
@@ -134,7 +136,7 @@ function Root({
   children,
   ...rest
 }: MenubarRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
@@ -167,22 +169,26 @@ function Root({
     }),
     [instance],
   )
-  const { view, send } = useMachine(menubarMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop,
-    // Disabled items stay reachable by the bar's arrows and typeahead unless `false`;
-    // keyboard switching between open menus skips them either way.
-    focusableWhenDisabled,
-    orientation,
-    modal,
-    disabled,
-    menus,
-    ...(value !== undefined ? { value } : {}),
-    ...(defaultValue !== undefined ? { defaultValue } : {}),
-    ...(onValueChange ? { onValueChange } : {}),
-  })
+  const { view, send } = useMachine(
+    menubarMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop,
+      // Disabled items stay reachable by the bar's arrows and typeahead unless `false`;
+      // keyboard switching between open menus skips them either way.
+      focusableWhenDisabled,
+      orientation,
+      modal,
+      disabled,
+      menus,
+      ...(value !== undefined ? { value } : {}),
+      ...(defaultValue !== undefined ? { defaultValue } : {}),
+      ...(onValueChange ? { onValueChange } : {}),
+    },
+    env,
+  )
   const open = view.values.value ?? null
   const root = useRef<HTMLElement | null>(null)
   const [focusWithin, setFocusWithin] = useState(false)

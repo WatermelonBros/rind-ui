@@ -19,8 +19,8 @@ import { overlayEffect } from "../../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../../dom/position/options"
 import { quirkActive } from "../../../dom/quirk-conditions"
+import type { BaseDomEnvironment } from "../../../env/base-environment"
 import type { SchedulerEnv } from "../../../env/capabilities"
-import type { DomEnvironment } from "../../../env/dom-environment"
 import type { Align, PositionEnv, PositioningProps, Side } from "../../../env/position"
 import { partId } from "../../../ids"
 import type { EventObject } from "../../../machine/types"
@@ -296,7 +296,7 @@ export function patternPieces(options: {
  */
 export function popupOverlay(
   a: {
-    readonly env: DomEnvironment & PositionEnv
+    readonly env: BaseDomEnvironment & PositionEnv
     readonly props: { readonly positioning?: PositioningProps | undefined }
     send(event: PatternEvent): void
   },

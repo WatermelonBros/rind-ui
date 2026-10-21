@@ -13,7 +13,7 @@ import {
   initialCollectionContext,
 } from "../../collection/machine"
 import { quirkActive } from "../../dom/quirk-conditions"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type { PositionEnv } from "../../env/position"
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
@@ -189,7 +189,7 @@ export const comboboxIds = (root: string) => ({
 type Types = {
   props: ComboboxProps
   events: ComboboxEvent
-  env: DomEnvironment & PositionEnv & CollectionEnv
+  env: BaseDomEnvironment & PositionEnv & CollectionEnv
   context: ComboboxContext
   values: "value" | "inputValue" | "open"
 }

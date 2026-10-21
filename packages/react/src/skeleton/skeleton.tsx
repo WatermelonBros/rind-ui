@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type MessageOverrides,
   type SkeletonMessages,
   skeletonConnect,
@@ -19,7 +20,7 @@ import {
 } from "react"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import { useLocale, useMessages } from "../provider"
+import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -69,13 +70,18 @@ function Root({
   const instance = useRootId(id)
   const messages = useMessages("skeleton", skeletonMessages, ownMessages)
   const { locale } = useLocale()
-  const { view } = useMachine(skeletonMachine, {
-    loading,
-    announceOnLoad,
-    messages,
-    id: instance,
-    lang: locale,
-  })
+  const env = useEnvironment(announcerCapability)
+  const { view } = useMachine(
+    skeletonMachine,
+    {
+      loading,
+      announceOnLoad,
+      messages,
+      id: instance,
+      lang: locale,
+    },
+    env,
+  )
   const isLoading = view.state === "loading"
   const ctx = useMemo(
     () => ({

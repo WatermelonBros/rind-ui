@@ -1,4 +1,14 @@
-import { domPositioning, type Modality, type Service } from "@rind-ui/core"
+import {
+  announcerCapability,
+  clipboardCapability,
+  dateClockCapability,
+  domPositioning,
+  layoutCapability,
+  type Modality,
+  type Service,
+  validityCapability,
+  visibilityCapability,
+} from "@rind-ui/core"
 import {
   mergeProps,
   normalizeProps,
@@ -51,7 +61,14 @@ export interface RootProps extends Omit<AnchoredProps, "root"> {
 
 function Root({ id, keepMounted = false, children, ...rest }: RootProps) {
   const root = useRootId(id)
-  const env = useEnvironment()
+  const env = useEnvironment(
+    announcerCapability,
+    clipboardCapability,
+    layoutCapability,
+    validityCapability,
+    visibilityCapability,
+    dateClockCapability,
+  )
   // Positioning only for anchored components: not part of domEnvironment().
   const withPosition = useMemo(() => ({ ...env, position: domPositioning(env) }), [env])
   const props: AnchoredProps = { ...rest, root }

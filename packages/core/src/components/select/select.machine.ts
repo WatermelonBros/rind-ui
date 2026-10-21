@@ -25,7 +25,7 @@ import { type LayerId, layerId } from "../../dom/layer-stack"
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type {
   Align,
   PositionEnv,
@@ -124,7 +124,7 @@ export interface SelectContext extends CollectionContext {
   readonly autofilled: boolean
 }
 
-export type SelectEnv = DomEnvironment & PositionEnv & CollectionEnv
+export type SelectEnv = BaseDomEnvironment & PositionEnv & CollectionEnv
 
 export const selectIds = (root: string) => ({
   trigger: partId("select", root, "trigger"),

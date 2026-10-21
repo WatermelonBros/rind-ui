@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type CropData,
   cropData,
@@ -156,7 +157,7 @@ function Root(props: ImageCropperRootProps) {
     children,
     ...rest
   } = props
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("image-cropper", imageCropperMessages, ownMessages)

@@ -3,7 +3,7 @@
 // (METRICS, a user SCROLL, drag start/end). Visibility is computed in connect from the state
 // and these flags, never stored. Delays run through the scheduler, so Node tests use fake time.
 
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import { setup, type } from "../../machine/setup"
 
 export type ScrollAxis = "x" | "y"
@@ -122,7 +122,7 @@ export const scrollAreaMachine = /* @__PURE__ */ setup({
   types: type<{
     props: ScrollAreaProps
     events: ScrollAreaEvent
-    env: DomEnvironment & ScrollMetricsEnv
+    env: BaseDomEnvironment & ScrollMetricsEnv
     context: ScrollAreaContext
   }>(),
   guards: {

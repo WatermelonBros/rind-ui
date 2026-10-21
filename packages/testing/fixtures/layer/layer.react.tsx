@@ -1,4 +1,16 @@
-import { getLayerStack, type LayerMeta, type Modality, partId, type Service } from "@rind-ui/core"
+import {
+  announcerCapability,
+  clipboardCapability,
+  dateClockCapability,
+  getLayerStack,
+  type LayerMeta,
+  layoutCapability,
+  type Modality,
+  partId,
+  type Service,
+  validityCapability,
+  visibilityCapability,
+} from "@rind-ui/core"
 import {
   LayerProvider,
   mergeProps,
@@ -97,15 +109,27 @@ export interface RootProps extends Omit<LayerProps, "root" | "parent"> {
 function Root({ open, defaultOpen, onOpenChange, modal, kind, id, children }: RootProps) {
   const root = useRootId(id)
   const parent = useParentLayer()
-  const { service } = useMachine(layerMachine, {
-    open,
-    defaultOpen,
-    onOpenChange,
-    modal,
-    kind,
-    root,
-    parent,
-  })
+  const env = useEnvironment(
+    announcerCapability,
+    clipboardCapability,
+    layoutCapability,
+    validityCapability,
+    visibilityCapability,
+    dateClockCapability,
+  )
+  const { service } = useMachine(
+    layerMachine,
+    {
+      open,
+      defaultOpen,
+      onOpenChange,
+      modal,
+      kind,
+      root,
+      parent,
+    },
+    env,
+  )
   const ctx = useMemo(
     () => ({ service, root, modal: modal !== false, kind }),
     [service, root, modal, kind],

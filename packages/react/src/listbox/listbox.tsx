@@ -4,6 +4,7 @@
 // selection and typeahead; the core parts own every attribute.
 
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   createListCollection,
@@ -11,6 +12,7 @@ import {
   type ListboxActionDetails,
   type ListboxValue,
   type LoadingStatus,
+  layoutCapability,
   listboxConnect,
   listboxIds,
   listboxMachine,
@@ -128,7 +130,7 @@ function Root(all: ListboxRootProps) {
     disabled = false,
   } = all
   const p = all as Record<string, unknown>
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const { collection: registered, registry } = useCollectionItems()
   const data = useMemo(() => (items ? fromData(items) : null), [items])
@@ -147,32 +149,37 @@ function Root(all: ListboxRootProps) {
     onValueChange: p["onValueChange"] as ((v: unknown, d: unknown) => void) | undefined,
     onAction,
   }
-  const { service } = useMachine(listboxMachine, {
-    collection,
-    ids,
-    strategy,
-    orientation,
-    selectionMode,
-    selectionBehavior,
-    disabled,
-    disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
-    disabledBehavior: all.disabledBehavior,
-    focusableWhenDisabled: all.focusableWhenDisabled,
-    loop: all.loop,
-    typeaheadTimeout: all.typeaheadTimeout,
-    loading: all.loading,
-    onLoadMore: all.onLoadMore,
-    virtualized: all.virtualized,
-    scrollToIndex: all.scrollToIndex,
-    ...("value" in all ? { value: p["value"] as ListboxValue } : {}),
-    defaultValue:
-      (p["defaultValue"] as ListboxValue | undefined) ?? (selectionMode === "multiple" ? [] : null),
-    onValueChange: (v, details) => {
-      const e = details.event as { type: string; key?: string }
-      latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+  const { service } = useMachine(
+    listboxMachine,
+    {
+      collection,
+      ids,
+      strategy,
+      orientation,
+      selectionMode,
+      selectionBehavior,
+      disabled,
+      disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
+      disabledBehavior: all.disabledBehavior,
+      focusableWhenDisabled: all.focusableWhenDisabled,
+      loop: all.loop,
+      typeaheadTimeout: all.typeaheadTimeout,
+      loading: all.loading,
+      onLoadMore: all.onLoadMore,
+      virtualized: all.virtualized,
+      scrollToIndex: all.scrollToIndex,
+      ...("value" in all ? { value: p["value"] as ListboxValue } : {}),
+      defaultValue:
+        (p["defaultValue"] as ListboxValue | undefined) ??
+        (selectionMode === "multiple" ? [] : null),
+      onValueChange: (v, details) => {
+        const e = details.event as { type: string; key?: string }
+        latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+      },
+      onAction: onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
     },
-    onAction: onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
-  })
+    env,
+  )
   const view = service.view()
   const [mounted, setMounted] = useState<{
     label: boolean

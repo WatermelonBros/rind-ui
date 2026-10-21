@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type CollectionKey,
   createListCollection,
@@ -9,6 +10,7 @@ import {
   hiddenFormInput,
   implicitSubmit,
   isImeKey,
+  layoutCapability,
   mergeFieldProps,
   type RadioGroupEvent,
   type RadioNaming,
@@ -162,7 +164,7 @@ function Root({
   "aria-label": ariaLabel,
   ...rest
 }: RadioGroupRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const naming = useContext(RadioGroupNaming)
   const ids = useMemo(
@@ -197,24 +199,28 @@ function Root({
   // The reason of the latest accepted change, for the Field: only a user's clears its
   // external (server) errors (base-ui#1745); a parent's value or a reset does not.
   const lastReason = useRef<string | null>(null)
-  const { view, send } = useMachine(radioGroupMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop: true,
-    selectionMode: "single",
-    focusableWhenDisabled,
-    value,
-    defaultValue,
-    // A user change (an arrow or a press) is dispatched on that item's input after commit.
-    onValueChange: (next, details) => {
-      lastReason.current = details.reason
-      if (details.reason === "NAVIGATE" || details.reason === "PRESS") pending.current = next
-      onValueChange?.(next, details)
+  const { view, send } = useMachine(
+    radioGroupMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop: true,
+      selectionMode: "single",
+      focusableWhenDisabled,
+      value,
+      defaultValue,
+      // A user change (an arrow or a press) is dispatched on that item's input after commit.
+      onValueChange: (next, details) => {
+        lastReason.current = details.reason
+        if (details.reason === "NAVIGATE" || details.reason === "PRESS") pending.current = next
+        onValueChange?.(next, details)
+      },
+      disabled: field.disabled,
+      readOnly: field.readOnly,
     },
-    disabled: field.disabled,
-    readOnly: field.readOnly,
-  })
+    env,
+  )
   const current = view.values.value ?? null
   // The Label is expected unless something else names the group: the server HTML then
   // already labels the root (base-ui#5597).
