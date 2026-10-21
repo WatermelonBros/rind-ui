@@ -1,8 +1,9 @@
 "use client"
 
-import { Accordion, Button, Switch } from "@rind-ui/react"
-import { useRef, useState } from "react"
+import { Accordion, Button, CheckboxGroup, Switch } from "@rind-ui/react"
+import { useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
+import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -29,7 +30,7 @@ const expanded = (root: HTMLElement) =>
     .filter((t) => t.getAttribute("aria-expanded") === "true")
     .map((t) => t.textContent?.replace("+", "").trim())
 
-const STEPS: readonly Step[] = [
+const FAQ: readonly Step[] = [
   { code: 'const faq = getAccordion(screen, { item: "Returns" })' },
   {
     code: 'await faq.expand("Returns")',
@@ -39,23 +40,54 @@ const STEPS: readonly Step[] = [
     code: 'expect(await faq.expanded()).toEqual(["Returns"])',
     check: (r) => JSON.stringify(expanded(r)) === JSON.stringify(["Returns"]),
   },
-  { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })' },
-  {
-    code: "await wifi.toggle()",
-    act: (r) => click(r, '[data-scope="switch"][data-part="label"]', "Wi-Fi"),
-  },
-  {
-    code: "expect(await wifi.isChecked()).toBe(true)",
-    check: (r) =>
-      r.querySelector('[role="switch"]')?.getAttribute("aria-checked") === "true" ||
-      r.querySelector<HTMLInputElement>('[data-scope="switch"] input')?.checked === true,
-  },
 ]
-const CHECKS = STEPS.filter((s) => s.check).length
+
+// the second half drives the visit's own component, the one the hero showed (hero-state.ts)
+const CONTROL: Record<HeroKind, readonly Step[]> = {
+  switch: [
+    { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })' },
+    {
+      code: "await wifi.toggle()",
+      act: (r) => click(r, '[data-scope="switch"][data-part="label"]', "Wi-Fi"),
+    },
+    {
+      code: "expect(await wifi.isChecked()).toBe(true)",
+      check: (r) => r.querySelector('[role="switch"]')?.getAttribute("aria-checked") === "true",
+    },
+  ],
+  checkbox: [
+    { code: 'const ready = getCheckbox(screen, { name: "Keyboard ready" })' },
+    {
+      code: "await ready.toggle()",
+      act: (r) => click(r, '[data-scope="checkbox"][data-part="label"]', "Keyboard ready"),
+    },
+    {
+      code: "expect(await ready.isChecked()).toBe(true)",
+      check: (r) => r.querySelector('[role="checkbox"]')?.getAttribute("aria-checked") === "true",
+    },
+  ],
+  button: [
+    { code: 'const save = getButton(screen, { name: "Save" })' },
+    {
+      code: "await save.press()",
+      act: (r) => click(r, 'button[data-scope="button"]', "Save"),
+    },
+    {
+      // a press has no state of its own: the test asserts the handler, as the driver docs say
+      code: "expect(onPress).toHaveBeenCalledOnce()",
+      check: (r) => r.querySelector("[data-presses]")?.getAttribute("data-presses") === "1",
+    },
+  ],
+}
 
 /** A driver test plays itself against the live components next to it. */
 export function Tested() {
   const { phase } = usePhase()
+  const [kind, setKind] = useState<HeroKind>("switch")
+  useEffect(() => setKind(heroKind()), [])
+  const STEPS = [...FAQ, ...CONTROL[kind]]
+  const CHECKS = STEPS.filter((s) => s.check).length
+  const [presses, setPresses] = useState(0)
   const stage = useRef<HTMLDivElement>(null)
   const [line, setLine] = useState(-1)
   const [running, setRunning] = useState(false)
@@ -70,6 +102,7 @@ export function Tested() {
     setPassed(null)
     setResults({})
     setRun((n) => n + 1)
+    setPresses(0)
     setLine(-1)
     const started = performance.now()
     await new Promise((r) => setTimeout(r, 300))
@@ -106,7 +139,7 @@ export function Tested() {
         <Reveal className={styles.testPanel}>
           <div className={styles.testCode}>
             <div className={styles.testBar}>
-              <span>faq.test.ts</span>
+              <span>{kind}.test.ts</span>
               <Button className={styles.run} pending={running} onPress={play}>
                 {running ? "Running…" : "▶ Run"}
               </Button>
@@ -136,7 +169,7 @@ export function Tested() {
           >
             {passed !== null && (
               <>
-                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b> faq.test.ts · {CHECKS - failed}/{CHECKS}{" "}
+                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b> {kind}.test.ts · {CHECKS - failed}/{CHECKS}{" "}
                 assertions · {(passed / 1000).toFixed(1)}s
                 {failed ? null : (
                   <span className={styles.confetti} aria-hidden="true">
@@ -168,12 +201,25 @@ export function Tested() {
                   </Accordion.Item>
                 ))}
               </Accordion.Root>
-              <Switch.Root>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <Switch.Label>Wi-Fi</Switch.Label>
-              </Switch.Root>
+              {kind === "switch" ? (
+                <Switch.Root>
+                  <Switch.Control>
+                    <Switch.Thumb />
+                  </Switch.Control>
+                  <Switch.Label>Wi-Fi</Switch.Label>
+                </Switch.Root>
+              ) : kind === "checkbox" ? (
+                <CheckboxGroup.Item>
+                  <CheckboxGroup.ItemControl>
+                    <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                  </CheckboxGroup.ItemControl>
+                  <CheckboxGroup.ItemLabel>Keyboard ready</CheckboxGroup.ItemLabel>
+                </CheckboxGroup.Item>
+              ) : (
+                <div data-presses={presses}>
+                  <Button onPress={() => setPresses((n) => n + 1)}>Save</Button>
+                </div>
+              )}
             </div>
           </div>
         </Reveal>

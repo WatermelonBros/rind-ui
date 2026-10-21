@@ -269,6 +269,22 @@
   align-items: start;
 }
 
+/* on a phone the preview comes first: it is what the controls change (and where the hero's
+   object lands), so it must be on screen when they are */
+@media (max-width: 900px) {
+  .lookPanel {
+    display: flex;
+    flex-direction: column;
+  }
+  .lookStage {
+    order: -1;
+    padding: 28px 20px;
+  }
+  .lookControls {
+    border-bottom: 0;
+    border-top: var(--bw) solid var(--line);
+  }
+}
 .lookCode {
   border-top: var(--bw) solid var(--line);
   background: #0b0b0c;
