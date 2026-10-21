@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero"
+import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
 import { Outro } from "@/components/home/outro"
 import { Peel } from "@/components/home/peel"
@@ -25,6 +26,7 @@ export default function Home() {
         <Why />
         <AnyLook />
         <Tested />
+        <Agents />
         <Wall />
       </Hero>
       <Outro />
