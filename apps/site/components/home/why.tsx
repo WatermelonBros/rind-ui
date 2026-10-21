@@ -1,8 +1,9 @@
 "use client"
 
-import { Collapsible, Switch, ToggleGroup } from "@rind-ui/react"
+import { Button, CheckboxGroup, Collapsible, Switch, ToggleGroup } from "@rind-ui/react"
 import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
+import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 import { utterance } from "./sr-view"
@@ -137,7 +138,24 @@ function KeyboardProof() {
 }
 
 /** What a screen reader says, read from the same attributes it reads. */
+const HINTS: Record<HeroKind, string> = {
+  switch: "Focus or flip the switch.",
+  checkbox: "Focus or tick the checkbox.",
+  button: "Focus the button, then press it.",
+}
+
 function HeardProof() {
+  const [kind, setKind] = useState<HeroKind>("switch")
+  useEffect(() => setKind(heroKind()), [])
+  // the button's state worth hearing is pending: a press sends for a moment
+  const [pending, setPending] = useState(false)
+  const timer = useRef(0)
+  useEffect(() => () => clearTimeout(timer.current), [])
+  const send = () => {
+    setPending(true)
+    clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setPending(false), 1400)
+  }
   const stage = useRef<HTMLDivElement>(null)
   const [said, setSaid] = useState("")
   useEffect(() => {
@@ -162,7 +180,7 @@ function HeardProof() {
     <Proof
       title="Every state is heard."
       text="Names, roles and states land in the accessibility tree, so a screen reader says what you see."
-      hint="Focus or flip the switch."
+      hint={HINTS[kind]}
       readout={
         <output className={styles.said} aria-live="off">
           {said ? `“${said}”` : "…"}
@@ -170,12 +188,26 @@ function HeardProof() {
       }
     >
       <div ref={stage}>
-        <Switch.Root>
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-          <Switch.Label>Notifications</Switch.Label>
-        </Switch.Root>
+        {/* the visit's own component, the one the hero showed (hero-state.ts) */}
+        {kind === "switch" ? (
+          <Switch.Root>
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+            <Switch.Label>Notifications</Switch.Label>
+          </Switch.Root>
+        ) : kind === "checkbox" ? (
+          <CheckboxGroup.Item>
+            <CheckboxGroup.ItemControl>
+              <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+            </CheckboxGroup.ItemControl>
+            <CheckboxGroup.ItemLabel>Notifications</CheckboxGroup.ItemLabel>
+          </CheckboxGroup.Item>
+        ) : (
+          <Button pending={pending} onPress={send}>
+            {pending ? "Sending…" : "Send"}
+          </Button>
+        )}
       </div>
     </Proof>
   )
