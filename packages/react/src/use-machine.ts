@@ -22,11 +22,12 @@ type ViewOf<M extends AnyMachine> = ReturnType<Service<M>["view"]>
  * (or the machine declares none: `Record<string, never>`), required otherwise (pass
  * `useEnvironment(…the capabilities it needs)`).
  */
-type EnvArgument<M extends AnyMachine> = BaseDomEnvironment extends EnvOf<M>
-  ? [env?: EnvOf<M>]
-  : string extends keyof EnvOf<M>
+type EnvArgument<M extends AnyMachine> =
+  BaseDomEnvironment extends EnvOf<M>
     ? [env?: EnvOf<M>]
-    : [env: EnvOf<M>]
+    : string extends keyof EnvOf<M>
+      ? [env?: EnvOf<M>]
+      : [env: EnvOf<M>]
 
 /**
  * Binds one service to a component instance: created once, fed the latest props on every
