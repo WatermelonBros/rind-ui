@@ -146,13 +146,14 @@ export function Peel() {
   const p2 = clamp(progress / 0.4)
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
-  const vars = { "--p1": 1, "--p2": p2, "--p3": p3 } as CSSProperties
+  const dark = p2 * (1 - p3)
+  const vars = { "--p1": 1, "--p2": p2, "--p3": p3, "--dark": dark } as CSSProperties
   const machine = MACHINES[kind]
 
   return (
     <section ref={section} className={styles.peel} style={vars} aria-labelledby="peel-title">
       {/* each act owns the whole field: the bare parts on ink, the machine on the brand colour */}
-      <div className={styles.sticky} data-act={act + 1}>
+      <div className={styles.sticky} data-act={act + 1} data-dark={dark > 0.5 ? "" : undefined}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
             {ACTS[act]?.title}

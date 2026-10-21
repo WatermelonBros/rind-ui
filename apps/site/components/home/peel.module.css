@@ -13,17 +13,14 @@
   gap: 40px;
   padding: var(--bar-h) 56px 0;
   overflow: hidden;
-  background: var(--paper);
-  transition:
-    background-color 0.6s var(--spring),
-    color 0.6s var(--spring);
+  /* the ground follows the scroll, no seams: the hero's colour turns to ink while the
+     attributes come in, and back to the brand colour for the machine (--dark, peel.tsx) */
+  background: color-mix(in oklab, var(--ink) calc(var(--dark, 0) * 100%), var(--bg));
+  transition: color 0.4s var(--spring);
 }
-.sticky[data-act="1"] {
-  background: var(--ink);
+/* text flips once the ground is more ink than brand colour */
+.sticky[data-dark] {
   color: var(--paper);
-}
-.sticky[data-act="2"] {
-  background: var(--bg);
 }
 .title {
   font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
@@ -113,11 +110,11 @@
   color: #ff8fb1;
 }
 /* on the ink field the chips invert, so they read as labels on a blueprint */
-.sticky[data-act="1"] .attrs li {
+.sticky[data-dark] .attrs li {
   background: var(--paper);
   color: var(--ink);
 }
-.sticky[data-act="1"] .attrs b {
+.sticky[data-dark] .attrs b {
   color: var(--acc-deep);
 }
 
