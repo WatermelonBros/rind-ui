@@ -1,7 +1,9 @@
+import { Collapsible } from "@rind-ui/react"
 import roadmap from "@/content/generated/roadmap.json"
 import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
+import { WallSpecimens } from "./wall-specimens"
 
 type Item = { category: string; name: string; wave: string; status: string; slug?: string }
 
@@ -30,27 +32,37 @@ export function Wall() {
             lands complete: spec, tests, driver and docs.
           </p>
         </Reveal>
-        <div className={styles.wall}>
-          {categories.map((c) => (
-            <Reveal key={c} className={styles.wallGroup}>
-              <h3>{c}</h3>
-              <ul>
-                {items
-                  .filter((i) => i.category === c)
-                  .map((i) => (
-                    <li key={i.name} data-status={i.status}>
-                      {i.slug ? (
-                        <MorphLink href={`/docs/${i.slug}/`}>{i.name}</MorphLink>
-                      ) : (
-                        <span>{i.name}</span>
-                      )}
-                      <small>{LABEL[i.status] ?? i.status}</small>
-                    </li>
-                  ))}
-              </ul>
-            </Reveal>
-          ))}
-        </div>
+        <WallSpecimens />
+        {/* the whole roadmap, one click away: the count is in the heading, the list on demand */}
+        <Collapsible.Root className={styles.wallAll}>
+          <Collapsible.Trigger>
+            <Collapsible.Indicator>▸</Collapsible.Indicator>
+            All {items.length} components, by category
+          </Collapsible.Trigger>
+          <Collapsible.Content>
+            <div className={styles.wall}>
+              {categories.map((c) => (
+                <Reveal key={c} className={styles.wallGroup}>
+                  <h3>{c}</h3>
+                  <ul>
+                    {items
+                      .filter((i) => i.category === c)
+                      .map((i) => (
+                        <li key={i.name} data-status={i.status}>
+                          {i.slug ? (
+                            <MorphLink href={`/docs/${i.slug}/`}>{i.name}</MorphLink>
+                          ) : (
+                            <span>{i.name}</span>
+                          )}
+                          <small>{LABEL[i.status] ?? i.status}</small>
+                        </li>
+                      ))}
+                  </ul>
+                </Reveal>
+              ))}
+            </div>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </section>
     </div>
   )
