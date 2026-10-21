@@ -1,0 +1,52 @@
+{
+  "name": "@rind-ui/mcp",
+  "version": "0.0.0",
+  "description": "MCP server for rind-ui: lets coding agents list rind-ui's headless React components and read each one's parts, props, data-* attributes, keyboard support and test driver.",
+  "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://rind.watermelon-studio.it",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "headless",
+    "headless-ui",
+    "react",
+    "components",
+    "accessibility",
+    "llm"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "bin": {
+    "rind-ui-mcp": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/server.ts",
+      "types": "./dist/server.d.mts",
+      "default": "./dist/server.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
