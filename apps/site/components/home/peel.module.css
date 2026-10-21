@@ -195,3 +195,25 @@
     padding: 100px 56px 160px;
   }
 }
+
+/* the hero's 3D object, bare, over this scene's control (peel.tsx); the control stays in the
+   DOM for its attributes, invisibly */
+.canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s var(--spring);
+}
+.canvas[data-on] {
+  opacity: 1;
+}
+.scene[data-gl] :is([data-part="control"], [data-part="thumb"], [data-part="indicator"], button) {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: transparent;
+}
