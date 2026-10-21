@@ -874,37 +874,47 @@ function TransparencyGrid(props: Omit<ComponentPropsWithRef<typeof Grid>, "scope
   return <Grid {...props} scope="color-picker" />
 }
 
-export const ColorPicker = {
-  Root,
-  Label,
-  Control,
-  Trigger,
-  Portal,
-  Positioner,
-  Content,
-  Area,
-  AreaBackground: ColorArea.Background,
-  AreaThumb: ColorArea.Thumb,
-  ChannelSlider,
-  ChannelSliderLabel: ColorSlider.Label,
-  ChannelSliderValueText: ColorSlider.ValueText,
-  ChannelSliderTrack: ColorSlider.Track,
-  ChannelSliderThumb: ColorSlider.Thumb,
-  ChannelInput,
-  EyeDropperTrigger,
-  SwatchGroup,
-  SwatchTrigger,
-  SwatchIndicator: ColorSwatchPicker.Indicator,
-  Swatch,
-  ValueSwatch,
-  FormatSelect,
-  FormatTrigger,
-  View,
-  ValueText,
-  HiddenInput,
-  TransparencyGrid,
-  Description: HostDescription,
-  ErrorMessage: HostErrorMessage,
-}
+const AreaBackground = ColorArea.Background
+const AreaThumb = ColorArea.Thumb
+const ChannelSliderLabel = ColorSlider.Label
+const ChannelSliderValueText = ColorSlider.ValueText
+const ChannelSliderTrack = ColorSlider.Track
+const ChannelSliderThumb = ColorSlider.Thumb
+const SwatchIndicator = ColorSwatchPicker.Indicator
+const Description = HostDescription
+const ErrorMessage = HostErrorMessage
 
 export type { ColorSpace }
+/** The parts, by name: `color-picker.parts.ts` re-exports them as the `ColorPicker` namespace. */
+export {
+  Area,
+  AreaBackground,
+  AreaThumb,
+  ChannelInput,
+  ChannelSlider,
+  ChannelSliderLabel,
+  ChannelSliderThumb,
+  ChannelSliderTrack,
+  ChannelSliderValueText,
+  Content,
+  Control,
+  Description,
+  ErrorMessage,
+  EyeDropperTrigger,
+  FormatSelect,
+  FormatTrigger,
+  HiddenInput,
+  Label,
+  Portal,
+  Positioner,
+  Root,
+  Swatch,
+  SwatchGroup,
+  SwatchIndicator,
+  SwatchTrigger,
+  TransparencyGrid,
+  Trigger,
+  ValueSwatch,
+  ValueText,
+  View,
+}

@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "node:fs"
 import { defineConfig } from "tsdown"
+import { namespaceReexports } from "../../scripts/namespace-reexports.ts"
 import { packageExports } from "../../scripts/tsdown-exports.ts"
 
 // Unbundled: one output file per source module, so a bundler drops every component an app
@@ -17,4 +18,5 @@ export default defineConfig({
   publint: true,
   report: { summary: true },
   exports: packageExports,
+  plugins: [namespaceReexports],
 })

@@ -1,0 +1,36 @@
+"use client"
+
+// The ColorPicker namespace: a module namespace (not an object), so bundlers drop the parts a
+// consumer never references.
+export {
+  Area,
+  AreaBackground,
+  AreaThumb,
+  ChannelInput,
+  ChannelSlider,
+  ChannelSliderLabel,
+  ChannelSliderThumb,
+  ChannelSliderTrack,
+  ChannelSliderValueText,
+  Content,
+  Control,
+  Description,
+  ErrorMessage,
+  EyeDropperTrigger,
+  FormatSelect,
+  FormatTrigger,
+  HiddenInput,
+  Label,
+  Portal,
+  Positioner,
+  Root,
+  Swatch,
+  SwatchGroup,
+  SwatchIndicator,
+  SwatchTrigger,
+  TransparencyGrid,
+  Trigger,
+  ValueSwatch,
+  ValueText,
+  View,
+} from "./color-picker"
