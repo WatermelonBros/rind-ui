@@ -373,11 +373,15 @@ for (const url of urls) {
     await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })
     await page.waitForSelector("html[data-hydrated]", { state: "attached", timeout: 60_000 })
     await exercise(page, url)
-    // the site never names another component library (user rule): reword the doc if it does
-    const named = await page.evaluate(
-      (source) => document.body.innerText.match(new RegExp(source, "g")) ?? [],
-      otherLibraries.source,
-    )
+    // the site never names another component library (user rule): reword the doc if it does.
+    // The one exception is /compare/, a page that exists to compare (user-approved).
+    const named =
+      url === "/compare/"
+        ? []
+        : await page.evaluate(
+            (source) => document.body.innerText.match(new RegExp(source, "g")) ?? [],
+            otherLibraries.source,
+          )
     for (const n of new Set(named)) report(url, "other-library", `names "${n}"`)
     // every link inside the site resolves to an exported file
     for (const href of await page.evaluate(() =>
