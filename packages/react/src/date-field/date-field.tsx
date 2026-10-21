@@ -17,6 +17,7 @@ import {
   type DateValidityFlags,
   type DateValue,
   type DayOfWeek,
+  dateClockCapability,
   dateFieldConnect,
   dateFieldKey,
   dateFieldMachine,
@@ -347,7 +348,7 @@ function SingleRoot({
   ...fieldProps
 }: DateFieldRootProps) {
   void _single
-  const env = useEnvironment()
+  const env = useEnvironment(dateClockCapability)
   const generated = useId()
   const instance = id ?? generated
   const { locale, dir } = useLocale(ownLocale, ownDir)

@@ -6,6 +6,7 @@
 // under scope "tags-input", the popup parts the Combobox's. Wiring only.
 
 import {
+  announcerCapability,
   type Chip as ChipData,
   type Collection,
   type CollectionKey,
@@ -20,6 +21,7 @@ import {
   isExposed,
   isStale,
   type LoadingStatus,
+  layoutCapability,
   mergeFieldProps,
   type PositioningProps,
   patternResults,
@@ -183,7 +185,7 @@ const reasonOf = (type: string, delimiter: boolean) =>
 
 function Root(all: TagsInputRootProps) {
   const { id, children } = all
-  const base = useEnvironment()
+  const base = useEnvironment(announcerCapability, layoutCapability)
   const env = useMemo(() => ({ ...base, position: domPositioning(base) }), [base])
   const instance = useRootId(id)
   const binding = useFieldControl()
@@ -306,7 +308,7 @@ function Root(all: TagsInputRootProps) {
     onInputValueChange: (t: string, d: { event: { type: string } }) =>
       latest.current.onInputValueChange?.(t, { reason: reasonOf(d.event.type, false) }),
   }
-  const { service } = useMachine(tagsInputMachine, props as never, env as never)
+  const { service } = useMachine(tagsInputMachine, props as never, env)
   svc.current = service as never
   const view = service.view()
   const open = view.state === "suggesting"

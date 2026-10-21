@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type CollectionKey,
   createListCollection,
   createMenuTree,
@@ -11,6 +12,7 @@ import {
   type LayerMeta,
   type LinkEnv,
   type LinkInput,
+  layoutCapability,
   linkProps,
   type MenuActivation,
   type MenuChangeDetails,
@@ -233,7 +235,7 @@ function useLevelService(input: {
   /** A context menu's root level. */
   readonly region?: Pick<MenuProps, "onAnchorChange"> | undefined
 }) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const parent = useParentLayer()
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY

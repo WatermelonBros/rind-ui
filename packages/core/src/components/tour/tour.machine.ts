@@ -22,7 +22,8 @@ import { type PlacementState, placementFrom, unplaced } from "../../dom/position
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
 import { createStepVisit, type StepVisit } from "../../dom/step-effect"
 import { isRendered, waitForElement, waitForEvent } from "../../dom/wait-for-element"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
+import type { AnnouncerEnv } from "../../env/capabilities"
 import type {
   Align,
   PositionEnv,
@@ -270,13 +271,13 @@ const isPromise = (v: unknown): v is PromiseLike<unknown> =>
 
 const rectOf = (r: DOMRect | RectLike) => ({ x: r.x, y: r.y, width: r.width, height: r.height })
 
-const documentOf = (env: DomEnvironment) => {
+const documentOf = (env: BaseDomEnvironment) => {
   const root = env.dom.getRootNode()
   return "body" in root ? root : root.ownerDocument
 }
 
 /** The document, or null where there is none (Node, a model test's oracle environment). */
-const documentOrNull = (env: DomEnvironment): Document | null => {
+const documentOrNull = (env: BaseDomEnvironment): Document | null => {
   if (typeof document === "undefined") return null
   const root = env.dom?.getRootNode?.()
   if (!root || typeof root !== "object") return null
@@ -284,7 +285,7 @@ const documentOrNull = (env: DomEnvironment): Document | null => {
 }
 
 /** The element the non-modal Tab order treats as the target: the last tab stop it holds. */
-function tabStopFor(env: DomEnvironment, target: Element | null): HTMLElement | null {
+function tabStopFor(env: BaseDomEnvironment, target: Element | null): HTMLElement | null {
   if (!(target instanceof HTMLElement)) return null
   const inner = stopsOf(env, target)
   return inner.at(-1) ?? (target.tabIndex >= 0 ? target : null)
@@ -294,7 +295,7 @@ export const tourMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TourProps
     events: TourEvent
-    env: DomEnvironment & PositionEnv
+    env: BaseDomEnvironment & AnnouncerEnv & PositionEnv
     context: TourContext
     values: "open" | "stepId"
   }>(),

@@ -5,6 +5,7 @@
 // (the shared Field host); the hidden number input carries name, constraints and reset.
 
 import {
+  announcerCapability,
   canStepNumber,
   createNumberParser,
   describeKey,
@@ -214,7 +215,7 @@ function Root({
   ...fieldProps
 }: NumberInputRootProps) {
   const hostNaming = useContext(NumberInputNaming)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const generated = useId()
   const instance = id ?? generated
   const { locale, dir } = useLocale(ownLocale, ownDir)

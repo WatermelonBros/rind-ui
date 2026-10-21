@@ -26,12 +26,14 @@ or `domEnvironment`'s result.
      create(base: BaseDomEnvironment, options: DomEnvironmentOptions): T
    }
    ```
-   One per on-demand capability, next to its implementation (`announcerCapability` in
-   `dom/live-announcer.ts`, …), each `/* @__PURE__ */`. `create` returns the option when given
+   One per on-demand capability, all in `env/dom-capabilities.ts`, each `/* @__PURE__ */`
+   (unused exports and their implementation imports tree-shake away; one file keeps the six
+   side by side). `create` returns the option when given
    (`options.clipboard ?? domClipboard(...)`), so "option wins" lives in one place per capability.
-2. **`baseDomEnvironment(options)`** builds the base only. `domEnvironment(options)` becomes
-   `withCapabilities(baseDomEnvironment(options), options, allCapabilities)`: same result as today,
-   still public, and the only module that imports every implementation.
+2. **`baseDomEnvironment(options)`** (`env/base-environment.ts`) builds the base only.
+   `domEnvironment(options)` builds the base plus every capability: same result as today, still
+   public, and the only module that imports every implementation. `extendEnvironment(base, …)`
+   copies property descriptors, so the lazy `platform` getter is never read at creation.
 3. **Per-provider cache.** The provider value holds the base environment and a
    `Map<Capability, unknown>`; `useEnvironment(...caps)` returns a memoised object
    `{ ...base, [cap.key]: cache.get(cap) ?? build }`. The memo key is the provider value plus
@@ -42,10 +44,14 @@ or `domEnvironment`'s result.
    default `domEnvironment()`.
 4. **Types.** `useEnvironment<const C extends readonly Capability<string, unknown>[]>(...caps: C):
    BaseDomEnvironment & ProvidedBy<C>`, with `ProvidedBy` mapping each `Capability<K, T>` to
-   `{ readonly [P in K]: T }`. `useMachine`'s implicit env becomes the base only; a part whose
-   machine needs more passes `useEnvironment(...)` as the third argument, so a missing request
-   fails on `EnvOf<M>`. The cast in `useMachine` today ("domEnvironment implements every
-   capability") goes away.
+   `{ readonly [P in K]: T }` (a list typed only as `Capability[]` provides nothing).
+   `useMachine`'s implicit env becomes the base only: its third argument is optional when
+   `BaseDomEnvironment` satisfies `EnvOf<M>` and required otherwise, so a missing request is a
+   compile error at the call.
+7. **Machines typed with the whole `DomEnvironment`** (dialog, drawer, popover, tooltip,
+   hover-card, navigation-menu, menu, select, combobox, tags-input, scroll-area, table frame,
+   tour) are narrowed to `BaseDomEnvironment` plus what they read (only Tour reads the
+   announcer); otherwise every overlay would request all six.
 5. **Migration of parts** is mechanical and compiler-driven: switch `useMachine` to base env,
    run `tsc`, add the requested capabilities where it fails. Delegate to a Sonnet subagent with
    the error list.

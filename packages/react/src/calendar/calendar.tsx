@@ -4,6 +4,7 @@
 // range; connect every attribute and the key mapping; navigation is pure core logic.
 
 import {
+  announcerCapability,
   type CalendarCommitOnBlur,
   type CalendarDate,
   type CalendarMessages,
@@ -18,6 +19,7 @@ import {
   createCalendarDrag,
   type DateValue,
   type DayOfWeek,
+  dateClockCapability,
   describeKey,
   display,
   focusSafely,
@@ -232,7 +234,7 @@ function Root({
   /** Another element or a render function receiving the props. */
   readonly render?: RenderProp<undefined>
 }) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, dateClockCapability)
   const generated = useId()
   const instance = id ?? generated
   const { locale, dir } = useLocale(ownLocale, ownDir)
@@ -282,60 +284,64 @@ function Root({
     isMonthUnavailable,
     isYearUnavailable,
   }
-  const { view, send } = useMachine(calendarMachine, {
-    ...nav,
-    value,
-    defaultValue,
-    onValueChange: (v, details) => {
-      const d = details as { event: { type: string; modality?: string }; cancel(): void }
-      latest.current.onValueChange?.(v, {
-        reason:
-          d.event.type === "CELL.PRESS"
-            ? "CELL.PRESS"
-            : d.event.type === "DRAG.END"
-              ? "DRAG"
-              : "KEY",
-        modality: d.event.modality ?? "keyboard",
-        cancel: d.cancel,
-      })
+  const { view, send } = useMachine(
+    calendarMachine,
+    {
+      ...nav,
+      value,
+      defaultValue,
+      onValueChange: (v, details) => {
+        const d = details as { event: { type: string; modality?: string }; cancel(): void }
+        latest.current.onValueChange?.(v, {
+          reason:
+            d.event.type === "CELL.PRESS"
+              ? "CELL.PRESS"
+              : d.event.type === "DRAG.END"
+                ? "DRAG"
+                : "KEY",
+          modality: d.event.modality ?? "keyboard",
+          cancel: d.cancel,
+        })
+      },
+      focusedValue: show(focusedValue) ?? undefined,
+      defaultFocusedValue: initial,
+      onFocusedValueChange: (date) => latest.current.onFocusChange?.(date),
+      ...(anchor !== undefined ? { anchor: show(anchor) } : {}),
+      ...(defaultAnchor !== undefined ? { defaultAnchor: show(defaultAnchor) } : {}),
+      onAnchorChange: (a) => latest.current.onAnchorChange?.(a),
+      onDateSelect: (date, details) => latest.current.onDateSelect?.(date, details),
+      ...range,
+      ...periods,
+      view: viewProp,
+      defaultView: defaultView ?? minView,
+      onViewChange: (v, details) => {
+        const type = (details as { event: { type: string } }).event.type
+        latest.current.onViewChange?.(v, {
+          reason:
+            type === "VIEW.UP"
+              ? "heading"
+              : type === "VIEW.DOWN"
+                ? "escape-key"
+                : type === "CELL.PRESS" || type === "SELECT_FOCUSED"
+                  ? "select"
+                  : "api",
+        })
+      },
+      selectionMode,
+      isDateUnavailable,
+      disabled,
+      readOnly,
+      invalid,
+      calendar,
+      formatLocale,
+      messages,
+      id: instance,
+      focusCell: (date, modality) => {
+        pendingFocus.current = { date, modality }
+      },
     },
-    focusedValue: show(focusedValue) ?? undefined,
-    defaultFocusedValue: initial,
-    onFocusedValueChange: (date) => latest.current.onFocusChange?.(date),
-    ...(anchor !== undefined ? { anchor: show(anchor) } : {}),
-    ...(defaultAnchor !== undefined ? { defaultAnchor: show(defaultAnchor) } : {}),
-    onAnchorChange: (a) => latest.current.onAnchorChange?.(a),
-    onDateSelect: (date, details) => latest.current.onDateSelect?.(date, details),
-    ...range,
-    ...periods,
-    view: viewProp,
-    defaultView: defaultView ?? minView,
-    onViewChange: (v, details) => {
-      const type = (details as { event: { type: string } }).event.type
-      latest.current.onViewChange?.(v, {
-        reason:
-          type === "VIEW.UP"
-            ? "heading"
-            : type === "VIEW.DOWN"
-              ? "escape-key"
-              : type === "CELL.PRESS" || type === "SELECT_FOCUSED"
-                ? "select"
-                : "api",
-      })
-    },
-    selectionMode,
-    isDateUnavailable,
-    disabled,
-    readOnly,
-    invalid,
-    calendar,
-    formatLocale,
-    messages,
-    id: instance,
-    focusCell: (date, modality) => {
-      pendingFocus.current = { date, modality }
-    },
-  })
+    env,
+  )
   const drag = useCellDrag(env, instance, calendar, dragDelay, send)
   // The modality is tracked from mount: a pointer press that focuses a cell is seen as one.
   useEffect(() => env.modality.subscribe(() => {}), [env])

@@ -6,6 +6,7 @@
 // swipe.
 
 import {
+  announcerCapability,
   measureToast,
   type SwipeDirection,
   type Toaster as ToasterStore,
@@ -16,6 +17,7 @@ import {
   toastMessages,
   trackSwipe,
   trackToastRegion,
+  visibilityCapability,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -87,7 +89,7 @@ export interface ToasterProps {
 
 /** The region of one store: rendered only while it shows toasts (zag#2988). */
 export function Toaster({ toaster, id, children, messages: own, portal = true }: ToasterProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, visibilityCapability)
   const instance = useRootId(id)
   const { locale, dir } = useLocale()
   const messages: ToastMessages = { ...toastMessages, ...own }

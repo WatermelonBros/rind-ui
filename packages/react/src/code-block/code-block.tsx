@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type CodeBlockCopyDetails,
   type CodeBlockCopyState,
@@ -9,6 +10,7 @@ import {
   type CodeGrammar,
   type CodeLanguage,
   type CodeTokenType,
+  clipboardCapability,
   codeBlockConnect,
   codeBlockMachine,
   codeBlockMessages,
@@ -170,29 +172,33 @@ function Root({
   ...rest
 }: CodeBlockRootProps) {
   const instance = useRootId(id)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, clipboardCapability)
   const messages = useMessages("code-block", codeBlockMessages, ownMessages)
   const { locale } = useLocale(ownLocale)
   const registry = usePartRegistry<"title">({ scope: "code-block", root: instance })
   const copyAnchor = useRef<HTMLElement | null>(null)
   const source = useMemo(() => splitLines(code), [code])
   const collapsible = maxLines !== undefined && source.length > maxLines
-  const { view, send } = useMachine(codeBlockMachine, {
-    code,
-    messages,
-    id: instance,
-    lang: locale,
-    copyFeedbackDuration,
-    onCopy,
-    getCopyAnchor: () => copyAnchor.current,
-    collapsible,
-    wrapped,
-    defaultWrapped,
-    onWrappedChange,
-    expanded,
-    defaultExpanded: defaultExpanded ?? !collapsible,
-    onExpandedChange,
-  })
+  const { view, send } = useMachine(
+    codeBlockMachine,
+    {
+      code,
+      messages,
+      id: instance,
+      lang: locale,
+      copyFeedbackDuration,
+      onCopy,
+      getCopyAnchor: () => copyAnchor.current,
+      collapsible,
+      wrapped,
+      defaultWrapped,
+      onWrappedChange,
+      expanded,
+      defaultExpanded: defaultExpanded ?? !collapsible,
+      onExpandedChange,
+    },
+    env,
+  )
   // Keyed on the grammar's identity: a grammar object made in render re-lexes on every render.
   const tokens = useMemo(
     () => codeBlockTokens({ code, language, lines: ownTokens, html }),

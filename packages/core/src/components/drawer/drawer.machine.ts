@@ -6,7 +6,7 @@
 import type { Modality } from "../../contract/env"
 import { physicalSide } from "../../dom/position/options"
 import { type SwipeDirection, type SwipeRelease, trackSwipe } from "../../dom/swipe"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import { partId } from "../../ids"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
@@ -124,12 +124,12 @@ export const resolvedPoints = (
  * start. Frames, bounded; returns the cleanup of whichever ran.
  */
 function whenMounted(
-  env: DomEnvironment,
+  env: BaseDomEnvironment,
   el: () => HTMLElement | null,
   start: (el: HTMLElement) => () => void,
 ): () => void {
   let stop: (() => void) | null = null
-  let frame: ReturnType<DomEnvironment["scheduler"]["requestAnimationFrame"]> | null = null
+  let frame: ReturnType<BaseDomEnvironment["scheduler"]["requestAnimationFrame"]> | null = null
   const attempt = (left: number) => {
     frame = null
     const node = el()
@@ -157,7 +157,7 @@ export const drawerMachine = /* @__PURE__ */ setup({
   types: type<{
     props: DrawerProps
     events: DrawerEvent
-    env: DomEnvironment
+    env: BaseDomEnvironment
     context: DrawerContext
     values: "open" | "snapPoint"
   }>(),

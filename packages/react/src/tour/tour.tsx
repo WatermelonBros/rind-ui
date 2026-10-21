@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   domPositioning,
   getLayerStack,
   type HeadingLevel,
@@ -148,7 +149,7 @@ export function useTour({
   const root = useRootId(id)
   const parent = useParentLayer()
   const messages = useMessages("tour", tourMessages, ownMessages)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   // Positioning only for anchored components: not part of domEnvironment().
   const withPosition = useMemo(() => ({ ...env, position: domPositioning(env) }), [env])
   // The steps: the prop, or what the mutators set since it last changed.

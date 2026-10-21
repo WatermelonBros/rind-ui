@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type ImageViewerEvent,
   type ImageViewerMessages,
@@ -104,7 +105,7 @@ function Root({
   children,
   ...rest
 }: ImageViewerRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("image-viewer", imageViewerMessages, ownMessages)

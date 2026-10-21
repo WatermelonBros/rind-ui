@@ -22,7 +22,7 @@ import { getLayerStack, type LayerId, type LayerKind, layerId } from "../../dom/
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type { HoverIntentEnv } from "../../env/hover-intent"
 import type {
   Align,
@@ -226,7 +226,7 @@ export interface MenuContext extends CollectionContext {
   readonly regionAnchor: MenuAnchor | null
 }
 
-export type MenuEnv = DomEnvironment &
+export type MenuEnv = BaseDomEnvironment &
   PositionEnv &
   HoverIntentEnv &
   CollectionEnv & { readonly menuTree: MenuTree }

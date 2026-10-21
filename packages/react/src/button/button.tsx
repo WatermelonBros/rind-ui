@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ButtonMessages,
   type ButtonPressDetails,
   blurEvent,
@@ -103,7 +104,7 @@ export function Button(props: ButtonProps) {
     ref,
     ...rest
   } = props
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const messages = useMessages("button", buttonMessages, ownMessages)
   const { render, href } = anchorOf(renderProp)
@@ -111,16 +112,20 @@ export function Button(props: ButtonProps) {
   const tag = useRenderedTag("button", render, el)
   // A rind-ui Fieldset's context reaches portalled parts; the DOM tracker native fieldsets.
   const fieldsetContext = useFieldsetDisabled()
-  const { view, send } = useMachine(buttonMachine, {
-    // The machine guards activation on it as on the prop.
-    disabled: disabled || fieldsetContext,
-    pending,
-    onPress,
-    onPressStart,
-    onPressEnd,
-    messages,
-    id: instance,
-  })
+  const { view, send } = useMachine(
+    buttonMachine,
+    {
+      // The machine guards activation on it as on the prop.
+      disabled: disabled || fieldsetContext,
+      pending,
+      onPress,
+      onPressStart,
+      onPressEnd,
+      messages,
+      id: instance,
+    },
+    env,
+  )
   const fieldsetDisabled = view.context.fieldsetDisabled
   const effectiveDisabled = disabled || fieldsetDisabled || fieldsetContext
   // The modality tracker must see the pointerdown that comes before focus.

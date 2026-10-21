@@ -207,7 +207,8 @@ export function createDialogRoot(family: {
     const root = useRootId(id)
     const parent = useParentLayer(DIALOG_PARENT_KINDS)
     const messages = useMessages("dialog", dialogMessages, ownMessages)
-    const { service, send } = useMachine(family.machine, { ...props, root, parent })
+    const env = useEnvironment()
+    const { service, send } = useMachine(family.machine, { ...props, root, parent }, env)
     useImperativeHandle(
       actionsRef,
       () => ({ open: () => send({ type: "OPEN" }), close: () => send({ type: "CLOSE" }) }),

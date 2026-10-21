@@ -2,13 +2,16 @@
 
 import {
   type Announcer,
+  type BaseDomEnvironment,
+  baseDomEnvironment,
+  type Capability,
   DEFAULT_TYPEAHEAD_TIMEOUT,
-  type DomEnvironment,
   type DomEnvironmentOptions,
   directionOf,
-  domEnvironment,
+  extendEnvironment,
   type MessageOverrides,
   type Messages,
+  type ProvidedBy,
   resolveMessages,
 } from "@rind-ui/core"
 import {
@@ -70,7 +73,29 @@ interface RindConfig {
   readonly typeaheadTimeout: number
   readonly environment: DomEnvironmentOptions
   readonly icons: RindIcons
-  readonly env: DomEnvironment
+  readonly env: EnvironmentHolder
+}
+
+/**
+ * One provider's environment: the base, built with the provider, and each on-demand
+ * capability, built the first time a component below asks for it (one announcer, one set of
+ * live regions, per provider).
+ */
+interface EnvironmentHolder {
+  readonly base: BaseDomEnvironment
+  get(capability: Capability): unknown
+}
+
+function environmentHolder(options: DomEnvironmentOptions): EnvironmentHolder {
+  const base = baseDomEnvironment(options)
+  const built = new Map<Capability, unknown>()
+  return {
+    base,
+    get(capability) {
+      if (!built.has(capability)) built.set(capability, capability.create(base, options))
+      return built.get(capability)
+    },
+  }
 }
 
 const RindContext = createContext<RindConfig | null>(null)
@@ -101,7 +126,7 @@ export function RindProvider(props: RindProviderProps) {
       ...(merged.dir === undefined ? {} : { dir: merged.dir }),
       ...(merged.announcer === undefined ? {} : { announcer: merged.announcer }),
     }
-    return { ...merged, env: domEnvironment(options) }
+    return { ...merged, env: environmentHolder(options) }
   }, [parent, locale, dir, messages, announcer, typeaheadTimeout, environment, icons])
   return <RindContext value={value}>{children}</RindContext>
 }
@@ -117,11 +142,26 @@ function mergeMessages(
   return out
 }
 
-/** The provider's environment, or a default one (no provider). */
-export function useEnvironment(): DomEnvironment {
+/**
+ * The provider's environment (or a default one, with no provider): the base capabilities plus
+ * the on-demand ones named, e.g. `useEnvironment(announcerCapability)`. A machine whose `env`
+ * needs a capability that was not named does not type-check.
+ */
+export function useEnvironment<const C extends readonly Capability[]>(
+  ...capabilities: C
+): BaseDomEnvironment & ProvidedBy<C> {
   const config = useContext(RindContext)
-  const fallback = useMemo(() => (config ? null : domEnvironment()), [config])
-  return config?.env ?? (fallback as DomEnvironment)
+  const fallback = useMemo(() => (config ? null : environmentHolder({})), [config])
+  // Exactly one of the two is set: `fallback` exists whenever there is no provider.
+  const holder = config?.env ?? (fallback as EnvironmentHolder)
+  // The capability list is a set of module constants per call site: its length never changes.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the capabilities are the deps
+  return useMemo(() => {
+    if (capabilities.length === 0) return holder.base as BaseDomEnvironment & ProvidedBy<C>
+    const additions = Object.fromEntries(capabilities.map((c) => [c.key, holder.get(c)]))
+    // Each `c.key` maps to `c.create`'s result: the shape `ProvidedBy<C>` describes.
+    return extendEnvironment(holder.base, additions as ProvidedBy<C>)
+  }, [holder, ...capabilities])
 }
 
 const noSubscription = () => () => {}

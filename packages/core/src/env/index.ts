@@ -1,3 +1,8 @@
+export {
+  type BaseDomEnvironment,
+  baseDomEnvironment,
+  type DomEnvironmentOptions,
+} from "./base-environment"
 export type {
   Announcement,
   Announcer,
@@ -33,11 +38,17 @@ export type {
 } from "./capabilities"
 export type { DelayGroup, DelayGroupEnv, DelayGroupMember } from "./delay-group"
 export {
-  type DomEnvironment,
-  type DomEnvironmentOptions,
-  domEnvironment,
-  type ValidityEnv,
-} from "./dom-environment"
+  announcerCapability,
+  type Capability,
+  clipboardCapability,
+  dateClockCapability,
+  extendEnvironment,
+  layoutCapability,
+  type ProvidedBy,
+  validityCapability,
+  visibilityCapability,
+} from "./dom-capabilities"
+export { type DomEnvironment, domEnvironment, type ValidityEnv } from "./dom-environment"
 export type {
   HoverIntent,
   HoverIntentEnv,

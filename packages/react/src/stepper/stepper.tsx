@@ -2,6 +2,7 @@
 
 import {
   adjacentStep,
+  announcerCapability,
   type ChangeDetails,
   focusSafely,
   type MessageOverrides,
@@ -160,7 +161,7 @@ function Root({
   children,
   ...rest
 }: StepperRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("stepper", stepperMessages, ownMessages)

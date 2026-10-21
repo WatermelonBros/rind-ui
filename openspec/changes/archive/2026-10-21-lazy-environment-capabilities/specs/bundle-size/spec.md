@@ -5,11 +5,16 @@
 A component bundle SHALL NOT contain the implementation of an on-demand capability that
 none of its parts requests.
 
-#### Scenario: Button
+#### Scenario: Switch
+
+- **WHEN** `Switch` is bundled from `@rind-ui/react/switch` (its machine announces nothing)
+- **THEN** the output contains no live-announcer, clipboard or collection-layout implementation
+
+#### Scenario: Button announces
 
 - **WHEN** `Button` is bundled from `@rind-ui/react/button`
-- **THEN** the output contains no live-announcer, clipboard, collection-layout,
-  constraint-validity, page-visibility or date-clock implementation
+- **THEN** the output contains the live announcer (for its pending announcement) and no
+  clipboard or collection-layout implementation
 
 #### Scenario: Clipboard
 

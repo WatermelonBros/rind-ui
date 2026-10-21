@@ -11,7 +11,7 @@ import { trackNonModalTabOrder } from "../../dom/non-modal-tab-order"
 import { overlayEffect } from "../../dom/overlay"
 import { type PlacementState, placementFrom, unplaced } from "../../dom/position/connect"
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type { HoverIntentEnv } from "../../env/hover-intent"
 import type {
   Align,
@@ -126,7 +126,7 @@ const initialPlacement = (props: HoverCardProps) => {
   return unplaced(side, o.align)
 }
 
-type Env = DomEnvironment & PositionEnv & HoverIntentEnv
+type Env = BaseDomEnvironment & PositionEnv & HoverIntentEnv
 
 const CLOSE_REASON = {
   ESCAPE_KEY: "escape-key",

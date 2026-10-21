@@ -5,6 +5,7 @@
 // the key-ownership rule. Rows come from `items` data or from static Item parts.
 
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   createListCollection,
@@ -18,6 +19,7 @@ import {
   gridListIds,
   gridListMachine,
   gridSelectionOf,
+  layoutCapability,
   toKey,
   warnForeignFocusables,
 } from "@rind-ui/core"
@@ -176,7 +178,7 @@ function Root(all: GridListRootProps) {
     disallowTypeAhead = false,
   } = all
   const p = all as Record<string, unknown>
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const { collection: registered, registry } = useCollectionItems()
   const data = useMemo(() => (items ? fromData(items) : null), [items])
@@ -219,36 +221,40 @@ function Root(all: GridListRootProps) {
     onValueChange: p["onValueChange"] as ((v: unknown, d: unknown) => void) | undefined,
     onAction: all.onAction,
   }
-  const { service } = useMachine(gridListMachine, {
-    collection,
-    ids,
-    strategy: "roving",
-    selectionMode,
-    selectionBehavior,
-    disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
-    disabledBehavior: all.disabledBehavior,
-    focusableWhenDisabled: all.focusableWhenDisabled,
-    disabled,
-    loop,
-    typeaheadTimeout: all.typeaheadTimeout,
-    checkboxes,
-    messages: all.messages,
-    ...("value" in all ? { value: p["value"] as GridListValue } : {}),
-    defaultValue:
-      (p["defaultValue"] as GridListValue | undefined) ??
-      (selectionMode === "multiple" ? [] : null),
-    onValueChange: (v, details) => {
-      const e = details.event as { type: string; key?: string }
-      latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+  const { service } = useMachine(
+    gridListMachine,
+    {
+      collection,
+      ids,
+      strategy: "roving",
+      selectionMode,
+      selectionBehavior,
+      disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
+      disabledBehavior: all.disabledBehavior,
+      focusableWhenDisabled: all.focusableWhenDisabled,
+      disabled,
+      loop,
+      typeaheadTimeout: all.typeaheadTimeout,
+      checkboxes,
+      messages: all.messages,
+      ...("value" in all ? { value: p["value"] as GridListValue } : {}),
+      defaultValue:
+        (p["defaultValue"] as GridListValue | undefined) ??
+        (selectionMode === "multiple" ? [] : null),
+      onValueChange: (v, details) => {
+        const e = details.event as { type: string; key?: string }
+        latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+      },
+      actionRows,
+      onAction: actionable
+        ? (key, d) => {
+            rowActions.current.get(toKey(key))?.(d)
+            latest.current.onAction?.(key, d)
+          }
+        : undefined,
     },
-    actionRows,
-    onAction: actionable
-      ? (key, d) => {
-          rowActions.current.get(toKey(key))?.(d)
-          latest.current.onAction?.(key, d)
-        }
-      : undefined,
-  })
+    env,
+  )
   // autoFocus: the selected row, else the first (the machine's tab stop), once rows exist.
   const autoFocused = useRef(false)
   useEffect(() => {

@@ -5,10 +5,12 @@
 // data or from static Tag parts (collections registration); both render the same DOM.
 
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   checkTagGroupList,
   createListCollection,
+  layoutCapability,
   type TagGroupActionDetails,
   type TagGroupMessages,
   type TagGroupParts,
@@ -169,7 +171,7 @@ function Root(all: TagGroupRootProps) {
     disallowEmptySelection: _empty,
     ...rest
   } = own as Record<string, unknown>
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const { collection: registered, registry } = useCollectionItems()
   const data = useMemo(() => (items ? fromData(items) : null), [items])
@@ -193,31 +195,35 @@ function Root(all: TagGroupRootProps) {
     onRemove,
     onAction,
   }
-  const { service } = useMachine(tagGroupMachine, {
-    collection,
-    ids,
-    instance,
-    strategy: "roving",
-    selectionMode,
-    selectionBehavior: "toggle",
-    disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
-    disabled,
-    focusableWhenDisabled,
-    loop,
-    typeaheadTimeout,
-    links,
-    messages,
-    ...("value" in all ? { value: p["value"] as TagGroupValue } : {}),
-    defaultValue:
-      (p["defaultValue"] as TagGroupValue | undefined) ??
-      (selectionMode === "multiple" ? [] : null),
-    onValueChange: (v, details) => {
-      const e = details.event as { type: string; key?: string }
-      latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+  const { service } = useMachine(
+    tagGroupMachine,
+    {
+      collection,
+      ids,
+      instance,
+      strategy: "roving",
+      selectionMode,
+      selectionBehavior: "toggle",
+      disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
+      disabled,
+      focusableWhenDisabled,
+      loop,
+      typeaheadTimeout,
+      links,
+      messages,
+      ...("value" in all ? { value: p["value"] as TagGroupValue } : {}),
+      defaultValue:
+        (p["defaultValue"] as TagGroupValue | undefined) ??
+        (selectionMode === "multiple" ? [] : null),
+      onValueChange: (v, details) => {
+        const e = details.event as { type: string; key?: string }
+        latest.current.onValueChange?.(v, { reason: e.type, key: e.key })
+      },
+      onRemove: onRemove ? (keys, d) => latest.current.onRemove?.(keys, d) : undefined,
+      onAction: onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
     },
-    onRemove: onRemove ? (keys, d) => latest.current.onRemove?.(keys, d) : undefined,
-    onAction: onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
-  })
+    env,
+  )
   const view = service.view()
   const [mounted, setMounted] = useState({ label: false, description: false })
   const [mount] = useState(

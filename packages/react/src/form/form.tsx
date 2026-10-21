@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type FormErrors,
   type FormField,
   type FormMessages,
@@ -100,23 +101,27 @@ function Root({
   children,
   ...rest
 }: FormRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const messages = useMessages("form", formMessages, ownMessages)
   const fields = useRef(new Set<FormField>())
   const el = useRef<HTMLFormElement | null>(null)
-  const { view, send } = useMachine(formMachine, {
-    validationMode,
-    validationBehavior,
-    errors,
-    onFormSubmit,
-    messages,
-    fields: () => [...fields.current],
-    // After the current machine step: the new submit is then handled (and cancelled or
-    // replaced by onFormSubmit) while it is being dispatched.
-    requestSubmit: (submitter) =>
-      queueMicrotask(() => el.current?.requestSubmit(submitter ?? undefined)),
-  })
+  const { view, send } = useMachine(
+    formMachine,
+    {
+      validationMode,
+      validationBehavior,
+      errors,
+      onFormSubmit,
+      messages,
+      fields: () => [...fields.current],
+      // After the current machine step: the new submit is then handled (and cancelled or
+      // replaced by onFormSubmit) while it is being dispatched.
+      requestSubmit: (submitter) =>
+        queueMicrotask(() => el.current?.requestSubmit(submitter ?? undefined)),
+    },
+    env,
+  )
   // Normalised once per `errors` object, so a re-render never re-applies cleared errors.
   const byName = useMemo(() => {
     const out = new Map<string, readonly string[]>()

@@ -1,9 +1,11 @@
 "use client"
 
 import {
+  announcerCapability,
   type CompositeHost,
   type PartProps as CorePartProps,
   createListCollection,
+  layoutCapability,
   type SeparatorOrientation,
   toolbarConnect,
   toolbarIds,
@@ -87,21 +89,25 @@ function Root({
   children,
   ...rest
 }: ToolbarRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const ids = useMemo(() => toolbarIds(instance), [instance])
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
-  const { view, send } = useMachine(toolbarMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop,
-    // Each control registers as skipped when it is not focusable while disabled.
-    focusableWhenDisabled: false,
-    orientation,
-    disabled,
-  })
+  const { view, send } = useMachine(
+    toolbarMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop,
+      // Each control registers as skipped when it is not focusable while disabled.
+      focusableWhenDisabled: false,
+      orientation,
+      disabled,
+    },
+    env,
+  )
   const api = toolbarConnect(
     {
       instance,

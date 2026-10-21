@@ -5,7 +5,7 @@
 
 import { layerId } from "../../dom/layer-stack"
 import { overlayEffect } from "../../dom/overlay"
-import type { DomEnvironment } from "../../env/dom-environment"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import { setup, type } from "../../machine/setup"
 import type { ChangeDetails } from "../../machine/types"
 
@@ -34,7 +34,7 @@ export const tableFrameMachine = /* @__PURE__ */ setup({
   types: type<{
     props: TableFrameProps
     events: TableFrameEvent
-    env: DomEnvironment
+    env: BaseDomEnvironment
     values: "expanded"
   }>(),
   effects: {

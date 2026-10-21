@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   autosize as attachAutosize,
   defaultCount,
   type FieldMessages,
@@ -239,7 +240,7 @@ function HostRoot({
     // Sound: the own props (`config.ownProps`) were split off into `own` above.
   } = passed as Omit<TextFieldRootProps, TextFieldOwnRootProp>
   const scope = config.scope
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const generated = useId()
   const instance = id ?? generated
   // A preset's scope reuses the provider's overrides of its own scope (typed per preset).
@@ -264,44 +265,49 @@ function HostRoot({
     () => (part: "clearTriggers" | "triggers", delta: 1 | -1) =>
       setMountedState((m) => ({ ...m, [part]: m[part] + delta })),
   )
-  const { view, send } = useMachine(config.machine, {
-    ...config.machineProps?.(own, { controlEl, env, pendingSelection }),
-    value: value === undefined ? undefined : (value ?? ""),
-    defaultValue: defaultValue ?? "",
-    onValueChange: (v, details) => {
-      // Machine details → the public ones (reason, native event, isComposing).
-      const e = (
-        details as {
-          event: { type: string; reason?: string; event?: Event | null; composing?: boolean }
-        }
-      ).event
-      latestOnChange.current?.(v, {
-        reason: e.type === "RESET" ? "RESET" : (e.reason ?? "INPUT"),
-        event: e.event ?? null,
-        isComposing: e.composing === true,
-      })
+  const { view, send } = useMachine(
+    config.machine,
+    {
+      ...config.machineProps?.(own, { controlEl, env, pendingSelection }),
+      value: value === undefined ? undefined : (value ?? ""),
+      defaultValue: defaultValue ?? "",
+      onValueChange: (v, details) => {
+        // Machine details → the public ones (reason, native event, isComposing).
+        const e = (
+          details as {
+            event: { type: string; reason?: string; event?: Event | null; composing?: boolean }
+          }
+        ).event
+        latestOnChange.current?.(v, {
+          reason: e.type === "RESET" ? "RESET" : (e.reason ?? "INPUT"),
+          event: e.event ?? null,
+          isComposing: e.composing === true,
+        })
+      },
+      disabled,
+      readOnly,
+      focusableWhenDisabled,
+      limit,
+      threshold: countThreshold,
+      count: countState?.count,
+      messages,
+      id: instance,
+      // The only DOM write: the native setter, then one bubbling `input` event, which comes
+      // back as an ordinary INPUT carrying this reason (base-ui#4643).
+      clearInput: (why, focus) => {
+        const el = controlEl.current
+        if (!el) return
+        const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), "value")?.set
+        reason.current = why
+        setter?.call(el, "")
+        el.dispatchEvent(new Event("input", { bubbles: true }))
+        reason.current = undefined
+        if (focus && el.ownerDocument.activeElement !== el)
+          void focusSafely(el, env, "programmatic")
+      },
     },
-    disabled,
-    readOnly,
-    focusableWhenDisabled,
-    limit,
-    threshold: countThreshold,
-    count: countState?.count,
-    messages,
-    id: instance,
-    // The only DOM write: the native setter, then one bubbling `input` event, which comes
-    // back as an ordinary INPUT carrying this reason (base-ui#4643).
-    clearInput: (why, focus) => {
-      const el = controlEl.current
-      if (!el) return
-      const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), "value")?.set
-      reason.current = why
-      setter?.call(el, "")
-      el.dispatchEvent(new Event("input", { bubbles: true }))
-      reason.current = undefined
-      if (focus && el.ownerDocument.activeElement !== el) void focusSafely(el, env, "programmatic")
-    },
-  })
+    env,
+  )
   const modality = useModality(env.modality, view.context.focused)
   // Exactly one Input or Textarea (development error otherwise).
   useEffect(() => {

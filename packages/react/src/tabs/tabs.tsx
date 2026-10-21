@@ -1,10 +1,12 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type CollectionKey,
   createListCollection,
   type InactivePanels,
+  layoutCapability,
   observeTabbable,
   type TabsEvent,
   tabsConnect,
@@ -109,7 +111,7 @@ function Root({
   children,
   ...rest
 }: TabsRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const ids = useMemo(() => {
     const t = tabsIds(instance)
@@ -117,18 +119,22 @@ function Root({
   }, [instance])
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
-  const { view, send } = useMachine(tabsMachine, {
-    collection,
-    strategy: "roving",
-    ids,
-    loop,
-    focusableWhenDisabled,
-    value,
-    defaultValue,
-    onValueChange,
-    activationMode,
-    disabled,
-  })
+  const { view, send } = useMachine(
+    tabsMachine,
+    {
+      collection,
+      strategy: "roving",
+      ids,
+      loop,
+      focusableWhenDisabled,
+      value,
+      defaultValue,
+      onValueChange,
+      activationMode,
+      disabled,
+    },
+    env,
+  )
   const current = view.values.value ?? null
   const [panels, setPanels] = useState<ReadonlySet<string>>(() => new Set())
   const registerPanel = useCallback((key: string) => {

@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   checkRangeName,
   type MessageOverrides,
   type ProgressMessages,
@@ -95,7 +96,7 @@ function Root({
   ...rest
 }: ProgressRootProps) {
   const instance = useRootId(id)
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const messages = useMessages("progress", progressMessages, ownMessages)
   const { locale } = useLocale(ownLocale)
   const own = rest as Readonly<Record<string, unknown>> // the element's own props, read by name
@@ -106,15 +107,19 @@ function Root({
       ? { scope: "progress", root: instance }
       : { scope: "progress", root: instance, expected: ["label"] },
   )
-  useMachine(progressMachine, {
-    value,
-    min,
-    max,
-    announceCompletion,
-    messages,
-    id: instance,
-    lang: locale,
-  })
+  useMachine(
+    progressMachine,
+    {
+      value,
+      min,
+      max,
+      announceCompletion,
+      messages,
+      id: instance,
+      lang: locale,
+    },
+    env,
+  )
   const range = resolveRangeValue({ value, min, max }, "progress")
   const text = rangeValueText(range, { locale, formatOptions }, messages.valueText)
   const labelledBy = useRenderedId(registry, "label")

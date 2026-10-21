@@ -30,6 +30,7 @@ async function measure(contents) {
     external: ["react", "react/*", "react-dom", "react-dom/*"],
     define: { "process.env.NODE_ENV": '"production"' },
     write: false,
+    metafile: true,
     logLevel: "silent",
   })
   const file = result.outputFiles[0]
@@ -38,6 +39,12 @@ async function measure(contents) {
     min: code.length,
     gz: gzipSync(code, { level: 9 }).length,
     quirkMeta: carriesQuirkMeta(file?.text ?? ""),
+    // Modules with code in the output (the metafile's inputs also list tree-shaken ones).
+    modules: Object.values(result.metafile.outputs).flatMap((out) =>
+      Object.entries(out.inputs)
+        .filter(([, input]) => input.bytesInOutput > 0)
+        .map(([path]) => path),
+    ),
   }
 }
 
@@ -72,6 +79,19 @@ for (const slug of components) {
   )
   if (over) failures.push(`${name}: ${kb(worst)} gzip, budget ${kb(budget)}`)
 }
+
+// On-demand capabilities ship only with the components that request them (openspec
+// bundle-size): Switch requests none, Clipboard requests the clipboard and the announcer.
+// Constraint validity is not listed: its helpers also serve every hidden form input.
+const ON_DEMAND = ["live-announcer", "clipboard", "collection-layout"]
+const carries = (m, name) => m.modules.some((path) => path.endsWith(`/dom/${name}.mjs`))
+const plain = await measure(`import { Switch } from "@rind-ui/react/switch"; console.log(Switch)`)
+const leaked = ON_DEMAND.filter((name) => carries(plain, name))
+if (leaked.length > 0) failures.push(`Switch carries on-demand capabilities: ${leaked.join(", ")}`)
+const copy = await measure(
+  `import { Clipboard } from "@rind-ui/react/clipboard"; console.log(Clipboard)`,
+)
+if (!carries(copy, "clipboard")) failures.push("Clipboard does not carry the clipboard capability")
 
 const button = await measure(`import { Button } from "@rind-ui/react"; console.log(Button)`)
 const ratio = button.gz / all.gz

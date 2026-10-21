@@ -1,4 +1,9 @@
-import { type MessageOverrides, scopeAttrs, streamAnnouncement } from "@rind-ui/core"
+import {
+  announcerCapability,
+  type MessageOverrides,
+  scopeAttrs,
+  streamAnnouncement,
+} from "@rind-ui/core"
 import { useEnvironment, useMessages } from "@rind-ui/react"
 import { useEffect, useId, useState } from "react"
 
@@ -17,7 +22,7 @@ export function StreamFixture({
 }: {
   readonly messages?: MessageOverrides<typeof streamMessages>
 }) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const m = useMessages("stream", streamMessages, messages)
   const id = useId()
   const [done, setDone] = useState(false)

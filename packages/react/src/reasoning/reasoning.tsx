@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type MessageOverrides,
   partId,
@@ -92,7 +93,7 @@ function Root({
   children,
   ...rest
 }: ReasoningRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("reasoning", reasoningMessages, ownMessages)

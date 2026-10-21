@@ -1,10 +1,12 @@
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   createListCollection,
   type FocusStrategy,
   focusAttrs,
   type ItemRegistry,
+  layoutCapability,
   type SectionNode,
   type Service,
   toKey,
@@ -101,7 +103,8 @@ function Root({
     strategy: strategy ?? "roving",
     orientation: orientation ?? "vertical",
   }
-  const { service } = useMachine(listboxMachine, props)
+  const env = useEnvironment(announcerCapability, layoutCapability)
+  const { service } = useMachine(listboxMachine, props, env)
   const pending = !given && !data && registered === null
   // Rebuilt with the props on every Root render (the parts read the props from it).
   const ctx: Ctx = { service, root, registry: given || data ? null : registry, pending, props }

@@ -5,6 +5,7 @@
 // the listbox parts under scope "combobox". Wiring only.
 
 import {
+  announcerCapability,
   type Chip as ChipData,
   type Collection,
   type CollectionKey,
@@ -29,6 +30,7 @@ import {
   isExposed,
   isStale,
   type LoadingStatus,
+  layoutCapability,
   type Modality,
   mergeFieldProps,
   type PositioningProps,
@@ -254,7 +256,7 @@ const reasonOf = (type: string) =>
 function Root(all: ComboboxRootProps) {
   const { id, items, collection: given, children } = all
   const p = all as Record<string, unknown>
-  const base = useEnvironment()
+  const base = useEnvironment(announcerCapability, layoutCapability)
   const env = useMemo(() => ({ ...base, position: domPositioning(base) }), [base])
   // field-control: the Field's and an enclosing Fieldset's flags, OR-merged with our own.
   const binding = useFieldControl()

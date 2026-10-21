@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type FieldControlBinding,
   type FieldControlReport,
   type FieldMessages,
@@ -19,6 +20,7 @@ import {
   type Validate,
   type ValidationBehavior,
   type ValidationMode,
+  validityCapability,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -188,7 +190,7 @@ function Root({
   children,
   ...rest
 }: FieldRootProps) {
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, validityCapability)
   const instance = useRootId(id)
   const messages = useMessages("field", fieldMessages, ownMessages)
   const fieldsetDisabled = useFieldsetDisabled()
@@ -207,23 +209,27 @@ function Root({
   const validationBehavior = ownBehavior ?? form?.validationBehavior ?? "native"
   const latest = useRef({ disabled, invalid })
   latest.current = { disabled, invalid }
-  const { view, send, service } = useMachine(fieldMachine, {
-    name,
-    disabled,
-    readOnly,
-    required,
-    invalid,
-    errors: errors ?? form?.errorsFor(name),
-    managed: form !== null,
-    validate,
-    validationMode,
-    validationBehavior,
-    validationDebounce,
-    messages,
-    label: () => (labelEl.current?.textContent ?? "").trim(),
-    formValues: () => formValues(registered.current?.control.validityElement()?.form),
-    control: () => registered.current?.control ?? null,
-  })
+  const { view, send, service } = useMachine(
+    fieldMachine,
+    {
+      name,
+      disabled,
+      readOnly,
+      required,
+      invalid,
+      errors: errors ?? form?.errorsFor(name),
+      managed: form !== null,
+      validate,
+      validationMode,
+      validationBehavior,
+      validationDebounce,
+      messages,
+      label: () => (labelEl.current?.textContent ?? "").trim(),
+      formValues: () => formValues(registered.current?.control.validityElement()?.form),
+      control: () => registered.current?.control ?? null,
+    },
+    env,
+  )
   const registry = usePartRegistry<FieldPart>({ scope: "field", root: instance })
   const labelId = useRenderedId(registry, "label")
   const descriptionId = useRenderedId(registry, "description")

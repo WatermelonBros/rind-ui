@@ -4,6 +4,7 @@
 // checking and lazy loads; the core connect owns every attribute and key.
 
 import {
+  announcerCapability,
   type Collection,
   type CollectionKey,
   checkTreeView,
@@ -14,6 +15,7 @@ import {
   keySetOf,
   type LinkCurrent,
   type LinkEnv,
+  layoutCapability,
   linkProps,
   type PartProps,
   pointerTarget,
@@ -276,7 +278,7 @@ const EMPTY_TREE = fromData([])
 function Root(all: TreeViewRootProps) {
   const { id, items, collection, children } = all
   const p = all as Record<string, unknown>
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability, layoutCapability)
   const instance = useRootId(id)
   const data = useMemo(() => (items ? fromData(items) : null), [items])
   const tree = collection ?? data ?? EMPTY_TREE
@@ -290,49 +292,53 @@ function Root(all: TreeViewRootProps) {
   )
   const latest = useRef(all)
   latest.current = all
-  const { service } = useMachine(treeViewMachine, {
-    tree,
-    ids: { list: ids.tree, item: ids.item },
-    selectionMode,
-    selectionBehavior: all.selectionBehavior,
-    disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
-    focusableWhenDisabled: all.focusableWhenDisabled,
-    loop: all.loop,
-    typeaheadTimeout: all.typeaheadTimeout,
-    checkable: all.checkable,
-    checkPropagation: all.checkPropagation,
-    expandOnClick: all.expandOnClick,
-    disabled: all.disabled,
-    messages,
-    ...("value" in all ? { value: p["value"] as TreeViewValue } : {}),
-    defaultValue:
-      (p["defaultValue"] as TreeViewValue | undefined) ??
-      (selectionMode === "multiple" ? [] : null),
-    onValueChange: (v, details) => {
-      const e = details.event as { type: string; key?: string }
-      const cb = (latest.current as { onValueChange?: (v: unknown, d: unknown) => void })
-        .onValueChange
-      cb?.(v, { reason: e.type, key: e.key })
+  const { service } = useMachine(
+    treeViewMachine,
+    {
+      tree,
+      ids: { list: ids.tree, item: ids.item },
+      selectionMode,
+      selectionBehavior: all.selectionBehavior,
+      disallowEmptySelection: p["disallowEmptySelection"] as boolean | undefined,
+      focusableWhenDisabled: all.focusableWhenDisabled,
+      loop: all.loop,
+      typeaheadTimeout: all.typeaheadTimeout,
+      checkable: all.checkable,
+      checkPropagation: all.checkPropagation,
+      expandOnClick: all.expandOnClick,
+      disabled: all.disabled,
+      messages,
+      ...("value" in all ? { value: p["value"] as TreeViewValue } : {}),
+      defaultValue:
+        (p["defaultValue"] as TreeViewValue | undefined) ??
+        (selectionMode === "multiple" ? [] : null),
+      onValueChange: (v, details) => {
+        const e = details.event as { type: string; key?: string }
+        const cb = (latest.current as { onValueChange?: (v: unknown, d: unknown) => void })
+          .onValueChange
+        cb?.(v, { reason: e.type, key: e.key })
+      },
+      ...(all.expandedValue !== undefined ? { expandedValue: all.expandedValue } : {}),
+      defaultExpandedValue: all.defaultExpandedValue ?? [],
+      onExpandedValueChange: (keys, details) =>
+        latest.current.onExpandedChange?.(keys, { reason: expansionReason(details.event.type) }),
+      ...(all.checkedValue !== undefined ? { checkedValue: all.checkedValue } : {}),
+      defaultCheckedValue: all.defaultCheckedValue ?? [],
+      onCheckedValueChange: (keys, details) => {
+        const e = details.event as { type: string; key?: string }
+        latest.current.onCheckedChange?.(keys, { reason: e.type, key: e.key })
+      },
+      onAction: all.onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
+      onLoadChildren: all.onLoadChildren
+        ? (key, o) => latest.current.onLoadChildren?.(key, o)
+        : undefined,
+      virtualized: all.virtualized,
+      scrollToIndex: all.scrollToIndex ? (d) => latest.current.scrollToIndex?.(d) : undefined,
+      movable: all.movable,
+      onMove: all.onMove ? (key, d) => latest.current.onMove?.(key, d) : undefined,
     },
-    ...(all.expandedValue !== undefined ? { expandedValue: all.expandedValue } : {}),
-    defaultExpandedValue: all.defaultExpandedValue ?? [],
-    onExpandedValueChange: (keys, details) =>
-      latest.current.onExpandedChange?.(keys, { reason: expansionReason(details.event.type) }),
-    ...(all.checkedValue !== undefined ? { checkedValue: all.checkedValue } : {}),
-    defaultCheckedValue: all.defaultCheckedValue ?? [],
-    onCheckedValueChange: (keys, details) => {
-      const e = details.event as { type: string; key?: string }
-      latest.current.onCheckedChange?.(keys, { reason: e.type, key: e.key })
-    },
-    onAction: all.onAction ? (key, d) => latest.current.onAction?.(key, d) : undefined,
-    onLoadChildren: all.onLoadChildren
-      ? (key, o) => latest.current.onLoadChildren?.(key, o)
-      : undefined,
-    virtualized: all.virtualized,
-    scrollToIndex: all.scrollToIndex ? (d) => latest.current.scrollToIndex?.(d) : undefined,
-    movable: all.movable,
-    onMove: all.onMove ? (key, d) => latest.current.onMove?.(key, d) : undefined,
-  })
+    env,
+  )
   const view = service.view()
   const [mounted, setMounted] = useState<{
     label: boolean

@@ -15,8 +15,8 @@ import { type PlacementState, placementFrom, unplaced } from "../../dom/position
 import { positioningPresets, resolvePositioning } from "../../dom/position/options"
 import type { IndicatorBox, IndicatorCause, MeasuredIndicator } from "../../dom/selection-indicator"
 import { nextIndicator } from "../../dom/selection-indicator"
+import type { BaseDomEnvironment } from "../../env/base-environment"
 import type { ClockEnv } from "../../env/capabilities"
-import type { DomEnvironment } from "../../env/dom-environment"
 import type { HoverIntentEnv } from "../../env/hover-intent"
 import type {
   Align,
@@ -177,7 +177,7 @@ const initialPlacement = (props: NavigationMenuProps) => {
   return unplaced(side, o.align)
 }
 
-type Env = DomEnvironment & PositionEnv & HoverIntentEnv & ClockEnv
+type Env = BaseDomEnvironment & PositionEnv & HoverIntentEnv & ClockEnv
 
 /** The value the runtime falls back to: nothing open. */
 const NONE = null as unknown as string

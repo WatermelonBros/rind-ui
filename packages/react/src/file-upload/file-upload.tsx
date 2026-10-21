@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  announcerCapability,
   type ChangeDetails,
   type DropSource,
   domDropSource,
@@ -182,7 +183,7 @@ function Root<F extends FileLike = File>(props: FileUploadRootProps<F>) {
     children,
     ...rest
   } = props
-  const env = useEnvironment()
+  const env = useEnvironment(announcerCapability)
   const instance = useRootId(id)
   const { locale } = useLocale(ownLocale)
   const messages = useMessages("file-upload", fileUploadMessages, ownMessages)
