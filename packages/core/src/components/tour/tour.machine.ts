@@ -53,6 +53,8 @@ import {
   validateSteps,
 } from "./tour.steps"
 
+declare const process: { env: { NODE_ENV?: string } }
+
 type Dismissal<K extends string> = { readonly type: K; readonly request?: DismissRequest }
 
 export type TourEvent =
@@ -322,7 +324,9 @@ export const tourMachine = /* @__PURE__ */ setup({
     knownStep: ({ props, event }) => {
       if (event.type !== "STEP.GOTO") return false
       if (indexOf(props.steps, event.id) >= 0) return true
-      console.error(`[rind-ui] tour: goto("${event.id}"): no step has this id`)
+      if (process.env.NODE_ENV !== "production") {
+        console.error(`[rind-ui] tour: goto("${event.id}"): no step has this id`)
+      }
       return false
     },
     /** A dismiss action (not the close trigger) on the last step completes the tour. */
