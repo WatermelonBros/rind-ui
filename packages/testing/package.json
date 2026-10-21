@@ -9,16 +9,20 @@
     "url": "git+https://github.com/WatermelonBros/rind-ui.git",
     "directory": "packages/testing"
   },
-  "homepage": "https://github.com/WatermelonBros/rind-ui#readme",
+  "homepage": "https://rind.watermelon-studio.it",
   "bugs": {
     "url": "https://github.com/WatermelonBros/rind-ui/issues"
   },
   "keywords": [
     "testing",
+    "test-driver",
     "testing-library",
     "playwright",
-    "test-driver",
-    "accessibility"
+    "accessibility",
+    "a11y",
+    "model-based-testing",
+    "headless",
+    "react"
   ],
   "type": "module",
   "sideEffects": [
