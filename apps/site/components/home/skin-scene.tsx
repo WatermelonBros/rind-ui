@@ -179,14 +179,18 @@ export function SkinScene() {
     const alpha = () => {
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // fades while the builder's heading passes under it, and into the real component on arrival
-        const heading = last.look.closest("section")?.querySelector("h2")?.getBoundingClientRect()
+        // fades while the builder's heading or lede passes under it, and into the real
+        // component on arrival
         const me = target()
-        const overlap =
-          heading && me
-            ? Math.max(0, Math.min(heading.bottom, me.bottom) - Math.max(heading.top, me.top)) /
-              Math.max(1, me.height)
-            : 0
+        const section = last.look.closest("section")
+        const texts = section ? [...section.querySelectorAll(":scope > * h2, :scope > * > p")] : []
+        let overlap = 0
+        for (const text of texts) {
+          const r = text.getBoundingClientRect()
+          const x = Math.max(0, Math.min(r.right, me.right) - Math.max(r.left, me.left))
+          const y = Math.max(0, Math.min(r.bottom, me.bottom) - Math.max(r.top, me.top))
+          if (x > 0) overlap = Math.max(overlap, y / Math.max(1, me.height))
+        }
         return (1 - Math.min(1, overlap * 1.5)) * (1 - last.fade)
       }
       if (window.innerWidth > 900) return 1
