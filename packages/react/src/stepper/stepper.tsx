@@ -451,17 +451,18 @@ function Progress({ render, children, ...rest }: PartProps<"span">) {
   )
 }
 
-export const Stepper = {
-  Root,
-  List,
-  Item,
-  Trigger,
-  Indicator,
-  Title,
-  Description,
-  Separator,
+/** The parts, by name: `stepper.parts.ts` re-exports them as the `Stepper` namespace. */
+export {
   Content,
-  PrevTrigger,
+  Description,
+  Indicator,
+  Item,
+  List,
   NextTrigger,
+  PrevTrigger,
   Progress,
+  Root,
+  Separator,
+  Title,
+  Trigger,
 }

@@ -41,7 +41,8 @@ import { useSwatchProps } from "../color-swatch/color-swatch"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
-import { RadioGroup, RadioGroupNaming, type RadioGroupRootProps } from "../radio-group/radio-group"
+import { RadioGroupNaming, type RadioGroupRootProps } from "../radio-group/radio-group"
+import * as RadioGroup from "../radio-group/radio-group.parts"
 import { renderPart } from "../render"
 
 declare module "../provider" {

@@ -12,13 +12,13 @@ import {
   useEffect,
 } from "react"
 import {
-  Field,
   type FieldErrorMessageProps,
   type FieldRootProps,
   useFieldBindingPeek,
   useFieldControl,
   useIsInsideField,
 } from "./field"
+import * as Field from "./field.parts"
 
 declare const process: { env: { NODE_ENV?: string } }
 

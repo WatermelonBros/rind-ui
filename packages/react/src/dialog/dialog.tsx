@@ -577,16 +577,17 @@ function Portal(props: PortalProps) {
   return <PortalPart logicalParent={logicalParent} {...props} />
 }
 
-export const Dialog = {
-  Root,
-  Trigger,
-  Portal,
-  Backdrop,
-  Positioner,
-  Content,
-  Title,
-  Description,
-  CloseTrigger,
-  Cancel,
+/** The parts, by name: `dialog.parts.ts` re-exports them as the `Dialog` namespace. */
+export {
   Action,
+  Backdrop,
+  Cancel,
+  CloseTrigger,
+  Content,
+  Description,
+  Portal,
+  Positioner,
+  Root,
+  Title,
+  Trigger,
 }

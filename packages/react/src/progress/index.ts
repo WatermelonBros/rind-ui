@@ -1,1 +1,2 @@
-export { Progress, type ProgressRenderState, type ProgressRootProps } from "./progress"
+export type { ProgressRenderState, ProgressRootProps } from "./progress"
+export * as Progress from "./progress.parts"

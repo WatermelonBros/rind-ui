@@ -255,4 +255,5 @@ function CloseTrigger({ render, children, ...rest }: AlertCloseTriggerProps) {
  * An inline message in the page: never a live region of its own and never takes focus; it
  * announces through the Announcer when it appears after load or its text changes.
  */
-export const Alert = { Root, Icon, Title, Description, CloseTrigger }
+/** The parts, by name: `alert.parts.ts` re-exports them as the `Alert` namespace. */
+export { CloseTrigger, Description, Icon, Root, Title }

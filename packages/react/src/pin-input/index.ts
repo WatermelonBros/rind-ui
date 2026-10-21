@@ -1,6 +1,2 @@
-export {
-  PinInput,
-  type PinInputChangeDetails,
-  type PinInputRootProps,
-  type PinInputState,
-} from "./pin-input"
+export type { PinInputChangeDetails, PinInputRootProps, PinInputState } from "./pin-input"
+export * as PinInput from "./pin-input.parts"

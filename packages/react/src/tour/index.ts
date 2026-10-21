@@ -1,5 +1,4 @@
 export {
-  Tour,
   type TourActionTriggerProps,
   type TourContentState,
   type TourHandle,
@@ -12,3 +11,4 @@ export {
   type UseTourProps,
   useTour,
 } from "./tour"
+export * as Tour from "./tour.parts"

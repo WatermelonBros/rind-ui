@@ -1,8 +1,8 @@
-export {
-  Menubar,
-  type MenubarActions,
-  type MenubarMenuProps,
-  type MenubarRootProps,
-  type MenubarState,
-  type MenubarTriggerProps,
+export type {
+  MenubarActions,
+  MenubarMenuProps,
+  MenubarRootProps,
+  MenubarState,
+  MenubarTriggerProps,
 } from "./menubar"
+export * as Menubar from "./menubar.parts"

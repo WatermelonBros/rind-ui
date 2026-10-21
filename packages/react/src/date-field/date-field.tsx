@@ -1062,22 +1062,23 @@ function ErrorMessage(props: ComponentPropsWithRef<typeof HostErrorMessage>) {
   return embedded ? null : <HostErrorMessage {...props} />
 }
 
-export const DateField = {
-  Root,
-  Label,
+/** The parts, by name: `date-field.parts.ts` re-exports them as the `DateField` namespace. */
+export {
   Description,
+  End,
   ErrorMessage,
   Input,
+  Label,
+  PickerCalendar as Calendar,
+  PickerClearTrigger as ClearTrigger,
+  PickerCloseTrigger as CloseTrigger,
+  PickerContent as Content,
+  PickerControl as Control,
+  PickerPortal as Portal,
+  PickerPositioner as Positioner,
+  PickerTrigger as Trigger,
+  Root,
   Segment,
-  Start,
-  End,
   Separator,
-  Control: PickerControl,
-  Trigger: PickerTrigger,
-  ClearTrigger: PickerClearTrigger,
-  Portal: PickerPortal,
-  Positioner: PickerPositioner,
-  Content: PickerContent,
-  CloseTrigger: PickerCloseTrigger,
-  Calendar: PickerCalendar,
+  Start,
 }

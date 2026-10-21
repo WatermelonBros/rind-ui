@@ -1,7 +1,7 @@
-export {
-  RadioGroup,
-  type RadioGroupItemProps,
-  type RadioGroupRootProps,
-  type RadioGroupState,
-  type RadioItemState,
+export type {
+  RadioGroupItemProps,
+  RadioGroupRootProps,
+  RadioGroupState,
+  RadioItemState,
 } from "./radio-group"
+export * as RadioGroup from "./radio-group.parts"

@@ -44,12 +44,12 @@ import { TransparencyGrid as Grid } from "../color-swatch/color-swatch"
 import { normalizeProps } from "../normalize-props"
 import { useLocale, useMessages } from "../provider"
 import {
-  Slider,
   SliderNaming,
   type SliderRootProps,
   SliderRootSurface,
   type SliderThumbProps,
 } from "../slider/slider"
+import * as Slider from "../slider/slider.parts"
 import { useMachine } from "../use-machine"
 
 declare module "../provider" {

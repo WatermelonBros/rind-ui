@@ -27,7 +27,8 @@ import {
   useState,
   useSyncExternalStore,
 } from "react"
-import { createDialogRoot, Dialog, type DialogRootProps, useDialog } from "../dialog/dialog"
+import { createDialogRoot, type DialogRootProps, useDialog } from "../dialog/dialog"
+import * as Dialog from "../dialog/dialog.parts"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -196,17 +197,24 @@ function IndentBackground({ render, ref, ...rest }: Own<"div">) {
   return renderPart("div", mergeProps(useIndent("indent-background", ref), rest), render, undefined)
 }
 
-export const Drawer = {
-  Root,
-  Trigger: Dialog.Trigger,
-  Portal: Dialog.Portal,
+const Trigger = Dialog.Trigger
+const Portal = Dialog.Portal
+const Title = Dialog.Title
+const Description = Dialog.Description
+const CloseTrigger = Dialog.CloseTrigger
+
+/** The parts, by name: `drawer.parts.ts` re-exports them as the `Drawer` namespace. */
+export {
   Backdrop,
-  Positioner,
+  CloseTrigger,
   Content,
-  Title: Dialog.Title,
-  Description: Dialog.Description,
-  CloseTrigger: Dialog.CloseTrigger,
+  Description,
   Handle,
   Indent,
   IndentBackground,
+  Portal,
+  Positioner,
+  Root,
+  Title,
+  Trigger,
 }

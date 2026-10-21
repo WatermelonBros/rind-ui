@@ -357,4 +357,5 @@ function Indicator({ render, ref, ...rest }: TabsIndicatorProps) {
   return renderPart("span", props, render, { visible: props["data-state"] === "visible" })
 }
 
-export const Tabs = { Root, List, Tab, Panel, Indicator }
+/** The parts, by name: `tabs.parts.ts` re-exports them as the `Tabs` namespace. */
+export { Indicator, List, Panel, Root, Tab }

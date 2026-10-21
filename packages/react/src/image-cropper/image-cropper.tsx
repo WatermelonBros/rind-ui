@@ -392,4 +392,5 @@ function Grid({ render, axis, ...rest }: ImageCropperGridProps) {
   return renderPart("div", mergeProps(normalizeProps(ctx.api.grid(axis)), rest), render, ctx.state)
 }
 
-export const ImageCropper = { Root, Viewport, Image, Selection, Handle, Grid }
+/** The parts, by name: `image-cropper.parts.ts` re-exports them as the `ImageCropper` namespace. */
+export { Grid, Handle, Image, Root, Selection, Viewport }

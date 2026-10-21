@@ -476,4 +476,5 @@ function Item({ index, render, ...rest }: RatingItemProps) {
   return renderPart("span", props, render, ctx.state)
 }
 
-export const Rating = { Root, Label, Control, Item }
+/** The parts, by name: `rating.parts.ts` re-exports them as the `Rating` namespace. */
+export { Control, Item, Label, Root }

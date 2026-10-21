@@ -92,4 +92,5 @@ function SeparatorRoot({
 }
 
 /** A static divider between groups of content or controls; never focusable. */
-export const Separator = { Root: SeparatorRoot }
+/** The parts, by name: `separator.parts.ts` re-exports them as the `Separator` namespace. */
+export { SeparatorRoot as Root }

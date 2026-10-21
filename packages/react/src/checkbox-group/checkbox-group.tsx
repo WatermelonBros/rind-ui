@@ -381,15 +381,16 @@ const ItemLabel = Checkbox.Label
 /** The item's description, wired into `aria-describedby`. */
 const ItemDescription = Checkbox.Description
 
-export const CheckboxGroup = {
-  Root,
-  Label,
+/** The parts, by name: `checkbox-group.parts.ts` re-exports them as the `CheckboxGroup` namespace. */
+export {
   Description,
   ErrorMessage,
-  Parent,
   Item,
   ItemControl,
+  ItemDescription,
   ItemIndicator,
   ItemLabel,
-  ItemDescription,
+  Label,
+  Parent,
+  Root,
 }

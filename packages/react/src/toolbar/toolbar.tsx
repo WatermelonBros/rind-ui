@@ -312,11 +312,12 @@ function ToolbarSeparator({ orientation, render, ref, ...rest }: ToolbarSeparato
   })
 }
 
-export const Toolbar = {
+/** The parts, by name: `toolbar.parts.ts` re-exports them as the `Toolbar` namespace. */
+export {
   Root,
-  Button: ToolbarButton,
-  Link: ToolbarLink,
-  Item: ToolbarItem,
-  Group: ToolbarGroup,
-  Separator: ToolbarSeparator,
+  ToolbarButton as Button,
+  ToolbarGroup as Group,
+  ToolbarItem as Item,
+  ToolbarLink as Link,
+  ToolbarSeparator as Separator,
 }

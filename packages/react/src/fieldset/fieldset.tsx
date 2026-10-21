@@ -214,4 +214,5 @@ function ErrorMessageShown({
   return renderPart("p", props, render, { disabled: ctx.disabled, invalid: ctx.invalid })
 }
 
-export const Fieldset = { Root, Legend, Description, ErrorMessage }
+/** The parts, by name: `fieldset.parts.ts` re-exports them as the `Fieldset` namespace. */
+export { Description, ErrorMessage, Legend, Root }

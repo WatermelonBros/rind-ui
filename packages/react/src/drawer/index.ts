@@ -1,1 +1,2 @@
-export { Drawer, type DrawerRootProps } from "./drawer"
+export type { DrawerRootProps } from "./drawer"
+export * as Drawer from "./drawer.parts"

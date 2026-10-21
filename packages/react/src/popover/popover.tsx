@@ -480,17 +480,20 @@ function Portal(props: PortalProps) {
 /** Popover.Root with its parts re-scoped (`data-scope`), for composites (Date Picker): internal. */
 export const ScopedPopoverRoot = Root
 
-export const Popover = {
-  // Public: no `scope` (a narrower parameter, so the same function is sound as this type).
-  Root: Root as (props: PopoverRootProps) => ReturnType<typeof Root>,
-  Trigger,
+// Public: no `scope` (a narrower parameter, so the same function is sound as this type).
+const PublicRoot = Root as (props: PopoverRootProps) => ReturnType<typeof Root>
+
+/** The parts, by name: `popover.parts.ts` re-exports them as the `Popover` namespace. */
+export {
   Anchor,
+  Arrow,
+  CloseTrigger,
+  Content,
+  Description,
   Indicator,
   Portal,
   Positioner,
-  Content,
-  Arrow,
+  PublicRoot as Root,
   Title,
-  Description,
-  CloseTrigger,
+  Trigger,
 }

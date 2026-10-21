@@ -10,9 +10,5 @@ export type {
   PromptSubmitKey,
   PromptValueReason,
 } from "@rind-ui/core"
-export {
-  PromptInput,
-  type PromptInputControl,
-  type PromptInputRootProps,
-  usePromptInput,
-} from "./prompt-input"
+export { type PromptInputControl, type PromptInputRootProps, usePromptInput } from "./prompt-input"
+export * as PromptInput from "./prompt-input.parts"

@@ -102,4 +102,5 @@ function Root({
   return renderPart("kbd", { ...props, children: content }, render, state)
 }
 
-export const Kbd = { Root }
+/** The parts, by name: `kbd.parts.ts` re-exports them as the `Kbd` namespace. */
+export { Root }

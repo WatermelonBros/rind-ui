@@ -176,4 +176,5 @@ function GroupOverflow({
 }
 
 /** A person or entity as an image with a fallback; one accessible name in every status. */
-export const Avatar = { Root, Image, Fallback, Group, GroupOverflow }
+/** The parts, by name: `avatar.parts.ts` re-exports them as the `Avatar` namespace. */
+export { Fallback, Group, GroupOverflow, Image, Root }

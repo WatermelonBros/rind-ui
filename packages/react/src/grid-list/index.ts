@@ -1,6 +1,2 @@
-export {
-  GridList,
-  type GridListChangeDetails,
-  type GridListItemData,
-  type GridListRootProps,
-} from "./grid-list"
+export type { GridListChangeDetails, GridListItemData, GridListRootProps } from "./grid-list"
+export * as GridList from "./grid-list.parts"

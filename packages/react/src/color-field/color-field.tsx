@@ -60,11 +60,8 @@ import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
-import {
-  NumberInput,
-  NumberInputNaming,
-  type NumberInputRootProps,
-} from "../number-input/number-input"
+import { NumberInputNaming, type NumberInputRootProps } from "../number-input/number-input"
+import * as NumberInput from "../number-input/number-input.parts"
 import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useMachine } from "../use-machine"

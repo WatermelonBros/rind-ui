@@ -349,4 +349,5 @@ function Handle({ index, disabled, render, ref, ...rest }: SplitterHandleProps) 
   return renderPart("div", props, render, ctx.state)
 }
 
-export const Splitter = { Root, Panel, Handle }
+/** The parts, by name: `splitter.parts.ts` re-exports them as the `Splitter` namespace. */
+export { Handle, Panel, Root }

@@ -28,7 +28,7 @@ export function Nav() {
       <Link href="/" className={styles.mini} aria-label="rind home">
         r<span>i</span>nd
       </Link>
-      <Link href="/docs/">Docs</Link>
+      <Link href="/docs/get-started/">Docs</Link>
       <Link href="/docs/#components">Components</Link>
       <Link href="/docs/testing-accessibility/">Testing</Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>

@@ -184,4 +184,5 @@ function Content({ render, ref, children, ...rest }: PartProps<"div">) {
   )
 }
 
-export const Reasoning = { Root, Trigger, Content }
+/** The parts, by name: `reasoning.parts.ts` re-exports them as the `Reasoning` namespace. */
+export { Content, Root, Trigger }

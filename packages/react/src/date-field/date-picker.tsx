@@ -30,7 +30,8 @@ import {
   useRef,
   useState,
 } from "react"
-import { Calendar, type CalendarRootProps } from "../calendar/calendar"
+import type { CalendarRootProps } from "../calendar/calendar"
+import * as Calendar from "../calendar/calendar.parts"
 import { useFieldBindingPeek } from "../field/field"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"

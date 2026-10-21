@@ -299,4 +299,5 @@ function Indicator({ render, ...rest }: PartProps<"span">) {
   )
 }
 
-export const TableOfContents = { Root, Title, List, Item, Link, Indicator }
+/** The parts, by name: `table-of-contents.parts.ts` re-exports them as the `TableOfContents` namespace. */
+export { Indicator, Item, Link, List, Root, Title }

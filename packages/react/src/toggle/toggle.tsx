@@ -158,4 +158,5 @@ function Indicator({ fallback, render, children, ...rest }: ToggleIndicatorProps
   )
 }
 
-export const Toggle = { Root, Indicator }
+/** The parts, by name: `toggle.parts.ts` re-exports them as the `Toggle` namespace. */
+export { Indicator, Root }

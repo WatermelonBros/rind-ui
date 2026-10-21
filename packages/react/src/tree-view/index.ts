@@ -1,8 +1,8 @@
-export {
-  TreeView,
-  type TreeViewChangeDetails,
-  type TreeViewExpandedDetails,
-  type TreeViewItemData,
-  type TreeViewNodeState,
-  type TreeViewRootProps,
+export type {
+  TreeViewChangeDetails,
+  TreeViewExpandedDetails,
+  TreeViewItemData,
+  TreeViewNodeState,
+  TreeViewRootProps,
 } from "./tree-view"
+export * as TreeView from "./tree-view.parts"

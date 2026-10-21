@@ -208,4 +208,5 @@ function Indicator({ render, ...rest }: PartProps<"div">) {
 }
 
 /** A scalar measurement within a known range, with optional low/high/optimum regions. */
-export const Meter = { Root, Label, ValueText, Track, Indicator }
+/** The parts, by name: `meter.parts.ts` re-exports them as the `Meter` namespace. */
+export { Indicator, Label, Root, Track, ValueText }

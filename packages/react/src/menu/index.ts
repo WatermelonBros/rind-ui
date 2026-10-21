@@ -1,5 +1,4 @@
 export {
-  Menu,
   type MenuActions,
   type MenuCheckboxItemProps,
   type MenuContentState,
@@ -17,3 +16,4 @@ export {
   type MenuSubmenuTriggerProps,
   type MenuTriggerState,
 } from "./menu"
+export * as Menu from "./menu.parts"

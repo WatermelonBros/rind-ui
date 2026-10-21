@@ -1,0 +1,47 @@
+.strip {
+  margin-top: 24px;
+  border-top: 2px solid color-mix(in oklab, var(--ink) 12%, transparent);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0;
+}
+.lead {
+  font: 500 13px var(--mono);
+  color: color-mix(in oklab, var(--ink) 75%, transparent);
+}
+.link {
+  font: 700 15px var(--text);
+  color: var(--ink);
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.track {
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--ink) 12%, transparent);
+}
+/* transform only: the fill runs at frame rate */
+.bar {
+  height: 100%;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+.hint {
+  display: block;
+  padding: 8px 0 0;
+  text-align: center;
+  font: 500 11px var(--mono);
+  color: color-mix(in oklab, var(--ink) 70%, transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}

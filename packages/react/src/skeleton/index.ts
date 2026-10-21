@@ -1,8 +1,8 @@
-export {
-  Skeleton,
-  type SkeletonContentProps,
-  type SkeletonItemProps,
-  type SkeletonRootProps,
-  type SkeletonState,
-  type SkeletonStatusProps,
+export type {
+  SkeletonContentProps,
+  SkeletonItemProps,
+  SkeletonRootProps,
+  SkeletonState,
+  SkeletonStatusProps,
 } from "./skeleton"
+export * as Skeleton from "./skeleton.parts"
