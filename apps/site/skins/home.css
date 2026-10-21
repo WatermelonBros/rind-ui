@@ -12,11 +12,13 @@
 @import "./message-thread.css";
 @import "./switch.css";
 @import "./checkbox-group.css";
+@import "./rating.css";
 @import "./toggle-group.css";
 @import "./tabs.css";
 @import "./segmented-control.css";
 @import "./slider.css";
 @import "./color.css";
 @import "./popover.css";
+@import "./pin-input.css";
 @import "./text-field.css";
 @import "./tooltip.css";
