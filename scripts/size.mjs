@@ -7,10 +7,16 @@
 import { readdirSync, readFileSync, statSync } from "node:fs"
 import { gzipSync } from "node:zlib"
 import { build } from "esbuild"
+import { quirkMeta } from "../packages/core/src/dom/quirk-meta.ts"
 
 const reactDir = new URL("../packages/react/", import.meta.url).pathname
 const report = process.argv.includes("--report")
 const budgets = JSON.parse(readFileSync(new URL("size-budgets.json", import.meta.url), "utf8"))
+
+// Quirk metadata is tooling-only (openspec bundle-size): no component bundle may contain a
+// repro test path or a removal condition from the registry.
+const quirkMarkers = Object.values(quirkMeta).flatMap((m) => [m.test, m.removeWhen])
+const carriesQuirkMeta = (text) => quirkMarkers.some((marker) => text.includes(marker))
 
 const pascal = (slug) => slug.replace(/(^|-)(\w)/g, (_, __, c) => c.toUpperCase())
 
@@ -26,8 +32,13 @@ async function measure(contents) {
     write: false,
     logLevel: "silent",
   })
-  const code = result.outputFiles[0]?.contents ?? new Uint8Array()
-  return { min: code.length, gz: gzipSync(code, { level: 9 }).length }
+  const file = result.outputFiles[0]
+  const code = file?.contents ?? new Uint8Array()
+  return {
+    min: code.length,
+    gz: gzipSync(code, { level: 9 }).length,
+    quirkMeta: carriesQuirkMeta(file?.text ?? ""),
+  }
 }
 
 const kb = (bytes) => `${(bytes / 1024).toFixed(1)} kB`
@@ -48,6 +59,7 @@ for (const slug of components) {
   const sub = await measure(
     `import { ${name} } from "@rind-ui/react/${slug}"; console.log(${name})`,
   )
+  if (root.quirkMeta || sub.quirkMeta) failures.push(`${name}: bundle contains quirk metadata`)
   if (budgets.components[slug] === undefined) {
     failures.push(`${name}: no budget in scripts/size-budgets.json`)
     continue

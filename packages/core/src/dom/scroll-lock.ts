@@ -8,7 +8,7 @@
 
 import type { PlatformFlags } from "../env/capabilities"
 import { getLayerStack } from "./layer-stack"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 import { registerReset } from "./resets"
 
 const KEY = Symbol.for("rind-ui.scroll-lock@1")

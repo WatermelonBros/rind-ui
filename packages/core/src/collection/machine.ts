@@ -4,7 +4,7 @@
 // `lastCollection`, a pointer kept to repair the highlight against the previous order.
 
 import type { Modality } from "../contract/env"
-import { quirkActive } from "../dom/quirks"
+import { quirkActive } from "../dom/quirk-conditions"
 import type {
   AnnouncerEnv,
   ClockEnv,

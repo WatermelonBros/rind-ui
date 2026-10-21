@@ -5,7 +5,7 @@
 // racing, so the original value is restored exactly once.
 
 import type { PlatformInfo, SchedulerEnv, TimerHandle } from "../env/capabilities"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 import { registerReset } from "./resets"
 
 const RESTORE_MS = 300

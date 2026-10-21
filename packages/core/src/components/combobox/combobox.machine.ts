@@ -12,7 +12,7 @@ import {
   collectionPieces,
   initialCollectionContext,
 } from "../../collection/machine"
-import { quirkActive } from "../../dom/quirks"
+import { quirkActive } from "../../dom/quirk-conditions"
 import type { DomEnvironment } from "../../env/dom-environment"
 import type { PositionEnv } from "../../env/position"
 import { partId } from "../../ids"

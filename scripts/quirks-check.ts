@@ -1,8 +1,10 @@
 // Checks the quirks registry: every entry's repro test exists (fails otherwise), and
 // entries verified more than twelve months ago are reported for re-testing.
-// Run: pnpm quirks:check   (Node strips the types; quirks.ts has no runtime imports)
+// Run: pnpm quirks:check   (Node strips the types; quirk-meta.ts has no runtime imports)
 import { existsSync } from "node:fs"
-import { quirks } from "../packages/core/src/dom/quirks.ts"
+import { quirkMeta } from "../packages/core/src/dom/quirk-meta.ts"
+
+const quirks = Object.entries(quirkMeta).map(([id, meta]) => ({ id, ...meta }))
 
 interface Entry {
   readonly id: string

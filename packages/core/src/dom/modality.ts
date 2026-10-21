@@ -6,7 +6,7 @@
 import type { FocusCause } from "../a11y/events"
 import type { Modality } from "../contract/env"
 import type { ModalitySource, PlatformFlags } from "../env/capabilities"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 
 interface WindowState {
   modality: Modality

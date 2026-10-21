@@ -4,7 +4,7 @@
 
 import type { HoverEvent } from "../a11y/events"
 import type { DomEnv, ModalityEnv, PlatformInfo, SchedulerEnv } from "../env/capabilities"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 
 export interface HoverPointerEvent {
   readonly pointerType: string

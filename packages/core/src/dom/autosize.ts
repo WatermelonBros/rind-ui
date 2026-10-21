@@ -3,7 +3,7 @@
 // touches the value, the selection, the undo stack or the events.
 
 import type { PlatformInfo, SchedulerEnv } from "../env/capabilities"
-import { quirkActive } from "./quirks"
+import { quirkActive } from "./quirk-conditions"
 
 export interface Autosize {
   /** Re-measures after a value commit (controlled, programmatic, reset). No-op natively. */
