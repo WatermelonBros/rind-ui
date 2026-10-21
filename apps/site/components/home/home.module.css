@@ -678,7 +678,8 @@
 .outro {
   background: var(--ink);
   color: var(--bg);
-  padding: 120px 56px 32px;
+  /* the bottom clears the screen-reader toggle pinned over the viewport's foot */
+  padding: 120px 56px 104px;
 }
 .outroTitle {
   position: relative;
@@ -691,9 +692,11 @@
 .outroFill {
   grid-area: 1 / 1;
 }
-/* the unpeeled title: faint, so the filled copy reads as the rind coming off */
+/* the unpeeled title: dimmed but readable at rest (large-text contrast), so the filled copy reads
+   as the rind coming off. Not a text-stroke: the variable display face draws its overlapping
+   contours when stroked */
 .outroOutline {
-  color: color-mix(in oklab, var(--bg) 20%, transparent);
+  color: color-mix(in oklab, var(--bg) 50%, var(--ink));
 }
 /* filled in a circle around the pointer: the rind peeled where you point */
 .outroFill {
@@ -762,6 +765,7 @@
 }
 .outroCtas {
   display: flex;
+  flex-wrap: wrap;
   gap: 14px;
   margin: 40px 0 100px;
 }
@@ -771,6 +775,7 @@
   padding: 16px 24px;
   border-radius: var(--btn-r);
   text-decoration: none;
+  white-space: nowrap;
   transition: translate 0.4s var(--spring);
 }
 .outroPrimary {
@@ -855,7 +860,7 @@
     grid-template-columns: 1fr;
   }
   .outro {
-    padding: 80px 20px 24px;
+    padding: 80px 20px 96px;
   }
   .reset {
     margin-left: 0;
