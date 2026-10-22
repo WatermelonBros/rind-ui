@@ -226,6 +226,20 @@ export function SkinScene() {
         // row's height, then in along that row (collisions on the way fade it: alpha)
         // at the size it left the machine with (the preview's control can be 16px: a speck)
         const end = berth(to, from.width, from.height)
+        // from its berth it flies onto the component on a short arc, in time rather than with
+        // the scroll, and the real component takes its place on touchdown
+        const p = flip(last.t)
+        if (p >= 0) {
+          scene.current?.wake()
+          const e = p * p * (3 - 2 * p)
+          const arc = Math.sin(Math.PI * p) * 36
+          return new DOMRect(
+            lerp(end.x, live.x, e),
+            lerp(end.y, live.y, e) - arc,
+            lerp(end.width, live.width, e),
+            lerp(end.height, live.height, e),
+          )
+        }
         const out = smooth(0, 0.3)
         const down = smooth(0.25, 0.7)
         return new DOMRect(
@@ -256,10 +270,15 @@ export function SkinScene() {
     }
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
-    // the cross-dissolve at the berth: the builder's component comes in as the object goes
-    const handover = (t: number) => {
-      const k = Math.min(1, Math.max(0, (t - 0.8) / 0.2))
-      return k * k * (3 - 2 * k)
+    // the hop from the berth onto the builder's component: -1 before it, then 0→1 over 380ms
+    let flipAt = 0
+    const flip = (t: number) => {
+      if (t < 0.8) {
+        flipAt = 0
+        return -1
+      }
+      if (!flipAt) flipAt = performance.now()
+      return Math.min(1, (performance.now() - flipAt) / 380)
     }
     const alpha = () => {
       // re-emerging from the builder's component for the final leg
@@ -274,7 +293,11 @@ export function SkinScene() {
           return from.bottom > 0 || last.t >= 0.85 ? 1 - last.fade : 0
         }
         // desktop: visible all the way to its berth, then it dissolves into the component
-        return 1 - handover(last.t)
+        // the component is the object until the hop lands, then the real one takes over (set
+        // here, per frame: the hop runs in time, with no scroll event to hang it on)
+        const p = flip(last.t)
+        last.look.style.opacity = p >= 0 && p < 1 ? "0" : ""
+        return p >= 1 ? 0 : 1
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t
@@ -352,7 +375,7 @@ export function SkinScene() {
               ? last.t < 0.85
                 ? ""
                 : String(last.fade)
-              : String(handover(last.t))
+              : last.look.style.opacity
       }
       // one control at a time: the test's own stays hidden while the object flies to it (on a
       // phone the object is hidden in flight instead, so the control shows until touchdown)

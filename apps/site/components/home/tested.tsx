@@ -155,15 +155,17 @@ export function Tested() {
       playRef.current()
     }
     const off = onTestArrived(go)
-    // a phone runs as soon as most of the stage is in view: waiting for the control to reach
-    // the object's landing height let the visitor scroll past the PASS
-    const root = stage.current
+    // a phone runs as soon as the control itself is in view: waiting for it to reach the
+    // object's landing height let the visitor scroll past the PASS
+    const root = stage.current?.querySelector<HTMLElement>(
+      '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
+    )
     if (!root || !window.matchMedia("(max-width: 900px)").matches) return off
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) go()
       },
-      { threshold: 0.6 },
+      { threshold: 0.9 },
     )
     io.observe(root)
     return () => {

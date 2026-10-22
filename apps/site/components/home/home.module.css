@@ -530,6 +530,20 @@
   inline-size: 150px;
   block-size: 60px;
 }
+/* the control and its label stay in one row before and during a run: the run changes state,
+   never layout */
+.testStage :is([data-scope="switch"], [data-scope="checkbox"])[data-part="root"] {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .passBanner {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
 /* an assertion's real outcome, shown once its line has run */
 .verdict {
   margin-inline-start: auto;
