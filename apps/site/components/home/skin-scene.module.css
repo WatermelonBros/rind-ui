@@ -216,3 +216,9 @@
 .stage[data-travel] :is(.label, .attrs, .note, .caption) {
   opacity: 0;
 }
+
+/* the 3D object is drawn over the hero's real control, which takes the click: it shows as
+   clickable (the controls here carry no skin, which would set it) */
+.stage :is([data-part="control"], [data-part="label"], button) {
+  cursor: pointer;
+}

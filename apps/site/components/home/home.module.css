@@ -45,6 +45,52 @@
   gap: 96px;
   margin-top: 24px;
 }
+.proofClaims {
+  display: grid;
+  gap: 96px;
+}
+.proofSticky {
+  display: none;
+}
+/* desktop: the claims scroll, one sticky panel proves the claim in view; the panels sit stacked
+   in it and cross-fade */
+.proofs[data-staged] {
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  align-items: start;
+}
+.proofs[data-staged] .proofClaims {
+  gap: 0;
+}
+.proofs[data-staged] .proof {
+  display: flex;
+  align-items: center;
+  min-block-size: 72vh;
+}
+.proofs[data-staged] .claim {
+  opacity: 0.35;
+  transition: opacity 0.4s var(--spring);
+}
+.proofs[data-staged] .claim[data-active] {
+  opacity: 1;
+}
+.proofs[data-staged] .proofSticky {
+  display: grid;
+  position: sticky;
+  top: calc(50vh - 200px);
+}
+.proofs[data-staged] .proofSticky > .proofPanel {
+  grid-area: 1 / 1;
+  opacity: 0;
+  translate: 0 24px;
+  transition:
+    opacity 0.45s var(--spring),
+    translate 0.45s var(--spring);
+}
+.proofs[data-staged] .proofSticky > .proofPanel[data-active] {
+  opacity: 1;
+  translate: 0 0;
+}
 .proof {
   display: grid;
   grid-template-columns: 5fr 7fr;
