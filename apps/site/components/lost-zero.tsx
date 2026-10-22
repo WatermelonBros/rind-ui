@@ -8,7 +8,7 @@ import styles from "./lost-zero.module.css"
  * The 404's 0 is an avatar in the site's 3D make (home/skin-gl.ts): a disc with a face that
  * looks lost, blinks, follows the pointer with its eyes, and is surprised while touched. It
  * stands where the digit would and bobs as if waiting. Without WebGL 2 (or before its first
- * frame) the plain 0 shows.
+ * frame, and under reduced motion) the plain 0 shows.
  */
 export function LostZero() {
   const slot = useRef<HTMLSpanElement>(null)
@@ -22,14 +22,15 @@ export function LostZero() {
     const el = canvas.current
     const at = slot.current
     if (!el || !at) return
+    // like the hero's object: none under reduced motion (the plain 0 stays)
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
     let cancelled = false
     let frame = 0
-    const still = matchMedia("(prefers-reduced-motion: reduce)").matches
     const born = performance.now()
     const rect = () => {
       const r = at.getBoundingClientRect()
       // a slow bob, the same breath the dropped i-dot had
-      const bob = still ? 0 : Math.sin((performance.now() - born) / 900) * r.height * 0.04
+      const bob = Math.sin((performance.now() - born) / 900) * r.height * 0.04
       return new DOMRect(r.x, r.y + bob, r.width, r.height)
     }
     import("./home/skin-gl").then(({ mountSkin }) => {
@@ -49,7 +50,7 @@ export function LostZero() {
         scene.current?.wake()
         frame = requestAnimationFrame(breathe)
       }
-      if (!still) breathe()
+      breathe()
     })
     return () => {
       cancelled = true

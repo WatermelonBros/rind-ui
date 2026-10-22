@@ -1,7 +1,7 @@
 "use client"
 
+import Link from "next/link"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
-import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -104,12 +104,12 @@ export function Outro() {
           </span>
         </p>
         <div className={styles.outroCtas}>
-          <MorphLink wave href="/docs/get-started/" className={styles.outroPrimary}>
+          <Link prefetch={false} href="/docs/get-started/" className={styles.outroPrimary}>
             Get started →
-          </MorphLink>
-          <MorphLink wave href="/compare/" className={styles.outroGhost}>
+          </Link>
+          <Link prefetch={false} href="/compare/" className={styles.outroGhost}>
             How it compares
-          </MorphLink>
+          </Link>
           <a href="https://github.com/WatermelonBros/rind-ui" className={styles.outroGhost}>
             GitHub
           </a>
@@ -124,13 +124,13 @@ export function Outro() {
           Built using <b>Reado</b> ↗
         </a>
         <span>
-          <MorphLink wave href="/compare/">
+          <Link prefetch={false} href="/compare/">
             Compare
-          </MorphLink>{" "}
+          </Link>{" "}
           · MIT ·{" "}
-          <MorphLink wave href="/privacy/">
+          <Link prefetch={false} href="/privacy/">
             Privacy
-          </MorphLink>
+          </Link>
         </span>
       </div>
       <p className={styles.visuallyHidden} role="status">

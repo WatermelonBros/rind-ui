@@ -1,9 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import type { ReactNode } from "react"
 import styles from "./hero.module.css"
 import { SkinScene } from "./home/skin-scene"
-import { MorphLink } from "./morph-link"
 import { Wordmark } from "./wordmark"
 
 export function Hero({ children }: { children?: ReactNode }) {
@@ -21,12 +21,12 @@ export function Hero({ children }: { children?: ReactNode }) {
               <em className={styles.stays}>Everything else stays.</em>
             </p>
             <div className={styles.ctas}>
-              <MorphLink wave href="/docs/get-started/" className={styles.primary}>
+              <Link prefetch={false} href="/docs/get-started/" className={styles.primary}>
                 Get started →
-              </MorphLink>
-              <MorphLink wave href="/docs/#components" className={styles.install}>
+              </Link>
+              <Link prefetch={false} href="/docs/#components" className={styles.install}>
                 Browse components
-              </MorphLink>
+              </Link>
             </div>
             <p className={styles.frameworks}>
               <b>React</b> today · Vue, Svelte, Solid and Angular on the same core, soon

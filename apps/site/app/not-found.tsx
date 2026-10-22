@@ -4,6 +4,7 @@ import { GooFilters } from "@/components/goo"
 import { LostZero } from "@/components/lost-zero"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
+import { RouteWave } from "@/components/route-wave"
 import "./globals.css"
 import "@/skins/index.css"
 import styles from "./not-found.module.css"
@@ -14,6 +15,7 @@ export default function NotFound() {
   return (
     <PhaseProvider>
       <GooFilters />
+      <RouteWave />
       <header>
         <Nav />
       </header>

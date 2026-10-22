@@ -3,6 +3,7 @@ import { GooFilters } from "@/components/goo"
 import { Intro } from "@/components/intro"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
+import { RouteWave } from "@/components/route-wave"
 import { Secrets } from "@/components/secrets"
 import "../globals.css"
 
@@ -17,6 +18,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         </header>
         {children}
         <Secrets />
+        <RouteWave />
       </PhaseProvider>
       {/* after the page: its inline script copies the parsed header and main */}
       <Intro />
