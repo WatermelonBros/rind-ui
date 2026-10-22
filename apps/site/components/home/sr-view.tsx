@@ -155,7 +155,11 @@ export function ScreenReaderView() {
       cursor = to
       lastStates = states(next, readerRef.current)
       say(key, speakMove(prev, next, readerRef.current, move))
-      next.el.scrollIntoView({ block: "center", behavior: "smooth" })
+      // brought into the clear part of the screen, above the transcript panel
+      const r = next.el.getBoundingClientRect()
+      const clear = window.innerHeight * (window.matchMedia("(hover: none)").matches ? 0.3 : 0.38)
+      if (r.top < 80 || r.bottom > window.innerHeight * 0.6)
+        window.scrollTo({ top: window.scrollY + r.top - clear, behavior: "smooth" })
       // as in NVDA, focus follows the browse cursor onto focusable elements, so Tab goes on
       // from here (and that focus is not announced a second time)
       if (next.el.tabIndex >= 0 && next.role !== "text" && next.role !== "heading") {
@@ -284,9 +288,11 @@ export function ScreenReaderView() {
       mark(item)
     }
     // a control's state changes (a switch turned on, a section opened): only the new state is said
-    const watch = new MutationObserver(() => {
+    const watch = new MutationObserver((records) => {
       const subject = items[cursor]
       if (!subject) return
+      // only the element being read: other parts of the page change state on their own
+      if (!records.some((r) => r.target === subject.el || subject.el.contains(r.target))) return
       const now = states(subject, readerRef.current)
       const changed = now.filter((s) => !lastStates.includes(s))
       lastStates = now

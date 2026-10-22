@@ -95,7 +95,9 @@ export function Wordmark({ chips = true }: { chips?: boolean }) {
   )
 
   return (
-    <div className={styles.word} role="img" aria-label="rind">
+    // decorative: the hero's <h1> already says "rind" (a named image here made screen readers
+    // say it twice: "heading level 1, rind", then "graphic, rind")
+    <div className={styles.word} aria-hidden="true">
       {letter("r")}
       {letter(
         "i",

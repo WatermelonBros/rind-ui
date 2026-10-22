@@ -133,10 +133,26 @@ export function exit(c: Container, reader: Reader): string[] {
   return reader === "nvda" ? [`out of ${what}`] : [`end of ${what.replace(" landmark", "")}`]
 }
 
+// symbols as a screen reader pronounces them at its default punctuation level
+const SYMBOLS: Record<string, string> = {
+  "→": "right arrow",
+  "←": "left arrow",
+  "↗": "north east arrow",
+  "↓": "down arrow",
+  "↑": "up arrow",
+  "✓": "check",
+  "×": "times",
+}
+const spoken = (text: string) =>
+  text
+    .replace(/[→←↗↓↑✓×]/g, (c) => ` ${SYMBOLS[c] ?? c} `)
+    .replace(/\s+/g, " ")
+    .trim()
+
 /** The item itself, in the reader's order for this kind of move. */
 export function speakItem(item: Item, reader: Reader, move: Move): string[] {
-  if (item.role === "text") return [item.name]
-  const name = item.name
+  if (item.role === "text") return [spoken(item.name)]
+  const name = spoken(item.name)
   const st = states(item, reader)
   const pos = position(item.el, item.role)
   if (item.role === "heading") {

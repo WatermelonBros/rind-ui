@@ -167,8 +167,9 @@
   .keys {
     display: none;
   }
+  /* a phone keeps the panel short: the latest lines, Previous / Next, the screen stays readable */
   .lines {
-    block-size: 112px;
+    block-size: 76px;
   }
 }
 /* the element being read, outlined like a screen reader's own highlight */

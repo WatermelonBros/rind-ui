@@ -66,9 +66,31 @@ function isBlock(el: Element): boolean {
   return !d.startsWith("inline") && d !== "contents"
 }
 
+/**
+ * The elements that label a control (its <label>, or what its aria-labelledby points at): their
+ * text is the control's name, already said with it, so browse mode does not read it again.
+ */
+function controlLabels(root: Element): Set<Element> {
+  const labels = new Set<Element>()
+  for (const el of root.querySelectorAll(
+    "[aria-labelledby], input, select, textarea, button, meter, output, progress",
+  )) {
+    const role = getRole(el) ?? ""
+    if (!LEAVES.has(role) || role === "heading" || role === "img") continue
+    for (const id of (el.getAttribute("aria-labelledby") ?? "").split(/\s+/)) {
+      const target = id ? el.ownerDocument.getElementById(id) : null
+      if (target && !target.contains(el)) labels.add(target)
+    }
+    const own = (el as HTMLButtonElement).labels
+    if (own) for (const l of own) if (!l.contains(el)) labels.add(l)
+  }
+  return labels
+}
+
 /** Walks `root` (skipping `skip`, the simulator's own UI) into browse-mode items. */
 export function buildBuffer(root: Element, skip: (el: Element) => boolean): Item[] {
   const items: Item[] = []
+  const labels = controlLabels(root)
   let text = ""
   let textEl: HTMLElement | null = null
   let textPath: readonly Container[] = []
@@ -94,7 +116,7 @@ export function buildBuffer(root: Element, skip: (el: Element) => boolean): Item
     }
     if (!(node instanceof HTMLElement || node instanceof SVGElement)) return
     const el = node
-    if (skip(el) || hidden(el)) return
+    if (skip(el) || hidden(el) || labels.has(el)) return
     if (el instanceof SVGElement && !el.getAttribute("role") && !el.getAttribute("aria-label"))
       return
     const role = getRole(el) ?? ""
