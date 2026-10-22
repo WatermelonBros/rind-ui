@@ -140,6 +140,10 @@
 }
 
 @media (max-width: 900px) {
+  /* a phone reads the two acts faster: less scroll with nothing new on screen */
+  .peel {
+    height: 170vh;
+  }
   .sticky {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;

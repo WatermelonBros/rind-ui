@@ -311,6 +311,13 @@ export function SkinScene() {
         else if (past) setLanded(true)
         last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
       }
+      // one control at a time: the test's own stays hidden while the object flies to it (on a
+      // phone the object is hidden in flight instead, so the control shows until touchdown)
+      if (fin) {
+        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || atTests)
+        if (hide) fin.test.style.setProperty("opacity", "0", "important")
+        else fin.test.style.removeProperty("opacity")
+      }
       if (fin && scene.current && fin.y > fin.s4) {
         // it takes the builder's component with it, and gets the site's skin back on the way
         fin.look.style.opacity = window.innerWidth <= 900 ? "" : String(1 - fin.emerge)

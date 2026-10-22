@@ -56,7 +56,10 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
     { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })' },
     {
       code: "await wifi.toggle()",
-      act: (r) => click(r, '[data-scope="switch"][data-part="label"]', "Wi-Fi"),
+      // the control itself, as the driver does: a label's click focuses the control and scrolls
+      // it into view, which would pull back a visitor who has scrolled past the run
+      act: (r) =>
+        r.querySelector<HTMLElement>('[data-scope="switch"][data-part="control"]')?.click(),
     },
     {
       code: "expect(await wifi.isChecked()).toBe(true)",
@@ -67,7 +70,8 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
     { code: 'const ready = getCheckbox(screen, { name: "Keyboard ready" })' },
     {
       code: "await ready.toggle()",
-      act: (r) => click(r, '[data-scope="checkbox"][data-part="label"]', "Keyboard ready"),
+      act: (r) =>
+        r.querySelector<HTMLElement>('[data-scope="checkbox"][data-part="control"]')?.click(),
     },
     {
       code: "expect(await ready.isChecked()).toBe(true)",
