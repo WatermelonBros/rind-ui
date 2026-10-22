@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import { Hero } from "@/components/hero"
 import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
-import { BandReveal } from "@/components/home/band-reveal"
 import { Outro } from "@/components/home/outro"
 import { Peel } from "@/components/home/peel"
 import { ScreenReaderView } from "@/components/home/sr-view"
@@ -40,10 +39,6 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED) }}
       />
       <SmoothScroll />
-      <SoundInvite />
-      <BandReveal />
-      <XRay />
-      <ScreenReaderView />
       {/* each section its own boundary: React hydrates them one at a time, yielding between them,
           instead of the whole landing in one long task on a slow phone */}
       <Hero>
@@ -71,6 +66,11 @@ export default function Home() {
       <Suspense>
         <Outro />
       </Suspense>
+      {/* fixed overlays after the content: the router scrolls a new page to its first element,
+          and skips that when it is fixed (the x-ray label was first) */}
+      <XRay />
+      <SoundInvite />
+      <ScreenReaderView />
     </>
   )
 }

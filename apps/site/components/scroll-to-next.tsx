@@ -109,7 +109,7 @@ export function ScrollToNext({ stops }: { stops: readonly DocsStop[] }) {
     <div className={styles.strip}>
       <div className={styles.row}>
         <span className={styles.lead}>Keep scrolling for the next page</span>
-        <Link href={next.href} className={styles.link}>
+        <Link prefetch={false} href={next.href} className={styles.link}>
           {next.label} <span aria-hidden="true">→</span>
         </Link>
       </div>

@@ -99,7 +99,11 @@ export function Sidebar({ groups }: { groups: readonly NavGroup[] }) {
                       const href = `/docs/${slug}/`
                       return (
                         <li key={slug}>
-                          <Link href={href} aria-current={path === href ? "page" : undefined}>
+                          <Link
+                            prefetch={false}
+                            href={href}
+                            aria-current={path === href ? "page" : undefined}
+                          >
                             {label}
                           </Link>
                         </li>

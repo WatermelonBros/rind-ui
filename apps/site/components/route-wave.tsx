@@ -29,6 +29,10 @@ export function RouteWave() {
       // the link's own handler (next/link) sees this and stands down
       e.preventDefault()
       const { clientX: x, clientY: y } = e
+      // the next page's title rides with its page under the wave, not on a layer of its own
+      // above the page being left (globals.css: html[data-wave])
+      const root = document.documentElement
+      root.setAttribute("data-wave", "")
       const vt = document.startViewTransition(async () => {
         router.push(to.pathname + to.search + to.hash)
         const end = performance.now() + 2000
@@ -44,13 +48,14 @@ export function RouteWave() {
         })
       })
       vt.ready.then(
-        () => wave(x, y, document.documentElement.dataset["phase"] === "juicy"),
+        () => wave(x, y, document.documentElement.dataset["phase"] === "juicy", { dim: true }),
         () => {},
       )
-      vt.finished.catch(() => {})
+      vt.finished.catch(() => {}).finally(() => root.removeAttribute("data-wave"))
     }
     // intent: the page behind a link is fetched when the pointer reaches it, not for every link
-    // in view (that downloaded the docs for visitors who never left the landing)
+    // in view (the site's links all set prefetch={false}: in view, the landing fetched the docs'
+    // code and a docs page's sidebar 1.3 MB of other pages)
     const fetched = new Set<string>()
     const onIntent = (e: Event) => {
       const a = e.target instanceof Element ? e.target.closest("a[href]") : null

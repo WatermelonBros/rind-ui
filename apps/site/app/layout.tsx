@@ -9,9 +9,7 @@ import { HydrationMark } from "@/components/hydration-mark"
 // late one invisible rather than drawn twice
 // only the weights the site sets (display 800/900, mono 500 to 700): every file is preloaded
 const unbounded = localFont({
-  src: [
-    { path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" },
-  ],
+  src: [{ path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" }],
   variable: "--font-unbounded",
   display: "block",
 })
@@ -72,7 +70,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body>
+      {/* extensions (Grammarly, password managers) stamp attributes on <body> before React loads */}
+      <body suppressHydrationWarning>
         {/* The site chrome lives in app/(site)/layout.tsx; app/examples has none. */}
         {children}
         <HydrationMark />

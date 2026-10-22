@@ -26,10 +26,10 @@ export default function NotFound() {
         <h1 className={styles.title}>This page is headless.</h1>
         <p className={styles.text}>No behaviour, no state, no look. Nothing here at all.</p>
         <div className={styles.ctas}>
-          <Link href="/" className={styles.primary}>
+          <Link prefetch={false} href="/" className={styles.primary}>
             Back home
           </Link>
-          <Link href="/docs/" className={styles.ghost}>
+          <Link prefetch={false} href="/docs/" className={styles.ghost}>
             Browse the docs
           </Link>
         </div>

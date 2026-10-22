@@ -195,6 +195,9 @@ html.intro:not([data-intro-ready]) body {
 [data-page-title] {
   view-transition-name: page-title;
 }
+html[data-wave] [data-page-title] {
+  view-transition-name: none;
+}
 ::view-transition-group(page-title) {
   animation-duration: 0.55s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);

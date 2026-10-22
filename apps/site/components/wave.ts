@@ -1,8 +1,9 @@
 // The site's wave: inside a view transition, the new page spreads from a point. Round and
 // overshooting in juicy, a hard-edged diamond that snaps open in crisp. Used by the phase
-// switch (phase.tsx) and by links between pages (morph-link.tsx).
+// switch (phase.tsx) and by moves between pages (route-wave.tsx), where the page being left
+// also dims under it.
 
-export function wave(x: number, y: number, round: boolean) {
+export function wave(x: number, y: number, round: boolean, { dim = false } = {}) {
   const far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
   const r = far * 1.5
   document.documentElement.animate(
@@ -22,4 +23,19 @@ export function wave(x: number, y: number, round: boolean) {
       pseudoElement: "::view-transition-new(root)",
     },
   )
+  // between pages, the page being left darkens and blurs under the wave, as if a backdrop came
+  // down over it: it reads as the old page, going
+  if (dim)
+    document.documentElement.animate(
+      {
+        filter: ["brightness(1) blur(0px)", "brightness(0.45) blur(3px)"],
+        scale: [1, 0.97],
+      },
+      {
+        duration: round ? 900 : 600,
+        easing: "cubic-bezier(0.3, 0, 0.2, 1)",
+        fill: "forwards",
+        pseudoElement: "::view-transition-old(root)",
+      },
+    )
 }

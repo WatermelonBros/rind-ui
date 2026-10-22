@@ -1029,8 +1029,10 @@
 }
 
 /* full-bleed bands alternate the surface under the sections */
-/* each band's colour opens as a disc from its top edge while it enters the screen (band-reveal.tsx
-   drives --reveal), finished before its heading reaches the reading zone: no seams between bands */
+/* each band's colour opens from its top edge while it enters the screen, finished once it has
+   risen a third of the screen, before its heading reaches the reading zone: no seams between
+   bands. A scroll-driven animation, no script (a script wrote styles on sections React had not
+   hydrated yet); without scroll timelines or under reduced motion the bands are simply filled */
 .band[data-band] {
   position: relative;
   isolation: isolate;
@@ -1044,7 +1046,23 @@
   background: var(--band);
   /* a curtain the full width of the band: a disc opening from the top centre read as a stray
      block rising on its own */
-  clip-path: inset(0 0 calc((1 - var(--reveal, 1)) * 100%) 0);
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .band[data-band]::before {
+      animation: band-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0 entry 35vh;
+    }
+  }
+}
+@keyframes band-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
 }
 .band[data-band="ink"] {
   --band: #0b0b0c;
