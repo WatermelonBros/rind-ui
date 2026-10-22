@@ -311,7 +311,7 @@ export function SkinScene() {
         const card = last.look.closest("[data-look]")?.parentElement?.getBoundingClientRect()
         const vh = window.innerHeight
         const out = 1 - Math.min(1, Math.max(0, (last.t - 0.08) / 0.12))
-        const back = card ? Math.min(1, Math.max(0, (vh * 0.95 - card.top) / (vh * 0.2))) : 1
+        const back = card ? Math.min(1, Math.max(0, (vh * 0.7 - card.top) / (vh * 0.2))) : 1
         const a = Math.max(out, back)
         if (a < 1) last.peelEl.style.setProperty("opacity", String(1 - a), "important")
         return a

@@ -355,6 +355,10 @@
 :global([data-phase="juicy"]) .testCode {
   background: #2a1d5c;
 }
+/* juicy draws no lines; the dark editor on the dark band needs an edge to be a panel */
+:global([data-phase="juicy"]) .testPanel {
+  border-color: color-mix(in oklab, #fff 22%, transparent);
+}
 .testBar {
   display: flex;
   align-items: center;
