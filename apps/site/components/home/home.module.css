@@ -539,9 +539,10 @@
   gap: 12px;
 }
 @media (max-width: 600px) {
+  /* smaller, and free to wrap: a line that will not wrap stretches the whole card */
   .passBanner {
     font-size: 12px;
-    white-space: nowrap;
+    min-inline-size: 0;
   }
 }
 /* an assertion's real outcome, shown once its line has run */
@@ -677,10 +678,10 @@
     calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
   );
 }
-/* while the front crosses a card its components dim and come back in the new skin: the old
-   skin's text never sits readable-but-wrong on the new ground */
+/* while the front crosses a card its components recede and come back in the new skin: the old
+   skin's text never sits at full strength on the new ground, and the card is never empty */
 .specimenStage[data-wave] > * {
-  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.7) * 10, 1));
+  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.7) * 10, 1) * 0.6);
 }
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {

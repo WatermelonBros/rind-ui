@@ -240,7 +240,7 @@ export function SkinScene() {
         if (p >= 0) {
           const e = p * p * (3 - 2 * p)
           // over the card, never through its text
-          const arc = Math.sin(Math.PI * p) * 80
+          const arc = Math.sin(Math.PI * p) * 140
           return new DOMRect(
             lerp(end.x, live.x, e),
             lerp(end.y, live.y, e) - arc,
