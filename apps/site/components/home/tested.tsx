@@ -3,7 +3,15 @@
 import { Accordion, Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
-import { type HeroKind, heroKind } from "./hero-state"
+import {
+  type HeroKind,
+  heroKind,
+  onTestArrived,
+  setTestState,
+  setTestTarget,
+  useSceneGl,
+  useTestLanded,
+} from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -48,7 +56,10 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
     { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })' },
     {
       code: "await wifi.toggle()",
-      act: (r) => click(r, '[data-scope="switch"][data-part="label"]', "Wi-Fi"),
+      // the control itself, as the driver does: a label's click focuses the control and scrolls
+      // it into view, which would pull back a visitor who has scrolled past the run
+      act: (r) =>
+        r.querySelector<HTMLElement>('[data-scope="switch"][data-part="control"]')?.click(),
     },
     {
       code: "expect(await wifi.isChecked()).toBe(true)",
@@ -59,7 +70,8 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
     { code: 'const ready = getCheckbox(screen, { name: "Keyboard ready" })' },
     {
       code: "await ready.toggle()",
-      act: (r) => click(r, '[data-scope="checkbox"][data-part="label"]', "Keyboard ready"),
+      act: (r) =>
+        r.querySelector<HTMLElement>('[data-scope="checkbox"][data-part="control"]')?.click(),
     },
     {
       code: "expect(await ready.isChecked()).toBe(true)",
@@ -97,6 +109,55 @@ export function Tested() {
   const [results, setResults] = useState<Record<number, boolean>>({})
   const failed = Object.values(results).filter((ok) => !ok).length
 
+  // The hero's object ends its trip here (skin-scene.tsx): hand it this test's control and its
+  // state, hide the control while the object stands on it, and run the test once it arrives
+  const landed = useTestLanded()
+  const gl = useSceneGl()
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a new run remounts the stage, a new kind changes the control
+  useEffect(() => {
+    const root = stage.current
+    const el = root?.querySelector<HTMLElement>(
+      '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
+    )
+    setTestTarget(el ?? null)
+    if (!root) return
+    const read = () => {
+      const on =
+        root.querySelector('[role="switch"], [role="checkbox"]')?.getAttribute("aria-checked") ===
+        "true"
+      const presses = Number(
+        root.querySelector("[data-presses]")?.getAttribute("data-presses") ?? 0,
+      )
+      setTestState(on, presses)
+    }
+    read()
+    const mo = new MutationObserver(read)
+    mo.observe(root, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-checked", "data-presses"],
+    })
+    // the run opens an accordion item, which moves the control: hand it over again
+    const ro = new ResizeObserver(() => setTestTarget(el ?? null))
+    ro.observe(root)
+    return () => {
+      ro.disconnect()
+      mo.disconnect()
+      setTestTarget(null)
+    }
+  }, [kind, run])
+  const playRef = useRef<() => void>(() => {})
+  const autoRan = useRef(false)
+  useEffect(
+    () =>
+      onTestArrived(() => {
+        if (autoRan.current) return
+        autoRan.current = true
+        playRef.current()
+      }),
+    [],
+  )
+
   const play = async () => {
     setRunning(true)
     setPassed(null)
@@ -122,6 +183,9 @@ export function Tested() {
     setLine(STEPS.length)
     setPassed(Math.round(performance.now() - started))
     setRunning(false)
+  }
+  playRef.current = () => {
+    if (!running) void play()
   }
 
   return (
@@ -182,7 +246,15 @@ export function Tested() {
               </>
             )}
           </p>
-          <div className={styles.testStage} data-skinned="" data-skin={phase} ref={stage} key={run}>
+          <div
+            className={styles.testStage}
+            data-skinned=""
+            data-skin={phase}
+            data-gl={gl ? "" : undefined}
+            data-object={landed ? "" : undefined}
+            ref={stage}
+            key={run}
+          >
             <div className={styles.testStageInner}>
               <Accordion.Root>
                 {["Shipping", "Returns"].map((t) => (

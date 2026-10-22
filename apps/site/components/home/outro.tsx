@@ -9,8 +9,8 @@ const SECRET = "rind"
 const SEEDS = 28
 
 /**
- * The page's last word, peeled under the pointer: the title is an outline, filled in a circle
- * around the pointer (filled outright on touch and under reduced motion). Typing "rind" anywhere
+ * The page's last word: the dimmed title fills at full contrast as it scrolls in, then peels in
+ * the accent in a circle around the pointer (filled outright on touch and under reduced motion). Typing "rind" anywhere
  * outside a field rains watermelon seeds and says so politely.
  */
 export function Outro() {
@@ -40,10 +40,27 @@ export function Outro() {
       y = e.clientY
       if (!frame) frame = requestAnimationFrame(paint)
     }
+    // the title fills as it rises from the foot of the screen to its upper third
+    let scrolled = 0
+    const fillIn = () => {
+      scrolled = 0
+      const r = t.getBoundingClientRect()
+      const k = (window.innerHeight - r.top) / (window.innerHeight * 0.7)
+      t.style.setProperty("--fill", String(Math.min(1, Math.max(0, k))))
+    }
+    const onScroll = () => {
+      if (!scrolled) scrolled = requestAnimationFrame(fillIn)
+    }
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      fillIn()
+      window.addEventListener("scroll", onScroll, { passive: true })
+    }
     el.addEventListener("pointermove", onMove, { passive: true })
     return () => {
       el.removeEventListener("pointermove", onMove)
+      window.removeEventListener("scroll", onScroll)
       cancelAnimationFrame(frame)
+      cancelAnimationFrame(scrolled)
     }
   }, [])
 

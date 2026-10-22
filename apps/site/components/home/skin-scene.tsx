@@ -4,14 +4,19 @@ import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import {
+  emitTestArrived,
   getLookColors,
   getLookTarget,
   getPeelOn,
   getPeelTarget,
+  getTestState,
+  getTestTarget,
   onPeelOn,
+  onTestState,
   setHeroOn,
   setLanded,
   setSceneGl,
+  setTestLanded,
 } from "./hero-state"
 import type { Kind, SkinHandle } from "./skin-gl"
 import styles from "./skin-scene.module.css"
@@ -77,6 +82,7 @@ export function SkinScene() {
     let hint = 0
     let shown = false
     let past = false
+    let atTests = false
     // The skin comes off with the scroll. Desktop: while the sticky hero holds still (its run is
     // taller than the screen). Phone: as the component itself rises from 60% to 25% of the screen.
     const peelAt = () => {
@@ -127,12 +133,69 @@ export function SkinScene() {
       const fade = Math.min(1, Math.max(0, (y - s3) / (window.innerHeight * 0.25)))
       return { peelEl, look, y, s2, t, fade }
     }
+    // Final leg: once it has become the builder's component, the object leaves it again (when the
+    // builder rises to a quarter of the screen), flies to the tests' control, takes the site's
+    // skin back on the way, and the test runs as it lands (tested.tsx)
+    const testLeg = () => {
+      const look = getLookTarget()
+      const test = getTestTarget()
+      if (!look || !test) return null
+      const y = window.scrollY
+      const lr = look.getBoundingClientRect()
+      const s4 = lr.top + y + lr.height / 2 - window.innerHeight * 0.25
+      const tr = test.getBoundingClientRect()
+      // a phone runs the test while the control is still low on the screen, so the visitor
+      // sees the PASS before scrolling on
+      const anchor = window.innerWidth <= 900 ? 0.68 : 0.5
+      const s5 = tr.top + y + tr.height / 2 - window.innerHeight * anchor
+      const t = Math.min(1, Math.max(0, (y - s4) / Math.max(1, s5 - s4)))
+      const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
+      return { look, test, y, s4, t, emerge }
+    }
+    // The room right of the content frame (the builder's; the tests share its width): the
+    // object flies down it at a size that fits, never under 64px across, so it neither covers
+    // the panels nor shrinks to a speck
+    const gutterFit = (w: number, h: number) => {
+      const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
+      const room = window.innerWidth - (frame?.right ?? window.innerWidth) - 32
+      const k = Math.min(1, Math.max(64, room) / w)
+      return { w: w * k, h: h * k, x: window.innerWidth - w * k - 16 }
+    }
     const target = () => {
+      const fin = testLeg()
+      if (fin && fin.y > fin.s4) {
+        const live = fin.test.getBoundingClientRect()
+        // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
+        if (atTests || window.innerWidth <= 900) return live
+        const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
+        const top = window.innerHeight * 0.15
+        const bottom = window.innerHeight * 0.75 - live.height
+        const toY = Math.min(Math.max(live.y, top), bottom)
+        const smooth = (a: number, b: number) => {
+          const k = Math.min(1, Math.max(0, (fin.t - a) / (b - a)))
+          return k * k * (3 - 2 * k)
+        }
+        // around the content, like the leg before: out to the right-hand gutter, down to the
+        // control's height, then in
+        const g = gutterFit(live.width, live.height)
+        const out = smooth(0, 0.3)
+        const across = smooth(0.65, 0.9)
+        // across in the empty strip under the control's row, then up into it: the row's label
+        // sits between the gutter and the control, and the object never crosses it
+        const under = toY + live.height + 28
+        return new DOMRect(
+          lerp(lerp(from.x, g.x, out), live.x, across),
+          lerp(lerp(from.y, under, smooth(0.25, 0.65)), toY, smooth(0.88, 1)),
+          lerp(lerp(from.width, g.w, out), live.width, across),
+          lerp(lerp(from.height, g.h, out), live.height, across),
+        )
+      }
       const last = lastLeg()
       if (last && last.y > last.s2) {
         const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
         const live = last.look.getBoundingClientRect()
-        if (last.t >= 1) return live
+        // a phone hides it on the way (alpha): it waits on its control, so it appears there
+        if (last.t >= 1 || (window.innerWidth <= 900 && last.t > 0.05)) return live
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
         const top = window.innerHeight * 0.18
@@ -148,11 +211,18 @@ export function SkinScene() {
           const k = Math.min(1, Math.max(0, (t - a) / (b - a)))
           return k * k * (3 - 2 * k)
         }
+        // three moves, around the content: out to the right-hand gutter, down to the preview
+        // row's height, then in along that row (collisions on the way fade it: alpha)
+        // at the size it left the machine with (the preview's control can be 16px: a speck)
+        const g = gutterFit(from.width, from.height)
+        const out = smooth(0, 0.3)
+        const down = smooth(0.25, 0.65)
+        const across = smooth(0.65, 1)
         return new DOMRect(
-          lerp(from.x, to.x, smooth(0.2, 0.85)),
-          lerp(from.y, to.y, smooth(0, 0.7)),
-          lerp(from.width, to.width, smooth(0.4, 0.85)),
-          lerp(from.height, to.height, smooth(0.4, 0.85)),
+          lerp(lerp(from.x, g.x, out), to.x, across),
+          lerp(from.y, to.y, down),
+          lerp(lerp(from.width, g.w, out), to.width, across),
+          lerp(lerp(from.height, g.h, out), to.height, across),
         )
       }
       const { next, y, s0, t } = travel()
@@ -177,32 +247,43 @@ export function SkinScene() {
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
     const alpha = () => {
+      // re-emerging from the builder's component for the final leg
+      const fin = testLeg()
+      const phone = window.innerWidth <= 900
+      if (fin && fin.y > fin.s4) return phone ? (atTests ? 1 : 0) : fin.emerge
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // fades while the builder's heading or lede passes under it, and into the real
-        // component on arrival
-        const me = target()
-        const section = last.look.closest("section")
-        const texts = section ? [...section.querySelectorAll(":scope > * h2, :scope > * > p")] : []
-        let overlap = 0
-        for (const text of texts) {
-          const r = text.getBoundingClientRect()
-          const x = Math.max(0, Math.min(r.right, me.right) - Math.max(r.left, me.left))
-          const y = Math.max(0, Math.min(r.bottom, me.bottom) - Math.max(r.top, me.top))
-          if (x > 0) overlap = Math.max(overlap, y / Math.max(1, me.height))
-        }
-        return (1 - Math.min(1, overlap * 1.5)) * (1 - last.fade)
+        // a phone has no gutter to fly in: it hides on the way and appears near the preview
+        if (phone && last.t > 0.05 && last.t < 0.85) return 0
+        // always visible on the way (fading over every obstacle read as a flicker); it fades
+        // only at the end, into the real component
+        return 1 - last.fade
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t
-      // a short dip in the middle of the path only
-      return t <= 0 || t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * t) * 2.5)
+      // gone in the middle of the path, never half there (a faint ghost reads as a bug)
+      return t > 0.15 && t < 0.85 ? 0 : 1
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0
+    let presses = 0
+    let pulse = 0
     const follow = () => {
       const handle = scene.current
       if (!handle) return
+      if (leg === 3) {
+        // the tests drive it now: the control's state, and a press for every press
+        const state = getTestState()
+        if (kind === "button") {
+          if (state.presses > presses) {
+            handle.setPress(true)
+            clearTimeout(pulse)
+            pulse = window.setTimeout(() => scene.current?.setPress(false), 180)
+          }
+        } else handle.setChecked(state.on)
+        presses = state.presses
+        return
+      }
       // the builder's preview starts on (its switch and checkbox are checked, its button idle)
       const value = leg === 2 ? true : past ? getPeelOn() : heroOnRef.current
       if (kind === "button") handle.setPress(leg === 1 && getPeelOn())
@@ -230,7 +311,8 @@ export function SkinScene() {
       }
       // the last leg: the builder's colours come on, the real component fades in under the object
       const last = lastLeg()
-      const nextLeg = last && last.t > 0.5 ? 2 : past ? 1 : 0
+      const fin = testLeg()
+      const nextLeg = fin && fin.t > 0.5 ? 3 : last && last.t > 0.5 ? 2 : past ? 1 : 0
       if (nextLeg !== leg) {
         leg = nextLeg
         follow()
@@ -245,8 +327,39 @@ export function SkinScene() {
         else if (past) setLanded(true)
         last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
       }
+      // one control at a time: the test's own stays hidden while the object flies to it (on a
+      // phone the object is hidden in flight instead, so the control shows until touchdown)
+      if (fin) {
+        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || atTests)
+        if (hide) fin.test.style.setProperty("opacity", "0", "important")
+        else fin.test.style.removeProperty("opacity")
+      }
+      if (fin && scene.current && fin.y > fin.s4) {
+        // it takes the builder's component with it, and gets the site's skin back on the way
+        fin.look.style.opacity = window.innerWidth <= 900 ? "" : String(1 - fin.emerge)
+        const k = Math.min(1, Math.max(0, (fin.t - 0.55) / 0.45))
+        const back = k * k * (3 - 2 * k)
+        const colors = getLookColors()
+        scene.current.setLook(colors.brand, colors.surface, 1 - back)
+        // whole skin from the start of the leg: a peel closing in flight draws a half-folded shape
+        scene.current.setPeel(0)
+      }
+      // hysteresis: the control grows to the object's size on arrival, which moves the page a
+      // little; without it, arrival would flicker on and off at the threshold
+      const arrived = Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
+      if (arrived !== atTests) {
+        atTests = arrived
+        setTestLanded(arrived)
+        if (arrived) emitTestArrived()
+      }
     }
     const offPeelOn = onPeelOn(follow)
+    // a state change or a remounted control (a new run): follow it, wake the render loop, and
+    // re-apply the hand-over to the new control
+    const offTestState = onTestState(() => {
+      follow()
+      onScroll()
+    })
     const start = () => {
       import("./skin-gl")
         .then(({ mountSkin }) => {
@@ -285,6 +398,9 @@ export function SkinScene() {
     return () => {
       cancelled = true
       offPeelOn()
+      offTestState()
+      clearTimeout(pulse)
+      setTestLanded(false)
       window.removeEventListener("load", schedule)
       window.removeEventListener("scroll", onScroll)
       if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle)

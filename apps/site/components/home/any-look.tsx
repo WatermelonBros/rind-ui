@@ -395,9 +395,12 @@ export function AnyLook() {
     if (!el) return
     let gone = false
     const load = () => {
-      import("./colour").then((m) => {
-        if (!gone) setPicker(() => m.Colour)
-      })
+      import("./colour")
+        .then((m) => {
+          if (!gone) setPicker(() => m.Colour)
+        })
+        // a failed chunk keeps the plain input: the builder still works
+        .catch(() => {})
     }
     if (typeof IntersectionObserver === "undefined") {
       load()
@@ -513,7 +516,9 @@ export function AnyLook() {
                 <CheckboxGroup.ItemLabel>Keyboard support</CheckboxGroup.ItemLabel>
               </CheckboxGroup.Item>
               <div className={styles.lookRow}>
-                <Button>Save</Button>
+                <Button>
+                  Save <span aria-hidden="true">→</span>
+                </Button>
                 <Toggle.Root defaultPressed>Bold</Toggle.Root>
               </div>
             </div>

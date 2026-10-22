@@ -140,6 +140,10 @@
 }
 
 @media (max-width: 900px) {
+  /* a phone reads the two acts faster: less scroll with nothing new on screen */
+  .peel {
+    height: 170vh;
+  }
   .sticky {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
@@ -210,7 +214,8 @@
 /* hidden by opacity (the skin never sets it), so the 3D object is the only control seen, even
    while it is still travelling here */
 .scene[data-gl] .under .component :is([data-part="control"], button) {
-  opacity: 0;
+  /* biome-ignore lint/complexity/noImportantStyles: beats every skin's state opacity (pending, disabled) */
+  opacity: 0 !important;
 }
 
 .sticky::before {
@@ -219,7 +224,7 @@
   inset: 0;
   z-index: -1;
   background: var(--ink);
-  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
 }
 /* the copy again, in paper, clipped by the same disc (peel.tsx) */
 .inkLayer {
@@ -233,13 +238,13 @@
   padding: var(--bar-h) 56px 0;
   color: var(--paper);
   pointer-events: none;
-  clip-path: circle(calc(var(--dark, 0) * 120%) at 75% 50%);
+  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
 }
 /* on a phone the disc opens from the object, low in the column */
 @media (max-width: 900px) {
   .sticky::before,
   .inkLayer {
-    clip-path: circle(calc(var(--dark, 0) * 150%) at 50% 62%);
+    clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 156%) at 50% 62%);
   }
   .inkLayer {
     grid-template-columns: 1fr;
