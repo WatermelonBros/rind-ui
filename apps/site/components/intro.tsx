@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import styles from "./intro.module.css"
 
-const DROP_MS = 900
+const DROP_MS = 450
 
 type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { ready: Promise<void> }
@@ -52,7 +52,7 @@ export function Intro() {
         root.animate(
           { clipPath: [`circle(0% at ${x} ${y})`, `circle(150% at ${x} ${y})`] },
           {
-            duration: 1100,
+            duration: 800,
             easing: "cubic-bezier(0.7, 0, 0.2, 1)",
             pseudoElement: "::view-transition-new(root)",
           },

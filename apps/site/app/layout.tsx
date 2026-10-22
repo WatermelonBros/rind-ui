@@ -7,9 +7,9 @@ import { HydrationMark } from "@/components/hydration-mark"
 // the fonts the first screen uses are preloaded (they land before the first layout, so nothing
 // reflows: a late font moved the hero's lede and buttons by 66px on phones); "block" keeps a
 // late one invisible rather than drawn twice
+// only the weights the site sets (display 800/900, mono 500 to 700): every file is preloaded
 const unbounded = localFont({
   src: [
-    { path: "../fonts/unbounded/unbounded-latin-500.woff2", weight: "500" },
     { path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" },
   ],
   variable: "--font-unbounded",
@@ -38,7 +38,6 @@ const fredoka = localFont({
 })
 const mono = localFont({
   src: [
-    { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-400.woff2", weight: "400" },
     { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-500.woff2", weight: "500" },
     { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-600.woff2", weight: "600" },
   ],

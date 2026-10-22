@@ -6,9 +6,9 @@ import { wave } from "./wave"
 
 /**
  * Every move between the site's pages opens the next one with the phase's wave, from where the
- * link was pressed (wave.ts). One listener for every link, so no link has to opt in. It waits
- * for the next page to be mounted (its <main> replaced) within the browser's deadline; a page
- * slow to arrive just cuts in. Links that morph their text into the next title (morph-link.tsx,
+ * link was pressed (wave.ts). One listener for every link, so no link has to opt in. A link's
+ * page is fetched as the pointer reaches it (or on touch), so the move itself is quick; the
+ * transition waits for the next page to commit (its URL), within the browser's deadline. Links that morph their text into the next title (morph-link.tsx,
  * `data-morph`) keep their own transition. Plain navigation without view transitions, under
  * reduced motion, with a modifier key, for a new tab, another site or a place on this page.
  */
@@ -28,15 +28,14 @@ export function RouteWave() {
         return
       // the link's own handler (next/link) sees this and stands down
       e.preventDefault()
-      const before = document.querySelector("main")
       const { clientX: x, clientY: y } = e
       const vt = document.startViewTransition(async () => {
         router.push(to.pathname + to.search + to.hash)
         const end = performance.now() + 2000
         await new Promise<void>((resolve) => {
           const tick = () => {
-            const main = document.querySelector("main")
-            const arrived = location.pathname === to.pathname && main !== null && main !== before
+            // the URL changes as the next page commits
+            const arrived = location.pathname === to.pathname
             // a timer, not a frame: the browser holds rendering (and frames) during the update
             if (arrived || performance.now() > end) resolve()
             else setTimeout(tick, 16)
@@ -50,9 +49,28 @@ export function RouteWave() {
       )
       vt.finished.catch(() => {})
     }
+    // intent: the page behind a link is fetched when the pointer reaches it, not for every link
+    // in view (that downloaded the docs for visitors who never left the landing)
+    const fetched = new Set<string>()
+    const onIntent = (e: Event) => {
+      const a = e.target instanceof Element ? e.target.closest("a[href]") : null
+      if (!(a instanceof HTMLAnchorElement)) return
+      const to = new URL(a.href)
+      if (to.origin !== location.origin || fetched.has(to.pathname)) return
+      fetched.add(to.pathname)
+      router.prefetch(to.pathname)
+    }
     // capture: before next/link's own click handler runs
     document.addEventListener("click", onClick, true)
-    return () => document.removeEventListener("click", onClick, true)
+    document.addEventListener("pointerover", onIntent, { passive: true })
+    document.addEventListener("touchstart", onIntent, { passive: true })
+    document.addEventListener("focusin", onIntent)
+    return () => {
+      document.removeEventListener("click", onClick, true)
+      document.removeEventListener("pointerover", onIntent)
+      document.removeEventListener("touchstart", onIntent)
+      document.removeEventListener("focusin", onIntent)
+    }
   }, [router])
   return null
 }
