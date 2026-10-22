@@ -149,6 +149,15 @@ export function SkinScene() {
       const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
       return { look, test, y, s4, t, emerge }
     }
+    // The room right of the content frame (the builder's; the tests share its width): the
+    // object flies down it at a size that fits, never under 64px across, so it neither covers
+    // the panels nor shrinks to a speck
+    const gutterFit = (w: number, h: number) => {
+      const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
+      const room = window.innerWidth - (frame?.right ?? window.innerWidth) - 32
+      const k = Math.min(1, Math.max(64, room) / w)
+      return { w: w * k, h: h * k, x: window.innerWidth - w * k - 16 }
+    }
     const target = () => {
       const fin = testLeg()
       if (fin && fin.y > fin.s4) {
@@ -164,15 +173,15 @@ export function SkinScene() {
           return k * k * (3 - 2 * k)
         }
         // around the content, like the leg before: out to the right-hand gutter, down to the
-        // control's height, then in; it takes its full size early, so it never shrinks to a speck
-        const gutter = window.innerWidth - live.width - 24
-        const x = lerp(lerp(from.x, gutter, smooth(0, 0.3)), live.x, smooth(0.7, 1))
-        const grow = smooth(0, 0.25)
+        // control's height, then in
+        const g = gutterFit(live.width, live.height)
+        const out = smooth(0, 0.3)
+        const across = smooth(0.7, 1)
         return new DOMRect(
-          x,
+          lerp(lerp(from.x, g.x, out), live.x, across),
           lerp(from.y, toY, smooth(0.25, 0.7)),
-          lerp(from.width, live.width, grow),
-          lerp(from.height, live.height, grow),
+          lerp(lerp(from.width, g.w, out), live.width, across),
+          lerp(lerp(from.height, g.h, out), live.height, across),
         )
       }
       const last = lastLeg()
@@ -197,16 +206,15 @@ export function SkinScene() {
         }
         // three moves, around the content: out to the right-hand gutter, down to the preview
         // row's height, then in along that row (collisions on the way fade it: alpha)
-        const gutter = window.innerWidth - Math.max(from.width, to.width) - 24
+        const g = gutterFit(to.width, to.height)
         const out = smooth(0, 0.3)
         const down = smooth(0.25, 0.65)
         const across = smooth(0.65, 1)
-        const x = lerp(lerp(from.x, gutter, out), to.x, across)
         return new DOMRect(
-          x,
+          lerp(lerp(from.x, g.x, out), to.x, across),
           lerp(from.y, to.y, down),
-          lerp(from.width, to.width, smooth(0.5, 1)),
-          lerp(from.height, to.height, smooth(0.5, 1)),
+          lerp(lerp(from.width, g.w, out), to.width, across),
+          lerp(lerp(from.height, g.h, out), to.height, across),
         )
       }
       const { next, y, s0, t } = travel()
