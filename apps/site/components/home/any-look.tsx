@@ -395,9 +395,12 @@ export function AnyLook() {
     if (!el) return
     let gone = false
     const load = () => {
-      import("./colour").then((m) => {
-        if (!gone) setPicker(() => m.Colour)
-      })
+      import("./colour")
+        .then((m) => {
+          if (!gone) setPicker(() => m.Colour)
+        })
+        // a failed chunk keeps the plain input: the builder still works
+        .catch(() => {})
     }
     if (typeof IntersectionObserver === "undefined") {
       load()

@@ -9,6 +9,7 @@ import {
   onTestArrived,
   setTestState,
   setTestTarget,
+  useSceneGl,
   useTestLanded,
 } from "./hero-state"
 import styles from "./home.module.css"
@@ -107,6 +108,7 @@ export function Tested() {
   // The hero's object ends its trip here (skin-scene.tsx): hand it this test's control and its
   // state, hide the control while the object stands on it, and run the test once it arrives
   const landed = useTestLanded()
+  const gl = useSceneGl()
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new run remounts the stage, a new kind changes the control
   useEffect(() => {
     const root = stage.current
@@ -240,6 +242,7 @@ export function Tested() {
             className={styles.testStage}
             data-skinned=""
             data-skin={phase}
+            data-gl={gl ? "" : undefined}
             data-object={landed ? "" : undefined}
             ref={stage}
             key={run}

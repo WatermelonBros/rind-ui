@@ -153,22 +153,26 @@ export function SkinScene() {
       const fin = testLeg()
       if (fin && fin.y > fin.s4) {
         const live = fin.test.getBoundingClientRect()
-        if (atTests) return live
+        // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
+        if (atTests || window.innerWidth <= 900) return live
         const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
         const top = window.innerHeight * 0.15
         const bottom = window.innerHeight * 0.75 - live.height
-        const to = new DOMRect(
-          live.x,
-          Math.min(Math.max(live.y, top), bottom),
-          live.width,
-          live.height,
-        )
-        const e = fin.t * fin.t * (3 - 2 * fin.t)
+        const toY = Math.min(Math.max(live.y, top), bottom)
+        const smooth = (a: number, b: number) => {
+          const k = Math.min(1, Math.max(0, (fin.t - a) / (b - a)))
+          return k * k * (3 - 2 * k)
+        }
+        // around the content, like the leg before: out to the right-hand gutter, down to the
+        // control's height, then in; it takes its full size early, so it never shrinks to a speck
+        const gutter = window.innerWidth - live.width - 24
+        const x = lerp(lerp(from.x, gutter, smooth(0, 0.3)), live.x, smooth(0.7, 1))
+        const grow = smooth(0, 0.25)
         return new DOMRect(
-          lerp(from.x, to.x, e),
-          lerp(from.y, to.y, e),
-          lerp(from.width, to.width, e),
-          lerp(from.height, to.height, e),
+          x,
+          lerp(from.y, toY, smooth(0.25, 0.7)),
+          lerp(from.width, live.width, grow),
+          lerp(from.height, live.height, grow),
         )
       }
       const last = lastLeg()
@@ -229,9 +233,12 @@ export function SkinScene() {
     const alpha = () => {
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
-      if (fin && fin.y > fin.s4) return fin.emerge
+      const phone = window.innerWidth <= 900
+      if (fin && fin.y > fin.s4) return phone ? (atTests ? 1 : 0) : fin.emerge
       const last = lastLeg()
       if (last && last.y > last.s2) {
+        // a phone has no gutter to fly in: it hides on the way and appears near the preview
+        if (phone && last.t > 0.05 && last.t < 0.85) return 0
         // always visible on the way (fading over every obstacle read as a flicker); it fades
         // only at the end, into the real component
         return 1 - last.fade
@@ -306,7 +313,7 @@ export function SkinScene() {
       }
       if (fin && scene.current && fin.y > fin.s4) {
         // it takes the builder's component with it, and gets the site's skin back on the way
-        fin.look.style.opacity = String(1 - fin.emerge)
+        fin.look.style.opacity = window.innerWidth <= 900 ? "" : String(1 - fin.emerge)
         const k = Math.min(1, Math.max(0, (fin.t - 0.55) / 0.45))
         const back = k * k * (3 - 2 * k)
         const colors = getLookColors()

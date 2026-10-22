@@ -1,6 +1,6 @@
 /* ── shared ─────────────────────────────────────────────────────────────────────────── */
 .section {
-  padding: 120px 56px;
+  padding: clamp(80px, 7.5vw, 108px) 56px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -504,20 +504,21 @@
   justify-self: center;
 }
 /* the hero's 3D object stands on the test's control (skin-scene.tsx): the control keeps working
-   for the driver, unseen, at the object's size */
+   for the driver, unseen once it lands; it has the object's size as soon as the 3D runs, so the
+   landing never moves the page */
 .testStage[data-object] :is([data-part="control"], button[data-scope="button"]) {
   /* biome-ignore lint/complexity/noImportantStyles: beats every skin's state opacity */
   opacity: 0 !important;
 }
-.testStage[data-object] [data-scope="switch"][data-part="control"] {
+.testStage[data-gl] [data-scope="switch"][data-part="control"] {
   inline-size: 120px;
   block-size: 56px;
 }
-.testStage[data-object] [data-scope="checkbox"][data-part="control"] {
+.testStage[data-gl] [data-scope="checkbox"][data-part="control"] {
   inline-size: 72px;
   block-size: 72px;
 }
-.testStage[data-object] button[data-scope="button"] {
+.testStage[data-gl] button[data-scope="button"] {
   inline-size: 150px;
   block-size: 60px;
 }
