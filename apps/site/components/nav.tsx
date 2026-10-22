@@ -25,12 +25,20 @@ export function Nav() {
       aria-label="Main"
       data-floating={home && !scrolled ? "" : undefined}
     >
-      <Link href="/" className={styles.mini} aria-label="rind home">
+      {/* no prefetch on the site's links: the docs' code is large, and fetching it for every
+          link in view slowed the landing for visitors who never leave it */}
+      <Link prefetch={false} href="/" className={styles.mini} aria-label="rind home">
         r<span>i</span>nd
       </Link>
-      <Link href="/docs/get-started/">Docs</Link>
-      <Link href="/docs/#components">Components</Link>
-      <Link href="/docs/testing-accessibility/">Testing</Link>
+      <Link prefetch={false} href="/docs/get-started/">
+        Docs
+      </Link>
+      <Link prefetch={false} href="/docs/#components">
+        Components
+      </Link>
+      <Link prefetch={false} href="/docs/testing-accessibility/">
+        Testing
+      </Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>
       <a href="https://discord.gg/HHqT9ucXn4">Discord</a>
       {/* The site's phase is an on/off setting that applies at once: a rind Switch. */}

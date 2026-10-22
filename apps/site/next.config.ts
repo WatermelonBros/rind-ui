@@ -8,6 +8,10 @@ const config: NextConfig = {
   images: { unoptimized: true },
   // Workspace packages ship TypeScript sources under the @rind-ui/source condition.
   transpilePackages: ["@rind-ui/react", "@rind-ui/core", "@rind-ui/theme"],
+  // The packages' index re-exports every component; without this a page that uses three of
+  // them shipped all of them (the landing loaded the whole library). Next rewrites each import
+  // to the component's own module.
+  experimental: { optimizePackageImports: ["@rind-ui/react", "@rind-ui/core"] },
   // The repo runs TypeScript 7; Next's checker uses the TS JS API. `pnpm typecheck` runs tsc.
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
