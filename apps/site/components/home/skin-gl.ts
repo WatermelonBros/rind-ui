@@ -67,11 +67,13 @@ float stroke(vec2 p, vec2 a, vec2 b, float f) {
   return f <= 0.0 ? 1e3 : sdSegment(p, a, mix(a, b, clamp(f, 0.0, 1.0)));
 }
 
-float bodyDepth() { return mix(0.12, 0.26, uPhase); }
-float bevel(float depth) { return mix(0.03, depth * 0.95, uPhase); }
+// crisp is a solid slab with rounded edges (the bevel is what catches the cel bands), juicy a
+// soft pillow
+float bodyDepth() { return mix(0.22, 0.26, uPhase); }
+float bevel(float depth) { return mix(0.1, depth * 0.95, uPhase); }
 // a mark (thumb, check, arrow) lying on the body's face: a raised stroke or a sunk-in ball
 float onFace(float d2, vec3 p, float depth) {
-  return extrude(d2, p.z - depth - mix(0.04, -0.02, uPhase), mix(0.05, 0.07, uPhase), 0.02);
+  return extrude(d2, p.z - depth - mix(0.06, -0.02, uPhase), mix(0.08, 0.07, uPhase), 0.03);
 }
 
 // .x distance, .y part (0 body, 1 mark)
@@ -91,7 +93,7 @@ vec2 map(vec3 p) {
     float moving = clamp(uChecked * (1.0 - uChecked) * 4.0, 0.0, 1.0);
     t.x /= 1.0 + 0.3 * moving * uPhase;
     float r = mix(0.34, 0.36, uPhase);
-    mark = mix(extrude(length(t.xy) - r, t.z, 0.06, 0.025), length(t * vec3(1.0, 1.0, 1.15)) - r, uPhase);
+    mark = mix(extrude(length(t.xy) - r, t.z, 0.1, 0.06), length(t * vec3(1.0, 1.0, 1.15)) - r, uPhase);
   } else if (uKind < 1.5) {
     // Checkbox: a rounded square; the check draws itself along its two strokes
     float half_ = 0.86 + swell;
@@ -141,7 +143,9 @@ void ray(vec2 frag, out vec3 ro, out vec3 rd) {
   vec2 q = (frag - uCenter) / uSize * 0.82;
   ro = vec3(0.0, 0.0, 5.0);
   rd = normalize(vec3(q / 4.0, -1.0));
-  mat2 rx = rot(uTilt.y), ry = rot(-uTilt.x);
+  // crisp rests a little turned, so its thickness and bevel show; the pointer tilts from there
+  float rest = 1.0 - uPhase;
+  mat2 rx = rot(uTilt.y + 0.32 * rest), ry = rot(-uTilt.x - 0.26 * rest);
   ro.yz = rx * ro.yz; rd.yz = rx * rd.yz;
   ro.xz = ry * ro.xz; rd.xz = ry * rd.xz;
 }
@@ -193,14 +197,21 @@ void main() {
   vec3 body = uKind > 1.5 ? filled : mix(uCard, filled, on);
   vec3 mark = uKind < 0.5 ? mix(mix(uInk, uOn, on), uCard, uPhase) : mix(uOn, uCard, uPhase);
   vec3 base = isMark ? mark : body;
-  vec3 crisp = mix(base * 0.78, base, step(-0.15, ndl));
-  // a narrow ramp, not a step: a hard band edge stair-steps along a curved rim
-  crisp = mix(crisp, mix(base, vec3(1.0), 0.3), smoothstep(0.73, 0.77, ndl));
-  // crisp's flat faces end in an ink edge, like the page's 3px borders
-  float facing = abs(n.z);
-  crisp = mix(uInk, crisp, smoothstep(0.18, 0.3, facing));
   float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
   float spec = pow(max(dot(reflect(-L, n), V), 0.0), 40.0);
+  // crisp is cel-shaded, not flat: hard bands (shadow, base, lit, top), a light bevel where the
+  // face turns and a hard glint. The lit bands lighten towards white, so an ink body has depth
+  // too. Each band edge is a narrow ramp: a hard step stair-steps along a curved rim
+  float facing = abs(n.z);
+  vec3 crisp = mix(base * 0.62, base, smoothstep(-0.17, -0.13, ndl));
+  crisp = mix(crisp, mix(base, vec3(1.0), 0.16), smoothstep(0.33, 0.37, ndl));
+  crisp = mix(crisp, mix(base, vec3(1.0), 0.42), smoothstep(0.83, 0.87, ndl));
+  float bevel = smoothstep(0.3, 0.34, facing) * (1.0 - smoothstep(0.5, 0.54, facing))
+    * smoothstep(0.1, 0.2, ndl);
+  crisp = mix(crisp, mix(base, vec3(1.0), 0.55), bevel);
+  // crisp's flat faces end in an ink edge, like the page's 3px borders
+  crisp = mix(uInk, crisp, smoothstep(0.18, 0.3, facing));
+  crisp = mix(crisp, vec3(1.0), smoothstep(0.55, 0.6, spec));
   vec3 juicy = mix(base * 0.82, base, ndl * 0.5 + 0.5) + rim * 0.2 + spec * 0.75;
   vec3 skin = mix(crisp, juicy, uPhase);
 
