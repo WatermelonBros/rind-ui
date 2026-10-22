@@ -4,13 +4,14 @@ import type { ReactNode } from "react"
 import { HydrationMark } from "@/components/hydration-mark"
 
 // Self-hosted (OFL, licences in fonts/): the build must work with no network.
+// the fonts the first screen uses are preloaded (they land before the first layout, so nothing
+// reflows: a late font moved the hero's lede and buttons by 66px on phones); "block" keeps a
+// late one invisible rather than drawn twice
+// only the weights the site sets (display 800/900, mono 500 to 700): every file is preloaded
 const unbounded = localFont({
-  src: [
-    { path: "../fonts/unbounded/unbounded-latin-500.woff2", weight: "500" },
-    { path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" },
-  ],
+  src: [{ path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" }],
   variable: "--font-unbounded",
-  display: "swap",
+  display: "block",
 })
 const inter = localFont({
   src: [
@@ -20,7 +21,9 @@ const inter = localFont({
     { path: "../fonts/inter-tight/inter-tight-latin-700.woff2", weight: "700" },
   ],
   variable: "--font-inter",
-  display: "swap",
+  display: "block",
+  // crisp's text only (juicy is the default): fetched when used, not on every first load
+  preload: false,
 })
 const fredoka = localFont({
   src: [
@@ -29,18 +32,17 @@ const fredoka = localFont({
     { path: "../fonts/fredoka/fredoka-latin-700.woff2", weight: "700" },
   ],
   variable: "--font-fredoka",
-  display: "swap",
+  display: "block",
 })
 const mono = localFont({
   src: [
-    { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-400.woff2", weight: "400" },
     { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-500.woff2", weight: "500" },
     { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-600.woff2", weight: "600" },
   ],
   variable: "--font-mono",
-  display: "swap",
-  // small labels: they can swap in a moment later without delaying the first paint
-  preload: false,
+  display: "block",
+  // preloaded: the hero's "Browse components" is set in it, and a font that lands after the first
+  // layout rewraps the hero's buttons on phones, whatever its display
 })
 
 export const metadata: Metadata = {
@@ -68,7 +70,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body>
+      {/* extensions (Grammarly, password managers) stamp attributes on <body> before React loads */}
+      <body suppressHydrationWarning>
         {/* The site chrome lives in app/(site)/layout.tsx; app/examples has none. */}
         {children}
         <HydrationMark />

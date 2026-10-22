@@ -37,7 +37,9 @@ export interface ExampleCode {
 const SKIN_NOTE = (
   <>
     <b>Our skin, not yours.</b> This is how this site styles it; no package ships it.{" "}
-    <Link href="/docs/get-started/#styling">How styling works →</Link>
+    <Link prefetch={false} href="/docs/get-started/#styling">
+      How styling works →
+    </Link>
   </>
 )
 const PARTS_NOTE = (

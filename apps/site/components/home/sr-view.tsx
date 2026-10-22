@@ -2,6 +2,7 @@
 
 import { ToggleGroup } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
+import { useSound } from "../sound"
 import { buildBuffer, type Item, itemFor, itemIndexOf } from "./sr/buffer"
 import { type Move, type Reader, speakItem, speakMove, states } from "./sr/speech"
 import styles from "./sr-view.module.css"
@@ -104,7 +105,8 @@ function focusMode(el: Element | null): boolean {
 export function ScreenReaderView() {
   const [on, setOn] = useState(false)
   const [reader, setReader] = useState<Reader>("nvda")
-  const [voice, setVoice] = useState(false)
+  // the voice is the site's sound (sound.tsx): one setting, here or in the nav
+  const { enabled: voice, setEnabled: setVoice } = useSound()
   const [lines, setLines] = useState<readonly Line[]>([])
   const [box, setBox] = useState<DOMRect | null>(null)
   const readerRef = useRef(reader)

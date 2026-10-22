@@ -1,0 +1,25 @@
+/* lost-zero.tsx: the slot the 3D 0 stands in, square around the round avatar */
+.slot {
+  display: inline-block;
+  inline-size: 0.66em;
+  block-size: 0.66em;
+  margin-inline: 0.04em;
+  vertical-align: -0.02em;
+  line-height: 0.66;
+  text-align: center;
+  color: var(--acc);
+  cursor: pointer;
+}
+/* once the object is drawn, the digit gives way to it (it still reads as 0 to nobody: the
+   whole code is aria-hidden; the heading says what happened) */
+.slot[data-drawn] {
+  color: transparent;
+}
+.canvas {
+  position: fixed;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100vh;
+  pointer-events: none;
+  z-index: 2;
+}

@@ -79,7 +79,7 @@ export default async function DocPage({ params }: Props) {
         <ReleaseSync />
         <nav className={styles.pager} aria-label="Pages">
           {prev ? (
-            <Link href={`/docs/${prev.slug}/`} rel="prev">
+            <Link prefetch={false} href={`/docs/${prev.slug}/`} rel="prev">
               <small>Previous</small>
               {prev.title}
             </Link>
@@ -87,7 +87,7 @@ export default async function DocPage({ params }: Props) {
             <span />
           )}
           {next && (
-            <Link href={`/docs/${next.slug}/`} rel="next" data-next="">
+            <Link prefetch={false} href={`/docs/${next.slug}/`} rel="next" data-next="">
               <small>Next</small>
               {next.title}
             </Link>

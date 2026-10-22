@@ -13,7 +13,7 @@ export default function DocsIndex() {
       </h2>
       <div className={styles.cards}>
         {list.map((p) => (
-          <Link key={p.slug} href={`/docs/${p.slug}/`} className={styles.card}>
+          <Link prefetch={false} key={p.slug} href={`/docs/${p.slug}/`} className={styles.card}>
             <strong>{p.title}</strong>
             <span>{p.summary.replace(/[`*[\]]/g, "").replace(/\(([^)]+\.md)\)/g, "")}</span>
           </Link>

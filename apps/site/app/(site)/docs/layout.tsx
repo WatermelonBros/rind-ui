@@ -46,7 +46,10 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
         {children}
         <footer className={styles.footer}>
           <span>
-            rind · headless components by Watermelon · MIT · <Link href="/privacy/">Privacy</Link>
+            rind · headless components by Watermelon · MIT ·{" "}
+            <Link prefetch={false} href="/privacy/">
+              Privacy
+            </Link>
           </span>
           <a href="https://reado.watermelon-studio.it">
             Built using <b>Reado</b> ↗

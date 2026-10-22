@@ -11,18 +11,6 @@
   font: 900 clamp(120px, 26vw, 320px) / 0.85 var(--display);
   letter-spacing: -0.05em;
 }
-/* the 0 is a dropped i-dot that keeps bobbing */
-.code span {
-  display: inline-block;
-  color: var(--acc);
-  animation: bob 2.6s var(--spring) infinite alternate;
-}
-@keyframes bob {
-  to {
-    translate: 0 -0.08em;
-    scale: 1.04 0.96;
-  }
-}
 .title {
   font: 900 clamp(28px, 4vw, 48px) / 1 var(--display);
   letter-spacing: -0.03em;

@@ -24,7 +24,7 @@ uniform vec2 uRes;      // canvas size in pixels
 uniform vec2 uCenter;   // the component's centre, in canvas pixels from the bottom left
 uniform float uSize;    // its half width, in canvas pixels
 uniform float uAspect;  // its width / height
-uniform float uKind;    // 0 switch, 1 checkbox, 2 button
+uniform float uKind;    // 0 switch, 1 checkbox, 2 button, 3 avatar
 uniform float uPress;   // 0 to 1: the button held down
 uniform float uAlpha;   // the whole object's opacity (a phone dissolves it mid-flight)
 uniform float uCustom;  // 0 to 1: how much it wears the visitor's skin from the builder
@@ -81,10 +81,44 @@ float onFace(float d2, vec3 p, float depth) {
   return extrude(d2, p.z - depth - mix(0.06, -0.02, uPhase), mix(0.08, 0.07, uPhase), 0.03);
 }
 
+// The avatar (the 404's 0): an Avatar's round frame with a well in its face where the picture
+// sits, and in the well a bust (a head on shoulders, cut to the well) whose face is alive: the
+// eyes follow the pointer and blink every few seconds; the mouth is lost (a crooked line) and,
+// while touched (uChecked), surprised (a small o). A status dot sits on the rim.
+// .y: 0 frame, 1 the bust, 2 the face's features, 3 the status dot
+vec2 mapAvatar(vec3 p, float depth, float swell) {
+  float frame = extrude(length(p.xy) - (0.9 + swell), p.z, depth, bevel(depth));
+  float well = extrude(length(p.xy) - 0.74, p.z - depth, 0.14, 0.04);
+  frame = max(frame, -well);
+  float floor_ = depth - 0.12;
+  // scaled spheres: each distance divided by its largest scale, so the march never overshoots
+  float head = (length((p - vec3(0.0, 0.14, floor_)) * vec3(1.0, 0.95, 1.25)) - 0.3) / 1.25;
+  float shoulders = (length((p - vec3(0.0, -0.66, floor_ - 0.04)) * vec3(0.9, 1.45, 2.2)) - 0.5) / 2.2;
+  float bust = smin(head, max(shoulders, length(p.xy) - 0.72), 0.06);
+  float front = floor_ + 0.23;
+  vec2 g = clamp(vec2(-uTilt.x, uTilt.y) * 0.4, -0.05, 0.05);
+  float open_ = 1.0 - 0.92 * smoothstep(0.0, 0.025, 0.025 - abs(fract(uTime * 0.23) - 0.5));
+  vec3 e = vec3(abs(p.x - g.x) - 0.11, (p.y - g.y - 0.18) / open_, p.z - front);
+  float eyes = (length(e) - (0.045 + 0.018 * uChecked)) * open_;
+  // lost: a small frown (the top half of a circle); surprised: an open mouth, a dark oval
+  vec2 m = p.xy - vec2(0.0, -0.03);
+  float arc = m.y > 0.0 ? abs(length(m) - 0.07)
+    : min(length(m - vec2(0.07, 0.0)), length(m + vec2(0.07, 0.0)));
+  float lost = length(vec2(arc, p.z - front + 0.02)) - 0.022;
+  vec3 r = vec3(0.05, 0.065, 0.03);
+  float wow = (length((p - vec3(0.0, 0.0, front - 0.015)) / r) - 1.0) * 0.03;
+  float face = min(eyes, mix(lost, wow, uChecked));
+  // the status dot: online green, standing out of the rim
+  float dot_ = length(p - vec3(0.63, -0.63, depth * 0.8)) - 0.18;
+  float d = min(min(frame, bust), min(face, dot_));
+  return vec2(d, dot_ <= d + 1e-5 ? 3.0 : face <= d + 1e-5 ? 2.0 : bust <= d + 1e-5 ? 1.0 : 0.0);
+}
+
 // .x distance, .y part (0 body, 1 mark)
 vec2 map(vec3 p) {
   float swell = uPhase * (0.02 * sin(uTime * 1.6) + 0.04);
   float depth = bodyDepth() + swell;
+  if (uKind > 2.5) return mapAvatar(p, depth, swell);
   float body;
   float mark;
   // a squashed space stretches the field: divide it back, or the march steps through the surface
@@ -108,7 +142,7 @@ vec2 map(vec3 p) {
     float f = uChecked * (l1 + l2);
     float check = min(stroke(p.xy, a, b, f / l1), stroke(p.xy, b, c, (f - l1) / l2)) - 0.11;
     mark = onFace(check, p, depth);
-  } else {
+  } else if (uKind < 2.5) {
     // Button: a pill that sinks into its own shadow when pressed (crisp) or squashes (juicy)
     p.xy -= vec2(0.092, -0.092) * uPress * (1.0 - uPhase);
     squash = 1.0 + 0.5 * uPress * uPhase;
@@ -193,6 +227,9 @@ void main() {
   vec3 V = -rd;
   float ndl = dot(n, L);
   bool isMark = hit.z > 0.5;
+  // the avatar's eyes and mouth: ink on the picture, in both phases
+  bool isFeature = hit.z > 1.5 && hit.z < 2.5;
+  bool isStatus = hit.z > 2.5;
   float on = smoothstep(0.3, 0.7, uChecked);
 
   // skinned: the page's own look. Body: card when off, ink (crisp) or pink (juicy) when on; a
@@ -201,7 +238,7 @@ void main() {
   vec3 filled = mix(uInk, uAcc, uPhase);
   vec3 body = uKind > 1.5 ? filled : mix(uCard, filled, on);
   vec3 mark = uKind < 0.5 ? mix(mix(uInk, uOn, on), uCard, uPhase) : mix(uOn, uCard, uPhase);
-  vec3 base = isMark ? mark : body;
+  vec3 base = isStatus ? vec3(0.18, 0.76, 0.47) : isFeature ? uInk : isMark ? mark : body;
   float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
   float spec = pow(max(dot(reflect(-L, n), V), 0.0), 40.0);
   // crisp is cel-shaded, not flat: hard bands (shadow, base, lit, top), a light bevel where the
@@ -229,7 +266,7 @@ void main() {
   // darker grey; the skeleton shows as faint contour lines
   vec3 bareBody = mix(vec3(0.9, 0.9, 0.91), vec3(0.7, 0.7, 0.73), uKind < 1.5 ? on : 0.0);
   vec3 bareMark = uKind < 0.5 ? vec3(0.98) : vec3(0.3, 0.3, 0.33);
-  vec3 bare = (isMark ? bareMark : bareBody) * (0.9 + 0.1 * max(ndl, 0.0));
+  vec3 bare = (isFeature ? vec3(0.25) : isMark ? bareMark : bareBody) * (0.9 + 0.1 * max(ndl, 0.0));
   bare = mix(vec3(0.45, 0.45, 0.48), bare, smoothstep(0.08, 0.16, abs(n.z)));
   float lines = abs(fract(p.z * 10.0 + 0.5) - 0.5);
   bare = mix(bare, vec3(0.35, 0.4, 0.55), (1.0 - smoothstep(0.0, 0.05, lines)) * 0.25);
@@ -278,6 +315,8 @@ function palette() {
 /** The components the hero can show; the page picks one per visit (app/layout.tsx). */
 export const KINDS = ["switch", "checkbox", "button"] as const
 export type Kind = (typeof KINDS)[number]
+/** What can be drawn: the hero's kinds, and the avatar (the 404's 0, lost-zero.tsx). */
+export type Shape = Kind | "avatar"
 
 export interface SkinHandle {
   /** Follows the real Switch or Checkbox it stands in for. */
@@ -301,7 +340,7 @@ export function mountSkin(
   canvas: HTMLCanvasElement,
   /** Where the component stands this frame, in viewport pixels (null: nowhere), and how opaque. */
   rectAt: () => DOMRect | null,
-  kind: Kind,
+  kind: Shape,
   onFirstFrame: () => void,
   alphaAt: () => number,
   initial: { checked: boolean; peel: number },
@@ -323,7 +362,7 @@ export function mountSkin(
     uCenter: { value: [0, 0] },
     uSize: { value: 100 },
     uAspect: { value: 2 },
-    uKind: { value: KINDS.indexOf(kind) },
+    uKind: { value: kind === "avatar" ? 3 : KINDS.indexOf(kind) },
     uPress: { value: 0 },
     uAlpha: { value: 1 },
     uCustom: { value: 0 },

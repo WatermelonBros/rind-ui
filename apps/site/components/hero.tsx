@@ -21,10 +21,10 @@ export function Hero({ children }: { children?: ReactNode }) {
               <em className={styles.stays}>Everything else stays.</em>
             </p>
             <div className={styles.ctas}>
-              <Link href="/docs/get-started/" className={styles.primary}>
+              <Link prefetch={false} href="/docs/get-started/" className={styles.primary}>
                 Get started →
               </Link>
-              <Link href="/docs/#components" className={styles.install}>
+              <Link prefetch={false} href="/docs/#components" className={styles.install}>
                 Browse components
               </Link>
             </div>
