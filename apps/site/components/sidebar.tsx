@@ -37,8 +37,9 @@ export function Sidebar({ groups }: { groups: readonly NavGroup[] }) {
   return (
     <aside className={styles.side} aria-label="Documentation">
       <Collapsible.Root open={wide || menu} onOpenChange={setMenu} closedContent="hidden">
+        {/* "Pages", not "Menu": the bar's own Menu (nav-menu.tsx) is the site's */}
         <Collapsible.Trigger className={styles.menuButton}>
-          Menu
+          Pages
           <Collapsible.Indicator className={styles.menuIcon}>+</Collapsible.Indicator>
         </Collapsible.Trigger>
         <Collapsible.Content className={styles.menuContent}>
