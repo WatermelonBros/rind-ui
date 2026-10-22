@@ -301,6 +301,8 @@
 .lookCode .lookPre {
   color: #e8e8e3;
   margin: 0;
+  /* the window fades at its foot instead of cutting a line in half */
+  mask-image: linear-gradient(#000 82%, transparent);
   max-height: 320px;
   overflow: auto;
   overscroll-behavior: contain;
@@ -946,7 +948,9 @@
   inset: 0;
   z-index: -1;
   background: var(--band);
-  clip-path: circle(calc(var(--reveal, 1) * 160%) at 50% 0);
+  /* a curtain the full width of the band: a disc opening from the top centre read as a stray
+     block rising on its own */
+  clip-path: inset(0 0 calc((1 - var(--reveal, 1)) * 100%) 0);
 }
 .band[data-band="ink"] {
   --band: #0b0b0c;

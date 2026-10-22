@@ -148,15 +148,29 @@ export function Tested() {
   }, [kind, run])
   const playRef = useRef<() => void>(() => {})
   const autoRan = useRef(false)
-  useEffect(
-    () =>
-      onTestArrived(() => {
-        if (autoRan.current) return
-        autoRan.current = true
-        playRef.current()
-      }),
-    [],
-  )
+  useEffect(() => {
+    const go = () => {
+      if (autoRan.current) return
+      autoRan.current = true
+      playRef.current()
+    }
+    const off = onTestArrived(go)
+    // a phone runs as soon as most of the stage is in view: waiting for the control to reach
+    // the object's landing height let the visitor scroll past the PASS
+    const root = stage.current
+    if (!root || !window.matchMedia("(max-width: 900px)").matches) return off
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) go()
+      },
+      { threshold: 0.6 },
+    )
+    io.observe(root)
+    return () => {
+      off()
+      io.disconnect()
+    }
+  }, [])
 
   const play = async () => {
     setRunning(true)
