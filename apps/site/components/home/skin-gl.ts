@@ -194,7 +194,8 @@ void main() {
   vec3 mark = uKind < 0.5 ? mix(mix(uInk, uOn, on), uCard, uPhase) : mix(uOn, uCard, uPhase);
   vec3 base = isMark ? mark : body;
   vec3 crisp = mix(base * 0.78, base, step(-0.15, ndl));
-  crisp = mix(crisp, mix(base, vec3(1.0), 0.3), step(0.75, ndl));
+  // a narrow ramp, not a step: a hard band edge stair-steps along a curved rim
+  crisp = mix(crisp, mix(base, vec3(1.0), 0.3), smoothstep(0.73, 0.77, ndl));
   // crisp's flat faces end in an ink edge, like the page's 3px borders
   float facing = abs(n.z);
   crisp = mix(uInk, crisp, smoothstep(0.18, 0.3, facing));
