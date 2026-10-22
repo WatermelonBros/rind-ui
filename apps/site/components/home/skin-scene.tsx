@@ -148,11 +148,18 @@ export function SkinScene() {
           const k = Math.min(1, Math.max(0, (t - a) / (b - a)))
           return k * k * (3 - 2 * k)
         }
+        // three moves, around the content: out to the right-hand gutter, down to the preview
+        // row's height, then in along that row (collisions on the way fade it: alpha)
+        const gutter = window.innerWidth - Math.max(from.width, to.width) - 24
+        const out = smooth(0, 0.3)
+        const down = smooth(0.25, 0.65)
+        const across = smooth(0.65, 1)
+        const x = lerp(lerp(from.x, gutter, out), to.x, across)
         return new DOMRect(
-          lerp(from.x, to.x, smooth(0.2, 0.85)),
-          lerp(from.y, to.y, smooth(0, 0.7)),
-          lerp(from.width, to.width, smooth(0.4, 0.85)),
-          lerp(from.height, to.height, smooth(0.4, 0.85)),
+          x,
+          lerp(from.y, to.y, down),
+          lerp(from.width, to.width, smooth(0.5, 1)),
+          lerp(from.height, to.height, smooth(0.5, 1)),
         )
       }
       const { next, y, s0, t } = travel()
@@ -179,19 +186,33 @@ export function SkinScene() {
     const alpha = () => {
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // fades while the builder's heading or lede passes under it, and into the real
-        // component on arrival
+        // fades over anything it would cover on the way: the builder's heading, lede and controls,
+        // the machine's graph, the preview's other parts (never its own landing place)
         const me = target()
         const section = last.look.closest("section")
-        const texts = section ? [...section.querySelectorAll(":scope > * h2, :scope > * > p")] : []
+        const graph = last.peelEl.closest("section")?.querySelector("svg")
+        const own = last.look.closest('[data-part="root"]') ?? last.look
+        // things to read or use, not their containers: the object may pass over empty panel
+        const obstacles = [
+          ...(section
+            ? [
+                ...section.querySelectorAll(
+                  'h2, p, label, button, input, [data-part="label"], [data-part="trigger"], [data-part="control"]',
+                ),
+              ].filter((el) => !own.contains(el) && !el.contains(own))
+            : []),
+          ...(graph ? [graph] : []),
+        ]
         let overlap = 0
-        for (const text of texts) {
-          const r = text.getBoundingClientRect()
+        for (const el of obstacles) {
+          const r = el.getBoundingClientRect()
           const x = Math.max(0, Math.min(r.right, me.right) - Math.max(r.left, me.left))
           const y = Math.max(0, Math.min(r.bottom, me.bottom) - Math.max(r.top, me.top))
-          if (x > 0) overlap = Math.max(overlap, y / Math.max(1, me.height))
+          if (x > 0 && y > 0) overlap = Math.max(overlap, Math.min(x / me.width, y / me.height))
         }
-        return (1 - Math.min(1, overlap * 1.5)) * (1 - last.fade)
+        // a phone has no gutter to fly in: it hides on the way and appears near the preview
+        if (window.innerWidth <= 900 && last.t > 0.05 && last.t < 0.85) return 0
+        return (1 - Math.min(1, overlap * 3)) * (1 - last.fade)
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t

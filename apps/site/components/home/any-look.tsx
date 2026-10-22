@@ -513,7 +513,9 @@ export function AnyLook() {
                 <CheckboxGroup.ItemLabel>Keyboard support</CheckboxGroup.ItemLabel>
               </CheckboxGroup.Item>
               <div className={styles.lookRow}>
-                <Button>Save</Button>
+                <Button>
+                  Save <span aria-hidden="true">→</span>
+                </Button>
                 <Toggle.Root defaultPressed>Bold</Toggle.Root>
               </div>
             </div>
