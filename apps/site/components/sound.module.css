@@ -1,0 +1,113 @@
+/* sound-bars.tsx: the bars that move with what is playing */
+.bars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  block-size: 16px;
+}
+.bars i {
+  inline-size: 3px;
+  block-size: 16px;
+  border-radius: 2px;
+  background: currentColor;
+  /* off: a flat line; on: each bar its band's level (set per frame) */
+  scale: 1 calc(0.14 + var(--level, 0) * 0.86);
+  transition: scale 0.08s linear;
+}
+.bars i:nth-child(2) {
+  --delay: 0.12s;
+}
+.bars i:nth-child(3) {
+  --delay: 0.24s;
+}
+.bars i:nth-child(4) {
+  --delay: 0.36s;
+}
+/* hovered while off, or waiting in the invite, the line ripples: the bars want to move */
+.bars[data-idle] i {
+  animation: bars-wait 0.9s ease-in-out var(--delay, 0s) infinite;
+}
+:global([data-phase="juicy"]) .bars i {
+  inline-size: 4px;
+  border-radius: 4px;
+  background: var(--acc-deep);
+}
+:global([data-sound-toggle][aria-pressed="false"]:hover) .bars i {
+  animation: bars-wait 0.9s ease-in-out var(--delay, 0s) infinite;
+}
+:global([data-phase="juicy"] [data-sound-toggle][aria-pressed="true"]) .bars i {
+  background: var(--ink);
+}
+@keyframes bars-wait {
+  50% {
+    scale: 1 0.45;
+  }
+}
+
+/* sound-invite.tsx: the landing's one question, at the foot of the screen */
+.invite {
+  position: fixed;
+  inset-block-end: 24px;
+  inset-inline: 0;
+  z-index: 60;
+  inline-size: fit-content;
+  max-inline-size: calc(100% - 32px);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  padding: 10px 10px 10px 20px;
+  border: var(--bw) solid var(--line);
+  border-radius: var(--btn-r);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  font: 600 14px var(--mono);
+  animation: invite-in 0.7s var(--spring) both;
+}
+.invite p {
+  margin: 0;
+}
+.invite button {
+  min-block-size: 40px;
+  padding: 0 16px;
+  border: var(--bw) solid var(--line);
+  border-radius: var(--btn-r);
+  font: inherit;
+  cursor: pointer;
+}
+.inviteOn {
+  background: var(--ink);
+  color: var(--card);
+}
+.inviteOff {
+  background: transparent;
+  color: var(--ink);
+}
+:global([data-phase="juicy"]) .inviteOn {
+  background: var(--acc);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--acc-deep);
+}
+:global([data-phase="juicy"]) .inviteOff {
+  background: var(--muted);
+}
+/* on a phone, clear of the screen-reader toggle in the corner */
+@media (max-width: 760px) {
+  .invite {
+    inset-block-end: 84px;
+  }
+}
+@keyframes invite-in {
+  from {
+    translate: 0 140%;
+    scale: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .invite {
+    animation: none;
+  }
+}

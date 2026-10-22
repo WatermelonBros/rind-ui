@@ -3,10 +3,11 @@
 import { Switch, Toggle } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import styles from "./nav.module.css"
 import { usePhase } from "./phase"
 import { useSound } from "./sound"
+import { SoundBars } from "./sound-bars"
 
 export function Nav() {
   const { phase, setPhase } = usePhase()
@@ -45,7 +46,7 @@ export function Nav() {
           pressed={sound.enabled}
           onPressedChange={sound.setEnabled}
         >
-          <Bars />
+          <SoundBars />
           <span className={styles.soundWord} aria-hidden="true">
             sound
           </span>
@@ -72,34 +73,5 @@ export function Nav() {
         </Switch.Label>
       </Switch.Root>
     </nav>
-  )
-}
-
-/** The sound toggle's face: four bars that move with what is playing, a flat line when off. */
-function Bars() {
-  const { enabled, levels } = useSound()
-  const bars = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    const el = bars.current
-    if (!el) return
-    let frame = 0
-    const draw = () => {
-      const now = levels(4)
-      el.querySelectorAll("i").forEach((bar, k) => {
-        bar.style.setProperty("--level", String(now[k] ?? 0))
-      })
-      frame = requestAnimationFrame(draw)
-    }
-    if (enabled) draw()
-    else for (const bar of el.querySelectorAll("i")) bar.style.removeProperty("--level")
-    return () => cancelAnimationFrame(frame)
-  }, [enabled, levels])
-  return (
-    <span ref={bars} className={styles.bars} aria-hidden="true">
-      <i />
-      <i />
-      <i />
-      <i />
-    </span>
   )
 }
