@@ -172,7 +172,15 @@ export function SkinScene() {
       const y = Math.min(look.y + look.height / 2 - g.h / 2, window.innerHeight - g.h - 110)
       return new DOMRect(g.x, y, g.w, g.h)
     }
+    // in the right-hand gutter the object never drops level with the screen-reader toggle pinned
+    // in the corner (landed controls are never in the gutter, so they are not moved)
     const target = () => {
+      const r = route()
+      if (window.innerWidth <= 900 || r.x < window.innerWidth - 260) return r
+      const floor = window.innerHeight - r.height - 120
+      return r.y > floor ? new DOMRect(r.x, floor, r.width, r.height) : r
+    }
+    const route = () => {
       const fin = testLeg()
       if (fin && fin.y > fin.s4) {
         const live = fin.test.getBoundingClientRect()

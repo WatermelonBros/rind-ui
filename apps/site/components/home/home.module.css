@@ -77,7 +77,8 @@
 .proofs[data-staged] .proofSticky {
   display: grid;
   position: sticky;
-  top: calc(50vh - 200px);
+  /* the panel (about 300px tall) centred on the screen, level with the claim in the middle */
+  top: calc(50vh - 150px);
 }
 .proofs[data-staged] .proofSticky > .proofPanel {
   grid-area: 1 / 1;

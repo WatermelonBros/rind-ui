@@ -408,9 +408,9 @@ export function AnyLook() {
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return
         io.disconnect()
-        later = window.setTimeout(surprise, 1600)
+        later = window.setTimeout(surprise, 700)
       },
-      { threshold: 0.6 },
+      { threshold: 0.3 },
     )
     io.observe(el)
     return () => {
