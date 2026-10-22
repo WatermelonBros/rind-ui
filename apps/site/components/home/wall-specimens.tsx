@@ -49,7 +49,11 @@ function Specimen({
   const { phase } = usePhase()
   const [root, value] = useAttribute(selector, attr)
   const wave = useContext(Wave)
-  const skin = wave === null ? null : SKINS[(wave + index) % SKINS.length]
+  // a diagonal front: each card is a little behind the one up and to its left
+  const offset = ((index % 3) + Math.floor(index / 3)) * 0.3
+  const at = wave === null ? null : Math.floor(wave + offset)
+  const skin = at === null ? null : SKINS[at % SKINS.length]
+  const next = at === null ? null : SKINS[(at + 1) % SKINS.length]
   return (
     <li className={styles.specimen}>
       <div
@@ -58,7 +62,15 @@ function Specimen({
         data-skinned=""
         data-skin={skin?.base ?? phase}
         data-wave={skin ? "" : undefined}
-        style={skin?.vars}
+        style={
+          skin
+            ? ({
+                ...skin.vars,
+                "--o": String(offset),
+                "--next-bg": GROUND[next?.name ?? "crisp"],
+              } as CSSProperties)
+            : undefined
+        }
       >
         {skin ? (
           <span className={styles.skinChip} aria-hidden="true">
@@ -145,32 +157,42 @@ const SKINS: readonly Skin[] = [
   },
   { name: "bare", base: "bare" },
   {
-    name: "candy",
+    name: "citrus",
     base: "crisp",
     vars: v({
-      "--s-bg": "#ffe3f1",
-      "--s-ink": "#3d0a2a",
-      "--s-acc": "#ff2e93",
-      "--s-acc-deep": "#b0005a",
+      "--s-bg": "#fff0c2",
+      "--s-ink": "#2e1d00",
+      "--s-acc": "#ff7a00",
+      "--s-acc-deep": "#9a4300",
       "--s-on": "#ffffff",
       "--s-card": "#ffffff",
-      "--s-muted": "#ffd0e8",
-      "--s-line": "#3d0a2a",
+      "--s-muted": "#ffe08a",
+      "--s-line": "#2e1d00",
       "--s-bw": "2px",
       "--s-r": "20px",
       "--s-r-sm": "12px",
-      "--s-lift": "0 4px 0 #3d0a2a",
-      "--s-lift-hi": "0 6px 0 #3d0a2a",
-      "--s-lift-lo": "0 1px 0 #3d0a2a",
-      "--s-ok": "#3d0a2a",
-      "--s-error": "#9c0040",
-      "--s-brand": "#b0005a",
+      "--s-lift": "0 4px 0 #2e1d00",
+      "--s-lift-hi": "0 6px 0 #2e1d00",
+      "--s-lift-lo": "0 1px 0 #2e1d00",
+      "--s-ok": "#2e1d00",
+      "--s-error": "#9c1a00",
+      "--s-brand": "#9a4300",
       "--s-brand-text": "#ffffff",
-      "--s-brand-deep": "#7a003e",
-      "--s-focus": "#b0005a",
+      "--s-brand-deep": "#6b2e00",
+      "--s-focus": "#9a4300",
     }),
   },
 ]
+
+// each skin's ground, for the front that sweeps the next one in
+const GROUND: Record<string, string> = {
+  crisp: "#d4ff3a",
+  midnight: "#10132b",
+  juicy: "#e9e2ff",
+  paper: "#f4efe6",
+  bare: "#f4f4f5",
+  citrus: "#fff0c2",
+}
 
 /** The wave's position: which skin each card wears is its index plus this, round the list. */
 const Wave = createContext<number | null>(null)
@@ -189,7 +211,10 @@ export function WallSpecimens() {
       frame = 0
       const r = el.getBoundingClientRect()
       const p = (window.innerHeight - r.top) / (window.innerHeight + r.height)
-      setWave(Math.max(0, Math.floor(Math.min(1, Math.max(0, p)) * 8)))
+      const w = Math.min(1, Math.max(0, p)) * 8
+      el.style.setProperty("--w", String(w))
+      // React only hears whole-ish steps; the front between them is CSS (--w)
+      setWave(Math.round(w * 20) / 20)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)

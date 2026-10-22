@@ -146,7 +146,7 @@ export function SkinScene() {
       const tr = test.getBoundingClientRect()
       // a phone runs the test while the control is still low on the screen, so the visitor
       // sees the PASS before scrolling on
-      const anchor = window.innerWidth <= 900 ? 0.68 : 0.5
+      const anchor = window.innerWidth <= 900 ? 0.68 : 0.6
       const s5 = tr.top + y + tr.height / 2 - window.innerHeight * anchor
       const t = Math.min(1, Math.max(0, (y - s4) / Math.max(1, s5 - s4)))
       const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
@@ -249,7 +249,8 @@ export function SkinScene() {
           )
         }
         const out = smooth(0, 0.3)
-        const down = smooth(0.25, 0.7)
+        // out to the side first, down only once clear of the machine's diagram
+        const down = smooth(0.32, 0.72)
         return new DOMRect(
           lerp(from.x, end.x, out),
           lerp(from.y, end.y, down),
