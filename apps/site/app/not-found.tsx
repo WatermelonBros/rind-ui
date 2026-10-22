@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { GooFilters } from "@/components/goo"
+import { HeadlessPage } from "@/components/headless-page"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "./globals.css"
@@ -16,7 +17,7 @@ export default function NotFound() {
       <header>
         <Nav />
       </header>
-      <main className={styles.page}>
+      <HeadlessPage className={styles.page}>
         <p className={styles.code} aria-hidden="true">
           4<span>0</span>4
         </p>
@@ -30,7 +31,7 @@ export default function NotFound() {
             Browse the docs
           </Link>
         </div>
-      </main>
+      </HeadlessPage>
     </PhaseProvider>
   )
 }

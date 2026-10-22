@@ -12,6 +12,7 @@ import {
 import { flushSync } from "react-dom"
 import styles from "./phase.module.css"
 import { SoundProvider } from "./sound"
+import { wave } from "./wave"
 
 export type Phase = "crisp" | "juicy"
 
@@ -104,28 +105,8 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
         const recent = performance.now() - origin.current.at < 1500
         const x = recent ? origin.current.x : innerWidth - 60
         const y = recent ? origin.current.y : 30
-        const far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
         const vt = doc.startViewTransition(() => flushSync(() => apply(next, true)))
-        vt.ready.then(() => {
-          const juicy = next === "juicy"
-          document.documentElement.animate(
-            {
-              clipPath: juicy
-                ? [`circle(0px at ${x}px ${y}px)`, `circle(${far}px at ${x}px ${y}px)`]
-                : [
-                    `polygon(${x}px ${y}px, ${x}px ${y}px, ${x}px ${y}px, ${x}px ${y}px)`,
-                    `polygon(${x}px ${y - far * 1.5}px, ${x + far * 1.5}px ${y}px, ${x}px ${y + far * 1.5}px, ${x - far * 1.5}px ${y}px)`,
-                  ],
-            },
-            {
-              duration: juicy ? 1100 : 700,
-              easing: juicy
-                ? "linear(0, 0.22 8%, 0.62 20%, 0.94 32%, 1.06 42%, 1.08 50%, 1.03 62%, 0.99 76%, 1)"
-                : "cubic-bezier(0.85, 0, 0.15, 1)",
-              pseudoElement: "::view-transition-new(root)",
-            },
-          )
-        })
+        vt.ready.then(() => wave(x, y, next === "juicy"))
         vt.finished.finally(() => {
           busy.current = false
         })
