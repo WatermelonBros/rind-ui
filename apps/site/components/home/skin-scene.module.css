@@ -1,5 +1,5 @@
 /* The canvas is fixed over the viewport, at the body's level: the object rests in the hero, then
-   travels over the marquee to the next scene's control. It draws only near the object. */
+   travels to the next scene's control. It draws only near the object. */
 .canvas {
   position: fixed;
   inset: 0;

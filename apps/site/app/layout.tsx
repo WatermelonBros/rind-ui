@@ -60,11 +60,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         {/* Before paint: pick the landing's hero component for this visit (components/home/
             skin-scene.tsx), restore the phase (no juicy flash for a crisp visitor) and, on a
-            first visit of the landing, mark the intro (components/intro.tsx). */}
+            load of the landing, mark the intro (components/intro.tsx). */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `var r=document.documentElement;r.dataset.hero=["switch","checkbox","button"][Math.floor(Math.random()*3)];try{var p=localStorage.getItem("rind-phase");if(p==="crisp")r.dataset.phase=p;if(location.pathname==="/"&&!sessionStorage.getItem("rind-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
+            __html: `var r=document.documentElement;r.dataset.hero=["switch","checkbox","button"][Math.floor(Math.random()*3)];try{var p=localStorage.getItem("rind-phase");if(p==="crisp")r.dataset.phase=p;if(location.pathname==="/"&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
           }}
         />
       </head>
