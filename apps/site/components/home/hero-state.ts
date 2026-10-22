@@ -92,12 +92,14 @@ export const useLanded = () =>
 // The builder after the machine: the object's last stop is the preview component of its kind,
 // and on the way it takes the visitor's colours (any-look.tsx publishes both)
 let lookTarget: HTMLElement | null = null
-let lookColors: { brand: string; surface: string } = { brand: "#18181B", surface: "#FFFFFF" }
+// `picked`: the visitor chose the brand, and the object then wears it everywhere it flies
+type LookColors = { brand: string; surface: string; picked: boolean }
+let lookColors: LookColors = { brand: "#FF8FB1", surface: "#FFFFFF", picked: false }
 export const setLookTarget = (el: HTMLElement | null) => {
   lookTarget = el
 }
 export const getLookTarget = () => lookTarget
-export const setLookColors = (colors: { brand: string; surface: string }) => {
+export const setLookColors = (colors: LookColors) => {
   lookColors = colors
 }
 export const getLookColors = () => lookColors

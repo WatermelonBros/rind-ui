@@ -346,6 +346,28 @@
   font: 600 12px var(--mono);
   color: #d4ff3a;
 }
+.lookCodeBar [data-part="trigger"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.lookCodeBar [data-part="trigger"]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.lookCodeBar [data-part="indicator"] {
+  transition: rotate 0.2s;
+}
+.lookCodeBar [data-part="trigger"][aria-expanded="true"] [data-part="indicator"] {
+  rotate: 90deg;
+}
 .lookCode .lookPre {
   color: #e8e8e3;
   margin: 0;
@@ -354,7 +376,6 @@
   mask-composite: intersect;
   max-height: 320px;
   overflow: auto;
-  overscroll-behavior: contain;
   padding: 4px 16px 16px;
   font: 500 12px / 1.6 var(--mono);
   white-space: pre;

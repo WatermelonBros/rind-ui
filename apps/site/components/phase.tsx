@@ -45,13 +45,13 @@ const drops = (): Drop[] =>
   })
 
 export function PhaseProvider({ children }: { children: ReactNode }) {
-  const [phase, setPhaseState] = useState<Phase>("crisp")
+  const [phase, setPhaseState] = useState<Phase>("juicy")
   const [pour, setPour] = useState<{ next: Phase; drops: Drop[]; id: number } | null>(null)
   const busy = useRef(false)
 
-  // The inline script in <head> may already have restored "juicy" before hydration.
+  // The inline script in <head> may already have restored "crisp" before hydration.
   useEffect(() => {
-    if (document.documentElement.dataset["phase"] === "juicy") setPhaseState("juicy")
+    if (document.documentElement.dataset["phase"] === "crisp") setPhaseState("crisp")
   }, [])
 
   const apply = useCallback((next: Phase) => {

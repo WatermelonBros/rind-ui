@@ -107,6 +107,9 @@ export function Outro() {
           <Link href="/docs/get-started/" className={styles.outroPrimary}>
             Get started →
           </Link>
+          <Link href="/compare/" className={styles.outroGhost}>
+            How it compares
+          </Link>
           <a href="https://github.com/WatermelonBros/rind-ui" className={styles.outroGhost}>
             GitHub
           </a>

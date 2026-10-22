@@ -423,6 +423,9 @@ export function SkinScene() {
         // whole skin from the start of the leg: a peel closing in flight draws a half-folded shape
         scene.current.setPeel(0)
       }
+      // a brand the visitor picked stays on the object for the whole flight, hero to tests
+      const colors = getLookColors()
+      if (colors.picked && scene.current) scene.current.setLook(colors.brand, colors.surface, 1)
       // hysteresis: the control grows to the object's size on arrival, which moves the page a
       // little; without it, arrival would flicker on and off at the threshold
       const arrived = Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
@@ -431,8 +434,12 @@ export function SkinScene() {
         setTestLanded(arrived)
       }
       // the test starts as the object comes in to land, not once it has: a visitor scrolling at
-      // a normal pace still sees it run to PASS (it runs once; tested.tsx ignores repeats)
-      if (fin && fin.t >= 0.7) emitTestArrived()
+      // a normal pace still sees it run to PASS (it runs once; tested.tsx ignores repeats); and
+      // only once the test's control is on screen, however long the leg is
+      if (fin && fin.t >= 0.7) {
+        const r = fin.test.getBoundingClientRect()
+        if (r.top + r.height / 2 < window.innerHeight * 0.8) emitTestArrived()
+      }
     }
     const offPeelOn = onPeelOn(follow)
     // a state change or a remounted control (a new run): follow it, wake the render loop, and

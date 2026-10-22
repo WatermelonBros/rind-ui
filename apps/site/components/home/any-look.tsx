@@ -4,6 +4,7 @@ import {
   Accordion,
   Button,
   CheckboxGroup,
+  Collapsible,
   SegmentedControl,
   Slider,
   Switch,
@@ -11,6 +12,7 @@ import {
   Toggle,
 } from "@rind-ui/react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
+import { type Phase, usePhase } from "../phase"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
@@ -21,7 +23,8 @@ type Font = "sans" | "serif" | "mono" | "rounded"
 type Density = "compact" | "cozy" | "roomy"
 
 interface Look {
-  readonly brand: string
+  /** the visitor's pick; null wears the site phase's own brand (BRAND) */
+  readonly brand: string | null
   readonly surface: string
   readonly radius: number
   readonly border: number
@@ -30,9 +33,12 @@ interface Look {
   readonly density: Density
 }
 
-/** Where the builder starts and what Reset returns to: a plain, neutral look. */
+/** The brand before the visitor picks one: the site's own, pink in juicy and lime in crisp. */
+const BRAND: Record<Phase, string> = { juicy: "#FF8FB1", crisp: "#D4FF3A" }
+
+/** Where the builder starts and what Reset returns to: the site's brand on a plain look. */
 const BASE: Look = {
-  brand: "#18181B",
+  brand: null,
   surface: "#FFFFFF",
   radius: 8,
   border: 1,
@@ -74,7 +80,7 @@ function textOn(hex: string): string {
 const pick = <T,>(list: readonly T[]): T => list[Math.floor(Math.random() * list.length)] as T
 
 /** The whole skin: tokens on `:root`, then rules on rind's attributes and nothing else. */
-function skinCss(look: Look): string {
+function skinCss(look: Look & { readonly brand: string }): string {
   const [py, px, gap] = DENSITY[look.density]
   return `/* skin.css: the whole look of the components above */
 :root {
@@ -365,7 +371,9 @@ function LazyColour(props: ColourProps & { readonly picker: ColourComponent | nu
  * shown below it (scoped to the stage), so what you copy is exactly what you see.
  */
 export function AnyLook() {
-  const [look, setLook] = useState<Look>(BASE)
+  const [picked, setLook] = useState<Look>(BASE)
+  const { phase } = usePhase()
+  const look = { ...picked, brand: picked.brand ?? BRAND[phase] }
   // the hero's travelling object lands on the preview component of its own kind (skin-scene.tsx)
   const stage = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -378,8 +386,13 @@ export function AnyLook() {
     return () => setLookTarget(null)
   }, [])
   useEffect(
-    () => setLookColors({ brand: look.brand, surface: look.surface }),
-    [look.brand, look.surface],
+    () =>
+      setLookColors({
+        brand: look.brand,
+        surface: look.surface,
+        picked: picked.brand !== null || picked.surface !== BASE.surface,
+      }),
+    [look.brand, look.surface, picked.brand, picked.surface],
   )
   const [copied, setCopied] = useState(false)
   const set = (patch: Partial<Look>) => {
@@ -388,8 +401,6 @@ export function AnyLook() {
   }
   const surprise = () =>
     set({
-      brand: pick(SWATCHES),
-      surface: pick(SURFACES),
       radius: pick([0, 4, 8, 14, 22, 28]),
       border: pick([0, 1, 2, 3]),
       shadow: pick(["flat", "soft", "hard"] as const),
@@ -561,9 +572,13 @@ export function AnyLook() {
             </Accordion.Root>
           </div>
         </div>
-        <section className={styles.lookCode} aria-label="skin.css">
+        {/* the stylesheet is there on demand: open, its scrolling box sat in the page's path */}
+        <Collapsible.Root className={styles.lookCode}>
           <div className={styles.lookCodeBar}>
-            <span>skin.css</span>
+            <Collapsible.Trigger>
+              <Collapsible.Indicator>▸</Collapsible.Indicator>
+              Show skin.css
+            </Collapsible.Trigger>
             <span data-skinned="" data-skin="bare" data-rind-theme="skin-bare">
               <Button
                 onPress={() => {
@@ -577,14 +592,16 @@ export function AnyLook() {
               </Button>
             </span>
           </div>
-          <pre
-            className={styles.lookPre}
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
-            tabIndex={0}
-          >
-            <code>{highlight(css)}</code>
-          </pre>
-        </section>
+          <Collapsible.Content render={<section aria-label="skin.css" />}>
+            <pre
+              className={styles.lookPre}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
+              tabIndex={0}
+            >
+              <code>{highlight(css)}</code>
+            </pre>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </Reveal>
     </section>
   )
