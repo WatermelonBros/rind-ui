@@ -48,8 +48,9 @@ export default function Home() {
         <Peel />
         {/* the bare object ends its trip here: it becomes a real component in the visitor's skin */}
         <AnyLook />
-        <Why />
+        {/* …and its trip ends in the tests, which run as it lands and move it */}
         <Tested />
+        <Why />
         <Agents />
         <Wall />
       </Hero>

@@ -4,14 +4,19 @@ import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import {
+  emitTestArrived,
   getLookColors,
   getLookTarget,
   getPeelOn,
   getPeelTarget,
+  getTestState,
+  getTestTarget,
   onPeelOn,
+  onTestState,
   setHeroOn,
   setLanded,
   setSceneGl,
+  setTestLanded,
 } from "./hero-state"
 import type { Kind, SkinHandle } from "./skin-gl"
 import styles from "./skin-scene.module.css"
@@ -77,6 +82,7 @@ export function SkinScene() {
     let hint = 0
     let shown = false
     let past = false
+    let atTests = false
     // The skin comes off with the scroll. Desktop: while the sticky hero holds still (its run is
     // taller than the screen). Phone: as the component itself rises from 60% to 25% of the screen.
     const peelAt = () => {
@@ -127,7 +133,44 @@ export function SkinScene() {
       const fade = Math.min(1, Math.max(0, (y - s3) / (window.innerHeight * 0.25)))
       return { peelEl, look, y, s2, t, fade }
     }
+    // Final leg: once it has become the builder's component, the object leaves it again (when the
+    // builder rises to a quarter of the screen), flies to the tests' control, takes the site's
+    // skin back on the way, and the test runs as it lands (tested.tsx)
+    const testLeg = () => {
+      const look = getLookTarget()
+      const test = getTestTarget()
+      if (!look || !test) return null
+      const y = window.scrollY
+      const lr = look.getBoundingClientRect()
+      const s4 = lr.top + y + lr.height / 2 - window.innerHeight * 0.25
+      const tr = test.getBoundingClientRect()
+      const s5 = tr.top + y + tr.height / 2 - window.innerHeight * 0.5
+      const t = Math.min(1, Math.max(0, (y - s4) / Math.max(1, s5 - s4)))
+      const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
+      return { look, test, y, s4, t, emerge }
+    }
     const target = () => {
+      const fin = testLeg()
+      if (fin && fin.y > fin.s4) {
+        const live = fin.test.getBoundingClientRect()
+        if (atTests) return live
+        const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
+        const top = window.innerHeight * 0.15
+        const bottom = window.innerHeight * 0.75 - live.height
+        const to = new DOMRect(
+          live.x,
+          Math.min(Math.max(live.y, top), bottom),
+          live.width,
+          live.height,
+        )
+        const e = fin.t * fin.t * (3 - 2 * fin.t)
+        return new DOMRect(
+          lerp(from.x, to.x, e),
+          lerp(from.y, to.y, e),
+          lerp(from.width, to.width, e),
+          lerp(from.height, to.height, e),
+        )
+      }
       const last = lastLeg()
       if (last && last.y > last.s2) {
         const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
@@ -184,6 +227,9 @@ export function SkinScene() {
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
     const alpha = () => {
+      // re-emerging from the builder's component for the final leg
+      const fin = testLeg()
+      if (fin && fin.y > fin.s4) return fin.emerge
       const last = lastLeg()
       if (last && last.y > last.s2) {
         // always visible on the way (fading over every obstacle read as a flicker); it fades
@@ -197,9 +243,24 @@ export function SkinScene() {
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0
+    let presses = 0
+    let pulse = 0
     const follow = () => {
       const handle = scene.current
       if (!handle) return
+      if (leg === 3) {
+        // the tests drive it now: the control's state, and a press for every press
+        const state = getTestState()
+        if (kind === "button") {
+          if (state.presses > presses) {
+            handle.setPress(true)
+            clearTimeout(pulse)
+            pulse = window.setTimeout(() => scene.current?.setPress(false), 180)
+          }
+        } else handle.setChecked(state.on)
+        presses = state.presses
+        return
+      }
       // the builder's preview starts on (its switch and checkbox are checked, its button idle)
       const value = leg === 2 ? true : past ? getPeelOn() : heroOnRef.current
       if (kind === "button") handle.setPress(leg === 1 && getPeelOn())
@@ -227,7 +288,8 @@ export function SkinScene() {
       }
       // the last leg: the builder's colours come on, the real component fades in under the object
       const last = lastLeg()
-      const nextLeg = last && last.t > 0.5 ? 2 : past ? 1 : 0
+      const fin = testLeg()
+      const nextLeg = fin && fin.t > 0.5 ? 3 : last && last.t > 0.5 ? 2 : past ? 1 : 0
       if (nextLeg !== leg) {
         leg = nextLeg
         follow()
@@ -242,8 +304,26 @@ export function SkinScene() {
         else if (past) setLanded(true)
         last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
       }
+      if (fin && scene.current && fin.y > fin.s4) {
+        // it takes the builder's component with it, and gets the site's skin back on the way
+        fin.look.style.opacity = String(1 - fin.emerge)
+        const k = Math.min(1, Math.max(0, (fin.t - 0.55) / 0.45))
+        const back = k * k * (3 - 2 * k)
+        const colors = getLookColors()
+        scene.current.setLook(colors.brand, colors.surface, 1 - back)
+        scene.current.setPeel(1 - back)
+      }
+      // hysteresis: the control grows to the object's size on arrival, which moves the page a
+      // little; without it, arrival would flicker on and off at the threshold
+      const arrived = Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
+      if (arrived !== atTests) {
+        atTests = arrived
+        setTestLanded(arrived)
+        if (arrived) emitTestArrived()
+      }
     }
     const offPeelOn = onPeelOn(follow)
+    const offTestState = onTestState(follow)
     const start = () => {
       import("./skin-gl")
         .then(({ mountSkin }) => {
@@ -282,6 +362,9 @@ export function SkinScene() {
     return () => {
       cancelled = true
       offPeelOn()
+      offTestState()
+      clearTimeout(pulse)
+      setTestLanded(false)
       window.removeEventListener("load", schedule)
       window.removeEventListener("scroll", onScroll)
       if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle)

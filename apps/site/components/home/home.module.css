@@ -503,6 +503,24 @@
   inline-size: min(100%, 380px);
   justify-self: center;
 }
+/* the hero's 3D object stands on the test's control (skin-scene.tsx): the control keeps working
+   for the driver, unseen, at the object's size */
+.testStage[data-object] :is([data-part="control"], button[data-scope="button"]) {
+  /* biome-ignore lint/complexity/noImportantStyles: beats every skin's state opacity */
+  opacity: 0 !important;
+}
+.testStage[data-object] [data-scope="switch"][data-part="control"] {
+  inline-size: 120px;
+  block-size: 56px;
+}
+.testStage[data-object] [data-scope="checkbox"][data-part="control"] {
+  inline-size: 72px;
+  block-size: 72px;
+}
+.testStage[data-object] button[data-scope="button"] {
+  inline-size: 150px;
+  block-size: 60px;
+}
 /* an assertion's real outcome, shown once its line has run */
 .verdict {
   margin-inline-start: auto;
