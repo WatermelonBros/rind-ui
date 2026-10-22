@@ -172,7 +172,9 @@ export function SkinScene() {
     // the same berth for the tests: it never crosses the builder's text
     const berth = (look: DOMRect, w: number, h: number) => {
       const g = gutterFit(w, h)
-      return new DOMRect(g.x, look.y + look.height / 2 - g.h / 2, g.w, g.h)
+      // never down by the screen reader toggle pinned in the corner
+      const y = Math.min(look.y + look.height / 2 - g.h / 2, window.innerHeight - g.h - 110)
+      return new DOMRect(g.x, y, g.w, g.h)
     }
     const target = () => {
       const fin = testLeg()

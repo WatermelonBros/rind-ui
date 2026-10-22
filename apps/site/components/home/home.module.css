@@ -676,6 +676,11 @@
     calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
   );
 }
+/* while the front crosses a card its components dim and come back in the new skin: the old
+   skin's text never sits readable-but-wrong on the new ground */
+.specimenStage[data-wave] > * {
+  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.72) * 5, 1) * 0.9);
+}
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 0 0 1px var(--s-ink);
@@ -855,8 +860,8 @@
     color: transparent;
     background: linear-gradient(
       90deg,
-      var(--bg) calc(var(--fill, 1) * 106% - 6%),
-      color-mix(in oklab, var(--bg) 72%, var(--ink)) calc(var(--fill, 1) * 106%)
+      var(--bg) calc(var(--fill, 1) * 100%),
+      color-mix(in oklab, #fff 40%, var(--ink)) calc(var(--fill, 1) * 100%)
     );
     background-clip: text;
   }
