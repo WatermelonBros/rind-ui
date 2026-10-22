@@ -358,8 +358,6 @@ for (const url of urls) {
     viewport: { width: 1440, height: 900 },
     reducedMotion: "reduce",
   })
-  // the landing intro plays once per session; audit the styled page
-  await page.addInitScript(() => sessionStorage.setItem("rind-intro", "1"))
   page.on("console", (m) => {
     if (m.type() === "error" || m.type() === "warning") report(url, `console.${m.type()}`, m.text())
   })
@@ -465,7 +463,7 @@ for (const url of urls) {
   }
   await page.close()
 }
-// the intro itself: a first visit shows the raw copy over the page, then reveals the styled page
+// the intro itself: every load of the landing shows the raw copy over the page, then reveals the styled page
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))

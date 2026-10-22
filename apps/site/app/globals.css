@@ -100,6 +100,31 @@ html.intro:not([data-intro-ready]) body {
   /* biome-ignore lint/complexity/noImportantStyles: the raw copy must beat every stylesheet, skins included */
   all: revert !important;
 }
+/* a little order in the raw copy, so it still reads as the page: icons at text size (an SVG
+   keeps no size of its own), decorative duplicates gone, the nav's links apart */
+#rind-intro-layer#rind-intro-layer svg {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  inline-size: 1em !important;
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  block-size: 1em !important;
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  position: static !important;
+  vertical-align: -0.125em;
+}
+#rind-intro-layer#rind-intro-layer [aria-hidden="true"] {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  display: none !important;
+}
+#rind-intro-layer#rind-intro-layer nav {
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  display: flex !important;
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  flex-wrap: wrap !important;
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  gap: 4px 16px !important;
+  /* biome-ignore lint/complexity/noImportantStyles: beats the raw copy's revert */
+  align-items: center !important;
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;

@@ -95,7 +95,7 @@ export function SkinScene() {
       return (0.6 - middle) / 0.35
     }
     // Then the bare object travels to the next scene's control: from where it rested in the hero
-    // (the run's end) to where that control rests (its scene's start), eased; the marquee passes
+    // (the run's end) to where that control rests (its scene's start), eased; the page passes
     // under it. Before, it is on the hero's control; after, on the next scene's.
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t
     const shift = (r: DOMRect, dy: number) => new DOMRect(r.x, r.y + dy, r.width, r.height)

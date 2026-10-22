@@ -36,22 +36,17 @@ export default function PrivacyPage() {
 
       <h2>Cookies and your browser&rsquo;s storage</h2>
       <p>
-        The site sets no cookies. It stores two values in your browser, and never sends them
-        anywhere:
+        The site sets no cookies. It stores one value in your browser, and never sends it anywhere:
       </p>
       <ul>
         <li>
           <code>rind-phase</code> (local storage): whether you picked the crisp or the juicy look,
           so the site opens in it next time. It stays until you clear your browser data.
         </li>
-        <li>
-          <code>rind-intro</code> (session storage): that the opening animation has played, so it
-          does not play again in the same tab. It is gone when you close the tab.
-        </li>
       </ul>
       <p>
-        Both only remember a choice you made or something you already saw, so they need no consent.
-        Fonts and every other file come from this site, not from a third party.
+        It only remembers a choice you made, so it needs no consent. Fonts and every other file come
+        from this site, not from a third party.
       </p>
 
       <h2>Links out</h2>

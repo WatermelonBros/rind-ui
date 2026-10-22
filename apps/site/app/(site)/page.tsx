@@ -9,10 +9,8 @@ import { Tested } from "@/components/home/tested"
 import { Wall } from "@/components/home/wall"
 import { Why } from "@/components/home/why"
 import { XRay } from "@/components/home/xray"
-import { Marquee } from "@/components/marquee"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import release from "@/content/generated/release.json"
-import { pages } from "@/lib/docs"
 // only the skins of the components the landing renders: a smaller first-paint stylesheet
 import "@/skins/home.css"
 
@@ -44,7 +42,6 @@ export default function Home() {
       <XRay />
       <ScreenReaderView />
       <Hero>
-        <Marquee items={pages.filter((p) => p.section === "components").map((p) => p.title)} />
         <Peel />
         {/* the bare object ends its trip here: it becomes a real component in the visitor's skin */}
         <AnyLook />

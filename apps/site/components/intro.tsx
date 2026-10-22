@@ -19,7 +19,7 @@ type ViewTransitionDocument = Document & {
 const FILL = `(function(){var r=document.documentElement;try{if(!r.classList.contains("intro"))return;var l=document.createElement("div");l.id="rind-intro-layer";l.setAttribute("aria-hidden","true");l.inert=true;["header","main"].forEach(function(s){var e=document.querySelector(s);if(e)l.appendChild(e.cloneNode(true))});r.appendChild(l)}finally{r.setAttribute("data-intro-ready","")}})()`
 
 /**
- * First visit of the landing: the page appears as the browser's raw HTML, a drop falls, and the
+ * Every load of the landing: the page appears as the browser's raw HTML, a drop falls, and the
  * styles spread out from where it lands. Click, scroll or press a key to skip. Never runs under
  * reduced motion (the inline script in <head> only sets html.intro without it).
  */
@@ -38,11 +38,6 @@ export function Intro() {
     const reveal = () => {
       if (done) return
       done = true
-      try {
-        sessionStorage.setItem("rind-intro", "1")
-      } catch {
-        // without storage the intro may play again next visit; harmless
-      }
       const x = "50%"
       const y = "42%"
       const finish = () => {
