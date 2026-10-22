@@ -83,6 +83,7 @@ export function SkinScene() {
     let shown = false
     let past = false
     let atTests = false
+    let arrivedAt = 0
     // The skin comes off with the scroll. Desktop: while the sticky hero holds still (its run is
     // taller than the screen). Phone: as the component itself rises from 60% to 25% of the screen.
     const peelAt = () => {
@@ -174,34 +175,9 @@ export function SkinScene() {
     }
     const target = () => {
       const fin = testLeg()
-      if (fin && fin.y > fin.s4) {
-        const live = fin.test.getBoundingClientRect()
-        // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
-        if (atTests || window.innerWidth <= 900) return live
-        const lookAt = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
-        const from = berth(lookAt, live.width, live.height)
-        const top = window.innerHeight * 0.15
-        const bottom = window.innerHeight * 0.75 - live.height
-        const toY = Math.min(Math.max(live.y, top), bottom)
-        const smooth = (a: number, b: number) => {
-          const k = Math.min(1, Math.max(0, (fin.t - a) / (b - a)))
-          return k * k * (3 - 2 * k)
-        }
-        // around the content, like the leg before: out to the right-hand gutter, down to the
-        // control's height, then in
-        const g = gutterFit(live.width, live.height)
-        const out = 1
-        const across = smooth(0.65, 0.9)
-        // across in the empty strip under the control's row, then up into it: the row's label
-        // sits between the gutter and the control, and the object never crosses it
-        const under = toY + live.height + 28
-        return new DOMRect(
-          lerp(lerp(from.x, g.x, out), live.x, across),
-          lerp(lerp(from.y, under, smooth(0.25, 0.65)), toY, smooth(0.88, 1)),
-          lerp(lerp(from.width, g.w, out), live.width, across),
-          lerp(lerp(from.height, g.h, out), live.height, across),
-        )
-      }
+      // the last leg is not flown: the object waits on the test's control, unseen, and appears
+      // there as it arrives (alpha); a third trip down the gutter was one beat too many
+      if (fin && fin.y > fin.s4) return fin.test.getBoundingClientRect()
       const last = lastLeg()
       if (last && last.y > last.s2) {
         const raw = last.peelEl.getBoundingClientRect()
@@ -294,7 +270,12 @@ export function SkinScene() {
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
       const phone = window.innerWidth <= 900
-      if (fin && fin.y > fin.s4) return phone ? (atTests ? 1 : 0) : fin.emerge
+      if (fin && fin.y > fin.s4) {
+        if (!atTests) return 0
+        const k = Math.min(1, (performance.now() - arrivedAt) / 250)
+        if (k < 1) scene.current?.wake()
+        return k
+      }
       const last = lastLeg()
       if (last && last.y > last.s2) {
         // a phone has no gutter to fly in: it hides on the way and appears on the preview
@@ -410,7 +391,7 @@ export function SkinScene() {
       // one control at a time: the test's own stays hidden while the object flies to it (on a
       // phone the object is hidden in flight instead, so the control shows until touchdown)
       if (fin) {
-        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || atTests)
+        const hide = fin.y > fin.s4 && atTests
         if (hide) fin.test.style.setProperty("opacity", "0", "important")
         else fin.test.style.removeProperty("opacity")
       }
@@ -430,6 +411,7 @@ export function SkinScene() {
       const arrived = Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
       if (arrived !== atTests) {
         atTests = arrived
+        arrivedAt = arrived ? performance.now() : 0
         setTestLanded(arrived)
         if (arrived) emitTestArrived()
       }

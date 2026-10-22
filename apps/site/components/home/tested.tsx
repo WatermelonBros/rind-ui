@@ -250,7 +250,8 @@ export function Tested() {
           >
             {passed !== null && (
               <>
-                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b> {kind}.test.ts ·{" "}
+                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b>{" "}
+                <span className={styles.passFact}>{kind}.test.ts</span> ·{" "}
                 {/* each fact wraps whole: never "· 2.7s" alone on a line */}
                 <span className={styles.passFact}>
                   {CHECKS - failed}/{CHECKS} assertions
