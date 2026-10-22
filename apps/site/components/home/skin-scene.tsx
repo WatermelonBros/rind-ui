@@ -220,7 +220,8 @@ export function SkinScene() {
         if (window.innerWidth <= 900) {
           // a phone has no gutter: it scrolls away with the machine, then waits hidden on its
           // control and appears there (alpha)
-          return from.bottom > 0 && last.t < 0.92 ? from : live
+          // gone once it reaches the header: never half hidden under the bar
+          return from.top > 72 && last.t < 0.92 ? from : live
         }
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
@@ -308,7 +309,7 @@ export function SkinScene() {
         if (phone) {
           const from = last.peelEl.getBoundingClientRect()
           // a clean swap once it has landed: a half-faded object over the control read as a ghost
-          return from.bottom > 0 || (last.t >= 0.92 && last.fade === 0) ? 1 : 0
+          return from.top > 72 || (last.t >= 0.92 && last.fade === 0) ? 1 : 0
         }
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over
