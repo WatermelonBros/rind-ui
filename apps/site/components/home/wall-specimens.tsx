@@ -214,7 +214,7 @@ export function WallSpecimens() {
       const w = Math.min(1, Math.max(0, p)) * 8
       el.style.setProperty("--w", String(w))
       // React only hears whole-ish steps; the front between them is CSS (--w)
-      setWave(Math.round(w * 20) / 20)
+      setWave(Math.floor(w * 20) / 20)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)

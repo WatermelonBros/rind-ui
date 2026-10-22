@@ -206,12 +206,15 @@ export function SkinScene() {
       }
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
+        const raw = last.peelEl.getBoundingClientRect()
+        // desktop holds it where the machine left it (the leg starts from there); a phone lets
+        // it scroll away with the machine
+        const from = window.innerWidth <= 900 ? raw : shift(raw, last.y - last.s2)
         const live = last.look.getBoundingClientRect()
         if (window.innerWidth <= 900) {
           // a phone has no gutter: it scrolls away with the machine, then waits hidden on its
           // control and appears there (alpha)
-          return from.bottom > 0 && last.t < 0.85 ? from : live
+          return from.bottom > 0 && last.t < 0.92 ? from : live
         }
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
@@ -249,11 +252,12 @@ export function SkinScene() {
           )
         }
         const out = smooth(0, 0.3)
-        // out to the side first, down only once clear of the machine's diagram
+        // up and out to the side first, clear of the machine's diagram below it, then down
+        const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.9
         const down = smooth(0.32, 0.72)
         return new DOMRect(
           lerp(from.x, end.x, out),
-          lerp(from.y, end.y, down),
+          lerp(from.y, end.y, down) - rise,
           lerp(from.width, end.width, out),
           lerp(from.height, end.height, out),
         )
@@ -269,6 +273,9 @@ export function SkinScene() {
         return new DOMRect(to.x - (w - to.width) / 2, to.y - (h - to.height) / 2, w, h)
       }
       const a = shift(from, y - s0)
+      // a phone keeps it in the hero until the hero has scrolled away, then it waits hidden on
+      // the next control (alpha): no empty hero, no flight across the next heading
+      if (window.innerWidth <= 900) return a.bottom > 0 ? a : to
       const e = t * t * (3 - 2 * t)
       return new DOMRect(
         lerp(a.x, to.x, e),
@@ -298,8 +305,8 @@ export function SkinScene() {
       if (last && last.y > last.s2) {
         // a phone has no gutter to fly in: it hides on the way and appears on the preview
         if (phone) {
-          const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
-          return from.bottom > 0 || last.t >= 0.85 ? 1 - last.fade : 0
+          const from = last.peelEl.getBoundingClientRect()
+          return from.bottom > 0 || last.t >= 0.92 ? 1 - last.fade : 0
         }
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over (set
@@ -310,9 +317,11 @@ export function SkinScene() {
         return p >= 1 ? 0 : 1
       }
       if (window.innerWidth > 900) return 1
-      const t = travel().t
-      // gone in the middle of the path, never half there (a faint ghost reads as a bug)
-      return t > 0.15 && t < 0.85 ? 0 : 1
+      const { next, y, s0, t } = travel()
+      if (!next || y <= s0) return 1
+      const a = shift(at.getBoundingClientRect(), y - s0)
+      // in the hero while it is on screen, then hidden until it is on the next control
+      return a.bottom > 0 || t >= 0.92 ? 1 : 0
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0

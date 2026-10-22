@@ -670,7 +670,11 @@
   inset: 0;
   z-index: -1;
   background: var(--next-bg);
-  clip-path: circle(calc(mod(var(--w, 0) + var(--o, 0), 1) * 150%) at 0 0);
+  /* most of the step the card rests in its skin; the front crosses it in the last quarter, so
+     the old skin's text spends little time on the new ground */
+  clip-path: circle(
+    calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
+  );
 }
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
@@ -845,14 +849,14 @@
   color: color-mix(in oklab, var(--bg) 72%, var(--ink));
 }
 /* the closing beat: the title fills at full contrast as it scrolls in (--fill, outro.tsx), a
-   soft edge sweeping left to right; the pointer then peels it in the accent */
+   crisp edge sweeping left to right; the pointer then peels it in the accent */
 @supports (background-clip: text) {
   .outroOutline {
     color: transparent;
     background: linear-gradient(
       90deg,
-      var(--bg) calc(var(--fill, 1) * 130% - 30%),
-      color-mix(in oklab, var(--bg) 72%, var(--ink)) calc(var(--fill, 1) * 130%)
+      var(--bg) calc(var(--fill, 1) * 106% - 6%),
+      color-mix(in oklab, var(--bg) 72%, var(--ink)) calc(var(--fill, 1) * 106%)
     );
     background-clip: text;
   }
