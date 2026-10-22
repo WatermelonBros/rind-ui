@@ -146,7 +146,7 @@ export function SkinScene() {
       const tr = test.getBoundingClientRect()
       // a phone runs the test while the control is still low on the screen, so the visitor
       // sees the PASS before scrolling on
-      const anchor = window.innerWidth <= 900 ? 0.68 : 0.5
+      const anchor = window.innerWidth <= 900 ? 0.68 : 0.6
       const s5 = tr.top + y + tr.height / 2 - window.innerHeight * anchor
       const t = Math.min(1, Math.max(0, (y - s4) / Math.max(1, s5 - s4)))
       const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
@@ -157,9 +157,20 @@ export function SkinScene() {
     // the panels nor shrinks to a speck
     const gutterFit = (w: number, h: number) => {
       const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
-      const room = window.innerWidth - (frame?.right ?? window.innerWidth) - 32
-      const k = Math.min(1, Math.max(64, room) / w)
-      return { w: w * k, h: h * k, x: window.innerWidth - w * k - 16 }
+      const right = frame?.right ?? window.innerWidth
+      const room = window.innerWidth - right - 32
+      // big enough to read as the object, not debris, and 24px clear of the viewport's edge
+      const k = Math.min(1, Math.max(80, room) / w)
+      return { w: w * k, h: h * k, x: Math.max(right + 8, window.innerWidth - w * k - 24) }
+    }
+    // Desktop: between scenes the object lives in the right-hand gutter. It berths there level
+    // with the builder's component and hands over to it in a cross-dissolve, then sets off from
+    // the same berth for the tests: it never crosses the builder's text
+    const berth = (look: DOMRect, w: number, h: number) => {
+      const g = gutterFit(w, h)
+      // never down by the screen reader toggle pinned in the corner
+      const y = Math.min(look.y + look.height / 2 - g.h / 2, window.innerHeight - g.h - 110)
+      return new DOMRect(g.x, y, g.w, g.h)
     }
     const target = () => {
       const fin = testLeg()
@@ -167,7 +178,8 @@ export function SkinScene() {
         const live = fin.test.getBoundingClientRect()
         // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
         if (atTests || window.innerWidth <= 900) return live
-        const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
+        const lookAt = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
+        const from = berth(lookAt, live.width, live.height)
         const top = window.innerHeight * 0.15
         const bottom = window.innerHeight * 0.75 - live.height
         const toY = Math.min(Math.max(live.y, top), bottom)
@@ -178,7 +190,7 @@ export function SkinScene() {
         // around the content, like the leg before: out to the right-hand gutter, down to the
         // control's height, then in
         const g = gutterFit(live.width, live.height)
-        const out = smooth(0, 0.3)
+        const out = 1
         const across = smooth(0.65, 0.9)
         // across in the empty strip under the control's row, then up into it: the row's label
         // sits between the gutter and the control, and the object never crosses it
@@ -192,10 +204,16 @@ export function SkinScene() {
       }
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
+        const raw = last.peelEl.getBoundingClientRect()
+        // desktop holds it where the machine left it (the leg starts from there); a phone lets
+        // it scroll away with the machine
+        const from = window.innerWidth <= 900 ? raw : shift(raw, last.y - last.s2)
         const live = last.look.getBoundingClientRect()
-        // a phone hides it on the way (alpha): it waits on its control, so it appears there
-        if (last.t >= 1 || (window.innerWidth <= 900 && last.t > 0.05)) return live
+        if (window.innerWidth <= 900) {
+          // a phone has no gutter: it scrolls away with the machine, then waits hidden on its
+          // control and appears there (alpha)
+          return from.bottom > 0 && last.t < 0.92 ? from : live
+        }
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
         const top = window.innerHeight * 0.18
@@ -214,15 +232,31 @@ export function SkinScene() {
         // three moves, around the content: out to the right-hand gutter, down to the preview
         // row's height, then in along that row (collisions on the way fade it: alpha)
         // at the size it left the machine with (the preview's control can be 16px: a speck)
-        const g = gutterFit(from.width, from.height)
+        // level with the real component once it is on screen, so the hop is a short sideways move
+        const end = berth(last.t >= 0.6 ? live : to, from.width, from.height)
+        // from its berth it flies onto the component on a short arc, in time rather than with
+        // the scroll, and the real component takes its place on touchdown
+        const p = flip(last.t)
+        if (p >= 0) {
+          const e = p * p * (3 - 2 * p)
+          // over the card, never through its text
+          const arc = Math.sin(Math.PI * p) * 140
+          return new DOMRect(
+            lerp(end.x, live.x, e),
+            lerp(end.y, live.y, e) - arc,
+            lerp(end.width, live.width, e),
+            lerp(end.height, live.height, e),
+          )
+        }
         const out = smooth(0, 0.3)
-        const down = smooth(0.25, 0.65)
-        const across = smooth(0.65, 1)
+        // up and out to the side first, clear of the machine's diagram below it, then down
+        const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.5
+        const down = smooth(0.32, 0.72)
         return new DOMRect(
-          lerp(lerp(from.x, g.x, out), to.x, across),
-          lerp(from.y, to.y, down),
-          lerp(lerp(from.width, g.w, out), to.width, across),
-          lerp(lerp(from.height, g.h, out), to.height, across),
+          lerp(from.x, end.x, out),
+          lerp(from.y, end.y, down) - rise,
+          lerp(from.width, end.width, out),
+          lerp(from.height, end.height, out),
         )
       }
       const { next, y, s0, t } = travel()
@@ -236,6 +270,9 @@ export function SkinScene() {
         return new DOMRect(to.x - (w - to.width) / 2, to.y - (h - to.height) / 2, w, h)
       }
       const a = shift(from, y - s0)
+      // a phone keeps it in the hero until the hero has scrolled away, then it waits hidden on
+      // the next control (alpha): no empty hero, no flight across the next heading
+      if (window.innerWidth <= 900) return a.bottom > 0 ? a : to
       const e = t * t * (3 - 2 * t)
       return new DOMRect(
         lerp(a.x, to.x, e),
@@ -246,6 +283,9 @@ export function SkinScene() {
     }
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
+    // the hop from the berth onto the builder's component: -1 before it, then 0→1 with the
+    // scroll over the leg's last fifth, so a steady scroll always shows the arc
+    const flip = (t: number) => (t < 0.8 ? -1 : Math.min(1, (t - 0.8) / 0.18))
     const alpha = () => {
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
@@ -253,16 +293,24 @@ export function SkinScene() {
       if (fin && fin.y > fin.s4) return phone ? (atTests ? 1 : 0) : fin.emerge
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // a phone has no gutter to fly in: it hides on the way and appears near the preview
-        if (phone && last.t > 0.05 && last.t < 0.85) return 0
-        // always visible on the way (fading over every obstacle read as a flicker); it fades
-        // only at the end, into the real component
-        return 1 - last.fade
+        // a phone has no gutter to fly in: it hides on the way and appears on the preview
+        if (phone) {
+          const from = last.peelEl.getBoundingClientRect()
+          return from.bottom > 0 || last.t >= 0.92 ? 1 - last.fade : 0
+        }
+        // desktop: visible all the way to its berth, then it dissolves into the component
+        // the component is the object until the hop lands, then the real one takes over
+        const p = flip(last.t)
+        // one at a time: the real component is hidden from the berth until touchdown
+        last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0" : ""
+        return p >= 1 ? 0 : 1
       }
       if (window.innerWidth > 900) return 1
-      const t = travel().t
-      // gone in the middle of the path, never half there (a faint ghost reads as a bug)
-      return t > 0.15 && t < 0.85 ? 0 : 1
+      const { next, y, s0, t } = travel()
+      if (!next || y <= s0) return 1
+      const a = shift(at.getBoundingClientRect(), y - s0)
+      // in the hero while it is on screen, then hidden until it is on the next control
+      return a.bottom > 0 || t >= 0.92 ? 1 : 0
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0
@@ -325,7 +373,17 @@ export function SkinScene() {
         // the machine scene's label does not stay behind alone
         if (last.y > last.s2) setLanded(false)
         else if (past) setLanded(true)
-        last.look.style.opacity = last.y > last.s2 ? String(last.fade) : ""
+        // the component stays in place on a phone until the object appears on it; on a desktop it
+        // comes in as the object dissolves at its berth
+        const phone = window.innerWidth <= 900
+        last.look.style.opacity =
+          last.y <= last.s2
+            ? ""
+            : phone
+              ? last.t < 0.85
+                ? ""
+                : String(last.fade)
+              : last.look.style.opacity
       }
       // one control at a time: the test's own stays hidden while the object flies to it (on a
       // phone the object is hidden in flight instead, so the control shows until touchdown)
@@ -336,7 +394,8 @@ export function SkinScene() {
       }
       if (fin && scene.current && fin.y > fin.s4) {
         // it takes the builder's component with it, and gets the site's skin back on the way
-        fin.look.style.opacity = window.innerWidth <= 900 ? "" : String(1 - fin.emerge)
+        // the builder keeps its component: the object comes back at the berth
+        fin.look.style.opacity = ""
         const k = Math.min(1, Math.max(0, (fin.t - 0.55) / 0.45))
         const back = k * k * (3 - 2 * k)
         const colors = getLookColors()

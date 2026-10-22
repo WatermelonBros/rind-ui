@@ -108,7 +108,8 @@
   top: 100%;
   width: 420px;
   margin-top: 30px;
-  opacity: var(--p3);
+  /* only once the ink disc has closed: its nodes never float on the dark */
+  opacity: calc((var(--p3) - 0.88) * 8.4);
   translate: 0 calc((1 - var(--p3)) * 40px);
   font: 600 12px var(--mono);
 }
