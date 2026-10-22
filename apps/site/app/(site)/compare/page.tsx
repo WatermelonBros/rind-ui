@@ -19,7 +19,21 @@ export default function ComparePage() {
   return (
     <main className={styles.page}>
       {/* biome-ignore lint/security/noDangerouslySetInnerHtml: our own markdown, rendered at build time */}
-      <article className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
+      <article className={styles.prose} dangerouslySetInnerHTML={{ __html: layout(html) }} />
     </main>
   )
+}
+
+/** Gives the flat markdown its page shape: the intro, the table, one block per h2, one card per h3. */
+function layout(html: string): string {
+  const [intro = "", ...parts] = html.split(/(?=<h2)/)
+  const sections = parts.map((part) => {
+    const [head = "", ...cards] = part.split(/(?=<h3)/)
+    const grid = cards.length
+      ? `<div class="${styles.cards}">${cards.map((c) => `<div class="${styles.card}">${c}</div>`).join("")}</div>`
+      : ""
+    return `<section class="${styles.section}">${head}${grid}</section>`
+  })
+  const [lead = "", table = ""] = intro.split(/(?=<table)/)
+  return `<header class="${styles.intro}">${lead}</header>${table}${sections.join("")}`
 }

@@ -409,14 +409,14 @@ for (const url of urls) {
       await frames(page)
     }
     await invisibleText(page, url)
-    await axe(page, url, "crisp")
+    await axe(page, url, "juicy")
     // the theme pages are @rind-ui/theme's own, with no site phase
     if (!url.startsWith("/theme/")) {
       await page.getByRole("switch", { name: "juicy mode" }).click()
-      await page.waitForFunction(() => document.documentElement.dataset["phase"] === "juicy")
-      await axe(page, url, "juicy")
-      await page.getByRole("switch", { name: "juicy mode" }).click()
       await page.waitForFunction(() => document.documentElement.dataset["phase"] === "crisp")
+      await axe(page, url, "crisp")
+      await page.getByRole("switch", { name: "juicy mode" }).click()
+      await page.waitForFunction(() => document.documentElement.dataset["phase"] === "juicy")
       await settled(page, url)
     }
     await page.setViewportSize({ width: 390, height: 844 })

@@ -92,7 +92,7 @@ function Specimen({
 const TOPPINGS = ["Ham", "Cheese"]
 
 // The wall's skins: the site's three, plus three more written here as nothing but custom
-// properties, the way a consumer would. One wave of scroll re-skins every live card.
+// properties, the way a consumer would. A timed wave re-skins every live card.
 type Skin = {
   readonly name: string
   readonly base: "crisp" | "juicy" | "bare"
@@ -196,33 +196,57 @@ const GROUND: Record<string, string> = {
 
 /** The wave's position: which skin each card wears is its index plus this, round the list. */
 const Wave = createContext<number | null>(null)
+const STEP_MS = 2000
 
 /** Six ready components, alive: use them, and watch the attribute a stylesheet would target. */
 export function WallSpecimens() {
-  // the wave advances one skin per eighth of the list's trip through the screen; under reduced
-  // motion every card keeps the site's skin
+  // the wave advances one skin every two seconds while the list is on screen (a scroll-driven
+  // wave changed too fast to read); it holds while the pointer or focus is on a card, so a
+  // card can be used in one skin. Under reduced motion every card keeps the site's skin.
   const list = useRef<HTMLUListElement>(null)
   const [wave, setWave] = useState<number | null>(null)
   useEffect(() => {
     const el = list.current
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     let frame = 0
-    const update = () => {
-      frame = 0
-      const r = el.getBoundingClientRect()
-      const p = (window.innerHeight - r.top) / (window.innerHeight + r.height)
-      const w = Math.min(1, Math.max(0, p)) * 8
+    let last = 0
+    let w = 0
+    let seen = false
+    let held = false
+    const tick = (now: number) => {
+      frame = requestAnimationFrame(tick)
+      if (!held && last) w += (now - last) / STEP_MS
+      last = now
       el.style.setProperty("--w", String(w))
       // React only hears whole-ish steps; the front between them is CSS (--w)
       setWave(Math.floor(w * 20) / 20)
     }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update)
+    const run = () => {
+      if (seen && !document.hidden && !frame) frame = requestAnimationFrame(tick)
+      if ((!seen || document.hidden) && frame) {
+        cancelAnimationFrame(frame)
+        frame = 0
+        last = 0
+      }
     }
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
+    const io = new IntersectionObserver(
+      ([e]) => {
+        seen = !!e?.isIntersecting
+        run()
+      },
+      { threshold: 0.4 },
+    )
+    io.observe(el)
+    const hold = () => {
+      held = el.matches(":hover") || el.contains(document.activeElement)
+    }
+    setWave(0)
+    for (const t of ["pointerover", "pointerleave", "focusin", "focusout"])
+      el.addEventListener(t, () => requestAnimationFrame(hold))
+    document.addEventListener("visibilitychange", run)
     return () => {
-      window.removeEventListener("scroll", onScroll)
+      io.disconnect()
+      document.removeEventListener("visibilitychange", run)
       cancelAnimationFrame(frame)
     }
   }, [])

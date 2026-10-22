@@ -241,14 +241,14 @@ void main() {
   float peeling = step(0.002, uPeel) * step(uPeel, 0.998);
   float lip = (1.0 - smoothstep(0.0, 0.07, abs(edge + 0.035))) * peeling;
   float dusk = (1.0 - smoothstep(0.0, 0.22, edge)) * step(0.0, edge) * peeling;
+  // the visitor's skin, from the builder: brand where the component is on, surface elsewhere;
+  // it is a skin like the site's, so the peel still lifts it off the skeleton
+  vec3 cBody = uKind > 1.5 ? uBrand : mix(uSurface, uBrand, on);
+  vec3 cMark = uKind < 0.5 ? mix(uBrand, uSurface, on) : uSurface;
+  skin = mix(skin, (isMark ? cMark : cBody) * (0.82 + 0.18 * max(ndl, 0.0)), uCustom);
   vec3 c = mix(bare * (1.0 - 0.35 * dusk), skin, skinned);
   c = mix(c, mix(uCard, vec3(1.0), 0.5), lip * 0.9);
 
-  // the visitor's skin, from the builder: brand where the component is on, surface elsewhere
-  vec3 cBody = uKind > 1.5 ? uBrand : mix(uSurface, uBrand, on);
-  vec3 cMark = uKind < 0.5 ? mix(uBrand, uSurface, on) : uSurface;
-  vec3 custom = (isMark ? cMark : cBody) * (0.82 + 0.18 * max(ndl, 0.0));
-  c = mix(c, custom, uCustom);
   color = vec4(c, uAlpha);
 }`
 
