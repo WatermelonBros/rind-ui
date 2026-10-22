@@ -37,8 +37,9 @@ export function RouteWave() {
           const tick = () => {
             const main = document.querySelector("main")
             const arrived = location.pathname === to.pathname && main !== null && main !== before
+            // a timer, not a frame: the browser holds rendering (and frames) during the update
             if (arrived || performance.now() > end) resolve()
-            else requestAnimationFrame(tick)
+            else setTimeout(tick, 16)
           }
           tick()
         })

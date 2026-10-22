@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { Hero } from "@/components/hero"
 import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
@@ -43,17 +44,33 @@ export default function Home() {
       <BandReveal />
       <XRay />
       <ScreenReaderView />
+      {/* each section its own boundary: React hydrates them one at a time, yielding between them,
+          instead of the whole landing in one long task on a slow phone */}
       <Hero>
-        <Peel />
+        <Suspense>
+          <Peel />
+        </Suspense>
         {/* the bare object ends its trip here: it becomes a real component in the visitor's skin */}
-        <AnyLook />
+        <Suspense>
+          <AnyLook />
+        </Suspense>
         {/* …and its trip ends in the tests, which run as it lands and move it */}
-        <Tested />
-        <Why />
-        <Agents />
-        <Wall />
+        <Suspense>
+          <Tested />
+        </Suspense>
+        <Suspense>
+          <Why />
+        </Suspense>
+        <Suspense>
+          <Agents />
+        </Suspense>
+        <Suspense>
+          <Wall />
+        </Suspense>
       </Hero>
-      <Outro />
+      <Suspense>
+        <Outro />
+      </Suspense>
     </>
   )
 }

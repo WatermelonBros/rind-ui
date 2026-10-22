@@ -8,14 +8,15 @@ import type { ComponentProps, ReactNode } from "react"
 function until(done: () => boolean, ms = 3000): Promise<void> {
   const end = performance.now() + ms
   return new Promise((resolve) => {
-    const tick = () => (done() || performance.now() > end ? resolve() : requestAnimationFrame(tick))
+    // a timer, not a frame: the browser holds rendering (and frames) during a transition's update
+    const tick = () => (done() || performance.now() > end ? resolve() : setTimeout(tick, 16))
     tick()
   })
 }
 
 /**
- * A link whose text becomes the next page's title: it morphs into the docs page's <h1> (both carry `view-transition-name:
- * page-title` during it); `data-morph` keeps the site-wide wave (route-wave.tsx) off it. A
+ * A link whose text becomes the next page's title: it morphs into the docs page's <h1> (both
+ * carry `view-transition-name: page-title` during it); `data-morph` keeps the site-wide wave (route-wave.tsx) off it. A
  * plain navigation where view transitions are missing, under reduced motion, with a modifier
  * key, or to a place on the same page.
  */

@@ -4,16 +4,16 @@ import type { ReactNode } from "react"
 import { HydrationMark } from "@/components/hydration-mark"
 
 // Self-hosted (OFL, licences in fonts/): the build must work with no network.
-// the page's own fonts are preloaded and small: "optional" uses them when they arrive with the
-// first paint, and otherwise keeps the fallback for that visit instead of reflowing the text
-// under the reader (a late swap moved the hero on slow phones). The next visit has them cached.
+// the fonts the first screen uses are preloaded (they land before the first layout, so nothing
+// reflows: a late font moved the hero's lede and buttons by 66px on phones); "block" keeps a
+// late one invisible rather than drawn twice
 const unbounded = localFont({
   src: [
     { path: "../fonts/unbounded/unbounded-latin-500.woff2", weight: "500" },
     { path: "../fonts/unbounded/unbounded-latin-900.woff2", weight: "900" },
   ],
   variable: "--font-unbounded",
-  display: "optional",
+  display: "block",
 })
 const inter = localFont({
   src: [
@@ -23,7 +23,9 @@ const inter = localFont({
     { path: "../fonts/inter-tight/inter-tight-latin-700.woff2", weight: "700" },
   ],
   variable: "--font-inter",
-  display: "optional",
+  display: "block",
+  // crisp's text only (juicy is the default): fetched when used, not on every first load
+  preload: false,
 })
 const fredoka = localFont({
   src: [
@@ -32,7 +34,7 @@ const fredoka = localFont({
     { path: "../fonts/fredoka/fredoka-latin-700.woff2", weight: "700" },
   ],
   variable: "--font-fredoka",
-  display: "optional",
+  display: "block",
 })
 const mono = localFont({
   src: [
@@ -41,9 +43,9 @@ const mono = localFont({
     { path: "../fonts/jetbrains-mono/jetbrains-mono-latin-600.woff2", weight: "600" },
   ],
   variable: "--font-mono",
-  display: "swap",
-  // small labels: they can swap in a moment later without delaying the first paint
-  preload: false,
+  display: "block",
+  // preloaded: the hero's "Browse components" is set in it, and a font that lands after the first
+  // layout rewraps the hero's buttons on phones, whatever its display
 })
 
 export const metadata: Metadata = {
