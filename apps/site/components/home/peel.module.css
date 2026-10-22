@@ -193,6 +193,12 @@
   inline-size: 190px;
   block-size: 88px;
 }
+/* in proportion when the real control shows again (as the object leaves): the thumb fills the
+   track's height like the object's knob */
+.scene[data-gl] [data-scope="switch"][data-part="thumb"] {
+  inline-size: 72px;
+  block-size: 72px;
+}
 .scene[data-gl] [data-scope="checkbox"][data-part="control"] {
   inline-size: 110px;
   block-size: 110px;

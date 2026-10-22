@@ -454,6 +454,9 @@
   padding: 14px 18px;
   animation: pass-pop 0.6s var(--spring-pop);
 }
+.passFact {
+  white-space: nowrap;
+}
 .passBanner b {
   background: #0b0b0c;
   color: #9be7c4;
