@@ -788,17 +788,31 @@
 .outroOutline {
   color: color-mix(in oklab, var(--bg) 72%, var(--ink));
 }
+/* the closing beat: the title fills at full contrast as it scrolls in (--fill, outro.tsx), a
+   soft edge sweeping left to right; the pointer then peels it in the accent */
+@supports (background-clip: text) {
+  .outroOutline {
+    color: transparent;
+    background: linear-gradient(
+      90deg,
+      var(--bg) calc(var(--fill, 1) * 130% - 30%),
+      color-mix(in oklab, var(--bg) 72%, var(--ink)) calc(var(--fill, 1) * 130%)
+    );
+    background-clip: text;
+  }
+}
 /* filled in a circle around the pointer: the rind peeled where you point */
 .outroFill {
-  color: var(--bg);
+  color: var(--acc);
   /* hidden until the pointer comes in; outro.tsx moves the circle */
   clip-path: circle(0 at 50% 50%);
   pointer-events: none;
 }
+/* no pointer to peel with: the scroll fill is the whole effect (full contrast at rest under
+   reduced motion, where --fill stays unset) */
 @media (hover: none), (prefers-reduced-motion: reduce) {
   .outroFill {
-    /* biome-ignore lint/complexity/noImportantStyles: beats the circle outro.tsx writes inline */
-    clip-path: none !important;
+    display: none;
   }
 }
 
