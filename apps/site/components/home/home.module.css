@@ -767,20 +767,6 @@
   padding-block-start: 48px;
   background: var(--s-bg);
 }
-/* the front: the next skin's ground opens from the card's top-left corner as the page scrolls,
-   one card a beat behind the next (--o); the components take the new skin as it completes */
-.specimenStage[data-wave]::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--next-bg);
-  /* most of the step the card rests in its skin; the front crosses it in the last quarter, so
-     the old skin's text spends little time on the new ground */
-  clip-path: circle(
-    calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
-  );
-}
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 0 0 1px var(--s-ink);

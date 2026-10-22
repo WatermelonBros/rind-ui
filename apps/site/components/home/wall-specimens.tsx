@@ -52,8 +52,35 @@ function Specimen({
   // a diagonal front: each card is a little behind the one up and to its left
   const offset = ((index % 3) + Math.floor(index / 3)) * 0.3
   const at = wave === null ? null : Math.floor(wave + offset)
-  const skin = at === null ? null : SKINS[at % SKINS.length]
-  const next = at === null ? null : SKINS[(at + 1) % SKINS.length]
+  // the card turns over to change skin: the new one goes on while it is edge-on, so its ground
+  // and its component change together and nothing is seen in between
+  const [shown, setShown] = useState(at)
+  useEffect(() => {
+    // the whole card turns, foot and all, so no square edge shows behind the stage
+    const el = root.current?.closest("li")
+    if (at === shown) return
+    if (shown === null || !el) return setShown(at)
+    const turn = "perspective(900px) rotateY"
+    const away = el.animate(
+      { transform: [`${turn}(0deg)`, `${turn}(90deg)`] },
+      {
+        duration: 180,
+        easing: "cubic-bezier(0.5, 0, 1, 0.6)",
+      },
+    )
+    away.onfinish = () => {
+      setShown(at)
+      el.animate(
+        { transform: [`${turn}(-90deg)`, `${turn}(0deg)`] },
+        {
+          duration: 260,
+          easing: "cubic-bezier(0.2, 0.9, 0.3, 1.25)",
+        },
+      )
+    }
+    return () => away.cancel()
+  }, [at, shown, root])
+  const skin = shown === null ? null : SKINS[shown % SKINS.length]
   return (
     <li className={styles.specimen}>
       <div
@@ -62,15 +89,7 @@ function Specimen({
         data-skinned=""
         data-skin={skin?.base ?? phase}
         data-wave={skin ? "" : undefined}
-        style={
-          skin
-            ? ({
-                ...skin.vars,
-                "--o": String(offset),
-                "--next-bg": GROUND[next?.name ?? "crisp"],
-              } as CSSProperties)
-            : undefined
-        }
+        style={skin ? (skin.vars as CSSProperties) : undefined}
       >
         {skin ? (
           <span className={styles.skinChip} aria-hidden="true">
@@ -184,16 +203,6 @@ const SKINS: readonly Skin[] = [
   },
 ]
 
-// each skin's ground, for the front that sweeps the next one in
-const GROUND: Record<string, string> = {
-  crisp: "#d4ff3a",
-  midnight: "#10132b",
-  juicy: "#e9e2ff",
-  paper: "#f4efe6",
-  bare: "#f4f4f5",
-  citrus: "#fff0c2",
-}
-
 /** The wave's position: which skin each card wears is its index plus this, round the list. */
 const Wave = createContext<number | null>(null)
 const STEP_MS = 2000
@@ -217,9 +226,8 @@ export function WallSpecimens() {
       frame = requestAnimationFrame(tick)
       if (!held && last) w += (now - last) / STEP_MS
       last = now
-      el.style.setProperty("--w", String(w))
-      // React only hears whole-ish steps; the front between them is CSS (--w)
-      setWave(Math.floor(w * 20) / 20)
+      // React only hears whole steps: a card turns over when its own comes round
+      setWave(Math.floor(w * 10) / 10)
     }
     const run = () => {
       if (seen && !document.hidden && !frame) frame = requestAnimationFrame(tick)
