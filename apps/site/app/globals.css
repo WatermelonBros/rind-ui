@@ -84,21 +84,6 @@ html.intro:not([data-intro-ready]) body {
     visibility: visible;
   }
 }
-/* The 404 page while headless (components/headless-page.tsx): the browser's own look for the
-   whole page, the way the intro's raw copy shows it. */
-html:has([data-headless]),
-body:has([data-headless]) {
-  background: Canvas;
-  color: CanvasText;
-  font: 16px serif;
-}
-body:has([data-headless]) {
-  margin: 8px;
-}
-body:has([data-headless]) *:not(svg, svg *) {
-  /* biome-ignore lint/complexity/noImportantStyles: the bare page must beat every stylesheet */
-  all: revert !important;
-}
 /* the page as the browser renders it with no CSS: a static copy over the real, styled page */
 #rind-intro-layer {
   all: initial;

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { GooFilters } from "@/components/goo"
-import { HeadlessPage } from "@/components/headless-page"
+import { LostZero } from "@/components/lost-zero"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import "./globals.css"
@@ -17,9 +17,9 @@ export default function NotFound() {
       <header>
         <Nav />
       </header>
-      <HeadlessPage className={styles.page}>
+      <main className={styles.page}>
         <p className={styles.code} aria-hidden="true">
-          4<span>0</span>4
+          4<LostZero />4
         </p>
         <h1 className={styles.title}>This page is headless.</h1>
         <p className={styles.text}>No behaviour, no state, no look. Nothing here at all.</p>
@@ -31,7 +31,7 @@ export default function NotFound() {
             Browse the docs
           </Link>
         </div>
-      </HeadlessPage>
+      </main>
     </PhaseProvider>
   )
 }
