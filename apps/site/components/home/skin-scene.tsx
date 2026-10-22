@@ -144,7 +144,10 @@ export function SkinScene() {
       const lr = look.getBoundingClientRect()
       const s4 = lr.top + y + lr.height / 2 - window.innerHeight * 0.25
       const tr = test.getBoundingClientRect()
-      const s5 = tr.top + y + tr.height / 2 - window.innerHeight * 0.5
+      // a phone runs the test while the control is still low on the screen, so the visitor
+      // sees the PASS before scrolling on
+      const anchor = window.innerWidth <= 900 ? 0.68 : 0.5
+      const s5 = tr.top + y + tr.height / 2 - window.innerHeight * anchor
       const t = Math.min(1, Math.max(0, (y - s4) / Math.max(1, s5 - s4)))
       const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
       return { look, test, y, s4, t, emerge }
@@ -176,10 +179,13 @@ export function SkinScene() {
         // control's height, then in
         const g = gutterFit(live.width, live.height)
         const out = smooth(0, 0.3)
-        const across = smooth(0.7, 1)
+        const across = smooth(0.65, 0.9)
+        // across in the empty strip under the control's row, then up into it: the row's label
+        // sits between the gutter and the control, and the object never crosses it
+        const under = toY + live.height + 28
         return new DOMRect(
           lerp(lerp(from.x, g.x, out), live.x, across),
-          lerp(from.y, toY, smooth(0.25, 0.7)),
+          lerp(lerp(from.y, under, smooth(0.25, 0.65)), toY, smooth(0.88, 1)),
           lerp(lerp(from.width, g.w, out), live.width, across),
           lerp(lerp(from.height, g.h, out), live.height, across),
         )
@@ -207,7 +213,8 @@ export function SkinScene() {
         }
         // three moves, around the content: out to the right-hand gutter, down to the preview
         // row's height, then in along that row (collisions on the way fade it: alpha)
-        const g = gutterFit(to.width, to.height)
+        // at the size it left the machine with (the preview's control can be 16px: a speck)
+        const g = gutterFit(from.width, from.height)
         const out = smooth(0, 0.3)
         const down = smooth(0.25, 0.65)
         const across = smooth(0.65, 1)
@@ -334,7 +341,8 @@ export function SkinScene() {
         const back = k * k * (3 - 2 * k)
         const colors = getLookColors()
         scene.current.setLook(colors.brand, colors.surface, 1 - back)
-        scene.current.setPeel(1 - back)
+        // whole skin from the start of the leg: a peel closing in flight draws a half-folded shape
+        scene.current.setPeel(0)
       }
       // hysteresis: the control grows to the object's size on arrival, which moves the page a
       // little; without it, arrival would flicker on and off at the threshold
