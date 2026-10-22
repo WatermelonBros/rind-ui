@@ -104,10 +104,10 @@ export function Outro() {
           </span>
         </p>
         <div className={styles.outroCtas}>
-          <Link href="/docs/get-started/" className={styles.outroPrimary}>
+          <Link prefetch={false} href="/docs/get-started/" className={styles.outroPrimary}>
             Get started →
           </Link>
-          <Link href="/compare/" className={styles.outroGhost}>
+          <Link prefetch={false} href="/compare/" className={styles.outroGhost}>
             How it compares
           </Link>
           <a href="https://github.com/WatermelonBros/rind-ui" className={styles.outroGhost}>
@@ -124,7 +124,13 @@ export function Outro() {
           Built using <b>Reado</b> ↗
         </a>
         <span>
-          <Link href="/compare/">Compare</Link> · MIT · <Link href="/privacy/">Privacy</Link>
+          <Link prefetch={false} href="/compare/">
+            Compare
+          </Link>{" "}
+          · MIT ·{" "}
+          <Link prefetch={false} href="/privacy/">
+            Privacy
+          </Link>
         </span>
       </div>
       <p className={styles.visuallyHidden} role="status">

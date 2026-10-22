@@ -28,6 +28,7 @@ export function MorphLink({
   const router = useRouter()
   return (
     <Link
+      prefetch={false}
       href={href}
       onClick={(e) => {
         if (
