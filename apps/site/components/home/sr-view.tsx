@@ -13,6 +13,52 @@ export function utterance(el: HTMLElement): string {
 
 type Line = { readonly key: string; readonly chunks: readonly string[] }
 
+// the system's speech synthesis, with an English voice (a natural one where the system has it)
+let chosen: SpeechSynthesisVoice | null = null
+function pickVoice() {
+  const voices = speechSynthesis.getVoices()
+  chosen =
+    voices.find(
+      (v) => v.lang === "en-US" && /natural|premium|enhanced|samantha|google/i.test(v.name),
+    ) ??
+    voices.find((v) => v.lang.startsWith("en")) ??
+    null
+}
+// kept referenced: Chrome may garbage-collect an utterance mid-queue and then say nothing
+let current: SpeechSynthesisUtterance | null = null
+/** Told when the system's speech engine never starts (Chrome on macOS can hang until restarted). */
+let onStuck: (() => void) | null = null
+function speak(text: string) {
+  if (!("speechSynthesis" in window)) return
+  if (!chosen) pickVoice()
+  const u = new SpeechSynthesisUtterance(text)
+  u.lang = "en-US"
+  u.rate = 1.1
+  if (chosen) u.voice = chosen
+  u.onerror = (e) => {
+    if (e.error !== "interrupted" && e.error !== "canceled")
+      console.warn("[rind screen reader simulation] speech failed:", e.error)
+  }
+  current = u
+  let started = false
+  u.onstart = () => {
+    started = true
+  }
+  window.setTimeout(() => {
+    if (!started && current === u) onStuck?.()
+  }, 3000)
+  // a new utterance interrupts the last, as a screen reader does. Chrome drops a speak() that
+  // follows cancel() in the same task, so it waits a beat after cancelling
+  const busy = speechSynthesis.speaking || speechSynthesis.pending
+  if (busy) speechSynthesis.cancel()
+  const go = () => {
+    speechSynthesis.resume()
+    if (current === u) speechSynthesis.speak(u)
+  }
+  if (busy) window.setTimeout(go, 60)
+  else go()
+}
+
 // browse-mode quick-navigation keys (NVDA's single letter navigation) and what they find
 const QUICK: Record<string, { readonly what: string; readonly match: (i: Item) => boolean }> = {
   h: { what: "heading", match: (i) => i.role === "heading" },
@@ -87,13 +133,7 @@ export function ScreenReaderView() {
       const clean = chunks.filter(Boolean)
       if (!clean.length) return
       setLines((all) => [...all.slice(-11), { key, chunks: clean }])
-      if (voiceRef.current && "speechSynthesis" in window) {
-        speechSynthesis.cancel()
-        const u = new SpeechSynthesisUtterance(clean.join(", "))
-        u.lang = "en-US"
-        u.rate = 1.15
-        speechSynthesis.speak(u)
-      }
+      if (voiceRef.current) speak(clean.join(", "))
     }
     // the highlight tracks its element for a moment after a move (smooth scrolling, layout)
     let tracking = 0
@@ -152,8 +192,8 @@ export function ScreenReaderView() {
       go(to, dir > 0 ? "Next" : "Prev", "arrow")
     }
     const onKey = (e: KeyboardEvent) => {
-      const target = e.target as Element | null
-      if (target?.closest("[data-sr-view]")) return
+      const target = e.target
+      if (target instanceof Element && target.closest("[data-sr-view]")) return
       if (e.metaKey || e.ctrlKey || e.altKey) return
       if (focusMode(document.activeElement)) {
         if (e.key === "Escape") {
@@ -306,6 +346,20 @@ export function ScreenReaderView() {
 
   useEffect(() => {
     if (!voice && "speechSynthesis" in window) speechSynthesis.cancel()
+    if (!voice) return
+    onStuck = () =>
+      setLines((all) => [
+        ...all.slice(-11),
+        {
+          key: "",
+          chunks: [
+            "(no sound: the browser's speech engine is not responding; restarting the browser usually fixes it)",
+          ],
+        },
+      ])
+    return () => {
+      onStuck = null
+    }
   }, [voice])
 
   // while the page scrolls, the toggle steps aside so it never sits on what is being read; it
@@ -390,8 +444,16 @@ export function ScreenReaderView() {
               <ToggleGroup.Item value="nvda">NVDA + Chrome</ToggleGroup.Item>
               <ToggleGroup.Item value="voiceover">VoiceOver + Safari</ToggleGroup.Item>
             </ToggleGroup.Root>
-            <ToggleGroup.Item className={styles.voice} pressed={voice} onPressedChange={setVoice}>
-              Voice
+            <ToggleGroup.Item
+              className={styles.voice}
+              pressed={voice}
+              onPressedChange={(next) => {
+                setVoice(next)
+                // said inside the click: Safari only lets a page speak from a user gesture first
+                if (next) speak("Voice on")
+              }}
+            >
+              {voice ? "Voice on" : "Voice off"}
             </ToggleGroup.Item>
           </header>
           {/* the transcript repeats speech for sighted visitors; a real screen reader reads the
