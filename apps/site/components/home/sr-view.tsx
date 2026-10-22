@@ -180,6 +180,23 @@ export function ScreenReaderView() {
     }
   }, [])
 
+  // on a phone it lives in the hero and the footer: anywhere between, the narrow column puts it on
+  // top of body copy
+  const [pastHero, setPastHero] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 700px)")
+    const hero = document.querySelector("main section, main > div")
+    const foot = document.querySelector("footer")
+    if (!hero || typeof IntersectionObserver === "undefined") return
+    const seen = new Map<Element, boolean>()
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) seen.set(e.target, e.isIntersecting)
+      setPastHero(mq.matches && !seen.get(hero) && !(foot && seen.get(foot)))
+    })
+    io.observe(hero)
+    if (foot) io.observe(foot)
+    return () => io.disconnect()
+  }, [])
   // it also stays aside while the tests are on screen: there it would sit on the PASS bar
   const [overTests, setOverTests] = useState(false)
   useEffect(() => {
@@ -201,7 +218,7 @@ export function ScreenReaderView() {
       className={styles.view}
       data-sr-view=""
       data-on={on ? "" : undefined}
-      data-scrolling={(scrolling || overTests) && !on ? "" : undefined}
+      data-scrolling={(scrolling || overTests || pastHero) && !on ? "" : undefined}
     >
       <ToggleGroup.Item className={styles.toggle} pressed={on} onPressedChange={setOn}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">

@@ -474,6 +474,21 @@
 .testCode code {
   white-space: pre;
 }
+/* a phone wraps the code at its spaces (never inside a token), each wrapped line under its own
+   start, instead of cutting it at the edge */
+@media (max-width: 600px) {
+  .testCode li {
+    min-inline-size: 0;
+  }
+  .testCode code {
+    white-space: pre-wrap;
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+  .testCode ol {
+    mask-image: none;
+  }
+}
 /* PASS: lines go green one after the other, then the banner pops with a little burst */
 .pass {
   opacity: 1;

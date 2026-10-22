@@ -194,6 +194,7 @@ function HeardProof() {
   }
   const stage = useRef<HTMLDivElement>(null)
   const [said, setSaid] = useState("")
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the visit's kind renders a new control to read
   useEffect(() => {
     const el = stage.current
     if (!el) return
@@ -206,12 +207,15 @@ function HeardProof() {
     el.addEventListener("focusin", read)
     el.addEventListener("click", read)
     el.addEventListener("keyup", read)
+    // what it announces at rest, before anyone touches it: the claim proves itself on sight
+    const control = el.querySelector<HTMLElement>('[role="switch"], [role="checkbox"], button')
+    if (control) setSaid(utterance(control))
     return () => {
       el.removeEventListener("focusin", read)
       el.removeEventListener("click", read)
       el.removeEventListener("keyup", read)
     }
-  }, [])
+  }, [kind])
   return (
     <Proof
       index={1}
