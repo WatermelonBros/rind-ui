@@ -11,6 +11,7 @@ import {
 } from "react"
 import { flushSync } from "react-dom"
 import styles from "./phase.module.css"
+import { SoundProvider } from "./sound"
 
 export type Phase = "crisp" | "juicy"
 
@@ -143,7 +144,8 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
 
   return (
     <PhaseContext.Provider value={{ phase, setPhase }}>
-      {children}
+      {/* wherever the site's chrome is (the 404 page too), its sound setting is */}
+      <SoundProvider>{children}</SoundProvider>
       {pour && (
         <div className={styles.wipe} aria-hidden="true" key={pour.id}>
           <div className={styles.curtain} style={{ background: BG[pour.next] }}>

@@ -3,6 +3,7 @@
 import { Accordion, Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
+import { cue } from "../sound"
 import {
   type HeroKind,
   heroKind,
@@ -176,6 +177,7 @@ export function Tested() {
   }, [kind])
 
   const play = async () => {
+    let green = true
     setRunning(true)
     setPassed(null)
     setResults({})
@@ -194,12 +196,14 @@ export function Tested() {
       const check = step?.check
       if (check && stage.current) {
         const ok = check(stage.current)
+        if (!ok) green = false
         setResults((all) => ({ ...all, [i]: ok }))
       }
     }
     setLine(STEPS.length)
     setPassed(Math.round(performance.now() - started))
     setRunning(false)
+    if (green) cue("pass")
   }
   playRef.current = () => {
     if (!running) void play()

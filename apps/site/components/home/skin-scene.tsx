@@ -180,12 +180,38 @@ export function SkinScene() {
       const floor = window.innerHeight - r.height - 120
       return r.y > floor ? new DOMRect(r.x, floor, r.width, r.height) : r
     }
+    // A phone has no gutter: in flight the object shrinks and rides the screen's right edge,
+    // peeking in from it, then grows onto its next control. Every leg the same way, so it is
+    // always in sight and never sits on the text.
+    const ride = (from: DOMRect, to: DOMRect, t: number) => {
+      const w = 60
+      const h = w * (from.height / Math.max(1, from.width))
+      const edge = new DOMRect(
+        window.innerWidth - w * 0.65,
+        window.innerHeight * 0.42 - h / 2,
+        w,
+        h,
+      )
+      const smooth = (a: number, b: number) => {
+        const k = Math.min(1, Math.max(0, (t - a) / (b - a)))
+        return k * k * (3 - 2 * k)
+      }
+      const mix = (a: DOMRect, b: DOMRect, k: number) =>
+        new DOMRect(
+          lerp(a.x, b.x, k),
+          lerp(a.y, b.y, k),
+          lerp(a.width, b.width, k),
+          lerp(a.height, b.height, k),
+        )
+      const inward = smooth(0.7, 1)
+      return inward > 0 ? mix(edge, to, inward) : mix(from, edge, smooth(0, 0.3))
+    }
     const route = () => {
       const fin = testLeg()
       if (fin && fin.y > fin.s4) {
         const live = fin.test.getBoundingClientRect()
-        // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
-        if (atTests || window.innerWidth <= 900) return live
+        if (atTests) return live
+        if (window.innerWidth <= 900) return ride(fin.look.getBoundingClientRect(), live, fin.t)
         // it lifts off the builder's component itself and flies on, in sight all the way
         const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
         const top = window.innerHeight * 0.15
@@ -217,12 +243,7 @@ export function SkinScene() {
         // it scroll away with the machine
         const from = window.innerWidth <= 900 ? raw : shift(raw, last.y - last.s2)
         const live = last.look.getBoundingClientRect()
-        if (window.innerWidth <= 900) {
-          // a phone has no gutter: it scrolls away with the machine, then waits hidden on its
-          // control and appears there (alpha)
-          // gone once it reaches the header: never half hidden under the bar
-          return from.top > 72 && last.t < 0.92 ? from : live
-        }
+        if (window.innerWidth <= 900) return ride(from, live, last.t)
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
         const top = window.innerHeight * 0.18
@@ -280,9 +301,7 @@ export function SkinScene() {
         return new DOMRect(to.x - (w - to.width) / 2, to.y - (h - to.height) / 2, w, h)
       }
       const a = shift(from, y - s0)
-      // a phone keeps it in the hero until the hero has scrolled away, then it waits hidden on
-      // the next control (alpha): no empty hero, no flight across the next heading
-      if (window.innerWidth <= 900) return a.bottom > 0 ? a : to
+      if (window.innerWidth <= 900) return ride(a, to, t)
       const e = t * t * (3 - 2 * t)
       return new DOMRect(
         lerp(a.x, to.x, e),
@@ -291,8 +310,6 @@ export function SkinScene() {
         lerp(a.height, to.height, e),
       )
     }
-    // on a phone the straight path would cross the next scene's heading: the object dissolves
-    // out and back in on the way instead
     // the hop from the berth onto the builder's component: -1 before it, then 0→1 with the
     // scroll over the leg's last fifth, so a steady scroll always shows the arc
     const flip = (t: number) => (t < 0.8 ? -1 : Math.min(1, (t - 0.8) / 0.18))
@@ -302,15 +319,12 @@ export function SkinScene() {
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
       const phone = window.innerWidth <= 900
-      if (fin && fin.y > fin.s4) return phone ? (atTests ? 1 : 0) : fin.emerge
+      if (fin && fin.y > fin.s4) return phone ? 1 : fin.emerge
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // a phone has no gutter to fly in: it hides on the way and appears on the preview
-        if (phone) {
-          const from = last.peelEl.getBoundingClientRect()
-          // a clean swap once it has landed: a half-faded object over the control read as a ghost
-          return from.top > 72 || (last.t >= 0.92 && last.fade === 0) ? 1 : 0
-        }
+        // a phone rides the edge (route) and hands over to the real component as it scrolls on:
+        // a clean swap, since a half-faded object over the control reads as a ghost
+        if (phone) return last.fade === 0 ? 1 : 0
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over
         const p = flip(last.t)
@@ -319,12 +333,7 @@ export function SkinScene() {
         if (p >= 1) return 0
         return 1
       }
-      if (window.innerWidth > 900) return 1
-      const { next, y, s0, t } = travel()
-      if (!next || y <= s0) return 1
-      const a = shift(at.getBoundingClientRect(), y - s0)
-      // in the hero while it is on screen, then hidden until it is on the next control
-      return a.bottom > 0 || t >= 0.92 ? 1 : 0
+      return 1
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0
@@ -406,9 +415,9 @@ export function SkinScene() {
               : last.look.style.opacity
       }
       // one control at a time: the test's own stays hidden while the object flies to it (on a
-      // phone the object is hidden in flight instead, so the control shows until touchdown)
+      // phone, from when the object leaves the edge to come down on it)
       if (fin) {
-        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || atTests)
+        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || fin.t >= 0.7)
         if (hide) fin.test.style.setProperty("opacity", "0", "important")
         else fin.test.style.removeProperty("opacity")
       }
