@@ -148,6 +148,7 @@ export function Tested() {
   }, [kind, run])
   const playRef = useRef<() => void>(() => {})
   const autoRan = useRef(false)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the visit's kind renders a new control to observe
   useEffect(() => {
     const go = () => {
       if (autoRan.current) return
@@ -165,14 +166,14 @@ export function Tested() {
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) go()
       },
-      { threshold: 0.9 },
+      { threshold: 0.6 },
     )
     io.observe(root)
     return () => {
       off()
       io.disconnect()
     }
-  }, [])
+  }, [kind])
 
   const play = async () => {
     setRunning(true)
