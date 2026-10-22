@@ -10,13 +10,14 @@ import {
   useRef,
   useState,
 } from "react"
+import { ambient } from "./ambient"
 
 // The site's sound, off until the visitor turns it on (nav.tsx) and never remembered: every
 // sound is synthesised here, so there is nothing to download. Crisp is a hard tick, juicy a
 // soft pop; a component turning on sounds higher than one turning off; a slider sings its
 // value as it moves; a change of phase is a sweep, a passing test a small chord. Each voice is
 // layered (a transient, a tone, a body), placed left or right where the component is, and
-// sent into a short room, so it has depth rather than beeping. Only what the visitor does
+// sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
 // makes a sound (plus the explicit cues): the page's own demos stay quiet.
 
 type Cue = "on" | "off" | "phase" | "pass"
@@ -24,6 +25,8 @@ type Cue = "on" | "off" | "phase" | "pass"
 interface SoundValue {
   readonly enabled: boolean
   readonly setEnabled: (on: boolean) => void
+  /** The sound's level now in `n` bands, low to high, 0 to 1 (all 0 while it is off). */
+  readonly levels: (n: number) => number[]
 }
 
 const SoundContext = createContext<SoundValue | null>(null)
@@ -53,6 +56,11 @@ function engine(ac: AudioContext) {
   master.threshold.value = -18
   master.ratio.value = 4
   master.connect(ac.destination)
+  // read by the nav's toggle, whose bars move with what is playing
+  const analyser = ac.createAnalyser()
+  analyser.fftSize = 256
+  analyser.smoothingTimeConstant = 0.82
+  master.connect(analyser)
   const room = ac.createConvolver()
   const length = Math.ceil(ac.sampleRate * 1.1)
   const impulse = ac.createBuffer(2, length, ac.sampleRate)
@@ -63,7 +71,7 @@ function engine(ac: AudioContext) {
   room.buffer = impulse
   const wet = ac.createGain()
   room.connect(wet).connect(master)
-  return { master, room, wet }
+  return { master, room, wet, analyser }
 }
 type Engine = ReturnType<typeof engine>
 
@@ -317,6 +325,8 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     const audio = ac.current
     if (!enabled || !home || !audio) return
     const { context, out } = audio
+    // the music under it all (ambient.ts), for as long as the sound is on
+    const music = ambient(context, out)
     // only what the visitor does: their last press, key or drag, within the moment
     let input = 0
     const touched = () => {
@@ -398,8 +408,34 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("rind:cue", onCue)
       values.disconnect()
       phase.disconnect()
+      music.stop()
     }
   }, [enabled, home])
 
-  return <SoundContext.Provider value={{ enabled, setEnabled }}>{children}</SoundContext.Provider>
+  const levels = useCallback(
+    (n: number) => {
+      const analyser = ac.current?.out.analyser
+      if (!enabled || !analyser) return Array.from({ length: n }, () => 0)
+      const data = new Uint8Array(analyser.frequencyBinCount)
+      analyser.getByteFrequencyData(data)
+      // the music lives under 2 kHz (bins of ~190 Hz): four bands across it, the higher ones
+      // lifted, since they carry less energy and would otherwise never move
+      const edges = [1, 2, 3, 5, 9]
+      const lift = [1, 1.3, 1.9, 2.8]
+      return Array.from({ length: n }, (_, i) => {
+        const from = edges[i % 4] ?? 1
+        const to = edges[(i % 4) + 1] ?? from + 1
+        let sum = 0
+        for (let k = from; k < to; k++) sum += data[k] ?? 0
+        return Math.min(1, (sum / (to - from) / 200) * (lift[i % 4] ?? 1))
+      })
+    },
+    [enabled],
+  )
+
+  return (
+    <SoundContext.Provider value={{ enabled, setEnabled, levels }}>
+      {children}
+    </SoundContext.Provider>
+  )
 }
