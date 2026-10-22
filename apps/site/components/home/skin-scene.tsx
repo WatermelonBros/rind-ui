@@ -248,10 +248,12 @@ export function SkinScene() {
             lerp(end.height, live.height, e),
           )
         }
-        const out = smooth(0, 0.3)
+        // it stays put while it fades off the machine, and only then travels (unseen) to the
+        // gutter: no half-faded object drifting over the machine's own control
+        const out = smooth(0.2, 0.4)
         // up and out to the side first, clear of the machine's diagram below it, then down
         const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.5
-        const down = smooth(0.32, 0.72)
+        const down = smooth(0.35, 0.72)
         return new DOMRect(
           lerp(from.x, end.x, out),
           lerp(from.y, end.y, down) - rise,
@@ -310,10 +312,13 @@ export function SkinScene() {
         // comes into the gutter only once the builder's card is in view: never alone at the edge
         const card = last.look.closest("[data-look]")?.parentElement?.getBoundingClientRect()
         const vh = window.innerHeight
-        const out = 1 - Math.min(1, Math.max(0, (last.t - 0.08) / 0.12))
+        // in sequence: the object fades out, then the machine's own control fades in
+        const out = 1 - Math.min(1, Math.max(0, (last.t - 0.06) / 0.05))
+        const control = Math.min(1, Math.max(0, (last.t - 0.1) / 0.05))
         const back = card ? Math.min(1, Math.max(0, (vh * 0.7 - card.top) / (vh * 0.2))) : 1
         const a = Math.max(out, back)
-        if (a < 1) last.peelEl.style.setProperty("opacity", String(1 - a), "important")
+        if (a < 1)
+          last.peelEl.style.setProperty("opacity", String(control * (1 - back)), "important")
         return a
       }
       if (window.innerWidth > 900) return 1
@@ -378,9 +383,14 @@ export function SkinScene() {
       }
       if (last && scene.current) {
         const colors = getLookColors()
-        // the re-skin happens in view, near the panel, as one event
-        const k = Math.min(1, Math.max(0, (last.t - 0.75) / 0.25))
+        // in the gutter it wears the site's own skin; it takes the builder's during the hop, as
+        // one event, on its way into the component
+        const k =
+          window.innerWidth <= 900
+            ? Math.min(1, Math.max(0, (last.t - 0.75) / 0.25))
+            : Math.max(0, flip(last.t))
         scene.current.setLook(colors.brand, colors.surface, k * k * (3 - 2 * k))
+        if (window.innerWidth > 900 && last.y > last.s2 && last.t > 0.2) scene.current.setPeel(0)
         // the machine scene's label does not stay behind alone
         if (last.y > last.s2) setLanded(false)
         else if (past) setLanded(true)
