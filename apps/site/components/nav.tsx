@@ -35,19 +35,22 @@ export function Nav() {
       <Link href="/docs/testing-accessibility/">Testing</Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>
       <a href="https://discord.gg/HHqT9ucXn4">Discord</a>
-      {/* Sound is a pressed/unpressed button, off until pressed: a rind Toggle. */}
-      <Toggle.Root
-        className={styles.sound}
-        data-sound-toggle=""
-        aria-label="Sound"
-        pressed={sound.enabled}
-        onPressedChange={sound.setEnabled}
-      >
-        {/* the indicator is a span: it holds a whole icon, on or muted */}
-        <Toggle.Indicator className={styles.soundIcon} fallback={<Speaker muted />}>
-          <Speaker />
-        </Toggle.Indicator>
-      </Toggle.Root>
+      {/* Sound is a pressed/unpressed button, off until pressed: a rind Toggle (the landing's
+          only: sound.tsx) */}
+      {home && (
+        <Toggle.Root
+          className={styles.sound}
+          data-sound-toggle=""
+          aria-label="Sound"
+          pressed={sound.enabled}
+          onPressedChange={sound.setEnabled}
+        >
+          {/* the indicator is a span: it holds a whole icon, on or muted */}
+          <Toggle.Indicator className={styles.soundIcon} fallback={<Speaker muted />}>
+            <Speaker />
+          </Toggle.Indicator>
+        </Toggle.Root>
+      )}
       {/* The site's phase is an on/off setting that applies at once: a rind Switch. */}
       <Switch.Root
         className={styles.phase}

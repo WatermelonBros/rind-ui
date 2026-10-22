@@ -1,5 +1,6 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import {
   createContext,
   type ReactNode,
@@ -122,37 +123,167 @@ function voice(ac: AudioContext, out: Engine, pan: number) {
   return { now, tone, noise }
 }
 
-function play(ac: AudioContext, out: Engine, name: Cue, pan = 0) {
+// the voices, by what happened: each component kind has its own, in both phases
+type Voice =
+  | "on"
+  | "off"
+  | "check"
+  | "uncheck"
+  | "select"
+  | "press"
+  | "open"
+  | "close"
+  | "key"
+  | "delete"
+  | "note"
+
+function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value = 0.5) {
   const { now, tone, noise } = voice(ac, out, pan)
-  const up = name === "on" ? 1.26 : 1
-  if (name === "on" || name === "off") {
-    if (juicy()) {
-      // a pop: a falling sine, its octave for colour, and a soft thump under it
-      tone("sine", 560 * up, 190 * up, 0, 0.15, 0.26)
-      tone("triangle", 1120 * up, 420 * up, 0, 0.07, 0.06)
-      tone("sine", 95, 50, 0, 0.14, 0.2)
-    } else {
-      // a tick: a click of noise, a filtered square, and a short wooden body
-      noise(0.008, 0.25, "highpass", 3800)
-      tone("square", 2300 * up, 1500 * up, 0, 0.03, 0.05, { type: "lowpass", frequency: 6000 })
-      tone("sine", 210 * up, 160 * up, 0, 0.05, 0.14)
+  const soft = juicy()
+  // a little variation every time, so repeated sounds never ring like a machine gun
+  const jitter = 1 + (Math.random() - 0.5) * 0.06
+  switch (name) {
+    case "on":
+    case "off": {
+      // a switch: crisp ticks, juicy pops; on sounds higher than off
+      const up = name === "on" ? 1.26 : 1
+      if (soft) {
+        tone("sine", 560 * up, 190 * up, 0, 0.15, 0.26)
+        tone("triangle", 1120 * up, 420 * up, 0, 0.07, 0.06)
+        tone("sine", 95, 50, 0, 0.14, 0.2)
+      } else {
+        noise(0.008, 0.25, "highpass", 3800)
+        tone("square", 2300 * up, 1500 * up, 0, 0.03, 0.05, { type: "lowpass", frequency: 6000 })
+        tone("sine", 210 * up, 160 * up, 0, 0.05, 0.14)
+      }
+      return
     }
-    return
+    case "check":
+    case "uncheck": {
+      // a checkbox: a drop of water in juicy (rising when checked), a snappy mark in crisp
+      const on = name === "check"
+      if (soft) tone("sine", on ? 420 : 1100, on ? 1250 : 380, 0, 0.09, 0.2)
+      else {
+        noise(0.012, 0.3, "bandpass", on ? 5200 : 3000)
+        tone("triangle", on ? 1800 : 1200, on ? 2400 : 900, 0, 0.035, 0.08)
+      }
+      return
+    }
+    case "select": {
+      // tabs, toggle groups, radios: a detent, two quick clicks of a wheel
+      if (soft) {
+        tone("sine", 700 * jitter, 900 * jitter, 0, 0.05, 0.14)
+        tone("sine", 1050 * jitter, 1250 * jitter, 0.045, 0.06, 0.1)
+      } else {
+        noise(0.006, 0.22, "highpass", 4500)
+        tone("sine", 950 * jitter, 900 * jitter, 0, 0.025, 0.16)
+        noise(0.005, 0.14, "highpass", 5500)
+        tone("sine", 1400 * jitter, 1300 * jitter, 0.03, 0.02, 0.08)
+      }
+      return
+    }
+    case "press": {
+      // a button: a dull thock in crisp, a rubbery boing in juicy
+      if (soft) {
+        tone("sine", 260, 140, 0, 0.18, 0.24)
+        tone("sine", 390, 330, 0.02, 0.12, 0.05)
+      } else {
+        noise(0.01, 0.2, "lowpass", 2400)
+        tone("sine", 150 * jitter, 90, 0, 0.09, 0.3)
+      }
+      return
+    }
+    case "open":
+    case "close": {
+      // a disclosure: a short swoosh, up as it opens, down as it closes
+      const band = noise(0.22, soft ? 0.14 : 0.1, "bandpass", 1000)
+      band.Q.value = 2.2
+      const [a, b] = name === "open" ? [500, 2600] : [2600, 500]
+      band.frequency.setValueAtTime(a, now)
+      band.frequency.exponentialRampToValueAtTime(b, now + 0.22)
+      tone(
+        soft ? "sine" : "triangle",
+        name === "open" ? 330 : 500,
+        name === "open" ? 500 : 330,
+        0,
+        0.12,
+        0.06,
+      )
+      return
+    }
+    case "key":
+    case "delete": {
+      // a keyboard: each key its own pitch; a deletion is lower and duller
+      const del = name === "delete"
+      noise(0.018, soft ? 0.16 : 0.26, "bandpass", (del ? 1600 : 3200) * jitter)
+      tone(
+        soft ? "sine" : "triangle",
+        (del ? 260 : 420) * jitter,
+        (del ? 180 : 300) * jitter,
+        0,
+        0.03,
+        soft ? 0.08 : 0.1,
+      )
+      return
+    }
+    case "note": {
+      // a rating: a pentatonic step for each star
+      const scale = [0, 2, 4, 7, 9, 12, 14]
+      const n = scale[Math.min(scale.length - 1, Math.round(value * (scale.length - 1)))] ?? 0
+      const f = (soft ? 523 : 659) * 2 ** (n / 12)
+      tone(soft ? "sine" : "triangle", f, f, 0, 0.4, 0.12)
+      tone("sine", f * 2, f * 2, 0, 0.15, 0.03)
+      return
+    }
+    case "pass": {
+      const notes = soft ? [660, 880, 1100] : [880, 1320]
+      notes.forEach((f, k) => {
+        tone(soft ? "sine" : "triangle", f, f * 0.995, k * 0.08, 0.6, 0.1)
+      })
+      return
+    }
+    case "phase": {
+      // a band of noise swept up into juicy, down into crisp, with a low tone under it
+      const band = noise(0.7, 0.2, "bandpass", 1000)
+      band.Q.value = 1.6
+      const [a, b] = soft ? [300, 2800] : [2800, 300]
+      band.frequency.setValueAtTime(a, now)
+      band.frequency.exponentialRampToValueAtTime(b, now + 0.7)
+      tone("sine", soft ? 110 : 160, soft ? 220 : 80, 0, 0.5, 0.12)
+      return
+    }
   }
-  if (name === "pass") {
-    const notes = juicy() ? [660, 880, 1100] : [880, 1320]
-    notes.forEach((f, i) => {
-      tone(juicy() ? "sine" : "triangle", f, f * 0.995, i * 0.08, 0.6, 0.1)
-    })
-    return
+}
+
+/** Which voice a click on a rind part makes, read after the click from the state it left. */
+function voiceFor(part: Element): { name: Voice; value?: number } | null {
+  const scope = part.closest("[data-scope]")?.getAttribute("data-scope") ?? ""
+  const read = (sel: string, attr: string) => part.closest(sel)?.getAttribute(attr)
+  if (scope === "switch")
+    return { name: read("[data-state]", "data-state") === "checked" ? "on" : "off" }
+  if (scope === "checkbox" || scope === "checkbox-group") {
+    const state = read("[aria-checked]", "aria-checked") ?? read("[data-state]", "data-state")
+    return {
+      name: state === "true" || state === "checked" || state === "mixed" ? "check" : "uncheck",
+    }
   }
-  // the phase: a band of noise swept up into juicy, down into crisp, with a low tone under it
-  const band = noise(0.7, 0.2, "bandpass", 1000)
-  band.Q.value = 1.6
-  const [a, b] = juicy() ? [300, 2800] : [2800, 300]
-  band.frequency.setValueAtTime(a, now)
-  band.frequency.exponentialRampToValueAtTime(b, now + 0.7)
-  tone("sine", juicy() ? 110 : 160, juicy() ? 220 : 80, 0, 0.5, 0.12)
+  if (
+    ["tabs", "toggle-group", "segmented-control", "radio-group", "listbox", "select"].includes(
+      scope,
+    )
+  )
+    return { name: "select" }
+  if (scope === "rating") {
+    const now = Number(read("[aria-valuenow]", "aria-valuenow") ?? 0)
+    const max = Number(read("[aria-valuemax]", "aria-valuemax") ?? 5)
+    return { name: "note", value: max ? now / max : 0.5 }
+  }
+  const expanded = read("[aria-expanded]", "aria-expanded")
+  if (expanded) return { name: expanded === "true" ? "open" : "close" }
+  if (scope === "toggle")
+    return { name: read("[aria-pressed]", "aria-pressed") === "true" ? "on" : "off" }
+  if (scope === "button" || part.closest("button")) return { name: "press" }
+  return null
 }
 
 /** A slider's step: its pitch is its value, and it slides the way the value went. */
@@ -167,6 +298,8 @@ function step(ac: AudioContext, out: Engine, fraction: number, rising: boolean, 
 
 export function SoundProvider({ children }: { children: ReactNode }) {
   const [enabled, setOn] = useState(false)
+  // the landing's alone: the docs are for reading, and stay quiet
+  const home = usePathname() === "/"
   const ac = useRef<{ context: AudioContext; out: Engine } | null>(null)
 
   const setEnabled = useCallback((on: boolean) => {
@@ -182,7 +315,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const audio = ac.current
-    if (!enabled || !audio) return
+    if (!enabled || !home || !audio) return
     const { context, out } = audio
     // only what the visitor does: their last press, key or drag, within the moment
     let input = 0
@@ -194,21 +327,27 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       // the tests' own presses are scripted clicks: only the visitor's are heard
       if (!e.isTrusted) return
       const target = e.target instanceof Element ? e.target.closest("[data-scope]") : null
-      if (!target || target.closest("[data-sound-toggle], [role=slider], [data-scope=slider]"))
+      // sliders sing as they move, text fields as they are typed in (below)
+      if (
+        !target ||
+        target.closest("[data-sound-toggle], [role=slider], [data-scope=slider], input, textarea")
+      )
         return
       // after the click, so the state it lands in is read
       setTimeout(() => {
-        const stateful = target.closest(
-          "[aria-checked], [aria-pressed], [aria-expanded], [data-state]",
-        )
-        const value =
-          stateful?.getAttribute("aria-checked") ??
-          stateful?.getAttribute("aria-pressed") ??
-          stateful?.getAttribute("aria-expanded") ??
-          stateful?.getAttribute("data-state")
-        const on = value === "true" || value === "checked" || value === "on" || value === "open"
-        play(context, out, on ? "on" : "off", panOf(target))
+        const v = voiceFor(target)
+        if (v) play(context, out, v.name, panOf(target), v.value)
       })
+    }
+    // typing: a key for each character written, a duller one for each taken out
+    const onInput = (e: Event) => {
+      if (!e.isTrusted || !(e instanceof InputEvent)) return
+      play(
+        context,
+        out,
+        e.inputType.startsWith("delete") ? "delete" : "key",
+        panOf(e.target as Element),
+      )
     }
     // a slider's every step, as it moves (at most one every 30 ms)
     const last = new WeakMap<Element, number>()
@@ -248,8 +387,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     window.addEventListener("pointermove", drag, true)
     window.addEventListener("keydown", touched, true)
     document.addEventListener("click", onClick, true)
+    document.addEventListener("input", onInput, true)
     window.addEventListener("rind:cue", onCue)
     return () => {
+      document.removeEventListener("input", onInput, true)
       window.removeEventListener("pointerdown", touched, true)
       window.removeEventListener("pointermove", drag, true)
       window.removeEventListener("keydown", touched, true)
@@ -258,7 +399,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       values.disconnect()
       phase.disconnect()
     }
-  }, [enabled])
+  }, [enabled, home])
 
   return <SoundContext.Provider value={{ enabled, setEnabled }}>{children}</SoundContext.Provider>
 }
