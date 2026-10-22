@@ -1,5 +1,44 @@
 # @rind-ui/react
 
+## 1.0.0
+
+### Major Changes
+
+- 0774e80: rind-ui 1.0: the public API is stable. Component and part names, props, the `data-*` and `aria-*` attributes parts render, CSS custom properties, messages and driver actions and queries change only in a major release, after at least one minor release of development warnings.
+
+### Minor Changes
+
+- ec8c68a: Components ship only the environment capabilities they use. The announcer, clipboard,
+  collection layout, constraint validity, page visibility and date clock are on-demand
+  capabilities (`announcerCapability`, …) built by the provider when a component asks for them,
+  once per provider: most components are 0.5–2 kB gzip smaller. New: `baseDomEnvironment`,
+  `extendEnvironment`, `Capability`, `ProvidedBy`, and `useEnvironment(...capabilities)`.
+  `domEnvironment()` and the provider's props are unchanged. `useMachine` now requires its
+  `env` argument when the machine needs more than the base environment.
+
+### Patch Changes
+
+- 746d104: Development warnings are dropped from production bundles: the checks in Avatar, Breadcrumbs, Pagination, Pin Input, the range value (Slider, Meter, Progress) and the list collection read `process.env.NODE_ENV` inline instead of through a helper function a minifier cannot resolve.
+- ed626d1: Package pages on npm point to the docs site and carry searchable keywords; `@rind-ui/react` describes what it is.
+- 8cd0689: Long press ships only with the parts that opt in (Context Menu): every other pressable is about
+  0.2 kB gzip smaller. **Breaking** for direct `createPress` callers: the `longPress` option takes
+  `longPress({ threshold, moveTolerance })` (exported from `@rind-ui/core`) instead of a plain
+  object.
+- c63f1e0: The last two development diagnostics left in production bundles (Tour's unknown `goto` id,
+  Table's missing name) are dropped there; the size check now fails on any new one.
+- caca874: Compound components expose their parts as module namespaces instead of objects, so Vite,
+  Rollup, Rolldown and webpack drop the parts an app never renders (`Dialog.Root` alone: 23.5 →
+  13.9 kB gzip; a Color Picker with Root, Area and ChannelSlider: 85.6 → 68.4 kB). Same API:
+  `import { Dialog } from "@rind-ui/react"` and `<Dialog.Root>` work as before.
+- Updated dependencies [746d104]
+- Updated dependencies [ec8c68a]
+- Updated dependencies [ed626d1]
+- Updated dependencies [8cd0689]
+- Updated dependencies [0774e80]
+- Updated dependencies [6e648bd]
+- Updated dependencies [c63f1e0]
+  - @rind-ui/core@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes

@@ -1,5 +1,35 @@
 # @rind-ui/core
 
+## 1.0.0
+
+### Major Changes
+
+- 0774e80: rind-ui 1.0: the public API is stable. Component and part names, props, the `data-*` and `aria-*` attributes parts render, CSS custom properties, messages and driver actions and queries change only in a major release, after at least one minor release of development warnings.
+
+### Minor Changes
+
+- ec8c68a: Components ship only the environment capabilities they use. The announcer, clipboard,
+  collection layout, constraint validity, page visibility and date clock are on-demand
+  capabilities (`announcerCapability`, …) built by the provider when a component asks for them,
+  once per provider: most components are 0.5–2 kB gzip smaller. New: `baseDomEnvironment`,
+  `extendEnvironment`, `Capability`, `ProvidedBy`, and `useEnvironment(...capabilities)`.
+  `domEnvironment()` and the provider's props are unchanged. `useMachine` now requires its
+  `env` argument when the machine needs more than the base environment.
+- 8cd0689: Long press ships only with the parts that opt in (Context Menu): every other pressable is about
+  0.2 kB gzip smaller. **Breaking** for direct `createPress` callers: the `longPress` option takes
+  `longPress({ threshold, moveTolerance })` (exported from `@rind-ui/core`) instead of a plain
+  object.
+
+### Patch Changes
+
+- 746d104: Development warnings are dropped from production bundles: the checks in Avatar, Breadcrumbs, Pagination, Pin Input, the range value (Slider, Meter, Progress) and the list collection read `process.env.NODE_ENV` inline instead of through a helper function a minifier cannot resolve.
+- ed626d1: Package pages on npm point to the docs site and carry searchable keywords; `@rind-ui/react` describes what it is.
+- 6e648bd: Quirk checks no longer bundle the registry's metadata (bug links, repro tests, removal
+  conditions): every component is about 1.7 kB gzip smaller (`Button` 17.4 → 15.7 kB). The
+  exported `quirks` list, `quirkActive`, `QuirkId` and `QuirksAffecting` are unchanged.
+- c63f1e0: The last two development diagnostics left in production bundles (Tour's unknown `goto` id,
+  Table's missing name) are dropped there; the size check now fails on any new one.
+
 ## 0.5.0
 
 ### Minor Changes
