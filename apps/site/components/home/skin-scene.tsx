@@ -178,8 +178,8 @@ export function SkinScene() {
         const live = fin.test.getBoundingClientRect()
         // a phone has no gutter: the object waits hidden on its control and appears there (alpha)
         if (atTests || window.innerWidth <= 900) return live
-        const lookAt = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
-        const from = berth(lookAt, live.width, live.height)
+        // it lifts off the builder's component itself and flies on, in sight all the way
+        const from = shift(fin.look.getBoundingClientRect(), fin.y - fin.s4)
         const top = window.innerHeight * 0.15
         const bottom = window.innerHeight * 0.75 - live.height
         const toY = Math.min(Math.max(live.y, top), bottom)
@@ -190,7 +190,7 @@ export function SkinScene() {
         // around the content, like the leg before: out to the right-hand gutter, down to the
         // control's height, then in
         const g = gutterFit(live.width, live.height)
-        const out = 1
+        const out = smooth(0, 0.3)
         const across = smooth(0.65, 0.9)
         // across in the empty strip under the control's row, then up into it: the row's label
         // sits between the gutter and the control, and the object never crosses it
@@ -248,12 +248,11 @@ export function SkinScene() {
             lerp(end.height, live.height, e),
           )
         }
-        // it stays put while it fades off the machine, and only then travels (unseen) to the
-        // gutter: no half-faded object drifting over the machine's own control
-        const out = smooth(0.2, 0.4)
-        // up and out to the side first, clear of the machine's diagram below it, then down
+        // always in sight: up and out to the side, clear of the machine's diagram, then down the
+        // gutter (passing over a container for a moment is fine; the text stays readable)
+        const out = smooth(0, 0.3)
         const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.5
-        const down = smooth(0.35, 0.72)
+        const down = smooth(0.3, 0.72)
         return new DOMRect(
           lerp(from.x, end.x, out),
           lerp(from.y, end.y, down) - rise,
@@ -308,18 +307,7 @@ export function SkinScene() {
         // the slot waits as a ghost of the component (never a hole) until the hop lands
         last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0.25" : ""
         if (p >= 1) return 0
-        // it leaves the machine as the machine scrolls away (whose own control comes back), and
-        // comes into the gutter only once the builder's card is in view: never alone at the edge
-        const card = last.look.closest("[data-look]")?.parentElement?.getBoundingClientRect()
-        const vh = window.innerHeight
-        // in sequence: the object fades out, then the machine's own control fades in
-        const out = 1 - Math.min(1, Math.max(0, (last.t - 0.06) / 0.05))
-        const control = Math.min(1, Math.max(0, (last.t - 0.1) / 0.05))
-        const back = card ? Math.min(1, Math.max(0, (vh * 0.7 - card.top) / (vh * 0.2))) : 1
-        const a = Math.max(out, back)
-        if (a < 1)
-          last.peelEl.style.setProperty("opacity", String(control * (1 - back)), "important")
-        return a
+        return 1
       }
       if (window.innerWidth > 900) return 1
       const { next, y, s0, t } = travel()
