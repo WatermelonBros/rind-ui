@@ -158,14 +158,10 @@ export function SkinScene() {
     const gutterFit = (w: number, h: number) => {
       const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
       const right = frame?.right ?? window.innerWidth
-      const room = window.innerWidth - right - 40
-      const k = Math.min(1, Math.max(64, room) / w)
-      // centred in the gutter: hugging the viewport's edge read as clipped
-      return {
-        w: w * k,
-        h: h * k,
-        x: Math.max(right + 12, (right + window.innerWidth - w * k) / 2),
-      }
+      const room = window.innerWidth - right - 32
+      // big enough to read as the object, not debris, and 24px clear of the viewport's edge
+      const k = Math.min(1, Math.max(80, room) / w)
+      return { w: w * k, h: h * k, x: Math.max(right + 8, window.innerWidth - w * k - 24) }
     }
     // Desktop: between scenes the object lives in the right-hand gutter. It berths there level
     // with the builder's component and hands over to it in a cross-dissolve, then sets off from
@@ -242,7 +238,6 @@ export function SkinScene() {
         // the scroll, and the real component takes its place on touchdown
         const p = flip(last.t)
         if (p >= 0) {
-          scene.current?.wake()
           const e = p * p * (3 - 2 * p)
           // over the card, never through its text
           const arc = Math.sin(Math.PI * p) * 80
@@ -255,7 +250,7 @@ export function SkinScene() {
         }
         const out = smooth(0, 0.3)
         // up and out to the side first, clear of the machine's diagram below it, then down
-        const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.9
+        const rise = Math.sin(Math.PI * Math.min(1, last.t / 0.4)) * from.height * 0.5
         const down = smooth(0.32, 0.72)
         return new DOMRect(
           lerp(from.x, end.x, out),
@@ -288,16 +283,9 @@ export function SkinScene() {
     }
     // on a phone the straight path would cross the next scene's heading: the object dissolves
     // out and back in on the way instead
-    // the hop from the berth onto the builder's component: -1 before it, then 0→1 over 380ms
-    let flipAt = 0
-    const flip = (t: number) => {
-      if (t < 0.8) {
-        flipAt = 0
-        return -1
-      }
-      if (!flipAt) flipAt = performance.now()
-      return Math.min(1, (performance.now() - flipAt) / 380)
-    }
+    // the hop from the berth onto the builder's component: -1 before it, then 0→1 with the
+    // scroll over the leg's last fifth, so a steady scroll always shows the arc
+    const flip = (t: number) => (t < 0.8 ? -1 : Math.min(1, (t - 0.8) / 0.18))
     const alpha = () => {
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
@@ -311,8 +299,7 @@ export function SkinScene() {
           return from.bottom > 0 || last.t >= 0.92 ? 1 - last.fade : 0
         }
         // desktop: visible all the way to its berth, then it dissolves into the component
-        // the component is the object until the hop lands, then the real one takes over (set
-        // here, per frame: the hop runs in time, with no scroll event to hang it on)
+        // the component is the object until the hop lands, then the real one takes over
         const p = flip(last.t)
         // one at a time: the real component is hidden from the berth until touchdown
         last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0" : ""
