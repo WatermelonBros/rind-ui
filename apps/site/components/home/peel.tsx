@@ -91,7 +91,9 @@ export function Peel() {
   // the machine takes a transition on its own once the camera shows it: from the hero's state
   // to the other one (a button goes pending)
   const late = progress > 0.75
-  const on = kind === "button" ? late : late ? !heroOn : heroOn
+  // a button stays idle: the object has no pending look, and a diagram saying "pending" over an
+  // idle button contradicts it
+  const on = kind === "button" ? false : late ? !heroOn : heroOn
   useEffect(() => setPeelOn(on), [on])
 
   // the chips are the control's real attributes, read from the DOM as they change

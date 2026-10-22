@@ -301,6 +301,8 @@
 .lookCode .lookPre {
   color: #e8e8e3;
   margin: 0;
+  /* the window fades at its foot instead of cutting a line in half */
+  mask-image: linear-gradient(#000 82%, transparent);
   max-height: 320px;
   overflow: auto;
   overscroll-behavior: contain;
@@ -528,6 +530,21 @@
   inline-size: 150px;
   block-size: 60px;
 }
+/* the control and its label stay in one row before and during a run: the run changes state,
+   never layout */
+.testStage :is([data-scope="switch"], [data-scope="checkbox"])[data-part="root"] {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  /* smaller, and free to wrap: a line that will not wrap stretches the whole card */
+  .passBanner {
+    font-size: 12px;
+    min-inline-size: 0;
+  }
+}
 /* an assertion's real outcome, shown once its line has run */
 .verdict {
   margin-inline-start: auto;
@@ -597,10 +614,11 @@
   min-inline-size: 0;
 }
 .agentsThread [data-scope="streaming-message"][data-part="content"] {
-  white-space: pre-wrap;
-  /* code keeps its words whole: a line too long for a phone scrolls inside the bubble instead
-     of breaking mid-tag or widening the page */
+  /* tags stay whole: a line too long scrolls inside the bubble, fading at its edge so the cut
+     reads as more to see, never widening the page */
+  white-space: pre;
   overflow-x: auto;
+  mask-image: linear-gradient(90deg, #000 88%, transparent);
   font: 500 13px / 1.55 var(--mono);
 }
 @media (max-width: 900px) {
@@ -637,6 +655,48 @@
 }
 .specimenStage > * {
   inline-size: min(100%, 260px);
+}
+/* the wall's skin wave (wall-specimens.tsx): each card wears its skin's own ground, and says
+   which skin it is */
+.specimenStage[data-wave] {
+  position: relative;
+  isolation: isolate;
+  padding-block-start: 48px;
+  background: var(--s-bg);
+}
+/* the front: the next skin's ground opens from the card's top-left corner as the page scrolls,
+   one card a beat behind the next (--o); the components take the new skin as it completes */
+.specimenStage[data-wave]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--next-bg);
+  /* most of the step the card rests in its skin; the front crosses it in the last quarter, so
+     the old skin's text spends little time on the new ground */
+  clip-path: circle(
+    calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
+  );
+}
+/* while the front crosses a card its components recede and come back in the new skin: the old
+   skin's text never sits at full strength on the new ground, and the card is never empty */
+.specimenStage[data-wave] > * {
+  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.7) * 10, 1) * 0.6);
+}
+/* the bare skin's thumb is pale on pale: an edge keeps it in sight */
+.specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
+  box-shadow: 0 0 0 1px var(--s-ink);
+}
+.specimenStage[data-wave] > .skinChip {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  inline-size: auto;
+  font: 600 11px var(--mono);
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--s-ink);
+  color: var(--s-bg);
 }
 .specimenFoot {
   display: flex;
@@ -796,14 +856,14 @@
   color: color-mix(in oklab, var(--bg) 72%, var(--ink));
 }
 /* the closing beat: the title fills at full contrast as it scrolls in (--fill, outro.tsx), a
-   soft edge sweeping left to right; the pointer then peels it in the accent */
+   crisp edge sweeping left to right; the pointer then peels it in the accent */
 @supports (background-clip: text) {
   .outroOutline {
     color: transparent;
     background: linear-gradient(
       90deg,
-      var(--bg) calc(var(--fill, 1) * 130% - 30%),
-      color-mix(in oklab, var(--bg) 72%, var(--ink)) calc(var(--fill, 1) * 130%)
+      var(--bg) calc(var(--fill, 1) * 100%),
+      color-mix(in oklab, #fff 40%, var(--ink)) calc(var(--fill, 1) * 100%)
     );
     background-clip: text;
   }
@@ -946,7 +1006,9 @@
   inset: 0;
   z-index: -1;
   background: var(--band);
-  clip-path: circle(calc(var(--reveal, 1) * 160%) at 50% 0);
+  /* a curtain the full width of the band: a disc opening from the top centre read as a stray
+     block rising on its own */
+  clip-path: inset(0 0 calc((1 - var(--reveal, 1)) * 100%) 0);
 }
 .band[data-band="ink"] {
   --band: #0b0b0c;

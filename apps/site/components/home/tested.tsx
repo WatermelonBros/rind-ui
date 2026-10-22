@@ -148,15 +148,31 @@ export function Tested() {
   }, [kind, run])
   const playRef = useRef<() => void>(() => {})
   const autoRan = useRef(false)
-  useEffect(
-    () =>
-      onTestArrived(() => {
-        if (autoRan.current) return
-        autoRan.current = true
-        playRef.current()
-      }),
-    [],
-  )
+  useEffect(() => {
+    const go = () => {
+      if (autoRan.current) return
+      autoRan.current = true
+      playRef.current()
+    }
+    const off = onTestArrived(go)
+    // a phone runs as soon as the control itself is in view: waiting for it to reach the
+    // object's landing height let the visitor scroll past the PASS
+    const root = stage.current?.querySelector<HTMLElement>(
+      '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
+    )
+    if (!root || !window.matchMedia("(max-width: 900px)").matches) return off
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) go()
+      },
+      { threshold: 0.9 },
+    )
+    io.observe(root)
+    return () => {
+      off()
+      io.disconnect()
+    }
+  }, [])
 
   const play = async () => {
     setRunning(true)
@@ -166,13 +182,13 @@ export function Tested() {
     setPresses(0)
     setLine(-1)
     const started = performance.now()
-    await new Promise((r) => setTimeout(r, 300))
+    await new Promise((r) => setTimeout(r, 200))
     for (let i = 0; i < STEPS.length; i++) {
       setLine(i)
       const root = stage.current
       const step = STEPS[i]
       if (root) step?.act?.(root)
-      await new Promise((r) => setTimeout(r, 750))
+      await new Promise((r) => setTimeout(r, 420))
       // read after the component has settled, like an awaited driver query
       const check = step?.check
       if (check && stage.current) {
