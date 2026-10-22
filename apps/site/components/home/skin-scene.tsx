@@ -299,7 +299,8 @@ export function SkinScene() {
         // a phone has no gutter to fly in: it hides on the way and appears on the preview
         if (phone) {
           const from = last.peelEl.getBoundingClientRect()
-          return from.bottom > 0 || last.t >= 0.92 ? 1 - last.fade : 0
+          // a clean swap once it has landed: a half-faded object over the control read as a ghost
+          return from.bottom > 0 || (last.t >= 0.92 && last.fade === 0) ? 1 : 0
         }
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over
@@ -390,9 +391,9 @@ export function SkinScene() {
           last.y <= last.s2
             ? ""
             : phone
-              ? last.t < 0.85
-                ? ""
-                : String(last.fade)
+              ? last.t >= 0.92 && last.fade === 0
+                ? "0"
+                : ""
               : last.look.style.opacity
       }
       // one control at a time: the test's own stays hidden while the object flies to it (on a

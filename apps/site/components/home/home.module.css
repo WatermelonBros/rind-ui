@@ -640,6 +640,22 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   gap: 20px;
 }
+/* on a phone the wall is a row you swipe through, not six screens of scrolling */
+@media (max-width: 700px) {
+  .specimens {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-inline: -20px;
+    padding: 4px 20px 12px;
+    scroll-padding-inline: 20px;
+  }
+  .specimens > li {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+  }
+}
 .specimen {
   display: grid;
   grid-template-rows: 1fr auto;

@@ -386,6 +386,38 @@ export function AnyLook() {
     setLook((l) => ({ ...l, ...patch }))
     setCopied(false)
   }
+  const surprise = () =>
+    set({
+      brand: pick(SWATCHES),
+      surface: pick(SURFACES),
+      radius: pick([0, 4, 8, 14, 22, 28]),
+      border: pick([0, 1, 2, 3]),
+      shadow: pick(["flat", "soft", "hard"] as const),
+      font: pick(["sans", "serif", "mono", "rounded"] as const),
+      density: pick(["compact", "cozy", "roomy"] as const),
+    })
+  // the builder surprises itself once, when it is first in view: a visitor who only scrolls still
+  // sees the same components take another skin (not under reduced motion)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once, on first view
+  useEffect(() => {
+    const el = stage.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    let later = 0
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        io.disconnect()
+        later = window.setTimeout(surprise, 1600)
+      },
+      { threshold: 0.6 },
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      clearTimeout(later)
+    }
+  }, [])
   const css = skinCss(look)
   const section = useRef<HTMLElement>(null)
   const [picker, setPicker] = useState<ColourComponent | null>(null)
@@ -477,21 +509,7 @@ export function AnyLook() {
             onChange={(v) => set({ density: v })}
           />
           <div className={styles.tuneActions}>
-            <Button
-              onPress={() =>
-                set({
-                  brand: pick(SWATCHES),
-                  surface: pick(SURFACES),
-                  radius: pick([0, 4, 8, 14, 22, 28]),
-                  border: pick([0, 1, 2, 3]),
-                  shadow: pick(["flat", "soft", "hard"] as const),
-                  font: pick(["sans", "serif", "mono", "rounded"] as const),
-                  density: pick(["compact", "cozy", "roomy"] as const),
-                })
-              }
-            >
-              Surprise me
-            </Button>
+            <Button onPress={surprise}>Surprise me</Button>
             <Button onPress={() => set(BASE)}>Reset</Button>
           </div>
         </div>

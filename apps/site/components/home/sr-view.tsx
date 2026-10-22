@@ -180,13 +180,28 @@ export function ScreenReaderView() {
     }
   }, [])
 
+  // it also stays aside while the tests are on screen: there it would sit on the PASS bar
+  const [overTests, setOverTests] = useState(false)
+  useEffect(() => {
+    const tests = document.querySelector('section[aria-labelledby="tested-title"]')
+    if (!tests || typeof IntersectionObserver === "undefined") return
+    const io = new IntersectionObserver(
+      (entries) => setOverTests(entries.some((e) => e.isIntersecting)),
+      {
+        threshold: 0.3,
+      },
+    )
+    io.observe(tests)
+    return () => io.disconnect()
+  }, [])
+
   if (!supported) return null
   return (
     <div
       className={styles.view}
       data-sr-view=""
       data-on={on ? "" : undefined}
-      data-scrolling={scrolling && !on ? "" : undefined}
+      data-scrolling={(scrolling || overTests) && !on ? "" : undefined}
     >
       <ToggleGroup.Item className={styles.toggle} pressed={on} onPressedChange={setOn}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
