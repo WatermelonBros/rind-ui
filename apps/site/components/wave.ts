@@ -1,25 +1,43 @@
-// The site's wave: inside a view transition, the new page spreads from a point. Round and
-// overshooting in juicy, a hard-edged diamond that snaps open in crisp. Used by the phase
+// The site's wave: inside a view transition, the new page spreads from a point. Round, with a
+// bounce half way, in juicy; a hard-edged diamond that snaps open in crisp. Used by the phase
 // switch (phase.tsx) and by moves between pages (route-wave.tsx), where the page being left
 // also dims under it.
 
 export function wave(x: number, y: number, round: boolean, { dim = false } = {}) {
   const far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
   const r = far * 1.5
+  // percentages of the snapshot, not px: a Chrome on a 2x screen read px on the transition's
+  // pseudo-element at half scale, so the wave grew from the wrong point to half its size and
+  // vanished midway (a circle's % is of the box's diagonal over √2)
+  const px = (v: number) => `${(v / innerWidth) * 100}%`
+  const py = (v: number) => `${(v / innerHeight) * 100}%`
+  const pr = (v: number) => `${(v / (Math.hypot(innerWidth, innerHeight) / Math.SQRT2)) * 100}%`
+  const at = `at ${px(x)} ${py(y)}`
+  // juicy: out to half way with a bounce (past it, back a little, settled), then on to the edge;
+  // crisp: a hard-edged diamond that snaps open
+  const bounce: [number, number, string][] = [
+    [0, 0, "cubic-bezier(0.2, 0.8, 0.3, 1)"],
+    [0.52, 0.3, "ease-in-out"],
+    [0.44, 0.42, "ease-in-out"],
+    [0.47, 0.5, "cubic-bezier(0.6, 0, 0.3, 1)"],
+    [1, 1, "linear"],
+  ]
   document.documentElement.animate(
-    {
-      clipPath: round
-        ? [`circle(0px at ${x}px ${y}px)`, `circle(${far}px at ${x}px ${y}px)`]
-        : [
-            `polygon(${x}px ${y}px, ${x}px ${y}px, ${x}px ${y}px, ${x}px ${y}px)`,
-            `polygon(${x}px ${y - r}px, ${x + r}px ${y}px, ${x}px ${y + r}px, ${x - r}px ${y}px)`,
+    round
+      ? bounce.map(([k, offset, easing]) => ({
+          clipPath: `circle(${pr(far * k)} ${at})`,
+          offset,
+          easing,
+        }))
+      : {
+          clipPath: [
+            `polygon(${px(x)} ${py(y)}, ${px(x)} ${py(y)}, ${px(x)} ${py(y)}, ${px(x)} ${py(y)})`,
+            `polygon(${px(x)} ${py(y - r)}, ${px(x + r)} ${py(y)}, ${px(x)} ${py(y + r)}, ${px(x - r)} ${py(y)})`,
           ],
-    },
+        },
     {
-      duration: round ? 1100 : 700,
-      easing: round
-        ? "linear(0, 0.22 8%, 0.62 20%, 0.94 32%, 1.06 42%, 1.08 50%, 1.03 62%, 0.99 76%, 1)"
-        : "cubic-bezier(0.85, 0, 0.15, 1)",
+      duration: round ? 1200 : 700,
+      easing: round ? "linear" : "cubic-bezier(0.85, 0, 0.15, 1)",
       pseudoElement: "::view-transition-new(root)",
     },
   )
