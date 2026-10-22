@@ -46,6 +46,7 @@ export function LostZero() {
           peel: 0,
         },
       )
+      if (!scene.current) return
       const breathe = () => {
         scene.current?.wake()
         frame = requestAnimationFrame(breathe)

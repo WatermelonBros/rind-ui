@@ -354,6 +354,14 @@ export function mountSkin(
   })
   if (!renderer.isWebgl2) return null
   const gl = renderer.gl
+  // no GPU (a software rasteriser draws the raymarch on the CPU, 100 ms and more a frame, which
+  // freezes the page: a machine without one, or a test lab's headless Chrome): the plain version
+  const info = gl.getExtension("WEBGL_debug_renderer_info")
+  const gpu = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER))
+  if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(gpu)) {
+    gl.getExtension("WEBGL_lose_context")?.loseContext()
+    return null
+  }
   gl.clearColor(0, 0, 0, 0)
 
   const start = palette()
