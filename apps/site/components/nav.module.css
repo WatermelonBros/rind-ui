@@ -62,6 +62,39 @@
 .mini span {
   color: var(--acc);
 }
+/* the sound toggle (nav.tsx): a real button in the phase's own make, the bars inside it.
+   It is where the sound invite (sound-invite.tsx) lands. */
+.sound {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 36px;
+  padding: 0 12px;
+  border: var(--bw) solid var(--line);
+  border-radius: var(--btn-r);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    translate 0.3s var(--spring),
+    box-shadow 0.3s var(--spring),
+    background 0.3s;
+}
+.sound:hover {
+  translate: -1px -1px;
+}
+.sound:active {
+  translate: 2px 2px;
+  box-shadow: none;
+}
+.sound[aria-pressed="true"] {
+  background: var(--acc);
+}
+:global([data-phase="juicy"]) .sound:active {
+  translate: 0 3px;
+}
 .phase {
   display: flex;
   align-items: center;
@@ -124,7 +157,8 @@
     gap: 16px;
     padding: 0 16px;
   }
-  .nav > a:not(.mini) {
+  .nav > a:not(.mini),
+  .soundWord {
     display: none;
   }
 }

@@ -10,6 +10,7 @@ import { Wall } from "@/components/home/wall"
 import { Why } from "@/components/home/why"
 import { XRay } from "@/components/home/xray"
 import { SmoothScroll } from "@/components/smooth-scroll"
+import { SoundInvite } from "@/components/sound-invite"
 import release from "@/content/generated/release.json"
 // only the skins of the components the landing renders: a smaller first-paint stylesheet
 import "@/skins/home.css"
@@ -38,6 +39,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED) }}
       />
       <SmoothScroll />
+      <SoundInvite />
       <BandReveal />
       <XRay />
       <ScreenReaderView />
