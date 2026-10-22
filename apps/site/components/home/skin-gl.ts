@@ -69,7 +69,12 @@ float stroke(vec2 p, vec2 a, vec2 b, float f) {
 
 // crisp is a solid slab with rounded edges (the bevel is what catches the cel bands), juicy a
 // soft pillow
-float bodyDepth() { return mix(0.22, 0.26, uPhase); }
+// a small crisp object gets a deeper slab, so its side still shows a few pixels at builder and
+// test sizes (uSize is its half width in pixels)
+float bodyDepth() {
+  float small = 1.0 - smoothstep(60.0, 200.0, uSize);
+  return mix(mix(0.22, 0.36, small), 0.26, uPhase);
+}
 float bevel(float depth) { return mix(0.1, depth * 0.95, uPhase); }
 // a mark (thumb, check, arrow) lying on the body's face: a raised stroke or a sunk-in ball
 float onFace(float d2, vec3 p, float depth) {
@@ -210,8 +215,12 @@ void main() {
     * smoothstep(0.1, 0.2, ndl);
   crisp = mix(crisp, mix(base, vec3(1.0), 0.55), bevel);
   // crisp's flat faces end in an ink edge, like the page's 3px borders
-  crisp = mix(uInk, crisp, smoothstep(0.18, 0.3, facing));
-  crisp = mix(crisp, vec3(1.0), smoothstep(0.55, 0.6, spec));
+  // the side is its own face, a lifted ink catching a little light, so it does not fuse with the
+  // ink outline into one blob
+  vec3 side = mix(uInk, vec3(1.0), 0.13 + 0.12 * max(ndl, 0.0));
+  crisp = mix(side, crisp, smoothstep(0.18, 0.3, facing));
+  // the glint: small, and only on the top band (never a streak across the face)
+  crisp = mix(crisp, vec3(1.0), smoothstep(0.7, 0.75, spec) * smoothstep(0.8, 0.86, ndl));
   vec3 juicy = mix(base * 0.82, base, ndl * 0.5 + 0.5) + rim * 0.2 + spec * 0.75;
   vec3 skin = mix(crisp, juicy, uPhase);
 
