@@ -186,33 +186,9 @@ export function SkinScene() {
     const alpha = () => {
       const last = lastLeg()
       if (last && last.y > last.s2) {
-        // fades over anything it would cover on the way: the builder's heading, lede and controls,
-        // the machine's graph, the preview's other parts (never its own landing place)
-        const me = target()
-        const section = last.look.closest("section")
-        const graph = last.peelEl.closest("section")?.querySelector("svg")
-        const own = last.look.closest('[data-part="root"]') ?? last.look
-        // things to read or use, not their containers: the object may pass over empty panel
-        const obstacles = [
-          ...(section
-            ? [
-                ...section.querySelectorAll(
-                  'h2, p, label, button, input, [data-part="label"], [data-part="trigger"], [data-part="control"]',
-                ),
-              ].filter((el) => !own.contains(el) && !el.contains(own))
-            : []),
-          ...(graph ? [graph] : []),
-        ]
-        let overlap = 0
-        for (const el of obstacles) {
-          const r = el.getBoundingClientRect()
-          const x = Math.max(0, Math.min(r.right, me.right) - Math.max(r.left, me.left))
-          const y = Math.max(0, Math.min(r.bottom, me.bottom) - Math.max(r.top, me.top))
-          if (x > 0 && y > 0) overlap = Math.max(overlap, Math.min(x / me.width, y / me.height))
-        }
-        // a phone has no gutter to fly in: it hides on the way and appears near the preview
-        if (window.innerWidth <= 900 && last.t > 0.05 && last.t < 0.85) return 0
-        return (1 - Math.min(1, overlap * 3)) * (1 - last.fade)
+        // always visible on the way (fading over every obstacle read as a flicker); it fades
+        // only at the end, into the real component
+        return 1 - last.fade
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t
