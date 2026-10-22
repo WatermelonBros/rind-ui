@@ -182,13 +182,13 @@ export function Tested() {
     setPresses(0)
     setLine(-1)
     const started = performance.now()
-    await new Promise((r) => setTimeout(r, 300))
+    await new Promise((r) => setTimeout(r, 200))
     for (let i = 0; i < STEPS.length; i++) {
       setLine(i)
       const root = stage.current
       const step = STEPS[i]
       if (root) step?.act?.(root)
-      await new Promise((r) => setTimeout(r, 750))
+      await new Promise((r) => setTimeout(r, 420))
       // read after the component has settled, like an awaited driver query
       const check = step?.check
       if (check && stage.current) {

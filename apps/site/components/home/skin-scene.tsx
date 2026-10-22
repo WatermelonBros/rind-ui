@@ -157,9 +157,15 @@ export function SkinScene() {
     // the panels nor shrinks to a speck
     const gutterFit = (w: number, h: number) => {
       const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
-      const room = window.innerWidth - (frame?.right ?? window.innerWidth) - 32
+      const right = frame?.right ?? window.innerWidth
+      const room = window.innerWidth - right - 40
       const k = Math.min(1, Math.max(64, room) / w)
-      return { w: w * k, h: h * k, x: window.innerWidth - w * k - 16 }
+      // centred in the gutter: hugging the viewport's edge read as clipped
+      return {
+        w: w * k,
+        h: h * k,
+        x: Math.max(right + 12, (right + window.innerWidth - w * k) / 2),
+      }
     }
     // Desktop: between scenes the object lives in the right-hand gutter. It berths there level
     // with the builder's component and hands over to it in a cross-dissolve, then sets off from

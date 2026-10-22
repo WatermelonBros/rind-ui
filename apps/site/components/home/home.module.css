@@ -653,6 +653,25 @@
 .specimenStage > * {
   inline-size: min(100%, 260px);
 }
+/* the wall's skin wave (wall-specimens.tsx): each card wears its skin's own ground, and says
+   which skin it is */
+.specimenStage[data-wave] {
+  position: relative;
+  padding-block-start: 48px;
+  background: var(--s-bg);
+  transition: background-color 0.35s var(--spring);
+}
+.specimenStage[data-wave] > .skinChip {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  inline-size: auto;
+  font: 600 11px var(--mono);
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--s-ink);
+  color: var(--s-bg);
+}
 .specimenFoot {
   display: flex;
   flex-wrap: wrap;
