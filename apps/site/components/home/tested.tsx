@@ -189,7 +189,7 @@ export function Tested() {
       const root = stage.current
       const step = STEPS[i]
       if (root) step?.act?.(root)
-      await new Promise((r) => setTimeout(r, 420))
+      await new Promise((r) => setTimeout(r, 260))
       // read after the component has settled, like an awaited driver query
       const check = step?.check
       if (check && stage.current) {

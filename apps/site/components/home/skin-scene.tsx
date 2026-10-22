@@ -428,8 +428,10 @@ export function SkinScene() {
       if (arrived !== atTests) {
         atTests = arrived
         setTestLanded(arrived)
-        if (arrived) emitTestArrived()
       }
+      // the test starts as the object comes in to land, not once it has: a visitor scrolling at
+      // a normal pace still sees it run to PASS (it runs once; tested.tsx ignores repeats)
+      if (fin && fin.t >= 0.7) emitTestArrived()
     }
     const offPeelOn = onPeelOn(follow)
     // a state change or a remounted control (a new run): follow it, wake the render loop, and

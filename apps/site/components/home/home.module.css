@@ -68,11 +68,12 @@
   min-block-size: 72vh;
 }
 .proofs[data-staged] .claim {
-  opacity: 0.35;
-  transition: opacity 0.4s var(--spring);
+  /* a tint, not opacity: the claims out of focus stay readable (over 4.5:1 on paper) */
+  color: color-mix(in oklab, var(--ink) 66%, var(--paper));
+  transition: color 0.4s var(--spring);
 }
 .proofs[data-staged] .claim[data-active] {
-  opacity: 1;
+  color: var(--ink);
 }
 .proofs[data-staged] .proofSticky {
   display: grid;
@@ -744,11 +745,6 @@
     calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
   );
 }
-/* while the front crosses a card its components recede and come back in the new skin: the old
-   skin's text never sits at full strength on the new ground, and the card is never empty */
-.specimenStage[data-wave] > * {
-  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.7) * 10, 1) * 0.6);
-}
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
   box-shadow: 0 0 0 1px var(--s-ink);
@@ -902,7 +898,7 @@
   background: var(--ink);
   color: var(--bg);
   /* the bottom clears the screen-reader toggle pinned over the viewport's foot */
-  padding: 120px 56px 104px;
+  padding: 80px 56px 104px;
 }
 .outroTitle {
   position: relative;
