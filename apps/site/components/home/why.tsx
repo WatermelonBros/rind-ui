@@ -1,7 +1,16 @@
 "use client"
 
 import { Button, CheckboxGroup, Collapsible, Switch, ToggleGroup } from "@rind-ui/react"
-import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react"
+import {
+  createContext,
+  type KeyboardEvent,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
+import { createPortal } from "react-dom"
 import { usePhase } from "../phase"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
@@ -17,14 +26,26 @@ const KEYS = [
   ["Space", "Space"],
 ] as const
 
+// Desktop: the claims scroll on the left while one sticky panel on the right shows the proof of
+// the claim in view (all three stay mounted, so each keeps its state). Phones stack them.
+type Stage = {
+  readonly target: HTMLElement | null
+  readonly active: number
+  readonly claim: (i: number, el: HTMLElement | null) => void
+}
+const StageContext = createContext<Stage>({ target: null, active: 0, claim: () => {} })
+
 /** A claim on the left, the live component that proves it on the right. */
 function Proof({
+  index,
   title,
   text,
   hint,
   readout,
   children,
 }: {
+  /** its place in the sticky stage */
+  index: number
   title: string
   text: string
   hint: string
@@ -32,21 +53,35 @@ function Proof({
   children: ReactNode
 }) {
   const { phase } = usePhase()
+  const { target, active, claim } = useContext(StageContext)
+  const shown = !target || active === index
+  const panel = (
+    <div
+      className={styles.proofPanel}
+      data-active={shown ? "" : undefined}
+      inert={!shown}
+      aria-hidden={shown ? undefined : true}
+    >
+      <div className={styles.proofStage} data-skinned="" data-skin={phase}>
+        {children}
+      </div>
+      <div className={styles.readout}>
+        <span className={styles.hint}>{hint}</span>
+        {readout}
+      </div>
+    </div>
+  )
   return (
     <Reveal className={styles.proof}>
-      <div className={styles.claim}>
+      <div
+        className={styles.claim}
+        ref={(el) => claim(index, el)}
+        data-active={shown ? "" : undefined}
+      >
         <h3>{title}</h3>
         <p>{text}</p>
       </div>
-      <div className={styles.proofPanel}>
-        <div className={styles.proofStage} data-skinned="" data-skin={phase}>
-          {children}
-        </div>
-        <div className={styles.readout}>
-          <span className={styles.hint}>{hint}</span>
-          {readout}
-        </div>
-      </div>
+      {target ? createPortal(panel, target) : panel}
     </Reveal>
   )
 }
@@ -112,6 +147,7 @@ function KeyboardProof() {
   }
   return (
     <Proof
+      index={0}
       title="Every key works."
       text="Tab in, arrows across, Home and End to the ends. The keyboard pattern is built in, not bolted on."
       hint={inside ? "Focus is in. Try ← → Home End." : "Click the panel, or press ← →."}
@@ -178,6 +214,7 @@ function HeardProof() {
   }, [])
   return (
     <Proof
+      index={1}
       title="Every state is heard."
       text="Names, roles and states land in the accessibility tree, so a screen reader says what you see."
       hint={HINTS[kind]}
@@ -218,6 +255,7 @@ function MachineProof() {
   const [log, setLog] = useState<readonly string[]>([])
   return (
     <Proof
+      index={2}
       title="Every change is a transition."
       text="Behind each component is a declared state machine. Nothing happens that is not in its graph."
       hint="Open it, close it."
@@ -250,6 +288,61 @@ function MachineProof() {
   )
 }
 
+function ProofStage({ children }: { children: ReactNode }) {
+  const [target, setTarget] = useState<HTMLElement | null>(null)
+  const [active, setActive] = useState(0)
+  const sticky = useRef<HTMLDivElement>(null)
+  const claims = useRef<(HTMLElement | null)[]>([])
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 901px)")
+    const sync = () => setTarget(mq.matches ? sticky.current : null)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
+  // the claim nearest the middle of the screen is the one the panel proves
+  useEffect(() => {
+    if (!target) return
+    let frame = 0
+    const pick = () => {
+      frame = 0
+      const mid = window.innerHeight / 2
+      let best = 0
+      let gap = Number.POSITIVE_INFINITY
+      claims.current.forEach((el, i) => {
+        if (!el) return
+        const r = el.getBoundingClientRect()
+        const d = Math.abs(r.top + r.height / 2 - mid)
+        if (d < gap) {
+          gap = d
+          best = i
+        }
+      })
+      setActive(best)
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(pick)
+    }
+    pick()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(frame)
+    }
+  }, [target])
+  const claim = (i: number, el: HTMLElement | null) => {
+    claims.current[i] = el
+  }
+  return (
+    <StageContext.Provider value={{ target, active, claim }}>
+      <div className={styles.proofs} data-staged={target ? "" : undefined}>
+        <div className={styles.proofClaims}>{children}</div>
+        <div ref={sticky} className={styles.proofSticky} />
+      </div>
+    </StageContext.Provider>
+  )
+}
+
 export function Why() {
   return (
     <div className={styles.band} data-band="paper">
@@ -260,11 +353,11 @@ export function Why() {
           </h2>
           <p className={styles.lead}>No CSS ships. Here is what does: try each one.</p>
         </Reveal>
-        <div className={styles.proofs}>
+        <ProofStage>
           <KeyboardProof />
           <HeardProof />
           <MachineProof />
-        </div>
+        </ProofStage>
       </section>
     </div>
   )

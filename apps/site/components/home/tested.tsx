@@ -189,7 +189,7 @@ export function Tested() {
       const root = stage.current
       const step = STEPS[i]
       if (root) step?.act?.(root)
-      await new Promise((r) => setTimeout(r, 420))
+      await new Promise((r) => setTimeout(r, 260))
       // read after the component has settled, like an awaited driver query
       const check = step?.check
       if (check && stage.current) {
@@ -257,14 +257,6 @@ export function Tested() {
                   · {CHECKS - failed}/{CHECKS} assertions
                 </span>{" "}
                 <span className={styles.passFact}>· {(passed / 1000).toFixed(1)}s</span>
-                {failed ? null : (
-                  <span className={styles.confetti} aria-hidden="true">
-                    {Array.from({ length: 14 }, (_, i) => (
-                      // biome-ignore lint/suspicious/noArrayIndexKey: fixed decorative set
-                      <i key={i} style={{ "--i": i } as React.CSSProperties} />
-                    ))}
-                  </span>
-                )}
               </>
             )}
           </p>

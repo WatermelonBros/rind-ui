@@ -45,6 +45,54 @@
   gap: 96px;
   margin-top: 24px;
 }
+.proofClaims {
+  display: grid;
+  gap: 96px;
+}
+.proofSticky {
+  display: none;
+}
+/* desktop: the claims scroll, one sticky panel proves the claim in view; the panels sit stacked
+   in it and cross-fade */
+.proofs[data-staged] {
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  align-items: start;
+}
+.proofs[data-staged] .proofClaims {
+  gap: 0;
+}
+.proofs[data-staged] .proof {
+  display: flex;
+  align-items: center;
+  min-block-size: 72vh;
+}
+.proofs[data-staged] .claim {
+  /* a tint, not opacity: the claims out of focus stay readable (over 4.5:1 on paper) */
+  color: color-mix(in oklab, var(--ink) 66%, var(--paper));
+  transition: color 0.4s var(--spring);
+}
+.proofs[data-staged] .claim[data-active] {
+  color: var(--ink);
+}
+.proofs[data-staged] .proofSticky {
+  display: grid;
+  position: sticky;
+  /* the panel (about 300px tall) centred on the screen, level with the claim in the middle */
+  top: calc(50vh - 150px);
+}
+.proofs[data-staged] .proofSticky > .proofPanel {
+  grid-area: 1 / 1;
+  opacity: 0;
+  translate: 0 24px;
+  transition:
+    opacity 0.45s var(--spring),
+    translate 0.45s var(--spring);
+}
+.proofs[data-staged] .proofSticky > .proofPanel[data-active] {
+  opacity: 1;
+  translate: 0 0;
+}
 .proof {
   display: grid;
   grid-template-columns: 5fr 7fr;
@@ -302,7 +350,8 @@
   color: #e8e8e3;
   margin: 0;
   /* the window fades at its foot instead of cutting a line in half */
-  mask-image: linear-gradient(#000 82%, transparent);
+  mask-image: linear-gradient(#000 82%, transparent), linear-gradient(90deg, #000 90%, transparent);
+  mask-composite: intersect;
   max-height: 320px;
   overflow: auto;
   overscroll-behavior: contain;
@@ -478,21 +527,6 @@
     scale: 1.01;
   }
 }
-.confetti {
-  position: absolute;
-  left: 60px;
-  top: 50%;
-  pointer-events: none;
-}
-.confetti i {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: hsl(calc(var(--i) * 47) 90% 60%);
-  animation: burst 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-  rotate: calc(var(--i) * 26deg);
-}
 @keyframes burst {
   from {
     translate: 0 0;
@@ -556,6 +590,10 @@
   .passBanner {
     font-size: 12px;
     min-inline-size: 0;
+  }
+  /* the time is the one fact a phone does without: it kept landing alone on a second line */
+  .passFact:last-child {
+    display: none;
   }
 }
 /* an assertion's real outcome, shown once its line has run */
@@ -650,6 +688,22 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   gap: 20px;
 }
+/* on a phone the wall is a row you swipe through, not six screens of scrolling */
+@media (max-width: 700px) {
+  .specimens {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-inline: -20px;
+    padding: 4px 20px 12px;
+    scroll-padding-inline: 20px;
+  }
+  .specimens > li {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+  }
+}
 .specimen {
   display: grid;
   grid-template-rows: 1fr auto;
@@ -690,11 +744,6 @@
   clip-path: circle(
     calc(clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.75) * 4, 1) * 150%) at 0 0
   );
-}
-/* while the front crosses a card its components recede and come back in the new skin: the old
-   skin's text never sits at full strength on the new ground, and the card is never empty */
-.specimenStage[data-wave] > * {
-  opacity: calc(1 - clamp(0, (mod(var(--w, 0) + var(--o, 0), 1) - 0.7) * 10, 1) * 0.6);
 }
 /* the bare skin's thumb is pale on pale: an edge keeps it in sight */
 .specimenStage[data-wave][data-skin="bare"] [data-scope="switch"][data-part="thumb"] {
@@ -849,7 +898,7 @@
   background: var(--ink);
   color: var(--bg);
   /* the bottom clears the screen-reader toggle pinned over the viewport's foot */
-  padding: 120px 56px 104px;
+  padding: 80px 56px 104px;
 }
 .outroTitle {
   position: relative;
