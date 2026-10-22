@@ -302,7 +302,8 @@
   color: #e8e8e3;
   margin: 0;
   /* the window fades at its foot instead of cutting a line in half */
-  mask-image: linear-gradient(#000 82%, transparent);
+  mask-image: linear-gradient(#000 82%, transparent), linear-gradient(90deg, #000 90%, transparent);
+  mask-composite: intersect;
   max-height: 320px;
   overflow: auto;
   overscroll-behavior: contain;
@@ -478,21 +479,6 @@
     scale: 1.01;
   }
 }
-.confetti {
-  position: absolute;
-  left: 60px;
-  top: 50%;
-  pointer-events: none;
-}
-.confetti i {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: hsl(calc(var(--i) * 47) 90% 60%);
-  animation: burst 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-  rotate: calc(var(--i) * 26deg);
-}
 @keyframes burst {
   from {
     translate: 0 0;
@@ -556,6 +542,10 @@
   .passBanner {
     font-size: 12px;
     min-inline-size: 0;
+  }
+  /* the time is the one fact a phone does without: it kept landing alone on a second line */
+  .passFact:last-child {
+    display: none;
   }
 }
 /* an assertion's real outcome, shown once its line has run */

@@ -213,17 +213,9 @@ export function SkinScene() {
         // from its berth it flies onto the component on a short arc, in time rather than with
         // the scroll, and the real component takes its place on touchdown
         const p = flip(last.t)
-        if (p >= 0) {
-          const e = p * p * (3 - 2 * p)
-          // over the card, never through its text
-          const arc = Math.sin(Math.PI * p) * 180
-          return new DOMRect(
-            lerp(end.x, live.x, e),
-            lerp(end.y, live.y, e) - arc,
-            lerp(end.width, live.width, e),
-            lerp(end.height, live.height, e),
-          )
-        }
+        // no flight across the card: it fades out at its berth and in on the component (alpha),
+        // the way it arrives at the tests
+        if (p >= 0) return p < 0.5 ? end : live
         // it stays put while it fades off the machine, and only then travels (unseen) to the
         // gutter: no half-faded object drifting over the machine's own control
         const out = smooth(0.2, 0.4)
@@ -286,9 +278,10 @@ export function SkinScene() {
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over
         const p = flip(last.t)
-        // the slot waits as a ghost of the component (never a hole) until the hop lands
+        // the slot waits as a ghost of the component (never a hole) until the object is on it
         last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0.25" : ""
         if (p >= 1) return 0
+        if (p >= 0) return p < 0.5 ? 1 - p * 2 : (p - 0.5) * 2
         // it leaves the machine as the machine scrolls away (whose own control comes back), and
         // comes into the gutter only once the builder's card is in view: never alone at the edge
         const card = last.look.closest("[data-look]")?.parentElement?.getBoundingClientRect()
