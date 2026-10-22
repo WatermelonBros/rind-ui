@@ -392,7 +392,8 @@ export function SkinScene() {
         scene.current.setLook(colors.brand, colors.surface, k * k * (3 - 2 * k))
         if (window.innerWidth > 900 && last.y > last.s2 && last.t > 0.2) scene.current.setPeel(0)
         // the machine scene's label does not stay behind alone
-        if (last.y > last.s2) setLanded(false)
+        // the machine's label stays while the machine is on screen, with whichever is drawn
+        if (last.y > last.s2) setLanded(last.t < 0.3)
         else if (past) setLanded(true)
         // the component stays in place on a phone until the object appears on it; on a desktop it
         // comes in as the object dissolves at its berth

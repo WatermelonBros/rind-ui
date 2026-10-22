@@ -250,8 +250,12 @@ export function Tested() {
           >
             {passed !== null && (
               <>
-                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b> {kind}.test.ts · {CHECKS - failed}/{CHECKS}{" "}
-                assertions · {(passed / 1000).toFixed(1)}s
+                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b> {kind}.test.ts ·{" "}
+                {/* each fact wraps whole: never "· 2.7s" alone on a line */}
+                <span className={styles.passFact}>
+                  {CHECKS - failed}/{CHECKS} assertions
+                </span>{" "}
+                · <span className={styles.passFact}>{(passed / 1000).toFixed(1)}s</span>
                 {failed ? null : (
                   <span className={styles.confetti} aria-hidden="true">
                     {Array.from({ length: 14 }, (_, i) => (
