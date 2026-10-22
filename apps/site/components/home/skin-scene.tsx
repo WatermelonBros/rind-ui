@@ -225,14 +225,16 @@ export function SkinScene() {
         // three moves, around the content: out to the right-hand gutter, down to the preview
         // row's height, then in along that row (collisions on the way fade it: alpha)
         // at the size it left the machine with (the preview's control can be 16px: a speck)
-        const end = berth(to, from.width, from.height)
+        // level with the real component once it is on screen, so the hop is a short sideways move
+        const end = berth(last.t >= 0.6 ? live : to, from.width, from.height)
         // from its berth it flies onto the component on a short arc, in time rather than with
         // the scroll, and the real component takes its place on touchdown
         const p = flip(last.t)
         if (p >= 0) {
           scene.current?.wake()
           const e = p * p * (3 - 2 * p)
-          const arc = Math.sin(Math.PI * p) * 36
+          // over the card, never through its text
+          const arc = Math.sin(Math.PI * p) * 80
           return new DOMRect(
             lerp(end.x, live.x, e),
             lerp(end.y, live.y, e) - arc,
@@ -296,7 +298,8 @@ export function SkinScene() {
         // the component is the object until the hop lands, then the real one takes over (set
         // here, per frame: the hop runs in time, with no scroll event to hang it on)
         const p = flip(last.t)
-        last.look.style.opacity = p >= 0 && p < 1 ? "0" : ""
+        // one at a time: the real component is hidden from the berth until touchdown
+        last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0" : ""
         return p >= 1 ? 0 : 1
       }
       if (window.innerWidth > 900) return 1
