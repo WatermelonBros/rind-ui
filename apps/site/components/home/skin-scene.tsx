@@ -240,7 +240,7 @@ export function SkinScene() {
         if (p >= 0) {
           const e = p * p * (3 - 2 * p)
           // over the card, never through its text
-          const arc = Math.sin(Math.PI * p) * 140
+          const arc = Math.sin(Math.PI * p) * 180
           return new DOMRect(
             lerp(end.x, live.x, e),
             lerp(end.y, live.y, e) - arc,
@@ -287,6 +287,8 @@ export function SkinScene() {
     // scroll over the leg's last fifth, so a steady scroll always shows the arc
     const flip = (t: number) => (t < 0.8 ? -1 : Math.min(1, (t - 0.8) / 0.18))
     const alpha = () => {
+      // the machine's own control shows only while the object is fading off it (below)
+      getPeelTarget()?.style.removeProperty("opacity")
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
       const phone = window.innerWidth <= 900
@@ -301,9 +303,18 @@ export function SkinScene() {
         // desktop: visible all the way to its berth, then it dissolves into the component
         // the component is the object until the hop lands, then the real one takes over
         const p = flip(last.t)
-        // one at a time: the real component is hidden from the berth until touchdown
-        last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0" : ""
-        return p >= 1 ? 0 : 1
+        // the slot waits as a ghost of the component (never a hole) until the hop lands
+        last.look.style.opacity = last.t >= 0.6 && p < 1 ? "0.25" : ""
+        if (p >= 1) return 0
+        // it leaves the machine as the machine scrolls away (whose own control comes back), and
+        // comes into the gutter only once the builder's card is in view: never alone at the edge
+        const card = last.look.closest("[data-look]")?.parentElement?.getBoundingClientRect()
+        const vh = window.innerHeight
+        const out = 1 - Math.min(1, Math.max(0, (last.t - 0.08) / 0.12))
+        const back = card ? Math.min(1, Math.max(0, (vh * 0.95 - card.top) / (vh * 0.2))) : 1
+        const a = Math.max(out, back)
+        if (a < 1) last.peelEl.style.setProperty("opacity", String(1 - a), "important")
+        return a
       }
       if (window.innerWidth > 900) return 1
       const { next, y, s0, t } = travel()
