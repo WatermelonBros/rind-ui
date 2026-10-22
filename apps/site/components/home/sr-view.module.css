@@ -44,19 +44,23 @@
   outline: 3px solid var(--acc);
   outline-offset: 3px;
 }
-.caption {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: min(720px, calc(100vw - 32px));
-  margin: 0;
-  padding: 12px 18px;
+.panel {
+  pointer-events: auto;
+  inline-size: min(560px, calc(100vw - 32px));
   border-radius: 14px;
   background: #0b0b0c;
   color: #f5f5ee;
-  font: 500 17px / 1.4 var(--text);
   box-shadow: 0 14px 40px #0006;
+  overflow: hidden;
   animation: rise 0.3s var(--spring);
+}
+.panelBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #ffffff1f;
+  font: 600 12px var(--mono);
 }
 .badge {
   flex: none;
@@ -68,10 +72,120 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.text {
-  min-height: 1.4em;
+.readers {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 99px;
+  background: #ffffff14;
 }
-:global([data-phase="juicy"]) .caption {
+.readers > button,
+.voice {
+  border: 0;
+  border-radius: 99px;
+  padding: 5px 10px;
+  background: transparent;
+  color: #f5f5ee;
+  font: 600 12px var(--mono);
+  cursor: pointer;
+}
+.readers > button[aria-pressed="true"],
+.voice[aria-pressed="true"] {
+  background: #f5f5ee;
+  color: #0b0b0c;
+}
+.voice {
+  margin-inline-start: auto;
+  border: 1px solid #ffffff3d;
+}
+/* NVDA's Speech Viewer: one line per utterance, its chunks spaced apart, the latest last */
+.lines {
+  list-style: none;
+  margin: 0;
+  padding: 8px 12px;
+  /* anchored at the bottom: older lines scroll off the top, the latest is always in view */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  block-size: 200px;
+  overflow: hidden;
+  font: 500 14px / 1.45 var(--mono);
+}
+.lines li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  opacity: 0.55;
+}
+.lines li[data-last] {
+  opacity: 1;
+}
+.lines kbd,
+.keys kbd {
+  justify-self: start;
+  padding: 1px 6px;
+  border: 1px solid #ffffff4d;
+  border-radius: 6px;
+  font: 600 11px var(--mono);
+}
+.chunks {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.2em;
+}
+.keys {
+  margin: 0;
+  padding: 8px 12px 12px;
+  border-top: 1px solid #ffffff1f;
+  color: #f5f5eebf;
+  font: 500 12px / 1.6 var(--text);
+}
+.keys a {
+  color: inherit;
+}
+/* touch screens: swipe stand-ins instead of the key list */
+.swipe {
+  display: none;
+  gap: 8px;
+  padding: 8px 12px 12px;
+}
+.swipe button {
+  flex: 1;
+  min-block-size: 44px;
+  border: 1px solid #ffffff4d;
+  border-radius: 10px;
+  background: transparent;
+  color: #f5f5ee;
+  font: 600 14px var(--mono);
+}
+@media (hover: none) {
+  .swipe {
+    display: flex;
+  }
+  .keys {
+    display: none;
+  }
+  .lines {
+    block-size: 112px;
+  }
+}
+/* the element being read, outlined like a screen reader's own highlight */
+.cursor {
+  position: fixed;
+  z-index: 64;
+  border: 3px solid var(--acc-deep);
+  border-radius: 8px;
+  box-shadow: 0 0 0 3px #ffffffcc;
+  pointer-events: none;
+  transition:
+    top 0.18s var(--spring),
+    left 0.18s var(--spring),
+    width 0.18s var(--spring),
+    height 0.18s var(--spring);
+}
+:global([data-phase="juicy"]) .panel {
   background: #2a1d5c;
 }
 :global([data-phase="juicy"]) .badge {
@@ -95,7 +209,7 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-  .caption {
+  .panel {
     justify-self: center;
   }
 }
@@ -106,7 +220,10 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .caption {
+  .panel {
     animation: none;
+  }
+  .cursor {
+    transition: none;
   }
 }
