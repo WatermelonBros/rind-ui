@@ -137,7 +137,11 @@ export function Tested() {
       attributes: true,
       attributeFilter: ["aria-checked", "data-presses"],
     })
+    // the run opens an accordion item, which moves the control: hand it over again
+    const ro = new ResizeObserver(() => setTestTarget(el ?? null))
+    ro.observe(root)
     return () => {
+      ro.disconnect()
       mo.disconnect()
       setTestTarget(null)
     }

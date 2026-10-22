@@ -107,6 +107,8 @@ export const getLookColors = () => lookColors
 let testTarget: HTMLElement | null = null
 export const setTestTarget = (el: HTMLElement | null) => {
   testTarget = el
+  // a new run remounts the control: the scene must look again even if nothing scrolls
+  for (const l of testListeners) l()
 }
 export const getTestTarget = () => testTarget
 

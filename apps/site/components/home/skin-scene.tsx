@@ -188,7 +188,8 @@ export function SkinScene() {
       if (last && last.y > last.s2) {
         const from = shift(last.peelEl.getBoundingClientRect(), last.y - last.s2)
         const live = last.look.getBoundingClientRect()
-        if (last.t >= 1) return live
+        // a phone hides it on the way (alpha): it waits on its control, so it appears there
+        if (last.t >= 1 || (window.innerWidth <= 900 && last.t > 0.05)) return live
         // the object never leaves the screen: it waits in a visible band while the builder
         // rises to meet it, and reaches its preview component exactly on arrival
         const top = window.innerHeight * 0.18
@@ -253,8 +254,8 @@ export function SkinScene() {
       }
       if (window.innerWidth > 900) return 1
       const t = travel().t
-      // a short dip in the middle of the path only
-      return t <= 0 || t >= 1 ? 1 : Math.min(1, Math.abs(1 - 2 * t) * 2.5)
+      // gone in the middle of the path, never half there (a faint ghost reads as a bug)
+      return t > 0.15 && t < 0.85 ? 0 : 1
     }
     // on touchdown the object takes the next scene's state; before, the hero's
     let leg = 0
@@ -345,7 +346,12 @@ export function SkinScene() {
       }
     }
     const offPeelOn = onPeelOn(follow)
-    const offTestState = onTestState(follow)
+    // a state change or a remounted control (a new run): follow it, wake the render loop, and
+    // re-apply the hand-over to the new control
+    const offTestState = onTestState(() => {
+      follow()
+      onScroll()
+    })
     const start = () => {
       import("./skin-gl")
         .then(({ mountSkin }) => {
