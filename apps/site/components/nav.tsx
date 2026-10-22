@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import styles from "./nav.module.css"
+import { NavMenu } from "./nav-menu"
 import { usePhase } from "./phase"
 import { useSound } from "./sound"
 import { SoundBars } from "./sound-bars"
@@ -80,6 +81,7 @@ export function Nav() {
           juicy<span className={styles.visuallyHidden}> mode</span>
         </Switch.Label>
       </Switch.Root>
+      <NavMenu />
     </nav>
   )
 }

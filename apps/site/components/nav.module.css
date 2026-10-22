@@ -154,11 +154,152 @@
 
 @media (max-width: 760px) {
   .nav {
-    gap: 16px;
+    gap: 12px;
     padding: 0 16px;
   }
   .nav > a:not(.mini),
   .soundWord {
+    display: none;
+  }
+}
+
+/* The phone's menu (nav-menu.tsx): a rind Drawer from the bottom edge, in the site's phase. It is
+   portalled to <body>, so these classes stand alone. The machine writes the swipe variables
+   (--rind-drawer-*); the slide only reads them. */
+.menuButton {
+  display: none;
+  order: 10;
+  font: 600 13px var(--mono);
+  color: var(--ink);
+  background: var(--card);
+  border: var(--bw) solid var(--line);
+  border-radius: 99px;
+  box-shadow: var(--shadow-sm);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.menuButton:focus-visible,
+.menuHandle:focus-visible,
+.menu a:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 3px;
+}
+.menuBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in oklab, var(--ink) 45%, transparent);
+  opacity: calc(1 - var(--rind-drawer-swipe-progress, 0));
+  transition: opacity 0.3s var(--spring);
+}
+.menuBackdrop[data-state="open"] {
+  @starting-style {
+    opacity: 0;
+  }
+}
+.menuBackdrop[data-state="closed"] {
+  opacity: 0;
+}
+.menuPositioner {
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: grid;
+  align-items: end;
+  pointer-events: none;
+  overflow: clip;
+}
+.menu {
+  box-sizing: border-box;
+  display: grid;
+  gap: 8px;
+  padding: 8px 24px calc(28px + env(safe-area-inset-bottom));
+  pointer-events: auto;
+  color: var(--ink);
+  font-family: var(--text);
+  background: var(--card);
+  border: var(--bw) solid var(--line);
+  border-bottom: 0;
+  border-radius: var(--r) var(--r) 0 0;
+  box-shadow: 0 -6px 0 var(--soft);
+  transform: translateY(var(--rind-drawer-swipe-y, 0px));
+  transition: transform 0.45s var(--spring);
+}
+.menu[data-state="open"] {
+  @starting-style {
+    transform: translateY(100%);
+  }
+}
+.menu[data-state="closed"] {
+  transform: translateY(100%);
+}
+.menu[data-swiping],
+.menuBackdrop[data-swiping] {
+  transition: none;
+}
+.menuHandle {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.menuHandle::before {
+  content: "";
+  width: 40px;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--soft);
+}
+.menuTitle {
+  margin: 0;
+  font: 600 12px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.menuLinks,
+.menuOut {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menuLinks a {
+  display: block;
+  padding: 6px 0;
+  font: 900 clamp(32px, 10vw, 44px) / 1.1 var(--display);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.menuLinks a:active {
+  color: var(--acc-deep);
+}
+.menuOut {
+  display: flex;
+  gap: 20px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 2px solid var(--muted);
+}
+.menuOut a {
+  font: 600 14px var(--mono);
+  color: var(--ink);
+  text-decoration: none;
+  padding: 6px 0;
+}
+
+@media (max-width: 760px) {
+  .menuButton {
+    display: block;
+  }
+  /* room for the Menu button: the switch keeps its own label (juicy) and drops the decorative
+     other side */
+  .side[aria-hidden="true"] {
     display: none;
   }
 }
