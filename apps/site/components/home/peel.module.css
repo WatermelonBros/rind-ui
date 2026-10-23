@@ -281,7 +281,7 @@
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .peel {
     z-index: 1;
-    margin-top: calc(-18 * var(--vh));
+    margin-top: calc(-30 * var(--vh));
   }
   /* the builder rises into this scene's last stretch (home.module.css): the copy is gone first */
   .copy {
