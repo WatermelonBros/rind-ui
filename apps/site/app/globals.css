@@ -284,3 +284,45 @@ html[data-wave] [data-page-title] {
 ::view-transition-new(root) {
   animation-duration: 0.35s;
 }
+
+/* lib/docs.ts + components/code-copy.tsx: every rendered code block has its copy button */
+.code-block {
+  position: relative;
+}
+.code-copy {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  font: 600 12px var(--mono);
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1.5px solid color-mix(in oklab, currentColor 25%, transparent);
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.75;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+}
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+.code-copy[data-copied] {
+  background: var(--acc);
+  border-color: var(--acc);
+  opacity: 1;
+}
+.code-copy:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
