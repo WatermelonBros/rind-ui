@@ -63,3 +63,7 @@
     display: none;
   }
 }
+/* a prop or part name leading a heading */
+.toc code {
+  font: 500 0.92em var(--mono);
+}

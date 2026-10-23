@@ -306,7 +306,8 @@ function step(ac: AudioContext, out: Engine, fraction: number, rising: boolean, 
 
 export function SoundProvider({ children }: { children: ReactNode }) {
   const [enabled, setOn] = useState(false)
-  // the landing's alone: the docs are for reading, and stay quiet
+  // off until the visitor turns it on, on any page: the docs' live examples answer like the
+  // landing's components; the music under it all is the landing's alone (docs are for reading)
   const home = usePathname() === "/"
   const ac = useRef<{ context: AudioContext; out: Engine } | null>(null)
 
@@ -323,10 +324,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const audio = ac.current
-    if (!enabled || !home || !audio) return
+    if (!enabled || !audio) return
     const { context, out } = audio
     // the music under it all (ambient.ts), for as long as the sound is on
-    const music = ambient(context, out)
+    const music = home ? ambient(context, out) : null
     // only what the visitor does: their last press, key or drag, within the moment
     let input = 0
     const touched = () => {
@@ -408,7 +409,7 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("rind:cue", onCue)
       values.disconnect()
       phase.disconnect()
-      music.stop()
+      music?.stop()
     }
   }, [enabled, home])
 

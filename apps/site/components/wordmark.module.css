@@ -40,7 +40,8 @@
   content: "";
   position: absolute;
   inset: 0.13em -0.06em -0.02em;
-  border: 0.028em solid var(--acc);
+  /* ink, like every line in crisp: the accent pink rang orange against the lime */
+  border: 0.028em solid var(--ink);
   border-radius: 0.12em;
   animation: ring 3.6s ease-in-out infinite;
   transition: opacity 0.4s;
@@ -86,13 +87,14 @@
   left: 50%;
   top: 100%;
   translate: -50% 14px;
-  font: 600 13px / 1 var(--mono);
+  /* small enough that the i's chip, wider than its letter, clears its neighbours' */
+  font: 600 11px / 1 var(--mono);
   letter-spacing: 0;
   white-space: nowrap;
   text-shadow: none;
   background: var(--ink);
   color: var(--bg);
-  padding: 6px 9px;
+  padding: 5px 7px;
   border-radius: 99px;
   transition: opacity 0.4s;
 }

@@ -4,30 +4,22 @@ import { Button } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
 import { useSound } from "./sound"
 import styles from "./sound.module.css"
-import { SoundBars } from "./sound-bars"
 
 const SHOW_AFTER_MS = 900
 const LEAVE_AFTER_MS = 9000
 
 /**
- * The landing asks once, as the intro ends: this page has sound. Whatever the answer (or none,
- * after a while or once the visitor scrolls on), the invite flies up into the nav and becomes
- * the sound toggle there, so the way back to it is seen being made. Not a dialog: it takes no
- * focus and blocks nothing.
+ * The landing asks once, as the intro ends: this page has sound. The question hangs under the
+ * nav's sound toggle, pointing at it, so the answer and the way back to it are one thing on
+ * screen (a bar at the foot of the screen competed with the hero and the screen-reader toggle).
+ * Whatever the answer (or none, after a while or once the visitor scrolls on), it folds up into
+ * the toggle. Not a dialog: it takes no focus and blocks nothing.
  */
 export function SoundInvite() {
   const { setEnabled } = useSound()
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLElement>(null)
   const done = useRef(false)
-
-  useEffect(() => {
-    // the nav's toggle stays hidden while the question is pending (sound.module.css); the inline
-    // script in <head> sets this on the landing's first paint, this keeps it on a return visit
-    const root = document.documentElement
-    if (!done.current) root.setAttribute("data-sound-ask", "")
-    return () => root.removeAttribute("data-sound-ask")
-  }, [])
 
   useEffect(() => {
     // after the intro (html.intro goes once the styled page is revealed)
@@ -49,10 +41,7 @@ export function SoundInvite() {
     if (on !== null) setEnabled(on)
     const el = box.current
     const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
-    const handOver = () => {
-      setOpen(false)
-      document.documentElement.removeAttribute("data-sound-ask")
-    }
+    const handOver = () => setOpen(false)
     if (!el || !to || matchMedia("(prefers-reduced-motion: reduce)").matches) {
       handOver()
       return
@@ -85,6 +74,22 @@ export function SoundInvite() {
     }
   }
 
+  // hung under the toggle, its point on the toggle's middle
+  useEffect(() => {
+    if (!open) return
+    const place = () => {
+      const el = box.current
+      const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
+      if (!el || !to) return
+      el.style.setProperty("--invite-top", `${to.bottom + 14}px`)
+      el.style.setProperty("--invite-end", `${Math.max(16, window.innerWidth - to.right)}px`)
+      el.style.setProperty("--invite-point", `${to.width / 2}px`)
+    }
+    place()
+    window.addEventListener("resize", place)
+    return () => window.removeEventListener("resize", place)
+  }, [open])
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: leave only reads refs and setters
   useEffect(() => {
     if (!open) return
@@ -102,7 +107,6 @@ export function SoundInvite() {
   if (!open) return null
   return (
     <aside ref={box} className={styles.invite} aria-label="Sound">
-      <SoundBars idle />
       <p>
         <span className={styles.long}>This page has sound.</span>
         <span className={styles.short}>Sound?</span>

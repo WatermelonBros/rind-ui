@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { CopyMarkdown } from "@/components/copy-markdown"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
+import { Letters } from "@/components/letters"
 import { ReleaseSync } from "@/components/release"
 import { Toc } from "@/components/toc"
 import { exampleCode, pageBySlug, pages, render } from "@/lib/docs"
@@ -54,7 +55,8 @@ export default async function DocPage({ params }: Props) {
       <article>
         <header className={styles.head}>
           <h1 className={styles.title} data-page-title="">
-            {page.title}
+            {/* its letters answer the phase, like the landing's titles */}
+            <Letters>{page.title}</Letters>
           </h1>
           <CopyMarkdown slug={page.slug} />
         </header>

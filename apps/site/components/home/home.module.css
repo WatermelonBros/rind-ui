@@ -1,6 +1,6 @@
 /* ── shared ─────────────────────────────────────────────────────────────────────────── */
 .section {
-  padding: clamp(80px, 7.5vw, 108px) 56px;
+  padding: clamp(64px, 6vw, 88px) 56px;
   max-width: 1320px;
   margin: 0 auto;
 }
@@ -19,49 +19,6 @@
   letter-spacing: -0.035em;
   margin: 18px 0 18px;
   max-width: 14ch;
-}
-/* letters.tsx: a title's letters answer the phase. Switching to juicy, each swells and bounces
-   back, one after another; to crisp, each snaps stiff, sheared and back in hard steps. phase.tsx
-   sets html[data-letters] once the switch's wave has passed (inside it the letters would be
-   hidden behind its front); the animation's name is the phase's, so each change replays it. */
-.word {
-  white-space: nowrap;
-}
-.ch {
-  display: inline-block;
-  transform-origin: 50% 85%;
-}
-:global([data-letters="juicy"]) .ch {
-  animation: ch-swell 0.75s var(--spring-pop) calc(var(--i) * 28ms) both;
-}
-:global([data-letters="crisp"]) .ch {
-  animation: ch-snap 0.6s steps(4, jump-none) calc(var(--i) * 22ms) both;
-}
-@keyframes ch-swell {
-  0% {
-    scale: 1;
-  }
-  35% {
-    scale: 1.22 1.3;
-    translate: 0 -0.06em;
-  }
-  65% {
-    scale: 0.94 0.9;
-  }
-  100% {
-    scale: 1;
-  }
-}
-@keyframes ch-snap {
-  0% {
-    transform: skewX(0deg);
-  }
-  50% {
-    transform: skewX(-14deg) translateX(0.04em);
-  }
-  100% {
-    transform: skewX(0deg);
-  }
 }
 .lead {
   font: 500 clamp(17px, 1.4vw, 21px) / 1.5 var(--text);
@@ -1292,7 +1249,8 @@
 .proofs[data-staged] .proof {
   display: flex;
   align-items: center;
-  min-block-size: 72vh;
+  /* enough scroll for each claim to own the panel, no more: a longer run was empty paper */
+  min-block-size: 56vh;
 }
 .proofs[data-staged] .claim {
   /* a tint, not opacity: the claims out of focus stay readable (over 4.5:1 on paper) */
@@ -1319,4 +1277,15 @@
 .proofs[data-staged] .proofSticky > .proofPanel[data-active] {
   opacity: 1;
   translate: 0 0;
+}
+
+/* desktop: the builder rises into the machine scene's last stretch, under its diagram, so the
+   scenes meet without a screen of empty ground between them (peel.module.css does the same with
+   the hero) */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .section[aria-labelledby="look-title"] {
+    position: relative;
+    z-index: 2;
+    margin-top: -15vh;
+  }
 }

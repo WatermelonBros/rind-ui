@@ -1,5 +1,5 @@
 import { type CSSProperties, Fragment } from "react"
-import styles from "./home.module.css"
+import styles from "./letters.module.css"
 
 /**
  * A title whose letters answer the phase (home.module.css: .ch): when it changes they swell one

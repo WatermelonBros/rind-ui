@@ -152,6 +152,22 @@ export function SkinScene() {
       const emerge = Math.min(1, Math.max(0, (y - s4) / (window.innerHeight * 0.12)))
       return { look, test, y, s4, t, emerge }
     }
+    // After the tests: once their band has let go (and the ticks it sends have left first), the
+    // object lifts off the tests' control, rides the right-hand gutter down through the claims
+    // and the agents, and ends its trip on the wall's component of its own kind, one of the
+    // catalogue, where it dissolves into the real one
+    const wallLeg = () => {
+      const test = getTestTarget()
+      const band = test?.closest("[data-band]")
+      const wall = document.querySelector<HTMLElement>(`[data-object-land="${kind}"]`)
+      if (!test || !band || !wall) return null
+      const y = window.scrollY
+      const s6 = band.getBoundingClientRect().bottom + y - window.innerHeight * 0.55
+      const r = wall.getBoundingClientRect()
+      const s7 = r.top + y + r.height / 2 - window.innerHeight * 0.55
+      const t = Math.min(1, Math.max(0, (y - s6) / Math.max(1, s7 - s6)))
+      return { test, wall, y, s6, t }
+    }
     // The room right of the content frame (the builder's; the tests share its width): the
     // object flies down it at a size that fits, never under 64px across, so it neither covers
     // the panels nor shrinks to a speck
@@ -159,9 +175,11 @@ export function SkinScene() {
       const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
       const right = frame?.right ?? window.innerWidth
       const room = window.innerWidth - right - 32
-      // big enough to read as the object, not debris, and 24px clear of the viewport's edge
-      const k = Math.min(1, Math.max(80, room) / w)
-      return { w: w * k, h: h * k, x: Math.max(right + 8, window.innerWidth - w * k - 24) }
+      // big enough to read as the object, not debris (it may overlap the frame's edge for that),
+      // centred in the room when there is room, and always 32px clear of the viewport's edge
+      const k = Math.min(1, Math.max(112, room) / w)
+      const x = right + 8 + Math.max(0, (room - w * k) / 2)
+      return { w: w * k, h: h * k, x: Math.min(x, window.innerWidth - w * k - 32) }
     }
     // Desktop: between scenes the object lives in the right-hand gutter. It berths there level
     // with the builder's component and hands over to it in a cross-dissolve, then sets off from
@@ -186,12 +204,8 @@ export function SkinScene() {
     const ride = (from: DOMRect, to: DOMRect, t: number) => {
       const w = 60
       const h = w * (from.height / Math.max(1, from.width))
-      const edge = new DOMRect(
-        window.innerWidth - w * 0.65,
-        window.innerHeight * 0.42 - h / 2,
-        w,
-        h,
-      )
+      const x = window.innerWidth - w - 12
+      const edge = new DOMRect(x, clearY(x, window.innerHeight * 0.42 - h / 2, w, h), w, h)
       const smooth = (a: number, b: number) => {
         const k = Math.min(1, Math.max(0, (t - a) / (b - a)))
         return k * k * (3 - 2 * k)
@@ -206,7 +220,65 @@ export function SkinScene() {
       const inward = smooth(0.7, 1)
       return inward > 0 ? mix(edge, to, inward) : mix(from, edge, smooth(0, 0.3))
     }
+    // A phone's edge lane crosses right-aligned controls (the tests' Run) and the ends of titles:
+    // the object slides past them, above or below, eased so it glides rather than jumps
+    let laneY = Number.NaN
+    const clearY = (x: number, y: number, w: number, h: number) => {
+      let want = y
+      for (let i = 0; i < 3; i++) {
+        const hit = [
+          [x + 4, want + 4],
+          [x + w - 4, want + 4],
+          [x + 4, want + h - 4],
+          [x + w - 4, want + h - 4],
+          [x + w / 2, want + h / 2],
+        ]
+          .flatMap(([px = 0, py = 0]) => document.elementsFromPoint(px, py))
+          .map((el) =>
+            el.closest(
+              "main a, main button, main input, main [role]:not(section), main h2, main h3",
+            ),
+          )
+          .find((el): el is Element => el !== null)
+        if (!hit) break
+        const r = hit.getBoundingClientRect()
+        want = r.bottom + h + 8 < window.innerHeight * 0.85 ? r.bottom + 8 : r.top - h - 8
+      }
+      laneY = Number.isNaN(laneY) ? want : laneY + (want - laneY) * 0.2
+      return laneY
+    }
     const route = () => {
+      const end = wallLeg()
+      if (end && end.y > end.s6) {
+        const live = end.wall.getBoundingClientRect()
+        if (end.t >= 1) return live
+        const from = end.test.getBoundingClientRect()
+        if (window.innerWidth <= 900) {
+          // a phone's wall scrolls sideways: a card out of view to the right is reached by
+          // leaving through the right edge, towards it
+          const off = live.left > window.innerWidth - 8
+          const to = off
+            ? new DOMRect(window.innerWidth + 24, live.y, live.width, live.height)
+            : live
+          return ride(from, to, end.t)
+        }
+        const smooth = (a: number, b: number) => {
+          const k = Math.min(1, Math.max(0, (end.t - a) / (b - a)))
+          return k * k * (3 - 2 * k)
+        }
+        // out to the gutter, at the size that fits it; level in the gutter while the page
+        // passes; then in, onto the wall's component, at its size
+        const g = gutterFit(from.width, from.height)
+        const out = smooth(0, 0.15)
+        const into = smooth(0.82, 1)
+        const midY = window.innerHeight * 0.42 - g.h / 2
+        return new DOMRect(
+          lerp(lerp(from.x, g.x, out), live.x, into),
+          lerp(lerp(from.y, midY, out), live.y, into),
+          lerp(lerp(from.width, g.w, out), live.width, into),
+          lerp(lerp(from.height, g.h, out), live.height, into),
+        )
+      }
       const fin = testLeg()
       if (fin && fin.y > fin.s4) {
         const live = fin.test.getBoundingClientRect()
@@ -316,6 +388,9 @@ export function SkinScene() {
     const alpha = () => {
       // the machine's own control shows only while the object is fading off it (below)
       getPeelTarget()?.style.removeProperty("opacity")
+      // dissolving into the wall's component as it touches down, gone once it has
+      const end = wallLeg()
+      if (end && end.y > end.s6) return end.t < 0.94 ? 1 : Math.max(0, (1 - end.t) / 0.06)
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
       const phone = window.innerWidth <= 900
@@ -339,9 +414,16 @@ export function SkinScene() {
     let leg = 0
     let presses = 0
     let pulse = 0
+    // between landings it always flies as the checked component (on, with its tick): an
+    // unchecked checkbox in the site's skin is a blank white square, which reads as debris
+    let flying = false
     const follow = () => {
       const handle = scene.current
       if (!handle) return
+      if ((flying || leg === 4) && kind !== "button") {
+        handle.setChecked(true)
+        return
+      }
       if (leg === 3) {
         // the tests drive it now: the control's state, and a press for every press
         const state = getTestState()
@@ -383,7 +465,9 @@ export function SkinScene() {
       // the last leg: the builder's colours come on, the real component fades in under the object
       const last = lastLeg()
       const fin = testLeg()
-      const nextLeg = fin && fin.t > 0.5 ? 3 : last && last.t > 0.5 ? 2 : past ? 1 : 0
+      const end = wallLeg()
+      const leaving = Boolean(end && end.y > end.s6)
+      const nextLeg = leaving ? 4 : fin && fin.t > 0.5 ? 3 : last && last.t > 0.5 ? 2 : past ? 1 : 0
       if (nextLeg !== leg) {
         leg = nextLeg
         follow()
@@ -417,11 +501,11 @@ export function SkinScene() {
       // one control at a time: the test's own stays hidden while the object flies to it (on a
       // phone, from when the object leaves the edge to come down on it)
       if (fin) {
-        const hide = fin.y > fin.s4 && (window.innerWidth > 900 || fin.t >= 0.7)
+        const hide = !leaving && fin.y > fin.s4 && (window.innerWidth > 900 || fin.t >= 0.7)
         if (hide) fin.test.style.setProperty("opacity", "0", "important")
         else fin.test.style.removeProperty("opacity")
       }
-      if (fin && scene.current && fin.y > fin.s4) {
+      if (fin && scene.current && fin.y > fin.s4 && !leaving) {
         // it takes the builder's component with it, and gets the site's skin back on the way
         // the builder keeps its component: the object comes back at the berth
         fin.look.style.opacity = ""
@@ -437,10 +521,24 @@ export function SkinScene() {
       if (colors.picked && scene.current) scene.current.setLook(colors.brand, colors.surface, 1)
       // hysteresis: the control grows to the object's size on arrival, which moves the page a
       // little; without it, arrival would flicker on and off at the threshold
-      const arrived = Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
+      const arrived = !leaving && Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
       if (arrived !== atTests) {
         atTests = arrived
         setTestLanded(arrived)
+      }
+      // down the gutter to the wall, in the site's own skin and whole
+      if (leaving && scene.current) {
+        if (!colors.picked) scene.current.setLook(colors.brand, colors.surface, 0)
+        scene.current.setPeel(0)
+      }
+      const air = Boolean(
+        (leaving && end && end.t < 1) ||
+          (!leaving && fin && fin.y > fin.s4 && !atTests) ||
+          (!(fin && fin.y > fin.s4) && last && last.y > last.s2 && flip(last.t) < 1),
+      )
+      if (air !== flying) {
+        flying = air
+        follow()
       }
       // the test starts as the object comes in to land, not once it has: a visitor scrolling at
       // a normal pace still sees it run to PASS (it runs once; tested.tsx ignores repeats); and

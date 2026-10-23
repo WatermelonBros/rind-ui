@@ -12,12 +12,12 @@ import {
   Toggle,
 } from "@rind-ui/react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
 import { type Phase, usePhase } from "../phase"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import { handoff } from "./handoff"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Shadow = "flat" | "soft" | "hard"
@@ -56,11 +56,20 @@ const SHADOWS: Record<Shadow, string> = {
   hard: "3px 3px 0 var(--skin-ink)",
 }
 // system stacks, so the copied CSS renders the same anywhere: no web font to load
+/** The faces as the copied CSS names them: real families, each falling back to the platform's. */
 const FONTS: Record<Font, string> = {
-  sans: "system-ui, sans-serif",
-  serif: "ui-serif, Georgia, serif",
-  mono: "ui-monospace, Menlo, monospace",
-  rounded: "ui-rounded, 'SF Pro Rounded', system-ui, sans-serif",
+  sans: '"Inter Tight", system-ui, sans-serif',
+  serif: '"Source Serif 4", Georgia, serif',
+  mono: '"JetBrains Mono", ui-monospace, monospace',
+  rounded: "Fredoka, ui-rounded, system-ui, sans-serif",
+}
+/** The same faces in the preview, as this site loads them (app/layout.tsx): a visitor without
+ *  them installed still sees the designed type, never a system default. */
+const SITE_FONTS: Record<Font, string> = {
+  sans: "var(--font-inter)",
+  serif: "var(--font-serif)",
+  mono: "var(--font-mono)",
+  rounded: "var(--font-fredoka)",
 }
 const DENSITY: Record<Density, readonly [number, number, number]> = {
   compact: [6, 10, 10],
@@ -555,7 +564,7 @@ export function AnyLook() {
             <Button onPress={() => set(BASE)}>Reset</Button>
           </div>
         </div>
-        <style>{scoped(css)}</style>
+        <style>{scoped(css.replace(FONTS[look.font], SITE_FONTS[look.font]))}</style>
         <div ref={stage} className={styles.lookStage} data-look="">
           <div className={styles.lookGrid}>
             <div className={styles.lookCol}>

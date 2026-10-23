@@ -45,6 +45,17 @@ const mono = localFont({
   // layout rewraps the hero's buttons on phones, whatever its display
 })
 
+// the landing's skin builder only, when its visitor picks "serif": fetched then, never up front
+const serif = localFont({
+  src: [
+    { path: "../fonts/source-serif/source-serif-latin-400.woff2", weight: "400" },
+    { path: "../fonts/source-serif/source-serif-latin-600.woff2", weight: "600" },
+  ],
+  variable: "--font-serif",
+  display: "swap",
+  preload: false,
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://rind.watermelon-studio.it"),
   title: { default: "rind — headless components", template: "%s · rind" },
@@ -56,7 +67,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en-US"
       data-phase="juicy"
-      className={`${unbounded.variable} ${inter.variable} ${fredoka.variable} ${mono.variable}`}
+      className={`${unbounded.variable} ${inter.variable} ${fredoka.variable} ${mono.variable} ${serif.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -67,7 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{
-            __html: `var r=document.documentElement;r.dataset.hero=["switch","checkbox","button"][Math.floor(Math.random()*3)];try{var p=localStorage.getItem("rind-phase");if(p==="crisp")r.dataset.phase=p;if(location.pathname==="/"){r.setAttribute("data-sound-ask","");if(!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}}catch(e){}`,
+            __html: `var r=document.documentElement;r.dataset.hero=["switch","checkbox","button"][Math.floor(Math.random()*3)];try{var p=localStorage.getItem("rind-phase");if(p==="crisp")r.dataset.phase=p;if(location.pathname==="/"&&!matchMedia("(prefers-reduced-motion: reduce)").matches)r.classList.add("intro")}catch(e){}`,
           }}
         />
       </head>

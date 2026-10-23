@@ -2,6 +2,7 @@
 
 import { Accordion, Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
 import { usePhase } from "../phase"
 import { cue } from "../sound"
 import {
@@ -14,7 +15,6 @@ import {
   useTestLanded,
 } from "./hero-state"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Step = {

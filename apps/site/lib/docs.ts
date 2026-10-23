@@ -85,7 +85,12 @@ export interface Rendered {
   /** the first paragraph, shown under the live example */
   readonly intro: string
   readonly html: string
-  readonly toc: readonly { readonly id: string; readonly text: string }[]
+  readonly toc: readonly {
+    readonly id: string
+    readonly text: string
+    /** the heading's leading code span (a prop or part name), kept as code in the outline */
+    readonly code?: string
+  }[]
 }
 
 /**
@@ -102,15 +107,22 @@ export function render(page: DocPage, { hasExample = false } = {}): Rendered {
   if (hasExample) remainder = remainder.replace(/^```[\s\S]*?\n```\s*/, "")
   const intro = tables(marked.parse(first, { async: false }))
   const html = tables(marked.parse(remainder, { async: false }))
-  const toc = [...html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>/g)].map((m) => ({
-    id: m[1] ?? "",
-    // plain text for React, which escapes it again: tags dropped, marked's entities decoded
-    text: (m[2] ?? "")
+  // plain text for React, which escapes it again: tags dropped, marked's entities decoded
+  const plain = (h: string) =>
+    h
       .replace(/<[^>]+>/g, "")
       .replace(/&(lt|gt|quot|#39|amp);/g, (_, e: string) =>
         e === "lt" ? "<" : e === "gt" ? ">" : e === "quot" ? '"' : e === "#39" ? "'" : "&",
-      ),
-  }))
+      )
+  const toc = [...html.matchAll(/<h2 id="([^"]+)">(.*?)<\/h2>/g)].map((m) => {
+    const heading = m[2] ?? ""
+    const code = /^<code>(.*?)<\/code>/.exec(heading)?.[1]
+    return {
+      id: m[1] ?? "",
+      text: plain(heading),
+      ...(code === undefined ? {} : { code: plain(code) }),
+    }
+  })
   return { intro, html, toc }
 }
 

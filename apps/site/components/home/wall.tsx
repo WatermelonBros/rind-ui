@@ -1,8 +1,8 @@
 import { Collapsible } from "@rind-ui/react"
 import roadmap from "@/content/generated/roadmap.json"
+import { Letters } from "../letters"
 import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 import { WallSpecimens } from "./wall-specimens"
 

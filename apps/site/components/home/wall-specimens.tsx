@@ -269,7 +269,8 @@ export function WallSpecimens() {
           attr="data-state"
         >
           <Switch.Root>
-            <Switch.Control>
+            {/* where the hero's object ends its trip on a switch visit (skin-scene.tsx) */}
+            <Switch.Control data-object-land="switch">
               <Switch.Thumb />
             </Switch.Control>
             <Switch.Label>Dark mode</Switch.Label>
@@ -345,7 +346,9 @@ export function WallSpecimens() {
             </CheckboxGroup.Parent>
             {TOPPINGS.map((value) => (
               <CheckboxGroup.Item key={value} value={value}>
-                <CheckboxGroup.ItemControl>
+                <CheckboxGroup.ItemControl
+                  data-object-land={value === "Ham" ? "checkbox" : undefined}
+                >
                   <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
                 </CheckboxGroup.ItemControl>
                 <CheckboxGroup.ItemLabel>{value}</CheckboxGroup.ItemLabel>
@@ -361,7 +364,9 @@ export function WallSpecimens() {
           attr="aria-pressed"
         >
           <ToggleGroup.Root aria-label="Format" selectionMode="multiple">
-            <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+            <ToggleGroup.Item value="bold" data-object-land="button">
+              Bold
+            </ToggleGroup.Item>
             <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
           </ToggleGroup.Root>
         </Specimen>

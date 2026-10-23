@@ -387,9 +387,10 @@ export function ScreenReaderView() {
     }
   }, [])
 
-  // on a phone it lives in the hero and the footer: anywhere between, the narrow column puts it on
+  // it waits out the hero, where the sound question and the object already ask for attention;
+  // on a phone it then lives only in the footer: anywhere between, the narrow column puts it on
   // top of body copy
-  const [pastHero, setPastHero] = useState(false)
+  const [away, setAway] = useState(true)
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 700px)")
     const hero = document.querySelector("main section, main > div")
@@ -398,7 +399,7 @@ export function ScreenReaderView() {
     const seen = new Map<Element, boolean>()
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) seen.set(e.target, e.isIntersecting)
-      setPastHero(mq.matches && !seen.get(hero) && !(foot && seen.get(foot)))
+      setAway(Boolean(seen.get(hero)) || (mq.matches && !(foot && seen.get(foot))))
     })
     io.observe(hero)
     if (foot) io.observe(foot)
@@ -422,7 +423,7 @@ export function ScreenReaderView() {
       className={styles.view}
       data-sr-view=""
       data-on={on ? "" : undefined}
-      data-scrolling={(scrolling || overTests || pastHero) && !on ? "" : undefined}
+      data-scrolling={(scrolling || overTests || away) && !on ? "" : undefined}
     >
       {box ? (
         <span

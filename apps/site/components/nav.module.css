@@ -157,8 +157,8 @@
     gap: 12px;
     padding: 0 16px;
   }
-  .nav > a:not(.mini),
-  .soundWord {
+  /* the sound toggle keeps its word: four dashes alone did not say what they were */
+  .nav > a:not(.mini) {
     display: none;
   }
 }
@@ -364,10 +364,4 @@
   .phase {
     display: none;
   }
-}
-
-/* the sound toggle waits for the landing's invite to fly into it (sound-invite.tsx): one sound
-   control on screen at a time; it keeps its box, so the invite can aim at it */
-:global(html[data-sound-ask]) .sound {
-  visibility: hidden;
 }

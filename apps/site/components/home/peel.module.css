@@ -273,3 +273,12 @@
 .graph[data-left] .event {
   opacity: 0;
 }
+
+/* desktop: the scene rises over the hero's last stretch, below its copy, so the trip from the hero
+   has the machine coming in under it rather than a screen of empty ground */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .peel {
+    z-index: 1;
+    margin-top: -18vh;
+  }
+}

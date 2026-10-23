@@ -11,11 +11,11 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { Letters } from "../letters"
 import { usePhase } from "../phase"
 import { handoff } from "./handoff"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 import { utterance } from "./sr-view"
 
