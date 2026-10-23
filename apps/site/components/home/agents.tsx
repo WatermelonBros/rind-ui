@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Status = "pending" | "streaming" | "complete"
@@ -144,7 +145,7 @@ export function Agents() {
       <div className={styles.agents}>
         <Reveal>
           <h2 id="agents-title" className={styles.h2}>
-            Made for agents.
+            <Letters>Made for agents.</Letters>
           </h2>
           <p className={styles.lead}>
             The whole API is generated into <code>llms.txt</code>, never written by hand, so it

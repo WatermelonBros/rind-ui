@@ -2,6 +2,7 @@ import { Collapsible } from "@rind-ui/react"
 import roadmap from "@/content/generated/roadmap.json"
 import { MorphLink } from "../morph-link"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 import { WallSpecimens } from "./wall-specimens"
 
@@ -25,7 +26,7 @@ export function Wall() {
       <section className={styles.section} aria-labelledby="wall-title">
         <Reveal>
           <h2 id="wall-title" className={styles.h2}>
-            {ready} ready. {items.length - ready} on the way.
+            <Letters>{`${ready} ready. ${items.length - ready} on the way.`}</Letters>
           </h2>
           <p className={styles.lead}>
             Every component you would reach for, plus the AI-UI primitives nobody ships yet. Each

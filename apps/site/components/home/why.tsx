@@ -14,6 +14,7 @@ import { createPortal } from "react-dom"
 import { usePhase } from "../phase"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 import { utterance } from "./sr-view"
 
@@ -353,7 +354,7 @@ export function Why() {
       <section className={styles.section} aria-labelledby="why-title">
         <Reveal>
           <h2 id="why-title" className={styles.h2}>
-            Everything but the look.
+            <Letters>Everything but the look.</Letters>
           </h2>
           <p className={styles.lead}>No CSS ships. Here is what does: try each one.</p>
         </Reveal>

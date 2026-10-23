@@ -14,6 +14,7 @@ import {
   useTestLanded,
 } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Step = {
@@ -214,7 +215,7 @@ export function Tested() {
       <section className={styles.section} aria-labelledby="tested-title">
         <Reveal>
           <h2 id="tested-title" className={styles.h2}>
-            The tests come in the box.
+            <Letters>The tests come in the box.</Letters>
           </h2>
           <p className={styles.lead}>
             Every component ships a driver: what a user does and asks. One test runs in Testing

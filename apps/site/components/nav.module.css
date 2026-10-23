@@ -178,6 +178,11 @@
   padding: 8px 14px;
   cursor: pointer;
 }
+/* juicy draws no lines (--line is transparent): white on the white docs bar would read only by
+   its shadow, so it gets an edge of its own */
+:global([data-phase="juicy"]) .menuButton {
+  border: 2px solid var(--soft);
+}
 .menuButton:focus-visible,
 .menuHandle:focus-visible,
 .menu a:focus-visible {
@@ -302,4 +307,10 @@
   .side[aria-hidden="true"] {
     display: none;
   }
+}
+
+/* the sound toggle waits for the landing's invite to fly into it (sound-invite.tsx): one sound
+   control on screen at a time; it keeps its box, so the invite can aim at it */
+:global(html[data-sound-ask]) .sound {
+  visibility: hidden;
 }

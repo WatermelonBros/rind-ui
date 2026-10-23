@@ -16,6 +16,7 @@ import { type Phase, usePhase } from "../phase"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Shadow = "flat" | "soft" | "hard"
@@ -469,7 +470,7 @@ export function AnyLook() {
     <section ref={section} className={styles.section} aria-labelledby="look-title">
       <Reveal>
         <h2 id="look-title" className={styles.h2}>
-          Same components. Any skin.
+          <Letters>Same components. Any skin.</Letters>
         </h2>
         <p className={styles.lead}>
           These are live rind components with no styles of their own. Build a skin, then take the

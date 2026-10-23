@@ -20,6 +20,52 @@
   margin: 18px 0 18px;
   max-width: 14ch;
 }
+/* letters.tsx: a title's letters answer the phase. Switching to juicy, each swells and bounces
+   back, one after another; to crisp, each snaps stiff, sheared and back in hard steps. The
+   animation's name is the phase's, so a change replays it. */
+.word {
+  white-space: nowrap;
+}
+.ch {
+  display: inline-block;
+  transform-origin: 50% 85%;
+}
+:global([data-phase="juicy"]) .ch {
+  animation: ch-swell 0.75s var(--spring-pop) calc(var(--i) * 28ms) both;
+}
+:global([data-phase="crisp"]) .ch {
+  animation: ch-snap 0.32s steps(3, jump-none) calc(var(--i) * 16ms) both;
+}
+/* not under the intro's raw copy, where nobody sees it */
+:global(html.intro) .ch {
+  animation: none;
+}
+@keyframes ch-swell {
+  0% {
+    scale: 1;
+  }
+  35% {
+    scale: 1.22 1.3;
+    translate: 0 -0.06em;
+  }
+  65% {
+    scale: 0.94 0.9;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes ch-snap {
+  0% {
+    transform: skewX(0deg);
+  }
+  50% {
+    transform: skewX(-14deg) translateX(0.04em);
+  }
+  100% {
+    transform: skewX(0deg);
+  }
+}
 .lead {
   font: 500 clamp(17px, 1.4vw, 21px) / 1.5 var(--text);
   max-width: 640px;
