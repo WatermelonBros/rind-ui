@@ -19,7 +19,7 @@
     border-color 0.2s var(--s-ease);
 }
 [data-rind-theme="skin-juicy"] [data-scope="menu"][data-part="trigger"][data-context-menu] {
-  border: 2px dashed #c9bdf2;
+  border: 2px dashed #f3a7a2;
 }
 [data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu] small {
   font: 500 12px var(--s-font);

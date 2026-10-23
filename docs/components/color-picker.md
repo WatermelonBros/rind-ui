@@ -97,11 +97,11 @@ import { ColorPicker } from "@rind-ui/react"
 | `ColorPicker.Control` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
 | `ColorPicker.Trigger` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
 | `ColorPicker.Portal` | `children` | `ReactNode` | — | The content rendered into the portal host. |
-| `ColorPicker.Portal` | `container` | `Element \| ShadowRoot \| null \| undefined` | — | Where to render (default: resolved from the logical parent, then `body`). |
-| `ColorPicker.Portal` | `logicalParent` | `(() => Element \| null) \| undefined` | — | The element the content belongs to (its trigger): target resolution and dir/lang/theme. |
-| `ColorPicker.Portal` | `observe` | `boolean \| undefined` | `true` | Keeps the host's `dir`, `lang` and theme in step with the logical parent as they change; `false` copies them once. |
+| `ColorPicker.Portal` | `container` | `Element \| ShadowRoot \| null` | — | Where to render (default: resolved from the logical parent, then `body`). |
+| `ColorPicker.Portal` | `logicalParent` | `(() => Element \| null)` | — | The element the content belongs to (its trigger): target resolution and dir/lang/theme. |
+| `ColorPicker.Portal` | `observe` | `boolean` | `true` | Keeps the host's `dir`, `lang` and theme in step with the logical parent as they change; `false` copies them once. |
 | `ColorPicker.Portal` | `render` | `RenderProp` | — | Another element or a render function receiving the props, in place of the host `div`. |
-| `ColorPicker.Positioner` | `render` | `RenderProp<S>` | — | Another element or a render function receiving the props and the part's state. |
+| `ColorPicker.Positioner` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props and the part's state. |
 | `ColorPicker.Content` | `render` | `RenderProp<ColorPickerState>` | — | Another element or a render function receiving the props and the picker's state. |
 | `ColorPicker.Area` | `children` | `ReactNode` | — | The area's parts (Background, Thumb). |
 | `ColorPicker.Area` | `onValueChange` | `(color: Color, details: ColorChangeDetails<ColorAreaReason>) => void` | — | Each applied change, in the space of the colour you passed; not for a change that leaves the emitted colour as it is (hue at black). |
@@ -166,7 +166,7 @@ import { ColorPicker } from "@rind-ui/react"
 | `ColorPicker.SwatchTrigger` | `color` | `ColorInput` | — | The swatch's colour: a colour, or a string `parseColor` reads. |
 | `ColorPicker.SwatchTrigger` | `value` | `string` | — | The item's key (default the canonical `#RRGGBBAA`). |
 | `ColorPicker.SwatchTrigger` | `colorName` | `ColorNameProp` | — | A fixed name or a function replacing the computed colour name (the swatch's accessible name). |
-| `ColorPicker.SwatchIndicator` | `render` | `RenderProp<S>` | — | Another element or a render function receiving the props and the part's state. |
+| `ColorPicker.SwatchIndicator` | `render` | `RenderProp<RadioItemState>` | — | Another element or a render function receiving the props and the part's state. |
 | `ColorPicker.Swatch` | `color` | `ColorInput` | — | Default transparent black. |
 | `ColorPicker.Swatch` | `respectAlpha` | `boolean` | — | `false`: the opaque colour (default true). |
 | `ColorPicker.Swatch` | `colorName` | `ColorNameProp` | — | A fixed name (a design token) or a function replacing the computed name. |

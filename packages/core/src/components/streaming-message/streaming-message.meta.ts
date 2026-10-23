@@ -62,7 +62,7 @@ export const streamingMessageMeta = {
     },
     locale: { type: "string", description: "Default: the provider's locale (sentence splitting)." },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

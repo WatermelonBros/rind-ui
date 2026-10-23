@@ -50,7 +50,7 @@ export const toggleMeta = {
       description: "Disabled but focusable: `aria-disabled` instead of native `disabled`.",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
     "*.fallback": {

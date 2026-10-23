@@ -84,7 +84,7 @@ export const marqueeMeta = {
     },
     messages: { type: "Partial<MarqueeMessages>", description: "Overrides the trigger names." },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

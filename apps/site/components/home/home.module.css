@@ -43,6 +43,9 @@
 .lead code[data-landed] {
   animation: token-catch 0.6s var(--spring-pop);
 }
+.lead code[data-waiting] {
+  opacity: 0;
+}
 @keyframes token-catch {
   40% {
     scale: 1.35;
@@ -388,7 +391,7 @@
   white-space: pre;
 }
 :global([data-phase="juicy"]) .lookCode {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 /* the stage's own layout only: every component style comes from the generated skin.css */
 .lookCol {
@@ -432,7 +435,7 @@
   color: #e8e8e3;
 }
 :global([data-phase="juicy"]) .testCode {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 /* juicy draws no lines; the dark editor on the dark band needs an edge to be a panel */
 :global([data-phase="juicy"]) .testPanel {
@@ -704,7 +707,7 @@
 }
 /* a fixed window: the thread follows the stream at its foot, the page never jumps */
 .agentsThread {
-  block-size: min(560px, 70vh);
+  block-size: min(560px, calc(70 * var(--vh)));
   min-inline-size: 0;
 }
 .agentsThread [data-scope="streaming-message"][data-part="content"] {
@@ -714,6 +717,11 @@
   overflow-x: auto;
   mask-image: linear-gradient(90deg, #000 88%, transparent);
   font: 500 13px / 1.55 var(--mono);
+}
+.agentsThread [data-scope="streaming-message"][data-part="content"]:focus-visible {
+  outline: 3px solid var(--acc);
+  outline-offset: 2px;
+  mask-image: none;
 }
 @media (max-width: 900px) {
   .agents {
@@ -725,7 +733,7 @@
 /* ── wall: six live specimens, then the whole roadmap on demand ───────────────────────── */
 .specimens {
   list-style: none;
-  margin: 0 0 40px;
+  margin: 0 0 24px;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
@@ -812,6 +820,60 @@
 .specimenFoot code {
   font: 500 13px var(--mono);
   color: var(--bg);
+}
+/* wall-specimens.tsx: in use, a card says what a screen reader would and which keys work. The
+   keys are rind Kbd caps in the card's own skin, along the stage's foot */
+.specimenStage {
+  position: relative;
+}
+.specimenKeys {
+  position: absolute;
+  inset-inline: 12px;
+  /* along the top, by the skin's chip: the x-ray reading follows the pointer below a control */
+  inset-block-start: 10px;
+  justify-content: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  inline-size: auto;
+  font-size: 13px;
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.25s var(--spring),
+    translate 0.25s var(--spring);
+  pointer-events: none;
+}
+.specimenKeys[data-shown] {
+  opacity: 1;
+  translate: 0 0;
+}
+/* the reader's words replace the attribute while it speaks, typed out */
+.specimenFoot[data-speaking] code {
+  display: none;
+}
+.spoken {
+  flex-basis: 100%;
+  font: 500 13px var(--mono);
+  color: var(--bg);
+  quotes: "\201C" "\201D";
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: spoken-type 0.6s steps(28, end) both;
+}
+@keyframes spoken-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spoken {
+    animation: none;
+  }
 }
 .wallAll {
   margin-top: 8px;
@@ -1007,7 +1069,7 @@
 }
 @keyframes fall {
   to {
-    translate: 0 calc(100vh + 48px);
+    translate: 0 calc(calc(100 * var(--vh)) + 48px);
     rotate: calc(var(--r) + 220deg);
   }
 }
@@ -1107,7 +1169,7 @@
     .band[data-band]::before {
       animation: band-open linear both;
       animation-timeline: view();
-      animation-range: entry 0 entry 35vh;
+      animation-range: entry 0 entry calc(35 * var(--vh));
     }
   }
 }
@@ -1126,23 +1188,28 @@
   @media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
     .band[data-band]::before {
       animation-name: band-wave;
-      animation-range: entry 0 entry 55vh;
+      animation-range: entry 0 entry calc(55 * var(--vh));
     }
     :global([data-phase="crisp"]) .band[data-band]::before {
       animation-name: band-diamond;
     }
-    /* the band's title comes in as the wave reaches it, never light type on the page before it */
-    .band[data-band] h2 {
+    /* the band's copy comes in as the wave reaches it, never light type on the page before it */
+    .band[data-band] :is(h2, .lead) {
       animation: band-title linear both;
       animation-timeline: view();
-      animation-range: entry 0 entry 35vh;
+      animation-range: entry 0 entry calc(35 * var(--vh));
     }
   }
 }
+/* the title appears at once as the wave reaches it, never a long washed-out middle state */
 @keyframes band-title {
   0%,
-  50% {
+  69.9% {
     opacity: 0;
+  }
+  70%,
+  100% {
+    opacity: 1;
   }
 }
 @keyframes band-wave {
@@ -1178,29 +1245,35 @@
   color: #f5f5ee;
 }
 :global([data-phase="juicy"]) .band[data-band="ink"] {
-  --band: #2a1d5c;
+  --band: #103d2e;
 }
 .band[data-band="ink"] .kicker {
   background: #d4ff3a;
   color: #0b0b0c;
 }
 :global([data-phase="juicy"]) .band[data-band="ink"] .kicker {
-  background: #ff8fb1;
-  color: #2a1d5c;
+  background: #5cd690;
+  color: #103d2e;
 }
 .band[data-band="ink"] .testPanel {
   border-color: #f5f5ee;
   box-shadow: 8px 8px 0 #d4ff3a;
 }
 :global([data-phase="juicy"]) .band[data-band="ink"] .testPanel {
-  box-shadow: 0 10px 0 #ff8fb1;
+  box-shadow: 0 10px 0 #5cd690;
 }
 .band[data-band="ink"] .testStage {
   background: #d4ff3a;
   color: #0b0b0c;
 }
+/* crisp's own button is lime: on this lime stage it would vanish, so here it is drawn in ink */
+:global([data-phase="crisp"]) .band[data-band="ink"] .testStage button[data-scope="button"] {
+  background: #0b0b0c;
+  color: #d4ff3a;
+  border-color: #0b0b0c;
+}
 :global([data-phase="juicy"]) .band[data-band="ink"] .testStage {
-  background: #e9e2ff;
+  background: #ffd9d2;
 }
 
 @media (max-width: 900px) {
@@ -1251,7 +1324,7 @@
   display: flex;
   align-items: center;
   /* enough scroll for each claim to own the panel, no more: a longer run was empty paper */
-  min-block-size: 56vh;
+  min-block-size: calc(56 * var(--vh));
 }
 .proofs[data-staged] .claim {
   /* a tint, not opacity: the claims out of focus stay readable (over 4.5:1 on paper) */
@@ -1265,7 +1338,7 @@
   display: grid;
   position: sticky;
   /* the panel (about 300px tall) centred on the screen, level with the claim in the middle */
-  top: calc(50vh - 150px);
+  top: calc(calc(50 * var(--vh)) - 150px);
 }
 .proofs[data-staged] .proofSticky > .proofPanel {
   grid-area: 1 / 1;
@@ -1287,6 +1360,377 @@
   .section[aria-labelledby="look-title"] {
     position: relative;
     z-index: 2;
-    margin-top: -15vh;
+    margin-top: calc(-22 * var(--vh));
+  }
+}
+
+/* ── install (install.tsx): one core, a socket per framework, a terminal ──────────────────── */
+.rig {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 90px;
+  padding-block: 8px 24px;
+  perspective: 1200px;
+  --lean-x: 0;
+  --lean-y: 0;
+}
+.core {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  inline-size: 132px;
+  block-size: 132px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow:
+    0 0 0 10px color-mix(in oklab, var(--ink) 12%, transparent),
+    0 24px 60px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+/* the core's stem down to the bus the sockets hang from, live: rind's core is always running */
+.core::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  inline-size: 3px;
+  block-size: 46px;
+  margin-inline-start: -1.5px;
+  background: linear-gradient(to bottom, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
+  background-size: 100% 300%;
+  animation: cable 1.6s linear infinite reverse;
+}
+.core b {
+  font: 900 30px / 1 var(--display);
+  letter-spacing: -0.03em;
+}
+.core small {
+  font: 600 11px var(--mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.sockets {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--lean-y) * -10deg)) rotateY(calc(var(--lean-x) * 12deg));
+  transition: transform 0.4s var(--spring);
+}
+/* an arc under the core: the middle socket highest, the outer ones lower (five of them) */
+.socketSlot {
+  --drop: calc((var(--i) - 2) * (var(--i) - 2) * 14px);
+  position: relative;
+  translate: 0 var(--drop);
+}
+/* the bus: one line the sockets hang from, under the core's stem */
+.sockets::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -44px;
+  inset-inline: 52px;
+  block-size: 3px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    to right,
+    color-mix(in oklab, var(--ink) 25%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+/* the live stretch of the bus, from the core's stem to the released sockets on its left (React
+   first; install.tsx flags it) */
+.sockets[data-lit-left]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -44px;
+  inset-inline-start: 52px;
+  inline-size: calc(50% - 52px);
+  block-size: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
+  background-size: 300% 100%;
+  animation: bus 1.6s linear infinite;
+  box-shadow: 0 0 12px color-mix(in oklab, var(--acc) 70%, transparent);
+}
+@keyframes bus {
+  to {
+    background-position: 300% 0;
+  }
+}
+/* each socket's drop from the bus: live and pulsing for a released framework, a faint dash for
+   the rest */
+.socketSlot::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: 100%;
+  inline-size: 3px;
+  block-size: calc(44px + var(--drop));
+  margin-inline-start: -1.5px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    to top,
+    color-mix(in oklab, var(--ink) 25%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+.socketSlot[data-ready]::before {
+  background: linear-gradient(to top, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
+  background-size: 100% 300%;
+  animation: cable 1.6s linear infinite;
+  box-shadow: 0 0 12px color-mix(in oklab, var(--acc) 70%, transparent);
+}
+@keyframes cable {
+  to {
+    background-position: 0 -300%;
+  }
+}
+.socket {
+  position: relative;
+  display: inline-grid;
+  justify-items: center;
+  gap: 8px;
+  min-inline-size: 104px;
+  padding: 16px 14px 14px;
+  border: var(--bw) solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+  color: var(--ink);
+  font: 700 15px var(--text);
+  box-shadow: var(--shadow-sm);
+  transition:
+    translate 0.3s var(--spring-pop),
+    background 0.3s var(--spring),
+    box-shadow 0.3s var(--spring);
+}
+button.socket {
+  cursor: pointer;
+}
+button.socket:hover {
+  translate: 0 -4px;
+}
+button.socket[aria-pressed="true"] {
+  background: var(--acc);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 4px color-mix(in oklab, var(--acc) 35%, transparent);
+}
+button.socket:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+.socket[data-soon] {
+  opacity: 0.6;
+  cursor: help;
+  box-shadow: none;
+  border-style: dashed;
+}
+.socket small {
+  font: 600 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.glyph {
+  display: grid;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  font: 900 18px / 1 var(--display);
+}
+/* React's mark is a symbol, smaller in the face than a letter: it gets a larger size */
+.socketSlot:first-child .glyph {
+  font:
+    400 26px / 1 system-ui,
+    sans-serif;
+}
+/* a passed test's tick, landed from the tests above: it shows once one has */
+.socketMark {
+  position: absolute;
+  inset-block-start: -10px;
+  inset-inline-end: -10px;
+  display: grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 50%;
+  background: #2fbf71;
+  color: #fff;
+  font: 900 15px / 1 var(--text);
+  opacity: 0;
+  scale: 0.4;
+  transition:
+    opacity 0.2s,
+    scale 0.5s var(--spring-pop);
+}
+.socketMark[data-landed] {
+  opacity: 1;
+  scale: 1;
+}
+/* the terminal: the command types itself, Copy is rind's Clipboard */
+.terminal {
+  max-inline-size: 640px;
+  margin: 56px auto 0;
+  border-radius: var(--r);
+  background: #0b0b0c;
+  color: #f5f5ee;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.terminalBar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 16px;
+  border-block-end: 1px solid #ffffff1f;
+  font: 500 12px var(--mono);
+  color: #f5f5ee99;
+}
+.terminalBar i {
+  inline-size: 11px;
+  block-size: 11px;
+  border-radius: 50%;
+  background: #ffffff33;
+}
+.terminalBar span {
+  margin-inline-start: 8px;
+}
+.terminalLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 18px 22px 22px;
+}
+.command {
+  font: 500 17px var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+  animation: type-in 0.9s steps(26, end) both;
+}
+@keyframes type-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.prompt {
+  color: var(--acc);
+}
+.copy {
+  flex: none;
+  min-block-size: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--acc);
+  color: var(--ink);
+  font: 700 15px var(--text);
+  cursor: pointer;
+  transition: translate 0.2s var(--spring-pop);
+}
+.copy[data-hover] {
+  translate: 0 -2px;
+}
+.copy:focus-visible {
+  outline: 3px solid #f5f5ee;
+  outline-offset: 3px;
+}
+:global([data-phase="crisp"]) .terminal {
+  border: 3px solid #0b0b0c;
+}
+@media (max-width: 760px) {
+  .rig {
+    gap: 28px;
+  }
+  .core {
+    inline-size: 96px;
+    block-size: 96px;
+  }
+  .sockets {
+    flex-wrap: wrap;
+    gap: 10px;
+    transform: none;
+  }
+  .socketSlot {
+    translate: none;
+  }
+  .socketSlot::before,
+  .sockets::before,
+  .sockets::after,
+  .core::after {
+    display: none;
+  }
+  .socket {
+    min-inline-size: 92px;
+  }
+  .command {
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .command,
+  .socketSlot[data-ready]::before,
+  .core::after {
+    animation: none;
+  }
+}
+
+/* the wall closes the page's run: no band of empty ground under its last control (desktop) */
+@media (min-width: 761px) {
+  .section[aria-labelledby="wall-title"] {
+    padding-block-end: 40px;
+  }
+}
+
+/* install.tsx: a waiting socket shakes its head when pressed (two names, so a second press
+   restarts it), and the rig says how far along that framework is */
+.socket[data-asked="0"] {
+  animation: socket-no 0.5s var(--spring);
+}
+.socket[data-asked="1"] {
+  animation: socket-no-again 0.5s var(--spring);
+}
+@keyframes socket-no {
+  20%,
+  60% {
+    translate: -6px 0;
+  }
+  40%,
+  80% {
+    translate: 6px 0;
+  }
+}
+@keyframes socket-no-again {
+  20%,
+  60% {
+    translate: -6px 0;
+  }
+  40%,
+  80% {
+    translate: 6px 0;
+  }
+}
+.socketSays {
+  min-block-size: 1.5em;
+  margin: 12px 0 0;
+  text-align: center;
+  font: 600 14px var(--mono);
+}
+@media (prefers-reduced-motion: reduce) {
+  .socket[data-asked] {
+    animation: none;
   }
 }

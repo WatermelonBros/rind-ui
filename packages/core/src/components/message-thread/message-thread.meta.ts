@@ -75,7 +75,7 @@ export const messageThreadMeta = {
     messages: { type: "Partial<MessageThreadMessages>", description: "Overrides the names." },
     locale: { type: "string", description: "Default: the provider's locale." },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

@@ -117,7 +117,7 @@
   box-shadow: 4px 4px 0 var(--s-ink);
 }
 [data-rind-theme="skin-juicy"] [data-scope="toast"][data-part="root"] {
-  box-shadow: 0 6px 0 #c9bdf2;
+  box-shadow: 0 6px 0 #f3a7a2;
 }
 
 :is([data-skinned], [data-rind-theme^="skin-"])

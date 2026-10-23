@@ -2,6 +2,7 @@
 
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
 import {
   type HeroKind,
   heroKind,
@@ -73,7 +74,10 @@ export function Peel() {
       raf = 0
       const rect = el.getBoundingClientRect()
       const travel = rect.height - window.innerHeight
-      setProgress(clamp(-rect.top / (travel || 1)))
+      // a phone starts the acts while the scene is still rising into place: waiting for it to
+      // reach the top left most of the screen empty ground
+      const early = window.innerWidth <= 900 ? window.innerHeight * 0.48 : 0
+      setProgress(clamp((early - rect.top) / (travel || 1)))
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -121,7 +125,16 @@ export function Peel() {
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
   const dark = p2 * (1 - p3)
-  const vars = { "--p1": 1, "--p2": p2, "--p3": p3, "--dark": dark } as CSSProperties
+  // the scene's copy goes before the builder's title rises into its last stretch (desktop:
+  // peel.module.css), so the two display titles never overlap
+  const out = clamp((progress - 0.93) / 0.04)
+  const vars = {
+    "--p1": 1,
+    "--p2": p2,
+    "--p3": p3,
+    "--dark": dark,
+    "--out": out,
+  } as CSSProperties
   const machine = MACHINES[kind]
 
   return (
@@ -131,7 +144,7 @@ export function Peel() {
       <div className={styles.sticky} data-act={act + 1} data-ink={dark > 0.15 ? "" : undefined}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
-            {ACTS[act]?.title}
+            <Letters>{ACTS[act]?.title ?? ""}</Letters>
           </h2>
           <p className={styles.text}>{ACTS[act]?.text}</p>
         </div>
@@ -139,7 +152,7 @@ export function Peel() {
         <div className={styles.inkLayer} aria-hidden="true">
           <div className={styles.copy}>
             <p className={styles.title} key={act}>
-              {ACTS[act]?.title}
+              <Letters>{ACTS[act]?.title ?? ""}</Letters>
             </p>
             <p className={styles.text}>{ACTS[act]?.text}</p>
           </div>

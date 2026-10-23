@@ -1,12 +1,12 @@
 .peel {
   position: relative;
-  height: 220vh;
+  height: calc(220 * var(--vh));
   background: var(--paper);
 }
 .sticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
@@ -39,7 +39,7 @@
 
 .scene {
   position: relative;
-  height: 80vh;
+  height: calc(80 * var(--vh));
   display: grid;
   place-items: center;
 }
@@ -106,7 +106,8 @@
 .graph {
   position: absolute;
   top: 100%;
-  width: 420px;
+  /* grows with a wide screen, so the machine fills its scene instead of a corner of it */
+  width: clamp(420px, calc(34 * var(--vw)), 620px);
   margin-top: 30px;
   /* only once the ink disc has closed: its nodes never float on the dark */
   opacity: calc((var(--p3) - 0.88) * 8.4);
@@ -143,7 +144,7 @@
 @media (max-width: 900px) {
   /* a phone reads the two acts faster: less scroll with nothing new on screen */
   .peel {
-    height: 170vh;
+    height: calc(170 * var(--vh));
   }
   .sticky {
     grid-template-columns: 1fr;
@@ -270,7 +271,8 @@
   transition: opacity 0.3s;
 }
 .graph[data-left] .edge,
-.graph[data-left] .event {
+.graph[data-left] .event,
+.graph[data-left] [data-state-node] {
   opacity: 0;
 }
 
@@ -279,6 +281,11 @@
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .peel {
     z-index: 1;
-    margin-top: -18vh;
+    margin-top: calc(-18 * var(--vh));
+  }
+  /* the builder rises into this scene's last stretch (home.module.css): the copy is gone first */
+  .copy {
+    opacity: calc(1 - var(--out, 0));
+    translate: 0 calc(var(--out, 0) * -24px);
   }
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { zoom } from "../zoom"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -33,7 +34,8 @@ export function Outro() {
     const paint = () => {
       frame = 0
       const r = t.getBoundingClientRect()
-      f.style.clipPath = `circle(150px at ${x - r.left}px ${y - r.top}px)`
+      const z = zoom()
+      f.style.clipPath = `circle(150px at ${(x - r.left) / z}px ${(y - r.top) / z}px)`
     }
     const onMove = (e: PointerEvent) => {
       x = e.clientX

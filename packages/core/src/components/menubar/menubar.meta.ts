@@ -64,7 +64,7 @@ export const menubarMeta = {
       description: "`focus()` moves focus to the bar's tab stop (an application shortcut).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

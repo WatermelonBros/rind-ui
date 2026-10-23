@@ -250,7 +250,7 @@ export const menuMeta = {
       description: "On `Menu.Separator`: overrides the orientation (default: across the menu).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

@@ -12,9 +12,10 @@
 }
 .bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
   padding: 8px 10px;
   border-bottom: var(--bw) solid var(--line);
   font: 600 12px var(--mono);
@@ -77,6 +78,8 @@
 }
 .getCode {
   border: 2px solid var(--ink);
+  /* a pill on one line: on a narrow screen it moves under the views rather than wrap inside */
+  white-space: nowrap;
 }
 .getCode[data-hover] {
   translate: 0 -1px;
@@ -119,11 +122,17 @@
   min-width: min(100%, 340px);
   max-width: min(100%, 600px);
 }
+/* an example that is one button (a dialog's or a popover's trigger) sits in the middle of the
+   canvas's minimum width, not at its left edge */
+.canvas > button:only-child {
+  display: block;
+  margin-inline: auto;
+}
 .stage[data-view="crisp"] {
   background: #d4ff3a;
 }
 .stage[data-view="juicy"] {
-  background: #e9e2ff;
+  background: #ffd9d2;
 }
 /* parts: every rendered part gets a faint outline; the inspected one lights up with its name */
 .stage[data-view="parts"] {
@@ -196,7 +205,7 @@
   animation: open 0.45s var(--spring);
 }
 :global([data-phase="juicy"]) .code {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 @keyframes open {
   from {

@@ -348,11 +348,27 @@ export function extractParts(
             if (!node || !sym) continue
             const typeNode = "type" in node ? (node.type as typeof node | undefined) : undefined
             const symType = checker.getTypeOfSymbol(sym)
-            const typeText = typeNode
-              ? node.getSourceFile().text.slice(typeNode.pos, typeNode.end)
+            const written = typeNode
+              ? node.getSourceFile().text.slice(typeNode.pos, typeNode.end).trim()
               : symType
                 ? checker.typeToString(symType)
                 : "unknown"
+            // a type written against the part's own type parameter (`RenderProp<S>`) says nothing
+            // to a reader: the instantiated type does; a part with no state renders `RenderProp`
+            // the prop as this part instantiates it (its type parameters filled in), when the
+            // checker can say
+            const filled = checker.getTypeOfSymbol(prop) ?? symType
+            const typeText = (
+              /^RenderProp<undefined>$/.test(written)
+                ? "RenderProp"
+                : /<[A-Z]>/.test(written)
+                  ? (filled ? checker.typeToString(filled) : written)
+                      .replace(/ \| undefined$/, "")
+                      .replace(/^RenderProp<[A-Z]>$/, "RenderProp")
+                  : written
+            )
+              // optional is said by the table's default column, not by a trailing undefined
+              .replace(/ \| undefined$/, "")
             const tag = checker.getJsDocTagsOfSymbol(sym).find((t) => t.name === "default")
             const doc = splitDefault(
               checker

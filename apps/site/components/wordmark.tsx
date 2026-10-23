@@ -2,6 +2,7 @@
 
 import { type PointerEvent, useRef, useState } from "react"
 import styles from "./wordmark.module.css"
+import { zoom } from "./zoom"
 
 type Letter = "r" | "i" | "n" | "d"
 
@@ -37,7 +38,9 @@ export function Wordmark({ chips = true }: { chips?: boolean }) {
     if (!d || !el) return
     d.cx += (d.tx - d.cx) * 0.25
     d.cy += (d.ty - d.cy) * 0.25
-    el.style.translate = `${d.cx}px ${d.cy}px`
+    // pointer pixels, written into the zoomed page (zoom.ts)
+    const z = zoom()
+    el.style.translate = `${d.cx / z}px ${d.cy / z}px`
     d.raf = requestAnimationFrame(follow)
   }
   const grab = (e: PointerEvent<HTMLSpanElement>) => {

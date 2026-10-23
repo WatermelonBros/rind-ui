@@ -40,10 +40,10 @@
   font-weight: 600;
 }
 :global([data-phase="juicy"]) .xray {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 :global([data-phase="juicy"]) .name {
-  color: #ff8fb1;
+  color: #5cd690;
 }
 @media (pointer: coarse), (prefers-reduced-motion: reduce) {
   .xray {

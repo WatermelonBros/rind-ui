@@ -1,3 +1,5 @@
+import { zoom } from "../zoom"
+
 // A hand-off between two scenes of the landing: as one scene lets go, a few of its elements
 // travel, tied to the scroll, and land on elements of the next one, so the page reads as one
 // story instead of rooms. Desktop only, with motion allowed: on a phone or under reduced motion
@@ -24,6 +26,10 @@ export interface HandoffOptions {
   /** A margin to travel in (x in viewport pixels): out to it first, down it, and into the
    *  landing only at the end, along the landing's own line, so the trip never crosses copy. */
   readonly lane?: () => number
+  /** With a lane: a clear strip under the landing's own paragraph (y in viewport pixels). The
+   *  traveller crosses along it and rises into its landing from below, so it never crosses the
+   *  paragraph's copy: for a landing in running text whose last line ends short of it. */
+  readonly under?: () => number
   /** Where in the viewport (0 top, 1 bottom) the first landing's centre ends the trip: earlier
    *  than the middle when the next hand-off leaves from the same scene. */
   readonly endAt?: number
@@ -88,6 +94,8 @@ export function handoff(o: HandoffOptions): () => void {
         layer = document.createElement("div")
         layer.setAttribute("aria-hidden", "true")
         layer.style.cssText = "position:fixed;inset:0;z-index:45;pointer-events:none"
+        // unzoomed inside (zoom.ts), so the rects it is placed from are its own pixels
+        layer.style.zoom = String(1 / zoom())
         travellers = from.map((el, i) => {
           const node = o.make(el, i)
           node.style.position = "absolute"
@@ -101,6 +109,7 @@ export function handoff(o: HandoffOptions): () => void {
         document.body.appendChild(layer)
       }
       const lane = o.lane?.()
+      const under = o.under?.()
       travellers.forEach((node, i) => {
         const a = from[i]?.getBoundingClientRect()
         const b = to[i % to.length]?.getBoundingClientRect()
@@ -120,6 +129,14 @@ export function handoff(o: HandoffOptions): () => void {
         if (lane === undefined) {
           x = ax + (bx - ax) * ease(clamp((p - 0.35) / 0.65))
           y = ay + (by - ay) * ease(clamp(p * 1.4))
+        } else if (under !== undefined) {
+          // out to the margin, down it to the strip under the paragraph, along it, then up
+          const out = ease(clamp(p / 0.2))
+          const down = ease(clamp((p - 0.15) / 0.45))
+          const across = ease(clamp((p - 0.6) / 0.2))
+          const up = ease(clamp((p - 0.8) / 0.2))
+          x = ax + (lane - ax) * out + (bx - lane) * across
+          y = ay + (under - ay) * down + (by - under) * up
         } else {
           // out to the margin, down it, then in along the landing's line
           const out = ease(clamp(p / 0.2))
@@ -137,7 +154,7 @@ export function handoff(o: HandoffOptions): () => void {
         // whole on screen, however wide the traveller is next to its lane
         const half = (w * s) / 2
         // (only on the way: where it lands is where it lands)
-        if (p < 1) x = Math.min(window.innerWidth - half - 16, Math.max(half + 16, x))
+        if (p < 1) x = Math.min(window.innerWidth - half - 32, Math.max(half + 32, x))
         node.style.transform = `translate(${x - half}px, ${y - (h * s) / 2}px) scale(${s})`
         // it lifts off its start and melts into its landing, never a copy lying on either
         node.style.opacity = String(Math.min(1, ti / 0.12, (1 - ti) / (1 - ARRIVE)))

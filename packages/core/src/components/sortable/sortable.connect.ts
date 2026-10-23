@@ -20,10 +20,15 @@ export interface SortableConnectInput {
   readonly active: string | null
   readonly disabled: (key: string) => boolean
   readonly label: (key: string) => string
-  /** A pointer drag: the active item's offset and the indicator's position (px). */
+  /**
+   * A pointer drag: the active item's offset, the indicator's position, the drop index, and
+   * the room the active item takes along the axis (its size plus the gap), all in px.
+   */
   readonly drag: {
     readonly delta: { readonly x: number; readonly y: number }
     readonly indicator: number
+    readonly target?: number
+    readonly room?: number
   } | null
   readonly ids: { readonly instructions: string }
   readonly messages: SortableMessages
@@ -48,6 +53,21 @@ export function sortableConnect(input: SortableConnectInput) {
     item: (key: string): PartProps => {
       const active = input.active === key
       const dragging = active && input.state === "dragging" && input.drag !== null
+      // the others between the picked item's place and the drop index step aside by its room,
+      // so the gap it will drop into opens where it will land (a skin may transition it)
+      const from = input.active === null ? -1 : input.items.indexOf(input.active)
+      const at = input.items.indexOf(key)
+      const to = input.drag?.target ?? from
+      const room = input.drag?.room ?? 0
+      const shift =
+        input.state !== "dragging" || active || from < 0 || room === 0
+          ? 0
+          : from < to && at > from && at <= to
+            ? -room
+            : from > to && at >= to && at < from
+              ? room
+              : 0
+      const horizontal = input.orientation === "horizontal"
       return {
         ...part("item"),
         ...shared,
@@ -56,6 +76,7 @@ export function sortableConnect(input: SortableConnectInput) {
         "data-active": dataFlag(active),
         "data-dragging": dataFlag(dragging),
         "data-disabled": dataFlag(input.disabled(key)),
+        "data-shifted": dataFlag(shift !== 0),
         ...(dragging && input.drag
           ? {
               style: {
@@ -66,7 +87,16 @@ export function sortableConnect(input: SortableConnectInput) {
                 zIndex: "1",
               },
             }
-          : {}),
+          : input.state === "dragging" && !active
+            ? {
+                style: {
+                  "--rind-sortable-shift": `${shift}px`,
+                  transform: horizontal
+                    ? "translateX(var(--rind-sortable-shift))"
+                    : "translateY(var(--rind-sortable-shift))",
+                },
+              }
+            : {}),
       }
     },
     handle: (key: string, focus: SortableFocus = NONE): PartProps => ({

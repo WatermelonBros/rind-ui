@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { zoom } from "../zoom"
 import styles from "./xray.module.css"
 
 /** The attributes worth showing: rind's state and the ARIA it keeps in sync. */
@@ -51,11 +52,13 @@ export function XRay() {
       const el = box.current
       if (el) {
         // beside the pointer, flipped to the other side near the viewport's right or bottom edge
-        const w = el.offsetWidth
-        const h = el.offsetHeight
+        // measured and placed in viewport pixels, written back in the zoomed page's (zoom.ts)
+        const z = zoom()
+        const w = el.offsetWidth * z
+        const h = el.offsetHeight * z
         const left = shownX + 18 + w > innerWidth - 8 ? shownX - 18 - w : shownX + 18
         const top = shownY + 20 + h > innerHeight - 8 ? shownY - 12 - h : shownY + 20
-        el.style.translate = `${left}px ${top}px`
+        el.style.translate = `${left / z}px ${top / z}px`
       }
       frame = Math.abs(x - shownX) + Math.abs(y - shownY) > 0.5 ? requestAnimationFrame(follow) : 0
     }
@@ -80,9 +83,16 @@ export function XRay() {
       target = null
       setReading(null)
     }
+    // a wheel scroll moves the page under a still pointer: the reading would hang over whatever
+    // slid beneath it, so it goes until the pointer moves again
+    const onScroll = () => {
+      if (target) onLeave()
+    }
     document.addEventListener("pointermove", onMove, { passive: true })
     document.documentElement.addEventListener("pointerleave", onLeave)
+    window.addEventListener("scroll", onScroll, { passive: true })
     return () => {
+      window.removeEventListener("scroll", onScroll)
       document.removeEventListener("pointermove", onMove)
       document.documentElement.removeEventListener("pointerleave", onLeave)
       watch.disconnect()

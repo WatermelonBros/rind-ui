@@ -9,6 +9,7 @@ import {
   autoUpdate,
   computePosition,
   type Placement as FloatingPlacement,
+  platform,
   type ReferenceElement,
 } from "@floating-ui/dom"
 import type { DomEnv, SchedulerEnv } from "../../env/capabilities"
@@ -19,6 +20,21 @@ import type {
   Positioning,
   PositionRequest,
 } from "../../env/position"
+import { cssZoom } from "../css-zoom"
+
+// Floating UI sizes the floating element (and the arrow) by its layout box, which CSS zoom does
+// not scale, but measures the anchor in viewport pixels: in a zoomed page the two disagree and a
+// popup above its anchor overlaps it. The layout size times the element's zoom is its viewport
+// size, the same unit as everything else (css-zoom.ts).
+const zoomed: typeof platform = {
+  ...platform,
+  getDimensions: async (el) => {
+    const d = await platform.getDimensions(el)
+    const z = cssZoom(el)
+    return z === 1 ? d : { width: d.width * z, height: d.height * z }
+  },
+}
+
 import { getLayerStack } from "../layer-stack"
 import { middlewareFor, type SizeReport, splitPlacement, transformOrigin } from "./middleware"
 import { paddingOf, physicalSide, placementOf, snap } from "./options"
@@ -173,6 +189,7 @@ export function domPositioning(env: DomEnv & SchedulerEnv): Positioning {
         result = await computePosition(ref, floating, {
           placement: lock ?? placementOf(side, o.align),
           strategy,
+          platform: zoomed,
           middleware: middlewareFor(
             o,
             side,
@@ -200,26 +217,30 @@ export function domPositioning(env: DomEnv & SchedulerEnv): Positioning {
       if (r.anchor.kind === "element" && anchorElement(r.anchor) !== anchorEl) return
       const view = floating.ownerDocument.defaultView
       const dpr = view?.devicePixelRatio ?? 1
+      // Floating UI measures in viewport pixels; lengths written for the floating element are
+      // multiplied by its CSS zoom, so they are divided by it first (css-zoom.ts).
+      const zoom = cssZoom(floating)
+      const u = (n: number) => n / zoom
       write ??= writer(floating)
       write("--rind-position", strategy)
       // For tests (the layout invariant): the effective padding, and which element anchors it.
       const pad = paddingOf(o.collisionPadding)
       write("--rind-collision-padding", `${pad.top}px ${pad.right}px ${pad.bottom}px ${pad.left}px`)
       write("--rind-anchor-id", r.anchor.kind === "element" ? r.anchor.id : "")
-      write("--rind-x", `${snap(result.x, dpr)}px`)
-      write("--rind-y", `${snap(result.y, dpr)}px`)
+      write("--rind-x", `${snap(u(result.x), dpr)}px`)
+      write("--rind-y", `${snap(u(result.y), dpr)}px`)
       const s = sized.current
       if (s) {
-        write("--rind-available-width", `${Math.max(0, s.availableWidth)}px`)
-        write("--rind-available-height", `${Math.max(0, s.availableHeight)}px`)
-        write("--rind-anchor-width", `${snap(s.anchorWidth, dpr)}px`)
-        write("--rind-anchor-height", `${snap(s.anchorHeight, dpr)}px`)
+        write("--rind-available-width", `${u(Math.max(0, s.availableWidth))}px`)
+        write("--rind-available-height", `${u(Math.max(0, s.availableHeight))}px`)
+        write("--rind-anchor-width", `${snap(u(s.anchorWidth), dpr)}px`)
+        write("--rind-anchor-height", `${snap(u(s.anchorHeight), dpr)}px`)
       }
       const placed = splitPlacement(result.placement)
       const arrowData = result.middlewareData.arrow
       if (arrowEl && arrowData) {
-        write("--rind-arrow-x", arrowData.x == null ? "" : `${snap(arrowData.x, dpr)}px`)
-        write("--rind-arrow-y", arrowData.y == null ? "" : `${snap(arrowData.y, dpr)}px`)
+        write("--rind-arrow-x", arrowData.x == null ? "" : `${snap(u(arrowData.x), dpr)}px`)
+        write("--rind-arrow-y", arrowData.y == null ? "" : `${snap(u(arrowData.y), dpr)}px`)
         // The arrow cannot point at the anchor's centre within the padding.
         arrowEl.toggleAttribute("data-uncentered", (arrowData.centerOffset ?? 0) !== 0)
       }
@@ -229,12 +250,22 @@ export function domPositioning(env: DomEnv & SchedulerEnv): Positioning {
         transformOrigin({
           ...placed,
           rtl: dir === "rtl",
-          floating: { x: result.x, y: result.y, width: floatRect.width, height: floatRect.height },
+          floating: {
+            x: u(result.x),
+            y: u(result.y),
+            width: u(floatRect.width),
+            height: u(floatRect.height),
+          },
           arrow:
             arrowEl && arrowRect && arrowData
-              ? { x: arrowData.x, y: arrowData.y, width: arrowRect.width, height: arrowRect.height }
+              ? {
+                  x: arrowData.x == null ? arrowData.x : u(arrowData.x),
+                  y: arrowData.y == null ? arrowData.y : u(arrowData.y),
+                  width: u(arrowRect.width),
+                  height: u(arrowRect.height),
+                }
               : undefined,
-          point: r.anchor.kind === "point" ? { x: r.anchor.x, y: r.anchor.y } : undefined,
+          point: r.anchor.kind === "point" ? { x: u(r.anchor.x), y: u(r.anchor.y) } : undefined,
         }),
       )
       const hidden =

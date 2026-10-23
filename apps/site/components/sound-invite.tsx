@@ -4,9 +4,10 @@ import { Button } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
 import { useSound } from "./sound"
 import styles from "./sound.module.css"
+import { zoom } from "./zoom"
 
-const SHOW_AFTER_MS = 900
-const LEAVE_AFTER_MS = 9000
+const SHOW_AFTER_MS = 1600
+const LEAVE_AFTER_MS = 5000
 
 /**
  * The landing asks once, as the intro ends: this page has sound. The question hangs under the
@@ -48,7 +49,7 @@ export function SoundInvite() {
     }
     // scrolled away from: it just goes, at once, rather than fold across the moving page
     if (quick) {
-      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" }).onfinish =
+      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 90, fill: "forwards" }).onfinish =
         handOver
       return
     }
@@ -87,9 +88,10 @@ export function SoundInvite() {
       const el = box.current
       const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
       if (!el || !to) return
-      el.style.setProperty("--invite-top", `${to.bottom + 14}px`)
-      el.style.setProperty("--invite-end", `${Math.max(16, window.innerWidth - to.right)}px`)
-      el.style.setProperty("--invite-point", `${to.width / 2}px`)
+      const z = zoom()
+      el.style.setProperty("--invite-top", `${(to.bottom + 14) / z}px`)
+      el.style.setProperty("--invite-end", `${Math.max(16, window.innerWidth - to.right) / z}px`)
+      el.style.setProperty("--invite-point", `${to.width / 2 / z}px`)
     }
     place()
     window.addEventListener("resize", place)
@@ -101,12 +103,16 @@ export function SoundInvite() {
     if (!open) return
     const timer = window.setTimeout(() => leave(null), LEAVE_AFTER_MS)
     const onScroll = () => {
-      if (window.scrollY > 120) leave(null, true)
+      // at once, before the wordmark scrolls up under it
+      if (window.scrollY > 24) leave(null, true)
     }
+    const onMenu = () => leave(null, true)
     window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("rind:menu-open", onMenu)
     return () => {
       clearTimeout(timer)
       window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("rind:menu-open", onMenu)
     }
   }, [open])
 

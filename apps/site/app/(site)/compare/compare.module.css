@@ -45,6 +45,40 @@
 .prose td:first-child {
   white-space: nowrap;
 }
+/* on a phone the table scrolls sideways: the names stay put, and a shadow at the edge says
+   there is more (it shows only while there is more, the classic local/scroll backgrounds) */
+@media (max-width: 760px) {
+  /* separate borders: with collapsed ones a sticky cell's background leaves its edge
+     uncovered, and the cells scrolling under it showed through */
+  .prose table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .prose table {
+    background:
+      linear-gradient(to left, var(--card) 40%, transparent) right / 40px 100% no-repeat local,
+      radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 0.18), transparent) right / 16px 100%
+      no-repeat scroll,
+      var(--card);
+  }
+  .prose th:first-child,
+  .prose td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    /* narrow, so the columns that scroll get the screen; a long name wraps */
+    width: 110px;
+    min-width: 110px;
+    white-space: normal;
+    background: var(--card);
+    border-right: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+    /* the cells scrolling under it fall into a soft shadow, never a hard cut through glyphs */
+    box-shadow: 8px 0 10px -6px rgb(0 0 0 / 0.18);
+  }
+  .prose tbody tr:first-child td:first-child {
+    background: color-mix(in oklab, var(--acc) 14%, var(--card));
+  }
+}
 .prose th {
   font: 600 13px var(--mono);
 }
@@ -141,4 +175,157 @@
   border-radius: 99px;
   background: color-mix(in oklab, var(--acc) 28%, var(--card));
   color: var(--ink);
+}
+
+/* page.tsx: the libraries compared, as chips (the landing's attribute chips) */
+.libs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.libs li {
+  font: 600 13px var(--mono);
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 2px solid color-mix(in oklab, var(--ink) 25%, transparent);
+  color: var(--ink);
+  animation: lib-in 0.45s var(--spring-pop) calc(var(--i) * 50ms) both;
+}
+.libs li[data-own] {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--ink);
+}
+@keyframes lib-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .libs li {
+    animation: none;
+  }
+}
+.libs a {
+  color: inherit;
+  text-decoration: none;
+}
+.libs li:hover {
+  translate: 0 -2px;
+}
+/* a library's row, reached from its chip: clears the sticky bar and lights up a moment */
+.page tr[id] {
+  scroll-margin-top: 120px;
+}
+.page tr[id]:target td {
+  animation: row-lit 1.6s ease-out;
+}
+@keyframes row-lit {
+  from {
+    background: color-mix(in oklab, var(--acc) 45%, transparent);
+  }
+}
+
+/* page.tsx: the table as a picture, bars growing in one after another */
+.board {
+  display: grid;
+  gap: 8px;
+  margin: 40px 0 48px;
+  font: 600 13px var(--mono);
+}
+.boardHead,
+.bar {
+  display: grid;
+  grid-template-columns: minmax(120px, 190px) 1fr repeat(3, 64px);
+  align-items: center;
+  gap: 12px;
+}
+.boardHead {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.boardHead span:nth-child(n + 3) {
+  text-align: center;
+}
+.track {
+  position: relative;
+  block-size: 22px;
+  border-radius: 99px;
+  /* the planned part, ghosted, past the ready one */
+  background: linear-gradient(
+    to right,
+    transparent calc(var(--ready) * 100%),
+    color-mix(in oklab, var(--ink) 12%, transparent) calc(var(--ready) * 100%)
+      calc((var(--ready) + var(--planned)) * 100%),
+    transparent 0
+  );
+}
+.track i {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: calc(var(--ready) * 100%);
+  border-radius: 99px;
+  background: color-mix(in oklab, var(--ink) 30%, transparent);
+  transform-origin: left;
+  animation: bar-grow 0.9s var(--spring-pop) calc(0.3s + var(--i) * 70ms) both;
+}
+.bar[data-own] .track i {
+  background: var(--acc);
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.track b {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--ready) * 100% + 8px);
+  display: flex;
+  align-items: center;
+}
+.bar[data-own] {
+  font-weight: 800;
+}
+.mark {
+  justify-self: center;
+  inline-size: 14px;
+  block-size: 14px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--ink) 30%, transparent);
+}
+.mark[data-on] {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.bar[data-own] .mark[data-on] {
+  background: var(--acc);
+  box-shadow: 0 0 0 2px var(--ink);
+  border-color: transparent;
+}
+@keyframes bar-grow {
+  from {
+    scale: 0 1;
+  }
+}
+@media (max-width: 760px) {
+  .boardHead,
+  .bar {
+    grid-template-columns: 96px 1fr repeat(3, 28px);
+    gap: 6px;
+    font-size: 11px;
+  }
+  .boardHead span:nth-child(n + 3) {
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    justify-self: center;
+    font-size: 9px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .track i {
+    animation: none;
+  }
 }

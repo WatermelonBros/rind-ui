@@ -62,7 +62,7 @@ import { CodeBlock } from "@rind-ui/react"
 | `CodeBlock.Root` | `copyFeedbackDuration` | `number` | `2000` | How long `copied` / `error` last (ms). |
 | `CodeBlock.Root` | `onCopy` | `({ ok, error? }) => void` | — | The copy's result, after the write settled. |
 | `CodeBlock.Root` | `messages` | `Partial<CodeBlockMessages>` | — | Overrides the strings (also through the provider). |
-| `CodeBlock.Root` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element without changing behaviour. |
+| `CodeBlock.Root` | `render` | `RenderProp` | — | Substitutes the rendered element without changing behaviour. |
 | `CodeBlock.Root` | `locale` | `string` | — | Default: the provider's locale (the announcement's language). |
 | `CodeBlock.Header` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |
 | `CodeBlock.Title` | `render` | `RenderProp<CodeBlockRenderState>` | — | Another element or a render function receiving the props and the part's state. |

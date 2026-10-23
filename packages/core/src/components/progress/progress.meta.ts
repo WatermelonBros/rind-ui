@@ -88,7 +88,7 @@ export const progressMeta = {
       description: "Overrides the English defaults (also through the provider).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element.",
     },
   },

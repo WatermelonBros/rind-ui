@@ -3,6 +3,7 @@
 import { ToggleGroup } from "@rind-ui/react"
 import { useEffect, useRef, useState } from "react"
 import { useSound } from "../sound"
+import { zoom } from "../zoom"
 import { buildBuffer, type Item, itemFor, itemIndexOf } from "./sr/buffer"
 import { type Move, type Reader, speakItem, speakMove, states } from "./sr/speech"
 import styles from "./sr-view.module.css"
@@ -429,11 +430,12 @@ export function ScreenReaderView() {
         <span
           className={styles.cursor}
           aria-hidden="true"
+          // the read element's rect, in the zoomed page's pixels (zoom.ts)
           style={{
-            top: box.top - 4,
-            left: box.left - 4,
-            width: box.width + 8,
-            height: box.height + 8,
+            top: (box.top - 4) / zoom(),
+            left: (box.left - 4) / zoom(),
+            width: (box.width + 8) / zoom(),
+            height: (box.height + 8) / zoom(),
           }}
         />
       ) : null}

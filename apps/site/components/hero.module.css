@@ -1,7 +1,7 @@
-/* desktop: 80vh of scroll during which the hero stays put and the skin peels (skin-scene.tsx) */
+/* desktop: calc(80 * var(--vh)) of scroll during which the hero stays put and the skin peels (skin-scene.tsx) */
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .run {
-    height: 180svh;
+    height: calc(180 * var(--svh));
   }
   /* .run > .hero: over the plain .hero rule below, which sets position: relative */
   .run > .hero {
@@ -11,7 +11,7 @@
 }
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: calc(100 * var(--svh));
   display: grid;
   grid-template-columns: 1.25fr 1fr;
   align-items: center;
@@ -150,13 +150,13 @@
   color: var(--ink);
   box-shadow:
     0 6px 0 var(--acc-deep),
-    0 14px 24px #e0608a40;
+    0 14px 24px #2e9e6640;
 }
 :global([data-phase="juicy"]) .primary:hover {
   translate: 0 -2px;
   box-shadow:
     0 8px 0 var(--acc-deep),
-    0 18px 28px #e0608a40;
+    0 18px 28px #2e9e6640;
 }
 :global([data-phase="juicy"]) .primary:active {
   translate: 0 4px;
@@ -171,5 +171,16 @@
   .hero {
     grid-template-columns: 1fr;
     padding: 96px 20px 64px;
+  }
+}
+/* the sound question hangs under the bar (sound-invite.tsx): the wordmark starts below it, so
+   the first frame on a phone is never the brand cut by it */
+@media (max-width: 760px) {
+  .hero {
+    padding-top: 156px;
+  }
+  /* tighter, so the object and its label are on the first screen too */
+  .copy {
+    gap: 16px;
   }
 }

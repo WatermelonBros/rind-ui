@@ -6,6 +6,7 @@
 // their transitions.
 
 import type { Modality } from "../../contract/env"
+import { cssZoom } from "../../dom/css-zoom"
 import type { DismissRequest } from "../../dom/dismiss"
 import { focusSafely } from "../../dom/focus-safely"
 import {
@@ -784,14 +785,19 @@ export const tourMachine = /* @__PURE__ */ setup({
       let markerWaits = 3
       const paint = () => {
         paintQueued = false
+        // all in the backdrop's own pixels: rects and the visual viewport are viewport pixels,
+        // which a zoomed page multiplies again when they are written (css-zoom.ts)
+        const z = cssZoom(byId(ids.backdrop) ?? doc.documentElement)
+        const own = (r: DOMRect) => new DOMRect(r.x / z, r.y / z, r.width / z, r.height / z)
         const vv = view?.visualViewport
         const viewport = {
-          width: vv?.width ?? doc.documentElement.clientWidth,
-          height: vv?.height ?? doc.documentElement.clientHeight,
+          width: vv ? vv.width / z : doc.documentElement.clientWidth,
+          height: vv ? vv.height / z : doc.documentElement.clientHeight,
         }
         const t =
-          current && isRendered(current) ? rectOf(current.getBoundingClientRect()) : undefined
-        const card = cardCutout ? byId(ids.content)?.getBoundingClientRect() : undefined
+          current && isRendered(current) ? rectOf(own(current.getBoundingClientRect())) : undefined
+        const shown = cardCutout ? byId(ids.content)?.getBoundingClientRect() : undefined
+        const card = shown ? own(shown) : undefined
         const cutouts = cutoutsFor({
           target: centered ? undefined : t,
           content: card ? rectOf(card) : undefined,

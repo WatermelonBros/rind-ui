@@ -164,7 +164,7 @@ export const codeBlockMeta = {
       description: "Overrides the strings (also through the provider).",
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

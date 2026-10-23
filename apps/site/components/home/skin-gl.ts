@@ -5,6 +5,7 @@
 // as contour lines of its distance field. One fragment shader raymarches the scene.
 // Decorative only: the real component sits under it (skin-scene.tsx).
 import { Mesh, Program, Renderer, Triangle } from "ogl"
+import { zoom } from "../zoom"
 
 const VERTEX = /* glsl */ `#version 300 es
 in vec2 position;
@@ -62,9 +63,10 @@ float sdSegment(vec2 p, vec2 a, vec2 b) {
   vec2 pa = p - a, ba = b - a;
   return length(pa - ba * clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0));
 }
-// a stroke from a to b drawn up to fraction f (0 hides it)
+// a stroke from a to b drawn up to fraction f (0 hides it; so does a sliver: the state's spring
+// settles a hair above 0, and a stroke that short drew a stray dot on an unchecked box)
 float stroke(vec2 p, vec2 a, vec2 b, float f) {
-  return f <= 0.0 ? 1e3 : sdSegment(p, a, mix(a, b, clamp(f, 0.0, 1.0)));
+  return f <= 0.04 ? 1e3 : sdSegment(p, a, mix(a, b, clamp(f, 0.0, 1.0)));
 }
 
 // crisp is a solid slab with rounded edges (the bevel is what catches the cel bands), juicy a
@@ -323,8 +325,8 @@ export interface SkinHandle {
   readonly setChecked: (checked: boolean) => void
   /** Follows the real Button: held down or not. */
   readonly setPress: (pressed: boolean) => void
-  /** 0 skin on, 1 skin off. */
-  readonly setPeel: (peel: number) => void
+  /** 0 skin on, 1 skin off; `now` skips the easing (an object in flight is never half-peeled). */
+  readonly setPeel: (peel: number, now?: boolean) => void
   /** The page scrolled: draw again if the component was off screen. */
   readonly wake: () => void
   /** How much it wears the builder's skin (0 to 1), in the builder's two colours (hex). */
@@ -406,8 +408,9 @@ export function mountSkin(
   // so it can travel from one place on the page to another
   let present = true
   const place = () => {
-    const dpr = renderer.dpr
     const s = canvas.getBoundingClientRect()
+    // canvas pixels per viewport pixel: the device ratio, over the page's zoom (zoom.ts)
+    const dpr = gl.canvas.width / Math.max(1, s.width)
     const a = rectAt()
     u.uAlpha.value = alphaAt()
     present = Boolean(a && a.bottom > -a.height && a.top < s.height + a.height)
@@ -422,7 +425,9 @@ export function mountSkin(
   // the canvas covers the viewport: size it from the window (setSize writes its CSS size inline,
   // so measuring the element would freeze it at whatever it measured first)
   const resize = () => {
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    // in the zoomed page's own pixels, so it still covers the viewport exactly (zoom.ts)
+    const z = zoom()
+    renderer.setSize(window.innerWidth / z, window.innerHeight / z)
     u.uRes.value = [gl.canvas.width, gl.canvas.height]
     place()
   }
@@ -546,8 +551,12 @@ export function mountSkin(
     wake: () => {
       if (asleep) loop()
     },
-    setPeel: (value) => {
+    setPeel: (value, now) => {
       peelGoal = Math.min(1, Math.max(0, value))
+      if (now) {
+        peel = peelGoal
+        u.uPeel.value = peel
+      }
       loop()
     },
     dispose: () => {

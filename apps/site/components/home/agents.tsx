@@ -174,7 +174,8 @@ export function Agents() {
               </MessageThread.Message>
               <MessageThread.Message index={1} from="assistant">
                 <StreamingMessage.Root text={text} status={status} announce="none">
-                  <StreamingMessage.Content />
+                  {/* a long line scrolls inside the bubble: reachable by keyboard to scroll it */}
+                  <StreamingMessage.Content tabIndex={0} />
                   <StreamingMessage.Caret />
                 </StreamingMessage.Root>
               </MessageThread.Message>

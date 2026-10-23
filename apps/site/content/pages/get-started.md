@@ -22,9 +22,7 @@ You install the framework package. Everything else is optional.
 
 ## Install
 
-```sh
-pnpm add @rind-ui/react
-```
+{{install}}
 
 `@rind-ui/core` comes with it as a dependency. React 19 or newer is required.
 
@@ -125,13 +123,7 @@ render, CSS custom properties, messages, and each driver's actions and queries.
 
 rind's behaviour lives in `@rind-ui/core`, which has no framework in it. A framework package only wires parts, refs and props, so each one gets the same behaviour, accessibility and drivers.
 
-| Framework | Package | Status |
-|---|---|---|
-| React | `@rind-ui/react` | Available |
-| Vue | `@rind-ui/vue` | Planned |
-| Svelte | `@rind-ui/svelte` | Planned |
-| Solid | `@rind-ui/solid` | Planned |
-| Angular | `@rind-ui/angular` | Planned |
+{{frameworks}}
 
 ## Using rind with an AI assistant
 

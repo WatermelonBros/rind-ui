@@ -164,8 +164,9 @@
 
 /* juicy: goo + puffy depth, letters wobble out of phase, drips fall and rejoin */
 :global([data-phase="juicy"]) .word {
-  filter: url(#goo) drop-shadow(0 0.03em 0 #e0608a) drop-shadow(0 0.08em 0.07em #5a3db033);
-  color: var(--acc);
+  filter: url(#goo) drop-shadow(0 0.03em 0 #c22a49) drop-shadow(0 0.08em 0.07em #8c223833);
+  /* the flesh of the watermelon: the wordmark is its red, the rest of juicy its rind's green */
+  color: #ff5d78;
 }
 :global([data-phase="juicy"]) .chip {
   opacity: 0;
@@ -232,6 +233,19 @@
   }
 }
 
+/* on a phone the goo melted the letters into one blob: there juicy keeps its colour and depth
+   and drops the filter that merges them */
+@media (max-width: 760px) {
+  :global([data-phase="juicy"]) .word {
+    filter: drop-shadow(0 0.03em 0 #c22a49) drop-shadow(0 0.08em 0.07em #8c223833);
+  }
+  /* the drips join their letter only through the goo, which also swallowed the n's ring */
+  .drop,
+  :global([data-phase="juicy"]) .l[data-letter="n"]::after {
+    display: none;
+  }
+}
+
 /* on a phone the state chips would collide under the letters; the letters still play */
 /* below the two-column hero the letters are too narrow for their chips: they would collide */
 @media (max-width: 960px) {
@@ -240,14 +254,24 @@
   }
 }
 
-/* the hero's skin is off (skin-scene.tsx sets data-bare): the wordmark loses its look too.
-   Plain grey letters, no shadows, rings or drips; the behaviour chips stay */
+/* the hero's skin is off (skin-scene.tsx sets data-bare): the wordmark loses its look too, down
+   to its skeleton: outlines in ink, no fill, shadows, rings or drips (a flat grey read as a
+   faded logo, not a bare one); the behaviour chips stay. The outline is drawn around each
+   letter's whole shape (four hard shadows on a ground-coloured fill), so the font's overlapping
+   contours never show as seams the way a text stroke would draw them */
+:global([data-bare]) .word {
+  filter: drop-shadow(0.012em 0 0 var(--ink)) drop-shadow(-0.012em 0 0 var(--ink))
+    drop-shadow(0 0.012em 0 var(--ink)) drop-shadow(0 -0.012em 0 var(--ink));
+}
 :global([data-bare]) .l {
-  color: #8e8e93;
+  color: var(--bg);
   animation: none;
   text-shadow: none;
   translate: none;
   scale: none;
+}
+:global([data-bare]) .l::after {
+  display: none;
 }
 :global([data-bare]) .l::after,
 :global([data-bare]) .drop {

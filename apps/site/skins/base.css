@@ -33,22 +33,22 @@
 }
 [data-skin="juicy"],
 [data-rind-theme="skin-juicy"] {
-  --s-bg: #e9e2ff;
-  --s-ink: #2a1d5c;
-  --s-acc: #ff8fb1;
-  --s-acc-deep: #e0608a;
+  --s-bg: #ffd9d2;
+  --s-ink: #103d2e;
+  --s-acc: #5cd690;
+  --s-acc-deep: #2e9e66;
   --s-on: #ffffff;
   --s-card: #ffffff;
-  --s-muted: #f1ecff;
+  --s-muted: #ffeae4;
   --s-line: transparent;
   /* control and field edges: 3:1 against the lavender (WCAG 1.4.11) */
-  --s-field-line: #7a68cf;
+  --s-field-line: #2f7d5b;
   --s-bw: 0px;
   --s-r: 22px;
   --s-r-sm: 14px;
-  --s-lift: 0 5px 0 #c9bdf2;
-  --s-lift-hi: 0 7px 0 #c9bdf2;
-  --s-lift-lo: 0 2px 0 #c9bdf2;
+  --s-lift: 0 5px 0 #f3a7a2;
+  --s-lift-hi: 0 7px 0 #f3a7a2;
+  --s-lift-lo: 0 2px 0 #f3a7a2;
   --s-font: var(--font-fredoka), system-ui, sans-serif;
   --s-ok: #6fcfa5;
   --s-error: #b0174f;

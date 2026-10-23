@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples, heroName } from "@/examples"
 import styles from "./example-frame.module.css"
 import { usePhase } from "./phase"
+import { zoom } from "./zoom"
 
 type Skin = "crisp" | "juicy" | "bare" | "parts"
 
@@ -146,13 +147,15 @@ export function ExampleFrame({
     if (!inspect) return
     const [scope, part] = inspect.split(" · ")
     const box = root.getBoundingClientRect()
+    const z = zoom()
     const at: { x: number; y: number }[] = []
     for (const el of anatomy(root)) {
       if (el.dataset["scope"] !== scope || el.dataset["part"] !== part) continue
       el.dataset["anatomyOn"] = ""
       const r = el.getBoundingClientRect()
-      const x = r.left - box.left
-      const y = r.top - box.top
+      // in the stage's own (zoomed) pixels (zoom.ts)
+      const x = (r.left - box.left) / z
+      const y = (r.top - box.top) / z
       // two matching parts at the same origin (a part inside another) share one label
       if (!at.some((t) => t.x === x && t.y === y)) at.push({ x, y })
     }

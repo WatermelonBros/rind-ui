@@ -79,7 +79,7 @@ export const contextMenuMeta = {
       description: "Programmatic open at viewport coordinates, and close.",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "On the region: substitutes the rendered element without changing behaviour.",
     },
   },

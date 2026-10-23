@@ -10,7 +10,8 @@
 }
 .updated {
   font: 500 13px var(--mono);
-  opacity: 0.7;
+  /* a quieter ink, still over 4.5:1 on both phases' grounds */
+  color: color-mix(in oklab, var(--ink) 82%, var(--bg));
   margin: 0 0 32px;
 }
 .page h2 {

@@ -74,10 +74,10 @@ import { TextField } from "@rind-ui/react"
 | `TextField.Input` | `render` | `RenderProp<{ composing: boolean }>` | — | Another element or a render function receiving the props and the part's state (`composing`). |
 | `TextField.Textarea` | `autosize` | `boolean` | `false` | On Textarea: grows with its content (native `field-sizing` where supported). |
 | `TextField.Textarea` | `render` | `RenderProp<{ composing: boolean }>` | — | Another element or a render function receiving the props and the part's state (`composing`). |
-| `TextField.ClearTrigger` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TextField.ClearTrigger` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TextField.CharacterCount` | `max` | `number` | — | On CharacterCount: a soft limit (an error past it, never a truncation). |
 | `TextField.CharacterCount` | `count` | `(value) => number` | — | On CharacterCount: replaces the counter. |
-| `TextField.CharacterCount` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TextField.CharacterCount` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TextField.VisibilityTrigger` | `render` | `RenderProp<{ visible: boolean }>` | — | Another element or a render function receiving the props and `{ visible }`. |
 | `TextField.VisibilityIndicator` | `children` | `ReactNode` | — | The icon; style it by `data-state` (`aria-hidden`). |
 | `TextField.VisibilityIndicator` | `render` | `RenderProp<{ visible: boolean }>` | — | Another element or a render function receiving the props and `{ visible }`. |

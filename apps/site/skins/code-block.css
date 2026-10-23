@@ -26,8 +26,8 @@
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="code-block"][data-part="root"] {
-  --cb-bg: #2a1d5c;
-  --cb-mark: #ff8fb1;
+  --cb-bg: #103d2e;
+  --cb-mark: #5cd690;
   --cb-gutter: #b8afd9;
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="code-block"][data-part="root"] {

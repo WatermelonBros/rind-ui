@@ -47,6 +47,52 @@ const marked = new Marked({
 /**
  * Wide tables scroll inside a focusable box named after the section it sits in.
  */
+/**
+ * A props table led by a Part column repeats the part on every row and left the description
+ * squeezed out of view: the part becomes a heading row over its props instead.
+ */
+function byPart(table: string, order: readonly string[]): string {
+  if (!/<th>Part<\/th>\s*<th>Prop<\/th>/.test(table)) return table
+  const columns = (table.match(/<th>/g) ?? []).length - 1
+  const [head = "", body = ""] = table.split(/<tbody>/)
+  // the rows of each part together, the parts in the order the anatomy lists them (Root first)
+  const groups = new Map<string, string[]>()
+  for (const m of body.matchAll(/<tr>\s*<td>([\s\S]*?)<\/td>\s*([\s\S]*?)<\/tr>/g)) {
+    const part = m[1] ?? ""
+    groups.set(part, [...(groups.get(part) ?? []), `<tr>${m[2] ?? ""}</tr>`])
+  }
+  const rank = (part: string) => {
+    const at = order.indexOf(part)
+    return at < 0 ? order.length : at
+  }
+  const rows = [...groups]
+    .sort(([a], [b]) => rank(a) - rank(b))
+    .map(
+      ([part, cells]) =>
+        `<tr class="part-row" id="${partId(part)}"><th colspan="${columns}" scope="colgroup">${part}</th></tr>${cells.join("")}`,
+    )
+    .join("")
+  return `${head.replace(/<th>Part<\/th>\s*/, "")}<tbody>${rows}</tbody></table>`
+}
+
+/** The anchor of a part's rows in the props table (the header's part chips link to it). */
+export function partId(part: string): string {
+  return `part-${part
+    .replace(/<[^>]+>/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")}`
+}
+
+/** The parts in the order the page's anatomy table lists them. */
+function anatomy(html: string): string[] {
+  const table = /<table>\s*<thead>\s*<tr>\s*<th>Part<\/th>\s*<th>(?!Prop)[\s\S]*?<\/table>/.exec(
+    html,
+  )
+  return [...(table?.[0] ?? "").matchAll(/<tr>\s*<td[^>]*>([\s\S]*?)<\/td>/g)].map(
+    (m) => m[1] ?? "",
+  )
+}
+
 function tables(html: string): string {
   let heading = "Table"
   const used = new Map<string, number>()
@@ -62,6 +108,27 @@ function tables(html: string): string {
       return `<div class="table-scroll" tabindex="0" role="region" aria-label="${label}"><table>`
     })
     .replace(/<\/table>/g, "</table></div>")
+    .replace(/<table>([\s\S]*?)<\/table>/g, (whole: string) => byPart(whole, anatomy(html)))
+    .replace(/<table>([\s\S]*?)<\/table>/g, (table, body: string) => {
+      // each cell carries its column's name, so a phone can show a row as a labelled card
+      const names = [...body.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map((m) =>
+        (m[1] ?? "").replace(/<[^>]+>/g, "").replace(/"/g, "&quot;"),
+      )
+      if (!names.length) return table
+      return table.replace(/<tr>([\s\S]*?)<\/tr>/g, (_row, cells: string) => {
+        let i = 0
+        const labelled = cells.replace(/<td(?=[ >])/g, () => `<td data-label="${names[i++] ?? ""}"`)
+        // a long type breaks before its type arguments, not in the middle of a name, and a
+        // function's arrow stays with what it returns
+        return `<tr>${labelled.replace(/(<td data-label="Type">[\s\S]*?<\/td>)/g, (cell: string) =>
+          cell
+            .replace(/(?<=\w)&lt;/g, "<wbr>&lt;")
+            .replace(/ =&gt; /g, "&nbsp;=&gt;&nbsp;")
+            // a destructured argument reads as one piece: "{ reason }" never splits
+            .replace(/\{ [^{}]* \}/g, (group: string) => group.replace(/ /g, "&nbsp;")),
+        )}</tr>`
+      })
+    })
 }
 
 /**
@@ -85,6 +152,8 @@ export interface Rendered {
   /** the first paragraph, shown under the live example */
   readonly intro: string
   readonly html: string
+  /** the component's parts, in its anatomy's order (empty for a guide) */
+  readonly parts: readonly string[]
   readonly toc: readonly {
     readonly id: string
     readonly text: string
@@ -123,7 +192,8 @@ export function render(page: DocPage, { hasExample = false } = {}): Rendered {
       ...(code === undefined ? {} : { code: plain(code) }),
     }
   })
-  return { intro, html, toc }
+  const parts = anatomy(html).map((p) => p.replace(/<[^>]+>/g, ""))
+  return { intro, html, toc, parts }
 }
 
 const highlight = (raw: string, language: string) => ({

@@ -126,7 +126,7 @@
   background: #fff;
   box-shadow:
     0 0 0 3px var(--s-focus),
-    0 6px 16px #ff8fb133;
+    0 6px 16px #5cd69033;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="text-field"][data-part="input"][aria-invalid="true"] {

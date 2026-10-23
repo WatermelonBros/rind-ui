@@ -11,6 +11,7 @@ import ts from "typescript"
 import { apiMetas, llms, renderApi } from "../../../scripts/docs-gen.ts"
 // @ts-expect-error plain .mjs script, no types
 import { renderTokens } from "../../../scripts/theme-docs.mjs"
+import { frameworks } from "../lib/frameworks.ts"
 
 const repo = join(import.meta.dirname, "../../..")
 const out = join(import.meta.dirname, "../content/generated")
@@ -81,6 +82,30 @@ const byRelease = (md: string) =>
     (_, when: string, body: string) => ((when === "1.0+") === stable ? body : ""),
   )
 
+// The frameworks as the packages say (lib/frameworks.ts): {{frameworks}} is their table and
+// {{install}} the install command of each released one, so neither is ever out of step.
+const fws = frameworks()
+const frameworksTable = [
+  "| Framework | Package | Status |",
+  "|---|---|---|",
+  ...fws.map(
+    (f) =>
+      `| ${f.name} | \`${f.pkg}\` | ${
+        f.ready
+          ? "Available"
+          : f.components.length
+            ? `In progress (${f.components.length} component${f.components.length > 1 ? "s" : ""})`
+            : "Planned"
+      } |`,
+  ),
+].join("\n")
+const installBlocks = fws
+  .filter((f) => f.ready)
+  .map(
+    (f, i, all) => `${all.length > 1 ? `${f.name}:\n\n` : ""}\`\`\`sh\npnpm add ${f.pkg}\n\`\`\``,
+  )
+  .join("\n\n")
+
 // Site-owned pages (get started…) live with the site, not in the repo's docs/.
 const sitePages = join(import.meta.dirname, "../content/pages")
 const pages: DocPage[] = [
@@ -93,7 +118,10 @@ const pages: DocPage[] = [
       return page(
         f,
         "start",
-        md.replaceAll("{{version}}", `<span data-release="minor">${v}</span>`),
+        md
+          .replaceAll("{{version}}", `<span data-release="minor">${v}</span>`)
+          .replaceAll("{{frameworks}}", frameworksTable)
+          .replaceAll("{{install}}", installBlocks),
       )
     }),
   ...markdownFiles(join(repo, "docs/components")).map((f) =>

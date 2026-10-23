@@ -47,7 +47,7 @@
 }
 .panel {
   pointer-events: auto;
-  inline-size: min(560px, calc(100vw - 32px));
+  inline-size: min(560px, calc(100 * var(--vw) - 32px));
   border-radius: 14px;
   background: #0b0b0c;
   color: #f5f5ee;
@@ -188,10 +188,10 @@
     height 0.18s var(--spring);
 }
 :global([data-phase="juicy"]) .panel {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 :global([data-phase="juicy"]) .badge {
-  background: #ff8fb1;
+  background: #5cd690;
 }
 /* narrow screens: an icon in the corner, so the pill never covers the content; the name stays
    for assistive technology */

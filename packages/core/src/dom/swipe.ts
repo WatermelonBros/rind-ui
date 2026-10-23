@@ -5,6 +5,7 @@
 // takes a pan); mouse and pen with pointer events and pointer capture.
 
 import type { ClockEnv, DomEnv, SchedulerEnv } from "../env/capabilities"
+import { cssZoom } from "./css-zoom"
 
 /** A physical direction (logical sides are resolved by the component). */
 export type SwipeDirection = "up" | "down" | "left" | "right"
@@ -207,8 +208,10 @@ export function trackSwipe(
   const v = (name: string) => `--rind-${options.prefix}-swipe-${name}`
 
   const write = (x: number, y: number, progress: number) => {
-    el.style.setProperty(v("x"), `${x}px`)
-    el.style.setProperty(v("y"), `${y}px`)
+    // pointer pixels, written into the element's own (zoomed) pixels (css-zoom.ts)
+    const z = cssZoom(el)
+    el.style.setProperty(v("x"), `${x / z}px`)
+    el.style.setProperty(v("y"), `${y / z}px`)
     el.style.setProperty(v("progress"), String(progress))
   }
   const reset = () => {

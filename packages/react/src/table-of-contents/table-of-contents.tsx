@@ -2,6 +2,7 @@
 
 import {
   type ChangeDetails,
+  cssZoom,
   type MessageOverrides,
   partId,
   readingPosition,
@@ -213,12 +214,15 @@ function List({ render, ref, children, ...rest }: PartProps<"ol">) {
     }
     const box = list.getBoundingClientRect()
     const own = link.getBoundingClientRect()
-    const top = own.top - box.top + list.scrollTop
-    setMarker({ top, height: own.height })
+    // rects are viewport pixels; the marker is placed in the list's own (zoomed) ones
+    const z = cssZoom(list)
+    const top = (own.top - box.top) / z + list.scrollTop
+    const height = own.height / z
+    setMarker({ top, height })
     if (list.scrollHeight > list.clientHeight) {
       if (top < list.scrollTop) list.scrollTop = top
-      else if (top + own.height > list.scrollTop + list.clientHeight) {
-        list.scrollTop = top + own.height - list.clientHeight
+      else if (top + height > list.scrollTop + list.clientHeight) {
+        list.scrollTop = top + height - list.clientHeight
       }
     }
   }, [current, setMarker])

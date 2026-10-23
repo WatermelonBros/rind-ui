@@ -144,6 +144,7 @@ type Voice =
   | "key"
   | "delete"
   | "note"
+  | "appear"
 
 function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value = 0.5) {
   const { now, tone, noise } = voice(ac, out, pan)
@@ -232,6 +233,17 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
         0.03,
         soft ? 0.08 : 0.1,
       )
+      return
+    }
+    case "appear": {
+      // a tooltip or a hover card comes up: a small glassy bubble in juicy, a dry tick in crisp
+      if (soft) {
+        tone("sine", 900 * jitter, 1500 * jitter, 0, 0.12, 0.05)
+        tone("sine", 1800 * jitter, 2100 * jitter, 0.03, 0.08, 0.02)
+      } else {
+        noise(0.008, 0.12, "highpass", 5000)
+        tone("triangle", 2200 * jitter, 2000 * jitter, 0, 0.035, 0.04)
+      }
       return
     }
     case "note": {
@@ -385,6 +397,26 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       attributes: true,
       attributeFilter: ["aria-valuenow"],
     })
+    // a tooltip or a hover card coming up has its own small sound, once per opening
+    const POPS =
+      '[data-scope="tooltip"][data-part="content"][data-state="open"], [data-scope="hover-card"][data-part="content"][data-state="open"]'
+    let shown = new Set<Element>()
+    let looking = 0
+    const lookForPops = () => {
+      looking = 0
+      const now = new Set(document.querySelectorAll(POPS))
+      for (const el of now) if (!shown.has(el)) play(context, out, "appear", panOf(el))
+      shown = now
+    }
+    const pops = new MutationObserver(() => {
+      if (!looking) looking = requestAnimationFrame(lookForPops)
+    })
+    pops.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["data-state"],
+    })
     const phase = new MutationObserver(() => play(context, out, "phase"))
     phase.observe(document.documentElement, { attributes: true, attributeFilter: ["data-phase"] })
     const onCue = (e: Event) => {
@@ -398,10 +430,12 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     window.addEventListener("pointermove", drag, true)
     window.addEventListener("keydown", touched, true)
     document.addEventListener("click", onClick, true)
-    document.addEventListener("input", onInput, true)
+    // beforeinput, not input: a field that plans its own insertions (Pin Input) cancels the
+    // edit and writes it itself, so no input event follows; beforeinput comes either way
+    document.addEventListener("beforeinput", onInput, true)
     window.addEventListener("rind:cue", onCue)
     return () => {
-      document.removeEventListener("input", onInput, true)
+      document.removeEventListener("beforeinput", onInput, true)
       window.removeEventListener("pointerdown", touched, true)
       window.removeEventListener("pointermove", drag, true)
       window.removeEventListener("keydown", touched, true)
@@ -409,6 +443,8 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("rind:cue", onCue)
       values.disconnect()
       phase.disconnect()
+      pops.disconnect()
+      cancelAnimationFrame(looking)
       music?.stop()
     }
   }, [enabled, home])
