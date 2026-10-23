@@ -24,11 +24,20 @@ export interface HandoffOptions {
   /** A margin to travel in (x in viewport pixels): out to it first, down it, and into the
    *  landing only at the end, along the landing's own line, so the trip never crosses copy. */
   readonly lane?: () => number
+  /** Where in the viewport (0 top, 1 bottom) the first landing's centre ends the trip: earlier
+   *  than the middle when the next hand-off leaves from the same scene. */
+  readonly endAt?: number
 }
 
 const DESKTOP = "(min-width: 761px) and (prefers-reduced-motion: no-preference)"
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 const clamp = (t: number) => Math.min(1, Math.max(0, t))
+// a start that can be used (a link, a button) stays put; anything else is drawn away while its
+// copy travels, by opacity only, so it stays in the accessibility tree
+const spent = (el: Element) => !el.matches("a, button, input, select, textarea, [tabindex]")
+const show = (els: readonly Element[], on: boolean) => {
+  for (const el of els) if (spent(el)) (el as HTMLElement).style.opacity = on ? "" : "0"
+}
 
 export function handoff(o: HandoffOptions): () => void {
   const media = matchMedia(DESKTOP)
@@ -42,7 +51,7 @@ export function handoff(o: HandoffOptions): () => void {
     layer?.remove()
     layer = null
     travellers = []
-    for (const el of o.from()) (el as HTMLElement).style.removeProperty("visibility")
+    show(o.from(), true)
   }
 
   const paint = () => {
@@ -56,11 +65,13 @@ export function handoff(o: HandoffOptions): () => void {
     // both distances move with the scroll at the same rate, so their share is the progress
     const gone = vh - scene.getBoundingClientRect().bottom
     const r = first.getBoundingClientRect()
-    const rest = r.top + r.height / 2 - vh / 2
+    const rest = r.top + r.height / 2 - vh * (o.endAt ?? 0.5)
     const t = gone <= 0 ? 0 : rest <= 0 ? 1 : clamp(gone / (gone + rest))
     if (t > 0 !== left) {
       left = t > 0
       o.leaving?.(left)
+      // every start goes at once, so no copy ever passes over a start still waiting its turn
+      show(from, !left)
     }
     const n = from.length
     // one after another: each starts a little after the one before and lands on its own beat
@@ -90,11 +101,8 @@ export function handoff(o: HandoffOptions): () => void {
         const ti = own(i)
         if (!a || !b || ti <= 0 || ti >= 1) {
           node.style.opacity = "0"
-          const el = from[i] as HTMLElement | undefined
-          if (el) el.style.visibility = ti >= 1 ? "hidden" : ""
           return
         }
-        ;(from[i] as HTMLElement).style.visibility = "hidden"
         o.update?.(node, ti, i)
         const ax = a.left + a.width / 2
         const ay = a.top + a.height / 2
@@ -123,7 +131,8 @@ export function handoff(o: HandoffOptions): () => void {
         const half = (w * s) / 2
         x = Math.min(window.innerWidth - half - 16, Math.max(half + 16, x))
         node.style.transform = `translate(${x - half}px, ${y - (h * s) / 2}px) scale(${s})`
-        node.style.opacity = String(ti > 0.9 ? (1 - ti) / 0.1 : 1)
+        // it lifts off its start and melts into its landing, never a copy lying on either
+        node.style.opacity = String(Math.min(1, ti / 0.12, (1 - ti) / 0.1))
       })
     } else if (t <= 0) clear()
     else {
@@ -138,7 +147,6 @@ export function handoff(o: HandoffOptions): () => void {
       caught[j] = on
       o.landed?.(target, on)
     })
-    if (t >= 1) for (const el of from) (el as HTMLElement).style.visibility = "hidden"
   }
 
   const schedule = () => {

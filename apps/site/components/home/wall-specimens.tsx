@@ -281,6 +281,9 @@ export function WallSpecimens() {
             list.current?.querySelectorAll(":scope > li [data-morph]")[i]?.textContent ?? ""
           return name
         },
+        // down the left margin, beside the wall's title and lead, then in across the gap above
+        // the row: never over copy
+        lane: () => (list.current?.getBoundingClientRect().left ?? 120) / 2,
         landed: (spot, on) =>
           spot.parentElement?.querySelector("[data-morph]")?.toggleAttribute("data-landed", on),
       }),

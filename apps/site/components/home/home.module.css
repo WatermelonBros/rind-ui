@@ -94,9 +94,9 @@
 /* agents.tsx, wall-specimens.tsx: lines and names in flight between scenes (handoff.ts) */
 .lineTraveller,
 .nameTraveller {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 99px;
-  font: 600 12px var(--mono);
+  font: 600 14px var(--mono);
   white-space: nowrap;
   color: var(--card);
   background: var(--ink);

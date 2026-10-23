@@ -141,7 +141,9 @@ export function Agents() {
           line.textContent = `- ${words.slice(0, 2).join(" ")}…`
           return line
         },
-        landed: (code, on) => code.toggleAttribute("data-landed", on),
+        landed: (link, on) => link.toggleAttribute("data-landed", on),
+        // done before the wall's names leave the same link (wall-specimens.tsx)
+        endAt: 0.6,
         // the page's left margin, clear of the claims' text
         lane: () =>
           (document.getElementById("agents-title")?.getBoundingClientRect().left ?? 120) / 2,
