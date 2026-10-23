@@ -9,6 +9,8 @@ New packages: `@rind-ui/vue` (Vue ≥ 3.5) and `@rind-ui/svelte` (Svelte ≥ 5.2
 ARIA and drivers as `@rind-ui/react`; components are ported one at a time (this release: Toggle,
 Button, Separator, Kbd, Badge, Heading, Label, Link, Skeleton, Progress, Meter, Avatar, Image,
 Alert, Toggle Group, Fieldset, Field, Text Field, Checkbox, Checkbox Group, Switch, Visually
-Hidden). `@rind-ui/core/internal` gains
+Hidden, Radio Group, Segmented Control, Collapsible, Accordion, Tabs, Toolbar, Breadcrumbs,
+Pagination; Rating in Vue). `@rind-ui/core/internal` gains
 the framework-neutral helpers the adapters share; `@rind-ui/testing` exports `canonicalHtml` to
-compare a component's markup across frameworks.
+compare a component's markup across frameworks. Every `@rind-ui` library package now ships at
+one version (a Changesets fixed group).

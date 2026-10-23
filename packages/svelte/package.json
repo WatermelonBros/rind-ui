@@ -39,6 +39,12 @@
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.ts",
+      "svelte": "./dist/accordion/index.js",
+      "default": "./dist/accordion/index.js"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.ts",
@@ -57,6 +63,12 @@
       "svelte": "./dist/badge/index.js",
       "default": "./dist/badge/index.js"
     },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.ts",
+      "svelte": "./dist/breadcrumbs/index.js",
+      "default": "./dist/breadcrumbs/index.js"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.ts",
@@ -74,6 +86,12 @@
       "types": "./dist/checkbox-group/index.d.ts",
       "svelte": "./dist/checkbox-group/index.js",
       "default": "./dist/checkbox-group/index.js"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.ts",
+      "svelte": "./dist/collapsible/index.js",
+      "default": "./dist/collapsible/index.js"
     },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
@@ -129,11 +147,29 @@
       "svelte": "./dist/meter/index.js",
       "default": "./dist/meter/index.js"
     },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.ts",
+      "svelte": "./dist/pagination/index.js",
+      "default": "./dist/pagination/index.js"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
       "svelte": "./dist/progress/index.js",
       "default": "./dist/progress/index.js"
+    },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.ts",
+      "svelte": "./dist/radio-group/index.js",
+      "default": "./dist/radio-group/index.js"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.ts",
+      "svelte": "./dist/segmented-control/index.js",
+      "default": "./dist/segmented-control/index.js"
     },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
@@ -153,6 +189,12 @@
       "svelte": "./dist/switch/index.js",
       "default": "./dist/switch/index.js"
     },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.ts",
+      "svelte": "./dist/tabs/index.js",
+      "default": "./dist/tabs/index.js"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.ts",
@@ -170,6 +212,12 @@
       "types": "./dist/toggle-group/index.d.ts",
       "svelte": "./dist/toggle-group/index.js",
       "default": "./dist/toggle-group/index.js"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.ts",
+      "svelte": "./dist/toolbar/index.js",
+      "default": "./dist/toolbar/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -206,6 +254,11 @@
         "svelte": "./dist/index.js",
         "default": "./dist/index.js"
       },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.ts",
+        "svelte": "./dist/accordion/index.js",
+        "default": "./dist/accordion/index.js"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.ts",
         "svelte": "./dist/alert/index.js",
@@ -221,6 +274,11 @@
         "svelte": "./dist/badge/index.js",
         "default": "./dist/badge/index.js"
       },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.ts",
+        "svelte": "./dist/breadcrumbs/index.js",
+        "default": "./dist/breadcrumbs/index.js"
+      },
       "./button": {
         "types": "./dist/button/index.d.ts",
         "svelte": "./dist/button/index.js",
@@ -235,6 +293,11 @@
         "types": "./dist/checkbox-group/index.d.ts",
         "svelte": "./dist/checkbox-group/index.js",
         "default": "./dist/checkbox-group/index.js"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.ts",
+        "svelte": "./dist/collapsible/index.js",
+        "default": "./dist/collapsible/index.js"
       },
       "./field": {
         "types": "./dist/field/index.d.ts",
@@ -281,10 +344,25 @@
         "svelte": "./dist/meter/index.js",
         "default": "./dist/meter/index.js"
       },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.ts",
+        "svelte": "./dist/pagination/index.js",
+        "default": "./dist/pagination/index.js"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.ts",
         "svelte": "./dist/progress/index.js",
         "default": "./dist/progress/index.js"
+      },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.ts",
+        "svelte": "./dist/radio-group/index.js",
+        "default": "./dist/radio-group/index.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.ts",
+        "svelte": "./dist/segmented-control/index.js",
+        "default": "./dist/segmented-control/index.js"
       },
       "./separator": {
         "types": "./dist/separator/index.d.ts",
@@ -301,6 +379,11 @@
         "svelte": "./dist/switch/index.js",
         "default": "./dist/switch/index.js"
       },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.ts",
+        "svelte": "./dist/tabs/index.js",
+        "default": "./dist/tabs/index.js"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",
         "svelte": "./dist/text-field/index.js",
@@ -315,6 +398,11 @@
         "types": "./dist/toggle-group/index.d.ts",
         "svelte": "./dist/toggle-group/index.js",
         "default": "./dist/toggle-group/index.js"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.ts",
+        "svelte": "./dist/toolbar/index.js",
+        "default": "./dist/toolbar/index.js"
       },
       "./package.json": "./package.json"
     }

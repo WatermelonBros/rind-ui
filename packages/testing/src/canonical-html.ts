@@ -3,15 +3,16 @@
 // framework spells the incidentals differently (comment markers, attribute order, style
 // whitespace, the shape of generated ids), so both sides are reduced to one canonical form.
 
-/** Attributes whose values may contain generated ids. */
+/** Attributes whose values may contain generated ids (a toolbar control's key is its id). */
 const ID_REFS =
-  /^(id|for|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
+  /^(id|for|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
 
 /**
  * A canonical rendering of `html` (or of `node`'s children): comments and whitespace-only text
- * dropped, attributes sorted, styles normalised by the browser's CSS serialiser, and every
- * instance id (`data-instance`) replaced by `#0`, `#1`… in order of first appearance, wherever
- * it appears in another attribute's value. Needs a DOM (jsdom or a browser).
+ * dropped, adjacent texts joined, attributes sorted, styles normalised by the browser's CSS
+ * serialiser; every element id becomes `@0`, `@1`… (in document order) wherever an id or an ARIA
+ * relation names it, and every instance id (`data-instance`) `#0`, `#1`… inside the others.
+ * Needs a DOM (jsdom or a browser).
  */
 export function canonicalHtml(html: string | Node): string {
   const root =
@@ -25,10 +26,25 @@ export function canonicalHtml(html: string | Node): string {
     for (const child of Array.from(el.children)) seen(child)
   }
   for (const child of Array.from(root.childNodes)) if (child instanceof Element) seen(child)
+  // Every element id, in document order: a framework's generated ids need not contain the
+  // instance id (an Accordion item's own `useId`), so each one is a token of its own.
+  const elementIds: string[] = []
+  const collect = (el: Element) => {
+    if (el.id && !elementIds.includes(el.id)) elementIds.push(el.id)
+    for (const child of Array.from(el.children)) collect(child)
+  }
+  for (const child of Array.from(root.childNodes)) if (child instanceof Element) collect(child)
   // Longest first, so an id that contains another is replaced whole.
   const order = [...instances].sort((a, b) => b.length - a.length)
-  const ids = (value: string) =>
+  const inInstance = (value: string) =>
     order.reduce((v, id) => v.split(id).join(`#${instances.indexOf(id)}`), value)
+  const ids = (value: string) =>
+    value
+      .split(" ")
+      .map((token) =>
+        elementIds.includes(token) ? `@${elementIds.indexOf(token)}` : inInstance(token),
+      )
+      .join(" ")
 
   const out: string[] = []
   const walk = (node: Node, depth: number) => {
@@ -43,7 +59,8 @@ export function canonicalHtml(html: string | Node): string {
             .map((p) => `${p}: ${style.getPropertyValue(p)}`)
           return `style="${decls.join("; ")}"`
         }
-        const v = name === "data-instance" || ID_REFS.test(name) ? ids(value) : value
+        const v =
+          name === "data-instance" ? inInstance(value) : ID_REFS.test(name) ? ids(value) : value
         return `${name}="${v}"`
       })
       .sort()

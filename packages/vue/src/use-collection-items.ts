@@ -9,12 +9,15 @@ import {
   type RegisteredItem,
 } from "@rind-ui/core"
 import {
+  isVNode,
   onBeforeUnmount,
   onMounted,
   onUpdated,
   type Ref,
   type ShallowRef,
+  type Slots,
   shallowRef,
+  type VNodeChild,
   watch,
 } from "vue"
 
@@ -114,4 +117,42 @@ export function declaredStop() {
     }
     return selected.length > 0 ? firstSelected : firstEnabled
   }
+}
+
+export interface DeclaredItem {
+  readonly value: string
+  readonly disabled: boolean
+}
+
+/**
+ * The items of a composite declared in a slot's output (any depth, in render order, slots of
+ * nested components expanded), before they register: the server render needs them. Items
+ * rendered by a consumer component's own template are not seen (they follow registration).
+ */
+export function declaredItems(children: VNodeChild, item: unknown): readonly DeclaredItem[] {
+  const out: DeclaredItem[] = []
+  const walk = (node: VNodeChild) => {
+    if (Array.isArray(node)) return node.forEach(walk)
+    if (!isVNode(node)) return
+    const props = node.props as { value?: unknown; disabled?: unknown } | null
+    if (node.type === item && typeof props?.value === "string") {
+      out.push({ value: props.value, disabled: props.disabled === true || props.disabled === "" })
+    }
+    const kids = node.children
+    if (Array.isArray(kids)) walk(kids as VNodeChild)
+    else if (kids && typeof kids === "object" && typeof (kids as Slots)["default"] === "function") {
+      walk((kids as Slots)["default"]?.() as VNodeChild)
+    }
+  }
+  walk(children)
+  return out
+}
+
+/** The server tab stop: the first enabled declared item that is selected, else the first enabled. */
+export function serverStop(
+  items: readonly DeclaredItem[],
+  selected: readonly string[],
+): string | null {
+  const enabled = items.filter((i) => !i.disabled)
+  return (enabled.find((i) => selected.includes(i.value)) ?? enabled[0])?.value ?? null
 }

@@ -36,14 +36,14 @@
 - [x] 2.19 Checkbox
 - [x] 2.20 Checkbox Group
 - [x] 2.21 Switch
-- [ ] 2.22 Radio Group
-- [ ] 2.23 Segmented Control
-- [ ] 2.24 Collapsible
-- [ ] 2.25 Accordion
-- [ ] 2.26 Tabs
-- [ ] 2.27 Toolbar
-- [ ] 2.28 Breadcrumbs
-- [ ] 2.29 Pagination
+- [x] 2.22 Radio Group
+- [x] 2.23 Segmented Control
+- [x] 2.24 Collapsible
+- [x] 2.25 Accordion
+- [x] 2.26 Tabs
+- [x] 2.27 Toolbar
+- [x] 2.28 Breadcrumbs
+- [x] 2.29 Pagination
 - [ ] 2.30 Rating
 - [ ] 2.31 Slider
 - [ ] 2.32 Number Input
