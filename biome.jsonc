@@ -27,5 +27,17 @@
         "useLiteralKeys": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      // Biome reads a component's <script> only: what the template uses looks unused.
+      "includes": ["**/*.svelte"],
+      "linter": {
+        "rules": {
+          "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" },
+          "style": { "useConst": "off", "useImportType": "off" }
+        }
+      }
+    }
+  ]
 }
