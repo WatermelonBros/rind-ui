@@ -285,6 +285,12 @@
     z-index: 1;
     margin-top: calc(-30 * var(--vh));
   }
+  /* rising over the hero's tail, it lets that tail show (its ground is the page's own): an
+     opaque ground cut the hero's buttons through their middle */
+  .peel,
+  .sticky {
+    background: transparent;
+  }
 }
 
 /* a large screen (globals.css zooms it): the scene keeps to the sections' column, like the hero */

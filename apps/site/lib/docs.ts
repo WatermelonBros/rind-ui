@@ -212,12 +212,27 @@ const highlight = (raw: string, language: string) => ({
 
 /** A component's example sources, highlighted at build time. */
 export function exampleCode(slug: string): ExampleCode | undefined {
-  const entry = (exampleData as Record<string, { code: Record<string, string>; css: string }>)[slug]
+  const entry = (
+    exampleData as Record<
+      string,
+      {
+        code: Record<string, string>
+        css: string
+        vue?: Record<string, string>
+        svelte?: Record<string, string>
+      }
+    >
+  )[slug]
   if (!entry) return undefined
+  // a single-file component reads best as HTML (its template, script and style blocks)
+  const each = (code: Record<string, string> | undefined, lang: string) =>
+    Object.fromEntries(
+      Object.entries(code ?? {}).map(([name, raw]) => [name, highlight(raw, lang)]),
+    )
   return {
-    code: Object.fromEntries(
-      Object.entries(entry.code).map(([name, raw]) => [name, highlight(raw, "tsx")]),
-    ),
+    code: each(entry.code, "tsx"),
+    vue: each(entry.vue, "xml"),
+    svelte: each(entry.svelte, "xml"),
     css: highlight(entry.css, "css"),
   }
 }

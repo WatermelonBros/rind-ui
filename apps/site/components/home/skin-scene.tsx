@@ -231,13 +231,28 @@ export function SkinScene() {
     const grab = { x: 0, y: 0, down: false, sx: 0, sy: 0, moved: false, spring: 0 }
     let checkedNow = true
     const fine = matchMedia("(pointer: fine) and (prefers-reduced-motion: no-preference)")
-    const over = (e: PointerEvent) => {
+    // "free" over empty ground, "control" where a usable element lies under it (its own control,
+    // in the hero and the scenes it stands on), false off the object
+    const over = (e: PointerEvent): "free" | "control" | false => {
       if (!fine.matches || !drawn || alpha() < 0.5) return false
       const r = new DOMRect(drawn.x + grab.x, drawn.y + grab.y, drawn.width, drawn.height)
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)
         return false
       const under = document.elementFromPoint(e.clientX, e.clientY)
-      return !under?.closest("a, button, input, textarea, select, label, [role], [tabindex]")
+      return under?.closest("a, button, input, textarea, select, label, [role], [tabindex]")
+        ? "control"
+        : "free"
+    }
+    // over a control a press stays the control's (a click toggles it) unless the pointer moves
+    // off by a few pixels: then it is a drag of the object, and the click it would end in is
+    // swallowed
+    let armed: { x: number; y: number } | null = null
+    let swallow = false
+    const onClickCapture = (e: MouseEvent) => {
+      if (!swallow) return
+      swallow = false
+      e.preventDefault()
+      e.stopPropagation()
     }
     const poke = () => {
       const handle = scene.current
@@ -255,7 +270,12 @@ export function SkinScene() {
       window.setTimeout(follow, 1100)
     }
     const onGrabDown = (e: PointerEvent) => {
-      if (!over(e)) return
+      const where = over(e)
+      if (!where) return
+      if (where === "control") {
+        armed = { x: e.clientX, y: e.clientY }
+        return
+      }
       e.preventDefault()
       cancelAnimationFrame(grab.spring)
       grab.down = true
@@ -265,6 +285,17 @@ export function SkinScene() {
       document.body.style.cursor = "grabbing"
     }
     const onGrabMove = (e: PointerEvent) => {
+      if (armed && !grab.down && Math.hypot(e.clientX - armed.x, e.clientY - armed.y) > 6) {
+        cancelAnimationFrame(grab.spring)
+        grab.down = true
+        grab.moved = true
+        grab.sx = armed.x - grab.x
+        grab.sy = armed.y - grab.y
+        armed = null
+        swallow = true
+        window.getSelection()?.removeAllRanges()
+        document.body.style.cursor = "grabbing"
+      }
       if (grab.down) {
         // kept whole on screen: a pull never loses it past an edge (32px, since the drawn
         // object, its depth and shadow, runs past the box it is fitted to)
@@ -282,6 +313,9 @@ export function SkinScene() {
       document.body.style.cursor = over(e) ? "grab" : ""
     }
     const onGrabUp = () => {
+      armed = null
+      // the swallowed click comes right after the release, or not at all
+      if (swallow) window.setTimeout(() => (swallow = false), 50)
       if (!grab.down) return
       grab.down = false
       document.body.style.cursor = ""
@@ -312,6 +346,7 @@ export function SkinScene() {
     window.addEventListener("pointerdown", onGrabDown, true)
     window.addEventListener("pointermove", onGrabMove, { passive: true })
     window.addEventListener("pointerup", onGrabUp)
+    window.addEventListener("click", onClickCapture, true)
     // A phone has no gutter: in flight the object shrinks and rides the screen's right edge,
     // peeking in from it, then grows onto its next control. Every leg the same way, so it is
     // always in sight and never sits on the text.
@@ -810,6 +845,7 @@ export function SkinScene() {
       window.removeEventListener("pointerdown", onGrabDown, true)
       window.removeEventListener("pointermove", onGrabMove)
       window.removeEventListener("pointerup", onGrabUp)
+      window.removeEventListener("click", onClickCapture, true)
       cancelAnimationFrame(grab.spring)
       document.body.style.cursor = ""
       if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle)

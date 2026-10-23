@@ -55,8 +55,8 @@
   --s-brand: var(--s-acc);
   --s-brand-text: var(--s-ink);
   --s-brand-deep: var(--s-acc-deep);
-  /* focus ring: the pink is under 3:1 on white; this violet is ≥3:1 on lavender, white and pink */
-  --s-focus: #5b3fd1;
+  /* focus ring: the rind's dark green, ≥3:1 on white, the pinks and the mint accent */
+  --s-focus: #103d2e;
 }
 [data-skin="bare"],
 [data-rind-theme="skin-bare"] {

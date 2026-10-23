@@ -229,3 +229,24 @@
     transition: none;
   }
 }
+
+/* resting, it is only its icon in a round button, so it never sits on the page's content; the
+   label opens on hover and focus (and stays while the reader runs). The text stays in the DOM,
+   so the button's name is whole */
+.label {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  max-inline-size: 22ch;
+  transition:
+    max-inline-size 0.3s var(--spring),
+    opacity 0.2s;
+}
+.toggle:not([aria-pressed="true"]):not([data-hover]):not(:focus-visible) {
+  gap: 0;
+  padding: 10px;
+}
+.toggle:not([aria-pressed="true"]):not([data-hover]):not(:focus-visible) .label {
+  max-inline-size: 0;
+  opacity: 0;
+}

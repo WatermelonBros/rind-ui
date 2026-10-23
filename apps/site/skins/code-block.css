@@ -1,5 +1,5 @@
 /* ── Code Block: the site's own code look (example frames, docs fences); dark ink in crisp,
-   deep violet in juicy, a light neutral block in bare. Lines carry the inline padding, so a
+   rind green in juicy, a light neutral block in bare. Lines carry the inline padding, so a
    highlighted line runs edge to edge; numbers are a ::before counter, never text. Token colours
    are the --rind-code-token-* properties with the site's palette as the fallback (≥ 4.5:1). ── */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="code-block"][data-part="root"] {
@@ -28,7 +28,11 @@
   [data-scope="code-block"][data-part="root"] {
   --cb-bg: #103d2e;
   --cb-mark: #5cd690;
-  --cb-gutter: #b8afd9;
+  /* the rind green is lighter than a black block: the dimmer tokens lighten to keep 4.5:1 on a
+     highlighted line */
+  --cb-gutter: #b5dcc7;
+  --cb-keyword: #ffb3d2;
+  --cb-comment: #cfcfc8;
 }
 :is([data-skin="bare"], [data-rind-theme="skin-bare"]) [data-scope="code-block"][data-part="root"] {
   --cb-bg: #f4f4f5;

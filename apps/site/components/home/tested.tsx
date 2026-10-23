@@ -165,7 +165,7 @@ export function Tested() {
     const hold = roomRef.current?.previousElementSibling
     const onHold = () => {
       if (!hold || autoRan.current) return
-      const top = Number.parseFloat(getComputedStyle(hold).top || "0") * zoom()
+      const top = (Number.parseFloat(getComputedStyle(hold).top) || 0) * zoom()
       if (hold.getBoundingClientRect().top <= top + 1) {
         autoRan.current = true
         scrollRef.current()
@@ -288,11 +288,14 @@ export function Tested() {
     // ends with the hold (home.module.css: .testRoom is the lines' stretches and a little for the
     // PASS); the first line waits a half stretch, so the reset state is seen first
     const hold = roomRef.current?.previousElementSibling
-    const stuckAt = hold
-      ? window.scrollY +
-        hold.getBoundingClientRect().top -
-        Number.parseFloat(getComputedStyle(hold).top || "0") * zoom()
-      : window.scrollY
+    // (a phone does not hold the scene: its lines count from where the run starts)
+    const holdStyle = hold ? getComputedStyle(hold) : null
+    const stuckAt =
+      hold && holdStyle?.position === "sticky"
+        ? window.scrollY +
+          hold.getBoundingClientRect().top -
+          (Number.parseFloat(holdStyle.top) || 0) * zoom()
+        : window.scrollY
     const y0 = Math.max(window.scrollY, stuckAt) + stepPx * 0.5
     let done = 0
     let green = true

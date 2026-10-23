@@ -72,11 +72,11 @@
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="switch"][data-part="control"] {
-  background: #d6ccf7;
+  background: #f6c1bb;
   box-shadow: inset 0 0 0 2px var(--s-field-line);
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"]) [data-scope="switch"][data-part="thumb"] {
-  box-shadow: 0 3px 0 #d8d0f5;
+  box-shadow: 0 3px 0 #ecaaa3;
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="switch"][data-part="control"][data-state="checked"] {

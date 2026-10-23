@@ -117,6 +117,11 @@
   color: #2fbf71;
   text-shadow: 0 6px 18px #2fbf7155;
 }
+/* in crisp the tick is the phase's own: ink with the lime under it */
+:global([data-phase="crisp"]) .tickTraveller {
+  color: var(--ink);
+  text-shadow: 0 4px 0 var(--acc);
+}
 .claim p {
   font: 500 clamp(17px, 1.3vw, 20px) / 1.5 var(--text);
   max-width: 34ch;
@@ -607,7 +612,7 @@
 /* the hero's 3D object stands on the test's control (skin-scene.tsx): the control keeps working
    for the driver, unseen once it lands; it has the object's size as soon as the 3D runs, so the
    landing never moves the page */
-.testStage[data-object] :is([data-part="control"], button[data-scope="button"]) {
+.testStage[data-object][data-gl] :is([data-part="control"], button[data-scope="button"]) {
   /* biome-ignore lint/complexity/noImportantStyles: beats every skin's state opacity */
   opacity: 0 !important;
 }
