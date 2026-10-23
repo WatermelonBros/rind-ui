@@ -86,6 +86,8 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
     )
       return
     const move = (e: PointerEvent) => {
+      // still while over a socket: leaning would turn it out from under the pointer mid-press
+      if (e.target instanceof Element && e.target.closest("button")) return
       const r = el.getBoundingClientRect()
       el.style.setProperty("--lean-x", String((e.clientX - r.left) / r.width - 0.5))
       el.style.setProperty("--lean-y", String((e.clientY - r.top) / r.height - 0.5))

@@ -49,6 +49,8 @@ export function Peel() {
   const section = useRef<HTMLElement>(null)
   const control = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
+  // how far the builder's title has come up under the scene's copy (0 far, 1 at it)
+  const [meet, setMeet] = useState(0)
   const [kind, setKind] = useState<HeroKind>("switch")
   const heroOn = useHeroOn()
   const [attrs, setAttrs] = useState<readonly string[]>([])
@@ -78,6 +80,9 @@ export function Peel() {
       // reach the top left most of the screen empty ground
       const early = window.innerWidth <= 900 ? window.innerHeight * 0.48 : 0
       setProgress(clamp((early - rect.top) / (travel || 1)))
+      const next = document.getElementById("look-title")?.getBoundingClientRect().top
+      const vh = window.innerHeight
+      setMeet(next === undefined ? 0 : clamp((vh * 0.92 - next) / (vh * 0.18)))
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -125,9 +130,9 @@ export function Peel() {
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
   const dark = p2 * (1 - p3)
-  // the scene's copy goes before the builder's title rises into its last stretch (desktop:
-  // peel.module.css), so the two display titles never overlap
-  const out = clamp((progress - 0.93) / 0.04)
+  // the scene's copy stays until the builder's title comes up to it, then goes (desktop:
+  // peel.module.css): the two display titles never overlap and no screen is left empty between
+  const out = Math.max(meet, clamp((progress - 0.985) / 0.015))
   const vars = {
     "--p1": 1,
     "--p2": p2,

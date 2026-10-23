@@ -110,8 +110,10 @@
   width: clamp(420px, calc(34 * var(--vw)), 620px);
   margin-top: 30px;
   /* only once the ink disc has closed: its nodes never float on the dark */
-  opacity: calc((var(--p3) - 0.88) * 8.4);
-  translate: 0 calc((1 - var(--p3)) * 40px);
+  /* and it leaves with the copy (--out), rising, so the next scene's title comes up into the
+     room it leaves instead of over its nodes */
+  opacity: min(calc((var(--p3) - 0.88) * 8.4), calc(1 - var(--out, 0) * 1.6));
+  translate: 0 calc((1 - var(--p3)) * 40px - var(--out, 0) * 90px);
   font: 600 12px var(--mono);
 }
 .graph rect {

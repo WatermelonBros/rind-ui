@@ -708,7 +708,9 @@ export function SkinScene() {
         // a phone's object comes down on the component itself: the real one waits unseen
         // until the object has dissolved into it, never two controls on top of each other
         if (window.innerWidth <= 900) {
-          const over = leaving && end.t >= 0.7 && end.t < 1
+          // only while the object is really drawn there (it tucks away over controls): the
+          // card is never left without its control
+          const over = leaving && end.t >= 0.7 && end.t < 1 && alpha() > 0.5
           if (over) end.wall.style.setProperty("opacity", "0")
           else end.wall.style.removeProperty("opacity")
         }
