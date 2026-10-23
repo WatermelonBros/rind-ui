@@ -122,20 +122,40 @@
       "types": "./dist/link/index.d.mts",
       "default": "./dist/link/index.mjs"
     },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.mts",
+      "default": "./dist/marquee/index.mjs"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.mts",
       "default": "./dist/meter/index.mjs"
+    },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.mts",
+      "default": "./dist/number-input/index.mjs"
     },
     "./pagination": {
       "@rind-ui/source": "./src/pagination/index.ts",
       "types": "./dist/pagination/index.d.mts",
       "default": "./dist/pagination/index.mjs"
     },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.mts",
+      "default": "./dist/pin-input/index.mjs"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.mts",
       "default": "./dist/progress/index.mjs"
+    },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.mts",
+      "default": "./dist/qr-code/index.mjs"
     },
     "./radio-group": {
       "@rind-ui/source": "./src/radio-group/index.ts",
@@ -146,6 +166,11 @@
       "@rind-ui/source": "./src/rating/index.ts",
       "types": "./dist/rating/index.d.mts",
       "default": "./dist/rating/index.mjs"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.mts",
+      "default": "./dist/scroll-area/index.mjs"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -162,10 +187,30 @@
       "types": "./dist/skeleton/index.d.mts",
       "default": "./dist/skeleton/index.mjs"
     },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.mts",
+      "default": "./dist/slider/index.mjs"
+    },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.mts",
+      "default": "./dist/splitter/index.mjs"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.mts",
+      "default": "./dist/stepper/index.mjs"
+    },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
       "types": "./dist/switch/index.d.mts",
       "default": "./dist/switch/index.mjs"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.mts",
+      "default": "./dist/table-of-contents/index.mjs"
     },
     "./tabs": {
       "@rind-ui/source": "./src/tabs/index.ts",
@@ -176,6 +221,11 @@
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.mts",
       "default": "./dist/text-field/index.mjs"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.mts",
+      "default": "./dist/timeline/index.mjs"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -290,17 +340,33 @@
         "types": "./dist/link/index.d.mts",
         "default": "./dist/link/index.mjs"
       },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.mts",
+        "default": "./dist/marquee/index.mjs"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.mts",
         "default": "./dist/meter/index.mjs"
+      },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.mts",
+        "default": "./dist/number-input/index.mjs"
       },
       "./pagination": {
         "types": "./dist/pagination/index.d.mts",
         "default": "./dist/pagination/index.mjs"
       },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.mts",
+        "default": "./dist/pin-input/index.mjs"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.mts",
         "default": "./dist/progress/index.mjs"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.mts",
+        "default": "./dist/qr-code/index.mjs"
       },
       "./radio-group": {
         "types": "./dist/radio-group/index.d.mts",
@@ -309,6 +375,10 @@
       "./rating": {
         "types": "./dist/rating/index.d.mts",
         "default": "./dist/rating/index.mjs"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.mts",
+        "default": "./dist/scroll-area/index.mjs"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.mts",
@@ -322,9 +392,25 @@
         "types": "./dist/skeleton/index.d.mts",
         "default": "./dist/skeleton/index.mjs"
       },
+      "./slider": {
+        "types": "./dist/slider/index.d.mts",
+        "default": "./dist/slider/index.mjs"
+      },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.mts",
+        "default": "./dist/splitter/index.mjs"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.mts",
+        "default": "./dist/stepper/index.mjs"
+      },
       "./switch": {
         "types": "./dist/switch/index.d.mts",
         "default": "./dist/switch/index.mjs"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.mts",
+        "default": "./dist/table-of-contents/index.mjs"
       },
       "./tabs": {
         "types": "./dist/tabs/index.d.mts",
@@ -333,6 +419,10 @@
       "./text-field": {
         "types": "./dist/text-field/index.d.mts",
         "default": "./dist/text-field/index.mjs"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.mts",
+        "default": "./dist/timeline/index.mjs"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.mts",

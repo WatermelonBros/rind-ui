@@ -36,8 +36,14 @@
       "linter": { "rules": { "correctness": { "useHookAtTopLevel": "off" } } }
     },
     {
+      // The copyable examples are named after the site's React exports (Basic, Controlled):
+      // a page's example, not a reusable component.
+      "includes": ["packages/vue/examples/**"],
+      "linter": { "rules": { "style": { "useVueMultiWordComponentNames": "off" } } }
+    },
+    {
       // Biome reads a component's <script> only: what the template uses looks unused.
-      "includes": ["**/*.svelte"],
+      "includes": ["**/*.svelte", "**/*.vue"],
       "linter": {
         "rules": {
           "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" },

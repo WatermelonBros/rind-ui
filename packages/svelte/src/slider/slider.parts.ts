@@ -1,0 +1,11 @@
+// The Slider namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Control } from "./slider-control.svelte"
+export { default as Description } from "./slider-description.svelte"
+export { default as Indicator } from "./slider-indicator.svelte"
+export { default as Label } from "./slider-label.svelte"
+export { default as Marker } from "./slider-marker.svelte"
+export { default as MarkerGroup } from "./slider-marker-group.svelte"
+export { default as Root } from "./slider-root.svelte"
+export { default as Thumb } from "./slider-thumb.svelte"
+export { default as Track } from "./slider-track.svelte"
+export { default as ValueText } from "./slider-value-text.svelte"

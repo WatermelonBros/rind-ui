@@ -3,9 +3,9 @@
 // framework spells the incidentals differently (comment markers, attribute order, style
 // whitespace, the shape of generated ids), so both sides are reduced to one canonical form.
 
-/** Attributes whose values may contain generated ids (a toolbar control's key is its id). */
+/** Attributes whose values may contain generated ids (a toolbar control's key is its id, a radio group's default name holds its instance). */
 const ID_REFS =
-  /^(id|for|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
+  /^(id|for|name|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
 
 /**
  * A canonical rendering of `html` (or of `node`'s children): comments and whitespace-only text

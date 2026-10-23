@@ -129,14 +129,22 @@ export interface DeclaredItem {
  * nested components expanded), before they register: the server render needs them. Items
  * rendered by a consumer component's own template are not seen (they follow registration).
  */
-export function declaredItems(children: VNodeChild, item: unknown): readonly DeclaredItem[] {
+export function declaredItems(
+  children: VNodeChild,
+  item: unknown,
+  any = false,
+): readonly DeclaredItem[] {
   const out: DeclaredItem[] = []
   const walk = (node: VNodeChild) => {
     if (Array.isArray(node)) return node.forEach(walk)
     if (!isVNode(node)) return
     const props = node.props as { value?: unknown; disabled?: unknown } | null
-    if (node.type === item && typeof props?.value === "string") {
-      out.push({ value: props.value, disabled: props.disabled === true || props.disabled === "" })
+    // `any`: every element of the type counts (a part without a value: a QR code's ValueText).
+    if (node.type === item && (any || typeof props?.value === "string")) {
+      out.push({
+        value: String(props?.value ?? ""),
+        disabled: props?.disabled === true || props?.disabled === "",
+      })
     }
     const kids = node.children
     if (Array.isArray(kids)) walk(kids as VNodeChild)

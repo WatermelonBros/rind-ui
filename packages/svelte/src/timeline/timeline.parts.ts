@@ -1,0 +1,10 @@
+// The Timeline namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Connector } from "./timeline-connector.svelte"
+export { default as Content } from "./timeline-content.svelte"
+export { default as Description } from "./timeline-description.svelte"
+export { default as Indicator } from "./timeline-indicator.svelte"
+export { default as Item } from "./timeline-item.svelte"
+export { default as Opposite } from "./timeline-opposite.svelte"
+export { default as Root } from "./timeline-root.svelte"
+export { default as Time } from "./timeline-time.svelte"
+export { default as Title } from "./timeline-title.svelte"

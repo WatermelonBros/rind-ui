@@ -421,3 +421,11 @@ verified at round 3 (2026-10-14).
 
 - warning: in the test harness, letting a click on `<a href="#missing">` inside `CheckboxGroup.ItemLabel` proceed (not cancelled) toggles the checkbox (a TOGGLE through the control's press), while real trusted clicks in Chromium, Firefox and WebKit do not forward the label. The harness now lets only jumps to existing elements through; find what forwards the untrusted click (`press.ts` `forwardedByLabel`?) and add a test.
 - warning: `readingPosition` measures on scroll and resize only; content that grows without either (images loading above the line) updates on the next scroll.
+
+## Number Input (vue-svelte-adapters)
+
+- warning: in the server HTML (every adapter) the Increment and Decrement triggers' `aria-controls` names `number-input-<id>-input`, while a standalone Root's Input carries the Field's control id: the reference dangles until the client learns the Input's id after mount. The Root could use the Field's control id from the start (it creates that Field), so the server HTML is right too.
+
+## Stepper (vue-svelte-adapters)
+
+- warning: an Item's `disabled` and `completed` register after mount in every adapter, so the server HTML shows a disabled step as reachable and a `completed` override as upcoming until hydration. The Root could read them from its declared Items (as Tabs reads its declared panels) or the Items could register during render.
