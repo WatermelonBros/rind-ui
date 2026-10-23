@@ -63,6 +63,12 @@ export function renderPart(
   children: VNodeChild | undefined,
   asChild = false,
 ): VNode {
+  // Connect gives some parts their content as `children` (a calendar heading, a pin cell):
+  // the slot's content wins, else it renders.
+  if ("children" in props) {
+    const { children: own, ...rest } = props
+    return renderPart(tag, rest, children ?? (own as VNodeChild), asChild)
+  }
   if (!asChild) return h(tag, stripMarker(props), children as never)
   const found = elements(children ?? null)
   const child = found[0]

@@ -30,3 +30,21 @@ export const mergeProps = createMergeProps({
   refKey: "ref",
   composeRefs,
 })
+
+const setters = new WeakMap<object, (node: unknown) => void>()
+
+/**
+ * A stable ref callback writing the element into `target`. A function created in the render
+ * would be a new ref on every patch: Vue calls the old one with null and the new one with the
+ * element, so anything watching `target` would see it leave and come back each time.
+ */
+export function refTo(target: { value: Element | null }): (node: unknown) => void {
+  let set = setters.get(target)
+  if (!set) {
+    set = (node) => {
+      target.value = elementOf(node)
+    }
+    setters.set(target, set)
+  }
+  return set
+}

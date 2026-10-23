@@ -42,7 +42,9 @@ export function useMachine<M extends AnyMachine>(
   })
   $effect(() =>
     untrack(() => {
-      const off = service.subscribe(() => version++)
+      // Untracked: a `send` from inside another effect notifies synchronously, and reading
+      // `version` there would make that effect depend on it (and re-run on every change).
+      const off = service.subscribe(() => untrack(() => version++))
       service.start()
       version++
       return () => {

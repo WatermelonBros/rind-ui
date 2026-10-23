@@ -6,17 +6,17 @@ import type { RindIcons } from "./icons"
 import { rindContext, type ScopedMessages } from "./provider"
 
 interface Props {
-  readonly locale?: string
+  readonly locale?: string | undefined
   /** Default: the locale's direction. */
-  readonly dir?: "ltr" | "rtl"
-  readonly messages?: ScopedMessages
-  readonly announcer?: Announcer | "live-region" | "aria-notify"
+  readonly dir?: "ltr" | "rtl" | undefined
+  readonly messages?: ScopedMessages | undefined
+  readonly announcer?: Announcer | "live-region" | "aria-notify" | undefined
   /** Typeahead reset delay for every component below (default 1000 ms). */
-  readonly typeaheadTimeout?: number
+  readonly typeaheadTimeout?: number | undefined
   /** Further environment overrides (platform, reduced motion, nonce, …). */
-  readonly environment?: DomEnvironmentOptions
+  readonly environment?: DomEnvironmentOptions | undefined
   /** Icon components by name, rendered by indicator parts that got no children. */
-  readonly icons?: RindIcons
+  readonly icons?: RindIcons | undefined
   readonly children?: Snippet
 }
 

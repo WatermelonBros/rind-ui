@@ -2,8 +2,13 @@
 "@rind-ui/vue": minor
 "@rind-ui/svelte": minor
 "@rind-ui/core": patch
+"@rind-ui/testing": minor
 ---
 
-New packages: `@rind-ui/vue` (Vue ≥ 3.5) and `@rind-ui/svelte` (Svelte ≥ 5.29), starting with
-Toggle. Same machines, ARIA and drivers as `@rind-ui/react`; components are ported one at a time.
-`@rind-ui/core/internal` gains the framework-neutral helpers the adapters share.
+New packages: `@rind-ui/vue` (Vue ≥ 3.5) and `@rind-ui/svelte` (Svelte ≥ 5.29). Same machines,
+ARIA and drivers as `@rind-ui/react`; components are ported one at a time (this release: Toggle,
+Button, Separator, Kbd, Badge, Heading, Label, Link, Skeleton, Progress, Meter, Avatar, Image,
+Alert, Toggle Group, Fieldset, Field, Text Field, Checkbox, Checkbox Group, Switch, Visually
+Hidden). `@rind-ui/core/internal` gains
+the framework-neutral helpers the adapters share; `@rind-ui/testing` exports `canonicalHtml` to
+compare a component's markup across frameworks.

@@ -6,33 +6,36 @@
 - [x] 1.4 `@rind-ui/svelte` package: the same with runes, attachments and snippets; `svelte-package` build, `scripts/svelte-exports.mjs`, `svelte-check --tsgo`
 - [x] 1.5 Vitest: `@sveltejs/vite-plugin-svelte` in the root config (inherited by every project); Biome override for `.svelte`
 - [x] 1.6 Hydration tests: Vue (`renderToString` + `createSSRApp`), Svelte (server + client bundles of a fixture)
-- [ ] 1.7 Turbo/CI: both packages in `pnpm build`, `pnpm typecheck`, size budgets, changesets
+- [x] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck` (their scripts), changesets
+- [ ] 1.7b Size budgets for the two packages (scripts/size.mjs)
 - [ ] 1.8 Docs: installation for Vue and Svelte; each component's docs page lists the frameworks that ship it
-- [ ] 1.9 Tell the site agent when the first component is on main (exports are the source of truth)
+- [x] 1.9 Tell the site agent when the first component is on main (exports are the source of truth)
+
+- [x] 1.10 DOM parity: `canonicalHtml` (@rind-ui/testing) and per-package parity helpers render each scenario in React and in the adapter and compare the markup
 
 ## 2. Components (Vue and Svelte together; done = parts, contract model green in both, both entries in `exports`)
 
 - [x] 2.1 Toggle
 - [x] 2.2 Button
-- [ ] 2.3 Separator
-- [ ] 2.4 Kbd
-- [ ] 2.5 Badge
-- [ ] 2.6 Heading
-- [ ] 2.7 Label
-- [ ] 2.8 Link
-- [ ] 2.9 Skeleton
-- [ ] 2.10 Progress
-- [ ] 2.11 Meter
-- [ ] 2.12 Avatar
-- [ ] 2.13 Image
-- [ ] 2.14 Alert
-- [ ] 2.15 Toggle Group
-- [ ] 2.16 Fieldset
-- [ ] 2.17 Field
-- [ ] 2.18 Text Field
-- [ ] 2.19 Checkbox
-- [ ] 2.20 Checkbox Group
-- [ ] 2.21 Switch
+- [x] 2.3 Separator
+- [x] 2.4 Kbd
+- [x] 2.5 Badge
+- [x] 2.6 Heading
+- [x] 2.7 Label
+- [x] 2.8 Link
+- [x] 2.9 Skeleton
+- [x] 2.10 Progress
+- [x] 2.11 Meter
+- [x] 2.12 Avatar
+- [x] 2.13 Image
+- [x] 2.14 Alert
+- [x] 2.15 Toggle Group
+- [x] 2.16 Fieldset
+- [x] 2.17 Field
+- [x] 2.18 Text Field
+- [x] 2.19 Checkbox
+- [x] 2.20 Checkbox Group
+- [x] 2.21 Switch
 - [ ] 2.22 Radio Group
 - [ ] 2.23 Segmented Control
 - [ ] 2.24 Collapsible

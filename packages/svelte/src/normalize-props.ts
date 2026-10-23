@@ -1,4 +1,6 @@
 import type { PartProps } from "@rind-ui/core"
+import { neutralName } from "@rind-ui/core/internal"
+import type { HTMLAttributes } from "svelte/elements"
 
 const styleString = (style: object) =>
   Object.entries(style)
@@ -13,11 +15,14 @@ const styleString = (style: object) =>
  */
 export function normalizeProps(props: PartProps): Record<string | symbol, unknown> {
   const out: Record<string | symbol, unknown> = {}
-  for (const key of Reflect.ownKeys(props)) {
+  for (const own of Reflect.ownKeys(props)) {
     // Reflect.ownKeys returns the object's own keys; indexing with them is sound.
-    const value = (props as Record<string | symbol, unknown>)[key]
+    const value = (props as Record<string | symbol, unknown>)[own]
+    const key = typeof own === "string" ? neutralName(own) : own
     if (value === undefined) continue
     if (typeof key === "symbol") out[key] = value
+    // Content, not an attribute: the part renders it (`api.part().children`).
+    else if (key === "children") continue
     else if (key === "inert") {
       // An unknown boolean attribute would render inert="false", which is inert.
       if (value) out[key] = ""
@@ -29,3 +34,11 @@ export function normalizeProps(props: PartProps): Record<string | symbol, unknow
   }
   return out
 }
+
+/**
+ * Connect's (normalised, merged) props typed as element attributes, for spreading in markup:
+ * sound because connect produces only attributes, handlers and attachments of an element.
+ */
+export const attrs = <T = HTMLAttributes<HTMLElement>>(
+  props: Readonly<Record<string | symbol, unknown>>,
+): T => props as T

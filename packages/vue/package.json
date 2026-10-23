@@ -37,15 +37,115 @@
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     },
+    "./alert": {
+      "@rind-ui/source": "./src/alert/index.ts",
+      "types": "./dist/alert/index.d.mts",
+      "default": "./dist/alert/index.mjs"
+    },
+    "./avatar": {
+      "@rind-ui/source": "./src/avatar/index.ts",
+      "types": "./dist/avatar/index.d.mts",
+      "default": "./dist/avatar/index.mjs"
+    },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.mts",
+      "default": "./dist/badge/index.mjs"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.mts",
       "default": "./dist/button/index.mjs"
     },
+    "./checkbox": {
+      "@rind-ui/source": "./src/checkbox/index.ts",
+      "types": "./dist/checkbox/index.d.mts",
+      "default": "./dist/checkbox/index.mjs"
+    },
+    "./checkbox-group": {
+      "@rind-ui/source": "./src/checkbox-group/index.ts",
+      "types": "./dist/checkbox-group/index.d.mts",
+      "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./field": {
+      "@rind-ui/source": "./src/field/index.ts",
+      "types": "./dist/field/index.d.mts",
+      "default": "./dist/field/index.mjs"
+    },
+    "./fieldset": {
+      "@rind-ui/source": "./src/fieldset/index.ts",
+      "types": "./dist/fieldset/index.d.mts",
+      "default": "./dist/fieldset/index.mjs"
+    },
+    "./form-toggle": {
+      "@rind-ui/source": "./src/form-toggle/index.ts",
+      "types": "./dist/form-toggle/index.d.mts",
+      "default": "./dist/form-toggle/index.mjs"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.mts",
+      "default": "./dist/heading/index.mjs"
+    },
+    "./image": {
+      "@rind-ui/source": "./src/image/index.ts",
+      "types": "./dist/image/index.d.mts",
+      "default": "./dist/image/index.mjs"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.mts",
+      "default": "./dist/kbd/index.mjs"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.mts",
+      "default": "./dist/label/index.mjs"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.mts",
+      "default": "./dist/link/index.mjs"
+    },
+    "./meter": {
+      "@rind-ui/source": "./src/meter/index.ts",
+      "types": "./dist/meter/index.d.mts",
+      "default": "./dist/meter/index.mjs"
+    },
+    "./progress": {
+      "@rind-ui/source": "./src/progress/index.ts",
+      "types": "./dist/progress/index.d.mts",
+      "default": "./dist/progress/index.mjs"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.mts",
+      "default": "./dist/separator/index.mjs"
+    },
+    "./skeleton": {
+      "@rind-ui/source": "./src/skeleton/index.ts",
+      "types": "./dist/skeleton/index.d.mts",
+      "default": "./dist/skeleton/index.mjs"
+    },
+    "./switch": {
+      "@rind-ui/source": "./src/switch/index.ts",
+      "types": "./dist/switch/index.d.mts",
+      "default": "./dist/switch/index.mjs"
+    },
+    "./text-field": {
+      "@rind-ui/source": "./src/text-field/index.ts",
+      "types": "./dist/text-field/index.d.mts",
+      "default": "./dist/text-field/index.mjs"
+    },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
       "types": "./dist/toggle/index.d.mts",
       "default": "./dist/toggle/index.mjs"
+    },
+    "./toggle-group": {
+      "@rind-ui/source": "./src/toggle-group/index.ts",
+      "types": "./dist/toggle-group/index.d.mts",
+      "default": "./dist/toggle-group/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -58,8 +158,13 @@
     "@rind-ui/core": "workspace:*"
   },
   "devDependencies": {
+    "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "vue": "^3.5.44"
   },
   "peerDependencies": {
@@ -72,13 +177,93 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
+      "./alert": {
+        "types": "./dist/alert/index.d.mts",
+        "default": "./dist/alert/index.mjs"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.mts",
+        "default": "./dist/avatar/index.mjs"
+      },
+      "./badge": {
+        "types": "./dist/badge/index.d.mts",
+        "default": "./dist/badge/index.mjs"
+      },
       "./button": {
         "types": "./dist/button/index.d.mts",
         "default": "./dist/button/index.mjs"
       },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.mts",
+        "default": "./dist/checkbox/index.mjs"
+      },
+      "./checkbox-group": {
+        "types": "./dist/checkbox-group/index.d.mts",
+        "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.mts",
+        "default": "./dist/field/index.mjs"
+      },
+      "./fieldset": {
+        "types": "./dist/fieldset/index.d.mts",
+        "default": "./dist/fieldset/index.mjs"
+      },
+      "./form-toggle": {
+        "types": "./dist/form-toggle/index.d.mts",
+        "default": "./dist/form-toggle/index.mjs"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.mts",
+        "default": "./dist/heading/index.mjs"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.mts",
+        "default": "./dist/image/index.mjs"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.mts",
+        "default": "./dist/kbd/index.mjs"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.mts",
+        "default": "./dist/label/index.mjs"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.mts",
+        "default": "./dist/link/index.mjs"
+      },
+      "./meter": {
+        "types": "./dist/meter/index.d.mts",
+        "default": "./dist/meter/index.mjs"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.mts",
+        "default": "./dist/progress/index.mjs"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.mts",
+        "default": "./dist/separator/index.mjs"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.mts",
+        "default": "./dist/skeleton/index.mjs"
+      },
+      "./switch": {
+        "types": "./dist/switch/index.d.mts",
+        "default": "./dist/switch/index.mjs"
+      },
+      "./text-field": {
+        "types": "./dist/text-field/index.d.mts",
+        "default": "./dist/text-field/index.mjs"
+      },
       "./toggle": {
         "types": "./dist/toggle/index.d.mts",
         "default": "./dist/toggle/index.mjs"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.mts",
+        "default": "./dist/toggle-group/index.mjs"
       },
       "./package.json": "./package.json"
     }

@@ -30,6 +30,8 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/table/table.tsx` | `talkback-aria-sort` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+| `packages/vue/src/meter/meter.ts` | `nvda-progressbar-name` |
+| `packages/vue/src/progress/progress.ts` | `nvda-progressbar-name` |
 
 ## `webkit-grid-selection-not-announced`
 
@@ -198,7 +200,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/mui/base-ui/issues/4184>, <https://github.com/nvaccess/nvda/issues/13904>, <https://github.com/nvaccess/nvda/issues/16204>, <https://github.com/FreedomScientific/standards-support/issues/354>
 - Repro test: `packages/core/src/components/progress/progress.connect.test.ts`
-- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`
+- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`, `packages/vue/src/meter/meter.ts`, `packages/vue/src/progress/progress.ts`
 - Last verified: 2026-10-16
 - Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases
 
