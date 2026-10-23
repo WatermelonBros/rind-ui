@@ -94,10 +94,32 @@
 :global([data-phase="juicy"]) .inviteOff {
   background: var(--muted);
 }
-/* on a phone, clear of the screen-reader toggle in the corner */
+/* on a phone, one short row in the bottom corner beside the screen-reader toggle: over the hero
+   object's label, not the object (above it the wordmark would be covered) */
+.short {
+  display: none;
+}
 @media (max-width: 760px) {
   .invite {
-    inset-block-end: 84px;
+    inset-block-end: max(20px, env(safe-area-inset-bottom));
+    inset-inline: 16px auto;
+    max-inline-size: calc(100% - 32px - 64px);
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 6px 6px 6px 14px;
+    font-size: 13px;
+  }
+  .invite > :first-child,
+  .long {
+    display: none;
+  }
+  .short {
+    display: inline;
+  }
+  .invite button {
+    min-block-size: 36px;
+    padding: 0 12px;
+    white-space: nowrap;
   }
 }
 @keyframes invite-in {

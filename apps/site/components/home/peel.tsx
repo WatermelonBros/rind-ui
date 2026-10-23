@@ -200,7 +200,7 @@ export function Peel() {
               })}
             </ul>
 
-            <svg className={styles.graph} viewBox="0 0 420 150">
+            <svg className={styles.graph} viewBox="0 0 420 150" data-state-graph="">
               <title>{`${kind} state machine`}</title>
               <path className={styles.edge} d="M118 58 C170 20 250 20 302 58" />
               <path className={styles.edge} d="M302 92 C250 130 170 130 118 92" />
@@ -210,13 +210,13 @@ export function Peel() {
               <text className={styles.event} x="210" y="142" textAnchor="middle">
                 {machine.back}
               </text>
-              <g data-on={on ? undefined : ""}>
+              <g data-on={on ? undefined : ""} data-state-node="">
                 <rect x="10" y="50" width="120" height="50" rx="25" />
                 <text x="70" y="80" textAnchor="middle">
                   {machine.off}
                 </text>
               </g>
-              <g data-on={on ? "" : undefined}>
+              <g data-on={on ? "" : undefined} data-state-node="">
                 <rect x="290" y="50" width="120" height="50" rx="25" />
                 <text x="350" y="80" textAnchor="middle">
                   {machine.on}

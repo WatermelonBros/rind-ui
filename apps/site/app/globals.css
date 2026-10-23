@@ -73,6 +73,17 @@ a {
   border-radius: 6px;
 }
 
+/* a place on a page reached by its #id lands clear of the bar (and of the docs' Pages bar on a
+   phone, sidebar.module.css), not under it */
+main [id] {
+  scroll-margin-top: calc(var(--bar-h) + 24px);
+}
+@media (max-width: 860px) {
+  main [id] {
+    scroll-margin-top: calc(var(--bar-h) + 96px);
+  }
+}
+
 /* Intro (components/intro.tsx): until its copy of the page exists, nothing shows, so the styled
    page never flashes first. A failsafe shows it anyway if the copy never comes. */
 html.intro:not([data-intro-ready]) body {
@@ -82,6 +93,37 @@ html.intro:not([data-intro-ready]) body {
 @keyframes intro-failsafe {
   to {
     visibility: visible;
+  }
+}
+/* the drop that falls on the raw copy and, landing, lets the styles out (components/intro.tsx) */
+#rind-intro-drop {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  z-index: 200;
+  width: 34px;
+  height: 34px;
+  margin-left: -17px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: #ff3d8b;
+  animation: intro-fall 0.45s cubic-bezier(0.55, 0, 0.75, 0.2) forwards;
+}
+@keyframes intro-fall {
+  0% {
+    translate: 0 -40px;
+    scale: 0.8 1.15;
+  }
+  82% {
+    translate: 0 42vh;
+    scale: 0.85 1.2;
+  }
+  92% {
+    translate: 0 42vh;
+    scale: 1.5 0.6;
+  }
+  100% {
+    translate: 0 42vh;
+    scale: 1.1 0.9;
   }
 }
 /* the page as the browser renders it with no CSS: a static copy over the real, styled page */

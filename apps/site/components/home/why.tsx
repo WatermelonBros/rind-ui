@@ -12,8 +12,10 @@ import {
 } from "react"
 import { createPortal } from "react-dom"
 import { usePhase } from "../phase"
+import { handoff } from "./handoff"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 import { utterance } from "./sr-view"
 
@@ -78,7 +80,13 @@ function Proof({
         ref={(el) => claim(index, el)}
         data-active={shown ? "" : undefined}
       >
-        <h3>{title}</h3>
+        <h3>
+          {/* a passed test's tick, landed from the tests above (desktop only: handoff.ts) */}
+          <span className={styles.proved} data-proved="" aria-hidden="true">
+            ✓
+          </span>
+          {title}
+        </h3>
         <p>{text}</p>
       </div>
       {target ? createPortal(panel, target) : panel}
@@ -348,12 +356,38 @@ function ProofStage({ children }: { children: ReactNode }) {
 }
 
 export function Why() {
+  // the tests above end on PASS: as their band lets go, the pass splits into three ticks that
+  // fall down the margin to these claims and hang there as their marks, what is promised here
+  // already passed there (desktop only: handoff.ts)
+  useEffect(
+    () =>
+      handoff({
+        scene: () => document.getElementById("tested-title")?.closest("[data-band]") ?? null,
+        from: () => {
+          const pass = document.querySelector("[data-pass-mark]")
+          return pass ? [pass, pass, pass] : []
+        },
+        to: () => [...document.querySelectorAll("[data-proved]")],
+        make: () => {
+          const t = document.createElement("span")
+          t.className = styles.tickTraveller ?? ""
+          t.textContent = "✓"
+          return t
+        },
+        landed: (mark, on) => mark.toggleAttribute("data-landed", on),
+        lane: () => {
+          const r = document.querySelector("[data-proved]")?.getBoundingClientRect()
+          return r ? r.left + r.width / 2 : 80
+        },
+      }),
+    [],
+  )
   return (
     <div className={styles.band} data-band="paper">
       <section className={styles.section} aria-labelledby="why-title">
         <Reveal>
           <h2 id="why-title" className={styles.h2}>
-            Everything but the look.
+            <Letters>Everything but the look.</Letters>
           </h2>
           <p className={styles.lead}>No CSS ships. Here is what does: try each one.</p>
         </Reveal>

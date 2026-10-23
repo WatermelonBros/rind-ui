@@ -22,6 +22,14 @@ export function SoundInvite() {
   const done = useRef(false)
 
   useEffect(() => {
+    // the nav's toggle stays hidden while the question is pending (sound.module.css); the inline
+    // script in <head> sets this on the landing's first paint, this keeps it on a return visit
+    const root = document.documentElement
+    if (!done.current) root.setAttribute("data-sound-ask", "")
+    return () => root.removeAttribute("data-sound-ask")
+  }, [])
+
+  useEffect(() => {
     // after the intro (html.intro goes once the styled page is revealed)
     let shown = 0
     const wait = window.setInterval(() => {
@@ -41,8 +49,12 @@ export function SoundInvite() {
     if (on !== null) setEnabled(on)
     const el = box.current
     const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
-    if (!el || !to || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const handOver = () => {
       setOpen(false)
+      document.documentElement.removeAttribute("data-sound-ask")
+    }
+    if (!el || !to || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      handOver()
       return
     }
     // into the toggle: shrinking to its size and place, fading as it arrives
@@ -62,7 +74,7 @@ export function SoundInvite() {
       ],
       { duration: 650, easing: "cubic-bezier(0.6, 0, 0.3, 1)", fill: "forwards" },
     ).onfinish = () => {
-      setOpen(false)
+      handOver()
       // the toggle takes the hand-over with a little bounce
       document
         .querySelector("[data-sound-toggle]")
@@ -91,7 +103,10 @@ export function SoundInvite() {
   return (
     <aside ref={box} className={styles.invite} aria-label="Sound">
       <SoundBars idle />
-      <p>This page has sound.</p>
+      <p>
+        <span className={styles.long}>This page has sound.</span>
+        <span className={styles.short}>Sound?</span>
+      </p>
       <Button className={styles.inviteOn} onPress={() => leave(true)}>
         Turn it on
       </Button>

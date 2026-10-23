@@ -109,6 +109,9 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
         vt.ready.then(() => wave(x, y, next === "juicy"))
         vt.finished.finally(() => {
           busy.current = false
+          // the titles answer once the wave has passed: inside it their letters would be hidden
+          // behind its front (home/letters.tsx)
+          document.documentElement.dataset["letters"] = next
         })
         return
       }
@@ -118,6 +121,7 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
       setTimeout(() => {
         setPour(null)
         busy.current = false
+        document.documentElement.dataset["letters"] = next
       }, POUR_MS + 50)
     },
     [apply],

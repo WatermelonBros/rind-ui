@@ -14,6 +14,7 @@ import {
   useTestLanded,
 } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Step = {
@@ -214,7 +215,7 @@ export function Tested() {
       <section className={styles.section} aria-labelledby="tested-title">
         <Reveal>
           <h2 id="tested-title" className={styles.h2}>
-            The tests come in the box.
+            <Letters>The tests come in the box.</Letters>
           </h2>
           <p className={styles.lead}>
             Every component ships a driver: what a user does and asks. One test runs in Testing
@@ -254,7 +255,7 @@ export function Tested() {
           >
             {passed !== null && (
               <>
-                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b>{" "}
+                <b data-pass-mark={failed ? undefined : ""}>{failed ? "✗ FAIL" : "✓ PASS"}</b>{" "}
                 {/* each fact wraps whole, with its separator: never "· 2.7s" alone on a line */}
                 <span className={styles.passFact}>{kind}.test.ts</span>{" "}
                 <span className={styles.passFact}>

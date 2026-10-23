@@ -14,8 +14,10 @@ import {
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import { type Phase, usePhase } from "../phase"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
+import { handoff } from "./handoff"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
+import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Shadow = "flat" | "soft" | "hard"
@@ -376,6 +378,35 @@ export function AnyLook() {
   const look = { ...picked, brand: picked.brand ?? BRAND[phase] }
   // the hero's travelling object lands on the preview component of its own kind (skin-scene.tsx)
   const stage = useRef<HTMLDivElement>(null)
+  // from the machine above: its two states leave the graph as the scene lets go, become the
+  // selectors they are, and land on the data-* this section styles (desktop only: handoff.ts)
+  useEffect(
+    () =>
+      handoff({
+        scene: () => document.querySelector('[aria-labelledby="peel-title"]'),
+        from: () => [...document.querySelectorAll("[data-state-node]")],
+        to: () => [...document.querySelectorAll("[data-states-land]")],
+        make: (node) => {
+          const pill = document.createElement("span")
+          pill.className = styles.statePill ?? ""
+          pill.dataset["word"] = node.textContent?.trim() ?? ""
+          pill.textContent = pill.dataset["word"]
+          return pill
+        },
+        update: (pill, t) => {
+          const word = pill.dataset["word"] ?? ""
+          // the state, the selector it is, then the data-* it lands on, as wide as its landing
+          const text = t > 0.8 ? "data-*" : t > 0.3 ? `[data-state="${word}"]` : word
+          if (pill.textContent !== text) pill.textContent = text
+        },
+        landed: (code, on) => code.toggleAttribute("data-landed", on),
+        leaving: (on) =>
+          document.querySelector("[data-state-graph]")?.toggleAttribute("data-left", on),
+        // down the right margin, clear of this section's title and lead
+        lane: () => window.innerWidth - 140,
+      }),
+    [],
+  )
   useEffect(() => {
     const selector = {
       switch: '[data-scope="switch"][data-part="control"]',
@@ -469,12 +500,12 @@ export function AnyLook() {
     <section ref={section} className={styles.section} aria-labelledby="look-title">
       <Reveal>
         <h2 id="look-title" className={styles.h2}>
-          Same components. Any skin.
+          <Letters>Same components. Any skin.</Letters>
         </h2>
         <p className={styles.lead}>
           These are live rind components with no styles of their own. Build a skin, then take the
-          CSS: it only targets <code>data-*</code> attributes, so a skin is a stylesheet, never a
-          fork.
+          CSS: it only targets <code data-states-land="">data-*</code> attributes, so a skin is a
+          stylesheet, never a fork.
         </p>
       </Reveal>
       <Reveal className={styles.lookPanel}>
