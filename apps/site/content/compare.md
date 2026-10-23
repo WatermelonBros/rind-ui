@@ -81,6 +81,10 @@ Ariakit is a careful, low-level toolkit for React and Solid. Reka UI (Vue), Bits
 
 ## When rind-ui fits
 
+<!-- 1.0+ -->
+- You want a stable API: rind-ui is 1.0 and follows semantic versioning, so only a major
+  release removes or renames anything, and the old name warns for a minor release first.
+<!-- /1.0+ -->
 - You want every component tested from the outside, the way a user drives it, in both
   Testing Library and Playwright.
 - You build with coding agents and want them to know the API and verify what they write.
