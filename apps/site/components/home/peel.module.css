@@ -283,7 +283,7 @@
 @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
   .peel {
     z-index: 1;
-    margin-top: calc(-30 * var(--vh));
+    margin-top: calc(-42 * var(--vh));
   }
   /* rising over the hero's tail, it lets that tail show (its ground is the page's own): an
      opaque ground cut the hero's buttons through their middle */
