@@ -263,9 +263,13 @@
 }
 
 /* its states have left for the next scene (any-look.tsx, handoff.ts): the arcs and their events
-   go with them, so no empty graph is left behind */
+   go with them, so no empty graph is left behind; the whole graph fades as one, both ways */
+.graph [data-state-node],
+.graph .edge,
+.graph .event {
+  transition: opacity 0.3s;
+}
 .graph[data-left] .edge,
 .graph[data-left] .event {
   opacity: 0;
-  transition: opacity 0.3s;
 }

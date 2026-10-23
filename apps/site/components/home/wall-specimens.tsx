@@ -12,7 +12,6 @@ import {
 } from "react"
 import { MorphLink } from "../morph-link"
 import { usePhase } from "../phase"
-import { handoff } from "./handoff"
 import styles from "./home.module.css"
 
 /** One attribute of one part, read live from the DOM: the styling contract, in plain sight. */
@@ -84,8 +83,6 @@ function Specimen({
   const skin = shown === null ? null : SKINS[shown % SKINS.length]
   return (
     <li className={styles.specimen}>
-      {/* where a name from the agents' llms.txt lands (desktop only: handoff.ts) */}
-      <span className={styles.nameLand} data-name-land="" aria-hidden="true" />
       <div
         ref={root}
         className={styles.specimenStage}
@@ -261,37 +258,6 @@ export function WallSpecimens() {
       cancelAnimationFrame(frame)
     }
   }, [])
-  // the catalogue fills from the docs a model reads: as the agents' section lets go, the first
-  // names lift off beside its llms.txt link one after another and land on their cards (desktop
-  // only)
-  useEffect(
-    () =>
-      handoff({
-        scene: () => document.querySelector('[aria-labelledby="agents-title"]'),
-        from: () => {
-          const spot = document.querySelector("[data-names-from]")
-          return spot ? [spot, spot, spot] : []
-        },
-        // after the claims have gone into the link (agents.tsx), never both at once
-        startAt: 0.72,
-        // on each card's top edge, so the names cross the gap above the row, never a card
-        to: () =>
-          [...(list.current?.querySelectorAll(":scope > li > [data-name-land]") ?? [])].slice(0, 3),
-        make: (_, i) => {
-          const name = document.createElement("span")
-          name.className = styles.nameTraveller ?? ""
-          name.textContent =
-            list.current?.querySelectorAll(":scope > li [data-morph]")[i]?.textContent ?? ""
-          return name
-        },
-        // down the left margin, beside the wall's title and lead, then in across the gap above
-        // the row: never over copy
-        lane: () => (list.current?.getBoundingClientRect().left ?? 120) / 2,
-        landed: (spot, on) =>
-          spot.parentElement?.querySelector("[data-morph]")?.toggleAttribute("data-landed", on),
-      }),
-    [],
-  )
   return (
     <Wave.Provider value={wave}>
       <ul ref={list} className={styles.specimens} aria-label="Try a few">

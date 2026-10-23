@@ -3,7 +3,6 @@
 import { Button, MessageThread, StreamingMessage } from "@rind-ui/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
-import { handoff } from "./handoff"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
 import { Letters } from "./letters"
@@ -124,32 +123,6 @@ export function Agents() {
   const { phase } = usePhase()
   const [kind, setKind] = useState<HeroKind>("switch")
   useEffect(() => setKind(heroKind()), [])
-  // the claims above, the same facts read by a model: as their band lets go, each title drops
-  // down the margin as a line of text into this section's llms.txt (desktop only)
-  useEffect(
-    () =>
-      handoff({
-        scene: () => document.getElementById("why-title")?.closest("[data-band]") ?? null,
-        from: () =>
-          [...document.querySelectorAll("[data-proved]")].map((m) => m.parentElement ?? m),
-        to: () => [...document.querySelectorAll("[data-llms-link]")],
-        make: (title) => {
-          const line = document.createElement("span")
-          line.className = styles.lineTraveller ?? ""
-          // a line of the file, cut to fit the margin it falls down
-          const words = title.textContent?.replace("✓", "").trim().split(" ") ?? []
-          line.textContent = `${words.slice(0, 2).join(" ")}…`
-          return line
-        },
-        landed: (link, on) => link.toggleAttribute("data-landed", on),
-        // done before the wall's names leave the same link (wall-specimens.tsx)
-        endAt: 0.6,
-        // the page's left margin, clear of the claims' text
-        lane: () =>
-          (document.getElementById("agents-title")?.getBoundingClientRect().left ?? 120) / 2,
-      }),
-    [],
-  )
   const { text, status, play } = useReplay(kind)
   const stage = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -180,9 +153,7 @@ export function Agents() {
             the way you would.
           </p>
           <div className={styles.agentsActs}>
-            {/* where the wall's names lift off, in the margin beside the link (wall-specimens.tsx) */}
-            <span className={styles.namesFrom} data-names-from="" aria-hidden="true" />
-            <a href="/llms.txt" className={styles.agentsLink} data-llms-link="">
+            <a href="/llms.txt" className={styles.agentsLink}>
               Read llms.txt ↗
             </a>
             <Button

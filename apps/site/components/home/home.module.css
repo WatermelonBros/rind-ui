@@ -91,49 +91,6 @@
     background: var(--acc);
   }
 }
-/* agents.tsx, wall-specimens.tsx: lines and names in flight between scenes (handoff.ts) */
-.lineTraveller,
-.nameTraveller {
-  padding: 6px 12px;
-  border-radius: 99px;
-  font: 600 14px var(--mono);
-  white-space: nowrap;
-  color: var(--card);
-  background: var(--ink);
-}
-.nameTraveller {
-  font-size: 16px;
-  padding: 8px 16px;
-  background: var(--acc);
-  color: var(--ink);
-}
-.agentsActs {
-  position: relative;
-}
-.namesFrom {
-  position: absolute;
-  inset-inline-end: calc(100% + 16px);
-  inset-block-start: 50%;
-  inline-size: 1px;
-  block-size: 36px;
-  translate: 0 -50%;
-}
-.agentsLink[data-landed],
-.specimenFoot a[data-landed] {
-  animation: token-catch 0.6s var(--spring-pop);
-}
-.specimenFoot a {
-  display: inline-block;
-}
-/* a card's top edge, where a name from the agents' llms.txt lands (wall-specimens.tsx) */
-.nameLand {
-  position: absolute;
-  inset-block-start: -18px;
-  inset-inline-start: 50%;
-  inline-size: 1px;
-  block-size: 36px;
-  pointer-events: none;
-}
 .lead code {
   font: 500 0.9em var(--mono);
   background: color-mix(in oklab, var(--ink) 9%, transparent);
@@ -833,7 +790,6 @@
   }
 }
 .specimen {
-  position: relative;
   display: grid;
   grid-template-rows: 1fr auto;
   background: var(--ink);

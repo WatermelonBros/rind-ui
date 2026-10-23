@@ -1,9 +1,10 @@
 "use client"
 
-import { Drawer } from "@rind-ui/react"
+import { Drawer, SegmentedControl } from "@rind-ui/react"
 import Link from "next/link"
 import { useState } from "react"
 import styles from "./nav.module.css"
+import { usePhase } from "./phase"
 
 const LINKS = [
   { href: "/docs/get-started/", label: "Docs" },
@@ -18,13 +19,18 @@ const OUT = [
 /**
  * The phone's way around (the bar has room only for the logo and the toggles): a rind Drawer
  * from the bottom edge, where the thumb is; a swipe down puts it away. A link closes it, and the
- * page wave (route-wave.tsx) takes the move from the press.
+ * page wave (route-wave.tsx) takes the move from the press. The phase lives here too, both
+ * sides named: the bar's switch had room for one label only. The drawer stays open on a pick,
+ * so the wave is seen spreading from it.
  */
 export function NavMenu() {
   const [open, setOpen] = useState(false)
+  const { phase, setPhase } = usePhase()
   return (
     <Drawer.Root open={open} onOpenChange={setOpen}>
-      <Drawer.Trigger className={styles.menuButton}>Menu</Drawer.Trigger>
+      <Drawer.Trigger className={styles.menuButton} aria-label="Menu">
+        <span className={styles.burger} aria-hidden="true" />
+      </Drawer.Trigger>
       <Drawer.Portal>
         <Drawer.Backdrop className={styles.menuBackdrop} />
         <Drawer.Positioner className={styles.menuPositioner}>
@@ -40,6 +46,21 @@ export function NavMenu() {
                 </li>
               ))}
             </ul>
+            <SegmentedControl.Root
+              className={styles.menuPhase}
+              aria-label="Look"
+              value={phase}
+              onValueChange={(v) => {
+                if (v === "juicy" || v === "crisp") setPhase(v)
+              }}
+            >
+              {(["juicy", "crisp"] as const).map((p) => (
+                <SegmentedControl.Item key={p} className={styles.menuPhaseItem} value={p}>
+                  {p}
+                </SegmentedControl.Item>
+              ))}
+              <SegmentedControl.Indicator className={styles.menuPhaseIndicator} />
+            </SegmentedControl.Root>
             <ul className={styles.menuOut}>
               {OUT.map((l) => (
                 <li key={l.href}>

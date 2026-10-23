@@ -35,6 +35,9 @@ export interface HandoffOptions {
 const DESKTOP = "(min-width: 761px) and (prefers-reduced-motion: no-preference)"
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 const clamp = (t: number) => Math.min(1, Math.max(0, t))
+// a traveller is on its landing by this share of its trip and holds still there for the rest,
+// fading into it: one still moving as it fades read as landing beside its target
+const ARRIVE = 0.86
 // a start that can be used (a link, a button) stays put; anything else is drawn away while its
 // copy travels, by opacity only, so it stays in the accessibility tree
 const spent = (el: Element) => !el.matches("a, button, input, select, textarea, [tabindex]")
@@ -107,6 +110,7 @@ export function handoff(o: HandoffOptions): () => void {
           return
         }
         o.update?.(node, ti, i)
+        const p = clamp(ti / ARRIVE)
         const ax = a.left + a.width / 2
         const ay = a.top + a.height / 2
         const bx = b.left + b.width / 2
@@ -114,28 +118,29 @@ export function handoff(o: HandoffOptions): () => void {
         let x: number
         let y: number
         if (lane === undefined) {
-          x = ax + (bx - ax) * ease(clamp((ti - 0.35) / 0.65))
-          y = ay + (by - ay) * ease(clamp(ti * 1.4))
+          x = ax + (bx - ax) * ease(clamp((p - 0.35) / 0.65))
+          y = ay + (by - ay) * ease(clamp(p * 1.4))
         } else {
           // out to the margin, down it, then in along the landing's line
-          const out = ease(clamp(ti / 0.2))
-          const down = ease(clamp((ti - 0.15) / 0.65))
-          const into = ease(clamp((ti - 0.8) / 0.2))
+          const out = ease(clamp(p / 0.2))
+          const down = ease(clamp((p - 0.15) / 0.65))
+          const into = ease(clamp((p - 0.8) / 0.2))
           x = ax + (lane - ax) * out + (bx - lane) * into
           y = ay + (by - ay) * down
         }
         // it leaves at its start's size, travels at its own and lands at the landing's
         const w = node.offsetWidth || 1
         const h = node.offsetHeight || 1
-        const grow = ease(clamp(ti / 0.25))
-        const shrink = ease(clamp((ti - 0.75) / 0.25))
+        const grow = ease(clamp(p / 0.25))
+        const shrink = ease(clamp((p - 0.75) / 0.25))
         const s = (a.height / h) * (1 - grow) + grow * (1 - shrink) + (b.height / h) * shrink
         // whole on screen, however wide the traveller is next to its lane
         const half = (w * s) / 2
-        x = Math.min(window.innerWidth - half - 16, Math.max(half + 16, x))
+        // (only on the way: where it lands is where it lands)
+        if (p < 1) x = Math.min(window.innerWidth - half - 16, Math.max(half + 16, x))
         node.style.transform = `translate(${x - half}px, ${y - (h * s) / 2}px) scale(${s})`
         // it lifts off its start and melts into its landing, never a copy lying on either
-        node.style.opacity = String(Math.min(1, ti / 0.12, (1 - ti) / 0.1))
+        node.style.opacity = String(Math.min(1, ti / 0.12, (1 - ti) / (1 - ARRIVE)))
       })
     } else if (t <= 0) clear()
     else {
@@ -143,9 +148,10 @@ export function handoff(o: HandoffOptions): () => void {
       layer = null
       travellers = []
     }
-    // each landing is caught as the first traveller bound for it arrives
+    // each landing is caught as the first traveller bound for it arrives, and the traveller
+    // melts into it
     to.forEach((target, j) => {
-      const on = from.some((_, i) => i % to.length === j && own(i) >= 1)
+      const on = from.some((_, i) => i % to.length === j && own(i) >= ARRIVE)
       if (on === (caught[j] ?? false)) return
       caught[j] = on
       o.landed?.(target, on)
