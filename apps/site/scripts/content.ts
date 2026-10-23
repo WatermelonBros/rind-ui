@@ -523,8 +523,15 @@ const coverageTable = [
   `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | React (framework-free core) | every component | declared, with model-based tests | ${aiReady} ready |`,
   ...coverage,
 ].join("\n")
-const compare = byRelease(
-  readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"),
-).replace("<!-- coverage -->", coverageTable)
+// the gaps, from the repository's own list (docs/compare-gaps.md), so the page shows the same
+// table the maintainers keep; its links point inside the repository, so they become plain text
+const gapsTable = readFileSync(join(repo, "docs/compare-gaps.md"), "utf8")
+  .split("\n")
+  .filter((line) => line.startsWith("|"))
+  .map((line) => line.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/`([^`]+)` rows/, "$1 rows"))
+  .join("\n")
+const compare = byRelease(readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"))
+  .replace("<!-- coverage -->", coverageTable)
+  .replace("<!-- gaps -->", gapsTable)
 writeFileSync(join(out, "compare.md"), compare)
 writeFileSync(join(import.meta.dirname, "../public/compare.md"), compare)

@@ -189,11 +189,12 @@ export function SkinScene() {
     const gutterFit = (w: number, h: number) => {
       const frame = getLookTarget()?.closest("[data-look]")?.parentElement?.getBoundingClientRect()
       const right = frame?.right ?? window.innerWidth
-      const room = window.innerWidth - right - 32
+      // 24px off the frame: the drawn object (depth, shadow) runs past its box
+      const room = window.innerWidth - right - 24 - 32
       // big enough to read as the object, not debris (it may overlap the frame's edge for that),
       // centred in the room when there is room, and always 32px clear of the viewport's edge
       const k = Math.max(112, Math.min(w, room)) / w
-      const x = right + 8 + Math.max(0, (room - w * k) / 2)
+      const x = right + 24 + Math.max(0, (room - w * k) / 2)
       return { w: w * k, h: h * k, x: Math.min(x, window.innerWidth - w * k - 32) }
     }
     // Desktop: between scenes the object lives in the right-hand gutter. It berths there level
@@ -263,13 +264,14 @@ export function SkinScene() {
     }
     const onGrabMove = (e: PointerEvent) => {
       if (grab.down) {
-        // kept whole on screen: a pull never loses it past an edge
+        // kept whole on screen: a pull never loses it past an edge (32px, since the drawn
+        // object, its depth and shadow, runs past the box it is fitted to)
         const r = drawn
         grab.x = r
-          ? Math.min(window.innerWidth - r.right - 8, Math.max(8 - r.left, e.clientX - grab.sx))
+          ? Math.min(window.innerWidth - r.right - 32, Math.max(32 - r.left, e.clientX - grab.sx))
           : e.clientX - grab.sx
         grab.y = r
-          ? Math.min(window.innerHeight - r.bottom - 8, Math.max(72 - r.top, e.clientY - grab.sy))
+          ? Math.min(window.innerHeight - r.bottom - 32, Math.max(80 - r.top, e.clientY - grab.sy))
           : e.clientY - grab.sy
         if (Math.hypot(grab.x, grab.y) > 4) grab.moved = true
         scene.current?.wake()
