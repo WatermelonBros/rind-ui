@@ -246,11 +246,11 @@ const captureInput = (node: HTMLInputElement) => {
 }
 </script>
 
-{#snippet inputs()}
-  <!-- After the control: never a wrapping label's first labelable descendant. -->
-  <input {...attrs(normalizeProps(api.hiddenInput()))} {@attach captureInput} />
-  {#if unchecked}<input {...attrs(normalizeProps(unchecked))} />{/if}
-{/snippet}
+<!-- After the control: never a wrapping label's first labelable descendant. No whitespace
+around the inputs: an inline toggle lays out as in the other adapters. -->
+{#snippet inputs()}<input {...attrs(normalizeProps(api.hiddenInput()))} {@attach captureInput} />{#if unchecked}<input
+      {...attrs(normalizeProps(unchecked))}
+    />{/if}{/snippet}
 
 {#if child}
   {@render child({ props: merged, state: toggleState })}

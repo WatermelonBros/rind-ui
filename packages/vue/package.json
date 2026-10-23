@@ -37,6 +37,11 @@
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.mts",
+      "default": "./dist/accordion/index.mjs"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.mts",
@@ -52,6 +57,11 @@
       "types": "./dist/badge/index.d.mts",
       "default": "./dist/badge/index.mjs"
     },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.mts",
+      "default": "./dist/breadcrumbs/index.mjs"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.mts",
@@ -66,6 +76,11 @@
       "@rind-ui/source": "./src/checkbox-group/index.ts",
       "types": "./dist/checkbox-group/index.d.mts",
       "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.mts",
+      "default": "./dist/collapsible/index.mjs"
     },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
@@ -112,10 +127,30 @@
       "types": "./dist/meter/index.d.mts",
       "default": "./dist/meter/index.mjs"
     },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.mts",
+      "default": "./dist/pagination/index.mjs"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.mts",
       "default": "./dist/progress/index.mjs"
+    },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.mts",
+      "default": "./dist/radio-group/index.mjs"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.mts",
+      "default": "./dist/rating/index.mjs"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.mts",
+      "default": "./dist/segmented-control/index.mjs"
     },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
@@ -132,6 +167,11 @@
       "types": "./dist/switch/index.d.mts",
       "default": "./dist/switch/index.mjs"
     },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.mts",
+      "default": "./dist/tabs/index.mjs"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.mts",
@@ -146,6 +186,11 @@
       "@rind-ui/source": "./src/toggle-group/index.ts",
       "types": "./dist/toggle-group/index.d.mts",
       "default": "./dist/toggle-group/index.mjs"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.mts",
+      "default": "./dist/toolbar/index.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -177,6 +222,10 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.mts",
+        "default": "./dist/accordion/index.mjs"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.mts",
         "default": "./dist/alert/index.mjs"
@@ -189,6 +238,10 @@
         "types": "./dist/badge/index.d.mts",
         "default": "./dist/badge/index.mjs"
       },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.mts",
+        "default": "./dist/breadcrumbs/index.mjs"
+      },
       "./button": {
         "types": "./dist/button/index.d.mts",
         "default": "./dist/button/index.mjs"
@@ -200,6 +253,10 @@
       "./checkbox-group": {
         "types": "./dist/checkbox-group/index.d.mts",
         "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.mts",
+        "default": "./dist/collapsible/index.mjs"
       },
       "./field": {
         "types": "./dist/field/index.d.mts",
@@ -237,9 +294,25 @@
         "types": "./dist/meter/index.d.mts",
         "default": "./dist/meter/index.mjs"
       },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.mts",
+        "default": "./dist/pagination/index.mjs"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.mts",
         "default": "./dist/progress/index.mjs"
+      },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.mts",
+        "default": "./dist/radio-group/index.mjs"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.mts",
+        "default": "./dist/rating/index.mjs"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.mts",
+        "default": "./dist/segmented-control/index.mjs"
       },
       "./separator": {
         "types": "./dist/separator/index.d.mts",
@@ -253,6 +326,10 @@
         "types": "./dist/switch/index.d.mts",
         "default": "./dist/switch/index.mjs"
       },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.mts",
+        "default": "./dist/tabs/index.mjs"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.mts",
         "default": "./dist/text-field/index.mjs"
@@ -264,6 +341,10 @@
       "./toggle-group": {
         "types": "./dist/toggle-group/index.d.mts",
         "default": "./dist/toggle-group/index.mjs"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.mts",
+        "default": "./dist/toolbar/index.mjs"
       },
       "./package.json": "./package.json"
     }
