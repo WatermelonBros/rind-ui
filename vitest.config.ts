@@ -1,4 +1,5 @@
 import { availableParallelism } from "node:os"
+import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
 
@@ -63,7 +64,12 @@ const maxWorkers = process.env["CI"]
 // machine (several sessions, CI) needs more than Vitest's 1 s default.
 const patient = { poll: { timeout: 5000 } }
 
+// Compiles @rind-ui/svelte's components and fixtures (`.svelte`, `.svelte.ts`); inline
+// projects inherit it. Other files pass through untouched.
+const plugins = [svelte({ configFile: false, compilerOptions: { dev: true } })]
+
 export default defineConfig({
+  plugins,
   resolve,
   ssr,
   test: {
