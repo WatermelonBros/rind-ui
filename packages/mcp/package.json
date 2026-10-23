@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "MCP server for rind-ui: lets coding agents list rind-ui's headless React components and read each one's parts, props, data-* attributes, keyboard support and test driver.",
   "license": "MIT",
   "author": "Watermelon Bros",

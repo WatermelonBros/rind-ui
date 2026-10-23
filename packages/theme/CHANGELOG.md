@@ -1,5 +1,15 @@
 # @rind-ui/theme
 
+## 1.0.0
+
+### Major Changes
+
+- 0774e80: rind-ui 1.0: the public API is stable. Component and part names, props, the `data-*` and `aria-*` attributes parts render, CSS custom properties, messages and driver actions and queries change only in a major release, after at least one minor release of development warnings.
+
+### Patch Changes
+
+- ed626d1: Package pages on npm point to the docs site and carry searchable keywords; `@rind-ui/react` describes what it is.
+
 ## 0.5.0
 
 ### Minor Changes
