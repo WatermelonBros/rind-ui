@@ -57,11 +57,12 @@ export default function Home() {
         {/* the install: a socket per framework, lit as each package ships (lib/frameworks.ts) */}
         <Suspense>
           <Install
-            frameworks={frameworks().map(({ id, name, pkg, ready, components }) => ({
+            frameworks={frameworks().map(({ id, name, pkg, ready, version, components }) => ({
               id,
               name,
               pkg,
               ready,
+              version,
               count: components.length,
             }))}
           />

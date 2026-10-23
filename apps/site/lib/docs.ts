@@ -13,7 +13,8 @@ const slugs = new Set(pages.map((p) => p.slug))
 
 /** `collapsible.md`, `../components/label.md#x` → `/docs/collapsible/`, `/docs/label/#x`. */
 function docHref(href: string): string {
-  if (/^[a-z]+:/i.test(href) || href.startsWith("#")) return href
+  // absolute (another site), in-page or one of this site's own paths (/llms.txt): as written
+  if (/^[a-z]+:/i.test(href) || href.startsWith("#") || href.startsWith("/")) return href
   const m = /(?:^|\/)([\w-]+)\.md(#.*)?$/.exec(href)
   if (m?.[1] && slugs.has(m[1])) return `/docs/${m[1]}/${m[2] ?? ""}`
   return `https://github.com/WatermelonBros/rind-ui/blob/main/docs/${href.replace(/^(\.\.\/)+/, "")}`

@@ -26,6 +26,9 @@ export interface HandoffOptions {
   /** A margin to travel in (x in viewport pixels): out to it first, down it, and into the
    *  landing only at the end, along the landing's own line, so the trip never crosses copy. */
   readonly lane?: () => number
+  /** Instead of lane moves: one sinuous line, leaving its start downward at once (never along
+   *  the text it starts on) and swaying from side to side as it falls to its landing. */
+  readonly curve?: boolean
   /** With a lane: a clear strip under the landing's own paragraph (y in viewport pixels). The
    *  traveller crosses along it and rises into its landing from below, so it never crosses the
    *  paragraph's copy: for a landing in running text whose last line ends short of it. */
@@ -126,7 +129,13 @@ export function handoff(o: HandoffOptions): () => void {
         const by = b.top + b.height / 2
         let x: number
         let y: number
-        if (lane === undefined) {
+        if (o.curve) {
+          // down first, sideways later, with a sway that dies out as it nears the landing
+          const fall = 1 - (1 - p) ** 2
+          const amp = Math.min(90, 40 + Math.abs(bx - ax) * 0.25) * (1 - p)
+          x = ax + (bx - ax) * ease(clamp((p - 0.12) / 0.88)) + Math.sin(p * Math.PI * 2.5) * amp
+          y = ay + (by - ay) * fall
+        } else if (lane === undefined) {
           x = ax + (bx - ax) * ease(clamp((p - 0.35) / 0.65))
           y = ay + (by - ay) * ease(clamp(p * 1.4))
         } else if (under !== undefined) {

@@ -92,7 +92,7 @@ const frameworksTable = [
     (f) =>
       `| ${f.name} | \`${f.pkg}\` | ${
         f.ready
-          ? "Available"
+          ? `Available (${f.version})`
           : f.components.length
             ? `In progress (${f.components.length} component${f.components.length > 1 ? "s" : ""})`
             : "Planned"
@@ -102,7 +102,7 @@ const frameworksTable = [
 const installBlocks = fws
   .filter((f) => f.ready)
   .map(
-    (f, i, all) => `${all.length > 1 ? `${f.name}:\n\n` : ""}\`\`\`sh\npnpm add ${f.pkg}\n\`\`\``,
+    (f, _i, all) => `${all.length > 1 ? `${f.name}:\n\n` : ""}\`\`\`sh\npnpm add ${f.pkg}\n\`\`\``,
   )
   .join("\n\n")
 

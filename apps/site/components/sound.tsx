@@ -20,7 +20,7 @@ import { ambient } from "./ambient"
 // sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
 // makes a sound (plus the explicit cues): the page's own demos stay quiet.
 
-type Cue = "on" | "off" | "phase" | "pass"
+type Cue = "on" | "off" | "phase" | "pass" | "unlock"
 
 interface SoundValue {
   readonly enabled: boolean
@@ -236,13 +236,17 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       return
     }
     case "appear": {
-      // a tooltip or a hover card comes up: a small glassy bubble in juicy, a dry tick in crisp
+      // a tooltip or a hover card comes up: a swish of air swept upwards, with a glassy bubble
+      // on it in juicy, a dry tick in crisp
+      const swish = noise(0.16, soft ? 0.22 : 0.18, "bandpass", 700)
+      swish.Q.value = 1.2
+      swish.frequency.setValueAtTime(600 * jitter, now)
+      swish.frequency.exponentialRampToValueAtTime(4200 * jitter, now + 0.14)
       if (soft) {
-        tone("sine", 900 * jitter, 1500 * jitter, 0, 0.12, 0.05)
-        tone("sine", 1800 * jitter, 2100 * jitter, 0.03, 0.08, 0.02)
+        tone("sine", 900 * jitter, 1500 * jitter, 0.04, 0.12, 0.09)
+        tone("sine", 1800 * jitter, 2100 * jitter, 0.07, 0.08, 0.04)
       } else {
-        noise(0.008, 0.12, "highpass", 5000)
-        tone("triangle", 2200 * jitter, 2000 * jitter, 0, 0.035, 0.04)
+        tone("triangle", 2200 * jitter, 2000 * jitter, 0.08, 0.035, 0.06)
       }
       return
     }
@@ -259,6 +263,20 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       const notes = soft ? [660, 880, 1100] : [880, 1320]
       notes.forEach((f, k) => {
         tone(soft ? "sine" : "triangle", f, f * 0.995, k * 0.08, 0.6, 0.1)
+      })
+      return
+    }
+    case "unlock": {
+      // an achievement: a quick rising arpeggio, a held chord over a low thump, then a sparkle
+      // of high notes falling into place
+      tone("sine", 110, 55, 0, 0.35, 0.18)
+      const run = soft ? [523, 659, 784, 1047] : [659, 831, 988, 1319]
+      run.forEach((f, k) => {
+        tone("triangle", f, f, k * 0.07, 0.35, 0.1)
+      })
+      for (const f of run.slice(1)) tone("sine", f, f * 1.002, 0.3, 1.1, 0.06)
+      ;[2637, 3136, 3520, 4186, 3951].forEach((f, k) => {
+        tone("sine", f, f * 0.98, 0.38 + k * 0.06, 0.3, 0.025)
       })
       return
     }
@@ -353,7 +371,9 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       // sliders sing as they move, text fields as they are typed in (below)
       if (
         !target ||
-        target.closest("[data-sound-toggle], [role=slider], [data-scope=slider], input, textarea")
+        target.closest(
+          "[data-sound-toggle], [data-sound-own], [role=slider], [data-scope=slider], input, textarea",
+        )
       )
         return
       // after the click, so the state it lands in is read

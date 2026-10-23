@@ -83,6 +83,8 @@ export function SkinScene() {
     let hint = 0
     let shown = false
     let past = false
+    // the WebGL object is on screen at all (no GPU: it never draws, and nothing stands in for it)
+    let glOn = false
     let atTests = false
     // The skin comes off with the scroll. Desktop: while the sticky hero holds still (its run is
     // taller than the screen). Phone: as the component itself rises from 60% to 25% of the screen.
@@ -712,7 +714,7 @@ export function SkinScene() {
         if (window.innerWidth <= 900) {
           // only while the object is really drawn there (it tucks away over controls): the
           // card is never left without its control
-          const over = leaving && end.t >= 0.7 && end.t < 1 && alpha() > 0.5
+          const over = leaving && end.t >= 0.7 && end.t < 1 && glOn && alpha() > 0.5
           if (over) end.wall.style.setProperty("opacity", "0")
           else end.wall.style.removeProperty("opacity")
         }
@@ -722,7 +724,17 @@ export function SkinScene() {
             end.wall.getAttribute("aria-checked") === "false" ||
             end.wall.getAttribute("aria-pressed") === "false" ||
             end.wall.getAttribute("data-state") === "unchecked"
-          if (off) end.wall.click()
+          if (off) {
+            // the press must not pull focus (and the page) to the wall: a component that
+            // focuses what it presses finds it focused already, without scrolling; then focus
+            // goes back to where the visitor had it
+            const had = document.activeElement
+            end.wall.focus({ preventScroll: true })
+            end.wall.click()
+            if (had instanceof HTMLElement && had !== document.body)
+              had.focus({ preventScroll: true })
+            else end.wall.blur()
+          }
         }
         touched = down
       }
@@ -740,13 +752,9 @@ export function SkinScene() {
         flying = air
         follow()
       }
-      // the test starts as the object comes in to land, not once it has: a visitor scrolling at
-      // a normal pace still sees it run to PASS (it runs once; tested.tsx ignores repeats); and
-      // only once the test's control is on screen, however long the leg is
-      if (fin && fin.t >= 0.7) {
-        const r = fin.test.getBoundingClientRect()
-        if (r.top + r.height / 2 < window.innerHeight * 0.8) emitTestArrived()
-      }
+      // the test starts once the object has landed in its box (it runs once; tested.tsx ignores
+      // repeats, and pauses so the landing and the control's change of state read first)
+      if (atTests) emitTestArrived()
     }
     const offPeelOn = onPeelOn(follow)
     // a state change or a remounted control (a new run): follow it, wake the render loop, and
@@ -764,6 +772,7 @@ export function SkinScene() {
             target,
             kind,
             () => {
+              glOn = true
               setGl(true)
               setSceneGl(true)
             },

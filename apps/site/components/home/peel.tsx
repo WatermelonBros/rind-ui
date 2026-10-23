@@ -3,6 +3,7 @@
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { Letters } from "../letters"
+import { zoom } from "../zoom"
 import {
   type HeroKind,
   heroKind,
@@ -49,8 +50,6 @@ export function Peel() {
   const section = useRef<HTMLElement>(null)
   const control = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
-  // how far the builder's title has come up under the scene's copy (0 far, 1 at it)
-  const [meet, setMeet] = useState(0)
   const [kind, setKind] = useState<HeroKind>("switch")
   const heroOn = useHeroOn()
   const [attrs, setAttrs] = useState<readonly string[]>([])
@@ -72,6 +71,7 @@ export function Peel() {
     const el = section.current
     if (!el) return
     let raf = 0
+    let pushed = 0
     const update = () => {
       raf = 0
       const rect = el.getBoundingClientRect()
@@ -80,9 +80,20 @@ export function Peel() {
       // reach the top left most of the screen empty ground
       const early = window.innerWidth <= 900 ? window.innerHeight * 0.48 : 0
       setProgress(clamp((early - rect.top) / (travel || 1)))
+      // the builder's title, rising, pushes the whole scene up ahead of it, 40px clear
+      // of its lowest part (the diagram), so the two never meet and the screen is never left
+      // with the scene gone and the title not yet there
+      const stick = el.querySelector<HTMLElement>(`.${styles.sticky}`)
       const next = document.getElementById("look-title")?.getBoundingClientRect().top
-      const vh = window.innerHeight
-      setMeet(next === undefined ? 0 : clamp((vh * 0.92 - next) / (vh * 0.18)))
+      if (stick) {
+        const low = (stick.querySelector("[data-state-graph]") ?? stick).getBoundingClientRect()
+        const push = next === undefined ? 0 : Math.max(0, low.bottom + pushed + 40 - next)
+        if (push !== pushed) {
+          pushed = push
+          // its contents move, not its ground (moving that bared a band of the page under it)
+          stick.style.setProperty("--push", `${-push / zoom()}px`)
+        }
+      }
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -130,15 +141,11 @@ export function Peel() {
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
   const dark = p2 * (1 - p3)
-  // the scene's copy stays until the builder's title comes up to it, then goes (desktop:
-  // peel.module.css): the two display titles never overlap and no screen is left empty between
-  const out = Math.max(meet, clamp((progress - 0.985) / 0.015))
   const vars = {
     "--p1": 1,
     "--p2": p2,
     "--p3": p3,
     "--dark": dark,
-    "--out": out,
   } as CSSProperties
   const machine = MACHINES[kind]
 

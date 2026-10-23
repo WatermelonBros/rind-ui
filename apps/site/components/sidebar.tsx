@@ -1,6 +1,6 @@
 "use client"
 
-import { Collapsible, TextField, ToggleGroup, Tooltip } from "@rind-ui/react"
+import { Collapsible, TextField, ToggleGroup } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -69,7 +69,7 @@ export function Sidebar({
             <ToggleGroup.Root
               className={styles.fwList}
               aria-label="Framework"
-              // the planned ones stay reachable by keyboard, for the tooltip saying when
+              // the unreleased ones stay reachable by keyboard, so their state is heard
               focusableWhenDisabled
               disallowEmptySelection
               value={current ? [current.id] : []}
@@ -79,26 +79,20 @@ export function Sidebar({
               }}
             >
               {frameworks.map((f) => (
-                <Tooltip.Root key={f.name} disabled={f.ready}>
-                  <Tooltip.Trigger
-                    render={
-                      <ToggleGroup.Item className={styles.fw} value={f.id} disabled={!f.ready} />
-                    }
-                  >
-                    {f.name}
-                    {!f.ready && <small>{f.components.length ? "wip" : "soon"}</small>}
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Positioner className={styles.tipLayer}>
-                      <Tooltip.Content className={styles.tip}>
+                <ToggleGroup.Item key={f.id} className={styles.fw} value={f.id} disabled={!f.ready}>
+                  {f.name}
+                  {/* how far along an unreleased one is, in its name (no tooltip to find) */}
+                  {!f.ready && (
+                    <small>
+                      {f.components.length ? "wip" : "soon"}
+                      <span className={styles.visuallyHidden}>
                         {f.components.length
-                          ? `${f.name} is in progress: ${f.components.length} component${f.components.length > 1 ? "s" : ""} so far`
-                          : `${f.name} is planned`}
-                        <Tooltip.Arrow className={styles.tipArrow} />
-                      </Tooltip.Content>
-                    </Tooltip.Positioner>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
+                          ? `, ${f.components.length} component${f.components.length > 1 ? "s" : ""} so far`
+                          : ", planned"}
+                      </span>
+                    </small>
+                  )}
+                </ToggleGroup.Item>
               ))}
             </ToggleGroup.Root>
           </div>

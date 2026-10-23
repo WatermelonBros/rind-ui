@@ -17,6 +17,8 @@ export interface Framework {
   readonly pkg: string
   /** released on npm: its install command works */
   readonly ready: boolean
+  /** the released version (its package.json; "0.0.0" until the first release) */
+  readonly version: string
   /** the docs slugs it has a component for (empty when it has none yet) */
   readonly components: readonly string[]
 }
@@ -34,7 +36,8 @@ const packages = join(process.cwd(), "../../packages")
 function read(id: FrameworkId): Framework {
   const name = ORDER.find((f) => f.id === id)?.name ?? id
   const file = join(packages, id, "package.json")
-  if (!existsSync(file)) return { id, name, pkg: `@rind-ui/${id}`, ready: false, components: [] }
+  if (!existsSync(file))
+    return { id, name, pkg: `@rind-ui/${id}`, ready: false, version: "0.0.0", components: [] }
   const json = JSON.parse(readFileSync(file, "utf8")) as {
     readonly name?: string
     readonly version?: string
@@ -45,7 +48,14 @@ function read(id: FrameworkId): Framework {
     .filter((k) => k !== "." && k !== "./package.json" && k.startsWith("./"))
     .map((k) => k.slice(2))
   const ready = !json.private && json.version !== undefined && json.version !== "0.0.0"
-  return { id, name, pkg: json.name ?? `@rind-ui/${id}`, ready, components }
+  return {
+    id,
+    name,
+    pkg: json.name ?? `@rind-ui/${id}`,
+    ready,
+    version: json.version ?? "0.0.0",
+    components,
+  }
 }
 
 /** Every framework, in the site's order, as the packages say today. */

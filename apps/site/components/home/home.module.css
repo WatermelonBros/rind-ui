@@ -1602,9 +1602,6 @@ button.socket:focus-visible {
   border-radius: 50%;
   background: #ffffff33;
 }
-.terminalBar span {
-  margin-inline-start: 8px;
-}
 .terminalLine {
   display: flex;
   align-items: center;
@@ -1732,5 +1729,103 @@ button.socket:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .socket[data-asked] {
     animation: none;
+  }
+}
+
+/* install.tsx: the core flashes when the command is copied (two names restart it each time) */
+.core[data-cheer="0"] {
+  animation: core-cheer 0.9s var(--spring-pop);
+}
+.core[data-cheer="1"] {
+  animation: core-cheer-again 0.9s var(--spring-pop);
+}
+@keyframes core-cheer {
+  30% {
+    scale: 1.25;
+    box-shadow: 0 0 0 18px color-mix(in oklab, var(--acc) 55%, transparent);
+  }
+}
+@keyframes core-cheer-again {
+  30% {
+    scale: 1.25;
+    box-shadow: 0 0 0 18px color-mix(in oklab, var(--acc) 55%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .core[data-cheer] {
+    animation: none;
+  }
+}
+
+/* tested.tsx: the run goes with the scroll, a line per stretch, so the scene (title, lead, panel)
+   holds still on screen for that stretch and lets go after the PASS (desktop) */
+@media (min-width: 901px) {
+  .testHold {
+    position: sticky;
+    top: calc(var(--bar-h, 64px) + 8px);
+  }
+  /* the room for the hold, inside the section's content box (padding does not count for sticky);
+     tested.tsx removes it once the run has passed */
+  .testRoom {
+    /* six lines of 90px (tested.tsx: stepPx), a half to start and a little to read the PASS */
+    block-size: 680px;
+  }
+}
+
+/* install.tsx: the package manager, picked in the terminal's bar */
+.pms {
+  display: flex;
+  gap: 2px;
+  margin-inline-start: 8px;
+}
+.pm {
+  font: 600 12px var(--mono);
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 0;
+  background: transparent;
+  color: #ffffffa6;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--spring),
+    color 0.2s;
+}
+.pm[data-hover] {
+  color: #fff;
+}
+.pm[data-state="on"] {
+  background: var(--acc);
+  color: var(--ink);
+}
+.pm:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+/* outro.tsx: the title's peel follows the pointer over the links and buttons too: a copy of the
+   label (data-text) in the accent, cut to the same 150px circle around the pointer (--lx/--ly) */
+.outro [data-text] {
+  position: relative;
+  isolation: isolate;
+}
+.outro [data-text]::after {
+  /* decorative: the empty alternative keeps it out of the link's accessible name */
+  content: attr(data-text) / "";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  background: var(--acc);
+  color: var(--ink);
+  font: inherit;
+  white-space: nowrap;
+  pointer-events: none;
+  clip-path: circle(0 at 50% 50%);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .outro:hover [data-text]::after {
+    clip-path: circle(150px at var(--lx, -999px) var(--ly, -999px));
   }
 }

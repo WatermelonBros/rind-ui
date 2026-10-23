@@ -81,7 +81,7 @@ You can also pass `className` to any part, as you would to the element it render
 import "@rind-ui/theme"
 ```
 
-See [White-label theming](https://github.com/WatermelonBros/rind-ui/blob/main/docs/theme/white-label.md).
+See [`@rind-ui/theme` on npm](https://www.npmjs.com/package/@rind-ui/theme).
 
 ## Testing
 

@@ -8,7 +8,8 @@
   top: 0;
   height: calc(100 * var(--vh));
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* fixed halves: the acts' titles differ in width, and the scene must not jump when they swap */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding: var(--bar-h) 56px 0;
@@ -21,7 +22,8 @@
   transition: color 0.4s var(--spring);
 }
 .title {
-  font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
+  /* the longest word ("underneath.") fits its half at every width */
+  font: 900 clamp(40px, calc(4.9 * var(--vw)), 112px) / 0.95 var(--display);
   letter-spacing: -0.035em;
   margin: 14px 0 16px;
   animation: in 0.6s var(--spring);
@@ -110,10 +112,8 @@
   width: clamp(420px, calc(34 * var(--vw)), 620px);
   margin-top: 30px;
   /* only once the ink disc has closed: its nodes never float on the dark */
-  /* and it leaves with the copy (--out), rising, so the next scene's title comes up into the
-     room it leaves instead of over its nodes */
-  opacity: min(calc((var(--p3) - 0.88) * 8.4), calc(1 - var(--out, 0) * 1.6));
-  translate: 0 calc((1 - var(--p3)) * 40px - var(--out, 0) * 90px);
+  opacity: calc((var(--p3) - 0.88) * 8.4);
+  translate: 0 calc((1 - var(--p3)) * 40px);
   font: 600 12px var(--mono);
 }
 .graph rect {
@@ -242,7 +242,7 @@
   inset: 0;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding: var(--bar-h) 56px 0;
@@ -285,9 +285,17 @@
     z-index: 1;
     margin-top: calc(-30 * var(--vh));
   }
-  /* the builder rises into this scene's last stretch (home.module.css): the copy is gone first */
-  .copy {
-    opacity: calc(1 - var(--out, 0));
-    translate: 0 calc(var(--out, 0) * -24px);
+}
+
+/* a large screen (globals.css zooms it): the scene keeps to the sections' column, like the hero */
+@media (min-width: 2200px) {
+  .sticky,
+  .inkLayer {
+    padding-inline: max(56px, calc((100% - 1200px) / 2 + 56px));
   }
+}
+
+/* peel.tsx: the builder's title pushes the scene's contents up ahead of it (--push) */
+.sticky > * {
+  transform: translateY(var(--push, 0px));
 }
