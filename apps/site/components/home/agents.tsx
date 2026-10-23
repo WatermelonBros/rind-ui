@@ -173,9 +173,9 @@ export function Agents() {
             <Letters>Made for agents.</Letters>
           </h2>
           <p className={styles.lead}>
-            The whole API is generated into <code>llms.txt</code>, never written
-            by hand, so it cannot drift. And every component ships a driver, so an assistant can
-            check its own work the way you would.
+            The whole API is generated into <code>llms.txt</code>, never written by hand, so it
+            cannot drift. And every component ships a driver, so an assistant can check its own work
+            the way you would.
           </p>
           <div className={styles.agentsActs}>
             <a href="/llms.txt" className={styles.agentsLink} data-llms-link="">
