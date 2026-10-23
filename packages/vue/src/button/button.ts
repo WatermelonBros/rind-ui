@@ -26,7 +26,7 @@ import {
 } from "vue"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
-import { elementOf, mergeProps } from "../merge-props"
+import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment, useMessages } from "../provider"
 import { asChildProp, elements, renderedTag, renderPart } from "../render"
@@ -64,7 +64,7 @@ function anchorOf(children: VNodeChild, asChild: boolean) {
 }
 
 export const Button = defineComponent({
-  name: "Button",
+  name: "RindButton",
   inheritAttrs: false,
   props: {
     /** Default "button": never submits a form by accident. */
@@ -188,7 +188,7 @@ export const Button = defineComponent({
             onFocusout: () => send(blurEvent(env.modality)),
           }),
           ...(props.id === undefined ? {} : { id: props.id }),
-          ref: (node: unknown) => (el.value = elementOf(node)),
+          ref: refTo(el),
         },
         attrs,
       )

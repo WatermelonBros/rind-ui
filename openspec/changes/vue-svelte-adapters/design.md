@@ -57,3 +57,11 @@ not cover (the framework's binding idiom, element substitution, slots/snippets).
   mechanism for both.
 - Svelte hydration tests need a server compile of the fixture; they are added with the
   infrastructure task 1.6 (a Rolldown bundle per target).
+- Found while porting, in all three adapters: `Field.ErrorMessage` with several messages
+  renders a `<ul>` inside its `<p>`, which the HTML parser splits on load (server HTML then
+  differs from the DOM). The adapters keep React's markup; the fix belongs to the Field spec
+  (render the list in a `<div>` part, or the messages inline) and is reported separately.
+- Connect still spells some props the React way (`htmlFor`, `tabIndex`, `onChange`,
+  `defaultValue`): `neutralName` in `@rind-ui/core/internal` folds them back for Vue and
+  Svelte. `defaultValue`/`defaultChecked` stay DOM properties on the client (they set the
+  attribute and keep the user's edits) and become the attribute in server HTML.

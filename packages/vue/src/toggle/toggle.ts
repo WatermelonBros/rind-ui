@@ -25,7 +25,7 @@ import {
 import { changeEmitter } from "../emit-change"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
-import { elementOf, mergeProps } from "../merge-props"
+import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
 import { asChildProp, renderedTag, renderPart } from "../render"
@@ -151,7 +151,7 @@ const Root = defineComponent({
         {
           ...own,
           ...(props.id === undefined ? {} : { id: props.id }),
-          ref: (node: unknown) => (el.value = elementOf(node)),
+          ref: refTo(el),
         },
         attrs,
       )
