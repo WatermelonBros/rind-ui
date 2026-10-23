@@ -23,7 +23,9 @@
 }
 .title {
   /* the longest word ("underneath.") fits its half at every width */
-  font: 900 clamp(40px, calc(4.9 * var(--vw)), 112px) / 0.95 var(--display);
+  /* 1.04: tighter, the second line's ascenders met the first line's letters ("This" over
+     "ships" read "Thjs") */
+  font: 900 clamp(40px, calc(4.9 * var(--vw)), 112px) / 1.04 var(--display);
   letter-spacing: -0.035em;
   margin: 14px 0 16px;
   animation: in 0.6s var(--spring);
@@ -234,7 +236,9 @@
   inset: 0;
   z-index: -1;
   background: var(--ink);
-  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
+  clip-path: circle(
+    calc(max(var(--dark, 0) - 0.04, 0) * 125%) at var(--disc-x, 75%) var(--disc-y, 50%)
+  );
 }
 /* the copy again, in paper, clipped by the same disc (peel.tsx) */
 .inkLayer {
@@ -248,13 +252,17 @@
   padding: var(--bar-h) 56px 0;
   color: var(--paper);
   pointer-events: none;
-  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
+  clip-path: circle(
+    calc(max(var(--dark, 0) - 0.04, 0) * 125%) at var(--disc-x, 75%) var(--disc-y, 50%)
+  );
 }
 /* on a phone the disc opens from the object, low in the column */
 @media (max-width: 900px) {
   .sticky::before,
   .inkLayer {
-    clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 156%) at 50% 62%);
+    clip-path: circle(
+      calc(max(var(--dark, 0) - 0.04, 0) * 156%) at var(--disc-x, 50%) var(--disc-y, 62%)
+    );
   }
   .inkLayer {
     grid-template-columns: 1fr;

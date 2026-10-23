@@ -1,7 +1,7 @@
 .word {
   display: flex;
   gap: 0.05em;
-  font: 900 clamp(96px, 15.5vw, 250px) / 0.9 var(--display);
+  font: 900 clamp(96px, calc(15.5 * var(--vw)), 250px) / 0.9 var(--display);
   letter-spacing: -0.03em;
   margin-left: -0.04em;
   user-select: none;

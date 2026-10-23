@@ -29,6 +29,9 @@ export interface HandoffOptions {
   /** Instead of lane moves: one sinuous line, leaving its start downward at once (never along
    *  the text it starts on) and swaying from side to side as it falls to its landing. */
   readonly curve?: boolean
+  /** The starts stay as they are while their copies travel (a result that must stay readable,
+   *  the tests' PASS), instead of being drawn away. */
+  readonly keep?: boolean
   /** With a lane: a clear strip under the landing's own paragraph (y in viewport pixels). The
    *  traveller crosses along it and rises into its landing from below, so it never crosses the
    *  paragraph's copy: for a landing in running text whose last line ends short of it. */
@@ -50,7 +53,8 @@ const ARRIVE = 0.86
 // a start that can be used (a link, a button) stays put; anything else is drawn away while its
 // copy travels, by opacity only, so it stays in the accessibility tree
 const spent = (el: Element) => !el.matches("a, button, input, select, textarea, [tabindex]")
-const show = (els: readonly Element[], on: boolean) => {
+const show = (els: readonly Element[], on: boolean, keep = false) => {
+  if (keep) return
   for (const el of els) if (spent(el)) (el as HTMLElement).style.opacity = on ? "" : "0"
 }
 
@@ -86,7 +90,7 @@ export function handoff(o: HandoffOptions): () => void {
       left = t > 0
       o.leaving?.(left)
       // every start goes at once, so no copy ever passes over a start still waiting its turn
-      show(from, !left)
+      show(from, !left, o.keep)
     }
     const n = from.length
     // one after another: each starts a little after the one before and lands on its own beat

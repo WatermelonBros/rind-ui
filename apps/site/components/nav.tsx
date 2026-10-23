@@ -64,19 +64,28 @@ export function Nav() {
         checked={phase === "juicy"}
         onCheckedChange={(on) => setPhase(on ? "juicy" : "crisp")}
       >
+        {/* each word picks its own phase (a label would toggle, so "juicy" turned it crisp);
+            for the keyboard and assistive tech the switch and its label say it all */}
         <span
           className={styles.side}
           aria-hidden="true"
           data-on={phase === "crisp" ? "" : undefined}
+          onClick={() => setPhase("crisp")}
         >
           crisp
         </span>
         <Switch.Control className={styles.track}>
           <Switch.Thumb className={styles.thumb} />
         </Switch.Control>
-        <Switch.Label className={styles.side} data-on={phase === "juicy" ? "" : undefined}>
-          juicy<span className={styles.visuallyHidden}> mode</span>
-        </Switch.Label>
+        <Switch.Label className={styles.visuallyHidden}>Juicy mode</Switch.Label>
+        <span
+          className={styles.side}
+          aria-hidden="true"
+          data-on={phase === "juicy" ? "" : undefined}
+          onClick={() => setPhase("juicy")}
+        >
+          juicy
+        </span>
       </Switch.Root>
       <NavMenu />
     </nav>

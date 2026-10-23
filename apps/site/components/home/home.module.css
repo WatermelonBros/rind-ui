@@ -1830,7 +1830,19 @@ button.socket:focus-visible {
   clip-path: circle(0 at 50% 50%);
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .outro:hover [data-text]::after {
+  /* only the one under the pointer: a circle reaching into its neighbours left them half
+     filled */
+  .outro [data-text]:hover::after {
     clip-path: circle(150px at var(--lx, -999px) var(--ly, -999px));
   }
+}
+
+/* tested.tsx: crisp's own result bar (lime and ink), not juicy's mint */
+:global([data-phase="crisp"]) .passBanner {
+  background: var(--acc);
+  color: var(--ink);
+}
+:global([data-phase="crisp"]) .passBanner b {
+  background: var(--ink);
+  color: var(--acc);
 }

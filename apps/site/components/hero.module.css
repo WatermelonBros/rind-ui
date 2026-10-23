@@ -22,7 +22,9 @@
    instead of starting at the viewport's edge while they are centred */
 @media (min-width: 2200px) {
   .hero {
-    padding-inline: max(56px, calc((100% - 1200px) / 2 + 56px));
+    /* a little wider than the sections' 1200px: the wordmark needs its whole column, or it
+       ran into the object beside it */
+    padding-inline: max(56px, calc((100% - 1400px) / 2 + 56px));
   }
 }
 .copy {

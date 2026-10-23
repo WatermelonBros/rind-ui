@@ -77,6 +77,13 @@ html {
     --zf: 1.45;
   }
 }
+/* 2560 (a common 27"/QHD width) lays out at about 1550px: the 1200px content fills the screen
+   instead of leaving most of it empty */
+@media (min-width: 2400px) {
+  :root {
+    --zf: 1.65;
+  }
+}
 @media (min-width: 2700px) {
   :root {
     --zf: 1.75;

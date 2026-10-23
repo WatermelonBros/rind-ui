@@ -365,3 +365,8 @@
     display: none;
   }
 }
+
+/* nav.tsx: each word of the phase switch picks its phase */
+.phase .side {
+  cursor: pointer;
+}

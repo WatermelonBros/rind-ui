@@ -172,6 +172,8 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
         },
         landed: (mark, on) => mark.toggleAttribute("data-landed", on),
         curve: true,
+        // the PASS stays readable: the ticks leave it as copies
+        keep: true,
         // not before the PASS has been read: the tests' band is mostly gone when they set off
         startAt: 0.55,
       }),

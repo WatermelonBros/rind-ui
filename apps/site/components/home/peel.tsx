@@ -84,6 +84,22 @@ export function Peel() {
       // of its lowest part (the diagram), so the two never meet and the screen is never left
       // with the scene gone and the title not yet there
       const stick = el.querySelector<HTMLElement>(`.${styles.sticky}`)
+      // the ink disc opens from behind the component, so its first sliver is hidden by it (from
+      // a fixed point it began as a stray dot beside the object)
+      const c = (
+        control.current?.querySelector('[data-part="control"], button') ?? control.current
+      )?.getBoundingClientRect()
+      const box = stick?.getBoundingClientRect()
+      if (stick && c && box && box.width && box.height) {
+        stick.style.setProperty(
+          "--disc-x",
+          `${((c.left + c.width / 2 - box.left) / box.width) * 100}%`,
+        )
+        stick.style.setProperty(
+          "--disc-y",
+          `${((c.top + c.height / 2 - box.top) / box.height) * 100}%`,
+        )
+      }
       const next = document.getElementById("look-title")?.getBoundingClientRect().top
       if (stick) {
         const low = (stick.querySelector("[data-state-graph]") ?? stick).getBoundingClientRect()
