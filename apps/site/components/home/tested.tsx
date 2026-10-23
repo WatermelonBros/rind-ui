@@ -255,7 +255,7 @@ export function Tested() {
           >
             {passed !== null && (
               <>
-                <b>{failed ? "✗ FAIL" : "✓ PASS"}</b>{" "}
+                <b data-pass-mark={failed ? undefined : ""}>{failed ? "✗ FAIL" : "✓ PASS"}</b>{" "}
                 {/* each fact wraps whole, with its separator: never "· 2.7s" alone on a line */}
                 <span className={styles.passFact}>{kind}.test.ts</span>{" "}
                 <span className={styles.passFact}>

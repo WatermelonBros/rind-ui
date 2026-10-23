@@ -261,3 +261,11 @@
     padding: calc(var(--bar-h) + 24px) 20px 20px;
   }
 }
+
+/* its states have left for the next scene (any-look.tsx, handoff.ts): the arcs and their events
+   go with them, so no empty graph is left behind */
+.graph[data-left] .edge,
+.graph[data-left] .event {
+  opacity: 0;
+  transition: opacity 0.3s;
+}

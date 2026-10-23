@@ -3,6 +3,7 @@
 import { Button, MessageThread, StreamingMessage } from "@rind-ui/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { usePhase } from "../phase"
+import { handoff } from "./handoff"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
 import { Letters } from "./letters"
@@ -123,6 +124,30 @@ export function Agents() {
   const { phase } = usePhase()
   const [kind, setKind] = useState<HeroKind>("switch")
   useEffect(() => setKind(heroKind()), [])
+  // the claims above, the same facts read by a model: as their band lets go, each title drops
+  // down the margin as a line of text into this section's llms.txt (desktop only)
+  useEffect(
+    () =>
+      handoff({
+        scene: () => document.getElementById("why-title")?.closest("[data-band]") ?? null,
+        from: () =>
+          [...document.querySelectorAll("[data-proved]")].map((m) => m.parentElement ?? m),
+        to: () => [...document.querySelectorAll("[data-llms-link]")],
+        make: (title) => {
+          const line = document.createElement("span")
+          line.className = styles.lineTraveller ?? ""
+          // a line of the file, cut to fit the margin it falls down
+          const words = title.textContent?.replace("✓", "").trim().split(" ") ?? []
+          line.textContent = `- ${words.slice(0, 2).join(" ")}…`
+          return line
+        },
+        landed: (code, on) => code.toggleAttribute("data-landed", on),
+        // the page's left margin, clear of the claims' text
+        lane: () =>
+          (document.getElementById("agents-title")?.getBoundingClientRect().left ?? 120) / 2,
+      }),
+    [],
+  )
   const { text, status, play } = useReplay(kind)
   const stage = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -148,12 +173,12 @@ export function Agents() {
             <Letters>Made for agents.</Letters>
           </h2>
           <p className={styles.lead}>
-            The whole API is generated into <code>llms.txt</code>, never written by hand, so it
-            cannot drift. And every component ships a driver, so an assistant can check its own work
-            the way you would.
+            The whole API is generated into <code>llms.txt</code>, never written
+            by hand, so it cannot drift. And every component ships a driver, so an assistant can
+            check its own work the way you would.
           </p>
           <div className={styles.agentsActs}>
-            <a href="/llms.txt" className={styles.agentsLink}>
+            <a href="/llms.txt" className={styles.agentsLink} data-llms-link="">
               Read llms.txt ↗
             </a>
             <Button
