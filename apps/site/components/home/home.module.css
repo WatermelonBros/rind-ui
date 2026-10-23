@@ -107,6 +107,17 @@
   background: var(--acc);
   color: var(--ink);
 }
+.agentsActs {
+  position: relative;
+}
+.namesFrom {
+  position: absolute;
+  inset-inline-end: calc(100% + 16px);
+  inset-block-start: 50%;
+  inline-size: 1px;
+  block-size: 36px;
+  translate: 0 -50%;
+}
 .agentsLink[data-landed],
 .specimenFoot a[data-landed] {
   animation: token-catch 0.6s var(--spring-pop);

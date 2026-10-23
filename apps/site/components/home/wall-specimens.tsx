@@ -262,15 +262,18 @@ export function WallSpecimens() {
     }
   }, [])
   // the catalogue fills from the docs a model reads: as the agents' section lets go, the first
-  // names leave its llms.txt link one after another and land on their cards (desktop only)
+  // names lift off beside its llms.txt link one after another and land on their cards (desktop
+  // only)
   useEffect(
     () =>
       handoff({
         scene: () => document.querySelector('[aria-labelledby="agents-title"]'),
         from: () => {
-          const link = document.querySelector("[data-llms-link]")
-          return link ? [link, link, link] : []
+          const spot = document.querySelector("[data-names-from]")
+          return spot ? [spot, spot, spot] : []
         },
+        // after the claims have gone into the link (agents.tsx), never both at once
+        startAt: 0.72,
         // on each card's top edge, so the names cross the gap above the row, never a card
         to: () =>
           [...(list.current?.querySelectorAll(":scope > li > [data-name-land]") ?? [])].slice(0, 3),

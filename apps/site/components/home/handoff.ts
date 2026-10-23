@@ -27,6 +27,9 @@ export interface HandoffOptions {
   /** Where in the viewport (0 top, 1 bottom) the first landing's centre ends the trip: earlier
    *  than the middle when the next hand-off leaves from the same scene. */
   readonly endAt?: number
+  /** Where in the viewport the scene's bottom edge starts the trip (1, the viewport's bottom,
+   *  by default): later, when the hand-off before leaves from the same place. */
+  readonly startAt?: number
 }
 
 const DESKTOP = "(min-width: 761px) and (prefers-reduced-motion: no-preference)"
@@ -63,7 +66,7 @@ export function handoff(o: HandoffOptions): () => void {
     if (!media.matches || !scene || !from.length || !first) return clear()
     const vh = window.innerHeight
     // both distances move with the scroll at the same rate, so their share is the progress
-    const gone = vh - scene.getBoundingClientRect().bottom
+    const gone = vh * (o.startAt ?? 1) - scene.getBoundingClientRect().bottom
     const r = first.getBoundingClientRect()
     const rest = r.top + r.height / 2 - vh * (o.endAt ?? 0.5)
     const t = gone <= 0 ? 0 : rest <= 0 ? 1 : clamp(gone / (gone + rest))

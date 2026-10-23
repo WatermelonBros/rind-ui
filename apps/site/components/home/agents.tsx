@@ -138,7 +138,7 @@ export function Agents() {
           line.className = styles.lineTraveller ?? ""
           // a line of the file, cut to fit the margin it falls down
           const words = title.textContent?.replace("✓", "").trim().split(" ") ?? []
-          line.textContent = `- ${words.slice(0, 2).join(" ")}…`
+          line.textContent = `${words.slice(0, 2).join(" ")}…`
           return line
         },
         landed: (link, on) => link.toggleAttribute("data-landed", on),
@@ -180,6 +180,8 @@ export function Agents() {
             the way you would.
           </p>
           <div className={styles.agentsActs}>
+            {/* where the wall's names lift off, in the margin beside the link (wall-specimens.tsx) */}
+            <span className={styles.namesFrom} data-names-from="" aria-hidden="true" />
             <a href="/llms.txt" className={styles.agentsLink} data-llms-link="">
               Read llms.txt ↗
             </a>

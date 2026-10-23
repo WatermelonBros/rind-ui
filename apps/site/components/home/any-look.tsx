@@ -395,7 +395,8 @@ export function AnyLook() {
         },
         update: (pill, t) => {
           const word = pill.dataset["word"] ?? ""
-          const text = t > 0.3 ? `[data-state="${word}"]` : word
+          // the state, the selector it is, then the data-* it lands on, as wide as its landing
+          const text = t > 0.8 ? "data-*" : t > 0.3 ? `[data-state="${word}"]` : word
           if (pill.textContent !== text) pill.textContent = text
         },
         landed: (code, on) => code.toggleAttribute("data-landed", on),
