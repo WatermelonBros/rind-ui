@@ -1,7 +1,8 @@
 /* ── shared ─────────────────────────────────────────────────────────────────────────── */
 .section {
   padding: clamp(64px, 6vw, 88px) 56px;
-  max-width: 1320px;
+  /* leaves the hero's object a lane right of the content (skin-scene.tsx: gutterFit) at 1440 */
+  max-width: 1200px;
   margin: 0 auto;
 }
 .kicker {

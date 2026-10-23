@@ -103,7 +103,12 @@ export function SkinScene() {
       const next = getPeelTarget()
       const scene = next?.closest("section")
       const y = window.scrollY
-      const s0 = run.getBoundingClientRect().bottom + y - window.innerHeight
+      // a phone has no hold: the object stays on its control until the hero has nearly gone
+      // (its bottom at 40% of the screen), so its empty place is never seen
+      const s0 =
+        run.getBoundingClientRect().bottom +
+        y -
+        window.innerHeight * (window.innerWidth <= 900 ? 0.4 : 1)
       const s1 = scene ? scene.getBoundingClientRect().top + y : Number.POSITIVE_INFINITY
       // land three quarters of the way, then ride along with the control into its scene
       const land = s0 + (s1 - s0) * 0.75
@@ -177,7 +182,7 @@ export function SkinScene() {
       const room = window.innerWidth - right - 32
       // big enough to read as the object, not debris (it may overlap the frame's edge for that),
       // centred in the room when there is room, and always 32px clear of the viewport's edge
-      const k = Math.min(1, Math.max(112, room) / w)
+      const k = Math.max(112, Math.min(w, room)) / w
       const x = right + 8 + Math.max(0, (room - w * k) / 2)
       return { w: w * k, h: h * k, x: Math.min(x, window.innerWidth - w * k - 32) }
     }
@@ -269,8 +274,9 @@ export function SkinScene() {
         // out to the gutter, at the size that fits it; level in the gutter while the page
         // passes; then in, onto the wall's component, at its size
         const g = gutterFit(from.width, from.height)
+        // on the component by 0.92 and still there while it dissolves into it (alpha)
         const out = smooth(0, 0.15)
-        const into = smooth(0.82, 1)
+        const into = smooth(0.76, 0.92)
         const midY = window.innerHeight * 0.42 - g.h / 2
         return new DOMRect(
           lerp(lerp(from.x, g.x, out), live.x, into),
@@ -390,7 +396,7 @@ export function SkinScene() {
       getPeelTarget()?.style.removeProperty("opacity")
       // dissolving into the wall's component as it touches down, gone once it has
       const end = wallLeg()
-      if (end && end.y > end.s6) return end.t < 0.94 ? 1 : Math.max(0, (1 - end.t) / 0.06)
+      if (end && end.y > end.s6) return end.t < 0.92 ? 1 : Math.max(0, (1 - end.t) / 0.08)
       // re-emerging from the builder's component for the final leg
       const fin = testLeg()
       const phone = window.innerWidth <= 900

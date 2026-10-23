@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { Marked } from "marked"
 import type { Metadata } from "next"
+import letters from "@/components/letters.module.css"
 import styles from "./compare.module.css"
 
 export const metadata: Metadata = {
@@ -34,6 +35,21 @@ function layout(html: string): string {
       : ""
     return `<section class="${styles.section}">${head}${grid}</section>`
   })
-  const [lead = "", table = ""] = intro.split(/(?=<table)/)
+  const [raw = "", table = ""] = intro.split(/(?=<table)/)
+  const lead = raw.replace(/<h1>([^<&]*)<\/h1>/, (_, t: string) => `<h1>${lettered(t)}</h1>`)
   return `<header class="${styles.intro}">${lead}</header>${table}${sections.join("")}`
+}
+
+/** The title's letters answer the phase, as on the landing and the docs (components/letters.tsx,
+ *  as HTML: this page is markdown rendered to a string). */
+function lettered(text: string): string {
+  let i = 0
+  const words = text
+    .split(" ")
+    .map(
+      (w) =>
+        `<span class="${letters.word}">${[...w].map((ch) => `<span class="${letters.ch}" style="--i:${i++}">${ch}</span>`).join("")}</span>`,
+    )
+    .join(" ")
+  return `<span class="${letters.visuallyHidden}">${text}</span><span aria-hidden="true">${words}</span>`
 }

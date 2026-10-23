@@ -35,7 +35,7 @@ export function SoundInvite() {
     }
   }, [])
 
-  const leave = (on: boolean | null) => {
+  const leave = (on: boolean | null, quick = false) => {
     if (done.current) return
     done.current = true
     if (on !== null) setEnabled(on)
@@ -44,6 +44,12 @@ export function SoundInvite() {
     const handOver = () => setOpen(false)
     if (!el || !to || matchMedia("(prefers-reduced-motion: reduce)").matches) {
       handOver()
+      return
+    }
+    // scrolled away from: it just goes, at once, rather than fold across the moving page
+    if (quick) {
+      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" }).onfinish =
+        handOver
       return
     }
     // into the toggle: shrinking to its size and place, fading as it arrives
@@ -95,7 +101,7 @@ export function SoundInvite() {
     if (!open) return
     const timer = window.setTimeout(() => leave(null), LEAVE_AFTER_MS)
     const onScroll = () => {
-      if (window.scrollY > 300) leave(null)
+      if (window.scrollY > 120) leave(null, true)
     }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => {
