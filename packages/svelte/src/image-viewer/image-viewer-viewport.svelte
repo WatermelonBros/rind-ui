@@ -2,6 +2,7 @@
 import { zoomGestures } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
+import { createAttachmentKey } from "svelte/attachments"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { attrs, normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -36,6 +37,8 @@ const gestures = (viewport: HTMLElement) =>
       wheelZooms: ctx.wheelZooms,
     }),
   )
+// An attachment key in the props, so it lands on a `child`-rendered element too.
+const attach = createAttachmentKey()
 const merged = $derived(
   stripMarker(
     mergeProps(
@@ -71,6 +74,7 @@ const merged = $derived(
           }
         },
       }),
+      { [attach]: gestures },
       rest,
     ),
   ),
@@ -80,5 +84,5 @@ const merged = $derived(
 {#if child}
   {@render child({ props: merged, state: ctx.state() })}
 {:else}
-  <div {...attrs(merged)} {@attach gestures}>{@render children?.(ctx.state())}</div>
+  <div {...attrs(merged)}>{@render children?.(ctx.state())}</div>
 {/if}

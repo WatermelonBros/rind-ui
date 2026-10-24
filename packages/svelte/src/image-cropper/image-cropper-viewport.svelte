@@ -2,6 +2,7 @@
 import { cropGestures } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
+import { createAttachmentKey } from "svelte/attachments"
 import { mergeProps } from "../merge-props"
 import { attrs, normalizeProps } from "../normalize-props"
 import { imageCropper } from "./context"
@@ -22,11 +23,15 @@ const gestures = (viewport: HTMLElement) =>
       onPinchEnd: () => ctx.send({ type: "PINCH.END" }),
     }),
   )
-const merged = $derived(stripMarker(mergeProps(normalizeProps(ctx.api().viewport()), rest)))
+// An attachment key in the props, so it lands on a `child`-rendered element too.
+const attach = createAttachmentKey()
+const merged = $derived(
+  stripMarker(mergeProps({ ...normalizeProps(ctx.api().viewport()), [attach]: gestures }, rest)),
+)
 </script>
 
 {#if child}
   {@render child({ props: merged, state: ctx.state() })}
 {:else}
-  <div {...attrs(merged)} {@attach gestures}>{@render children?.(ctx.state())}</div>
+  <div {...attrs(merged)}>{@render children?.(ctx.state())}</div>
 {/if}

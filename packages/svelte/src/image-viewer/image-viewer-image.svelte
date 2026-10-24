@@ -1,6 +1,7 @@
 <script lang="ts">
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
+import { createAttachmentKey } from "svelte/attachments"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { attrs, normalizeProps } from "../normalize-props"
 import { imageViewer } from "./context"
@@ -19,6 +20,8 @@ const loaded = (img: HTMLImageElement) => {
     ctx.send({ type: "IMAGE.LOADED", width: img.naturalWidth, height: img.naturalHeight })
   }
 }
+// An attachment key in the props, so it lands on a `child`-rendered element too.
+const attach = createAttachmentKey()
 const merged = $derived(
   stripMarker(
     mergeProps(
@@ -28,6 +31,7 @@ const merged = $derived(
           ctx.send({ type: "IMAGE.LOADED", width: img.naturalWidth, height: img.naturalHeight })
         },
       }),
+      { [attach]: loaded },
       rest,
     ),
   ),
@@ -37,5 +41,5 @@ const merged = $derived(
 {#if child}
   {@render child({ props: merged, state: ctx.state() })}
 {:else}
-  <img {...attrs(merged)} {@attach loaded} />
+  <img {...attrs(merged)} />
 {/if}
