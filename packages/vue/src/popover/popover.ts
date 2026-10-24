@@ -236,7 +236,7 @@ const Root = defineComponent({
     const meta = shallowRef<LayerMeta | undefined>(undefined)
     onMounted(() =>
       watch(
-        () => [view.value.matches("open"), root()] as const,
+        [() => view.value.matches("open"), root] as const,
         ([open, id], _, onCleanup) => {
           meta.value = undefined
           if (!open) return
@@ -367,7 +367,7 @@ function useAnchorDir(ctx: Ctx) {
   const env = useEnvironment()
   onMounted(() =>
     watch(
-      () => [isOpen(ctx), ctx.anchorRendered.value, ctx.root(), ctx.scope()] as const,
+      [() => isOpen(ctx), () => ctx.anchorRendered.value, ctx.root, ctx.scope] as const,
       ([open, anchored, root, scope]) => {
         if (!open) return
         const ids = popoverIds(root, scope)

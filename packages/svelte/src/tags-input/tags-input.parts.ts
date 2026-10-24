@@ -1,0 +1,22 @@
+// The TagsInput namespace: a module namespace (not an object), so bundlers drop the parts a
+// consumer never references. The suggestion parts are the listbox parts and the Combobox's
+// popup parts, bound by the Root.
+export { default as Popup } from "../combobox/combobox-popup.svelte"
+export { default as Positioner } from "../combobox/combobox-positioner.svelte"
+export { default as Empty } from "../listbox/listbox-empty.svelte"
+export { default as Item } from "../listbox/listbox-item.svelte"
+export { default as ItemText } from "../listbox/listbox-item-text.svelte"
+export { default as Items } from "../listbox/listbox-items.svelte"
+export { default as List } from "../listbox/listbox-list.svelte"
+export { default as Group } from "../listbox/listbox-section.svelte"
+export { default as Separator } from "../listbox/listbox-separator.svelte"
+export { default as Chip } from "./tags-input-chip.svelte"
+export { default as ChipInput } from "./tags-input-chip-input.svelte"
+export { default as ChipRemove } from "./tags-input-chip-remove.svelte"
+export { default as ChipText } from "./tags-input-chip-text.svelte"
+export { default as Chips } from "./tags-input-chips.svelte"
+export { default as ClearTrigger } from "./tags-input-clear-trigger.svelte"
+export { default as Control } from "./tags-input-control.svelte"
+export { default as Input } from "./tags-input-input.svelte"
+export { default as Label } from "./tags-input-label.svelte"
+export { default as Root } from "./tags-input-root.svelte"

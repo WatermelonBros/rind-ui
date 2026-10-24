@@ -12,9 +12,13 @@ const ctx = popoverHost.get()
 const id = $derived(partId(ctx.scope(), ctx.root(), "description"))
 $effect(() => {
   const own = id
-  untrack(() => (ctx.shared.rendered = { ...ctx.shared.rendered, description: own }))
+  untrack(() => {
+    ctx.shared.rendered = { ...ctx.shared.rendered, description: own }
+  })
   return () =>
-    untrack(() => (ctx.shared.rendered = { ...ctx.shared.rendered, description: undefined }))
+    untrack(() => {
+      ctx.shared.rendered = { ...ctx.shared.rendered, description: undefined }
+    })
 })
 const merged = $derived(stripMarker(mergeProps(normalizeProps(api(ctx).description()), rest)))
 </script>

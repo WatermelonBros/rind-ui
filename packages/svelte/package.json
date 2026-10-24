@@ -105,6 +105,30 @@
       "svelte": "./dist/collapsible/index.js",
       "default": "./dist/collapsible/index.js"
     },
+    "./combobox": {
+      "@rind-ui/source": "./src/combobox/index.ts",
+      "types": "./dist/combobox/index.d.ts",
+      "svelte": "./dist/combobox/index.js",
+      "default": "./dist/combobox/index.js"
+    },
+    "./context-menu": {
+      "@rind-ui/source": "./src/context-menu/index.ts",
+      "types": "./dist/context-menu/index.d.ts",
+      "svelte": "./dist/context-menu/index.js",
+      "default": "./dist/context-menu/index.js"
+    },
+    "./dialog": {
+      "@rind-ui/source": "./src/dialog/index.ts",
+      "types": "./dist/dialog/index.d.ts",
+      "svelte": "./dist/dialog/index.js",
+      "default": "./dist/dialog/index.js"
+    },
+    "./drawer": {
+      "@rind-ui/source": "./src/drawer/index.ts",
+      "types": "./dist/drawer/index.d.ts",
+      "svelte": "./dist/drawer/index.js",
+      "default": "./dist/drawer/index.js"
+    },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
       "types": "./dist/field/index.d.ts",
@@ -147,6 +171,12 @@
       "svelte": "./dist/heading/index.js",
       "default": "./dist/heading/index.js"
     },
+    "./hover-card": {
+      "@rind-ui/source": "./src/hover-card/index.ts",
+      "types": "./dist/hover-card/index.d.ts",
+      "svelte": "./dist/hover-card/index.js",
+      "default": "./dist/hover-card/index.js"
+    },
     "./image": {
       "@rind-ui/source": "./src/image/index.ts",
       "types": "./dist/image/index.d.ts",
@@ -183,11 +213,29 @@
       "svelte": "./dist/marquee/index.js",
       "default": "./dist/marquee/index.js"
     },
+    "./menu": {
+      "@rind-ui/source": "./src/menu/index.ts",
+      "types": "./dist/menu/index.d.ts",
+      "svelte": "./dist/menu/index.js",
+      "default": "./dist/menu/index.js"
+    },
+    "./menubar": {
+      "@rind-ui/source": "./src/menubar/index.ts",
+      "types": "./dist/menubar/index.d.ts",
+      "svelte": "./dist/menubar/index.js",
+      "default": "./dist/menubar/index.js"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.ts",
       "svelte": "./dist/meter/index.js",
       "default": "./dist/meter/index.js"
+    },
+    "./navigation-menu": {
+      "@rind-ui/source": "./src/navigation-menu/index.ts",
+      "types": "./dist/navigation-menu/index.d.ts",
+      "svelte": "./dist/navigation-menu/index.js",
+      "default": "./dist/navigation-menu/index.js"
     },
     "./number-input": {
       "@rind-ui/source": "./src/number-input/index.ts",
@@ -249,6 +297,12 @@
       "svelte": "./dist/segmented-control/index.js",
       "default": "./dist/segmented-control/index.js"
     },
+    "./select": {
+      "@rind-ui/source": "./src/select/index.ts",
+      "types": "./dist/select/index.d.ts",
+      "svelte": "./dist/select/index.js",
+      "default": "./dist/select/index.js"
+    },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
       "types": "./dist/separator/index.d.ts",
@@ -266,6 +320,12 @@
       "types": "./dist/slider/index.d.ts",
       "svelte": "./dist/slider/index.js",
       "default": "./dist/slider/index.js"
+    },
+    "./sortable": {
+      "@rind-ui/source": "./src/sortable/index.ts",
+      "types": "./dist/sortable/index.d.ts",
+      "svelte": "./dist/sortable/index.js",
+      "default": "./dist/sortable/index.js"
     },
     "./splitter": {
       "@rind-ui/source": "./src/splitter/index.ts",
@@ -285,6 +345,12 @@
       "svelte": "./dist/switch/index.js",
       "default": "./dist/switch/index.js"
     },
+    "./table": {
+      "@rind-ui/source": "./src/table/index.ts",
+      "types": "./dist/table/index.d.ts",
+      "svelte": "./dist/table/index.js",
+      "default": "./dist/table/index.js"
+    },
     "./table-of-contents": {
       "@rind-ui/source": "./src/table-of-contents/index.ts",
       "types": "./dist/table-of-contents/index.d.ts",
@@ -303,6 +369,12 @@
       "svelte": "./dist/tag-group/index.js",
       "default": "./dist/tag-group/index.js"
     },
+    "./tags-input": {
+      "@rind-ui/source": "./src/tags-input/index.ts",
+      "types": "./dist/tags-input/index.d.ts",
+      "svelte": "./dist/tags-input/index.js",
+      "default": "./dist/tags-input/index.js"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.ts",
@@ -314,6 +386,12 @@
       "types": "./dist/timeline/index.d.ts",
       "svelte": "./dist/timeline/index.js",
       "default": "./dist/timeline/index.js"
+    },
+    "./toast": {
+      "@rind-ui/source": "./src/toast/index.ts",
+      "types": "./dist/toast/index.d.ts",
+      "svelte": "./dist/toast/index.js",
+      "default": "./dist/toast/index.js"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -332,6 +410,18 @@
       "types": "./dist/toolbar/index.d.ts",
       "svelte": "./dist/toolbar/index.js",
       "default": "./dist/toolbar/index.js"
+    },
+    "./tooltip": {
+      "@rind-ui/source": "./src/tooltip/index.ts",
+      "types": "./dist/tooltip/index.d.ts",
+      "svelte": "./dist/tooltip/index.js",
+      "default": "./dist/tooltip/index.js"
+    },
+    "./tour": {
+      "@rind-ui/source": "./src/tour/index.ts",
+      "types": "./dist/tour/index.d.ts",
+      "svelte": "./dist/tour/index.js",
+      "default": "./dist/tour/index.js"
     },
     "./tree-view": {
       "@rind-ui/source": "./src/tree-view/index.ts",
@@ -429,6 +519,26 @@
         "svelte": "./dist/collapsible/index.js",
         "default": "./dist/collapsible/index.js"
       },
+      "./combobox": {
+        "types": "./dist/combobox/index.d.ts",
+        "svelte": "./dist/combobox/index.js",
+        "default": "./dist/combobox/index.js"
+      },
+      "./context-menu": {
+        "types": "./dist/context-menu/index.d.ts",
+        "svelte": "./dist/context-menu/index.js",
+        "default": "./dist/context-menu/index.js"
+      },
+      "./dialog": {
+        "types": "./dist/dialog/index.d.ts",
+        "svelte": "./dist/dialog/index.js",
+        "default": "./dist/dialog/index.js"
+      },
+      "./drawer": {
+        "types": "./dist/drawer/index.d.ts",
+        "svelte": "./dist/drawer/index.js",
+        "default": "./dist/drawer/index.js"
+      },
       "./field": {
         "types": "./dist/field/index.d.ts",
         "svelte": "./dist/field/index.js",
@@ -464,6 +574,11 @@
         "svelte": "./dist/heading/index.js",
         "default": "./dist/heading/index.js"
       },
+      "./hover-card": {
+        "types": "./dist/hover-card/index.d.ts",
+        "svelte": "./dist/hover-card/index.js",
+        "default": "./dist/hover-card/index.js"
+      },
       "./image": {
         "types": "./dist/image/index.d.ts",
         "svelte": "./dist/image/index.js",
@@ -494,10 +609,25 @@
         "svelte": "./dist/marquee/index.js",
         "default": "./dist/marquee/index.js"
       },
+      "./menu": {
+        "types": "./dist/menu/index.d.ts",
+        "svelte": "./dist/menu/index.js",
+        "default": "./dist/menu/index.js"
+      },
+      "./menubar": {
+        "types": "./dist/menubar/index.d.ts",
+        "svelte": "./dist/menubar/index.js",
+        "default": "./dist/menubar/index.js"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.ts",
         "svelte": "./dist/meter/index.js",
         "default": "./dist/meter/index.js"
+      },
+      "./navigation-menu": {
+        "types": "./dist/navigation-menu/index.d.ts",
+        "svelte": "./dist/navigation-menu/index.js",
+        "default": "./dist/navigation-menu/index.js"
       },
       "./number-input": {
         "types": "./dist/number-input/index.d.ts",
@@ -549,6 +679,11 @@
         "svelte": "./dist/segmented-control/index.js",
         "default": "./dist/segmented-control/index.js"
       },
+      "./select": {
+        "types": "./dist/select/index.d.ts",
+        "svelte": "./dist/select/index.js",
+        "default": "./dist/select/index.js"
+      },
       "./separator": {
         "types": "./dist/separator/index.d.ts",
         "svelte": "./dist/separator/index.js",
@@ -563,6 +698,11 @@
         "types": "./dist/slider/index.d.ts",
         "svelte": "./dist/slider/index.js",
         "default": "./dist/slider/index.js"
+      },
+      "./sortable": {
+        "types": "./dist/sortable/index.d.ts",
+        "svelte": "./dist/sortable/index.js",
+        "default": "./dist/sortable/index.js"
       },
       "./splitter": {
         "types": "./dist/splitter/index.d.ts",
@@ -579,6 +719,11 @@
         "svelte": "./dist/switch/index.js",
         "default": "./dist/switch/index.js"
       },
+      "./table": {
+        "types": "./dist/table/index.d.ts",
+        "svelte": "./dist/table/index.js",
+        "default": "./dist/table/index.js"
+      },
       "./table-of-contents": {
         "types": "./dist/table-of-contents/index.d.ts",
         "svelte": "./dist/table-of-contents/index.js",
@@ -594,6 +739,11 @@
         "svelte": "./dist/tag-group/index.js",
         "default": "./dist/tag-group/index.js"
       },
+      "./tags-input": {
+        "types": "./dist/tags-input/index.d.ts",
+        "svelte": "./dist/tags-input/index.js",
+        "default": "./dist/tags-input/index.js"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",
         "svelte": "./dist/text-field/index.js",
@@ -603,6 +753,11 @@
         "types": "./dist/timeline/index.d.ts",
         "svelte": "./dist/timeline/index.js",
         "default": "./dist/timeline/index.js"
+      },
+      "./toast": {
+        "types": "./dist/toast/index.d.ts",
+        "svelte": "./dist/toast/index.js",
+        "default": "./dist/toast/index.js"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",
@@ -618,6 +773,16 @@
         "types": "./dist/toolbar/index.d.ts",
         "svelte": "./dist/toolbar/index.js",
         "default": "./dist/toolbar/index.js"
+      },
+      "./tooltip": {
+        "types": "./dist/tooltip/index.d.ts",
+        "svelte": "./dist/tooltip/index.js",
+        "default": "./dist/tooltip/index.js"
+      },
+      "./tour": {
+        "types": "./dist/tour/index.d.ts",
+        "svelte": "./dist/tour/index.js",
+        "default": "./dist/tour/index.js"
       },
       "./tree-view": {
         "types": "./dist/tree-view/index.d.ts",

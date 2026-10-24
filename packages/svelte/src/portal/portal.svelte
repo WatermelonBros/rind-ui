@@ -16,12 +16,16 @@ compositeHost.set(null)
 separatorHost.set(() => null)
 const contexts = getAllContexts()
 const parent = () => logicalParent?.() ?? null
+// The element itself: the host remounts only when it changes, not when the logical parent's
+// inputs do (a dialog's opener set on open; a remounted host is a node added after the layer
+// opened, which dismiss treats as not outside).
+const target = $derived(resolvePortalTarget(parent(), container))
 $effect(() => {
-  const target = resolvePortalTarget(parent(), container)
+  const into = target
   const host = untrack(() =>
     mount(PortalHost, {
       // A shadow root is a valid parent for the host.
-      target: target as Element,
+      target: into as Element,
       context: contexts,
       props: {
         get rest() {
