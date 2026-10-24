@@ -14,8 +14,13 @@ const ctx = popoverHost.get()
 const id = $derived(partId(ctx.scope(), ctx.root(), "title"))
 $effect(() => {
   const own = id
-  untrack(() => (ctx.shared.rendered = { ...ctx.shared.rendered, title: own }))
-  return () => untrack(() => (ctx.shared.rendered = { ...ctx.shared.rendered, title: undefined }))
+  untrack(() => {
+    ctx.shared.rendered = { ...ctx.shared.rendered, title: own }
+  })
+  return () =>
+    untrack(() => {
+      ctx.shared.rendered = { ...ctx.shared.rendered, title: undefined }
+    })
 })
 $effect.pre(() => {
   ctx.shared.titleLevel = level

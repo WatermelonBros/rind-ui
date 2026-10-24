@@ -433,3 +433,7 @@ verified at round 3 (2026-10-14).
 
 - warning: a dialog opened programmatically with no `Dialog.Trigger` has no logical parent, so its portal host lands in `<body>` without the opener's `data-rind-theme`, `dir` and `lang`, and a themed page shows it unstyled (the site's "Open from outside" example now passes `logicalParent`). Consider falling back to the portal's own React position (a marker element) or the focused element at open.
 - warning (text-field, site review): an `id` passed to `TextField.Input` replaces the generated control id, but `TextField.Label`'s `htmlFor` keeps the generated one, so the input loses its name. The control id should follow a consumer's `id` (Liskov: a part forwards the props of its element without changing behaviour); the site's tour example now puts its id on the Root.
+
+## Table of Contents (vue-svelte-adapters)
+
+- warning: the model test's keyboard NAVIGATE can fail `focusKept` under CI load (seen once on the Vue jsdom shard of #245): the heading focus runs on a frame of the virtual scheduler, so when it lands after the step's snapshot the next NAVIGATE starts from the link and ends on the heading. Same code and test in React. The model could advance the injected clock by a frame before collecting a step's facts.

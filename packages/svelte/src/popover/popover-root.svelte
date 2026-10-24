@@ -99,7 +99,9 @@ $effect(() => {
   return untrack(() => {
     const node = env.dom.getRootNode()
     const stack = getLayerStack("body" in node ? node : node.ownerDocument)
-    const read = () => (shared.meta = stack.get(layer)?.meta())
+    const read = () => {
+      shared.meta = stack.get(layer)?.meta()
+    }
     read()
     return stack.subscribe(read)
   })

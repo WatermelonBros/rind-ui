@@ -10,7 +10,9 @@ const { child, children, ...rest }: PopoverAnchorProps = $props()
 const ctx = popoverHost.get()
 $effect(() => {
   ctx.shared.anchorRendered = true
-  return () => (ctx.shared.anchorRendered = false)
+  return () => {
+    ctx.shared.anchorRendered = false
+  }
 })
 const merged = $derived(stripMarker(mergeProps(normalizeProps(api(ctx).anchor()), rest)))
 </script>

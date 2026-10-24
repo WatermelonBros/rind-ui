@@ -41,7 +41,9 @@ const diff: Directive<HTMLElement, readonly [Declarations, Declarations]> = {
 export function keepStyle() {
   let first: { style: unknown } | null = null
   return (props: Props, render: (props: Props) => VNode) => {
-    first ??= { style: props["style"] }
+    // Normalised once: a merged style is an array, which Vue turns into a new object on every
+    // render (and then re-applies every key).
+    first ??= { style: normalizeStyle(props["style"] as never) }
     const vnode = render({ ...props, style: first.style })
     return withDirectives(vnode, [
       [diff, [declarations(first.style), declarations(props["style"])]],
