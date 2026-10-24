@@ -10,266 +10,49 @@ import {
   Switch,
   TextField,
   Toggle,
+  ToggleGroup,
 } from "@rind-ui/react"
-import { type ReactNode, useEffect, useRef, useState } from "react"
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react"
 import { Letters } from "../letters"
 import { type Phase, usePhase } from "../phase"
+import { cue } from "../sound"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import { handoff } from "./handoff"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
-
-type Shadow = "flat" | "soft" | "hard"
-type Font = "sans" | "serif" | "mono" | "rounded"
-type Density = "compact" | "cozy" | "roomy"
-
-interface Look {
-  /** the visitor's pick; null wears the site phase's own brand (BRAND) */
-  readonly brand: string | null
-  readonly surface: string
-  readonly radius: number
-  readonly border: number
-  readonly shadow: Shadow
-  readonly font: Font
-  readonly density: Density
-}
+import {
+  DENSITIES,
+  decodeLook,
+  encodeLook,
+  FILLS,
+  FONT_NAMES,
+  FONTS,
+  LETTERS,
+  type Look,
+  MOTIONS,
+  PATTERNS,
+  PRESETS,
+  SHADOWS,
+  SITE_FONTS,
+  sameLook,
+  skinCss,
+} from "./skins"
 
 /** The brand before the visitor picks one: the site's own, rind green in juicy and lime in crisp. */
 const BRAND: Record<Phase, string> = { juicy: "#5cd690", crisp: "#D4FF3A" }
 
-/** Where the builder starts and what Reset returns to: the site's brand on a plain look. */
-const BASE: Look = {
-  brand: null,
-  surface: "#FFFFFF",
-  radius: 8,
-  border: 1,
-  shadow: "flat",
-  font: "sans",
-  density: "cozy",
-}
+/** Where the builder starts and what Reset returns to: the site's own look (skins.ts). */
+const BASE = PRESETS[0]?.look as Look // PRESETS is a non-empty literal list
 const SWATCHES = ["#FF3D8B", "#FF8F3D", "#F5D90A", "#2EC27E", "#3D8BFF", "#8B3DFF", "#18181B"]
-const SURFACES = ["#FFFFFF", "#FAF7F0", "#F1EDFF", "#EAF7EE", "#18181B", "#0F172A"]
-const SHADOWS: Record<Shadow, string> = {
-  flat: "none",
-  soft: "0 1px 2px rgb(0 0 0 / 0.12), 0 8px 20px rgb(0 0 0 / 0.1)",
-  hard: "3px 3px 0 var(--skin-ink)",
-}
-// system stacks, so the copied CSS renders the same anywhere: no web font to load
-/** The faces as the copied CSS names them: real families, each falling back to the platform's. */
-const FONTS: Record<Font, string> = {
-  sans: '"Inter Tight", system-ui, sans-serif',
-  serif: '"Source Serif 4", Georgia, serif',
-  mono: '"JetBrains Mono", ui-monospace, monospace',
-  rounded: "Fredoka, ui-rounded, system-ui, sans-serif",
-}
-/** The same faces in the preview, as this site loads them (app/layout.tsx): a visitor without
- *  them installed still sees the designed type, never a system default. */
-const SITE_FONTS: Record<Font, string> = {
-  sans: "var(--font-inter)",
-  serif: "var(--font-serif)",
-  mono: "var(--font-mono)",
-  rounded: "var(--font-fredoka)",
-}
-const DENSITY: Record<Density, readonly [number, number, number]> = {
-  compact: [6, 10, 10],
-  cozy: [9, 14, 14],
-  roomy: [12, 18, 20],
-}
+const ACCENTS = ["#FF8FA3", "#FFC371", "#01CDFE", "#C084FC", "#F2C12E", "#FF00E5", "#71717A"]
+const SURFACES = ["#FFFFFF", "#FAF7F0", "#F1EDFF", "#EAF7EE", "#C0C0C0", "#18181B", "#0F172A"]
+/** How long each ready skin shows while the builder plays them by itself. */
+const PLAY_MS = 2600
 
-/** Ink or white, whichever reads better on `hex` (WCAG relative luminance). */
-function textOn(hex: string): string {
-  const [r = 0, g = 0, b = 0] = [1, 3, 5].map((i) => {
-    const c = Number.parseInt(hex.slice(i, i + 2), 16) / 255
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-  })
-  const l = 0.2126 * r + 0.7152 * g + 0.0722 * b
-  // contrast against white vs against near-black ink; pick the larger
-  return 1.05 / (l + 0.05) >= (l + 0.05) / 0.055 ? "#FFFFFF" : "#18181B"
-}
-
-const pick = <T,>(list: readonly T[]): T => list[Math.floor(Math.random() * list.length)] as T
-
-/** The whole skin: tokens on `:root`, then rules on rind's attributes and nothing else. */
-function skinCss(look: Look & { readonly brand: string }): string {
-  const [py, px, gap] = DENSITY[look.density]
-  return `/* skin.css: the whole look of the components above */
-:root {
-  --skin-brand: ${look.brand.toLowerCase()};
-  --skin-brand-text: ${textOn(look.brand).toLowerCase()};
-  --skin-surface: ${look.surface.toLowerCase()};
-  --skin-ink: ${textOn(look.surface).toLowerCase()};
-  --skin-line: color-mix(in oklab, var(--skin-ink) 20%, var(--skin-surface));
-  --skin-muted: color-mix(in oklab, var(--skin-ink) 7%, var(--skin-surface));
-  --skin-radius: ${look.radius}px;
-  --skin-radius-sm: ${Math.round(look.radius * 0.6)}px;
-  --skin-border: ${look.border}px;
-  --skin-shadow: ${SHADOWS[look.shadow]};
-  --skin-font: ${FONTS[look.font]};
-  --skin-pad-y: ${py}px;
-  --skin-pad-x: ${px}px;
-  --skin-gap: ${gap}px;
-  background: var(--skin-surface);
-  color: var(--skin-ink);
-  font: 15px / 1.4 var(--skin-font);
-}
-[data-scope]:focus-visible {
-  outline: 2px solid var(--skin-brand);
-  outline-offset: 2px;
-}
-
-/* Text field */
-[data-scope="text-field"][data-part="root"] {
-  display: grid;
-  gap: 6px;
-}
-[data-scope="text-field"][data-part="label"] {
-  font-weight: 600;
-  font-size: 14px;
-}
-[data-scope="text-field"][data-part="input"] {
-  font: inherit;
-  color: inherit;
-  padding: var(--skin-pad-y) var(--skin-pad-x);
-  background: var(--skin-muted);
-  border: var(--skin-border) solid var(--skin-line);
-  border-radius: var(--skin-radius-sm);
-}
-[data-scope="text-field"][data-part="input"]:focus-visible {
-  outline-offset: 0;
-}
-
-/* Switch */
-[data-scope="switch"][data-part="root"] {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-[data-scope="switch"][data-part="control"] {
-  display: inline-flex;
-  align-items: center;
-  box-sizing: border-box;
-  inline-size: 44px;
-  block-size: 26px;
-  padding: 3px;
-  border: var(--skin-border) solid var(--skin-line);
-  border-radius: 99px;
-  background: var(--skin-line);
-  transition: background-color 0.2s;
-}
-[data-scope="switch"][data-part="control"][data-state="checked"] {
-  background: var(--skin-brand);
-  border-color: var(--skin-brand);
-}
-[data-scope="switch"][data-part="thumb"] {
-  inline-size: 18px;
-  block-size: 18px;
-  border-radius: 50%;
-  background: var(--skin-surface);
-  box-shadow: var(--skin-shadow);
-  transition: translate 0.2s;
-}
-[data-scope="switch"][data-part="thumb"][data-state="checked"] {
-  translate: calc(44px - 18px - 6px - 2 * var(--skin-border)) 0;
-}
-
-/* Checkbox */
-[data-scope="checkbox"][data-part="root"] {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-[data-scope="checkbox"][data-part="control"] {
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  inline-size: 20px;
-  block-size: 20px;
-  border: max(1px, var(--skin-border)) solid var(--skin-line);
-  border-radius: min(6px, var(--skin-radius-sm));
-  background: var(--skin-surface);
-  color: var(--skin-brand-text);
-  font-size: 13px;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-[data-scope="checkbox"][data-part="control"][data-state="checked"] {
-  background: var(--skin-brand);
-  border-color: var(--skin-brand);
-}
-[data-scope="checkbox"][data-part="indicator"][data-state="unchecked"] {
-  visibility: hidden;
-}
-
-/* Button and toggle */
-:is([data-scope="button"][data-part="root"], [data-scope="toggle"][data-part="root"]) {
-  font: 600 14px var(--skin-font);
-  padding: var(--skin-pad-y) calc(var(--skin-pad-x) + 4px);
-  border: var(--skin-border) solid var(--skin-line);
-  border-radius: var(--skin-radius-sm);
-  box-shadow: var(--skin-shadow);
-  cursor: pointer;
-  transition: background-color 0.2s, translate 0.1s;
-}
-[data-scope="button"][data-part="root"] {
-  background: var(--skin-brand);
-  border-color: var(--skin-brand);
-  color: var(--skin-brand-text);
-}
-[data-scope="button"][data-part="root"][data-hover] {
-  background: color-mix(in oklab, var(--skin-brand) 85%, var(--skin-ink));
-}
-[data-scope="toggle"][data-part="root"] {
-  background: var(--skin-muted);
-  color: var(--skin-ink);
-}
-[data-scope="toggle"][data-part="root"][data-state="on"] {
-  background: var(--skin-ink);
-  border-color: var(--skin-ink);
-  color: var(--skin-surface);
-}
-:is([data-scope="button"][data-part="root"], [data-scope="toggle"][data-part="root"])[data-pressed] {
-  translate: 0 1px;
-}
-
-/* Accordion */
-[data-scope="accordion"][data-part="root"] {
-  border: var(--skin-border) solid var(--skin-line);
-  border-radius: var(--skin-radius);
-  background: var(--skin-surface);
-  box-shadow: var(--skin-shadow);
-  overflow: hidden;
-}
-[data-scope="accordion"][data-part="item"] + [data-part="item"] {
-  border-top: max(1px, var(--skin-border)) solid var(--skin-line);
-}
-[data-scope="accordion"][data-part="header"] {
-  margin: 0;
-}
-[data-scope="accordion"][data-part="trigger"] {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  inline-size: 100%;
-  padding: calc(var(--skin-pad-y) + 4px) var(--skin-pad-x);
-  border: 0;
-  background: none;
-  color: inherit;
-  font: 600 15px var(--skin-font);
-  text-align: start;
-  cursor: pointer;
-}
-[data-scope="accordion"][data-part="indicator"] {
-  transition: rotate 0.2s;
-}
-[data-scope="accordion"][data-part="indicator"][data-state="open"] {
-  rotate: 45deg;
-}
-[data-scope="accordion"][data-part="content"] > p {
-  margin: 0;
-  padding: 0 var(--skin-pad-x) calc(var(--skin-pad-y) + 6px);
-  color: color-mix(in oklab, var(--skin-ink) 72%, var(--skin-surface));
-}`
-}
+/** The copied CSS names real families; the preview wears them as this site loads them. */
+const siteFonts = (css: string) =>
+  FONT_NAMES.reduce((out, f) => out.replaceAll(FONTS[f], SITE_FONTS[f]), css)
 
 /** The same CSS, scoped to the stage: `:root` becomes the stage, every rule stays as written. */
 const scoped = (css: string) => `@scope ([data-look]) {\n${css.replace(":root {", ":scope {")}\n}`
@@ -453,47 +236,80 @@ export function AnyLook() {
       setLookColors({
         brand: look.brand,
         surface: look.surface,
-        picked: picked.brand !== null || picked.surface !== BASE.surface,
+        // the skins the builder plays by itself are not the visitor's: the object keeps its own
+        picked: touched.current && (picked.brand !== null || picked.surface !== BASE.surface),
       }),
     [look.brand, look.surface, picked.brand, picked.surface],
   )
-  const [copied, setCopied] = useState(false)
+  const section = useRef<HTMLElement>(null)
+  const [copied, setCopied] = useState<"css" | "link" | null>(null)
+  // the visitor has taken over: the builder stops playing its skins by itself
+  const touched = useRef(false)
   const set = (patch: Partial<Look>) => {
     setLook((l) => ({ ...l, ...patch }))
-    setCopied(false)
+    setCopied(null)
   }
-  const surprise = () =>
-    set({
-      radius: pick([0, 4, 8, 14, 22, 28]),
-      border: pick([0, 1, 2, 3]),
-      shadow: pick(["flat", "soft", "hard"] as const),
-      font: pick(["sans", "serif", "mono", "rounded"] as const),
-      density: pick(["compact", "cozy", "roomy"] as const),
-    })
-  // the builder surprises itself once, when it is first in view: a visitor who only scrolls still
-  // sees the same components take another skin (not under reduced motion)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: once, on first view
+  const preset = PRESETS.find((p) => sameLook(p.look, picked))
+  // the ready skins in a shuffled deck: Surprise me deals the next, every one before a repeat
+  const deck = useRef<string[]>([])
+  const surprise = () => {
+    if (deck.current.length === 0)
+      deck.current = PRESETS.map((p) => p.id)
+        .filter((id) => id !== preset?.id)
+        .sort(() => Math.random() - 0.5)
+    const next = PRESETS.find((p) => p.id === deck.current.shift())
+    if (next) set(next.look)
+    return next?.id
+  }
+  // a shared link opens on its skin (#skin=…), the builder brought into view
+  // biome-ignore lint/correctness/useExhaustiveDependencies: once, on load
   useEffect(() => {
-    const el = stage.current
+    const m = /[#&]skin=([\w.-]+)/.exec(window.location.hash)
+    const shared = m?.[1] ? decodeLook(m[1]) : null
+    if (!shared) return
+    touched.current = true
+    set(shared)
+    document.getElementById("look-title")?.scrollIntoView({ block: "start" })
+  }, [])
+  // in view, the builder plays its ready skins one after another, until the visitor touches it
+  // (a press, a key, a focus inside) or it leaves the screen; not under reduced motion
+  useEffect(() => {
+    const el = section.current
     if (!el || typeof IntersectionObserver === "undefined") return
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    let later = 0
+    let timer = 0
+    const stop = () => {
+      touched.current = true
+      clearInterval(timer)
+    }
     const io = new IntersectionObserver(
       (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return
-        io.disconnect()
-        later = window.setTimeout(surprise, 700)
+        clearInterval(timer)
+        if (touched.current || !entries.some((e) => e.isIntersecting)) return
+        const play = () => {
+          const id = surpriseRef.current()
+          cue("reskin", { value: PRESETS.findIndex((p) => p.id === id) / (PRESETS.length - 1) })
+        }
+        play()
+        timer = window.setInterval(play, PLAY_MS)
       },
-      { threshold: 0.3 },
+      { threshold: 0.35 },
     )
-    io.observe(el)
+    io.observe(stage.current ?? el)
+    el.addEventListener("pointerdown", stop)
+    el.addEventListener("keydown", stop)
+    el.addEventListener("focusin", stop)
     return () => {
       io.disconnect()
-      clearTimeout(later)
+      clearInterval(timer)
+      el.removeEventListener("pointerdown", stop)
+      el.removeEventListener("keydown", stop)
+      el.removeEventListener("focusin", stop)
     }
   }, [])
+  const surpriseRef = useRef(surprise)
+  surpriseRef.current = surprise
   const css = skinCss(look)
-  const section = useRef<HTMLElement>(null)
   const [picker, setPicker] = useState<ColourComponent | null>(null)
   // load the picker a screen before the builder shows up (or at once without IntersectionObserver)
   useEffect(() => {
@@ -543,96 +359,199 @@ export function AnyLook() {
       <Reveal className={styles.lookPanel}>
         {/* the builder's own controls are rind components in the site's bare skin */}
         <div
-          className={styles.lookControls}
+          className={styles.lookPresets}
           data-skinned=""
           data-skin="bare"
           data-rind-theme="skin-bare"
         >
-          <LazyColour
-            label="Brand"
-            value={look.brand}
-            swatches={SWATCHES}
-            picker={picker}
-            onChange={(brand) => set({ brand })}
-          />
-          <LazyColour
-            label="Surface"
-            value={look.surface}
-            swatches={SURFACES}
-            picker={picker}
-            onChange={(surface) => set({ surface })}
-          />
-          <Tune label="Radius" value={look.radius} max={28} onChange={(v) => set({ radius: v })} />
-          <Tune label="Border" value={look.border} max={4} onChange={(v) => set({ border: v })} />
-          <Choice
-            label="Shadow"
-            value={look.shadow}
-            options={["flat", "soft", "hard"] as const}
-            onChange={(v) => set({ shadow: v })}
-          />
-          <Choice
-            label="Font"
-            value={look.font}
-            options={["sans", "serif", "mono", "rounded"] as const}
-            onChange={(v) => set({ font: v })}
-          />
-          <Choice
-            label="Density"
-            value={look.density}
-            options={["compact", "cozy", "roomy"] as const}
-            onChange={(v) => set({ density: v })}
-          />
+          <ToggleGroup.Root
+            className={styles.presets}
+            aria-label="Ready skins"
+            value={preset ? [preset.id] : []}
+            onValueChange={(v) => {
+              const next = PRESETS.find((p) => p.id === v[0])
+              if (next) set(next.look)
+            }}
+          >
+            {PRESETS.map((p) => (
+              <ToggleGroup.Item key={p.id} value={p.id} className={styles.preset}>
+                <span
+                  className={styles.presetSwatch}
+                  aria-hidden="true"
+                  style={
+                    {
+                      "--a": p.look.brand ?? BRAND[phase],
+                      "--b": p.look.surface,
+                      "--c": p.look.accent,
+                    } as CSSProperties
+                  }
+                />
+                {p.name}
+              </ToggleGroup.Item>
+            ))}
+          </ToggleGroup.Root>
           <div className={styles.tuneActions}>
             <Button onPress={surprise}>Surprise me</Button>
+            <Button
+              onPress={() => {
+                const url = `${window.location.origin}${window.location.pathname}#skin=${encodeLook(picked)}`
+                navigator.clipboard?.writeText(url).then(
+                  () => setCopied("link"),
+                  () => {},
+                )
+              }}
+            >
+              {copied === "link" ? "Link copied" : "Share link"}
+            </Button>
             <Button onPress={() => set(BASE)}>Reset</Button>
           </div>
         </div>
-        <style>{scoped(css.replace(FONTS[look.font], SITE_FONTS[look.font]))}</style>
-        <div ref={stage} className={styles.lookStage} data-look="">
-          <div className={styles.lookGrid}>
-            <div className={styles.lookCol}>
-              <TextField.Root name="handle">
-                <TextField.Label>Handle</TextField.Label>
-                <TextField.Input placeholder="@you" />
-              </TextField.Root>
-              <Switch.Root defaultChecked>
-                <Switch.Control>
-                  <Switch.Thumb />
-                </Switch.Control>
-                <Switch.Label>Notifications</Switch.Label>
-              </Switch.Root>
-              <CheckboxGroup.Item defaultChecked>
-                <CheckboxGroup.ItemControl>
-                  <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
-                </CheckboxGroup.ItemControl>
-                <CheckboxGroup.ItemLabel>Keyboard support</CheckboxGroup.ItemLabel>
-              </CheckboxGroup.Item>
-              <div className={styles.lookRow}>
-                <Button>
-                  Save <span aria-hidden="true">→</span>
-                </Button>
-                <Toggle.Root defaultPressed>Bold</Toggle.Root>
+        <style>{scoped(siteFonts(css))}</style>
+        <div className={styles.lookBody}>
+          <div ref={stage} className={styles.lookStage} data-look="">
+            <div className={styles.lookSticky}>
+              <div className={styles.lookGrid}>
+                <div className={styles.lookCol}>
+                  <TextField.Root name="handle">
+                    <TextField.Label>Handle</TextField.Label>
+                    <TextField.Input placeholder="@you" />
+                  </TextField.Root>
+                  <Switch.Root defaultChecked>
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Label>Notifications</Switch.Label>
+                  </Switch.Root>
+                  <CheckboxGroup.Item defaultChecked>
+                    <CheckboxGroup.ItemControl>
+                      <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                    </CheckboxGroup.ItemControl>
+                    <CheckboxGroup.ItemLabel>Keyboard support</CheckboxGroup.ItemLabel>
+                  </CheckboxGroup.Item>
+                  <div className={styles.lookRow}>
+                    <Button>
+                      Save <span aria-hidden="true">→</span>
+                    </Button>
+                    <Toggle.Root defaultPressed>Bold</Toggle.Root>
+                  </div>
+                </div>
+                <Accordion.Root defaultValue={["what"]}>
+                  {[
+                    [
+                      "what",
+                      "What do I get?",
+                      "Behaviour, keyboard, ARIA, state and a test driver.",
+                    ],
+                    [
+                      "css",
+                      "And the CSS?",
+                      "Yours. Write it on data-scope, data-part and data-state.",
+                    ],
+                    ["theme", "No time for CSS?", "@rind-ui/theme is an optional starting point."],
+                  ].map(([value = "", title, text]) => (
+                    <Accordion.Item key={value} value={value}>
+                      <Accordion.Header>
+                        <Accordion.Trigger>
+                          {title}
+                          <Accordion.Indicator>+</Accordion.Indicator>
+                        </Accordion.Trigger>
+                      </Accordion.Header>
+                      <Accordion.Content>
+                        <p>{text}</p>
+                      </Accordion.Content>
+                    </Accordion.Item>
+                  ))}
+                </Accordion.Root>
               </div>
             </div>
-            <Accordion.Root defaultValue={["what"]}>
-              {[
-                ["what", "What do I get?", "Behaviour, keyboard, ARIA, state and a test driver."],
-                ["css", "And the CSS?", "Yours. Write it on data-scope, data-part and data-state."],
-                ["theme", "No time for CSS?", "@rind-ui/theme is an optional starting point."],
-              ].map(([value = "", title, text]) => (
-                <Accordion.Item key={value} value={value}>
-                  <Accordion.Header>
-                    <Accordion.Trigger>
-                      {title}
-                      <Accordion.Indicator>+</Accordion.Indicator>
-                    </Accordion.Trigger>
-                  </Accordion.Header>
-                  <Accordion.Content>
-                    <p>{text}</p>
-                  </Accordion.Content>
-                </Accordion.Item>
-              ))}
-            </Accordion.Root>
+          </div>
+          <div
+            className={styles.lookControls}
+            data-skinned=""
+            data-skin="bare"
+            data-rind-theme="skin-bare"
+          >
+            <div className={styles.tuneGroup}>
+              <LazyColour
+                label="Brand"
+                value={look.brand}
+                swatches={SWATCHES}
+                picker={picker}
+                onChange={(brand) => set({ brand })}
+              />
+              <LazyColour
+                label="Accent"
+                value={look.accent}
+                swatches={ACCENTS}
+                picker={picker}
+                onChange={(accent) => set({ accent })}
+              />
+              <LazyColour
+                label="Surface"
+                value={look.surface}
+                swatches={SURFACES}
+                picker={picker}
+                onChange={(surface) => set({ surface })}
+              />
+            </div>
+            <div className={styles.tuneGroup}>
+              <Tune
+                label="Radius"
+                value={look.radius}
+                max={28}
+                onChange={(v) => set({ radius: v })}
+              />
+              <Tune
+                label="Border"
+                value={look.border}
+                max={4}
+                onChange={(v) => set({ border: v })}
+              />
+            </div>
+            <Choice
+              label="Shadow"
+              value={look.shadow}
+              options={SHADOWS}
+              onChange={(v) => set({ shadow: v })}
+            />
+            <Choice
+              label="Fill"
+              value={look.fill}
+              options={FILLS}
+              onChange={(v) => set({ fill: v })}
+            />
+            <Choice
+              label="Font"
+              value={look.font}
+              options={FONT_NAMES}
+              onChange={(v) => set({ font: v })}
+            />
+            <Choice
+              label="Ground"
+              value={look.pattern}
+              options={PATTERNS}
+              onChange={(v) => set({ pattern: v })}
+            />
+            <div className={styles.tuneGroup}>
+              <Choice
+                label="Density"
+                value={look.density}
+                options={DENSITIES}
+                onChange={(v) => set({ density: v })}
+              />
+              <Choice
+                label="Case"
+                value={look.letters}
+                options={LETTERS}
+                onChange={(v) => set({ letters: v })}
+              />
+            </div>
+            <Choice
+              label="Motion"
+              value={look.motion}
+              options={MOTIONS}
+              onChange={(v) => set({ motion: v })}
+            />
           </div>
         </div>
         {/* the stylesheet is there on demand: open, its scrolling box sat in the page's path */}
@@ -646,12 +565,12 @@ export function AnyLook() {
               <Button
                 onPress={() => {
                   navigator.clipboard?.writeText(css).then(
-                    () => setCopied(true),
+                    () => setCopied("css"),
                     () => {},
                   )
                 }}
               >
-                {copied ? "Copied" : "Copy"}
+                {copied === "css" ? "Copied" : "Copy"}
               </Button>
             </span>
           </div>

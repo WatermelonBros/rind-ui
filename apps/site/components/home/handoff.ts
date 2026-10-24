@@ -42,6 +42,9 @@ export interface HandoffOptions {
   /** Where in the viewport the scene's bottom edge starts the trip (1, the viewport's bottom,
    *  by default): later, when the hand-off before leaves from the same place. */
   readonly startAt?: number
+  /** With several travellers: how far into the trip each sets off after the one before (0.22
+   *  by default); smaller, and the last lands sooner after the first. */
+  readonly gap?: number
 }
 
 const DESKTOP = "(min-width: 761px) and (prefers-reduced-motion: no-preference)"
@@ -94,7 +97,7 @@ export function handoff(o: HandoffOptions): () => void {
     }
     const n = from.length
     // one after another: each starts a little after the one before and lands on its own beat
-    const gap = n > 1 ? 0.22 : 0
+    const gap = n > 1 ? (o.gap ?? 0.22) : 0
     const own = (i: number) => clamp((t - i * gap) / (1 - (n - 1) * gap))
     if (t > 0 && t < 1) {
       if (!layer) {

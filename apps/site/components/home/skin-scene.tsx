@@ -86,6 +86,8 @@ export function SkinScene() {
     // the WebGL object is on screen at all (no GPU: it never draws, and nothing stands in for it)
     let glOn = false
     let atTests = false
+    // landed in its slot by the outro's Get started
+    let atFinale = false
     // The skin comes off with the scroll. Desktop: while the sticky hero holds still (its run is
     // taller than the screen). Phone: as the component itself rises from 60% to 25% of the screen.
     const peelAt = () => {
@@ -184,6 +186,27 @@ export function SkinScene() {
       const near = Math.min(1, Math.max(0, (vh * 0.95 - card.top) / (vh * 0.4)))
       const gone = Math.min(1, Math.max(0, (vh * 0.5 - card.top) / (vh * 0.1)))
       return { test, wall, card, y, s6, t, near, gone }
+    }
+    // The finale: once the object has dissolved into the wall and the page's last word comes up
+    // (the outro), it lifts off the wall's component again, arcs down and lands in its slot by
+    // Get started, turning on as it touches down: the trip ends where the visitor's starts
+    const finaleLeg = () => {
+      const slot = document.querySelector<HTMLElement>("[data-object-finale]")
+      const end = wallLeg()
+      const footer = slot?.closest("footer")
+      if (!slot || !end || !footer) return null
+      const y = window.scrollY
+      const vh = window.innerHeight
+      // not before the wall's landing is over (its card halfway up the screen) nor before the
+      // outro shows its top
+      const gone = end.card.top + y - vh * 0.38
+      const s8 = Math.max(footer.getBoundingClientRect().top + y - vh * 0.92, gone)
+      const r = slot.getBoundingClientRect()
+      // the slot sits low on the page's last screen: the trip ends by the bottom of the scroll
+      const bottom = document.documentElement.scrollHeight - vh - 2
+      const s9 = Math.max(s8 + 1, Math.min(r.top + y + r.height / 2 - vh * 0.62, bottom))
+      const t = Math.min(1, Math.max(0, (y - s8) / (s9 - s8)))
+      return { slot, footer, wall: end.wall, y, s8, t }
     }
     // The room right of the content frame (the builder's; the tests share its width): the
     // object flies down it at a size that fits, never under 64px across, so it neither covers
@@ -400,6 +423,22 @@ export function SkinScene() {
       return laneY
     }
     const route = () => {
+      const fz = finaleLeg()
+      if (fz && fz.y > fz.s8) {
+        const to = fz.slot.getBoundingClientRect()
+        if (fz.t >= 1) return to
+        const from = fz.wall.getBoundingClientRect()
+        if (window.innerWidth <= 900) return ride(from, to, fz.t)
+        // up off the card and down into the slot along one arc, growing to the slot's size
+        const e = fz.t * fz.t * (3 - 2 * fz.t)
+        const lift = Math.sin(Math.PI * fz.t) * window.innerHeight * 0.16
+        return new DOMRect(
+          lerp(from.x, to.x, e),
+          lerp(from.y, to.y, e) - lift,
+          lerp(from.width, to.width, e),
+          lerp(from.height, to.height, e),
+        )
+      }
       const end = wallLeg()
       if (end && end.y > end.s6) {
         const live = end.wall.getBoundingClientRect()
@@ -553,6 +592,9 @@ export function SkinScene() {
     const alpha = () => {
       // the machine's own control shows only while the object is fading off it (below)
       getPeelTarget()?.style.removeProperty("opacity")
+      // out of the wall's component again for the finale, as it lifts off
+      const fz = finaleLeg()
+      if (fz && fz.y > fz.s8) return Math.min(1, fz.t / 0.08)
       // dissolving into the wall's component as it touches down, gone once it has
       const end = wallLeg()
       if (end && end.y > end.s6) {
@@ -590,7 +632,7 @@ export function SkinScene() {
     const follow = () => {
       const handle = scene.current
       if (!handle) return
-      if ((flying || leg === 4) && kind !== "button") {
+      if ((flying || leg === 4 || leg === 5) && kind !== "button") {
         checkedNow = true
         handle.setChecked(true)
         return
@@ -641,7 +683,19 @@ export function SkinScene() {
       const fin = testLeg()
       const end = wallLeg()
       const leaving = Boolean(end && end.y > end.s6)
-      const nextLeg = leaving ? 4 : fin && fin.t > 0.5 ? 3 : last && last.t > 0.5 ? 2 : past ? 1 : 0
+      const fz = finaleLeg()
+      const finale = Boolean(fz && fz.y > fz.s8)
+      const nextLeg = finale
+        ? 5
+        : leaving
+          ? 4
+          : fin && fin.t > 0.5
+            ? 3
+            : last && last.t > 0.5
+              ? 2
+              : past
+                ? 1
+                : 0
       if (nextLeg !== leg) {
         leg = nextLeg
         follow()
@@ -758,8 +812,23 @@ export function SkinScene() {
         if (!colors.picked) scene.current.setLook(colors.brand, colors.surface, 0)
         scene.current.setPeel(0)
       }
+      // the finale's touchdown: it turns on with its own sound, and Get started answers
+      const home = Boolean(finale && fz && fz.t >= 1)
+      if (home !== atFinale) {
+        atFinale = home
+        fz?.footer.toggleAttribute("data-finale", home)
+        if (home) {
+          cue("on")
+          if (kind === "button") {
+            scene.current?.setPress(true)
+            clearTimeout(pulse)
+            pulse = window.setTimeout(() => scene.current?.setPress(false), 220)
+          }
+        }
+      }
       const air = Boolean(
-        (leaving && end && end.t < 1) ||
+        (finale && fz && fz.t < 1) ||
+          (leaving && !finale && end && end.t < 1) ||
           (!leaving && fin && fin.y > fin.s4 && !atTests) ||
           (!(fin && fin.y > fin.s4) && last && last.y > last.s2 && flip(last.t) < 1),
       )
