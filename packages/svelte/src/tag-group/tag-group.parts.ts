@@ -1,0 +1,10 @@
+// The TagGroup namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Description } from "./tag-group-description.svelte"
+export { default as Empty } from "./tag-group-empty.svelte"
+export { default as Label } from "./tag-group-label.svelte"
+export { default as List } from "./tag-group-list.svelte"
+export { default as Root } from "./tag-group-root.svelte"
+export { default as Tag } from "./tag-group-tag.svelte"
+export { default as TagRemove } from "./tag-group-tag-remove.svelte"
+export { default as TagText } from "./tag-group-tag-text.svelte"
+export { default as Tags } from "./tag-group-tags.svelte"
