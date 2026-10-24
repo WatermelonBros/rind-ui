@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { AlertAnnounce } from "@rind-ui/core"
-import { Alert } from "../../src/index"
+import { Alert } from "../../src/alert"
 
 const {
   announce,

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { TextField } from "../../src/index"
+import { TextField } from "../../src/text-field"
 </script>
 
 <TextField.Root defaultValue="pw" type="password">
