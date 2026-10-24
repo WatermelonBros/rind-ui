@@ -226,8 +226,11 @@
   }
 }
 @media (max-width: 760px) {
+  /* no foot of empty ground: once the object leaves for the next scene it was a blank screen */
   .hero {
+    min-height: 0;
     padding-top: 112px;
+    padding-bottom: 32px;
   }
   /* tighter, so the object and its label are on the first screen too */
   .copy {

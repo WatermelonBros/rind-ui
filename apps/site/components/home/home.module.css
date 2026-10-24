@@ -2143,17 +2143,27 @@ g:not([data-plugged]) > .pulse {
   .core b {
     font-size: 26px;
   }
+  /* room between the slabs for their edges, the picked one's ring and its lift: at 12px they
+     touched and the picked one covered its neighbours */
   .sockets {
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 40px 16px;
   }
   .socketSlot {
     margin: 0;
   }
   .socket {
-    min-inline-size: 96px;
+    min-inline-size: 92px;
     padding: 14px 10px 12px;
     font-size: 14px;
+  }
+  button.socket[aria-pressed="true"] {
+    scale: 1;
+    translate: 0 -4px;
+    box-shadow:
+      0 0 0 3px var(--brand),
+      0 10px 0 3px color-mix(in oklab, var(--brand) 80%, var(--ink)),
+      0 24px 32px color-mix(in oklab, var(--brand) 40%, transparent);
   }
   .logo {
     inline-size: 40px;
