@@ -92,4 +92,4 @@
 
 - [ ] 3.1 `pnpm typecheck`, `pnpm test`, `pnpm lint`, builds, size check pass
 - [ ] 3.2 Review (two passes), archive, `docs/components.md` notes Solid/Angular parity
-- [ ] 3.3 One release for both packages (the version PR from the accumulated changesets)
+- [ ] 3.3 One release for both packages: drop `"private": true` from both package.json (it keeps them out of earlier releases and marks them unreleased on the site), then the version PR from the accumulated changesets
