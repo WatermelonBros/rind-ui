@@ -156,7 +156,17 @@ export class Button {
         ),
         ...(this.id() === undefined ? {} : { id: this.id() }),
       }),
-      ["disabled", "href", "id", "type"],
+      {
+        owns: [
+          "disabled",
+          "focusablewhendisabled",
+          "focusonpress",
+          "href",
+          "id",
+          "pending",
+          "type",
+        ],
+      },
     )
 
     if (inject(PLATFORM_ID) !== "browser") return

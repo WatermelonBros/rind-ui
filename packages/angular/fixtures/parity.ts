@@ -26,14 +26,15 @@ const reactAct = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 /** Angular's own attributes: `rind…` directive selectors, version, hydration, dev reflection. */
 const ANGULAR = /^(rind|ng-version$|ng-server-context$|ngh$|ng-reflect-|_ngcontent-|_nghost-)/
 
-/** A copy of `node`'s children without Angular's own attributes. */
-export function withoutAngular(node: ParentNode): HTMLElement {
-  const copy = document.createElement("div")
-  for (const child of Array.from(node.childNodes)) copy.append(child.cloneNode(true))
-  for (const el of Array.from(copy.querySelectorAll("*"))) {
+/**
+ * `node` without Angular's own attributes, removed in place: a copy would re-parse the styles,
+ * and jsdom drops a value it serialised itself (`clip: rect(0px)`).
+ */
+export function withoutAngular<N extends ParentNode>(node: N): N {
+  for (const el of Array.from(node.querySelectorAll("*"))) {
     for (const name of el.getAttributeNames()) if (ANGULAR.test(name)) el.removeAttribute(name)
   }
-  return copy
+  return node
 }
 
 /**
@@ -91,7 +92,10 @@ export async function serverHtml(fixture: Type<unknown>): Promise<string> {
   if (inner === undefined) throw new Error(`serverHtml: no <${selector}> in the server HTML`)
   // The test document parses it: the server platform's DOM classes are not the test's.
   const host = Object.assign(document.createElement("template"), { innerHTML: inner }).content
-  return withoutAngular(host).innerHTML
+  withoutAngular(host)
+  const out = document.createElement("div")
+  out.append(host)
+  return out.innerHTML
 }
 
 /** Server HTML of both, canonical. `fixture` is a standalone component with a selector. */
@@ -141,4 +145,12 @@ export async function clientParity(react: ReactElement, fixture: Type<unknown>) 
   host.style.pointerEvents = "none"
   // Measured parts (Scroll Area) settle on a later frame.
   await vi.waitFor(() => expect(canonicalHtml(withoutAngular(host))).toBe(expected))
+}
+
+/** Client markup everywhere; server markup too where the server platform runs (Node: jsdom). */
+export async function both(react: ReactElement, fixture: Type<unknown>) {
+  const node = (globalThis as { process?: { versions?: { node?: string } } }).process?.versions
+    ?.node
+  if (node !== undefined) await serverParity(react, fixture)
+  await clientParity(react, fixture)
 }

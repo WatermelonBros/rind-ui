@@ -12,6 +12,20 @@ export const shared = {
   oxc: { jsx: { runtime: "automatic" as const } },
   plugins: [angular({ tsconfig: `${root}tsconfig.spec.json`, workspaceRoot: root, jit: false })],
   resolve: { conditions: ["@rind-ui/source", "module", "browser", "default"] },
+  // The browser tests' runtime entries, declared up front: found mid-run on a cold cache, Vite
+  // would re-optimise and reload the page ("Vite unexpectedly reloaded a test").
+  optimizeDeps: {
+    include: [
+      "@angular/common",
+      "@angular/compiler",
+      "@angular/core",
+      "@angular/platform-browser",
+      "axe-core",
+      "react",
+      "react-dom/client",
+      "react-dom/server",
+    ],
+  },
   // No "import": jsdom's require("decimal.js") would get the ESM build (as in the root config).
   ssr: { resolve: { conditions: ["@rind-ui/source", "node", "default"] } },
 }

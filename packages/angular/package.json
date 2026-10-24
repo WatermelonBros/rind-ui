@@ -38,10 +38,40 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.ts",
+      "default": "./dist/badge/index.js"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.ts",
       "default": "./dist/button/index.js"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.ts",
+      "default": "./dist/heading/index.js"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.ts",
+      "default": "./dist/kbd/index.js"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.ts",
+      "default": "./dist/label/index.js"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.ts",
+      "default": "./dist/link/index.js"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.ts",
+      "default": "./dist/separator/index.js"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -66,6 +96,7 @@
     "@angular/core": "^22.2.3",
     "@angular/platform-browser": "^22.2.3",
     "@angular/platform-server": "^22.2.3",
+    "@angular/router": "^22.2.3",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/node": "^24.19.2",
@@ -77,6 +108,7 @@
     "typescript": "~6.0.3"
   },
   "peerDependencies": {
+    "@angular/common": ">=21",
     "@angular/core": ">=21"
   },
   "publishConfig": {
@@ -86,9 +118,33 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
+      "./badge": {
+        "types": "./dist/badge/index.d.ts",
+        "default": "./dist/badge/index.js"
+      },
       "./button": {
         "types": "./dist/button/index.d.ts",
         "default": "./dist/button/index.js"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.ts",
+        "default": "./dist/heading/index.js"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.ts",
+        "default": "./dist/kbd/index.js"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.ts",
+        "default": "./dist/label/index.js"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.ts",
+        "default": "./dist/link/index.js"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.ts",
+        "default": "./dist/separator/index.js"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",

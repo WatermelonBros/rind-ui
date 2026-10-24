@@ -23,7 +23,23 @@ service's snapshot changes. It SHALL never start a service during server renderi
 Each React part SHALL be an attribute directive `[rind<Component><Part>]` applied to the
 consumer's element, with `exportAs` `rind<Component><Part>`; each component SHALL export a
 const tuple of its directives for `imports`. A part SHALL add no wrapper element, so the
-rendered markup is the consumer's elements with the part's attributes.
+rendered markup is the consumer's elements with the part's attributes. A part that renders
+elements of its own (Kbd's keys, Badge's hidden label) SHALL be a component with the same kind of
+attribute selector, so its host is still the consumer's element. A static attribute that sets one
+of the part's inputs (`orientation="vertical"`) SHALL NOT stay on the element unless connect
+writes it.
+
+#### Scenario: Static input attribute
+
+- **WHEN** a template renders `<div rindSeparatorRoot orientation="vertical"></div>`
+- **THEN** the element carries React's vertical separator attributes and no `orientation`
+  attribute
+
+#### Scenario: Heading on another heading element
+
+- **WHEN** a template renders `<h2 rindHeading>` inside one `rindHeadingLevel` section
+- **THEN** the `h2` carries `aria-level="3"` (the consumer writes the element, so its tag can
+  differ from React's `h3`; the accessible level is the same)
 
 #### Scenario: Toggle on a button
 

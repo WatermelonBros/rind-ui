@@ -21,6 +21,7 @@ import {
 } from "@rind-ui/core"
 import {
   type AnyScopedMessages,
+  type EnvironmentHolder,
   environmentFor,
   environmentHolder,
   type ProviderConfig,
@@ -102,14 +103,38 @@ export class RindProvider {
 
 /**
  * The provider's environment (or a default one, with no provider): the base capabilities plus
- * the on-demand ones named, e.g. `injectEnvironment(announcerCapability)`. Read once, at
- * creation.
+ * the on-demand ones named, e.g. `injectEnvironment(announcerCapability)`.
+ *
+ * Read lazily: a part is created before the inputs of a `rindProvider` around it in the same
+ * template are set, so each access resolves the provider's current environment (the same object
+ * while the provider's inputs do not change).
  */
 export function injectEnvironment<const C extends readonly Capability[]>(
   ...capabilities: C
 ): BaseDomEnvironment & ProvidedBy<C> {
+  type Env = BaseDomEnvironment & ProvidedBy<C>
   const config = inject(RIND, { optional: true })
-  return environmentFor(config?.().env ?? environmentHolder({}), capabilities)
+  const fallback = environmentHolder({})
+  let holder: EnvironmentHolder | undefined
+  let env: Env | undefined
+  const current = (): Env => {
+    const next = config?.().env ?? fallback
+    if (next !== holder || env === undefined) {
+      holder = next
+      env = environmentFor(next, capabilities)
+    }
+    return env
+  }
+  // Every property read goes to the current environment; the proxy itself holds nothing.
+  return new Proxy({} as Env, {
+    get: (_, key) => Reflect.get(current(), key),
+    has: (_, key) => Reflect.has(current(), key),
+    ownKeys: () => Reflect.ownKeys(current()),
+    getOwnPropertyDescriptor: (_, key) => {
+      const descriptor = Reflect.getOwnPropertyDescriptor(current(), key)
+      return descriptor && { ...descriptor, configurable: true }
+    },
+  })
 }
 
 /** A component's messages: defaults, then the provider's for its scope, then its input. */

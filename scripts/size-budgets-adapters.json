@@ -163,7 +163,13 @@
     "toggle": 14
   },
   "angular": {
+    "badge": 4,
     "button": 17,
+    "heading": 4,
+    "kbd": 10,
+    "label": 8,
+    "link": 13,
+    "separator": 4,
     "toggle": 15
   }
 }

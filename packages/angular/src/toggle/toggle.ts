@@ -139,7 +139,7 @@ export class ToggleRoot {
         }),
         ...(this.id() === undefined ? {} : { id: this.id() }),
       }),
-      ["disabled", "id"],
+      { owns: ["defaultpressed", "disabled", "focusablewhendisabled", "id", "pressed"] },
     )
 
     if (inject(PLATFORM_ID) !== "browser") return

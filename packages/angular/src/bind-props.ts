@@ -43,6 +43,25 @@ interface Binder {
   readonly layers: (() => Props)[]
   /** The part's own attributes (its inputs), never the consumer's. */
   readonly owns: Set<string>
+  readonly drops: (() => readonly string[])[]
+  readonly statics: ReadonlyMap<string, string>
+}
+
+export interface BindOptions {
+  /**
+   * Attributes that are the part's inputs (lowercase, as in the DOM): a static `href="…"` sets
+   * Button's input. Angular keeps a static input attribute on the element; the part writes the
+   * ones connect produces and removes the others (`orientation="vertical"`), as React renders.
+   */
+  readonly owns?: readonly string[]
+  /** Consumer attributes the part removes while it says so (a decorative separator's name). */
+  readonly drop?: () => readonly string[]
+}
+
+/** What the binder knows about the element, for the part's development checks. */
+export interface Bound {
+  /** The consumer's static attributes, as written in the template. */
+  readonly statics: ReadonlyMap<string, string>
 }
 const binders = new WeakMap<Element, Binder>()
 
@@ -55,21 +74,22 @@ const binders = new WeakMap<Element, Binder>()
  * after the first render, after the consumer's own template listeners, so the consumer's
  * `(event)` runs first and may call `event.preventRindHandler()` to skip the part's handler.
  * A static attribute the consumer wrote on the element wins over the part's, except those the
- * part `owns` (its inputs: a static `href="…"` sets Button's input, and the part writes it).
+ * part `owns`. The binder removes only attributes it wrote itself: another directive's (a
+ * router link's `href`) stays.
  */
-export function bindProps(props: () => PartProps, owns: readonly string[] = []): void {
+export function bindProps(props: () => PartProps, options: BindOptions = {}): Bound {
   const el = inject(ElementRef<Element>).nativeElement
   const existing = binders.get(el)
   if (existing) {
     existing.layers.push(props)
-    for (const key of owns) existing.owns.add(key)
-    return
+    for (const key of options.owns ?? []) existing.owns.add(key)
+    if (options.drop) existing.drops.push(options.drop)
+    return { statics: existing.statics }
   }
 
   const renderer = inject(Renderer2)
   const zone = inject(NgZone)
   const browser = inject(PLATFORM_ID) === "browser"
-  const binder: Binder = { layers: [props], owns: new Set(owns) }
   // The consumer's static attributes, from the template, not the element: a hydrated element
   // already carries the attributes the part wrote on the server. The element's names are a
   // superset; the template answers for each (null: not the consumer's).
@@ -78,12 +98,29 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
     const value = inject(new HostAttributeToken(name), { optional: true })
     if (value !== null) statics.set(name, value)
   }
+  const binder: Binder = {
+    layers: [props],
+    owns: new Set(options.owns),
+    drops: options.drop ? [options.drop] : [],
+    statics,
+  }
+  let dropped = new Set<string>()
   const consumer = (key: string): string | null =>
-    binder.owns.has(key) ? null : (statics.get(key) ?? null)
+    binder.owns.has(key) || dropped.has(key) ? null : (statics.get(key) ?? null)
   binders.set(el, binder)
+  // ponytail: only client writes count; a server-written attribute the hydrating client no longer
+  // produces stays (hydration renders the server's state, so they agree by construction).
+  const written = new Set<string>()
+  let attrs: Readonly<Record<string, unknown>> = {}
+  // The part's own static inputs are its to remove (connect writes the real attributes back):
+  // seeded as the previous render's, so the first render drops those connect does not produce.
+  for (const key of binder.owns) {
+    if (!statics.has(key)) continue
+    written.add(key)
+    attrs = { ...attrs, [key]: statics.get(key) }
+  }
   const handlers = new Map<string, Handler>()
   const listening = new Map<string, () => void>()
-  let attrs: Readonly<Record<string, unknown>> = {}
   let styles = new Set<string>()
   let ready = false
 
@@ -118,6 +155,13 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
     const nextAttrs: Record<string, unknown> = {}
     let style: Readonly<Record<string, unknown>> | undefined
     handlers.clear()
+    const nextDropped = new Set(binder.drops.flatMap((drop) => drop()))
+    for (const key of nextDropped) if (statics.has(key)) renderer.removeAttribute(el, key)
+    for (const key of dropped) {
+      const value = statics.get(key)
+      if (!nextDropped.has(key) && value !== undefined) renderer.setAttribute(el, key, value)
+    }
+    dropped = nextDropped
     for (const own of Object.keys(next)) {
       const key = neutralName(own)
       const value = next[own]
@@ -127,7 +171,7 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
       else nextAttrs[key] = value
     }
     for (const key of Object.keys(attrs)) {
-      if (!(key in nextAttrs) && consumer(key) === null) renderer.removeAttribute(el, key)
+      if (!(key in nextAttrs) && consumer(key) === null) remove(key)
     }
     for (const [key, value] of Object.entries(nextAttrs)) {
       const own = consumer(key)
@@ -148,6 +192,18 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
       write(key, value)
     }
     attrs = nextAttrs
+    if (!browser) {
+      // The server's DOM (domino) drops style values it does not parse (`clip: rect(0 0 0 0)`):
+      // the server writes the declarations as one attribute, after the consumer's.
+      const own = Object.entries(style ?? {}).filter(([, v]) => v !== undefined && v !== null)
+      if (own.length > 0) {
+        const css = own.map(([k, v]) => `${k}: ${String(v)}`).join("; ")
+        const before = statics.get("style")
+        set("style", before ? `${before}; ${css}` : css)
+      }
+      if (ready) for (const event of handlers.keys()) listen(event)
+      return
+    }
     const nextStyles = new Set(Object.keys(style ?? {}))
     for (const key of styles) if (!nextStyles.has(key)) renderer.removeStyle(el, key, flags(key))
     for (const [key, value] of Object.entries(style ?? {})) {
@@ -168,13 +224,21 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
       return
     }
     const name = property ?? key
-    if (value === undefined || value === null) renderer.removeAttribute(el, name)
+    if (value === undefined || value === null) remove(name)
     else if (typeof value === "boolean" && !/^(aria|data)-/.test(name)) {
       // HTML boolean attributes (disabled, hidden, inert): present or absent, as React renders
       // them; aria-* and data-* keep "true"/"false".
-      if (value) renderer.setAttribute(el, name, "")
-      else renderer.removeAttribute(el, name)
-    } else renderer.setAttribute(el, name, String(value))
+      if (value) set(name, "")
+      else remove(name)
+    } else set(name, String(value))
+  }
+  const set = (name: string, value: string) => {
+    written.add(name)
+    renderer.setAttribute(el, name, value)
+  }
+  const remove = (name: string) => {
+    if (!written.delete(name)) return
+    renderer.removeAttribute(el, name)
   }
 
   effect(() => {
@@ -191,6 +255,8 @@ export function bindProps(props: () => PartProps, owns: readonly string[] = []):
     for (const off of listening.values()) off()
     binders.delete(el)
   })
+  return { statics }
 }
 
-const flags = (key: string) => (key.startsWith("--") ? RendererStyleFlags2.DashCase : undefined)
+// Connect's style keys are CSS property names (kebab case, custom properties): `setProperty`.
+const flags = (_key: string) => RendererStyleFlags2.DashCase
