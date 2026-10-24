@@ -1,0 +1,103 @@
+{
+  "name": "@rind-ui/solid",
+  "version": "1.1.0",
+  "description": "Accessible headless SolidJS components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
+  "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/solid"
+  },
+  "homepage": "https://rind.watermelon-studio.it",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "solid",
+    "solidjs",
+    "solid-js",
+    "headless",
+    "headless-ui",
+    "components",
+    "accessibility",
+    "a11y",
+    "wai-aria",
+    "state-machine",
+    "design-system",
+    "ui"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && node ../../scripts/size-adapters.mjs solid",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "size": "node ../../scripts/size-adapters.mjs solid"
+  },
+  "dependencies": {
+    "@rind-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@rind-ui/react": "workspace:*",
+    "@rind-ui/testing": "workspace:*",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "babel-preset-solid": "^1.9.16",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rolldown": "1.2.13",
+    "solid-js": "^1.9.17"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.9.0 <2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.mts",
+        "solid": "./dist/index.jsx",
+        "default": "./dist/index.mjs"
+      },
+      "./button": {
+        "types": "./dist/button/index.d.mts",
+        "solid": "./dist/button/index.jsx",
+        "default": "./dist/button/index.mjs"
+      },
+      "./toggle": {
+        "types": "./dist/toggle/index.d.mts",
+        "solid": "./dist/toggle/index.jsx",
+        "default": "./dist/toggle/index.mjs"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "solid": "./dist/index.jsx",
+      "default": "./dist/index.mjs"
+    },
+    "./button": {
+      "@rind-ui/source": "./src/button/index.ts",
+      "types": "./dist/button/index.d.mts",
+      "solid": "./dist/button/index.jsx",
+      "default": "./dist/button/index.mjs"
+    },
+    "./toggle": {
+      "@rind-ui/source": "./src/toggle/index.ts",
+      "types": "./dist/toggle/index.d.mts",
+      "solid": "./dist/toggle/index.jsx",
+      "default": "./dist/toggle/index.mjs"
+    },
+    "./package.json": "./package.json"
+  }
+}

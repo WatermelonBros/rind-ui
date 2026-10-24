@@ -151,5 +151,13 @@
     "tooltip": 34,
     "tour": 46,
     "tree-view": 28
+  },
+  "solid": {
+    "button": 16,
+    "toggle": 14
+  },
+  "angular": {
+    "button": 17,
+    "toggle": 15
   }
 }
