@@ -8,6 +8,12 @@ on:
   schedule:
     - cron: "0 3 * * *"
 
+# A new push to a pull request cancels its run still going: the free plan runs 20 jobs at once, and
+# an outdated run held them while the new one queued. Runs on main all finish.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # What the change touches. Pushes to main always run everything.
   changes:
