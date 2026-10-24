@@ -1,0 +1,236 @@
+{
+  "name": "@rind-ui/solid",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Accessible headless SolidJS components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
+  "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/solid"
+  },
+  "homepage": "https://rind.watermelon-studio.it",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "solid",
+    "solidjs",
+    "solid-js",
+    "headless",
+    "headless-ui",
+    "components",
+    "accessibility",
+    "a11y",
+    "wai-aria",
+    "state-machine",
+    "design-system",
+    "ui"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown && node ../../scripts/size-adapters.mjs solid",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit",
+    "size": "node ../../scripts/size-adapters.mjs solid"
+  },
+  "dependencies": {
+    "@rind-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@rind-ui/react": "workspace:*",
+    "@rind-ui/testing": "workspace:*",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "babel-preset-solid": "^1.9.16",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rolldown": "1.2.13",
+    "solid-js": "^1.9.17"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.9.0 <2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.mts",
+        "solid": "./dist/index.jsx",
+        "default": "./dist/index.mjs"
+      },
+      "./alert": {
+        "types": "./dist/alert/index.d.mts",
+        "solid": "./dist/alert/index.jsx",
+        "default": "./dist/alert/index.mjs"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.mts",
+        "solid": "./dist/avatar/index.jsx",
+        "default": "./dist/avatar/index.mjs"
+      },
+      "./badge": {
+        "types": "./dist/badge/index.d.mts",
+        "solid": "./dist/badge/index.jsx",
+        "default": "./dist/badge/index.mjs"
+      },
+      "./button": {
+        "types": "./dist/button/index.d.mts",
+        "solid": "./dist/button/index.jsx",
+        "default": "./dist/button/index.mjs"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.mts",
+        "solid": "./dist/heading/index.jsx",
+        "default": "./dist/heading/index.mjs"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.mts",
+        "solid": "./dist/image/index.jsx",
+        "default": "./dist/image/index.mjs"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.mts",
+        "solid": "./dist/kbd/index.jsx",
+        "default": "./dist/kbd/index.mjs"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.mts",
+        "solid": "./dist/label/index.jsx",
+        "default": "./dist/label/index.mjs"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.mts",
+        "solid": "./dist/link/index.jsx",
+        "default": "./dist/link/index.mjs"
+      },
+      "./meter": {
+        "types": "./dist/meter/index.d.mts",
+        "solid": "./dist/meter/index.jsx",
+        "default": "./dist/meter/index.mjs"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.mts",
+        "solid": "./dist/progress/index.jsx",
+        "default": "./dist/progress/index.mjs"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.mts",
+        "solid": "./dist/separator/index.jsx",
+        "default": "./dist/separator/index.mjs"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.mts",
+        "solid": "./dist/skeleton/index.jsx",
+        "default": "./dist/skeleton/index.mjs"
+      },
+      "./toggle": {
+        "types": "./dist/toggle/index.d.mts",
+        "solid": "./dist/toggle/index.jsx",
+        "default": "./dist/toggle/index.mjs"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "solid": "./dist/index.jsx",
+      "default": "./dist/index.mjs"
+    },
+    "./alert": {
+      "@rind-ui/source": "./src/alert/index.ts",
+      "types": "./dist/alert/index.d.mts",
+      "solid": "./dist/alert/index.jsx",
+      "default": "./dist/alert/index.mjs"
+    },
+    "./avatar": {
+      "@rind-ui/source": "./src/avatar/index.ts",
+      "types": "./dist/avatar/index.d.mts",
+      "solid": "./dist/avatar/index.jsx",
+      "default": "./dist/avatar/index.mjs"
+    },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.mts",
+      "solid": "./dist/badge/index.jsx",
+      "default": "./dist/badge/index.mjs"
+    },
+    "./button": {
+      "@rind-ui/source": "./src/button/index.ts",
+      "types": "./dist/button/index.d.mts",
+      "solid": "./dist/button/index.jsx",
+      "default": "./dist/button/index.mjs"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.mts",
+      "solid": "./dist/heading/index.jsx",
+      "default": "./dist/heading/index.mjs"
+    },
+    "./image": {
+      "@rind-ui/source": "./src/image/index.ts",
+      "types": "./dist/image/index.d.mts",
+      "solid": "./dist/image/index.jsx",
+      "default": "./dist/image/index.mjs"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.mts",
+      "solid": "./dist/kbd/index.jsx",
+      "default": "./dist/kbd/index.mjs"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.mts",
+      "solid": "./dist/label/index.jsx",
+      "default": "./dist/label/index.mjs"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.mts",
+      "solid": "./dist/link/index.jsx",
+      "default": "./dist/link/index.mjs"
+    },
+    "./meter": {
+      "@rind-ui/source": "./src/meter/index.ts",
+      "types": "./dist/meter/index.d.mts",
+      "solid": "./dist/meter/index.jsx",
+      "default": "./dist/meter/index.mjs"
+    },
+    "./progress": {
+      "@rind-ui/source": "./src/progress/index.ts",
+      "types": "./dist/progress/index.d.mts",
+      "solid": "./dist/progress/index.jsx",
+      "default": "./dist/progress/index.mjs"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.mts",
+      "solid": "./dist/separator/index.jsx",
+      "default": "./dist/separator/index.mjs"
+    },
+    "./skeleton": {
+      "@rind-ui/source": "./src/skeleton/index.ts",
+      "types": "./dist/skeleton/index.d.mts",
+      "solid": "./dist/skeleton/index.jsx",
+      "default": "./dist/skeleton/index.mjs"
+    },
+    "./toggle": {
+      "@rind-ui/source": "./src/toggle/index.ts",
+      "types": "./dist/toggle/index.d.mts",
+      "solid": "./dist/toggle/index.jsx",
+      "default": "./dist/toggle/index.mjs"
+    },
+    "./package.json": "./package.json"
+  }
+}
