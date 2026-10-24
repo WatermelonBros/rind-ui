@@ -67,6 +67,18 @@ when it renders again, and only the `display` it wrote.
 - **WHEN** a loaded Skeleton is compared with React's
 - **THEN** the markup matches once the hidden Status element is set aside
 
+### Requirement: A Directive Does Not Become Another Part
+
+A part React renders as another component in some context SHALL, in Angular, be written as that
+other part's directive: a Toggle Group item outside a group SHALL throw a descriptive error naming
+`rindToggleRoot` (React's lone item renders a Toggle). A component that composes another one's
+behaviour (a Text Field Root composing a Field) SHALL do it through a host directive.
+
+#### Scenario: A lone Toggle Group item
+
+- **WHEN** a template renders `<button rindToggleGroupItem value="b">` outside any group
+- **THEN** creating it throws an error that names `rindToggleGroupRoot` and `rindToggleRoot`
+
 ### Requirement: Binding Connect Output
 
 One binder per element SHALL apply connect's props through `Renderer2`: attributes set and

@@ -179,6 +179,10 @@
     "avatar": 13,
     "badge": 4,
     "button": 17,
+    "checkbox": 21,
+    "checkbox-group": 24,
+    "field": 20,
+    "fieldset": 10,
     "heading": 4,
     "image": 12,
     "kbd": 10,
@@ -188,6 +192,8 @@
     "progress": 14,
     "separator": 4,
     "skeleton": 12,
-    "toggle": 15
+    "text-field": 30,
+    "toggle": 15,
+    "toggle-group": 25
   }
 }
