@@ -114,7 +114,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.browsers }}
+          # one cache per set of browsers (a key cannot hold commas): the Playwright slices install all
+          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.engine && 'all' || matrix.browsers }}
       - if: matrix.browsers != ''
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
