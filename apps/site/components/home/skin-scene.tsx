@@ -378,6 +378,11 @@ export function SkinScene() {
         grab.sy = armed.y - grab.y
         armed = null
         swallow = true
+        // the control under it had started a press: it is a drag now, so the press is
+        // cancelled (rind's press ends on pointerup, before the click swallowed below)
+        document.dispatchEvent(
+          new PointerEvent("pointercancel", { bubbles: true, pointerId: e.pointerId }),
+        )
         window.getSelection()?.removeAllRanges()
         document.body.style.cursor = "grabbing"
       }

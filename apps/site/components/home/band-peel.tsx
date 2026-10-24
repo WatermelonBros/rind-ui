@@ -41,10 +41,10 @@ export function BandPeel() {
         // from the band's top at the screen's foot to its top halfway up the screen
         const raw = Math.min(1, Math.max(0, (vh * 0.98 - r.top) / (vh * 0.48)))
         const before = shownP.get(band) ?? 0
-        const idle = performance.now() - lastScroll > 220
+        const idle = performance.now() - lastScroll > 160
         // back below the screen: covered again for its next entry
         const p =
-          raw === 0 ? 0 : Math.max(raw, idle && before > 0 ? before + (1 - before) * 0.12 : before)
+          raw === 0 ? 0 : Math.max(raw, idle && before > 0 ? before + (1 - before) * 0.22 : before)
         shownP.set(band, p > 0.995 ? 1 : p)
         if (idle && p > 0 && p < 0.995) settling = true
         const e = p * p * (3 - 2 * p)
@@ -76,7 +76,7 @@ export function BandPeel() {
       lastScroll = performance.now()
       clearTimeout(idleTimer)
       // once the page has rested, the sheets left half off finish
-      idleTimer = window.setTimeout(schedule, 240)
+      idleTimer = window.setTimeout(schedule, 180)
       schedule()
     }
     paint()

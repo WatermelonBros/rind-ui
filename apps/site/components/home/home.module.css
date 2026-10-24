@@ -256,13 +256,24 @@
   --s-acc: var(--ink);
   --s-focus: var(--ink);
 }
-/* the builder's chrome is a neutral tool on any skin worn on the page (wear.ts): white, in the
-   bare skin's ink, never the skin's dark card under the bare skin's dark type */
+/* with a skin worn on the page (wear.ts) the builder's chrome wears it too, in its plain bare
+   shapes: a white tool on a dark skin read as a hole in the page */
 :global(html[data-worn]) :is(.lookPresets, .lookControls) {
-  --s-acc: #18181b;
-  --s-focus: #18181b;
-  background: #ffffff;
-  color: #18181b;
+  --s-bg: var(--skin-surface);
+  --s-ink: var(--skin-ink);
+  --s-acc: var(--skin-ink);
+  --s-on: var(--skin-surface);
+  --s-card: var(--skin-card);
+  --s-muted: var(--skin-muted);
+  --s-line: var(--skin-line);
+  --s-field-line: var(--skin-line);
+  /* its picked tab and chips in ink on the ground: the brand's fill text is the brand itself in
+     an outline skin, and read as nothing on the brand */
+  --s-brand: var(--skin-ink);
+  --s-brand-text: var(--skin-surface);
+  --s-focus: var(--skin-brand);
+  background: var(--skin-card);
+  color: var(--skin-ink);
 }
 /* the ready skins: a wall of chips across the panel's head, each with its colours as a dot */
 .lookPresets {
@@ -579,6 +590,13 @@
 }
 :global([data-phase="juicy"]) .lookCode {
   background: #103d2e;
+}
+/* a worn skin's own dark ground and its type on it, not the rind's green */
+:global(html[data-worn]) .lookCode {
+  background: var(--ground-ink);
+}
+:global(html[data-worn]) :is(.lookCode, .lookCodeBar, .lookCode .lookPre) {
+  color: var(--on-ground-ink);
 }
 /* the stage's own layout only: every component style comes from the generated skin.css */
 .lookCol {
@@ -1559,17 +1577,13 @@
   translate: 0 -100%;
   opacity: var(--lip, 0);
   border-radius: 0 0 50% 50% / 0 0 34px 34px;
-  /* the sheet's back, turned up: paler than its face, a line of light where it rolls, its
-     underside in shade */
-  background:
-    linear-gradient(180deg, transparent 58%, rgb(255 255 255 / 0.7) 64%, transparent 70%),
-    linear-gradient(
-      180deg,
-      var(--from) 0%,
-      color-mix(in oklab, var(--from), #000 8%) 26%,
-      color-mix(in oklab, var(--from), #fff 68%) 60%,
-      color-mix(in oklab, var(--from), #000 26%) 100%
-    );
+  /* the sheet's own colour rolling into shade: no white light line (on a dark skin it read as a
+     grey stripe between sections) */
+  background: linear-gradient(
+    180deg,
+    var(--from) 0%,
+    color-mix(in oklab, var(--from), #000 22%) 100%
+  );
   box-shadow:
     0 18px 26px -10px rgb(0 0 0 / 0.42),
     0 4px 0 -2px color-mix(in oklab, var(--from), #000 30%);
@@ -1733,7 +1747,6 @@
       color-mix(in oklab, var(--brand) 26%, transparent),
       transparent 70%
     ),
-    radial-gradient(ellipse 40% 40% at 12% 90%, #ffffffb3, transparent 70%),
     radial-gradient(circle, color-mix(in oklab, var(--ink) 9%, transparent) 1.5px, transparent 2px)
     0 0 / 24px 24px,
     var(--muted);
@@ -1818,7 +1831,8 @@
   inline-size: 156px;
   block-size: 156px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 28%, #ffffff, var(--card) 45%, var(--muted));
+  /* lit from the page's own card, never white: a white ball read as a stain on a dark skin */
+  background: radial-gradient(circle at 35% 28%, var(--card) 45%, var(--muted));
   color: var(--ink);
   box-shadow:
     0 0 0 10px color-mix(in oklab, var(--brand) 55%, transparent),

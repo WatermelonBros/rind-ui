@@ -51,8 +51,6 @@ const BASE = PRESETS[0]?.look as Look // PRESETS is a non-empty literal list
 const SWATCHES = ["#FF3D8B", "#FF8F3D", "#F5D90A", "#2EC27E", "#3D8BFF", "#8B3DFF", "#18181B"]
 const ACCENTS = ["#FF8FA3", "#FFC371", "#01CDFE", "#C084FC", "#F2C12E", "#FF00E5", "#71717A"]
 const SURFACES = ["#FFFFFF", "#FAF7F0", "#F1EDFF", "#EAF7EE", "#C0C0C0", "#18181B", "#0F172A"]
-/** How long each ready skin shows while the builder plays them by itself. */
-const PLAY_MS = 2600
 
 /** The copied CSS names real families; the preview wears them as this site loads them. */
 const siteFonts = (css: string) =>
@@ -76,7 +74,8 @@ function onPage(css: string): string {
         out.push(line)
         // the site's own skins speak --s-* (skins/base.css): their every part (a label, a
         // panel's copy, a value) takes the worn skin's colours too, never one phase's ink on
-        // another skin's ground; over the wall's cards too, whose wave writes its skins inline
+        // another skin's ground, and its shape (borders, radii, lifts) never juicy's pink edge;
+        // over the wall's cards too, whose wave writes its skins inline
         out.push(`html[data-worn] [data-skinned]:not([data-skin="bare"]) {
   --s-bg: var(--skin-surface) !important;
   --s-ink: var(--skin-ink) !important;
@@ -93,6 +92,12 @@ function onPage(css: string): string {
   --s-ok: var(--skin-ink) !important;
   --s-focus: var(--skin-brand) !important;
   --s-font: var(--skin-font) !important;
+  --s-bw: var(--skin-border) !important;
+  --s-r: var(--skin-radius) !important;
+  --s-r-sm: var(--skin-radius-sm) !important;
+  --s-lift: var(--skin-shadow) !important;
+  --s-lift-hi: var(--skin-shadow) !important;
+  --s-lift-lo: var(--skin-shadow) !important;
   color: var(--skin-ink);
 }`)
         continue
@@ -350,6 +355,7 @@ export function AnyLook() {
     if (!next) return undefined
     dealt.current = next.id
     set(next.look)
+    cue("reskin", { value: PRESETS.indexOf(next) / (PRESETS.length - 1) })
     return next.id
   }
   // a shared link opens on its skin (#skin=…), the builder brought into view
@@ -363,48 +369,27 @@ export function AnyLook() {
     set(shared)
     document.getElementById("look-title")?.scrollIntoView({ block: "start" })
   }, [])
-  // in view, the builder plays its ready skins one after another, until the visitor touches it
-  // (a press, a key, a focus inside) or it leaves the screen; not under reduced motion
+  // the page keeps the phase the visitor chose until they press a skin themselves: a pick (a
+  // press, a key, a focus inside the builder) makes it theirs and wears it
   useEffect(() => {
     const el = section.current
-    if (!el || typeof IntersectionObserver === "undefined") return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-    let timer = 0
+    if (!el) return
     const stop = () => {
       touched.current = true
       setOwned(true)
       // a pick wears it again, after crisp/juicy took the last one off (the switch itself
       // still turns it off: its own change comes after this press)
       setWearing(true)
-      clearInterval(timer)
     }
-    const io = new IntersectionObserver(
-      (entries) => {
-        clearInterval(timer)
-        if (touched.current || !entries.some((e) => e.isIntersecting)) return
-        const play = () => {
-          const id = surpriseRef.current()
-          cue("reskin", { value: PRESETS.findIndex((p) => p.id === id) / (PRESETS.length - 1) })
-        }
-        play()
-        timer = window.setInterval(play, PLAY_MS)
-      },
-      { threshold: 0.35 },
-    )
-    io.observe(stage.current ?? el)
     el.addEventListener("pointerdown", stop)
     el.addEventListener("keydown", stop)
     el.addEventListener("focusin", stop)
     return () => {
-      io.disconnect()
-      clearInterval(timer)
       el.removeEventListener("pointerdown", stop)
       el.removeEventListener("keydown", stop)
       el.removeEventListener("focusin", stop)
     }
   }, [])
-  const surpriseRef = useRef(surprise)
-  surpriseRef.current = surprise
   const css = skinCss(look)
   const [picker, setPicker] = useState<ColourComponent | null>(null)
   // load the picker a screen before the builder shows up (or at once without IntersectionObserver)

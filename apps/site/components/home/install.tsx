@@ -146,7 +146,10 @@ function assemble(
     // all from one point off the screen's left edge, so the convoy is a line: React first and in
     // front, each after it a little smaller and behind (they peel off to their sockets from there)
     const fromX = -260 - r.left
-    const fromY = -180 - (r.top - stage.getBoundingClientRect().top)
+    // a phone keeps the whole flight inside the stage: from above it, the convoy crossed the
+    // paragraph right over it
+    const narrow = window.innerWidth <= 760
+    const fromY = (narrow ? 40 : -180) - (r.top - stage.getBoundingClientRect().top)
     const size = 1.25 - i * 0.07
     slot.style.zIndex = String(slots.length - i)
     slot.style.transformOrigin = "50% 100%"
@@ -158,7 +161,7 @@ function assemble(
         },
         // hanging over its socket for a breath, then dropping like a weight
         {
-          transform: `translate(${-24 + i * 6}px, -250px) rotate(9deg) scale(1.08)`,
+          transform: `translate(${-24 + i * 6}px, ${narrow ? -60 : -250}px) rotate(9deg) scale(1.08)`,
           offset: 0.56,
           easing: "cubic-bezier(.55,0,.95,.45)",
         },
