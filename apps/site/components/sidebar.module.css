@@ -83,7 +83,7 @@
 }
 :global([data-phase="juicy"]) .fw[aria-pressed="true"] {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
 }
 
 .filter {
@@ -155,7 +155,7 @@
 }
 :global([data-phase="juicy"]) .groups li a[aria-current="page"] {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
 }
 :global([data-phase="juicy"]) .groups li a[aria-current="page"]::before {
   background: #fff;

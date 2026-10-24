@@ -26,8 +26,15 @@ function anatomy(stage: HTMLElement): HTMLElement[] {
   }
   return [...inside, ...outside]
 }
-type Tab = "react" | "vue" | "svelte" | "css"
-const CODE_TABS = { react: "React", vue: "Vue", svelte: "Svelte", css: "Our skin CSS" } as const
+type Tab = "react" | "vue" | "svelte" | "solid" | "angular" | "css"
+const CODE_TABS = {
+  react: "React",
+  vue: "Vue",
+  svelte: "Svelte",
+  solid: "Solid",
+  angular: "Angular",
+  css: "Our skin CSS",
+} as const
 
 /** Build-time highlighted sources of one component's examples. */
 export interface ExampleCode {
@@ -36,6 +43,8 @@ export interface ExampleCode {
   /** the same examples for the other frameworks, where their packages ship them (lib/docs.ts) */
   readonly vue?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
   readonly svelte?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
+  readonly solid?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
+  readonly angular?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
   /** highlighted CSS of our two skins for this component */
   readonly css: { readonly html: string; readonly raw: string }
 }
@@ -177,7 +186,9 @@ export function ExampleFrame({
   const codeOf = (t: Tab) =>
     t === "css" ? source.css : t === "react" ? source.code[shownName] : source[t]?.[shownName]
   // the tabs this example has: React always, a framework once its package ships this example
-  const tabs = (["react", "vue", "svelte", "css"] as const).filter((t) => codeOf(t)?.raw)
+  const tabs = (["react", "vue", "svelte", "solid", "angular", "css"] as const).filter(
+    (t) => codeOf(t)?.raw,
+  )
   const shown = tab ? codeOf(tab) : undefined
 
   return (

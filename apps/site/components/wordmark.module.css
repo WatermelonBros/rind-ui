@@ -164,9 +164,11 @@
 
 /* juicy: goo + puffy depth, letters wobble out of phase, drips fall and rejoin */
 :global([data-phase="juicy"]) .word {
-  filter: url(#goo) drop-shadow(0 0.03em 0 #c22a49) drop-shadow(0 0.08em 0.07em #8c223833);
-  /* the flesh of the watermelon: the wordmark is its red, the rest of juicy its rind's green */
-  color: #ff5d78;
+  filter: url(#goo) drop-shadow(0 0.03em 0 var(--wordmark-deep, #c22a49))
+    drop-shadow(0 0.08em 0.07em #8c223833);
+  /* the flesh of the watermelon: the wordmark is its red, the rest of juicy its rind's green
+     (a skin worn on the page, wear.ts, paints it in its brand) */
+  color: var(--wordmark, #ff5d78);
 }
 :global([data-phase="juicy"]) .chip {
   opacity: 0;

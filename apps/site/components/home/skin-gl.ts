@@ -31,6 +31,11 @@ uniform float uAlpha;   // the whole object's opacity (a phone dissolves it mid-
 uniform float uCustom;  // 0 to 1: how much it wears the visitor's skin from the builder
 uniform vec3 uBrand;    // the builder's brand colour
 uniform vec3 uSurface;  // the builder's surface colour
+uniform vec3 uAccent;   // the builder's accent (a gradient's end)
+uniform float uRound;   // the builder's radius, 0 square to 1 round
+uniform float uOutline; // the builder's border, in canvas pixels (an outline round the object)
+uniform float uMat;     // the builder's shadow, as a material: 0 flat 1 soft 2 hard 3 glow 4 bevel 5 clay
+uniform float uFill;    // the builder's fill: 0 solid 1 gradient 2 glass 3 outline
 uniform float uPhase;   // 0 crisp, 1 juicy
 uniform float uChecked; // 0 to 1, sprung by the script (it overshoots in juicy)
 uniform float uPeel;    // 0 skin on, 1 skin off
@@ -43,6 +48,17 @@ uniform vec3 uCard;
 uniform vec3 uSoft;
 
 mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
+
+// How soft the object is, 0 hard (crisp) to 1 inflated (juicy): the page's phase, or, as far as
+// it wears the visitor's skin, the material their shadow names (main sets it before the march)
+float PH;
+float materialSoftness(float m) {
+  return m < 0.5 ? 0.35 : m < 1.5 ? 1.0 : m < 2.5 ? 0.0 : m < 3.5 ? 0.8 : m < 4.5 ? 0.0 : 1.0;
+}
+// the corner radius the builder asks for, from a square corner to fully round, as far as worn
+float shaped(float own, float square, float round) {
+  return mix(own, mix(square, round, uRound), uCustom);
+}
 
 float smin(float a, float b, float k) {
   float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
@@ -75,12 +91,12 @@ float stroke(vec2 p, vec2 a, vec2 b, float f) {
 // test sizes (uSize is its half width in pixels)
 float bodyDepth() {
   float small = 1.0 - smoothstep(60.0, 200.0, uSize);
-  return mix(mix(0.22, 0.36, small), 0.26, uPhase);
+  return mix(mix(0.22, 0.36, small), 0.26, PH);
 }
-float bevel(float depth) { return mix(0.1, depth * 0.95, uPhase); }
+float bevel(float depth) { return mix(0.1, depth * 0.95, PH); }
 // a mark (thumb, check, arrow) lying on the body's face: a raised stroke or a sunk-in ball
 float onFace(float d2, vec3 p, float depth) {
-  return extrude(d2, p.z - depth - mix(0.06, -0.02, uPhase), mix(0.08, 0.07, uPhase), 0.03);
+  return extrude(d2, p.z - depth - mix(0.06, -0.02, PH), mix(0.08, 0.07, PH), 0.03);
 }
 
 // The avatar (the 404's 0): an Avatar's round frame with a well in its face where the picture
@@ -118,27 +134,30 @@ vec2 mapAvatar(vec3 p, float depth, float swell) {
 
 // .x distance, .y part (0 body, 1 mark)
 vec2 map(vec3 p) {
-  float swell = uPhase * (0.02 * sin(uTime * 1.6) + 0.04);
+  float swell = PH * (0.02 * sin(uTime * 1.6) + 0.04);
   float depth = bodyDepth() + swell;
   if (uKind > 2.5) return mapAvatar(p, depth, swell);
   float body;
   float mark;
+  float foot = 1e3;
   // a squashed space stretches the field: divide it back, or the march steps through the surface
   float squash = 1.0;
   if (uKind < 0.5) {
     // Switch: a pill track; crisp lays a disc on it, juicy sinks a ball into it
     float h = 0.46 + swell;
-    body = extrude(sdRoundRect(p.xy, vec2(1.0 + swell, h), h), p.z, depth, bevel(depth));
-    float travel = mix(0.54, 0.52, uPhase);
-    vec3 t = p - vec3(mix(-travel, travel, uChecked), 0.0, depth + mix(0.05, -0.02, uPhase));
+    foot = sdRoundRect(p.xy, vec2(1.0 + swell, h), shaped(h, h * 0.12, h));
+    body = extrude(foot, p.z, depth, bevel(depth));
+    float travel = mix(0.54, 0.52, PH);
+    vec3 t = p - vec3(mix(-travel, travel, uChecked), 0.0, depth + mix(0.05, -0.02, PH));
     float moving = clamp(uChecked * (1.0 - uChecked) * 4.0, 0.0, 1.0);
-    t.x /= 1.0 + 0.3 * moving * uPhase;
-    float r = mix(0.34, 0.36, uPhase);
-    mark = mix(extrude(length(t.xy) - r, t.z, 0.1, 0.06), length(t * vec3(1.0, 1.0, 1.15)) - r, uPhase);
+    t.x /= 1.0 + 0.3 * moving * PH;
+    float r = mix(0.34, 0.36, PH);
+    mark = mix(extrude(length(t.xy) - r, t.z, 0.1, 0.06), length(t * vec3(1.0, 1.0, 1.15)) - r, PH);
   } else if (uKind < 1.5) {
     // Checkbox: a rounded square; the check draws itself along its two strokes
     float half_ = 0.86 + swell;
-    body = extrude(sdRoundRect(p.xy, vec2(half_), mix(0.16, 0.36, uPhase)), p.z, depth, bevel(depth));
+    foot = sdRoundRect(p.xy, vec2(half_), shaped(mix(0.16, 0.36, PH), 0.05, 0.62));
+    body = extrude(foot, p.z, depth, bevel(depth));
     vec2 a = vec2(-0.42, -0.02), b = vec2(-0.12, -0.32), c = vec2(0.44, 0.32);
     float l1 = length(b - a), l2 = length(c - b);
     float f = uChecked * (l1 + l2);
@@ -146,17 +165,27 @@ vec2 map(vec3 p) {
     mark = onFace(check, p, depth);
   } else if (uKind < 2.5) {
     // Button: a pill that sinks into its own shadow when pressed (crisp) or squashes (juicy)
-    p.xy -= vec2(0.092, -0.092) * uPress * (1.0 - uPhase);
-    squash = 1.0 + 0.5 * uPress * uPhase;
+    p.xy -= vec2(0.092, -0.092) * uPress * (1.0 - PH);
+    squash = 1.0 + 0.5 * uPress * PH;
     p.z *= squash;
     float h = 0.4 + swell;
-    body = extrude(sdRoundRect(p.xy, vec2(1.0 + swell, h), h), p.z, depth, bevel(depth));
+    foot = sdRoundRect(p.xy, vec2(1.0 + swell, h), shaped(h, h * 0.12, h));
+    body = extrude(foot, p.z, depth, bevel(depth));
     vec2 tip = vec2(0.3, 0.0);
     float arrow = min(sdSegment(p.xy, vec2(-0.32, 0.0), tip),
       min(sdSegment(p.xy, vec2(0.08, 0.2), tip), sdSegment(p.xy, vec2(0.08, -0.2), tip))) - 0.075;
     mark = onFace(arrow, p, depth);
   }
-  float d = mix(min(body, mark), smin(body, mark, 0.08), uPhase) / squash;
+  float d = mix(min(body, mark), smin(body, mark, 0.08), PH) / squash;
+  // the peel's curl: while the skin comes off, the part already lifted rolls back on itself
+  // along the edge, a tube of skin standing off the face (inside the object's outline only)
+  if (uPeel > 0.002 && uPeel < 0.998) {
+    float e = dot(p.xy, normalize(vec2(1.0, 0.65))) - mix(1.7, -1.7, uPeel);
+    float R = mix(0.1, 0.16, PH);
+    float tube = abs(length(vec2(e - R * 0.6, p.z - depth - R * 0.9)) - R) - 0.022;
+    tube = max(tube, foot - 0.01);
+    if (tube < d) return vec2(tube, 4.0);
+  }
   return vec2(d, mark < body ? 1.0 : 0.0);
 }
 vec3 normalAt(vec3 p) {
@@ -185,13 +214,14 @@ void ray(vec2 frag, out vec3 ro, out vec3 rd) {
   ro = vec3(0.0, 0.0, 5.0);
   rd = normalize(vec3(q / 4.0, -1.0));
   // crisp rests a little turned, so its thickness and bevel show; the pointer tilts from there
-  float rest = 1.0 - uPhase;
+  float rest = 1.0 - PH;
   mat2 rx = rot(uTilt.y + 0.32 * rest), ry = rot(-uTilt.x - 0.26 * rest);
   ro.yz = rx * ro.yz; rd.yz = rx * rd.yz;
   ro.xz = ry * ro.xz; rd.xz = ry * rd.xz;
 }
 
 void main() {
+  PH = mix(uPhase, materialSoftness(uMat), uCustom);
   vec2 frag = vUv * uRes;
   // outside the component's box (and its shadow) nothing can be hit: skip the march
   if (any(greaterThan(abs(frag - uCenter), vec2(uSize * 1.4, uSize / uAspect * 1.4 + uSize * 0.4)))) {
@@ -205,11 +235,13 @@ void main() {
   if (hit.x < 0.0) {
     // crisp: an ink outline around the silhouette, and the silhouette again as a hard offset shadow;
     // juicy: no outline, a soft shadow below
-    float px = 3.0 / uSize;
-    float outline = (1.0 - smoothstep(px * 0.5, px, hit.y)) * (1.0 - uPhase) * (1.0 - uPeel);
+    float px = mix(3.0, max(uOutline, 0.0), uCustom) / uSize;
+    // the page's crisp draws one; a visitor's skin draws one as wide as its border, if any
+    float drawn = mix(1.0 - PH, step(0.5, uOutline), uCustom);
+    float outline = (1.0 - smoothstep(px * 0.5, px, hit.y)) * drawn * (1.0 - uPeel);
     // a pressed crisp button has sunk into its shadow: the shadow shrinks under it
-    float sink = uKind > 1.5 ? 1.0 - uPress * (1.0 - uPhase) : 1.0;
-    vec2 off = mix(vec2(0.09, -0.09) * sink, vec2(0.0, -0.12), uPhase) * uSize;
+    float sink = uKind > 1.5 ? 1.0 - uPress * (1.0 - PH) : 1.0;
+    vec2 off = mix(vec2(0.09, -0.09) * sink, vec2(0.0, -0.12), PH) * uSize;
     vec3 sro, srd;
     ray(frag - off, sro, srd);
     vec3 sh = march(sro, srd);
@@ -217,9 +249,19 @@ void main() {
     float hard = sh.x > 0.0 ? 1.0 : 1.0 - smoothstep(0.0, px * 0.5, sh.y);
     float soft = (1.0 - smoothstep(0.0, 0.3, sh.y)) * 0.6;
     // the shadow is part of the look: it comes off with the skin
-    float shadow = mix(hard, soft, uPhase) * (1.0 - uPeel);
-    vec3 c = outline > shadow ? uInk : mix(uInk, uSoft, uPhase);
-    color = vec4(c, max(outline, shadow) * uAlpha);
+    float shadow = mix(hard, soft, PH) * (1.0 - uPeel);
+    vec3 c = outline > shadow ? uInk : mix(uInk, uSoft, PH);
+    float a = max(outline, shadow);
+    // the visitor's material: flat casts nothing, glow a halo of its brand
+    if (uCustom > 0.0) {
+      if (uMat < 0.5) a = mix(a, outline, uCustom);
+      if (uMat > 2.5 && uMat < 3.5) {
+        float halo = (1.0 - smoothstep(0.0, 0.45, hit.y)) * 0.75;
+        c = mix(c, uBrand, uCustom);
+        a = mix(a, max(outline, halo), uCustom);
+      }
+    }
+    color = vec4(c, a * uAlpha);
     return;
   }
 
@@ -228,18 +270,20 @@ void main() {
   vec3 L = normalize(vec3(-0.5, 0.7, 0.6));
   vec3 V = -rd;
   float ndl = dot(n, L);
-  bool isMark = hit.z > 0.5;
+  // the peel's curl (map: 4) is skin, rolled back
+  bool isCurl = hit.z > 3.5;
+  bool isMark = hit.z > 0.5 && !isCurl;
   // the avatar's eyes and mouth: ink on the picture, in both phases
   bool isFeature = hit.z > 1.5 && hit.z < 2.5;
-  bool isStatus = hit.z > 2.5;
+  bool isStatus = hit.z > 2.5 && !isCurl;
   float on = smoothstep(0.3, 0.7, uChecked);
 
   // skinned: the page's own look. Body: card when off, ink (crisp) or pink (juicy) when on; a
   // button is always on. Mark: the switch's thumb is ink then acid (crisp) or white (juicy);
   // the check and the arrow are acid (crisp) or white (juicy).
-  vec3 filled = mix(uInk, uAcc, uPhase);
+  vec3 filled = mix(uInk, uAcc, PH);
   vec3 body = uKind > 1.5 ? filled : mix(uCard, filled, on);
-  vec3 mark = uKind < 0.5 ? mix(mix(uInk, uOn, on), uCard, uPhase) : mix(uOn, uCard, uPhase);
+  vec3 mark = uKind < 0.5 ? mix(mix(uInk, uOn, on), uCard, PH) : mix(uOn, uCard, PH);
   vec3 base = isStatus ? vec3(0.18, 0.76, 0.47) : isFeature ? uInk : isMark ? mark : body;
   float rim = pow(1.0 - max(dot(n, V), 0.0), 2.4);
   float spec = pow(max(dot(reflect(-L, n), V), 0.0), 40.0);
@@ -261,7 +305,7 @@ void main() {
   // the glint: small, and only on the top band (never a streak across the face)
   crisp = mix(crisp, vec3(1.0), smoothstep(0.7, 0.75, spec) * smoothstep(0.8, 0.86, ndl));
   vec3 juicy = mix(base * 0.82, base, ndl * 0.5 + 0.5) + rim * 0.2 + spec * 0.75;
-  vec3 skin = mix(crisp, juicy, uPhase);
+  vec3 skin = mix(crisp, juicy, PH);
 
   // bare: the browser's own switch-ish grey, and the skeleton as blue contour lines
   // bare: no look at all. Neutral greys, a hairline where the faces turn, the state only as a
@@ -282,13 +326,42 @@ void main() {
   float dusk = (1.0 - smoothstep(0.0, 0.22, edge)) * step(0.0, edge) * peeling;
   // the visitor's skin, from the builder: brand where the component is on, surface elsewhere;
   // it is a skin like the site's, so the peel still lifts it off the skeleton
-  vec3 cBody = uKind > 1.5 ? uBrand : mix(uSurface, uBrand, on);
-  vec3 cMark = uKind < 0.5 ? mix(uBrand, uSurface, on) : uSurface;
-  skin = mix(skin, (isMark ? cMark : cBody) * (0.82 + 0.18 * max(ndl, 0.0)), uCustom);
+  // its fill: the brand, the brand running into the accent (gradient), or only an outline of it
+  vec3 brand = uFill > 0.5 && uFill < 1.5
+    ? mix(uBrand, uAccent, smoothstep(-0.9, 0.9, p.x - p.y * 0.4)) : uBrand;
+  vec3 cBody = uKind > 1.5 ? brand : mix(uSurface, brand, on);
+  if (uFill > 2.5) cBody = uSurface;
+  vec3 cMark = uKind < 0.5 ? mix(brand, uSurface, on) : (uFill > 2.5 ? uBrand : uSurface);
+  vec3 cb = isMark ? cMark : cBody;
+  // and its material, from the builder's shadow
+  float lam = max(ndl, 0.0);
+  vec3 lit;
+  if (uMat < 0.5) lit = cb * (0.94 + 0.06 * lam);
+  else if (uMat < 1.5) lit = mix(cb * 0.8, cb, ndl * 0.5 + 0.5) + rim * 0.18 + spec * 0.55;
+  else if (uMat < 2.5) {
+    lit = mix(cb * 0.62, cb, smoothstep(-0.17, -0.13, ndl));
+    lit = mix(lit, mix(cb, vec3(1.0), 0.18), smoothstep(0.33, 0.37, ndl));
+    lit = mix(lit, mix(cb, vec3(1.0), 0.4), smoothstep(0.83, 0.87, ndl));
+    lit = mix(side, lit, smoothstep(0.18, 0.3, facing));
+  } else if (uMat < 3.5) lit = cb * (0.72 + 0.28 * lam) + uBrand * rim * 1.3 + spec * 0.4;
+  else if (uMat < 4.5) {
+    // bevelled: the faces as flat steps, light from the top left, dark below
+    float step_ = floor((ndl * 0.5 + 0.5) * 4.0) / 4.0;
+    lit = cb * (0.55 + 0.6 * step_);
+    lit = mix(lit, mix(cb, vec3(1.0), 0.6), bevel);
+  } else lit = cb * (0.78 + 0.22 * (ndl * 0.5 + 0.5)) * (0.86 + 0.14 * facing);
+  // an outline fill's ring of the brand where the faces turn
+  if (uFill > 2.5) lit = mix(lit, uBrand, smoothstep(0.5, 0.7, rim));
+  // glass: a fresnel sheen, clear in the middle (alpha, below)
+  if (uFill > 1.5 && uFill < 2.5) lit = mix(lit, vec3(1.0), rim * 0.55) + spec * 0.6;
+  skin = mix(skin, lit, uCustom);
   vec3 c = mix(bare * (1.0 - 0.35 * dusk), skin, skinned);
   c = mix(c, mix(uCard, vec3(1.0), 0.5), lip * 0.9);
+  // the curl is the skin's own back: paler, lit along its roll, darker where it turns under
+  if (isCurl) c = mix(skin, vec3(1.0), 0.28) * (0.62 + 0.38 * lam) + spec * 0.35;
+  float glass = uFill > 1.5 && uFill < 2.5 ? mix(1.0, mix(0.62, 1.0, rim), uCustom) : 1.0;
 
-  color = vec4(c, uAlpha);
+  color = vec4(c, uAlpha * glass);
 }`
 
 type Rgb = [number, number, number]
@@ -314,6 +387,19 @@ function palette() {
   }
 }
 
+/** What of the builder's skin the object is rebuilt in, as wear() names it (skins.ts). */
+export interface ObjectMaterial {
+  readonly accent: string
+  /** 0 to 28 px */
+  readonly radius: number
+  /** 0 to 4 px */
+  readonly border: number
+  readonly shadow: "flat" | "soft" | "hard" | "glow" | "bevel" | "clay"
+  readonly fill: "solid" | "gradient" | "glass" | "outline"
+}
+const MATERIALS = ["flat", "soft", "hard", "glow", "bevel", "clay"] as const
+const FILLS = ["solid", "gradient", "glass", "outline"] as const
+
 /** The components the hero can show; the page picks one per visit (app/layout.tsx). */
 export const KINDS = ["switch", "checkbox", "button"] as const
 export type Kind = (typeof KINDS)[number]
@@ -331,6 +417,8 @@ export interface SkinHandle {
   readonly wake: () => void
   /** How much it wears the builder's skin (0 to 1), in the builder's two colours (hex). */
   readonly setLook: (brand: string, surface: string, amount: number) => void
+  /** The rest of the builder's skin: the object is rebuilt in it (shape, outline, material). */
+  readonly setMaterial: (m: ObjectMaterial) => void
   readonly dispose: () => void
 }
 
@@ -378,6 +466,11 @@ export function mountSkin(
     uCustom: { value: 0 },
     uBrand: { value: [0.09, 0.09, 0.11] },
     uSurface: { value: [1, 1, 1] },
+    uAccent: { value: [1, 0.56, 0.64] },
+    uRound: { value: 0.5 },
+    uOutline: { value: 3 },
+    uMat: { value: 1 },
+    uFill: { value: 0 },
     uPhase: { value: start.phase },
     uChecked: { value: 0 },
     uPeel: { value: 0 },
@@ -402,7 +495,11 @@ export function mountSkin(
   const observer = new MutationObserver(() => {
     target = palette()
   })
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-phase"] })
+  // the phase, or a skin worn on the page (wear.ts writes the tokens inline on <html>)
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-phase", "style", "data-worn"],
+  })
 
   // the canvas is fixed over the viewport; the component's rect comes from the page each frame,
   // so it can travel from one place on the page to another
@@ -546,6 +643,15 @@ export function mountSkin(
       u.uBrand.value = hex(brand, [0.09, 0.09, 0.11])
       u.uSurface.value = hex(surface, [1, 1, 1])
       u.uCustom.value = Math.min(1, Math.max(0, amount))
+      loop()
+    },
+    setMaterial: (m) => {
+      u.uAccent.value = hex(m.accent, [1, 0.56, 0.64])
+      u.uRound.value = Math.min(1, m.radius / 22)
+      // a border is a line round the object a little heavier than the component's, in proportion
+      u.uOutline.value = m.border > 0 ? 2 + m.border * 1.5 : 0
+      u.uMat.value = MATERIALS.indexOf(m.shadow)
+      u.uFill.value = FILLS.indexOf(m.fill)
       loop()
     },
     wake: () => {

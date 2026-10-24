@@ -324,6 +324,38 @@ export function SkinScene() {
       grab.sy = e.clientY - grab.y
       document.body.style.cursor = "grabbing"
     }
+    // The page's skin comes off with the object: pulled away from its place, the whole page is
+    // left bare, the browser's own look (globals.css: html[data-stripped]), opening from the
+    // pointer; let go, and the skin comes back the same way
+    let stripped = false
+    let lastPull: [number, number] = [0, 0]
+    const strip = (on: boolean, x: number, y: number) => {
+      stripped = on
+      const root = document.documentElement
+      const flip = () => root.toggleAttribute("data-stripped", on)
+      cue("peel", { value: on ? 1 : 0 })
+      const vt = (
+        document as Document & { startViewTransition?: (f: () => void) => { ready: Promise<void> } }
+      ).startViewTransition
+      if (!vt) return flip()
+      vt.call(document, flip).ready.then(
+        () =>
+          root.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${Math.hypot(window.innerWidth, window.innerHeight)}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: on ? 650 : 520,
+              easing: "cubic-bezier(0.7, 0, 0.2, 1)",
+              pseudoElement: "::view-transition-new(root)",
+            },
+          ),
+        () => {},
+      )
+    }
     const onGrabMove = (e: PointerEvent) => {
       if (armed && !grab.down && Math.hypot(e.clientX - armed.x, e.clientY - armed.y) > 6) {
         cancelAnimationFrame(grab.spring)
@@ -347,6 +379,9 @@ export function SkinScene() {
           ? Math.min(window.innerHeight - r.bottom - 32, Math.max(80 - r.top, e.clientY - grab.sy))
           : e.clientY - grab.sy
         if (Math.hypot(grab.x, grab.y) > 4) grab.moved = true
+        // pulled far enough, it takes the page's skin with it (strip)
+        if (!stripped && Math.hypot(grab.x, grab.y) > 60) strip(true, e.clientX, e.clientY)
+        lastPull = [e.clientX, e.clientY]
         scene.current?.wake()
         return
       }
@@ -359,6 +394,7 @@ export function SkinScene() {
       if (!grab.down) return
       grab.down = false
       document.body.style.cursor = ""
+      if (stripped) strip(false, lastPull[0], lastPull[1])
       if (!grab.moved) {
         grab.x = 0
         grab.y = 0
@@ -387,16 +423,32 @@ export function SkinScene() {
     window.addEventListener("pointermove", onGrabMove, { passive: true })
     window.addEventListener("pointerup", onGrabUp)
     window.addEventListener("click", onClickCapture, true)
+    // A scroll that stops mid-flight never leaves the object hanging over the copy: once the
+    // page has been still a moment, it glides on to the nearer of its two docks (the scroll
+    // still decides where it is: this is only where it is drawn), and back onto its path as the
+    // scroll goes on
+    let lastScroll = 0
+    let settleK = 0
+    const flown = (t: number) => {
+      const goal = performance.now() - lastScroll > 200 ? 1 : 0
+      settleK += (goal - settleK) * (goal ? 0.1 : 0.3)
+      if (Math.abs(goal - settleK) > 0.002) scene.current?.wake()
+      const k = settleK * settleK * (3 - 2 * settleK)
+      return t + ((t < 0.5 ? 0 : 1) - t) * k
+    }
+    let shownT = 0
     const route = () => {
       const { p, boxes } = where()
       const from = p ? boxes[p.from] : null
       const to = p ? boxes[p.to] : null
       if (p && from && to) {
         if (p.t >= 1) return settled(to)
-        if (phone()) return hop(from, to, p.t).box
+        // where it is drawn along the flight (alpha reads the same, this frame)
+        shownT = flown(p.t)
+        if (phone()) return hop(from, to, shownT).box
         // one throw from dock to dock, higher the further it goes (a short hop barely lifts)
         const reach = Math.hypot(centre(to) - centre(from), to.x - from.x)
-        return arc(from, to, p.t, Math.min(vh() * 0.16, reach * 0.35))
+        return arc(from, to, shownT, Math.min(vh() * 0.16, reach * 0.35))
       }
       // before the machine lets go: the hero, then the hero's trip to the machine's control
       const { next, y, s0, t } = travel()
@@ -439,8 +491,8 @@ export function SkinScene() {
       // on a dock it melts into: whole as it touches down, gone within an eighth of a screen
       if (p.t >= 1) return reaching?.mode === "melt" ? Math.max(0, 1 - p.past / (vh() * 0.12)) : 1
       // out of a dock it melted into, it comes back over the first stretch of the flight
-      const emerge = leaving?.mode === "melt" ? Math.min(1, p.t / 0.08) : 1
-      return phone() ? Math.min(emerge, hop(from, to, p.t).alpha) : emerge
+      const emerge = leaving?.mode === "melt" ? Math.min(1, shownT / 0.08) : 1
+      return phone() ? Math.min(emerge, hop(from, to, shownT).alpha) : emerge
     }
     let presses = 0
     let pulse = 0
@@ -509,7 +561,20 @@ export function SkinScene() {
       }
     }
     let legKey = ""
+    // the render loop sleeps when nothing moves: woken once the scroll has been still long
+    // enough for the object to settle (flown), and when the page's layout changes under it
+    let idleWake = 0
+    const relayout = new ResizeObserver(() => update())
+    const main = document.querySelector("main")
+    if (main) relayout.observe(main)
     const onScroll = () => {
+      lastScroll = performance.now()
+      clearTimeout(idleWake)
+      idleWake = window.setTimeout(() => scene.current?.wake(), 220)
+      update()
+    }
+    // everything the object's place decides, for a scroll or a page that changed under it
+    const update = () => {
       const peel = Math.min(1, Math.max(0, peelAt()))
       scene.current?.setPeel(peel)
       scene.current?.wake()
@@ -560,6 +625,7 @@ export function SkinScene() {
               ? 1 - smooth(0.55, 1, p.t)
               : 0
         scene.current.setLook(colors.brand, colors.surface, colors.picked ? 1 : k)
+        if (colors.material) scene.current.setMaterial(colors.material)
       } else if (past) setLanded(true)
       // the real components: a melt dock's shows as a ghost of itself while the object comes
       // down on it (never a hole), and comes up to full as the object dissolves into it
@@ -574,8 +640,9 @@ export function SkinScene() {
       const testEl = els[DOCKS.findIndex((d) => d.id === "test")]
       if (testEl) {
         const inbound = reaching?.id === "test" && p && p.t < 1
-        if (inbound && p.t >= (phone() ? 0.7 : 0.6)) setOpacity(testEl, "0")
-        else if (inbound) setOpacity(testEl, "0.3")
+        // (a phone draws no object mid-hop: its control stays whole until the object grows in)
+        if (inbound && p.t >= (phone() ? 0.8 : 0.6)) setOpacity(testEl, "0")
+        else if (inbound && !phone()) setOpacity(testEl, "0.3")
         else setOpacity(testEl, null)
       }
       // hysteresis: the control grows to the object's size on arrival, which moves the page a
@@ -657,7 +724,7 @@ export function SkinScene() {
     // re-apply the hand-over to the new control
     const offTestState = onTestState(() => {
       follow()
-      onScroll()
+      update()
     })
     const start = () => {
       import("./skin-gl")
@@ -674,7 +741,7 @@ export function SkinScene() {
             alpha,
             { checked: true, peel: 0 },
           )
-          onScroll()
+          update()
           // a first hint that the skin comes off: it lifts a corner, then settles back
           if (peelAt() <= 0) {
             scene.current?.setPeel(0.4)
@@ -696,6 +763,8 @@ export function SkinScene() {
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => {
       cancelled = true
+      relayout.disconnect()
+      clearTimeout(idleWake)
       offPeelOn()
       offTestState()
       clearTimeout(pulse)
@@ -712,6 +781,7 @@ export function SkinScene() {
       clearTimeout(idle)
       clearTimeout(hint)
       hero.removeAttribute("data-bare")
+      document.documentElement.removeAttribute("data-stripped")
       for (const el of touchedEls) el.style.removeProperty("opacity")
       setSceneGl(false)
       setLanded(false)
@@ -794,7 +864,15 @@ export function SkinScene() {
           ))}
         </ul>
         <p className={styles.note}>
-          {bare ? "Bare. Everything else stayed." : "The look is the only thing that comes off."}
+          {bare ? (
+            "Bare. Everything else stayed."
+          ) : (
+            <>
+              The look is the only thing that comes off.{" "}
+              {/* a fine pointer can drag the object, and the page's skin comes off with it */}
+              <span className={styles.pull}>Pull it.</span>
+            </>
+          )}
         </p>
       </div>
     </>

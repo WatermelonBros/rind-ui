@@ -127,10 +127,12 @@ const frameworkWords = {
     ? ` (${and(behind.map((f) => f.name))} with ${Math.min(...behind.map((f) => f.components.length))} components so far)`
     : "",
 }
-// "React 19+, Vue 3.5+, Svelte 5.29+": each released package's own peer range
+// "React 19+, Vue 3.5+, Svelte 5.29+": the floor of each released package's own peer range
+// (">=1.9.0 <2" says 1.9.0)
 const requires = released
-  .filter((f) => f.requires?.startsWith(">="))
-  .map((f) => `${f.name} ${f.requires?.slice(2)}+`)
+  .map((f) => [f.name, /^>=\s*([\d.]+)/.exec(f.requires ?? "")?.[1]] as const)
+  .filter(([, floor]) => floor)
+  .map(([name, floor]) => `${name} ${floor}+`)
   .join(", ")
 const installBlocks = fws
   .filter((f) => f.ready)
@@ -412,14 +414,18 @@ for (const f of readdirSync(examplesDir).filter((f) => f.endsWith(".tsx"))) {
     throw new Error(`shown example code is not self-contained:\n${problems.join("\n")}`)
 }
 // The other frameworks' versions of the same examples, written next to their packages so they
-// land with them on main: packages/vue/examples/<slug>/<Name>.vue, packages/svelte/examples/
-// <slug>/<Name>.svelte, <Name> being the React example's export (Basic, Controlled…). A page
-// shows a framework's tab for every example that has one, without the site changing.
+// land with them on main: packages/<framework>/examples/<slug>/<Name>.<ext> (a Vue or Svelte
+// single-file component, Solid's JSX, an Angular component's TypeScript), <Name> being the React
+// example's export (Basic, Controlled…). A page shows a framework's tab for every example that
+// has one, without the site changing.
 const ADAPTERS = [
   { id: "vue", ext: ".vue" },
   { id: "svelte", ext: ".svelte" },
+  { id: "solid", ext: ".tsx" },
+  { id: "angular", ext: ".ts" },
 ] as const
-const adapted: Record<string, Partial<Record<"vue" | "svelte", Record<string, string>>>> = {}
+type Adapter = (typeof ADAPTERS)[number]["id"]
+const adapted: Record<string, Partial<Record<Adapter, Record<string, string>>>> = {}
 for (const { id, ext } of ADAPTERS) {
   const root = join(repo, "packages", id, "examples")
   if (!existsSync(root)) continue

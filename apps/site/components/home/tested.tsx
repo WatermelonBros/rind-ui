@@ -397,7 +397,7 @@ export function Tested() {
   }
 
   return (
-    <div className={styles.band} data-band="ink">
+    <div className={styles.band} data-band="ink" data-from="page">
       <section className={styles.section} aria-labelledby="tested-title">
         {/* the title, its lead and the panel hold still together while the run goes with the
             scroll, then the room under them (testRoom) is taken out once it has passed */}

@@ -100,7 +100,12 @@ export function Outro() {
   }, [egg])
 
   return (
-    <footer ref={footer} className={styles.outro}>
+    <footer
+      ref={footer}
+      className={`${styles.outro} ${styles.band}`}
+      data-band="outro"
+      data-from="paper"
+    >
       <Reveal>
         <p ref={title} className={styles.outroTitle}>
           <span className={styles.outroOutline}>

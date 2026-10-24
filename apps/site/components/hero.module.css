@@ -48,6 +48,17 @@
   color: var(--ink);
   vertical-align: -0.12em;
 }
+.facts {
+  transition:
+    opacity 0.3s var(--spring),
+    translate 0.4s var(--spring);
+}
+/* the facts go with the skin: the machine's scene rises over the hero's tail right after, and
+   its title came up through them */
+.hero[data-bare] .facts {
+  opacity: 0;
+  translate: 0 16px;
+}
 @media (max-width: 900px) {
   .facts {
     display: grid;
@@ -127,7 +138,7 @@
 }
 :global([data-phase="juicy"]) .lede em {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
   border-radius: 14px;
 }
 
@@ -188,7 +199,7 @@
 }
 :global([data-phase="juicy"]) .primary {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
   box-shadow:
     0 6px 0 var(--acc-deep),
     0 14px 24px #2e9e6640;
@@ -204,7 +215,7 @@
   box-shadow: 0 2px 0 var(--acc-deep);
 }
 :global([data-phase="juicy"]) .install {
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 5px 0 var(--soft);
 }
 

@@ -22,7 +22,7 @@ export function Wall() {
   const ready = items.filter((i) => i.status === "done").length
   const categories = [...new Set(items.map((i) => i.category))]
   return (
-    <div className={styles.band} data-band="paper">
+    <div className={styles.band} data-band="paper" data-from="page">
       <section className={styles.section} aria-labelledby="wall-title">
         <Reveal>
           <h2 id="wall-title" className={styles.h2}>
@@ -38,7 +38,7 @@ export function Wall() {
         <Collapsible.Root className={styles.wallAll}>
           <Collapsible.Trigger>
             <Collapsible.Indicator>▸</Collapsible.Indicator>
-            All {items.length} components, by category
+            The roadmap: all {items.length}, by category
           </Collapsible.Trigger>
           <Collapsible.Content>
             <div className={styles.wall}>
