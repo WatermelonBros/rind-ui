@@ -21,12 +21,12 @@
 - [x] 2.6 Heading
 - [x] 2.7 Label
 - [x] 2.8 Link
-- [ ] 2.9 Skeleton
-- [ ] 2.10 Progress
-- [ ] 2.11 Meter
-- [ ] 2.12 Avatar
-- [ ] 2.13 Image
-- [ ] 2.14 Alert
+- [x] 2.9 Skeleton
+- [x] 2.10 Progress
+- [x] 2.11 Meter
+- [x] 2.12 Avatar
+- [x] 2.13 Image
+- [x] 2.14 Alert
 - [ ] 2.15 Toggle Group
 - [ ] 2.16 Fieldset
 - [ ] 2.17 Field
