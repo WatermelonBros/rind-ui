@@ -21,10 +21,18 @@
   margin: 18px 0 18px;
   max-width: 14ch;
 }
+/* the page's second voice: under the display titles, the leads speak in an editorial serif */
 .lead {
-  font: 500 clamp(17px, 1.4vw, 21px) / 1.5 var(--text);
-  max-width: 640px;
+  font:
+    400 clamp(19px, 1.6vw, 25px) / 1.45 var(--font-serif),
+    Georgia,
+    serif;
+  letter-spacing: -0.005em;
+  max-width: 660px;
   margin-bottom: 40px;
+}
+.lead code {
+  font-size: 0.82em;
 }
 /* any-look.tsx: the machine's states, flying in from the scene above as selectors (handoff.ts) */
 .statePill {
