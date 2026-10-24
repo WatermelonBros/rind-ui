@@ -289,34 +289,6 @@ export function AnyLook() {
     setLookTarget(stage.current?.querySelector<HTMLElement>(selector) ?? null)
     return () => setLookTarget(null)
   }, [])
-  useEffect(
-    () =>
-      setLookColors({
-        brand: look.brand,
-        surface: look.surface,
-        // the skins the builder plays by itself are not the visitor's: the object keeps its own
-        picked: touched.current && (picked.brand !== null || picked.surface !== BASE.surface),
-        // and the rest of it: the object is rebuilt in the skin, not only recoloured
-        material: {
-          accent: look.accent,
-          radius: look.radius,
-          border: look.border,
-          shadow: look.shadow,
-          fill: look.fill,
-        },
-      }),
-    [
-      look.brand,
-      look.surface,
-      look.accent,
-      look.radius,
-      look.border,
-      look.shadow,
-      look.fill,
-      picked.brand,
-      picked.surface,
-    ],
-  )
   const section = useRef<HTMLElement>(null)
   const [copied, setCopied] = useState<"css" | "link" | null>(null)
   // the visitor has taken over: the builder stops playing its skins by itself
@@ -337,6 +309,25 @@ export function AnyLook() {
   const [owned, setOwned] = useState(false)
   const [wearing, setWearing] = useState(true)
   const worn = owned && wearing ? JSON.stringify(look) : ""
+  useEffect(
+    () =>
+      setLookColors({
+        brand: look.brand,
+        surface: look.surface,
+        // only a skin worn on the page dresses the object everywhere; crisp/juicy taking it off
+        // the page takes it off the object too (it kept the skin on a crisp page)
+        picked: worn !== "",
+        // and the rest of it: the object is rebuilt in the skin, not only recoloured
+        material: {
+          accent: look.accent,
+          radius: look.radius,
+          border: look.border,
+          shadow: look.shadow,
+          fill: look.fill,
+        },
+      }),
+    [look.brand, look.surface, look.accent, look.radius, look.border, look.shadow, look.fill, worn],
+  )
   // biome-ignore lint/correctness/useExhaustiveDependencies: worn is the look, serialised
   useEffect(() => {
     wear(worn ? look : null)

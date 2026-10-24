@@ -481,17 +481,39 @@
   transition: background 0.5s var(--spring);
 }
 /* any-look.tsx: the preview's head, a profile */
+/* the preview's head is a poster in the skin's own fill and display face, so a skin is seen at
+   the scale of a page, not only in its controls */
 .lookWho {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  border: var(--skin-border, 0px) solid var(--skin-brand);
+  border-radius: calc(var(--skin-radius, 12px) * 1.4);
+  background: var(--skin-fill);
+  color: var(--skin-fill-text);
+  box-shadow: var(--skin-shadow);
 }
 .lookWho > span {
   display: grid;
+  gap: 4px;
+}
+.lookWho b {
+  font: 800 clamp(26px, 3vw, 44px) / 1 var(--skin-heading);
+  letter-spacing: -0.02em;
+  text-transform: var(--skin-case);
 }
 .lookWho small {
-  opacity: 0.85;
+  font: 600 13px var(--skin-font);
+}
+.lookWho [data-scope="avatar"][data-part="root"] {
+  inline-size: 64px;
+  block-size: 64px;
+  font-size: 22px;
+}
+.lookWho [data-scope="badge"][data-part="root"] {
+  margin-inline-start: auto;
 }
 .lookGrid {
   display: grid;
