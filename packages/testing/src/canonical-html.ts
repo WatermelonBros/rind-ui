@@ -52,7 +52,7 @@ export function canonicalHtml(html: string | Node): string {
     if (!(node instanceof Element)) return
     const attrs = Array.from(node.attributes)
       // Hover follows wherever the pointer rests (a previous test's last move), not the markup.
-      .filter(({ name }) => name !== "data-hover")
+      .filter(({ name }) => name !== "data-hover" && name !== "data-hovering")
       .map(({ name, value }) => {
         if (name === "style") {
           const style = (node as HTMLElement).style
