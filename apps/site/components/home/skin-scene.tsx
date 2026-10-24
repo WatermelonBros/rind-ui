@@ -351,7 +351,11 @@ export function SkinScene() {
         document as Document & { startViewTransition?: (f: () => void) => { ready: Promise<void> } }
       ).startViewTransition
       if (!vt) return flip()
-      vt.call(document, flip).ready.then(
+      const t = vt.call(document, flip)
+      // dressed again on release: the browser's short crossfade (a disc opening from the pointer
+      // cut the springing object in half, half the page bare and half dressed)
+      if (!on) return
+      t.ready.then(
         () =>
           root.animate(
             {
@@ -361,7 +365,7 @@ export function SkinScene() {
               ],
             },
             {
-              duration: on ? 650 : 520,
+              duration: 650,
               easing: "cubic-bezier(0.7, 0, 0.2, 1)",
               pseudoElement: "::view-transition-new(root)",
             },
@@ -444,6 +448,44 @@ export function SkinScene() {
       }
       grab.spring = requestAnimationFrame(step)
     }
+    // The hero shows what it is once, by itself: a visitor who has done nothing for a few
+    // seconds at the top sees the object pulled off its place, the page come off with it, and
+    // the spring bring both back (the same pull a hand makes; never again once they act)
+    let demoed = false
+    const quiet = () => {
+      demoed = true
+      clearTimeout(demoTimer)
+    }
+    const demo = () => {
+      if (demoed || grab.down || window.scrollY > 40 || !fine.matches || !drawn || document.hidden)
+        return
+      demoed = true
+      const cx = drawn.x + drawn.width / 2
+      const cy = drawn.y + drawn.height / 2
+      const start = performance.now()
+      stage.current?.toggleAttribute("data-pulled", true)
+      const pull = (now: number) => {
+        const k = Math.min(1, (now - start) / 560)
+        const e = 1 - (1 - k) ** 3
+        grab.x = -130 * e
+        grab.y = 36 * e
+        lastPull = [cx + grab.x, cy + grab.y]
+        if (!stripped && k > 0.45) strip(true, lastPull[0], lastPull[1])
+        scene.current?.wake()
+        if (k < 1) grab.spring = requestAnimationFrame(pull)
+        else
+          demoTimer = window.setTimeout(() => {
+            // let go, as a hand would: the page dresses again and the spring takes it home
+            grab.down = true
+            grab.moved = true
+            onGrabUp()
+          }, 1100)
+      }
+      grab.spring = requestAnimationFrame(pull)
+    }
+    let demoTimer = window.setTimeout(demo, 3200)
+    for (const type of ["pointerdown", "keydown", "wheel", "touchstart"] as const)
+      window.addEventListener(type, quiet, { once: true, passive: true })
     window.addEventListener("pointerdown", onGrabDown, true)
     window.addEventListener("pointermove", onGrabMove, { passive: true })
     window.addEventListener("pointerup", onGrabUp)
@@ -823,6 +865,9 @@ export function SkinScene() {
       window.removeEventListener("pointerdown", onGrabDown, true)
       window.removeEventListener("pointermove", onGrabMove)
       window.removeEventListener("pointerup", onGrabUp)
+      clearTimeout(demoTimer)
+      for (const type of ["pointerdown", "keydown", "wheel", "touchstart"] as const)
+        window.removeEventListener(type, quiet)
       window.removeEventListener("rind:agents-driven", onAgentsDriven)
       window.removeEventListener("click", onClickCapture, true)
       cancelAnimationFrame(grab.spring)
