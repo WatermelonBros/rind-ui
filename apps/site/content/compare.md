@@ -53,9 +53,9 @@ carefully designed API.
 ### Ark UI
 
 Runs on React, Vue, Solid and Svelte today, built on the same idea as rind-ui: components
-as state machines (Zag.js). rind-ui's core is framework-free too, but only React is
-published so far.
-**Pick it if** you need a framework other than React now.
+as state machines (Zag.js). rind-ui's core is framework-free too: {{released}} are published{{partial}},
+{{unreleased}} not yet.
+**Pick it if** you need Solid now, or a component rind-ui has not ported to your framework yet.
 
 ### Headless UI
 
@@ -74,7 +74,7 @@ Ariakit is a careful, low-level toolkit for React and Solid. Reka UI (Vue), Bits
 <!-- /pre-1.0 -->
 - You need a long record in production: rind-ui's first production user is Reado, an IDE
   by the same author.
-- You need Vue, Svelte, Solid or Angular today.
+- You need {{unreleased-or}} today.
 - You need built-in translations for many locales: rind-ui's messages ship in English and
   are overridable, but not translated yet.
 - Your policy rules out dependencies with a single maintainer.
