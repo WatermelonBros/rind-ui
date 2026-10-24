@@ -2450,3 +2450,32 @@ g:not([data-plugged]) > .pulse {
     overflow-x: auto;
   }
 }
+
+/* the display titles and their leads stand over the travelling object (skin-scene.module.css:
+   its canvas is at 30): crossing them, it passes behind the type, depth instead of a sticker
+   over it */
+@media (min-width: 901px) {
+  .h2,
+  .lead,
+  .outroTitle {
+    position: relative;
+    z-index: 31;
+  }
+}
+
+/* the sections do not all speak from the left: the install is one centred assembly, the wall's
+   title runs the width of the page (desktop) */
+@media (min-width: 901px) {
+  .section[aria-labelledby="install-title"] :is(.h2, .lead) {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section[aria-labelledby="install-title"] .h2 {
+    max-width: 18ch;
+  }
+  .section[aria-labelledby="wall-title"] .h2 {
+    max-width: none;
+    font-size: clamp(56px, 8.2vw, 132px);
+    letter-spacing: -0.045em;
+  }
+}
