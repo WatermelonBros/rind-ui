@@ -1,5 +1,6 @@
 import {
   type ChangeDetails,
+  cssZoom,
   type MessageOverrides,
   partId,
   readingPosition,
@@ -230,8 +231,10 @@ const List = defineComponent({
       }
       const box = list.getBoundingClientRect()
       const own = link.getBoundingClientRect()
-      const top = own.top - box.top + list.scrollTop
-      const height = own.height
+      // rects are viewport pixels; the marker is placed in the list's own (zoomed) ones
+      const z = cssZoom(list)
+      const top = (own.top - box.top) / z + list.scrollTop
+      const height = own.height / z
       ctx.setMarker({ top, height })
       if (list.scrollHeight > list.clientHeight) {
         if (top < list.scrollTop) list.scrollTop = top
