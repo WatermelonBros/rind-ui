@@ -59,7 +59,7 @@ import {
   SwatchNamingKey,
 } from "../color-swatch/color-swatch"
 import { ColorSwatchPicker } from "../color-swatch-picker/color-swatch-picker"
-import { FieldControlBoundary, useFieldControl } from "../field/field"
+import { FieldControlBoundary, useFieldControl } from "../field/context"
 import { FieldHost, HostDescription, HostErrorMessage } from "../field/field-host"
 import { joinHandlers } from "../join-handlers"
 import { mergeProps, refTo } from "../merge-props"

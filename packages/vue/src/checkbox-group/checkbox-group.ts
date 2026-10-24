@@ -28,7 +28,7 @@ import {
 } from "vue"
 import { Checkbox } from "../checkbox/checkbox"
 import { changeEmitter } from "../emit-change"
-import { useFieldControl } from "../field/field"
+import { useFieldControl } from "../field/context"
 import { useFieldsetDisabled } from "../fieldset/context"
 import {
   type FormToggleGrouped,

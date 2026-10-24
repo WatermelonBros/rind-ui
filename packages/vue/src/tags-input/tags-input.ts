@@ -50,7 +50,7 @@ import {
   watch,
 } from "vue"
 import { createPopupParts } from "../combobox/popup-parts"
-import { useFieldControl } from "../field/field"
+import { useFieldControl } from "../field/context"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { createListboxParts, type ListboxHost } from "../listbox/parts"
 import { mergeProps, refTo } from "../merge-props"

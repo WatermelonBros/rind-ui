@@ -17,7 +17,7 @@ import {
   shallowRef,
   type VNodeChild,
 } from "vue"
-import { useFieldBindingPeek } from "../field/field"
+import { useFieldBindingPeek } from "../field/context"
 import { joinHandlers } from "../join-handlers"
 import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"

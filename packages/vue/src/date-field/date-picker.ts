@@ -34,7 +34,7 @@ import {
   watch,
 } from "vue"
 import * as Calendar from "../calendar/calendar.parts"
-import { useFieldBindingPeek } from "../field/field"
+import { useFieldBindingPeek } from "../field/context"
 import { mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { usePopoverControls } from "../popover/popover"

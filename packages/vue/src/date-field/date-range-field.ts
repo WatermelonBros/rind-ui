@@ -37,7 +37,7 @@ import {
   type VNodeChild,
   watch,
 } from "vue"
-import { fieldRootProps, useFieldBindingPeek, useFieldControl } from "../field/field"
+import { fieldRootProps, useFieldBindingPeek, useFieldControl } from "../field/context"
 import { FieldHost } from "../field/field-host"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { mergeProps, refTo } from "../merge-props"
