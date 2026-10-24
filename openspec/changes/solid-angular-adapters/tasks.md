@@ -63,14 +63,14 @@
 - [x] 2.48 Listbox
 - [x] 2.49 Grid List
 - [x] 2.50 Tree View
-- [ ] 2.51 Table
+- [x] 2.51 Table
 - [x] 2.52 Sortable
-- [ ] 2.53 Popover
-- [ ] 2.54 Tooltip
-- [ ] 2.55 Hover Card
-- [ ] 2.56 Dialog
-- [ ] 2.57 Drawer
-- [ ] 2.58 Toast
+- [x] 2.53 Popover
+- [x] 2.54 Tooltip
+- [x] 2.55 Hover Card
+- [x] 2.56 Dialog
+- [x] 2.57 Drawer
+- [x] 2.58 Toast
 - [ ] 2.59 Menu
 - [ ] 2.60 Context Menu
 - [ ] 2.61 Menubar
