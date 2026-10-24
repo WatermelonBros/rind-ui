@@ -45,7 +45,8 @@ const mono = localFont({
   // layout rewraps the hero's buttons on phones, whatever its display
 })
 
-// the landing's skin builder only, when its visitor picks "serif": fetched then, never up front
+// the landing's second voice (its sections' leads, under the display titles) and the builder's
+// "serif": below the first screen, so not preloaded; it swaps in long before a lead is read
 const serif = localFont({
   src: [
     { path: "../fonts/source-serif/source-serif-latin-400.woff2", weight: "400" },
