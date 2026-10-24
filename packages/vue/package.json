@@ -67,6 +67,11 @@
       "types": "./dist/button/index.d.mts",
       "default": "./dist/button/index.mjs"
     },
+    "./calendar": {
+      "@rind-ui/source": "./src/calendar/index.ts",
+      "types": "./dist/calendar/index.d.mts",
+      "default": "./dist/calendar/index.mjs"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.mts",
@@ -101,6 +106,11 @@
       "@rind-ui/source": "./src/context-menu/index.ts",
       "types": "./dist/context-menu/index.d.mts",
       "default": "./dist/context-menu/index.mjs"
+    },
+    "./date-field": {
+      "@rind-ui/source": "./src/date-field/index.ts",
+      "types": "./dist/date-field/index.d.mts",
+      "default": "./dist/date-field/index.mjs"
     },
     "./dialog": {
       "@rind-ui/source": "./src/dialog/index.ts",
@@ -373,6 +383,7 @@
     "@rind-ui/core": "workspace:*"
   },
   "devDependencies": {
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/node": "^24.19.2",
@@ -416,6 +427,10 @@
         "types": "./dist/button/index.d.mts",
         "default": "./dist/button/index.mjs"
       },
+      "./calendar": {
+        "types": "./dist/calendar/index.d.mts",
+        "default": "./dist/calendar/index.mjs"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.mts",
         "default": "./dist/checkbox/index.mjs"
@@ -443,6 +458,10 @@
       "./context-menu": {
         "types": "./dist/context-menu/index.d.mts",
         "default": "./dist/context-menu/index.mjs"
+      },
+      "./date-field": {
+        "types": "./dist/date-field/index.d.mts",
+        "default": "./dist/date-field/index.mjs"
       },
       "./dialog": {
         "types": "./dist/dialog/index.d.mts",

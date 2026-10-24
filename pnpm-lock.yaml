@@ -210,6 +210,9 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@internationalized/date':
+        specifier: ^3.12.4
+        version: 3.12.4
       '@rind-ui/react':
         specifier: workspace:*
         version: link:../react
@@ -314,6 +317,9 @@ importers:
         specifier: workspace:*
         version: link:../core
     devDependencies:
+      '@internationalized/date':
+        specifier: ^3.12.4
+        version: 3.12.4
       '@rind-ui/react':
         specifier: workspace:*
         version: link:../react

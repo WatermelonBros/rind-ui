@@ -31,6 +31,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/table/table.tsx` | `talkback-aria-sort` |
 | `packages/svelte/src/number-input/api.svelte.ts` | `ios-vo-spinbutton-input` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+| `packages/vue/src/date-field/date-field.ts` | `ios-vo-spinbutton-input` |
 | `packages/vue/src/meter/meter.ts` | `nvda-progressbar-name` |
 | `packages/vue/src/number-input/number-input.ts` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/vue/src/progress/progress.ts` | `nvda-progressbar-name` |
@@ -171,7 +172,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`, `packages/svelte/src/number-input/api.svelte.ts`, `packages/vue/src/number-input/number-input.ts`
+- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`, `packages/svelte/src/number-input/api.svelte.ts`, `packages/vue/src/date-field/date-field.ts`, `packages/vue/src/number-input/number-input.ts`
 - Last verified: 2026-10-14
 - Remove when: a device test shows iOS VoiceOver focusing and editing an <input role="spinbutton">
 
