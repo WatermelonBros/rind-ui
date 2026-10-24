@@ -1376,13 +1376,84 @@
 /* ── install (install.tsx): one core, a socket per framework, a terminal ──────────────────── */
 .rig {
   position: relative;
-  display: grid;
-  justify-items: center;
-  gap: 90px;
-  padding-block: 8px 24px;
-  perspective: 1200px;
+  perspective: 1400px;
   --lean-x: 0;
   --lean-y: 0;
+}
+/* a dark stage, so each framework's own colour glows on it; it leans towards the pointer, cables
+   and all (install.tsx draws them on its layout) */
+.stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 120px;
+  padding: 56px 32px 64px;
+  border-radius: calc(var(--r) * 1.4);
+  background:
+    radial-gradient(
+      ellipse 60% 55% at 50% 22%,
+      color-mix(in oklab, var(--brand) 32%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(circle, #ffffff12 1px, transparent 1.5px) 0 0 / 22px 22px,
+    #0d1110;
+  color: #f5f5ee;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--lean-y) * -6deg)) rotateY(calc(var(--lean-x) * 8deg));
+  transition:
+    transform 0.5s var(--spring),
+    background 0.6s var(--spring);
+}
+:global([data-phase="crisp"]) .stage {
+  border: 3px solid #0b0b0c;
+}
+.cables {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.cable {
+  fill: none;
+  stroke: #ffffff2e;
+  stroke-width: 2;
+  stroke-dasharray: 5 7;
+}
+[data-ready] > .cable {
+  stroke: color-mix(in oklab, var(--brand) 45%, transparent);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+/* a current running from the core out to the framework: dashes along the path (pathLength 100) */
+.pulse {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 3 22;
+  filter: drop-shadow(0 0 6px var(--brand));
+  animation: current 2.4s linear infinite;
+}
+[data-picked] > .cable {
+  stroke: color-mix(in oklab, var(--brand) 70%, transparent);
+  stroke-width: 4;
+}
+[data-picked] > .pulse {
+  stroke-width: 6;
+  stroke-dasharray: 6 19;
+  animation-duration: 1.1s;
+}
+@keyframes current {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 .core {
   position: relative;
@@ -1390,178 +1461,122 @@
   display: grid;
   place-items: center;
   align-content: center;
-  inline-size: 132px;
-  block-size: 132px;
+  inline-size: 148px;
+  block-size: 148px;
   border-radius: 50%;
-  background: var(--ink);
-  color: var(--bg);
+  background: radial-gradient(circle at 35% 30%, #ffffff, #e9e9e2 60%, #c9c9c0);
+  color: #0d1110;
   box-shadow:
-    0 0 0 10px color-mix(in oklab, var(--ink) 12%, transparent),
-    0 24px 60px color-mix(in oklab, var(--ink) 35%, transparent);
-}
-/* the core's stem down to the bus the sockets hang from, live: rind's core is always running */
-.core::after {
-  content: "";
-  position: absolute;
-  inset-block-start: 100%;
-  inset-inline-start: 50%;
-  inline-size: 3px;
-  block-size: 46px;
-  margin-inline-start: -1.5px;
-  background: linear-gradient(to bottom, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
-  background-size: 100% 300%;
-  animation: cable 1.6s linear infinite reverse;
+    0 0 0 8px color-mix(in oklab, var(--brand) 30%, transparent),
+    0 0 60px 10px color-mix(in oklab, var(--brand) 45%, transparent),
+    inset 0 -8px 18px #00000026;
+  transition: box-shadow 0.6s var(--spring);
 }
 .core b {
-  font: 900 30px / 1 var(--display);
+  font: 900 34px / 1 var(--display);
   letter-spacing: -0.03em;
 }
 .core small {
   font: 600 11px var(--mono);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 .sockets {
   position: relative;
+  z-index: 1;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
-  gap: 18px;
+  gap: 22px;
   margin: 0;
   padding: 0;
   list-style: none;
-  transform-style: preserve-3d;
-  transform: rotateX(calc(var(--lean-y) * -10deg)) rotateY(calc(var(--lean-x) * 12deg));
-  transition: transform 0.4s var(--spring);
 }
 /* an arc under the core: the middle socket highest, the outer ones lower (five of them) */
 .socketSlot {
-  --drop: calc((var(--i) - 2) * (var(--i) - 2) * 14px);
-  position: relative;
-  translate: 0 var(--drop);
-}
-/* the bus: one line the sockets hang from, under the core's stem */
-.sockets::before {
-  content: "";
-  position: absolute;
-  inset-block-start: -44px;
-  inset-inline: 52px;
-  block-size: 3px;
-  border-radius: 3px;
-  background: repeating-linear-gradient(
-    to right,
-    color-mix(in oklab, var(--ink) 25%, transparent) 0 6px,
-    transparent 6px 12px
+  margin-block-start: calc(
+    (var(--i) - (var(--n) - 1) / 2) *
+    (var(--i) - (var(--n) - 1) / 2) *
+    16px
   );
-}
-/* the live stretch of the bus, from the core's stem to the released sockets on its left (React
-   first; install.tsx flags it) */
-.sockets[data-lit-left]::after {
-  content: "";
-  position: absolute;
-  inset-block-start: -44px;
-  inset-inline-start: 52px;
-  inline-size: calc(50% - 52px);
-  block-size: 3px;
-  border-radius: 3px;
-  background: linear-gradient(to right, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
-  background-size: 300% 100%;
-  animation: bus 1.6s linear infinite;
-  box-shadow: 0 0 12px color-mix(in oklab, var(--acc) 70%, transparent);
-}
-@keyframes bus {
-  to {
-    background-position: 300% 0;
-  }
-}
-/* each socket's drop from the bus: live and pulsing for a released framework, a faint dash for
-   the rest */
-.socketSlot::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: 50%;
-  inset-block-end: 100%;
-  inline-size: 3px;
-  block-size: calc(44px + var(--drop));
-  margin-inline-start: -1.5px;
-  border-radius: 3px;
-  background: repeating-linear-gradient(
-    to top,
-    color-mix(in oklab, var(--ink) 25%, transparent) 0 6px,
-    transparent 6px 12px
-  );
-}
-.socketSlot[data-ready]::before {
-  background: linear-gradient(to top, var(--acc), var(--ink) 40%, var(--acc) 60%, var(--ink));
-  background-size: 100% 300%;
-  animation: cable 1.6s linear infinite;
-  box-shadow: 0 0 12px color-mix(in oklab, var(--acc) 70%, transparent);
-}
-@keyframes cable {
-  to {
-    background-position: 0 -300%;
-  }
 }
 .socket {
   position: relative;
   display: inline-grid;
   justify-items: center;
-  gap: 8px;
-  min-inline-size: 104px;
-  padding: 16px 14px 14px;
-  border: var(--bw) solid var(--line);
-  border-radius: var(--r);
-  background: var(--card);
-  color: var(--ink);
-  font: 700 15px var(--text);
-  box-shadow: var(--shadow-sm);
+  gap: 6px;
+  min-inline-size: 124px;
+  padding: 20px 14px 16px;
+  border: 0;
+  border-radius: calc(var(--r) * 0.8);
+  background: #f5f5ee;
+  color: #0d1110;
+  font: 700 16px var(--text);
+  box-shadow: 0 14px 30px #00000059;
   transition:
-    translate 0.3s var(--spring-pop),
-    background 0.3s var(--spring),
-    box-shadow 0.3s var(--spring);
+    translate 0.35s var(--spring-pop),
+    scale 0.35s var(--spring-pop),
+    box-shadow 0.35s var(--spring);
 }
 button.socket {
   cursor: pointer;
 }
-button.socket:hover {
-  translate: 0 -4px;
+button.socket:not([data-soon]):hover {
+  translate: 0 -6px;
 }
 button.socket[aria-pressed="true"] {
-  background: var(--acc);
+  scale: 1.08;
   box-shadow:
-    var(--shadow-sm),
-    0 0 0 4px color-mix(in oklab, var(--acc) 35%, transparent);
+    0 0 0 4px var(--brand),
+    0 0 44px 4px color-mix(in oklab, var(--brand) 60%, transparent),
+    0 14px 30px #00000059;
 }
 button.socket:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 3px;
+  outline: 3px solid #f5f5ee;
+  outline-offset: 5px;
 }
 .socket[data-soon] {
-  opacity: 0.6;
+  background: #ffffff10;
+  color: #f5f5eeb3;
+  box-shadow: inset 0 0 0 1.5px #ffffff2e;
   cursor: help;
-  box-shadow: none;
-  border-style: dashed;
 }
 .socket small {
   font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  opacity: 0.75;
 }
-.glyph {
+/* the framework's own mark, in its own colour; a planned one waits in grey */
+.logo {
   display: grid;
   place-items: center;
-  inline-size: 40px;
-  block-size: 40px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--bg);
-  font: 900 18px / 1 var(--display);
+  inline-size: 52px;
+  block-size: 52px;
+  margin-block-end: 4px;
+  font: 900 22px / 1 var(--display);
 }
-/* React's mark is a symbol, smaller in the face than a letter: it gets a larger size */
-.socketSlot:first-child .glyph {
-  font:
-    400 26px / 1 system-ui,
-    sans-serif;
+.logo svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: var(--brand);
+  transition: transform 0.5s var(--spring-pop);
+}
+button.socket[aria-pressed="true"] .logo svg {
+  transform: rotate(-8deg) scale(1.08);
+}
+/* React's atom turns, slowly, while it is the one picked */
+.socketSlot:has([data-socket="react"][aria-pressed="true"]) .logo svg {
+  animation: atom 9s linear infinite;
+}
+@keyframes atom {
+  to {
+    rotate: 360deg;
+  }
+}
+.socket[data-soon] .logo svg {
+  fill: #f5f5ee59;
 }
 /* a passed test's tick, landed from the tests above: it shows once one has */
 .socketMark {
@@ -1658,29 +1673,33 @@ button.socket:focus-visible {
   border: 3px solid #0b0b0c;
 }
 @media (max-width: 760px) {
-  .rig {
-    gap: 28px;
+  .stage {
+    gap: 64px;
+    padding: 36px 14px 28px;
+    transform: none;
   }
   .core {
-    inline-size: 96px;
-    block-size: 96px;
+    inline-size: 104px;
+    block-size: 104px;
+  }
+  .core b {
+    font-size: 26px;
   }
   .sockets {
     flex-wrap: wrap;
-    gap: 10px;
-    transform: none;
+    gap: 12px;
   }
   .socketSlot {
-    translate: none;
-  }
-  .socketSlot::before,
-  .sockets::before,
-  .sockets::after,
-  .core::after {
-    display: none;
+    margin: 0;
   }
   .socket {
-    min-inline-size: 92px;
+    min-inline-size: 96px;
+    padding: 14px 10px 12px;
+    font-size: 14px;
+  }
+  .logo {
+    inline-size: 40px;
+    block-size: 40px;
   }
   .command {
     font-size: 14px;
@@ -1688,8 +1707,8 @@ button.socket:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .command,
-  .socketSlot[data-ready]::before,
-  .core::after {
+  .pulse,
+  .logo svg {
     animation: none;
   }
 }
@@ -1854,9 +1873,8 @@ button.socket:focus-visible {
 /* install.tsx: the waiting socket last pressed stays picked out (solid edge, lifted, full
    colour) while the line under the rig speaks for it */
 .socket[data-soon][data-asked] {
-  opacity: 1;
-  border-style: solid;
-  border-color: var(--ink);
+  color: #f5f5ee;
+  box-shadow: inset 0 0 0 2px #f5f5ee;
   translate: 0 -4px;
 }
 

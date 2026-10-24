@@ -5,6 +5,7 @@ import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { stateWord, upcoming } from "@/lib/framework-status"
 import { Letters } from "../letters"
 import { cue } from "../sound"
+import { LOGOS } from "./framework-logos"
 import { handoff } from "./handoff"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
@@ -21,13 +22,21 @@ export interface InstallFramework {
   readonly version: string
 }
 
-// a mark per framework, drawn in type: the site never borrows their logos
-const GLYPH: Record<string, string> = {
-  react: "⚛",
-  vue: "V",
-  svelte: "S",
-  solid: "◆",
-  angular: "A",
+/** A cable from the core to one socket, in the stage's own pixels. */
+interface Cable {
+  readonly id: string
+  readonly d: string
+}
+
+/** Where an element sits inside the stage, before any transform (the lean) or page zoom. */
+function within(el: HTMLElement, stage: HTMLElement) {
+  let x = 0
+  let y = 0
+  for (let n: HTMLElement | null = el; n && n !== stage; n = n.offsetParent as HTMLElement | null) {
+    x += n.offsetLeft
+    y += n.offsetTop
+  }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight }
 }
 
 /**
@@ -183,9 +192,42 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
 
   // the sockets lean towards the pointer, a little: the rig has depth (desktop, motion allowed)
   const rig = useRef<HTMLDivElement>(null)
+  const stage = useRef<HTMLDivElement>(null)
   const terminal = useRef<HTMLDivElement>(null)
   const copyButton = useRef<HTMLButtonElement>(null)
   const [cheer, setCheer] = useState(0)
+  // the cables follow the layout (an arc on a desktop, two rows on a phone): measured, redrawn
+  // whenever the stage changes size
+  const [cables, setCables] = useState<readonly Cable[]>([])
+  useEffect(() => {
+    const el = stage.current
+    if (!el) return
+    const draw = () => {
+      const core = el.querySelector<HTMLElement>("[data-core]")
+      if (!core) return
+      const c = within(core, el)
+      const cx = c.x + c.w / 2
+      const cy = c.y + c.h / 2
+      setCables(
+        [...el.querySelectorAll<HTMLElement>("[data-socket]")].map((s) => {
+          const r = within(s, el)
+          const tx = r.x + r.w / 2
+          // into the socket's top edge, or its bottom when it sits above the core
+          const ty = r.y > cy ? r.y : r.y + r.h
+          const my = (cy + ty) / 2
+          return {
+            id: s.dataset["socket"] ?? "",
+            d: `M${cx} ${cy} C${cx} ${my} ${tx} ${my} ${tx} ${ty}`,
+          }
+        }),
+      )
+    }
+    draw()
+    const ro = new ResizeObserver(draw)
+    ro.observe(el)
+    document.fonts?.ready.then(draw)
+    return () => ro.disconnect()
+  }, [])
   useEffect(() => {
     const el = rig.current
     if (
@@ -224,67 +266,105 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
             {soon.length > 0 ? `${upcoming(soon)}, all on the same core.` : ""}
           </p>
         </Reveal>
-        <div ref={rig} className={styles.rig}>
-          {/* flashes with every copy (data-cheer flips, restarting its animation) */}
-          <div
-            className={styles.core}
-            aria-hidden="true"
-            data-cheer={cheer ? cheer % 2 : undefined}
-          >
-            <b>rind</b>
-            <small>core</small>
+        <div
+          ref={rig}
+          className={styles.rig}
+          style={{ "--brand": LOGOS[pick]?.color ?? "var(--acc)" } as CSSProperties}
+        >
+          <div ref={stage} className={styles.stage}>
+            {/* live cables carry a pulse in their framework's colour; the waiting ones are dashed */}
+            <svg className={styles.cables} aria-hidden="true">
+              {cables.map((c) => {
+                const f = frameworks.find((x) => x.id === c.id)
+                return (
+                  <g
+                    key={c.id}
+                    data-ready={f?.ready ? "" : undefined}
+                    data-picked={pick === c.id ? "" : undefined}
+                    style={{ "--brand": LOGOS[c.id]?.color } as CSSProperties}
+                  >
+                    <path className={styles.cable} d={c.d} />
+                    {f?.ready && <path className={styles.pulse} d={c.d} pathLength={100} />}
+                  </g>
+                )
+              })}
+            </svg>
+            {/* flashes with every copy (data-cheer flips, restarting its animation) */}
+            <div
+              className={styles.core}
+              data-core=""
+              aria-hidden="true"
+              data-cheer={cheer ? cheer % 2 : undefined}
+            >
+              <b>rind</b>
+              <small>core</small>
+            </div>
+            <ul className={styles.sockets} aria-label="Frameworks">
+              {frameworks.map((f, i) => {
+                const logo = LOGOS[f.id]
+                const mark = (
+                  <span className={styles.logo} aria-hidden="true">
+                    {logo ? (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d={logo.path} />
+                      </svg>
+                    ) : (
+                      f.name[0]
+                    )}
+                  </span>
+                )
+                return (
+                  <li
+                    key={f.id}
+                    className={styles.socketSlot}
+                    style={
+                      {
+                        "--i": i,
+                        "--n": frameworks.length,
+                        "--brand": logo?.color ?? "var(--acc)",
+                      } as CSSProperties
+                    }
+                    data-ready={f.ready ? "" : undefined}
+                  >
+                    {f.ready ? (
+                      <button
+                        type="button"
+                        className={styles.socket}
+                        data-socket={f.id}
+                        aria-pressed={pick === f.id}
+                        onClick={() => setPick(f.id)}
+                      >
+                        {mark}
+                        {f.name}
+                        <small>v{f.version}</small>
+                        {/* where a passed test's tick lands (the tests' hand-off above) */}
+                        <span className={styles.socketMark} data-proved="" aria-hidden="true">
+                          ✓
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.socket}
+                        data-socket={f.id}
+                        data-soon=""
+                        // restarts the shake on every press
+                        data-asked={asked?.id === f.id ? asked.n % 2 : undefined}
+                        onClick={() => {
+                          setAsked((a) => ({ id: f.id, n: (a?.n ?? 0) + 1 }))
+                          cue("off")
+                        }}
+                      >
+                        {mark}
+                        {f.name}
+                        <small>{stateWord(f)}</small>
+                      </button>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
           </div>
-          <ul
-            className={styles.sockets}
-            aria-label="Frameworks"
-            data-lit-left={frameworks.slice(0, 3).some((f) => f.ready) ? "" : undefined}
-          >
-            {frameworks.map((f, i) => (
-              <li
-                key={f.id}
-                className={styles.socketSlot}
-                style={{ "--i": i, "--n": frameworks.length } as CSSProperties}
-                data-ready={f.ready ? "" : undefined}
-              >
-                {f.ready ? (
-                  <button
-                    type="button"
-                    className={styles.socket}
-                    aria-pressed={pick === f.id}
-                    onClick={() => setPick(f.id)}
-                  >
-                    <span className={styles.glyph} aria-hidden="true">
-                      {GLYPH[f.id] ?? f.name[0]}
-                    </span>
-                    {f.name}
-                    <small>v{f.version}</small>
-                    {/* where a passed test's tick lands (the tests' hand-off above) */}
-                    <span className={styles.socketMark} data-proved="" aria-hidden="true">
-                      ✓
-                    </span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className={styles.socket}
-                    data-soon=""
-                    // restarts the shake on every press
-                    data-asked={asked?.id === f.id ? asked.n % 2 : undefined}
-                    onClick={() => {
-                      setAsked((a) => ({ id: f.id, n: (a?.n ?? 0) + 1 }))
-                      cue("off")
-                    }}
-                  >
-                    <span className={styles.glyph} aria-hidden="true">
-                      {GLYPH[f.id] ?? f.name[0]}
-                    </span>
-                    {f.name}
-                    <small>{stateWord(f)}</small>
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
           <p className={styles.socketSays} role="status">
             {(() => {
               const f = frameworks.find((x) => x.id === asked?.id)
