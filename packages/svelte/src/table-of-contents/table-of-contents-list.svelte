@@ -1,5 +1,4 @@
 <script lang="ts">
-import { cssZoom } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
 import { elementRef } from "../element-ref.svelte"
@@ -24,10 +23,8 @@ $effect(() => {
     }
     const box = list.getBoundingClientRect()
     const own = link.getBoundingClientRect()
-    // rects are viewport pixels; the marker is placed in the list's own (zoomed) ones
-    const z = cssZoom(list)
-    const top = (own.top - box.top) / z + list.scrollTop
-    const height = own.height / z
+    const top = own.top - box.top + list.scrollTop
+    const height = own.height
     ctx.setMarker({ top, height })
     if (list.scrollHeight > list.clientHeight) {
       if (top < list.scrollTop) list.scrollTop = top
