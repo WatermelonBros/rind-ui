@@ -162,6 +162,11 @@
         "solid": "./dist/pagination/index.jsx",
         "default": "./dist/pagination/index.mjs"
       },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.mts",
+        "solid": "./dist/pin-input/index.jsx",
+        "default": "./dist/pin-input/index.mjs"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.mts",
         "solid": "./dist/progress/index.jsx",
@@ -176,6 +181,11 @@
         "types": "./dist/rating/index.d.mts",
         "solid": "./dist/rating/index.jsx",
         "default": "./dist/rating/index.mjs"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.mts",
+        "solid": "./dist/scroll-area/index.jsx",
+        "default": "./dist/scroll-area/index.mjs"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.mts",
@@ -197,10 +207,25 @@
         "solid": "./dist/slider/index.jsx",
         "default": "./dist/slider/index.mjs"
       },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.mts",
+        "solid": "./dist/splitter/index.jsx",
+        "default": "./dist/splitter/index.mjs"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.mts",
+        "solid": "./dist/stepper/index.jsx",
+        "default": "./dist/stepper/index.mjs"
+      },
       "./switch": {
         "types": "./dist/switch/index.d.mts",
         "solid": "./dist/switch/index.jsx",
         "default": "./dist/switch/index.mjs"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.mts",
+        "solid": "./dist/table-of-contents/index.jsx",
+        "default": "./dist/table-of-contents/index.mjs"
       },
       "./tabs": {
         "types": "./dist/tabs/index.d.mts",
@@ -211,6 +236,11 @@
         "types": "./dist/text-field/index.d.mts",
         "solid": "./dist/text-field/index.jsx",
         "default": "./dist/text-field/index.mjs"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.mts",
+        "solid": "./dist/timeline/index.jsx",
+        "default": "./dist/timeline/index.mjs"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.mts",
@@ -351,6 +381,12 @@
       "solid": "./dist/pagination/index.jsx",
       "default": "./dist/pagination/index.mjs"
     },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.mts",
+      "solid": "./dist/pin-input/index.jsx",
+      "default": "./dist/pin-input/index.mjs"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.mts",
@@ -368,6 +404,12 @@
       "types": "./dist/rating/index.d.mts",
       "solid": "./dist/rating/index.jsx",
       "default": "./dist/rating/index.mjs"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.mts",
+      "solid": "./dist/scroll-area/index.jsx",
+      "default": "./dist/scroll-area/index.mjs"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -393,11 +435,29 @@
       "solid": "./dist/slider/index.jsx",
       "default": "./dist/slider/index.mjs"
     },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.mts",
+      "solid": "./dist/splitter/index.jsx",
+      "default": "./dist/splitter/index.mjs"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.mts",
+      "solid": "./dist/stepper/index.jsx",
+      "default": "./dist/stepper/index.mjs"
+    },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
       "types": "./dist/switch/index.d.mts",
       "solid": "./dist/switch/index.jsx",
       "default": "./dist/switch/index.mjs"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.mts",
+      "solid": "./dist/table-of-contents/index.jsx",
+      "default": "./dist/table-of-contents/index.mjs"
     },
     "./tabs": {
       "@rind-ui/source": "./src/tabs/index.ts",
@@ -410,6 +470,12 @@
       "types": "./dist/text-field/index.d.mts",
       "solid": "./dist/text-field/index.jsx",
       "default": "./dist/text-field/index.mjs"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.mts",
+      "solid": "./dist/timeline/index.jsx",
+      "default": "./dist/timeline/index.mjs"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
