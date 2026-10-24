@@ -147,6 +147,11 @@
         "solid": "./dist/form-toggle/index.jsx",
         "default": "./dist/form-toggle/index.mjs"
       },
+      "./grid-list": {
+        "types": "./dist/grid-list/index.d.mts",
+        "solid": "./dist/grid-list/index.jsx",
+        "default": "./dist/grid-list/index.mjs"
+      },
       "./heading": {
         "types": "./dist/heading/index.d.mts",
         "solid": "./dist/heading/index.jsx",
@@ -171,6 +176,11 @@
         "types": "./dist/link/index.d.mts",
         "solid": "./dist/link/index.jsx",
         "default": "./dist/link/index.mjs"
+      },
+      "./listbox": {
+        "types": "./dist/listbox/index.d.mts",
+        "solid": "./dist/listbox/index.jsx",
+        "default": "./dist/listbox/index.mjs"
       },
       "./marquee": {
         "types": "./dist/marquee/index.d.mts",
@@ -242,6 +252,11 @@
         "solid": "./dist/slider/index.jsx",
         "default": "./dist/slider/index.mjs"
       },
+      "./sortable": {
+        "types": "./dist/sortable/index.d.mts",
+        "solid": "./dist/sortable/index.jsx",
+        "default": "./dist/sortable/index.mjs"
+      },
       "./splitter": {
         "types": "./dist/splitter/index.d.mts",
         "solid": "./dist/splitter/index.jsx",
@@ -267,6 +282,11 @@
         "solid": "./dist/tabs/index.jsx",
         "default": "./dist/tabs/index.mjs"
       },
+      "./tag-group": {
+        "types": "./dist/tag-group/index.d.mts",
+        "solid": "./dist/tag-group/index.jsx",
+        "default": "./dist/tag-group/index.mjs"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.mts",
         "solid": "./dist/text-field/index.jsx",
@@ -291,6 +311,11 @@
         "types": "./dist/toolbar/index.d.mts",
         "solid": "./dist/toolbar/index.jsx",
         "default": "./dist/toolbar/index.mjs"
+      },
+      "./tree-view": {
+        "types": "./dist/tree-view/index.d.mts",
+        "solid": "./dist/tree-view/index.jsx",
+        "default": "./dist/tree-view/index.mjs"
       },
       "./visually-hidden": {
         "types": "./dist/visually-hidden/index.d.mts",
@@ -403,6 +428,12 @@
       "solid": "./dist/form-toggle/index.jsx",
       "default": "./dist/form-toggle/index.mjs"
     },
+    "./grid-list": {
+      "@rind-ui/source": "./src/grid-list/index.ts",
+      "types": "./dist/grid-list/index.d.mts",
+      "solid": "./dist/grid-list/index.jsx",
+      "default": "./dist/grid-list/index.mjs"
+    },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
       "types": "./dist/heading/index.d.mts",
@@ -432,6 +463,12 @@
       "types": "./dist/link/index.d.mts",
       "solid": "./dist/link/index.jsx",
       "default": "./dist/link/index.mjs"
+    },
+    "./listbox": {
+      "@rind-ui/source": "./src/listbox/index.ts",
+      "types": "./dist/listbox/index.d.mts",
+      "solid": "./dist/listbox/index.jsx",
+      "default": "./dist/listbox/index.mjs"
     },
     "./marquee": {
       "@rind-ui/source": "./src/marquee/index.ts",
@@ -517,6 +554,12 @@
       "solid": "./dist/slider/index.jsx",
       "default": "./dist/slider/index.mjs"
     },
+    "./sortable": {
+      "@rind-ui/source": "./src/sortable/index.ts",
+      "types": "./dist/sortable/index.d.mts",
+      "solid": "./dist/sortable/index.jsx",
+      "default": "./dist/sortable/index.mjs"
+    },
     "./splitter": {
       "@rind-ui/source": "./src/splitter/index.ts",
       "types": "./dist/splitter/index.d.mts",
@@ -547,6 +590,12 @@
       "solid": "./dist/tabs/index.jsx",
       "default": "./dist/tabs/index.mjs"
     },
+    "./tag-group": {
+      "@rind-ui/source": "./src/tag-group/index.ts",
+      "types": "./dist/tag-group/index.d.mts",
+      "solid": "./dist/tag-group/index.jsx",
+      "default": "./dist/tag-group/index.mjs"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.mts",
@@ -576,6 +625,12 @@
       "types": "./dist/toolbar/index.d.mts",
       "solid": "./dist/toolbar/index.jsx",
       "default": "./dist/toolbar/index.mjs"
+    },
+    "./tree-view": {
+      "@rind-ui/source": "./src/tree-view/index.ts",
+      "types": "./dist/tree-view/index.d.mts",
+      "solid": "./dist/tree-view/index.jsx",
+      "default": "./dist/tree-view/index.mjs"
     },
     "./visually-hidden": {
       "@rind-ui/source": "./src/visually-hidden/index.ts",

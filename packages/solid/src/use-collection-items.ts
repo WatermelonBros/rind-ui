@@ -76,6 +76,9 @@ export function useRegisterItem(
     createEffect(
       on(
         () => {
+          // The element too: a part that swaps its element (a filtered item shown or hidden)
+          // registers the new one.
+          el()
           const it = item()
           // Compared by value: equal sections and keywords are the same registration.
           return JSON.stringify([
