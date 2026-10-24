@@ -47,6 +47,26 @@ writes it.
 - **THEN** the button has `aria-pressed="false"` and React's Toggle attributes, and no other
   element is added
 
+### Requirement: Parts React Renders Nothing For
+
+A part React renders nothing for in a state (Skeleton's Status once loaded, an Image or Avatar
+Fallback before it is due, an Alert after it is dismissed and its exit has run, and its parts)
+SHALL keep the consumer's element, hidden by both the `hidden` attribute and an inline
+`display: none`, with only `data-scope` and `data-instance`: no `data-part`, no role and no
+`aria-*`, so drivers, skins and assistive technology find no part. The part SHALL remove both
+when it renders again, and only the `display` it wrote.
+
+#### Scenario: A consumer display rule does not reveal it
+
+- **WHEN** a dismissed Alert is styled by `[data-scope="alert"] { display: block }`
+- **THEN** its element computes `display: none`, carries `hidden`, and no element with
+  `data-part` remains inside it
+
+#### Scenario: Markup parity in the rendered states
+
+- **WHEN** a loaded Skeleton is compared with React's
+- **THEN** the markup matches once the hidden Status element is set aside
+
 ### Requirement: Binding Connect Output
 
 One binder per element SHALL apply connect's props through `Renderer2`: attributes set and

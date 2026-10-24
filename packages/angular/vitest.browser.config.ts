@@ -12,6 +12,8 @@ export default defineConfig({
     name: "angular-browser",
     root: new URL(".", import.meta.url).pathname,
     include,
+    // Its own group: listed beside the root's projects, it does not share their maxWorkers.
+    sequence: { groupOrder: 2 },
     // The server platform runs on Node only.
     exclude: ["**/*.ssr.dom.test.ts", "**/node_modules/**"],
     expect,

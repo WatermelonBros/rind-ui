@@ -1,12 +1,16 @@
 import {
+  afterNextRender,
   computed,
+  DestroyRef,
   Directive,
   type EnvironmentProviders,
   InjectionToken,
   inject,
   input,
   makeEnvironmentProviders,
+  PLATFORM_ID,
   type Signal,
+  signal,
   type Type,
 } from "@angular/core"
 import {
@@ -14,6 +18,7 @@ import {
   type BaseDomEnvironment,
   type Capability,
   type DomEnvironmentOptions,
+  directionOf,
   type MessageOverrides,
   type Messages,
   type ProvidedBy,
@@ -148,5 +153,35 @@ export function injectMessages<M extends Messages>(
     // The provider's overrides for a scope are that component's (checked where they are written).
     const provided = config?.().messages[scope] as MessageOverrides<M> | undefined
     return resolveMessages(defaults, provided, own())
+  })
+}
+
+/**
+ * Locale and direction for a component: its inputs, then the provider, then the document
+ * (updating when `<html lang>` or the browser language changes).
+ */
+export function injectLocale(
+  locale: () => string | undefined,
+  dir: () => "ltr" | "rtl" | undefined = () => undefined,
+): Signal<{ readonly locale: string; readonly dir: "ltr" | "rtl" }> {
+  const env = injectEnvironment()
+  const read = () => ({ locale: env.locale.locale(), dir: env.locale.dir() })
+  // The document's, re-read when it changes; a server render reads it once.
+  const version = signal(0)
+  if (inject(PLATFORM_ID) === "browser") {
+    const destroy = inject(DestroyRef)
+    afterNextRender(() => {
+      const off = env.locale.subscribe?.(() => version.update((v) => v + 1))
+      if (off) destroy.onDestroy(off)
+    })
+  }
+  return computed(() => {
+    version()
+    const current = read()
+    const own = locale()
+    return {
+      locale: own ?? current.locale ?? "en",
+      dir: dir() ?? (own ? directionOf(own) : current.dir === "rtl" ? "rtl" : "ltr"),
+    }
   })
 }

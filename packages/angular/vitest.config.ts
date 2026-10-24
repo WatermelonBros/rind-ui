@@ -41,6 +41,8 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include,
+    // Its own group: listed beside the root's projects, it does not share their maxWorkers.
+    sequence: { groupOrder: 1 },
     expect,
     setupFiles: [
       "fixtures/setup.ts",

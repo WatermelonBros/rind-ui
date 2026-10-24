@@ -169,13 +169,19 @@
     "toggle": 14
   },
   "angular": {
+    "alert": 15,
+    "avatar": 13,
     "badge": 4,
     "button": 17,
     "heading": 4,
+    "image": 12,
     "kbd": 10,
     "label": 8,
     "link": 13,
+    "meter": 13,
+    "progress": 14,
     "separator": 4,
+    "skeleton": 12,
     "toggle": 15
   }
 }
