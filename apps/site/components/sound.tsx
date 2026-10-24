@@ -17,10 +17,26 @@ import { ambient } from "./ambient"
 // soft pop; a component turning on sounds higher than one turning off; a slider sings its
 // value as it moves; a change of phase is a sweep, a passing test a small chord. Each voice is
 // layered (a transient, a tone, a body), placed left or right where the component is, and
-// sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
-// makes a sound (plus the explicit cues): the page's own demos stay quiet.
+// sent into a short room, so it has depth rather than beeping. Quiet music plays under it. What the
+// visitor does makes a sound, and so does everything on the page that moves (cues: the object's
+// flights and landings, a chip or a tick arriving, a test's line, a reply being written, a
+// convoy, a skin put on); clicks the page makes by itself stay quiet.
 
-type Cue = "on" | "off" | "phase" | "pass" | "unlock" | "whoosh" | "slam" | "reskin"
+type Cue =
+  | "on"
+  | "off"
+  | "phase"
+  | "pass"
+  | "unlock"
+  | "whoosh"
+  | "slam"
+  | "reskin"
+  | "fly"
+  | "land"
+  | "ding"
+  | "line"
+  | "type"
+  | "peel"
 
 /** Where a cue sounds (-1 left to 1 right) and, for the voices that read it, how far along a
  *  sequence it is (0 to 1): a slam rises a step with each framework that lands. */
@@ -299,6 +315,53 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       panner.pan.setValueAtTime(-0.9, now)
       panner.pan.linearRampToValueAtTime(0.7, now + length)
       tone("sine", 70, 120, 0, length * 0.8, 0.1)
+      return
+    }
+    case "fly": {
+      // the object lifting off for its next stop: a short rising breath of air
+      const air = noise(0.32, soft ? 0.16 : 0.13, "bandpass", 500)
+      air.Q.value = 1.4
+      air.frequency.setValueAtTime(380 * jitter, now)
+      air.frequency.exponentialRampToValueAtTime(2400 * jitter, now + 0.3)
+      tone("sine", 180, 320, 0, 0.25, 0.05)
+      return
+    }
+    case "land": {
+      // touching down: a soft thump, a squeak of rubber in juicy, a knock in crisp
+      tone("sine", 120, 55, 0, 0.22, 0.34)
+      if (soft) tone("sine", 700 * jitter, 520 * jitter, 0.01, 0.1, 0.07)
+      else noise(0.02, 0.22, "bandpass", 1800)
+      return
+    }
+    case "ding": {
+      // something small arriving where it was going (a state chip, a tick): a glassy bell,
+      // higher for each one of a run (value)
+      const scale = [0, 4, 7, 12, 16, 19]
+      const n = scale[Math.round(value * (scale.length - 1))] ?? 0
+      const f = (soft ? 880 : 1047) * 2 ** (n / 12)
+      tone("sine", f, f, 0, 0.45, 0.1)
+      tone("sine", f * 2.76, f * 2.76, 0, 0.12, 0.025)
+      return
+    }
+    case "line": {
+      // a test's line running: a dry tick, rising through the file (value)
+      const f = (soft ? 520 : 660) * 2 ** (value * 0.6)
+      noise(0.008, soft ? 0.12 : 0.18, "highpass", 4200)
+      tone(soft ? "sine" : "triangle", f, f * 0.98, 0, 0.05, 0.06)
+      return
+    }
+    case "type": {
+      // a reply being written: the quietest key
+      noise(0.012, soft ? 0.06 : 0.09, "bandpass", 3600 * jitter)
+      return
+    }
+    case "peel": {
+      // the skin coming off (or going back on): a strip of tape, a ripping band of noise
+      const rip = noise(0.28, soft ? 0.14 : 0.18, "bandpass", 2600)
+      rip.Q.value = 3
+      const [a, b] = value > 0.5 ? [1200, 5200] : [5200, 1200]
+      rip.frequency.setValueAtTime(a, now)
+      rip.frequency.exponentialRampToValueAtTime(b, now + 0.26)
       return
     }
     case "reskin": {

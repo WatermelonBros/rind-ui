@@ -37,7 +37,11 @@
   }
 }
 .text {
-  font: 500 clamp(17px, 1.5vw, 22px) / 1.5 var(--text);
+  /* the page's second voice, as in every section's lead (home.module.css: .lead) */
+  font:
+    400 clamp(19px, 1.6vw, 25px) / 1.45 var(--font-serif),
+    Georgia,
+    serif;
   max-width: 26ch;
 }
 /* peel.tsx: the control's opening tag, live, under the copy */
