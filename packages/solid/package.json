@@ -107,6 +107,16 @@
         "solid": "./dist/checkbox-group/index.jsx",
         "default": "./dist/checkbox-group/index.mjs"
       },
+      "./clipboard": {
+        "types": "./dist/clipboard/index.d.mts",
+        "solid": "./dist/clipboard/index.jsx",
+        "default": "./dist/clipboard/index.mjs"
+      },
+      "./code-block": {
+        "types": "./dist/code-block/index.d.mts",
+        "solid": "./dist/code-block/index.jsx",
+        "default": "./dist/code-block/index.mjs"
+      },
       "./collapsible": {
         "types": "./dist/collapsible/index.d.mts",
         "solid": "./dist/collapsible/index.jsx",
@@ -121,6 +131,21 @@
         "types": "./dist/fieldset/index.d.mts",
         "solid": "./dist/fieldset/index.jsx",
         "default": "./dist/fieldset/index.mjs"
+      },
+      "./file-upload": {
+        "types": "./dist/file-upload/index.d.mts",
+        "solid": "./dist/file-upload/index.jsx",
+        "default": "./dist/file-upload/index.mjs"
+      },
+      "./form": {
+        "types": "./dist/form/index.d.mts",
+        "solid": "./dist/form/index.jsx",
+        "default": "./dist/form/index.mjs"
+      },
+      "./form-toggle": {
+        "types": "./dist/form-toggle/index.d.mts",
+        "solid": "./dist/form-toggle/index.jsx",
+        "default": "./dist/form-toggle/index.mjs"
       },
       "./heading": {
         "types": "./dist/heading/index.d.mts",
@@ -147,6 +172,11 @@
         "solid": "./dist/link/index.jsx",
         "default": "./dist/link/index.mjs"
       },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.mts",
+        "solid": "./dist/marquee/index.jsx",
+        "default": "./dist/marquee/index.mjs"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.mts",
         "solid": "./dist/meter/index.jsx",
@@ -171,6 +201,11 @@
         "types": "./dist/progress/index.d.mts",
         "solid": "./dist/progress/index.jsx",
         "default": "./dist/progress/index.mjs"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.mts",
+        "solid": "./dist/qr-code/index.jsx",
+        "default": "./dist/qr-code/index.mjs"
       },
       "./radio-group": {
         "types": "./dist/radio-group/index.d.mts",
@@ -257,6 +292,11 @@
         "solid": "./dist/toolbar/index.jsx",
         "default": "./dist/toolbar/index.mjs"
       },
+      "./visually-hidden": {
+        "types": "./dist/visually-hidden/index.d.mts",
+        "solid": "./dist/visually-hidden/index.jsx",
+        "default": "./dist/visually-hidden/index.mjs"
+      },
       "./package.json": "./package.json"
     }
   },
@@ -315,6 +355,18 @@
       "solid": "./dist/checkbox-group/index.jsx",
       "default": "./dist/checkbox-group/index.mjs"
     },
+    "./clipboard": {
+      "@rind-ui/source": "./src/clipboard/index.ts",
+      "types": "./dist/clipboard/index.d.mts",
+      "solid": "./dist/clipboard/index.jsx",
+      "default": "./dist/clipboard/index.mjs"
+    },
+    "./code-block": {
+      "@rind-ui/source": "./src/code-block/index.ts",
+      "types": "./dist/code-block/index.d.mts",
+      "solid": "./dist/code-block/index.jsx",
+      "default": "./dist/code-block/index.mjs"
+    },
     "./collapsible": {
       "@rind-ui/source": "./src/collapsible/index.ts",
       "types": "./dist/collapsible/index.d.mts",
@@ -332,6 +384,24 @@
       "types": "./dist/fieldset/index.d.mts",
       "solid": "./dist/fieldset/index.jsx",
       "default": "./dist/fieldset/index.mjs"
+    },
+    "./file-upload": {
+      "@rind-ui/source": "./src/file-upload/index.ts",
+      "types": "./dist/file-upload/index.d.mts",
+      "solid": "./dist/file-upload/index.jsx",
+      "default": "./dist/file-upload/index.mjs"
+    },
+    "./form": {
+      "@rind-ui/source": "./src/form/index.ts",
+      "types": "./dist/form/index.d.mts",
+      "solid": "./dist/form/index.jsx",
+      "default": "./dist/form/index.mjs"
+    },
+    "./form-toggle": {
+      "@rind-ui/source": "./src/form-toggle/index.ts",
+      "types": "./dist/form-toggle/index.d.mts",
+      "solid": "./dist/form-toggle/index.jsx",
+      "default": "./dist/form-toggle/index.mjs"
     },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
@@ -363,6 +433,12 @@
       "solid": "./dist/link/index.jsx",
       "default": "./dist/link/index.mjs"
     },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.mts",
+      "solid": "./dist/marquee/index.jsx",
+      "default": "./dist/marquee/index.mjs"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.mts",
@@ -392,6 +468,12 @@
       "types": "./dist/progress/index.d.mts",
       "solid": "./dist/progress/index.jsx",
       "default": "./dist/progress/index.mjs"
+    },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.mts",
+      "solid": "./dist/qr-code/index.jsx",
+      "default": "./dist/qr-code/index.mjs"
     },
     "./radio-group": {
       "@rind-ui/source": "./src/radio-group/index.ts",
@@ -494,6 +576,12 @@
       "types": "./dist/toolbar/index.d.mts",
       "solid": "./dist/toolbar/index.jsx",
       "default": "./dist/toolbar/index.mjs"
+    },
+    "./visually-hidden": {
+      "@rind-ui/source": "./src/visually-hidden/index.ts",
+      "types": "./dist/visually-hidden/index.d.mts",
+      "solid": "./dist/visually-hidden/index.jsx",
+      "default": "./dist/visually-hidden/index.mjs"
     },
     "./package.json": "./package.json"
   }

@@ -51,13 +51,13 @@
 - [x] 2.36 Timeline
 - [x] 2.37 Table Of Contents
 - [x] 2.38 Scroll Area
-- [ ] 2.39 Marquee
-- [ ] 2.40 Qr Code
-- [ ] 2.41 Clipboard
-- [ ] 2.42 Code Block
-- [ ] 2.43 Form
-- [ ] 2.44 Form Toggle
-- [ ] 2.45 File Upload
+- [x] 2.39 Marquee
+- [x] 2.40 Qr Code
+- [x] 2.41 Clipboard
+- [x] 2.42 Code Block
+- [x] 2.43 Form
+- [x] 2.44 Form Toggle
+- [x] 2.45 File Upload
 - [ ] 2.46 Tags Input
 - [ ] 2.47 Tag Group
 - [ ] 2.48 Listbox
