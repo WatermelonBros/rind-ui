@@ -15,7 +15,7 @@ const reactAct = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
 const frame = () => new Promise<void>((done) => requestAnimationFrame(() => done()))
 
 /** React's DOM, canonical, once two frames pass without a change (measured parts settled). */
-async function reactSettled(react: ReactElement): Promise<string> {
+export async function reactSettled(react: ReactElement): Promise<string> {
   reactAct.IS_REACT_ACT_ENVIRONMENT = true
   const r = document.body.appendChild(document.createElement("div"))
   // Where the pointer rests (a previous test's last move) is not markup: hover stays out.
