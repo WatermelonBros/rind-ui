@@ -439,6 +439,8 @@ export function mountSkin(
     canvas,
     alpha: true,
     premultipliedAlpha: false,
+    // smooth edges at 1x (a phone): without it the object's outline was stair-stepped
+    antialias: true,
     // a phone raymarches the full-screen canvas at 1x: at 1.5 it dropped frames while scrolling
     dpr: Math.min(
       window.devicePixelRatio,

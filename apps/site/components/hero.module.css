@@ -237,3 +237,21 @@
     gap: 16px;
   }
 }
+
+/* leaving at the top, the hero's last lines fade out under the bar instead of lying there as a
+   stray strip over the next scene when the reader stops */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .frameworks,
+    .facts {
+      animation: leave-top linear both;
+      animation-timeline: view();
+      animation-range: exit 40% exit 90%;
+    }
+  }
+}
+@keyframes leave-top {
+  to {
+    opacity: 0;
+  }
+}
