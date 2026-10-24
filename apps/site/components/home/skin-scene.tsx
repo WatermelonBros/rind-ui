@@ -349,7 +349,8 @@ export function SkinScene() {
     window.addEventListener("click", onClickCapture, true)
     // A phone has no gutter: in flight the object shrinks and rides the screen's right edge,
     // peeking in from it, then grows onto its next control. Every leg the same way, so it is
-    // always in sight and never sits on the text.
+    // always in sight; it passes over the copy rather than hide there (hiding and showing again
+    // over each block of text flickered)
     const ride = (from: DOMRect, to: DOMRect, t: number) => {
       const w = 60
       const h = w * (from.height / Math.max(1, from.width))
@@ -367,40 +368,7 @@ export function SkinScene() {
           lerp(a.height, b.height, k),
         )
       const inward = smooth(0.7, 1)
-      const r = inward > 0 ? mix(edge, to, inward) : mix(from, edge, smooth(0, 0.3))
-      // anywhere between its two controls, it tucks away wherever it would lie on copy (alpha)
-      rodeAt = performance.now()
-      covered = t > 0.02 && t < 0.9 && overText(r, [from, to])
-      return r
-    }
-    // A phone's column of text runs to the edge the object rides: rather than lie on the words or
-    // on a control the visitor could use, it tucks away over them and comes back out in the gaps
-    // between blocks (the controls it leaves and lands on excepted)
-    let rodeAt = 0
-    let covered = false
-    let tuckK = 1
-    const inside = (a: DOMRect, b: DOMRect) =>
-      a.x + a.width / 2 > b.left &&
-      a.x + a.width / 2 < b.right &&
-      a.y + a.height / 2 > b.top &&
-      a.y + a.height / 2 < b.bottom
-    const overText = (r: DOMRect, ends: readonly DOMRect[]) =>
-      [
-        [r.x + r.width / 2, r.y + r.height / 2],
-        [r.x + 6, r.y + 6],
-        [r.x + 6, r.y + r.height - 6],
-      ].some(([px = 0, py = 0]) =>
-        document.elementsFromPoint(px, py).some((el) => {
-          const hit = el.closest(
-            "main p, main li, main pre, main label, main h2, main h3, main input, main button, main a, main [role], main [data-scope]",
-          )
-          return hit !== null && !ends.some((e) => inside(e, hit.getBoundingClientRect()))
-        }),
-      )
-    const tuck = () => {
-      const want = performance.now() - rodeAt < 100 && covered ? 0 : 1
-      tuckK += (want - tuckK) * 0.3
-      return tuckK
+      return inward > 0 ? mix(edge, to, inward) : mix(from, edge, smooth(0, 0.3))
     }
     // A phone's edge lane crosses right-aligned controls (the tests' Run) and the ends of titles:
     // the object slides past them, above or below, eased so it glides rather than jumps
@@ -582,8 +550,7 @@ export function SkinScene() {
     // the hop from the berth onto the builder's component: -1 before it, then 0→1 with the
     // scroll over the leg's last fifth, so a steady scroll always shows the arc
     const flip = (t: number) => (t < 0.8 ? -1 : Math.min(1, (t - 0.8) / 0.18))
-    const alpha = () => baseAlpha() * tuck()
-    const baseAlpha = () => {
+    const alpha = () => {
       // the machine's own control shows only while the object is fading off it (below)
       getPeelTarget()?.style.removeProperty("opacity")
       // dissolving into the wall's component as it touches down, gone once it has

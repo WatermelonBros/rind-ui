@@ -160,6 +160,9 @@ jobs:
     # change cannot affect the site.
     needs: changes
     runs-on: ubuntu-latest
+    # a run takes about 20 minutes: a page that stalls fails the job instead of holding it for
+    # hours (it did twice, with a headless Chrome left open)
+    timeout-minutes: 40
     steps:
       - if: needs.changes.outputs.site == 'true'
         uses: actions/checkout@v4
@@ -181,3 +184,6 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - if: needs.changes.outputs.site == 'true'
         run: pnpm --filter @rind-ui/site run audit
+        # names each page as it starts, so a stall shows where
+        env:
+          AUDIT_TRACE: "1"
