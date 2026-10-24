@@ -157,6 +157,10 @@
     "avatar": 11,
     "badge": 3,
     "button": 16,
+    "checkbox": 19,
+    "checkbox-group": 21,
+    "field": 18,
+    "fieldset": 8,
     "heading": 3,
     "image": 10,
     "kbd": 8,
@@ -166,7 +170,9 @@
     "progress": 12,
     "separator": 3,
     "skeleton": 11,
-    "toggle": 14
+    "text-field": 27,
+    "toggle": 14,
+    "toggle-group": 24
   },
   "angular": {
     "alert": 15,
