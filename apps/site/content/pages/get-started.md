@@ -16,6 +16,8 @@ You install the framework package. Everything else is optional.
 | Package | What it is | Do you need it? |
 |---|---|---|
 | `@rind-ui/react` | The components for React: `Accordion.Root`, `Button`, `TextField.Input`… | **Yes**, if you use React |
+| `@rind-ui/vue` | The same components for Vue, with the same parts and names | **Yes**, if you use Vue |
+| `@rind-ui/svelte` | The same components for Svelte, with the same parts and names | **Yes**, if you use Svelte |
 | `@rind-ui/core` | State machines, DOM helpers and contracts. No framework. Every framework package is built on it | It comes with the framework package |
 | `@rind-ui/theme` | An optional ready-made CSS theme on the same `data-*` attributes | Only if you want a starting look |
 | `@rind-ui/testing` | Test drivers for every component, for Testing Library and Playwright | In tests (dev dependency) |
@@ -24,10 +26,11 @@ You install the framework package. Everything else is optional.
 
 {{install}}
 
-`@rind-ui/core` comes with it as a dependency. React 19 or newer is required.
+`@rind-ui/core` comes with it as a dependency. Framework versions: {{requires}}.
 
-Your bundle carries only the components you import, from the package root or from a subpath
-(`@rind-ui/react/dialog`). Within a component, Vite, Rollup, Rolldown and webpack also drop the
+Imports are the same in every framework: `import { Dialog } from "@rind-ui/vue"`, or one
+component's own subpath (`@rind-ui/svelte/dialog`). Your bundle carries only the components you
+import. Within a component, Vite, Rollup, Rolldown and webpack also drop the
 parts you never render: an app that uses `Dialog.Root`, `Dialog.Trigger` and `Dialog.Content`
 does not ship `Dialog.Backdrop`. esbuild keeps every part of a component you import.
 

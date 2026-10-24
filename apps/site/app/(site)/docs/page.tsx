@@ -26,7 +26,7 @@ export default function DocsIndex() {
     <div>
       <header className={styles.head}>
         <h1 className={styles.title}>
-          <Letters>Build the look. We did the rest.</Letters>
+          <Letters>Everything but the look.</Letters>
         </h1>
         <p className={styles.summary}>
           Every rind component ships behaviour, accessibility, state and a test driver. You style it

@@ -127,6 +127,11 @@ const frameworkWords = {
     ? ` (${and(behind.map((f) => f.name))} with ${Math.min(...behind.map((f) => f.components.length))} components so far)`
     : "",
 }
+// "React 19+, Vue 3.5+, Svelte 5.29+": each released package's own peer range
+const requires = released
+  .filter((f) => f.requires?.startsWith(">="))
+  .map((f) => `${f.name} ${f.requires?.slice(2)}+`)
+  .join(", ")
 const installBlocks = fws
   .filter((f) => f.ready)
   .map(
@@ -149,7 +154,8 @@ const pages: DocPage[] = [
         md
           .replaceAll("{{version}}", `<span data-release="minor">${v}</span>`)
           .replaceAll("{{frameworks}}", frameworksTable)
-          .replaceAll("{{install}}", installBlocks),
+          .replaceAll("{{install}}", installBlocks)
+          .replaceAll("{{requires}}", requires),
       )
     }),
   ...markdownFiles(join(repo, "docs/components")).map((f) =>
