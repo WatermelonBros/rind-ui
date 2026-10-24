@@ -5,7 +5,7 @@ import type { ReactElement } from "react"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
 import { renderToString as reactToString } from "react-dom/server"
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
 import { createApp, createSSRApp, nextTick, type VNode } from "vue"
 import { renderToString as vueToString } from "vue/server-renderer"
 
@@ -29,7 +29,8 @@ export async function clientParity(react: ReactElement, vue: () => VNode | VNode
   const app = createApp({ render: vue })
   app.mount(v)
   await nextTick()
-  expect(canonicalHtml(v)).toBe(canonicalHtml(r))
+  // Measured parts (Scroll Area) settle on a later frame, in either order: compare once both have.
+  await vi.waitFor(() => expect(canonicalHtml(v)).toBe(canonicalHtml(r)))
   await act(async () => root.unmount())
   app.unmount()
   r.remove()

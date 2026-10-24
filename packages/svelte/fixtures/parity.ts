@@ -6,7 +6,7 @@ import type { ReactElement } from "react"
 import { act } from "react"
 import { createRoot } from "react-dom/client"
 import { type Component, flushSync, mount, unmount } from "svelte"
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
 
 /** React reads it to know `act` wraps the updates. */
 const reactAct = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -23,7 +23,8 @@ export async function clientParity<P extends Record<string, unknown>>(
   const s = document.body.appendChild(document.createElement("div"))
   const app = mount(svelte, { target: s, props })
   flushSync()
-  expect(canonicalHtml(s)).toBe(canonicalHtml(r))
+  // Measured parts (Scroll Area) settle on a later frame, in either order: compare once both have.
+  await vi.waitFor(() => expect(canonicalHtml(s)).toBe(canonicalHtml(r)))
   await act(async () => root.unmount())
   await unmount(app)
   r.remove()
