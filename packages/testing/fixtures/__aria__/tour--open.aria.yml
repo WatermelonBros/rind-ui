@@ -1,9 +1,9 @@
+- button "Take the tour" [expanded]
 - text: Search
 - textbox "Search"
 - toolbar "Formatting":
   - button "Bold"
   - button "Italic"
-- button "Take the tour" [expanded]
 - log
 - log
 - dialog "Search":
