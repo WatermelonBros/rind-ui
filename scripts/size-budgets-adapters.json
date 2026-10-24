@@ -151,5 +151,25 @@
     "tooltip": 34,
     "tour": 46,
     "tree-view": 28
+  },
+  "solid": {
+    "badge": 3,
+    "button": 16,
+    "heading": 3,
+    "kbd": 8,
+    "label": 7,
+    "link": 12,
+    "separator": 3,
+    "toggle": 14
+  },
+  "angular": {
+    "badge": 4,
+    "button": 17,
+    "heading": 4,
+    "kbd": 10,
+    "label": 8,
+    "link": 13,
+    "separator": 4,
+    "toggle": 15
   }
 }
