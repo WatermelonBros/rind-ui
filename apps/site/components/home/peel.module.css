@@ -334,3 +334,22 @@
 .sticky > * {
   transform: translateY(var(--push, 0px));
 }
+
+/* a skin worn on the page (wear.ts): the disc is its dark ground, never its ink (a light ink
+   on a dark skin opened a white disc), and the machine's states are its cards, not white */
+:global(html[data-worn]) .sticky::before {
+  background: var(--ground-ink);
+}
+:global(html[data-worn]) .inkLayer {
+  color: var(--on-ground-ink);
+}
+:global(html[data-worn]) .graph g:not([data-on]) rect {
+  fill: var(--card);
+}
+:global(html[data-worn]) .graph g[data-on] rect {
+  fill: var(--acc);
+  stroke: var(--acc);
+}
+:global(html[data-worn]) .graph g[data-on] text {
+  fill: var(--on-acc);
+}

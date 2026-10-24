@@ -162,7 +162,22 @@ export function Peel() {
   const p2 = clamp(progress / 0.4)
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
-  const dark = p2 * (1 - p3)
+  // the ink disc opens and closes by itself over a moment once its act is reached: tied to the
+  // scroll it rested half open wherever the reader stopped, the label half on pink
+  const darkTarget = progress > 0.12 && progress < 0.62 ? 1 : 0
+  const [dark, setDark] = useState(0)
+  const darkNow = useRef(0)
+  useEffect(() => {
+    let raf = 0
+    const step = () => {
+      const d = darkNow.current
+      darkNow.current = Math.abs(darkTarget - d) < 0.01 ? darkTarget : d + (darkTarget - d) * 0.1
+      setDark(darkNow.current)
+      if (darkNow.current !== darkTarget) raf = requestAnimationFrame(step)
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [darkTarget])
   const vars = {
     "--p1": 1,
     "--p2": p2,

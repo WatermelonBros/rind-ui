@@ -715,8 +715,8 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 }
 [data-scope="slider"][data-part="thumb"] {
   position: absolute;
-  inset-block-start: 50%;
-  translate: -50% -50%;
+  /* centred on the track by its top: the slider's inline translate owns only the x axis */
+  inset-block-start: calc(50% - 10px);
   inline-size: 20px;
   block-size: 20px;
   box-sizing: border-box;

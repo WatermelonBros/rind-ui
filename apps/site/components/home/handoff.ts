@@ -182,7 +182,10 @@ export function handoff(o: HandoffOptions): () => void {
         node.style.transform = `translate(${x - half}px, ${y - (h * s) / 2}px) scale(${s})`
         // it lifts off its start and melts into its landing in a breath: a scroll paused while
         // it was half faded left a ghost of it lying over the copy
-        node.style.opacity = String(clamp(Math.min(ti / 0.05, (ARRIVE + 0.03 - ti) / 0.03)))
+        // A copy leaving a start that stays (the PASS) shows only once it is clear of it: at
+        // rest at the very start it lay over the start's own type
+        const lift = o.keep ? clamp((ti - 0.06) / 0.08) : ti / 0.05
+        node.style.opacity = String(clamp(Math.min(lift, (ARRIVE + 0.03 - ti) / 0.03)))
       })
     } else if (t <= 0) clear()
     else {

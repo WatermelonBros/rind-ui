@@ -31,7 +31,7 @@ export function NavMenu() {
       open={open}
       onOpenChange={(next) => {
         setOpen(next)
-        // the landing's sound question does not hang over the open menu (sound-invite.tsx)
+        // the landing's sound question stops asking once the menu opens (sound-invite.tsx)
         if (next) window.dispatchEvent(new Event("rind:menu-open"))
       }}
     >

@@ -1,41 +1,47 @@
 "use client"
 
-import { Button } from "@rind-ui/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useSound } from "./sound"
-import styles from "./sound.module.css"
-import { zoom } from "./zoom"
 
 /** Asked once the visitor has done something (a press, a key), or after a while on the hero:
  *  never before the page has been seen. */
 const SHOW_AFTER_ACT_MS = 900
 const SHOW_IDLE_MS = 9000
-const LEAVE_AFTER_MS = 5000
+/** How long the toggle asks before it settles back to itself. */
+const ASK_MS = 7000
 
 /**
- * The landing asks once, after the visitor's first press or key (or a while on the hero): this
- * page has sound. The question hangs under the
- * nav's sound toggle, pointing at it, so the answer and the way back to it are one thing on
- * screen (a bar at the foot of the screen competed with the hero and the screen-reader toggle).
- * Whatever the answer (or none, after a while or once the visitor scrolls on), it folds up into
- * the toggle. Not a dialog: it takes no focus and blocks nothing.
+ * The landing says once that it has sound, with the sound toggle itself: for a few seconds it
+ * pulses, its bars ripple and its word asks "sound on?" (nav.module.css: html[data-sound-ask]).
+ * Nothing opens over the bar or the page; pressing the toggle is the answer. Not when the sound
+ * is on already, and gone as soon as the page scrolls on or the menu opens.
  */
 export function SoundInvite() {
-  const { setEnabled, enabled } = useSound()
+  const { enabled } = useSound()
   // turned on already (the nav's toggle): nothing to ask
   const on = useRef(enabled)
   on.current = enabled
-  const [open, setOpen] = useState(false)
-  const box = useRef<HTMLElement>(null)
-  const done = useRef(false)
 
   useEffect(() => {
-    // after the intro (html.intro goes once the styled page is revealed)
+    const root = document.documentElement
     let shown = 0
+    let done = 0
+    const stop = () => {
+      root.removeAttribute("data-sound-ask")
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("rind:menu-open", stop)
+    }
+    const onScroll = () => {
+      if (window.scrollY > 24) stop()
+    }
     const ask = (ms: number) => {
       clearTimeout(shown)
       shown = window.setTimeout(() => {
-        if (!on.current) setOpen(true)
+        if (on.current || window.scrollY > 24) return
+        root.setAttribute("data-sound-ask", "")
+        window.addEventListener("scroll", onScroll, { passive: true })
+        window.addEventListener("rind:menu-open", stop)
+        done = window.setTimeout(stop, ASK_MS)
       }, ms)
     }
     const acted = (e: Event) => {
@@ -48,8 +54,9 @@ export function SoundInvite() {
       window.removeEventListener("pointerdown", acted, true)
       window.removeEventListener("keydown", acted, true)
     }
+    // after the intro (html.intro goes once the styled page is revealed)
     const wait = window.setInterval(() => {
-      if (document.documentElement.classList.contains("intro")) return
+      if (root.classList.contains("intro")) return
       clearInterval(wait)
       window.addEventListener("pointerdown", acted, true)
       window.addEventListener("keydown", acted, true)
@@ -58,113 +65,16 @@ export function SoundInvite() {
     return () => {
       clearInterval(wait)
       clearTimeout(shown)
+      clearTimeout(done)
       off()
+      stop()
     }
   }, [])
 
-  const leave = (on: boolean | null, quick = false) => {
-    if (done.current) return
-    done.current = true
-    if (on !== null) setEnabled(on)
-    const el = box.current
-    const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
-    const handOver = () => setOpen(false)
-    if (!el || !to || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      handOver()
-      return
-    }
-    // scrolled away from: it just goes, at once, rather than fold across the moving page
-    if (quick) {
-      el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 90, fill: "forwards" }).onfinish =
-        handOver
-      return
-    }
-    // into the toggle: shrinking to its size and place, fading as it arrives
-    const from = el.getBoundingClientRect()
-    const dx = to.left + to.width / 2 - (from.left + from.width / 2)
-    const dy = to.top + to.height / 2 - (from.top + from.height / 2)
-    const k = to.height / from.height
-    el.animate(
-      [
-        { transform: "translate(0, 0) scale(1)", opacity: 1 },
-        {
-          transform: `translate(${dx * 0.4}px, ${dy * 0.55}px) scale(${0.6 + k * 0.4})`,
-          opacity: 1,
-          offset: 0.6,
-        },
-        { transform: `translate(${dx}px, ${dy}px) scale(${k})`, opacity: 0 },
-      ],
-      { duration: 650, easing: "cubic-bezier(0.6, 0, 0.3, 1)", fill: "forwards" },
-    ).onfinish = () => {
-      handOver()
-      // the toggle takes the hand-over with a little bounce
-      document
-        .querySelector("[data-sound-toggle]")
-        ?.animate([{ scale: 1 }, { scale: 1.18 }, { scale: 1 }], {
-          duration: 360,
-          easing: "ease-out",
-        })
-    }
-  }
-
-  // hung under the toggle, its point on the toggle's middle
+  // the answer: turned on, the question is over
   useEffect(() => {
-    if (!open) return
-    const place = () => {
-      const el = box.current
-      const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
-      if (!el || !to) return
-      const z = zoom()
-      // a desktop's bar has room: the question sits in it, beside the toggle, over the bar's
-      // links for a moment and never over the page; a phone's hangs under the toggle
-      const inBar = window.innerWidth > 900
-      el.toggleAttribute("data-in-bar", inBar)
-      if (inBar) {
-        const h = el.offsetHeight * z
-        el.style.setProperty("--invite-top", `${(to.top + to.height / 2 - h / 2) / z}px`)
-        el.style.setProperty("--invite-end", `${(window.innerWidth - to.left + 14) / z}px`)
-        return
-      }
-      el.style.setProperty("--invite-top", `${(to.bottom + 14) / z}px`)
-      el.style.setProperty("--invite-end", `${Math.max(16, window.innerWidth - to.right) / z}px`)
-      el.style.setProperty("--invite-point", `${to.width / 2 / z}px`)
-    }
-    place()
-    window.addEventListener("resize", place)
-    return () => window.removeEventListener("resize", place)
-  }, [open])
+    if (enabled) document.documentElement.removeAttribute("data-sound-ask")
+  }, [enabled])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: leave only reads refs and setters
-  useEffect(() => {
-    if (!open) return
-    const timer = window.setTimeout(() => leave(null), LEAVE_AFTER_MS)
-    const onScroll = () => {
-      // at once, before the wordmark scrolls up under it
-      if (window.scrollY > 24) leave(null, true)
-    }
-    const onMenu = () => leave(null, true)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("rind:menu-open", onMenu)
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("rind:menu-open", onMenu)
-    }
-  }, [open])
-
-  if (!open) return null
-  return (
-    <aside ref={box} className={styles.invite} aria-label="Sound">
-      <p>
-        <span className={styles.long}>This page has sound.</span>
-        <span className={styles.short}>Sound?</span>
-      </p>
-      <Button className={styles.inviteOn} onPress={() => leave(true)}>
-        Turn it on
-      </Button>
-      <Button className={styles.inviteOff} onPress={() => leave(false)}>
-        Not now
-      </Button>
-    </aside>
-  )
+  return null
 }

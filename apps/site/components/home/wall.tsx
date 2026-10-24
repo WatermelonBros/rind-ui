@@ -33,7 +33,7 @@ export function Wall() {
             lands complete: spec, tests, driver and docs.
           </p>
         </Reveal>
-        <WallSpecimens ready={ready} />
+        <WallSpecimens />
         {/* the whole roadmap, one click away: the count is in the heading, the list on demand */}
         <Collapsible.Root className={styles.wallAll}>
           <Collapsible.Trigger>
