@@ -130,33 +130,29 @@ function Specimen({
   // a diagonal front: each card is a little behind the one up and to its left
   const offset = ((index % 3) + Math.floor(index / 3)) * 0.3
   const at = wave === null ? null : Math.floor(wave + offset)
-  // the card turns over to change skin: the new one goes on while it is edge-on, so its ground
-  // and its component change together and nothing is seen in between
+  // the card is pressed in to change skin: it sinks a little, takes the new skin while down and
+  // springs back (a card turned over was caught edge-on, skewed or blank, by any pause)
   const [shown, setShown] = useState(at)
   useEffect(() => {
-    // the whole card turns, foot and all, so no square edge shows behind the stage
+    // the whole card, foot and all
     const el = root.current?.closest("li")
     if (at === shown) return
     if (shown === null || !el) return setShown(at)
     // the hero's object is coming in to land here (skin-scene.tsx): the card keeps its skin
-    // until the next turn after, never flipping under it
+    // until the next press after, never changing under it
     if (el.hasAttribute("data-held")) return
-    const turn = "perspective(900px) rotateY"
     const away = el.animate(
-      { transform: [`${turn}(0deg)`, `${turn}(90deg)`] },
-      {
-        duration: 180,
-        easing: "cubic-bezier(0.5, 0, 1, 0.6)",
-      },
+      { transform: ["scale(1)", "scale(0.94)"], filter: ["brightness(1)", "brightness(1.06)"] },
+      { duration: 140, easing: "cubic-bezier(0.5, 0, 1, 0.6)" },
     )
     away.onfinish = () => {
       setShown(at)
       el.animate(
-        { transform: [`${turn}(-90deg)`, `${turn}(0deg)`] },
         {
-          duration: 260,
-          easing: "cubic-bezier(0.2, 0.9, 0.3, 1.25)",
+          transform: ["scale(0.94)", "scale(1.025)", "scale(1)"],
+          filter: ["brightness(1.06)", "brightness(1)"],
         },
+        { duration: 320, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" },
       )
     }
     return () => away.cancel()
@@ -301,7 +297,7 @@ const Wave = createContext<number | null>(null)
 const STEP_MS = 2000
 
 /** Six ready components, alive: use them, and watch the attribute a stylesheet would target. */
-export function WallSpecimens() {
+export function WallSpecimens({ ready }: { readonly ready: number }) {
   // the wave advances one skin every two seconds while the list is on screen (a scroll-driven
   // wave changed too fast to read); it holds while the pointer or focus is on a card, so a
   // card can be used in one skin. Under reduced motion every card keeps the site's skin.
@@ -470,6 +466,15 @@ export function WallSpecimens() {
             <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
           </ToggleGroup.Root>
         </Specimen>
+        {/* the wall's last tile: the rest of the catalogue, one step away */}
+        <li className={styles.wallMore}>
+          <MorphLink href="/docs/">
+            <b>{ready} ready</b>
+            <span>
+              Every one with its spec, tests, driver and docs <span aria-hidden="true">→</span>
+            </span>
+          </MorphLink>
+        </li>
       </ul>
     </Wave.Provider>
   )

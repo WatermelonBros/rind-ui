@@ -18,6 +18,15 @@
 .head {
   margin-bottom: 28px;
 }
+/* [slug]/page.tsx: the frameworks whose package ships the component */
+.ships {
+  margin: 0 0 14px;
+  font: 500 14px var(--mono);
+  opacity: 0.8;
+}
+.ships b {
+  font-weight: 700;
+}
 /* [slug]/page.tsx: the parts, the way the landing shows a component's attributes */
 .parts {
   display: flex;

@@ -9,6 +9,7 @@ import { Letters } from "@/components/letters"
 import { ReleaseSync } from "@/components/release"
 import { Toc } from "@/components/toc"
 import { exampleCode, pageBySlug, pages, partId, render } from "@/lib/docs"
+import { frameworks } from "@/lib/frameworks"
 import styles from "../docs.module.css"
 
 type Props = { params: Promise<{ slug: string }> }
@@ -29,6 +30,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         alternates: { types: { "text/markdown": `/docs/${page.slug}.md` } },
       }
     : {}
+}
+
+/** "Ships for React, Vue and Svelte", from the packages; one still unreleased says so. */
+function Ships({ slug }: { readonly slug: string }) {
+  const ships = frameworks().filter((f) => f.components.includes(slug))
+  if (ships.length === 0) return null
+  return (
+    <p className={styles.ships}>
+      Ships for{" "}
+      {ships.map((f, i) => (
+        <span key={f.id}>
+          {i > 0 ? (i === ships.length - 1 ? " and " : ", ") : null}
+          <b>{f.name}</b>
+          {f.ready ? null : " (not released yet)"}
+        </span>
+      ))}
+    </p>
+  )
 }
 
 export default async function DocPage({ params }: Props) {
@@ -80,6 +99,8 @@ export default async function DocPage({ params }: Props) {
               ))}
             </ul>
           ) : null}
+          {/* which framework packages ship this component (read from their exports at build) */}
+          {page.section === "components" ? <Ships slug={page.slug} /> : null}
           <CopyMarkdown slug={page.slug} />
         </header>
         {source && (
