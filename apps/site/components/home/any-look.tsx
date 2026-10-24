@@ -320,8 +320,14 @@ export function AnyLook() {
   // the visitor has taken over: the builder stops playing its skins by itself
   const touched = useRef(false)
   const set = (patch: Partial<Look>) => {
-    setLook((l) => ({ ...l, ...patch }))
+    const next = { ...picked, ...patch }
+    setLook(next)
     setCopied(null)
+    touched.current = true
+    // a pick is the visitor's: the page wears it (again, after crisp/juicy took it off), except
+    // the Rind preset, which is the page's own look (worn, its white ground replaced the page's)
+    setOwned(!sameLook(next, BASE))
+    setWearing(true)
   }
   const preset = PRESETS.find((p) => sameLook(p.look, picked))
   // the page wears the skin once it is the visitor's own (a press in the builder, a shared
@@ -364,31 +370,8 @@ export function AnyLook() {
     const m = /[#&]skin=([\w.-]+)/.exec(window.location.hash)
     const shared = m?.[1] ? decodeLook(m[1]) : null
     if (!shared) return
-    touched.current = true
-    setOwned(true)
     set(shared)
     document.getElementById("look-title")?.scrollIntoView({ block: "start" })
-  }, [])
-  // the page keeps the phase the visitor chose until they press a skin themselves: a pick (a
-  // press, a key, a focus inside the builder) makes it theirs and wears it
-  useEffect(() => {
-    const el = section.current
-    if (!el) return
-    const stop = () => {
-      touched.current = true
-      setOwned(true)
-      // a pick wears it again, after crisp/juicy took the last one off (the switch itself
-      // still turns it off: its own change comes after this press)
-      setWearing(true)
-    }
-    el.addEventListener("pointerdown", stop)
-    el.addEventListener("keydown", stop)
-    el.addEventListener("focusin", stop)
-    return () => {
-      el.removeEventListener("pointerdown", stop)
-      el.removeEventListener("keydown", stop)
-      el.removeEventListener("focusin", stop)
-    }
   }, [])
   const css = skinCss(look)
   const [picker, setPicker] = useState<ColourComponent | null>(null)
