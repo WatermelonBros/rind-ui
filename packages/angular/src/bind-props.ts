@@ -151,7 +151,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   binder.own(options.owns ?? [])
   const handlers = new Map<string, Handler>()
   const listening = new Map<string, () => void>()
-  let styles = new Set<string>()
+  let styles = new Map<string, string>()
   let ready = false
 
   const listen = (event: string) => {
@@ -252,11 +252,17 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
       if (ready) for (const event of handlers.keys()) listen(event)
       return
     }
-    const nextStyles = new Set(Object.keys(style ?? {}))
-    for (const key of styles) if (!nextStyles.has(key)) renderer.removeStyle(el, key, flags(key))
+    // Only what changed since the last render: a part may write a property imperatively
+    // between renders (a Collapsible's measured size), as a framework's patch leaves it.
+    const nextStyles = new Map<string, string>()
     for (const [key, value] of Object.entries(style ?? {})) {
-      if (value === undefined || value === null) renderer.removeStyle(el, key, flags(key))
-      else renderer.setStyle(el, key, String(value), flags(key))
+      if (value !== undefined && value !== null) nextStyles.set(key, String(value))
+    }
+    for (const key of styles.keys()) {
+      if (!nextStyles.has(key)) renderer.removeStyle(el, key, flags(key))
+    }
+    for (const [key, value] of nextStyles) {
+      if (styles.get(key) !== value) renderer.setStyle(el, key, value, flags(key))
     }
     styles = nextStyles
     if (ready) for (const event of handlers.keys()) listen(event)

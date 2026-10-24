@@ -242,12 +242,8 @@ export class ToggleGroupItem {
       () => ({ key: this.value(), textValue: this.textValue(), disabled: this.disabled() }),
       el,
     )
-    // Read on the first application of the props, which runs in document order.
-    let stop: string | null | undefined
-    this.pendingStop = () => {
-      stop ??= group.stop(this.value(), group.groupDisabled() || this.disabled(), group.current())
-      return stop
-    }
+    this.pendingStop = () =>
+      group.stop(this.value(), group.groupDisabled() || this.disabled(), group.current())
     // Hosted: the item is also one of the host's controls (navigation and tab stop).
     const host = injectCompositeHost()
     const hostKey = () => group.api().item(this.key(), NO_STATE)["id"] as string // set by the connect

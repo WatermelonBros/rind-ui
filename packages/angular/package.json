@@ -38,6 +38,11 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.ts",
+      "default": "./dist/accordion/index.js"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.ts",
@@ -67,6 +72,11 @@
       "@rind-ui/source": "./src/checkbox-group/index.ts",
       "types": "./dist/checkbox-group/index.d.ts",
       "default": "./dist/checkbox-group/index.js"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.ts",
+      "default": "./dist/collapsible/index.js"
     },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
@@ -113,6 +123,16 @@
       "types": "./dist/progress/index.d.ts",
       "default": "./dist/progress/index.js"
     },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.ts",
+      "default": "./dist/radio-group/index.js"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.ts",
+      "default": "./dist/segmented-control/index.js"
+    },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
       "types": "./dist/separator/index.d.ts",
@@ -122,6 +142,16 @@
       "@rind-ui/source": "./src/skeleton/index.ts",
       "types": "./dist/skeleton/index.d.ts",
       "default": "./dist/skeleton/index.js"
+    },
+    "./switch": {
+      "@rind-ui/source": "./src/switch/index.ts",
+      "types": "./dist/switch/index.d.ts",
+      "default": "./dist/switch/index.js"
+    },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.ts",
+      "default": "./dist/tabs/index.js"
     },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
@@ -178,6 +208,10 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.ts",
+        "default": "./dist/accordion/index.js"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.ts",
         "default": "./dist/alert/index.js"
@@ -201,6 +235,10 @@
       "./checkbox-group": {
         "types": "./dist/checkbox-group/index.d.ts",
         "default": "./dist/checkbox-group/index.js"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.ts",
+        "default": "./dist/collapsible/index.js"
       },
       "./field": {
         "types": "./dist/field/index.d.ts",
@@ -238,6 +276,14 @@
         "types": "./dist/progress/index.d.ts",
         "default": "./dist/progress/index.js"
       },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.ts",
+        "default": "./dist/radio-group/index.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.ts",
+        "default": "./dist/segmented-control/index.js"
+      },
       "./separator": {
         "types": "./dist/separator/index.d.ts",
         "default": "./dist/separator/index.js"
@@ -245,6 +291,14 @@
       "./skeleton": {
         "types": "./dist/skeleton/index.d.ts",
         "default": "./dist/skeleton/index.js"
+      },
+      "./switch": {
+        "types": "./dist/switch/index.d.ts",
+        "default": "./dist/switch/index.js"
+      },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.ts",
+        "default": "./dist/tabs/index.js"
       },
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",

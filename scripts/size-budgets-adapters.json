@@ -175,12 +175,14 @@
     "toggle-group": 24
   },
   "angular": {
+    "accordion": 23,
     "alert": 15,
     "avatar": 13,
     "badge": 4,
     "button": 17,
     "checkbox": 21,
     "checkbox-group": 24,
+    "collapsible": 19,
     "field": 20,
     "fieldset": 10,
     "heading": 4,
@@ -190,8 +192,12 @@
     "link": 13,
     "meter": 13,
     "progress": 14,
+    "radio-group": 29,
+    "segmented-control": 29,
     "separator": 4,
     "skeleton": 12,
+    "switch": 21,
+    "tabs": 27,
     "text-field": 30,
     "toggle": 15,
     "toggle-group": 25

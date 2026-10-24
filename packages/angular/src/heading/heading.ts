@@ -23,7 +23,8 @@ import { bindProps } from "../bind-props"
 import { injectRootId } from "../ids"
 
 /** The raw (unclamped) level of the nearest `rindHeadingLevel`; injection crosses portals. */
-const HEADING_LEVEL = new InjectionToken<Signal<number | undefined>>("rind-ui.heading")
+/** @internal (not exported from the package): an Accordion panel provides its deeper level. */
+export const HEADING_LEVEL = new InjectionToken<Signal<number | undefined>>("rind-ui.heading")
 
 /** The level a heading gets at this position (1–6). Call it in an injection context. */
 export function injectHeadingLevel(): Signal<HeadingLevel> {

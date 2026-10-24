@@ -105,19 +105,19 @@ export function injectRegisterItem(
 
 /**
  * The server tab stop of a composite whose items have not registered yet (server render and
- * hydration): items read it in document order, each when its props first apply. With a
- * selection, the first enabled selected item; without one, the first enabled item.
- * ponytail: a selection naming no declared item gets no server stop (React falls back to the
- * first enabled item); the stop appears once the items register.
+ * hydration), as React's: the first enabled selected item, else the first enabled item. Each
+ * item declares itself when its props first apply (in document order) and reads the stop from
+ * a signal, so an earlier item follows what a later one declares.
  */
 export function declaredStop() {
-  let firstEnabled: string | null = null
-  let firstSelected: string | null = null
+  const items = signal<readonly { value: string; disabled: boolean }[]>([])
+  const seen = new Set<string>()
   return (value: string, disabled: boolean, selected: readonly string[]): string | null => {
-    if (!disabled) {
-      firstEnabled ??= value
-      if (firstSelected === null && selected.includes(value)) firstSelected = value
+    if (!seen.has(value)) {
+      seen.add(value)
+      items.update((all) => [...all, { value, disabled }])
     }
-    return selected.length > 0 ? firstSelected : firstEnabled
+    const enabled = items().filter((i) => !i.disabled)
+    return (enabled.find((i) => selected.includes(i.value)) ?? enabled[0])?.value ?? null
   }
 }
