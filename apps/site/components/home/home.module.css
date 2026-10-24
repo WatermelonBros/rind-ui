@@ -2493,6 +2493,12 @@ g:not([data-plugged]) > .pulse {
     position: relative;
     z-index: 31;
   }
+  /* a reveal's transform makes its own stack, so the copy it holds is lifted with it (only a
+     block of copy: never one that holds the controls the object lands on) */
+  :global([data-scroll-reveal]):has(> .h2):not(:has([data-object-dock], [data-part="control"])) {
+    position: relative;
+    z-index: 31;
+  }
 }
 
 /* the sections do not all speak from the left: the install is one centred assembly, the wall's

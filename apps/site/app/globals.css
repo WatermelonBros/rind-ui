@@ -61,6 +61,10 @@
 html {
   background: var(--bg);
   scroll-padding-top: calc(var(--bar-h) + 16px);
+  /* nothing flying past the edge (a socket's dust, an orbit) ever widens the page: on a phone a
+     particle at x=479 made it 480px wide and pushed the menu off the screen. clip, not hidden:
+     no scroll container, so sticky scenes keep working */
+  overflow-x: clip;
 }
 /* A big screen (a 4K display at its native-ish scale) sees the site as a 1440 one sees it,
    larger, rather than a narrow column in empty ground: the whole page is zoomed in steps.
