@@ -1,11 +1,13 @@
 // The Calendar model-test helper (task 7.1): the oracle props, the story and the clock,
 // shared by calendar.model.dom.test.tsx and calendar.broken.dom.test.tsx.
 import { CalendarDate, GregorianCalendar } from "@internationalized/date"
-import { calendarMessages, platforms } from "@rind-ui/core"
+import { calendarContract, calendarMessages, platforms } from "@rind-ui/core"
 import { Calendar, type CalendarRootProps, RindProvider } from "@rind-ui/react"
+import { render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import type { ReactNode } from "react"
-import { currentRun, fixedDateClock } from "../index"
+import { describe, it } from "vitest"
+import { currentRun, fixedDateClock, testMachine } from "../index"
 
 export const clock = fixedDateClock("2026-10-14T12:00:00Z")
 export const a11y = async () => {
@@ -79,4 +81,20 @@ export function Story({ cfg, children }: { readonly cfg: Config; readonly childr
       {children}
     </RindProvider>
   )
+}
+
+/** One configuration's model-based run (the calendar*.model.dom.test.tsx files): split over
+ * three files so CI's shards can spread them, one file took 18 minutes alone. */
+export function config(name: string, cfg: Config) {
+  describe(`calendar model: ${name}`, () => {
+    testMachine(calendarContract, {
+      // Long keyboard paths on a loaded machine: more than the 5 s default.
+      test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
+      setup: () => render(<Story cfg={cfg} />),
+      target: () => screen,
+      anchor: [{ name: "Departure" }],
+      props: oracle(cfg) as never,
+      a11y,
+    } as never)
+  })
 }

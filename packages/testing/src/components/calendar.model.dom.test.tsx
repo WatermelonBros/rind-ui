@@ -1,24 +1,7 @@
-// Model-based tests: the Calendar contract over the configurations of design §5 (task 7.1).
-import { CalendarDate, createCalendar, isWeekend } from "@internationalized/date"
-import { calendarContract } from "@rind-ui/core"
-import { render, screen } from "@testing-library/react"
-import { describe, it } from "vitest"
-import { testMachine } from "../index"
-import { a11y, type Config, oracle, Story } from "./calendar-model"
-
-function config(name: string, cfg: Config) {
-  describe(`calendar model: ${name}`, () => {
-    testMachine(calendarContract, {
-      // Long keyboard paths on a loaded machine: more than the 5 s default.
-      test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
-      setup: () => render(<Story cfg={cfg} />),
-      target: () => screen,
-      anchor: [{ name: "Departure" }],
-      props: oracle(cfg) as never,
-      a11y,
-    } as never)
-  })
-}
+// Model-based tests: the Calendar contract over the configurations of design §5 (task 7.1), single and multiple selection by day
+// (the others: calendar*.model.dom.test.tsx).
+import { CalendarDate, isWeekend } from "@internationalized/date"
+import { config } from "./calendar-model"
 
 config("en-US, one month", {})
 config("en-GB, Monday weeks", { locale: "en-GB", firstDayOfWeek: "mon" })
@@ -30,30 +13,3 @@ config("min and max", {
 })
 config("weekends unavailable", { isDateUnavailable: (d) => isWeekend(d, "en-US") })
 config("read-only", { readOnly: true })
-config("range", { selectionMode: "range" })
-config("range, 2–7 days", { selectionMode: "range", minRangeLength: 2, maxRangeLength: 7 })
-config("range, weekends unavailable (contiguous)", {
-  selectionMode: "range",
-  isDateUnavailable: (d) => isWeekend(d, "en-US"),
-})
-config("range, weekends unavailable (non-contiguous)", {
-  selectionMode: "range",
-  isDateUnavailable: (d) => isWeekend(d, "en-US"),
-  allowsNonContiguousRanges: true,
-})
-// Month and year views (spec "Month And Year Views"): the value is chosen at the period.
-config("month view", { minView: "months" })
-config("month view, columns 3, unavailable August", {
-  minView: "months",
-  columns: 3,
-  isMonthUnavailable: (m) => m.month === 8,
-})
-config("month view, range", { minView: "months", selectionMode: "range" })
-config("year view", { minView: "years" })
-config("year view, min and max", {
-  minView: "years",
-  minValue: new CalendarDate(2020, 6, 1),
-  maxValue: new CalendarDate(2031, 6, 1),
-})
-// Display calendars: the oracle stays gregorian (paths and values are by day).
-void createCalendar

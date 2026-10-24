@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Firefox and WebKit run on main and every night (pull requests run Chromium: ci-matrix.mjs)
+  schedule:
+    - cron: "0 3 * * *"
+
+# A new push to a pull request cancels its run still going: the free plan runs 20 jobs at once, and
+# an outdated run held them while the new one queued. Runs on main all finish.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # What the change touches. Pushes to main always run everything.
@@ -14,6 +23,7 @@ jobs:
       site: ${{ steps.scope.outputs.site }}
       full: ${{ steps.scope.outputs.full }}
       base: ${{ steps.scope.outputs.base }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,10 +34,19 @@ jobs:
             echo "components=true" "site=true" "full=true" | tr ' ' '\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # The release pull request only bumps versions and writes changelogs, from changes main
+          # has already tested (pnpm release builds before it publishes): its checks pass at once,
+          # so its auto-merge lands before the next merge to main rewrites it
+          if [ "${{ github.head_ref }}" = "changeset-release/main" ]; then
+            echo "components=false" "site=false" "full=false" | tr ' ' '\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           base="origin/${{ github.base_ref }}"
           echo "base=$base" >> "$GITHUB_OUTPUT"
           # Same rules as `pnpm verify` (scripts/ci-scope.mjs).
           node scripts/ci-scope.mjs "$base" | tee -a "$GITHUB_OUTPUT"
+      - id: matrix
+        run: node scripts/ci-matrix.mjs ${{ github.event_name != 'pull_request' && 'full' || 'pr' }} >> "$GITHUB_OUTPUT"
 
   static:
     needs: changes
@@ -71,23 +90,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { slice: node, projects: "--project node", browsers: "" }
-          - { slice: jsdom, projects: "--project jsdom --project setup-noglobals --project setup-optout", browsers: "" }
-          # Real-browser projects in two shards each: a full run in one Chromium has dropped the
-          # vitest connection mid-run; half the files per browser process keeps it short.
-          - { slice: browser-chromium-1, projects: "--project 'browser (chromium)' --shard=1/2", browsers: chromium }
-          - { slice: browser-chromium-2, projects: "--project 'browser (chromium)' --shard=2/2", browsers: chromium }
-          - { slice: browser-firefox-1, projects: "--project 'browser (firefox)' --shard=1/2", browsers: firefox }
-          - { slice: browser-firefox-2, projects: "--project 'browser (firefox)' --shard=2/2", browsers: firefox }
-          - { slice: browser-webkit-1, projects: "--project 'browser (webkit)' --shard=1/2", browsers: webkit }
-          - { slice: browser-webkit-2, projects: "--project 'browser (webkit)' --shard=2/2", browsers: webkit }
-          # Playwright fixtures: one slice per engine (RIND_BROWSERS picks it for the examples
-          # axe and the theme fixtures); all three are installed for the few cross-engine tests.
-          - { slice: playwright-chromium, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: chromium }
-          - { slice: playwright-firefox, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: firefox }
-          - { slice: playwright-webkit, projects: "--project playwright", browsers: "chromium,firefox,webkit", engine: webkit }
+      # jsdom and Chromium on pull requests, every engine on main (scripts/ci-matrix.mjs). Real
+      # browsers stay sharded: a full run in one Chromium has dropped the vitest connection mid-run.
+      matrix: ${{ fromJSON(needs.changes.outputs.matrix) }}
     name: test (${{ matrix.slice }})
     steps:
       - uses: actions/checkout@v4
@@ -109,7 +114,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.slice }}
+          # one cache per set of browsers (a key cannot hold commas): the Playwright slices install all
+          key: playwright-${{ steps.pw.outputs.version }}-${{ matrix.engine && 'all' || matrix.browsers }}
       - if: matrix.browsers != ''
         run: pnpm exec playwright install --with-deps ${BROWSERS//,/ }
         env:
@@ -154,12 +160,21 @@ jobs:
           ok() { [ "$1" = "success" ] || [ "$1" = "skipped" ]; }
           [ "${{ needs.changes.result }}" = "success" ] && ok "${{ needs.static.result }}" && ok "${{ needs.test.result }}"
 
-  site-audit:
-    # The docs site, built and walked page by page: every example in every skin, axe in both
-    # phases, invisible text, phone overflow (apps/site/scripts). Skipped (green) when the
-    # change cannot affect the site.
+  # The docs site, built and walked page by page: every example in every skin, axe in both
+  # phases, invisible text, phone overflow (apps/site/tests/audit.ts). Skipped (green) when the
+  # change cannot affect the site. The pages split over four runners (AUDIT_SHARD): one walk
+  # takes ~16 minutes, the build one.
+  site-audit-shard:
     needs: changes
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    name: site-audit (${{ matrix.shard }}/4)
+    # a shard takes about 6 minutes: a page that stalls fails the job instead of holding it for
+    # hours (it did twice, with a headless Chrome left open)
+    timeout-minutes: 20
     steps:
       - if: needs.changes.outputs.site == 'true'
         uses: actions/checkout@v4
@@ -181,3 +196,15 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
       - if: needs.changes.outputs.site == 'true'
         run: pnpm --filter @rind-ui/site run audit
+        # names each page as it starts, so a stall shows where
+        env:
+          AUDIT_TRACE: "1"
+          AUDIT_SHARD: ${{ matrix.shard }}/4
+
+  # The required status check for the site: green when every shard passed or was skipped.
+  site-audit:
+    if: always()
+    needs: site-audit-shard
+    runs-on: ubuntu-latest
+    steps:
+      - run: '[ "${{ needs.site-audit-shard.result }}" = "success" ]'
