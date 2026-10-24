@@ -1,5 +1,14 @@
 # @rind-ui/react
 
+## 1.1.0
+
+### Patch Changes
+
+- 175c5cf: Positions measured from the page (floating content, the tour's spotlight, a sortable drag and its indicator, swipe offsets, the table of contents' marker) are now right inside a CSS-zoomed page or container: lengths measured in viewport pixels are divided by the element's effective zoom (`currentCSSZoom`) before they are written to its style. `cssZoom(el)` is exported from `@rind-ui/core`.
+- Updated dependencies [175c5cf]
+- Updated dependencies [6d53336]
+  - @rind-ui/core@1.1.0
+
 ## 1.0.0
 
 ### Major Changes
