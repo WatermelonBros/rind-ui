@@ -156,6 +156,12 @@ export function injectMessages<M extends Messages>(
   })
 }
 
+/** The provider's icon component for `name`, if any (an indicator part that got no content). */
+export function injectIcon(name: string): Signal<Type<unknown> | undefined> {
+  const config = inject(RIND, { optional: true })
+  return computed(() => config?.().icons[name])
+}
+
 /**
  * Locale and direction for a component: its inputs, then the provider, then the document
  * (updating when `<html lang>` or the browser language changes).

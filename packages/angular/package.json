@@ -78,6 +78,16 @@
       "types": "./dist/checkbox-group/index.d.ts",
       "default": "./dist/checkbox-group/index.js"
     },
+    "./clipboard": {
+      "@rind-ui/source": "./src/clipboard/index.ts",
+      "types": "./dist/clipboard/index.d.ts",
+      "default": "./dist/clipboard/index.js"
+    },
+    "./code-block": {
+      "@rind-ui/source": "./src/code-block/index.ts",
+      "types": "./dist/code-block/index.d.ts",
+      "default": "./dist/code-block/index.js"
+    },
     "./collapsible": {
       "@rind-ui/source": "./src/collapsible/index.ts",
       "types": "./dist/collapsible/index.d.ts",
@@ -92,6 +102,21 @@
       "@rind-ui/source": "./src/fieldset/index.ts",
       "types": "./dist/fieldset/index.d.ts",
       "default": "./dist/fieldset/index.js"
+    },
+    "./file-upload": {
+      "@rind-ui/source": "./src/file-upload/index.ts",
+      "types": "./dist/file-upload/index.d.ts",
+      "default": "./dist/file-upload/index.js"
+    },
+    "./form": {
+      "@rind-ui/source": "./src/form/index.ts",
+      "types": "./dist/form/index.d.ts",
+      "default": "./dist/form/index.js"
+    },
+    "./form-toggle": {
+      "@rind-ui/source": "./src/form-toggle/index.ts",
+      "types": "./dist/form-toggle/index.d.ts",
+      "default": "./dist/form-toggle/index.js"
     },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
@@ -118,6 +143,11 @@
       "types": "./dist/link/index.d.ts",
       "default": "./dist/link/index.js"
     },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.ts",
+      "default": "./dist/marquee/index.js"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.ts",
@@ -142,6 +172,11 @@
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
       "default": "./dist/progress/index.js"
+    },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.ts",
+      "default": "./dist/qr-code/index.js"
     },
     "./radio-group": {
       "@rind-ui/source": "./src/radio-group/index.ts",
@@ -228,6 +263,11 @@
       "types": "./dist/toolbar/index.d.ts",
       "default": "./dist/toolbar/index.js"
     },
+    "./visually-hidden": {
+      "@rind-ui/source": "./src/visually-hidden/index.ts",
+      "types": "./dist/visually-hidden/index.d.ts",
+      "default": "./dist/visually-hidden/index.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -300,6 +340,14 @@
         "types": "./dist/checkbox-group/index.d.ts",
         "default": "./dist/checkbox-group/index.js"
       },
+      "./clipboard": {
+        "types": "./dist/clipboard/index.d.ts",
+        "default": "./dist/clipboard/index.js"
+      },
+      "./code-block": {
+        "types": "./dist/code-block/index.d.ts",
+        "default": "./dist/code-block/index.js"
+      },
       "./collapsible": {
         "types": "./dist/collapsible/index.d.ts",
         "default": "./dist/collapsible/index.js"
@@ -311,6 +359,18 @@
       "./fieldset": {
         "types": "./dist/fieldset/index.d.ts",
         "default": "./dist/fieldset/index.js"
+      },
+      "./file-upload": {
+        "types": "./dist/file-upload/index.d.ts",
+        "default": "./dist/file-upload/index.js"
+      },
+      "./form": {
+        "types": "./dist/form/index.d.ts",
+        "default": "./dist/form/index.js"
+      },
+      "./form-toggle": {
+        "types": "./dist/form-toggle/index.d.ts",
+        "default": "./dist/form-toggle/index.js"
       },
       "./heading": {
         "types": "./dist/heading/index.d.ts",
@@ -332,6 +392,10 @@
         "types": "./dist/link/index.d.ts",
         "default": "./dist/link/index.js"
       },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.ts",
+        "default": "./dist/marquee/index.js"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.ts",
         "default": "./dist/meter/index.js"
@@ -351,6 +415,10 @@
       "./progress": {
         "types": "./dist/progress/index.d.ts",
         "default": "./dist/progress/index.js"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.ts",
+        "default": "./dist/qr-code/index.js"
       },
       "./radio-group": {
         "types": "./dist/radio-group/index.d.ts",
@@ -419,6 +487,10 @@
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
         "default": "./dist/toolbar/index.js"
+      },
+      "./visually-hidden": {
+        "types": "./dist/visually-hidden/index.d.ts",
+        "default": "./dist/visually-hidden/index.js"
       },
       "./package.json": "./package.json"
     }

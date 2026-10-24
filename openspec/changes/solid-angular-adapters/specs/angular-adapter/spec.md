@@ -103,6 +103,30 @@ focused one is replaced.
   for `i.state().current`
 - **THEN** it is a focusable `<span aria-current="page">`, as React renders it
 
+### Requirement: Repeated Content Is A Structural Directive
+
+A part React renders several times from the same children (a Marquee's copies) SHALL be a
+structural directive on the consumer's element (`<div *rindMarqueeContent>`), stamped once per
+copy, so every copy stays live as the content changes; the stamped elements SHALL carry the same
+part props React gives each copy, and the consumer's `id` only on the first.
+
+#### Scenario: Marquee copies
+
+- **WHEN** an auto-filled Marquee needs three copies of its content
+- **THEN** the Viewport holds three stamped elements, the second and third `aria-hidden` with no
+  tab stop inside, and the markup matches React's
+
+### Requirement: Outputs Never Share A Native Event's Name
+
+An output SHALL NOT be named like a DOM event that bubbles to its element, since a template
+listener of that name hears both: Clipboard's and Code Block's copy result is `copyResult`, not
+`copy`.
+
+#### Scenario: Copying from the Input
+
+- **WHEN** the user copies the Clipboard Input's text with `(copyResult)` bound on the Root
+- **THEN** the handler runs once per result
+
 ### Requirement: Binding Connect Output
 
 One binder per element SHALL apply connect's props through `Renderer2`: attributes set and

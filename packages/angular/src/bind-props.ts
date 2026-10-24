@@ -210,7 +210,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
             : next,
         )
       } else if (key === "style" && value && typeof value === "object")
-        style = value as typeof style
+        style = Object.fromEntries(
+          Object.entries(value as Record<string, unknown>).map(([k, v]) => [cssName(k), v]),
+        )
       else if (key === "children") {
         // Text content in connect's output (an element the part renders itself: NVDA's
         // filler); a consumer's element never gets one.
@@ -285,7 +287,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
         if (!(key in attrs)) renderer.setProperty(el, key, value)
         return
       }
-      renderer.setProperty(el, key, value)
+      // Only a change: re-writing the same value collapses the selection (and the caret).
+      if ((el as unknown as Record<string, unknown>)[key] !== value)
+        renderer.setProperty(el, key, value)
       // React syncs an input's value to its `value` attribute as well (its markup carries it).
       if (key === "value" && el.tagName === "INPUT") set("value", String(value))
       return
@@ -330,5 +334,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   return { statics }
 }
 
-// Connect's style keys are CSS property names (kebab case, custom properties): `setProperty`.
+// Written as CSS property names through `setProperty` (custom properties included).
 const flags = (_key: string) => RendererStyleFlags2.DashCase
+
+/** A connect style key as a CSS property name: `flexShrink` → `flex-shrink`; `--x` stays. */
+export const cssName = (key: string) =>
+  key.startsWith("--") ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)

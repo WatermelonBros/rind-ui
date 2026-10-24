@@ -317,7 +317,7 @@ abstract class TriggerBase extends PaginationControl {
     const hasText = () => (el.textContent ?? "").trim() !== ""
     const text = signal(hasText())
     // `direction` is a subclass field: read in renders, after construction.
-    const c = computed(() => root.api().trigger(this.direction, labelled || text()))
+    const c = computed(() => root.api().trigger(this.direction, labelled || text() || hasText()))
     this.wire(
       root,
       () => {
