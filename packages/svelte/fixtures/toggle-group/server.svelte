@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ToggleGroup } from "../../src/index"
+import { ToggleGroup } from "../../src/toggle-group"
 </script>
 
 <ToggleGroup.Root aria-label="A" defaultValue={["center"]}>

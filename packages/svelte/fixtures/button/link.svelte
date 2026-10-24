@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Button } from "../../src/index"
+import { Button } from "../../src/button"
 </script>
 
 <Button href="/docs">Docs</Button>
