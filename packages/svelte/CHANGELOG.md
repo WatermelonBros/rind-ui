@@ -1,5 +1,28 @@
 # @rind-ui/svelte
 
+## 1.2.0
+
+### Minor Changes
+
+- 9aa73fa: Vue and Svelte: Message Thread, Streaming Message, Reasoning and Prompt Input (with
+  `usePromptInput()`), each with React's contract models and markup parity. Every component of
+  `@rind-ui/react` now ships in both adapters.
+- 3cfd40d: Vue and Svelte: Image Viewer, Image Cropper, and Color Picker with its Area, channel Sliders, Field and Channel Field, Swatch
+  and Swatch group (internal parts, as in React), each with React's contract models and markup
+  parity.
+- 945b493: Vue and Svelte: Table, Sortable, Tooltip, Hover Card, Dialog, Drawer, Toast, Menu, Context Menu,
+  Menubar, Navigation Menu, Select, Combobox, Tags Input, Tour, Calendar and Date Field (single,
+  range and picker). Parts that positioning or the scroll lock style keep those styles across
+  re-renders.
+- e5140db: Vue and Svelte: Popover, with a Portal and the layer context the overlays share (outside
+  presses, Escape and focus return follow the nesting). `canonicalHtml` rounds measured lengths
+  to whole pixels, drops an empty `style` and treats a generated `data-value` as one token, so
+  two renders of one component compare equal across engines.
+
+### Patch Changes
+
+- @rind-ui/core@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes
