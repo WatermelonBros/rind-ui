@@ -1380,26 +1380,28 @@
   --lean-x: 0;
   --lean-y: 0;
 }
-/* a dark stage, so each framework's own colour glows on it; it leans towards the pointer, cables
-   and all (install.tsx draws them on its layout) */
+/* the stage is the page's own candy ground (paper and ink in crisp): each framework's colour is
+   a slab's edge, a tube of jelly from the core and a pastel glow; it leans towards the pointer,
+   cables and all (install.tsx draws them on its layout) */
 .stage {
   position: relative;
   display: grid;
   justify-items: center;
   gap: 120px;
-  padding: 56px 32px 64px;
+  padding: 56px 32px 72px;
   border-radius: calc(var(--r) * 1.4);
   background:
     radial-gradient(
-      ellipse 60% 55% at 50% 22%,
-      color-mix(in oklab, var(--brand) 32%, transparent),
+      ellipse 55% 60% at 50% 18%,
+      color-mix(in oklab, var(--brand) 26%, transparent),
       transparent 70%
     ),
-    radial-gradient(circle, #ffffff12 1px, transparent 1.5px) 0 0 / 22px 22px,
-    #0d1110;
-  color: #f5f5ee;
+    radial-gradient(ellipse 40% 40% at 12% 90%, #ffffffb3, transparent 70%),
+    radial-gradient(circle, color-mix(in oklab, var(--ink) 9%, transparent) 1.5px, transparent 2px)
+    0 0 / 24px 24px,
+    var(--muted);
+  color: var(--ink);
   box-shadow: var(--shadow);
-  overflow: hidden;
   transform-style: preserve-3d;
   transform: rotateX(calc(var(--lean-y) * -6deg)) rotateY(calc(var(--lean-x) * 8deg));
   transition:
@@ -1407,7 +1409,11 @@
     background 0.6s var(--spring);
 }
 :global([data-phase="crisp"]) .stage {
-  border: 3px solid #0b0b0c;
+  border: 3px solid var(--ink);
+  background:
+    radial-gradient(circle, color-mix(in oklab, var(--ink) 16%, transparent) 1.5px, transparent 2px)
+    0 0 / 24px 24px,
+    var(--paper);
 }
 .cables {
   position: absolute;
@@ -1419,32 +1425,43 @@
 }
 .cable {
   fill: none;
-  stroke: #ffffff2e;
-  stroke-width: 2;
-  stroke-dasharray: 5 7;
-}
-[data-ready] > .cable {
-  stroke: color-mix(in oklab, var(--brand) 45%, transparent);
+  stroke: color-mix(in oklab, var(--ink) 22%, transparent);
   stroke-width: 3;
-  stroke-dasharray: none;
+  stroke-linecap: round;
+  stroke-dasharray: 2 4;
+  transition: opacity 0.4s;
 }
-/* a current running from the core out to the framework: dashes along the path (pathLength 100) */
-.pulse {
-  fill: none;
+/* a tube of the framework's jelly, with a highlight running along it */
+[data-ready] > .cable {
   stroke: var(--brand);
+  stroke-width: 14;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.45s var(--spring);
+}
+.gloss {
+  fill: none;
+  stroke: #ffffff8c;
   stroke-width: 4;
   stroke-linecap: round;
-  stroke-dasharray: 3 22;
-  filter: drop-shadow(0 0 6px var(--brand));
+  translate: -3px -3px;
+  stroke-dasharray: 100;
+  transition: stroke-dashoffset 0.45s var(--spring);
+}
+/* a current running from the core out to the framework: bubbles along the tube (pathLength 100) */
+.pulse {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 12;
   animation: current 2.4s linear infinite;
 }
 [data-picked] > .cable {
-  stroke: color-mix(in oklab, var(--brand) 70%, transparent);
-  stroke-width: 4;
+  stroke-width: 18;
 }
 [data-picked] > .pulse {
-  stroke-width: 6;
-  stroke-dasharray: 6 19;
+  stroke-width: 8;
   animation-duration: 1.1s;
 }
 @keyframes current {
@@ -1461,16 +1478,24 @@
   display: grid;
   place-items: center;
   align-content: center;
-  inline-size: 148px;
-  block-size: 148px;
+  inline-size: 156px;
+  block-size: 156px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffffff, #e9e9e2 60%, #c9c9c0);
-  color: #0d1110;
+  background: radial-gradient(circle at 35% 28%, #ffffff, var(--card) 45%, var(--muted));
+  color: var(--ink);
   box-shadow:
-    0 0 0 8px color-mix(in oklab, var(--brand) 30%, transparent),
-    0 0 60px 10px color-mix(in oklab, var(--brand) 45%, transparent),
-    inset 0 -8px 18px #00000026;
+    0 0 0 10px color-mix(in oklab, var(--brand) 55%, transparent),
+    0 12px 0 10px color-mix(in oklab, var(--brand) 75%, var(--ink)),
+    0 40px 60px color-mix(in oklab, var(--brand) 35%, transparent);
   transition: box-shadow 0.6s var(--spring);
+}
+:global([data-phase="crisp"]) .core {
+  background: var(--bg);
+  border: 3px solid var(--ink);
+  box-shadow:
+    0 0 0 8px var(--brand),
+    0 0 0 11px var(--ink),
+    8px 8px 0 11px var(--ink);
 }
 .core b {
   font: 900 34px / 1 var(--display);
@@ -1488,36 +1513,47 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 22px;
+  gap: 24px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 /* an arc under the core: the middle socket highest, the outer ones lower (five of them) */
 .socketSlot {
+  position: relative;
   margin-block-start: calc(
     (var(--i) - (var(--n) - 1) / 2) *
     (var(--i) - (var(--n) - 1) / 2) *
     16px
   );
 }
+/* a slab of candy: white face, a thick edge in the framework's own colour */
 .socket {
   position: relative;
   display: inline-grid;
   justify-items: center;
   gap: 6px;
-  min-inline-size: 124px;
-  padding: 20px 14px 16px;
+  min-inline-size: 136px;
+  padding: 22px 16px 18px;
   border: 0;
-  border-radius: calc(var(--r) * 0.8);
-  background: #f5f5ee;
-  color: #0d1110;
-  font: 700 16px var(--text);
-  box-shadow: 0 14px 30px #00000059;
+  border-radius: calc(var(--r) * 0.85);
+  background: var(--card);
+  color: var(--ink);
+  font: 700 17px var(--text);
+  box-shadow:
+    0 9px 0 color-mix(in oklab, var(--brand) 80%, var(--ink)),
+    0 26px 36px color-mix(in oklab, var(--brand) 30%, transparent);
   transition:
     translate 0.35s var(--spring-pop),
     scale 0.35s var(--spring-pop),
     box-shadow 0.35s var(--spring);
+}
+:global([data-phase="crisp"]) .socket {
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  box-shadow:
+    7px 7px 0 var(--brand),
+    7px 7px 0 3px var(--ink);
 }
 button.socket {
   cursor: pointer;
@@ -1526,21 +1562,36 @@ button.socket:not([data-soon]):hover {
   translate: 0 -6px;
 }
 button.socket[aria-pressed="true"] {
-  scale: 1.08;
+  scale: 1.1;
+  translate: 0 -8px;
   box-shadow:
-    0 0 0 4px var(--brand),
-    0 0 44px 4px color-mix(in oklab, var(--brand) 60%, transparent),
-    0 14px 30px #00000059;
+    0 0 0 5px var(--brand),
+    0 14px 0 5px color-mix(in oklab, var(--brand) 80%, var(--ink)),
+    0 36px 50px color-mix(in oklab, var(--brand) 45%, transparent);
+}
+:global([data-phase="crisp"]) button.socket[aria-pressed="true"] {
+  background: var(--bg);
+  box-shadow:
+    10px 10px 0 var(--brand),
+    10px 10px 0 3px var(--ink);
 }
 button.socket:focus-visible {
-  outline: 3px solid #f5f5ee;
-  outline-offset: 5px;
+  outline: 3px solid var(--ink);
+  outline-offset: 6px;
 }
+/* a planned framework: a slab not cast yet, only its outline */
 .socket[data-soon] {
-  background: #ffffff10;
-  color: #f5f5eeb3;
-  box-shadow: inset 0 0 0 1.5px #ffffff2e;
+  background: color-mix(in oklab, var(--card) 45%, transparent);
+  color: color-mix(in oklab, var(--ink) 70%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--ink) 25%, transparent);
+  outline: 2px dashed color-mix(in oklab, var(--ink) 30%, transparent);
+  outline-offset: 5px;
   cursor: help;
+}
+:global([data-phase="crisp"]) .socket[data-soon] {
+  border-style: dashed;
+  box-shadow: none;
+  outline: 0;
 }
 .socket small {
   font: 600 11px var(--mono);
@@ -1552,8 +1603,8 @@ button.socket:focus-visible {
 .logo {
   display: grid;
   place-items: center;
-  inline-size: 52px;
-  block-size: 52px;
+  inline-size: 60px;
+  block-size: 60px;
   margin-block-end: 4px;
   font: 900 22px / 1 var(--display);
 }
@@ -1576,7 +1627,53 @@ button.socket[aria-pressed="true"] .logo svg {
   }
 }
 .socket[data-soon] .logo svg {
-  fill: #f5f5ee59;
+  fill: color-mix(in oklab, var(--ink) 30%, transparent);
+}
+/* not plugged yet: the tube is still rolled up in the core, a waiting wire not drawn */
+g:not([data-plugged]) > .cable {
+  opacity: 0;
+}
+[data-ready]:not([data-plugged]) > :is(.cable, .gloss) {
+  opacity: 1;
+  stroke-dashoffset: 100;
+  /* a round cap would draw the rolled-up tube as a dot */
+  stroke-linecap: butt;
+}
+g:not([data-plugged]) > .pulse {
+  visibility: hidden;
+}
+:global([data-phase="crisp"]) [data-ready] > .cable {
+  stroke-width: 10;
+  stroke: var(--ink);
+}
+:global([data-phase="crisp"]) .gloss {
+  stroke: var(--brand);
+  translate: 0 0;
+}
+/* until the frameworks fly in (install.tsx: assemble), their sockets are not there yet */
+.stage[data-await] .socketSlot {
+  opacity: 0;
+}
+/* where a socket lands (install.tsx: puff): a ring of dust on the ground and crumbs of candy */
+.dust {
+  position: absolute;
+  inset-block-end: -10px;
+  inset-inline-start: 50%;
+  inline-size: 150px;
+  block-size: 26px;
+  border-radius: 50%;
+  border: 5px solid color-mix(in oklab, var(--brand) 70%, var(--card));
+  pointer-events: none;
+}
+.crumb {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: calc(50% - 6px);
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+  background: var(--brand);
+  pointer-events: none;
 }
 /* a passed test's tick, landed from the tests above: it shows once one has */
 .socketMark {
@@ -1700,6 +1797,9 @@ button.socket[aria-pressed="true"] .logo svg {
   .logo {
     inline-size: 40px;
     block-size: 40px;
+  }
+  [data-ready] > .cable {
+    stroke-width: 10;
   }
   .command {
     font-size: 14px;
