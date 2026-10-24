@@ -157,6 +157,10 @@
     "avatar": 11,
     "badge": 3,
     "button": 16,
+    "checkbox": 19,
+    "checkbox-group": 21,
+    "field": 18,
+    "fieldset": 8,
     "heading": 3,
     "image": 10,
     "kbd": 8,
@@ -166,13 +170,19 @@
     "progress": 12,
     "separator": 3,
     "skeleton": 11,
-    "toggle": 14
+    "text-field": 27,
+    "toggle": 14,
+    "toggle-group": 24
   },
   "angular": {
     "alert": 15,
     "avatar": 13,
     "badge": 4,
     "button": 17,
+    "checkbox": 21,
+    "checkbox-group": 24,
+    "field": 20,
+    "fieldset": 10,
     "heading": 4,
     "image": 12,
     "kbd": 10,
@@ -182,6 +192,8 @@
     "progress": 14,
     "separator": 4,
     "skeleton": 12,
-    "toggle": 15
+    "text-field": 30,
+    "toggle": 15,
+    "toggle-group": 25
   }
 }

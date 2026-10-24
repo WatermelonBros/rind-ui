@@ -27,12 +27,12 @@
 - [x] 2.12 Avatar
 - [x] 2.13 Image
 - [x] 2.14 Alert
-- [ ] 2.15 Toggle Group
-- [ ] 2.16 Fieldset
-- [ ] 2.17 Field
-- [ ] 2.18 Text Field
-- [ ] 2.19 Checkbox
-- [ ] 2.20 Checkbox Group
+- [x] 2.15 Toggle Group
+- [x] 2.16 Fieldset
+- [x] 2.17 Field
+- [x] 2.18 Text Field
+- [x] 2.19 Checkbox
+- [x] 2.20 Checkbox Group
 - [ ] 2.21 Switch
 - [ ] 2.22 Radio Group
 - [ ] 2.23 Segmented Control

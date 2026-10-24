@@ -21,14 +21,33 @@ type Handler = (event: Event) => void
 
 const isHandler = (key: string) => /^on[A-Z]/.test(key)
 
-/** A part's own props from several core modules; same-named handlers all run in order. */
-// PartProps and AdapterProps are both records of unknown values keyed by strings and CRITICAL;
-// only their index signatures are spelled differently.
+/**
+ * A part's own props from several core modules; same-named handlers all run in order. Keys are
+ * neutral names first: connect may spell a handler React's way (`onFocus`) where another
+ * source spells it `onFocusIn`, and both listen to `focusin`.
+ */
 export const joinHandlers = (...sources: Props[]): Props =>
-  join(isHandler, ...(sources as Readonly<AdapterProps>[])) as Props
+  // PartProps and AdapterProps are both records of unknown values keyed by strings and
+  // CRITICAL; only their index signatures are spelled differently.
+  join(isHandler, ...(sources.map(neutralKeys) as Readonly<AdapterProps>[])) as Props
+
+/** `props` with every string key in its neutral spelling (symbol keys kept). */
+function neutralKeys(props: Props): Props {
+  const out: Record<string | symbol, unknown> = {}
+  for (const key of Reflect.ownKeys(props)) {
+    // Reflect.ownKeys returns the object's own keys; indexing with them is sound.
+    const value = (props as Record<string | symbol, unknown>)[key]
+    out[typeof key === "string" ? neutralName(key) : key] = value
+  }
+  return out as Props
+}
+
 /** `onPointerDown` → `pointerdown`, `onFocusIn` → `focusin`, `onDblClick` → `dblclick`. */
 const eventName = (key: string) => key.slice(2).toLowerCase()
-/** Written as DOM properties in the browser (the user's edits stay), as attributes on the server. */
+/**
+ * Written as DOM properties in the browser (the user's edits stay); on the server as the
+ * attribute named here.
+ */
 const PROPERTIES: Readonly<Record<string, string>> = {
   value: "value",
   checked: "checked",
@@ -45,6 +64,8 @@ interface Binder {
   readonly owns: Set<string>
   readonly drops: (() => readonly string[])[]
   readonly statics: ReadonlyMap<string, string>
+  /** Adds a later directive's inputs to the owned ones (removable static attributes). */
+  own: (keys: readonly string[]) => void
 }
 
 export interface BindOptions {
@@ -82,7 +103,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   const existing = binders.get(el)
   if (existing) {
     existing.layers.push(props)
-    for (const key of options.owns ?? []) existing.owns.add(key)
+    existing.own(options.owns ?? [])
     if (options.drop) existing.drops.push(options.drop)
     return { statics: existing.statics }
   }
@@ -100,9 +121,10 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   }
   const binder: Binder = {
     layers: [props],
-    owns: new Set(options.owns),
+    owns: new Set(),
     drops: options.drop ? [options.drop] : [],
     statics,
+    own: () => {},
   }
   let dropped = new Set<string>()
   const consumer = (key: string): string | null =>
@@ -115,11 +137,18 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   let text: unknown
   // The part's own static inputs are its to remove (connect writes the real attributes back):
   // seeded as the previous render's, so the first render drops those connect does not produce.
-  for (const key of binder.owns) {
-    if (!statics.has(key)) continue
-    written.add(key)
-    attrs = { ...attrs, [key]: statics.get(key) }
+  binder.own = (keys) => {
+    for (const key of keys) {
+      binder.owns.add(key)
+      // On the element before the part wrote anything: its static input (the DOM lowercases
+      // the template's `defaultValue`, which the template lookup would need spelled as written).
+      const value = el.getAttribute(key)
+      if (value === null) continue
+      written.add(key)
+      attrs = { ...attrs, [key]: value }
+    }
   }
+  binder.own(options.owns ?? [])
   const handlers = new Map<string, Handler>()
   const listening = new Map<string, () => void>()
   let styles = new Set<string>()
@@ -166,9 +195,22 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
     for (const own of Object.keys(next)) {
       const key = neutralName(own)
       const value = next[own]
-      if (isHandler(key) && typeof value === "function")
-        handlers.set(eventName(key), value as Handler)
-      else if (key === "style" && value && typeof value === "object") style = value as typeof style
+      if (isHandler(key) && typeof value === "function") {
+        // Two spellings of one event (`onFocus`, `onFocusIn`) both run.
+        const event = eventName(key)
+        const prev = handlers.get(event)
+        const next = value as Handler
+        handlers.set(
+          event,
+          prev
+            ? (e) => {
+                prev(e)
+                next(e)
+              }
+            : next,
+        )
+      } else if (key === "style" && value && typeof value === "object")
+        style = value as typeof style
       else if (key === "children") {
         // Text content in connect's output (an element the part renders itself: NVDA's
         // filler); a consumer's element never gets one.
@@ -222,11 +264,19 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
 
   const write = (key: string, value: unknown) => {
     const property = PROPERTIES[key]
+    // An undefined value is no value (uncontrolled), as React leaves it: never "undefined".
+    if (property && (value === undefined || value === null)) return
     if (property && browser) {
+      // The DOM property of the same name: `defaultValue` / `defaultChecked` reflect to the
+      // `value` / `checked` attribute (as React writes them) and keep what the user typed.
       if (key.startsWith("default")) {
-        // Only the initial value: later renders keep what the user typed.
-        if (!(key in attrs)) renderer.setProperty(el, property, value)
-      } else renderer.setProperty(el, property, value)
+        if (!(key in attrs)) renderer.setProperty(el, key, value)
+      } else renderer.setProperty(el, key, value)
+      return
+    }
+    // A textarea's initial value is its content, on the server as in React's markup.
+    if (key === "defaultValue" && el.tagName === "TEXTAREA") {
+      if (!(key in attrs)) renderer.setProperty(el, "textContent", String(value))
       return
     }
     const name = property ?? key

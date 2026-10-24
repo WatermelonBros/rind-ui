@@ -87,6 +87,26 @@
         "solid": "./dist/button/index.jsx",
         "default": "./dist/button/index.mjs"
       },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.mts",
+        "solid": "./dist/checkbox/index.jsx",
+        "default": "./dist/checkbox/index.mjs"
+      },
+      "./checkbox-group": {
+        "types": "./dist/checkbox-group/index.d.mts",
+        "solid": "./dist/checkbox-group/index.jsx",
+        "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.mts",
+        "solid": "./dist/field/index.jsx",
+        "default": "./dist/field/index.mjs"
+      },
+      "./fieldset": {
+        "types": "./dist/fieldset/index.d.mts",
+        "solid": "./dist/fieldset/index.jsx",
+        "default": "./dist/fieldset/index.mjs"
+      },
       "./heading": {
         "types": "./dist/heading/index.d.mts",
         "solid": "./dist/heading/index.jsx",
@@ -132,10 +152,20 @@
         "solid": "./dist/skeleton/index.jsx",
         "default": "./dist/skeleton/index.mjs"
       },
+      "./text-field": {
+        "types": "./dist/text-field/index.d.mts",
+        "solid": "./dist/text-field/index.jsx",
+        "default": "./dist/text-field/index.mjs"
+      },
       "./toggle": {
         "types": "./dist/toggle/index.d.mts",
         "solid": "./dist/toggle/index.jsx",
         "default": "./dist/toggle/index.mjs"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.mts",
+        "solid": "./dist/toggle-group/index.jsx",
+        "default": "./dist/toggle-group/index.mjs"
       },
       "./package.json": "./package.json"
     }
@@ -170,6 +200,30 @@
       "types": "./dist/button/index.d.mts",
       "solid": "./dist/button/index.jsx",
       "default": "./dist/button/index.mjs"
+    },
+    "./checkbox": {
+      "@rind-ui/source": "./src/checkbox/index.ts",
+      "types": "./dist/checkbox/index.d.mts",
+      "solid": "./dist/checkbox/index.jsx",
+      "default": "./dist/checkbox/index.mjs"
+    },
+    "./checkbox-group": {
+      "@rind-ui/source": "./src/checkbox-group/index.ts",
+      "types": "./dist/checkbox-group/index.d.mts",
+      "solid": "./dist/checkbox-group/index.jsx",
+      "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./field": {
+      "@rind-ui/source": "./src/field/index.ts",
+      "types": "./dist/field/index.d.mts",
+      "solid": "./dist/field/index.jsx",
+      "default": "./dist/field/index.mjs"
+    },
+    "./fieldset": {
+      "@rind-ui/source": "./src/fieldset/index.ts",
+      "types": "./dist/fieldset/index.d.mts",
+      "solid": "./dist/fieldset/index.jsx",
+      "default": "./dist/fieldset/index.mjs"
     },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
@@ -225,11 +279,23 @@
       "solid": "./dist/skeleton/index.jsx",
       "default": "./dist/skeleton/index.mjs"
     },
+    "./text-field": {
+      "@rind-ui/source": "./src/text-field/index.ts",
+      "types": "./dist/text-field/index.d.mts",
+      "solid": "./dist/text-field/index.jsx",
+      "default": "./dist/text-field/index.mjs"
+    },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
       "types": "./dist/toggle/index.d.mts",
       "solid": "./dist/toggle/index.jsx",
       "default": "./dist/toggle/index.mjs"
+    },
+    "./toggle-group": {
+      "@rind-ui/source": "./src/toggle-group/index.ts",
+      "types": "./dist/toggle-group/index.d.mts",
+      "solid": "./dist/toggle-group/index.jsx",
+      "default": "./dist/toggle-group/index.mjs"
     },
     "./package.json": "./package.json"
   }
