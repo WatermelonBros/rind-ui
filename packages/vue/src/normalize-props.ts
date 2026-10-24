@@ -6,6 +6,19 @@ import { getCurrentInstance, inject, ssrContextKey } from "vue"
 const rendersOnServer = () => getCurrentInstance() !== null && inject(ssrContextKey, null) !== null
 
 /**
+ * A neutral handler key as Vue's listener key: the event name lower-cased after `on` and its
+ * capital (`onKeyDown` → `onKeydown`, `onFocusIn` → `onFocusin`), a capture phase kept as Vue's
+ * `Capture` modifier (`onClickCapture` → `onClickCapture`: lower-cased, it would listen to a
+ * `clickcapture` event that never fires). `gotpointercapture` / `lostpointercapture` are events
+ * whose names end in "capture", not the modifier.
+ */
+function vueListener(key: string): string {
+  const capture = /Capture$/.test(key) && !/^on(?:Got|Lost)PointerCapture$/.test(key)
+  const name = capture ? key.slice(2, -"Capture".length) : key.slice(2)
+  return `on${name[0]}${name.slice(1).toLowerCase()}${capture ? "Capture" : ""}`
+}
+
+/**
  * Converts framework-neutral part props into Vue props. Attributes keep their HTML names;
  * handlers become Vue's listener keys (`onKeyDown` → `onKeydown`, listening to `keydown`;
  * `onFocusIn` → `onFocusin`). Symbol keys are kept.
@@ -27,7 +40,7 @@ export function normalizeProps(props: PartProps): Record<string | symbol, unknow
       // `inert="false"` would be inert: Vue renders false as "false" for this attribute.
       if (value) out[key] = ""
     } else if (/^on[A-Z]/.test(key) && typeof value === "function") {
-      out[`on${key[2]}${key.slice(3).toLowerCase()}`] = value
+      out[vueListener(key)] = value
     } else out[key] = value
   }
   return out
