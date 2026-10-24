@@ -133,6 +133,11 @@
       "types": "./dist/pagination/index.d.ts",
       "default": "./dist/pagination/index.js"
     },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.ts",
+      "default": "./dist/pin-input/index.js"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
@@ -147,6 +152,11 @@
       "@rind-ui/source": "./src/rating/index.ts",
       "types": "./dist/rating/index.d.ts",
       "default": "./dist/rating/index.js"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.ts",
+      "default": "./dist/scroll-area/index.js"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -168,10 +178,25 @@
       "types": "./dist/slider/index.d.ts",
       "default": "./dist/slider/index.js"
     },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.ts",
+      "default": "./dist/splitter/index.js"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.ts",
+      "default": "./dist/stepper/index.js"
+    },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
       "types": "./dist/switch/index.d.ts",
       "default": "./dist/switch/index.js"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.ts",
+      "default": "./dist/table-of-contents/index.js"
     },
     "./tabs": {
       "@rind-ui/source": "./src/tabs/index.ts",
@@ -182,6 +207,11 @@
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.ts",
       "default": "./dist/text-field/index.js"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.ts",
+      "default": "./dist/timeline/index.js"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -314,6 +344,10 @@
         "types": "./dist/pagination/index.d.ts",
         "default": "./dist/pagination/index.js"
       },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.ts",
+        "default": "./dist/pin-input/index.js"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.ts",
         "default": "./dist/progress/index.js"
@@ -325,6 +359,10 @@
       "./rating": {
         "types": "./dist/rating/index.d.ts",
         "default": "./dist/rating/index.js"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.ts",
+        "default": "./dist/scroll-area/index.js"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.ts",
@@ -342,9 +380,21 @@
         "types": "./dist/slider/index.d.ts",
         "default": "./dist/slider/index.js"
       },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.ts",
+        "default": "./dist/splitter/index.js"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.ts",
+        "default": "./dist/stepper/index.js"
+      },
       "./switch": {
         "types": "./dist/switch/index.d.ts",
         "default": "./dist/switch/index.js"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.ts",
+        "default": "./dist/table-of-contents/index.js"
       },
       "./tabs": {
         "types": "./dist/tabs/index.d.ts",
@@ -353,6 +403,10 @@
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",
         "default": "./dist/text-field/index.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.ts",
+        "default": "./dist/timeline/index.js"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",

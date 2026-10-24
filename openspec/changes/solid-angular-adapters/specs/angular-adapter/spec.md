@@ -86,7 +86,8 @@ by state or props SHALL be one directive per element, the consumer writing the e
 asks for: a Pagination page or trigger SHALL be a Button on `<button>` and a Link on `<a>` (with
 the Root's `getPageHref`), and the current crumb without `href` SHALL be
 `<span rindBreadcrumbsCurrent>` (React's text span) where a linked crumb is
-`<a rindBreadcrumbsLink>`. The state the choice reads SHALL be readable from the template
+`<a rindBreadcrumbsLink>`; a Stepper Trigger SHALL be `<button rindStepperTrigger>` while its
+step is reachable and `<span rindStepperTrigger>` otherwise (`i.triggerIsButton()`). The state the choice reads SHALL be readable from the template
 (`#i="rindBreadcrumbsItem"`, `i.state().current`); focus SHALL move to the new element when the
 focused one is replaced.
 

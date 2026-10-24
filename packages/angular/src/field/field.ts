@@ -461,7 +461,7 @@ function joinedPart(parts: JoinedParts, name: string) {
 
 /** The control's label: `<label rindFieldLabel>`. */
 @Directive({
-  selector: "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel]",
+  selector: "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel], [rindPinInputLabel]",
   exportAs: "rindFieldLabel",
 })
 export class FieldLabel {
@@ -501,7 +501,8 @@ export class FieldLabel {
 }
 
 @Directive({
-  selector: "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription]",
+  selector:
+    "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription], [rindPinInputDescription]",
   exportAs: "rindFieldDescription",
 })
 export class FieldDescription {
@@ -523,7 +524,8 @@ export class FieldDescription {
  * messages (a list when there are several). Hidden otherwise (React renders nothing).
  */
 @Component({
-  selector: "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage]",
+  selector:
+    "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage], [rindPinInputErrorMessage]",
   exportAs: "rindFieldErrorMessage",
   encapsulation: ViewEncapsulation.None,
   template: `<ng-content
