@@ -75,6 +75,12 @@
       "svelte": "./dist/button/index.js",
       "default": "./dist/button/index.js"
     },
+    "./calendar": {
+      "@rind-ui/source": "./src/calendar/index.ts",
+      "types": "./dist/calendar/index.d.ts",
+      "svelte": "./dist/calendar/index.js",
+      "default": "./dist/calendar/index.js"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.ts",
@@ -116,6 +122,12 @@
       "types": "./dist/context-menu/index.d.ts",
       "svelte": "./dist/context-menu/index.js",
       "default": "./dist/context-menu/index.js"
+    },
+    "./date-field": {
+      "@rind-ui/source": "./src/date-field/index.ts",
+      "types": "./dist/date-field/index.d.ts",
+      "svelte": "./dist/date-field/index.js",
+      "default": "./dist/date-field/index.js"
     },
     "./dialog": {
       "@rind-ui/source": "./src/dialog/index.ts",
@@ -439,6 +451,7 @@
     "@rind-ui/core": "workspace:*"
   },
   "devDependencies": {
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@sveltejs/package": "^3.0.1",
@@ -494,6 +507,11 @@
         "svelte": "./dist/button/index.js",
         "default": "./dist/button/index.js"
       },
+      "./calendar": {
+        "types": "./dist/calendar/index.d.ts",
+        "svelte": "./dist/calendar/index.js",
+        "default": "./dist/calendar/index.js"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.ts",
         "svelte": "./dist/checkbox/index.js",
@@ -528,6 +546,11 @@
         "types": "./dist/context-menu/index.d.ts",
         "svelte": "./dist/context-menu/index.js",
         "default": "./dist/context-menu/index.js"
+      },
+      "./date-field": {
+        "types": "./dist/date-field/index.d.ts",
+        "svelte": "./dist/date-field/index.js",
+        "default": "./dist/date-field/index.js"
       },
       "./dialog": {
         "types": "./dist/dialog/index.d.ts",
