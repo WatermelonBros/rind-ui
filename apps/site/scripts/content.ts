@@ -107,6 +107,26 @@ const frameworksTable = [
       } |`,
   ),
 ].join("\n")
+// in prose: "React, Vue and Svelte" released, "Solid and Angular" not, and how far the adapters
+// behind React have come ("Vue and Svelte with 41 components so far")
+const list = (names: readonly string[], word: "and" | "or") =>
+  names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} ${word} ${names.at(-1)}`
+const and = (names: readonly string[]) => list(names, "and")
+const released = fws.filter((f) => f.ready)
+const reactCount = fws.find((f) => f.id === "react")?.components.length ?? 0
+const behind = released.filter((f) => f.id !== "react" && f.components.length < reactCount)
+const frameworkWords = {
+  released: and(released.map((f) => f.name)),
+  unreleased: and(fws.filter((f) => !f.ready).map((f) => f.name)),
+  unreleasedOr: list(
+    fws.filter((f) => !f.ready).map((f) => f.name),
+    "or",
+  ),
+  // with its leading space and brackets, so it can simply vanish once the adapters catch up
+  partial: behind.length
+    ? ` (${and(behind.map((f) => f.name))} with ${Math.min(...behind.map((f) => f.components.length))} components so far)`
+    : "",
+}
 const installBlocks = fws
   .filter((f) => f.ready)
   .map(
@@ -562,7 +582,7 @@ const aiReady = ready.filter((r) => r.wave === "AI").length
 const coverageTable = [
   "| Library | Components | Frameworks | Test drivers | State machines | AI-UI primitives |",
   "|---|---|---|---|---|---|",
-  `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | React (framework-free core) | every component | declared, with model-based tests | ${aiReady} ready |`,
+  `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | ${frameworkWords.released} on a framework-free core${frameworkWords.partial} | every component | declared, with model-based tests | ${aiReady} ready |`,
   ...coverage,
 ].join("\n")
 // the gaps, from the repository's own list (docs/compare-gaps.md), so the page shows the same
@@ -575,5 +595,9 @@ const gapsTable = readFileSync(join(repo, "docs/compare-gaps.md"), "utf8")
 const compare = byRelease(readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"))
   .replace("<!-- coverage -->", coverageTable)
   .replace("<!-- gaps -->", gapsTable)
+  .replaceAll("{{released}}", frameworkWords.released)
+  .replaceAll("{{unreleased}}", frameworkWords.unreleased)
+  .replaceAll("{{unreleased-or}}", frameworkWords.unreleasedOr)
+  .replaceAll("{{partial}}", frameworkWords.partial)
 writeFileSync(join(out, "compare.md"), compare)
 writeFileSync(join(import.meta.dirname, "../public/compare.md"), compare)

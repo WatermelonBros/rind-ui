@@ -7,9 +7,9 @@ A gap closes when the action is done and the compare page no longer needs to say
 | Gap | Ahead | Action | Status |
 |---|---|---|---|
 | Production record | React Aria, Radix, Base UI | Ship Reado on rind-ui; collect external adopters; publish a "used by" list only with permission | open |
-| API stability | React Aria, Radix, Base UI, Ark | 1.0 with a written semver and deprecation policy (Get started → Versioning) | closing: 1.0 changeset merged, published with the next version PR |
+| API stability | React Aria, Radix, Base UI, Ark | 1.0 with a written semver and deprecation policy (Get started → Versioning) | done: 1.0 published (1.1.0 now) |
 | Translations | React Aria (30+ languages) | Translate every component's messages for the most used locales, generated from one catalogue | open |
-| Frameworks beyond React | Ark (React, Vue, Solid, Svelte); Reka, Bits, Kobalte for one framework each | Publish the next adapter on the framework-free core (Vue first: largest audience after React) | open |
+| Frameworks beyond React | Ark (React, Vue, Solid, Svelte); Reka, Bits, Kobalte for one framework each | Vue and Svelte published on the framework-free core (1.1.0), components ported one at a time; Solid and Angular after | closing |
 | Drag and drop depth | React Aria | Research note on React Aria's drag and drop (keyboard and screen-reader moves across collections); extend Sortable and Tree View to cross-collection moves | open |
 | Ecosystem and community answers | Radix | Copy-paste skins (crisp, juicy, calm) as a CLI-installable kit; answer questions in public; examples for common stacks | open |
 | Team size and backing | React Aria (Adobe), Base UI (company-backed), Ark (Chakra team) | Second maintainer; contribution guide; good-first-issue labels | open |

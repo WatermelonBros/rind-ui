@@ -44,6 +44,9 @@ export default function Home() {
       {/* each section its own boundary: React hydrates them one at a time, yielding between them,
           instead of the whole landing in one long task on a slow phone */}
       <Hero
+        today={frameworks()
+          .filter((f) => f.ready)
+          .map((f) => f.name)}
         frameworks={upcoming(
           frameworks().map((f) => ({ name: f.name, ready: f.ready, count: f.components.length })),
         )}
