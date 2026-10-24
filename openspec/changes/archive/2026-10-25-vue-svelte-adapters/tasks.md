@@ -93,4 +93,4 @@
 ## 3. Close
 
 - [x] 3.1 `pnpm typecheck`, `pnpm test`, `pnpm lint`, builds, size check pass
-- [ ] 3.2 Review (two passes), archive, `docs/components.md` notes Vue/Svelte parity
+- [x] 3.2 Review (two passes), archive, `docs/components.md` notes Vue/Svelte parity
