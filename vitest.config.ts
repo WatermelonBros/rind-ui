@@ -85,9 +85,18 @@ export default defineConfig({
   plugins,
   resolve,
   ssr,
-  // Solid's runtime entries, declared up front: found mid-run on a cold cache, Vite would
-  // re-optimise and reload the browser tests ("Vite unexpectedly reloaded a test").
-  optimizeDeps: { include: ["solid-js", "solid-js/web", "solid-js/store"] },
+  // Declared up front: found mid-run on a cold cache (CI), a dependency makes Vite re-optimise
+  // and reload the browser tests ("Vite unexpectedly reloaded a test"). Solid's runtime entries,
+  // and React's JSX runtimes (an explicit list stops Vite discovering them in time).
+  optimizeDeps: {
+    include: [
+      "solid-js",
+      "solid-js/web",
+      "solid-js/store",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+    ],
+  },
   test: {
     ...(maxWorkers === undefined ? {} : { maxWorkers }),
     projects: [
