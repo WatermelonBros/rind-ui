@@ -10,12 +10,15 @@ export function Hero({
   children,
   today = ["React"],
   frameworks = "",
+  ready = 0,
 }: {
   children?: ReactNode
   /** the frameworks released, from their packages (lib/frameworks.ts) */
   today?: readonly string[]
   /** where the other frameworks stand (lib/framework-status.ts: upcoming) */
   frameworks?: string
+  /** the components ready today (the roadmap) */
+  ready?: number
 }) {
   return (
     <main>
@@ -49,6 +52,21 @@ export function Hero({
             </p>
           </section>
           <SkinScene />
+          {/* the hero's foot: what the library is, in numbers */}
+          <ul className={styles.facts} aria-label="rind in numbers">
+            <li>
+              <b>{ready}</b> components
+            </li>
+            <li>
+              <b>{today.length}</b> frameworks
+            </li>
+            <li>
+              <b>0</b> styles shipped
+            </li>
+            <li>
+              <b>1</b> test driver each
+            </li>
+          </ul>
         </div>
       </div>
       {children}

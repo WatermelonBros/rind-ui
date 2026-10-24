@@ -67,10 +67,11 @@ export function XRay() {
       y = e.clientY
       if (!frame) frame = requestAnimationFrame(follow)
       // the event target of a pointer event is an Element (or null over nothing)
-      const hit =
-        (e.target as Element | null)?.closest<HTMLElement>(
-          "[data-skinned] [data-scope][data-part]",
-        ) ?? null
+      // (a tool's own chrome, the builder's chips and rack, is not what the page shows off)
+      const over = e.target as Element | null
+      const hit = over?.closest("[data-xray-off]")
+        ? null
+        : (over?.closest<HTMLElement>("[data-skinned] [data-scope][data-part]") ?? null)
       if (hit === target) return
       watch.disconnect()
       target = hit

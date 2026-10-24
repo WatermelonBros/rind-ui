@@ -1,6 +1,6 @@
 "use client"
 
-import { Button, MessageThread, StreamingMessage } from "@rind-ui/react"
+import { Button, CheckboxGroup, MessageThread, StreamingMessage, Switch } from "@rind-ui/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Letters } from "../letters"
 import { usePhase } from "../phase"
@@ -25,9 +25,10 @@ ${body}
   </Dialog.Portal>
 </Dialog.Root>`
 
-const SESSIONS: Record<HeroKind, { ask: string; reply: string }> = {
+const SESSIONS: Record<HeroKind, { ask: string; reply: string; title: string }> = {
   switch: {
     ask: "Add a settings dialog with a dark mode switch. Test it.",
+    title: "Settings",
     reply: `Read llms.txt: Dialog and Switch are both ready.
 
 ${DIALOG(
@@ -50,6 +51,7 @@ expect(await dark.isChecked()).toBe(true)
   },
   checkbox: {
     ask: 'Add a terms dialog with an "I agree" checkbox. Test it.',
+    title: "Terms",
     reply: `Read llms.txt: Dialog and Checkbox are both ready.
 
 ${DIALOG(
@@ -74,6 +76,7 @@ expect(await agree.isChecked()).toBe(true)
   },
   button: {
     ask: "Add a confirm dialog with a Delete button. Test it.",
+    title: "Delete project",
     reply: `Read llms.txt: Dialog and Button are both ready.
 
 ${DIALOG("Delete project", `        <Button onPress={remove}>Delete</Button>`)}
@@ -185,6 +188,36 @@ export function Agents() {
               </MessageThread.Message>
             </MessageThread.Viewport>
           </MessageThread.Root>
+          {/* what the reply's code renders, live, in the site's skin: the dialog's content
+              with its control, where the travelling object comes down (skin-scene.tsx) */}
+          <figure
+            className={styles.agentsRender}
+            data-skinned=""
+            data-skin={phase}
+            data-done={status === "complete" ? "" : undefined}
+          >
+            <figcaption>What it renders</figcaption>
+            <div className={styles.agentsDialog}>
+              <b>{SESSIONS[kind].title}</b>
+              {kind === "switch" ? (
+                <Switch.Root>
+                  <Switch.Control data-object-dock="agents">
+                    <Switch.Thumb />
+                  </Switch.Control>
+                  <Switch.Label>Dark mode</Switch.Label>
+                </Switch.Root>
+              ) : kind === "checkbox" ? (
+                <CheckboxGroup.Item>
+                  <CheckboxGroup.ItemControl data-object-dock="agents">
+                    <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                  </CheckboxGroup.ItemControl>
+                  <CheckboxGroup.ItemLabel>I agree</CheckboxGroup.ItemLabel>
+                </CheckboxGroup.Item>
+              ) : (
+                <Button data-object-dock="agents">Delete</Button>
+              )}
+            </div>
+          </figure>
         </div>
       </div>
     </section>

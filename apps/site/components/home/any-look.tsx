@@ -2,6 +2,8 @@
 
 import {
   Accordion,
+  Avatar,
+  Badge,
   Button,
   CheckboxGroup,
   Collapsible,
@@ -360,6 +362,7 @@ export function AnyLook() {
         {/* the builder's own controls are rind components in the site's bare skin */}
         <div
           className={styles.lookPresets}
+          data-xray-off=""
           data-skinned=""
           data-skin="bare"
           data-rind-theme="skin-bare"
@@ -411,11 +414,32 @@ export function AnyLook() {
           <div ref={stage} className={styles.lookStage} data-look="">
             <div className={styles.lookSticky}>
               <div className={styles.lookGrid}>
+                {/* a profile's head: who it is, and its plan */}
+                <div className={styles.lookWho}>
+                  {/* beside the person's visible name, which names it */}
+                  <Avatar.Root aria-hidden="true">
+                    <Avatar.Fallback>AV</Avatar.Fallback>
+                  </Avatar.Root>
+                  <span>
+                    <b>Ada Vance</b>
+                    <small>@ada</small>
+                  </span>
+                  <Badge.Root>Pro</Badge.Root>
+                </div>
                 <div className={styles.lookCol}>
                   <TextField.Root name="handle">
                     <TextField.Label>Handle</TextField.Label>
                     <TextField.Input placeholder="@you" />
                   </TextField.Root>
+                  <Slider.Root defaultValue={60} min={0} max={100}>
+                    <Slider.Label>Volume</Slider.Label>
+                    <Slider.Control>
+                      <Slider.Track>
+                        <Slider.Indicator />
+                      </Slider.Track>
+                      <Slider.Thumb index={0} />
+                    </Slider.Control>
+                  </Slider.Root>
                   <Switch.Root defaultChecked>
                     <Switch.Control>
                       <Switch.Thumb />
@@ -467,6 +491,7 @@ export function AnyLook() {
           </div>
           <div
             className={styles.lookControls}
+            data-xray-off=""
             data-skinned=""
             data-skin="bare"
             data-rind-theme="skin-bare"

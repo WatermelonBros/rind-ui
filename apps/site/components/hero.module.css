@@ -27,6 +27,38 @@
     padding-inline: max(56px, calc((100% - 1400px) / 2 + 56px));
   }
 }
+/* the hero's foot: four facts across the bottom of the first screen, under both columns */
+.facts {
+  grid-column: 1 / -1;
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 32px;
+  margin: 0;
+  padding: 18px 0 0;
+  list-style: none;
+  border-top: 2px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  font: 500 15px var(--mono);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
+}
+.facts b {
+  margin-inline-end: 6px;
+  font: 900 clamp(26px, 2.2vw, 34px) / 1 var(--display);
+  color: var(--ink);
+  vertical-align: -0.12em;
+}
+@media (max-width: 900px) {
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-size: 13px;
+  }
+}
+/* the copy and the object share the screen above it */
+.hero {
+  grid-template-rows: 1fr auto;
+}
 .copy {
   display: flex;
   flex-direction: column;

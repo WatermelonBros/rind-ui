@@ -91,6 +91,8 @@ export default defineConfig({
             "packages/*/{src,fixtures}/**/*.test.{ts,tsx}",
             "scripts/**/*.test.ts",
             "a11y-nightly/**/*.test.ts",
+            // the site's pure geometry (no DOM): components/home/docks.ts
+            "apps/site/components/**/*.test.ts",
           ],
           exclude: [
             ...dom,
