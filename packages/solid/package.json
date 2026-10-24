@@ -87,6 +87,11 @@
         "solid": "./dist/badge/index.jsx",
         "default": "./dist/badge/index.mjs"
       },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.mts",
+        "solid": "./dist/breadcrumbs/index.jsx",
+        "default": "./dist/breadcrumbs/index.mjs"
+      },
       "./button": {
         "types": "./dist/button/index.d.mts",
         "solid": "./dist/button/index.jsx",
@@ -147,6 +152,16 @@
         "solid": "./dist/meter/index.jsx",
         "default": "./dist/meter/index.mjs"
       },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.mts",
+        "solid": "./dist/number-input/index.jsx",
+        "default": "./dist/number-input/index.mjs"
+      },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.mts",
+        "solid": "./dist/pagination/index.jsx",
+        "default": "./dist/pagination/index.mjs"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.mts",
         "solid": "./dist/progress/index.jsx",
@@ -156,6 +171,11 @@
         "types": "./dist/radio-group/index.d.mts",
         "solid": "./dist/radio-group/index.jsx",
         "default": "./dist/radio-group/index.mjs"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.mts",
+        "solid": "./dist/rating/index.jsx",
+        "default": "./dist/rating/index.mjs"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.mts",
@@ -171,6 +191,11 @@
         "types": "./dist/skeleton/index.d.mts",
         "solid": "./dist/skeleton/index.jsx",
         "default": "./dist/skeleton/index.mjs"
+      },
+      "./slider": {
+        "types": "./dist/slider/index.d.mts",
+        "solid": "./dist/slider/index.jsx",
+        "default": "./dist/slider/index.mjs"
       },
       "./switch": {
         "types": "./dist/switch/index.d.mts",
@@ -196,6 +221,11 @@
         "types": "./dist/toggle-group/index.d.mts",
         "solid": "./dist/toggle-group/index.jsx",
         "default": "./dist/toggle-group/index.mjs"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.mts",
+        "solid": "./dist/toolbar/index.jsx",
+        "default": "./dist/toolbar/index.mjs"
       },
       "./package.json": "./package.json"
     }
@@ -230,6 +260,12 @@
       "types": "./dist/badge/index.d.mts",
       "solid": "./dist/badge/index.jsx",
       "default": "./dist/badge/index.mjs"
+    },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.mts",
+      "solid": "./dist/breadcrumbs/index.jsx",
+      "default": "./dist/breadcrumbs/index.mjs"
     },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
@@ -303,6 +339,18 @@
       "solid": "./dist/meter/index.jsx",
       "default": "./dist/meter/index.mjs"
     },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.mts",
+      "solid": "./dist/number-input/index.jsx",
+      "default": "./dist/number-input/index.mjs"
+    },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.mts",
+      "solid": "./dist/pagination/index.jsx",
+      "default": "./dist/pagination/index.mjs"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.mts",
@@ -314,6 +362,12 @@
       "types": "./dist/radio-group/index.d.mts",
       "solid": "./dist/radio-group/index.jsx",
       "default": "./dist/radio-group/index.mjs"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.mts",
+      "solid": "./dist/rating/index.jsx",
+      "default": "./dist/rating/index.mjs"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -332,6 +386,12 @@
       "types": "./dist/skeleton/index.d.mts",
       "solid": "./dist/skeleton/index.jsx",
       "default": "./dist/skeleton/index.mjs"
+    },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.mts",
+      "solid": "./dist/slider/index.jsx",
+      "default": "./dist/slider/index.mjs"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -362,6 +422,12 @@
       "types": "./dist/toggle-group/index.d.mts",
       "solid": "./dist/toggle-group/index.jsx",
       "default": "./dist/toggle-group/index.mjs"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.mts",
+      "solid": "./dist/toolbar/index.jsx",
+      "default": "./dist/toolbar/index.mjs"
     },
     "./package.json": "./package.json"
   }

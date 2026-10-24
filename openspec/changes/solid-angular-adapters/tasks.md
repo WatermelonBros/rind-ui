@@ -39,12 +39,12 @@
 - [x] 2.24 Collapsible
 - [x] 2.25 Accordion
 - [x] 2.26 Tabs
-- [ ] 2.27 Toolbar
-- [ ] 2.28 Breadcrumbs
-- [ ] 2.29 Pagination
-- [ ] 2.30 Rating
-- [ ] 2.31 Slider
-- [ ] 2.32 Number Input
+- [x] 2.27 Toolbar
+- [x] 2.28 Breadcrumbs
+- [x] 2.29 Pagination
+- [x] 2.30 Rating
+- [x] 2.31 Slider
+- [x] 2.32 Number Input
 - [ ] 2.33 Pin Input
 - [ ] 2.34 Splitter
 - [ ] 2.35 Stepper
