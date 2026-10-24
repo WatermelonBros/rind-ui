@@ -209,6 +209,10 @@
   translate: 0 0;
 }
 
+/* pulled off its place, the object leaves no second control showing under where it was */
+.stage[data-pulled] :is(.switch, .checkbox, .button, .thumb, .check) {
+  visibility: hidden;
+}
 /* the invitation to pull the object (and the page's skin off): only where it can be dragged */
 .pull {
   font-weight: 700;

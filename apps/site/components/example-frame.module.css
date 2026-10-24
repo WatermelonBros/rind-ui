@@ -113,8 +113,8 @@
   transition: background 0.5s var(--spring);
 }
 .frame[data-hero] .stage {
-  min-height: 300px;
-  padding: 56px 28px;
+  min-height: 240px;
+  padding: 48px 28px;
 }
 /* one box per example, so multi-root examples (headings, rows) keep their own layout */
 .canvas {
@@ -127,6 +127,10 @@
 .canvas > button:only-child {
   display: block;
   margin-inline: auto;
+}
+/* a row of controls that wraps (a phone) stays centred in the stage, not hung on its left */
+.canvas > :global(.row) {
+  justify-content: center;
 }
 .stage[data-view="crisp"] {
   background: #d4ff3a;

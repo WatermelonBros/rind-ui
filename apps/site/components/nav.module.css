@@ -62,8 +62,30 @@
 .mini span {
   color: var(--acc);
 }
+:global(html[data-sound-ask]) .sound {
+  animation: sound-ask 1.4s var(--spring) infinite;
+}
+:global(html[data-sound-ask]) .soundWord::after {
+  content: " on?";
+}
+@keyframes sound-ask {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--acc) 60%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :global(html[data-sound-ask]) .sound {
+    animation: none;
+    outline: 2px solid var(--acc);
+  }
+}
 /* the sound toggle (nav.tsx): a real button in the phase's own make, the bars inside it.
-   It is where the sound invite (sound-invite.tsx) lands. */
+   For a few seconds it asks itself whether to play (sound-invite.tsx): it pulses and its word
+   says "sound on?" */
 .sound {
   display: flex;
   align-items: center;
@@ -111,6 +133,10 @@
   transition: opacity 0.4s var(--spring);
 }
 .side[data-on] {
+  opacity: 1;
+}
+/* a worn skin (wear.ts) can sit at the edge of 4.5:1: its words are drawn whole */
+:global(html[data-worn]) .side {
   opacity: 1;
 }
 .visuallyHidden {

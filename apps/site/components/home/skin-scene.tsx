@@ -245,6 +245,13 @@ export function SkinScene() {
     // a small overshoot on every touchdown, so a landing reads as an event
     let dockedAt = 0
     let dockedKey = ""
+    // Docked, it holds on: the dock it reached keeps it while the flight reads 80% and more, so a
+    // control that moves under it (the test opening its accordion, pushing the switch down) takes
+    // it along instead of throwing it back into the air
+    let held = ""
+    const leg = (p: DockPosition) => `${p.from}>${p.to}`
+    const isDocked = (p: DockPosition | null): boolean =>
+      p !== null && (p.t >= 1 || (held === leg(p) && p.t > 0.8))
     const settled = (b: DOMRect) => {
       const k = dockedAt ? (performance.now() - dockedAt) / 260 : 1
       const g = k >= 1 ? 1 : 1 + 0.05 * Math.sin(k * Math.PI) * (1 - k)
@@ -261,7 +268,13 @@ export function SkinScene() {
     const target = () => {
       const r = path()
       drawn = r
-      return grab.x || grab.y ? new DOMRect(r.x + grab.x, r.y + grab.y, r.width, r.height) : r
+      if (!grab.x && !grab.y) return r
+      // pulled, it stretches along the pull like the rubber it is (up to a third longer)
+      const sx = 1 + Math.min(0.33, Math.abs(grab.x) / 600)
+      const sy = 1 + Math.min(0.33, Math.abs(grab.y) / 600)
+      const w = r.width * sx
+      const h = r.height * sy
+      return new DOMRect(r.x + grab.x - (w - r.width) / 2, r.y + grab.y - (h - r.height) / 2, w, h)
     }
     // The object can be caught anywhere on its trip (a fine pointer, motion allowed): a press
     // on it, where nothing usable lies under it, flips it for a moment (the switch and the
@@ -378,7 +391,13 @@ export function SkinScene() {
         grab.y = r
           ? Math.min(window.innerHeight - r.bottom - 32, Math.max(80 - r.top, e.clientY - grab.sy))
           : e.clientY - grab.sy
-        if (Math.hypot(grab.x, grab.y) > 4) grab.moved = true
+        if (Math.hypot(grab.x, grab.y) > 4 && !grab.moved) {
+          grab.moved = true
+          // the release must not land as a click on what lies under the pointer then
+          swallow = true
+          // nor the real control show through where the object was pulled from
+          stage.current?.toggleAttribute("data-pulled", true)
+        }
         // pulled far enough, it takes the page's skin with it (strip)
         if (!stripped && Math.hypot(grab.x, grab.y) > 60) strip(true, e.clientX, e.clientY)
         lastPull = [e.clientX, e.clientY]
@@ -394,6 +413,7 @@ export function SkinScene() {
       if (!grab.down) return
       grab.down = false
       document.body.style.cursor = ""
+      stage.current?.removeAttribute("data-pulled")
       if (stripped) strip(false, lastPull[0], lastPull[1])
       if (!grab.moved) {
         grab.x = 0
@@ -442,7 +462,7 @@ export function SkinScene() {
       const from = p ? boxes[p.from] : null
       const to = p ? boxes[p.to] : null
       if (p && from && to) {
-        if (p.t >= 1) return settled(to)
+        if (isDocked(p)) return settled(to)
         // where it is drawn along the flight (alpha reads the same, this frame)
         shownT = flown(p.t)
         if (phone()) return hop(from, to, shownT).box
@@ -489,7 +509,8 @@ export function SkinScene() {
       const leaving = dockOf(p.from)
       const reaching = dockOf(p.to)
       // on a dock it melts into: whole as it touches down, gone within an eighth of a screen
-      if (p.t >= 1) return reaching?.mode === "melt" ? Math.max(0, 1 - p.past / (vh() * 0.12)) : 1
+      if (isDocked(p))
+        return reaching?.mode === "melt" ? Math.max(0, 1 - p.past / (vh() * 0.12)) : 1
       // out of a dock it melted into, it comes back over the first stretch of the flight
       const emerge = leaving?.mode === "melt" ? Math.min(1, shownT / 0.08) : 1
       return phone() ? Math.min(emerge, hop(from, to, shownT).alpha) : emerge
@@ -520,7 +541,7 @@ export function SkinScene() {
       const handle = scene.current
       if (!handle) return
       const { p } = where()
-      const docked = p && p.t >= 1 ? dockOf(p.to)?.id : undefined
+      const docked = p && isDocked(p) ? dockOf(p.to)?.id : undefined
       if (docked === "test") {
         // the tests drive it now: the control's state, and a press for every press
         const state = getTestState()
@@ -598,7 +619,9 @@ export function SkinScene() {
       const { p, els } = where()
       const leaving = dockOf(p?.from)
       const reaching = dockOf(p?.to)
-      const docked = p && p.t >= 1 ? reaching?.id : undefined
+      const docked = isDocked(p) ? reaching?.id : undefined
+      if (p && p.t >= 1) held = leg(p)
+      else if (!p || held !== leg(p) || p.t <= 0.8) held = ""
       const key = p ? `${p.from}>${p.to}${docked ? ":on" : ""}` : past ? "machine" : "hero"
       if (key !== legKey) {
         legKey = key
@@ -627,19 +650,30 @@ export function SkinScene() {
         scene.current.setLook(colors.brand, colors.surface, colors.picked ? 1 : k)
         if (colors.material) scene.current.setMaterial(colors.material)
       } else if (past) setLanded(true)
-      // the real components: a melt dock's shows as a ghost of itself while the object comes
-      // down on it (never a hole), and comes up to full as the object dissolves into it
+      // the real components: a melt dock's shows as a ghost of itself while the object flies to
+      // it or away from it (never a hole), is gone while the object stands on it (a ghost peeking
+      // out from under the object read as a smudge), and comes back whole as it dissolves
       const objectAlpha = alpha()
       for (const [i, d] of DOCKS.entries()) {
         if (d.mode !== "melt") continue
         const el = els[i]
+        const on = p && p.to === i && isDocked(p)
         const near = p && ((p.to === i && p.t >= 0.6) || (p.from === i && p.t < 0.15))
-        setOpacity(el, near ? String(Math.max(0.25, 1 - objectAlpha)) : null)
+        setOpacity(
+          el,
+          on
+            ? objectAlpha > 0.5
+              ? "0"
+              : null
+            : near
+              ? String(Math.max(0.25, 1 - objectAlpha))
+              : null,
+        )
       }
       // the test's control: a ghost while the object flies to it, gone as it comes down on it
       const testEl = els[DOCKS.findIndex((d) => d.id === "test")]
       if (testEl) {
-        const inbound = reaching?.id === "test" && p && p.t < 1
+        const inbound = reaching?.id === "test" && p && !isDocked(p)
         // (a phone draws no object mid-hop: its control stays whole until the object grows in)
         if (inbound && p.t >= (phone() ? 0.8 : 0.6)) setOpacity(testEl, "0")
         else if (inbound && !phone()) setOpacity(testEl, "0.3")
@@ -707,7 +741,7 @@ export function SkinScene() {
           }
         }
       }
-      const air = Boolean(p && p.t < 1)
+      const air = Boolean(p && !isDocked(p))
       if (air !== flying) {
         flying = air
         follow()

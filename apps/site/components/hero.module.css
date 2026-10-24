@@ -225,11 +225,9 @@
     padding: 96px 20px 64px;
   }
 }
-/* the sound question hangs under the bar (sound-invite.tsx): the wordmark starts below it, so
-   the first frame on a phone is never the brand cut by it */
 @media (max-width: 760px) {
   .hero {
-    padding-top: 156px;
+    padding-top: 112px;
   }
   /* tighter, so the object and its label are on the first screen too */
   .copy {

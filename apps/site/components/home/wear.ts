@@ -28,6 +28,7 @@ const TOKENS = [
   "--wordmark",
   "--wordmark-deep",
   "--on-acc",
+  "--on-outro",
 ] as const
 
 /** The shadows a skin names, as the site's two sizes (large, small). */
@@ -66,6 +67,8 @@ export function wear(look: (Look & { readonly brand: string }) | null) {
     return
   }
   const ink = textOn(look.surface)
+  // white type: a dark ground
+  const dark = ink === "#FFFFFF"
   const [shadow, small] = shadows(look)
   const body = look.font === "display" ? "sans" : look.font
   const set: Record<(typeof TOKENS)[number], string> = {
@@ -86,9 +89,14 @@ export function wear(look: (Look & { readonly brand: string }) | null) {
     "--text": `${SITE_FONTS[body]}, system-ui, sans-serif`,
     "--display": `${SITE_FONTS[look.font]}, sans-serif`,
     "--btn-r": look.radius >= 20 ? "99px" : `${look.radius}px`,
-    // the dark bands (tests, the outro) turn the skin inside out
-    "--ground-ink": ink,
-    "--on-ground-ink": look.surface,
+    // the dark bands (tests, the outro): a light skin turns inside out (its ink as their ground);
+    // a dark skin's are its own ground, tinted with its brand and always deeper than the page
+    // (a brand lighter than the ground lifted it under its white type), never a stark white
+    "--ground-ink": dark
+      ? `color-mix(in oklab, color-mix(in oklab, ${look.surface} 85%, ${look.brand}) 70%, #000)`
+      : ink,
+    "--on-ground-ink": dark ? ink : look.surface,
+    "--on-outro": dark ? ink : look.surface,
     "--wordmark": look.brand,
     "--on-acc": textOn(look.brand),
     "--wordmark-deep": `color-mix(in oklab, ${look.brand} 65%, #000)`,
