@@ -353,3 +353,11 @@
 :global(html[data-worn]) .graph g[data-on] text {
   fill: var(--on-acc);
 }
+/* a worn skin: the label is the page's ink, and the disc's own type on the disc (the component's
+   skin kept its dark grey, near-invisible on a dark skin's ground) */
+:global(html[data-worn]) .scene[data-gl] [data-part="label"] {
+  color: var(--ink);
+}
+:global(html[data-worn]) .sticky[data-ink] .scene[data-gl] [data-part="label"] {
+  color: var(--on-ground-ink);
+}
