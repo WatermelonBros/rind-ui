@@ -67,6 +67,11 @@
         "solid": "./dist/index.jsx",
         "default": "./dist/index.mjs"
       },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.mts",
+        "solid": "./dist/accordion/index.jsx",
+        "default": "./dist/accordion/index.mjs"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.mts",
         "solid": "./dist/alert/index.jsx",
@@ -96,6 +101,11 @@
         "types": "./dist/checkbox-group/index.d.mts",
         "solid": "./dist/checkbox-group/index.jsx",
         "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.mts",
+        "solid": "./dist/collapsible/index.jsx",
+        "default": "./dist/collapsible/index.mjs"
       },
       "./field": {
         "types": "./dist/field/index.d.mts",
@@ -142,6 +152,16 @@
         "solid": "./dist/progress/index.jsx",
         "default": "./dist/progress/index.mjs"
       },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.mts",
+        "solid": "./dist/radio-group/index.jsx",
+        "default": "./dist/radio-group/index.mjs"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.mts",
+        "solid": "./dist/segmented-control/index.jsx",
+        "default": "./dist/segmented-control/index.mjs"
+      },
       "./separator": {
         "types": "./dist/separator/index.d.mts",
         "solid": "./dist/separator/index.jsx",
@@ -151,6 +171,16 @@
         "types": "./dist/skeleton/index.d.mts",
         "solid": "./dist/skeleton/index.jsx",
         "default": "./dist/skeleton/index.mjs"
+      },
+      "./switch": {
+        "types": "./dist/switch/index.d.mts",
+        "solid": "./dist/switch/index.jsx",
+        "default": "./dist/switch/index.mjs"
+      },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.mts",
+        "solid": "./dist/tabs/index.jsx",
+        "default": "./dist/tabs/index.mjs"
       },
       "./text-field": {
         "types": "./dist/text-field/index.d.mts",
@@ -176,6 +206,12 @@
       "types": "./dist/index.d.mts",
       "solid": "./dist/index.jsx",
       "default": "./dist/index.mjs"
+    },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.mts",
+      "solid": "./dist/accordion/index.jsx",
+      "default": "./dist/accordion/index.mjs"
     },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
@@ -212,6 +248,12 @@
       "types": "./dist/checkbox-group/index.d.mts",
       "solid": "./dist/checkbox-group/index.jsx",
       "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.mts",
+      "solid": "./dist/collapsible/index.jsx",
+      "default": "./dist/collapsible/index.mjs"
     },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
@@ -267,6 +309,18 @@
       "solid": "./dist/progress/index.jsx",
       "default": "./dist/progress/index.mjs"
     },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.mts",
+      "solid": "./dist/radio-group/index.jsx",
+      "default": "./dist/radio-group/index.mjs"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.mts",
+      "solid": "./dist/segmented-control/index.jsx",
+      "default": "./dist/segmented-control/index.mjs"
+    },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
       "types": "./dist/separator/index.d.mts",
@@ -278,6 +332,18 @@
       "types": "./dist/skeleton/index.d.mts",
       "solid": "./dist/skeleton/index.jsx",
       "default": "./dist/skeleton/index.mjs"
+    },
+    "./switch": {
+      "@rind-ui/source": "./src/switch/index.ts",
+      "types": "./dist/switch/index.d.mts",
+      "solid": "./dist/switch/index.jsx",
+      "default": "./dist/switch/index.mjs"
+    },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.mts",
+      "solid": "./dist/tabs/index.jsx",
+      "default": "./dist/tabs/index.mjs"
     },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",

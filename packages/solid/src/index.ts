@@ -1,11 +1,13 @@
 // @rind-ui/solid: SolidJS parts over the framework-neutral core, one component at a time.
 
+export * from "./accordion"
 export * from "./alert"
 export * from "./avatar"
 export * from "./badge"
 export * from "./button"
 export * from "./checkbox"
 export * from "./checkbox-group"
+export * from "./collapsible"
 export * from "./field"
 export * from "./fieldset"
 export * from "./heading"
@@ -27,9 +29,13 @@ export {
   useLocale,
   useMessages,
 } from "./provider"
+export * from "./radio-group"
 export type { RenderProp } from "./render"
+export * from "./segmented-control"
 export * from "./separator"
 export * from "./skeleton"
+export * from "./switch"
+export * from "./tabs"
 export * from "./text-field"
 export * from "./toggle"
 export * from "./toggle-group"
