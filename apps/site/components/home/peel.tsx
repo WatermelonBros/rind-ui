@@ -90,7 +90,7 @@ export function Peel() {
         control.current?.querySelector('[data-part="control"], button') ?? control.current
       )?.getBoundingClientRect()
       const box = stick?.getBoundingClientRect()
-      if (stick && c && box && box.width && box.height) {
+      if (stick && c && box?.width && box.height) {
         stick.style.setProperty(
           "--disc-x",
           `${((c.left + c.width / 2 - box.left) / box.width) * 100}%`,
@@ -103,7 +103,11 @@ export function Peel() {
       const next = document.getElementById("look-title")?.getBoundingClientRect().top
       if (stick) {
         const low = (stick.querySelector("[data-state-graph]") ?? stick).getBoundingClientRect()
-        const push = next === undefined ? 0 : Math.max(0, low.bottom + pushed + 40 - next)
+        // desktop only: a phone's column scrolls the scene away on its own
+        const push =
+          next === undefined || window.innerWidth <= 900
+            ? 0
+            : Math.max(0, low.bottom + pushed + 40 - next)
         if (push !== pushed) {
           pushed = push
           // its contents move, not its ground (moving that bared a band of the page under it)

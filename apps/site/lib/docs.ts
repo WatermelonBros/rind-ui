@@ -27,7 +27,7 @@ const marked = new Marked({
       const language = lang && hljs.getLanguage(lang) ? lang : "plaintext"
       const html = hljs.highlight(text, { language }).value
       // every block has its copy button (components/code-copy.tsx handles them all)
-      return `<div class="code-block"><pre data-lang="${language}" tabindex="0" aria-label="${language} code"><code class="hljs">${html}</code></pre><button type="button" class="code-copy" data-code-copy aria-label="Copy the ${language} code">Copy</button></div>`
+      return `<div class="code-block"><pre data-lang="${language}" tabindex="0" aria-label="${language} code"><code class="hljs">${html}</code></pre><button type="button" class="code-copy" data-code-copy>Copy</button></div>`
     },
     link({ href, title, tokens }) {
       const text = this.parser.parseInline(tokens)

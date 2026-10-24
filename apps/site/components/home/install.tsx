@@ -2,6 +2,7 @@
 
 import { Clipboard, ToggleGroup } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { stateWord, upcoming } from "@/lib/framework-status"
 import { Letters } from "../letters"
 import { cue } from "../sound"
 import { handoff } from "./handoff"
@@ -220,9 +221,7 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
           </h2>
           <p className={styles.lead}>
             {list(ready.map((f) => f.name))} today.{" "}
-            {soon.length > 0
-              ? `${list(soon.map((f) => f.name))} on the same core, as they land.`
-              : ""}
+            {soon.length > 0 ? `${upcoming(soon)}, all on the same core.` : ""}
           </p>
         </Reveal>
         <div ref={rig} className={styles.rig}>
@@ -280,7 +279,7 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
                       {GLYPH[f.id] ?? f.name[0]}
                     </span>
                     {f.name}
-                    <small>{f.count > 0 ? "in progress" : "soon"}</small>
+                    <small>{stateWord(f)}</small>
                   </button>
                 )}
               </li>

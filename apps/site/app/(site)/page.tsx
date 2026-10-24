@@ -15,6 +15,7 @@ import release from "@/content/generated/release.json"
 import { frameworks } from "@/lib/frameworks"
 // only the skins of the components the landing renders: a smaller first-paint stylesheet
 import "@/skins/home.css"
+import { upcoming } from "@/lib/framework-status"
 
 /** What search engines (and the AI search built on them) should understand this site to be. */
 const STRUCTURED = {
@@ -42,7 +43,11 @@ export default function Home() {
       <SmoothScroll />
       {/* each section its own boundary: React hydrates them one at a time, yielding between them,
           instead of the whole landing in one long task on a slow phone */}
-      <Hero>
+      <Hero
+        frameworks={upcoming(
+          frameworks().map((f) => ({ name: f.name, ready: f.ready, count: f.components.length })),
+        )}
+      >
         <Suspense>
           <Peel />
         </Suspense>

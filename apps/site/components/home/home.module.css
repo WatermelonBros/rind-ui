@@ -862,9 +862,8 @@
   font: 500 13px var(--mono);
   color: var(--bg);
   quotes: "\201C" "\201D";
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* the whole phrase, on two lines if it needs them (cut short, it read as broken) */
+  overflow-wrap: anywhere;
   animation: spoken-type 0.6s steps(28, end) both;
 }
 @keyframes spoken-type {
@@ -1845,4 +1844,13 @@ button.socket:focus-visible {
 :global([data-phase="crisp"]) .passBanner b {
   background: var(--ink);
   color: var(--acc);
+}
+
+/* install.tsx: the waiting socket last pressed stays picked out (solid edge, lifted, full
+   colour) while the line under the rig speaks for it */
+.socket[data-soon][data-asked] {
+  opacity: 1;
+  border-style: solid;
+  border-color: var(--ink);
+  translate: 0 -4px;
 }

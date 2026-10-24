@@ -4,6 +4,7 @@ import { Collapsible, TextField, ToggleGroup } from "@rind-ui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
+import { stateWord } from "@/lib/framework-status"
 import { useFramework } from "./framework"
 import styles from "./sidebar.module.css"
 
@@ -84,7 +85,7 @@ export function Sidebar({
                   {/* how far along an unreleased one is, in its name (no tooltip to find) */}
                   {!f.ready && (
                     <small>
-                      {f.components.length ? "wip" : "soon"}
+                      {stateWord({ name: f.name, ready: f.ready, count: f.components.length })}
                       <span className={styles.visuallyHidden}>
                         {f.components.length
                           ? `, ${f.components.length} component${f.components.length > 1 ? "s" : ""} so far`

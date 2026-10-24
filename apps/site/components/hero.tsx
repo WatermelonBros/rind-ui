@@ -6,7 +6,14 @@ import styles from "./hero.module.css"
 import { SkinScene } from "./home/skin-scene"
 import { Wordmark } from "./wordmark"
 
-export function Hero({ children }: { children?: ReactNode }) {
+export function Hero({
+  children,
+  frameworks = "",
+}: {
+  children?: ReactNode
+  /** where the other frameworks stand (lib/framework-status.ts: upcoming) */
+  frameworks?: string
+}) {
   return (
     <main>
       {/* the run is taller than the screen: the hero holds still while the skin comes off */}
@@ -29,7 +36,7 @@ export function Hero({ children }: { children?: ReactNode }) {
               </Link>
             </div>
             <p className={styles.frameworks}>
-              <b>React</b> today · Vue, Svelte, Solid and Angular on the same core, soon
+              <b>React</b> today{frameworks ? ` · ${frameworks}, on the same core` : ""}
             </p>
           </section>
           <SkinScene />

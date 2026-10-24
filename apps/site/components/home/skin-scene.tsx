@@ -734,7 +734,20 @@ export function SkinScene() {
       if (colors.picked && scene.current) scene.current.setLook(colors.brand, colors.surface, 1)
       // hysteresis: the control grows to the object's size on arrival, which moves the page a
       // little; without it, arrival would flicker on and off at the threshold
-      const arrived = !leaving && Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97))
+      // and on its way out it still counts as there while it covers the control at all: the
+      // control showing under an object still on it read as two controls
+      const testRect = getTestTarget()?.getBoundingClientRect()
+      const stillOver =
+        leaving &&
+        atTests &&
+        drawn !== null &&
+        testRect !== undefined &&
+        drawn.right > testRect.left &&
+        drawn.left < testRect.right &&
+        drawn.bottom > testRect.top &&
+        drawn.top < testRect.bottom
+      const arrived =
+        stillOver || (!leaving && Boolean(fin && (atTests ? fin.t > 0.9 : fin.t >= 0.97)))
       if (arrived !== atTests) {
         atTests = arrived
         setTestLanded(arrived)
