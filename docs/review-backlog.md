@@ -437,3 +437,7 @@ verified at round 3 (2026-10-14).
 ## Table of Contents (vue-svelte-adapters)
 
 - warning: the model test's keyboard NAVIGATE can fail `focusKept` under CI load (seen once on the Vue jsdom shard of #245): the heading focus runs on a frame of the virtual scheduler, so when it lands after the step's snapshot the next NAVIGATE starts from the link and ends on the heading. Same code and test in React. The model could advance the injected clock by a frame before collecting a step's facts.
+
+## Color Swatch Picker (vue-svelte-adapters)
+
+- warning: in the server HTML of a swatch group, React renders no swatch with `tabindex="0"` while Vue puts it on the first enabled swatch (the items register after mount in both; React's server radio group finds no declared stop). Both are corrected at hydration. The swatch picker could match against its declared items on the server, so the checked swatch (else the first) is the tab stop from the first byte in every adapter.
