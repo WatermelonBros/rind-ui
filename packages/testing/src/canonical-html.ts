@@ -46,6 +46,18 @@ export function canonicalHtml(html: string | Node): string {
       )
       .join(" ")
 
+  // CSS anchor names hold an escaped id (`--rind-anchor-popover-_5f_r_5f_0_5f_-trigger`): each
+  // becomes `--rind-anchor-0`, `--rind-anchor-1`… in order of appearance.
+  const anchorNames: string[] = []
+  const anchors = (value: string) =>
+    value.replace(/--rind-anchor-[^\s;,)]+/g, (name) => {
+      if (!anchorNames.includes(name)) anchorNames.push(name)
+      return `--rind-anchor-${anchorNames.indexOf(name)}`
+    })
+  const declaration = (p: string, value: string) =>
+    // The positioner names its anchor's id (a part id, holding the instance).
+    p === "--rind-anchor-id" ? inInstance(value) : anchors(value)
+
   const out: string[] = []
   const walk = (node: Node, depth: number) => {
     const pad = "  ".repeat(depth)
@@ -58,7 +70,7 @@ export function canonicalHtml(html: string | Node): string {
           const style = (node as HTMLElement).style
           const decls = Array.from({ length: style.length }, (_, i) => style.item(i))
             .sort()
-            .map((p) => `${p}: ${style.getPropertyValue(p)}`)
+            .map((p) => `${p}: ${declaration(p, style.getPropertyValue(p))}`)
           return `style="${decls.join("; ")}"`
         }
         const v =

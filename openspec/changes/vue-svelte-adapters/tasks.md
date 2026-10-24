@@ -67,7 +67,7 @@
 - [x] 2.50 Tree View
 - [ ] 2.51 Table
 - [ ] 2.52 Sortable
-- [ ] 2.53 Popover
+- [x] 2.53 Popover
 - [ ] 2.54 Tooltip
 - [ ] 2.55 Hover Card
 - [ ] 2.56 Dialog

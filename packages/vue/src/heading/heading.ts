@@ -41,6 +41,19 @@ export function useHeadingContextLevel(): ComputedRef<number | undefined> {
   return computed(() => context?.value)
 }
 
+/**
+ * Makes the calling component a section: the headings below get `level` (default: one more
+ * than the level around it). Call in setup; a part that renders its own element uses it in
+ * place of a `Heading.Level` wrapper (which `asChild` could not see through).
+ */
+export function provideHeadingSection(level: () => HeadingLevel | undefined): void {
+  const parent = inject(HeadingLevelKey, null)
+  provide(
+    HeadingLevelKey,
+    computed(() => nextHeadingLevel(parent?.value, level())),
+  )
+}
+
 /** A section: sets the level of the headings below it. Renders no element. */
 const HeadingLevelSection = defineComponent({
   name: "HeadingLevel",
@@ -49,11 +62,7 @@ const HeadingLevelSection = defineComponent({
     level: Number as PropType<HeadingLevel>,
   },
   setup(props, { slots }) {
-    const parent = inject(HeadingLevelKey, null)
-    provide(
-      HeadingLevelKey,
-      computed(() => nextHeadingLevel(parent?.value, props.level)),
-    )
+    provideHeadingSection(() => props.level)
     return () => slots["default"]?.()
   },
 })

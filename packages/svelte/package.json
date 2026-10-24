@@ -207,6 +207,12 @@
       "svelte": "./dist/pin-input/index.js",
       "default": "./dist/pin-input/index.js"
     },
+    "./popover": {
+      "@rind-ui/source": "./src/popover/index.ts",
+      "types": "./dist/popover/index.d.ts",
+      "svelte": "./dist/popover/index.js",
+      "default": "./dist/popover/index.js"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
@@ -507,6 +513,11 @@
         "types": "./dist/pin-input/index.d.ts",
         "svelte": "./dist/pin-input/index.js",
         "default": "./dist/pin-input/index.js"
+      },
+      "./popover": {
+        "types": "./dist/popover/index.d.ts",
+        "svelte": "./dist/popover/index.js",
+        "default": "./dist/popover/index.js"
       },
       "./progress": {
         "types": "./dist/progress/index.d.ts",

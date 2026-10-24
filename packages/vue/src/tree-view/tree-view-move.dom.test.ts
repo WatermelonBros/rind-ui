@@ -5,7 +5,7 @@ import { getTreeView, recordingAnnouncer } from "@rind-ui/testing"
 import { screen } from "@testing-library/dom"
 import { userEvent } from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
-import { defineComponent, h, shallowRef } from "vue"
+import { defineComponent, h, nextTick, shallowRef } from "vue"
 import { mount } from "../../fixtures/mount"
 import { RindProvider, TreeView, type TreeViewItemData, type TreeViewNodeState } from "../index"
 
@@ -89,6 +89,8 @@ describe("vue tree view moves", () => {
   it("Alt+Down reorders the root by one; focus stays on the node", async () => {
     const user = userEvent.setup()
     const { d, said } = setup()
+    // Mounted with the first update still queued (React's render flushes it inside act).
+    await nextTick()
     row("readme.md").focus()
     await user.keyboard("{Alt>}{ArrowDown}{/Alt}")
     expect(await rows(d)).toEqual([
