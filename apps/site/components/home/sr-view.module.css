@@ -148,6 +148,18 @@
 .keys a {
   color: inherit;
 }
+.keyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+}
+.keyRow span {
+  white-space: nowrap;
+}
+.keyNote {
+  margin: 6px 0 0;
+}
 /* touch screens: swipe stand-ins instead of the key list */
 .swipe {
   display: none;

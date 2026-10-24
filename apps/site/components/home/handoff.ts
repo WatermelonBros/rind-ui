@@ -208,13 +208,31 @@ export function handoff(o: HandoffOptions): () => void {
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(paint)
   }
-  window.addEventListener("scroll", schedule, { passive: true })
+  // the page at rest never shows a traveller frozen mid-flight over the copy: a moment after the
+  // scroll stops the layer fades out, and comes back the instant it moves again (those that
+  // arrived have already melted into their landings)
+  let rest = 0
+  const onScroll = () => {
+    schedule()
+    if (layer) {
+      layer.style.transition = "none"
+      layer.style.opacity = "1"
+    }
+    clearTimeout(rest)
+    rest = window.setTimeout(() => {
+      if (!layer) return
+      layer.style.transition = "opacity 0.3s"
+      layer.style.opacity = "0"
+    }, 260)
+  }
+  window.addEventListener("scroll", onScroll, { passive: true })
   window.addEventListener("resize", schedule)
   media.addEventListener("change", schedule)
   schedule()
   return () => {
     cancelAnimationFrame(frame)
-    window.removeEventListener("scroll", schedule)
+    clearTimeout(rest)
+    window.removeEventListener("scroll", onScroll)
     window.removeEventListener("resize", schedule)
     media.removeEventListener("change", schedule)
     clear()

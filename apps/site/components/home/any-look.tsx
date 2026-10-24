@@ -25,6 +25,7 @@ import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 import {
+  contrast,
   DENSITIES,
   decodeLook,
   encodeLook,
@@ -40,6 +41,7 @@ import {
   SITE_FONTS,
   sameLook,
   skinCss,
+  textOn,
 } from "./skins"
 import { wear } from "./wear"
 
@@ -287,13 +289,34 @@ export function AnyLook() {
     setLookTarget(stage.current?.querySelector<HTMLElement>(selector) ?? null)
     return () => setLookTarget(null)
   }, [])
+  const section = useRef<HTMLElement>(null)
+  const [copied, setCopied] = useState<"css" | "link" | null>(null)
+  // the visitor has taken over: the builder stops playing its skins by itself
+  const touched = useRef(false)
+  const set = (patch: Partial<Look>) => {
+    const next = { ...picked, ...patch }
+    setLook(next)
+    setCopied(null)
+    touched.current = true
+    // a pick is the visitor's: the page wears it (again, after crisp/juicy took it off), except
+    // the Rind preset, which is the page's own look (worn, its white ground replaced the page's)
+    setOwned(!sameLook(next, BASE))
+    setWearing(true)
+  }
+  const preset = PRESETS.find((p) => sameLook(p.look, picked))
+  // the page wears the skin once it is the visitor's own (a press in the builder, a shared
+  // link), never one the builder plays by itself; the nav's crisp/juicy takes it off
+  const [owned, setOwned] = useState(false)
+  const [wearing, setWearing] = useState(true)
+  const worn = owned && wearing ? JSON.stringify(look) : ""
   useEffect(
     () =>
       setLookColors({
         brand: look.brand,
         surface: look.surface,
-        // the skins the builder plays by itself are not the visitor's: the object keeps its own
-        picked: touched.current && (picked.brand !== null || picked.surface !== BASE.surface),
+        // only a skin worn on the page dresses the object everywhere; crisp/juicy taking it off
+        // the page takes it off the object too (it kept the skin on a crisp page)
+        picked: worn !== "",
         // and the rest of it: the object is rebuilt in the skin, not only recoloured
         material: {
           accent: look.accent,
@@ -303,32 +326,8 @@ export function AnyLook() {
           fill: look.fill,
         },
       }),
-    [
-      look.brand,
-      look.surface,
-      look.accent,
-      look.radius,
-      look.border,
-      look.shadow,
-      look.fill,
-      picked.brand,
-      picked.surface,
-    ],
+    [look.brand, look.surface, look.accent, look.radius, look.border, look.shadow, look.fill, worn],
   )
-  const section = useRef<HTMLElement>(null)
-  const [copied, setCopied] = useState<"css" | "link" | null>(null)
-  // the visitor has taken over: the builder stops playing its skins by itself
-  const touched = useRef(false)
-  const set = (patch: Partial<Look>) => {
-    setLook((l) => ({ ...l, ...patch }))
-    setCopied(null)
-  }
-  const preset = PRESETS.find((p) => sameLook(p.look, picked))
-  // the page wears the skin once it is the visitor's own (a press in the builder, a shared
-  // link), never one the builder plays by itself; the nav's crisp/juicy takes it off
-  const [owned, setOwned] = useState(false)
-  const [wearing, setWearing] = useState(true)
-  const worn = owned && wearing ? JSON.stringify(look) : ""
   // biome-ignore lint/correctness/useExhaustiveDependencies: worn is the look, serialised
   useEffect(() => {
     wear(worn ? look : null)
@@ -364,31 +363,8 @@ export function AnyLook() {
     const m = /[#&]skin=([\w.-]+)/.exec(window.location.hash)
     const shared = m?.[1] ? decodeLook(m[1]) : null
     if (!shared) return
-    touched.current = true
-    setOwned(true)
     set(shared)
     document.getElementById("look-title")?.scrollIntoView({ block: "start" })
-  }, [])
-  // the page keeps the phase the visitor chose until they press a skin themselves: a pick (a
-  // press, a key, a focus inside the builder) makes it theirs and wears it
-  useEffect(() => {
-    const el = section.current
-    if (!el) return
-    const stop = () => {
-      touched.current = true
-      setOwned(true)
-      // a pick wears it again, after crisp/juicy took the last one off (the switch itself
-      // still turns it off: its own change comes after this press)
-      setWearing(true)
-    }
-    el.addEventListener("pointerdown", stop)
-    el.addEventListener("keydown", stop)
-    el.addEventListener("focusin", stop)
-    return () => {
-      el.removeEventListener("pointerdown", stop)
-      el.removeEventListener("keydown", stop)
-      el.removeEventListener("focusin", stop)
-    }
   }, [])
   const css = skinCss(look)
   const [picker, setPicker] = useState<ColourComponent | null>(null)
@@ -631,6 +607,34 @@ export function AnyLook() {
                     onChange={(surface) => set({ surface })}
                   />
                 </div>
+                {/* the brand's ramp, and how the three read together, measured (WCAG) */}
+                <div
+                  className={styles.ramp}
+                  aria-hidden="true"
+                  style={{ "--b": look.brand } as CSSProperties}
+                >
+                  {[12, 28, 46, 64, 82, 100].map((k) => (
+                    <i key={k} style={{ "--k": `${k}%` } as CSSProperties} />
+                  ))}
+                </div>
+                <ul className={styles.checks} aria-label="Contrast">
+                  {(
+                    [
+                      ["Text on surface", textOn(look.surface), look.surface, 4.5],
+                      ["Text on brand", textOn(look.brand), look.brand, 4.5],
+                      ["Brand on surface", look.brand, look.surface, 3],
+                    ] as const
+                  ).map(([name, fg, bg, need]) => {
+                    const ratio = contrast(fg, bg)
+                    return (
+                      <li key={name} data-pass={ratio >= need ? "" : undefined}>
+                        <span>{name}</span>
+                        <b>{ratio.toFixed(1)}:1</b>
+                        <small>{ratio >= need ? "AA ✓" : `below ${need}:1`}</small>
+                      </li>
+                    )
+                  })}
+                </ul>
               </Tabs.Panel>
               <Tabs.Panel value="shape" className={styles.rackPanel}>
                 <div className={styles.tuneGroup}>
