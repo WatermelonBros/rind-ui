@@ -21,6 +21,8 @@ export interface Framework {
   readonly version: string
   /** the docs slugs it has a component for (empty when it has none yet) */
   readonly components: readonly string[]
+  /** the framework version it needs (its peer dependency's range: ">=3.5"), when it has one */
+  readonly requires: string | null
 }
 
 const ORDER: readonly { id: FrameworkId; name: string }[] = [
@@ -37,12 +39,21 @@ function read(id: FrameworkId): Framework {
   const name = ORDER.find((f) => f.id === id)?.name ?? id
   const file = join(packages, id, "package.json")
   if (!existsSync(file))
-    return { id, name, pkg: `@rind-ui/${id}`, ready: false, version: "0.0.0", components: [] }
+    return {
+      id,
+      name,
+      pkg: `@rind-ui/${id}`,
+      ready: false,
+      version: "0.0.0",
+      components: [],
+      requires: null,
+    }
   const json = JSON.parse(readFileSync(file, "utf8")) as {
     readonly name?: string
     readonly version?: string
     readonly private?: boolean
     readonly exports?: Record<string, unknown>
+    readonly peerDependencies?: Record<string, string>
   }
   const components = Object.keys(json.exports ?? {})
     .filter((k) => k !== "." && k !== "./package.json" && k.startsWith("./"))
@@ -55,6 +66,8 @@ function read(id: FrameworkId): Framework {
     ready,
     version: json.version ?? "0.0.0",
     components,
+    // the framework itself: "react", "vue", "svelte"… (its other peers are not the framework)
+    requires: json.peerDependencies?.[id] ?? null,
   }
 }
 

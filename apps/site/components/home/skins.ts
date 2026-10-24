@@ -85,7 +85,7 @@ export const PRESETS: readonly Preset[] = [
     id: "glass",
     name: "Glass",
     look: look({
-      brand: "#7C5CFF",
+      brand: "#6A45F0",
       accent: "#FF5CAA",
       surface: "#EEF0FF",
       radius: 20,
@@ -470,7 +470,12 @@ function brandFill(l: Look & { readonly brand: string }): readonly [string, stri
     case "gradient":
       return ["linear-gradient(135deg, var(--skin-brand), var(--skin-accent))", textOn(l.brand)]
     case "glass":
-      return ["color-mix(in oklab, var(--skin-brand) 72%, transparent)", textOn(l.brand)]
+      // a glossy pane of the brand: a light catches its top, the colour stays whole under the
+      // text (a see-through brand left white text at 2:1 on a pale ground)
+      return [
+        "linear-gradient(180deg, rgb(255 255 255 / 0.32), rgb(255 255 255 / 0) 55%), var(--skin-brand)",
+        textOn(l.brand),
+      ]
     case "outline":
       // the text is the brand on the stage's own surface
       return ["transparent", l.brand]
@@ -648,6 +653,81 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 :is([data-scope="button"][data-part="root"], [data-scope="toggle"][data-part="root"])[data-pressed] {
   translate: ${l.shadow === "hard" ? "3px 3px" : "0 1px"};
   box-shadow: ${l.shadow === "hard" ? "1px 1px 0 var(--skin-ink)" : l.shadow === "bevel" ? "inset 2px 2px 0 rgb(0 0 0 / 0.45), inset -2px -2px 0 rgb(255 255 255 / 0.85)" : "var(--skin-shadow)"};
+}
+
+/* Avatar and badge */
+[data-scope="avatar"][data-part="root"] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: min(50%, calc(var(--skin-radius) * 2));
+  background: ${l.fill === "outline" ? "var(--skin-brand)" : "var(--skin-fill)"};
+  color: ${l.fill === "outline" ? textOn(l.brand).toLowerCase() : "var(--skin-fill-text)"};
+  box-shadow: var(--skin-shadow);
+  overflow: hidden;
+}
+[data-scope="avatar"][data-part="fallback"] {
+  font: 700 15px var(--skin-heading);
+}
+[data-scope="badge"][data-part="root"] {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: max(1px, var(--skin-border)) solid color-mix(in oklab, var(--skin-brand) 55%, var(--skin-surface));
+  border-radius: var(--skin-radius-sm);
+  background: color-mix(in oklab, var(--skin-brand) 16%, var(--skin-surface));
+  color: var(--skin-ink);
+  font: 700 11px var(--skin-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Slider */
+[data-scope="slider"][data-part="root"] {
+  display: grid;
+  gap: 8px;
+  inline-size: min(100%, 220px);
+}
+[data-scope="slider"][data-part="label"] {
+  font: 600 13px var(--skin-heading);
+  text-transform: var(--skin-case);
+  letter-spacing: var(--skin-tracking);
+}
+[data-scope="slider"][data-part="control"] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  block-size: 22px;
+}
+[data-scope="slider"][data-part="track"] {
+  position: relative;
+  flex: 1;
+  block-size: 6px;
+  border-radius: 99px;
+  background: var(--skin-line);
+}
+[data-scope="slider"][data-part="indicator"] {
+  position: absolute;
+  inset-block: 0;
+  border-radius: inherit;
+  background: ${l.fill === "outline" ? "var(--skin-brand)" : "var(--skin-fill)"};
+}
+[data-scope="slider"][data-part="thumb"] {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: -50% -50%;
+  inline-size: 20px;
+  block-size: 20px;
+  box-sizing: border-box;
+  border: max(2px, var(--skin-border)) solid var(--skin-brand);
+  border-radius: min(99px, var(--skin-radius));
+  background: var(--skin-surface);
+  box-shadow: var(--skin-shadow);
+  transition: scale var(--skin-duration) var(--skin-ease);
+}
+[data-scope="slider"][data-part="thumb"][data-dragging] {
+  scale: 1.15;
 }
 
 /* Accordion */

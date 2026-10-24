@@ -123,7 +123,7 @@ export function Outro() {
             <Link
               prefetch={false}
               href="/docs/get-started/"
-              className={styles.finaleSlot}
+              className={styles.objectSlot}
               data-object-finale=""
               aria-hidden="true"
               tabIndex={-1}

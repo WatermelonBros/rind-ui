@@ -6,18 +6,25 @@ import { useSound } from "./sound"
 import styles from "./sound.module.css"
 import { zoom } from "./zoom"
 
-const SHOW_AFTER_MS = 1600
+/** Asked once the visitor has done something (a press, a key), or after a while on the hero:
+ *  never before the page has been seen. */
+const SHOW_AFTER_ACT_MS = 900
+const SHOW_IDLE_MS = 9000
 const LEAVE_AFTER_MS = 5000
 
 /**
- * The landing asks once, as the intro ends: this page has sound. The question hangs under the
+ * The landing asks once, after the visitor's first press or key (or a while on the hero): this
+ * page has sound. The question hangs under the
  * nav's sound toggle, pointing at it, so the answer and the way back to it are one thing on
  * screen (a bar at the foot of the screen competed with the hero and the screen-reader toggle).
  * Whatever the answer (or none, after a while or once the visitor scrolls on), it folds up into
  * the toggle. Not a dialog: it takes no focus and blocks nothing.
  */
 export function SoundInvite() {
-  const { setEnabled } = useSound()
+  const { setEnabled, enabled } = useSound()
+  // turned on already (the nav's toggle): nothing to ask
+  const on = useRef(enabled)
+  on.current = enabled
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLElement>(null)
   const done = useRef(false)
@@ -25,14 +32,33 @@ export function SoundInvite() {
   useEffect(() => {
     // after the intro (html.intro goes once the styled page is revealed)
     let shown = 0
+    const ask = (ms: number) => {
+      clearTimeout(shown)
+      shown = window.setTimeout(() => {
+        if (!on.current) setOpen(true)
+      }, ms)
+    }
+    const acted = (e: Event) => {
+      // the sound's own toggle answers the question itself
+      if (e.target instanceof Element && e.target.closest("[data-sound-toggle]")) return
+      off()
+      ask(SHOW_AFTER_ACT_MS)
+    }
+    const off = () => {
+      window.removeEventListener("pointerdown", acted, true)
+      window.removeEventListener("keydown", acted, true)
+    }
     const wait = window.setInterval(() => {
       if (document.documentElement.classList.contains("intro")) return
       clearInterval(wait)
-      shown = window.setTimeout(() => setOpen(true), SHOW_AFTER_MS)
+      window.addEventListener("pointerdown", acted, true)
+      window.addEventListener("keydown", acted, true)
+      ask(SHOW_IDLE_MS)
     }, 200)
     return () => {
       clearInterval(wait)
       clearTimeout(shown)
+      off()
     }
   }, [])
 

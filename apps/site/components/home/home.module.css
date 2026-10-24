@@ -1,7 +1,6 @@
 /* ── shared ─────────────────────────────────────────────────────────────────────────── */
 .section {
   padding: clamp(64px, 6vw, 88px) 56px;
-  /* leaves the hero's object a lane right of the content (skin-scene.tsx: gutterFit) at 1440 */
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -120,15 +119,24 @@
     display: none;
   }
 }
+/* a tick in flight is the mark it lands as (.socketMark), larger: a disc that reads on any
+   ground (a bare glyph fell back to a thin face, faint on cream) */
 .tickTraveller {
-  font: 900 56px / 1 var(--display);
-  color: #2fbf71;
-  text-shadow: 0 6px 18px #2fbf7155;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: 50%;
+  background: #2fbf71;
+  color: #fff;
+  font: 900 22px / 1 var(--text);
+  box-shadow: 0 8px 20px #2fbf7166;
 }
 /* in crisp the tick is the phase's own: ink with the lime under it */
 :global([data-phase="crisp"]) .tickTraveller {
-  color: var(--ink);
-  text-shadow: 0 4px 0 var(--acc);
+  background: var(--ink);
+  color: var(--acc);
+  box-shadow: 4px 4px 0 var(--acc);
 }
 .claim p {
   font: 500 clamp(17px, 1.3vw, 20px) / 1.5 var(--text);
@@ -240,6 +248,13 @@
   box-shadow: var(--shadow);
   overflow: hidden;
   background: var(--card);
+}
+/* the builder's own chrome wears the bare skin with the site's ink for its accent and focus
+   ring (the bare skin's own blue read as a browser default) */
+.lookPresets,
+.lookControls {
+  --s-acc: var(--ink);
+  --s-focus: var(--ink);
 }
 /* the ready skins: a wall of chips across the panel's head, each with its colours as a dot */
 .lookPresets {
@@ -416,6 +431,19 @@
   padding: 48px clamp(20px, 5vw, 64px);
   transition: background 0.5s var(--spring);
 }
+/* any-look.tsx: the preview's head, a profile */
+.lookWho {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lookWho > span {
+  display: grid;
+}
+.lookWho small {
+  opacity: 0.65;
+}
 .lookGrid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
@@ -589,7 +617,8 @@
   gap: 14px;
   padding: 5px 16px;
   font: 500 13.5px / 1.5 var(--mono);
-  opacity: 0.55;
+  /* waiting lines still read (0.55 left them at 3:1 on the editor's green) */
+  opacity: 0.78;
   transition:
     opacity 0.35s var(--spring),
     background 0.35s var(--spring);
@@ -601,7 +630,7 @@
   opacity: 0.6;
 }
 .testCode li[data-state="done"] {
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .testCode li[data-state="current"] {
   opacity: 1;
@@ -634,10 +663,10 @@
   color: #9be7c4;
   animation: line-pass 0.5s var(--spring) backwards;
 }
+/* colour only: lines shifting one after another read as code knocked out of its indent */
 @keyframes line-pass {
   from {
     color: inherit;
-    translate: -6px 0;
   }
 }
 .passBanner {
@@ -692,15 +721,42 @@
 }
 
 .testStage {
+  position: relative;
   padding: 40px clamp(20px, 4vw, 48px);
   display: grid;
   align-content: center;
   background: var(--bg);
 }
-/* room under the control's row: the 3D object comes in along it, under the label (skin-scene.tsx) */
-@media (min-width: 901px) {
-  .testStage[data-gl] {
-    padding-block-end: 112px;
+/* the running line's target, as its driver finds it: a frame round it and the ARIA it reads
+   (tested.tsx); it glides from target to target */
+.driving {
+  position: absolute;
+  inset: 0 auto auto 0;
+  z-index: 2;
+  margin: -6px;
+  padding: 6px;
+  box-sizing: content-box;
+  border: 2px dashed var(--acc-deep);
+  border-radius: 12px;
+  pointer-events: none;
+  transition:
+    translate 0.35s var(--spring),
+    inline-size 0.35s var(--spring),
+    block-size 0.35s var(--spring);
+}
+:global([data-phase="crisp"]) .driving {
+  border-color: var(--ink);
+  border-radius: 4px;
+}
+/* the running line's comment: what its driver read (tested.tsx) */
+.reads {
+  color: #9be7c4;
+  white-space: pre;
+  animation: reads-in 0.3s var(--spring) both;
+}
+@keyframes reads-in {
+  from {
+    opacity: 0;
   }
 }
 /* full width of the stage, so the components keep their natural size */
@@ -790,7 +846,48 @@
 }
 .agentsStage {
   display: grid;
+  gap: 14px;
   min-inline-size: 0;
+}
+/* what the reply's code renders: its dialog's content, live, under the thread (agents.tsx); it
+   comes up once the reply is complete */
+.agentsRender {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  justify-items: start;
+}
+.agentsRender figcaption {
+  font: 600 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.agentsDialog {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  min-inline-size: min(320px, 100%);
+  padding: 20px 24px;
+  border-radius: var(--r);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition:
+    opacity 0.4s var(--spring),
+    translate 0.5s var(--spring-pop);
+}
+.agentsDialog > b {
+  font: 700 18px var(--text);
+}
+.agentsRender:not([data-done]) .agentsDialog {
+  opacity: 0.35;
+  translate: 0 8px;
+}
+/* the install's core gives its face to the object while it stands in it (skin-scene.tsx) */
+.core :is(b, small) {
+  transition: opacity 0.3s;
+}
+.core[data-docked] :is(b, small) {
+  opacity: 0;
 }
 .agentsReplay {
   font: 700 16px var(--text);
@@ -849,6 +946,84 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   gap: 20px;
+}
+/* a wide screen lays the wall out as a bento: the switch and the checkboxes tall at the sides,
+   the slider wide between them, the catalogue's tile closing the last row; each tile drifts at
+   its own pace with the scroll, so the wall has depth */
+@media (min-width: 1100px) {
+  .specimens {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+  }
+  .specimens > li:nth-child(1),
+  .specimens > li:nth-child(3) {
+    grid-row: span 2;
+  }
+  .specimens > li:nth-child(2),
+  .specimens > li:nth-child(6),
+  .specimens > li:nth-child(7) {
+    grid-column: span 2;
+  }
+  .specimens > li:nth-child(1) .specimenStage,
+  .specimens > li:nth-child(3) .specimenStage {
+    min-height: 100%;
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .specimens > li {
+        animation: wall-drift linear both;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+      .specimens > li:nth-child(odd) {
+        --drift: 26px;
+      }
+      .specimens > li:nth-child(3n) {
+        --drift: -18px;
+      }
+    }
+  }
+}
+@keyframes wall-drift {
+  from {
+    translate: 0 var(--drift, 12px);
+  }
+  to {
+    translate: 0 calc(var(--drift, 12px) * -1);
+  }
+}
+/* the catalogue's tile: big type, the whole tile a link */
+.wallMore {
+  display: grid;
+}
+.wallMore a {
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  min-block-size: 160px;
+  padding: 24px 28px;
+  border-radius: var(--r);
+  background: var(--acc);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: translate 0.3s var(--spring-pop);
+}
+.wallMore a:hover {
+  translate: 0 -4px;
+}
+.wallMore b {
+  font: 900 clamp(34px, 3.4vw, 56px) / 1 var(--display);
+  letter-spacing: -0.02em;
+}
+.wallMore span {
+  font:
+    500 17px / 1.4 var(--font-serif),
+    Georgia,
+    serif;
+}
+:global([data-phase="crisp"]) .wallMore a {
+  border: 3px solid var(--ink);
 }
 /* on a phone the wall is a row you swipe through, not six screens of scrolling */
 @media (max-width: 700px) {
@@ -1203,36 +1378,21 @@
   gap: 14px;
   margin: 40px 0 100px;
 }
-/* the object's last berth (outro.tsx renders it only while the object is drawn), sized to its
-   kind: the hero picks one per visit (html[data-hero]) */
-.finaleSlot {
+/* where the travelling object stops (skin-scene.tsx: its docks): rendered only while the object
+   is drawn, sized to its kind, which the hero picks per visit (html[data-hero]) */
+.objectSlot {
   display: inline-block;
   align-self: center;
   inline-size: 104px;
   block-size: 62px;
 }
-:global(html[data-hero="checkbox"]) .finaleSlot {
+:global(html[data-hero="checkbox"]) .objectSlot {
   inline-size: 64px;
   block-size: 64px;
 }
-:global(html[data-hero="button"]) .finaleSlot {
+:global(html[data-hero="button"]) .objectSlot {
   inline-size: 120px;
   block-size: 58px;
-}
-/* the object touches down in it: Get started hops, once */
-.outro[data-finale] .outroPrimary {
-  animation: finale-hop 0.7s var(--spring-pop);
-}
-@keyframes finale-hop {
-  35% {
-    translate: 0 -10px;
-    scale: 1.08;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .outro[data-finale] .outroPrimary {
-    animation: none;
-  }
 }
 .outroPrimary,
 .outroGhost {
@@ -1272,6 +1432,21 @@
 .builtWith:hover {
   background: var(--bg);
   color: var(--ink);
+}
+/* the object touches down in it: Get started hops, once */
+.outro[data-finale] .outroPrimary {
+  animation: finale-hop 0.7s var(--spring-pop);
+}
+@keyframes finale-hop {
+  35% {
+    translate: 0 -10px;
+    scale: 1.08;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outro[data-finale] .outroPrimary {
+    animation: none;
+  }
 }
 .outroBottom {
   /* three tracks, the outer two equal: the middle item sits on the page's true centre whatever
@@ -1693,7 +1868,9 @@
 button.socket {
   cursor: pointer;
 }
-button.socket:not([data-soon]):hover {
+/* the lift is the slot's hover, not the button's: a button rising out from under a pointer at its
+   foot lost the hover and fell back under it, again and again (install.tsx drops it on leave) */
+.socketSlot:hover > button.socket:not([data-soon]) {
   translate: 0 -6px;
 }
 button.socket[aria-pressed="true"] {

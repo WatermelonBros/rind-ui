@@ -194,6 +194,34 @@ function assemble(
   })
 }
 
+/**
+ * A socket the pointer has left drops back into place the way it first landed: a short fall, a
+ * squash, a puff of dust and its "bam" (fine pointer and motion allowed).
+ */
+function drop(slot: HTMLElement, i: number, n: number) {
+  // the socket inside falls, never the slot: the slot is the hover's ground, and a slot rising
+  // back under a pointer at its edge took the hover again, fell, and so on, flickering
+  const socket = slot.firstElementChild
+  if (!(socket instanceof HTMLElement)) return
+  // one fall at a time: a pointer leaving again mid-fall does not restart it
+  if (performance.now() - Number(slot.dataset["fell"] ?? 0) < 700) return
+  slot.dataset["fell"] = String(performance.now())
+  socket.style.transformOrigin = "50% 100%"
+  socket.animate(
+    [
+      { transform: "translate(0, -30px)", easing: "cubic-bezier(.55,0,.95,.45)" },
+      { transform: "translate(0, 0) scale(1.16, 0.8)", offset: 0.5, easing: "ease-out" },
+      { transform: "translate(0, -10px) scale(0.96, 1.05)", offset: 0.75, easing: "ease-in-out" },
+      { transform: "none" },
+    ],
+    { duration: 480 },
+  )
+  window.setTimeout(() => {
+    cue("slam", { pan: panOf(slot), value: i / Math.max(1, n - 1) })
+    puff(slot)
+  }, 240)
+}
+
 /** A ring of dust and a few crumbs, kicked up where a socket lands. */
 function puff(slot: HTMLElement) {
   const ring = document.createElement("i")
@@ -235,6 +263,8 @@ function puff(slot: HTMLElement) {
       )
   }
 }
+
+const motion = () => matchMedia("(prefers-reduced-motion: no-preference)").matches
 
 /** Each package manager's own way of adding a package. */
 const ADD = { npm: "npm i", pnpm: "pnpm add", yarn: "yarn add", bun: "bun add" } as const
@@ -480,6 +510,16 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
                       } as CSSProperties
                     }
                     data-ready={f.ready ? "" : undefined}
+                    // the pointer picks a socket up (a lift and its breath of air) and, leaving
+                    // it, lets it fall back with a bam; never while the frameworks are landing
+                    onPointerEnter={(e) => {
+                      if (e.pointerType !== "mouse" || plugged !== null || !motion()) return
+                      cue("fly", { pan: panOf(e.currentTarget) })
+                    }}
+                    onPointerLeave={(e) => {
+                      if (e.pointerType !== "mouse" || plugged !== null || !motion()) return
+                      drop(e.currentTarget, i, frameworks.length)
+                    }}
                   >
                     {f.ready ? (
                       <button
