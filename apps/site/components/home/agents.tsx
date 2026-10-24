@@ -4,6 +4,7 @@ import { Button, MessageThread, StreamingMessage } from "@rind-ui/react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Letters } from "../letters"
 import { usePhase } from "../phase"
+import { cue } from "../sound"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
@@ -110,6 +111,7 @@ function useReplay(kind: HeroKind) {
       i = Math.min(words.length, i + 2 + Math.floor(Math.random() * 4))
       const done = i >= words.length
       setText(words.slice(0, i).join(""))
+      cue("type")
       setStatus(done ? "complete" : "streaming")
       if (!done) timer.current = window.setTimeout(step, 40 + Math.random() * 70)
     }

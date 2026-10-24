@@ -312,6 +312,7 @@ export function Tested() {
     }
     const runStep = (i: number) => {
       setLine(i)
+      cue("line", { value: i / Math.max(1, STEPS.length - 1) })
       const step = STEPS[i]
       if (stage.current) step?.act?.(stage.current)
       window.setTimeout(() => {

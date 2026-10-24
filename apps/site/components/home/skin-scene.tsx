@@ -665,6 +665,7 @@ export function SkinScene() {
       if (peel > 0.55 !== shown) {
         shown = !shown
         setBare(shown)
+        cue("peel", { value: shown ? 1 : 0 })
         // the rest of the hero (wordmark, lede) follows: hero.module.css, wordmark.module.css
         hero.toggleAttribute("data-bare", shown)
       }
@@ -835,6 +836,9 @@ export function SkinScene() {
       if (air !== flying) {
         flying = air
         follow()
+        // every lift-off and touchdown is heard, from where the object is
+        const at = drawn ? (drawn.x + drawn.width / 2) / window.innerWidth : 0.5
+        cue(air ? "fly" : "land", { pan: (at * 2 - 1) * 0.6 })
       }
       // the test starts once the object has landed in its box (it runs once; tested.tsx ignores
       // repeats, and pauses so the landing and the control's change of state read first)
