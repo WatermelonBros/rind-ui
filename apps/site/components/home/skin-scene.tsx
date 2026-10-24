@@ -527,7 +527,6 @@ export function SkinScene() {
     let flying = false
     // the wall's component has been reached (and turned on) on this pass; the agents' too
     let touched = false
-    let touchedAgents = false
     // a component the object lands on as "on": pressed if it is off, without pulling focus (and
     // the page) to it; focus goes back to where the visitor had it
     const turnOn = (el: HTMLElement) => {
@@ -558,6 +557,16 @@ export function SkinScene() {
           }
         } else handle.setChecked(state.on)
         presses = state.presses
+        return
+      }
+      if (p && dockOf(p.to)?.id === "agents" && kind !== "button") {
+        // on its way to the agents' preview and on it: that control's state, as the reply's
+        // test leaves it (agents.tsx), off until driven
+        const el = document.querySelector<HTMLElement>('[data-object-dock="agents"]')
+        checkedNow =
+          el?.getAttribute("aria-checked") === "true" ||
+          el?.getAttribute("data-state") === "checked"
+        handle.setChecked(checkedNow)
         return
       }
       if (p) {
@@ -726,12 +735,7 @@ export function SkinScene() {
         if (down && !touched) turnOn(wallEl)
         touched = down
       }
-      // the agents' rendered dialog: its control turns on as the object comes down, as the
-      // reply's own test says it does (toggle, then isChecked)
-      const agentsEl = els[DOCKS.findIndex((d) => d.id === "agents")]
-      const onAgents = docked === "agents"
-      if (agentsEl && onAgents && !touchedAgents) turnOn(agentsEl)
-      touchedAgents = onAgents
+      // (the agents' preview is driven by its own reply's test, agents.tsx)
       // the finale's touchdown: it turns on with its own sound, and Get started answers
       const home = docked === "finale"
       if (home !== atFinale) {
@@ -759,6 +763,12 @@ export function SkinScene() {
       if (atTests) emitTestArrived()
     }
     const offPeelOn = onPeelOn(follow)
+    // the agents' preview was driven (agents.tsx): its control changed under the object
+    const onAgentsDriven = () => {
+      follow()
+      update()
+    }
+    window.addEventListener("rind:agents-driven", onAgentsDriven)
     // a state change or a remounted control (a new run): follow it, wake the render loop, and
     // re-apply the hand-over to the new control
     const offTestState = onTestState(() => {
@@ -813,6 +823,7 @@ export function SkinScene() {
       window.removeEventListener("pointerdown", onGrabDown, true)
       window.removeEventListener("pointermove", onGrabMove)
       window.removeEventListener("pointerup", onGrabUp)
+      window.removeEventListener("rind:agents-driven", onAgentsDriven)
       window.removeEventListener("click", onClickCapture, true)
       cancelAnimationFrame(grab.spring)
       document.body.style.cursor = ""
