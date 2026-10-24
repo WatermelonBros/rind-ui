@@ -107,6 +107,13 @@
   color: color-mix(in oklab, var(--s-ink) 40%, transparent);
   cursor: default;
 }
+/* a pointer drag reorders on the drop: until then every arrow would still describe the old order,
+   so all of them rest as disabled */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="sortable"][data-state="dragging"]
+  [data-scope="sortable"][data-part="move-button"] {
+  color: color-mix(in oklab, var(--s-ink) 40%, transparent);
+}
 
 /* while dragging, the others glide aside to open the gap the card will drop into (only then: on
    the drop they reorder and lose the shift in the same frame, which must not animate) */

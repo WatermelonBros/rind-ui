@@ -62,6 +62,11 @@ function Stage({
   const ids = { search: `${base}-search`, toolbar: `${base}-toolbar` }
   return (
     <div className="stack">
+      {/* the trigger first: a card placed below its target never covers it */}
+      <Tour.Root steps={steps(ids)} {...props}>
+        <Tour.Trigger>{trigger}</Tour.Trigger>
+        <Card />
+      </Tour.Root>
       {/* rind parts, so the field and the toolbar wear the skin; on one text baseline, since the
           field's box is taller than its input (the label sits in it) */}
       <div className="row" style={{ alignItems: "last baseline" }}>
@@ -81,10 +86,6 @@ function Stage({
         </div>
       </div>
       {children}
-      <Tour.Root steps={steps(ids)} {...props}>
-        <Tour.Trigger>{trigger}</Tour.Trigger>
-        <Card />
-      </Tour.Root>
     </div>
   )
 }
