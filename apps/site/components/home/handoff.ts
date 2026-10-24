@@ -180,8 +180,9 @@ export function handoff(o: HandoffOptions): () => void {
         // (only on the way: where it lands is where it lands)
         if (p < 1) x = Math.min(window.innerWidth - half - 32, Math.max(half + 32, x))
         node.style.transform = `translate(${x - half}px, ${y - (h * s) / 2}px) scale(${s})`
-        // it lifts off its start and melts into its landing, never a copy lying on either
-        node.style.opacity = String(Math.min(1, ti / 0.12, (1 - ti) / (1 - ARRIVE)))
+        // it lifts off its start and melts into its landing in a breath: a scroll paused while
+        // it was half faded left a ghost of it lying over the copy
+        node.style.opacity = String(clamp(Math.min(ti / 0.05, (ARRIVE + 0.03 - ti) / 0.03)))
       })
     } else if (t <= 0) clear()
     else {

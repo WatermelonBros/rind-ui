@@ -115,7 +115,8 @@
   translate: calc(-50% + (50% - var(--ax, 0.5) * 100% + var(--x)) * var(--fly))
     calc(-50% + var(--y) * var(--fly));
   /* in only once the ink disc has reached them, and gone before the machine arrives */
-  opacity: min(calc(var(--p2) * 1.4 - var(--p3) * 4), calc((var(--dark, 0) - 0.22) * 6));
+  /* out quickly: a chip held half-faded by a pause in the scroll read as washed out */
+  opacity: min(calc(var(--p2) * 1.4 - var(--p3) * 8), calc((var(--dark, 0) - 0.22) * 6));
   scale: calc(0.6 + var(--fly) * 0.4);
 }
 .attrs b {

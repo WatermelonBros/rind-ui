@@ -109,7 +109,9 @@
   flex-direction: column;
   justify-content: flex-end;
   gap: 4px;
-  block-size: 200px;
+  /* as tall as what it holds, up to 200px: a fixed box sat mostly empty over the page */
+  max-block-size: 200px;
+  min-block-size: 56px;
   overflow: hidden;
   font: 500 14px / 1.45 var(--mono);
 }

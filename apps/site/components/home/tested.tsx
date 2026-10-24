@@ -1,6 +1,7 @@
 "use client"
 
 import { Accordion, Button, CheckboxGroup, Switch } from "@rind-ui/react"
+import { computeAccessibleName } from "dom-accessibility-api"
 import { useEffect, useRef, useState } from "react"
 import { Letters } from "../letters"
 import { usePhase } from "../phase"
@@ -24,6 +25,28 @@ type Step = {
   readonly act?: (root: HTMLElement) => void
   /** an assertion: checked against the live DOM when the line runs, never assumed */
   readonly check?: (root: HTMLElement) => boolean
+  /** what the line's driver finds: drawn round on the stage while the line runs */
+  readonly target?: (root: HTMLElement) => HTMLElement | null
+}
+
+const byText = (root: HTMLElement, selector: string, text: string) =>
+  [...root.querySelectorAll<HTMLElement>(selector)].find((el) => el.textContent?.includes(text)) ??
+  null
+const returns = (r: HTMLElement) =>
+  byText(r, '[data-scope="accordion"][data-part="trigger"]', "Returns")
+const control = (r: HTMLElement) =>
+  r.querySelector<HTMLElement>(
+    '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
+  )
+
+/** What a driver reads off an element: its role, its accessible name and its state, from ARIA. */
+function readAria(el: HTMLElement): string {
+  const role = el.getAttribute("role") ?? (el.tagName === "BUTTON" ? "button" : el.localName)
+  const name = computeAccessibleName(el).trim()
+  const state = ["aria-expanded", "aria-checked", "aria-pressed"]
+    .map((a) => (el.hasAttribute(a) ? `${a}="${el.getAttribute(a)}"` : ""))
+    .find(Boolean)
+  return `${role} "${name}"${state ? ` · ${state}` : ""}`
 }
 
 const click = (root: HTMLElement, selector: string, text: string) => {
@@ -42,23 +65,26 @@ const expanded = (root: HTMLElement) =>
     .map((t) => t.textContent?.replace("+", "").trim())
 
 const FAQ: readonly Step[] = [
-  { code: 'const faq = getAccordion(screen, { item: "Returns" })' },
+  { code: 'const faq = getAccordion(screen, { item: "Returns" })', target: returns },
   {
     code: 'await faq.expand("Returns")',
     act: (r) => click(r, '[data-scope="accordion"][data-part="trigger"]', "Returns"),
+    target: returns,
   },
   {
     code: 'expect(await faq.expanded()).toEqual(["Returns"])',
     check: (r) => JSON.stringify(expanded(r)) === JSON.stringify(["Returns"]),
+    target: returns,
   },
 ]
 
 // the second half drives the visit's own component, the one the hero showed (hero-state.ts)
 const CONTROL: Record<HeroKind, readonly Step[]> = {
   switch: [
-    { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })' },
+    { code: 'const wifi = getSwitch(screen, { name: "Wi-Fi" })', target: control },
     {
       code: "await wifi.toggle()",
+      target: control,
       // the control itself, as the driver does: a label's click focuses the control and scrolls
       // it into view, which would pull back a visitor who has scrolled past the run
       act: (r) =>
@@ -66,30 +92,35 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
     },
     {
       code: "expect(await wifi.isChecked()).toBe(true)",
+      target: control,
       check: (r) => r.querySelector('[role="switch"]')?.getAttribute("aria-checked") === "true",
     },
   ],
   checkbox: [
-    { code: 'const ready = getCheckbox(screen, { name: "Keyboard ready" })' },
+    { code: 'const ready = getCheckbox(screen, { name: "Keyboard ready" })', target: control },
     {
       code: "await ready.toggle()",
+      target: control,
       act: (r) =>
         r.querySelector<HTMLElement>('[data-scope="checkbox"][data-part="control"]')?.click(),
     },
     {
       code: "expect(await ready.isChecked()).toBe(true)",
+      target: control,
       check: (r) => r.querySelector('[role="checkbox"]')?.getAttribute("aria-checked") === "true",
     },
   ],
   button: [
-    { code: 'const save = getButton(screen, { name: "Save" })' },
+    { code: 'const save = getButton(screen, { name: "Save" })', target: control },
     {
       code: "await save.press()",
+      target: control,
       act: (r) => click(r, 'button[data-scope="button"]', "Save"),
     },
     {
       // a press has no state of its own: the test asserts the handler, as the driver docs say
       code: "expect(onPress).toHaveBeenCalledOnce()",
+      target: control,
       check: (r) => r.querySelector("[data-presses]")?.getAttribute("data-presses") === "1",
     },
   ],
@@ -149,6 +180,39 @@ export function Tested() {
       setTestTarget(null)
     }
   }, [kind, run])
+  // the running line's target, framed on the stage with what its driver reads there (live ARIA,
+  // read again once the line's action has settled)
+  const [driving, setDriving] = useState<{
+    x: number
+    y: number
+    w: number
+    h: number
+    aria: string
+  } | null>(null)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: follows the running line only
+  useEffect(() => {
+    const root = stage.current
+    const target = root ? STEPS[line]?.target?.(root) : null
+    if (!root || !target) {
+      setDriving(null)
+      return
+    }
+    const frame = () => {
+      const s = root.getBoundingClientRect()
+      const r = target.getBoundingClientRect()
+      const z = zoom()
+      setDriving({
+        x: (r.left - s.left) / z,
+        y: (r.top - s.top) / z,
+        w: r.width / z,
+        h: r.height / z,
+        aria: readAria(target),
+      })
+    }
+    frame()
+    const later = window.setTimeout(frame, 320)
+    return () => window.clearTimeout(later)
+  }, [line, run])
   const playRef = useRef<() => void>(() => {})
   const autoRan = useRef(false)
   // biome-ignore lint/correctness/useExhaustiveDependencies: the visit's kind renders a new control to observe
@@ -364,6 +428,10 @@ export function Tested() {
                     style={passed !== null ? { animationDelay: `${i * 0.05}s` } : undefined}
                   >
                     <code>{s.code}</code>
+                    {/* what the line's driver reads off its target, live, as a comment */}
+                    {i === line && driving ? (
+                      <span className={styles.reads}>{`// ${driving.aria}`}</span>
+                    ) : null}
                     {i in results ? (
                       <span className={styles.verdict} data-ok={results[i] ? "" : undefined}>
                         {results[i] ? "✓" : "✗"}
@@ -399,6 +467,17 @@ export function Tested() {
               ref={stage}
               key={run}
             >
+              {driving ? (
+                <div
+                  className={styles.driving}
+                  aria-hidden="true"
+                  style={{
+                    translate: `${driving.x}px ${driving.y}px`,
+                    inlineSize: driving.w,
+                    blockSize: driving.h,
+                  }}
+                />
+              ) : null}
               <div className={styles.testStageInner}>
                 <Accordion.Root>
                   {["Shipping", "Returns"].map((t) => (
