@@ -29,7 +29,11 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/table/table.tsx` | `talkback-aria-sort` |
+| `packages/svelte/src/number-input/api.svelte.ts` | `ios-vo-spinbutton-input` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
+| `packages/vue/src/meter/meter.ts` | `nvda-progressbar-name` |
+| `packages/vue/src/number-input/number-input.ts` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
+| `packages/vue/src/progress/progress.ts` | `nvda-progressbar-name` |
 
 ## `webkit-grid-selection-not-announced`
 
@@ -166,7 +170,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`
+- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`, `packages/svelte/src/number-input/api.svelte.ts`, `packages/vue/src/number-input/number-input.ts`
 - Last verified: 2026-10-14
 - Remove when: a device test shows iOS VoiceOver focusing and editing an <input role="spinbutton">
 
@@ -174,7 +178,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/issues/5731>, <https://github.com/chakra-ui/ark/issues/3500>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/number-input/number-input.tsx`
+- Checked in: `packages/react/src/number-input/number-input.tsx`, `packages/vue/src/number-input/number-input.ts`
 - Last verified: 2026-10-14
 - Remove when: touch decimal keypads follow the field's lang or inputmode locale
 
@@ -198,7 +202,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/mui/base-ui/issues/4184>, <https://github.com/nvaccess/nvda/issues/13904>, <https://github.com/nvaccess/nvda/issues/16204>, <https://github.com/FreedomScientific/standards-support/issues/354>
 - Repro test: `packages/core/src/components/progress/progress.connect.test.ts`
-- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`
+- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`, `packages/vue/src/meter/meter.ts`, `packages/vue/src/progress/progress.ts`
 - Last verified: 2026-10-16
 - Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases
 

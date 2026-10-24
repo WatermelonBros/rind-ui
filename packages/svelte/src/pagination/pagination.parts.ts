@@ -1,0 +1,10 @@
+// The Pagination namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Ellipsis } from "./pagination-ellipsis.svelte"
+export { default as First } from "./pagination-first.svelte"
+export { default as Item } from "./pagination-item.svelte"
+export { default as Last } from "./pagination-last.svelte"
+export { default as List } from "./pagination-list.svelte"
+export { default as Next } from "./pagination-next.svelte"
+export { default as Page } from "./pagination-page.svelte"
+export { default as Previous } from "./pagination-previous.svelte"
+export { default as Root } from "./pagination-root.svelte"

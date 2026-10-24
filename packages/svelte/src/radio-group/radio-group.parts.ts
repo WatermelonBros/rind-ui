@@ -1,0 +1,10 @@
+// The RadioGroup namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Description } from "./radio-group-description.svelte"
+export { default as ErrorMessage } from "./radio-group-error-message.svelte"
+export { default as Item } from "./radio-group-item.svelte"
+export { default as ItemControl } from "./radio-group-item-control.svelte"
+export { default as ItemDescription } from "./radio-group-item-description.svelte"
+export { default as ItemIndicator } from "./radio-group-item-indicator.svelte"
+export { default as ItemLabel } from "./radio-group-item-label.svelte"
+export { default as Label } from "./radio-group-label.svelte"
+export { default as Root } from "./radio-group-root.svelte"

@@ -1,0 +1,5 @@
+{
+  "//": "Declarations for the package source only: some tests import fixtures from @rind-ui/testing, and generating declarations for them wrote .d.ts files next to those sources.",
+  "extends": "./tsconfig.json",
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.test-d.ts", "src/**/*.test-d.tsx"]
+}

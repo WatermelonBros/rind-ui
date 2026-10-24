@@ -1,0 +1,442 @@
+{
+  "name": "@rind-ui/vue",
+  "version": "0.0.0",
+  "description": "Accessible headless Vue components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
+  "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/vue"
+  },
+  "homepage": "https://rind.watermelon-studio.it",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "headless",
+    "headless-ui",
+    "components",
+    "accessibility",
+    "a11y",
+    "wai-aria",
+    "state-machine",
+    "design-system",
+    "ui"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.mts",
+      "default": "./dist/accordion/index.mjs"
+    },
+    "./alert": {
+      "@rind-ui/source": "./src/alert/index.ts",
+      "types": "./dist/alert/index.d.mts",
+      "default": "./dist/alert/index.mjs"
+    },
+    "./avatar": {
+      "@rind-ui/source": "./src/avatar/index.ts",
+      "types": "./dist/avatar/index.d.mts",
+      "default": "./dist/avatar/index.mjs"
+    },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.mts",
+      "default": "./dist/badge/index.mjs"
+    },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.mts",
+      "default": "./dist/breadcrumbs/index.mjs"
+    },
+    "./button": {
+      "@rind-ui/source": "./src/button/index.ts",
+      "types": "./dist/button/index.d.mts",
+      "default": "./dist/button/index.mjs"
+    },
+    "./checkbox": {
+      "@rind-ui/source": "./src/checkbox/index.ts",
+      "types": "./dist/checkbox/index.d.mts",
+      "default": "./dist/checkbox/index.mjs"
+    },
+    "./checkbox-group": {
+      "@rind-ui/source": "./src/checkbox-group/index.ts",
+      "types": "./dist/checkbox-group/index.d.mts",
+      "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.mts",
+      "default": "./dist/collapsible/index.mjs"
+    },
+    "./field": {
+      "@rind-ui/source": "./src/field/index.ts",
+      "types": "./dist/field/index.d.mts",
+      "default": "./dist/field/index.mjs"
+    },
+    "./fieldset": {
+      "@rind-ui/source": "./src/fieldset/index.ts",
+      "types": "./dist/fieldset/index.d.mts",
+      "default": "./dist/fieldset/index.mjs"
+    },
+    "./form-toggle": {
+      "@rind-ui/source": "./src/form-toggle/index.ts",
+      "types": "./dist/form-toggle/index.d.mts",
+      "default": "./dist/form-toggle/index.mjs"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.mts",
+      "default": "./dist/heading/index.mjs"
+    },
+    "./image": {
+      "@rind-ui/source": "./src/image/index.ts",
+      "types": "./dist/image/index.d.mts",
+      "default": "./dist/image/index.mjs"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.mts",
+      "default": "./dist/kbd/index.mjs"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.mts",
+      "default": "./dist/label/index.mjs"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.mts",
+      "default": "./dist/link/index.mjs"
+    },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.mts",
+      "default": "./dist/marquee/index.mjs"
+    },
+    "./meter": {
+      "@rind-ui/source": "./src/meter/index.ts",
+      "types": "./dist/meter/index.d.mts",
+      "default": "./dist/meter/index.mjs"
+    },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.mts",
+      "default": "./dist/number-input/index.mjs"
+    },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.mts",
+      "default": "./dist/pagination/index.mjs"
+    },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.mts",
+      "default": "./dist/pin-input/index.mjs"
+    },
+    "./progress": {
+      "@rind-ui/source": "./src/progress/index.ts",
+      "types": "./dist/progress/index.d.mts",
+      "default": "./dist/progress/index.mjs"
+    },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.mts",
+      "default": "./dist/qr-code/index.mjs"
+    },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.mts",
+      "default": "./dist/radio-group/index.mjs"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.mts",
+      "default": "./dist/rating/index.mjs"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.mts",
+      "default": "./dist/scroll-area/index.mjs"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.mts",
+      "default": "./dist/segmented-control/index.mjs"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.mts",
+      "default": "./dist/separator/index.mjs"
+    },
+    "./skeleton": {
+      "@rind-ui/source": "./src/skeleton/index.ts",
+      "types": "./dist/skeleton/index.d.mts",
+      "default": "./dist/skeleton/index.mjs"
+    },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.mts",
+      "default": "./dist/slider/index.mjs"
+    },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.mts",
+      "default": "./dist/splitter/index.mjs"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.mts",
+      "default": "./dist/stepper/index.mjs"
+    },
+    "./switch": {
+      "@rind-ui/source": "./src/switch/index.ts",
+      "types": "./dist/switch/index.d.mts",
+      "default": "./dist/switch/index.mjs"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.mts",
+      "default": "./dist/table-of-contents/index.mjs"
+    },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.mts",
+      "default": "./dist/tabs/index.mjs"
+    },
+    "./text-field": {
+      "@rind-ui/source": "./src/text-field/index.ts",
+      "types": "./dist/text-field/index.d.mts",
+      "default": "./dist/text-field/index.mjs"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.mts",
+      "default": "./dist/timeline/index.mjs"
+    },
+    "./toggle": {
+      "@rind-ui/source": "./src/toggle/index.ts",
+      "types": "./dist/toggle/index.d.mts",
+      "default": "./dist/toggle/index.mjs"
+    },
+    "./toggle-group": {
+      "@rind-ui/source": "./src/toggle-group/index.ts",
+      "types": "./dist/toggle-group/index.d.mts",
+      "default": "./dist/toggle-group/index.mjs"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.mts",
+      "default": "./dist/toolbar/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rind-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@rind-ui/react": "workspace:*",
+    "@rind-ui/testing": "workspace:*",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "vue": "^3.5.44"
+  },
+  "peerDependencies": {
+    "vue": ">=3.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.mts",
+        "default": "./dist/accordion/index.mjs"
+      },
+      "./alert": {
+        "types": "./dist/alert/index.d.mts",
+        "default": "./dist/alert/index.mjs"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.mts",
+        "default": "./dist/avatar/index.mjs"
+      },
+      "./badge": {
+        "types": "./dist/badge/index.d.mts",
+        "default": "./dist/badge/index.mjs"
+      },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.mts",
+        "default": "./dist/breadcrumbs/index.mjs"
+      },
+      "./button": {
+        "types": "./dist/button/index.d.mts",
+        "default": "./dist/button/index.mjs"
+      },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.mts",
+        "default": "./dist/checkbox/index.mjs"
+      },
+      "./checkbox-group": {
+        "types": "./dist/checkbox-group/index.d.mts",
+        "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.mts",
+        "default": "./dist/collapsible/index.mjs"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.mts",
+        "default": "./dist/field/index.mjs"
+      },
+      "./fieldset": {
+        "types": "./dist/fieldset/index.d.mts",
+        "default": "./dist/fieldset/index.mjs"
+      },
+      "./form-toggle": {
+        "types": "./dist/form-toggle/index.d.mts",
+        "default": "./dist/form-toggle/index.mjs"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.mts",
+        "default": "./dist/heading/index.mjs"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.mts",
+        "default": "./dist/image/index.mjs"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.mts",
+        "default": "./dist/kbd/index.mjs"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.mts",
+        "default": "./dist/label/index.mjs"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.mts",
+        "default": "./dist/link/index.mjs"
+      },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.mts",
+        "default": "./dist/marquee/index.mjs"
+      },
+      "./meter": {
+        "types": "./dist/meter/index.d.mts",
+        "default": "./dist/meter/index.mjs"
+      },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.mts",
+        "default": "./dist/number-input/index.mjs"
+      },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.mts",
+        "default": "./dist/pagination/index.mjs"
+      },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.mts",
+        "default": "./dist/pin-input/index.mjs"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.mts",
+        "default": "./dist/progress/index.mjs"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.mts",
+        "default": "./dist/qr-code/index.mjs"
+      },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.mts",
+        "default": "./dist/radio-group/index.mjs"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.mts",
+        "default": "./dist/rating/index.mjs"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.mts",
+        "default": "./dist/scroll-area/index.mjs"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.mts",
+        "default": "./dist/segmented-control/index.mjs"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.mts",
+        "default": "./dist/separator/index.mjs"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.mts",
+        "default": "./dist/skeleton/index.mjs"
+      },
+      "./slider": {
+        "types": "./dist/slider/index.d.mts",
+        "default": "./dist/slider/index.mjs"
+      },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.mts",
+        "default": "./dist/splitter/index.mjs"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.mts",
+        "default": "./dist/stepper/index.mjs"
+      },
+      "./switch": {
+        "types": "./dist/switch/index.d.mts",
+        "default": "./dist/switch/index.mjs"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.mts",
+        "default": "./dist/table-of-contents/index.mjs"
+      },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.mts",
+        "default": "./dist/tabs/index.mjs"
+      },
+      "./text-field": {
+        "types": "./dist/text-field/index.d.mts",
+        "default": "./dist/text-field/index.mjs"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.mts",
+        "default": "./dist/timeline/index.mjs"
+      },
+      "./toggle": {
+        "types": "./dist/toggle/index.d.mts",
+        "default": "./dist/toggle/index.mjs"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.mts",
+        "default": "./dist/toggle-group/index.mjs"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.mts",
+        "default": "./dist/toolbar/index.mjs"
+      },
+      "./package.json": "./package.json"
+    }
+  }
+}

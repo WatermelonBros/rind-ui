@@ -15,6 +15,7 @@ export {
 } from "./adapters/playwright"
 export { installAnnouncementLog, recordingAnnouncer } from "./announcements"
 export { missingAriaLines } from "./aria-snapshot"
+export { canonicalHtml } from "./canonical-html"
 export { type CheckboxStepInvariants, checkboxStepInvariants } from "./checkbox-invariants"
 export type { DomSnapshot, ElementInfo, IdRef } from "./collect"
 export { getAccordion } from "./components/accordion"

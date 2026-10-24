@@ -2,6 +2,10 @@
 // group): their machines, connect functions, contracts and messages. Not public API: the
 // framework adapters' Color Picker and the test drivers use them through
 // `@rind-ui/core/internal`; only `ColorPicker` is documented and supported.
+
+// The framework adapters' shared, framework-neutral helpers (prop merging, part registry,
+// provider config).
+export * from "./adapter"
 export * from "./components/color-area"
 export * from "./components/color-field"
 export {

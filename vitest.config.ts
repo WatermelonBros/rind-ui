@@ -1,4 +1,6 @@
 import { availableParallelism } from "node:os"
+import { svelte } from "@sveltejs/vite-plugin-svelte"
+import vue from "@vitejs/plugin-vue"
 import { playwright } from "@vitest/browser-playwright"
 import { defineConfig } from "vitest/config"
 
@@ -63,7 +65,16 @@ const maxWorkers = process.env["CI"]
 // machine (several sessions, CI) needs more than Vitest's 1 s default.
 const patient = { poll: { timeout: 5000 } }
 
+// Compiles @rind-ui/svelte's components and fixtures (`.svelte`, `.svelte.ts`) and the Vue
+// examples' single-file components (`.vue`); inline projects inherit it. Other files pass
+// through untouched.
+const plugins = [svelte({ configFile: false, compilerOptions: { dev: true } }), vue()]
+
 export default defineConfig({
+  // The adapters' example tests render the site's React examples, whose tsconfig keeps JSX
+  // for Next (\`preserve\`): transform it here as every package does (react-jsx).
+  oxc: { jsx: { runtime: "automatic" } },
+  plugins,
   resolve,
   ssr,
   test: {

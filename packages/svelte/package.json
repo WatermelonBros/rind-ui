@@ -1,0 +1,531 @@
+{
+  "name": "@rind-ui/svelte",
+  "version": "0.0.0",
+  "description": "Accessible headless Svelte 5 components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
+  "license": "MIT",
+  "author": "Watermelon Bros",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatermelonBros/rind-ui.git",
+    "directory": "packages/svelte"
+  },
+  "homepage": "https://rind.watermelon-studio.it",
+  "bugs": {
+    "url": "https://github.com/WatermelonBros/rind-ui/issues"
+  },
+  "keywords": [
+    "svelte",
+    "svelte5",
+    "headless",
+    "headless-ui",
+    "components",
+    "accessibility",
+    "a11y",
+    "wai-aria",
+    "state-machine",
+    "design-system",
+    "ui"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "svelte": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "@rind-ui/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./accordion": {
+      "@rind-ui/source": "./src/accordion/index.ts",
+      "types": "./dist/accordion/index.d.ts",
+      "svelte": "./dist/accordion/index.js",
+      "default": "./dist/accordion/index.js"
+    },
+    "./alert": {
+      "@rind-ui/source": "./src/alert/index.ts",
+      "types": "./dist/alert/index.d.ts",
+      "svelte": "./dist/alert/index.js",
+      "default": "./dist/alert/index.js"
+    },
+    "./avatar": {
+      "@rind-ui/source": "./src/avatar/index.ts",
+      "types": "./dist/avatar/index.d.ts",
+      "svelte": "./dist/avatar/index.js",
+      "default": "./dist/avatar/index.js"
+    },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.ts",
+      "svelte": "./dist/badge/index.js",
+      "default": "./dist/badge/index.js"
+    },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.ts",
+      "svelte": "./dist/breadcrumbs/index.js",
+      "default": "./dist/breadcrumbs/index.js"
+    },
+    "./button": {
+      "@rind-ui/source": "./src/button/index.ts",
+      "types": "./dist/button/index.d.ts",
+      "svelte": "./dist/button/index.js",
+      "default": "./dist/button/index.js"
+    },
+    "./checkbox": {
+      "@rind-ui/source": "./src/checkbox/index.ts",
+      "types": "./dist/checkbox/index.d.ts",
+      "svelte": "./dist/checkbox/index.js",
+      "default": "./dist/checkbox/index.js"
+    },
+    "./checkbox-group": {
+      "@rind-ui/source": "./src/checkbox-group/index.ts",
+      "types": "./dist/checkbox-group/index.d.ts",
+      "svelte": "./dist/checkbox-group/index.js",
+      "default": "./dist/checkbox-group/index.js"
+    },
+    "./collapsible": {
+      "@rind-ui/source": "./src/collapsible/index.ts",
+      "types": "./dist/collapsible/index.d.ts",
+      "svelte": "./dist/collapsible/index.js",
+      "default": "./dist/collapsible/index.js"
+    },
+    "./field": {
+      "@rind-ui/source": "./src/field/index.ts",
+      "types": "./dist/field/index.d.ts",
+      "svelte": "./dist/field/index.js",
+      "default": "./dist/field/index.js"
+    },
+    "./fieldset": {
+      "@rind-ui/source": "./src/fieldset/index.ts",
+      "types": "./dist/fieldset/index.d.ts",
+      "svelte": "./dist/fieldset/index.js",
+      "default": "./dist/fieldset/index.js"
+    },
+    "./form-toggle": {
+      "@rind-ui/source": "./src/form-toggle/index.ts",
+      "types": "./dist/form-toggle/index.d.ts",
+      "svelte": "./dist/form-toggle/index.js",
+      "default": "./dist/form-toggle/index.js"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.ts",
+      "svelte": "./dist/heading/index.js",
+      "default": "./dist/heading/index.js"
+    },
+    "./image": {
+      "@rind-ui/source": "./src/image/index.ts",
+      "types": "./dist/image/index.d.ts",
+      "svelte": "./dist/image/index.js",
+      "default": "./dist/image/index.js"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.ts",
+      "svelte": "./dist/kbd/index.js",
+      "default": "./dist/kbd/index.js"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.ts",
+      "svelte": "./dist/label/index.js",
+      "default": "./dist/label/index.js"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.ts",
+      "svelte": "./dist/link/index.js",
+      "default": "./dist/link/index.js"
+    },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.ts",
+      "svelte": "./dist/marquee/index.js",
+      "default": "./dist/marquee/index.js"
+    },
+    "./meter": {
+      "@rind-ui/source": "./src/meter/index.ts",
+      "types": "./dist/meter/index.d.ts",
+      "svelte": "./dist/meter/index.js",
+      "default": "./dist/meter/index.js"
+    },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.ts",
+      "svelte": "./dist/number-input/index.js",
+      "default": "./dist/number-input/index.js"
+    },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.ts",
+      "svelte": "./dist/pagination/index.js",
+      "default": "./dist/pagination/index.js"
+    },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.ts",
+      "svelte": "./dist/pin-input/index.js",
+      "default": "./dist/pin-input/index.js"
+    },
+    "./progress": {
+      "@rind-ui/source": "./src/progress/index.ts",
+      "types": "./dist/progress/index.d.ts",
+      "svelte": "./dist/progress/index.js",
+      "default": "./dist/progress/index.js"
+    },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.ts",
+      "svelte": "./dist/qr-code/index.js",
+      "default": "./dist/qr-code/index.js"
+    },
+    "./radio-group": {
+      "@rind-ui/source": "./src/radio-group/index.ts",
+      "types": "./dist/radio-group/index.d.ts",
+      "svelte": "./dist/radio-group/index.js",
+      "default": "./dist/radio-group/index.js"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.ts",
+      "svelte": "./dist/rating/index.js",
+      "default": "./dist/rating/index.js"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.ts",
+      "svelte": "./dist/scroll-area/index.js",
+      "default": "./dist/scroll-area/index.js"
+    },
+    "./segmented-control": {
+      "@rind-ui/source": "./src/segmented-control/index.ts",
+      "types": "./dist/segmented-control/index.d.ts",
+      "svelte": "./dist/segmented-control/index.js",
+      "default": "./dist/segmented-control/index.js"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.ts",
+      "svelte": "./dist/separator/index.js",
+      "default": "./dist/separator/index.js"
+    },
+    "./skeleton": {
+      "@rind-ui/source": "./src/skeleton/index.ts",
+      "types": "./dist/skeleton/index.d.ts",
+      "svelte": "./dist/skeleton/index.js",
+      "default": "./dist/skeleton/index.js"
+    },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.ts",
+      "svelte": "./dist/slider/index.js",
+      "default": "./dist/slider/index.js"
+    },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.ts",
+      "svelte": "./dist/splitter/index.js",
+      "default": "./dist/splitter/index.js"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.ts",
+      "svelte": "./dist/stepper/index.js",
+      "default": "./dist/stepper/index.js"
+    },
+    "./switch": {
+      "@rind-ui/source": "./src/switch/index.ts",
+      "types": "./dist/switch/index.d.ts",
+      "svelte": "./dist/switch/index.js",
+      "default": "./dist/switch/index.js"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.ts",
+      "svelte": "./dist/table-of-contents/index.js",
+      "default": "./dist/table-of-contents/index.js"
+    },
+    "./tabs": {
+      "@rind-ui/source": "./src/tabs/index.ts",
+      "types": "./dist/tabs/index.d.ts",
+      "svelte": "./dist/tabs/index.js",
+      "default": "./dist/tabs/index.js"
+    },
+    "./text-field": {
+      "@rind-ui/source": "./src/text-field/index.ts",
+      "types": "./dist/text-field/index.d.ts",
+      "svelte": "./dist/text-field/index.js",
+      "default": "./dist/text-field/index.js"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.ts",
+      "svelte": "./dist/timeline/index.js",
+      "default": "./dist/timeline/index.js"
+    },
+    "./toggle": {
+      "@rind-ui/source": "./src/toggle/index.ts",
+      "types": "./dist/toggle/index.d.ts",
+      "svelte": "./dist/toggle/index.js",
+      "default": "./dist/toggle/index.js"
+    },
+    "./toggle-group": {
+      "@rind-ui/source": "./src/toggle-group/index.ts",
+      "types": "./dist/toggle-group/index.d.ts",
+      "svelte": "./dist/toggle-group/index.js",
+      "default": "./dist/toggle-group/index.js"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.ts",
+      "svelte": "./dist/toolbar/index.js",
+      "default": "./dist/toolbar/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "svelte-package -i src -o dist && node ../../scripts/svelte-exports.mjs",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --tsgo --fail-on-warnings"
+  },
+  "dependencies": {
+    "@rind-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@rind-ui/react": "workspace:*",
+    "@rind-ui/testing": "workspace:*",
+    "@sveltejs/package": "^3.0.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rolldown": "1.2.13",
+    "svelte": "^5.57.2",
+    "svelte-check": "^4.7.7",
+    "typescript": "~6.0.0"
+  },
+  "peerDependencies": {
+    "svelte": ">=5.29"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "svelte": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.ts",
+        "svelte": "./dist/accordion/index.js",
+        "default": "./dist/accordion/index.js"
+      },
+      "./alert": {
+        "types": "./dist/alert/index.d.ts",
+        "svelte": "./dist/alert/index.js",
+        "default": "./dist/alert/index.js"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.ts",
+        "svelte": "./dist/avatar/index.js",
+        "default": "./dist/avatar/index.js"
+      },
+      "./badge": {
+        "types": "./dist/badge/index.d.ts",
+        "svelte": "./dist/badge/index.js",
+        "default": "./dist/badge/index.js"
+      },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.ts",
+        "svelte": "./dist/breadcrumbs/index.js",
+        "default": "./dist/breadcrumbs/index.js"
+      },
+      "./button": {
+        "types": "./dist/button/index.d.ts",
+        "svelte": "./dist/button/index.js",
+        "default": "./dist/button/index.js"
+      },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.ts",
+        "svelte": "./dist/checkbox/index.js",
+        "default": "./dist/checkbox/index.js"
+      },
+      "./checkbox-group": {
+        "types": "./dist/checkbox-group/index.d.ts",
+        "svelte": "./dist/checkbox-group/index.js",
+        "default": "./dist/checkbox-group/index.js"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.ts",
+        "svelte": "./dist/collapsible/index.js",
+        "default": "./dist/collapsible/index.js"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.ts",
+        "svelte": "./dist/field/index.js",
+        "default": "./dist/field/index.js"
+      },
+      "./fieldset": {
+        "types": "./dist/fieldset/index.d.ts",
+        "svelte": "./dist/fieldset/index.js",
+        "default": "./dist/fieldset/index.js"
+      },
+      "./form-toggle": {
+        "types": "./dist/form-toggle/index.d.ts",
+        "svelte": "./dist/form-toggle/index.js",
+        "default": "./dist/form-toggle/index.js"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.ts",
+        "svelte": "./dist/heading/index.js",
+        "default": "./dist/heading/index.js"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.ts",
+        "svelte": "./dist/image/index.js",
+        "default": "./dist/image/index.js"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.ts",
+        "svelte": "./dist/kbd/index.js",
+        "default": "./dist/kbd/index.js"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.ts",
+        "svelte": "./dist/label/index.js",
+        "default": "./dist/label/index.js"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.ts",
+        "svelte": "./dist/link/index.js",
+        "default": "./dist/link/index.js"
+      },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.ts",
+        "svelte": "./dist/marquee/index.js",
+        "default": "./dist/marquee/index.js"
+      },
+      "./meter": {
+        "types": "./dist/meter/index.d.ts",
+        "svelte": "./dist/meter/index.js",
+        "default": "./dist/meter/index.js"
+      },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.ts",
+        "svelte": "./dist/number-input/index.js",
+        "default": "./dist/number-input/index.js"
+      },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.ts",
+        "svelte": "./dist/pagination/index.js",
+        "default": "./dist/pagination/index.js"
+      },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.ts",
+        "svelte": "./dist/pin-input/index.js",
+        "default": "./dist/pin-input/index.js"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.ts",
+        "svelte": "./dist/progress/index.js",
+        "default": "./dist/progress/index.js"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.ts",
+        "svelte": "./dist/qr-code/index.js",
+        "default": "./dist/qr-code/index.js"
+      },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.ts",
+        "svelte": "./dist/radio-group/index.js",
+        "default": "./dist/radio-group/index.js"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.ts",
+        "svelte": "./dist/rating/index.js",
+        "default": "./dist/rating/index.js"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.ts",
+        "svelte": "./dist/scroll-area/index.js",
+        "default": "./dist/scroll-area/index.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.ts",
+        "svelte": "./dist/segmented-control/index.js",
+        "default": "./dist/segmented-control/index.js"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.ts",
+        "svelte": "./dist/separator/index.js",
+        "default": "./dist/separator/index.js"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.ts",
+        "svelte": "./dist/skeleton/index.js",
+        "default": "./dist/skeleton/index.js"
+      },
+      "./slider": {
+        "types": "./dist/slider/index.d.ts",
+        "svelte": "./dist/slider/index.js",
+        "default": "./dist/slider/index.js"
+      },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.ts",
+        "svelte": "./dist/splitter/index.js",
+        "default": "./dist/splitter/index.js"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.ts",
+        "svelte": "./dist/stepper/index.js",
+        "default": "./dist/stepper/index.js"
+      },
+      "./switch": {
+        "types": "./dist/switch/index.d.ts",
+        "svelte": "./dist/switch/index.js",
+        "default": "./dist/switch/index.js"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.ts",
+        "svelte": "./dist/table-of-contents/index.js",
+        "default": "./dist/table-of-contents/index.js"
+      },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.ts",
+        "svelte": "./dist/tabs/index.js",
+        "default": "./dist/tabs/index.js"
+      },
+      "./text-field": {
+        "types": "./dist/text-field/index.d.ts",
+        "svelte": "./dist/text-field/index.js",
+        "default": "./dist/text-field/index.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.ts",
+        "svelte": "./dist/timeline/index.js",
+        "default": "./dist/timeline/index.js"
+      },
+      "./toggle": {
+        "types": "./dist/toggle/index.d.ts",
+        "svelte": "./dist/toggle/index.js",
+        "default": "./dist/toggle/index.js"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.ts",
+        "svelte": "./dist/toggle-group/index.js",
+        "default": "./dist/toggle-group/index.js"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.ts",
+        "svelte": "./dist/toolbar/index.js",
+        "default": "./dist/toolbar/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  }
+}

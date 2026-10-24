@@ -1,0 +1,8 @@
+{
+  "//": "Node types: the tests import @rind-ui/testing, whose Playwright adapter uses Buffer.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src", "fixtures", "examples"]
+}

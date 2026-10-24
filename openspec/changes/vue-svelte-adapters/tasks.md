@@ -1,0 +1,96 @@
+## 1. Infrastructure
+
+- [x] 1.1 Research note `docs/research/framework-adapters.md`, decision 0013
+- [x] 1.2 Shared helpers in `@rind-ui/core/internal` (`adapter/`: merge, registry, provider)
+- [x] 1.3 `@rind-ui/vue` package: normalize/merge props, provider, `useMachine`, ids, press/hover, modality, `asChild`, tsdown build with per-component exports
+- [x] 1.4 `@rind-ui/svelte` package: the same with runes, attachments and snippets; `svelte-package` build, `scripts/svelte-exports.mjs`, `svelte-check --tsgo`
+- [x] 1.5 Vitest: `@sveltejs/vite-plugin-svelte` in the root config (inherited by every project); Biome override for `.svelte`
+- [x] 1.6 Hydration tests: Vue (`renderToString` + `createSSRApp`), Svelte (server + client bundles of a fixture)
+- [x] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck` (their scripts), changesets
+- [ ] 1.7b Size budgets for the two packages (scripts/size.mjs)
+- [ ] 1.8 Docs: installation for Vue and Svelte; each component's docs page lists the frameworks that ship it
+- [x] 1.9 Tell the site agent when the first component is on main (exports are the source of truth)
+
+- [x] 1.10 DOM parity: `canonicalHtml` (@rind-ui/testing) and per-package parity helpers render each scenario in React and in the adapter and compare the markup
+
+## 2. Components (Vue and Svelte together; done = parts, contract model green in both, both entries in `exports`)
+
+- [x] 2.1 Toggle
+- [x] 2.2 Button
+- [x] 2.3 Separator
+- [x] 2.4 Kbd
+- [x] 2.5 Badge
+- [x] 2.6 Heading
+- [x] 2.7 Label
+- [x] 2.8 Link
+- [x] 2.9 Skeleton
+- [x] 2.10 Progress
+- [x] 2.11 Meter
+- [x] 2.12 Avatar
+- [x] 2.13 Image
+- [x] 2.14 Alert
+- [x] 2.15 Toggle Group
+- [x] 2.16 Fieldset
+- [x] 2.17 Field
+- [x] 2.18 Text Field
+- [x] 2.19 Checkbox
+- [x] 2.20 Checkbox Group
+- [x] 2.21 Switch
+- [x] 2.22 Radio Group
+- [x] 2.23 Segmented Control
+- [x] 2.24 Collapsible
+- [x] 2.25 Accordion
+- [x] 2.26 Tabs
+- [x] 2.27 Toolbar
+- [x] 2.28 Breadcrumbs
+- [x] 2.29 Pagination
+- [x] 2.30 Rating
+- [x] 2.31 Slider
+- [x] 2.32 Number Input
+- [x] 2.33 Pin Input
+- [x] 2.34 Splitter
+- [x] 2.35 Stepper
+- [x] 2.36 Timeline
+- [x] 2.37 Table Of Contents
+- [x] 2.38 Scroll Area
+- [x] 2.39 Marquee
+- [x] 2.40 Qr Code
+- [ ] 2.41 Clipboard
+- [ ] 2.42 Code Block
+- [ ] 2.43 Form
+- [ ] 2.44 Form Toggle
+- [ ] 2.45 File Upload
+- [ ] 2.46 Tags Input
+- [ ] 2.47 Tag Group
+- [ ] 2.48 Listbox
+- [ ] 2.49 Grid List
+- [ ] 2.50 Tree View
+- [ ] 2.51 Table
+- [ ] 2.52 Sortable
+- [ ] 2.53 Popover
+- [ ] 2.54 Tooltip
+- [ ] 2.55 Hover Card
+- [ ] 2.56 Dialog
+- [ ] 2.57 Drawer
+- [ ] 2.58 Toast
+- [ ] 2.59 Menu
+- [ ] 2.60 Context Menu
+- [ ] 2.61 Menubar
+- [ ] 2.62 Navigation Menu
+- [ ] 2.63 Select
+- [ ] 2.64 Combobox
+- [ ] 2.65 Tour
+- [ ] 2.66 Calendar
+- [ ] 2.67 Date Field
+- [ ] 2.68 Color Picker
+- [ ] 2.69 Image Viewer
+- [ ] 2.70 Image Cropper
+- [ ] 2.71 Message Thread
+- [ ] 2.72 Streaming Message
+- [ ] 2.73 Reasoning
+- [ ] 2.74 Prompt Input
+
+## 3. Close
+
+- [ ] 3.1 `pnpm typecheck`, `pnpm test`, `pnpm lint`, builds, size check pass
+- [ ] 3.2 Review (two passes), archive, `docs/components.md` notes Vue/Svelte parity

@@ -27,5 +27,29 @@
         "useLiteralKeys": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      // React's rules of hooks: Vue composables and Svelte rune helpers are named `use*` but
+      // run in setup / component initialisation, where these rules do not apply.
+      "includes": ["packages/vue/**", "packages/svelte/**"],
+      "linter": { "rules": { "correctness": { "useHookAtTopLevel": "off" } } }
+    },
+    {
+      // The copyable examples are named after the site's React exports (Basic, Controlled):
+      // a page's example, not a reusable component.
+      "includes": ["packages/vue/examples/**"],
+      "linter": { "rules": { "style": { "useVueMultiWordComponentNames": "off" } } }
+    },
+    {
+      // Biome reads a component's <script> only: what the template uses looks unused.
+      "includes": ["**/*.svelte", "**/*.vue"],
+      "linter": {
+        "rules": {
+          "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" },
+          "style": { "useConst": "off", "useImportType": "off" }
+        }
+      }
+    }
+  ]
 }
