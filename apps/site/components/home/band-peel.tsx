@@ -7,9 +7,9 @@ import { zoom } from "../zoom"
 /**
  * Every section that changes the page's ground comes in by peeling the last one off it: until
  * then the band wears the previous ground as a sheet over it (its colour, data-from), and as it
- * rises the sheet comes away from the bottom of the screen upwards, its edge curled, until the
+ * rises the sheet comes away from the bottom of the screen upwards, until the
  * band's top. The sheet is drawn by home.module.css (.band[data-from]); this only says how much
- * of it is left (--peel, from the band's top) and whether its edge shows (--lip), in a style
+ * of it is left (--peel, from the band's top), in a style
  * sheet of its own: the bands are React's, and may still be hydrating (each section is its own
  * Suspense boundary), so their attributes are never touched. A strip of tape is heard as each
  * one starts. Never under reduced motion nor on a phone: the bands are simply there.
@@ -52,7 +52,7 @@ export function BandPeel() {
         const peel = Math.min(r.height, Math.max(0, (vh - r.top) * (1 - e)))
         // each band is one of a kind by what it is and what it covers
         rules.push(
-          `[data-band="${band.dataset["band"]}"][data-from="${band.dataset["from"]}"]{--peel:${(peel / z).toFixed(1)}px;--lip:${p > 0 && p < 1 ? 1 : 0}}`,
+          `[data-band="${band.dataset["band"]}"][data-from="${band.dataset["from"]}"]{--peel:${(peel / z).toFixed(1)}px}`,
         )
         if (p > 0.02 && !started.has(band)) {
           started.add(band)

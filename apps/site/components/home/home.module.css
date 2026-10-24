@@ -1664,7 +1664,8 @@
 }
 /* each band comes in by peeling the last ground off it (band-peel.tsx): until then it wears that
    ground as a sheet over it, content and all, which comes away from the screen's foot upwards
-   with its edge curled. --peel is how much of the sheet is left, from the band's top */
+   with a clean edge (a curled one read as a glitch). --peel is how much of the sheet is left,
+   from the band's top */
 .band[data-from="page"] {
   --from: var(--bg);
 }
@@ -1674,44 +1675,15 @@
 .band[data-from="ink"] {
   --from: var(--ground-ink);
 }
-:global(html[data-bands-peel]) .band[data-from]::before,
-:global(html[data-bands-peel]) .band[data-from]::after {
+:global(html[data-bands-peel]) .band[data-from]::before {
   content: "";
   position: absolute;
   inset-inline: 0;
   z-index: 3;
   pointer-events: none;
-}
-:global(html[data-bands-peel]) .band[data-from]::before {
   inset-block-start: 0;
   block-size: var(--peel, 0px);
   background: var(--from);
-}
-/* the curl: the sheet's edge rolled up on itself, its back catching the light, casting a soft
-   shadow on the ground it uncovers (juicy); a hard fold with the accent under it (crisp) */
-:global(html[data-bands-peel]) .band[data-from]::after {
-  inset-block-start: var(--peel, 0px);
-  block-size: 64px;
-  translate: 0 -100%;
-  opacity: var(--lip, 0);
-  border-radius: 0 0 50% 50% / 0 0 34px 34px;
-  /* the sheet's own colour rolling into shade: no white light line (on a dark skin it read as a
-     grey stripe between sections) */
-  background: linear-gradient(
-    180deg,
-    var(--from) 0%,
-    color-mix(in oklab, var(--from), #000 22%) 100%
-  );
-  box-shadow:
-    0 18px 26px -10px rgb(0 0 0 / 0.42),
-    0 4px 0 -2px color-mix(in oklab, var(--from), #000 30%);
-}
-:global([data-phase="crisp"]) :global(html[data-bands-peel]) .band[data-from]::after {
-  block-size: 18px;
-  border-radius: 0;
-  background: var(--from);
-  border-block-end: 3px solid var(--ink);
-  box-shadow: 0 7px 0 var(--acc);
 }
 .band[data-band="page"] {
   --band: var(--bg);
