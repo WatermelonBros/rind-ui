@@ -80,6 +80,19 @@
   border-block-start: var(--bw) solid var(--line);
   border-inline-start: var(--bw) solid var(--line);
 }
+/* in the bar (desktop): its point turns to the toggle on its right */
+.invite[data-in-bar] {
+  padding-block: 6px;
+  box-shadow: var(--shadow-sm);
+  transform-origin: 100% 50%;
+}
+.invite[data-in-bar]::before {
+  inset-block-start: calc(50% - 6px);
+  inset-inline-end: -7px;
+  border-block-start: var(--bw) solid var(--line);
+  border-inline-start: 0;
+  border-inline-end: var(--bw) solid var(--line);
+}
 .invite p {
   margin: 0;
 }
@@ -101,7 +114,7 @@
 }
 :global([data-phase="juicy"]) .inviteOn {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
   box-shadow: 0 4px 0 var(--acc-deep);
 }
 :global([data-phase="juicy"]) .inviteOff {

@@ -35,6 +35,15 @@ const ORDER: readonly { id: FrameworkId; name: string }[] = [
 
 const packages = join(process.cwd(), "../../packages")
 
+/** Each framework's own package, as a framework package names it among its peers. */
+const PEER: Record<FrameworkId, string> = {
+  react: "react",
+  vue: "vue",
+  svelte: "svelte",
+  solid: "solid-js",
+  angular: "@angular/core",
+}
+
 function read(id: FrameworkId): Framework {
   const name = ORDER.find((f) => f.id === id)?.name ?? id
   const file = join(packages, id, "package.json")
@@ -66,8 +75,9 @@ function read(id: FrameworkId): Framework {
     ready,
     version: json.version ?? "0.0.0",
     components,
-    // the framework itself: "react", "vue", "svelte"… (its other peers are not the framework)
-    requires: json.peerDependencies?.[id] ?? null,
+    // the framework itself (its other peers are not the framework): a range such as ">=3.5",
+    // or ">=1.9.0 <2" (Solid's), of which the floor is what is said
+    requires: json.peerDependencies?.[PEER[id]] ?? null,
   }
 }
 

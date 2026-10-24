@@ -20,6 +20,11 @@
   --shadow-sm: 4px 4px 0 var(--ink);
   --text: var(--font-inter), system-ui, sans-serif;
   --btn-r: 99px;
+  /* the dark grounds (the tests' band, the outro, the terminals) and the type on them */
+  --ground-ink: #0b0b0c;
+  --on-ground-ink: #f5f5ee;
+  /* type on the accent (a skin worn on the page picks the one that reads: wear.ts) */
+  --on-acc: var(--ink);
 }
 [data-phase="juicy"] {
   --bg: #ffd9d2;
@@ -38,6 +43,9 @@
   --shadow-sm: 0 5px 0 #f3a7a2;
   --text: var(--font-fredoka), system-ui, sans-serif;
   --btn-r: 22px;
+  --ground-ink: #103d2e;
+  --on-ground-ink: #f5f5ee;
+  --on-acc: var(--ink);
 }
 
 :root {
@@ -105,7 +113,7 @@ body {
 }
 ::selection {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
 }
 a {
   color: inherit;
@@ -214,6 +222,56 @@ html.intro:not([data-intro-ready]) body {
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+/* The page with its skin pulled off (skin-scene.tsx: dragging the object strips it): what rind
+   ships, and nothing else. The browser's own look: white, black, its serif, blue links, no
+   radius, no shadow; every rind component on the page in the bare skin's terms. It comes back on
+   release. */
+html[data-stripped] {
+  --bg: #ffffff;
+  --ink: #000000;
+  --acc: #0000ee;
+  --acc-deep: #0000ee;
+  --on: #ffffff;
+  --on-acc: #ffffff;
+  --card: #ffffff;
+  --paper: #ffffff;
+  --muted: #f0f0f0;
+  --soft: transparent;
+  --line: #000000;
+  --bw: 1px;
+  --r: 0px;
+  --btn-r: 0px;
+  --shadow: none;
+  --shadow-sm: none;
+  --text: ui-serif, "Times New Roman", Times, serif;
+  --display: ui-serif, "Times New Roman", Times, serif;
+  --mono: ui-monospace, monospace;
+  --ground-ink: #ffffff;
+  --on-ground-ink: #000000;
+  --wordmark: #000000;
+  --wordmark-deep: transparent;
+}
+html[data-stripped] [data-skinned] {
+  --s-bg: #ffffff;
+  --s-ink: #000000;
+  --s-acc: #0000ee;
+  --s-acc-deep: #0000ee;
+  --s-on: #ffffff;
+  --s-card: #ffffff;
+  --s-muted: #f0f0f0;
+  --s-line: #767676;
+  --s-field-line: #767676;
+  --s-bw: 1px;
+  --s-r: 0px;
+  --s-r-sm: 0px;
+  --s-lift: none;
+  --s-lift-hi: none;
+  --s-lift-lo: none;
+  --s-font: ui-serif, "Times New Roman", Times, serif;
+  --s-brand: #0000ee;
+  --s-brand-text: #ffffff;
 }
 
 /* Scroll reveal (components/home/reveal.tsx; not data-reveal, which rind uses): content fades and lifts in once. */

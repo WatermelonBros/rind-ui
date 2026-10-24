@@ -209,6 +209,15 @@
   translate: 0 0;
 }
 
+/* the invitation to pull the object (and the page's skin off): only where it can be dragged */
+.pull {
+  font-weight: 700;
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .pull {
+    display: none;
+  }
+}
 /* the object is about to travel: its labels clear out first (skin-scene.tsx sets data-travel) */
 .stage :is(.label, .attrs, .note, .caption) {
   transition: opacity 0.25s var(--spring);

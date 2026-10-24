@@ -730,6 +730,28 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   scale: 1.15;
 }
 
+/* Message thread */
+[data-scope="message-thread"][data-part="viewport"] {
+  background: var(--skin-card);
+  color: var(--skin-ink);
+  border: var(--skin-border) solid var(--skin-line);
+  border-radius: var(--skin-radius);
+  box-shadow: var(--skin-shadow);
+}
+[data-scope="message-thread"][data-part="message"] {
+  background: var(--skin-muted);
+  color: var(--skin-ink);
+  border-radius: var(--skin-radius-sm);
+  font-family: var(--skin-font);
+}
+[data-scope="message-thread"][data-part="message"][data-from="user"] {
+  background: var(--skin-fill);
+  color: var(--skin-fill-text);
+}
+[data-scope="streaming-message"][data-part="caret"] {
+  background: var(--skin-brand);
+}
+
 /* Accordion */
 [data-scope="accordion"][data-part="root"] {
   border: var(--skin-border) solid var(--skin-line);
@@ -738,6 +760,11 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   box-shadow: var(--skin-shadow);
   backdrop-filter: var(--skin-blur);
   overflow: hidden;
+}
+[data-scope="accordion"][data-part="item"] {
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 [data-scope="accordion"][data-part="item"] + [data-part="item"] {
   border-top: max(1px, var(--skin-border)) solid var(--skin-line);

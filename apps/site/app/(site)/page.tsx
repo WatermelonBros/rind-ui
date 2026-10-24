@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { Hero } from "@/components/hero"
 import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
+import { BandPeel } from "@/components/home/band-peel"
 import { Install } from "@/components/home/install"
 import { Outro } from "@/components/home/outro"
 import { Peel } from "@/components/home/peel"
@@ -91,6 +92,7 @@ export default function Home() {
           and skips that when it is fixed (the x-ray label was first) */}
       <XRay />
       <SoundInvite />
+      <BandPeel />
       <ScreenReaderView />
     </>
   )

@@ -148,78 +148,81 @@ export function Agents() {
   }, [play])
 
   return (
-    <section className={styles.section} aria-labelledby="agents-title">
-      <div className={styles.agents}>
-        <Reveal>
-          <h2 id="agents-title" className={styles.h2}>
-            <Letters>Made for agents.</Letters>
-          </h2>
-          <p className={styles.lead}>
-            The whole API is generated into <code>llms.txt</code>, never written by hand, so it
-            cannot drift. And every component ships a driver, so an assistant can check its own work
-            the way you would.
-          </p>
-          <div className={styles.agentsActs}>
-            <a href="/llms.txt" className={styles.agentsLink}>
-              Read llms.txt ↗
-            </a>
-            <Button
-              className={styles.agentsReplay}
-              onPress={play}
-              disabled={status === "streaming"}
-            >
-              Replay
-            </Button>
-          </div>
-          <p className={styles.agentsNote}>A replay of a session, not a live model.</p>
-        </Reveal>
-        <div ref={stage} className={styles.agentsStage} data-skinned="" data-skin={phase}>
-          <MessageThread.Root className={styles.agentsThread} count={2} lastFromUser={false}>
-            <MessageThread.Viewport>
-              <MessageThread.Message index={0} from="user">
-                {SESSIONS[kind].ask}
-              </MessageThread.Message>
-              <MessageThread.Message index={1} from="assistant">
-                <StreamingMessage.Root text={text} status={status} announce="none">
-                  {/* a long line scrolls inside the bubble: reachable by keyboard to scroll it */}
-                  <StreamingMessage.Content tabIndex={0} />
-                  <StreamingMessage.Caret />
-                </StreamingMessage.Root>
-              </MessageThread.Message>
-            </MessageThread.Viewport>
-          </MessageThread.Root>
-          {/* what the reply's code renders, live, in the site's skin: the dialog's content
-              with its control, where the travelling object comes down (skin-scene.tsx) */}
-          <figure
-            className={styles.agentsRender}
-            data-skinned=""
-            data-skin={phase}
-            data-done={status === "complete" ? "" : undefined}
-          >
-            <figcaption>What it renders</figcaption>
-            <div className={styles.agentsDialog}>
-              <b>{SESSIONS[kind].title}</b>
-              {kind === "switch" ? (
-                <Switch.Root>
-                  <Switch.Control data-object-dock="agents">
-                    <Switch.Thumb />
-                  </Switch.Control>
-                  <Switch.Label>Dark mode</Switch.Label>
-                </Switch.Root>
-              ) : kind === "checkbox" ? (
-                <CheckboxGroup.Item>
-                  <CheckboxGroup.ItemControl data-object-dock="agents">
-                    <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
-                  </CheckboxGroup.ItemControl>
-                  <CheckboxGroup.ItemLabel>I agree</CheckboxGroup.ItemLabel>
-                </CheckboxGroup.Item>
-              ) : (
-                <Button data-object-dock="agents">Delete</Button>
-              )}
+    // a band of the page's own ground, peeled in over the install's paper (band-peel.tsx)
+    <div className={styles.band} data-band="page" data-from="paper">
+      <section className={styles.section} aria-labelledby="agents-title">
+        <div className={styles.agents}>
+          <Reveal>
+            <h2 id="agents-title" className={styles.h2}>
+              <Letters>Made for agents.</Letters>
+            </h2>
+            <p className={styles.lead}>
+              The whole API is generated into <code>llms.txt</code>, never written by hand, so it
+              cannot drift. And every component ships a driver, so an assistant can check its own
+              work the way you would.
+            </p>
+            <div className={styles.agentsActs}>
+              <a href="/llms.txt" className={styles.agentsLink}>
+                Read llms.txt ↗
+              </a>
+              <Button
+                className={styles.agentsReplay}
+                onPress={play}
+                disabled={status === "streaming"}
+              >
+                Replay
+              </Button>
             </div>
-          </figure>
+            <p className={styles.agentsNote}>A replay of a session, not a live model.</p>
+          </Reveal>
+          <div ref={stage} className={styles.agentsStage} data-skinned="" data-skin={phase}>
+            <MessageThread.Root className={styles.agentsThread} count={2} lastFromUser={false}>
+              <MessageThread.Viewport>
+                <MessageThread.Message index={0} from="user">
+                  {SESSIONS[kind].ask}
+                </MessageThread.Message>
+                <MessageThread.Message index={1} from="assistant">
+                  <StreamingMessage.Root text={text} status={status} announce="none">
+                    {/* a long line scrolls inside the bubble: reachable by keyboard to scroll it */}
+                    <StreamingMessage.Content tabIndex={0} />
+                    <StreamingMessage.Caret />
+                  </StreamingMessage.Root>
+                </MessageThread.Message>
+              </MessageThread.Viewport>
+            </MessageThread.Root>
+            {/* what the reply's code renders, live, in the site's skin: the dialog's content
+              with its control, where the travelling object comes down (skin-scene.tsx) */}
+            <figure
+              className={styles.agentsRender}
+              data-skinned=""
+              data-skin={phase}
+              data-done={status === "complete" ? "" : undefined}
+            >
+              <figcaption>{status === "complete" ? "What it renders" : "Rendering…"}</figcaption>
+              <div className={styles.agentsDialog}>
+                <b>{SESSIONS[kind].title}</b>
+                {kind === "switch" ? (
+                  <Switch.Root>
+                    <Switch.Control data-object-dock="agents">
+                      <Switch.Thumb />
+                    </Switch.Control>
+                    <Switch.Label>Dark mode</Switch.Label>
+                  </Switch.Root>
+                ) : kind === "checkbox" ? (
+                  <CheckboxGroup.Item>
+                    <CheckboxGroup.ItemControl data-object-dock="agents">
+                      <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                    </CheckboxGroup.ItemControl>
+                    <CheckboxGroup.ItemLabel>I agree</CheckboxGroup.ItemLabel>
+                  </CheckboxGroup.Item>
+                ) : (
+                  <Button data-object-dock="agents">Delete</Button>
+                )}
+              </div>
+            </figure>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }

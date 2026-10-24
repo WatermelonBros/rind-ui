@@ -220,6 +220,8 @@ export function exampleCode(slug: string): ExampleCode | undefined {
         css: string
         vue?: Record<string, string>
         svelte?: Record<string, string>
+        solid?: Record<string, string>
+        angular?: Record<string, string>
       }
     >
   )[slug]
@@ -233,6 +235,8 @@ export function exampleCode(slug: string): ExampleCode | undefined {
     code: each(entry.code, "tsx"),
     vue: each(entry.vue, "xml"),
     svelte: each(entry.svelte, "xml"),
+    solid: each(entry.solid, "tsx"),
+    angular: each(entry.angular, "typescript"),
     css: highlight(entry.css, "css"),
   }
 }
