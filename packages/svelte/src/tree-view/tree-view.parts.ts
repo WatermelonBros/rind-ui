@@ -1,0 +1,12 @@
+// The TreeView namespace: a module namespace, so bundlers drop the parts never referenced.
+export { useVisibleRows } from "./context"
+export { default as DropIndicator } from "./tree-view-drop-indicator.svelte"
+export { default as Empty } from "./tree-view-empty.svelte"
+export { default as Item } from "./tree-view-item.svelte"
+export { default as ItemCheckbox } from "./tree-view-item-checkbox.svelte"
+export { default as ItemIndicator } from "./tree-view-item-indicator.svelte"
+export { default as ItemText } from "./tree-view-item-text.svelte"
+export { default as Label } from "./tree-view-label.svelte"
+export { default as Loading } from "./tree-view-loading.svelte"
+export { default as Root } from "./tree-view-root.svelte"
+export { default as Tree } from "./tree-view-tree.svelte"

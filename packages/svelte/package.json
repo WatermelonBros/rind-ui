@@ -87,6 +87,18 @@
       "svelte": "./dist/checkbox-group/index.js",
       "default": "./dist/checkbox-group/index.js"
     },
+    "./clipboard": {
+      "@rind-ui/source": "./src/clipboard/index.ts",
+      "types": "./dist/clipboard/index.d.ts",
+      "svelte": "./dist/clipboard/index.js",
+      "default": "./dist/clipboard/index.js"
+    },
+    "./code-block": {
+      "@rind-ui/source": "./src/code-block/index.ts",
+      "types": "./dist/code-block/index.d.ts",
+      "svelte": "./dist/code-block/index.js",
+      "default": "./dist/code-block/index.js"
+    },
     "./collapsible": {
       "@rind-ui/source": "./src/collapsible/index.ts",
       "types": "./dist/collapsible/index.d.ts",
@@ -105,11 +117,29 @@
       "svelte": "./dist/fieldset/index.js",
       "default": "./dist/fieldset/index.js"
     },
+    "./file-upload": {
+      "@rind-ui/source": "./src/file-upload/index.ts",
+      "types": "./dist/file-upload/index.d.ts",
+      "svelte": "./dist/file-upload/index.js",
+      "default": "./dist/file-upload/index.js"
+    },
+    "./form": {
+      "@rind-ui/source": "./src/form/index.ts",
+      "types": "./dist/form/index.d.ts",
+      "svelte": "./dist/form/index.js",
+      "default": "./dist/form/index.js"
+    },
     "./form-toggle": {
       "@rind-ui/source": "./src/form-toggle/index.ts",
       "types": "./dist/form-toggle/index.d.ts",
       "svelte": "./dist/form-toggle/index.js",
       "default": "./dist/form-toggle/index.js"
+    },
+    "./grid-list": {
+      "@rind-ui/source": "./src/grid-list/index.ts",
+      "types": "./dist/grid-list/index.d.ts",
+      "svelte": "./dist/grid-list/index.js",
+      "default": "./dist/grid-list/index.js"
     },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
@@ -140,6 +170,12 @@
       "types": "./dist/link/index.d.ts",
       "svelte": "./dist/link/index.js",
       "default": "./dist/link/index.js"
+    },
+    "./listbox": {
+      "@rind-ui/source": "./src/listbox/index.ts",
+      "types": "./dist/listbox/index.d.ts",
+      "svelte": "./dist/listbox/index.js",
+      "default": "./dist/listbox/index.js"
     },
     "./marquee": {
       "@rind-ui/source": "./src/marquee/index.ts",
@@ -255,6 +291,12 @@
       "svelte": "./dist/tabs/index.js",
       "default": "./dist/tabs/index.js"
     },
+    "./tag-group": {
+      "@rind-ui/source": "./src/tag-group/index.ts",
+      "types": "./dist/tag-group/index.d.ts",
+      "svelte": "./dist/tag-group/index.js",
+      "default": "./dist/tag-group/index.js"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.ts",
@@ -284,6 +326,12 @@
       "types": "./dist/toolbar/index.d.ts",
       "svelte": "./dist/toolbar/index.js",
       "default": "./dist/toolbar/index.js"
+    },
+    "./tree-view": {
+      "@rind-ui/source": "./src/tree-view/index.ts",
+      "types": "./dist/tree-view/index.d.ts",
+      "svelte": "./dist/tree-view/index.js",
+      "default": "./dist/tree-view/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -360,6 +408,16 @@
         "svelte": "./dist/checkbox-group/index.js",
         "default": "./dist/checkbox-group/index.js"
       },
+      "./clipboard": {
+        "types": "./dist/clipboard/index.d.ts",
+        "svelte": "./dist/clipboard/index.js",
+        "default": "./dist/clipboard/index.js"
+      },
+      "./code-block": {
+        "types": "./dist/code-block/index.d.ts",
+        "svelte": "./dist/code-block/index.js",
+        "default": "./dist/code-block/index.js"
+      },
       "./collapsible": {
         "types": "./dist/collapsible/index.d.ts",
         "svelte": "./dist/collapsible/index.js",
@@ -375,10 +433,25 @@
         "svelte": "./dist/fieldset/index.js",
         "default": "./dist/fieldset/index.js"
       },
+      "./file-upload": {
+        "types": "./dist/file-upload/index.d.ts",
+        "svelte": "./dist/file-upload/index.js",
+        "default": "./dist/file-upload/index.js"
+      },
+      "./form": {
+        "types": "./dist/form/index.d.ts",
+        "svelte": "./dist/form/index.js",
+        "default": "./dist/form/index.js"
+      },
       "./form-toggle": {
         "types": "./dist/form-toggle/index.d.ts",
         "svelte": "./dist/form-toggle/index.js",
         "default": "./dist/form-toggle/index.js"
+      },
+      "./grid-list": {
+        "types": "./dist/grid-list/index.d.ts",
+        "svelte": "./dist/grid-list/index.js",
+        "default": "./dist/grid-list/index.js"
       },
       "./heading": {
         "types": "./dist/heading/index.d.ts",
@@ -404,6 +477,11 @@
         "types": "./dist/link/index.d.ts",
         "svelte": "./dist/link/index.js",
         "default": "./dist/link/index.js"
+      },
+      "./listbox": {
+        "types": "./dist/listbox/index.d.ts",
+        "svelte": "./dist/listbox/index.js",
+        "default": "./dist/listbox/index.js"
       },
       "./marquee": {
         "types": "./dist/marquee/index.d.ts",
@@ -500,6 +578,11 @@
         "svelte": "./dist/tabs/index.js",
         "default": "./dist/tabs/index.js"
       },
+      "./tag-group": {
+        "types": "./dist/tag-group/index.d.ts",
+        "svelte": "./dist/tag-group/index.js",
+        "default": "./dist/tag-group/index.js"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",
         "svelte": "./dist/text-field/index.js",
@@ -524,6 +607,11 @@
         "types": "./dist/toolbar/index.d.ts",
         "svelte": "./dist/toolbar/index.js",
         "default": "./dist/toolbar/index.js"
+      },
+      "./tree-view": {
+        "types": "./dist/tree-view/index.d.ts",
+        "svelte": "./dist/tree-view/index.js",
+        "default": "./dist/tree-view/index.js"
       },
       "./package.json": "./package.json"
     }

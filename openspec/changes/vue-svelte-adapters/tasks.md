@@ -55,16 +55,16 @@
 - [x] 2.38 Scroll Area
 - [x] 2.39 Marquee
 - [x] 2.40 Qr Code
-- [ ] 2.41 Clipboard
-- [ ] 2.42 Code Block
-- [ ] 2.43 Form
-- [ ] 2.44 Form Toggle
-- [ ] 2.45 File Upload
+- [x] 2.41 Clipboard
+- [x] 2.42 Code Block
+- [x] 2.43 Form
+- [x] 2.44 Form Toggle
+- [x] 2.45 File Upload
 - [ ] 2.46 Tags Input
-- [ ] 2.47 Tag Group
-- [ ] 2.48 Listbox
-- [ ] 2.49 Grid List
-- [ ] 2.50 Tree View
+- [x] 2.47 Tag Group
+- [x] 2.48 Listbox
+- [x] 2.49 Grid List
+- [x] 2.50 Tree View
 - [ ] 2.51 Table
 - [ ] 2.52 Sortable
 - [ ] 2.53 Popover
