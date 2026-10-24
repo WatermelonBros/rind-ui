@@ -20,7 +20,7 @@ import { ambient } from "./ambient"
 // sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
 // makes a sound (plus the explicit cues): the page's own demos stay quiet.
 
-type Cue = "on" | "off" | "phase" | "pass" | "unlock" | "whoosh" | "slam"
+type Cue = "on" | "off" | "phase" | "pass" | "unlock" | "whoosh" | "slam" | "reskin"
 
 /** Where a cue sounds (-1 left to 1 right) and, for the voices that read it, how far along a
  *  sequence it is (0 to 1): a slam rises a step with each framework that lands. */
@@ -299,6 +299,19 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       panner.pan.setValueAtTime(-0.9, now)
       panner.pan.linearRampToValueAtTime(0.7, now + length)
       tone("sine", 70, 120, 0, length * 0.8, 0.1)
+      return
+    }
+    case "reskin": {
+      // the builder putting on another skin by itself: a brush of air and a bell, its pitch the
+      // skin's place in the list (value), so a run of skins plays a little tune
+      const brush = noise(0.24, soft ? 0.12 : 0.1, "highpass", 2500)
+      brush.frequency.setValueAtTime(1800, now)
+      brush.frequency.exponentialRampToValueAtTime(7000, now + 0.22)
+      const scale = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21]
+      const n = scale[Math.round(value * (scale.length - 1))] ?? 0
+      const f = (soft ? 587 : 698) * 2 ** (n / 12)
+      tone("sine", f, f, 0.03, 0.5, 0.09)
+      tone(soft ? "sine" : "triangle", f * 2, f * 2, 0.03, 0.2, 0.03)
       return
     }
     case "slam": {

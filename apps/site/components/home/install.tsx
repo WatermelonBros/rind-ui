@@ -134,8 +134,8 @@ function assemble(
   done: () => void,
 ): readonly number[] {
   const slots = [...stage.querySelectorAll<HTMLElement>("[data-socket]")]
-  const FLY = 1250
-  const GAP = 190
+  const FLY = 1000
+  const GAP = 140
   const HIT = 0.78
   cue("whoosh")
   stage.removeAttribute("data-await")
@@ -300,6 +300,9 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
         keep: true,
         // not before the PASS has been read: the tests' band is mostly gone when they set off
         startAt: 0.55,
+        // quick, close together, all landed while the sockets are still low on the screen
+        gap: 0.08,
+        endAt: 0.6,
       }),
     [],
   )
@@ -367,8 +370,9 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
           },
         )
       },
-      // the whole row of sockets on screen, so every landing is seen, not under the fold
-      { threshold: 1 },
+      // as soon as the row of sockets comes up the screen: they land before the tests' ticks
+      // flying down to them do
+      { rootMargin: "0px 0px -6% 0px" },
     )
     io.observe(el.querySelector("ul") ?? el)
     return () => {

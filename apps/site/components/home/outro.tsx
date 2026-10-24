@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { zoom } from "../zoom"
+import { useSceneGl } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -20,6 +21,8 @@ export function Outro() {
   const fill = useRef<HTMLSpanElement>(null)
   const [egg, setEgg] = useState(0)
   const [said, setSaid] = useState("")
+  // the object's last berth is there only while the object is drawn (WebGL on)
+  const gl = useSceneGl()
 
   useEffect(() => {
     const el = footer.current
@@ -113,6 +116,19 @@ export function Outro() {
           </span>
         </p>
         <div className={styles.outroCtas}>
+          {/* where the travelling object ends its trip (skin-scene.tsx: the finale), by the way in */}
+          {/* a press on the landed object is a press on Get started (the scene lets a control under
+              the object take the press); the link itself is named once, below */}
+          {gl ? (
+            <Link
+              prefetch={false}
+              href="/docs/get-started/"
+              className={styles.finaleSlot}
+              data-object-finale=""
+              aria-hidden="true"
+              tabIndex={-1}
+            />
+          ) : null}
           <Link
             prefetch={false}
             href="/docs/get-started/"

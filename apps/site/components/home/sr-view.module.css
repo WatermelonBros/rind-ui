@@ -237,7 +237,8 @@
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  max-inline-size: 22ch;
+  /* the whole "Simulate a screen reader" (22ch cut its last letters) */
+  max-inline-size: 26ch;
   transition:
     max-inline-size 0.3s var(--spring),
     opacity 0.2s;

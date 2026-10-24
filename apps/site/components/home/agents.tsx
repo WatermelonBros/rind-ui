@@ -113,7 +113,7 @@ function useReplay(kind: HeroKind) {
       setStatus(done ? "complete" : "streaming")
       if (!done) timer.current = window.setTimeout(step, 40 + Math.random() * 70)
     }
-    timer.current = window.setTimeout(step, 600)
+    timer.current = window.setTimeout(step, 250)
   }, [kind])
   useEffect(() => () => clearTimeout(timer.current), [])
   return { text, status, play }
@@ -134,7 +134,9 @@ export function Agents() {
         io.disconnect()
         play()
       },
-      { threshold: 0.4 },
+      // the reply starts as the thread comes up the screen, so it is already writing when the
+      // thread is in full view (at 40% in view, an empty box sat waiting)
+      { rootMargin: "0px 0px -10% 0px" },
     )
     io.observe(el)
     return () => io.disconnect()

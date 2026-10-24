@@ -150,6 +150,13 @@ export function ScreenReaderView() {
       }
       step()
     }
+    // brought into the clear part of the screen, above the transcript panel
+    const clearOf = (el: Element) => {
+      const r = el.getBoundingClientRect()
+      const clear = window.innerHeight * (window.matchMedia("(hover: none)").matches ? 0.3 : 0.38)
+      if (r.top < 80 || r.bottom > window.innerHeight * 0.6)
+        window.scrollTo({ top: window.scrollY + r.top - clear, behavior: "smooth" })
+    }
     const go = (to: number, key: string, move: Move) => {
       const all = fresh()
       const prev = all[cursor] ?? null
@@ -158,11 +165,7 @@ export function ScreenReaderView() {
       cursor = to
       lastStates = states(next, readerRef.current)
       say(key, speakMove(prev, next, readerRef.current, move))
-      // brought into the clear part of the screen, above the transcript panel
-      const r = next.el.getBoundingClientRect()
-      const clear = window.innerHeight * (window.matchMedia("(hover: none)").matches ? 0.3 : 0.38)
-      if (r.top < 80 || r.bottom > window.innerHeight * 0.6)
-        window.scrollTo({ top: window.scrollY + r.top - clear, behavior: "smooth" })
+      clearOf(next.el)
       // as in NVDA, focus follows the browse cursor onto focusable elements, so Tab goes on
       // from here (and that focus is not announced a second time)
       if (next.el.tabIndex >= 0 && next.role !== "text" && next.role !== "heading") {
@@ -289,6 +292,8 @@ export function ScreenReaderView() {
       if (focusMode(el)) chunks.push("focus mode")
       say("Tab", chunks)
       mark(item)
+      // Tab's own scroll stops at the screen's edge, under the transcript panel
+      clearOf(el)
     }
     // a control's state changes (a switch turned on, a section opened): only the new state is said
     const watch = new MutationObserver((records) => {

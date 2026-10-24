@@ -233,17 +233,98 @@
   overflow: hidden;
   background: var(--card);
 }
-.lookControls {
+/* the ready skins: a wall of chips across the panel's head, each with its colours as a dot */
+.lookPresets {
   display: flex;
   flex-wrap: wrap;
-  align-items: end;
-  gap: 18px 24px;
+  align-items: center;
+  gap: 14px 24px;
   padding: 16px 18px;
   border-bottom: var(--bw) solid var(--line);
+}
+:global([data-phase="juicy"]) .lookPresets {
+  border-bottom: 2px solid var(--muted);
+}
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 560px;
+}
+.preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-block-size: 32px;
+  padding: 0 11px 0 6px;
+  border: 1.5px solid color-mix(in oklab, var(--ink) 16%, transparent);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--ink);
+  font: 600 12px var(--mono);
+  cursor: pointer;
+  transition:
+    background 0.25s var(--spring),
+    color 0.25s var(--spring),
+    translate 0.25s var(--spring-pop);
+}
+.preset[data-hover] {
+  translate: 0 -2px;
+}
+.preset[data-state="on"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
+}
+.preset:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+/* brand over surface, the accent a crescent at its edge */
+.presetSwatch {
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 70% 70%, var(--c) 0 28%, transparent 30%),
+    linear-gradient(135deg, var(--a) 0 50%, var(--b) 50%);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+/* the preview, large, with the rack of controls beside it */
+.lookBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+}
+.lookControls {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 18px;
+  border-inline-start: var(--bw) solid var(--line);
   font: 600 13px var(--mono);
 }
 :global([data-phase="juicy"]) .lookControls {
-  border-bottom: 2px solid var(--muted);
+  border-inline-start: 2px solid var(--muted);
+}
+/* six shadows on one row: the rack's segments are tighter than the theme's */
+.lookControls [data-scope="segmented-control"][data-part="item"][data-part] {
+  padding-inline: 9px;
+  font-size: 12px;
+}
+.lookControls [data-scope="segmented-control"][data-part="root"][data-part] {
+  flex-wrap: nowrap;
+}
+/* the components stay in view while the rack beside them is scrolled through (desktop) */
+@media (min-width: 901px) {
+  .lookSticky {
+    position: sticky;
+    top: calc(var(--bar-h) + 48px);
+  }
+}
+.tuneGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 18px;
 }
 .segment {
   display: flex;
@@ -295,7 +376,7 @@
 .tuneSlider {
   display: grid;
   gap: 6px;
-  inline-size: 150px;
+  flex: 1 1 130px;
 }
 .tuneHead {
   display: flex;
@@ -318,12 +399,14 @@
 }
 .tuneActions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-inline-start: auto;
-  align-self: end;
 }
 .lookStage {
+  min-block-size: 420px;
   padding: 48px clamp(20px, 5vw, 64px);
+  transition: background 0.5s var(--spring);
 }
 .lookGrid {
   display: grid;
@@ -335,17 +418,27 @@
 /* on a phone the preview comes first: it is what the controls change (and where the hero's
    object lands), so it must be on screen when they are */
 @media (max-width: 900px) {
-  .lookPanel {
-    display: flex;
-    flex-direction: column;
+  .lookBody {
+    grid-template-columns: 1fr;
   }
   .lookStage {
-    order: -1;
+    min-block-size: 0;
     padding: 28px 20px;
   }
   .lookControls {
-    border-bottom: 0;
+    border-inline-start: 0;
     border-top: var(--bw) solid var(--line);
+  }
+  /* the chips scroll sideways in one row rather than taking the phone's whole screen */
+  .presets {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: -18px;
+    padding-inline: 18px;
+    scrollbar-width: none;
+  }
+  .preset {
+    flex: none;
   }
 }
 .lookCode {
@@ -1102,6 +1195,37 @@
   gap: 14px;
   margin: 40px 0 100px;
 }
+/* the object's last berth (outro.tsx renders it only while the object is drawn), sized to its
+   kind: the hero picks one per visit (html[data-hero]) */
+.finaleSlot {
+  display: inline-block;
+  align-self: center;
+  inline-size: 104px;
+  block-size: 62px;
+}
+:global(html[data-hero="checkbox"]) .finaleSlot {
+  inline-size: 64px;
+  block-size: 64px;
+}
+:global(html[data-hero="button"]) .finaleSlot {
+  inline-size: 120px;
+  block-size: 58px;
+}
+/* the object touches down in it: Get started hops, once */
+.outro[data-finale] .outroPrimary {
+  animation: finale-hop 0.7s var(--spring-pop);
+}
+@keyframes finale-hop {
+  35% {
+    translate: 0 -10px;
+    scale: 1.08;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outro[data-finale] .outroPrimary {
+    animation: none;
+  }
+}
 .outroPrimary,
 .outroGhost {
   font: 600 16px var(--text);
@@ -1197,7 +1321,8 @@
   @media (min-width: 761px) and (prefers-reduced-motion: no-preference) {
     .band[data-band]::before {
       animation-name: band-wave;
-      animation-range: entry 0 entry calc(55 * var(--vh));
+      /* open within a short stretch: a half-open swell at rest read as a stray shape */
+      animation-range: entry 0 entry calc(40 * var(--vh));
     }
     :global([data-phase="crisp"]) .band[data-band]::before {
       animation-name: band-diamond;
@@ -1226,7 +1351,9 @@
     clip-path: circle(0% at var(--wave-x, 50%) 0%);
   }
   to {
-    clip-path: circle(120% at var(--wave-x, 50%) 0%);
+    /* 170%: a tall band's far bottom corner lies beyond 120% of circle()'s reference radius,
+       which left a wedge of the page's ground in it for good */
+    clip-path: circle(170% at var(--wave-x, 50%) 0%);
   }
 }
 @keyframes band-diamond {
