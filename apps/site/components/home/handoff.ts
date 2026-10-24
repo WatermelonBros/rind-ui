@@ -26,8 +26,8 @@ export interface HandoffOptions {
   /** A margin to travel in (x in viewport pixels): out to it first, down it, and into the
    *  landing only at the end, along the landing's own line, so the trip never crosses copy. */
   readonly lane?: () => number
-  /** Instead of lane moves: one sinuous line, leaving its start downward at once (never along
-   *  the text it starts on) and swaying from side to side as it falls to its landing. */
+  /** Instead of lane moves: one smooth swing out through the right of the page and back in to
+   *  its landing, crossing no copy on the way. */
   readonly curve?: boolean
   /** The starts stay as they are while their copies travel (a result that must stay readable,
    *  the tests' PASS), instead of being drawn away. */
@@ -134,11 +134,17 @@ export function handoff(o: HandoffOptions): () => void {
         let x: number
         let y: number
         if (o.curve) {
-          // down first, sideways later, with a sway that dies out as it nears the landing
-          const fall = 1 - (1 - p) ** 2
-          const amp = Math.min(90, 40 + Math.abs(bx - ax) * 0.25) * (1 - p)
-          x = ax + (bx - ax) * ease(clamp((p - 0.12) / 0.88)) + Math.sin(p * Math.PI * 2.5) * amp
-          y = ay + (by - ay) * fall
+          // one smooth swing out through the right of the page and back in to the landing (a
+          // cubic curve), so it never crosses the copy between them (the next scene's title)
+          const side = window.innerWidth * 0.86
+          const c1x = side
+          const c1y = ay + (by - ay) * 0.15
+          const c2x = side
+          const c2y = by - (by - ay) * 0.1
+          const u = ease(p)
+          const v = 1 - u
+          x = v * v * v * ax + 3 * v * v * u * c1x + 3 * v * u * u * c2x + u * u * u * bx
+          y = v * v * v * ay + 3 * v * v * u * c1y + 3 * v * u * u * c2y + u * u * u * by
         } else if (lane === undefined) {
           x = ax + (bx - ax) * ease(clamp((p - 0.35) / 0.65))
           y = ay + (by - ay) * ease(clamp(p * 1.4))

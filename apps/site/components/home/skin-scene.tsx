@@ -469,7 +469,7 @@ export function SkinScene() {
         // across the gap it keeps a size that reads as the object (a small control, Bold, would
         // make it a speck), centred on the control's line, and takes the control's own size only
         // as it lands
-        const k64 = Math.max(1, 64 / Math.max(live.width, live.height))
+        const k64 = Math.max(1, 44 / Math.max(live.width, live.height))
         const tw = live.width * k64
         const th = live.height * k64
         const tx = live.x + live.width / 2 - tw / 2

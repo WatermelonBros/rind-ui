@@ -39,8 +39,8 @@ function Card({ children }: { readonly children?: ReactNode }) {
                 ))
               }
             </Tour.Actions>
+            <Tour.CloseTrigger>Close</Tour.CloseTrigger>
           </div>
-          <Tour.CloseTrigger>Close</Tour.CloseTrigger>
         </Tour.Content>
       </Tour.Positioner>
     </Tour.Portal>

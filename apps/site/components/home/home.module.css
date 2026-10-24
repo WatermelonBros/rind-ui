@@ -1854,3 +1854,16 @@ button.socket:focus-visible {
   border-color: var(--ink);
   translate: 0 -4px;
 }
+
+/* agents.tsx on a phone: the assistant's message takes the thread's whole width (at the skin's
+   85% it left a strip of empty frame), and its code keeps whole lines, scrolling sideways inside
+   the focusable transcript instead of breaking tokens */
+@media (max-width: 600px) {
+  .agentsStage .agentsThread [data-scope="message-thread"][data-part="message"] {
+    max-inline-size: 100%;
+  }
+  .agentsStage .agentsThread [data-scope="streaming-message"][data-part="content"] {
+    white-space: pre;
+    overflow-x: auto;
+  }
+}
