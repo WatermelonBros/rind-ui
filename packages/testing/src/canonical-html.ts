@@ -8,6 +8,12 @@ const ID_REFS =
   /^(id|for|name|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
 
 /**
+ * The frameworks' generated ids (React's useId, Vue's useId and an app prefix, Svelte's
+ * `$props.id()`): an item keyed by one (`data-value`, no value given) differs only in it.
+ */
+const GENERATED = /^(?:_[rR]_[0-9a-zA-Z]+_|[«:][rR][0-9a-zA-Z]+[»:]|v-\d+|parity\d+-\d+|[cs]\d+)$/
+
+/**
  * A canonical rendering of `html` (or of `node`'s children): comments and whitespace-only text
  * dropped, adjacent texts joined, attributes sorted, styles normalised by the browser's CSS
  * serialiser; every element id becomes `@0`, `@1`… (in document order) wherever an id or an ARIA
@@ -56,7 +62,11 @@ export function canonicalHtml(html: string | Node): string {
     })
   const declaration = (p: string, value: string) =>
     // The positioner names its anchor's id (a part id, holding the instance).
-    p === "--rind-anchor-id" ? inInstance(value) : anchors(value)
+    p === "--rind-anchor-id" ? inInstance(value) : anchors(whole(value))
+
+  // Measured lengths differ below a pixel between two renders (subpixel layout): whole pixels.
+  const whole = (value: string) =>
+    value.replace(/-?\d+\.\d+px/g, (n) => `${Math.round(Number.parseFloat(n))}px`)
 
   const out: string[] = []
   const walk = (node: Node, depth: number) => {
@@ -65,6 +75,8 @@ export function canonicalHtml(html: string | Node): string {
     const attrs = Array.from(node.attributes)
       // Hover follows wherever the pointer rests (a previous test's last move), not the markup.
       .filter(({ name }) => name !== "data-hover" && name !== "data-hovering")
+      // An empty style is no style (a framework may leave `style=""` after removing the last).
+      .filter(({ name }) => name !== "style" || (node as HTMLElement).style.length > 0)
       .map(({ name, value }) => {
         if (name === "style") {
           const style = (node as HTMLElement).style
@@ -74,7 +86,13 @@ export function canonicalHtml(html: string | Node): string {
           return `style="${decls.join("; ")}"`
         }
         const v =
-          name === "data-instance" ? inInstance(value) : ID_REFS.test(name) ? ids(value) : value
+          name === "data-instance"
+            ? inInstance(value)
+            : ID_REFS.test(name)
+              ? ids(value)
+              : name === "data-value" && GENERATED.test(value)
+                ? "~generated"
+                : value
         return `${name}="${v}"`
       })
       .sort()
