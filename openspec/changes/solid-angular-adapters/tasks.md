@@ -15,12 +15,12 @@
 
 - [x] 2.1 Toggle
 - [x] 2.2 Button
-- [ ] 2.3 Separator
-- [ ] 2.4 Kbd
-- [ ] 2.5 Badge
-- [ ] 2.6 Heading
-- [ ] 2.7 Label
-- [ ] 2.8 Link
+- [x] 2.3 Separator
+- [x] 2.4 Kbd
+- [x] 2.5 Badge
+- [x] 2.6 Heading
+- [x] 2.7 Label
+- [x] 2.8 Link
 - [ ] 2.9 Skeleton
 - [ ] 2.10 Progress
 - [ ] 2.11 Meter

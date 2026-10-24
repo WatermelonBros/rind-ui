@@ -67,10 +67,40 @@
         "solid": "./dist/index.jsx",
         "default": "./dist/index.mjs"
       },
+      "./badge": {
+        "types": "./dist/badge/index.d.mts",
+        "solid": "./dist/badge/index.jsx",
+        "default": "./dist/badge/index.mjs"
+      },
       "./button": {
         "types": "./dist/button/index.d.mts",
         "solid": "./dist/button/index.jsx",
         "default": "./dist/button/index.mjs"
+      },
+      "./heading": {
+        "types": "./dist/heading/index.d.mts",
+        "solid": "./dist/heading/index.jsx",
+        "default": "./dist/heading/index.mjs"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.mts",
+        "solid": "./dist/kbd/index.jsx",
+        "default": "./dist/kbd/index.mjs"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.mts",
+        "solid": "./dist/label/index.jsx",
+        "default": "./dist/label/index.mjs"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.mts",
+        "solid": "./dist/link/index.jsx",
+        "default": "./dist/link/index.mjs"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.mts",
+        "solid": "./dist/separator/index.jsx",
+        "default": "./dist/separator/index.mjs"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.mts",
@@ -87,11 +117,47 @@
       "solid": "./dist/index.jsx",
       "default": "./dist/index.mjs"
     },
+    "./badge": {
+      "@rind-ui/source": "./src/badge/index.ts",
+      "types": "./dist/badge/index.d.mts",
+      "solid": "./dist/badge/index.jsx",
+      "default": "./dist/badge/index.mjs"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.mts",
       "solid": "./dist/button/index.jsx",
       "default": "./dist/button/index.mjs"
+    },
+    "./heading": {
+      "@rind-ui/source": "./src/heading/index.ts",
+      "types": "./dist/heading/index.d.mts",
+      "solid": "./dist/heading/index.jsx",
+      "default": "./dist/heading/index.mjs"
+    },
+    "./kbd": {
+      "@rind-ui/source": "./src/kbd/index.ts",
+      "types": "./dist/kbd/index.d.mts",
+      "solid": "./dist/kbd/index.jsx",
+      "default": "./dist/kbd/index.mjs"
+    },
+    "./label": {
+      "@rind-ui/source": "./src/label/index.ts",
+      "types": "./dist/label/index.d.mts",
+      "solid": "./dist/label/index.jsx",
+      "default": "./dist/label/index.mjs"
+    },
+    "./link": {
+      "@rind-ui/source": "./src/link/index.ts",
+      "types": "./dist/link/index.d.mts",
+      "solid": "./dist/link/index.jsx",
+      "default": "./dist/link/index.mjs"
+    },
+    "./separator": {
+      "@rind-ui/source": "./src/separator/index.ts",
+      "types": "./dist/separator/index.d.mts",
+      "solid": "./dist/separator/index.jsx",
+      "default": "./dist/separator/index.mjs"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",

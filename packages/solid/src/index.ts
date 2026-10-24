@@ -1,7 +1,12 @@
 // @rind-ui/solid: SolidJS parts over the framework-neutral core, one component at a time.
 
+export * from "./badge"
 export * from "./button"
+export * from "./heading"
 export { IconChildren, type IconName, type RindIcons } from "./icons"
+export * from "./kbd"
+export * from "./label"
+export * from "./link"
 export { composeRefs, mergeProps, type RindEventExtension } from "./merge-props"
 export { normalizeProps } from "./normalize-props"
 export {
@@ -14,4 +19,5 @@ export {
   useMessages,
 } from "./provider"
 export type { RenderProp } from "./render"
+export * from "./separator"
 export * from "./toggle"

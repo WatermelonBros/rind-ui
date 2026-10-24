@@ -153,7 +153,13 @@
     "tree-view": 28
   },
   "solid": {
+    "badge": 3,
     "button": 16,
+    "heading": 3,
+    "kbd": 8,
+    "label": 7,
+    "link": 12,
+    "separator": 3,
     "toggle": 14
   },
   "angular": {
