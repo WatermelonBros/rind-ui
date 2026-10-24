@@ -19,7 +19,7 @@ export function scope(base) {
     // Config, dependencies and the test infrastructure itself: run the whole suite, since
     // Vitest's --changed only follows imports.
     full: any(
-      /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github\/|\.nvmrc|scripts\/(ci-scope|verify)\.mjs|packages\/testing\/src\/(model|driver|adapter|adapters\/|invariants|collect|setup|env)|packages\/[^/]+\/package\.json|packages\/[^/]+\/tsdown\.config\.ts|apps\/site\/examples\/harness\.ts|packages\/testing\/fixtures\/harness\.ts)/,
+      /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|vitest\.config\.ts|tsconfig[^/]*\.json|\.github\/|\.nvmrc|scripts\/(ci-scope|ci-matrix|verify)\.mjs|packages\/testing\/src\/(model|driver|adapter|adapters\/|invariants|collect|setup|env)|packages\/[^/]+\/package\.json|packages\/[^/]+\/tsdown\.config\.ts|apps\/site\/examples\/harness\.ts|packages\/testing\/fixtures\/harness\.ts)/,
     ),
   }
 }

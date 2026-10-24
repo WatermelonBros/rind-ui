@@ -38,6 +38,9 @@ const base = `http://localhost:${typeof address === "object" && address ? addres
 const docs = JSON.parse(readFileSync(join(root, "content/generated/docs.json"), "utf8")) as {
   slug: string
 }[]
+// AUDIT_SHARD=2/4 walks every fourth page from the second (CI runs the shards in parallel); the
+// harness check runs in the last shard only, the intro check in the first
+const [shard = 1, shards = 1] = (process.env["AUDIT_SHARD"] ?? "1/1").split("/").map(Number)
 const urls = [
   "/",
   "/docs/",
@@ -46,7 +49,7 @@ const urls = [
   "/compare/",
   ...docs.map((p) => `/docs/${p.slug}/`),
   ...["/theme/", "/theme/tokens/", "/theme/contrast/", "/theme/showcase/"],
-]
+].filter((_, i) => i % shards === shard - 1)
 const axeSource = readFileSync(join(root, "node_modules/axe-core/axe.min.js"), "utf8")
 
 type Finding = { url: string; kind: string; message: string }
@@ -430,7 +433,7 @@ for (const url of urls) {
 }
 // the examples harness: every example of index.json is exported in every skin and renders
 // alone, with no site stylesheet on the unstyled skin
-{
+if (shard === shards) {
   type Entry = { slug: string; example: string; urls: Record<string, string> }
   const index = JSON.parse(readFileSync(join(outDir, "examples/index.json"), "utf8")) as Entry[]
   for (const u of index.flatMap((e) => Object.values(e.urls))) {
@@ -464,7 +467,7 @@ for (const url of urls) {
   await page.close()
 }
 // the intro itself: every load of the landing shows the raw copy over the page, then reveals the styled page
-{
+if (shard === 1) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
   page.on("pageerror", (e) => report("/ (intro)", "pageerror", e.message))
   await page.goto(`${base}/`, { waitUntil: "domcontentloaded" })
