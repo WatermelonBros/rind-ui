@@ -1,11 +1,13 @@
 import type { ReactNode } from "react"
 import { GooFilters } from "@/components/goo"
 import { Intro } from "@/components/intro"
+import { LettersReplay } from "@/components/letters-replay"
 import { Nav } from "@/components/nav"
 import { PhaseProvider } from "@/components/phase"
 import { RouteWave } from "@/components/route-wave"
 import { Secrets } from "@/components/secrets"
 import "../globals.css"
+import { CodeCopy } from "@/components/code-copy"
 
 /** The site: navigation, phase, intro and the site stylesheet. */
 export default function SiteLayout({ children }: { children: ReactNode }) {
@@ -19,6 +21,8 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         {children}
         <Secrets />
         <RouteWave />
+        <LettersReplay />
+        <CodeCopy />
       </PhaseProvider>
       {/* after the page: its inline script copies the parsed header and main */}
       <Intro />

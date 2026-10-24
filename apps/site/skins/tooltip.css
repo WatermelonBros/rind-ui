@@ -78,11 +78,11 @@
   box-shadow: 3px 3px 0 #ff3d8b;
 }
 [data-rind-theme="skin-juicy"] [data-scope="tooltip"][data-part="content"] {
-  --s-tip-bg: #2a1d5c;
+  --s-tip-bg: #103d2e;
   --s-tip-fg: #fff;
   border-radius: 12px;
   padding: 7px 12px;
-  box-shadow: 0 4px 0 #c9bdf2;
+  box-shadow: 0 4px 0 #f3a7a2;
 }
 
 [data-rind-theme^="skin-"] [data-scope="tooltip"][data-part="arrow"] {

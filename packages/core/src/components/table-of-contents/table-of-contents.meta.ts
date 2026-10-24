@@ -92,7 +92,7 @@ export const tableOfContentsMeta = {
       description: "Overrides the landmark's name.",
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

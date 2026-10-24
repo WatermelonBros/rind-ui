@@ -6,6 +6,7 @@ import { pages } from "@/lib/docs"
 import styles from "./docs.module.css"
 // every component's skin (the landing loads only its own: skins/home.css)
 import "@/skins/index.css"
+import { frameworks } from "@/lib/frameworks"
 
 /** "hidden-until-found" → "Hidden until found": guide titles are sentences, the nav wants names. */
 const shortLabel = (slug: string) => {
@@ -41,7 +42,7 @@ export default function DocsLayout({ children }: { children: ReactNode }) {
   ]
   return (
     <div className={styles.shell} data-surface="docs">
-      <Sidebar groups={groups} />
+      <Sidebar groups={groups} frameworks={frameworks()} />
       <main id="content" className={styles.main}>
         {children}
         <footer className={styles.footer}>

@@ -3,8 +3,8 @@
 .canvas {
   position: fixed;
   inset: 0;
-  inline-size: 100vw;
-  block-size: 100vh;
+  inline-size: calc(100 * var(--vw));
+  block-size: calc(100 * var(--vh));
   z-index: 30;
   pointer-events: none;
   opacity: 0;

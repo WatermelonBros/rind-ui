@@ -77,23 +77,23 @@ The Textarea needs an accessible name: render a `PromptInput.Label` (visually hi
 | `PromptInput.Root` | `errors` | `string[]` | — | The Field's error messages. |
 | `PromptInput.Root` | `messages` | `Partial<PromptInputMessages>` | — | Every string reaching assistive technology. |
 | `PromptInput.Root` | `children` | `ReactNode` | — | The parts. |
-| `PromptInput.Root` | `render` | `RenderProp<undefined>` | — | Substitutes the `<form>` element. |
+| `PromptInput.Root` | `render` | `RenderProp` | — | Substitutes the `<form>` element. |
 | `PromptInput.Root` | `fieldMessages` | `MessageOverrides<FieldMessages>` | — | Replaces the Field's own strings. |
 | `PromptInput.Label` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
 | `PromptInput.Description` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
 | `PromptInput.ErrorMessage` | `render` | `RenderProp<FieldState>` | — | Another element or a render function receiving the props and the Field's state. |
 | `PromptInput.ErrorMessage` | `match` | `string` | — | Rendered only when this validity key caused the error (one message per constraint). |
 | `PromptInput.ErrorMessage` | `children` | `ReactNode \| ((messages: readonly string[]) => ReactNode)` | — | Replaces the default text; a function returning null/undefined falls back to it. |
-| `PromptInput.Textarea` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Textarea` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 | `PromptInput.Textarea` | `autosize` | `boolean` | — | Grows with the content (`field-sizing: content`, a measured fallback). Default `true`. |
-| `PromptInput.Submit` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
-| `PromptInput.AttachTrigger` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
-| `PromptInput.Attachments` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Submit` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `PromptInput.AttachTrigger` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `PromptInput.Attachments` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 | `PromptInput.Attachments` | `children` | `(attachment: PromptAttachment) => ReactNode` | — | Renders one attachment; default: its name and its remove button. |
-| `PromptInput.Attachment` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
-| `PromptInput.AttachmentName` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
-| `PromptInput.AttachmentRemove` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
-| `PromptInput.CharacterCount` | `render` | `RenderProp<undefined>` | — | Substitutes the rendered element. |
+| `PromptInput.Attachment` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `PromptInput.AttachmentName` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `PromptInput.AttachmentRemove` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `PromptInput.CharacterCount` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 | `PromptInput.CharacterCount` | `max` | `number` | — | A soft limit: over it, nothing is sent and the input is invalid; never a truncation. |
 | `PromptInput.CharacterCount` | `count` | `(value: string) => number` | `characters, a line break once` | Counts the draft (a tokenizer for a token limit). |
 

@@ -63,7 +63,7 @@ for (const intro of [false, true]) {
   await p.goto("http://localhost:4555/", { waitUntil: "load" })
   await p.waitForTimeout(6000)
   const s = await p.evaluate(() => window.__shifts)
-  console.log("intro-skipped=" + intro, "CLS", s.reduce((a, e) => a + e.v, 0).toFixed(3))
+  console.log(`intro-skipped=${intro}`, "CLS", s.reduce((a, e) => a + e.v, 0).toFixed(3))
   for (const e of s) console.log(" ", e.t, e.v, e.src.slice(0, 3).join(" | "))
   await p.close()
 }

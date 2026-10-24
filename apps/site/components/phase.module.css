@@ -7,11 +7,11 @@
 }
 .curtain {
   position: absolute;
-  left: -10vw;
-  right: -10vw;
+  left: calc(-10 * var(--vw));
+  right: calc(-10 * var(--vw));
   top: 0;
-  height: 130vh;
-  translate: 0 -160vh;
+  height: calc(130 * var(--vh));
+  translate: 0 calc(-160 * var(--vh));
   animation: pour 1.4s cubic-bezier(0.7, 0, 0.3, 1) forwards;
 }
 .curtain i {
@@ -20,13 +20,13 @@
 }
 @keyframes pour {
   0% {
-    translate: 0 -160vh;
+    translate: 0 calc(-160 * var(--vh));
   }
   40%,
   60% {
-    translate: 0 -15vh;
+    translate: 0 calc(-15 * var(--vh));
   }
   100% {
-    translate: 0 150vh;
+    translate: 0 calc(150 * var(--vh));
   }
 }

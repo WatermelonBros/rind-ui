@@ -2,6 +2,8 @@
 
 import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
+import { zoom } from "../zoom"
 import {
   type HeroKind,
   heroKind,
@@ -69,11 +71,49 @@ export function Peel() {
     const el = section.current
     if (!el) return
     let raf = 0
+    let pushed = 0
     const update = () => {
       raf = 0
       const rect = el.getBoundingClientRect()
       const travel = rect.height - window.innerHeight
-      setProgress(clamp(-rect.top / (travel || 1)))
+      // a phone starts the acts while the scene is still rising into place: waiting for it to
+      // reach the top left most of the screen empty ground
+      const early = window.innerWidth <= 900 ? window.innerHeight * 0.48 : 0
+      setProgress(clamp((early - rect.top) / (travel || 1)))
+      // the builder's title, rising, pushes the whole scene up ahead of it, 40px clear
+      // of its lowest part (the diagram), so the two never meet and the screen is never left
+      // with the scene gone and the title not yet there
+      const stick = el.querySelector<HTMLElement>(`.${styles.sticky}`)
+      // the ink disc opens from behind the component, so its first sliver is hidden by it (from
+      // a fixed point it began as a stray dot beside the object)
+      const c = (
+        control.current?.querySelector('[data-part="control"], button') ?? control.current
+      )?.getBoundingClientRect()
+      const box = stick?.getBoundingClientRect()
+      if (stick && c && box?.width && box.height) {
+        stick.style.setProperty(
+          "--disc-x",
+          `${((c.left + c.width / 2 - box.left) / box.width) * 100}%`,
+        )
+        stick.style.setProperty(
+          "--disc-y",
+          `${((c.top + c.height / 2 - box.top) / box.height) * 100}%`,
+        )
+      }
+      const next = document.getElementById("look-title")?.getBoundingClientRect().top
+      if (stick) {
+        const low = (stick.querySelector("[data-state-graph]") ?? stick).getBoundingClientRect()
+        // desktop only: a phone's column scrolls the scene away on its own
+        const push =
+          next === undefined || window.innerWidth <= 900
+            ? 0
+            : Math.max(0, low.bottom + pushed + 40 - next)
+        if (push !== pushed) {
+          pushed = push
+          // its contents move, not its ground (moving that bared a band of the page under it)
+          stick.style.setProperty("--push", `${-push / zoom()}px`)
+        }
+      }
     }
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -121,7 +161,12 @@ export function Peel() {
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
   const dark = p2 * (1 - p3)
-  const vars = { "--p1": 1, "--p2": p2, "--p3": p3, "--dark": dark } as CSSProperties
+  const vars = {
+    "--p1": 1,
+    "--p2": p2,
+    "--p3": p3,
+    "--dark": dark,
+  } as CSSProperties
   const machine = MACHINES[kind]
 
   return (
@@ -131,7 +176,7 @@ export function Peel() {
       <div className={styles.sticky} data-act={act + 1} data-ink={dark > 0.15 ? "" : undefined}>
         <div className={styles.copy}>
           <h2 id="peel-title" className={styles.title} key={act}>
-            {ACTS[act]?.title}
+            <Letters>{ACTS[act]?.title ?? ""}</Letters>
           </h2>
           <p className={styles.text}>{ACTS[act]?.text}</p>
         </div>
@@ -139,7 +184,7 @@ export function Peel() {
         <div className={styles.inkLayer} aria-hidden="true">
           <div className={styles.copy}>
             <p className={styles.title} key={act}>
-              {ACTS[act]?.title}
+              <Letters>{ACTS[act]?.title ?? ""}</Letters>
             </p>
             <p className={styles.text}>{ACTS[act]?.text}</p>
           </div>

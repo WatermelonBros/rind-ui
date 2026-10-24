@@ -2,10 +2,10 @@
 
 import { Button, MessageThread, StreamingMessage } from "@rind-ui/react"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
 import { usePhase } from "../phase"
 import { type HeroKind, heroKind } from "./hero-state"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Status = "pending" | "streaming" | "complete"
@@ -174,7 +174,8 @@ export function Agents() {
               </MessageThread.Message>
               <MessageThread.Message index={1} from="assistant">
                 <StreamingMessage.Root text={text} status={status} announce="none">
-                  <StreamingMessage.Content />
+                  {/* a long line scrolls inside the bubble: reachable by keyboard to scroll it */}
+                  <StreamingMessage.Content tabIndex={0} />
                   <StreamingMessage.Caret />
                 </StreamingMessage.Root>
               </MessageThread.Message>

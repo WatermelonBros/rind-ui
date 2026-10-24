@@ -85,7 +85,7 @@ export const toolbarMeta = {
       description: "`focus()` moves focus to the toolbar's tab stop (an application shortcut).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

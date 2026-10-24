@@ -38,7 +38,7 @@
   transition: opacity 0.3s var(--s-ease);
 }
 [data-rind-theme="skin-juicy"] [data-scope="drawer"][data-part="backdrop"] {
-  background: color-mix(in oklab, #9b87e8 45%, transparent);
+  background: color-mix(in oklab, #e9787f 45%, transparent);
 }
 [data-rind-theme^="skin-"] [data-scope="drawer"][data-part="backdrop"][data-state="open"] {
   @starting-style {
@@ -93,7 +93,7 @@
   box-shadow: 0 -6px 0 var(--s-ink);
 }
 [data-rind-theme="skin-juicy"] [data-scope="drawer"][data-part="content"] {
-  box-shadow: 0 -8px 0 #c9bdf2;
+  box-shadow: 0 -8px 0 #f3a7a2;
 }
 [data-rind-theme^="skin-"]
   [data-scope="drawer"][data-part="content"]:is([data-side="left"], [data-side="right"]) {

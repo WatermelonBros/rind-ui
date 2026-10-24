@@ -12,12 +12,12 @@ import {
   Toggle,
 } from "@rind-ui/react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
+import { Letters } from "../letters"
 import { type Phase, usePhase } from "../phase"
 import { type ColourComponent, ColourPlaceholder, type ColourProps } from "./colour-placeholder"
 import { handoff } from "./handoff"
 import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
-import { Letters } from "./letters"
 import { Reveal } from "./reveal"
 
 type Shadow = "flat" | "soft" | "hard"
@@ -35,8 +35,8 @@ interface Look {
   readonly density: Density
 }
 
-/** The brand before the visitor picks one: the site's own, pink in juicy and lime in crisp. */
-const BRAND: Record<Phase, string> = { juicy: "#FF8FB1", crisp: "#D4FF3A" }
+/** The brand before the visitor picks one: the site's own, rind green in juicy and lime in crisp. */
+const BRAND: Record<Phase, string> = { juicy: "#5cd690", crisp: "#D4FF3A" }
 
 /** Where the builder starts and what Reset returns to: the site's brand on a plain look. */
 const BASE: Look = {
@@ -56,11 +56,20 @@ const SHADOWS: Record<Shadow, string> = {
   hard: "3px 3px 0 var(--skin-ink)",
 }
 // system stacks, so the copied CSS renders the same anywhere: no web font to load
+/** The faces as the copied CSS names them: real families, each falling back to the platform's. */
 const FONTS: Record<Font, string> = {
-  sans: "system-ui, sans-serif",
-  serif: "ui-serif, Georgia, serif",
-  mono: "ui-monospace, Menlo, monospace",
-  rounded: "ui-rounded, 'SF Pro Rounded', system-ui, sans-serif",
+  sans: '"Inter Tight", system-ui, sans-serif',
+  serif: '"Source Serif 4", Georgia, serif',
+  mono: '"JetBrains Mono", ui-monospace, monospace',
+  rounded: "Fredoka, ui-rounded, system-ui, sans-serif",
+}
+/** The same faces in the preview, as this site loads them (app/layout.tsx): a visitor without
+ *  them installed still sees the designed type, never a system default. */
+const SITE_FONTS: Record<Font, string> = {
+  sans: "var(--font-inter)",
+  serif: "var(--font-serif)",
+  mono: "var(--font-mono)",
+  rounded: "var(--font-fredoka)",
 }
 const DENSITY: Record<Density, readonly [number, number, number]> = {
   compact: [6, 10, 10],
@@ -378,13 +387,20 @@ export function AnyLook() {
   const look = { ...picked, brand: picked.brand ?? BRAND[phase] }
   // the hero's travelling object lands on the preview component of its own kind (skin-scene.tsx)
   const stage = useRef<HTMLDivElement>(null)
-  // from the machine above: its two states leave the graph as the scene lets go, become the
-  // selectors they are, and land on the data-* this section styles (desktop only: handoff.ts)
+  // from the machine above: its state leaves the graph as the scene lets go, becomes the
+  // selector it is, and lands on the data-* this section styles (desktop only: handoff.ts)
   useEffect(
     () =>
       handoff({
         scene: () => document.querySelector('[aria-labelledby="peel-title"]'),
-        from: () => [...document.querySelectorAll("[data-state-node]")],
+        // one traveller (two crossed and left a stale one behind): the state the object flies
+        // in, checked for a switch or a checkbox, idle for a button (skin-scene.tsx), so the chip
+        // and the object beside it say the same thing
+        from: () => {
+          const nodes = document.querySelectorAll("[data-state-node]")
+          const node = nodes[heroKind() === "button" ? 0 : 1]
+          return node ? [node] : []
+        },
         to: () => [...document.querySelectorAll("[data-states-land]")],
         make: (node) => {
           const pill = document.createElement("span")
@@ -396,14 +412,30 @@ export function AnyLook() {
         update: (pill, t) => {
           const word = pill.dataset["word"] ?? ""
           // the state, the selector it is, then the data-* it lands on, as wide as its landing
-          const text = t > 0.8 ? "data-*" : t > 0.3 ? `[data-state="${word}"]` : word
+          // before it turns in under the paragraph
+          const text = t > 0.5 ? "data-*" : t > 0.2 ? `[data-state="${word}"]` : word
           if (pill.textContent !== text) pill.textContent = text
+          // the word gives way only while the chip rises into it: a swap, never the chip lying
+          // over a word already there, nor a gap in the sentence while it is still far away
+          // (not once it has landed: the trip goes on to its end after the catch)
+          const code = document.querySelector("[data-states-land]")
+          if (code && !code.hasAttribute("data-landed"))
+            code.toggleAttribute("data-waiting", t > 0.69)
         },
-        landed: (code, on) => code.toggleAttribute("data-landed", on),
-        leaving: (on) =>
-          document.querySelector("[data-state-graph]")?.toggleAttribute("data-left", on),
+        landed: (code, on) => {
+          code.toggleAttribute("data-landed", on)
+          if (on) code.removeAttribute("data-waiting")
+        },
+        leaving: (on) => {
+          document.querySelector("[data-state-graph]")?.toggleAttribute("data-left", on)
+          if (!on) document.querySelector("[data-states-land]")?.removeAttribute("data-waiting")
+        },
         // down the right margin, clear of this section's title and lead
         lane: () => window.innerWidth - 140,
+        // then along under the lead, whose last line ends short of the word, and up into it
+        under: () =>
+          (document.querySelector("[data-states-land]")?.closest("p")?.getBoundingClientRect()
+            .bottom ?? 0) + 20,
       }),
     [],
   )
@@ -555,7 +587,7 @@ export function AnyLook() {
             <Button onPress={() => set(BASE)}>Reset</Button>
           </div>
         </div>
-        <style>{scoped(css)}</style>
+        <style>{scoped(css.replace(FONTS[look.font], SITE_FONTS[look.font]))}</style>
         <div ref={stage} className={styles.lookStage} data-look="">
           <div className={styles.lookGrid}>
             <div className={styles.lookCol}>

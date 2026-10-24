@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { Letters } from "@/components/letters"
 import { pages } from "@/lib/docs"
 import styles from "./docs.module.css"
 
@@ -24,7 +25,9 @@ export default function DocsIndex() {
   return (
     <div>
       <header className={styles.head}>
-        <h1 className={styles.title}>Build the look. We did the rest.</h1>
+        <h1 className={styles.title}>
+          <Letters>Build the look. We did the rest.</Letters>
+        </h1>
         <p className={styles.summary}>
           Every rind component ships behaviour, accessibility, state and a test driver. You style it
           through <code>data-*</code> attributes.

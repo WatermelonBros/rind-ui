@@ -22,20 +22,20 @@
   --btn-r: 99px;
 }
 [data-phase="juicy"] {
-  --bg: #e9e2ff;
-  --ink: #2a1d5c;
-  --acc: #ff8fb1;
-  --acc-deep: #e0608a;
+  --bg: #ffd9d2;
+  --ink: #103d2e;
+  --acc: #5cd690;
+  --acc-deep: #2e9e66;
   --card: #ffffff;
   --line: transparent;
   --on: #ffffff;
-  --soft: #c9bdf2;
-  --muted: #f1ecff;
-  --paper: #f8f5ff;
+  --soft: #f3a7a2;
+  --muted: #ffeae4;
+  --paper: #fff4ef;
   --r: 30px;
   --bw: 0px;
-  --shadow: 0 8px 0 #c9bdf2, 0 28px 48px #5a3db02e;
-  --shadow-sm: 0 5px 0 #c9bdf2;
+  --shadow: 0 8px 0 #f3a7a2, 0 28px 48px #8c22382e;
+  --shadow-sm: 0 5px 0 #f3a7a2;
   --text: var(--font-fredoka), system-ui, sans-serif;
   --btn-r: 22px;
 }
@@ -53,6 +53,49 @@
 html {
   background: var(--bg);
   scroll-padding-top: calc(var(--bar-h) + 16px);
+}
+/* A big screen (a 4K display at its native-ish scale) sees the site as a 1440 one sees it,
+   larger, rather than a narrow column in empty ground: the whole page is zoomed in steps.
+   Zoom multiplies viewport units too, so the site's own CSS reads them through --vh / --vw
+   (divided back by --zf), and scripts that place things from measured rects divide by the
+   computed zoom (zoom.ts). The component skins (skins/) keep plain units: they are the CSS a
+   visitor copies. */
+:root {
+  --zf: 1;
+  --vh: calc(1vh / var(--zf));
+  --svh: calc(1svh / var(--zf));
+  --dvh: calc(1dvh / var(--zf));
+  --vw: calc(1vw / var(--zf));
+}
+@media (min-width: 1800px) {
+  :root {
+    --zf: 1.2;
+  }
+}
+@media (min-width: 2200px) {
+  :root {
+    --zf: 1.45;
+  }
+}
+/* 2560 (a common 27"/QHD width) lays out at about 1550px: the 1200px content fills the screen
+   instead of leaving most of it empty */
+@media (min-width: 2400px) {
+  :root {
+    --zf: 1.65;
+  }
+}
+@media (min-width: 2700px) {
+  :root {
+    --zf: 1.75;
+  }
+}
+@media (min-width: 3300px) {
+  :root {
+    --zf: 2.2;
+  }
+}
+html {
+  zoom: var(--zf);
 }
 body {
   background: var(--bg);
@@ -114,15 +157,15 @@ html.intro:not([data-intro-ready]) body {
     scale: 0.8 1.15;
   }
   82% {
-    translate: 0 42vh;
+    translate: 0 calc(42 * var(--vh));
     scale: 0.85 1.2;
   }
   92% {
-    translate: 0 42vh;
+    translate: 0 calc(42 * var(--vh));
     scale: 1.5 0.6;
   }
   100% {
-    translate: 0 42vh;
+    translate: 0 calc(42 * var(--vh));
     scale: 1.1 0.9;
   }
 }
@@ -247,4 +290,46 @@ html[data-wave] [data-page-title] {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.35s;
+}
+
+/* lib/docs.ts + components/code-copy.tsx: every rendered code block has its copy button */
+.code-block {
+  position: relative;
+}
+.code-copy {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  font: 600 12px var(--mono);
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1.5px solid color-mix(in oklab, currentColor 25%, transparent);
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.75;
+  transition:
+    opacity 0.2s,
+    background 0.2s;
+}
+.code-block:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+.code-copy[data-copied] {
+  background: var(--acc);
+  border-color: var(--acc);
+  opacity: 1;
+}
+.code-copy:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

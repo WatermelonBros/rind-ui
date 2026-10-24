@@ -79,25 +79,25 @@ import { TreeView } from "@rind-ui/react"
 | `TreeView.Root` | `virtualized` | `boolean` | — | Rows are windowed by the consumer (`TreeView.Tree` `indexes`): keyboard moves call `scrollToIndex`, never `scrollIntoView`. |
 | `TreeView.Root` | `scrollToIndex` | `(details: ScrollToIndexDetails) => void` | — | Scrolls the highlighted row into view; `index` is its position in the visible list. |
 | `TreeView.Root` | `disallowEmptySelection` | `boolean` | — | The last selected item cannot be deselected. |
-| `TreeView.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.DropIndicator` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.Tree` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Label` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.DropIndicator` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.Tree` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TreeView.Tree` | `children` | `(node: TreeViewNodeState) => ReactNode` | — | Called once per visible node with its state; returns its row (usually a `TreeView.Item`). |
 | `TreeView.Tree` | `loading` | `(node: TreeViewNodeState) => ReactNode` | — | Under a loading branch (default: the Loading part with the loading text). |
 | `TreeView.Tree` | `indexes` | `readonly number[]` | `every visible node` | Virtualized: the visible-list indexes to render (a virtualizer's window plus `TreeView.useVisibleRows().persistedIndexes`). |
-| `TreeView.Item` | `rel` | `string \| undefined` | — | With `href`: passed to the anchor. |
-| `TreeView.Item` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Item` | `rel` | `string` | — | With `href`: passed to the anchor. |
+| `TreeView.Item` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TreeView.Item` | `value` | `string` | — | The node key. |
 | `TreeView.Item` | `children` | `ReactNode` | — | The row's content (ItemText, ItemIndicator, ItemCheckbox). |
-| `TreeView.Item` | `href` | `Href \| undefined` | — | Renders a native `<a role="treeitem">` (link navigation). |
-| `TreeView.Item` | `target` | `string \| undefined` | — | With `href`: passed to the anchor; not `_self` opens elsewhere. |
-| `TreeView.Item` | `current` | `LinkCurrent \| undefined` | — | With `href`: sets `aria-current` and `data-current`; the link still navigates. |
-| `TreeView.Item` | `routerOptions` | `RouterOptions \| undefined` | — | With `href`: passed unchanged to the router's `navigate`. |
-| `TreeView.ItemText` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.ItemIndicator` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.ItemCheckbox` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.Loading` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TreeView.Empty` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TreeView.Item` | `href` | `Href` | — | Renders a native `<a role="treeitem">` (link navigation). |
+| `TreeView.Item` | `target` | `string` | — | With `href`: passed to the anchor; not `_self` opens elsewhere. |
+| `TreeView.Item` | `current` | `LinkCurrent` | — | With `href`: sets `aria-current` and `data-current`; the link still navigates. |
+| `TreeView.Item` | `routerOptions` | `RouterOptions` | — | With `href`: passed unchanged to the router's `navigate`. |
+| `TreeView.ItemText` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.ItemIndicator` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.ItemCheckbox` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.Loading` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TreeView.Empty` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

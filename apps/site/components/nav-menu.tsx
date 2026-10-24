@@ -27,7 +27,14 @@ export function NavMenu() {
   const [open, setOpen] = useState(false)
   const { phase, setPhase } = usePhase()
   return (
-    <Drawer.Root open={open} onOpenChange={setOpen}>
+    <Drawer.Root
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        // the landing's sound question does not hang over the open menu (sound-invite.tsx)
+        if (next) window.dispatchEvent(new Event("rind:menu-open"))
+      }}
+    >
       <Drawer.Trigger className={styles.menuButton} aria-label="Menu">
         <span className={styles.burger} aria-hidden="true" />
       </Drawer.Trigger>

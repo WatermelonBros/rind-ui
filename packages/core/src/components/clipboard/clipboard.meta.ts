@@ -92,7 +92,7 @@ export const clipboardMeta = {
       description: "Default: the provider's locale (the announcement's language).",
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

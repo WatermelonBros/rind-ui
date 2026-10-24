@@ -94,7 +94,7 @@ export const useLanded = () =>
 let lookTarget: HTMLElement | null = null
 // `picked`: the visitor chose the brand, and the object then wears it everywhere it flies
 type LookColors = { brand: string; surface: string; picked: boolean }
-let lookColors: LookColors = { brand: "#FF8FB1", surface: "#FFFFFF", picked: false }
+let lookColors: LookColors = { brand: "#5cd690", surface: "#FFFFFF", picked: false }
 export const setLookTarget = (el: HTMLElement | null) => {
   lookTarget = el
 }

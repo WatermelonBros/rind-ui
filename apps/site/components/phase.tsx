@@ -29,7 +29,7 @@ export function usePhase(): PhaseContextValue {
   return ctx
 }
 
-const BG: Record<Phase, string> = { crisp: "#d4ff3a", juicy: "#e9e2ff" }
+const BG: Record<Phase, string> = { crisp: "#d4ff3a", juicy: "#ffd9d2" }
 const POUR_MS = 1400
 // The curtain fully covers the page between 40% and 60% of its run; flip in the middle.
 const FLIP_AT = POUR_MS / 2

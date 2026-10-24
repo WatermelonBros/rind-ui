@@ -58,8 +58,13 @@
     translate 0.25s var(--s-ease),
     box-shadow 0.25s var(--s-ease);
 }
-[data-rind-theme^="skin-"] [data-scope="tour"][data-part="action-trigger"][data-action="next"] {
-  background: var(--s-acc);
+/* the action that moves the tour on (Next, and Done on the last step) is the primary one, in the
+   brand colour, so it stands out from Back and Skip */
+[data-rind-theme^="skin-"]
+[data-scope="tour"][data-part="action-trigger"]:is([data-action="next"], [data-action="dismiss"]) {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+  border-color: var(--s-brand);
 }
 [data-rind-theme^="skin-"] [data-scope="tour"][data-part="action-trigger"][data-disabled] {
   opacity: 0.55;

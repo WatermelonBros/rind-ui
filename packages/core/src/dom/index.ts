@@ -30,6 +30,7 @@ export {
 export { type ContentSize, contentSize } from "./content-size"
 export { type CropDragTarget, type CropGestureHandlers, cropGestures } from "./crop-gestures"
 export { CropError, type CropErrorCode, type CropImageOptions, cropImage } from "./crop-image"
+export { cssZoom } from "./css-zoom"
 export { domDelayGroup } from "./delay-group"
 export {
   type DismissOptions,

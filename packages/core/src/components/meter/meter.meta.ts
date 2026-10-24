@@ -69,7 +69,7 @@ export const meterMeta = {
       description: "Overrides the English default (also through the provider); say the zone.",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element.",
     },
   },

@@ -5,12 +5,21 @@
 // Run: node scripts/content.ts → content/generated/{docs.json,llms.txt,tokens.md,…}
 
 import { execFileSync } from "node:child_process"
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs"
 import { basename, join } from "node:path"
 import ts from "typescript"
 import { apiMetas, llms, renderApi } from "../../../scripts/docs-gen.ts"
 // @ts-expect-error plain .mjs script, no types
 import { renderTokens } from "../../../scripts/theme-docs.mjs"
+import { frameworks } from "../lib/frameworks.ts"
 
 const repo = join(import.meta.dirname, "../../..")
 const out = join(import.meta.dirname, "../content/generated")
@@ -81,6 +90,30 @@ const byRelease = (md: string) =>
     (_, when: string, body: string) => ((when === "1.0+") === stable ? body : ""),
   )
 
+// The frameworks as the packages say (lib/frameworks.ts): {{frameworks}} is their table and
+// {{install}} the install command of each released one, so neither is ever out of step.
+const fws = frameworks()
+const frameworksTable = [
+  "| Framework | Package | Status |",
+  "|---|---|---|",
+  ...fws.map(
+    (f) =>
+      `| ${f.name} | \`${f.pkg}\` | ${
+        f.ready
+          ? `Available (${f.version})`
+          : f.components.length
+            ? `In progress (${f.components.length} component${f.components.length > 1 ? "s" : ""})`
+            : "Planned"
+      } |`,
+  ),
+].join("\n")
+const installBlocks = fws
+  .filter((f) => f.ready)
+  .map(
+    (f, _i, all) => `${all.length > 1 ? `${f.name}:\n\n` : ""}\`\`\`sh\npnpm add ${f.pkg}\n\`\`\``,
+  )
+  .join("\n\n")
+
 // Site-owned pages (get started…) live with the site, not in the repo's docs/.
 const sitePages = join(import.meta.dirname, "../content/pages")
 const pages: DocPage[] = [
@@ -93,7 +126,10 @@ const pages: DocPage[] = [
       return page(
         f,
         "start",
-        md.replaceAll("{{version}}", `<span data-release="minor">${v}</span>`),
+        md
+          .replaceAll("{{version}}", `<span data-release="minor">${v}</span>`)
+          .replaceAll("{{frameworks}}", frameworksTable)
+          .replaceAll("{{install}}", installBlocks),
       )
     }),
   ...markdownFiles(join(repo, "docs/components")).map((f) =>
@@ -349,7 +385,41 @@ for (const f of readdirSync(examplesDir).filter((f) => f.endsWith(".tsx"))) {
   if (problems.length)
     throw new Error(`shown example code is not self-contained:\n${problems.join("\n")}`)
 }
-writeFileSync(join(out, "examples.json"), `${JSON.stringify(examples, null, 2)}\n`)
+// The other frameworks' versions of the same examples, written next to their packages so they
+// land with them on main: packages/vue/examples/<slug>/<Name>.vue, packages/svelte/examples/
+// <slug>/<Name>.svelte, <Name> being the React example's export (Basic, Controlled…). A page
+// shows a framework's tab for every example that has one, without the site changing.
+const ADAPTERS = [
+  { id: "vue", ext: ".vue" },
+  { id: "svelte", ext: ".svelte" },
+] as const
+const adapted: Record<string, Partial<Record<"vue" | "svelte", Record<string, string>>>> = {}
+for (const { id, ext } of ADAPTERS) {
+  const root = join(repo, "packages", id, "examples")
+  if (!existsSync(root)) continue
+  for (const slug of readdirSync(root)) {
+    if (!examples[slug] || !statSync(join(root, slug)).isDirectory()) continue
+    for (const f of readdirSync(join(root, slug)).filter((f) => f.endsWith(ext))) {
+      const name = basename(f, ext)
+      if (!(name in (examples[slug]?.code ?? {}))) continue
+      const bySlug = adapted[slug] ?? {}
+      adapted[slug] = bySlug
+      const byFramework = bySlug[id] ?? {}
+      bySlug[id] = byFramework
+      byFramework[name] = `${readFileSync(join(root, slug, f), "utf8").trimEnd()}\n`
+    }
+  }
+}
+writeFileSync(
+  join(out, "examples.json"),
+  `${JSON.stringify(
+    Object.fromEntries(
+      Object.entries(examples).map(([slug, e]) => [slug, { ...e, ...(adapted[slug] ?? {}) }]),
+    ),
+    null,
+    2,
+  )}\n`,
+)
 
 // ── examples harness: every example of every module, for /examples/<slug>/<example>/<skin>/ ──
 const kebab = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
@@ -495,8 +565,15 @@ const coverageTable = [
   `| **rind-ui** | ${ready.length} ready, ${roadmap.length - ready.length} planned | React (framework-free core) | every component | declared, with model-based tests | ${aiReady} ready |`,
   ...coverage,
 ].join("\n")
-const compare = byRelease(
-  readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"),
-).replace("<!-- coverage -->", coverageTable)
+// the gaps, from the repository's own list (docs/compare-gaps.md), so the page shows the same
+// table the maintainers keep; its links point inside the repository, so they become plain text
+const gapsTable = readFileSync(join(repo, "docs/compare-gaps.md"), "utf8")
+  .split("\n")
+  .filter((line) => line.startsWith("|"))
+  .map((line) => line.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/`([^`]+)` rows/, "$1 rows"))
+  .join("\n")
+const compare = byRelease(readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"))
+  .replace("<!-- coverage -->", coverageTable)
+  .replace("<!-- gaps -->", gapsTable)
 writeFileSync(join(out, "compare.md"), compare)
 writeFileSync(join(import.meta.dirname, "../public/compare.md"), compare)

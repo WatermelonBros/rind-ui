@@ -96,5 +96,6 @@ Ariakit is a careful, low-level toolkit for React and Solid. Reka UI (Vue), Bits
 Component counts come from rind-ui's inventory of every headless library (collected from
 their documentation and source in October 2026) and are approximate where a library's
 boundaries are fuzzy. Every point above where another library is ahead is tracked as a gap
-in [compare-gaps.md](https://github.com/WatermelonBros/rind-ui/blob/main/docs/compare-gaps.md),
-with what rind-ui will do about it. Corrections are welcome as issues.
+below, with what rind-ui will do about it. Corrections are welcome as issues.
+
+<!-- gaps -->

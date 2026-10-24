@@ -52,14 +52,14 @@ import { ScrollArea } from "@rind-ui/react"
 | `ScrollArea.Root` | `hideDelay` | `number` | `600` | Root: milliseconds the scrollbars stay after the last hover, focus or scroll. |
 | `ScrollArea.Root` | `trackPress` | `"page" \| "jump"` | `"page"` | Root: a press on the track scrolls one page toward it, or jumps there and drags. |
 | `ScrollArea.Root` | `actionsRef` | `Ref<{ measure(): void }>` | — | Root: call `measure()` after a change the observers cannot see (a deep descendant resized). |
-| `ScrollArea.Root` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Root` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 | `ScrollArea.Root` | `children` | `ReactNode` | — | The Viewport, Scrollbars and Corner. |
-| `ScrollArea.Viewport` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
-| `ScrollArea.Content` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Viewport` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `ScrollArea.Content` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 | `ScrollArea.Scrollbar` | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Scrollbar: its axis. |
-| `ScrollArea.Scrollbar` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
-| `ScrollArea.Thumb` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
-| `ScrollArea.Corner` | `render` | `element \| (props, state) => element` | — | Substitutes the rendered element. |
+| `ScrollArea.Scrollbar` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `ScrollArea.Thumb` | `render` | `RenderProp` | — | Substitutes the rendered element. |
+| `ScrollArea.Corner` | `render` | `RenderProp` | — | Substitutes the rendered element. |
 
 Every attribute of the rendered element is accepted and forwarded.
 

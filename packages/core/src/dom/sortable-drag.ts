@@ -1,3 +1,4 @@
+import { cssZoom } from "./css-zoom"
 // sortable-drag (add-sortable design §3): one pointer drag of a sortable item. It starts after
 // a 4 px move (a 300 ms press on touch, so a swipe still scrolls the page), follows the pointer,
 // finds the drop index from the other items' midpoints (measured once, shifted by the scroll
@@ -77,13 +78,15 @@ export function sortableDrag(start: PointerEvent, o: SortableDragOptions): () =>
           : target >= others.length
             ? (others[others.length - 1]?.b ?? 0)
             : ((others[target - 1]?.b ?? 0) + (others[target]?.a ?? 0)) / 2
+    // viewport pixels in, the list's own (zoomed) pixels out (css-zoom.ts)
+    const z = cssZoom(o.root)
     o.onMove(
       {
-        x: last.clientX - start.clientX + (y ? 0 : shift),
-        y: last.clientY - start.clientY + (y ? shift : 0),
+        x: (last.clientX - start.clientX + (y ? 0 : shift)) / z,
+        y: (last.clientY - start.clientY + (y ? shift : 0)) / z,
       },
       target,
-      gapAt - rootStart,
+      (gapAt - rootStart) / z,
     )
   }
 

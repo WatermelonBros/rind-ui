@@ -186,7 +186,7 @@
 }
 [data-rind-theme="skin-juicy"] [data-scope="slider"][data-part="thumb"] {
   border: 4px solid var(--s-brand);
-  box-shadow: 0 4px 0 #c9bdf2;
+  box-shadow: 0 4px 0 #f3a7a2;
 }
 [data-rind-theme="skin-juicy"] [data-scope="slider"][data-part="marker"] {
   background: color-mix(in oklab, var(--s-ink) 35%, transparent);

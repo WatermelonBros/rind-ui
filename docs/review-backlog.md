@@ -429,3 +429,7 @@ verified at round 3 (2026-10-14).
 ## Stepper (vue-svelte-adapters)
 
 - warning: an Item's `disabled` and `completed` register after mount in every adapter, so the server HTML shows a disabled step as reachable and a `completed` override as upcoming until hydration. The Root could read them from its declared Items (as Tabs reads its declared panels) or the Items could register during render.
+## Dialog (site review, round 47)
+
+- warning: a dialog opened programmatically with no `Dialog.Trigger` has no logical parent, so its portal host lands in `<body>` without the opener's `data-rind-theme`, `dir` and `lang`, and a themed page shows it unstyled (the site's "Open from outside" example now passes `logicalParent`). Consider falling back to the portal's own React position (a marker element) or the focused element at open.
+- warning (text-field, site review): an `id` passed to `TextField.Input` replaces the generated control id, but `TextField.Label`'s `htmlFor` keeps the generated one, so the input loses its name. The control id should follow a consumer's `id` (Liskov: a part forwards the props of its element without changing behaviour); the site's tour example now puts its id on the Root.

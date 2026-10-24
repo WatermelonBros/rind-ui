@@ -88,7 +88,7 @@ export const tabsMeta = {
       description: "Disabled tabs stay reachable by arrows (never selectable).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

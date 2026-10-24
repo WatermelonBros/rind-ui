@@ -15,6 +15,8 @@
   border: 1.5px solid color-mix(in oklab, var(--s-ink) 16%, transparent);
   border-radius: 14px;
   background: var(--s-card);
+  /* a press on the label starts a drag, not a text selection */
+  user-select: none;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="sortable"][data-part="item"][data-active] {
@@ -104,4 +106,23 @@
   [data-scope="sortable"][data-part="move-button"][data-disabled] {
   color: color-mix(in oklab, var(--s-ink) 40%, transparent);
   cursor: default;
+}
+
+/* while dragging, the others glide aside to open the gap the card will drop into (only then: on
+   the drop they reorder and lose the shift in the same frame, which must not animate) */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="sortable"][data-state="dragging"]
+  [data-scope="sortable"][data-part="item"] {
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* the dragged card follows the pointer exactly; the open gap shows where it lands, so the drop
+   line is not needed while dragging */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="sortable"][data-part="item"][data-dragging] {
+  transition: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="sortable"][data-state="dragging"]
+  [data-scope="sortable"][data-part="indicator"] {
+  opacity: 0;
 }

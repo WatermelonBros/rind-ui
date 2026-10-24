@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
+import { zoom } from "../zoom"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 
@@ -33,8 +34,16 @@ export function Outro() {
     const paint = () => {
       frame = 0
       const r = t.getBoundingClientRect()
-      f.style.clipPath = `circle(150px at ${x - r.left}px ${y - r.top}px)`
+      const z = zoom()
+      f.style.clipPath = `circle(150px at ${(x - r.left) / z}px ${(y - r.top) / z}px)`
+      // the same peel on the links and buttons under the title, each in its own coordinates
+      for (const l of lenses) {
+        const b = l.getBoundingClientRect()
+        l.style.setProperty("--lx", `${(x - b.left) / z}px`)
+        l.style.setProperty("--ly", `${(y - b.top) / z}px`)
+      }
     }
+    const lenses = [...el.querySelectorAll<HTMLElement>("[data-text]")]
     const onMove = (e: PointerEvent) => {
       x = e.clientX
       y = e.clientY
@@ -104,23 +113,41 @@ export function Outro() {
           </span>
         </p>
         <div className={styles.outroCtas}>
-          <Link prefetch={false} href="/docs/get-started/" className={styles.outroPrimary}>
+          <Link
+            prefetch={false}
+            href="/docs/get-started/"
+            className={styles.outroPrimary}
+            data-text="Get started →"
+          >
             Get started →
           </Link>
-          <Link prefetch={false} href="/compare/" className={styles.outroGhost}>
+          <Link
+            prefetch={false}
+            href="/compare/"
+            className={styles.outroGhost}
+            data-text="How it compares"
+          >
             How it compares
           </Link>
-          <a href="https://github.com/WatermelonBros/rind-ui" className={styles.outroGhost}>
+          <a
+            href="https://github.com/WatermelonBros/rind-ui"
+            className={styles.outroGhost}
+            data-text="GitHub"
+          >
             GitHub
           </a>
-          <a href="https://discord.gg/HHqT9ucXn4" className={styles.outroGhost}>
+          <a href="https://discord.gg/HHqT9ucXn4" className={styles.outroGhost} data-text="Discord">
             Discord
           </a>
         </div>
       </Reveal>
       <div className={styles.outroBottom}>
         <span>rind · headless components by Watermelon</span>
-        <a className={styles.builtWith} href="https://reado.watermelon-studio.it">
+        <a
+          className={styles.builtWith}
+          href="https://reado.watermelon-studio.it"
+          data-text="Built using Reado ↗"
+        >
           Built using <b>Reado</b> ↗
         </a>
         <span>

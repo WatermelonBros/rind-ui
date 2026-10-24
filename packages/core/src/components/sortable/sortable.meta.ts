@@ -78,7 +78,7 @@ export const sortableMeta = {
       description: "Overrides the handle name, instructions, move buttons and announcements.",
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

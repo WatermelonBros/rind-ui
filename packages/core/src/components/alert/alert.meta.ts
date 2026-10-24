@@ -87,7 +87,7 @@ export const alertMeta = {
       description: 'Icon: names it as an image (`role="img"`) and puts it in the announcement.',
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element (a Title as a Heading, say).",
     },
   },

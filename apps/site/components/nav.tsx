@@ -45,41 +45,47 @@ export function Nav() {
       </Link>
       <a href="https://github.com/WatermelonBros/rind-ui">GitHub</a>
       <a href="https://discord.gg/HHqT9ucXn4">Discord</a>
-      {/* Sound is a pressed/unpressed button, off until pressed: a rind Toggle (the landing's
-          only: sound.tsx) */}
-      {home && (
-        <Toggle.Root
-          className={styles.sound}
-          data-sound-toggle=""
-          aria-label="Sound"
-          pressed={sound.enabled}
-          onPressedChange={sound.setEnabled}
-        >
-          <SoundBars />
-          <span className={styles.soundWord} aria-hidden="true">
-            sound
-          </span>
-        </Toggle.Root>
-      )}
+      {/* Sound is a pressed/unpressed button, off until pressed: a rind Toggle (sound.tsx) */}
+      <Toggle.Root
+        className={styles.sound}
+        data-sound-toggle=""
+        aria-label="Sound"
+        pressed={sound.enabled}
+        onPressedChange={sound.setEnabled}
+      >
+        <SoundBars />
+        <span className={styles.soundWord} aria-hidden="true">
+          sound
+        </span>
+      </Toggle.Root>
       {/* The site's phase is an on/off setting that applies at once: a rind Switch. */}
       <Switch.Root
         className={styles.phase}
         checked={phase === "juicy"}
         onCheckedChange={(on) => setPhase(on ? "juicy" : "crisp")}
       >
+        {/* each word picks its own phase (a label would toggle, so "juicy" turned it crisp);
+            for the keyboard and assistive tech the switch and its label say it all */}
         <span
           className={styles.side}
           aria-hidden="true"
           data-on={phase === "crisp" ? "" : undefined}
+          onClick={() => setPhase("crisp")}
         >
           crisp
         </span>
         <Switch.Control className={styles.track}>
           <Switch.Thumb className={styles.thumb} />
         </Switch.Control>
-        <Switch.Label className={styles.side} data-on={phase === "juicy" ? "" : undefined}>
-          juicy<span className={styles.visuallyHidden}> mode</span>
-        </Switch.Label>
+        <Switch.Label className={styles.visuallyHidden}>Juicy mode</Switch.Label>
+        <span
+          className={styles.side}
+          aria-hidden="true"
+          data-on={phase === "juicy" ? "" : undefined}
+          onClick={() => setPhase("juicy")}
+        >
+          juicy
+        </span>
       </Switch.Root>
       <NavMenu />
     </nav>

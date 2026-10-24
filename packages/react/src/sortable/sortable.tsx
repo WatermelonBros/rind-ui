@@ -48,7 +48,12 @@ export interface SortableRenderState {
 }
 
 type Api = ReturnType<typeof sortableConnect>
-type Drag = { readonly delta: { x: number; y: number }; readonly indicator: number } | null
+type Drag = {
+  readonly delta: { x: number; y: number }
+  readonly indicator: number
+  readonly target: number
+  readonly room: number
+} | null
 
 interface Ctx {
   readonly api: Api
@@ -142,6 +147,13 @@ function Root({
         .filter((el): el is HTMLElement => el !== null)
       const index = itemsRef.current.indexOf(key)
       if (index < 0) return
+      // the room the picked item leaves: its size along the axis plus the list's gap (layout
+      // pixels: the same the others' transforms are written in)
+      const horizontal = orientation === "horizontal"
+      const picked = els[index]
+      const cs = getComputedStyle(root)
+      const gap = Number.parseFloat(horizontal ? cs.columnGap : cs.rowGap) || 0
+      const room = picked ? (horizontal ? picked.offsetWidth : picked.offsetHeight) + gap : 0
       sortableDrag(e.nativeEvent, {
         items: els,
         index,
@@ -149,7 +161,7 @@ function Root({
         root,
         onStart: () => send({ type: "DRAG.START", key }),
         onMove: (delta, target, indicator) => {
-          setDrag({ delta, indicator })
+          setDrag({ delta, indicator, target, room })
           send({ type: "DRAG.OVER", index: target })
         },
         onEnd: (drop) => {

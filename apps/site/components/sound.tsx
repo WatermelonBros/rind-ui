@@ -20,7 +20,7 @@ import { ambient } from "./ambient"
 // sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
 // makes a sound (plus the explicit cues): the page's own demos stay quiet.
 
-type Cue = "on" | "off" | "phase" | "pass"
+type Cue = "on" | "off" | "phase" | "pass" | "unlock"
 
 interface SoundValue {
   readonly enabled: boolean
@@ -144,6 +144,7 @@ type Voice =
   | "key"
   | "delete"
   | "note"
+  | "appear"
 
 function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value = 0.5) {
   const { now, tone, noise } = voice(ac, out, pan)
@@ -234,6 +235,21 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       )
       return
     }
+    case "appear": {
+      // a tooltip or a hover card comes up: a swish of air swept upwards, with a glassy bubble
+      // on it in juicy, a dry tick in crisp
+      const swish = noise(0.16, soft ? 0.22 : 0.18, "bandpass", 700)
+      swish.Q.value = 1.2
+      swish.frequency.setValueAtTime(600 * jitter, now)
+      swish.frequency.exponentialRampToValueAtTime(4200 * jitter, now + 0.14)
+      if (soft) {
+        tone("sine", 900 * jitter, 1500 * jitter, 0.04, 0.12, 0.09)
+        tone("sine", 1800 * jitter, 2100 * jitter, 0.07, 0.08, 0.04)
+      } else {
+        tone("triangle", 2200 * jitter, 2000 * jitter, 0.08, 0.035, 0.06)
+      }
+      return
+    }
     case "note": {
       // a rating: a pentatonic step for each star
       const scale = [0, 2, 4, 7, 9, 12, 14]
@@ -247,6 +263,20 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       const notes = soft ? [660, 880, 1100] : [880, 1320]
       notes.forEach((f, k) => {
         tone(soft ? "sine" : "triangle", f, f * 0.995, k * 0.08, 0.6, 0.1)
+      })
+      return
+    }
+    case "unlock": {
+      // an achievement: a quick rising arpeggio, a held chord over a low thump, then a sparkle
+      // of high notes falling into place
+      tone("sine", 110, 55, 0, 0.35, 0.18)
+      const run = soft ? [523, 659, 784, 1047] : [659, 831, 988, 1319]
+      run.forEach((f, k) => {
+        tone("triangle", f, f, k * 0.07, 0.35, 0.1)
+      })
+      for (const f of run.slice(1)) tone("sine", f, f * 1.002, 0.3, 1.1, 0.06)
+      ;[2637, 3136, 3520, 4186, 3951].forEach((f, k) => {
+        tone("sine", f, f * 0.98, 0.38 + k * 0.06, 0.3, 0.025)
       })
       return
     }
@@ -306,7 +336,8 @@ function step(ac: AudioContext, out: Engine, fraction: number, rising: boolean, 
 
 export function SoundProvider({ children }: { children: ReactNode }) {
   const [enabled, setOn] = useState(false)
-  // the landing's alone: the docs are for reading, and stay quiet
+  // off until the visitor turns it on, on any page: the docs' live examples answer like the
+  // landing's components; the music under it all is the landing's alone (docs are for reading)
   const home = usePathname() === "/"
   const ac = useRef<{ context: AudioContext; out: Engine } | null>(null)
 
@@ -323,10 +354,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const audio = ac.current
-    if (!enabled || !home || !audio) return
+    if (!enabled || !audio) return
     const { context, out } = audio
     // the music under it all (ambient.ts), for as long as the sound is on
-    const music = ambient(context, out)
+    const music = home ? ambient(context, out) : null
     // only what the visitor does: their last press, key or drag, within the moment
     let input = 0
     const touched = () => {
@@ -340,7 +371,9 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       // sliders sing as they move, text fields as they are typed in (below)
       if (
         !target ||
-        target.closest("[data-sound-toggle], [role=slider], [data-scope=slider], input, textarea")
+        target.closest(
+          "[data-sound-toggle], [data-sound-own], [role=slider], [data-scope=slider], input, textarea",
+        )
       )
         return
       // after the click, so the state it lands in is read
@@ -384,6 +417,26 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       attributes: true,
       attributeFilter: ["aria-valuenow"],
     })
+    // a tooltip or a hover card coming up has its own small sound, once per opening
+    const POPS =
+      '[data-scope="tooltip"][data-part="content"][data-state="open"], [data-scope="hover-card"][data-part="content"][data-state="open"]'
+    let shown = new Set<Element>()
+    let looking = 0
+    const lookForPops = () => {
+      looking = 0
+      const now = new Set(document.querySelectorAll(POPS))
+      for (const el of now) if (!shown.has(el)) play(context, out, "appear", panOf(el))
+      shown = now
+    }
+    const pops = new MutationObserver(() => {
+      if (!looking) looking = requestAnimationFrame(lookForPops)
+    })
+    pops.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["data-state"],
+    })
     const phase = new MutationObserver(() => play(context, out, "phase"))
     phase.observe(document.documentElement, { attributes: true, attributeFilter: ["data-phase"] })
     const onCue = (e: Event) => {
@@ -397,10 +450,12 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     window.addEventListener("pointermove", drag, true)
     window.addEventListener("keydown", touched, true)
     document.addEventListener("click", onClick, true)
-    document.addEventListener("input", onInput, true)
+    // beforeinput, not input: a field that plans its own insertions (Pin Input) cancels the
+    // edit and writes it itself, so no input event follows; beforeinput comes either way
+    document.addEventListener("beforeinput", onInput, true)
     window.addEventListener("rind:cue", onCue)
     return () => {
-      document.removeEventListener("input", onInput, true)
+      document.removeEventListener("beforeinput", onInput, true)
       window.removeEventListener("pointerdown", touched, true)
       window.removeEventListener("pointermove", drag, true)
       window.removeEventListener("keydown", touched, true)
@@ -408,7 +463,9 @@ export function SoundProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("rind:cue", onCue)
       values.disconnect()
       phase.disconnect()
-      music.stop()
+      pops.disconnect()
+      cancelAnimationFrame(looking)
+      music?.stop()
     }
   }, [enabled, home])
 

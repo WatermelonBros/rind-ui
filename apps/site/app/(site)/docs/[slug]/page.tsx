@@ -1,12 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import type { CSSProperties } from "react"
 import { CopyMarkdown } from "@/components/copy-markdown"
 import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
+import { Letters } from "@/components/letters"
 import { ReleaseSync } from "@/components/release"
 import { Toc } from "@/components/toc"
-import { exampleCode, pageBySlug, pages, render } from "@/lib/docs"
+import { exampleCode, pageBySlug, pages, partId, render } from "@/lib/docs"
 import styles from "../docs.module.css"
 
 type Props = { params: Promise<{ slug: string }> }
@@ -42,6 +44,7 @@ export default async function DocPage({ params }: Props) {
   const {
     intro,
     html,
+    parts,
     toc: outline,
   } = render(page, { hasExample: Boolean(source) && page.section === "components" })
   // the Examples section lists every example but the first, so a page with one (a guide) has none
@@ -54,8 +57,29 @@ export default async function DocPage({ params }: Props) {
       <article>
         <header className={styles.head}>
           <h1 className={styles.title} data-page-title="">
-            {page.title}
+            {/* its letters answer the phase, like the landing's titles */}
+            <Letters>{page.title}</Letters>
           </h1>
+          {/* the component's parts as the landing shows attributes: chips in the mono face,
+              coming in one after another (decorative: the anatomy table below lists them) */}
+          {parts.length > 0 ? (
+            <ul className={styles.parts} aria-hidden="true">
+              {parts.map((part, i) => (
+                <li key={part} style={{ "--i": i } as CSSProperties}>
+                  {/* to its props, when it has any */}
+                  {html.includes(`id="${partId(part)}"`) ? (
+                    <a href={`#${partId(part)}`} tabIndex={-1}>
+                      {i === 0 ? part : part.replace(/^[^.]+\./, ".")}
+                    </a>
+                  ) : i === 0 ? (
+                    part
+                  ) : (
+                    part.replace(/^[^.]+\./, ".")
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : null}
           <CopyMarkdown slug={page.slug} />
         </header>
         {source && (

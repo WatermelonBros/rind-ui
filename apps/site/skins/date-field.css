@@ -120,7 +120,7 @@
 }
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="date-field"][data-part="content"] {
-  box-shadow: 0 8px 0 #c9bdf2;
+  box-shadow: 0 8px 0 #f3a7a2;
   outline: 2px solid #e2d9fb;
   outline-offset: -2px;
 }

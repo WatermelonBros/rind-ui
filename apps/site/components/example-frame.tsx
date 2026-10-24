@@ -5,7 +5,9 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { exampleComponent, examples, heroName } from "@/examples"
 import styles from "./example-frame.module.css"
+import { useFramework } from "./framework"
 import { usePhase } from "./phase"
+import { zoom } from "./zoom"
 
 type Skin = "crisp" | "juicy" | "bare" | "parts"
 
@@ -24,12 +26,16 @@ function anatomy(stage: HTMLElement): HTMLElement[] {
   }
   return [...inside, ...outside]
 }
-type Tab = "react" | "css"
+type Tab = "react" | "vue" | "svelte" | "css"
+const CODE_TABS = { react: "React", vue: "Vue", svelte: "Svelte", css: "Our skin CSS" } as const
 
 /** Build-time highlighted sources of one component's examples. */
 export interface ExampleCode {
   /** example name → highlighted TSX */
   readonly code: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
+  /** the same examples for the other frameworks, where their packages ship them (lib/docs.ts) */
+  readonly vue?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
+  readonly svelte?: Readonly<Record<string, { readonly html: string; readonly raw: string }>>
   /** highlighted CSS of our two skins for this component */
   readonly css: { readonly html: string; readonly raw: string }
 }
@@ -76,6 +82,7 @@ export function ExampleFrame({
   const { phase } = usePhase()
   const [picked, setPicked] = useState<Skin | null>(null)
   const [tab, setTab] = useState<Tab | null>(null)
+  const [framework] = useFramework("react")
   const [copied, setCopied] = useState(false)
   const skin: Skin = picked ?? phase
   // parts view: the distinct scope·part pairs the example renders, and the one being inspected
@@ -146,13 +153,15 @@ export function ExampleFrame({
     if (!inspect) return
     const [scope, part] = inspect.split(" · ")
     const box = root.getBoundingClientRect()
+    const z = zoom()
     const at: { x: number; y: number }[] = []
     for (const el of anatomy(root)) {
       if (el.dataset["scope"] !== scope || el.dataset["part"] !== part) continue
       el.dataset["anatomyOn"] = ""
       const r = el.getBoundingClientRect()
-      const x = r.left - box.left
-      const y = r.top - box.top
+      // in the stage's own (zoomed) pixels (zoom.ts)
+      const x = (r.left - box.left) / z
+      const y = (r.top - box.top) / z
       // two matching parts at the same origin (a part inside another) share one label
       if (!at.some((t) => t.x === x && t.y === y)) at.push({ x, y })
     }
@@ -164,7 +173,12 @@ export function ExampleFrame({
   const shownName = (hero && mod && heroName(mod)) || name
   const Example = mod && exampleComponent(mod, shownName)
   if (!Example) return null
-  const shown = tab === "css" ? source.css : source.code[shownName]
+  // the code of one tab: the example in its framework, or the skin's CSS
+  const codeOf = (t: Tab) =>
+    t === "css" ? source.css : t === "react" ? source.code[shownName] : source[t]?.[shownName]
+  // the tabs this example has: React always, a framework once its package ships this example
+  const tabs = (["react", "vue", "svelte", "css"] as const).filter((t) => codeOf(t)?.raw)
+  const shown = tab ? codeOf(tab) : undefined
 
   return (
     <section
@@ -194,7 +208,10 @@ export function ExampleFrame({
           <ToggleGroup.Item
             className={styles.getCode}
             pressed={tab !== null}
-            onPressedChange={(on) => setTab(on ? "react" : null)}
+            // opens on the framework the visitor reads the docs for, when this example has it
+            onPressedChange={(on) =>
+              setTab(on ? (tabs.find((t) => t === framework) ?? "react") : null)
+            }
           >
             {"</>"} Get code
           </ToggleGroup.Item>
@@ -251,19 +268,17 @@ export function ExampleFrame({
           className={styles.code}
           value={tab}
           onValueChange={(v) => {
-            if (v === "react" || v === "css") setTab(v)
+            const next = tabs.find((t) => t === v)
+            if (next) setTab(next)
           }}
         >
           <div className={styles.tabs}>
             <Tabs.List className={styles.codeList} aria-label={`${label}: code`}>
-              <Tabs.Tab className={styles.codeTab} value="react">
-                React
-              </Tabs.Tab>
-              {source.css.raw && (
-                <Tabs.Tab className={styles.codeTab} value="css">
-                  Our skin CSS
+              {tabs.map((t) => (
+                <Tabs.Tab key={t} className={styles.codeTab} value={t}>
+                  {CODE_TABS[t]}
                 </Tabs.Tab>
-              )}
+              ))}
               <Tabs.Indicator className={styles.codeIndicator} />
             </Tabs.List>
             <Button
@@ -278,26 +293,24 @@ export function ExampleFrame({
               {copied ? "Copied" : "Copy"}
             </Button>
           </div>
-          {(["react", "css"] as const).map((t) =>
-            t === "css" && !source.css.raw ? null : (
-              <Tabs.Panel key={t} value={t}>
-                <pre
-                  // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
-                  tabIndex={0}
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
-                  dangerouslySetInnerHTML={{
-                    __html: `<code class="hljs">${(t === "css" ? source.css : source.code[shownName])?.html ?? ""}</code>`,
-                  }}
-                />
-                {t === "css" && (
-                  <p className={styles.cssNote}>
-                    Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a
-                    start, or write your own on the same attributes.
-                  </p>
-                )}
-              </Tabs.Panel>
-            ),
-          )}
+          {tabs.map((t) => (
+            <Tabs.Panel key={t} value={t}>
+              <pre
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
+                tabIndex={0}
+                // biome-ignore lint/security/noDangerouslySetInnerHtml: highlighted at build time from the site's own sources
+                dangerouslySetInnerHTML={{
+                  __html: `<code class="hljs">${codeOf(t)?.html ?? ""}</code>`,
+                }}
+              />
+              {t === "css" && (
+                <p className={styles.cssNote}>
+                  Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a
+                  start, or write your own on the same attributes.
+                </p>
+              )}
+            </Tabs.Panel>
+          ))}
         </Tabs.Root>
       )}
 

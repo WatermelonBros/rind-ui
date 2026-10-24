@@ -96,7 +96,7 @@ export const scrollAreaMeta = {
         "Root: call `measure()` after a change the observers cannot see (a deep descendant resized).",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element.",
     },
   },

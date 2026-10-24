@@ -2,18 +2,20 @@ import { Suspense } from "react"
 import { Hero } from "@/components/hero"
 import { Agents } from "@/components/home/agents"
 import { AnyLook } from "@/components/home/any-look"
+import { Install } from "@/components/home/install"
 import { Outro } from "@/components/home/outro"
 import { Peel } from "@/components/home/peel"
 import { ScreenReaderView } from "@/components/home/sr-view"
 import { Tested } from "@/components/home/tested"
 import { Wall } from "@/components/home/wall"
-import { Why } from "@/components/home/why"
 import { XRay } from "@/components/home/xray"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import { SoundInvite } from "@/components/sound-invite"
 import release from "@/content/generated/release.json"
+import { frameworks } from "@/lib/frameworks"
 // only the skins of the components the landing renders: a smaller first-paint stylesheet
 import "@/skins/home.css"
+import { upcoming } from "@/lib/framework-status"
 
 /** What search engines (and the AI search built on them) should understand this site to be. */
 const STRUCTURED = {
@@ -41,7 +43,11 @@ export default function Home() {
       <SmoothScroll />
       {/* each section its own boundary: React hydrates them one at a time, yielding between them,
           instead of the whole landing in one long task on a slow phone */}
-      <Hero>
+      <Hero
+        frameworks={upcoming(
+          frameworks().map((f) => ({ name: f.name, ready: f.ready, count: f.components.length })),
+        )}
+      >
         <Suspense>
           <Peel />
         </Suspense>
@@ -53,8 +59,18 @@ export default function Home() {
         <Suspense>
           <Tested />
         </Suspense>
+        {/* the install: a socket per framework, lit as each package ships (lib/frameworks.ts) */}
         <Suspense>
-          <Why />
+          <Install
+            frameworks={frameworks().map(({ id, name, pkg, ready, version, components }) => ({
+              id,
+              name,
+              pkg,
+              ready,
+              version,
+              count: components.length,
+            }))}
+          />
         </Suspense>
         <Suspense>
           <Agents />

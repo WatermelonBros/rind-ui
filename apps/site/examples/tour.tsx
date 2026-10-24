@@ -1,6 +1,6 @@
 "use client"
 
-import { Tour, type TourStepDef, type UseTourProps } from "@rind-ui/react"
+import { TextField, Toolbar, Tour, type TourStepDef, type UseTourProps } from "@rind-ui/react"
 import { type ReactNode, useId, useState } from "react"
 import type { States, Variants } from "./types"
 
@@ -11,6 +11,11 @@ export const states: States = {
 const nav = [
   { action: "prev" as const, label: "Back" },
   { action: "next" as const, label: "Next" },
+]
+// the last step ends the tour instead of offering a next one
+const last = [
+  { action: "prev" as const, label: "Back" },
+  { action: "dismiss" as const, label: "Done" },
 ]
 
 /** The card every example uses: title, description, progress, actions, close. */
@@ -34,8 +39,8 @@ function Card({ children }: { readonly children?: ReactNode }) {
                 ))
               }
             </Tour.Actions>
+            <Tour.CloseTrigger>Close</Tour.CloseTrigger>
           </div>
-          <Tour.CloseTrigger>Close</Tour.CloseTrigger>
         </Tour.Content>
       </Tour.Positioner>
     </Tour.Portal>
@@ -57,13 +62,22 @@ function Stage({
   const ids = { search: `${base}-search`, toolbar: `${base}-toolbar` }
   return (
     <div className="stack">
-      <div className="row">
-        <label>
-          Search <input id={ids.search} />
-        </label>
-        <div id={ids.toolbar} className="row" role="toolbar" aria-label="Formatting">
-          <button type="button">Bold</button>
-          <button type="button">Italic</button>
+      {/* rind parts, so the field and the toolbar wear the skin; on one text baseline, since the
+          field's box is taller than its input (the label sits in it) */}
+      <div className="row" style={{ alignItems: "last baseline" }}>
+        {/* the tour's targets are plain wrappers: an id on a rind part would replace the one it
+            generates (an input's is what its Label is tied to) */}
+        <div id={ids.search}>
+          <TextField.Root className="row">
+            <TextField.Label>Search</TextField.Label>
+            <TextField.Input />
+          </TextField.Root>
+        </div>
+        <div id={ids.toolbar}>
+          <Toolbar.Root className="row" aria-label="Formatting">
+            <Toolbar.Button>Bold</Toolbar.Button>
+            <Toolbar.Button>Italic</Toolbar.Button>
+          </Toolbar.Root>
         </div>
       </div>
       {children}
@@ -97,7 +111,7 @@ const basicSteps = (ids: { search: string; toolbar: string }): TourStepDef[] => 
     description: "Bold and italic live here.",
     target: byId(ids.toolbar),
     side: "top",
-    actions: nav,
+    actions: last,
   },
 ]
 
@@ -157,7 +171,7 @@ const waitSteps = (ids: { search: string; toolbar: string }): TourStepDef[] => [
       next()
     },
   },
-  { id: "done", title: "Found it", description: "That is all there is to search.", actions: nav },
+  { id: "done", title: "Found it", description: "That is all there is to search.", actions: last },
 ]
 
 export function WaitStep() {

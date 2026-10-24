@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckboxGroup, PinInput, Rating, Slider, Switch, ToggleGroup } from "@rind-ui/react"
+import { CheckboxGroup, Kbd, PinInput, Rating, Slider, Switch, ToggleGroup } from "@rind-ui/react"
 import {
   type CSSProperties,
   createContext,
@@ -13,6 +13,83 @@ import {
 import { MorphLink } from "../morph-link"
 import { usePhase } from "../phase"
 import styles from "./home.module.css"
+import { itemFor } from "./sr/buffer"
+import { speakItem } from "./sr/speech"
+
+/** The keys each card's component answers to, shown as it is used (the APG pattern's). */
+const KEYS: Record<string, readonly string[]> = {
+  switch: ["Tab", "Space"],
+  slider: ["←", "→", "Home", "End"],
+  rating: ["←", "→", "Home", "End"],
+  "pin-input": ["0–9", "⌫", "←", "→"],
+  "checkbox-group": ["Tab", "Space"],
+  "toggle-group": ["←", "→", "Space"],
+}
+
+/**
+ * What a screen reader says for the control in use in a card (NVDA's words on focus, from the
+ * site's speech model: sr/speech.ts), read again as its state changes. The card is the proof
+ * that the keyboard and the reader are built in: used, not explained.
+ */
+function useSpoken(root: React.RefObject<HTMLDivElement | null>) {
+  const [said, setSaid] = useState<string | null>(null)
+  useEffect(() => {
+    const stage = root.current
+    const li = stage?.closest("li")
+    if (!stage || !li) return
+    let el: HTMLElement | null = null
+    const say = () =>
+      setSaid(el && stage.contains(el) ? speakItem(itemFor(el), "nvda", "focus").join(", ") : null)
+    const CONTROLS =
+      '[role="switch"], [role="slider"], [role="checkbox"], [role="radio"], button, input'
+    // the control under the pointer, else the card's own (a slider's track, a rating's row:
+    // the pointer is rarely on the exact element a reader focuses)
+    const pick = (t: EventTarget | null) => {
+      const near = t instanceof Element ? t.closest<HTMLElement>(CONTROLS) : null
+      const hit =
+        near && stage.contains(near)
+          ? near
+          : (stage.querySelector<HTMLElement>(
+              '[role="radio"][aria-checked="true"], [role="slider"], [role="switch"], input, button',
+            ) ?? null)
+      if (hit) {
+        el = hit
+        say()
+      }
+    }
+    const onOver = (e: Event) => pick(e.target)
+    const onLeave = () => {
+      if (stage.contains(document.activeElement)) return
+      el = null
+      say()
+    }
+    const onBlur = () =>
+      requestAnimationFrame(() => {
+        if (!li.matches(":hover")) onLeave()
+      })
+    // the state it reads changes as the control is used
+    const mo = new MutationObserver(say)
+    mo.observe(stage, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["aria-checked", "aria-valuenow", "aria-pressed", "data-state", "value"],
+    })
+    stage.addEventListener("pointerover", onOver)
+    stage.addEventListener("focusin", onOver)
+    li.addEventListener("pointerleave", onLeave)
+    stage.addEventListener("focusout", onBlur)
+    stage.addEventListener("input", say)
+    return () => {
+      mo.disconnect()
+      stage.removeEventListener("pointerover", onOver)
+      stage.removeEventListener("focusin", onOver)
+      li.removeEventListener("pointerleave", onLeave)
+      stage.removeEventListener("focusout", onBlur)
+      stage.removeEventListener("input", say)
+    }
+  }, [root])
+  return said
+}
 
 /** One attribute of one part, read live from the DOM: the styling contract, in plain sight. */
 function useAttribute(selector: string, attr: string) {
@@ -48,6 +125,7 @@ function Specimen({
 }) {
   const { phase } = usePhase()
   const [root, value] = useAttribute(selector, attr)
+  const said = useSpoken(root)
   const wave = useContext(Wave)
   // a diagonal front: each card is a little behind the one up and to its left
   const offset = ((index % 3) + Math.floor(index / 3)) * 0.3
@@ -60,6 +138,9 @@ function Specimen({
     const el = root.current?.closest("li")
     if (at === shown) return
     if (shown === null || !el) return setShown(at)
+    // the hero's object is coming in to land here (skin-scene.tsx): the card keeps its skin
+    // until the next turn after, never flipping under it
+    if (el.hasAttribute("data-held")) return
     const turn = "perspective(900px) rotateY"
     const away = el.animate(
       { transform: [`${turn}(0deg)`, `${turn}(90deg)`] },
@@ -97,12 +178,24 @@ function Specimen({
           </span>
         ) : null}
         {children}
+        {/* the keys it answers to, while it is in use (decorative: the control says it all) */}
+        <span className={styles.specimenKeys} data-shown={said ? "" : undefined} aria-hidden="true">
+          {(KEYS[slug] ?? []).map((k) => (
+            <Kbd.Root key={k}>{k}</Kbd.Root>
+          ))}
+        </span>
       </div>
-      <div className={styles.specimenFoot}>
+      <div className={styles.specimenFoot} data-speaking={said ? "" : undefined}>
         <MorphLink href={`/docs/${slug}/`}>{name}</MorphLink>
         <code aria-hidden="true">
           {value === null ? `no ${attr}` : value === "" ? attr : `${attr}="${value}"`}
         </code>
+        {/* what a screen reader says for it, typed out (decorative: a real reader says it itself) */}
+        {said ? (
+          <q key={said} className={styles.spoken} aria-hidden="true">
+            {said}
+          </q>
+        ) : null}
       </div>
     </li>
   )
@@ -258,8 +351,15 @@ export function WallSpecimens() {
       cancelAnimationFrame(frame)
     }
   }, [])
+  // the wave starts at the site phase's own skin, so the first card wears the page's look and
+  // a phase switch turns the wall with it
+  const { phase } = usePhase()
+  const start = Math.max(
+    0,
+    SKINS.findIndex((k) => k.name === phase),
+  )
   return (
-    <Wave.Provider value={wave}>
+    <Wave.Provider value={wave === null ? null : wave + start}>
       <ul ref={list} className={styles.specimens} aria-label="Try a few">
         <Specimen
           index={0}
@@ -269,7 +369,8 @@ export function WallSpecimens() {
           attr="data-state"
         >
           <Switch.Root>
-            <Switch.Control>
+            {/* where the hero's object ends its trip on a switch visit (skin-scene.tsx) */}
+            <Switch.Control data-object-land="switch">
               <Switch.Thumb />
             </Switch.Control>
             <Switch.Label>Dark mode</Switch.Label>
@@ -295,19 +396,32 @@ export function WallSpecimens() {
         </Specimen>
         <Specimen
           index={2}
-          name="Rating"
-          slug="rating"
-          selector="[aria-valuenow]"
-          attr="aria-valuenow"
+          name="Checkbox Group"
+          slug="checkbox-group"
+          selector="[data-parent][data-state]"
+          attr="data-state"
         >
-          <Rating.Root defaultValue={3}>
-            <Rating.Label>Rate it</Rating.Label>
-            <Rating.Control>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Rating.Item key={i} index={i} />
-              ))}
-            </Rating.Control>
-          </Rating.Root>
+          <CheckboxGroup.Root allValues={TOPPINGS} defaultValue={["Ham"]}>
+            <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
+            <CheckboxGroup.Parent>
+              <CheckboxGroup.ItemControl>
+                <CheckboxGroup.ItemIndicator>
+                  {({ indeterminate }) => (indeterminate ? "–" : "✓")}
+                </CheckboxGroup.ItemIndicator>
+              </CheckboxGroup.ItemControl>
+              <CheckboxGroup.ItemLabel>All</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Parent>
+            {TOPPINGS.map((value) => (
+              <CheckboxGroup.Item key={value} value={value}>
+                <CheckboxGroup.ItemControl
+                  data-object-land={value === "Ham" ? "checkbox" : undefined}
+                >
+                  <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+                </CheckboxGroup.ItemControl>
+                <CheckboxGroup.ItemLabel>{value}</CheckboxGroup.ItemLabel>
+              </CheckboxGroup.Item>
+            ))}
+          </CheckboxGroup.Root>
         </Specimen>
         <Specimen
           index={3}
@@ -328,30 +442,19 @@ export function WallSpecimens() {
         </Specimen>
         <Specimen
           index={4}
-          name="Checkbox Group"
-          slug="checkbox-group"
-          selector="[data-parent][data-state]"
-          attr="data-state"
+          name="Rating"
+          slug="rating"
+          selector="[aria-valuenow]"
+          attr="aria-valuenow"
         >
-          <CheckboxGroup.Root allValues={TOPPINGS} defaultValue={["Ham"]}>
-            <CheckboxGroup.Label>Toppings</CheckboxGroup.Label>
-            <CheckboxGroup.Parent>
-              <CheckboxGroup.ItemControl>
-                <CheckboxGroup.ItemIndicator>
-                  {({ indeterminate }) => (indeterminate ? "–" : "✓")}
-                </CheckboxGroup.ItemIndicator>
-              </CheckboxGroup.ItemControl>
-              <CheckboxGroup.ItemLabel>All</CheckboxGroup.ItemLabel>
-            </CheckboxGroup.Parent>
-            {TOPPINGS.map((value) => (
-              <CheckboxGroup.Item key={value} value={value}>
-                <CheckboxGroup.ItemControl>
-                  <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
-                </CheckboxGroup.ItemControl>
-                <CheckboxGroup.ItemLabel>{value}</CheckboxGroup.ItemLabel>
-              </CheckboxGroup.Item>
-            ))}
-          </CheckboxGroup.Root>
+          <Rating.Root defaultValue={3}>
+            <Rating.Label>Rate it</Rating.Label>
+            <Rating.Control>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Rating.Item key={i} index={i} />
+              ))}
+            </Rating.Control>
+          </Rating.Root>
         </Specimen>
         <Specimen
           index={5}
@@ -361,7 +464,9 @@ export function WallSpecimens() {
           attr="aria-pressed"
         >
           <ToggleGroup.Root aria-label="Format" selectionMode="multiple">
-            <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+            <ToggleGroup.Item value="bold" data-object-land="button">
+              Bold
+            </ToggleGroup.Item>
             <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
           </ToggleGroup.Root>
         </Specimen>

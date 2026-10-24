@@ -32,9 +32,14 @@ export function Basic() {
 export function Controlled() {
   const [open, setOpen] = useState(false)
   const [reason, setReason] = useState("—")
+  // opened from outside, it has no trigger to take its theme, dir and lang from: the portal is
+  // told which element it belongs to
+  const opener = useRef<HTMLButtonElement>(null)
   return (
     <div className="stack">
-      <Button onClick={() => setOpen(true)}>Open from outside</Button>
+      <Button ref={opener} onClick={() => setOpen(true)}>
+        Open from outside
+      </Button>
       <Dialog.Root
         open={open}
         onOpenChange={(next, details) => {
@@ -42,7 +47,7 @@ export function Controlled() {
           setReason(details.reason)
         }}
       >
-        <Dialog.Portal>
+        <Dialog.Portal logicalParent={() => opener.current}>
           <Dialog.Backdrop />
           <Dialog.Positioner>
             <Dialog.Content>

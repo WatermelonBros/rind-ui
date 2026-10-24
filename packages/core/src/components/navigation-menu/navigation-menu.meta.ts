@@ -126,7 +126,7 @@ export const navigationMenuMeta = {
       description: 'The landmark\'s default name ("Main").',
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

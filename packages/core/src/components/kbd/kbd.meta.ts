@@ -38,7 +38,7 @@ export const kbdMeta = {
         'Spoken key names (`keyName`) and the words between keys (`chord`, "plus") and chords (`sequence`, "then").',
     },
     render: {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

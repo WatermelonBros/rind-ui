@@ -4,7 +4,7 @@
   padding-top: var(--bar-h);
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
-  min-height: 100svh;
+  min-height: calc(100 * var(--svh));
 }
 .main {
   padding: 40px 48px 80px;
@@ -17,6 +17,46 @@
 }
 .head {
   margin-bottom: 28px;
+}
+/* [slug]/page.tsx: the parts, the way the landing shows a component's attributes */
+.parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -4px 0 18px;
+  padding: 0;
+  list-style: none;
+}
+.parts li {
+  font: 600 12px var(--mono);
+  padding: 5px 10px;
+  border-radius: 99px;
+  background: var(--ink);
+  color: var(--bg);
+  animation: part-in 0.45s var(--spring-pop) calc(var(--i) * 60ms) both;
+}
+.parts a {
+  color: inherit;
+  text-decoration: none;
+}
+.parts li:has(a):hover {
+  translate: 0 -2px;
+}
+.parts li:not(:first-child) {
+  background: color-mix(in oklab, var(--ink) 10%, transparent);
+  color: var(--ink);
+}
+@keyframes part-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    scale: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .parts li {
+    animation: none;
+  }
 }
 .kicker {
   font: 600 12px var(--mono);
@@ -93,7 +133,7 @@
   font-size: inherit;
 }
 :global([data-phase="juicy"]) .prose :where(pre) {
-  background: #2a1d5c;
+  background: #103d2e;
 }
 .prose :where(table) {
   width: 100%;
@@ -120,8 +160,102 @@
   border-bottom: 1px solid color-mix(in oklab, var(--ink) 15%, transparent);
   vertical-align: top;
 }
+/* names stay whole; a long type (a union) wraps, so the description keeps its room on screen */
 .prose :where(td code) {
   white-space: nowrap;
+}
+/* code reads as typed: "=>" stays two characters, not an arrow */
+.prose :where(code) {
+  font-variant-ligatures: none;
+}
+.prose :where(td[data-label="Type"] code, td[data-label="Default"] code) {
+  white-space: normal;
+  /* only a token longer than the column breaks inside: never a lone ")" on its own line */
+  overflow-wrap: break-word;
+}
+.prose :where(td[data-label="Type"]) {
+  /* room for a type name on one line; only a union longer than that wraps */
+  min-width: 17ch;
+}
+/* lib/docs.ts: byPart, the part a group of props belongs to */
+.prose :global(.part-row) th {
+  padding: 18px 10px 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 1;
+  font: 600 13px var(--mono);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 30%, transparent);
+}
+.prose :where(td[data-label="Description"]) {
+  min-width: 28ch;
+}
+/* a phone: each row is a labelled card, every column readable without scrolling sideways */
+@media (max-width: 700px) {
+  .prose :where(table:has(td[data-label])) :where(thead) {
+    display: none;
+  }
+  .prose :where(table:has(td[data-label]), table:has(td[data-label]) tbody) {
+    display: block;
+  }
+  .prose :global(.part-row) th {
+    display: block;
+  }
+  .prose :where(table:has(td[data-label]) tr) {
+    display: block;
+    padding: 10px 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--ink) 15%, transparent);
+  }
+  /* the label hangs in its own column, so a value that wraps keeps its edge */
+  .prose :where(table:has(td[data-label]) td) {
+    display: block;
+    padding: 2px 0 2px 112px;
+    border: 0;
+  }
+  .prose :where(table:has(td[data-label]) td)::before {
+    content: attr(data-label);
+    display: inline-block;
+    width: 104px;
+    margin-inline: -112px 8px;
+    font: 600 11px / 1.9 var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+  }
+  .prose :where(table:has(td[data-label]) td:empty)::before {
+    content: none;
+  }
+  /* a props table is dense: name, type and default on one line, the description under them, so
+     a part with many props (Select.Root has 26) is a short read, not a long scroll */
+  .prose
+  :where(
+    table:has(td[data-label="Prop"]) td[data-label="Prop"],
+    table:has(td[data-label="Prop"]) td[data-label="Type"],
+    table:has(td[data-label="Prop"]) td[data-label="Default"]
+  ) {
+    display: inline;
+    padding: 0 10px 0 0;
+  }
+  .prose
+    :where(
+      table:has(td[data-label="Prop"]) td[data-label="Prop"],
+      table:has(td[data-label="Prop"]) td[data-label="Type"]
+    )::before {
+    content: none;
+  }
+  .prose :where(table:has(td[data-label="Prop"]) td[data-label="Prop"] code) {
+    font-weight: 700;
+  }
+  .prose :where(table:has(td[data-label="Prop"]) td[data-label="Default"])::before {
+    width: auto;
+    margin-inline: 0 6px;
+  }
+  .prose :where(table:has(td[data-label="Prop"]) td[data-label="Description"]) {
+    display: block;
+    padding: 4px 0 0;
+  }
+  .prose :where(table:has(td[data-label="Prop"]) td[data-label="Description"])::before {
+    content: none;
+  }
 }
 
 /* highlight.js tokens, tuned to the two phases */
@@ -277,7 +411,7 @@
 :global([data-phase="juicy"]) .title {
   background: none;
   color: var(--ink);
-  text-shadow: 0 4px 0 #ff8fb1;
+  text-shadow: 0 4px 0 #5cd690;
 }
 .kicker {
   display: inline-block;
@@ -321,4 +455,9 @@
   border-left: 5px solid var(--acc);
   background: #fff;
   border-radius: 0 10px 10px 0;
+}
+
+/* a part's rows, reached from its chip, clear the sticky bar */
+.prose :global(tr.part-row) {
+  scroll-margin-top: 96px;
 }

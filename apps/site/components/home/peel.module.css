@@ -1,14 +1,15 @@
 .peel {
   position: relative;
-  height: 220vh;
+  height: calc(220 * var(--vh));
   background: var(--paper);
 }
 .sticky {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: calc(100 * var(--vh));
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* fixed halves: the acts' titles differ in width, and the scene must not jump when they swap */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding: var(--bar-h) 56px 0;
@@ -21,7 +22,10 @@
   transition: color 0.4s var(--spring);
 }
 .title {
-  font: 900 clamp(40px, 6.2vw, 112px) / 0.95 var(--display);
+  /* the longest word ("underneath.") fits its half at every width */
+  /* 1.04: tighter, the second line's ascenders met the first line's letters ("This" over
+     "ships" read "Thjs") */
+  font: 900 clamp(40px, calc(4.9 * var(--vw)), 112px) / 1.04 var(--display);
   letter-spacing: -0.035em;
   margin: 14px 0 16px;
   animation: in 0.6s var(--spring);
@@ -39,7 +43,7 @@
 
 .scene {
   position: relative;
-  height: 80vh;
+  height: calc(80 * var(--vh));
   display: grid;
   place-items: center;
 }
@@ -106,7 +110,8 @@
 .graph {
   position: absolute;
   top: 100%;
-  width: 420px;
+  /* grows with a wide screen, so the machine fills its scene instead of a corner of it */
+  width: clamp(420px, calc(34 * var(--vw)), 620px);
   margin-top: 30px;
   /* only once the ink disc has closed: its nodes never float on the dark */
   opacity: calc((var(--p3) - 0.88) * 8.4);
@@ -143,7 +148,7 @@
 @media (max-width: 900px) {
   /* a phone reads the two acts faster: less scroll with nothing new on screen */
   .peel {
-    height: 170vh;
+    height: calc(170 * var(--vh));
   }
   .sticky {
     grid-template-columns: 1fr;
@@ -231,7 +236,9 @@
   inset: 0;
   z-index: -1;
   background: var(--ink);
-  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
+  clip-path: circle(
+    calc(max(var(--dark, 0) - 0.04, 0) * 125%) at var(--disc-x, 75%) var(--disc-y, 50%)
+  );
 }
 /* the copy again, in paper, clipped by the same disc (peel.tsx) */
 .inkLayer {
@@ -239,19 +246,23 @@
   inset: 0;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: 40px;
   padding: var(--bar-h) 56px 0;
   color: var(--paper);
   pointer-events: none;
-  clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 125%) at 75% 50%);
+  clip-path: circle(
+    calc(max(var(--dark, 0) - 0.04, 0) * 125%) at var(--disc-x, 75%) var(--disc-y, 50%)
+  );
 }
 /* on a phone the disc opens from the object, low in the column */
 @media (max-width: 900px) {
   .sticky::before,
   .inkLayer {
-    clip-path: circle(calc(max(var(--dark, 0) - 0.04, 0) * 156%) at 50% 62%);
+    clip-path: circle(
+      calc(max(var(--dark, 0) - 0.04, 0) * 156%) at var(--disc-x, 50%) var(--disc-y, 62%)
+    );
   }
   .inkLayer {
     grid-template-columns: 1fr;
@@ -270,6 +281,35 @@
   transition: opacity 0.3s;
 }
 .graph[data-left] .edge,
-.graph[data-left] .event {
+.graph[data-left] .event,
+.graph[data-left] [data-state-node] {
   opacity: 0;
+}
+
+/* desktop: the scene rises over the hero's last stretch, below its copy, so the trip from the hero
+   has the machine coming in under it rather than a screen of empty ground */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .peel {
+    z-index: 1;
+    margin-top: calc(-42 * var(--vh));
+  }
+  /* rising over the hero's tail, it lets that tail show (its ground is the page's own): an
+     opaque ground cut the hero's buttons through their middle */
+  .peel,
+  .sticky {
+    background: transparent;
+  }
+}
+
+/* a large screen (globals.css zooms it): the scene keeps to the sections' column, like the hero */
+@media (min-width: 2200px) {
+  .sticky,
+  .inkLayer {
+    padding-inline: max(56px, calc((100% - 1200px) / 2 + 56px));
+  }
+}
+
+/* peel.tsx: the builder's title pushes the scene's contents up ahead of it (--push) */
+.sticky > * {
+  transform: translateY(var(--push, 0px));
 }

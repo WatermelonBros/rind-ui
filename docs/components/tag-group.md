@@ -62,19 +62,19 @@ The list needs an accessible name: render a `TagGroup.Label`, or pass `aria-labe
 | `TagGroup.Root` | `focusableWhenDisabled` | `boolean` | — | Disabled tags stay reachable (announced as dimmed). Default true. |
 | `TagGroup.Root` | `typeaheadTimeout` | `number` | `1000` | How long typed characters build one typeahead search (ms). |
 | `TagGroup.Root` | `collection` | `Collection<unknown>` | — | A collection built by the consumer, used instead of `items`. |
-| `TagGroup.Root` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Root` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TagGroup.Root` | `disallowEmptySelection` | `boolean` | — | No user action leaves the selection empty. |
-| `TagGroup.Label` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TagGroup.Description` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TagGroup.List` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TagGroup.Tag` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Label` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TagGroup.Description` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TagGroup.List` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TagGroup.Tag` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TagGroup.Tag` | `value` | `string` | — | The tag key. |
-| `TagGroup.Tag` | `textValue` | `string \| undefined` | — | The tag's text for typeahead and the remove button's name. |
-| `TagGroup.Tag` | `disabled` | `boolean \| undefined` | — | Disables this tag: it cannot be selected or removed. |
-| `TagGroup.Tag` | `href` | `string \| undefined` | — | A link tag: TagText renders an anchor to it. |
-| `TagGroup.TagText` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TagGroup.TagRemove` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
-| `TagGroup.Empty` | `render` | `RenderProp<undefined>` | — | Another element or a render function receiving the props. |
+| `TagGroup.Tag` | `textValue` | `string` | — | The tag's text for typeahead and the remove button's name. |
+| `TagGroup.Tag` | `disabled` | `boolean` | — | Disables this tag: it cannot be selected or removed. |
+| `TagGroup.Tag` | `href` | `string` | — | A link tag: TagText renders an anchor to it. |
+| `TagGroup.TagText` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TagGroup.TagRemove` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
+| `TagGroup.Empty` | `render` | `RenderProp` | — | Another element or a render function receiving the props. |
 | `TagGroup.Tags` | `children` | `(label: string, key: string) => ReactNode` | — | Renders one tag's content from its label and key; default: TagText and TagRemove. |
 
 Every attribute of the rendered element is accepted and forwarded.

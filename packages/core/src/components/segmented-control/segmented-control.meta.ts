@@ -80,7 +80,7 @@ export const segmentedControlMeta = {
     name: { type: "string", description: "The submitted name (default: derived from the id)." },
     form: { type: "string", description: "The id of the form the hidden inputs belong to." },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },

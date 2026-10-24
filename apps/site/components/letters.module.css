@@ -1,0 +1,93 @@
+/* letters.tsx (the landing's section titles, the docs' and compare's page titles): a title's
+   letters come alive, one after another: in juicy each swells and bounces back, in crisp each
+   snaps stiff, sheared and back in hard steps. letters-replay.tsx plays them when the phase
+   changes (once its wave has passed) and again every few seconds while the title is on screen,
+   by flipping data-play between two names of the same animation, so each flip restarts it. */
+.word {
+  white-space: nowrap;
+}
+.ch {
+  display: inline-block;
+  transform-origin: 50% 85%;
+}
+.title[data-play="a"] .ch {
+  animation: ch-swell 0.75s var(--spring-pop) calc(var(--i) * 28ms) both;
+}
+.title[data-play="b"] .ch {
+  animation: ch-swell-again 0.75s var(--spring-pop) calc(var(--i) * 28ms) both;
+}
+:global(html[data-phase="crisp"]) .title[data-play="a"] .ch {
+  animation: ch-snap 0.6s steps(4, jump-none) calc(var(--i) * 22ms) both;
+}
+:global(html[data-phase="crisp"]) .title[data-play="b"] .ch {
+  animation: ch-snap-again 0.6s steps(4, jump-none) calc(var(--i) * 22ms) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .title[data-play] .ch {
+    animation: none;
+  }
+}
+@keyframes ch-swell {
+  0% {
+    scale: 1;
+  }
+  /* enough to read as a swell, not so much that a letter reaches the line above or its
+     neighbour */
+  35% {
+    scale: 1.1 1.16;
+    translate: 0 -0.03em;
+  }
+  65% {
+    scale: 0.94 0.9;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes ch-swell-again {
+  0% {
+    scale: 1;
+  }
+  /* enough to read as a swell, not so much that a letter reaches the line above or its
+     neighbour */
+  35% {
+    scale: 1.1 1.16;
+    translate: 0 -0.03em;
+  }
+  65% {
+    scale: 0.94 0.9;
+  }
+  100% {
+    scale: 1;
+  }
+}
+@keyframes ch-snap {
+  0% {
+    transform: skewX(0deg);
+  }
+  50% {
+    transform: skewX(-14deg) translateX(0.04em);
+  }
+  100% {
+    transform: skewX(0deg);
+  }
+}
+@keyframes ch-snap-again {
+  0% {
+    transform: skewX(0deg);
+  }
+  50% {
+    transform: skewX(-14deg) translateX(0.04em);
+  }
+  100% {
+    transform: skewX(0deg);
+  }
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

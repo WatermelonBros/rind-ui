@@ -221,7 +221,7 @@ export const tourMeta = {
       description: "On `Tour.ActionTrigger`: one of the step's actions.",
     },
     "*.render": {
-      type: "element | (props, state) => element",
+      type: "RenderProp",
       description: "Substitutes the rendered element without changing behaviour.",
     },
   },
