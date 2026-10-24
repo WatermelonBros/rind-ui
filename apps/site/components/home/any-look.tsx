@@ -25,6 +25,7 @@ import { heroKind, setLookColors, setLookTarget } from "./hero-state"
 import styles from "./home.module.css"
 import { Reveal } from "./reveal"
 import {
+  contrast,
   DENSITIES,
   decodeLook,
   encodeLook,
@@ -40,6 +41,7 @@ import {
   SITE_FONTS,
   sameLook,
   skinCss,
+  textOn,
 } from "./skins"
 import { wear } from "./wear"
 
@@ -614,6 +616,34 @@ export function AnyLook() {
                     onChange={(surface) => set({ surface })}
                   />
                 </div>
+                {/* the brand's ramp, and how the three read together, measured (WCAG) */}
+                <div
+                  className={styles.ramp}
+                  aria-hidden="true"
+                  style={{ "--b": look.brand } as CSSProperties}
+                >
+                  {[12, 28, 46, 64, 82, 100].map((k) => (
+                    <i key={k} style={{ "--k": `${k}%` } as CSSProperties} />
+                  ))}
+                </div>
+                <ul className={styles.checks} aria-label="Contrast">
+                  {(
+                    [
+                      ["Text on surface", textOn(look.surface), look.surface, 4.5],
+                      ["Text on brand", textOn(look.brand), look.brand, 4.5],
+                      ["Brand on surface", look.brand, look.surface, 3],
+                    ] as const
+                  ).map(([name, fg, bg, need]) => {
+                    const ratio = contrast(fg, bg)
+                    return (
+                      <li key={name} data-pass={ratio >= need ? "" : undefined}>
+                        <span>{name}</span>
+                        <b>{ratio.toFixed(1)}:1</b>
+                        <small>{ratio >= need ? "AA ✓" : `below ${need}:1`}</small>
+                      </li>
+                    )
+                  })}
+                </ul>
               </Tabs.Panel>
               <Tabs.Panel value="shape" className={styles.rackPanel}>
                 <div className={styles.tuneGroup}>

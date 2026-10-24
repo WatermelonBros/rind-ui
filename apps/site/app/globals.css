@@ -384,6 +384,13 @@ html[data-wave] [data-page-title] {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+/* a phone has no room beside the code: the button gets its own strip over the first line,
+   never on top of it */
+@media (max-width: 760px) {
+  .code-block > pre {
+    padding-block-start: 52px;
+  }
+}
 .visually-hidden {
   position: absolute;
   width: 1px;

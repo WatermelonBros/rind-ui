@@ -403,21 +403,17 @@ export function ScreenReaderView() {
   }, [])
 
   // it waits out the hero, where the sound question and the object already ask for attention;
-  // on a phone it then lives only in the footer: anywhere between, the narrow column puts it on
-  // top of body copy
+  // after it, a phone shows it too, as an icon in the corner while the page rests (it steps
+  // aside as soon as the page scrolls, so it never sits on copy being read; found only in the
+  // footer, it was a feature nobody on a phone discovered)
   const [away, setAway] = useState(true)
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 700px)")
     const hero = document.querySelector("main section, main > div")
-    const foot = document.querySelector("footer")
     if (!hero || typeof IntersectionObserver === "undefined") return
-    const seen = new Map<Element, boolean>()
     const io = new IntersectionObserver((entries) => {
-      for (const e of entries) seen.set(e.target, e.isIntersecting)
-      setAway(Boolean(seen.get(hero)) || (mq.matches && !(foot && seen.get(foot))))
+      for (const e of entries) setAway(e.isIntersecting)
     })
     io.observe(hero)
-    if (foot) io.observe(foot)
     return () => io.disconnect()
   }, [])
   // it also stays aside while the tests are on screen: there it would sit on the PASS bar
@@ -505,15 +501,43 @@ export function ScreenReaderView() {
               Next →
             </button>
           </div>
-          <p className={styles.keys}>
-            <kbd>↓</kbd> <kbd>↑</kbd> read · <kbd>H</kbd> heading · <kbd>D</kbd> landmark ·{" "}
-            <kbd>K</kbd> link · <kbd>B</kbd> button · <kbd>F</kbd> field · <kbd>Tab</kbd> focus ·{" "}
-            <kbd>Enter</kbd> use. Based on recorded output in{" "}
-            <a href="https://aria-at.w3.org" target="_blank" rel="noreferrer">
-              W3C ARIA-AT
-            </a>
-            ; real screen readers vary with settings.
-          </p>
+          {/* each key stays with its word, and the source has its own line: run together, a
+            keycap ended one line and its word began the next */}
+          <div className={styles.keys}>
+            <p className={styles.keyRow}>
+              <span>
+                <kbd>↓</kbd> <kbd>↑</kbd> read
+              </span>
+              <span>
+                <kbd>H</kbd> heading
+              </span>
+              <span>
+                <kbd>D</kbd> landmark
+              </span>
+              <span>
+                <kbd>K</kbd> link
+              </span>
+              <span>
+                <kbd>B</kbd> button
+              </span>
+              <span>
+                <kbd>F</kbd> field
+              </span>
+              <span>
+                <kbd>Tab</kbd> focus
+              </span>
+              <span>
+                <kbd>Enter</kbd> use
+              </span>
+            </p>
+            <p className={styles.keyNote}>
+              Based on recorded output in{" "}
+              <a href="https://aria-at.w3.org" target="_blank" rel="noreferrer">
+                W3C ARIA-AT
+              </a>
+              ; real screen readers vary with settings.
+            </p>
+          </div>
         </section>
       ) : null}
       <ToggleGroup.Item className={styles.toggle} pressed={on} onPressedChange={setOn}>
