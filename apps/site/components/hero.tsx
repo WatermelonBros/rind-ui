@@ -1,16 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import type { ReactNode } from "react"
+import { Fragment, type ReactNode } from "react"
 import styles from "./hero.module.css"
 import { SkinScene } from "./home/skin-scene"
 import { Wordmark } from "./wordmark"
 
 export function Hero({
   children,
+  today = ["React"],
   frameworks = "",
 }: {
   children?: ReactNode
+  /** the frameworks released, from their packages (lib/frameworks.ts) */
+  today?: readonly string[]
   /** where the other frameworks stand (lib/framework-status.ts: upcoming) */
   frameworks?: string
 }) {
@@ -36,7 +39,13 @@ export function Hero({
               </Link>
             </div>
             <p className={styles.frameworks}>
-              <b>React</b> today{frameworks ? ` · ${frameworks}, on the same core` : ""}
+              {today.map((name, i) => (
+                <Fragment key={name}>
+                  {i === 0 ? "" : i === today.length - 1 ? " and " : ", "}
+                  <b>{name}</b>
+                </Fragment>
+              ))}{" "}
+              today{frameworks ? ` · ${frameworks}, on the same core` : ""}
             </p>
           </section>
           <SkinScene />
