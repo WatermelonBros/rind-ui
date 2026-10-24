@@ -116,6 +116,21 @@ part props React gives each copy, and the consumer's `id` only on the first.
 - **THEN** the Viewport holds three stamped elements, the second and third `aria-hidden` with no
   tab stop inside, and the markup matches React's
 
+### Requirement: Data Rows Come From The Template
+
+A part that React renders from data or a render function (a Listbox's data items, a Tag
+Group's or Grid List's data rows, a Tree View's visible nodes) SHALL, in Angular, be the
+consumer's template: the Root SHALL expose the data in render order (`groups()`, `tags()`,
+`rows()`) for an `@for`, and a Tree View's Tree SHALL stamp its `<ng-template rindTreeViewRow
+let-node>` once per visible node with the node's state. A Root that renders no element in React
+SHALL be a directive on an `<ng-container>`.
+
+#### Scenario: A data listbox
+
+- **WHEN** a template renders `l.groups()` of a `<ng-container rindListboxRoot [items]>` as
+  Sections and Items
+- **THEN** the markup matches React's `Listbox.Items`
+
 ### Requirement: Outputs Never Share A Native Event's Name
 
 An output SHALL NOT be named like a DOM event that bubbles to its element, since a template

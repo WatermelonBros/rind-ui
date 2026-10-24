@@ -7,7 +7,8 @@ New package `@rind-ui/angular` (`@angular/core` ≥ 21): the same machines, ARIA
 Badge, Heading, Label, Link, Skeleton, Progress, Meter, Image, Avatar, Alert, Toggle Group, Fieldset, Field,
 Text Field, Checkbox, Checkbox Group, Switch, Radio Group, Segmented Control, Collapsible,
 Accordion, Tabs, Toolbar, Breadcrumbs, Pagination, Rating, Slider, Number Input, Pin Input, Splitter, Stepper, Timeline, Table of
-Contents, Scroll Area, Marquee, QR Code, Clipboard, Code Block, Form, File Upload, VisuallyHidden;
+Contents, Scroll Area, Marquee, QR Code, Clipboard, Code Block, Form, File Upload, VisuallyHidden, Listbox, Tag
+Group, Grid List, Tree View, Sortable;
 the form toggle bases, for a toggle of your own). Parts are attribute directives on your own elements
 (`<button rindToggleRoot [(pressed)]="bold">`), so no wrapper element is added and any host element
 keeps the behaviour; a part that renders elements of its own (Kbd, Badge) is a component with an

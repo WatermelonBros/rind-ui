@@ -118,6 +118,11 @@
       "types": "./dist/form-toggle/index.d.ts",
       "default": "./dist/form-toggle/index.js"
     },
+    "./grid-list": {
+      "@rind-ui/source": "./src/grid-list/index.ts",
+      "types": "./dist/grid-list/index.d.ts",
+      "default": "./dist/grid-list/index.js"
+    },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
       "types": "./dist/heading/index.d.ts",
@@ -142,6 +147,11 @@
       "@rind-ui/source": "./src/link/index.ts",
       "types": "./dist/link/index.d.ts",
       "default": "./dist/link/index.js"
+    },
+    "./listbox": {
+      "@rind-ui/source": "./src/listbox/index.ts",
+      "types": "./dist/listbox/index.d.ts",
+      "default": "./dist/listbox/index.js"
     },
     "./marquee": {
       "@rind-ui/source": "./src/marquee/index.ts",
@@ -213,6 +223,11 @@
       "types": "./dist/slider/index.d.ts",
       "default": "./dist/slider/index.js"
     },
+    "./sortable": {
+      "@rind-ui/source": "./src/sortable/index.ts",
+      "types": "./dist/sortable/index.d.ts",
+      "default": "./dist/sortable/index.js"
+    },
     "./splitter": {
       "@rind-ui/source": "./src/splitter/index.ts",
       "types": "./dist/splitter/index.d.ts",
@@ -238,6 +253,11 @@
       "types": "./dist/tabs/index.d.ts",
       "default": "./dist/tabs/index.js"
     },
+    "./tag-group": {
+      "@rind-ui/source": "./src/tag-group/index.ts",
+      "types": "./dist/tag-group/index.d.ts",
+      "default": "./dist/tag-group/index.js"
+    },
     "./text-field": {
       "@rind-ui/source": "./src/text-field/index.ts",
       "types": "./dist/text-field/index.d.ts",
@@ -262,6 +282,11 @@
       "@rind-ui/source": "./src/toolbar/index.ts",
       "types": "./dist/toolbar/index.d.ts",
       "default": "./dist/toolbar/index.js"
+    },
+    "./tree-view": {
+      "@rind-ui/source": "./src/tree-view/index.ts",
+      "types": "./dist/tree-view/index.d.ts",
+      "default": "./dist/tree-view/index.js"
     },
     "./visually-hidden": {
       "@rind-ui/source": "./src/visually-hidden/index.ts",
@@ -372,6 +397,10 @@
         "types": "./dist/form-toggle/index.d.ts",
         "default": "./dist/form-toggle/index.js"
       },
+      "./grid-list": {
+        "types": "./dist/grid-list/index.d.ts",
+        "default": "./dist/grid-list/index.js"
+      },
       "./heading": {
         "types": "./dist/heading/index.d.ts",
         "default": "./dist/heading/index.js"
@@ -391,6 +420,10 @@
       "./link": {
         "types": "./dist/link/index.d.ts",
         "default": "./dist/link/index.js"
+      },
+      "./listbox": {
+        "types": "./dist/listbox/index.d.ts",
+        "default": "./dist/listbox/index.js"
       },
       "./marquee": {
         "types": "./dist/marquee/index.d.ts",
@@ -448,6 +481,10 @@
         "types": "./dist/slider/index.d.ts",
         "default": "./dist/slider/index.js"
       },
+      "./sortable": {
+        "types": "./dist/sortable/index.d.ts",
+        "default": "./dist/sortable/index.js"
+      },
       "./splitter": {
         "types": "./dist/splitter/index.d.ts",
         "default": "./dist/splitter/index.js"
@@ -468,6 +505,10 @@
         "types": "./dist/tabs/index.d.ts",
         "default": "./dist/tabs/index.js"
       },
+      "./tag-group": {
+        "types": "./dist/tag-group/index.d.ts",
+        "default": "./dist/tag-group/index.js"
+      },
       "./text-field": {
         "types": "./dist/text-field/index.d.ts",
         "default": "./dist/text-field/index.js"
@@ -487,6 +528,10 @@
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
         "default": "./dist/toolbar/index.js"
+      },
+      "./tree-view": {
+        "types": "./dist/tree-view/index.d.ts",
+        "default": "./dist/tree-view/index.js"
       },
       "./visually-hidden": {
         "types": "./dist/visually-hidden/index.d.ts",
