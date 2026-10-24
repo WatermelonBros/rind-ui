@@ -35,6 +35,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/solid/src/meter/meter.tsx` | `nvda-progressbar-name` |
 | `packages/solid/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/solid/src/progress/progress.tsx` | `nvda-progressbar-name` |
+| `packages/solid/src/table/table.tsx` | `talkback-aria-sort` |
 | `packages/svelte/src/number-input/api.svelte.ts` | `ios-vo-spinbutton-input` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 | `packages/vue/src/date-field/date-field.ts` | `ios-vo-spinbutton-input` |
@@ -218,7 +219,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/table/useTableColumnHeader.ts>
 - Repro test: `packages/core/src/components/table/table.connect.test.ts`
-- Checked in: `packages/react/src/table/table.tsx`, `packages/vue/src/table/table.ts`
+- Checked in: `packages/react/src/table/table.tsx`, `packages/solid/src/table/table.tsx`, `packages/vue/src/table/table.ts`
 - Last verified: 2026-10-19
 - Remove when: a device test shows TalkBack reading the sort direction of a column header with aria-sort (manual protocol)
 
