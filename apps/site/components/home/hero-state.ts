@@ -2,6 +2,7 @@
 // state: which component this visit shows (app/layout.tsx picks it before paint) and whether it
 // is on. A tiny external store: React reads it with useSyncExternalStore.
 import { useSyncExternalStore } from "react"
+import type { ObjectMaterial } from "./skin-gl"
 
 export type HeroKind = "switch" | "checkbox" | "button"
 const KINDS: readonly HeroKind[] = ["switch", "checkbox", "button"]
@@ -93,7 +94,13 @@ export const useLanded = () =>
 // and on the way it takes the visitor's colours (any-look.tsx publishes both)
 let lookTarget: HTMLElement | null = null
 // `picked`: the visitor chose the brand, and the object then wears it everywhere it flies
-type LookColors = { brand: string; surface: string; picked: boolean }
+type LookColors = {
+  brand: string
+  surface: string
+  picked: boolean
+  /** the rest of the skin the object is rebuilt in (skin-gl.ts) */
+  material?: ObjectMaterial
+}
 let lookColors: LookColors = { brand: "#5cd690", surface: "#FFFFFF", picked: false }
 export const setLookTarget = (el: HTMLElement | null) => {
   lookTarget = el

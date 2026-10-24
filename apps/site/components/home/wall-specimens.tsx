@@ -464,6 +464,7 @@ export function WallSpecimens({ ready }: { readonly ready: number }) {
               Bold
             </ToggleGroup.Item>
             <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+            <ToggleGroup.Item value="code">Code</ToggleGroup.Item>
           </ToggleGroup.Root>
         </Specimen>
         {/* the wall's last tile: the rest of the catalogue, one step away */}

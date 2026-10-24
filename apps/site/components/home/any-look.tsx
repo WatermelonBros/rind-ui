@@ -10,6 +10,7 @@ import {
   SegmentedControl,
   Slider,
   Switch,
+  Tabs,
   TextField,
   Toggle,
   ToggleGroup,
@@ -40,6 +41,7 @@ import {
   sameLook,
   skinCss,
 } from "./skins"
+import { wear } from "./wear"
 
 /** The brand before the visitor picks one: the site's own, rind green in juicy and lime in crisp. */
 const BRAND: Record<Phase, string> = { juicy: "#5cd690", crisp: "#D4FF3A" }
@@ -55,6 +57,28 @@ const PLAY_MS = 2600
 /** The copied CSS names real families; the preview wears them as this site loads them. */
 const siteFonts = (css: string) =>
   FONT_NAMES.reduce((out, f) => out.replaceAll(FONTS[f], SITE_FONTS[f]), css)
+
+/**
+ * The same CSS for every rind component on the page while the skin is worn (wear.ts): its tokens
+ * on the page, its rules on every skinned part (over the site's own skins) but the builder's
+ * own chrome. The page's sections keep their grounds: the root's paint is left out.
+ */
+function onPage(css: string): string {
+  const out: string[] = []
+  let root = false
+  for (const line of css.split("\n")) {
+    if (line === ":root {") {
+      root = true
+      out.push("html[data-worn] {")
+    } else if (root) {
+      if (line === "}") root = false
+      if (!/^\s*(background|color|font):/.test(line)) out.push(line)
+    } else if (line.endsWith("{") && !line.trimStart().startsWith("/*"))
+      out.push(`html[data-worn] [data-skinned]:not([data-skin="bare"]) ${line}`)
+    else out.push(line)
+  }
+  return out.join("\n")
+}
 
 /** The same CSS, scoped to the stage: `:root` becomes the stage, every rule stays as written. */
 const scoped = (css: string) => `@scope ([data-look]) {\n${css.replace(":root {", ":scope {")}\n}`
@@ -240,8 +264,26 @@ export function AnyLook() {
         surface: look.surface,
         // the skins the builder plays by itself are not the visitor's: the object keeps its own
         picked: touched.current && (picked.brand !== null || picked.surface !== BASE.surface),
+        // and the rest of it: the object is rebuilt in the skin, not only recoloured
+        material: {
+          accent: look.accent,
+          radius: look.radius,
+          border: look.border,
+          shadow: look.shadow,
+          fill: look.fill,
+        },
       }),
-    [look.brand, look.surface, picked.brand, picked.surface],
+    [
+      look.brand,
+      look.surface,
+      look.accent,
+      look.radius,
+      look.border,
+      look.shadow,
+      look.fill,
+      picked.brand,
+      picked.surface,
+    ],
   )
   const section = useRef<HTMLElement>(null)
   const [copied, setCopied] = useState<"css" | "link" | null>(null)
@@ -252,6 +294,21 @@ export function AnyLook() {
     setCopied(null)
   }
   const preset = PRESETS.find((p) => sameLook(p.look, picked))
+  // the page wears the skin once it is the visitor's own (a press in the builder, a shared
+  // link), never one the builder plays by itself; the nav's crisp/juicy takes it off
+  const [owned, setOwned] = useState(false)
+  const [wearing, setWearing] = useState(true)
+  const worn = owned && wearing ? JSON.stringify(look) : ""
+  // biome-ignore lint/correctness/useExhaustiveDependencies: worn is the look, serialised
+  useEffect(() => {
+    wear(worn ? look : null)
+  }, [worn])
+  useEffect(() => () => wear(null), [])
+  const firstPhase = useRef(phase)
+  useEffect(() => {
+    if (phase !== firstPhase.current) setWearing(false)
+    firstPhase.current = phase
+  }, [phase])
   // the ready skins in a shuffled deck: Surprise me deals the next, every one before a repeat
   const deck = useRef<string[]>([])
   const surprise = () => {
@@ -270,6 +327,7 @@ export function AnyLook() {
     const shared = m?.[1] ? decodeLook(m[1]) : null
     if (!shared) return
     touched.current = true
+    setOwned(true)
     set(shared)
     document.getElementById("look-title")?.scrollIntoView({ block: "start" })
   }, [])
@@ -282,6 +340,7 @@ export function AnyLook() {
     let timer = 0
     const stop = () => {
       touched.current = true
+      setOwned(true)
       clearInterval(timer)
     }
     const io = new IntersectionObserver(
@@ -404,12 +463,35 @@ export function AnyLook() {
                 )
               }}
             >
-              {copied === "link" ? "Link copied" : "Share link"}
+              {/* both labels hold the button's width: the copied one never moves the row */}
+              <span className={styles.swap}>
+                <span aria-hidden={copied === "link" ? true : undefined}>Share link</span>
+                <span aria-hidden={copied === "link" ? undefined : true}>Link copied</span>
+              </span>
             </Button>
-            <Button onPress={() => set(BASE)}>Reset</Button>
+            <Button
+              onPress={() => {
+                set(BASE)
+                setOwned(false)
+              }}
+            >
+              Reset
+            </Button>
+            {/* the visitor's skin on the whole page, nav and titles and all (wear.ts) */}
+            <Switch.Root
+              checked={wearing}
+              onCheckedChange={setWearing}
+              className={styles.wearSwitch}
+            >
+              <Switch.Control>
+                <Switch.Thumb />
+              </Switch.Control>
+              <Switch.Label>Wear it on the page</Switch.Label>
+            </Switch.Root>
           </div>
         </div>
         <style>{scoped(siteFonts(css))}</style>
+        {worn ? <style>{onPage(siteFonts(css))}</style> : null}
         <div className={styles.lookBody}>
           <div ref={stage} className={styles.lookStage} data-look="">
             <div className={styles.lookSticky}>
@@ -496,87 +578,103 @@ export function AnyLook() {
             data-skin="bare"
             data-rind-theme="skin-bare"
           >
-            <div className={styles.tuneGroup}>
-              <LazyColour
-                label="Brand"
-                value={look.brand}
-                swatches={SWATCHES}
-                picker={picker}
-                onChange={(brand) => set({ brand })}
-              />
-              <LazyColour
-                label="Accent"
-                value={look.accent}
-                swatches={ACCENTS}
-                picker={picker}
-                onChange={(accent) => set({ accent })}
-              />
-              <LazyColour
-                label="Surface"
-                value={look.surface}
-                swatches={SURFACES}
-                picker={picker}
-                onChange={(surface) => set({ surface })}
-              />
-            </div>
-            <div className={styles.tuneGroup}>
-              <Tune
-                label="Radius"
-                value={look.radius}
-                max={28}
-                onChange={(v) => set({ radius: v })}
-              />
-              <Tune
-                label="Border"
-                value={look.border}
-                max={4}
-                onChange={(v) => set({ border: v })}
-              />
-            </div>
-            <Choice
-              label="Shadow"
-              value={look.shadow}
-              options={SHADOWS}
-              onChange={(v) => set({ shadow: v })}
-            />
-            <Choice
-              label="Fill"
-              value={look.fill}
-              options={FILLS}
-              onChange={(v) => set({ fill: v })}
-            />
-            <Choice
-              label="Font"
-              value={look.font}
-              options={FONT_NAMES}
-              onChange={(v) => set({ font: v })}
-            />
-            <Choice
-              label="Ground"
-              value={look.pattern}
-              options={PATTERNS}
-              onChange={(v) => set({ pattern: v })}
-            />
-            <div className={styles.tuneGroup}>
-              <Choice
-                label="Density"
-                value={look.density}
-                options={DENSITIES}
-                onChange={(v) => set({ density: v })}
-              />
-              <Choice
-                label="Case"
-                value={look.letters}
-                options={LETTERS}
-                onChange={(v) => set({ letters: v })}
-              />
-            </div>
-            <Choice
-              label="Motion"
-              value={look.motion}
-              options={MOTIONS}
-              onChange={(v) => set({ motion: v })}
-            />
+            {/* four short tabs, not one long rack: the preview beside it keeps its height */}
+            <Tabs.Root defaultValue="colour" className={styles.rackTabs}>
+              <Tabs.List aria-label="Skin settings">
+                <Tabs.Tab value="colour">Colour</Tabs.Tab>
+                <Tabs.Tab value="shape">Shape</Tabs.Tab>
+                <Tabs.Tab value="type">Type</Tabs.Tab>
+                <Tabs.Tab value="feel">Feel</Tabs.Tab>
+                <Tabs.Indicator />
+              </Tabs.List>
+              <Tabs.Panel value="colour" className={styles.rackPanel}>
+                <div className={styles.tuneGroup}>
+                  <LazyColour
+                    label="Brand"
+                    value={look.brand}
+                    swatches={SWATCHES}
+                    picker={picker}
+                    onChange={(brand) => set({ brand })}
+                  />
+                  <LazyColour
+                    label="Accent"
+                    value={look.accent}
+                    swatches={ACCENTS}
+                    picker={picker}
+                    onChange={(accent) => set({ accent })}
+                  />
+                  <LazyColour
+                    label="Surface"
+                    value={look.surface}
+                    swatches={SURFACES}
+                    picker={picker}
+                    onChange={(surface) => set({ surface })}
+                  />
+                </div>
+              </Tabs.Panel>
+              <Tabs.Panel value="shape" className={styles.rackPanel}>
+                <div className={styles.tuneGroup}>
+                  <Tune
+                    label="Radius"
+                    value={look.radius}
+                    max={28}
+                    onChange={(v) => set({ radius: v })}
+                  />
+                  <Tune
+                    label="Border"
+                    value={look.border}
+                    max={4}
+                    onChange={(v) => set({ border: v })}
+                  />
+                </div>
+                <Choice
+                  label="Shadow"
+                  value={look.shadow}
+                  options={SHADOWS}
+                  onChange={(v) => set({ shadow: v })}
+                />
+                <Choice
+                  label="Fill"
+                  value={look.fill}
+                  options={FILLS}
+                  onChange={(v) => set({ fill: v })}
+                />
+              </Tabs.Panel>
+              <Tabs.Panel value="type" className={styles.rackPanel}>
+                <Choice
+                  label="Font"
+                  value={look.font}
+                  options={FONT_NAMES}
+                  onChange={(v) => set({ font: v })}
+                />
+                <Choice
+                  label="Case"
+                  value={look.letters}
+                  options={LETTERS}
+                  onChange={(v) => set({ letters: v })}
+                />
+              </Tabs.Panel>
+              <Tabs.Panel value="feel" className={styles.rackPanel}>
+                <Choice
+                  label="Ground"
+                  value={look.pattern}
+                  options={PATTERNS}
+                  onChange={(v) => set({ pattern: v })}
+                />
+                <Choice
+                  label="Density"
+                  value={look.density}
+                  options={DENSITIES}
+                  onChange={(v) => set({ density: v })}
+                />
+                <Choice
+                  label="Motion"
+                  value={look.motion}
+                  options={MOTIONS}
+                  onChange={(v) => set({ motion: v })}
+                />
+              </Tabs.Panel>
+            </Tabs.Root>
           </div>
         </div>
         {/* the stylesheet is there on demand: open, its scrolling box sat in the page's path */}

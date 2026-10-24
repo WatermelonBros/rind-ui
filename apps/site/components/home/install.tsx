@@ -438,7 +438,7 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
   }, [])
 
   return (
-    <div className={styles.band} data-band="paper">
+    <div className={styles.band} data-band="paper" data-from="ink">
       <section className={styles.section} aria-labelledby="install-title">
         <Reveal>
           <h2 id="install-title" className={styles.h2}>

@@ -197,7 +197,7 @@
 .libs li[data-own] {
   background: var(--acc);
   border-color: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
 }
 @keyframes lib-in {
   from {

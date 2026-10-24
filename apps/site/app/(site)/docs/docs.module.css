@@ -432,7 +432,7 @@
 }
 :global([data-phase="juicy"]) .kicker {
   background: var(--acc);
-  color: var(--ink);
+  color: var(--on-acc);
 }
 .prose :where(h2)::before {
   content: "";

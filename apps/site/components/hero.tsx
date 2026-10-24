@@ -55,7 +55,7 @@ export function Hero({
           {/* the hero's foot: what the library is, in numbers */}
           <ul className={styles.facts} aria-label="rind in numbers">
             <li>
-              <b>{ready}</b> components
+              <b>{ready}</b> components ready
             </li>
             <li>
               <b>{today.length}</b> frameworks

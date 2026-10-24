@@ -318,14 +318,23 @@ export function ScreenReaderView() {
       ],
     })
     // live regions (rind's announcer included): what they announce is said; alerts say so first
+    // once per region per change, and only what is new in it: one update arrives as several
+    // records (the PASS was said seven times)
+    const heard = new WeakMap<Element, string>()
     const live = new MutationObserver((records) => {
+      const regions = new Set<Element>()
       for (const r of records) {
         const region = (r.target instanceof Element ? r.target : r.target.parentElement)?.closest(
           "[aria-live]:not([aria-live='off']), [role='status'], [role='alert']",
         )
-        if (!region || region.closest("[data-sr-view]")) continue
+        if (region && !region.closest("[data-sr-view]")) regions.add(region)
+      }
+      for (const region of regions) {
         const text = region.textContent?.trim() ?? ""
-        if (!text) continue
+        // emptied, it may say the same again later (a second run's PASS)
+        if (!text) heard.delete(region)
+        if (!text || heard.get(region) === text) continue
+        heard.set(region, text)
         const alert = region.getAttribute("role") === "alert"
         say("", alert && readerRef.current === "nvda" ? ["alert", text] : [text])
       }

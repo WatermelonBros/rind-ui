@@ -115,6 +115,16 @@ export function SoundInvite() {
       const to = document.querySelector("[data-sound-toggle]")?.getBoundingClientRect()
       if (!el || !to) return
       const z = zoom()
+      // a desktop's bar has room: the question sits in it, beside the toggle, over the bar's
+      // links for a moment and never over the page; a phone's hangs under the toggle
+      const inBar = window.innerWidth > 900
+      el.toggleAttribute("data-in-bar", inBar)
+      if (inBar) {
+        const h = el.offsetHeight * z
+        el.style.setProperty("--invite-top", `${(to.top + to.height / 2 - h / 2) / z}px`)
+        el.style.setProperty("--invite-end", `${(window.innerWidth - to.left + 14) / z}px`)
+        return
+      }
       el.style.setProperty("--invite-top", `${(to.bottom + 14) / z}px`)
       el.style.setProperty("--invite-end", `${Math.max(16, window.innerWidth - to.right) / z}px`)
       el.style.setProperty("--invite-point", `${to.width / 2 / z}px`)

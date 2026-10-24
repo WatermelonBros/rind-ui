@@ -19,7 +19,7 @@
 :global([data-phase="juicy"]) .nav {
   /* opaque: the hero's white wordmark and the headings scrolling under the bar read through even
      a 3% veil as a smear */
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 4px 0 var(--soft);
 }
 /* over the hero: no surface at all until the page scrolls */
