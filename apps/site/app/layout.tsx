@@ -74,8 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         {/* Before paint: pick the landing's hero component for this visit (components/home/
             skin-scene.tsx), restore the phase (no juicy flash for a crisp visitor) and, on a
-            load of the landing, mark the intro (components/intro.tsx) and the sound question
-            still to ask (components/sound-invite.tsx). */}
+            load of the landing, mark the intro (components/intro.tsx). */}
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline script, no user input
           dangerouslySetInnerHTML={{

@@ -250,6 +250,7 @@ html[data-stripped] {
   --mono: ui-monospace, monospace;
   --ground-ink: #ffffff;
   --on-ground-ink: #000000;
+  --on-outro: #000000;
   --wordmark: #000000;
   --wordmark-deep: transparent;
 }

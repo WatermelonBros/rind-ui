@@ -52,13 +52,23 @@ export function Outro() {
       y = e.clientY
       if (!frame) frame = requestAnimationFrame(paint)
     }
-    // the title fills as it rises from the foot of the screen to its upper third
+    // the title fills once it is well on screen, by itself over a moment: tied to the scroll it
+    // rested half grey wherever the reader stopped (the page's foot came before it was full)
     let scrolled = 0
+    let shown = 0
+    let target = 0
+    let tween = 0
+    const step = () => {
+      shown += (target - shown) * 0.12
+      if (Math.abs(target - shown) < 0.005) shown = target
+      t.style.setProperty("--fill", shown.toFixed(3))
+      tween = shown === target ? 0 : requestAnimationFrame(step)
+    }
     const fillIn = () => {
       scrolled = 0
       const r = t.getBoundingClientRect()
-      const k = (window.innerHeight - r.top) / (window.innerHeight * 0.7)
-      t.style.setProperty("--fill", String(Math.min(1, Math.max(0, k))))
+      target = r.top < window.innerHeight * 0.8 ? 1 : 0
+      if (!tween && shown !== target) tween = requestAnimationFrame(step)
     }
     const onScroll = () => {
       if (!scrolled) scrolled = requestAnimationFrame(fillIn)
@@ -73,6 +83,7 @@ export function Outro() {
       window.removeEventListener("scroll", onScroll)
       cancelAnimationFrame(frame)
       cancelAnimationFrame(scrolled)
+      cancelAnimationFrame(tween)
     }
   }, [])
 

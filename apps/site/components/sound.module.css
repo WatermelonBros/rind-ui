@@ -23,7 +23,8 @@
 .bars i:nth-child(4) {
   --delay: 0.36s;
 }
-/* hovered while off, or waiting in the invite, the line ripples: the bars want to move */
+/* hovered while off, or asking (sound-invite.tsx), the line ripples: the bars want to move */
+:global(html[data-sound-ask]) .bars i,
 .bars[data-idle] i {
   animation: bars-wait 0.9s ease-in-out var(--delay, 0s) infinite;
 }
@@ -41,116 +42,5 @@
 @keyframes bars-wait {
   50% {
     scale: 1 0.45;
-  }
-}
-
-/* sound-invite.tsx: the landing's one question, hung under the nav's sound toggle (the script
-   sets where), its point on the toggle */
-.invite {
-  position: fixed;
-  inset-block-start: var(--invite-top, 80px);
-  inset-inline-end: var(--invite-end, 16px);
-  z-index: 60;
-  inline-size: fit-content;
-  max-inline-size: calc(100% - 32px);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px 14px;
-  padding: 10px 10px 10px 20px;
-  border: var(--bw) solid var(--line);
-  border-radius: var(--btn-r);
-  background: var(--card);
-  color: var(--ink);
-  box-shadow: var(--shadow);
-  font: 600 14px var(--mono);
-  animation: invite-in 0.7s var(--spring) both;
-  transform-origin: calc(100% - var(--invite-point, 40px)) 0;
-}
-.invite::before {
-  content: "";
-  position: absolute;
-  inset-block-start: -7px;
-  inset-inline-end: calc(var(--invite-point, 40px) - 7px);
-  inline-size: 12px;
-  block-size: 12px;
-  rotate: 45deg;
-  background: inherit;
-  border-block-start: var(--bw) solid var(--line);
-  border-inline-start: var(--bw) solid var(--line);
-}
-/* in the bar (desktop): its point turns to the toggle on its right */
-.invite[data-in-bar] {
-  padding-block: 6px;
-  box-shadow: var(--shadow-sm);
-  transform-origin: 100% 50%;
-}
-.invite[data-in-bar]::before {
-  inset-block-start: calc(50% - 6px);
-  inset-inline-end: -7px;
-  border-block-start: var(--bw) solid var(--line);
-  border-inline-start: 0;
-  border-inline-end: var(--bw) solid var(--line);
-}
-.invite p {
-  margin: 0;
-}
-.invite button {
-  min-block-size: 40px;
-  padding: 0 16px;
-  border: var(--bw) solid var(--line);
-  border-radius: var(--btn-r);
-  font: inherit;
-  cursor: pointer;
-}
-.inviteOn {
-  background: var(--ink);
-  color: var(--card);
-}
-.inviteOff {
-  background: transparent;
-  color: var(--ink);
-}
-:global([data-phase="juicy"]) .inviteOn {
-  background: var(--acc);
-  color: var(--on-acc);
-  box-shadow: 0 4px 0 var(--acc-deep);
-}
-:global([data-phase="juicy"]) .inviteOff {
-  background: var(--muted);
-}
-/* on a phone, one short row under the bar */
-.short {
-  display: none;
-}
-@media (max-width: 760px) {
-  .invite {
-    flex-wrap: nowrap;
-    gap: 8px;
-    padding: 6px 6px 6px 14px;
-    font-size: 13px;
-  }
-  .long {
-    display: none;
-  }
-  .short {
-    display: inline;
-  }
-  .invite button {
-    min-block-size: 36px;
-    padding: 0 12px;
-    white-space: nowrap;
-  }
-}
-@keyframes invite-in {
-  from {
-    opacity: 0;
-    scale: 0.6;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .invite {
-    animation: none;
   }
 }

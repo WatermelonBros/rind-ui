@@ -197,9 +197,13 @@ export function Tested() {
       setDriving(null)
       return
     }
+    // framed whole: an accordion's trigger opening its panel under a frame drawn round the
+    // trigger alone struck the panel's first line through
+    const framed =
+      target.closest<HTMLElement>('[data-scope="accordion"][data-part="item"]') ?? target
     const frame = () => {
       const s = root.getBoundingClientRect()
-      const r = target.getBoundingClientRect()
+      const r = framed.getBoundingClientRect()
       const z = zoom()
       setDriving({
         x: (r.left - s.left) / z,
@@ -210,8 +214,13 @@ export function Tested() {
       })
     }
     frame()
+    // again once a panel the line opened has finished growing
     const later = window.setTimeout(frame, 320)
-    return () => window.clearTimeout(later)
+    const settled = window.setTimeout(frame, 720)
+    return () => {
+      window.clearTimeout(later)
+      window.clearTimeout(settled)
+    }
   }, [line, run])
   const playRef = useRef<() => void>(() => {})
   const autoRan = useRef(false)

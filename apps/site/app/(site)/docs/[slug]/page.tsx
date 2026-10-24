@@ -32,20 +32,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : {}
 }
 
-/** "Ships for React, Vue and Svelte", from the packages; one still unreleased says so. */
+/** The names in a sentence: "React", "React and Vue", "React, Vue and Svelte". */
+function names(list: readonly { readonly id: string; readonly name: string }[]) {
+  return list.map((f, i) => (
+    <span key={f.id}>
+      {i > 0 ? (i === list.length - 1 ? " and " : ", ") : null}
+      <b>{f.name}</b>
+    </span>
+  ))
+}
+
+/** "Ships for React, Vue and Svelte · Solid and Angular soon", from the packages. */
 function Ships({ slug }: { readonly slug: string }) {
   const ships = frameworks().filter((f) => f.components.includes(slug))
+  const out = ships.filter((f) => f.ready)
+  const soon = ships.filter((f) => !f.ready)
   if (ships.length === 0) return null
   return (
     <p className={styles.ships}>
-      Ships for{" "}
-      {ships.map((f, i) => (
-        <span key={f.id}>
-          {i > 0 ? (i === ships.length - 1 ? " and " : ", ") : null}
-          <b>{f.name}</b>
-          {f.ready ? null : " (not released yet)"}
-        </span>
-      ))}
+      {out.length > 0 ? <>Ships for {names(out)}</> : null}
+      {out.length > 0 && soon.length > 0 ? " · " : null}
+      {soon.length > 0 ? <>{names(soon)} soon</> : null}
     </p>
   )
 }

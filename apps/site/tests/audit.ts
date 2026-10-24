@@ -431,6 +431,33 @@ for (const url of urls) {
   }
   await page.close()
 }
+// the home wearing each of the builder's ready skins on the whole page (any-look.tsx: a shared
+// link, #skin=<id>, puts it on): every skin a visitor can wear must still pass axe. In the
+// second shard, the first carries the home's own walk and the intro
+if (shard === Math.min(2, shards)) {
+  const ids = [
+    ...readFileSync(join(root, "components/home/skins.ts"), "utf8").matchAll(/id: "([a-z0-9-]+)"/g),
+  ].map((m) => m[1] ?? "")
+  for (const id of ids) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
+    // still: the scenes rest in their final states, so what is measured is what is read
+    await page.emulateMedia({ reducedMotion: "reduce" })
+    const url = `/#skin=${id}`
+    try {
+      await page.goto(base + url, { waitUntil: "domcontentloaded", timeout: 60_000 })
+      await page.waitForSelector("html[data-worn]", { state: "attached", timeout: 30_000 })
+      const height = await page.evaluate(() => document.body.scrollHeight)
+      for (let y = 0; y < height; y += 600) {
+        await page.evaluate((top) => window.scrollTo(0, top), y)
+        await frames(page)
+      }
+      await axe(page, url, id)
+    } catch (e) {
+      report(url, "audit", e instanceof Error ? e.message : String(e))
+    }
+    await page.close()
+  }
+}
 // the examples harness: every example of index.json is exported in every skin and renders
 // alone, with no site stylesheet on the unstyled skin
 if (shard === shards) {

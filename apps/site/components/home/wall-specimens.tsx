@@ -297,7 +297,7 @@ const Wave = createContext<number | null>(null)
 const STEP_MS = 2000
 
 /** Six ready components, alive: use them, and watch the attribute a stylesheet would target. */
-export function WallSpecimens({ ready }: { readonly ready: number }) {
+export function WallSpecimens() {
   // the wave advances one skin every two seconds while the list is on screen (a scroll-driven
   // wave changed too fast to read); it holds while the pointer or focus is on a card, so a
   // card can be used in one skin. Under reduced motion every card keeps the site's skin.
@@ -470,9 +470,9 @@ export function WallSpecimens({ ready }: { readonly ready: number }) {
         {/* the wall's last tile: the rest of the catalogue, one step away */}
         <li className={styles.wallMore}>
           <MorphLink href="/docs/">
-            <b>{ready} ready</b>
+            <b>Browse them all</b>
             <span>
-              Every one with its spec, tests, driver and docs <span aria-hidden="true">→</span>
+              Each with its spec, tests, driver and docs <span aria-hidden="true">→</span>
             </span>
           </MorphLink>
         </li>
