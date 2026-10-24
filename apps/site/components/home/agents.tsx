@@ -151,7 +151,8 @@ function Preview({ kind, text, done }: { kind: HeroKind; text: string; done: boo
     const on =
       el?.getAttribute("aria-checked") === "true" || el?.getAttribute("data-state") === "checked"
     if (el && !on) el.click()
-    window.dispatchEvent(new Event("rind:agents-driven"))
+    // once React has rendered the new state, so the object reads it, not the old one
+    window.setTimeout(() => window.dispatchEvent(new Event("rind:agents-driven")), 60)
     cue("ding")
   }, [acted])
   useEffect(() => {

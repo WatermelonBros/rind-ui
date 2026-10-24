@@ -8,7 +8,7 @@
 - [x] 1.6 Hydration tests: Vue (`renderToString` + `createSSRApp`), Svelte (server + client bundles of a fixture)
 - [x] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck` (their scripts), changesets
 - [x] 1.7b Size budgets for the two packages (scripts/size.mjs)
-- [ ] 1.8 Docs: installation for Vue and Svelte; each component's docs page lists the frameworks that ship it
+- [x] 1.8 Docs: installation for Vue and Svelte; each component's docs page lists the frameworks that ship it
 - [x] 1.9 Tell the site agent when the first component is on main (exports are the source of truth)
 
 - [x] 1.10 DOM parity: `canonicalHtml` (@rind-ui/testing) and per-package parity helpers render each scenario in React and in the adapter and compare the markup
@@ -92,5 +92,5 @@
 
 ## 3. Close
 
-- [ ] 3.1 `pnpm typecheck`, `pnpm test`, `pnpm lint`, builds, size check pass
+- [x] 3.1 `pnpm typecheck`, `pnpm test`, `pnpm lint`, builds, size check pass
 - [ ] 3.2 Review (two passes), archive, `docs/components.md` notes Vue/Svelte parity

@@ -15,6 +15,8 @@
   border-radius: 99px;
 }
 .h2 {
+  /* no word left alone on its last line */
+  text-wrap: balance;
   font: 900 clamp(38px, 5.6vw, 84px) / 0.95 var(--display);
   letter-spacing: -0.035em;
   margin: 18px 0 18px;
@@ -479,17 +481,39 @@
   transition: background 0.5s var(--spring);
 }
 /* any-look.tsx: the preview's head, a profile */
+/* the preview's head is a poster in the skin's own fill and display face, so a skin is seen at
+   the scale of a page, not only in its controls */
 .lookWho {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  border: var(--skin-border, 0px) solid var(--skin-brand);
+  border-radius: calc(var(--skin-radius, 12px) * 1.4);
+  background: var(--skin-fill);
+  color: var(--skin-fill-text);
+  box-shadow: var(--skin-shadow);
 }
 .lookWho > span {
   display: grid;
+  gap: 4px;
+}
+.lookWho b {
+  font: 800 clamp(26px, 3vw, 44px) / 1 var(--skin-heading);
+  letter-spacing: -0.02em;
+  text-transform: var(--skin-case);
 }
 .lookWho small {
-  opacity: 0.85;
+  font: 600 13px var(--skin-font);
+}
+.lookWho [data-scope="avatar"][data-part="root"] {
+  inline-size: 64px;
+  block-size: 64px;
+  font-size: 22px;
+}
+.lookWho [data-scope="badge"][data-part="root"] {
+  margin-inline-start: auto;
 }
 .lookGrid {
   display: grid;
@@ -708,11 +732,18 @@
 .testCode code {
   white-space: pre;
 }
-/* a phone keeps each line whole and scrolls the file sideways (lines wrapped at their spaces
-   read as code knocked out of its indent) */
+/* a phone wraps a long line under itself, hung two characters in so it still reads as the
+   same line (scrolled sideways, its end was simply cut off at the screen's edge) */
 @media (max-width: 600px) {
   .testCode li {
     font-size: 12px;
+  }
+  .testCode code {
+    display: inline-block;
+    padding-inline-start: 2ch;
+    text-indent: -2ch;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 }
 /* PASS: lines go green one after the other, then the banner pops with a little burst */
@@ -1163,6 +1194,8 @@
   translate: 0 -4px;
 }
 .wallMore b {
+  /* no word left alone on its last line */
+  text-wrap: balance;
   font: 900 clamp(34px, 3.4vw, 56px) / 1 var(--display);
   letter-spacing: -0.02em;
 }
@@ -1427,6 +1460,8 @@
   padding: 80px 56px 104px;
 }
 .outroTitle {
+  /* no word left alone on its last line */
+  text-wrap: balance;
   position: relative;
   display: grid;
   font: 900 clamp(44px, 8vw, 128px) / 0.92 var(--display);
@@ -2433,14 +2468,110 @@ g:not([data-plugged]) > .pulse {
 }
 
 /* agents.tsx on a phone: the assistant's message takes the thread's whole width (at the skin's
-   85% it left a strip of empty frame), and its code keeps whole lines, scrolling sideways inside
-   the focusable transcript instead of breaking tokens */
+   85% it left a strip of empty frame), and its code wraps where it must (scrolled sideways, its
+   tags were cut mid-word at the edge) */
 @media (max-width: 600px) {
   .agentsStage .agentsThread [data-scope="message-thread"][data-part="message"] {
     max-inline-size: 100%;
   }
   .agentsStage .agentsThread [data-scope="streaming-message"][data-part="content"] {
-    white-space: pre;
-    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow-x: visible;
+    mask-image: none;
+    font-size: 12px;
   }
+}
+
+/* the display titles and their leads stand over the travelling object (skin-scene.module.css:
+   its canvas is at 30): crossing them, it passes behind the type, depth instead of a sticker
+   over it */
+@media (min-width: 901px) {
+  .h2,
+  .lead,
+  .outroTitle {
+    position: relative;
+    z-index: 31;
+  }
+  /* a reveal's transform makes its own stack, so the copy it holds is lifted with it (only a
+     block of copy: never one that holds the controls the object lands on) */
+  :global([data-scroll-reveal]):has(> .h2):not(:has([data-object-dock], [data-part="control"])) {
+    position: relative;
+    z-index: 31;
+  }
+}
+
+/* the sections do not all speak from the left: the install is one centred assembly, the wall's
+   title runs the width of the page (desktop) */
+@media (min-width: 901px) {
+  .section[aria-labelledby="install-title"] :is(.h2, .lead) {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section[aria-labelledby="install-title"] .h2 {
+    max-width: 18ch;
+  }
+  .section[aria-labelledby="wall-title"] .h2 {
+    max-width: none;
+    font-size: clamp(56px, 8.2vw, 132px);
+    letter-spacing: -0.045em;
+  }
+}
+
+/* the builder's own switch on a worn skin: its thumb is never the same white as its track (on, it
+   is the ground on the ink track; off, the ink on the faint track) */
+:global(html[data-worn]) :is(.lookPresets, .lookControls) [data-scope="switch"][data-part="thumb"] {
+  background: var(--skin-ink);
+}
+:global(html[data-worn])
+  :is(.lookPresets, .lookControls)
+  [data-scope="switch"][data-part="thumb"][data-state="checked"] {
+  background: var(--skin-surface);
+}
+
+/* inside the agents' window the thread is one of its panes: no frame of its own, whose edge cut
+   into the browser pane beside it */
+.agentsStage > .agentsThread[data-scope="message-thread"][data-part="root"] {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* the Colour tab (any-look.tsx): the brand's ramp from the ground up, and its contrast, measured */
+.ramp {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  block-size: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ramp i {
+  background: color-mix(in oklab, var(--b) var(--k), var(--s-card, #fff));
+}
+.checks {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 600 12px var(--mono);
+}
+.checks li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--s-line, #d4d4d8);
+  border-radius: 8px;
+}
+.checks small {
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--s-muted, #f4f4f5);
+  font: inherit;
+}
+.checks li[data-pass] small {
+  background: var(--s-ink, #18181b);
+  color: var(--s-bg, #fff);
 }
