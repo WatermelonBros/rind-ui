@@ -31,11 +31,14 @@ export function Sidebar({
   const [picked, pick] = useFramework("react")
   const current =
     frameworks.find((f) => f.id === picked && f.ready) ?? frameworks.find((f) => f.ready)
-  // the component pages the chosen framework has not got yet (React has them all)
+  // the component pages the chosen framework has not got yet (React has them all); a recipe
+  // (Aspect Ratio: a page with no component, not even React's) is there in every framework
+  const react = frameworks.find((f) => f.id === "react")
   const missing = (slug: string, group: string) =>
     group === "Components" &&
     current !== undefined &&
     current.id !== "react" &&
+    react?.components.includes(slug) === true &&
     !current.components.includes(slug)
   const [query, setQuery] = useState("")
   const q = query.trim().toLowerCase()
