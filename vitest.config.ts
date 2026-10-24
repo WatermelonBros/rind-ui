@@ -2,6 +2,7 @@ import { availableParallelism } from "node:os"
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import vue from "@vitejs/plugin-vue"
 import { playwright } from "@vitest/browser-playwright"
+import solid from "vite-plugin-solid"
 import { defineConfig } from "vitest/config"
 
 // Workspace packages resolve to their TypeScript sources (see the `@rind-ui/source`
@@ -52,6 +53,8 @@ const ciRetry = process.env["CI"] ? 1 : 0
 // `*.test.ts`: machines, graphs — no DOM. `*.dom.test.tsx`: driver tests that run
 // unchanged in jsdom (through @rind-ui/testing/setup) and in real browsers.
 const dom = ["packages/*/{src,fixtures}/**/*.dom.test.{ts,tsx}"]
+// @rind-ui/angular's tests need the Angular compiler: its own projects (below) run them.
+const angularOwn = ["packages/angular/**", "**/node_modules/**"]
 
 // Locally the machine is shared by several sessions: at most half the cores per run unless
 // RIND_MAX_WORKERS says otherwise, so parallel runs do not starve each other. CI unchanged.
@@ -65,10 +68,15 @@ const maxWorkers = process.env["CI"]
 // machine (several sessions, CI) needs more than Vitest's 1 s default.
 const patient = { poll: { timeout: 5000 } }
 
-// Compiles @rind-ui/svelte's components and fixtures (`.svelte`, `.svelte.ts`) and the Vue
-// examples' single-file components (`.vue`); inline projects inherit it. Other files pass
-// through untouched.
-const plugins = [svelte({ configFile: false, compilerOptions: { dev: true } }), vue()]
+// Compiles @rind-ui/svelte's components and fixtures (`.svelte`, `.svelte.ts`), the Vue
+// examples' single-file components (`.vue`) and @rind-ui/solid's JSX (babel-preset-solid, only
+// under packages/solid: every other `.tsx` keeps the React transform); inline projects inherit
+// it. Other files pass through untouched.
+const plugins = [
+  svelte({ configFile: false, compilerOptions: { dev: true } }),
+  vue(),
+  solid({ include: ["packages/solid/**/*.{tsx,jsx}"], hot: false, dev: true }),
+]
 
 export default defineConfig({
   // The adapters' example tests render the site's React examples, whose tsconfig keeps JSX
@@ -77,9 +85,24 @@ export default defineConfig({
   plugins,
   resolve,
   ssr,
+  // Declared up front: found mid-run on a cold cache (CI), a dependency makes Vite re-optimise
+  // and reload the browser tests ("Vite unexpectedly reloaded a test"). Solid's runtime entries,
+  // and React's JSX runtimes (an explicit list stops Vite discovering them in time).
+  optimizeDeps: {
+    include: [
+      "solid-js",
+      "solid-js/web",
+      "solid-js/store",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+    ],
+  },
   test: {
     ...(maxWorkers === undefined ? {} : { maxWorkers }),
     projects: [
+      // @rind-ui/angular, compiled ahead of time by Analog's plugin, in jsdom and real browsers.
+      "packages/angular/vitest.config.ts",
+      "packages/angular/vitest.browser.config.ts",
       {
         resolve,
         ssr,
@@ -113,6 +136,7 @@ export default defineConfig({
           // Globals let Testing Library and @rind-ui/testing/setup register afterEach.
           globals: true,
           include: dom,
+          exclude: angularOwn,
           setupFiles: [
             "packages/testing/src/setup.ts",
             "packages/testing/src/warning-guard.setup.ts",
@@ -156,6 +180,7 @@ export default defineConfig({
           expect: patient,
           // `*.browser.test.*`: needs real input (vitest/browser's userEvent), browser only.
           include: [...dom, "packages/*/{src,fixtures}/**/*.browser.test.{ts,tsx}"],
+          exclude: angularOwn,
           browser: browser("browser", classicScrollbars),
           retry: ciRetry,
           globals: true,

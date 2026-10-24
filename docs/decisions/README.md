@@ -18,6 +18,7 @@ by a new record that supersedes it, not by silently editing history.
 | [0011](0011-site-examples.md) | Site examples replace Storybook (supersedes the Storybook half of 0004) | accepted |
 | [0012](0012-site-webgl-ogl.md) | OGL for the landing's WebGL scene (site only) | accepted |
 | [0013](0013-vue-svelte-adapters.md) | Vue and Svelte adapters, one component at a time to parity | accepted |
+| [0014](0014-solid-angular-adapters.md) | Solid and Angular adapters, one component at a time to parity, one release | accepted |
 | [0008](0008-dom-accessibility-api.md) | `dom-accessibility-api` in @rind-ui/testing | accepted |
 
 Decisions say *why*. Behaviour — what a component SHALL do — is specified in

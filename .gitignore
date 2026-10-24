@@ -20,7 +20,8 @@ packages/theme/tokens.manifest.json
 packages/theme/src/builder/components.generated.ts
 # svelte-check's generated TypeScript (--tsgo).
 .svelte-check/
-# Hydration tests' server and client bundles (packages/svelte/fixtures/ssr.ts).
+# Hydration tests' server and client bundles (packages/{svelte,solid}/fixtures/ssr.ts).
 packages/svelte/.ssr/
+packages/solid/.ssr/
 # svelte-package's working directory.
 .svelte-kit/

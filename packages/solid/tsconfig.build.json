@@ -1,0 +1,6 @@
+{
+  "//": "Declarations for the package source only (no tests, fixtures or examples).",
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.test-d.ts", "src/**/*.test-d.tsx"]
+}
