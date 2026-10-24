@@ -374,6 +374,12 @@
   min-block-size: 280px;
   padding: 16px;
 }
+/* a phone stacks the rack under the preview: a steady height there is only an empty box */
+@media (max-width: 760px) {
+  .rackPanel[data-part] {
+    min-block-size: 0;
+  }
+}
 .tuneGroup {
   display: flex;
   flex-wrap: wrap;

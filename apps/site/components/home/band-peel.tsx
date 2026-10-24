@@ -12,11 +12,14 @@ import { zoom } from "../zoom"
  * of it is left (--peel, from the band's top) and whether its edge shows (--lip), in a style
  * sheet of its own: the bands are React's, and may still be hydrating (each section is its own
  * Suspense boundary), so their attributes are never touched. A strip of tape is heard as each
- * one starts. Never under reduced motion: the bands are simply there.
+ * one starts. Never under reduced motion nor on a phone: the bands are simply there.
  */
 export function BandPeel() {
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    // not on a phone: a full-width sheet repainted every frame lagged and its curl smeared
+    // between sections (the bands simply meet there)
+    if (window.matchMedia("(max-width: 760px), (pointer: coarse)").matches) return
     const bands = [...document.querySelectorAll<HTMLElement>("[data-band][data-from]")]
     const started = new WeakSet<HTMLElement>()
     // how far each sheet is shown peeled: it never goes back once started, and once the page

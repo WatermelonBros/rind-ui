@@ -439,7 +439,11 @@ export function mountSkin(
     canvas,
     alpha: true,
     premultipliedAlpha: false,
-    dpr: Math.min(window.devicePixelRatio, 1.5),
+    // a phone raymarches the full-screen canvas at 1x: at 1.5 it dropped frames while scrolling
+    dpr: Math.min(
+      window.devicePixelRatio,
+      window.matchMedia("(pointer: coarse)").matches ? 1 : 1.5,
+    ),
     webgl: 2,
   })
   if (!renderer.isWebgl2) return null
