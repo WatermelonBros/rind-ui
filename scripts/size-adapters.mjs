@@ -1,16 +1,17 @@
-// Per-component bundle budgets for @rind-ui/vue and @rind-ui/svelte (vue-svelte-adapters
-// 1.7b): what a consumer downloads when it imports one component from its subpath. Each is
+// Per-component bundle budgets for @rind-ui/vue, @rind-ui/svelte, @rind-ui/solid and @rind-ui/angular
+// (vue-svelte-adapters 1.7b, solid-angular-adapters 1.8): what a consumer downloads when it imports one component from its subpath. Each is
 // bundled the way Vite would in production (Rolldown, minified; the framework external, core
-// bundled; `.svelte` compiled for the client), gzipped and checked against
+// bundled; `.svelte` compiled for the client; Solid's DOM build, the `default` condition; Angular's partial compilation as published, before the
+// application's linker), gzipped and checked against
 // size-budgets-adapters.json (every subpath needs one). Runs after the package's build.
-// `node scripts/size-adapters.mjs <vue|svelte> --report` prints the sizes without failing.
+// `node scripts/size-adapters.mjs <vue|svelte|solid|angular> --report` prints the sizes without failing.
 import { readFileSync } from "node:fs"
 import { createRequire } from "node:module"
 import { gzipSync } from "node:zlib"
 
 const framework = process.argv[2]
-if (framework !== "vue" && framework !== "svelte") {
-  console.error("usage: node scripts/size-adapters.mjs <vue|svelte> [--report]")
+if (!["vue", "svelte", "solid", "angular"].includes(framework)) {
+  console.error("usage: node scripts/size-adapters.mjs <vue|svelte|solid|angular> [--report]")
   process.exit(2)
 }
 const report = process.argv.includes("--report")
@@ -18,12 +19,18 @@ const dir = new URL(`../packages/${framework}/`, import.meta.url).pathname
 const require = createRequire(dir)
 // Rolldown is core's dev dependency (as in size.mjs); the compiler is the package's own.
 const { rolldown } = createRequire(new URL("../packages/core/", import.meta.url))("rolldown")
-const budgets = JSON.parse(
-  readFileSync(new URL("size-budgets-adapters.json", import.meta.url), "utf8"),
-)[framework]
+const budgets =
+  JSON.parse(readFileSync(new URL("size-budgets-adapters.json", import.meta.url), "utf8"))[
+    framework
+  ] ?? {}
 const pkg = JSON.parse(readFileSync(`${dir}package.json`, "utf8"))
 
-const external = framework === "vue" ? [/^vue($|\/)/] : [/^svelte($|\/)/, /^esm-env/]
+const external = {
+  vue: [/^vue($|\/)/],
+  svelte: [/^svelte($|\/)/, /^esm-env/],
+  solid: [/^solid-js($|\/)/],
+  angular: [/^@angular\//, /^rxjs/],
+}[framework]
 const plugins = [
   {
     name: "entry",

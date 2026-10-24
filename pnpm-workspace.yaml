@@ -3,11 +3,27 @@ packages:
   - apps/*
 
 # pnpm 11 asks which dependencies may run install scripts. esbuild ships its binary as a
-# per-platform optional dependency, so its postinstall is not needed.
+# per-platform optional dependency, so its postinstall is not needed. @angular/build's
+# file watcher and cache (@parcel/watcher, lmdb, msgpackr-extract) ship prebuilt binaries too, and
+# @rind-ui/angular's tests use neither.
 allowBuilds:
+  '@parcel/watcher': false
   esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+
+# @angular/compiler-cli 22 and @angular/build bring @babel/core 8, whose @babel/types 8 needs
+# @babel/helper-string-parser 8.0.8, younger than the release-age gate.
+minimumReleaseAgeExclude:
+  - '@babel/helper-string-parser@8.0.8'
 
 # Next 15.5 pins postcss 8.4.31, which has known advisories (GHSA-fxqj-rqcc-2cmp and others);
 # 8.5.28 is the patched line. Scoped to Next so nothing else moves.
 overrides:
   "next>postcss": 8.5.28
+
+# Analog's Angular plugin imports typescript without declaring it; the root TS 7 has no JS API.
+packageExtensions:
+  '@analogjs/vite-plugin-angular':
+    peerDependencies:
+      typescript: '*'
