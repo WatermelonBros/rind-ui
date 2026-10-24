@@ -141,11 +141,23 @@
       "svelte": "./dist/link/index.js",
       "default": "./dist/link/index.js"
     },
+    "./marquee": {
+      "@rind-ui/source": "./src/marquee/index.ts",
+      "types": "./dist/marquee/index.d.ts",
+      "svelte": "./dist/marquee/index.js",
+      "default": "./dist/marquee/index.js"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.ts",
       "svelte": "./dist/meter/index.js",
       "default": "./dist/meter/index.js"
+    },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.ts",
+      "svelte": "./dist/number-input/index.js",
+      "default": "./dist/number-input/index.js"
     },
     "./pagination": {
       "@rind-ui/source": "./src/pagination/index.ts",
@@ -153,17 +165,41 @@
       "svelte": "./dist/pagination/index.js",
       "default": "./dist/pagination/index.js"
     },
+    "./pin-input": {
+      "@rind-ui/source": "./src/pin-input/index.ts",
+      "types": "./dist/pin-input/index.d.ts",
+      "svelte": "./dist/pin-input/index.js",
+      "default": "./dist/pin-input/index.js"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
       "svelte": "./dist/progress/index.js",
       "default": "./dist/progress/index.js"
     },
+    "./qr-code": {
+      "@rind-ui/source": "./src/qr-code/index.ts",
+      "types": "./dist/qr-code/index.d.ts",
+      "svelte": "./dist/qr-code/index.js",
+      "default": "./dist/qr-code/index.js"
+    },
     "./radio-group": {
       "@rind-ui/source": "./src/radio-group/index.ts",
       "types": "./dist/radio-group/index.d.ts",
       "svelte": "./dist/radio-group/index.js",
       "default": "./dist/radio-group/index.js"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.ts",
+      "svelte": "./dist/rating/index.js",
+      "default": "./dist/rating/index.js"
+    },
+    "./scroll-area": {
+      "@rind-ui/source": "./src/scroll-area/index.ts",
+      "types": "./dist/scroll-area/index.d.ts",
+      "svelte": "./dist/scroll-area/index.js",
+      "default": "./dist/scroll-area/index.js"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -183,11 +219,35 @@
       "svelte": "./dist/skeleton/index.js",
       "default": "./dist/skeleton/index.js"
     },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.ts",
+      "svelte": "./dist/slider/index.js",
+      "default": "./dist/slider/index.js"
+    },
+    "./splitter": {
+      "@rind-ui/source": "./src/splitter/index.ts",
+      "types": "./dist/splitter/index.d.ts",
+      "svelte": "./dist/splitter/index.js",
+      "default": "./dist/splitter/index.js"
+    },
+    "./stepper": {
+      "@rind-ui/source": "./src/stepper/index.ts",
+      "types": "./dist/stepper/index.d.ts",
+      "svelte": "./dist/stepper/index.js",
+      "default": "./dist/stepper/index.js"
+    },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
       "types": "./dist/switch/index.d.ts",
       "svelte": "./dist/switch/index.js",
       "default": "./dist/switch/index.js"
+    },
+    "./table-of-contents": {
+      "@rind-ui/source": "./src/table-of-contents/index.ts",
+      "types": "./dist/table-of-contents/index.d.ts",
+      "svelte": "./dist/table-of-contents/index.js",
+      "default": "./dist/table-of-contents/index.js"
     },
     "./tabs": {
       "@rind-ui/source": "./src/tabs/index.ts",
@@ -200,6 +260,12 @@
       "types": "./dist/text-field/index.d.ts",
       "svelte": "./dist/text-field/index.js",
       "default": "./dist/text-field/index.js"
+    },
+    "./timeline": {
+      "@rind-ui/source": "./src/timeline/index.ts",
+      "types": "./dist/timeline/index.d.ts",
+      "svelte": "./dist/timeline/index.js",
+      "default": "./dist/timeline/index.js"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -339,25 +405,55 @@
         "svelte": "./dist/link/index.js",
         "default": "./dist/link/index.js"
       },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.ts",
+        "svelte": "./dist/marquee/index.js",
+        "default": "./dist/marquee/index.js"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.ts",
         "svelte": "./dist/meter/index.js",
         "default": "./dist/meter/index.js"
+      },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.ts",
+        "svelte": "./dist/number-input/index.js",
+        "default": "./dist/number-input/index.js"
       },
       "./pagination": {
         "types": "./dist/pagination/index.d.ts",
         "svelte": "./dist/pagination/index.js",
         "default": "./dist/pagination/index.js"
       },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.ts",
+        "svelte": "./dist/pin-input/index.js",
+        "default": "./dist/pin-input/index.js"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.ts",
         "svelte": "./dist/progress/index.js",
         "default": "./dist/progress/index.js"
       },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.ts",
+        "svelte": "./dist/qr-code/index.js",
+        "default": "./dist/qr-code/index.js"
+      },
       "./radio-group": {
         "types": "./dist/radio-group/index.d.ts",
         "svelte": "./dist/radio-group/index.js",
         "default": "./dist/radio-group/index.js"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.ts",
+        "svelte": "./dist/rating/index.js",
+        "default": "./dist/rating/index.js"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.ts",
+        "svelte": "./dist/scroll-area/index.js",
+        "default": "./dist/scroll-area/index.js"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.ts",
@@ -374,10 +470,30 @@
         "svelte": "./dist/skeleton/index.js",
         "default": "./dist/skeleton/index.js"
       },
+      "./slider": {
+        "types": "./dist/slider/index.d.ts",
+        "svelte": "./dist/slider/index.js",
+        "default": "./dist/slider/index.js"
+      },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.ts",
+        "svelte": "./dist/splitter/index.js",
+        "default": "./dist/splitter/index.js"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.ts",
+        "svelte": "./dist/stepper/index.js",
+        "default": "./dist/stepper/index.js"
+      },
       "./switch": {
         "types": "./dist/switch/index.d.ts",
         "svelte": "./dist/switch/index.js",
         "default": "./dist/switch/index.js"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.ts",
+        "svelte": "./dist/table-of-contents/index.js",
+        "default": "./dist/table-of-contents/index.js"
       },
       "./tabs": {
         "types": "./dist/tabs/index.d.ts",
@@ -388,6 +504,11 @@
         "types": "./dist/text-field/index.d.ts",
         "svelte": "./dist/text-field/index.js",
         "default": "./dist/text-field/index.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.ts",
+        "svelte": "./dist/timeline/index.js",
+        "default": "./dist/timeline/index.js"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",

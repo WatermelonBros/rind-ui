@@ -44,17 +44,17 @@
 - [x] 2.27 Toolbar
 - [x] 2.28 Breadcrumbs
 - [x] 2.29 Pagination
-- [ ] 2.30 Rating
-- [ ] 2.31 Slider
-- [ ] 2.32 Number Input
-- [ ] 2.33 Pin Input
-- [ ] 2.34 Splitter
-- [ ] 2.35 Stepper
-- [ ] 2.36 Timeline
-- [ ] 2.37 Table Of Contents
-- [ ] 2.38 Scroll Area
-- [ ] 2.39 Marquee
-- [ ] 2.40 Qr Code
+- [x] 2.30 Rating
+- [x] 2.31 Slider
+- [x] 2.32 Number Input
+- [x] 2.33 Pin Input
+- [x] 2.34 Splitter
+- [x] 2.35 Stepper
+- [x] 2.36 Timeline
+- [x] 2.37 Table Of Contents
+- [x] 2.38 Scroll Area
+- [x] 2.39 Marquee
+- [x] 2.40 Qr Code
 - [ ] 2.41 Clipboard
 - [ ] 2.42 Code Block
 - [ ] 2.43 Form

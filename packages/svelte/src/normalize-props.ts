@@ -2,10 +2,14 @@ import type { PartProps } from "@rind-ui/core"
 import { neutralName } from "@rind-ui/core/internal"
 import type { HTMLAttributes } from "svelte/elements"
 
+/** A declaration's property name: camelCase keys (`flexDirection`) hyphenated, custom properties kept. */
+const property = (key: string) =>
+  key.startsWith("--") ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
+
 const styleString = (style: object) =>
   Object.entries(style)
     .filter(([, v]) => v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${k}: ${String(v)}`)
+    .map(([k, v]) => `${property(k)}: ${String(v)}`)
     .join("; ")
 
 /**

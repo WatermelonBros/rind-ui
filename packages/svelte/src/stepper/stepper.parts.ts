@@ -1,0 +1,13 @@
+// The Stepper namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Content } from "./stepper-content.svelte"
+export { default as Description } from "./stepper-description.svelte"
+export { default as Indicator } from "./stepper-indicator.svelte"
+export { default as Item } from "./stepper-item.svelte"
+export { default as List } from "./stepper-list.svelte"
+export { default as NextTrigger } from "./stepper-next-trigger.svelte"
+export { default as PrevTrigger } from "./stepper-prev-trigger.svelte"
+export { default as Progress } from "./stepper-progress.svelte"
+export { default as Root } from "./stepper-root.svelte"
+export { default as Separator } from "./stepper-separator.svelte"
+export { default as Title } from "./stepper-title.svelte"
+export { default as Trigger } from "./stepper-trigger.svelte"

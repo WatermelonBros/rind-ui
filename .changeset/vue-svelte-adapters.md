@@ -10,7 +10,7 @@ ARIA and drivers as `@rind-ui/react`; components are ported one at a time (this 
 Button, Separator, Kbd, Badge, Heading, Label, Link, Skeleton, Progress, Meter, Avatar, Image,
 Alert, Toggle Group, Fieldset, Field, Text Field, Checkbox, Checkbox Group, Switch, Visually
 Hidden, Radio Group, Segmented Control, Collapsible, Accordion, Tabs, Toolbar, Breadcrumbs,
-Pagination; Rating in Vue). `@rind-ui/core/internal` gains
+Pagination, Rating, Slider, Number Input, Pin Input, Splitter, Stepper, Timeline, Table of Contents, Scroll Area, Marquee, QR Code). `@rind-ui/core/internal` gains
 the framework-neutral helpers the adapters share; `@rind-ui/testing` exports `canonicalHtml` to
 compare a component's markup across frameworks. Every `@rind-ui` library package now ships at
 one version (a Changesets fixed group).

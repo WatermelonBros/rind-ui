@@ -3,9 +3,9 @@
 // framework spells the incidentals differently (comment markers, attribute order, style
 // whitespace, the shape of generated ids), so both sides are reduced to one canonical form.
 
-/** Attributes whose values may contain generated ids (a toolbar control's key is its id). */
+/** Attributes whose values may contain generated ids (a toolbar control's key is its id, a radio group's default name holds its instance). */
 const ID_REFS =
-  /^(id|for|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
+  /^(id|for|name|data-key|aria-(labelledby|describedby|controls|owns|activedescendant|details|errormessage|flowto))$/
 
 /**
  * A canonical rendering of `html` (or of `node`'s children): comments and whitespace-only text
@@ -51,6 +51,8 @@ export function canonicalHtml(html: string | Node): string {
     const pad = "  ".repeat(depth)
     if (!(node instanceof Element)) return
     const attrs = Array.from(node.attributes)
+      // Hover follows wherever the pointer rests (a previous test's last move), not the markup.
+      .filter(({ name }) => name !== "data-hover" && name !== "data-hovering")
       .map(({ name, value }) => {
         if (name === "style") {
           const style = (node as HTMLElement).style
