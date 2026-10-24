@@ -11,6 +11,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | Module | Quirks |
 |---|---|
 | `packages/angular/src/meter/meter.ts` | `nvda-progressbar-name` |
+| `packages/angular/src/number-input/number-input.ts` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/angular/src/progress/progress.ts` | `nvda-progressbar-name` |
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/combobox.machine.ts` | `vo-activedescendant` |
@@ -177,7 +178,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/numberfield/useNumberField.ts>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`, `packages/solid/src/number-input/number-input.tsx`, `packages/svelte/src/number-input/api.svelte.ts`, `packages/vue/src/date-field/date-field.ts`, `packages/vue/src/number-input/number-input.ts`
+- Checked in: `packages/angular/src/number-input/number-input.ts`, `packages/react/src/date-field/date-field.tsx`, `packages/react/src/number-input/number-input.tsx`, `packages/solid/src/number-input/number-input.tsx`, `packages/svelte/src/number-input/api.svelte.ts`, `packages/vue/src/date-field/date-field.ts`, `packages/vue/src/number-input/number-input.ts`
 - Last verified: 2026-10-14
 - Remove when: a device test shows iOS VoiceOver focusing and editing an <input role="spinbutton">
 
@@ -185,7 +186,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/issues/5731>, <https://github.com/chakra-ui/ark/issues/3500>
 - Repro test: `packages/core/src/dom/quirks-input.test.ts`
-- Checked in: `packages/react/src/number-input/number-input.tsx`, `packages/solid/src/number-input/number-input.tsx`, `packages/vue/src/number-input/number-input.ts`
+- Checked in: `packages/angular/src/number-input/number-input.ts`, `packages/react/src/number-input/number-input.tsx`, `packages/solid/src/number-input/number-input.tsx`, `packages/vue/src/number-input/number-input.ts`
 - Last verified: 2026-10-14
 - Remove when: touch decimal keypads follow the field's lang or inputmode locale
 

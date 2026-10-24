@@ -58,6 +58,11 @@
       "types": "./dist/badge/index.d.ts",
       "default": "./dist/badge/index.js"
     },
+    "./breadcrumbs": {
+      "@rind-ui/source": "./src/breadcrumbs/index.ts",
+      "types": "./dist/breadcrumbs/index.d.ts",
+      "default": "./dist/breadcrumbs/index.js"
+    },
     "./button": {
       "@rind-ui/source": "./src/button/index.ts",
       "types": "./dist/button/index.d.ts",
@@ -118,6 +123,16 @@
       "types": "./dist/meter/index.d.ts",
       "default": "./dist/meter/index.js"
     },
+    "./number-input": {
+      "@rind-ui/source": "./src/number-input/index.ts",
+      "types": "./dist/number-input/index.d.ts",
+      "default": "./dist/number-input/index.js"
+    },
+    "./pagination": {
+      "@rind-ui/source": "./src/pagination/index.ts",
+      "types": "./dist/pagination/index.d.ts",
+      "default": "./dist/pagination/index.js"
+    },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
       "types": "./dist/progress/index.d.ts",
@@ -127,6 +142,11 @@
       "@rind-ui/source": "./src/radio-group/index.ts",
       "types": "./dist/radio-group/index.d.ts",
       "default": "./dist/radio-group/index.js"
+    },
+    "./rating": {
+      "@rind-ui/source": "./src/rating/index.ts",
+      "types": "./dist/rating/index.d.ts",
+      "default": "./dist/rating/index.js"
     },
     "./segmented-control": {
       "@rind-ui/source": "./src/segmented-control/index.ts",
@@ -142,6 +162,11 @@
       "@rind-ui/source": "./src/skeleton/index.ts",
       "types": "./dist/skeleton/index.d.ts",
       "default": "./dist/skeleton/index.js"
+    },
+    "./slider": {
+      "@rind-ui/source": "./src/slider/index.ts",
+      "types": "./dist/slider/index.d.ts",
+      "default": "./dist/slider/index.js"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -167,6 +192,11 @@
       "@rind-ui/source": "./src/toggle-group/index.ts",
       "types": "./dist/toggle-group/index.d.ts",
       "default": "./dist/toggle-group/index.js"
+    },
+    "./toolbar": {
+      "@rind-ui/source": "./src/toolbar/index.ts",
+      "types": "./dist/toolbar/index.d.ts",
+      "default": "./dist/toolbar/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -224,6 +254,10 @@
         "types": "./dist/badge/index.d.ts",
         "default": "./dist/badge/index.js"
       },
+      "./breadcrumbs": {
+        "types": "./dist/breadcrumbs/index.d.ts",
+        "default": "./dist/breadcrumbs/index.js"
+      },
       "./button": {
         "types": "./dist/button/index.d.ts",
         "default": "./dist/button/index.js"
@@ -272,6 +306,14 @@
         "types": "./dist/meter/index.d.ts",
         "default": "./dist/meter/index.js"
       },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.ts",
+        "default": "./dist/number-input/index.js"
+      },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.ts",
+        "default": "./dist/pagination/index.js"
+      },
       "./progress": {
         "types": "./dist/progress/index.d.ts",
         "default": "./dist/progress/index.js"
@@ -279,6 +321,10 @@
       "./radio-group": {
         "types": "./dist/radio-group/index.d.ts",
         "default": "./dist/radio-group/index.js"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.ts",
+        "default": "./dist/rating/index.js"
       },
       "./segmented-control": {
         "types": "./dist/segmented-control/index.d.ts",
@@ -291,6 +337,10 @@
       "./skeleton": {
         "types": "./dist/skeleton/index.d.ts",
         "default": "./dist/skeleton/index.js"
+      },
+      "./slider": {
+        "types": "./dist/slider/index.d.ts",
+        "default": "./dist/slider/index.js"
       },
       "./switch": {
         "types": "./dist/switch/index.d.ts",
@@ -311,6 +361,10 @@
       "./toggle-group": {
         "types": "./dist/toggle-group/index.d.ts",
         "default": "./dist/toggle-group/index.js"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.ts",
+        "default": "./dist/toolbar/index.js"
       },
       "./package.json": "./package.json"
     }

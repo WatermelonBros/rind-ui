@@ -79,6 +79,29 @@ behaviour (a Text Field Root composing a Field) SHALL do it through a host direc
 - **WHEN** a template renders `<button rindToggleGroupItem value="b">` outside any group
 - **THEN** creating it throws an error that names `rindToggleGroupRoot` and `rindToggleRoot`
 
+### Requirement: The Element Picks The Part
+
+An element never changes its tag in Angular, so a part React renders as one element or another
+by state or props SHALL be one directive per element, the consumer writing the element the state
+asks for: a Pagination page or trigger SHALL be a Button on `<button>` and a Link on `<a>` (with
+the Root's `getPageHref`), and the current crumb without `href` SHALL be
+`<span rindBreadcrumbsCurrent>` (React's text span) where a linked crumb is
+`<a rindBreadcrumbsLink>`. The state the choice reads SHALL be readable from the template
+(`#i="rindBreadcrumbsItem"`, `i.state().current`); focus SHALL move to the new element when the
+focused one is replaced.
+
+#### Scenario: Pagination with links
+
+- **WHEN** a Pagination Root has `getPageHref` and its pages are `<a rindPaginationPage>`
+- **THEN** each page is a link to its `getPageHref` value, the current one `aria-current="page"`,
+  and the markup matches React's
+
+#### Scenario: The current crumb
+
+- **WHEN** the last Item has no `href` and its template renders `<span rindBreadcrumbsCurrent>`
+  for `i.state().current`
+- **THEN** it is a focusable `<span aria-current="page">`, as React renders it
+
 ### Requirement: Binding Connect Output
 
 One binder per element SHALL apply connect's props through `Renderer2`: attributes set and

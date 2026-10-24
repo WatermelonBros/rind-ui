@@ -1,0 +1,18 @@
+export {
+  Slider,
+  type SliderChangeDetails,
+  type SliderChangeEvent,
+  type SliderCommitEvent,
+  SliderControl,
+  SliderDescription,
+  SliderIndicator,
+  SliderLabel,
+  SliderMarker,
+  SliderMarkerGroup,
+  SliderRoot,
+  type SliderState,
+  SliderThumb,
+  SliderTrack,
+  type SliderValue,
+  SliderValueText,
+} from "./slider"

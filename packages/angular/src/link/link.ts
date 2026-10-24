@@ -25,6 +25,7 @@ import {
   warnLinkFallback,
 } from "@rind-ui/core"
 import { bindProps, joinHandlers } from "../bind-props"
+import { CONTROL_OVERRIDE } from "../hosted-control"
 import { injectRootId } from "../ids"
 import { injectHover, injectModality, injectPress } from "../inject-press"
 import { injectEnvironment } from "../provider"
@@ -84,12 +85,22 @@ export class Link {
     const env = injectEnvironment()
     const el: HTMLElement = inject(ElementRef).nativeElement
     const tag = el.tagName.toLowerCase()
-    const instance = injectRootId(() => this.id())
+    // Composed by another part (a Toolbar's Link, a Breadcrumbs Link): it decides these.
+    const control = inject(CONTROL_OVERRIDE, { optional: true, self: true })
+    const disabled = () => control?.source.disabled?.() ?? this.disabled()
+    const keepsFocus = () =>
+      control?.source.focusableWhenDisabled
+        ? control.source.focusableWhenDisabled()
+        : this.focusableWhenDisabled()
+    const ownId = () => (control?.source.id ? control.source.id() : this.id())
+    const current = () => (control?.source.current ? control.source.current() : this.current())
+    const href = () => (control?.source.href ? control.source.href() : this.href())
+    const instance = injectRootId(ownId)
     // Unknown on the server and while hydrating, so both renders agree on data-external.
     const origin = signal<string | undefined>(undefined)
     const focused = signal(false)
     const input_ = computed<LinkInput>(() => ({
-      href: this.href(),
+      href: href(),
       target: this.target(),
       rel: this.rel(),
       download: this.download(),
@@ -97,27 +108,27 @@ export class Link {
       referrerPolicy: this.referrerpolicy(),
       hrefLang: this.hreflang(),
       routerOptions: this.routerOptions(),
-      disabled: this.disabled(),
-      focusableWhenDisabled: this.focusableWhenDisabled(),
-      current: this.current(),
+      disabled: disabled(),
+      focusableWhenDisabled: keepsFocus(),
+      current: current(),
       onActivate: (details) => this.activate.emit(details),
       origin: origin(),
       tag,
     }))
     const press = injectPress({
       env,
-      disabled: () => this.disabled(),
+      disabled: () => disabled(),
       send: (e) => {
         // A native anchor activates through its own click; the fallback through the routine.
         if (e.type === "PRESS" && tag !== "a") activateLink(input_(), el, e, env)
       },
     })
-    const hover = injectHover({ env, disabled: () => this.disabled(), send: () => {} })
+    const hover = injectHover({ env, disabled: () => disabled(), send: () => {} })
     const modality = injectModality(env.modality, focused)
     const focus = computed(() => focusAttrs(focused(), modality()))
     this.state = computed<LinkState>(() => ({
-      disabled: this.disabled(),
-      current: this.current() !== undefined && this.current() !== false,
+      disabled: disabled(),
+      current: current() !== undefined && current() !== false,
       pressed: press.pressed(),
       hovered: hover.hovered(),
       focusVisible: focus()["data-focus-visible"] !== undefined,
@@ -135,7 +146,7 @@ export class Link {
           hover.props,
           { onFocusIn: () => focused.set(true), onFocusOut: () => focused.set(false) },
         ),
-        ...(this.id() === undefined ? {} : { id: this.id() }),
+        ...(ownId() === undefined ? {} : { id: ownId() }),
       }),
       {
         owns: [
@@ -163,7 +174,7 @@ export class Link {
         el,
         "click",
         (e: Event) => {
-          if (this.disabled()) e.stopImmediatePropagation()
+          if (disabled()) e.stopImmediatePropagation()
         },
         { capture: true },
       ),

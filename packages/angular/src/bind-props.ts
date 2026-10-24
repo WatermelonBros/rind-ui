@@ -241,13 +241,19 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
     }
     attrs = nextAttrs
     if (!browser) {
-      // The server's DOM (domino) drops style values it does not parse (`clip: rect(0 0 0 0)`):
-      // the server writes the declarations as one attribute, after the consumer's.
-      const own = Object.entries(style ?? {}).filter(([, v]) => v !== undefined && v !== null)
-      if (own.length > 0) {
-        const css = own.map(([k, v]) => `${k}: ${String(v)}`).join("; ")
-        const before = statics.get("style")
-        set("style", before ? `${before}; ${css}` : css)
+      // Each declaration as a property, beside the consumer's (static or bound). The server's
+      // DOM (domino) drops values it does not parse (`clip: rect(0 0 0 0)`): those are
+      // appended to the attribute as text.
+      const dropped: string[] = []
+      for (const [k, v] of Object.entries(style ?? {})) {
+        if (v === undefined || v === null) continue
+        renderer.setStyle(el, k, String(v), flags(k))
+        const kept = (el as HTMLElement).style?.getPropertyValue(k)
+        if (!kept) dropped.push(`${k}: ${String(v)}`)
+      }
+      if (dropped.length > 0) {
+        const now = el.getAttribute("style")
+        set("style", now ? `${now}; ${dropped.join("; ")}` : dropped.join("; "))
       }
       if (ready) for (const event of handlers.keys()) listen(event)
       return
@@ -277,7 +283,11 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
       // `value` / `checked` attribute (as React writes them) and keep what the user typed.
       if (key.startsWith("default")) {
         if (!(key in attrs)) renderer.setProperty(el, key, value)
-      } else renderer.setProperty(el, key, value)
+        return
+      }
+      renderer.setProperty(el, key, value)
+      // React syncs an input's value to its `value` attribute as well (its markup carries it).
+      if (key === "value" && el.tagName === "INPUT") set("value", String(value))
       return
     }
     // A textarea's initial value is its content, on the server as in React's markup.

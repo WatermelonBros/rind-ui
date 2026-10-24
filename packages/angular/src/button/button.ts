@@ -27,6 +27,7 @@ import {
 } from "@rind-ui/core"
 import { bindProps, joinHandlers } from "../bind-props"
 import { injectFieldsetDisabled } from "../fieldset/context"
+import { CONTROL_OVERRIDE } from "../hosted-control"
 import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectHover, injectModality, injectPress } from "../inject-press"
@@ -80,7 +81,13 @@ export class Button {
     const env = injectEnvironment(announcerCapability)
     const el: HTMLElement = inject(ElementRef).nativeElement
     const tag = el.tagName.toLowerCase()
-    const instance = injectRootId(() => this.id())
+    // Composed by another part (a Toolbar's Button): it decides these.
+    const control = inject(CONTROL_OVERRIDE, { optional: true, self: true })
+    const ownDisabled = () => control?.source.disabled?.() ?? this.disabled()
+    const keepsFocus = () =>
+      control?.source.focusableWhenDisabled?.() ?? this.focusableWhenDisabled()
+    const ownId = () => (control?.source.id ? control.source.id() : this.id())
+    const instance = injectRootId(ownId)
     const messages = injectMessages("button", buttonMessages, () => this.messages())
     // A rind-ui Fieldset's injection reaches portalled parts; the DOM tracker native fieldsets.
     const fieldsetContext = injectFieldsetDisabled()
@@ -88,7 +95,7 @@ export class Button {
       buttonMachine,
       () => ({
         // The machine guards activation on it as on the input.
-        disabled: this.disabled() || fieldsetContext(),
+        disabled: ownDisabled() || fieldsetContext(),
         pending: this.pending(),
         onPress: (d: ButtonPressDetails) => this.press.emit(d),
         onPressStart: (d: ButtonPressDetails) => this.pressStart.emit(d),
@@ -99,7 +106,7 @@ export class Button {
       env,
     )
     const disabled = computed(
-      () => this.disabled() || view().context.fieldsetDisabled || fieldsetContext(),
+      () => ownDisabled() || view().context.fieldsetDisabled || fieldsetContext(),
     )
     // Server and hydration render without it, like React's server snapshot.
     const origin = signal<string | undefined>(undefined)
@@ -136,7 +143,7 @@ export class Button {
               href: this.href(),
               origin: origin(),
               disabled: disabled(),
-              focusableWhenDisabled: this.focusableWhenDisabled(),
+              focusableWhenDisabled: keepsFocus(),
               pending: this.pending(),
               type: this.type(),
               focused: focused(),
@@ -154,7 +161,7 @@ export class Button {
             onFocusOut: () => send(blurEvent(env.modality)),
           },
         ),
-        ...(this.id() === undefined ? {} : { id: this.id() }),
+        ...(ownId() === undefined ? {} : { id: ownId() }),
       }),
       {
         owns: [

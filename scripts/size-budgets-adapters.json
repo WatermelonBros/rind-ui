@@ -185,6 +185,7 @@
     "alert": 15,
     "avatar": 13,
     "badge": 4,
+    "breadcrumbs": 18,
     "button": 17,
     "checkbox": 21,
     "checkbox-group": 24,
@@ -197,15 +198,20 @@
     "label": 8,
     "link": 13,
     "meter": 13,
+    "number-input": 37,
+    "pagination": 23,
     "progress": 14,
     "radio-group": 29,
+    "rating": 19,
     "segmented-control": 29,
     "separator": 4,
     "skeleton": 12,
+    "slider": 24,
     "switch": 21,
     "tabs": 27,
     "text-field": 30,
     "toggle": 15,
-    "toggle-group": 25
+    "toggle-group": 25,
+    "toolbar": 28
   }
 }
