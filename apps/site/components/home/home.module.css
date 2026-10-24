@@ -723,10 +723,15 @@
   mask-image: linear-gradient(90deg, #000 88%, transparent);
   font: 500 13px / 1.55 var(--mono);
 }
+/* the ring goes round the bubble, not the text inside its padding */
 .agentsThread [data-scope="streaming-message"][data-part="content"]:focus-visible {
-  outline: 3px solid var(--acc);
-  outline-offset: 2px;
+  outline: none;
   mask-image: none;
+}
+.agentsThread
+  [data-scope="message-thread"][data-part="message"]:has([data-part="content"]:focus-visible) {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
 }
 @media (max-width: 900px) {
   .agents {

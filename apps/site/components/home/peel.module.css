@@ -40,6 +40,18 @@
   font: 500 clamp(17px, 1.5vw, 22px) / 1.5 var(--text);
   max-width: 26ch;
 }
+/* peel.tsx: the control's opening tag, live, under the copy */
+.markup {
+  margin: 28px 0 0;
+  padding-inline-start: 16px;
+  border-inline-start: 3px solid currentColor;
+  font: 500 clamp(12px, 0.95vw, 15px) / 1.65 var(--mono);
+  white-space: pre;
+}
+/* the values in bold, in the copy's own colour: the brand green is under 3:1 on juicy's pink */
+.markup b {
+  font-weight: 800;
+}
 
 .scene {
   position: relative;
@@ -175,6 +187,10 @@
   }
   .text {
     font-size: 16px;
+  }
+  /* a phone's column has no room under the copy: the chips say it */
+  .markup {
+    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {

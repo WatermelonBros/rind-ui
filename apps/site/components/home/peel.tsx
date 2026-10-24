@@ -53,6 +53,7 @@ export function Peel() {
   const [kind, setKind] = useState<HeroKind>("switch")
   const heroOn = useHeroOn()
   const [attrs, setAttrs] = useState<readonly string[]>([])
+  const [tag, setTag] = useState("button")
   useEffect(() => setKind(heroKind()), [])
 
   // The hero's 3D object travels here and stands over this scene's real control (skin-scene.tsx):
@@ -142,6 +143,7 @@ export function Peel() {
     const host = control.current
     const el = host?.querySelector<HTMLElement>('[data-part="control"], button')
     if (!el) return
+    setTag(el.tagName.toLowerCase())
     const read = () =>
       setAttrs(
         [...el.attributes]
@@ -179,6 +181,7 @@ export function Peel() {
             <Letters>{ACTS[act]?.title ?? ""}</Letters>
           </h2>
           <p className={styles.text}>{ACTS[act]?.text}</p>
+          <Markup tag={tag} attrs={attrs} />
         </div>
         {/* the same copy in paper, clipped by the ink disc: every letter reads on both grounds */}
         <div className={styles.inkLayer} aria-hidden="true">
@@ -187,6 +190,7 @@ export function Peel() {
               <Letters>{ACTS[act]?.title ?? ""}</Letters>
             </p>
             <p className={styles.text}>{ACTS[act]?.text}</p>
+            <Markup tag={tag} attrs={attrs} />
           </div>
         </div>
 
@@ -272,5 +276,30 @@ export function Peel() {
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * The control's opening tag as it is in the DOM right now: the copy's "as attributes", shown,
+ * and it changes as the machine takes its transition. The chips say the same: hidden from
+ * assistive technology.
+ */
+function Markup({ tag, attrs }: { tag: string; attrs: readonly string[] }) {
+  if (attrs.length === 0) return null
+  return (
+    <pre className={styles.markup} aria-hidden="true">
+      {`<${tag}`}
+      {attrs.map((a) => {
+        const eq = a.indexOf("=")
+        return (
+          <span key={a.slice(0, eq < 0 ? undefined : eq)}>
+            {"\n  "}
+            {eq < 0 ? a : a.slice(0, eq + 1)}
+            {eq < 0 ? null : <b>{a.slice(eq + 1)}</b>}
+          </span>
+        )
+      })}
+      {">"}
+    </pre>
   )
 }

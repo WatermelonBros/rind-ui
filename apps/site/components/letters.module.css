@@ -34,7 +34,7 @@
   /* enough to read as a swell, not so much that a letter reaches the line above or its
      neighbour */
   35% {
-    scale: 1.1 1.16;
+    scale: 1.03 1.14;
     translate: 0 -0.03em;
   }
   65% {
@@ -51,7 +51,7 @@
   /* enough to read as a swell, not so much that a letter reaches the line above or its
      neighbour */
   35% {
-    scale: 1.1 1.16;
+    scale: 1.03 1.14;
     translate: 0 -0.03em;
   }
   65% {
@@ -66,7 +66,7 @@
     transform: skewX(0deg);
   }
   50% {
-    transform: skewX(-14deg) translateX(0.04em);
+    transform: skewX(-10deg);
   }
   100% {
     transform: skewX(0deg);
@@ -77,7 +77,7 @@
     transform: skewX(0deg);
   }
   50% {
-    transform: skewX(-14deg) translateX(0.04em);
+    transform: skewX(-10deg);
   }
   100% {
     transform: skewX(0deg);

@@ -129,6 +129,12 @@
     color: var(--rind-color-text-disabled);
     cursor: default;
   }
+  /* a pointer drag reorders on the drop: until then the arrows describe the old order */
+  :where(
+    [data-scope="sortable"][data-state="dragging"] [data-scope="sortable"][data-part="move-button"]
+  ) {
+    color: var(--rind-color-text-disabled);
+  }
 
   @media (forced-colors: active) {
     :where([data-scope="sortable"][data-part="item"][data-active]) {
