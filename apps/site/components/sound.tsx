@@ -20,7 +20,14 @@ import { ambient } from "./ambient"
 // sent into a short room, so it has depth rather than beeping. Quiet music plays under it. Only what the visitor does
 // makes a sound (plus the explicit cues): the page's own demos stay quiet.
 
-type Cue = "on" | "off" | "phase" | "pass" | "unlock"
+type Cue = "on" | "off" | "phase" | "pass" | "unlock" | "whoosh" | "slam"
+
+/** Where a cue sounds (-1 left to 1 right) and, for the voices that read it, how far along a
+ *  sequence it is (0 to 1): a slam rises a step with each framework that lands. */
+interface CueOptions {
+  readonly pan?: number
+  readonly value?: number
+}
 
 interface SoundValue {
   readonly enabled: boolean
@@ -38,13 +45,13 @@ export function useSound(): SoundValue {
 }
 
 /** Ask for a cue from anywhere (a passing test, say) without importing the provider. */
-export const cue = (name: Cue) =>
-  window.dispatchEvent(new CustomEvent("rind:cue", { detail: name }))
+export const cue = (name: Cue, options: CueOptions = {}) =>
+  window.dispatchEvent(new CustomEvent("rind:cue", { detail: { name, ...options } }))
 
 const juicy = () => document.documentElement.dataset["phase"] === "juicy"
 
 /** Where an element is across the screen, as a stereo position (kept off the hard edges). */
-const panOf = (el: Element | null) => {
+export const panOf = (el: Element | null) => {
   if (!el) return 0
   const r = el.getBoundingClientRect()
   return Math.max(-1, Math.min(1, ((r.left + r.width / 2) / innerWidth) * 2 - 1)) * 0.6
@@ -128,7 +135,7 @@ function voice(ac: AudioContext, out: Engine, pan: number) {
     src.start(now)
     return f
   }
-  return { now, tone, noise }
+  return { now, tone, noise, panner }
 }
 
 // the voices, by what happened: each component kind has its own, in both phases
@@ -147,7 +154,7 @@ type Voice =
   | "appear"
 
 function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value = 0.5) {
-  const { now, tone, noise } = voice(ac, out, pan)
+  const { now, tone, noise, panner } = voice(ac, out, pan)
   const soft = juicy()
   // a little variation every time, so repeated sounds never ring like a machine gun
   const jitter = 1 + (Math.random() - 0.5) * 0.06
@@ -278,6 +285,38 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       ;[2637, 3136, 3520, 4186, 3951].forEach((f, k) => {
         tone("sine", f, f * 0.98, 0.38 + k * 0.06, 0.3, 0.025)
       })
+      return
+    }
+    case "whoosh": {
+      // something big flying past: a band of air swept up and down again, travelling from the
+      // left of the stereo field to the right as it goes
+      const length = 1.1
+      const band = noise(length, soft ? 0.34 : 0.3, "bandpass", 400)
+      band.Q.value = 0.9
+      band.frequency.setValueAtTime(260, now)
+      band.frequency.exponentialRampToValueAtTime(1900, now + length * 0.45)
+      band.frequency.exponentialRampToValueAtTime(500, now + length)
+      panner.pan.setValueAtTime(-0.9, now)
+      panner.pan.linearRampToValueAtTime(0.7, now + length)
+      tone("sine", 70, 120, 0, length * 0.8, 0.1)
+      return
+    }
+    case "slam": {
+      // a framework hitting the stage: a kick that drops, a crack on top and a note of a riff
+      // that climbs with each one that lands (value: how far along the line it is); a rubbery
+      // wobble in juicy, a metal clang in crisp
+      tone("sine", 165, 38, 0, 0.42, 0.62)
+      noise(0.09, soft ? 0.32 : 0.5, "lowpass", soft ? 1400 : 3200)
+      const scale = [0, 3, 5, 7, 10, 12, 15]
+      const n = scale[Math.min(scale.length - 1, Math.round(value * (scale.length - 1)))] ?? 0
+      const f = (soft ? 196 : 247) * 2 ** (n / 12)
+      if (soft) {
+        tone("sine", f * 1.5, f, 0.01, 0.32, 0.22)
+        tone("triangle", f * 2, f * 2.02, 0.02, 0.22, 0.05)
+      } else {
+        tone("square", f * 2, f * 1.96, 0.005, 0.18, 0.06, { type: "lowpass", frequency: 3800 })
+        tone("triangle", f * 4.02, f * 3.98, 0.005, 0.32, 0.04)
+      }
       return
     }
     case "phase": {
@@ -440,8 +479,8 @@ export function SoundProvider({ children }: { children: ReactNode }) {
     const phase = new MutationObserver(() => play(context, out, "phase"))
     phase.observe(document.documentElement, { attributes: true, attributeFilter: ["data-phase"] })
     const onCue = (e: Event) => {
-      const name = (e as CustomEvent<Cue>).detail
-      if (name) play(context, out, name)
+      const detail = (e as CustomEvent<CueOptions & { name: Cue }>).detail
+      if (detail?.name) play(context, out, detail.name, detail.pan ?? 0, detail.value ?? 0.5)
     }
     const drag = (e: PointerEvent) => {
       if (e.buttons) touched()

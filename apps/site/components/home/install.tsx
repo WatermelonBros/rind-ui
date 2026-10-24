@@ -4,7 +4,7 @@ import { Clipboard, ToggleGroup } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { stateWord, upcoming } from "@/lib/framework-status"
 import { Letters } from "../letters"
-import { cue } from "../sound"
+import { cue, panOf } from "../sound"
 import { LOGOS } from "./framework-logos"
 import { handoff } from "./handoff"
 import styles from "./home.module.css"
@@ -122,6 +122,120 @@ function celebrate(from: Element, terminal: HTMLElement | null) {
   window.setTimeout(() => layer.remove(), 2800)
 }
 
+/**
+ * The frameworks arrive: a convoy flies in from the left of the screen, React at its head and
+ * the others in its wake, swings up over the stage and drops, one after another, each into its
+ * own socket with a slam (a squash, a puff of dust, the stage shaken, a "bam"). `landed` hears
+ * each one as it hits, `done` the last. Returns the timers to clear if the page leaves first.
+ */
+function assemble(
+  stage: HTMLElement,
+  landed: (id: string) => void,
+  done: () => void,
+): readonly number[] {
+  const slots = [...stage.querySelectorAll<HTMLElement>("[data-socket]")]
+  const FLY = 1250
+  const GAP = 190
+  const HIT = 0.78
+  cue("whoosh")
+  stage.removeAttribute("data-await")
+  return slots.flatMap((socket, i) => {
+    const slot = socket.parentElement
+    if (!slot) return []
+    const r = slot.getBoundingClientRect()
+    // all from one point off the screen's left edge, so the convoy is a line: React first and in
+    // front, each after it a little smaller and behind (they peel off to their sockets from there)
+    const fromX = -260 - r.left
+    const fromY = -180 - (r.top - stage.getBoundingClientRect().top)
+    const size = 1.25 - i * 0.07
+    slot.style.zIndex = String(slots.length - i)
+    slot.style.transformOrigin = "50% 100%"
+    slot.animate(
+      [
+        {
+          transform: `translate(${fromX}px, ${fromY}px) rotate(-26deg) scale(${size})`,
+          easing: "cubic-bezier(.12,.62,.32,1)",
+        },
+        // hanging over its socket for a breath, then dropping like a weight
+        {
+          transform: `translate(${-24 + i * 6}px, -250px) rotate(9deg) scale(1.08)`,
+          offset: 0.56,
+          easing: "cubic-bezier(.55,0,.95,.45)",
+        },
+        { transform: "translate(0, 0) scale(1.24, 0.72)", offset: HIT, easing: "ease-out" },
+        { transform: "translate(0, -20px) scale(0.93, 1.09)", offset: 0.9, easing: "ease-in-out" },
+        { transform: "none" },
+      ],
+      { duration: FLY, delay: i * GAP, fill: "backwards" },
+    )
+    const last = i === slots.length - 1
+    return [
+      window.setTimeout(
+        () => {
+          cue("slam", { pan: panOf(slot), value: i / Math.max(1, slots.length - 1) })
+          landed(socket.dataset["socket"] ?? "")
+          // each hit harder than the last
+          const d = 4 + i * 2
+          stage.animate(
+            [
+              { translate: "0 0" },
+              { translate: `${i % 2 ? -d / 2 : d / 2}px ${d}px` },
+              { translate: `0 ${-d / 2}px` },
+              { translate: "0 0" },
+            ],
+            { duration: 260, easing: "ease-out" },
+          )
+          puff(slot)
+          if (last) done()
+        },
+        i * GAP + FLY * HIT,
+      ),
+    ]
+  })
+}
+
+/** A ring of dust and a few crumbs, kicked up where a socket lands. */
+function puff(slot: HTMLElement) {
+  const ring = document.createElement("i")
+  ring.className = styles.dust ?? ""
+  ring.setAttribute("aria-hidden", "true")
+  slot.append(ring)
+  ring
+    .animate(
+      [
+        { transform: "translateX(-50%) scale(0.3, 0.3)", opacity: 0.85 },
+        { transform: "translateX(-50%) scale(2.4, 1)", opacity: 0 },
+      ],
+      { duration: 620, easing: "cubic-bezier(.1,.7,.3,1)" },
+    )
+    .finished.then(
+      () => ring.remove(),
+      () => ring.remove(),
+    )
+  for (let k = 0; k < 8; k++) {
+    const bit = document.createElement("i")
+    bit.className = styles.crumb ?? ""
+    bit.setAttribute("aria-hidden", "true")
+    slot.append(bit)
+    const side = k % 2 ? 1 : -1
+    const dx = side * (40 + Math.random() * 90)
+    const up = 30 + Math.random() * 70
+    bit
+      .animate(
+        [
+          { transform: "translate(0, 0) scale(1)", opacity: 1 },
+          { transform: `translate(${dx * 0.6}px, ${-up}px) scale(0.9)`, opacity: 1, offset: 0.4 },
+          { transform: `translate(${dx}px, 6px) scale(0.4)`, opacity: 0 },
+        ],
+        { duration: 560 + Math.random() * 200, easing: "cubic-bezier(.2,.6,.4,1)" },
+      )
+      .finished.then(
+        () => bit.remove(),
+        () => bit.remove(),
+      )
+  }
+}
+
 /** Each package manager's own way of adding a package. */
 const ADD = { npm: "npm i", pnpm: "pnpm add", yarn: "yarn add", bun: "bun add" } as const
 type PackageManager = keyof typeof ADD
@@ -228,6 +342,41 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
     document.fonts?.ready.then(draw)
     return () => ro.disconnect()
   }, [])
+  // the sockets the frameworks have landed in, while they arrive (null: all of them, as the page
+  // is drawn: no motion, no observer, or the stage already on screen)
+  const [plugged, setPlugged] = useState<ReadonlySet<string> | null>(null)
+  useEffect(() => {
+    const el = stage.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    // reloaded with the stage already in view or passed: it stays as it is
+    if (el.getBoundingClientRect().top < window.innerHeight) return
+    el.toggleAttribute("data-await", true)
+    setPlugged(new Set())
+    let timers: readonly number[] = []
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return
+        io.disconnect()
+        timers = assemble(
+          el,
+          (id) => setPlugged((p) => new Set(p).add(id)),
+          () => {
+            setPlugged(null)
+            setCheer((n) => n + 1)
+          },
+        )
+      },
+      // the whole row of sockets on screen, so every landing is seen, not under the fold
+      { threshold: 1 },
+    )
+    io.observe(el.querySelector("ul") ?? el)
+    return () => {
+      io.disconnect()
+      for (const t of timers) clearTimeout(t)
+      el.removeAttribute("data-await")
+    }
+  }, [])
   useEffect(() => {
     const el = rig.current
     if (
@@ -281,9 +430,11 @@ export function Install({ frameworks }: { readonly frameworks: readonly InstallF
                     key={c.id}
                     data-ready={f?.ready ? "" : undefined}
                     data-picked={pick === c.id ? "" : undefined}
+                    data-plugged={!plugged || plugged.has(c.id) ? "" : undefined}
                     style={{ "--brand": LOGOS[c.id]?.color } as CSSProperties}
                   >
-                    <path className={styles.cable} d={c.d} />
+                    <path className={styles.cable} d={c.d} pathLength={100} />
+                    {f?.ready && <path className={styles.gloss} d={c.d} pathLength={100} />}
                     {f?.ready && <path className={styles.pulse} d={c.d} pathLength={100} />}
                   </g>
                 )
