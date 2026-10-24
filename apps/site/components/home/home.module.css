@@ -878,11 +878,14 @@
 }
 
 /* ── agents: a replayed session, streaming into a real Message Thread ───────────────── */
+/* the copy over a wide window: the agent's thread on the left, the page it builds on the right
+   (agents.tsx), so the section reads as one session at work, not one more heading and card */
 .agents {
   display: grid;
-  grid-template-columns: 5fr 7fr;
-  gap: 56px;
-  align-items: center;
+  gap: 24px;
+}
+.agents > :first-child {
+  max-inline-size: 760px;
 }
 .agentsActs {
   display: flex;
@@ -908,54 +911,123 @@
 }
 .agentsStage {
   display: grid;
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-inline-size: 0;
+  margin-block-start: 24px;
+  border: var(--bw) solid var(--line);
+  border-radius: calc(var(--r) * 1.2);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
-/* what the reply's code renders: its dialog's content, live, under the thread (agents.tsx); it
-   comes up once the reply is complete */
-.agentsRender {
+.agentsStage > :first-child {
+  border-inline-end: var(--bw) solid var(--line);
+}
+/* the page the reply builds: a browser's bar, the page, the driver's status at its foot */
+.agentsPreview {
   display: grid;
-  gap: 8px;
+  grid-template-rows: auto 1fr auto;
   margin: 0;
-  justify-items: start;
+  min-inline-size: 0;
+  background: var(--muted);
 }
-.agentsRender figcaption {
-  font: 600 11px var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+.previewBar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 16px;
+  border-block-end: var(--bw) solid var(--line);
+  background: var(--card);
+}
+.previewBar i {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--ink) 18%, transparent);
+}
+.previewBar span {
+  flex: 1;
+  margin-inline-start: 10px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: var(--muted);
+  font: 600 12px var(--mono);
+}
+.previewPage {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 28px;
+  padding: 40px 24px;
+}
+.previewTrigger {
+  justify-self: start;
 }
 .agentsDialog {
   display: grid;
   gap: 14px;
   justify-items: start;
-  min-inline-size: min(320px, 100%);
-  padding: 20px 24px;
+  inline-size: min(340px, 100%);
+  padding: 22px 26px;
   border-radius: var(--r);
   background: var(--card);
-  box-shadow: var(--shadow);
+  box-shadow: none;
+  outline: 2px dashed color-mix(in oklab, var(--ink) 35%, transparent);
+  outline-offset: -2px;
+  opacity: 0.6;
   transition:
     opacity 0.4s var(--spring),
-    translate 0.5s var(--spring-pop);
+    box-shadow 0.4s var(--spring),
+    scale 0.5s var(--spring-pop);
+}
+/* written, it is whole; opened by the driver, it pops up as a dialog over the page */
+.agentsPreview[data-written] .agentsDialog {
+  opacity: 1;
+}
+.agentsDialog[data-open] {
+  outline: 0;
+  box-shadow: var(--shadow);
+  animation: render-pop 0.5s var(--spring-pop);
 }
 .agentsDialog > b {
   font: 700 18px var(--text);
 }
-/* still being written: drawn whole, its frame dashed, until the reply completes and it pops */
-.agentsRender:not([data-done]) .agentsDialog {
-  box-shadow: none;
-  outline: 2px dashed color-mix(in oklab, var(--ink) 35%, transparent);
-  outline-offset: -2px;
+.previewCount {
+  font: 600 12px var(--mono);
 }
-.agentsRender[data-done] .agentsDialog {
-  animation: render-pop 0.5s var(--spring-pop);
+/* what the driver is touching now: a ring that breathes round it */
+.previewPage [data-driven] {
+  outline: 3px solid var(--acc);
+  outline-offset: 5px;
+  animation: driven 0.9s ease-in-out infinite alternate;
+}
+@keyframes driven {
+  to {
+    outline-offset: 9px;
+  }
 }
 @keyframes render-pop {
   40% {
-    scale: 1.03;
+    scale: 1.04;
   }
 }
+.previewStatus {
+  padding: 12px 16px;
+  border-block-start: var(--bw) solid var(--line);
+  background: var(--card);
+  font: 600 12px var(--mono);
+  transition:
+    background 0.4s var(--spring),
+    color 0.4s var(--spring);
+}
+.previewStatus[data-pass] {
+  background: var(--acc);
+  color: var(--on-acc);
+}
 @media (prefers-reduced-motion: reduce) {
-  .agentsRender[data-done] .agentsDialog {
+  .agentsDialog[data-open],
+  .previewPage [data-driven] {
     animation: none;
   }
 }
@@ -1009,9 +1081,20 @@
   outline-offset: 3px;
 }
 @media (max-width: 900px) {
-  .agents {
+  .agentsStage {
     grid-template-columns: 1fr;
-    gap: 32px;
+  }
+  /* short enough that the page it builds is on the same screen */
+  .agentsThread {
+    block-size: calc(34 * var(--vh));
+  }
+  .previewPage {
+    padding: 24px 16px;
+    gap: 18px;
+  }
+  .agentsStage > :first-child {
+    border-inline-end: 0;
+    border-block-end: var(--bw) solid var(--line);
   }
 }
 

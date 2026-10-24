@@ -98,9 +98,12 @@ const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matc
 function useReplay(kind: HeroKind) {
   const [text, setText] = useState("")
   const [status, setStatus] = useState<Status>("pending")
+  // each play builds the preview afresh (its control back to unchecked)
+  const [run, setRun] = useState(0)
   const timer = useRef(0)
   const play = useCallback(() => {
     clearTimeout(timer.current)
+    setRun((r) => r + 1)
     if (reduced()) {
       setText(SESSIONS[kind].reply)
       setStatus("complete")
@@ -121,14 +124,113 @@ function useReplay(kind: HeroKind) {
     timer.current = window.setTimeout(step, 250)
   }, [kind])
   useEffect(() => () => clearTimeout(timer.current), [])
-  return { text, status, play }
+  return { text, status, play, run }
+}
+
+/**
+ * The preview beside the thread: a page at localhost that builds what the reply writes, then the
+ * driver calls of the reply run against it (the trigger opens the dialog, the control is driven,
+ * the test passes), each step framed as the driver touches it. Real components, in the site's
+ * skin; the travelling object comes down on the control (skin-scene.tsx).
+ */
+function Preview({ kind, text, done }: { kind: HeroKind; text: string; done: boolean }) {
+  const { phase } = usePhase()
+  const page = useRef<HTMLDivElement>(null)
+  const has = (s: string) => text.includes(s)
+  const written = has("</Dialog.Root>")
+  const opened = has(".open()")
+  const acted = has(".toggle()") || has(".press()")
+  const passed = has("✓ 1 test passed")
+  const [shut, setShut] = useState(false)
+  const [presses, setPresses] = useState(0)
+  // the driver's act is a real press of the real control
+  useEffect(() => {
+    if (!acted) return
+    const el = page.current?.querySelector<HTMLElement>('[data-object-dock="agents"]')
+    // toggle() turns it on: a control already on (pressed by the visitor) stays on
+    const on =
+      el?.getAttribute("aria-checked") === "true" || el?.getAttribute("data-state") === "checked"
+    if (el && !on) el.click()
+    window.dispatchEvent(new Event("rind:agents-driven"))
+    cue("ding")
+  }, [acted])
+  useEffect(() => {
+    if (passed) cue("on")
+  }, [passed])
+  const open = opened && !shut
+  const driving = passed ? null : acted ? "control" : opened ? "trigger" : null
+  const session = SESSIONS[kind]
+  return (
+    <figure
+      className={styles.agentsPreview}
+      data-skinned=""
+      data-skin={phase}
+      data-written={written ? "" : undefined}
+      data-done={done ? "" : undefined}
+    >
+      <div className={styles.previewBar} aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <span>localhost:3000</span>
+      </div>
+      <div ref={page} className={styles.previewPage}>
+        <Button
+          className={styles.previewTrigger}
+          data-driven={driving === "trigger" ? "" : undefined}
+          disabled={!written}
+          onPress={() => setShut((v) => !v)}
+        >
+          {session.title}
+        </Button>
+        <div
+          className={styles.agentsDialog}
+          data-open={open ? "" : undefined}
+          data-driven={driving === "control" ? "" : undefined}
+        >
+          <b>{session.title}</b>
+          {kind === "switch" ? (
+            <Switch.Root>
+              <Switch.Control data-object-dock="agents">
+                <Switch.Thumb />
+              </Switch.Control>
+              <Switch.Label>Dark mode</Switch.Label>
+            </Switch.Root>
+          ) : kind === "checkbox" ? (
+            <CheckboxGroup.Item>
+              <CheckboxGroup.ItemControl data-object-dock="agents">
+                <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
+              </CheckboxGroup.ItemControl>
+              <CheckboxGroup.ItemLabel>I agree</CheckboxGroup.ItemLabel>
+            </CheckboxGroup.Item>
+          ) : (
+            <>
+              <Button data-object-dock="agents" onPress={() => setPresses((n) => n + 1)}>
+                Delete
+              </Button>
+              <code className={styles.previewCount}>remove() × {presses}</code>
+            </>
+          )}
+        </div>
+      </div>
+      <figcaption className={styles.previewStatus} data-pass={passed ? "" : undefined}>
+        {passed
+          ? "✓ 1 test passed, against this page"
+          : opened
+            ? "Driving the page…"
+            : written
+              ? "Built. Waiting for the test…"
+              : "Writing the code…"}
+      </figcaption>
+    </figure>
+  )
 }
 
 export function Agents() {
   const { phase } = usePhase()
   const [kind, setKind] = useState<HeroKind>("switch")
   useEffect(() => setKind(heroKind()), [])
-  const { text, status, play } = useReplay(kind)
+  const { text, status, play, run } = useReplay(kind)
   const stage = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const el = stage.current
@@ -190,36 +292,7 @@ export function Agents() {
                 </MessageThread.Message>
               </MessageThread.Viewport>
             </MessageThread.Root>
-            {/* what the reply's code renders, live, in the site's skin: the dialog's content
-              with its control, where the travelling object comes down (skin-scene.tsx) */}
-            <figure
-              className={styles.agentsRender}
-              data-skinned=""
-              data-skin={phase}
-              data-done={status === "complete" ? "" : undefined}
-            >
-              <figcaption>{status === "complete" ? "What it renders" : "Rendering…"}</figcaption>
-              <div className={styles.agentsDialog}>
-                <b>{SESSIONS[kind].title}</b>
-                {kind === "switch" ? (
-                  <Switch.Root>
-                    <Switch.Control data-object-dock="agents">
-                      <Switch.Thumb />
-                    </Switch.Control>
-                    <Switch.Label>Dark mode</Switch.Label>
-                  </Switch.Root>
-                ) : kind === "checkbox" ? (
-                  <CheckboxGroup.Item>
-                    <CheckboxGroup.ItemControl data-object-dock="agents">
-                      <CheckboxGroup.ItemIndicator>✓</CheckboxGroup.ItemIndicator>
-                    </CheckboxGroup.ItemControl>
-                    <CheckboxGroup.ItemLabel>I agree</CheckboxGroup.ItemLabel>
-                  </CheckboxGroup.Item>
-                ) : (
-                  <Button data-object-dock="agents">Delete</Button>
-                )}
-              </div>
-            </figure>
+            <Preview key={run} kind={kind} text={text} done={status === "complete"} />
           </div>
         </div>
       </section>
