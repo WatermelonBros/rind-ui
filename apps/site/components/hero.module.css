@@ -48,16 +48,35 @@
   color: var(--ink);
   vertical-align: -0.12em;
 }
-.facts {
-  transition:
-    opacity 0.3s var(--spring),
-    translate 0.4s var(--spring);
-}
 /* the facts go with the skin: the machine's scene rises over the hero's tail right after, and
-   its title came up through them */
+   its title came up through them. They leave one after another, sinking under the line, which
+   then draws back (all four snapping off at once read as a cut) */
+.facts {
+  transition: border-color 0.5s var(--spring);
+}
+.facts li {
+  transition:
+    opacity 0.6s var(--spring),
+    translate 0.8s var(--spring),
+    filter 0.6s var(--spring);
+}
+.facts li:nth-child(2) {
+  transition-delay: 90ms;
+}
+.facts li:nth-child(3) {
+  transition-delay: 180ms;
+}
+.facts li:nth-child(4) {
+  transition-delay: 270ms;
+}
 .hero[data-bare] .facts {
+  border-color: transparent;
+  transition-delay: 340ms;
+}
+.hero[data-bare] .facts li {
   opacity: 0;
-  translate: 0 16px;
+  translate: 0 28px;
+  filter: blur(4px);
 }
 @media (max-width: 900px) {
   .facts {
