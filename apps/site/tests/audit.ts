@@ -437,7 +437,10 @@ for (const url of urls) {
 if (shard === Math.min(2, shards)) {
   const ids = [
     ...readFileSync(join(root, "components/home/skins.ts"), "utf8").matchAll(/id: "([a-z0-9-]+)"/g),
-  ].map((m) => m[1] ?? "")
+  ]
+    .map((m) => m[1] ?? "")
+    // the rind preset is the page's own look, not worn (any-look.tsx): the home's walk covers it
+    .filter((id) => id !== "rind")
   for (const id of ids) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
     // still: the scenes rest in their final states, so what is measured is what is read
