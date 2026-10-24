@@ -359,8 +359,12 @@ function createDomEnv(
       const own = normalize(el.textContent)
       return typeof text === "string" ? own === text : text.test(own)
     }
-    // Deepest matches only, like Playwright's getByText: ancestors repeat the same text.
-    const found = Array.from(within.querySelectorAll("*")).filter(matches)
+    // Deepest matches only, like Playwright's getByText: ancestors repeat the same text. Hidden
+    // elements (and those inside one) are not text a user finds, as Playwright's getByText
+    // skips them; `hidden="until-found"` is, through find-in-page.
+    const found = Array.from(within.querySelectorAll("*")).filter(
+      (el) => matches(el) && !el.closest('[hidden]:not([hidden="until-found"])'),
+    )
     return found.filter((el) => !found.some((other) => other !== el && el.contains(other)))
   }
 

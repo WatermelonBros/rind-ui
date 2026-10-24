@@ -10,6 +10,8 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 | Module | Quirks |
 |---|---|
+| `packages/angular/src/meter/meter.ts` | `nvda-progressbar-name` |
+| `packages/angular/src/progress/progress.ts` | `nvda-progressbar-name` |
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/combobox.machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/pattern/machine.ts` | `vo-activedescendant` |
@@ -29,6 +31,8 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/react/src/number-input/number-input.tsx` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/react/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/react/src/table/table.tsx` | `talkback-aria-sort` |
+| `packages/solid/src/meter/meter.tsx` | `nvda-progressbar-name` |
+| `packages/solid/src/progress/progress.tsx` | `nvda-progressbar-name` |
 | `packages/svelte/src/number-input/api.svelte.ts` | `ios-vo-spinbutton-input` |
 | `packages/testing/src/invariants.ts` | `vo-activedescendant`, `vo-section-entry` |
 | `packages/vue/src/date-field/date-field.ts` | `ios-vo-spinbutton-input` |
@@ -204,7 +208,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/mui/base-ui/issues/4184>, <https://github.com/nvaccess/nvda/issues/13904>, <https://github.com/nvaccess/nvda/issues/16204>, <https://github.com/FreedomScientific/standards-support/issues/354>
 - Repro test: `packages/core/src/components/progress/progress.connect.test.ts`
-- Checked in: `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`, `packages/vue/src/meter/meter.ts`, `packages/vue/src/progress/progress.ts`
+- Checked in: `packages/angular/src/meter/meter.ts`, `packages/angular/src/progress/progress.ts`, `packages/react/src/meter/meter.tsx`, `packages/react/src/progress/progress.tsx`, `packages/solid/src/meter/meter.tsx`, `packages/solid/src/progress/progress.tsx`, `packages/vue/src/meter/meter.ts`, `packages/vue/src/progress/progress.ts`
 - Last verified: 2026-10-16
 - Remove when: NVDA reads progressbar/meter names without text content (nvda#16204 fixed) in the two latest NVDA releases
 

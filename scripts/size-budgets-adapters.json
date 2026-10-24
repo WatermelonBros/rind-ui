@@ -153,23 +153,35 @@
     "tree-view": 28
   },
   "solid": {
+    "alert": 14,
+    "avatar": 11,
     "badge": 3,
     "button": 16,
     "heading": 3,
+    "image": 10,
     "kbd": 8,
     "label": 7,
     "link": 12,
+    "meter": 11,
+    "progress": 12,
     "separator": 3,
+    "skeleton": 11,
     "toggle": 14
   },
   "angular": {
+    "alert": 15,
+    "avatar": 13,
     "badge": 4,
     "button": 17,
     "heading": 4,
+    "image": 12,
     "kbd": 10,
     "label": 8,
     "link": 13,
+    "meter": 13,
+    "progress": 14,
     "separator": 4,
+    "skeleton": 12,
     "toggle": 15
   }
 }

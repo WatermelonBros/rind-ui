@@ -34,6 +34,11 @@ export function withoutAngular<N extends ParentNode>(node: N): N {
   for (const el of Array.from(node.querySelectorAll("*"))) {
     for (const name of el.getAttributeNames()) if (ANGULAR.test(name)) el.removeAttribute(name)
   }
+  // A part React renders nothing for keeps its element in Angular, hidden (absentProps): it is
+  // not markup to compare. Its own checks assert it is hidden.
+  for (const el of Array.from(node.querySelectorAll("[data-scope]:not([data-part])[hidden]"))) {
+    if ((el as HTMLElement).style.display === "none") el.remove()
+  }
   return node
 }
 

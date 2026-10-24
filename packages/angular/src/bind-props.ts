@@ -112,6 +112,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   // produces stays (hydration renders the server's state, so they agree by construction).
   const written = new Set<string>()
   let attrs: Readonly<Record<string, unknown>> = {}
+  let text: unknown
   // The part's own static inputs are its to remove (connect writes the real attributes back):
   // seeded as the previous render's, so the first render drops those connect does not produce.
   for (const key of binder.owns) {
@@ -168,7 +169,12 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
       if (isHandler(key) && typeof value === "function")
         handlers.set(eventName(key), value as Handler)
       else if (key === "style" && value && typeof value === "object") style = value as typeof style
-      else nextAttrs[key] = value
+      else if (key === "children") {
+        // Text content in connect's output (an element the part renders itself: NVDA's
+        // filler); a consumer's element never gets one.
+        if (value !== text) renderer.setProperty(el, "textContent", value ?? "")
+        text = value
+      } else nextAttrs[key] = value
     }
     for (const key of Object.keys(attrs)) {
       if (!(key in nextAttrs) && consumer(key) === null) remove(key)

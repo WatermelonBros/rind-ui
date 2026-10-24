@@ -38,6 +38,16 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./alert": {
+      "@rind-ui/source": "./src/alert/index.ts",
+      "types": "./dist/alert/index.d.ts",
+      "default": "./dist/alert/index.js"
+    },
+    "./avatar": {
+      "@rind-ui/source": "./src/avatar/index.ts",
+      "types": "./dist/avatar/index.d.ts",
+      "default": "./dist/avatar/index.js"
+    },
     "./badge": {
       "@rind-ui/source": "./src/badge/index.ts",
       "types": "./dist/badge/index.d.ts",
@@ -52,6 +62,11 @@
       "@rind-ui/source": "./src/heading/index.ts",
       "types": "./dist/heading/index.d.ts",
       "default": "./dist/heading/index.js"
+    },
+    "./image": {
+      "@rind-ui/source": "./src/image/index.ts",
+      "types": "./dist/image/index.d.ts",
+      "default": "./dist/image/index.js"
     },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
@@ -68,10 +83,25 @@
       "types": "./dist/link/index.d.ts",
       "default": "./dist/link/index.js"
     },
+    "./meter": {
+      "@rind-ui/source": "./src/meter/index.ts",
+      "types": "./dist/meter/index.d.ts",
+      "default": "./dist/meter/index.js"
+    },
+    "./progress": {
+      "@rind-ui/source": "./src/progress/index.ts",
+      "types": "./dist/progress/index.d.ts",
+      "default": "./dist/progress/index.js"
+    },
     "./separator": {
       "@rind-ui/source": "./src/separator/index.ts",
       "types": "./dist/separator/index.d.ts",
       "default": "./dist/separator/index.js"
+    },
+    "./skeleton": {
+      "@rind-ui/source": "./src/skeleton/index.ts",
+      "types": "./dist/skeleton/index.d.ts",
+      "default": "./dist/skeleton/index.js"
     },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
@@ -118,6 +148,14 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
+      "./alert": {
+        "types": "./dist/alert/index.d.ts",
+        "default": "./dist/alert/index.js"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.ts",
+        "default": "./dist/avatar/index.js"
+      },
       "./badge": {
         "types": "./dist/badge/index.d.ts",
         "default": "./dist/badge/index.js"
@@ -129,6 +167,10 @@
       "./heading": {
         "types": "./dist/heading/index.d.ts",
         "default": "./dist/heading/index.js"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.ts",
+        "default": "./dist/image/index.js"
       },
       "./kbd": {
         "types": "./dist/kbd/index.d.ts",
@@ -142,9 +184,21 @@
         "types": "./dist/link/index.d.ts",
         "default": "./dist/link/index.js"
       },
+      "./meter": {
+        "types": "./dist/meter/index.d.ts",
+        "default": "./dist/meter/index.js"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.ts",
+        "default": "./dist/progress/index.js"
+      },
       "./separator": {
         "types": "./dist/separator/index.d.ts",
         "default": "./dist/separator/index.js"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.ts",
+        "default": "./dist/skeleton/index.js"
       },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",
