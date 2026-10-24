@@ -28,6 +28,13 @@ jobs:
             echo "components=true" "site=true" "full=true" | tr ' ' '\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # The release pull request only bumps versions and writes changelogs, from changes main
+          # has already tested (pnpm release builds before it publishes): its checks pass at once,
+          # so its auto-merge lands before the next merge to main rewrites it
+          if [ "${{ github.head_ref }}" = "changeset-release/main" ]; then
+            echo "components=false" "site=false" "full=false" | tr ' ' '\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           base="origin/${{ github.base_ref }}"
           echo "base=$base" >> "$GITHUB_OUTPUT"
           # Same rules as `pnpm verify` (scripts/ci-scope.mjs).
