@@ -7,7 +7,7 @@
 - [x] 1.5 Vitest: `@sveltejs/vite-plugin-svelte` in the root config (inherited by every project); Biome override for `.svelte`
 - [x] 1.6 Hydration tests: Vue (`renderToString` + `createSSRApp`), Svelte (server + client bundles of a fixture)
 - [x] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck` (their scripts), changesets
-- [ ] 1.7b Size budgets for the two packages (scripts/size.mjs)
+- [x] 1.7b Size budgets for the two packages (scripts/size.mjs)
 - [ ] 1.8 Docs: installation for Vue and Svelte; each component's docs page lists the frameworks that ship it
 - [x] 1.9 Tell the site agent when the first component is on main (exports are the source of truth)
 
@@ -85,10 +85,10 @@
 - [x] 2.68 Color Picker
 - [x] 2.69 Image Viewer
 - [x] 2.70 Image Cropper
-- [ ] 2.71 Message Thread
-- [ ] 2.72 Streaming Message
-- [ ] 2.73 Reasoning
-- [ ] 2.74 Prompt Input
+- [x] 2.71 Message Thread
+- [x] 2.72 Streaming Message
+- [x] 2.73 Reasoning
+- [x] 2.74 Prompt Input
 
 ## 3. Close
 

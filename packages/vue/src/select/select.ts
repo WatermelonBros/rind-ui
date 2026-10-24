@@ -42,7 +42,7 @@ import {
   type VNodeChild,
   watch,
 } from "vue"
-import { useFieldBindingPeek, useFieldControl } from "../field/field"
+import { useFieldBindingPeek, useFieldControl } from "../field/context"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { keepStyle } from "../keep-style"

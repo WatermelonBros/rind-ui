@@ -3,7 +3,7 @@
 // only joins it, and its own Label / Description / ErrorMessage render nothing. Text Field,
 // Number Input, Pin Input, Password Input and Search Field Roots use it.
 import { defineComponent, h, type InjectionKey, inject, onMounted, provide } from "vue"
-import { fieldRootProps, useFieldBindingPeek, useIsInsideField } from "./field"
+import { fieldRootProps, useFieldBindingPeek, useIsInsideField } from "./context"
 import * as Field from "./field.parts"
 
 declare const process: { env: { NODE_ENV?: string } }

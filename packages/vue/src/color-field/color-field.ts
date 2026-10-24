@@ -53,7 +53,7 @@ import {
   watch,
 } from "vue"
 import { colorProp, useColorProp } from "../color-input"
-import { fieldRootProps, useFieldBindingPeek, useFieldControl } from "../field/field"
+import { fieldRootProps, useFieldBindingPeek, useFieldControl } from "../field/context"
 import { FieldHost, HostDescription, HostErrorMessage, HostLabel } from "../field/field-host"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"

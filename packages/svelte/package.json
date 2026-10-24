@@ -111,6 +111,12 @@
       "svelte": "./dist/collapsible/index.js",
       "default": "./dist/collapsible/index.js"
     },
+    "./color-picker": {
+      "@rind-ui/source": "./src/color-picker/index.ts",
+      "types": "./dist/color-picker/index.d.ts",
+      "svelte": "./dist/color-picker/index.js",
+      "default": "./dist/color-picker/index.js"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.ts",
@@ -195,6 +201,18 @@
       "svelte": "./dist/image/index.js",
       "default": "./dist/image/index.js"
     },
+    "./image-cropper": {
+      "@rind-ui/source": "./src/image-cropper/index.ts",
+      "types": "./dist/image-cropper/index.d.ts",
+      "svelte": "./dist/image-cropper/index.js",
+      "default": "./dist/image-cropper/index.js"
+    },
+    "./image-viewer": {
+      "@rind-ui/source": "./src/image-viewer/index.ts",
+      "types": "./dist/image-viewer/index.d.ts",
+      "svelte": "./dist/image-viewer/index.js",
+      "default": "./dist/image-viewer/index.js"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
       "types": "./dist/kbd/index.d.ts",
@@ -236,6 +254,12 @@
       "types": "./dist/menubar/index.d.ts",
       "svelte": "./dist/menubar/index.js",
       "default": "./dist/menubar/index.js"
+    },
+    "./message-thread": {
+      "@rind-ui/source": "./src/message-thread/index.ts",
+      "types": "./dist/message-thread/index.d.ts",
+      "svelte": "./dist/message-thread/index.js",
+      "default": "./dist/message-thread/index.js"
     },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
@@ -279,6 +303,12 @@
       "svelte": "./dist/progress/index.js",
       "default": "./dist/progress/index.js"
     },
+    "./prompt-input": {
+      "@rind-ui/source": "./src/prompt-input/index.ts",
+      "types": "./dist/prompt-input/index.d.ts",
+      "svelte": "./dist/prompt-input/index.js",
+      "default": "./dist/prompt-input/index.js"
+    },
     "./qr-code": {
       "@rind-ui/source": "./src/qr-code/index.ts",
       "types": "./dist/qr-code/index.d.ts",
@@ -296,6 +326,12 @@
       "types": "./dist/rating/index.d.ts",
       "svelte": "./dist/rating/index.js",
       "default": "./dist/rating/index.js"
+    },
+    "./reasoning": {
+      "@rind-ui/source": "./src/reasoning/index.ts",
+      "types": "./dist/reasoning/index.d.ts",
+      "svelte": "./dist/reasoning/index.js",
+      "default": "./dist/reasoning/index.js"
     },
     "./scroll-area": {
       "@rind-ui/source": "./src/scroll-area/index.ts",
@@ -350,6 +386,12 @@
       "types": "./dist/stepper/index.d.ts",
       "svelte": "./dist/stepper/index.js",
       "default": "./dist/stepper/index.js"
+    },
+    "./streaming-message": {
+      "@rind-ui/source": "./src/streaming-message/index.ts",
+      "types": "./dist/streaming-message/index.d.ts",
+      "svelte": "./dist/streaming-message/index.js",
+      "default": "./dist/streaming-message/index.js"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -444,8 +486,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "svelte-package -i src -o dist && node ../../scripts/svelte-exports.mjs",
-    "typecheck": "svelte-check --tsconfig ./tsconfig.json --tsgo --fail-on-warnings"
+    "build": "svelte-package -i src -o dist && node ../../scripts/svelte-exports.mjs && node ../../scripts/size-adapters.mjs svelte",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --tsgo --fail-on-warnings",
+    "size": "node ../../scripts/size-adapters.mjs svelte"
   },
   "dependencies": {
     "@rind-ui/core": "workspace:*"
@@ -537,6 +580,11 @@
         "svelte": "./dist/collapsible/index.js",
         "default": "./dist/collapsible/index.js"
       },
+      "./color-picker": {
+        "types": "./dist/color-picker/index.d.ts",
+        "svelte": "./dist/color-picker/index.js",
+        "default": "./dist/color-picker/index.js"
+      },
       "./combobox": {
         "types": "./dist/combobox/index.d.ts",
         "svelte": "./dist/combobox/index.js",
@@ -607,6 +655,16 @@
         "svelte": "./dist/image/index.js",
         "default": "./dist/image/index.js"
       },
+      "./image-cropper": {
+        "types": "./dist/image-cropper/index.d.ts",
+        "svelte": "./dist/image-cropper/index.js",
+        "default": "./dist/image-cropper/index.js"
+      },
+      "./image-viewer": {
+        "types": "./dist/image-viewer/index.d.ts",
+        "svelte": "./dist/image-viewer/index.js",
+        "default": "./dist/image-viewer/index.js"
+      },
       "./kbd": {
         "types": "./dist/kbd/index.d.ts",
         "svelte": "./dist/kbd/index.js",
@@ -641,6 +699,11 @@
         "types": "./dist/menubar/index.d.ts",
         "svelte": "./dist/menubar/index.js",
         "default": "./dist/menubar/index.js"
+      },
+      "./message-thread": {
+        "types": "./dist/message-thread/index.d.ts",
+        "svelte": "./dist/message-thread/index.js",
+        "default": "./dist/message-thread/index.js"
       },
       "./meter": {
         "types": "./dist/meter/index.d.ts",
@@ -677,6 +740,11 @@
         "svelte": "./dist/progress/index.js",
         "default": "./dist/progress/index.js"
       },
+      "./prompt-input": {
+        "types": "./dist/prompt-input/index.d.ts",
+        "svelte": "./dist/prompt-input/index.js",
+        "default": "./dist/prompt-input/index.js"
+      },
       "./qr-code": {
         "types": "./dist/qr-code/index.d.ts",
         "svelte": "./dist/qr-code/index.js",
@@ -691,6 +759,11 @@
         "types": "./dist/rating/index.d.ts",
         "svelte": "./dist/rating/index.js",
         "default": "./dist/rating/index.js"
+      },
+      "./reasoning": {
+        "types": "./dist/reasoning/index.d.ts",
+        "svelte": "./dist/reasoning/index.js",
+        "default": "./dist/reasoning/index.js"
       },
       "./scroll-area": {
         "types": "./dist/scroll-area/index.d.ts",
@@ -736,6 +809,11 @@
         "types": "./dist/stepper/index.d.ts",
         "svelte": "./dist/stepper/index.js",
         "default": "./dist/stepper/index.js"
+      },
+      "./streaming-message": {
+        "types": "./dist/streaming-message/index.d.ts",
+        "svelte": "./dist/streaming-message/index.js",
+        "default": "./dist/streaming-message/index.js"
       },
       "./switch": {
         "types": "./dist/switch/index.d.ts",

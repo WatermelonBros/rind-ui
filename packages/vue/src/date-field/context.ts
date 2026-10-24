@@ -21,7 +21,7 @@ import {
   type Service,
 } from "@rind-ui/core"
 import { type ComputedRef, type InjectionKey, inject, type ShallowRef } from "vue"
-import { useFieldBindingPeek } from "../field/field"
+import { useFieldBindingPeek } from "../field/context"
 
 export interface DateFieldState {
   readonly value: FieldValue | null

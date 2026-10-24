@@ -36,7 +36,7 @@ import {
   shallowRef,
   watch,
 } from "vue"
-import { useFieldControl } from "../field/field"
+import { useFieldControl } from "../field/context"
 import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { elementOf, mergeProps, refTo } from "../merge-props"
