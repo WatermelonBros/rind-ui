@@ -19,20 +19,29 @@ export async function serverParity(react: ReactElement, vue: () => VNode | VNode
   expect(actual).toBe(expected)
 }
 
+let apps = 0
+
 /** The DOM of both after mount (effects run), canonical. */
 export async function clientParity(react: ReactElement, vue: () => VNode | VNode[]) {
   reactAct.IS_REACT_ACT_ENVIRONMENT = true
   const r = document.body.appendChild(document.createElement("div"))
-  const root = createRoot(r)
-  await act(async () => root.render(react))
   const v = document.body.appendChild(document.createElement("div"))
+  // Where the pointer rests (a previous test's last move) is not markup: hover stays out.
+  r.style.pointerEvents = v.style.pointerEvents = "none"
+  const root = createRoot(r)
   const app = createApp({ render: vue })
-  app.mount(v)
-  await nextTick()
-  // Measured parts (Scroll Area) settle on a later frame, in either order: compare once both have.
-  await vi.waitFor(() => expect(canonicalHtml(v)).toBe(canonicalHtml(r)))
-  await act(async () => root.unmount())
-  app.unmount()
-  r.remove()
-  v.remove()
+  // Every app's useId restarts at v-0: an app left by a failed attempt would own the ids.
+  app.config.idPrefix = `parity${apps++}`
+  try {
+    await act(async () => root.render(react))
+    app.mount(v)
+    await nextTick()
+    // Measured parts (Scroll Area) settle on a later frame, in either order: compare once both have.
+    await vi.waitFor(() => expect(canonicalHtml(v)).toBe(canonicalHtml(r)))
+  } finally {
+    await act(async () => root.unmount())
+    app.unmount()
+    r.remove()
+    v.remove()
+  }
 }
