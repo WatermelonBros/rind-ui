@@ -15,7 +15,14 @@ export function Letters({ children }: { children: string }) {
   return (
     <>
       <span className={styles.visuallyHidden}>{children}</span>
-      <span className={styles.title} data-letters-title="" aria-hidden="true">
+      {/* letters-replay.tsx writes data-play here as soon as it is seen, which can be before a
+          suspended section (the machine) hydrates: that attribute is the DOM's, not a mismatch */}
+      <span
+        className={styles.title}
+        data-letters-title=""
+        aria-hidden="true"
+        suppressHydrationWarning
+      >
         {children.split(" ").map((word, w) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: a static title's words, never reordered
           <Fragment key={w}>
