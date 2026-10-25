@@ -190,6 +190,12 @@ export function ExampleFrame({
     (t) => codeOf(t)?.raw,
   )
   const shown = tab ? codeOf(tab) : undefined
+  // the visitor reads the docs for a framework this example is not written for yet: said, not
+  // silently swapped for React
+  const missing =
+    framework === "react" || tabs.some((t) => t === framework)
+      ? undefined
+      : Object.entries(CODE_TABS).find(([id]) => id === framework)?.[1]
 
   return (
     <section
@@ -314,6 +320,12 @@ export function ExampleFrame({
                   __html: `<code class="hljs">${codeOf(t)?.html ?? ""}</code>`,
                 }}
               />
+              {t === "react" && missing && (
+                <p className={styles.cssNote}>
+                  Not written for {missing} yet: this is the React version. The parts, props and{" "}
+                  <code>data-*</code> attributes are the same in every framework.
+                </p>
+              )}
               {t === "css" && (
                 <p className={styles.cssNote}>
                   Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a
