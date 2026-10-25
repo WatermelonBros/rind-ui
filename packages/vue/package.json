@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/vue",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Accessible headless Vue components: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
   "license": "MIT",
   "author": "Watermelon Bros",
