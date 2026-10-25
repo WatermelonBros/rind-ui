@@ -728,6 +728,8 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   position: absolute;
   /* centred on the track by its top: the slider's inline translate owns only the x axis */
   inset-block-start: calc(50% - 10px);
+  /* so a margin that centres it another way (a base skin's) does not move it twice */
+  margin-block-start: 0;
   inline-size: 20px;
   block-size: 20px;
   box-sizing: border-box;

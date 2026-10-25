@@ -240,11 +240,13 @@ html.intro:not([data-intro-ready]) body {
    ships, and nothing else. The browser's own look: white, black, its serif, blue links, no
    radius, no shadow; every rind component on the page in the bare skin's terms. It comes back on
    release. */
+/* stripped: no brand at all, a white-label greyscale (a browser blue read as one more theme, and
+   its contrasts broke) */
 html[data-stripped] {
   --bg: #ffffff;
   --ink: #000000;
-  --acc: #0000ee;
-  --acc-deep: #0000ee;
+  --acc: #1f1f1f;
+  --acc-deep: #000000;
   --on: #ffffff;
   --on-acc: #ffffff;
   --card: #ffffff;
@@ -269,8 +271,8 @@ html[data-stripped] {
 html[data-stripped] [data-skinned] {
   --s-bg: #ffffff;
   --s-ink: #000000;
-  --s-acc: #0000ee;
-  --s-acc-deep: #0000ee;
+  --s-acc: #1f1f1f;
+  --s-acc-deep: #000000;
   --s-on: #ffffff;
   --s-card: #ffffff;
   --s-muted: #f0f0f0;
@@ -283,7 +285,7 @@ html[data-stripped] [data-skinned] {
   --s-lift-hi: none;
   --s-lift-lo: none;
   --s-font: ui-serif, "Times New Roman", Times, serif;
-  --s-brand: #0000ee;
+  --s-brand: #1f1f1f;
   --s-brand-text: #ffffff;
 }
 

@@ -113,6 +113,8 @@
 }
 .sound[aria-pressed="true"] {
   background: var(--acc);
+  /* the type made for the accent: a worn skin's ink can be its brand (Blueprint: white on white) */
+  color: var(--on-acc);
 }
 :global([data-phase="juicy"]) .sound:active {
   translate: 0 3px;

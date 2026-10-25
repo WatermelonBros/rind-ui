@@ -32,7 +32,6 @@ type Cue =
   | "slam"
   | "reskin"
   | "fly"
-  | "land"
   | "ding"
   | "line"
   | "type"
@@ -324,13 +323,6 @@ function play(ac: AudioContext, out: Engine, name: Cue | Voice, pan = 0, value =
       air.frequency.setValueAtTime(380 * jitter, now)
       air.frequency.exponentialRampToValueAtTime(2400 * jitter, now + 0.3)
       tone("sine", 180, 320, 0, 0.25, 0.05)
-      return
-    }
-    case "land": {
-      // touching down: a soft thump, a squeak of rubber in juicy, a knock in crisp
-      tone("sine", 120, 55, 0, 0.22, 0.34)
-      if (soft) tone("sine", 700 * jitter, 520 * jitter, 0.01, 0.1, 0.07)
-      else noise(0.02, 0.22, "bandpass", 1800)
       return
     }
     case "ding": {
