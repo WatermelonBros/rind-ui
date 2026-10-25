@@ -97,7 +97,12 @@ the Root's `getPageHref`), and the current crumb without `href` SHALL be
 `<a rindBreadcrumbsLink>`; a Stepper Trigger SHALL be `<button rindStepperTrigger>` while its
 step is reachable and `<span rindStepperTrigger>` otherwise (`i.triggerIsButton()`); a Drawer
 Handle SHALL be `<button rindDrawerHandle>` with two or more measured snap points and
-`<div rindDrawerHandle>` otherwise (`d.handleIsButton()`), a mismatch warning in development. The state the choice reads SHALL be readable from the template
+`<div rindDrawerHandle>` otherwise (`d.handleIsButton()`), a mismatch warning in development.
+A part whose element React picks from a prop the template writes statically SHALL be chosen by
+that attribute: a Date Field Root with `selectionMode="range"` SHALL be the range field (two
+hidden inputs, Start and End inside its Input), any other the single field; a Color Picker
+Channel Input with `channel="hex"` or `channel="css"` SHALL be a colour text field, with any
+other channel a Number Input for that channel. The state the choice reads SHALL be readable from the template
 (`#i="rindBreadcrumbsItem"`, `i.state().current`); focus SHALL move to the new element when the
 focused one is replaced.
 
@@ -106,6 +111,13 @@ focused one is replaced.
 - **WHEN** a Pagination Root has `getPageHref` and its pages are `<a rindPaginationPage>`
 - **THEN** each page is a link to its `getPageHref` value, the current one `aria-current="page"`,
   and the markup matches React's
+
+#### Scenario: A channel input
+
+- **WHEN** an inline Color Picker's Content holds `<div rindColorPickerChannelInput
+  channel="hex">` and `<div rindColorPickerChannelInput channel="hue">`
+- **THEN** the first renders a text input for the hex colour, the second a spin button for the
+  hue, each named by its channel, and the markup matches React's
 
 #### Scenario: The current crumb
 
@@ -152,8 +164,8 @@ copy made before the provider's inputs are set.
 
 ### Requirement: Roots Without An Element
 
-A Root React renders no element for (Popover, Dialog, Menu, Select, Combobox, Tags Input) SHALL
-be a directive on an `<ng-container>`; the elements React renders after its children (a
+A Root React renders no element for (Popover, Dialog, Menu, Select, Combobox, Tags Input, Tour)
+SHALL be a directive on an `<ng-container>`; the elements React renders after its children (a
 Select's hidden form inputs) SHALL follow the container's content in the same order, on the
 server too.
 

@@ -38,6 +38,7 @@ import {
   type Modality,
   mergeFieldProps,
   normalizeValues,
+  type PartNaming,
   partId,
   pointerDragSession,
   resolveSlider,
@@ -45,6 +46,7 @@ import {
   type SliderEvent,
   type SliderMessages,
   type SliderOrientation,
+  type SliderPart,
   type SliderReason,
   sameNumbers,
   sliderConnect,
@@ -103,6 +105,36 @@ export interface SliderState {
 type FormInput = ReturnType<typeof hiddenFormInput>
 
 const SLIDER = new InjectionToken<SliderRoot>("rind-ui.slider")
+
+/** What a component hosting the Root decides (a Color Slider): each one it leaves out stays the Root's. */
+export interface SliderSource {
+  readonly value?: () => SliderValue | undefined
+  readonly defaultValue?: () => SliderValue | undefined
+  readonly min?: () => number | undefined
+  readonly max?: () => number | undefined
+  readonly step?: () => number | undefined
+  readonly largeStep?: () => number | undefined
+  readonly orientation?: () => SliderOrientation
+  readonly disabled?: () => boolean
+  readonly readOnly?: () => boolean
+  readonly name?: () => string | undefined
+  readonly locale?: () => string | undefined
+  readonly dir?: () => "ltr" | "rtl" | undefined
+  readonly messages?: () => Partial<SliderMessages> | undefined
+  readonly onValueChange?: (value: SliderValue, details: SliderChangeDetails) => void
+  readonly onValueCommit?: (value: SliderValue, details: SliderCommitDetails) => void
+}
+
+/**
+ * Provided on the element by a component hosting the Root as a host directive (Color Slider),
+ * which sets `source` in its constructor: the parts carry the host's names, and without a
+ * Control the Root is the pointer surface. Internal.
+ */
+export interface SliderHost {
+  readonly naming: PartNaming<SliderPart>
+  source: SliderSource
+}
+export const SLIDER_HOST = new InjectionToken<SliderHost>("rind-ui.slider-host")
 
 function injectSlider(part: string): SliderRoot {
   const root = inject(SLIDER, { optional: true })
@@ -194,30 +226,49 @@ export class SliderRoot {
   readonly inField: boolean
   /** @internal */
   readonly direction: Signal<"ltr" | "rtl">
+  /** @internal The axis (the host's, when hosted). */
+  readonly axis: () => SliderOrientation
   /** The slider's state, for the template (`#s="rindSliderRoot"`, `s.state()`). */
   readonly state: Signal<SliderState>
 
   constructor() {
     const env = injectEnvironment()
     const instance = this.instance
-    const locale = injectLocale(
-      () => this.locale(),
-      () => this.dir(),
-    )
+    const host = inject(SLIDER_HOST, { optional: true, self: true })
+    const naming = host?.naming
+    // Its parts under a host's names when the Slider is another component's part.
+    const scopeName = naming?.scope ?? "slider"
+    const partNamed = (part: SliderPart) => naming?.part(part) ?? part
+    // A host's choice, else the Root's own input (read in renders: the host sets it after).
+    const own = <K extends keyof SliderSource, T>(key: K, mine: () => T) => {
+      return (): T => {
+        const get = host?.source[key] as (() => T) | undefined
+        return get ? get() : mine()
+      }
+    }
+    const value = own("value", this.value)
+    const defaultValue = own("defaultValue", this.defaultValue)
+    const orientation = own("orientation", this.orientation)
+    this.axis = orientation
+    const locale = injectLocale(own("locale", this.locale), own("dir", this.dir))
     this.direction = computed(() => locale().dir)
-    const messages = injectMessages("slider", sliderMessages, () => this.messages())
+    const messages = injectMessages("slider", sliderMessages, own("messages", this.messages))
     const binding = injectFieldControl()
     this.inField = binding !== null
     const fieldsetContext = injectFieldsetDisabled()
     const fieldsetDom = signal(false)
     const ownLabel = injectRenderedId(this.registry, "label")
     const ownDescription = injectRenderedId(this.registry, "description")
-    const scalar = () => !Array.isArray(this.value() ?? this.defaultValue())
+    const scalar = () => !Array.isArray(value() ?? defaultValue())
+    const min = own("min", this.min)
+    const max = own("max", this.max)
+    const step = own("step", this.step)
+    const largeStep = own("largeStep", this.largeStep)
     const rangeProps = () => ({
-      min: this.min(),
-      max: this.max(),
-      step: this.step(),
-      largeStep: this.largeStep(),
+      min: min(),
+      max: max(),
+      step: step(),
+      largeStep: largeStep(),
       minStepsBetweenThumbs: this.minStepsBetweenThumbs(),
     })
     const range = computed(() => sliderRange(rangeProps()))
@@ -226,7 +277,7 @@ export class SliderRoot {
     let creation: readonly number[] | undefined
     const creationDefault = () =>
       (creation ??= untracked(() =>
-        normalizeValues(toArray(this.defaultValue()) ?? [range().min], range(), "defaultValue"),
+        normalizeValues(toArray(defaultValue()) ?? [range().min], range(), "defaultValue"),
       ))
     const inputs = this.inputs
     const thumbs = this.thumbs
@@ -245,11 +296,11 @@ export class SliderRoot {
         {
           role: "slider",
           labelable: false,
-          disabled: this.disabled() || fieldsetContext() || fieldsetDom(),
-          readOnly: this.readonly(),
+          disabled: own("disabled", this.disabled)() || fieldsetContext() || fieldsetDom(),
+          readOnly: own("readOnly", this.readonly)(),
           required: this.required(),
           invalid: this.invalid(),
-          name: this.name(),
+          name: own("name", this.name)(),
           describedBy: ownDescription(),
         },
         binding?.() ?? null,
@@ -281,11 +332,11 @@ export class SliderRoot {
     const shape = (v: readonly number[]): SliderValue => (scalar() ? (v[0] ?? range().min) : v)
     let lastReason: SliderReason | null = null
     const machineProps = () => {
-      const valueArray = toArray(this.value())
+      const valueArray = toArray(value())
       if (valueArray) normalizeValues(valueArray, range(), "value") // development warning only
       return {
         value: valueArray,
-        defaultValue: toArray(this.defaultValue()) ?? creationDefault(),
+        defaultValue: toArray(defaultValue()) ?? creationDefault(),
         ...rangeProps(),
         thumbCollision: this.thumbCollision(),
         disabled: field().disabled,
@@ -294,7 +345,7 @@ export class SliderRoot {
         onValueChange: (next: readonly number[], details: ChangeDetails<SliderEvent>) => {
           lastReason = details.reason
           const before = latest ?? untracked(this.values)
-          if (untracked(this.value) === undefined) {
+          if (untracked(value) === undefined) {
             // Uncontrolled: the inputs already show the value when the consumer runs (a
             // requestSubmit() there submits it); a cancel re-syncs them ($reverted).
             const t = untracked(() => texts(next))
@@ -306,27 +357,28 @@ export class SliderRoot {
             })
           }
           let cancelled = false
-          const value = untracked(() => shape(next))
-          this.valueChangeDetails.emit({
-            value,
-            details: {
-              reason: details.reason,
-              index: Math.max(
-                0,
-                next.findIndex((v, i) => v !== before[i]),
-              ),
-              event: details.event,
-              cancel: () => {
-                cancelled = true
-                details.cancel()
-              },
+          const shaped = untracked(() => shape(next))
+          const changeDetails: SliderChangeDetails = {
+            reason: details.reason,
+            index: Math.max(
+              0,
+              next.findIndex((v, i) => v !== before[i]),
+            ),
+            event: details.event,
+            cancel: () => {
+              cancelled = true
+              details.cancel()
             },
-          })
-          if (!cancelled) this.valueChange.emit(value)
+          }
+          host?.source.onValueChange?.(shaped, changeDetails)
+          this.valueChangeDetails.emit({ value: shaped, details: changeDetails })
+          if (!cancelled) this.valueChange.emit(shaped)
         },
         onValueCommit: (next: readonly number[], details: SliderCommitDetails) => {
           binding?.().report({ type: "commit" })
-          this.valueCommit.emit({ value: untracked(() => shape(next)), details })
+          const shaped = untracked(() => shape(next))
+          host?.source.onValueCommit?.(shaped, details)
+          this.valueCommit.emit({ value: shaped, details })
         },
       }
     }
@@ -350,9 +402,10 @@ export class SliderRoot {
       const i = instance()
       return sliderConnect({
         instance: i,
+        ...(naming ? { naming } : {}),
         values: values(),
         range: range(),
-        orientation: this.orientation(),
+        orientation: orientation(),
         dir: locale().dir,
         alignment: this.thumbAlignment(),
         field: field(),
@@ -374,7 +427,7 @@ export class SliderRoot {
         formatOptions: this.formatOptions(),
         messages: messages(),
         form: this.form(),
-        defaultValues: normalizeValues(toArray(this.defaultValue()) ?? creationDefault(), range()),
+        defaultValues: normalizeValues(toArray(defaultValue()) ?? creationDefault(), range()),
       })
     })
     this.state = computed(() => ({
@@ -382,7 +435,7 @@ export class SliderRoot {
       dragging: dragging(),
       disabled: field().disabled,
       readOnly: field().readOnly,
-      orientation: this.orientation(),
+      orientation: orientation(),
     }))
     // A touch drag (iOS): no text selection or callout while it lasts (BU#1295).
     let selection: (() => void) | null = null
@@ -392,7 +445,7 @@ export class SliderRoot {
       const surface = e.currentTarget
       if (!(surface instanceof HTMLElement)) return
       const thumb = (e.target as Element | null)?.closest?.(
-        '[data-scope="slider"][data-part="thumb"]',
+        `[data-scope="${scopeName}"][data-part="${partNamed("thumb")}"]`,
       )
       // A disabled thumb is no target: the press is a track press there.
       const index =
@@ -408,7 +461,7 @@ export class SliderRoot {
         untracked(this.thumbAlignment) === "contain" ? (thumbs[index ?? 0] ?? null) : null
       const fraction = drag.press(surface, e, {
         ...sliderDragAxis(
-          { orientation: untracked(this.orientation), dir: untracked(locale).dir },
+          { orientation: untracked(orientation), dir: untracked(locale).dir },
           contain instanceof HTMLElement ? contain : null,
         ),
         anchor,
@@ -419,31 +472,49 @@ export class SliderRoot {
       if (touch) selection = textSelection(surface, env, true)
       send({ type: "POINTER.DOWN", fraction, thumb: index, modality: touch ? "touch" : "pointer" })
     }
-    bindProps(() => this.api().root(), {
-      owns: [
-        "defaultvalue",
-        "dir",
-        "disabled",
-        "form",
-        "formatoptions",
-        "id",
-        "invalid",
-        "largestep",
-        "locale",
-        "max",
-        "messages",
-        "min",
-        "minstepsbetweenthumbs",
-        "name",
-        "orientation",
-        "readonly",
-        "required",
-        "step",
-        "thumbalignment",
-        "thumbcollision",
-        "value",
-      ],
-    })
+    // Hosted (Color Slider): without a Control part the Root is the pointer surface; presses
+    // that start on the Label, the ValueText or the Description do not start a drag.
+    const rootPress = (e: PointerEvent) => {
+      if (!host || this.control.value) return
+      const from = (e.target as Element | null)?.closest?.(`[data-scope="${scopeName}"][data-part]`)
+      const name = from?.getAttribute("data-part")
+      if (
+        name === partNamed("label") ||
+        name === partNamed("value-text") ||
+        name === partNamed("description")
+      )
+        return
+      this.press(e)
+    }
+    bindProps(
+      () =>
+        host ? joinHandlers(this.api().root(), { onPointerDown: rootPress }) : this.api().root(),
+      {
+        owns: [
+          "defaultvalue",
+          "dir",
+          "disabled",
+          "form",
+          "formatoptions",
+          "id",
+          "invalid",
+          "largestep",
+          "locale",
+          "max",
+          "messages",
+          "min",
+          "minstepsbetweenthumbs",
+          "name",
+          "orientation",
+          "readonly",
+          "required",
+          "step",
+          "thumbalignment",
+          "thumbcollision",
+          "value",
+        ],
+      },
+    )
 
     if (inject(PLATFORM_ID) !== "browser") return
     const destroy = inject(DestroyRef)
@@ -530,7 +601,8 @@ export class SliderLabel {
 
 /** The formatted value (a range for two thumbs): its content, or the text. Not a live region. */
 @Component({
-  selector: "[rindSliderValueText]",
+  selector:
+    "[rindSliderValueText], [rindColorSliderValueText], [rindColorPickerChannelSliderValueText]",
   exportAs: "rindSliderValueText",
   encapsulation: ViewEncapsulation.None,
   template: "<ng-content>{{ text() }}</ng-content>",
@@ -590,20 +662,14 @@ export class SliderMarkerGroup {
   }
 }
 
-/**
- * One thumb and its native range input (the focusable `slider`), rendered after its content:
- * `<div rindSliderThumb [index]="0" aria-label="Minimum">`; the name goes to the input.
- */
-@Component({
-  selector: "[rindSliderThumb]",
-  exportAs: "rindSliderThumb",
-  imports: [RindProps],
-  encapsulation: ViewEncapsulation.None,
-  template: `<ng-content /><input #input [rindProps]="inputProps()" />`,
-})
-export class SliderThumb {
-  /** The thumb's value index (known on the server). */
-  readonly index = input.required<number>()
+/** The thumb's template: its content, then its range input. Internal. */
+export const SLIDER_THUMB_TEMPLATE = `<ng-content /><input #input [rindProps]="inputProps()" />`
+
+/** A thumb and its range input, whatever decides its index. Internal. */
+@Directive()
+export abstract class SliderThumbBase {
+  /** The thumb's value index. */
+  abstract readonly index: () => number
   /** Disables this thumb only. */
   readonly disabled = input<boolean | undefined, boolean | "" | undefined>(undefined, {
     transform: (v: boolean | "" | undefined) => (v === undefined ? undefined : v !== false),
@@ -614,9 +680,12 @@ export class SliderThumb {
   /** @internal */
   protected readonly inputProps: Signal<ReturnType<ReturnType<typeof sliderConnect>["input"]>>
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>("input")
+  /** @internal */
+  protected readonly root: SliderRoot
 
   constructor() {
     const root = injectSlider("Thumb")
+    this.root = root
     const env = injectEnvironment()
     const el: Element = inject(ElementRef).nativeElement
     // The thumb's name is its input's (moved there; the thumb itself is decorative).
@@ -634,7 +703,7 @@ export class SliderThumb {
       return joinHandlers(root.api().input(index, own()), {
         onKeyDown: (e: KeyboardEvent) => {
           const event = sliderKeyEvent(describeKey(e, env), index, {
-            orientation: root.orientation(),
+            orientation: root.axis(),
             dir: root.direction(),
             platform: env.platform,
             dragging: root.state().dragging,
@@ -710,6 +779,22 @@ export class SliderThumb {
       if (tracked !== undefined) root.setThumbDisabled(tracked, false)
     })
   }
+}
+
+/**
+ * One thumb and its native range input (the focusable `slider`), rendered after its content:
+ * `<div rindSliderThumb [index]="0" aria-label="Minimum">`; the name goes to the input.
+ */
+@Component({
+  selector: "[rindSliderThumb]",
+  exportAs: "rindSliderThumb",
+  imports: [RindProps],
+  encapsulation: ViewEncapsulation.None,
+  template: SLIDER_THUMB_TEMPLATE,
+})
+export class SliderThumb extends SliderThumbBase {
+  /** The thumb's value index (known on the server). */
+  readonly index = input.required<number>()
 }
 
 /** A tick at `value`: `data-state` under-value, at-value or over-value. */

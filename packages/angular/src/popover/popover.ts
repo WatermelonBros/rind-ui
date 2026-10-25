@@ -55,6 +55,33 @@ type Rendered = { readonly title?: string | undefined; readonly description?: st
 
 const POPOVER = new InjectionToken<PopoverRoot>("rind-ui.popover")
 
+/** What a composite hosting the Root decides (a Date Field's picker): each one it leaves out stays the Root's. */
+export interface PopoverOverride {
+  readonly id?: () => string
+  readonly disabled?: () => boolean
+  readonly initialFocus?: () => (() => FocusTarget) | null | undefined
+  readonly persistentElements?: () => readonly Element[]
+  /** Controlled visibility (a Color Picker's machine owns it). */
+  readonly open?: () => boolean | undefined
+  /** Replaces the Root's own outputs. */
+  readonly onOpenChange?: (open: boolean, details: { readonly reason: string }) => void
+  readonly modal?: () => boolean | undefined
+  readonly positioning?: () => PositioningProps | undefined
+  /**
+   * The content in place (an inline Color Picker): never opens, and the Anchor and the Content
+   * bind nothing of the Popover's. Read once, when the Content is created.
+   */
+  readonly inline?: () => boolean
+}
+
+/**
+ * Provided on the element by a composite hosting the Root as a host directive, which sets
+ * `source` in its constructor; read in renders. Internal.
+ */
+export const POPOVER_OVERRIDE = new InjectionToken<{ source: PopoverOverride }>(
+  "rind-ui.popover-override",
+)
+
 /**
  * The parts' `data-scope` for a composite hosting the Root as a host directive (Table's
  * filters), where the `scope` input cannot be set. Internal.
@@ -173,11 +200,14 @@ export class PopoverRoot {
   readonly texts: Signal<PopoverMessages>
   /** @internal */
   readonly isOpen: () => boolean
+  /** @internal The content is in place (see `PopoverOverride.inline`). */
+  readonly inline: () => boolean
   /** The popover's state, for the template (`#p="rindPopoverRoot"`, `p.state()`). */
   readonly state: Signal<PopoverState>
 
   constructor() {
-    const root = injectRootId(() => this.id())
+    const override = inject(POPOVER_OVERRIDE, { optional: true, self: true })
+    const root = injectRootId(() => this.id() ?? override?.source.id?.())
     this.root = root
     const parent = injectParentLayer()
     this.texts = injectMessages("popover", popoverMessages, () => this.messages())
@@ -185,19 +215,23 @@ export class PopoverRoot {
     // Positioning only for anchored components: not part of domEnvironment().
     const withPosition = withCapabilities(env, { position: domPositioning(env) })
     this.props = (): PopoverProps => ({
-      open: this.open(),
+      open: override?.source.open ? override.source.open() : this.open(),
       defaultOpen: this.defaultOpen(),
-      onOpenChange: this.emit,
-      modal: this.modal(),
-      disabled: this.disabled(),
+      onOpenChange: override?.source.onOpenChange ?? this.emit,
+      modal: override?.source.modal ? override.source.modal() : this.modal(),
+      disabled: override?.source.disabled ? override.source.disabled() : this.disabled(),
       closeOnEscape: this.closeOnEscape(),
       closeOnInteractOutside: this.closeOnInteractOutside(),
       onEscapeKeyDown: (e) => this.escapeKeyDown.emit(e),
       onInteractOutside: (e) => this.interactOutside.emit(e),
-      persistentElements: this.persistentElements(),
-      initialFocus: this.initialFocus(),
+      persistentElements: override?.source.persistentElements ?? this.persistentElements(),
+      initialFocus: override?.source.initialFocus
+        ? override.source.initialFocus()
+        : this.initialFocus(),
       finalFocus: this.finalFocus(),
-      positioning: this.positioning(),
+      positioning: override?.source.positioning
+        ? override.source.positioning()
+        : this.positioning(),
       root: root(),
       parent: parent(),
       anchored: this.anchorRendered(),
@@ -207,6 +241,7 @@ export class PopoverRoot {
     this.view = view
     this.send = send
     this.isOpen = () => view().matches("open")
+    this.inline = () => override?.source.inline?.() === true
     this.state = computed(() => ({ open: view().matches("open") }))
     this.meta = injectLayerMeta(this.isOpen, () => popoverLayerId(root()))
   }
@@ -287,6 +322,7 @@ export class PopoverTrigger {
 export class PopoverAnchor {
   constructor() {
     const root = injectPopover("Anchor")
+    if (root.inline()) return
     bindProps(() => root.api().anchor())
     if (inject(PLATFORM_ID) !== "browser") return
     afterNextRender(() => root.anchorRendered.set(true))
@@ -319,7 +355,10 @@ function injectAnchorDir(root: PopoverRoot): Signal<"ltr" | "rtl" | undefined> {
 }
 
 /** Places the content against the anchor: `<div rindPopoverPositioner>`. */
-@Directive({ selector: "[rindPopoverPositioner]", exportAs: "rindPopoverPositioner" })
+@Directive({
+  selector: "[rindPopoverPositioner], [rindDateFieldPositioner], [rindColorPickerPositioner]",
+  exportAs: "rindPopoverPositioner",
+})
 export class PopoverPositioner {
   constructor() {
     const root = injectPopover("Positioner")
@@ -353,6 +392,8 @@ export class PopoverPositioner {
       provide: LAYER,
       useFactory: () => {
         const root = injectPopover("Content")
+        // In place: no layer of its own; the layers opened from it are the page's.
+        if (root.inline()) return inject(LAYER, { optional: true, skipSelf: true })
         return layerProvider(
           () => popoverLayerId(root.root()),
           () => "popover",
@@ -363,6 +404,7 @@ export class PopoverPositioner {
       provide: HEADING_LEVEL,
       useFactory: () => {
         const root = injectPopover("Content")
+        if (root.inline()) return inject(HEADING_LEVEL, { optional: true, skipSelf: true })
         return computed(() => Math.min(6, root.titleLevel() + 1))
       },
     },
@@ -371,6 +413,7 @@ export class PopoverPositioner {
 export class PopoverContent {
   constructor() {
     const root = injectPopover("Content")
+    if (root.inline()) return
     const env = injectEnvironment()
     const el: Element = inject(ElementRef).nativeElement
     const focusWithin = signal(false)
@@ -521,7 +564,8 @@ export class PopoverCloseTrigger {
  * parent: the host carries its theme, dir and lang.
  */
 @Directive({
-  selector: "ng-template[rindPopoverPortal], ng-template[rindTableFilterPortal]",
+  selector:
+    "ng-template[rindPopoverPortal], ng-template[rindTableFilterPortal], ng-template[rindDateFieldPortal], ng-template[rindColorPickerPortal]",
   exportAs: "rindPopoverPortal",
   providers: PORTAL_PROVIDERS,
 })

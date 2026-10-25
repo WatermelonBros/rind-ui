@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/babel__core": "^7.20.5",
@@ -97,6 +98,11 @@
         "solid": "./dist/button/index.jsx",
         "default": "./dist/button/index.mjs"
       },
+      "./calendar": {
+        "types": "./dist/calendar/index.d.mts",
+        "solid": "./dist/calendar/index.jsx",
+        "default": "./dist/calendar/index.mjs"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.mts",
         "solid": "./dist/checkbox/index.jsx",
@@ -122,6 +128,11 @@
         "solid": "./dist/collapsible/index.jsx",
         "default": "./dist/collapsible/index.mjs"
       },
+      "./color-picker": {
+        "types": "./dist/color-picker/index.d.mts",
+        "solid": "./dist/color-picker/index.jsx",
+        "default": "./dist/color-picker/index.mjs"
+      },
       "./combobox": {
         "types": "./dist/combobox/index.d.mts",
         "solid": "./dist/combobox/index.jsx",
@@ -131,6 +142,11 @@
         "types": "./dist/context-menu/index.d.mts",
         "solid": "./dist/context-menu/index.jsx",
         "default": "./dist/context-menu/index.mjs"
+      },
+      "./date-field": {
+        "types": "./dist/date-field/index.d.mts",
+        "solid": "./dist/date-field/index.jsx",
+        "default": "./dist/date-field/index.mjs"
       },
       "./dialog": {
         "types": "./dist/dialog/index.d.mts",
@@ -186,6 +202,16 @@
         "types": "./dist/image/index.d.mts",
         "solid": "./dist/image/index.jsx",
         "default": "./dist/image/index.mjs"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper/index.d.mts",
+        "solid": "./dist/image-cropper/index.jsx",
+        "default": "./dist/image-cropper/index.mjs"
+      },
+      "./image-viewer": {
+        "types": "./dist/image-viewer/index.d.mts",
+        "solid": "./dist/image-viewer/index.jsx",
+        "default": "./dist/image-viewer/index.mjs"
       },
       "./kbd": {
         "types": "./dist/kbd/index.d.mts",
@@ -382,6 +408,11 @@
         "solid": "./dist/tooltip/index.jsx",
         "default": "./dist/tooltip/index.mjs"
       },
+      "./tour": {
+        "types": "./dist/tour/index.d.mts",
+        "solid": "./dist/tour/index.jsx",
+        "default": "./dist/tour/index.mjs"
+      },
       "./tree-view": {
         "types": "./dist/tree-view/index.d.mts",
         "solid": "./dist/tree-view/index.jsx",
@@ -438,6 +469,12 @@
       "solid": "./dist/button/index.jsx",
       "default": "./dist/button/index.mjs"
     },
+    "./calendar": {
+      "@rind-ui/source": "./src/calendar/index.ts",
+      "types": "./dist/calendar/index.d.mts",
+      "solid": "./dist/calendar/index.jsx",
+      "default": "./dist/calendar/index.mjs"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.mts",
@@ -468,6 +505,12 @@
       "solid": "./dist/collapsible/index.jsx",
       "default": "./dist/collapsible/index.mjs"
     },
+    "./color-picker": {
+      "@rind-ui/source": "./src/color-picker/index.ts",
+      "types": "./dist/color-picker/index.d.mts",
+      "solid": "./dist/color-picker/index.jsx",
+      "default": "./dist/color-picker/index.mjs"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.mts",
@@ -479,6 +522,12 @@
       "types": "./dist/context-menu/index.d.mts",
       "solid": "./dist/context-menu/index.jsx",
       "default": "./dist/context-menu/index.mjs"
+    },
+    "./date-field": {
+      "@rind-ui/source": "./src/date-field/index.ts",
+      "types": "./dist/date-field/index.d.mts",
+      "solid": "./dist/date-field/index.jsx",
+      "default": "./dist/date-field/index.mjs"
     },
     "./dialog": {
       "@rind-ui/source": "./src/dialog/index.ts",
@@ -545,6 +594,18 @@
       "types": "./dist/image/index.d.mts",
       "solid": "./dist/image/index.jsx",
       "default": "./dist/image/index.mjs"
+    },
+    "./image-cropper": {
+      "@rind-ui/source": "./src/image-cropper/index.ts",
+      "types": "./dist/image-cropper/index.d.mts",
+      "solid": "./dist/image-cropper/index.jsx",
+      "default": "./dist/image-cropper/index.mjs"
+    },
+    "./image-viewer": {
+      "@rind-ui/source": "./src/image-viewer/index.ts",
+      "types": "./dist/image-viewer/index.d.mts",
+      "solid": "./dist/image-viewer/index.jsx",
+      "default": "./dist/image-viewer/index.mjs"
     },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
@@ -779,6 +840,12 @@
       "types": "./dist/tooltip/index.d.mts",
       "solid": "./dist/tooltip/index.jsx",
       "default": "./dist/tooltip/index.mjs"
+    },
+    "./tour": {
+      "@rind-ui/source": "./src/tour/index.ts",
+      "types": "./dist/tour/index.d.mts",
+      "solid": "./dist/tour/index.jsx",
+      "default": "./dist/tour/index.mjs"
     },
     "./tree-view": {
       "@rind-ui/source": "./src/tree-view/index.ts",
