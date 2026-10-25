@@ -416,7 +416,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "ngc -p tsconfig.build.json && node ../../scripts/size-adapters.mjs angular",
+    "build": "ngc -p tsconfig.build.json && node ../../scripts/angular-esm.mjs && node ../../scripts/size-adapters.mjs angular",
     "typecheck": "ngc -p tsconfig.json",
     "size": "node ../../scripts/size-adapters.mjs angular"
   },

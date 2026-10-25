@@ -1,11 +1,13 @@
-// Markup parity with React: empty, a date, a date-time, a time, in a form, a picker, a range.
-import { Component } from "@angular/core"
+// Markup parity with React: empty, a date, a date-time, a time, in a form, a picker, a range;
+// the picker's CloseTrigger closes it.
+import { ApplicationRef, Component } from "@angular/core"
 import { CalendarDate, CalendarDateTime, Time } from "@internationalized/date"
 import type { DateRangeFieldValue, FieldValue } from "@rind-ui/core"
 import * as R from "@rind-ui/react"
 import { createElement as r } from "react"
-import { describe, it } from "vitest"
+import { describe, expect, it } from "vitest"
 import { clock } from "../../fixtures/date-field-model"
+import { mount } from "../../fixtures/mount"
 import { both, clientParity } from "../../fixtures/parity"
 import { Calendar } from "../calendar/calendar"
 import { RindProvider } from "../provider"
@@ -49,6 +51,7 @@ const CONTENT = `<label rindDateFieldLabel>Birthday</label>
                 </div>
                 <table rindCalendarGrid></table>
               </div>
+              <button rindDateFieldCloseTrigger>Done</button>
             </div>
           </div>
         </ng-template>
@@ -134,6 +137,7 @@ const react = (p: P, picker = false) =>
                   ),
                   r(R.Calendar.Grid),
                 ),
+                r(R.DateField.CloseTrigger, null, "Done"),
               ),
             ),
           )
@@ -176,4 +180,18 @@ describe("Angular DateField matches React", () => {
       await both(react(p), Fixture)
     })
   }
+})
+
+describe("Angular DateField CloseTrigger", () => {
+  it("closes the open picker", async () => {
+    current = { p: { defaultOpen: true }, picker: true }
+    const { ref } = await mount(Fixture)
+    const content = "[data-scope=date-field][data-part=content]"
+    expect(document.querySelector(content)).not.toBeNull()
+    const done = [...document.querySelectorAll("button")].find((b) => b.textContent === "Done")
+    expect(done).toBeDefined()
+    done?.click()
+    await ref.injector.get(ApplicationRef).whenStable()
+    expect(document.querySelector(content)).toBeNull()
+  })
 })
