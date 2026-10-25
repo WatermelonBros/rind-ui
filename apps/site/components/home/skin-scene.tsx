@@ -5,7 +5,7 @@ import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { cue } from "../sound"
 import { zoom } from "../zoom"
-import { arc, type DockPosition, fit, hop, locate } from "./docks"
+import { arc, aside, type DockPosition, fit, hop, locate } from "./docks"
 import {
   emitTestArrived,
   getLookColors,
@@ -518,6 +518,11 @@ export function SkinScene() {
       return t + ((t < 0.5 ? 0 : 1) - t) * k
     }
     let shownT = 0
+    // in flight it is never cut by the screen's side (it left the wall half past the left edge)
+    const onScreen = (b: DOMRect) => {
+      const x = Math.min(window.innerWidth - b.width - 8, Math.max(8, b.x))
+      return new DOMRect(x, b.y, b.width, b.height)
+    }
     const route = () => {
       const { p, boxes } = where()
       const from = p ? boxes[p.from] : null
@@ -527,9 +532,22 @@ export function SkinScene() {
         // where it is drawn along the flight (alpha reads the same, this frame)
         shownT = flown(p.t)
         if (phone()) return hop(from, to, shownT).box
+        // into the wall: the section's title and lead stand right above its cards, so it comes
+        // down the clear side of the lead and in along the gap over the cards (straight, it
+        // crossed the lead's copy)
+        const wallEl = dockOf(p.to)?.id === "wall" ? measured?.els[p.to] : null
+        const section = wallEl?.closest("section")
+        const title = section?.querySelector("h2")?.getBoundingClientRect()
+        const lead = section?.querySelector("p")?.getBoundingClientRect()
+        const cards = wallEl?.closest("ul")?.getBoundingClientRect()
+        if (title && lead && cards && cards.top > lead.bottom) {
+          const copy = Math.max(title.right, lead.right)
+          const lane = Math.min(window.innerWidth - to.width, copy + to.width)
+          return onScreen(aside(from, to, shownT, lane, (lead.bottom + cards.top) / 2))
+        }
         // one throw from dock to dock, higher the further it goes (a short hop barely lifts)
         const reach = Math.hypot(centre(to) - centre(from), to.x - from.x)
-        return arc(from, to, shownT, Math.min(vh() * 0.16, reach * 0.35))
+        return onScreen(arc(from, to, shownT, Math.min(vh() * 0.16, reach * 0.35)))
       }
       // before the machine lets go: the hero, then the hero's trip to the machine's control
       const { next, y, s0, t } = travel()

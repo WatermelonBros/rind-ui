@@ -18,6 +18,8 @@ You install the framework package. Everything else is optional.
 | `@rind-ui/react` | The components for React: `Accordion.Root`, `Button`, `TextField.Input`… | **Yes**, if you use React |
 | `@rind-ui/vue` | The same components for Vue, with the same parts and names | **Yes**, if you use Vue |
 | `@rind-ui/svelte` | The same components for Svelte, with the same parts and names | **Yes**, if you use Svelte |
+| `@rind-ui/solid` | The same components for Solid, with the same parts and names | **Yes**, if you use Solid |
+| `@rind-ui/angular` | The same components for Angular, as directives with the same parts and names | **Yes**, if you use Angular |
 | `@rind-ui/core` | State machines, DOM helpers and contracts. No framework. Every framework package is built on it | It comes with the framework package |
 | `@rind-ui/theme` | An optional ready-made CSS theme on the same `data-*` attributes | Only if you want a starting look |
 | `@rind-ui/testing` | Test drivers for every component, for Testing Library and Playwright | In tests (dev dependency) |

@@ -607,6 +607,10 @@ const gapsTable = readFileSync(join(repo, "docs/compare-gaps.md"), "utf8")
 const compare = byRelease(readFileSync(join(import.meta.dirname, "../content/compare.md"), "utf8"))
   .replace("<!-- coverage -->", coverageTable)
   .replace("<!-- gaps -->", gapsTable)
+  // what only holds while a framework is still to come: gone once every one is published
+  .replace(/<!-- unreleased -->([\s\S]*?)<!-- \/unreleased -->\n?/g, (_, body: string) =>
+    frameworkWords.unreleased ? body : "",
+  )
   .replaceAll("{{released}}", frameworkWords.released)
   .replaceAll("{{unreleased}}", frameworkWords.unreleased)
   .replaceAll("{{unreleased-or}}", frameworkWords.unreleasedOr)

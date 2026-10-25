@@ -55,17 +55,22 @@
 .acts > :not(.leave) .text {
   animation: in 0.6s var(--spring) 0.08s both;
 }
+/* acts swap as one cross-fade in place: the old one waiting to clear before the new came in left
+   a moment with no title at all, a blink on every swap while scrolling */
 .leave {
-  animation: out 0.22s ease-in both;
+  animation: out 0.25s linear both;
 }
-/* the new act waits for the old one to clear: two titles over each other read as noise */
 .acts[data-swap] > :not(.leave) :is(.title, .text) {
-  animation-delay: 0.2s;
+  animation: fade 0.25s linear both;
 }
 @keyframes out {
   to {
     opacity: 0;
-    translate: 0 -14px;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
   }
 }
 /* peel.tsx: the control's opening tag, live, under the copy */

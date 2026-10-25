@@ -64,6 +64,25 @@ export function arc(from: DOMRect, to: DOMRect, t: number, lift: number, least =
 }
 
 /**
+ * A flight that keeps off a block of copy standing between two docks: out to `lane` (a clear
+ * x beside the copy), down it to `strip` (a clear y between the copy and the dock), along it,
+ * and down into the dock.
+ */
+export function aside(from: DOMRect, to: DOMRect, t: number, lane: number, strip: number): DOMRect {
+  const ax = from.x + from.width / 2
+  const ay = from.y + from.height / 2
+  const bx = to.x + to.width / 2
+  const by = to.y + to.height / 2
+  const k = (a: number, b: number) => ease(Math.min(1, Math.max(0, (t - a) / (b - a))))
+  const cx = ax + (lane - ax) * k(0, 0.3) + (bx - lane) * k(0.55, 0.85)
+  const cy = ay + (strip - ay) * k(0.15, 0.6) + (by - strip) * k(0.8, 1)
+  const e = ease(t)
+  const w = lerp(from.width, to.width, e)
+  const h = lerp(from.height, to.height, e)
+  return new DOMRect(cx - w / 2, cy - h / 2, w, h)
+}
+
+/**
  * A phone's flight: there is no room beside the copy, so the object never crosses it. It
  * shrinks away into the dock it leaves and grows out of the one it reaches; in between it is not
  * drawn. Returns the box and the opacity.
