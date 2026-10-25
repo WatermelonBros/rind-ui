@@ -231,7 +231,10 @@ export function Tested() {
     const go = () => {
       if (autoRan.current) return
       autoRan.current = true
-      wait = window.setTimeout(() => scrollRef.current(), 500)
+      // a phone does not hold the scene, so a run driven by the scroll carried the panel off the
+      // screen before its PASS: there it runs on its own, as the Run button does
+      const phone = window.matchMedia("(max-width: 900px)").matches
+      wait = window.setTimeout(() => (phone ? playRef.current() : scrollRef.current()), 500)
     }
     const off = onTestArrived(go)
     // desktop: the run also starts as the scene comes to hold still, if the object is late
@@ -349,7 +352,7 @@ export function Tested() {
   scrollRef.current = () => {
     if (running) return
     const n = STEPS.length
-    const stepPx = window.matchMedia("(max-width: 900px)").matches ? 70 : 90
+    const stepPx = 90
     setRunning(true)
     setPassed(null)
     setResults({})
@@ -361,7 +364,6 @@ export function Tested() {
     // ends with the hold (home.module.css: .testRoom is the lines' stretches and a little for the
     // PASS); the first line waits a half stretch, so the reset state is seen first
     const hold = roomRef.current?.previousElementSibling
-    // (a phone does not hold the scene: its lines count from where the run starts)
     const holdStyle = hold ? getComputedStyle(hold) : null
     const stuckAt =
       hold && holdStyle?.position === "sticky"
