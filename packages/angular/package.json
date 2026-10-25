@@ -416,8 +416,9 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "ngc -p tsconfig.build.json",
-    "typecheck": "ngc -p tsconfig.json"
+    "build": "ngc -p tsconfig.build.json && node ../../scripts/size-adapters.mjs angular",
+    "typecheck": "ngc -p tsconfig.json",
+    "size": "node ../../scripts/size-adapters.mjs angular"
   },
   "dependencies": {
     "@rind-ui/core": "workspace:*"

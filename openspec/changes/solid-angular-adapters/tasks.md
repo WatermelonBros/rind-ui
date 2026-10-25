@@ -6,7 +6,7 @@
 - [x] 1.4 Vitest: `vite-plugin-solid` (scoped to `packages/solid`, `browser`/`solid` conditions) and `@analogjs/vite-plugin-angular` (AOT, scoped to `packages/angular`) projects
 - [x] 1.5 Fixtures per package: `mount`, parity (`clientParity`/`serverParity` against React, framework attributes stripped), examples test (`packages/<fw>/examples/<slug>/<Name>.<ext>` against `apps/site/examples/<slug>.tsx`)
 - [x] 1.6 Hydration tests: Solid (ssr + dom bundles of a fixture), Angular (`@angular/platform-server`)
-- [ ] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck`; Changesets fixed group
+- [x] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck`; Changesets fixed group
 - [x] 1.8 Size budgets for the two packages (`scripts/size-adapters.mjs`)
 - [x] 1.2b Layer portals for both packages (with the first overlay component, 2.53 Popover)
 - [x] 1.9 Tell the site agent when the first component of each is on main (exports are the source of truth); docs: installation for Solid and Angular
