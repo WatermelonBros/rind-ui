@@ -126,6 +126,10 @@ const CONTROL: Record<HeroKind, readonly Step[]> = {
   ],
 }
 
+// a phone runs the test on its own once in view; a desktop window as narrow (or zoomed in) keeps
+// the run on its scroll, as every desktop does
+const PHONE = "(max-width: 900px) and (pointer: coarse)"
+
 /** A driver test plays itself against the live components next to it. */
 export function Tested() {
   const { phase } = usePhase()
@@ -233,7 +237,7 @@ export function Tested() {
       autoRan.current = true
       // a phone does not hold the scene, so a run driven by the scroll carried the panel off the
       // screen before its PASS: there it runs on its own, as the Run button does
-      const phone = window.matchMedia("(max-width: 900px)").matches
+      const phone = window.matchMedia(PHONE).matches
       wait = window.setTimeout(() => (phone ? playRef.current() : scrollRef.current()), 500)
     }
     const off = onTestArrived(go)
@@ -254,7 +258,7 @@ export function Tested() {
     const root = stage.current?.querySelector<HTMLElement>(
       '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
     )
-    if (!root || !window.matchMedia("(max-width: 900px)").matches)
+    if (!root || !window.matchMedia(PHONE).matches)
       return () => {
         off()
         window.clearTimeout(wait)
@@ -352,7 +356,7 @@ export function Tested() {
   scrollRef.current = () => {
     if (running) return
     const n = STEPS.length
-    const stepPx = 90
+    const stepPx = window.matchMedia("(max-width: 900px)").matches ? 70 : 90
     setRunning(true)
     setPassed(null)
     setResults({})
