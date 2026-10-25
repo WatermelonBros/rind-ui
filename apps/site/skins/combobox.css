@@ -169,7 +169,8 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="combobox"][data-part="item-description"] {
-  color: color-mix(in srgb, var(--s-ink) 65%, var(--s-card));
+  /* 4.5:1 on the card and on the highlighted row (65% fell to 3.7:1 in juicy) */
+  color: color-mix(in srgb, var(--s-ink) 80%, var(--s-card));
   font-size: 13px;
   font-weight: 500;
 }

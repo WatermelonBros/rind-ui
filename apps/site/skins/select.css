@@ -33,7 +33,7 @@
   outline-offset: 2px;
 }
 [data-rind-theme^="skin-"] [data-scope="select"][data-part="trigger"][data-placeholder] {
-  color: color-mix(in oklab, var(--s-ink) 65%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 [data-rind-theme^="skin-"] [data-scope="select"][data-part="trigger"][data-disabled] {
   cursor: not-allowed;
@@ -135,7 +135,7 @@
   font: 700 11px var(--s-font);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: color-mix(in oklab, var(--s-ink) 70%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 @media (prefers-reduced-motion: reduce) {
   [data-rind-theme^="skin-"]

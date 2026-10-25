@@ -14,7 +14,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-part="description"] {
   font-size: 13.5px;
-  color: color-mix(in oklab, var(--s-ink) 74%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
   margin-top: 6px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-part="error-message"] {

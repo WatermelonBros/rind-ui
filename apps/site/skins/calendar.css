@@ -143,18 +143,18 @@
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-unavailable] {
   /* Muted by colour, never by opacity: it would compound with a disabled root. */
-  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
   text-decoration: line-through;
   cursor: not-allowed;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-disabled] {
-  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
   cursor: not-allowed;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="calendar"][data-part="cell"][data-outside-month] {
-  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
   cursor: default;
 }
 /* Range mode: one band per week row; the ends keep the selected look */

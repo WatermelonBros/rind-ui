@@ -270,7 +270,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="toast"][data-part="description"] {
   grid-area: description;
-  color: color-mix(in oklab, var(--s-ink) 72%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 /* Alone, the title centres on the glyph; with a description both columns pair up. */
 :is([data-skinned], [data-rind-theme^="skin-"])

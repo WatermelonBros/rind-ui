@@ -100,7 +100,7 @@
   :is([data-scope="accordion"], [data-scope="collapsible"])[data-part="content"]
   > .pad {
   padding: 2px 16px 16px;
-  color: color-mix(in oklab, var(--s-ink) 78%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
   font-size: 15px;
   line-height: 1.5;
 }

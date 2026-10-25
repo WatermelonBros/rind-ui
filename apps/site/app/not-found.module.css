@@ -17,7 +17,7 @@
 }
 .text {
   font: 500 18px / 1.5 var(--text);
-  color: color-mix(in oklab, var(--ink) 78%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
 }
 .ctas {
   display: flex;

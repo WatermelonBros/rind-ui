@@ -43,7 +43,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-placeholder] {
-  color: color-mix(in srgb, var(--s-ink) 55%, transparent);
+  color: color-mix(in srgb, var(--s-ink) 80%, transparent);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-focus] {

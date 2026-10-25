@@ -1409,7 +1409,7 @@
   font-size: 15px;
 }
 .wallGroup li span {
-  color: color-mix(in oklab, var(--ink) 72%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
 }
 .wallGroup li a {
   font-weight: 700;
@@ -1793,7 +1793,7 @@
 }
 .proofs[data-staged] .claim {
   /* a tint, not opacity: the claims out of focus stay readable (over 4.5:1 on paper) */
-  color: color-mix(in oklab, var(--ink) 66%, var(--paper));
+  color: color-mix(in oklab, var(--ink) 80%, var(--paper));
   transition: color 0.4s var(--spring);
 }
 .proofs[data-staged] .claim[data-active] {
@@ -1961,7 +1961,8 @@
   font: 600 11px var(--mono);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.6;
+  /* 0.85: 4.5:1 on every worn brand (0.6 fell to 3.4:1 on Handheld) */
+  opacity: 0.85;
 }
 .sockets {
   position: relative;
@@ -2045,7 +2046,7 @@ button.socket:focus-visible {
 /* a planned framework: a slab not cast yet, only its outline */
 .socket[data-soon] {
   background: color-mix(in oklab, var(--card) 45%, transparent);
-  color: color-mix(in oklab, var(--ink) 70%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
   box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--ink) 25%, transparent);
   outline: 2px dashed color-mix(in oklab, var(--ink) 30%, transparent);
   outline-offset: 5px;
@@ -2442,8 +2443,10 @@ g:not([data-plugged]) > .pulse {
   color: var(--on-acc);
 }
 :global([data-phase="crisp"]) .passBanner b {
-  background: var(--ink);
-  color: var(--acc);
+  /* the accent with its own type: the accent on ink failed in most worn skins (Terminal's green on
+     white, Newsprint's black on black) */
+  background: var(--acc);
+  color: var(--on-acc);
 }
 
 /* install.tsx: the waiting socket last pressed stays picked out (solid edge, lifted, full

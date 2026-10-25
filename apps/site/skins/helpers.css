@@ -9,9 +9,10 @@
   display: grid;
   gap: 14px;
 }
+/* 0.82: 4.5:1 and more on every skin's ground (0.7 left juicy's ink at 4.3:1 on its pink) */
 .note {
   font-size: 14px;
-  opacity: 0.7;
+  opacity: 0.82;
 }
 
 /* live attribute readout used by the guide demos */

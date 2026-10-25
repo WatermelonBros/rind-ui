@@ -132,7 +132,7 @@
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] p {
   margin: 0;
   font-size: 14px;
-  color: color-mix(in oklab, var(--s-ink) 78%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
 }
 [data-rind-theme^="skin-"] [data-scope="popover"][data-part="content"] input {
   font: 500 14px var(--s-font);

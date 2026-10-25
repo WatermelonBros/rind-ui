@@ -356,7 +356,7 @@
   padding-top: 20px;
   border-top: 2px solid color-mix(in oklab, var(--ink) 12%, transparent);
   font: 500 13px var(--mono);
-  color: color-mix(in oklab, var(--ink) 75%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
 }
 .footer a {
   text-decoration: none;
@@ -408,7 +408,7 @@
   font: 600 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: color-mix(in oklab, var(--ink) 70%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
 }
 
 /* crisp character on paper: acid markers, hard rules, square bullets */

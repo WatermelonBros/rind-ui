@@ -16,7 +16,10 @@ export const metadata: Metadata = {
 /** The one page of the site that names other libraries: an honest comparison (content/compare.md). */
 export default function ComparePage() {
   const markdown = readFileSync(join(process.cwd(), "content/generated/compare.md"), "utf8")
-  const html = new Marked({ gfm: true }).parse(markdown, { async: false })
+  // a table too wide for a phone scrolls sideways on its own: focusable, so a keyboard can too
+  const html = new Marked({ gfm: true })
+    .parse(markdown, { async: false })
+    .replaceAll("<table>", '<table tabindex="0">')
   return (
     <main className={styles.page}>
       {/* biome-ignore lint/security/noDangerouslySetInnerHtml: our own markdown, rendered at build time */}
