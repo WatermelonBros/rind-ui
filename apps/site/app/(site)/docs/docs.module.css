@@ -123,6 +123,8 @@
   background: color-mix(in oklab, var(--ink) 8%, transparent);
   padding: 0.12em 0.35em;
   border-radius: 6px;
+  /* a long path or attribute breaks rather than running past a phone's edge */
+  overflow-wrap: anywhere;
 }
 .prose :where(pre) {
   background: #0b0b0c;

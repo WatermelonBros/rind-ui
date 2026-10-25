@@ -2584,3 +2584,10 @@ g:not([data-plugged]) > .pulse {
 :global(html[data-stripped]) :is(.reads, .verdict[data-ok]) {
   color: #4a4a4a;
 }
+:global(html[data-stripped]) .passBanner {
+  color: #000000;
+}
+/* the install's glow is the frameworks' brand: stripped, a plain grey one */
+:global(html[data-stripped]) .stage {
+  --brand: #9a9a9a;
+}
