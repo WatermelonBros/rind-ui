@@ -155,6 +155,29 @@
 :global([data-bare]) .stays {
   display: inline;
 }
+/* on a phone the two lines take the same room: the longer one wraps where the shorter does not,
+   and the swap (half-way through the peel) pushed the page under the reader; at 320px the push
+   moved the peel back over its threshold and the page shook */
+@media (max-width: 900px) {
+  .swap {
+    display: inline-grid;
+  }
+  .swap > .look,
+  .swap > .stays {
+    display: inline;
+    grid-area: 1 / 1;
+    justify-self: start;
+  }
+  .swap > .stays {
+    visibility: hidden;
+  }
+  :global([data-bare]) .swap > .look {
+    visibility: hidden;
+  }
+  :global([data-bare]) .swap > .stays {
+    visibility: visible;
+  }
+}
 :global([data-phase="juicy"]) .lede em {
   background: var(--acc);
   color: var(--on-acc);

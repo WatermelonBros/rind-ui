@@ -120,6 +120,8 @@ body {
   color: var(--ink);
   font-family: var(--text);
   -webkit-font-smoothing: antialiased;
+  /* again on the body: Safari on a phone lets the page pan sideways past html's clip */
+  overflow-x: clip;
 }
 ::selection {
   background: var(--acc);
