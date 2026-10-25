@@ -42,6 +42,9 @@ export interface HandoffOptions {
   /** Where in the viewport the scene's bottom edge starts the trip (1, the viewport's bottom,
    *  by default): later, when the hand-off before leaves from the same place. */
   readonly startAt?: number
+  /** The page has come to rest and the travellers fade out where they are: what gave way to
+   *  one still on its way comes back (the next scroll paints them again). */
+  readonly rest?: () => void
   /** With several travellers: how far into the trip each sets off after the one before (0.22
    *  by default); smaller, and the last lands sooner after the first. */
   readonly gap?: number
@@ -223,6 +226,7 @@ export function handoff(o: HandoffOptions): () => void {
       if (!layer) return
       layer.style.transition = "opacity 0.3s"
       layer.style.opacity = "0"
+      o.rest?.()
     }, 260)
   }
   window.addEventListener("scroll", onScroll, { passive: true })
