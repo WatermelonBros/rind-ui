@@ -54,13 +54,21 @@ Fallback before it is due, an Alert after it is dismissed and its exit has run, 
 SHALL keep the consumer's element, hidden by both the `hidden` attribute and an inline
 `display: none`, with only `data-scope` and `data-instance`: no `data-part`, no role and no
 `aria-*`, so drivers, skins and assistive technology find no part. The part SHALL remove both
-when it renders again, and only the `display` it wrote.
+when it renders again, and only the `display` it wrote. The parts inside an absent part
+(the items of a closed Menu's Content) SHALL be absent too, and an absent part's children
+SHALL NOT count as rendered for the references they enable (a closed Select's List and the
+trigger's `aria-controls`).
 
 #### Scenario: A consumer display rule does not reveal it
 
 - **WHEN** a dismissed Alert is styled by `[data-scope="alert"] { display: block }`
 - **THEN** its element computes `display: none`, carries `hidden`, and no element with
   `data-part` remains inside it
+
+#### Scenario: A closed menu's items
+
+- **WHEN** a menu opened by pointer closes, its Content kept and hidden
+- **THEN** no item inside it carries `data-part` or a focus attribute
 
 #### Scenario: Markup parity in the rendered states
 
@@ -142,6 +150,18 @@ copy made before the provider's inputs are set.
 - **WHEN** the user drags an open Drawer's content, whose state changes on every move
 - **THEN** focus stays on the element inside the content that had it
 
+### Requirement: Roots Without An Element
+
+A Root React renders no element for (Popover, Dialog, Menu, Select, Combobox, Tags Input) SHALL
+be a directive on an `<ng-container>`; the elements React renders after its children (a
+Select's hidden form inputs) SHALL follow the container's content in the same order, on the
+server too.
+
+#### Scenario: A named single select
+
+- **WHEN** `<ng-container rindSelectRoot name="fruit">` renders its Label, Trigger and Portal
+- **THEN** its hidden input follows them, as React's, and the server markup matches React's
+
 ### Requirement: Data Rows Come From The Template
 
 A part that React renders from data or a render function (a Listbox's data items, a Tag
@@ -161,7 +181,7 @@ SHALL be a directive on an `<ng-container>`.
 
 An output SHALL NOT be named like a DOM event that bubbles to its element, since a template
 listener of that name hears both: Clipboard's and Code Block's copy result is `copyResult`, not
-`copy`.
+`copy`, and a Menu item's activation is `itemSelect`, not `select`.
 
 #### Scenario: Copying from the Input
 

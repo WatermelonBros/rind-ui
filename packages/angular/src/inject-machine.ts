@@ -50,7 +50,8 @@ type EnvArgument<M extends AnyMachine> =
  * started on the server.
  */
 export function injectMachine<M extends AnyMachine>(
-  machine: M,
+  /** The definition, or a function choosing it when the service is created (after inputs). */
+  machine: M | (() => M),
   props: () => MachinePropsOf<M>,
   ...[env]: EnvArgument<M>
 ): {
@@ -65,7 +66,11 @@ export function injectMachine<M extends AnyMachine>(
   let created: Service<M> | undefined
   const service = () => {
     // Without an `env` argument, EnvArgument<M> proved the base environment satisfies EnvOf<M>.
-    created ??= createService(machine, untracked(props), env ?? (provided as EnvOf<M>))
+    created ??= createService(
+      typeof machine === "function" ? untracked(machine) : machine,
+      untracked(props),
+      env ?? (provided as EnvOf<M>),
+    )
     return created
   }
   const version = signal(0)

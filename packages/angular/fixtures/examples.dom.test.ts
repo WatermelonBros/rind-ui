@@ -1,7 +1,7 @@
 // The copyable Angular examples (packages/angular/examples/<slug>/<Name>.ts, shown on the docs
 // site's "Get code" panel): each renders the same markup as the site's React example of the
 // same name (apps/site/examples/<slug>.tsx), and passes axe.
-import type { Type } from "@angular/core"
+import { APP_ID, type Type } from "@angular/core"
 import { canonicalHtml } from "@rind-ui/testing"
 import axe from "axe-core"
 import { createElement, type FunctionComponent } from "react"
@@ -40,7 +40,8 @@ describe("Angular examples", () => {
       if (!AngularExample) throw new Error(`${path} has no export ${name}`)
       // React settles alone first: two renders in one document interfere (ids, focus, layout).
       const expected = await reactSettled(createElement(Example))
-      const { host } = await mount(AngularExample)
+      // An app id canonicalHtml knows as generated (an item keyed by its generated id).
+      const { host } = await mount(AngularExample, {}, [{ provide: APP_ID, useValue: "parity0" }])
       host.style.pointerEvents = "none"
       // Measured parts (an indicator) settle on a later frame.
       await vi.waitFor(() => expect(canonicalHtml(withoutAngular(host))).toBe(expected))

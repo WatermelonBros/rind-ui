@@ -8,7 +8,7 @@
 - [x] 1.6 Hydration tests: Solid (ssr + dom bundles of a fixture), Angular (`@angular/platform-server`)
 - [ ] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck`; Changesets fixed group
 - [x] 1.8 Size budgets for the two packages (`scripts/size-adapters.mjs`)
-- [ ] 1.2b Layer portals for both packages (with the first overlay component, 2.53 Popover)
+- [x] 1.2b Layer portals for both packages (with the first overlay component, 2.53 Popover)
 - [ ] 1.9 Tell the site agent when the first component of each is on main (exports are the source of truth); docs: installation for Solid and Angular
 
 ## 2. Components (Solid and Angular together, one pull request per batch; done = parts, contract model and parity green in both, both entries in `exports`, an example in both)
@@ -58,7 +58,7 @@
 - [x] 2.43 Form
 - [x] 2.44 Form Toggle
 - [x] 2.45 File Upload
-- [ ] 2.46 Tags Input
+- [x] 2.46 Tags Input
 - [x] 2.47 Tag Group
 - [x] 2.48 Listbox
 - [x] 2.49 Grid List
@@ -71,12 +71,12 @@
 - [x] 2.56 Dialog
 - [x] 2.57 Drawer
 - [x] 2.58 Toast
-- [ ] 2.59 Menu
-- [ ] 2.60 Context Menu
-- [ ] 2.61 Menubar
-- [ ] 2.62 Navigation Menu
-- [ ] 2.63 Select
-- [ ] 2.64 Combobox
+- [x] 2.59 Menu
+- [x] 2.60 Context Menu
+- [x] 2.61 Menubar
+- [x] 2.62 Navigation Menu
+- [x] 2.63 Select
+- [x] 2.64 Combobox
 - [ ] 2.65 Tour
 - [ ] 2.66 Calendar
 - [ ] 2.67 Date Field

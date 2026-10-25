@@ -1,0 +1,20 @@
+// The Menu namespace: a module namespace, so bundlers drop the parts never referenced.
+export {
+  Arrow,
+  CheckboxItem,
+  Content,
+  Group,
+  GroupLabel,
+  Item,
+  ItemIndicator,
+  ItemText,
+  Portal,
+  Positioner,
+  RadioGroup,
+  RadioItem,
+  Root,
+  Separator,
+  Submenu,
+  SubmenuTrigger,
+  Trigger,
+} from "./menu"
