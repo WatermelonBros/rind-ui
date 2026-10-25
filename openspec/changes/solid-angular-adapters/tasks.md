@@ -77,12 +77,12 @@
 - [x] 2.62 Navigation Menu
 - [x] 2.63 Select
 - [x] 2.64 Combobox
-- [ ] 2.65 Tour
-- [ ] 2.66 Calendar
-- [ ] 2.67 Date Field
-- [ ] 2.68 Color Picker
-- [ ] 2.69 Image Viewer
-- [ ] 2.70 Image Cropper
+- [x] 2.65 Tour
+- [x] 2.66 Calendar
+- [x] 2.67 Date Field
+- [x] 2.68 Color Picker
+- [x] 2.69 Image Viewer
+- [x] 2.70 Image Cropper
 - [ ] 2.71 Message Thread
 - [ ] 2.72 Streaming Message
 - [ ] 2.73 Reasoning
