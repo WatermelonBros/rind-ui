@@ -211,7 +211,7 @@
   span {
   font-weight: 500;
   font-size: 13px;
-  color: color-mix(in oklab, var(--s-ink) 72%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="navigation-menu"][data-part="content"][data-layout="grid"] {

@@ -221,7 +221,7 @@
 [data-rind-theme^="skin-"] [data-scope="drawer"][data-part="description"] {
   margin: 0;
   font-size: 14px;
-  color: color-mix(in oklab, var(--s-ink) 75%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
 }
 [data-rind-theme^="skin-"] [data-scope="drawer"][data-part="content"] ul {
   margin: 0;

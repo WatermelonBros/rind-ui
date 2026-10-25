@@ -140,7 +140,7 @@
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="empty"] > td {
   padding: 28px 16px;
   text-align: center;
-  color: color-mix(in oklab, var(--s-ink) 70%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="table"][data-part="sort-trigger"] {

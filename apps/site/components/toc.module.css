@@ -43,7 +43,7 @@
 .toc a {
   display: block;
   padding: 4px 0;
-  color: color-mix(in oklab, var(--ink) 72%, transparent);
+  color: color-mix(in oklab, var(--ink) 80%, transparent);
   text-decoration: none;
   transition:
     color 0.3s var(--spring),

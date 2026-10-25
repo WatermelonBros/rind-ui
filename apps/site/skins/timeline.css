@@ -74,7 +74,7 @@
     [data-part="time"],
     [data-part="opposite"]
   ) {
-  color: color-mix(in oklab, var(--s-ink) 68%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
   font-size: 13px;
 }
 /* alternate: the rail in the middle */

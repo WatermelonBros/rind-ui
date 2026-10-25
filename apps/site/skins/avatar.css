@@ -86,5 +86,6 @@
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="avatar"][data-part="fallback"] {
   background: var(--s-acc);
-  color: #fff;
+  /* white on the mint read at 1.8:1 */
+  color: var(--s-ink);
 }

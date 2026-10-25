@@ -30,7 +30,7 @@
   min-block-size: 24px;
   padding-block: 3px;
   box-sizing: border-box;
-  color: color-mix(in oklab, var(--s-ink) 64%, transparent);
+  color: color-mix(in oklab, var(--s-ink) 80%, transparent);
   text-decoration: none;
   border-radius: var(--s-r-sm);
 }

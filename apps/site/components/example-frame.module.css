@@ -309,7 +309,7 @@
   text-underline-offset: 3px;
 }
 .note code,
-.variant p code {
+.variant > p code {
   font: 500 0.9em var(--mono);
   background: color-mix(in oklab, var(--ink) 8%, transparent);
   padding: 0.1em 0.35em;
@@ -327,7 +327,9 @@
   margin: 26px 0 4px;
   scroll-margin-top: 90px;
 }
-.variant p {
+/* the variant's own caption only: every <p> of the example under it (a group's description,
+   its error) lost 20% of its contrast */
+.variant > p {
   font-size: 15px;
   opacity: 0.8;
   margin-bottom: 6px;

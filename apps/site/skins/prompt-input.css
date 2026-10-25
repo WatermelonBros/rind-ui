@@ -70,7 +70,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="prompt-input"][data-part="textarea"]::placeholder {
-  color: color-mix(in oklab, var(--s-ink) 62%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="prompt-input"]:is([data-part="attach-trigger"], [data-part="submit"]) {

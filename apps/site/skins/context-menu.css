@@ -23,7 +23,7 @@
 }
 [data-rind-theme^="skin-"] [data-scope="menu"][data-part="trigger"][data-context-menu] small {
   font: 500 12px var(--s-font);
-  color: color-mix(in oklab, var(--s-ink) 78%, var(--s-card));
+  color: color-mix(in oklab, var(--s-ink) 80%, var(--s-card));
 }
 [data-rind-theme^="skin-"]
   [data-scope="menu"][data-part="trigger"][data-context-menu][data-state="open"] {

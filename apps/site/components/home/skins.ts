@@ -510,6 +510,9 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   --skin-fill-text: ${fillText.toLowerCase()};
   --skin-surface: ${l.surface.toLowerCase()};
   --skin-ink: ${textOn(l.surface).toLowerCase()};
+  /* edges, rings and icons: the brand where it shows (3:1) on the surface, deepened with the ink
+     where it does not (a mint ring round a mint button on white read at 1.8:1) */
+  --skin-edge: ${contrast(l.brand, l.surface) >= 3 ? "var(--skin-brand)" : "color-mix(in oklab, var(--skin-brand) 40%, var(--skin-ink))"};
   --skin-card: ${glass ? "color-mix(in oklab, var(--skin-surface) 55%, transparent)" : "var(--skin-surface)"};
   --skin-line: color-mix(in oklab, var(--skin-ink) ${glass ? "14%, transparent" : "20%, var(--skin-surface)"});
   --skin-muted: color-mix(in oklab, var(--skin-ink) 7%, ${glass ? "transparent" : "var(--skin-surface)"});
@@ -532,7 +535,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   font: 15px / 1.4 var(--skin-font);
 }
 [data-scope]:focus-visible {
-  outline: 2px solid var(--skin-brand);
+  outline: 2px solid var(--skin-edge);
   outline-offset: 2px;
 }
 
@@ -562,7 +565,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 }
 [data-scope="text-field"][data-part="input"]:focus-visible {
   outline-offset: 0;
-  border-color: var(--skin-brand);
+  border-color: var(--skin-edge);
 }
 
 /* Switch */
@@ -585,7 +588,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 }
 [data-scope="switch"][data-part="control"][data-state="checked"] {
   background: ${l.fill === "outline" ? "var(--skin-brand)" : "var(--skin-fill)"};
-  border-color: var(--skin-brand);
+  border-color: var(--skin-edge);
 }
 [data-scope="switch"][data-part="thumb"] {
   inline-size: 18px;
@@ -620,7 +623,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 }
 [data-scope="checkbox"][data-part="control"][data-state="checked"] {
   background: ${l.fill === "outline" ? "var(--skin-brand)" : "var(--skin-fill)"};
-  border-color: var(--skin-brand);
+  border-color: var(--skin-edge);
   color: ${l.fill === "outline" ? textOn(l.brand).toLowerCase() : "var(--skin-fill-text)"};
 }
 [data-scope="checkbox"][data-part="control"][data-pressed] {
@@ -645,7 +648,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
 }
 [data-scope="button"][data-part="root"] {
   background: var(--skin-fill);
-  border-color: var(--skin-brand);
+  border-color: var(--skin-edge);
   color: var(--skin-fill-text);
 }
 [data-scope="button"][data-part="root"][data-hover] {
@@ -731,7 +734,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   inline-size: 20px;
   block-size: 20px;
   box-sizing: border-box;
-  border: max(2px, var(--skin-border)) solid var(--skin-brand);
+  border: max(2px, var(--skin-border)) solid var(--skin-edge);
   border-radius: min(99px, var(--skin-radius));
   background: var(--skin-surface);
   box-shadow: var(--skin-shadow);
@@ -799,7 +802,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   cursor: pointer;
 }
 [data-scope="accordion"][data-part="indicator"] {
-  color: var(--skin-brand);
+  color: var(--skin-edge);
   transition: rotate var(--skin-duration) var(--skin-ease);
 }
 [data-scope="accordion"][data-part="indicator"][data-state="open"] {

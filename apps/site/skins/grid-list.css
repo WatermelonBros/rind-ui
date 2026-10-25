@@ -96,7 +96,7 @@
   [data-scope="grid-list"][data-part="item-cell"]
   > [data-part="item-description"] {
   grid-row: 2;
-  color: color-mix(in srgb, var(--s-ink) 65%, var(--s-card));
+  color: color-mix(in srgb, var(--s-ink) 80%, var(--s-card));
   font-size: 13px;
   font-weight: 400;
 }
@@ -178,5 +178,5 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="grid-list"][data-part="empty"] {
   padding: 12px;
-  color: color-mix(in srgb, var(--s-ink) 65%, var(--s-card));
+  color: color-mix(in srgb, var(--s-ink) 80%, var(--s-card));
 }
