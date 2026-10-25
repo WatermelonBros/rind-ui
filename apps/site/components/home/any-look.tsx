@@ -271,6 +271,8 @@ export function AnyLook() {
           document.querySelector("[data-state-graph]")?.toggleAttribute("data-left", on)
           if (!on) document.querySelector("[data-states-land]")?.removeAttribute("data-waiting")
         },
+        // at rest the chip fades where it is, so the word it was to take does not stay a gap
+        rest: () => document.querySelector("[data-states-land]")?.removeAttribute("data-waiting"),
         // down the right margin, clear of this section's title and lead
         lane: () => window.innerWidth - 140,
         // then along under the lead, whose last line ends short of the word, and up into it
