@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Placeholder text reads at 4.5:1: preflight's 50% currentcolor fell to 2.7–3.7 on both phases. */
+@layer base {
+  ::placeholder {
+    color: color-mix(in oklab, currentcolor 80%, transparent);
+  }
+}
+
 /* Two phases of the same identity. crisp: acid, hard edges, offset shadows.
    juicy: pastel, inflated, squishy. Everything reads these tokens. */
 :root,

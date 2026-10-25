@@ -561,7 +561,7 @@ export function skinCss(l: Look & { readonly brand: string }): string {
   transition: border-color var(--skin-duration) var(--skin-ease);
 }
 [data-scope="text-field"][data-part="input"]::placeholder {
-  color: color-mix(in oklab, var(--skin-ink) 45%, transparent);
+  color: color-mix(in oklab, var(--skin-ink) 80%, var(--skin-muted));
 }
 [data-scope="text-field"][data-part="input"]:focus-visible {
   outline-offset: 0;

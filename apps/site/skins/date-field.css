@@ -45,6 +45,11 @@
   [data-scope="date-field"][data-part="segment"][data-placeholder] {
   color: color-mix(in srgb, var(--s-ink) 80%, transparent);
 }
+/* the segment's own colour already dims it; a second dimming fell under 3:1 */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="date-field"][data-part="segment"]::placeholder {
+  color: inherit;
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-focus] {
   background: var(--s-brand);
