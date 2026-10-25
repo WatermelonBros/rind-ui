@@ -1,5 +1,21 @@
 # @rind-ui/testing
 
+## 1.2.0
+
+### Patch Changes
+
+- be7adde: Text locators skip `hidden` elements, as Playwright's getByText does.
+- aefab08: Table of Contents: the contract's keyboard follow waits for the target heading to take focus
+  (the next frame), so model runs no longer race the step's snapshot, and the focus invariant
+  accepts focus moving from an in-page link (`href="#id"`) to its target as native link
+  behaviour, not focus lost.
+- e5140db: Vue and Svelte: Popover, with a Portal and the layer context the overlays share (outside
+  presses, Escape and focus return follow the nesting). `canonicalHtml` rounds measured lengths
+  to whole pixels, drops an empty `style` and treats a generated `data-value` as one token, so
+  two renders of one component compare equal across engines.
+- Updated dependencies [aefab08]
+  - @rind-ui/core@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes
