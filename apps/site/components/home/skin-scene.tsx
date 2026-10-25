@@ -4,6 +4,7 @@ import { Button, CheckboxGroup, Switch } from "@rind-ui/react"
 import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { cue } from "../sound"
+import { zoom } from "../zoom"
 import { arc, type DockPosition, fit, hop, locate } from "./docks"
 import {
   emitTestArrived,
@@ -145,6 +146,9 @@ export function SkinScene() {
       readonly box?: (r: DOMRect) => DOMRect
       /** the screen line (0 top, 1 bottom) its centre comes up to as the object arrives */
       readonly arrive: number
+      /** where its centre stops instead (viewport pixels), when a sticky scene holds it short of
+       *  that line */
+      readonly stops?: (el: HTMLElement, box: DOMRect) => number
       /** pixels scrolled past the moment it sets off again */
       readonly gone: (el: HTMLElement, box: DOMRect) => number
       /** stand: drawn on it for as long as it is there; melt: it dissolves into the real
@@ -174,6 +178,15 @@ export function SkinScene() {
         id: "test",
         el: getTestTarget,
         arrive: phone() ? 0.68 : 0.6,
+        // a desktop's test scene holds still with the control lower than that line: the object
+        // lands where the hold keeps it (it hung mid-flight over the code lines)
+        stops: (el, b) => {
+          const hold = el.closest<HTMLElement>("[data-hold]")
+          const style = hold && getComputedStyle(hold)
+          if (!hold || style?.position !== "sticky") return vh() * 0.6
+          const stuck = (Number.parseFloat(style.top) || 0) * zoom()
+          return Math.max(vh() * 0.6, centre(b) - (hold.getBoundingClientRect().top - stuck))
+        },
         gone: (el) =>
           vh() * 0.55 - (el.closest("[data-band]")?.getBoundingClientRect().bottom ?? vh()),
         mode: "stand",
@@ -235,7 +248,8 @@ export function SkinScene() {
         const el = els[i]
         const box = boxes[i] ?? null
         if (!el || !box) return { box: null, rest: 0, gone: 0 }
-        return { box, rest: centre(box) - vh() * d.arrive, gone: d.gone(el, box) }
+        const line = d.stops ? d.stops(el, box) : vh() * d.arrive
+        return { box, rest: centre(box) - line, gone: d.gone(el, box) }
       })
       const room = document.documentElement.scrollHeight - vh() - y
       measured = { at: now, y, els, boxes, p: locate(readings, room) }
