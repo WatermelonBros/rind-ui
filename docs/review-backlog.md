@@ -482,3 +482,7 @@ verified at round 3 (2026-10-14).
 
 - warning (unverified): Angular parts read `process.env.NODE_ENV` (`packages/angular/src/bind-props.ts`, `toggle/toggle.ts`, `field/field.ts`, …). The application builder (esbuild) and Vite define it, but the legacy webpack builder (`@angular-devkit/build-angular:browser`, still supported in Angular 21) was not checked. If it does not replace it, the first Toggle or Field render throws `ReferenceError: process is not defined`. A README note or `typeof process` guards would close it.
 - warning: Solid's `render` path now creates a part's children even when the consumer's `render` never spreads `children` (`packages/solid/src/render.ts`). With `render={(p) => <input {...p} />}` on a part given children, they are created and kept alive but never inserted; collection items among them would register with the root without being in the DOM.
+
+## Calendar (site audit, 2026-10-25)
+
+- warning: a server-rendered calendar's cell `aria-label` comes from the server's ICU and the browser's may differ: WebKit formats `ar` dates as "السبت، ٢٦ سبتمبر، ٢٠٢٦" where Node writes "السبت، ٢٦ سبتمبر ٢٠٢٦", so hydration warns and WebKit keeps the server's string (the docs' Arabic example). Formatting locale-dependent labels after mount, or marking those attributes as client-owned, would remove the mismatch; date-field may share it.
