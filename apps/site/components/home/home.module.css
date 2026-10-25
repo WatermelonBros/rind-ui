@@ -1006,16 +1006,13 @@
   box-shadow: none;
   outline: 2px dashed color-mix(in oklab, var(--ink) 35%, transparent);
   outline-offset: -2px;
-  opacity: 0.6;
+  /* never dimmed while it is being written: the dashed frame says so, and a 60% title failed
+     contrast whenever axe looked before the reply was done */
   transition:
-    opacity 0.4s var(--spring),
     box-shadow 0.4s var(--spring),
     scale 0.5s var(--spring-pop);
 }
-/* written, it is whole; opened by the driver, it pops up as a dialog over the page */
-.agentsPreview[data-written] .agentsDialog {
-  opacity: 1;
-}
+/* opened by the driver, it pops up as a dialog over the page */
 .agentsDialog[data-open] {
   outline: 0;
   box-shadow: var(--shadow);
