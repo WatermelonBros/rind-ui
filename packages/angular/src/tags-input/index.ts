@@ -1,0 +1,16 @@
+export {
+  TagsInput,
+  type TagsInputChangeDetails,
+  TagsInputChip,
+  TagsInputChipInput,
+  TagsInputChipRemove,
+  TagsInputChips,
+  TagsInputChipText,
+  TagsInputClearTrigger,
+  TagsInputControl,
+  TagsInputInput,
+  type TagsInputInputValueEvent,
+  type TagsInputItemData,
+  TagsInputRoot,
+  type TagsInputValueEvent,
+} from "./tags-input"

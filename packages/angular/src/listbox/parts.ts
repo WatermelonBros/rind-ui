@@ -76,7 +76,10 @@ function injectItemKey(part: string): () => CollectionKey {
 }
 
 /** The list's visible name (a `<span>`). */
-@Directive({ selector: "[rindListboxLabel]", exportAs: "rindListboxLabel" })
+@Directive({
+  selector: "[rindListboxLabel], [rindComboboxLabel], [rindTagsInputLabel]",
+  exportAs: "rindListboxLabel",
+})
 export class ListboxLabel {
   constructor() {
     const host = injectHost("Label")
@@ -88,7 +91,10 @@ export class ListboxLabel {
 }
 
 /** The `listbox`: `<div rindListboxList>`, named by the Label or `aria-label`. */
-@Directive({ selector: "[rindListboxList]", exportAs: "rindListboxList" })
+@Directive({
+  selector: "[rindListboxList], [rindComboboxList], [rindTagsInputList]",
+  exportAs: "rindListboxList",
+})
 export class ListboxList {
   constructor() {
     const host = injectHost("List")
@@ -119,7 +125,7 @@ export class ListboxList {
 
 /** An option: `<div rindListboxItem value="apple">`. */
 @Directive({
-  selector: "[rindListboxItem]",
+  selector: "[rindListboxItem], [rindSelectItem], [rindComboboxItem], [rindTagsInputItem]",
   exportAs: "rindListboxItem",
   providers: [{ provide: ITEM, useExisting: forwardRef(() => ListboxItem) }],
 })
@@ -194,7 +200,11 @@ export class ListboxItem {
   }
 }
 
-@Directive({ selector: "[rindListboxItemText]", exportAs: "rindListboxItemText" })
+@Directive({
+  selector:
+    "[rindListboxItemText], [rindSelectItemText], [rindComboboxItemText], [rindTagsInputItemText]",
+  exportAs: "rindListboxItemText",
+})
 export class ListboxItemText {
   constructor() {
     const host = injectHost("ItemText")
@@ -203,7 +213,11 @@ export class ListboxItemText {
 }
 
 /** The option's description (its `aria-describedby`). */
-@Directive({ selector: "[rindListboxItemDescription]", exportAs: "rindListboxItemDescription" })
+@Directive({
+  selector:
+    "[rindListboxItemDescription], [rindSelectItemDescription], [rindComboboxItemDescription]",
+  exportAs: "rindListboxItemDescription",
+})
 export class ListboxItemDescription {
   constructor() {
     const host = injectHost("ItemDescription")
@@ -222,7 +236,10 @@ export class ListboxItemDescription {
 }
 
 /** Shown while its option is selected (`keepMounted`: always, hidden by CSS on `data-state`). */
-@Directive({ selector: "[rindListboxItemIndicator]", exportAs: "rindListboxItemIndicator" })
+@Directive({
+  selector: "[rindListboxItemIndicator], [rindSelectItemIndicator], [rindComboboxItemIndicator]",
+  exportAs: "rindListboxItemIndicator",
+})
 export class ListboxItemIndicator {
   /** Rendered while not selected too (hidden by CSS on `data-state`). */
   readonly keepMounted = input(false, { transform: booleanAttribute })
@@ -246,7 +263,8 @@ export class ListboxItemIndicator {
  * content of a `[rindListboxSectionLabel]` element inside, else the label text) heads it.
  */
 @Component({
-  selector: "[rindListboxSection]",
+  selector:
+    "[rindListboxSection], [rindSelectSection], [rindComboboxSection], [rindTagsInputSection]",
   exportAs: "rindListboxSection",
   imports: [RindProps],
   encapsulation: ViewEncapsulation.None,
@@ -291,7 +309,11 @@ export class ListboxSection {
 }
 
 /** A decorative divider between options; it takes no name. */
-@Directive({ selector: "[rindListboxSeparator]", exportAs: "rindListboxSeparator" })
+@Directive({
+  selector:
+    "[rindListboxSeparator], [rindSelectSeparator], [rindComboboxSeparator], [rindTagsInputSeparator]",
+  exportAs: "rindListboxSeparator",
+})
 export class ListboxSeparator {
   constructor() {
     const host = injectHost("Separator")
@@ -300,7 +322,10 @@ export class ListboxSeparator {
 }
 
 /** Shown while there is no option; render it after the List. */
-@Directive({ selector: "[rindListboxEmpty]", exportAs: "rindListboxEmpty" })
+@Directive({
+  selector: "[rindListboxEmpty], [rindSelectEmpty], [rindComboboxEmpty], [rindTagsInputEmpty]",
+  exportAs: "rindListboxEmpty",
+})
 export class ListboxEmpty {
   constructor() {
     const host = injectHost("Empty")
@@ -330,7 +355,10 @@ export class ListboxEmpty {
 }
 
 /** The sentinel of an infinite list: in view, it asks for more. */
-@Directive({ selector: "[rindListboxLoadMore]", exportAs: "rindListboxLoadMore" })
+@Directive({
+  selector: "[rindListboxLoadMore], [rindSelectLoadMore], [rindComboboxLoadMore]",
+  exportAs: "rindListboxLoadMore",
+})
 export class ListboxLoadMore {
   constructor() {
     const host = injectHost("LoadMore")
