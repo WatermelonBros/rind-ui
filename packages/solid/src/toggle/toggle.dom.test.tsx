@@ -104,6 +104,27 @@ describe("solid toggle parts", () => {
     expect(changes).toEqual([true, false])
   })
 
+  it("render keeps the children it was given across state changes", async () => {
+    let mounts = 0
+    const Child = () => {
+      mounts++
+      return <span data-testid="child">Bold</span>
+    }
+    mount(() => (
+      <Toggle.Root render={(props) => <button type="button" {...props} />}>
+        <Child />
+      </Toggle.Root>
+    ))
+    const child = screen.getByTestId("child")
+    const el = screen.getByRole("button", { name: "Bold" })
+    el.click()
+    await vi.waitFor(() => expect(el.getAttribute("aria-pressed")).toBe("true"))
+    el.click()
+    await vi.waitFor(() => expect(el.getAttribute("aria-pressed")).toBe("false"))
+    expect(screen.getByTestId("child")).toBe(child)
+    expect(mounts).toBe(1)
+  })
+
   it("a consumer prop changed after mount reaches the element; both handlers run", async () => {
     const [described, setDescribed] = createSignal<string | undefined>(undefined)
     const clicks: string[] = []
