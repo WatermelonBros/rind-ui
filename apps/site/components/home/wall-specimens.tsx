@@ -58,6 +58,13 @@ function useSpoken(root: React.RefObject<HTMLDivElement | null>) {
       }
     }
     const onOver = (e: Event) => pick(e.target)
+    // focus that is still there a frame later: the hero's object turns a control on by focusing
+    // and clicking it, then hands focus back (skin-scene.tsx: turnOn), and the card flashed what
+    // a reader says for a frame
+    const onFocus = (e: Event) =>
+      requestAnimationFrame(() => {
+        if (stage.contains(document.activeElement)) pick(e.target)
+      })
     const onLeave = () => {
       if (stage.contains(document.activeElement)) return
       el = null
@@ -75,14 +82,14 @@ function useSpoken(root: React.RefObject<HTMLDivElement | null>) {
       attributeFilter: ["aria-checked", "aria-valuenow", "aria-pressed", "data-state", "value"],
     })
     stage.addEventListener("pointerover", onOver)
-    stage.addEventListener("focusin", onOver)
+    stage.addEventListener("focusin", onFocus)
     li.addEventListener("pointerleave", onLeave)
     stage.addEventListener("focusout", onBlur)
     stage.addEventListener("input", say)
     return () => {
       mo.disconnect()
       stage.removeEventListener("pointerover", onOver)
-      stage.removeEventListener("focusin", onOver)
+      stage.removeEventListener("focusin", onFocus)
       li.removeEventListener("pointerleave", onLeave)
       stage.removeEventListener("focusout", onBlur)
       stage.removeEventListener("input", say)

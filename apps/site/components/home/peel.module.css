@@ -28,7 +28,7 @@
   font: 900 clamp(40px, calc(4.9 * var(--vw)), 112px) / 1.04 var(--display);
   letter-spacing: -0.035em;
   margin: 14px 0 16px;
-  animation: in 0.6s var(--spring);
+  animation: in 0.6s var(--spring) both;
 }
 @keyframes in {
   from {
@@ -43,6 +43,30 @@
     Georgia,
     serif;
   max-width: 26ch;
+}
+/* peel.tsx: the act leaving and the one arriving share one cell, so the old copy fades out
+   under the new one instead of vanishing in a frame */
+.acts {
+  display: grid;
+}
+.acts > * {
+  grid-area: 1 / 1;
+}
+.acts > :not(.leave) .text {
+  animation: in 0.6s var(--spring) 0.08s both;
+}
+.leave {
+  animation: out 0.22s ease-in both;
+}
+/* the new act waits for the old one to clear: two titles over each other read as noise */
+.acts[data-swap] > :not(.leave) :is(.title, .text) {
+  animation-delay: 0.2s;
+}
+@keyframes out {
+  to {
+    opacity: 0;
+    translate: 0 -14px;
+  }
 }
 /* peel.tsx: the control's opening tag, live, under the copy */
 .markup {
