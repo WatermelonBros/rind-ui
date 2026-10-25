@@ -58,6 +58,26 @@
       "types": "./dist/button/index.d.ts",
       "default": "./dist/button/index.js"
     },
+    "./checkbox": {
+      "@rind-ui/source": "./src/checkbox/index.ts",
+      "types": "./dist/checkbox/index.d.ts",
+      "default": "./dist/checkbox/index.js"
+    },
+    "./checkbox-group": {
+      "@rind-ui/source": "./src/checkbox-group/index.ts",
+      "types": "./dist/checkbox-group/index.d.ts",
+      "default": "./dist/checkbox-group/index.js"
+    },
+    "./field": {
+      "@rind-ui/source": "./src/field/index.ts",
+      "types": "./dist/field/index.d.ts",
+      "default": "./dist/field/index.js"
+    },
+    "./fieldset": {
+      "@rind-ui/source": "./src/fieldset/index.ts",
+      "types": "./dist/fieldset/index.d.ts",
+      "default": "./dist/fieldset/index.js"
+    },
     "./heading": {
       "@rind-ui/source": "./src/heading/index.ts",
       "types": "./dist/heading/index.d.ts",
@@ -103,10 +123,20 @@
       "types": "./dist/skeleton/index.d.ts",
       "default": "./dist/skeleton/index.js"
     },
+    "./text-field": {
+      "@rind-ui/source": "./src/text-field/index.ts",
+      "types": "./dist/text-field/index.d.ts",
+      "default": "./dist/text-field/index.js"
+    },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
       "types": "./dist/toggle/index.d.ts",
       "default": "./dist/toggle/index.js"
+    },
+    "./toggle-group": {
+      "@rind-ui/source": "./src/toggle-group/index.ts",
+      "types": "./dist/toggle-group/index.d.ts",
+      "default": "./dist/toggle-group/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -164,6 +194,22 @@
         "types": "./dist/button/index.d.ts",
         "default": "./dist/button/index.js"
       },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.ts",
+        "default": "./dist/checkbox/index.js"
+      },
+      "./checkbox-group": {
+        "types": "./dist/checkbox-group/index.d.ts",
+        "default": "./dist/checkbox-group/index.js"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.ts",
+        "default": "./dist/field/index.js"
+      },
+      "./fieldset": {
+        "types": "./dist/fieldset/index.d.ts",
+        "default": "./dist/fieldset/index.js"
+      },
       "./heading": {
         "types": "./dist/heading/index.d.ts",
         "default": "./dist/heading/index.js"
@@ -200,9 +246,17 @@
         "types": "./dist/skeleton/index.d.ts",
         "default": "./dist/skeleton/index.js"
       },
+      "./text-field": {
+        "types": "./dist/text-field/index.d.ts",
+        "default": "./dist/text-field/index.js"
+      },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",
         "default": "./dist/toggle/index.js"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.ts",
+        "default": "./dist/toggle-group/index.js"
       },
       "./package.json": "./package.json"
     }
