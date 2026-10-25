@@ -416,7 +416,7 @@ export function Tested() {
       <section className={styles.section} aria-labelledby="tested-title">
         {/* the title, its lead and the panel hold still together while the run goes with the
             scroll, then the room under them (testRoom) is taken out once it has passed */}
-        <div className={styles.testHold}>
+        <div className={styles.testHold} data-hold="">
           <Reveal>
             <h2 id="tested-title" className={styles.h2}>
               <Letters>The tests come in the box.</Letters>
