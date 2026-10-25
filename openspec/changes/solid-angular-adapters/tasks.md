@@ -83,10 +83,10 @@
 - [x] 2.68 Color Picker
 - [x] 2.69 Image Viewer
 - [x] 2.70 Image Cropper
-- [ ] 2.71 Message Thread
-- [ ] 2.72 Streaming Message
-- [ ] 2.73 Reasoning
-- [ ] 2.74 Prompt Input
+- [x] 2.71 Message Thread
+- [x] 2.72 Streaming Message
+- [x] 2.73 Reasoning
+- [x] 2.74 Prompt Input
 
 ## 3. Release
 

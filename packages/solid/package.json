@@ -248,6 +248,11 @@
         "solid": "./dist/menubar/index.jsx",
         "default": "./dist/menubar/index.mjs"
       },
+      "./message-thread": {
+        "types": "./dist/message-thread/index.d.mts",
+        "solid": "./dist/message-thread/index.jsx",
+        "default": "./dist/message-thread/index.mjs"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.mts",
         "solid": "./dist/meter/index.jsx",
@@ -283,6 +288,11 @@
         "solid": "./dist/progress/index.jsx",
         "default": "./dist/progress/index.mjs"
       },
+      "./prompt-input": {
+        "types": "./dist/prompt-input/index.d.mts",
+        "solid": "./dist/prompt-input/index.jsx",
+        "default": "./dist/prompt-input/index.mjs"
+      },
       "./qr-code": {
         "types": "./dist/qr-code/index.d.mts",
         "solid": "./dist/qr-code/index.jsx",
@@ -297,6 +307,11 @@
         "types": "./dist/rating/index.d.mts",
         "solid": "./dist/rating/index.jsx",
         "default": "./dist/rating/index.mjs"
+      },
+      "./reasoning": {
+        "types": "./dist/reasoning/index.d.mts",
+        "solid": "./dist/reasoning/index.jsx",
+        "default": "./dist/reasoning/index.mjs"
       },
       "./scroll-area": {
         "types": "./dist/scroll-area/index.d.mts",
@@ -342,6 +357,11 @@
         "types": "./dist/stepper/index.d.mts",
         "solid": "./dist/stepper/index.jsx",
         "default": "./dist/stepper/index.mjs"
+      },
+      "./streaming-message": {
+        "types": "./dist/streaming-message/index.d.mts",
+        "solid": "./dist/streaming-message/index.jsx",
+        "default": "./dist/streaming-message/index.mjs"
       },
       "./switch": {
         "types": "./dist/switch/index.d.mts",
@@ -649,6 +669,12 @@
       "solid": "./dist/menubar/index.jsx",
       "default": "./dist/menubar/index.mjs"
     },
+    "./message-thread": {
+      "@rind-ui/source": "./src/message-thread/index.ts",
+      "types": "./dist/message-thread/index.d.mts",
+      "solid": "./dist/message-thread/index.jsx",
+      "default": "./dist/message-thread/index.mjs"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.mts",
@@ -691,6 +717,12 @@
       "solid": "./dist/progress/index.jsx",
       "default": "./dist/progress/index.mjs"
     },
+    "./prompt-input": {
+      "@rind-ui/source": "./src/prompt-input/index.ts",
+      "types": "./dist/prompt-input/index.d.mts",
+      "solid": "./dist/prompt-input/index.jsx",
+      "default": "./dist/prompt-input/index.mjs"
+    },
     "./qr-code": {
       "@rind-ui/source": "./src/qr-code/index.ts",
       "types": "./dist/qr-code/index.d.mts",
@@ -708,6 +740,12 @@
       "types": "./dist/rating/index.d.mts",
       "solid": "./dist/rating/index.jsx",
       "default": "./dist/rating/index.mjs"
+    },
+    "./reasoning": {
+      "@rind-ui/source": "./src/reasoning/index.ts",
+      "types": "./dist/reasoning/index.d.mts",
+      "solid": "./dist/reasoning/index.jsx",
+      "default": "./dist/reasoning/index.mjs"
     },
     "./scroll-area": {
       "@rind-ui/source": "./src/scroll-area/index.ts",
@@ -762,6 +800,12 @@
       "types": "./dist/stepper/index.d.mts",
       "solid": "./dist/stepper/index.jsx",
       "default": "./dist/stepper/index.mjs"
+    },
+    "./streaming-message": {
+      "@rind-ui/source": "./src/streaming-message/index.ts",
+      "types": "./dist/streaming-message/index.d.mts",
+      "solid": "./dist/streaming-message/index.jsx",
+      "default": "./dist/streaming-message/index.mjs"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
