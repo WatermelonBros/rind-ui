@@ -58,7 +58,7 @@
 - [x] 2.43 Form
 - [x] 2.44 Form Toggle
 - [x] 2.45 File Upload
-- [ ] 2.46 Tags Input
+- [x] 2.46 Tags Input
 - [x] 2.47 Tag Group
 - [x] 2.48 Listbox
 - [x] 2.49 Grid List
@@ -71,12 +71,12 @@
 - [x] 2.56 Dialog
 - [x] 2.57 Drawer
 - [x] 2.58 Toast
-- [ ] 2.59 Menu
-- [ ] 2.60 Context Menu
-- [ ] 2.61 Menubar
-- [ ] 2.62 Navigation Menu
-- [ ] 2.63 Select
-- [ ] 2.64 Combobox
+- [x] 2.59 Menu
+- [x] 2.60 Context Menu
+- [x] 2.61 Menubar
+- [x] 2.62 Navigation Menu
+- [x] 2.63 Select
+- [x] 2.64 Combobox
 - [ ] 2.65 Tour
 - [ ] 2.66 Calendar
 - [ ] 2.67 Date Field
