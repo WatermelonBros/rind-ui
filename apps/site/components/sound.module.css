@@ -37,7 +37,7 @@
   animation: bars-wait 0.9s ease-in-out var(--delay, 0s) infinite;
 }
 :global([data-phase="juicy"] [data-sound-toggle][aria-pressed="true"]) .bars i {
-  background: var(--ink);
+  background: var(--on-acc);
 }
 @keyframes bars-wait {
   50% {

@@ -2562,3 +2562,22 @@ g:not([data-plugged]) > .pulse {
   background: var(--s-ink, #18181b);
   color: var(--s-bg, #fff);
 }
+
+/* stripped (the object dragged off the page: globals.css html[data-stripped]): the tests' own
+   colours give way to the greyscale too */
+:global(html[data-stripped]) .run {
+  background: #1f1f1f;
+  color: #ffffff;
+}
+:global(html[data-stripped]) .testCode li[data-state="current"] {
+  box-shadow: inset 3px 0 0 #000000;
+}
+:global(html[data-stripped]) .passBanner {
+  background: #e6e6e6;
+}
+:global(html[data-stripped]) .passBanner b {
+  color: #ffffff;
+}
+:global(html[data-stripped]) :is(.reads, .verdict[data-ok]) {
+  color: #4a4a4a;
+}
