@@ -48,7 +48,7 @@
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-focus] {
   background: var(--s-brand);
-  color: #fff;
+  color: var(--s-brand-text);
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="date-field"][data-part="segment"][data-invalid]:not([data-focus]) {
