@@ -430,7 +430,11 @@ export function Tested() {
                   {running ? "Running…" : "▶ Run"}
                 </Button>
               </div>
-              <ol>
+              <ol
+                aria-label={`${kind}.test.ts`}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: a line too long for the panel scrolls the list, which must be reachable by keyboard
+                tabIndex={0}
+              >
                 {STEPS.map((s, i) => (
                   <li
                     key={s.code}
