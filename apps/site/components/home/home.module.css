@@ -2591,3 +2591,16 @@ g:not([data-plugged]) > .pulse {
 :global(html[data-stripped]) .stage {
   --brand: #9a9a9a;
 }
+
+/* a card as narrow as a small phone's: a group of toggles wraps inside it rather than running
+   out of its right edge (every worn skin's padding made "Bold Italic Code" wider than 270px) */
+.specimens [data-scope="toggle-group"][data-part="root"] {
+  flex-wrap: wrap;
+  max-inline-size: 100%;
+}
+@media (max-width: 380px) {
+  /* (through the li: as specific as the skins' own rule, which loads later) */
+  .specimens li [data-scope="toggle-group"][data-part="item"] {
+    padding-inline: 0.45em;
+  }
+}
