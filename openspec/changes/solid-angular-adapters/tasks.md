@@ -8,7 +8,7 @@
 - [x] 1.6 Hydration tests: Solid (ssr + dom bundles of a fixture), Angular (`@angular/platform-server`)
 - [ ] 1.7 Turbo/CI: both packages in `pnpm build` and `pnpm typecheck`; Changesets fixed group
 - [x] 1.8 Size budgets for the two packages (`scripts/size-adapters.mjs`)
-- [ ] 1.2b Layer portals for both packages (with the first overlay component, 2.53 Popover)
+- [x] 1.2b Layer portals for both packages (with the first overlay component, 2.53 Popover)
 - [ ] 1.9 Tell the site agent when the first component of each is on main (exports are the source of truth); docs: installation for Solid and Angular
 
 ## 2. Components (Solid and Angular together, one pull request per batch; done = parts, contract model and parity green in both, both entries in `exports`, an example in both)
