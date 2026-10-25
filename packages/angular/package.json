@@ -218,6 +218,11 @@
       "types": "./dist/menubar/index.d.ts",
       "default": "./dist/menubar/index.js"
     },
+    "./message-thread": {
+      "@rind-ui/source": "./src/message-thread/index.ts",
+      "types": "./dist/message-thread/index.d.ts",
+      "default": "./dist/message-thread/index.js"
+    },
     "./meter": {
       "@rind-ui/source": "./src/meter/index.ts",
       "types": "./dist/meter/index.d.ts",
@@ -253,6 +258,11 @@
       "types": "./dist/progress/index.d.ts",
       "default": "./dist/progress/index.js"
     },
+    "./prompt-input": {
+      "@rind-ui/source": "./src/prompt-input/index.ts",
+      "types": "./dist/prompt-input/index.d.ts",
+      "default": "./dist/prompt-input/index.js"
+    },
     "./qr-code": {
       "@rind-ui/source": "./src/qr-code/index.ts",
       "types": "./dist/qr-code/index.d.ts",
@@ -267,6 +277,11 @@
       "@rind-ui/source": "./src/rating/index.ts",
       "types": "./dist/rating/index.d.ts",
       "default": "./dist/rating/index.js"
+    },
+    "./reasoning": {
+      "@rind-ui/source": "./src/reasoning/index.ts",
+      "types": "./dist/reasoning/index.d.ts",
+      "default": "./dist/reasoning/index.js"
     },
     "./scroll-area": {
       "@rind-ui/source": "./src/scroll-area/index.ts",
@@ -312,6 +327,11 @@
       "@rind-ui/source": "./src/stepper/index.ts",
       "types": "./dist/stepper/index.d.ts",
       "default": "./dist/stepper/index.js"
+    },
+    "./streaming-message": {
+      "@rind-ui/source": "./src/streaming-message/index.ts",
+      "types": "./dist/streaming-message/index.d.ts",
+      "default": "./dist/streaming-message/index.js"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -578,6 +598,10 @@
         "types": "./dist/menubar/index.d.ts",
         "default": "./dist/menubar/index.js"
       },
+      "./message-thread": {
+        "types": "./dist/message-thread/index.d.ts",
+        "default": "./dist/message-thread/index.js"
+      },
       "./meter": {
         "types": "./dist/meter/index.d.ts",
         "default": "./dist/meter/index.js"
@@ -606,6 +630,10 @@
         "types": "./dist/progress/index.d.ts",
         "default": "./dist/progress/index.js"
       },
+      "./prompt-input": {
+        "types": "./dist/prompt-input/index.d.ts",
+        "default": "./dist/prompt-input/index.js"
+      },
       "./qr-code": {
         "types": "./dist/qr-code/index.d.ts",
         "default": "./dist/qr-code/index.js"
@@ -617,6 +645,10 @@
       "./rating": {
         "types": "./dist/rating/index.d.ts",
         "default": "./dist/rating/index.js"
+      },
+      "./reasoning": {
+        "types": "./dist/reasoning/index.d.ts",
+        "default": "./dist/reasoning/index.js"
       },
       "./scroll-area": {
         "types": "./dist/scroll-area/index.d.ts",
@@ -653,6 +685,10 @@
       "./stepper": {
         "types": "./dist/stepper/index.d.ts",
         "default": "./dist/stepper/index.js"
+      },
+      "./streaming-message": {
+        "types": "./dist/streaming-message/index.d.ts",
+        "default": "./dist/streaming-message/index.js"
       },
       "./switch": {
         "types": "./dist/switch/index.d.ts",

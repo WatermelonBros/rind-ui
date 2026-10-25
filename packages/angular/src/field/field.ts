@@ -31,6 +31,7 @@ import {
   getLayerStack,
   labelInteraction,
   type MessageOverrides,
+  type PartProps,
   partId,
   type RegisteredControl,
   registerFormValue,
@@ -140,13 +141,22 @@ export class FieldRoot {
   readonly state: Signal<FieldState>
   /** @internal The instance id (a host's parts share it). */
   readonly instance: () => string
+  /** @internal The root's props, for a host rendering the Field on an inner element. */
+  readonly rootProps: () => PartProps
 
   constructor() {
     const host = inject(FIELD_HOST, { optional: true, self: true })
     const scope = host?.scope ?? "field"
     const invalid = () => (host?.invalid ? host.invalid() : this.invalid())
-    const instance = injectRootId(() => this.id())
+    const instance = injectRootId(() => this.id() ?? host?.id?.())
     this.instance = instance
+    // Rendered on the host's inner element: the host applies the props (`rootProps`).
+    let rootProps: () => PartProps = () => ({})
+    this.rootProps = () => rootProps()
+    const bind = (props: () => PartProps, options: Parameters<typeof bindProps>[1]) => {
+      rootProps = props
+      if (!host?.inner) bindProps(props, options)
+    }
     const enclosing = inject(FIELD_CONTROL, { optional: true, skipSelf: true }) ?? null
     const embedded = inject(FIELD_EMBEDDED, { optional: true, skipSelf: true }) === true
     // A host inside a Field joins it: the enclosing Field decides, its own Field inputs are
@@ -155,7 +165,7 @@ export class FieldRoot {
       this.binding = enclosing
       this.parts = { joined: true, scope, instance }
       this.state = computed(() => ({ valid: false, invalid: false, validating: false }))
-      bindProps(
+      bind(
         () => ({
           "data-scope": scope,
           "data-part": host.rootPart ?? "root",
@@ -309,7 +319,7 @@ export class FieldRoot {
       invalid: api().display === "invalid",
       validating: view().state === "validating",
     }))
-    bindProps(
+    bind(
       () => ({
         ...api().root(),
         // A host's Field is its root: it carries the host's id.
@@ -319,9 +329,11 @@ export class FieldRoot {
     )
 
     if (inject(PLATFORM_ID) !== "browser") return
-    const el: Element = inject(ElementRef).nativeElement
+    const own: Element = inject(ElementRef).nativeElement
+    let el = own
     const destroy = inject(DestroyRef)
     afterNextRender(() => {
+      el = host?.inner?.() ?? own
       // The modality tracker must see the pointerdown that comes before focus.
       destroy.onDestroy(env.modality.subscribe(() => {}))
       // Focus entering and leaving the Field (layers opened from the control count as inside).
@@ -463,7 +475,7 @@ function joinedPart(parts: JoinedParts, name: string) {
 /** The control's label: `<label rindFieldLabel>`. */
 @Directive({
   selector:
-    "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel], [rindPinInputLabel], [rindDateFieldLabel], [rindColorFieldLabel]",
+    "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel], [rindPinInputLabel], [rindDateFieldLabel], [rindColorFieldLabel], [rindPromptInputLabel]",
   exportAs: "rindFieldLabel",
 })
 export class FieldLabel {
@@ -504,7 +516,7 @@ export class FieldLabel {
 
 @Directive({
   selector:
-    "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription], [rindPinInputDescription], [rindDateFieldDescription], [rindColorFieldDescription], [rindColorPickerDescription]",
+    "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription], [rindPinInputDescription], [rindDateFieldDescription], [rindColorFieldDescription], [rindColorPickerDescription], [rindPromptInputDescription]",
   exportAs: "rindFieldDescription",
 })
 export class FieldDescription {
@@ -527,7 +539,7 @@ export class FieldDescription {
  */
 @Component({
   selector:
-    "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage], [rindPinInputErrorMessage], [rindDateFieldErrorMessage], [rindColorFieldErrorMessage], [rindColorPickerErrorMessage]",
+    "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage], [rindPinInputErrorMessage], [rindDateFieldErrorMessage], [rindColorFieldErrorMessage], [rindColorPickerErrorMessage], [rindPromptInputErrorMessage]",
   exportAs: "rindFieldErrorMessage",
   encapsulation: ViewEncapsulation.None,
   template: `<ng-content

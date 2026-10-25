@@ -10,7 +10,8 @@ Accordion, Tabs, Toolbar, Breadcrumbs, Pagination, Rating, Slider, Number Input,
 Contents, Scroll Area, Marquee, QR Code, Clipboard, Code Block, Form, File Upload, VisuallyHidden, Listbox, Tag
 Group, Grid List, Tree View, Sortable, Popover, Tooltip, Hover Card, Dialog, Drawer, Toast, Table
 with its Filter parts, Menu, Context Menu, Menubar, Navigation Menu, Select, Combobox, Tags Input,
-Calendar, Date Field with its picker, Color Picker, Image Viewer, Image Cropper, Tour;
+Calendar, Date Field with its picker, Color Picker, Image Viewer, Image Cropper, Tour, Message
+Thread, Streaming Message, Reasoning, Prompt Input;
 the form toggle bases, for a toggle of your own). Parts are attribute directives on your own elements
 (`<button rindToggleRoot [(pressed)]="bold">`), so no wrapper element is added and any host element
 keeps the behaviour; a part that renders elements of its own (Kbd, Badge) is a component with an
@@ -28,7 +29,10 @@ is a range field with `selectionMode="range"` on its Root; a Color Picker Channe
 field for `channel="hex"` or `"css"` and a Number Input for any other channel; an inline Color
 Picker has its Content in place (no Portal or Positioner). A Tour Root is an `<ng-container>`
 (`injectTour()` gives a handle for `[tour]`), its actions a template
-(`<ng-template rindTourActions let-actions>`). A part React renders nothing for in some state (a loaded Skeleton's Status, a
+(`<ng-template rindTourActions let-actions>`). A Prompt Input is `<form rindPromptInputRoot>`; its send
+is the `submitHandler` input (it may return a promise), its Attachments take an
+`<ng-template let-a>` chip; a Streaming Message's Content shows the text when it has no content of
+its own. A part React renders nothing for in some state (a loaded Skeleton's Status, a
 dismissed Alert, an inactive Tab's panel) keeps your element, hidden. Controlled values are an input and a `<value>Change` output (`[(pressed)]`),
 with `<value>ChangeDetails` for vetoing a change. Published as Angular partial compilation, linked
 by your application's build.
