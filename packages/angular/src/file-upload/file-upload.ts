@@ -49,7 +49,7 @@ import { injectFieldsetDisabled } from "../fieldset/context"
 import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectModality } from "../inject-press"
-import { injectEnvironment, injectLocale, injectMessages } from "../provider"
+import { injectEnvironment, injectLocale, injectMessages, withCapabilities } from "../provider"
 import { injectPartRegistry, injectRegisterPart, injectRenderedId } from "../registry"
 import { RindProps } from "../rind-props"
 
@@ -273,12 +273,11 @@ export class FileUploadRoot {
         readOnly: field().readOnly,
         onReject: (r: readonly FileRejection<FileLike>[]) => this.reject.emit(r),
       }),
-      {
-        ...env,
+      withCapabilities(env, {
         // In the press's task: the chooser needs the user activation.
         openPicker: () => inputEl()?.click(),
         syncInput: sync,
-      },
+      }),
     )
     this.send = send
     const held = () => view().values.files

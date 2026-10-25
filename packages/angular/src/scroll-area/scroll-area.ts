@@ -27,7 +27,7 @@ import { bindProps } from "../bind-props"
 import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectModality } from "../inject-press"
-import { injectEnvironment } from "../provider"
+import { injectEnvironment, withCapabilities } from "../provider"
 
 export interface ScrollAreaState {
   readonly state: ScrollAreaActivity
@@ -88,7 +88,7 @@ export class ScrollAreaRoot {
           this.handle = h
         },
       }),
-      { ...env, scrollMetrics: domScrollMetrics(env) },
+      withCapabilities(env, { scrollMetrics: domScrollMetrics(env) }),
     )
     this.send = send
     const modality = injectModality(env.modality, () => view().context.viewportFocused)

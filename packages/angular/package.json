@@ -93,6 +93,16 @@
       "types": "./dist/collapsible/index.d.ts",
       "default": "./dist/collapsible/index.js"
     },
+    "./dialog": {
+      "@rind-ui/source": "./src/dialog/index.ts",
+      "types": "./dist/dialog/index.d.ts",
+      "default": "./dist/dialog/index.js"
+    },
+    "./drawer": {
+      "@rind-ui/source": "./src/drawer/index.ts",
+      "types": "./dist/drawer/index.d.ts",
+      "default": "./dist/drawer/index.js"
+    },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
       "types": "./dist/field/index.d.ts",
@@ -127,6 +137,11 @@
       "@rind-ui/source": "./src/heading/index.ts",
       "types": "./dist/heading/index.d.ts",
       "default": "./dist/heading/index.js"
+    },
+    "./hover-card": {
+      "@rind-ui/source": "./src/hover-card/index.ts",
+      "types": "./dist/hover-card/index.d.ts",
+      "default": "./dist/hover-card/index.js"
     },
     "./image": {
       "@rind-ui/source": "./src/image/index.ts",
@@ -177,6 +192,11 @@
       "@rind-ui/source": "./src/pin-input/index.ts",
       "types": "./dist/pin-input/index.d.ts",
       "default": "./dist/pin-input/index.js"
+    },
+    "./popover": {
+      "@rind-ui/source": "./src/popover/index.ts",
+      "types": "./dist/popover/index.d.ts",
+      "default": "./dist/popover/index.js"
     },
     "./progress": {
       "@rind-ui/source": "./src/progress/index.ts",
@@ -243,6 +263,11 @@
       "types": "./dist/switch/index.d.ts",
       "default": "./dist/switch/index.js"
     },
+    "./table": {
+      "@rind-ui/source": "./src/table/index.ts",
+      "types": "./dist/table/index.d.ts",
+      "default": "./dist/table/index.js"
+    },
     "./table-of-contents": {
       "@rind-ui/source": "./src/table-of-contents/index.ts",
       "types": "./dist/table-of-contents/index.d.ts",
@@ -268,6 +293,11 @@
       "types": "./dist/timeline/index.d.ts",
       "default": "./dist/timeline/index.js"
     },
+    "./toast": {
+      "@rind-ui/source": "./src/toast/index.ts",
+      "types": "./dist/toast/index.d.ts",
+      "default": "./dist/toast/index.js"
+    },
     "./toggle": {
       "@rind-ui/source": "./src/toggle/index.ts",
       "types": "./dist/toggle/index.d.ts",
@@ -282,6 +312,11 @@
       "@rind-ui/source": "./src/toolbar/index.ts",
       "types": "./dist/toolbar/index.d.ts",
       "default": "./dist/toolbar/index.js"
+    },
+    "./tooltip": {
+      "@rind-ui/source": "./src/tooltip/index.ts",
+      "types": "./dist/tooltip/index.d.ts",
+      "default": "./dist/tooltip/index.js"
     },
     "./tree-view": {
       "@rind-ui/source": "./src/tree-view/index.ts",
@@ -377,6 +412,14 @@
         "types": "./dist/collapsible/index.d.ts",
         "default": "./dist/collapsible/index.js"
       },
+      "./dialog": {
+        "types": "./dist/dialog/index.d.ts",
+        "default": "./dist/dialog/index.js"
+      },
+      "./drawer": {
+        "types": "./dist/drawer/index.d.ts",
+        "default": "./dist/drawer/index.js"
+      },
       "./field": {
         "types": "./dist/field/index.d.ts",
         "default": "./dist/field/index.js"
@@ -404,6 +447,10 @@
       "./heading": {
         "types": "./dist/heading/index.d.ts",
         "default": "./dist/heading/index.js"
+      },
+      "./hover-card": {
+        "types": "./dist/hover-card/index.d.ts",
+        "default": "./dist/hover-card/index.js"
       },
       "./image": {
         "types": "./dist/image/index.d.ts",
@@ -444,6 +491,10 @@
       "./pin-input": {
         "types": "./dist/pin-input/index.d.ts",
         "default": "./dist/pin-input/index.js"
+      },
+      "./popover": {
+        "types": "./dist/popover/index.d.ts",
+        "default": "./dist/popover/index.js"
       },
       "./progress": {
         "types": "./dist/progress/index.d.ts",
@@ -497,6 +548,10 @@
         "types": "./dist/switch/index.d.ts",
         "default": "./dist/switch/index.js"
       },
+      "./table": {
+        "types": "./dist/table/index.d.ts",
+        "default": "./dist/table/index.js"
+      },
       "./table-of-contents": {
         "types": "./dist/table-of-contents/index.d.ts",
         "default": "./dist/table-of-contents/index.js"
@@ -517,6 +572,10 @@
         "types": "./dist/timeline/index.d.ts",
         "default": "./dist/timeline/index.js"
       },
+      "./toast": {
+        "types": "./dist/toast/index.d.ts",
+        "default": "./dist/toast/index.js"
+      },
       "./toggle": {
         "types": "./dist/toggle/index.d.ts",
         "default": "./dist/toggle/index.js"
@@ -528,6 +587,10 @@
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
         "default": "./dist/toolbar/index.js"
+      },
+      "./tooltip": {
+        "types": "./dist/tooltip/index.d.ts",
+        "default": "./dist/tooltip/index.js"
       },
       "./tree-view": {
         "types": "./dist/tree-view/index.d.ts",

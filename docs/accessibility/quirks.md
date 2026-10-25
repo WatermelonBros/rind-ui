@@ -13,6 +13,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 | `packages/angular/src/meter/meter.ts` | `nvda-progressbar-name` |
 | `packages/angular/src/number-input/number-input.ts` | `ios-vo-spinbutton-input`, `keypad-decimal-separator` |
 | `packages/angular/src/progress/progress.ts` | `nvda-progressbar-name` |
+| `packages/angular/src/table/table.ts` | `talkback-aria-sort` |
 | `packages/core/src/collection/machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/combobox.machine.ts` | `vo-activedescendant` |
 | `packages/core/src/components/combobox/pattern/machine.ts` | `vo-activedescendant` |
@@ -219,7 +220,7 @@ the problem and is re-verified yearly (`pnpm quirks:check`).
 
 - Bugs: <https://github.com/adobe/react-spectrum/blob/main/packages/react-aria/src/table/useTableColumnHeader.ts>
 - Repro test: `packages/core/src/components/table/table.connect.test.ts`
-- Checked in: `packages/react/src/table/table.tsx`, `packages/solid/src/table/table.tsx`, `packages/vue/src/table/table.ts`
+- Checked in: `packages/angular/src/table/table.ts`, `packages/react/src/table/table.tsx`, `packages/solid/src/table/table.tsx`, `packages/vue/src/table/table.ts`
 - Last verified: 2026-10-19
 - Remove when: a device test shows TalkBack reading the sort direction of a column header with aria-sort (manual protocol)
 

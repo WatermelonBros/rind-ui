@@ -41,7 +41,7 @@ import { bindProps, joinHandlers } from "../bind-props"
 import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectModality } from "../inject-press"
-import { injectEnvironment, injectLocale, injectMessages } from "../provider"
+import { injectEnvironment, injectLocale, injectMessages, withCapabilities } from "../provider"
 import { RindProps } from "../rind-props"
 
 /** The stepper's state, for the template (`#s="rindStepperRoot"`, `s.state()`). */
@@ -195,18 +195,21 @@ export class StepperRoot {
       messages: messages(),
       lang: locale().locale,
     })
-    const { view, send } = injectMachine(stepperMachine, machineProps, {
-      ...env,
-      focusContent: (index: number) => {
-        // The press's modality, read now: the focus lands a frame later (after the render that
-        // shows the step), when the tracker no longer knows what caused it.
-        const modality = env.modality.modality()
-        env.scheduler.requestAnimationFrame(() => {
-          const el = document.getElementById(untracked(() => contentId(index)))
-          if (el) void focusSafely(el, env, "programmatic", modality)
-        })
-      },
-    })
+    const { view, send } = injectMachine(
+      stepperMachine,
+      machineProps,
+      withCapabilities(env, {
+        focusContent: (index: number) => {
+          // The press's modality, read now: the focus lands a frame later (after the render that
+          // shows the step), when the tracker no longer knows what caused it.
+          const modality = env.modality.modality()
+          env.scheduler.requestAnimationFrame(() => {
+            const el = document.getElementById(untracked(() => contentId(index)))
+            if (el) void focusSafely(el, env, "programmatic", modality)
+          })
+        },
+      }),
+    )
     this.send = send
     this.api = computed(() => {
       const p = machineProps()

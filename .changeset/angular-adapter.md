@@ -8,14 +8,19 @@ Badge, Heading, Label, Link, Skeleton, Progress, Meter, Image, Avatar, Alert, To
 Text Field, Checkbox, Checkbox Group, Switch, Radio Group, Segmented Control, Collapsible,
 Accordion, Tabs, Toolbar, Breadcrumbs, Pagination, Rating, Slider, Number Input, Pin Input, Splitter, Stepper, Timeline, Table of
 Contents, Scroll Area, Marquee, QR Code, Clipboard, Code Block, Form, File Upload, VisuallyHidden, Listbox, Tag
-Group, Grid List, Tree View, Sortable;
+Group, Grid List, Tree View, Sortable, Popover, Tooltip, Hover Card, Dialog, Drawer, Toast, Table
+with its Filter parts;
 the form toggle bases, for a toggle of your own). Parts are attribute directives on your own elements
 (`<button rindToggleRoot [(pressed)]="bold">`), so no wrapper element is added and any host element
 keeps the behaviour; a part that renders elements of its own (Kbd, Badge) is a component with an
 attribute selector, and a part that is a Button or a Link (Pagination's pages and triggers) is
 the one its element asks for: `<button>`, or `<a>` with `getPageHref`; a Stepper's Trigger is `<button>` while its step is reachable,
 `<span>` otherwise; a Marquee's Content is a structural directive (`<div *rindMarqueeContent>`),
-stamped once per copy. A part React renders nothing for in some state (a loaded Skeleton's Status, a
+stamped once per copy; a Drawer's Handle is `<button>` with two or more measured snap points
+(`d.handleIsButton()`), `<div>` otherwise. A layer's portal is a template
+(`<ng-template rindPopoverPortal>`, `<ng-template [rindToaster]="store" let-toast>`), rendered into
+`body` after the first render with the trigger's dir, lang and theme; a Table Filter's content goes
+in `<ng-template rindTableFilterPortal>` with a FilterPositioner around it. A part React renders nothing for in some state (a loaded Skeleton's Status, a
 dismissed Alert, an inactive Tab's panel) keeps your element, hidden. Controlled values are an input and a `<value>Change` output (`[(pressed)]`),
 with `<value>ChangeDetails` for vetoing a change. Published as Angular partial compilation, linked
 by your application's build.

@@ -31,6 +31,27 @@ export const joinHandlers = (...sources: Props[]): Props =>
   // CRITICAL; only their index signatures are spelled differently.
   join(isHandler, ...(sources.map(neutralKeys) as Readonly<AdapterProps>[])) as Props
 
+/**
+ * The directives' layers on one element, as React's mergeProps merges a part's own props with
+ * the ones given to it (a Drawer part's extras on the Dialog part it hosts): handlers all run,
+ * `style` declarations and `class` names add up, any other key is the later layer's.
+ */
+function mergeLayers(layers: readonly Props[]): Props {
+  const merged = joinHandlers(...layers)
+  if (layers.length < 2) return merged
+  const styles = layers.flatMap((l) =>
+    l["style"] && typeof l["style"] === "object" ? [l["style"]] : [],
+  )
+  const classes = layers.flatMap((l) =>
+    typeof l["class"] === "string" && l["class"] ? [l["class"]] : [],
+  )
+  return {
+    ...merged,
+    ...(styles.length > 1 ? { style: Object.assign({}, ...styles) } : {}),
+    ...(classes.length > 1 ? { class: classes.join(" ") } : {}),
+  }
+}
+
 /** `props` with every string key in its neutral spelling (symbol keys kept). */
 function neutralKeys(props: Props): Props {
   const out: Record<string | symbol, unknown> = {}
@@ -319,7 +340,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
 
   effect(() => {
     const layers = binder.layers.map((layer) => layer())
-    untracked(() => apply(joinHandlers(...layers)))
+    untracked(() => apply(mergeLayers(layers)))
   })
   if (browser) {
     afterNextRender(() => {

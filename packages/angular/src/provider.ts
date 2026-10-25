@@ -142,6 +142,18 @@ export function injectEnvironment<const C extends readonly Capability[]>(
   })
 }
 
+/**
+ * `env` with a component's own capabilities added (positioning, a machine's effects), still
+ * read lazily: spreading `env` would copy the environment of construction time, before the
+ * provider's inputs are set (a provided scheduler would be missed).
+ */
+export function withCapabilities<E extends object, X extends object>(env: E, extra: X): E & X {
+  return new Proxy(extra as E & X, {
+    get: (target, key) => (key in target ? Reflect.get(target, key) : Reflect.get(env, key)),
+    has: (target, key) => key in target || Reflect.has(env, key),
+  })
+}
+
 /** A component's messages: defaults, then the provider's for its scope, then its input. */
 export function injectMessages<M extends Messages>(
   scope: string,
