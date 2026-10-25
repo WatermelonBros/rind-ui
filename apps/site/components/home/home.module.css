@@ -1656,6 +1656,10 @@
 .band[data-band] {
   position: relative;
   isolation: isolate;
+  /* nothing in a section (a landing's dust, a scaled scene) widens the page: on a phone it did,
+     and the browser zoomed the whole page out to fit, cutting the header. clip, not hidden: no
+     scroll container, so the sticky scenes still hold */
+  overflow-x: clip;
   --band: var(--paper);
   background: var(--band);
 }
