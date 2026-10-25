@@ -24,6 +24,13 @@ export interface FieldHost {
    * `false`, so its Field shows valid as React's does). Set by the host in its constructor.
    */
   invalid?: () => boolean | undefined
+  /** The Field's instance id (a Prompt Input's `<id>-field`). */
+  id?: () => string
+  /**
+   * The Field renders on an element inside the host (a Prompt Input's form holds it): the
+   * host applies `FieldRoot.rootProps()` there; this returns that element once rendered.
+   */
+  inner?: () => Element | null
 }
 export const FIELD_HOST = new InjectionToken<FieldHost>("rind-ui.field-host")
 
