@@ -534,7 +534,10 @@ export class PopoverDescription {
 }
 
 /** Closes it: `<button rindPopoverCloseTrigger>`; an empty one (an icon) is named "Close". */
-@Directive({ selector: "[rindPopoverCloseTrigger]", exportAs: "rindPopoverCloseTrigger" })
+@Directive({
+  selector: "[rindPopoverCloseTrigger], [rindDateFieldCloseTrigger]",
+  exportAs: "rindPopoverCloseTrigger",
+})
 export class PopoverCloseTrigger {
   constructor() {
     const root = injectPopover("CloseTrigger")

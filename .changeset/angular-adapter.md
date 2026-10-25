@@ -35,4 +35,6 @@ is the `submitHandler` input (it may return a promise), its Attachments take an
 its own. A part React renders nothing for in some state (a loaded Skeleton's Status, a
 dismissed Alert, an inactive Tab's panel) keeps your element, hidden. Controlled values are an input and a `<value>Change` output (`[(pressed)]`),
 with `<value>ChangeDetails` for vetoing a change. Published as Angular partial compilation, linked
-by your application's build.
+by your application's build; its relative imports name their files, so Node's ESM loader (SSR, a
+test runner that leaves the package external) loads it too. A Date Field's picker has a
+CloseTrigger (`<button rindDateFieldCloseTrigger>`), as in React.

@@ -154,9 +154,16 @@ Angular 22.2 (current), ng-primitives 0.131, Angular Aria 22.2, Radix NG and Spa
   trigger that is also a Toggle) is two directives on one element. Each writes the host, so
   two parts writing the same attribute (`id`, `aria-describedby`, `data-state`) need one
   writer per element that merges them in a fixed order.
-- **Dev checks.** Angular builds define `ngDevMode`; whether the Angular CLI's production
-  build replaces `process.env.NODE_ENV` (which core and our parts use) is not established —
-  verify with a production build in the scaffold.
+- **Dev checks.** Angular builds define `ngDevMode`, not `process.env.NODE_ENV` (which core and
+  our parts read; `@angular/build` 22.2's define block has `ngDevMode`, `ngJitMode`,
+  `ngServerMode`, `ngHmrMode`). The CLI bundles with esbuild on `platform: "browser"`, and
+  esbuild defines `process.env.NODE_ENV` itself there (`"production"` when minifying,
+  `"development"` otherwise): bundling `dist` that way leaves no `process.env` reference, with
+  or without `--minify`. So the parts keep `process.env.NODE_ENV`, like every other adapter.
+- **Node ESM.** `ngc` keeps the source's extensionless relative imports, which Node's ESM loader
+  rejects (`ERR_MODULE_NOT_FOUND` on `dist/toggle/toggle`); a consumer's SSR or a test runner
+  that leaves the package external loads it that way. The build rewrites them to the files
+  (`scripts/angular-esm.mjs`) and fails unless Node imports the root entry.
 
 ## Mapping from React
 
@@ -250,8 +257,6 @@ Angular 22.2 (current), ng-primitives 0.131, Angular Aria 22.2, Radix NG and Spa
 
 - Does `ngc` partial output linked by an Angular 21 CLI work (peer `>=21`)? Prove with a
   consumer build in the scaffold, or narrow the peer range to `>=22`.
-- Does the Angular CLI production build replace `process.env.NODE_ENV`? If not, dev checks
-  need `ngDevMode` in the Angular parts (core is shared and stays as is).
 - Forms: `ControlValueAccessor` and Signal Forms (`FormValueControl`) for form-capable parts
   are an Angular-only API surface; React has no counterpart. Out of the first batches; a
   separate change once Checkbox/Switch ship.

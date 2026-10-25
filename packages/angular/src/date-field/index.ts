@@ -1,5 +1,5 @@
 import { FieldDescription, FieldErrorMessage, FieldLabel } from "../field/field"
-import { PopoverPortal, PopoverPositioner } from "../popover/popover"
+import { PopoverCloseTrigger, PopoverPortal, PopoverPositioner } from "../popover/popover"
 import {
   DateFieldEnd,
   DateFieldInput,
@@ -46,7 +46,7 @@ export {
 
 /**
  * The Date Field's parts, for a standalone component's `imports` (its Label, Description and
- * ErrorMessage are the Field's, its Portal and Positioner the Popover's).
+ * ErrorMessage are the Field's, its Portal, Positioner and CloseTrigger the Popover's).
  */
 export const DateField = [
   DateFieldRoot,
@@ -66,4 +66,5 @@ export const DateField = [
   PopoverPositioner,
   DateFieldContent,
   DateFieldCalendar,
+  PopoverCloseTrigger,
 ] as const
