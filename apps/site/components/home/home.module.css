@@ -1735,6 +1735,19 @@
   .testPanel {
     grid-template-columns: 1fr;
   }
+  /* stacked, the stage's height is the page's: a run must not change it. The accordion opens in
+     room kept for it, and the PASS banner lands over the stage's foot (growing, they pushed the
+     page down under the reader twice, 40px each) */
+  .testPanel {
+    position: relative;
+  }
+  .testStage {
+    min-block-size: 340px;
+  }
+  .passBanner {
+    position: absolute;
+    inset: auto 0 0;
+  }
   .outro {
     padding: 80px 20px 96px;
   }

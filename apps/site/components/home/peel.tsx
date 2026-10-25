@@ -162,6 +162,42 @@ export function Peel() {
   const p2 = clamp(progress / 0.4)
   const p3 = clamp((progress - 0.5) / 0.35)
   const act = progress < 0.5 ? 0 : 1
+  // the act just left stays a moment, fading under the new one: swapped outright, its title
+  // vanished in a frame and its text changed in place
+  // (set while rendering, not in an effect: an effect let one frame through with no title at all)
+  const [shownAct, setShownAct] = useState(act)
+  const [leaving, setLeaving] = useState<number | null>(null)
+  if (shownAct !== act) {
+    setShownAct(act)
+    setLeaving(shownAct)
+  }
+  useEffect(() => {
+    if (leaving === null) return
+    const t = window.setTimeout(() => setLeaving(null), 600)
+    return () => window.clearTimeout(t)
+  }, [leaving])
+  // one element per act, kept as it goes from current to leaving, so its letters never remount
+  const acts = (heading: boolean) => {
+    const Title = heading ? "h2" : "p"
+    return (
+      <div className={styles.acts} data-swap={leaving === null ? undefined : ""}>
+        {ACTS.map((a, i) =>
+          i === act || i === leaving ? (
+            <div
+              key={a.title}
+              className={i === act ? undefined : styles.leave}
+              aria-hidden={i === act ? undefined : true}
+            >
+              <Title id={heading && i === act ? "peel-title" : undefined} className={styles.title}>
+                <Letters>{a.title}</Letters>
+              </Title>
+              <p className={styles.text}>{a.text}</p>
+            </div>
+          ) : null,
+        )}
+      </div>
+    )
+  }
   // the ink disc opens and closes by itself over a moment once its act is reached: tied to the
   // scroll it rested half open wherever the reader stopped, the label half on pink
   const darkTarget = progress > 0.12 && progress < 0.62 ? 1 : 0
@@ -192,19 +228,13 @@ export function Peel() {
       {/* the object's label turns light as soon as the ink disc reaches it */}
       <div className={styles.sticky} data-act={act + 1} data-ink={dark > 0.15 ? "" : undefined}>
         <div className={styles.copy}>
-          <h2 id="peel-title" className={styles.title} key={act}>
-            <Letters>{ACTS[act]?.title ?? ""}</Letters>
-          </h2>
-          <p className={styles.text}>{ACTS[act]?.text}</p>
+          {acts(true)}
           <Markup tag={tag} attrs={attrs} />
         </div>
         {/* the same copy in paper, clipped by the ink disc: every letter reads on both grounds */}
         <div className={styles.inkLayer} aria-hidden="true">
           <div className={styles.copy}>
-            <p className={styles.title} key={act}>
-              <Letters>{ACTS[act]?.title ?? ""}</Letters>
-            </p>
-            <p className={styles.text}>{ACTS[act]?.text}</p>
+            {acts(false)}
             <Markup tag={tag} attrs={attrs} />
           </div>
         </div>
