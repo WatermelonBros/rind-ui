@@ -82,15 +82,36 @@ export interface RadioItemState {
  */
 export const RADIO_NAMING = new InjectionToken<RadioNaming>("rind-ui.radio-naming")
 
+/** What a component hosting the Root decides (a Color Swatch Picker): each one it leaves out stays the Root's. */
+export interface RadioGroupSource {
+  readonly value?: () => string | null
+  readonly orientation?: () => "vertical" | "horizontal"
+  readonly disabled?: () => boolean
+  readonly readOnly?: () => boolean
+  readonly name?: () => string | undefined
+  readonly ariaLabel?: () => string | undefined
+  readonly onValueChange?: (value: string | null, details: ChangeDetails<RadioGroupEvent>) => void
+}
+
+/**
+ * Provided on the element by a component hosting the Root as a host directive, which sets
+ * `source` in its constructor; read in renders. Internal.
+ */
+export const RADIO_OVERRIDE = new InjectionToken<{ source: RadioGroupSource }>(
+  "rind-ui.radio-override",
+)
+
 const GROUP = new InjectionToken<RadioGroupRoot>("rind-ui.radio-group")
-const ITEM = new InjectionToken<RadioGroupItem>("rind-ui.radio-item")
+const ITEM = new InjectionToken<RadioItemBase>("rind-ui.radio-item")
+/** A radio item subclass provides itself under it. Internal. */
+export const RADIO_ITEM = ITEM
 
 function injectGroup(part: string): RadioGroupRoot {
   const root = inject(GROUP, { optional: true })
   if (!root) throw new Error(`rindRadioGroup${part} must be inside rindRadioGroupRoot`)
   return root
 }
-function injectItem(part: string): RadioGroupItem {
+function injectItem(part: string): RadioItemBase {
   const item = inject(ITEM, { optional: true })
   if (!item) throw new Error(`rindRadioGroup${part} must be inside rindRadioGroupItem`)
   return item
@@ -173,6 +194,16 @@ export class RadioGroupRoot {
     const env = injectEnvironment(announcerCapability, layoutCapability)
     const instance = injectRootId(() => this.id())
     const naming = inject(RADIO_NAMING, { optional: true })
+    const override = inject(RADIO_OVERRIDE, { optional: true, self: true })
+    // A host's choice, else the Root's own input (read in renders: the host sets it after).
+    const own = <K extends keyof RadioGroupSource, T>(key: K, mine: () => T) => {
+      return (): T => {
+        const get = override?.source[key] as (() => T) | undefined
+        return get ? get() : mine()
+      }
+    }
+    const value = own("value", this.value)
+    const orientation = own("orientation", this.orientation)
     const ids = computed(() =>
       naming ? radioGroupIds(instance(), naming) : radioGroupIds(instance()),
     )
@@ -190,19 +221,24 @@ export class RadioGroupRoot {
     const focusableWhenDisabled = () =>
       this.focusableWhenDisabled() ?? host?.focusableWhenDisabled ?? false
     this.hostFocusableWhenDisabled = focusableWhenDisabled
-    const ariaLabel = inject(new HostAttributeToken("aria-label"), { optional: true }) ?? undefined
+    const staticLabel =
+      inject(new HostAttributeToken("aria-label"), { optional: true }) ?? undefined
+    const ariaLabel = () => (override?.source.ariaLabel ? override.source.ariaLabel() : staticLabel)
     const field = computed(() =>
       mergeFieldProps(
         {
           role: "radiogroup",
           labelable: false,
           disabled:
-            this.disabled() || fieldsetContext() || fieldsetDom() || host?.disabled === true,
-          readOnly: this.readonly(),
+            own("disabled", this.disabled)() ||
+            fieldsetContext() ||
+            fieldsetDom() ||
+            host?.disabled === true,
+          readOnly: own("readOnly", this.readonly)(),
           required: this.required(),
           invalid: this.invalid(),
-          name: this.name(),
-          ariaLabel,
+          name: own("name", this.name)(),
+          ariaLabel: ariaLabel(),
         },
         binding?.() ?? null,
       ),
@@ -225,12 +261,13 @@ export class RadioGroupRoot {
         loop: true,
         selectionMode: "single" as const,
         focusableWhenDisabled: focusableWhenDisabled(),
-        value: this.value(),
+        value: value(),
         defaultValue: this.defaultValue(),
         // A user change (an arrow or a press) is dispatched on that item's input after commit.
         onValueChange: (next: string | null, details: ChangeDetails<RadioGroupEvent>) => {
           lastReason = details.reason
           if (details.reason === "NAVIGATE" || details.reason === "PRESS") pending.current = next
+          override?.source.onValueChange?.(next, details)
           this.emit(next, details)
         },
         disabled: field().disabled,
@@ -246,7 +283,9 @@ export class RadioGroupRoot {
     this.parts = injectPartRegistry<GroupPart>(() => ({
       scope: "radio-group",
       root: instance(),
-      ...(ariaLabel === undefined && binding === null ? { expected: ["label"] as const } : {}),
+      ...(untracked(ariaLabel) === undefined && binding === null
+        ? { expected: ["label"] as const }
+        : {}),
     }))
     const rendered = {
       label: injectRenderedId(this.parts, "label"),
@@ -264,7 +303,7 @@ export class RadioGroupRoot {
           highlightSource: view().context.highlightSource,
           pending: registered() === null,
           pendingStop,
-          orientation: this.orientation(),
+          orientation: orientation(),
           disabled: field().disabled,
           focusableWhenDisabled: focusableWhenDisabled(),
           readOnly: field().readOnly,
@@ -278,7 +317,7 @@ export class RadioGroupRoot {
             errorMessage: rendered.errorMessage(),
           },
           ...(binding ? { field: binding().ids } : {}),
-          ariaLabel,
+          ariaLabel: ariaLabel(),
           hosted: host !== null,
         },
         send,
@@ -289,7 +328,7 @@ export class RadioGroupRoot {
       () => ({
         ...this.api().root(),
         ...binding?.().data,
-        ...(ariaLabel === undefined ? {} : { "aria-label": ariaLabel }),
+        ...(ariaLabel() === undefined ? {} : { "aria-label": ariaLabel() }),
       }),
       {
         owns: [
@@ -436,25 +475,18 @@ export class RadioGroupErrorMessage {
 }
 
 /**
- * A radio: `<div rindRadioGroupItem value="s">` with an ItemControl, an ItemLabel and an
- * ItemDescription; its hidden input follows the content (a sibling of the control, never inside
- * it: reka-ui#1597).
+ * A radio whatever decides its value (a Radio Group Item, a colour swatch). A subclass
+ * provides `ITEM_TOKEN` as itself and renders the hidden input as `#input`. Internal.
  */
-@Component({
-  selector: "[rindRadioGroupItem]",
-  exportAs: "rindRadioGroupItem",
-  imports: [RindProps],
-  encapsulation: ViewEncapsulation.None,
-  providers: [{ provide: ITEM, useExisting: forwardRef(() => RadioGroupItem) }],
-  template: `<ng-content /><input #input [rindProps]="hiddenInput()" />`,
-})
-export class RadioGroupItem {
-  /** The item's value: what the group's value and the form submit. */
-  readonly value = input.required<string>()
-  /** Disables this radio only. */
-  readonly disabled = input(false, { transform: booleanAttribute })
-  /** The text for the collection (defaults to the item's text content). */
-  readonly textValue = input<string>()
+@Directive()
+export abstract class RadioItemBase {
+  abstract readonly value: () => string
+  abstract readonly disabled: () => boolean
+  abstract readonly textValue: () => string | undefined
+  /** @internal What the item adds to its control (a swatch's name and colour). */
+  controlExtra(): PartProps {
+    return {}
+  }
 
   /** @internal */
   readonly group = injectGroup("Item")
@@ -530,6 +562,28 @@ export class RadioGroupItem {
   }
 }
 
+/**
+ * A radio: `<div rindRadioGroupItem value="s">` with an ItemControl, an ItemLabel and an
+ * ItemDescription; its hidden input follows the content (a sibling of the control, never inside
+ * it: reka-ui#1597).
+ */
+@Component({
+  selector: "[rindRadioGroupItem]",
+  exportAs: "rindRadioGroupItem",
+  imports: [RindProps],
+  encapsulation: ViewEncapsulation.None,
+  providers: [{ provide: ITEM, useExisting: forwardRef(() => RadioGroupItem) }],
+  template: `<ng-content /><input #input [rindProps]="hiddenInput()" />`,
+})
+export class RadioGroupItem extends RadioItemBase {
+  /** The item's value: what the group's value and the form submit. */
+  readonly value = input.required<string>()
+  /** Disables this radio only. */
+  readonly disabled = input(false, { transform: booleanAttribute })
+  /** The text for the collection (defaults to the item's text content). */
+  readonly textValue = input<string>()
+}
+
 /** The radio itself: `<button rindRadioGroupItemControl>`. */
 @Directive({ selector: "[rindRadioGroupItemControl]", exportAs: "rindRadioGroupItemControl" })
 export class RadioGroupItemControl {
@@ -582,7 +636,7 @@ export class RadioGroupItemControl {
         descriptionRendered: item.descriptionRendered(),
       })
       return joinHandlers(
-        own,
+        { ...own, ...item.controlExtra() },
         hostProps,
         {
           // Enter submits the form (implicit submission) and never checks; hosted by a toolbar,

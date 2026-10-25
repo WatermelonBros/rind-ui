@@ -144,6 +144,7 @@ export class FieldRoot {
   constructor() {
     const host = inject(FIELD_HOST, { optional: true, self: true })
     const scope = host?.scope ?? "field"
+    const invalid = () => (host?.invalid ? host.invalid() : this.invalid())
     const instance = injectRootId(() => this.id())
     this.instance = instance
     const enclosing = inject(FIELD_CONTROL, { optional: true, skipSelf: true }) ?? null
@@ -191,7 +192,7 @@ export class FieldRoot {
         disabled: disabled(),
         readOnly: this.readonly(),
         required: this.required(),
-        invalid: this.invalid(),
+        invalid: invalid(),
         errors: this.errors() ?? form?.errorsFor(this.name()),
         managed: form !== null,
         validate: this.validate(),
@@ -220,7 +221,7 @@ export class FieldRoot {
           disabled: disabled(),
           readOnly: this.readonly(),
           required: this.required(),
-          invalid: this.invalid(),
+          invalid: invalid(),
         },
         touched: this.touched(),
         dirty: this.dirty(),
@@ -363,7 +364,7 @@ export class FieldRoot {
                 ? "validating"
                 : fieldDisplay(snap.state, snap.context, {
                     disabled: disabled(),
-                    invalid: this.invalid(),
+                    invalid: invalid(),
                   })
             },
             focus: () => registered?.control.focus("keyboard"),
@@ -461,7 +462,8 @@ function joinedPart(parts: JoinedParts, name: string) {
 
 /** The control's label: `<label rindFieldLabel>`. */
 @Directive({
-  selector: "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel], [rindPinInputLabel]",
+  selector:
+    "[rindFieldLabel], [rindTextFieldLabel], [rindNumberInputLabel], [rindPinInputLabel], [rindDateFieldLabel], [rindColorFieldLabel]",
   exportAs: "rindFieldLabel",
 })
 export class FieldLabel {
@@ -502,7 +504,7 @@ export class FieldLabel {
 
 @Directive({
   selector:
-    "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription], [rindPinInputDescription]",
+    "[rindFieldDescription], [rindTextFieldDescription], [rindNumberInputDescription], [rindPinInputDescription], [rindDateFieldDescription], [rindColorFieldDescription], [rindColorPickerDescription]",
   exportAs: "rindFieldDescription",
 })
 export class FieldDescription {
@@ -525,7 +527,7 @@ export class FieldDescription {
  */
 @Component({
   selector:
-    "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage], [rindPinInputErrorMessage]",
+    "[rindFieldErrorMessage], [rindTextFieldErrorMessage], [rindNumberInputErrorMessage], [rindPinInputErrorMessage], [rindDateFieldErrorMessage], [rindColorFieldErrorMessage], [rindColorPickerErrorMessage]",
   exportAs: "rindFieldErrorMessage",
   encapsulation: ViewEncapsulation.None,
   template: `<ng-content

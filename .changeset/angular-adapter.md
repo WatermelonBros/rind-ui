@@ -9,7 +9,8 @@ Text Field, Checkbox, Checkbox Group, Switch, Radio Group, Segmented Control, Co
 Accordion, Tabs, Toolbar, Breadcrumbs, Pagination, Rating, Slider, Number Input, Pin Input, Splitter, Stepper, Timeline, Table of
 Contents, Scroll Area, Marquee, QR Code, Clipboard, Code Block, Form, File Upload, VisuallyHidden, Listbox, Tag
 Group, Grid List, Tree View, Sortable, Popover, Tooltip, Hover Card, Dialog, Drawer, Toast, Table
-with its Filter parts, Menu, Context Menu, Menubar, Navigation Menu, Select, Combobox, Tags Input;
+with its Filter parts, Menu, Context Menu, Menubar, Navigation Menu, Select, Combobox, Tags Input,
+Calendar, Date Field with its picker, Color Picker, Image Viewer, Image Cropper, Tour;
 the form toggle bases, for a toggle of your own). Parts are attribute directives on your own elements
 (`<button rindToggleRoot [(pressed)]="bold">`), so no wrapper element is added and any host element
 keeps the behaviour; a part that renders elements of its own (Kbd, Badge) is a component with an
@@ -22,7 +23,12 @@ stamped once per copy; a Drawer's Handle is `<button>` with two or more measured
 `body` after the first render with the trigger's dir, lang and theme; a Table Filter's content goes
 in `<ng-template rindTableFilterPortal>` with a FilterPositioner around it. A Menu item's activation is `(itemSelect)`
 (a native `select` event bubbles); Select, Combobox and Tags Input options are the Listbox
-parts under their own names (`rindSelectItem`), their data rows from the Root's `groups()`. A part React renders nothing for in some state (a loaded Skeleton's Status, a
+parts under their own names (`rindSelectItem`), their data rows from the Root's `groups()`. A Date Field
+is a range field with `selectionMode="range"` on its Root; a Color Picker Channel Input is a text
+field for `channel="hex"` or `"css"` and a Number Input for any other channel; an inline Color
+Picker has its Content in place (no Portal or Positioner). A Tour Root is an `<ng-container>`
+(`injectTour()` gives a handle for `[tour]`), its actions a template
+(`<ng-template rindTourActions let-actions>`). A part React renders nothing for in some state (a loaded Skeleton's Status, a
 dismissed Alert, an inactive Tab's panel) keeps your element, hidden. Controlled values are an input and a `<value>Change` output (`[(pressed)]`),
 with `<value>ChangeDetails` for vetoing a change. Published as Angular partial compilation, linked
 by your application's build.

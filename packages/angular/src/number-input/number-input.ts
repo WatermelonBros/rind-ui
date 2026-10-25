@@ -36,12 +36,15 @@ import {
   type NumberInputCommitDetails,
   type NumberInputEvent,
   type NumberInputMessages,
+  type NumberInputPart,
   type NumberInputReason,
   type NumberInputTrigger,
   numberInputConnect,
   numberInputKey,
   numberInputMachine,
   numberInputMessages,
+  type PartNaming,
+  type PartProps,
   partId,
   planInsertion,
   quirkActive,
@@ -97,6 +100,31 @@ export interface NumberInputState {
 }
 
 const NUMBER_INPUT = new InjectionToken<NumberInputRoot>("rind-ui.number-input")
+
+/**
+ * What a subclass hosting the Number Input decides (a colour channel input): each one it
+ * leaves out stays the Root's input. Internal.
+ */
+export interface NumberInputSource {
+  readonly naming?: PartNaming<NumberInputPart>
+  readonly value?: () => number | null | undefined
+  readonly min?: () => number | undefined
+  readonly max?: () => number | undefined
+  readonly step?: () => number | undefined
+  readonly largeStep?: () => number | undefined
+  readonly formatOptions?: () => Intl.NumberFormatOptions | undefined
+  readonly commitBehavior?: () => "snap" | "validate" | undefined
+  readonly disabled?: () => boolean
+  readonly readOnly?: () => boolean
+  readonly locale?: () => string | undefined
+  /** What the host adds to the Input (a channel input's name). */
+  readonly inputProps?: () => PartProps
+  readonly onValueChange?: (value: number | null) => void
+  readonly onValueCommit?: (value: number | null, details: NumberInputCommitDetails) => void
+}
+
+/** The NumberInputRoot's own provider, for a subclass's `providers`. Internal. */
+export const NUMBER_INPUT_TOKEN = NUMBER_INPUT
 
 function injectNumberInput(part: string): NumberInputRoot {
   const root = inject(NUMBER_INPUT, { optional: true })
@@ -212,6 +240,26 @@ export class NumberInputRoot {
   readonly hiddenProps: Signal<ReturnType<ReturnType<typeof numberInputConnect>["hiddenInput"]>>
   /** The input's state, for the template (`#n="rindNumberInputRoot"`, `n.state()`). */
   readonly state: Signal<NumberInputState>
+  /** @internal A subclass's choices (read in renders). */
+  protected source(): NumberInputSource | null {
+    return null
+  }
+  /** @internal The host's choice, else the Root's own input. */
+  readonly own = <K extends Exclude<keyof NumberInputSource, "naming" | `on${string}`>, T>(
+    key: K,
+    mine: () => T,
+  ): (() => T) => {
+    return () => {
+      const get = this.source()?.[key] as (() => T) | undefined
+      return get ? get() : mine()
+    }
+  }
+  /** @internal */
+  readonly lo = this.own("min", this.min)
+  /** @internal */
+  readonly hi = this.own("max", this.max)
+  /** @internal */
+  readonly by = this.own("step", this.step)
   private readonly hiddenRef = viewChild<ElementRef<HTMLInputElement>>("hidden")
   /** @internal The hidden number input (the Field's validity element). */
   readonly hiddenInput = () => asInput(this.hiddenRef()?.nativeElement ?? null)
@@ -219,20 +267,22 @@ export class NumberInputRoot {
   constructor() {
     const env = injectEnvironment(announcerCapability)
     this.instance = this.field.instance
-    const locale = injectLocale(
-      () => this.locale(),
-      () => this.dir(),
-    )
+    const locale = injectLocale(this.own("locale", this.locale), () => this.dir())
     this.direction = computed(() => locale().dir)
     this.texts = injectMessages("number-input", numberInputMessages, () => this.messages())
     // Cached by value: an inline options object each render keeps the parser (RX#1893).
-    this.parser = computed(() => createNumberParser(locale().locale, this.formatOptions()))
+    this.parser = computed(() =>
+      createNumberParser(locale().locale, this.own("formatOptions", this.formatOptions)()),
+    )
     // The enclosing Field's state (this element's own Field is its own inputs).
     const enclosing = inject(FIELD_CONTROL, { optional: true, skipSelf: true }) ?? null
     const fieldsetDisabled = injectFieldsetDisabled()
     this.disabledState = () =>
-      this.field.disabled() || enclosing?.().state.disabled === true || fieldsetDisabled()
-    this.readOnlyState = () => this.field.readonly() || enclosing?.().state.readOnly === true
+      this.own("disabled", this.field.disabled)() ||
+      enclosing?.().state.disabled === true ||
+      fieldsetDisabled()
+    this.readOnlyState = () =>
+      this.own("readOnly", this.field.readonly)() || enclosing?.().state.readOnly === true
     const formInput = hiddenFormInput(
       { input: this.hiddenInput, control: () => asInput(this.inputEl.value) },
       env,
@@ -241,7 +291,7 @@ export class NumberInputRoot {
     const { view, send } = injectMachine(
       numberInputMachine,
       () => ({
-        value: this.value(),
+        value: this.own("value", this.value)(),
         defaultValue: this.defaultValue(),
         onValueChange: (v: number | null, details) => {
           let cancelled = false
@@ -256,16 +306,20 @@ export class NumberInputRoot {
               },
             },
           })
-          if (!cancelled) this.valueChange.emit(v)
+          if (cancelled) return
+          this.source()?.onValueChange?.(v)
+          this.valueChange.emit(v)
         },
-        onValueCommit: (v: number | null, d: NumberInputCommitDetails) =>
-          this.valueCommit.emit({ value: v, details: d }),
+        onValueCommit: (v: number | null, d: NumberInputCommitDetails) => {
+          this.source()?.onValueCommit?.(v, d)
+          this.valueCommit.emit({ value: v, details: d })
+        },
         onInputValueChange: (t: string) => this.inputValueChange.emit(t),
-        min: this.min(),
-        max: this.max(),
-        step: this.step(),
-        largeStep: this.largeStep(),
-        commitBehavior: this.commitBehavior(),
+        min: this.lo(),
+        max: this.hi(),
+        step: this.by(),
+        largeStep: this.own("largeStep", this.largeStep)(),
+        commitBehavior: this.own("commitBehavior", this.commitBehavior)(),
         spinOnPress: this.spinOnPress(),
         spinDelay: this.spinDelay(),
         spinInterval: this.spinInterval(),
@@ -310,7 +364,8 @@ export class NumberInputRoot {
       () => {
         const focused = view().context.focused
         return {
-          dir: locale().dir,
+          // Inside a Field the root is a plain element (React's joined host): no direction.
+          ...(this.field.parts.joined ? {} : { dir: locale().dir }),
           "data-focus": focused ? "" : undefined,
           "data-focus-visible":
             focused && modality() !== "pointer" && modality() !== "touch" ? "" : undefined,
@@ -365,6 +420,16 @@ export class NumberInputRoot {
   }
 
   /** @internal */
+  inputExtra(): PartProps {
+    return this.source()?.inputProps?.() ?? {}
+  }
+
+  /** @internal */
+  naming(): PartNaming<NumberInputPart> | undefined {
+    return this.source()?.naming
+  }
+
+  /** @internal */
   setPressed(t: NumberInputTrigger, on: boolean): void {
     const p = untracked(this.pressed)
     if (p[t] !== on) this.pressed.set({ ...p, [t]: on })
@@ -400,10 +465,12 @@ function injectApi(root: NumberInputRoot, binding: Signal<FieldControlBinding> |
     )
     const value = view.values.value ?? null
     const parser = root.parser()
-    const range = { min: root.min(), max: root.max(), step: root.step() }
+    const range = { min: root.lo(), max: root.hi(), step: root.by() }
+    const naming = root.naming()
     return numberInputConnect(
       {
         instance: root.instance(),
+        ...(naming ? { naming } : {}),
         value,
         text: view.context.text,
         defaultValue: root.defaultValue(),
@@ -475,6 +542,7 @@ export class NumberInputInput {
         joinHandlers(
           {
             ...apiFor().input(),
+            ...root.inputExtra(),
             id: controlId(),
             ...(this.inputmode() === undefined ? {} : { inputmode: this.inputmode() }),
           },
@@ -486,8 +554,8 @@ export class NumberInputInput {
             onKeyDown: (e: KeyboardEvent) => {
               if (e.defaultPrevented) return
               const event = numberInputKey(describeKey(e, env), {
-                hasMin: root.min() !== undefined,
-                hasMax: root.max() !== undefined,
+                hasMin: root.lo() !== undefined,
+                hasMax: root.hi() !== undefined,
               })
               if (!event) return
               if (event.type === "COMMIT") {

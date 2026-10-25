@@ -19,6 +19,11 @@ export interface FieldHost {
   readonly scope: string
   /** Inside a Field: the root's `data-part` (default `root`). */
   readonly rootPart?: string | undefined
+  /**
+   * The host's own invalid flag, replacing the Field's input (a Color Picker passes an explicit
+   * `false`, so its Field shows valid as React's does). Set by the host in its constructor.
+   */
+  invalid?: () => boolean | undefined
 }
 export const FIELD_HOST = new InjectionToken<FieldHost>("rind-ui.field-host")
 

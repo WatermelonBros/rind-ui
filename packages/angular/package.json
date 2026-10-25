@@ -68,6 +68,11 @@
       "types": "./dist/button/index.d.ts",
       "default": "./dist/button/index.js"
     },
+    "./calendar": {
+      "@rind-ui/source": "./src/calendar/index.ts",
+      "types": "./dist/calendar/index.d.ts",
+      "default": "./dist/calendar/index.js"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.ts",
@@ -93,6 +98,11 @@
       "types": "./dist/collapsible/index.d.ts",
       "default": "./dist/collapsible/index.js"
     },
+    "./color-picker": {
+      "@rind-ui/source": "./src/color-picker/index.ts",
+      "types": "./dist/color-picker/index.d.ts",
+      "default": "./dist/color-picker/index.js"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.ts",
@@ -102,6 +112,11 @@
       "@rind-ui/source": "./src/context-menu/index.ts",
       "types": "./dist/context-menu/index.d.ts",
       "default": "./dist/context-menu/index.js"
+    },
+    "./date-field": {
+      "@rind-ui/source": "./src/date-field/index.ts",
+      "types": "./dist/date-field/index.d.ts",
+      "default": "./dist/date-field/index.js"
     },
     "./dialog": {
       "@rind-ui/source": "./src/dialog/index.ts",
@@ -157,6 +172,16 @@
       "@rind-ui/source": "./src/image/index.ts",
       "types": "./dist/image/index.d.ts",
       "default": "./dist/image/index.js"
+    },
+    "./image-cropper": {
+      "@rind-ui/source": "./src/image-cropper/index.ts",
+      "types": "./dist/image-cropper/index.d.ts",
+      "default": "./dist/image-cropper/index.js"
+    },
+    "./image-viewer": {
+      "@rind-ui/source": "./src/image-viewer/index.ts",
+      "types": "./dist/image-viewer/index.d.ts",
+      "default": "./dist/image-viewer/index.js"
     },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
@@ -353,6 +378,11 @@
       "types": "./dist/tooltip/index.d.ts",
       "default": "./dist/tooltip/index.js"
     },
+    "./tour": {
+      "@rind-ui/source": "./src/tour/index.ts",
+      "types": "./dist/tour/index.d.ts",
+      "default": "./dist/tour/index.js"
+    },
     "./tree-view": {
       "@rind-ui/source": "./src/tree-view/index.ts",
       "types": "./dist/tree-view/index.d.ts",
@@ -382,6 +412,7 @@
     "@angular/platform-browser": "^22.2.3",
     "@angular/platform-server": "^22.2.3",
     "@angular/router": "^22.2.3",
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/node": "^24.19.2",
@@ -427,6 +458,10 @@
         "types": "./dist/button/index.d.ts",
         "default": "./dist/button/index.js"
       },
+      "./calendar": {
+        "types": "./dist/calendar/index.d.ts",
+        "default": "./dist/calendar/index.js"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.ts",
         "default": "./dist/checkbox/index.js"
@@ -447,6 +482,10 @@
         "types": "./dist/collapsible/index.d.ts",
         "default": "./dist/collapsible/index.js"
       },
+      "./color-picker": {
+        "types": "./dist/color-picker/index.d.ts",
+        "default": "./dist/color-picker/index.js"
+      },
       "./combobox": {
         "types": "./dist/combobox/index.d.ts",
         "default": "./dist/combobox/index.js"
@@ -454,6 +493,10 @@
       "./context-menu": {
         "types": "./dist/context-menu/index.d.ts",
         "default": "./dist/context-menu/index.js"
+      },
+      "./date-field": {
+        "types": "./dist/date-field/index.d.ts",
+        "default": "./dist/date-field/index.js"
       },
       "./dialog": {
         "types": "./dist/dialog/index.d.ts",
@@ -498,6 +541,14 @@
       "./image": {
         "types": "./dist/image/index.d.ts",
         "default": "./dist/image/index.js"
+      },
+      "./image-cropper": {
+        "types": "./dist/image-cropper/index.d.ts",
+        "default": "./dist/image-cropper/index.js"
+      },
+      "./image-viewer": {
+        "types": "./dist/image-viewer/index.d.ts",
+        "default": "./dist/image-viewer/index.js"
       },
       "./kbd": {
         "types": "./dist/kbd/index.d.ts",
@@ -654,6 +705,10 @@
       "./tooltip": {
         "types": "./dist/tooltip/index.d.ts",
         "default": "./dist/tooltip/index.js"
+      },
+      "./tour": {
+        "types": "./dist/tour/index.d.ts",
+        "default": "./dist/tour/index.js"
       },
       "./tree-view": {
         "types": "./dist/tree-view/index.d.ts",
