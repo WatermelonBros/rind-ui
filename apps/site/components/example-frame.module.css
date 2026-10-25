@@ -10,7 +10,11 @@
   box-shadow: var(--shadow);
   margin-bottom: 40px;
 }
+/* (above the example: a stack of toasts growing up out of the stage covered its tabs, which then
+   took no tap) */
 .bar {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -363,4 +367,16 @@
 .stage[data-view="parts"]:has([aria-haspopup][aria-expanded="true"]) {
   place-items: start center;
   min-height: 400px;
+}
+
+/* an example's own toast region is as wide as the stage at most (it ran 28px past a phone's) */
+.stage [data-scope="toast"][data-part="region"] {
+  max-inline-size: 100%;
+}
+/* on a phone an example wider than the screen (a date range, a stepper, a toolbar) scrolls
+   sideways in its stage: the frame's rounded edge cut it, with no way to reach the rest */
+@media (max-width: 480px) {
+  .stage {
+    overflow-x: auto;
+  }
 }
