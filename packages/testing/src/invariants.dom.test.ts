@@ -132,6 +132,19 @@ describe("generic invariants", () => {
     )
   })
 
+  it("focus moving to an in-page link's target is kept", () => {
+    const inside = facts(
+      `<a href="#install" ${part("link")}>Install</a><h2 id="install">Install</h2>`,
+    )
+    ;(document.querySelector("a") as HTMLElement).focus()
+    const before = collectDom({ scope: "x", instance: "i" })
+    const heading = document.getElementById("install") as HTMLElement
+    heading.tabIndex = -1
+    heading.focus()
+    const after = collectDom({ scope: "x", instance: "i" })
+    expect(generic("focusKept", { ...inside, before, after })).toEqual([])
+  })
+
   it("own live regions fail without the live-region trait", () => {
     const f = facts(`<div ${part("root")}><div role="status">x</div></div>`)
     expect(generic("liveRegions", f)[0]).toMatch(/live region/)

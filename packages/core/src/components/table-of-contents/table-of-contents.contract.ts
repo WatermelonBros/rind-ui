@@ -38,8 +38,16 @@ export const tableOfContentsContract = contract("table-of-contents", {
       pointer: async (env, label: string) => (await linkNamed(env, label)).click(),
       keyboard: async (env, label: string) => {
         const link = await linkNamed(env, label)
+        const target = (await link.attr("href"))?.slice(1)
         await link.focus()
         await link.press("Enter")
+        // The heading takes focus on the next frame: every run waits for it (no race with the
+        // step's snapshot).
+        const landed = async () => {
+          const el = env.focused()
+          return (await el.exists()) && (await el.attr("id")) === target
+        }
+        for (let t = 0; t < 500 && !(await landed()); t += 16) await env.advance(16)
       },
       done: async (): Promise<boolean> => true,
     },
