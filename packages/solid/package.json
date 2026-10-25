@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
+    "@internationalized/date": "^3.12.4",
     "@rind-ui/react": "workspace:*",
     "@rind-ui/testing": "workspace:*",
     "@types/babel__core": "^7.20.5",
