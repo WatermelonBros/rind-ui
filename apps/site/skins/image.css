@@ -52,5 +52,5 @@
 :is([data-skin="juicy"], [data-rind-theme="skin-juicy"])
   [data-scope="image"][data-part="fallback"] {
   background: var(--s-acc);
-  color: #fff;
+  color: var(--s-ink);
 }

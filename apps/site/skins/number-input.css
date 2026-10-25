@@ -48,7 +48,7 @@
     [data-part="decrement-trigger"]
   )[data-pressed] {
   background: var(--s-brand);
-  color: #fff;
+  color: var(--s-brand-text);
 }
 /* At a bound and disabled: base.css dims the outermost disabled element only. */
 :is([data-skinned], [data-rind-theme^="skin-"])
