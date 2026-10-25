@@ -5,7 +5,7 @@ import { type CSSProperties, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { cue } from "../sound"
 import { zoom } from "../zoom"
-import { arc, aside, type DockPosition, fit, hop, locate } from "./docks"
+import { arc, aside, type DockPosition, fit, hop, locate, via } from "./docks"
 import {
   emitTestArrived,
   getLookColors,
@@ -133,6 +133,7 @@ export function SkinScene() {
     const vh = () => window.innerHeight
     const phone = () => window.innerWidth <= 900
     const centre = (r: DOMRect) => r.top + r.height / 2
+    const centre2 = (r: DOMRect) => r.left + r.width / 2
     // the object's own proportions (its hero control): a dock that is not a control of its kind
     // (the install's core) takes a box of that shape
     const aspect = () => {
@@ -544,6 +545,25 @@ export function SkinScene() {
           const copy = Math.max(title.right, lead.right)
           const lane = Math.min(window.innerWidth - to.width, copy + to.width)
           return onScreen(aside(from, to, shownT, lane, (lead.bottom + cards.top) / 2))
+        }
+        // to the finale: the outro's title stands over its slot, so it goes down to just above
+        // the title, out past its right end, down under the buttons and back in, up into the slot
+        // (straight, it crossed "Build the look.")
+        const finEl = dockOf(p.to)?.id === "finale" ? measured?.els[p.to] : null
+        const row = finEl?.parentElement?.getBoundingClientRect()
+        const head = finEl?.parentElement?.previousElementSibling?.getBoundingClientRect()
+        if (row && head && head.bottom <= row.top) {
+          const lane = Math.min(window.innerWidth - to.width / 2 - 8, head.right + to.width)
+          const above = head.top - to.height
+          const below = row.bottom + to.height * 0.8
+          return onScreen(
+            via(from, to, shownT, [
+              [centre2(from), above],
+              [lane, above],
+              [lane, below],
+              [to.x + to.width / 2, below],
+            ]),
+          )
         }
         // one throw from dock to dock, higher the further it goes (a short hop barely lifts)
         const reach = Math.hypot(centre(to) - centre(from), to.x - from.x)

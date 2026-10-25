@@ -83,6 +83,43 @@ export function aside(from: DOMRect, to: DOMRect, t: number, lane: number, strip
 }
 
 /**
+ * A flight along clear points (viewport pixels) between two docks, eased as one move: each
+ * stretch takes its share of `t` by its length, so the speed holds through the corners.
+ */
+export function via(
+  from: DOMRect,
+  to: DOMRect,
+  t: number,
+  points: readonly (readonly [number, number])[],
+): DOMRect {
+  const path: [number, number][] = [
+    [from.x + from.width / 2, from.y + from.height / 2],
+    ...points.map(([x, y]) => [x, y] as [number, number]),
+    [to.x + to.width / 2, to.y + to.height / 2],
+  ]
+  const lengths = path
+    .slice(1)
+    .map(([x, y], i) => Math.hypot(x - (path[i]?.[0] ?? x), y - (path[i]?.[1] ?? y)))
+  const total = lengths.reduce((a, b) => a + b, 0) || 1
+  let d = ease(t) * total
+  let cx = path[0]?.[0] ?? 0
+  let cy = path[0]?.[1] ?? 0
+  for (const [i, len] of lengths.entries()) {
+    const [x0, y0] = path[i] ?? [cx, cy]
+    const [x1, y1] = path[i + 1] ?? [x0, y0]
+    const k = len ? Math.min(1, d / len) : 1
+    cx = lerp(x0, x1, k)
+    cy = lerp(y0, y1, k)
+    d -= len
+    if (d <= 0) break
+  }
+  const e = ease(t)
+  const w = lerp(from.width, to.width, e)
+  const h = lerp(from.height, to.height, e)
+  return new DOMRect(cx - w / 2, cy - h / 2, w, h)
+}
+
+/**
  * A phone's flight: there is no room beside the copy, so the object never crosses it. It
  * shrinks away into the dock it leaves and grows out of the one it reaches; in between it is not
  * drawn. Returns the box and the opacity.
