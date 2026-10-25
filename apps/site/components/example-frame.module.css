@@ -265,6 +265,12 @@
   max-height: 460px;
   font: 500 13.5px / 1.6 var(--mono);
 }
+/* said before the code it is about: a Vue reader meets it before React's imports */
+.codeNote {
+  padding: 14px 20px 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
 .cssNote {
   padding: 0 20px 16px;
   font-size: 13px;
