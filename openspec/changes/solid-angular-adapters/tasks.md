@@ -33,44 +33,44 @@
 - [x] 2.18 Text Field
 - [x] 2.19 Checkbox
 - [x] 2.20 Checkbox Group
-- [ ] 2.21 Switch
-- [ ] 2.22 Radio Group
-- [ ] 2.23 Segmented Control
-- [ ] 2.24 Collapsible
-- [ ] 2.25 Accordion
-- [ ] 2.26 Tabs
-- [ ] 2.27 Toolbar
-- [ ] 2.28 Breadcrumbs
-- [ ] 2.29 Pagination
-- [ ] 2.30 Rating
-- [ ] 2.31 Slider
-- [ ] 2.32 Number Input
-- [ ] 2.33 Pin Input
-- [ ] 2.34 Splitter
-- [ ] 2.35 Stepper
-- [ ] 2.36 Timeline
-- [ ] 2.37 Table Of Contents
-- [ ] 2.38 Scroll Area
-- [ ] 2.39 Marquee
-- [ ] 2.40 Qr Code
-- [ ] 2.41 Clipboard
-- [ ] 2.42 Code Block
-- [ ] 2.43 Form
-- [ ] 2.44 Form Toggle
-- [ ] 2.45 File Upload
+- [x] 2.21 Switch
+- [x] 2.22 Radio Group
+- [x] 2.23 Segmented Control
+- [x] 2.24 Collapsible
+- [x] 2.25 Accordion
+- [x] 2.26 Tabs
+- [x] 2.27 Toolbar
+- [x] 2.28 Breadcrumbs
+- [x] 2.29 Pagination
+- [x] 2.30 Rating
+- [x] 2.31 Slider
+- [x] 2.32 Number Input
+- [x] 2.33 Pin Input
+- [x] 2.34 Splitter
+- [x] 2.35 Stepper
+- [x] 2.36 Timeline
+- [x] 2.37 Table Of Contents
+- [x] 2.38 Scroll Area
+- [x] 2.39 Marquee
+- [x] 2.40 Qr Code
+- [x] 2.41 Clipboard
+- [x] 2.42 Code Block
+- [x] 2.43 Form
+- [x] 2.44 Form Toggle
+- [x] 2.45 File Upload
 - [ ] 2.46 Tags Input
-- [ ] 2.47 Tag Group
-- [ ] 2.48 Listbox
-- [ ] 2.49 Grid List
-- [ ] 2.50 Tree View
-- [ ] 2.51 Table
-- [ ] 2.52 Sortable
-- [ ] 2.53 Popover
-- [ ] 2.54 Tooltip
-- [ ] 2.55 Hover Card
-- [ ] 2.56 Dialog
-- [ ] 2.57 Drawer
-- [ ] 2.58 Toast
+- [x] 2.47 Tag Group
+- [x] 2.48 Listbox
+- [x] 2.49 Grid List
+- [x] 2.50 Tree View
+- [x] 2.51 Table
+- [x] 2.52 Sortable
+- [x] 2.53 Popover
+- [x] 2.54 Tooltip
+- [x] 2.55 Hover Card
+- [x] 2.56 Dialog
+- [x] 2.57 Drawer
+- [x] 2.58 Toast
 - [ ] 2.59 Menu
 - [ ] 2.60 Context Menu
 - [ ] 2.61 Menubar

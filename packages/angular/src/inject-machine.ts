@@ -21,6 +21,18 @@ import { injectEnvironment } from "./provider"
 
 type ViewOf<M extends AnyMachine> = ReturnType<Service<M>["view"]>
 
+/** Equal props, callbacks aside: they are new closures on every read, reading live state. */
+const sameData = (a: object, b: object) => {
+  const x = a as Record<string, unknown>
+  const y = b as Record<string, unknown>
+  const keys = new Set([...Object.keys(x), ...Object.keys(y)])
+  for (const k of keys) {
+    if (typeof x[k] === "function" && typeof y[k] === "function") continue
+    if (!Object.is(x[k], y[k])) return false
+  }
+  return true
+}
+
 /**
  * The environment argument: optional when the base environment satisfies the machine's `env`
  * (or the machine declares none), required otherwise (pass `injectEnvironment(…capabilities)`).
@@ -57,9 +69,14 @@ export function injectMachine<M extends AnyMachine>(
     return created
   }
   const version = signal(0)
+  let applied: MachinePropsOf<M> | undefined
+  const apply = (next: MachinePropsOf<M>) => {
+    applied = next
+    service().setProps(next)
+  }
   effect(() => {
     const next = props()
-    untracked(() => service().setProps(next))
+    untracked(() => apply(next))
   })
   let off: (() => void) | undefined
   let destroyed = false
@@ -82,8 +99,11 @@ export function injectMachine<M extends AnyMachine>(
     return service().view(props())
   })
   // An event can arrive before the props effect flushed (an input changed in the same tick).
+  // Only changed data: an event sent from inside another (a focus a press moves) must not
+  // re-apply a controlled value its parent has not passed back yet, which reads as a refusal.
   const send: Service<M>["send"] = (event) => {
-    service().setProps(untracked(props))
+    const next = untracked(props)
+    if (applied === undefined || !sameData(applied, next)) apply(next)
     service().send(event)
   }
   return { view, send, service }

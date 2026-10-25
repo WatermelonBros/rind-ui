@@ -1,0 +1,22 @@
+export type {
+  TableButtonProps,
+  TableCellProps,
+  TableColumnHeaderProps,
+  TableEmptyProps,
+  TableExpandTriggerProps,
+  TableFilterContentProps,
+  TableFilterIndicatorProps,
+  TableFilterProps,
+  TableFilterTriggerProps,
+  TableFrameDivProps,
+  TableFrameProps,
+  TableFrameRenderState,
+  TableRenderState,
+  TableRootProps,
+  TableRowDetailsProps,
+  TableRowHeaderProps,
+  TableRowProps,
+  TableSortIndicatorProps,
+  TableTableProps,
+} from "./table"
+export * as Table from "./table.parts"

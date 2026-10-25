@@ -79,11 +79,104 @@ behaviour (a Text Field Root composing a Field) SHALL do it through a host direc
 - **WHEN** a template renders `<button rindToggleGroupItem value="b">` outside any group
 - **THEN** creating it throws an error that names `rindToggleGroupRoot` and `rindToggleRoot`
 
+### Requirement: The Element Picks The Part
+
+An element never changes its tag in Angular, so a part React renders as one element or another
+by state or props SHALL be one directive per element, the consumer writing the element the state
+asks for: a Pagination page or trigger SHALL be a Button on `<button>` and a Link on `<a>` (with
+the Root's `getPageHref`), and the current crumb without `href` SHALL be
+`<span rindBreadcrumbsCurrent>` (React's text span) where a linked crumb is
+`<a rindBreadcrumbsLink>`; a Stepper Trigger SHALL be `<button rindStepperTrigger>` while its
+step is reachable and `<span rindStepperTrigger>` otherwise (`i.triggerIsButton()`); a Drawer
+Handle SHALL be `<button rindDrawerHandle>` with two or more measured snap points and
+`<div rindDrawerHandle>` otherwise (`d.handleIsButton()`), a mismatch warning in development. The state the choice reads SHALL be readable from the template
+(`#i="rindBreadcrumbsItem"`, `i.state().current`); focus SHALL move to the new element when the
+focused one is replaced.
+
+#### Scenario: Pagination with links
+
+- **WHEN** a Pagination Root has `getPageHref` and its pages are `<a rindPaginationPage>`
+- **THEN** each page is a link to its `getPageHref` value, the current one `aria-current="page"`,
+  and the markup matches React's
+
+#### Scenario: The current crumb
+
+- **WHEN** the last Item has no `href` and its template renders `<span rindBreadcrumbsCurrent>`
+  for `i.state().current`
+- **THEN** it is a focusable `<span aria-current="page">`, as React renders it
+
+### Requirement: Repeated Content Is A Structural Directive
+
+A part React renders several times from the same children (a Marquee's copies) SHALL be a
+structural directive on the consumer's element (`<div *rindMarqueeContent>`), stamped once per
+copy, so every copy stays live as the content changes; the stamped elements SHALL carry the same
+part props React gives each copy, and the consumer's `id` only on the first.
+
+#### Scenario: Marquee copies
+
+- **WHEN** an auto-filled Marquee needs three copies of its content
+- **THEN** the Viewport holds three stamped elements, the second and third `aria-hidden` with no
+  tab stop inside, and the markup matches React's
+
+### Requirement: Layers Render Through A Template
+
+A part React renders through a portal (an overlay's Portal, a Toaster's region) SHALL be a
+directive on an `<ng-template>` (`<ng-template rindPopoverPortal>`, `<ng-template
+[rindToaster]="store" let-toast>`): nothing SHALL render on the server or while hydrating; after
+the first render a `div[data-rind-portal]` host SHALL be appended after the target's own children,
+carrying the logical parent's `dir`, `lang` and theme, with the template's view inside it, so
+injection crosses into it. A changed target or logical parent (a dialog's opener, set on open)
+SHALL move the host without recreating the content or detaching the focused element, and the
+host SHALL be removed on destroy. A part reading the provider's environment with capabilities of
+its own (positioning, hover intent) SHALL keep reading the provider's current environment, not a
+copy made before the provider's inputs are set.
+
+#### Scenario: A portalled popover
+
+- **WHEN** an open Popover's Positioner is in `<ng-template rindPopoverPortal>`
+- **THEN** the server markup has no portal host, and after mount `body` ends with a
+  `div[data-rind-portal]` holding the positioner, with the trigger's `dir` and `lang`
+
+#### Scenario: A swipe keeps focus
+
+- **WHEN** the user drags an open Drawer's content, whose state changes on every move
+- **THEN** focus stays on the element inside the content that had it
+
+### Requirement: Data Rows Come From The Template
+
+A part that React renders from data or a render function (a Listbox's data items, a Tag
+Group's or Grid List's data rows, a Tree View's visible nodes) SHALL, in Angular, be the
+consumer's template: the Root SHALL expose the data in render order (`groups()`, `tags()`,
+`rows()`) for an `@for`, and a Tree View's Tree SHALL stamp its `<ng-template rindTreeViewRow
+let-node>` once per visible node with the node's state. A Root that renders no element in React
+SHALL be a directive on an `<ng-container>`.
+
+#### Scenario: A data listbox
+
+- **WHEN** a template renders `l.groups()` of a `<ng-container rindListboxRoot [items]>` as
+  Sections and Items
+- **THEN** the markup matches React's `Listbox.Items`
+
+### Requirement: Outputs Never Share A Native Event's Name
+
+An output SHALL NOT be named like a DOM event that bubbles to its element, since a template
+listener of that name hears both: Clipboard's and Code Block's copy result is `copyResult`, not
+`copy`.
+
+#### Scenario: Copying from the Input
+
+- **WHEN** the user copies the Clipboard Input's text with `(copyResult)` bound on the Root
+- **THEN** the handler runs once per result
+
 ### Requirement: Binding Connect Output
 
 One binder per element SHALL apply connect's props through `Renderer2`: attributes set and
 removed by difference (`false` / `undefined` removed, `true` as an empty attribute), styles
-per property, the consumer's classes kept, handlers through one listener per event. The
+per property and only the declarations that changed (positioning and the scroll lock write
+their own to the same element), the consumer's classes kept, handlers through one listener per
+event. The layers of several directives on one element (a Drawer part over the Dialog part it
+hosts) SHALL merge as React's `mergeProps`: every handler runs, `style` declarations and `class`
+names add up, any other attribute is the later layer's. The
 consumer's own listener on the same event SHALL run first and MAY call
 `event.preventRindHandler()` to skip the part's handler. Overriding an attribute the part's
 accessibility depends on SHALL warn in development.

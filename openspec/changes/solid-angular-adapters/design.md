@@ -57,6 +57,14 @@ unchanged.
 - Context: an injection token per component root; collections register with the root and order
   by DOM position (content projection breaks parent injection, Radix NG #451).
 - Ids: a root-provided id source (`APP_ID` + counter); an `id` input overrides.
+- Composition: a part that is also another part composes it as a host directive (Text Field Root
+  composes `rindFieldRoot`, its inputs forwarded, Field's `messages` as `fieldMessages`); inside
+  an enclosing Field it runs joined (no machine of its own, the outer binding passed through, the
+  host's Label/Description/ErrorMessage absent with a warning, as in Vue). Checkbox and Switch
+  share an abstract form-toggle base whose Root is a component (it renders the hidden input after
+  the content).
+- A directive does not become another part: a Toggle Group item outside a group throws, pointing
+  to `rindToggleRoot` (React's lone item renders a Toggle).
 - Build: `ngc` partial compilation into `dist/` (per-file ESM + `.d.ts`), the same subpath
   `exports` shape as `@rind-ui/vue`; `typescript@~6.0` beside 7; `typecheck` is
   `ngc -p tsconfig.json --noEmit`.

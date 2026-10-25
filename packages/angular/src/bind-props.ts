@@ -31,6 +31,27 @@ export const joinHandlers = (...sources: Props[]): Props =>
   // CRITICAL; only their index signatures are spelled differently.
   join(isHandler, ...(sources.map(neutralKeys) as Readonly<AdapterProps>[])) as Props
 
+/**
+ * The directives' layers on one element, as React's mergeProps merges a part's own props with
+ * the ones given to it (a Drawer part's extras on the Dialog part it hosts): handlers all run,
+ * `style` declarations and `class` names add up, any other key is the later layer's.
+ */
+function mergeLayers(layers: readonly Props[]): Props {
+  const merged = joinHandlers(...layers)
+  if (layers.length < 2) return merged
+  const styles = layers.flatMap((l) =>
+    l["style"] && typeof l["style"] === "object" ? [l["style"]] : [],
+  )
+  const classes = layers.flatMap((l) =>
+    typeof l["class"] === "string" && l["class"] ? [l["class"]] : [],
+  )
+  return {
+    ...merged,
+    ...(styles.length > 1 ? { style: Object.assign({}, ...styles) } : {}),
+    ...(classes.length > 1 ? { class: classes.join(" ") } : {}),
+  }
+}
+
 /** `props` with every string key in its neutral spelling (symbol keys kept). */
 function neutralKeys(props: Props): Props {
   const out: Record<string | symbol, unknown> = {}
@@ -151,7 +172,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   binder.own(options.owns ?? [])
   const handlers = new Map<string, Handler>()
   const listening = new Map<string, () => void>()
-  let styles = new Set<string>()
+  let styles = new Map<string, string>()
   let ready = false
 
   const listen = (event: string) => {
@@ -210,7 +231,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
             : next,
         )
       } else if (key === "style" && value && typeof value === "object")
-        style = value as typeof style
+        style = Object.fromEntries(
+          Object.entries(value as Record<string, unknown>).map(([k, v]) => [cssName(k), v]),
+        )
       else if (key === "children") {
         // Text content in connect's output (an element the part renders itself: NVDA's
         // filler); a consumer's element never gets one.
@@ -241,22 +264,34 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
     }
     attrs = nextAttrs
     if (!browser) {
-      // The server's DOM (domino) drops style values it does not parse (`clip: rect(0 0 0 0)`):
-      // the server writes the declarations as one attribute, after the consumer's.
-      const own = Object.entries(style ?? {}).filter(([, v]) => v !== undefined && v !== null)
-      if (own.length > 0) {
-        const css = own.map(([k, v]) => `${k}: ${String(v)}`).join("; ")
-        const before = statics.get("style")
-        set("style", before ? `${before}; ${css}` : css)
+      // Each declaration as a property, beside the consumer's (static or bound). The server's
+      // DOM (domino) drops values it does not parse (`clip: rect(0 0 0 0)`): those are
+      // appended to the attribute as text.
+      const dropped: string[] = []
+      for (const [k, v] of Object.entries(style ?? {})) {
+        if (v === undefined || v === null) continue
+        renderer.setStyle(el, k, String(v), flags(k))
+        const kept = (el as HTMLElement).style?.getPropertyValue(k)
+        if (!kept) dropped.push(`${k}: ${String(v)}`)
+      }
+      if (dropped.length > 0) {
+        const now = el.getAttribute("style")
+        set("style", now ? `${now}; ${dropped.join("; ")}` : dropped.join("; "))
       }
       if (ready) for (const event of handlers.keys()) listen(event)
       return
     }
-    const nextStyles = new Set(Object.keys(style ?? {}))
-    for (const key of styles) if (!nextStyles.has(key)) renderer.removeStyle(el, key, flags(key))
+    // Only what changed since the last render: a part may write a property imperatively
+    // between renders (a Collapsible's measured size), as a framework's patch leaves it.
+    const nextStyles = new Map<string, string>()
     for (const [key, value] of Object.entries(style ?? {})) {
-      if (value === undefined || value === null) renderer.removeStyle(el, key, flags(key))
-      else renderer.setStyle(el, key, String(value), flags(key))
+      if (value !== undefined && value !== null) nextStyles.set(key, String(value))
+    }
+    for (const key of styles.keys()) {
+      if (!nextStyles.has(key)) renderer.removeStyle(el, key, flags(key))
+    }
+    for (const [key, value] of nextStyles) {
+      if (styles.get(key) !== value) renderer.setStyle(el, key, value, flags(key))
     }
     styles = nextStyles
     if (ready) for (const event of handlers.keys()) listen(event)
@@ -271,7 +306,13 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
       // `value` / `checked` attribute (as React writes them) and keep what the user typed.
       if (key.startsWith("default")) {
         if (!(key in attrs)) renderer.setProperty(el, key, value)
-      } else renderer.setProperty(el, key, value)
+        return
+      }
+      // Only a change: re-writing the same value collapses the selection (and the caret).
+      if ((el as unknown as Record<string, unknown>)[key] !== value)
+        renderer.setProperty(el, key, value)
+      // React syncs an input's value to its `value` attribute as well (its markup carries it).
+      if (key === "value" && el.tagName === "INPUT") set("value", String(value))
       return
     }
     // A textarea's initial value is its content, on the server as in React's markup.
@@ -299,7 +340,7 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
 
   effect(() => {
     const layers = binder.layers.map((layer) => layer())
-    untracked(() => apply(joinHandlers(...layers)))
+    untracked(() => apply(mergeLayers(layers)))
   })
   if (browser) {
     afterNextRender(() => {
@@ -314,5 +355,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
   return { statics }
 }
 
-// Connect's style keys are CSS property names (kebab case, custom properties): `setProperty`.
+// Written as CSS property names through `setProperty` (custom properties included).
 const flags = (_key: string) => RendererStyleFlags2.DashCase
+
+/** A connect style key as a CSS property name: `flexShrink` → `flex-shrink`; `--x` stays. */
+export const cssName = (key: string) =>
+  key.startsWith("--") ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)

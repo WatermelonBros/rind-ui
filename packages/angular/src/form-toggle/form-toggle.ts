@@ -70,6 +70,11 @@ export type FormToggleEvent =
   | FocusEvent
   | BlurEvent
 
+/** A bare `checked` / `defaultChecked` attribute (`""`) is `true`. */
+// V is a CheckedState (true is one of its values); "" only comes from a bare attribute.
+const bare = <V extends CheckedState>(v: V | "" | undefined): V =>
+  v === "" ? (true as V) : (v as V)
+
 /** What the shared parts read from a component's machine. */
 export interface FormToggleService {
   readonly checked: () => CheckedState
@@ -135,9 +140,9 @@ function injectFormToggle(part: string): FormToggleRoot<CheckedState, unknown> {
 @Directive()
 export abstract class FormToggleRoot<V extends CheckedState, D> {
   /** Controlled value (`[(checked)]`). */
-  readonly checked = input<V | undefined>(undefined)
+  readonly checked = input<V | undefined, V | "" | undefined>(undefined, { transform: bare })
   /** Read at creation; a later change only changes what a form reset restores. */
-  readonly defaultChecked = input<V>(false as V)
+  readonly defaultChecked = input<V, V | "">(false as V, { transform: bare })
   /** Ignores activation. In a Checkbox Group the group's `disabled` also applies. */
   readonly disabled = input(false, { transform: booleanAttribute })
   /** Disabled but still in the Tab order (`aria-disabled`). */
