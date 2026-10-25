@@ -192,7 +192,7 @@
     height: calc(170 * var(--vh));
   }
   .sticky {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     align-content: start;
     gap: 10px;
@@ -220,6 +220,27 @@
   /* a phone's column has no room under the copy: the chips say it */
   .markup {
     display: none;
+  }
+}
+/* the narrowest phones: "This is what" and "underneath." fit the column (at 40px they ran past
+   the screen's edge, and the ink copy wrapped apart from the paper one), and the chips and the
+   component fit beside the copy instead of over it and past the edge */
+@media (max-width: 360px) {
+  .title {
+    font-size: min(40px, calc(11 * var(--vw)));
+  }
+  .camera {
+    --zoom: 0.95;
+  }
+  .component {
+    padding: 18px 14px;
+  }
+  .graph {
+    width: 200px;
+  }
+  .attrs li {
+    font-size: 9px;
+    padding: 3px 6px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -310,7 +331,7 @@
     );
   }
   .inkLayer {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     align-content: start;
     gap: 10px;

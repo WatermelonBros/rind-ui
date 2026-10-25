@@ -30,8 +30,10 @@ export function Hero({
             <Wordmark />
             <p className={styles.lede}>
               Behaviour, accessibility and state. {/* the line follows the hero's peel */}
-              <em className={styles.look}>The look is yours.</em>
-              <em className={styles.stays}>Everything else stays.</em>
+              <span className={styles.swap}>
+                <em className={styles.look}>The look is yours.</em>
+                <em className={styles.stays}>Everything else stays.</em>
+              </span>
             </p>
             <div className={styles.ctas}>
               <Link prefetch={false} href="/docs/get-started/" className={styles.primary}>
