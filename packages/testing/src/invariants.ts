@@ -380,12 +380,23 @@ const hiddenFocus: GenericInvariant = (f) => {
 const restoresToPrevious = (f: StepFacts) =>
   f.semantics["finalFocus"] === undefined && f.semantics["trigger"] === undefined
 
+/**
+ * An in-page link (`href="#id"`) moving focus to its target: native link semantics (a Table of
+ * Contents' keyboard follow), not focus lost.
+ */
+const toLinkTarget = (f: StepFacts) => {
+  const href = f.before?.focus.element?.attrs["href"]
+  const id = f.after.focus.element?.attrs["id"]
+  return href !== undefined && id !== undefined && href === `#${id}`
+}
+
 const focusKept: GenericInvariant = (f) =>
   // A layer that returns focus to what had it before (no restore target declared): back in
   // its initial state with nothing focused at the start, <body> is where focus belongs.
   !(restoresToPrevious(f) && f.atInitial && f.baseline.focus.onBody && f.after.focus.onBody) &&
   f.before?.focus.inInstance &&
   !f.after.focus.inInstance &&
+  !toLinkTarget(f) &&
   (f.after.focus.onBody || f.from === null || f.from === f.state)
     ? [
         `focus left the component (now ${f.after.focus.onBody ? "<body>" : f.after.focus.element?.describe})`,
