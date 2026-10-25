@@ -130,8 +130,13 @@ body {
 a {
   color: inherit;
 }
+/* the focus ring is the ink (or the type on a dark band): the accent read under 3:1 on the
+   juicy pink, the crisp lime and many worn skins' grounds */
+:root {
+  --focus: var(--ink);
+}
 :focus-visible {
-  outline: 3px solid var(--acc);
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
   border-radius: 6px;
 }

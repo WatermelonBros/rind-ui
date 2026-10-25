@@ -68,10 +68,14 @@
   text-transform: uppercase;
   opacity: 0.7;
 }
+.fw:hover {
+  border-color: color-mix(in oklab, var(--ink) 60%, transparent);
+}
+/* the page's ground on its ink: the old lime read on a light skin's ink only */
 .fw[aria-pressed="true"] {
   background: var(--ink);
   border-color: var(--ink);
-  color: #d4ff3a;
+  color: var(--bg);
 }
 .fw:is([data-disabled], [aria-disabled="true"]) {
   opacity: 0.5;
@@ -101,14 +105,14 @@
   transition: box-shadow 0.35s var(--spring);
 }
 .filterInput:focus {
-  box-shadow: 3px 3px 0 var(--acc);
+  box-shadow: 3px 3px 0 var(--focus);
 }
 :global([data-phase="juicy"]) .filterInput {
   border: 0;
   background: var(--muted);
 }
 :global([data-phase="juicy"]) .filterInput:focus {
-  box-shadow: 0 0 0 3px var(--acc);
+  box-shadow: 0 0 0 3px var(--focus);
 }
 
 .group + .group {

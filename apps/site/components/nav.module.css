@@ -106,6 +106,7 @@
 }
 .sound:hover {
   translate: -1px -1px;
+  background: color-mix(in oklab, var(--card) 88%, var(--ink));
 }
 .sound:active {
   translate: 2px 2px;
@@ -130,8 +131,9 @@
   cursor: pointer;
   padding: 4px;
 }
+/* 0.8: the phase not chosen reads quieter, still 4.5:1 (0.68 was 4.1:1 on juicy's pink) */
 .side {
-  opacity: 0.68;
+  opacity: 0.8;
   transition: opacity 0.4s var(--spring);
 }
 .side[data-on] {
@@ -226,7 +228,7 @@
 .menuButton:focus-visible,
 .menuHandle:focus-visible,
 .menu a:focus-visible {
-  outline: 3px solid var(--acc);
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 .menuBackdrop {
@@ -351,7 +353,7 @@
   color: var(--bg);
 }
 .menuPhaseItem:focus-visible {
-  outline: 3px solid var(--acc);
+  outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
 .menuPhaseIndicator {

@@ -137,7 +137,7 @@
   translate: none;
 }
 :is(.switch, .checkbox, .button)[data-focus-visible] {
-  outline: 4px solid var(--acc);
+  outline: 4px solid var(--focus);
   outline-offset: 12px;
 }
 .label {

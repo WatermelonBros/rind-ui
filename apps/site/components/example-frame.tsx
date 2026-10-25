@@ -312,6 +312,12 @@ export function ExampleFrame({
           </div>
           {tabs.map((t) => (
             <Tabs.Panel key={t} value={t}>
+              {t === "react" && missing && (
+                <p className={styles.codeNote}>
+                  Not written for {missing} yet: this is the React version. The parts, props and{" "}
+                  <code>data-*</code> attributes are the same in every framework.
+                </p>
+              )}
               <pre
                 // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be reachable by keyboard
                 tabIndex={0}
@@ -320,12 +326,6 @@ export function ExampleFrame({
                   __html: `<code class="hljs">${codeOf(t)?.html ?? ""}</code>`,
                 }}
               />
-              {t === "react" && missing && (
-                <p className={styles.cssNote}>
-                  Not written for {missing} yet: this is the React version. The parts, props and{" "}
-                  <code>data-*</code> attributes are the same in every framework.
-                </p>
-              )}
               {t === "css" && (
                 <p className={styles.cssNote}>
                   Our styles for both skins, scoped by <code>[data-skin]</code>. Copy them as a

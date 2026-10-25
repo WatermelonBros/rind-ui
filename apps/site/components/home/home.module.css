@@ -1364,7 +1364,7 @@
   translate: 0 -2px;
 }
 .wallAll > [data-part="trigger"]:focus-visible {
-  outline: 3px solid var(--acc);
+  outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
 .wallAll [data-part="indicator"] {
@@ -1692,6 +1692,7 @@
 }
 .band[data-band="outro"] {
   --band: var(--ground-ink);
+  --focus: var(--on-outro, var(--bg));
 }
 /* a worn skin's wave of skins on the wall says the wrong name: the wall wears the visitor's */
 :global(html[data-worn]) .skinChip {
@@ -1701,6 +1702,7 @@
    (wear.ts) turns it inside out too */
 .band[data-band="ink"] {
   --band: var(--ground-ink);
+  --focus: var(--on-ground-ink);
   color: var(--on-ground-ink);
 }
 .band[data-band="ink"] .kicker {
@@ -2403,7 +2405,7 @@ g:not([data-plugged]) > .pulse {
   color: var(--on-acc);
 }
 .pm:focus-visible {
-  outline: 2px solid var(--acc);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
