@@ -253,12 +253,17 @@ export function Tested() {
     }
     if (window.matchMedia("(min-width: 901px)").matches)
       window.addEventListener("scroll", onHold, { passive: true })
-    // a phone runs as soon as the control itself is in view: waiting for it to reach the
-    // object's landing height let the visitor scroll past the PASS
-    const root = stage.current?.querySelector<HTMLElement>(
-      '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
-    )
-    if (!root || !window.matchMedia(PHONE).matches)
+    // stacked (900px or less) the scene does not hold, so the run starts once it is in view:
+    // waiting for the object to land let the visitor scroll past the PASS (and with reduced motion
+    // it never lands at all). A phone runs on its own once the control is in view; a narrow
+    // desktop runs with its scroll once the whole list is in view, so its lines stay on screen
+    const phone = window.matchMedia(PHONE).matches
+    const root = phone
+      ? stage.current?.querySelector<HTMLElement>(
+          '[data-scope="switch"][data-part="control"], [data-scope="checkbox"][data-part="control"], button[data-scope="button"]',
+        )
+      : hold?.querySelector("ol")
+    if (!root || !window.matchMedia("(max-width: 900px)").matches)
       return () => {
         off()
         window.clearTimeout(wait)
@@ -268,7 +273,7 @@ export function Tested() {
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) go()
       },
-      { threshold: 0.6 },
+      { threshold: phone ? 0.6 : 1 },
     )
     io.observe(root)
     return () => {
