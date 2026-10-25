@@ -57,6 +57,14 @@ value (fully controlled); without a binding the prop is the starting value. It S
   activates it
 - **THEN** it stays as the parent's `pressed` says
 
+#### Scenario: A binding with no value yet
+
+- **WHEN** a Radio Group is bound with `bind:value={plan}` where `plan` starts at `null` and
+  the user picks an item
+- **THEN** `plan` holds the picked value (Svelte cannot tell a binding that holds `undefined`
+  from an unbound prop: `undefined` is an uncontrolled starting value, so a binding with no
+  value yet starts at `null`)
+
 ### Requirement: Element Substitution With Snippets
 
 Every part SHALL accept a `child` snippet receiving `{ props, state }`: rendered instead of the

@@ -19,6 +19,9 @@ seen in docs or source but not confirmed as public, stable API.
   usually a single library's speciality, and the place to read its source first.
 - **Wave** the order we build in (see [decisions/0002-architecture.md](decisions/0002-architecture.md#build-order)):
   1 foundations and what Reado uses · 2 complex interactions · 3 heavy or niche.
+- **Frameworks** every `done` component ships in `@rind-ui/react`, `@rind-ui/vue` and
+  `@rind-ui/svelte` (vue-svelte-adapters, parity reached 2026-10-25); `@rind-ui/solid` and
+  `@rind-ui/angular` follow (solid-angular-adapters).
 - **Status** `todo` → `research` → `spec` → `wip` → `done`. Research notes live
   in [research/](research/), one file per component.
 
