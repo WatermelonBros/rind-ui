@@ -1,4 +1,4 @@
-import { $PROXY, type Accessor, type JSX, untrack } from "solid-js"
+import { $PROXY, type Accessor, type JSX, children as resolveOnce, untrack } from "solid-js"
 
 type Props = Record<string | symbol, unknown>
 
@@ -40,7 +40,10 @@ export function renderPart<S>(
 ): JSX.Element {
   const view = reactive(props)
   if (!render) return element(view)
-  const withChildren = reactive(() => ({ ...props(), children: children() }))
+  // Solid's JSX getter creates the children on every read, and the proxy reads them on every
+  // lookup: resolve them once, so a state change does not remount them.
+  const resolved = resolveOnce(children)
+  const withChildren = reactive(() => ({ ...props(), children: resolved() }))
   return untrack(() => render(withChildren, state))
 }
 
