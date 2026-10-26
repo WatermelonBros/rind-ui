@@ -10,6 +10,7 @@ import {
   hiddenFormInput,
   implicitSubmit,
   isImeKey,
+  labelInteraction,
   layoutCapability,
   mergeFieldProps,
   type RadioGroupEvent,
@@ -610,8 +611,24 @@ function ItemLabel({ render, ...rest }: PartProps<"label", RadioItemState>) {
     return () => setLabelRendered(false)
   }, [setLabelRendered])
   const labelable = item.controlTag === "button" || item.controlTag === "input"
+  const env = useEnvironment()
+  // A non-labelable control (a substituted span): a press on the label focuses and checks it
+  // (spec "Activation"), with the double-click text-selection guard.
+  const interaction = labelInteraction(env, {
+    target: () => item.controlEl.current,
+    forwardsFocus: () => !labelable,
+    focusTarget: () => {
+      const control = item.controlEl.current
+      if (control) void focusSafely(control, env, "programmatic")
+      if (!item.disabled)
+        ctx.send({ type: "PRESS", key: item.key, modality: env.modality.modality() })
+    },
+  })
   const props = mergeProps(
-    normalizeProps(ctx.api.itemLabel(item.key, { disabled: item.disabled, labelable })),
+    {
+      ...normalizeProps(ctx.api.itemLabel(item.key, { disabled: item.disabled, labelable })),
+      ...interaction,
+    },
     rest,
   )
   return renderPart("label", props, render, {

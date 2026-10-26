@@ -128,6 +128,25 @@ const focused = () => document.activeElement
 const tokens = (el: Element, attr: string) =>
   (el.getAttribute(attr) ?? "").split(" ").filter(Boolean)
 
+describe("Substituted control", () => {
+  it("a press on the label of a span control checks and focuses it", async () => {
+    render(
+      <RadioGroup.Root aria-label="Size">
+        {["Small", "Large"].map((label) => (
+          <RadioGroup.Item key={label} value={label}>
+            <RadioGroup.ItemControl render={<span />} />
+            <RadioGroup.ItemLabel>{label}</RadioGroup.ItemLabel>
+          </RadioGroup.Item>
+        ))}
+      </RadioGroup.Root>,
+    )
+    await userEvent.setup().click(screen.getByText("Large"))
+    const large = screen.getByRole("radio", { name: "Large" })
+    expect(large.getAttribute("aria-checked")).toBe("true")
+    expect(document.activeElement).toBe(large)
+  })
+})
+
 describe("Anatomy", () => {
   it("the hidden input is not nested and axe finds no nested-interactive (reka-ui#1597)", async () => {
     render(<Grp />)

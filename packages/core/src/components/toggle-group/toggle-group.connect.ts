@@ -6,7 +6,7 @@ import { toLogicalKey } from "../../a11y/keys"
 import { type CompositeEnv, tabStop } from "../../collection/composite"
 import type { CollectionKey } from "../../collection/key"
 import type { Collection } from "../../collection/list"
-import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
+import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
 import { describeKey } from "../../dom/keyboard"
 import type { LinkEnv } from "../../dom/link"
@@ -157,6 +157,8 @@ export function toggleGroupConnect(
         "data-orientation": input.orientation,
         "data-highlighted": dataFlag(input.highlightedKey === key),
         onFocus: () => send({ type: "FOCUS", key, modality: env.modality.modality() }),
+        // The id is the part's: the roving focus resolves it.
+        [CRITICAL]: [...((toggle as PartProps)[CRITICAL] ?? []), "!id"],
       }
     },
     /** An item's indicator: decorative, its state the item's (as a lone toggle's). */

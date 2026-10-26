@@ -6,7 +6,7 @@ import { act, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { type ReactNode, useState } from "react"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { getTabs, installAnnouncementLog } from "../index"
+import { expectRindWarning, getTabs, installAnnouncementLog } from "../index"
 
 const platform = domEnvironment().platform
 afterEach(() => vi.restoreAllMocks())
@@ -64,6 +64,47 @@ const tab = (name: string) => screen.getByRole("tab", { name })
 const focused = () => document.activeElement
 const panels = () => [...document.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
 const visiblePanel = () => panels().find((p) => !p.hasAttribute("hidden"))
+
+describe("Consumer id on a tab", () => {
+  it("is ignored with a warning: the panel's name and the roving focus keep working", async () => {
+    expectRindWarning(/tabs\.tab: "id" is the part's own/)
+    render(
+      <Tabs.Root>
+        <Tabs.List aria-label="Ids">
+          <Tabs.Tab value="a" id="my-a">
+            A
+          </Tabs.Tab>
+          <Tabs.Tab value="b" id="my-b">
+            B
+          </Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel value="a">Panel A</Tabs.Panel>
+        <Tabs.Panel value="b">Panel B</Tabs.Panel>
+      </Tabs.Root>,
+    )
+    const a = tab("A")
+    act(() => a.focus())
+    await userEvent.setup().keyboard("{ArrowRight}")
+    expect(focused()).toBe(tab("B"))
+    const panel = screen.getByRole("tabpanel")
+    expect(document.getElementById(panel.getAttribute("aria-labelledby") ?? "")).toBe(tab("B"))
+  })
+})
+
+describe("Disabled root", () => {
+  it("the list is the one tab stop (every tab is disabled)", () => {
+    render(
+      <Tabs.Root disabled defaultValue="a">
+        <Tabs.List aria-label="Off">
+          <Tabs.Tab value="a">A</Tabs.Tab>
+          <Tabs.Tab value="b">B</Tabs.Tab>
+        </Tabs.List>
+      </Tabs.Root>,
+    )
+    expect(screen.getByRole("tablist").getAttribute("tabindex")).toBe("0")
+    expect(tab("A").getAttribute("tabindex")).toBe("-1")
+  })
+})
 
 describe("Default selection", () => {
   it("selects the first enabled tab and reports it once with reason INITIAL", async () => {

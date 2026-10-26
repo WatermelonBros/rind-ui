@@ -21,6 +21,23 @@ function Faq(props: Partial<Parameters<typeof Accordion.Root>[0]>) {
   )
 }
 
+describe("Accordion modified keys", () => {
+  it("Ctrl+End on a trigger stays the browser's (no focus move)", () => {
+    render(<Faq keyboardNavigation />)
+    const first = screen.getAllByRole("button")[0] as HTMLElement
+    first.focus()
+    const e = new KeyboardEvent("keydown", {
+      key: "End",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
+    first.dispatchEvent(e)
+    expect(e.defaultPrevented).toBe(false)
+    expect(document.activeElement).toBe(first)
+  })
+})
+
 describe("Accordion smoke", () => {
   it("single mode switches; headers are h3; region while open", async () => {
     render(<Faq />)
