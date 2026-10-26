@@ -3,7 +3,7 @@
 // Signature Pad server markup hydrates with no mismatch.
 import { type Component, flushSync, hydrate, unmount } from "svelte"
 import { render } from "svelte/server"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 import { build } from "../../fixtures/ssr"
 
 afterEach(() => vi.restoreAllMocks())
@@ -11,9 +11,16 @@ afterEach(() => vi.restoreAllMocks())
 type Fixture = { default: Component }
 
 describe("Svelte Signature Pad hydration", () => {
+  // Compiling the fixture twice is the slow part: on a busy CI runner it alone exceeded the 5 s
+  // test timeout. The test itself measures the hydration.
+  let server: Fixture
+  let client: Fixture
+  beforeAll(async () => {
+    server = await build<Fixture>("signature-pad/hydrate.svelte", "server")
+    client = await build<Fixture>("signature-pad/hydrate.svelte", "client")
+  }, 30_000)
+
   it("server HTML is a named, empty pad; hydrates with zero warnings", async () => {
-    const server = await build<Fixture>("signature-pad/hydrate.svelte", "server")
-    const client = await build<Fixture>("signature-pad/hydrate.svelte", "client")
     const container = document.body.appendChild(document.createElement("div"))
     const { body } = render(server.default)
     container.innerHTML = body
