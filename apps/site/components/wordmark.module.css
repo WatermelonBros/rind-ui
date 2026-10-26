@@ -255,6 +255,13 @@
     display: none;
   }
 }
+/* up to 1300 the letters are too narrow for four chips in a row: the i's (the longest) drops
+   to a second row, clear of its neighbours' */
+@media (min-width: 961px) and (max-width: 1299px) {
+  .l[data-letter="i"] .chip {
+    translate: -50% 36px;
+  }
+}
 
 /* the hero's skin is off (skin-scene.tsx sets data-bare): the wordmark loses its look too, down
    to its skeleton: outlines in ink, no fill, shadows, rings or drips (a flat grey read as a
