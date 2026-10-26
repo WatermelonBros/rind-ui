@@ -278,6 +278,7 @@ const SingleCalendar = defineComponent({
       const base = ctx.base()
       const api = single?.api()
       const firstDay = ctx.picker.firstDayOfWeek()
+      const createCalendar = ctx.picker.createCalendar()
       return h(
         Calendar.Root,
         {
@@ -308,6 +309,10 @@ const SingleCalendar = defineComponent({
           readOnly: ctx.readOnly(),
           invalid: (api?.validity.message ?? "") !== "" || ctx.own().invalid === true,
           ...(firstDay ? { firstDayOfWeek: firstDay } : {}),
+          // The field's locale, direction and calendar system (spec "Picker — Calendar Binding").
+          locale: ctx.picker.locale(),
+          dir: ctx.dir(),
+          ...(createCalendar ? { createCalendar } : {}),
         },
         slots,
       )
@@ -403,6 +408,9 @@ const RangeCalendar = defineComponent({
           readOnly: endProps.readOnly,
           invalid: ctx.state().message !== "",
           ...(firstDay ? { firstDayOfWeek: firstDay } : {}),
+          // The field's locale and direction (spec "Picker — Calendar Binding").
+          ...(endProps.locale ? { locale: endProps.locale } : {}),
+          ...(endProps.dir ? { dir: endProps.dir } : {}),
         },
         slots,
       )

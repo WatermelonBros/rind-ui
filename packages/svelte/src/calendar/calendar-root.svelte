@@ -108,6 +108,11 @@ const nav = $derived({
 })
 const current = $derived(value === undefined ? defaultValue : value)
 const today = $derived(todayOf(env.dateClock, todayZone(timeZone, valuesOf(current ?? null))))
+// Server markup marks no day as today (the server's day or zone may not be the viewer's).
+let mounted = $state(false)
+$effect(() => {
+  mounted = true
+})
 // The first focus: the given one, else the value, else today (calendar-navigation).
 const initial = untrack(
   () =>
@@ -238,7 +243,7 @@ const api = $derived(
     dragging: view.context.dragging,
     gridFocused: view.matches("focused"),
     modality: modality.current,
-    today: display(today, resolved.calendar),
+    today: mounted ? display(today, resolved.calendar) : null,
     dir: loc.current.dir,
     consumerNamed: rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined,
     ids: {

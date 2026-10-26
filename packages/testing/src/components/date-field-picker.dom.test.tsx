@@ -252,6 +252,27 @@ describe("Date Field picker (single)", () => {
     expect(dialog.querySelector("[data-value]")?.getAttribute("data-value")).toBe("2026-09-28")
   })
 
+  it("the calendar follows the field's own locale, not the app's (react-spectrum#8557)", async () => {
+    render(<Birthday locale="de-DE" defaultValue={d(10, 14)} />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    const dialog = await screen.findByRole("dialog")
+    expect(dialog.querySelector('[data-part="heading"]')?.textContent).toMatch(/Oktober/)
+    // German weeks start on Monday: October 2026's grid starts on Monday 28 September.
+    expect(dialog.querySelector("[data-value]")?.getAttribute("data-value")).toBe("2026-09-28")
+  })
+
+  it("min greater than max: a development warning names both props (react-spectrum#5208)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    render(<Birthday minValue={d(10, 20)} maxValue={d(10, 10)} />)
+    const user = userEvent.setup()
+    await user.click(trigger())
+    await screen.findByRole("dialog")
+    const said = warn.mock.calls.map((c) => String(c[0]))
+    expect(said.some((m) => m.includes("date-field") && m.includes("minValue"))).toBe(true)
+    expect(said.some((m) => m.includes("calendar") && m.includes("maxValue"))).toBe(true)
+  })
+
   it("inside a modal Dialog: a pick closes the picker, not the Dialog", async () => {
     render(
       <RindProvider environment={{ dateClock: clock }}>

@@ -73,6 +73,7 @@ let {
   onBoundary,
   onDraftChange,
   onClearAll,
+  revision,
   segmentScope,
   fieldMessages,
   children,
@@ -141,20 +142,19 @@ const disabled = $derived(
 const readOnly = $derived(fieldProps.readonly === true || enclosing()?.state.readOnly === true)
 const required = $derived(fieldProps.required === true || enclosing()?.state.required === true)
 // Today is read once: a placeholder that moved at midnight would rewrite a stepped segment.
-const placeholder = untrack(() => {
+// The consumer's placeholderValue is followed (it also decides the value's kind).
+const defaultPlaceholder = untrack(() => {
   const current = value === undefined ? defaultValue : value
-  return (
-    placeholderValue ??
-    defaultPlaceholderValue({
-      today: todayOf(env.dateClock, todayZone(undefined, current instanceof Time ? null : current)),
-      granularity,
-      maxGranularity,
-      timeZone: current && "timeZone" in current ? current.timeZone : undefined,
-      minValue,
-      maxValue,
-    })
-  )
+  return defaultPlaceholderValue({
+    today: todayOf(env.dateClock, todayZone(undefined, current instanceof Time ? null : current)),
+    granularity,
+    maxGranularity,
+    timeZone: current && "timeZone" in current ? current.timeZone : undefined,
+    minValue,
+    maxValue,
+  })
 })
+const placeholder = $derived<FieldValue>(placeholderValue ?? defaultPlaceholder)
 const inputEl: { current: HTMLElement | null } = { current: null }
 const hiddenEl: { current: HTMLInputElement | null } = { current: null }
 const selectAll = { current: false }
@@ -189,6 +189,7 @@ const machineEnv = {
 }
 const machineProps = () => ({
   value,
+  revision,
   defaultValue,
   onValueChange: (v: FieldValue | null, details: { event: { type: string }; cancel(): void }) => {
     cancelled.current = false
@@ -324,7 +325,11 @@ const ctx: Ctx = {
   picker: {
     closeOnSelect: () => closeOnSelect,
     firstDayOfWeek: () => firstDayOfWeek,
-    placeholder,
+    locale: () => loc.current.locale,
+    createCalendar: () => createCalendar,
+    get placeholder() {
+      return placeholder
+    },
     cancelled,
     triggers,
   },

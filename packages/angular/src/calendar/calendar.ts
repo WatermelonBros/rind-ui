@@ -139,6 +139,10 @@ export interface CalendarSource {
   readonly onValueChange?: (value: CalendarValue, details: CalendarChangeDetails) => void
   readonly onFocusChange?: (date: CalendarDate) => void
   readonly onDateSelect?: (date: CalendarDate, details: { readonly modality: Modality }) => void
+  /** The host field's locale, direction and calendar system (a picker shows the field's). */
+  readonly locale?: () => string | undefined
+  readonly dir?: () => "ltr" | "rtl" | undefined
+  readonly createCalendar?: () => CreateCalendar | undefined
 }
 
 /** The Calendar's inputs, outputs and wiring: CalendarRoot and a picker's Calendar. Internal. */
@@ -280,11 +284,16 @@ export abstract class CalendarRootBase {
     const instance = injectRootId(() => this.id())
     this.instance = instance
     const loc = injectLocale(
-      () => this.locale(),
-      () => this.dir(),
+      () => (src.locale ? src.locale() : this.locale()),
+      () => (src.dir ? src.dir() : this.dir()),
     )
     const messages = injectMessages("calendar", calendarMessages, () => this.messages())
-    const resolved = computed(() => resolveCalendar(loc().locale, this.createCalendar()))
+    const resolved = computed(() =>
+      resolveCalendar(
+        loc().locale,
+        src.createCalendar ? src.createCalendar() : this.createCalendar(),
+      ),
+    )
     const firstDay = computed(() => weekStart(loc().locale, firstDayOfWeek_()))
     const show = (d: DateValue | null | undefined) => (d ? display(d, resolved().calendar) : null)
     const nav = () => ({
@@ -296,6 +305,7 @@ export abstract class CalendarRootBase {
       firstDayOfWeek: firstDay(),
     })
     const current = () => (value_() === undefined ? this.defaultValue() : value_())
+    const rendered = injectRendered()
     const today = () =>
       todayOf(env.dateClock, todayZone(this.timeZone(), valuesOf(current() ?? null)))
     // The first focus: the given one, else the value, else today (calendar-navigation).
@@ -451,7 +461,8 @@ export abstract class CalendarRootBase {
         dragging: v.context.dragging,
         gridFocused: v.matches("focused"),
         modality: modality(),
-        today: display(today(), calendar),
+        // Server markup marks no day as today (the server's day or zone may not be the viewer's).
+        today: rendered() ? display(today(), calendar) : null,
         dir: loc().dir,
         consumerNamed: named,
         ids: {

@@ -370,6 +370,9 @@ function Root(
   onCleanup(() => drag.dispose())
   // The modality is tracked from mount: a pointer press that focuses a cell is seen as one.
   afterMount(() => onCleanup(env.modality.subscribe(() => {})))
+  // Server markup marks no day as today (the server's day or zone may not be the viewer's).
+  const [mounted, setMounted] = createSignal(false)
+  afterMount(() => setMounted(true))
   const gridFocused = createMemo(() => view().matches("focused"))
   const modality = useModality(env.modality, gridFocused)
   const anchored = createMemo(() =>
@@ -405,7 +408,7 @@ function Root(
       dragging: v.context.dragging,
       gridFocused: gridFocused(),
       modality: modality(),
-      today: display(today(), calendar),
+      today: mounted() ? display(today(), calendar) : null,
       dir: loc().dir,
       consumerNamed: rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined,
       ids: {
