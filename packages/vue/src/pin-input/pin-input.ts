@@ -94,6 +94,8 @@ interface Ctx {
   readonly inputEl: { value: Element | null }
   readonly pendingCaret: { current: number | null }
   readonly pendingSubmit: { current: boolean }
+  /** The next value change is the user's (a reset or a parent's value is not). */
+  readonly userChange: { current: boolean }
   readonly slots: { current: number }
 }
 const PinInputKey: InjectionKey<Ctx> = Symbol("rind-ui.pin-input")
@@ -164,7 +166,7 @@ const Root = defineComponent({
     defaultValue: { type: String, default: "" },
     /** Default `"numeric"`. */
     validationType: String as PropType<PinValidationType>,
-    /** One accepted character (replaces `validationType`). */
+    /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
     pattern: RegExp,
     /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
     sanitize: Function as PropType<(text: string) => string>,
@@ -215,15 +217,16 @@ const Root = defineComponent({
     const inputEl = shallowRef<Element | null>(null)
     const pendingCaret = { current: null as number | null }
     const pendingSubmit = { current: false }
+    const userChange = { current: false }
     const slotCount = { current: 0 }
     const { view, send } = useMachine(pinInputMachine, () => ({
       ...rules(),
       value: shown(),
       defaultValue: renderedValue(rules(), props.defaultValue),
       onValueChange: (v: string, details) => {
-        emit("valueChange", v, {
-          reason: publicReason((details as { event: PinInputEvent }).event),
-        })
+        const event = (details as { event: PinInputEvent }).event
+        userChange.current = event.type !== "RESET"
+        emit("valueChange", v, { reason: publicReason(event) })
         emit("update:modelValue", v)
       },
       onValueInvalid: (t: string) => emit("valueInvalid", t),
@@ -293,6 +296,7 @@ const Root = defineComponent({
       inputEl,
       pendingCaret,
       pendingSubmit,
+      userChange,
       slots: slotCount,
     }
     provide(PinInputKey, ctx)
@@ -439,7 +443,10 @@ const Input = defineComponent({
       watch(value, (now) => {
         if (reported === now) return
         reported = now
-        report({ type: "change", value: now, user: true, composing: false })
+        // A reset or a parent's value is reported too, but not as the user's (RA#6830).
+        const user = ctx.userChange.current
+        ctx.userChange.current = false
+        report({ type: "change", value: now, user, composing: false })
       })
       afterRender()
       if (!el) return

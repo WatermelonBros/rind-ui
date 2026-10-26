@@ -283,6 +283,19 @@ describe("Tags Input", () => {
     )
   })
 
+  it("read-only: a paste with delimiters adds nothing (BU#4809)", async () => {
+    render(<Tags readOnly defaultValue={["Rome"]} />)
+    const u = await user()
+    await u.click(input())
+    await u.paste("zz1,zz2")
+    expect(await ti().tags()).toEqual(["Rome"])
+  })
+
+  it("required: the textbox itself is aria-required (its native required is on the hidden input)", () => {
+    render(<Tags required />)
+    expect(input().getAttribute("aria-required")).toBe("true")
+  })
+
   it("a refused controlled creation keeps the draft", async () => {
     render(<Tags value={[]} />)
     await ti().addTag("rome")

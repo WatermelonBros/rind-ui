@@ -93,6 +93,8 @@ const Root = defineComponent({
     const fieldsetDisabled = useFieldsetDisabled()
     const disabled = () => props.disabled || fieldsetDisabled.value
     let labelEl: Element | null = null
+    // The Label rendered as another element (asChild): the control is named by aria-labelledby.
+    const labelNotNative = shallowRef(false)
     let registered: { control: RegisteredControl; label: string } | null = null
     /** The dirty baseline: the value at the first registration, once per Field. */
     let baseline: { value: unknown } | null = null
@@ -198,6 +200,7 @@ const Root = defineComponent({
     }
     const binding = computed<FieldControlBinding>(() => ({
       ids: { label: labelId.value, description: descriptionId.value, error: errorId.value },
+      labelNotNative: labelNotNative.value,
       data: api.value.controlData(),
       state: {
         disabled: disabled(),
@@ -327,6 +330,7 @@ const Root = defineComponent({
       api: () => api.value,
       setLabel: (el) => {
         labelEl = el
+        labelNotNative.value = el !== null && el.tagName !== "LABEL"
       },
       control: () => registered?.control ?? null,
       hasErrorPart,
@@ -367,12 +371,18 @@ const Label = defineComponent({
     const own = () => props.id ?? partId("field", ctx.instance(), "label")
     useRegisterPart(ctx.registry, "label", own)
     // Stable: a new ref function on every render would detach and reattach the element.
-    const setLabel = (node: unknown) => ctx.setLabel(elementOf(node))
-    // A non-labelable control (a group) is named by aria-labelledby; a press focuses it.
+    let node: Element | null = null
+    const setLabel = (n: unknown) => {
+      node = elementOf(n)
+      ctx.setLabel(node)
+    }
+    // A non-labelable control (a group), or a Label that is not a <label> (base-ui#587): named
+    // by aria-labelledby; a press focuses the control.
     const interaction = normalizeProps(
       labelInteraction(env, {
         target: () => null,
-        forwardsFocus: () => ctx.control()?.labelable === false,
+        forwardsFocus: () =>
+          (node !== null && node.tagName !== "LABEL") || ctx.control()?.labelable === false,
         focusTarget: () => ctx.control()?.focus("pointer"),
       }),
     )

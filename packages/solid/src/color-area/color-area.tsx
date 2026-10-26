@@ -19,9 +19,11 @@ import {
   type MessageOverrides,
   type Modality,
   makeColor,
+  mergeFieldProps,
   partId,
   pointerDragSession2D,
   textSelection,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   areaAxes,
@@ -50,6 +52,8 @@ import {
   useContext,
 } from "solid-js"
 import { useColorProp } from "../color-input"
+import { useFieldBindingPeek } from "../field/context"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { afterMount } from "../lifecycle"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -179,8 +183,18 @@ function Root(props: ColorAreaRootProps) {
   const messages = useMessages("color-area", colorAreaMessages, () => local.messages)
   const value = useColorProp(() => local.value, "value", "color-area")
   const defaultValue = useColorProp(() => local.defaultValue, "defaultValue", "color-area")
-  const disabled = () => local.disabled === true
-  const readOnly = () => local.readOnly === true
+  // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>.
+  const enclosing = useFieldBindingPeek()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = createSignal(false)
+  const fieldFlags = createMemo(() =>
+    mergeFieldProps(
+      { role: "group", labelable: false, disabled: local.disabled, readOnly: local.readOnly },
+      enclosing?.() ?? null,
+    ),
+  )
+  const disabled = () => fieldFlags().disabled || fieldsetDisabled() || fieldsetDom()
+  const readOnly = () => fieldFlags().readOnly
   // The space of the axes: the prop, else the first colour's (read once), else hsb.
   const firstSpace: ColorSpace = untrack(() => (value() ?? defaultValue())?.space ?? "hsb")
   const axes = createMemo(() =>
@@ -273,6 +287,13 @@ function Root(props: ColorAreaRootProps) {
     undefined,
     { equals: (a, b) => a.x === b.x && a.y === b.y },
   )
+  afterMount(() => {
+    const node = inputs.x
+    if (!node) return
+    const fieldset = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(fieldset.disabled)
+    onCleanup(fieldset.stop)
+  })
   afterMount(() => {
     createEffect(() => {
       const s = shown()

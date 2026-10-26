@@ -20,6 +20,7 @@ import {
   output,
   PLATFORM_ID,
   type Signal,
+  signal,
   untracked,
   ViewEncapsulation,
   viewChild,
@@ -40,10 +41,12 @@ import {
   type MessageOverrides,
   type Modality,
   makeColor,
+  mergeFieldProps,
   type PartProps,
   partId,
   pointerDragSession2D,
   textSelection,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   areaAxes,
@@ -61,6 +64,8 @@ import {
 import { bindProps, joinHandlers } from "../bind-props"
 import { injectColorBinding } from "../color-binding"
 import { colorReader } from "../color-input"
+import { injectFieldBindingPeek } from "../field/context"
+import { injectFieldsetDisabled } from "../fieldset/context"
 import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectModality } from "../inject-press"
@@ -175,8 +180,20 @@ export class ColorAreaRoot {
     const value = colorReader(() => this.value(), "value", "color-area")
     const defaultValue = colorReader(() => this.defaultValue(), "defaultValue", "color-area")
     const own = () => (binding ? binding.color() : value())
-    const disabled = () => binding?.disabled() ?? this.disabled()
-    const readOnly = () => binding?.readOnly() ?? this.readonly()
+    // Standalone: OR-merged with an enclosing Field, rind's Fieldset and a native
+    // <fieldset disabled> (inside a picker, the picker's binding already merged them).
+    const enclosing = injectFieldBindingPeek()
+    const fieldsetDisabled = injectFieldsetDisabled()
+    const fieldsetDom = signal(false)
+    const fieldFlags = computed(() =>
+      mergeFieldProps(
+        { role: "group", labelable: false, disabled: this.disabled(), readOnly: this.readonly() },
+        enclosing?.() ?? null,
+      ),
+    )
+    const disabled = () =>
+      binding?.disabled() ?? (fieldFlags().disabled || fieldsetDisabled() || fieldsetDom())
+    const readOnly = () => binding?.readOnly() ?? fieldFlags().readOnly
     const colorName = () => this.colorName() ?? binding?.colorName()
     // The space of the axes: the input, else the first colour's (read once), else hsb.
     let firstSpace: ColorSpace | undefined
@@ -345,6 +362,13 @@ export class ColorAreaRoot {
     })
     // The modality tracker must see the pointerdown that comes before the input's focus.
     afterNextRender(() => destroy.onDestroy(env.modality.subscribe(() => {})))
+    afterNextRender(() => {
+      const node = this.inputs.x()
+      if (!node) return
+      const fieldset = watchFieldsetDisabled(node, (d) => fieldsetDom.set(d))
+      fieldsetDom.set(fieldset.disabled)
+      destroy.onDestroy(fieldset.stop)
+    })
     effect(() => {
       if (dragging()) return
       selection?.()

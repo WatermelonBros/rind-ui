@@ -52,7 +52,10 @@ $effect(() => {
   untrack(() => {
     if (reported === now) return
     reported = now
-    report({ type: "change", value: now, user: true, composing: false })
+    // A reset or a parent's value is reported too, but not as the user's (RA#6830).
+    const user = ctx.userChange.current
+    ctx.userChange.current = false
+    report({ type: "change", value: now, user, composing: false })
   })
 })
 // After every update: the DOM shows the value, the planned caret is placed, and a pending

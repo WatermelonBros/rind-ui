@@ -7,7 +7,7 @@ export type PinValidationType = "numeric" | "alphanumeric" | "alpha"
 export interface PinRules {
   readonly length: number
   readonly validationType?: PinValidationType | undefined
-  /** One accepted character (replaces `validationType`). */
+  /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
   readonly pattern?: RegExp | undefined
   /** Applied after NFKC (e.g. uppercasing). */
   readonly sanitize?: ((text: string) => string) | undefined

@@ -106,6 +106,8 @@ function Root(props: FieldRootProps) {
   const fieldsetDisabled = useFieldsetDisabled()
   const disabled = () => local.disabled === true || fieldsetDisabled()
   let labelEl: Element | null = null
+  // The Label rendered as another element: the control is named by aria-labelledby.
+  const [labelNotNative, setLabelNotNative] = createSignal(false)
   let registered: { control: RegisteredControl; label: string } | null = null
   /** The dirty baseline: the value at the first registration, once per Field. */
   let baseline: { value: unknown } | null = null
@@ -210,6 +212,7 @@ function Root(props: FieldRootProps) {
   }
   const binding = createMemo<FieldControlBinding>(() => ({
     ids: { label: labelId(), description: descriptionId(), error: errorId() },
+    labelNotNative: labelNotNative(),
     data: api().controlData(),
     state: {
       disabled: disabled(),
@@ -354,6 +357,7 @@ function Root(props: FieldRootProps) {
           api,
           setLabel: (el) => {
             labelEl = el
+            setLabelNotNative(el !== null && el.tagName !== "LABEL")
           },
           control: () => registered?.control ?? null,
           hasErrorPart,
@@ -385,11 +389,14 @@ function Label(props: PartProps<JSX.LabelHTMLAttributes<HTMLLabelElement>>) {
   const env = useEnvironment()
   const own = () => local.id ?? partId("field", ctx.instance(), "label")
   useRegisterPart(ctx.registry, "label", own)
-  // A non-labelable control (a group) is named by aria-labelledby; a press focuses it.
+  let node: Element | null = null
+  // A non-labelable control (a group), or a Label that is not a <label> (base-ui#587): named
+  // by aria-labelledby; a press focuses the control.
   const interaction = normalizeProps(
     labelInteraction(env, {
       target: () => null,
-      forwardsFocus: () => ctx.control()?.labelable === false,
+      forwardsFocus: () =>
+        (node !== null && node.tagName !== "LABEL") || ctx.control()?.labelable === false,
       focusTarget: () => ctx.control()?.focus("pointer"),
     }),
   )
@@ -403,7 +410,10 @@ function Label(props: PartProps<JSX.LabelHTMLAttributes<HTMLLabelElement>>) {
           for: ctx.control() ? part["for"] : partId("field", ctx.instance(), "control"),
         }),
         ...interaction,
-        ref: (node: Element) => ctx.setLabel(node),
+        ref: (el: Element) => {
+          node = el
+          ctx.setLabel(el)
+        },
       },
       rest,
     )

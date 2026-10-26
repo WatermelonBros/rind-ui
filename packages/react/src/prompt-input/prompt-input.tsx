@@ -519,11 +519,13 @@ function Textarea({
         "aria-describedby": undefined,
         ref: composeRefs(el, ref),
         // The Field validates on the control's changes.
+        // The machine's own writes (a send clearing the draft, history, restore) are not the
+        // user's: a successful send must not show "Please fill out this field".
         onChange: (e: { target: HTMLTextAreaElement; nativeEvent: Event }) =>
           report?.({
             type: "change",
             value: e.target.value,
-            user: true,
+            user: host.takeReason() === undefined,
             composing: (e.nativeEvent as InputEvent).isComposing === true,
           }),
       },

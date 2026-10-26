@@ -370,6 +370,7 @@ export const tagsInputMachine = /* @__PURE__ */ setup({
       chipsOf({ props, values }).some((c) => c.key === event.key && !c.disabled),
     pasteTakenOver: ({ props, event }) =>
       event.type === "PASTE" &&
+      interactive(props) &&
       props.addOnPaste !== false &&
       hasDelimiter(event.text, props.pasteDelimiter ?? defaultPasteDelimiters(delimitersOf(props))),
     blurAdds: ({ props }) => props.blurBehavior === "add",

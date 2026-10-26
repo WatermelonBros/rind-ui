@@ -65,13 +65,16 @@ const shown = $derived(controlled ? renderedValue(rules, value) : undefined)
 const inputEl: { current: HTMLInputElement | null } = { current: null }
 const pendingCaret = { current: null as number | null }
 const pendingSubmit = { current: false }
+const userChange = { current: false }
 const slots = { current: 0 }
 const machine = useMachine(pinInputMachine, () => ({
   ...rules,
   value: shown,
   defaultValue: renderedValue(rules, defaultValue),
   onValueChange: (v: string, details: unknown) => {
-    onValueChange?.(v, { reason: publicReason((details as { event: PinInputEvent }).event) })
+    const event = (details as { event: PinInputEvent }).event
+    userChange.current = event.type !== "RESET"
+    onValueChange?.(v, { reason: publicReason(event) })
     if (controlled) value = v
   },
   onValueInvalid: (t: string) => onValueInvalid?.(t),
@@ -133,6 +136,7 @@ const ctx = {
   inputEl,
   pendingCaret,
   pendingSubmit,
+  userChange,
   slots,
 }
 pinInputContext.set(ctx)

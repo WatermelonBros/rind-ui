@@ -21,9 +21,11 @@ import {
   type MessageOverrides,
   type Modality,
   makeColor,
+  mergeFieldProps,
   partId,
   pointerDragSession2D,
   textSelection,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   areaAxes,
@@ -52,6 +54,8 @@ import {
   useState,
 } from "react"
 import { useColorProp } from "../color-input"
+import { useFieldBindingPeek } from "../field/field"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -155,8 +159,8 @@ function Root({
   xName,
   yName,
   form,
-  disabled = false,
-  readOnly = false,
+  disabled: ownDisabled = false,
+  readOnly: ownReadOnly = false,
   colorName,
   locale: ownLocale,
   dir: ownDir,
@@ -173,6 +177,16 @@ function Root({
   const env = useEnvironment()
   const instance = useRootId(id)
   const { locale, dir } = useLocale(ownLocale, ownDir)
+  // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>.
+  const enclosing = useFieldBindingPeek()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = useState(false)
+  const merged = mergeFieldProps(
+    { role: "group", labelable: false, disabled: ownDisabled, readOnly: ownReadOnly },
+    enclosing,
+  )
+  const disabled = merged.disabled || fieldsetDisabled || fieldsetDom
+  const readOnly = merged.readOnly
   const messages = useMessages("color-area", colorAreaMessages, ownMessages)
   const value = useColorProp(valueProp, "value", "color-area")
   const defaultValue = useColorProp(defaultProp, "defaultValue", "color-area")
@@ -181,6 +195,13 @@ function Root({
   const axes = areaAxes(colorSpace ?? firstSpace, xChannel, yChannel)
   const inputs = useRef<Record<Axis, HTMLInputElement | null>>({ x: null, y: null })
   const thumb = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    const node = inputs.current.x
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   const latest = useRef({ x: 0, y: 0 })
   const [formInputs] = useState(() => new Map<Axis, FormInput>())
   // Stable: the form-reset tracking effect depends on it.

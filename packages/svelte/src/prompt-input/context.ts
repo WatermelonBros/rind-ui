@@ -21,6 +21,8 @@ export const promptInput = createContext<{
   readonly setCount: (c: CountState | null) => void
   readonly count: () => { readonly used: number; readonly max: number | undefined } | null
   readonly setTextareaId: (id: string) => void
+  /** Set while the machine writes the draft itself (a send, history, restore). */
+  readonly takeReason: () => unknown
   readonly textarea: { current: HTMLTextAreaElement | null }
   readonly mounted: { textareas: number; submits: number }
 }>("prompt-input")

@@ -92,6 +92,8 @@ interface Ctx {
   readonly pendingCaret: { current: number | null }
   readonly pendingSubmit: { current: boolean }
   readonly slots: { current: number }
+  /** The next value change is the user's (a reset or a parent's value is not). */
+  readonly userChange: { current: boolean }
 }
 
 const PinInputContext = createContext<Ctx | null>(null)
@@ -119,7 +121,7 @@ export type PinInputRootProps = Omit<
   readonly onValueComplete?: (value: string) => void
   /** Default `"numeric"`. */
   readonly validationType?: PinValidationType
-  /** One accepted character (replaces `validationType`). */
+  /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
   readonly pattern?: RegExp
   /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
   readonly sanitize?: (text: string) => string
@@ -227,6 +229,7 @@ function Root(all: PinInputRootProps) {
   const inputEl = useRef<HTMLInputElement | null>(null)
   const pendingCaret = useRef<number | null>(null)
   const pendingSubmit = useRef(false)
+  const userChange = useRef(false)
   const slots = useRef(0)
   const latest = useRef({ onValueChange, onValueInvalid, onValueComplete })
   latest.current = { onValueChange, onValueInvalid, onValueComplete }
@@ -234,10 +237,11 @@ function Root(all: PinInputRootProps) {
     ...rules,
     value: shown,
     defaultValue: renderedValue(rules, defaultValue),
-    onValueChange: (v, details) =>
-      latest.current.onValueChange?.(v, {
-        reason: publicReason((details as { event: PinInputEvent }).event),
-      }),
+    onValueChange: (v, details) => {
+      const event = (details as { event: PinInputEvent }).event
+      userChange.current = event.type !== "RESET"
+      latest.current.onValueChange?.(v, { reason: publicReason(event) })
+    },
     onValueInvalid: (t) => latest.current.onValueInvalid?.(t),
     onValueComplete: (v) => latest.current.onValueComplete?.(v),
     autoSubmit,
@@ -287,6 +291,7 @@ function Root(all: PinInputRootProps) {
     pendingCaret,
     pendingSubmit,
     slots,
+    userChange,
   }
   const api = useApi(ctx, enclosing, modality)
   const root = api.root()
@@ -422,8 +427,11 @@ function Input({
   useEffect(() => {
     if (reported.current === value) return
     reported.current = value
-    report?.({ type: "change", value, user: true, composing: false })
-  }, [value, report])
+    // A reset or a parent's value is reported too, but not as the user's (RA#6830).
+    const user = ctx.userChange.current
+    ctx.userChange.current = false
+    report?.({ type: "change", value, user, composing: false })
+  }, [value, report, ctx.userChange])
   // After every commit: the DOM shows the value, the planned caret is placed, and a pending
   // auto-submit runs against the full code.
   useIsoLayoutEffect(() => {

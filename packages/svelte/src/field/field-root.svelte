@@ -60,6 +60,9 @@ const messages = useMessages("field", fieldMessages, () => ownMessages)
 const fieldsetDisabled = useFieldsetDisabled()
 const disabled = $derived(ownDisabled || fieldsetDisabled())
 let labelEl: Element | null = null
+// The Label rendered as another element (child snippet): the control is named by
+// aria-labelledby.
+let labelNotNative = $state(false)
 let registered = $state.raw<{ control: RegisteredControl; label: string } | null>(null)
 /** The dirty baseline: the value at the first registration, once per Field. */
 let baseline = $state.raw<{ value: unknown } | null>(null)
@@ -155,6 +158,7 @@ const report = (event: FieldControlReport) => {
 }
 const binding: FieldControlBinding = $derived({
   ids: { label: labelId.current, description: descriptionId.current, error: errorId.current },
+  labelNotNative,
   data: api.controlData(),
   state: {
     disabled,
@@ -279,6 +283,7 @@ fieldParts.set({
   api: () => api,
   setLabel: (el) => {
     labelEl = el
+    labelNotNative = el !== null && el.tagName !== "LABEL"
   },
   control: () => registered?.control ?? null,
   hasErrorPart,

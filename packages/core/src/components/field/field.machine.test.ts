@@ -979,7 +979,7 @@ describe("flags: touched, dirty, filled", () => {
 
 describe("reset", () => {
   it("clears the displayed error, the flags, the custom validity and the external errors", () => {
-    const f = make({ value: "x", props: { validate: () => "bad" } })
+    const f = make({ value: "x", props: { validate: (v) => (v === "y" ? "bad" : null) } })
     f.setProps({ errors: ["Server"] })
     f.type("y")
     f.blur()
@@ -997,6 +997,14 @@ describe("reset", () => {
       announced: null,
     })
     expect(f.element.custom()).toBe("")
+  })
+
+  it("a reset value that fails validate keeps blocking submission, not shown (kobalte#473)", () => {
+    const f = make({ value: "admin", props: { validate: (v) => (v === "admin" ? "taken" : null) } })
+    f.type("free")
+    f.reset("admin")
+    expect(f.ctx().shown).toBe("none")
+    expect(f.element.custom()).toBe("taken")
   })
 
   it("re-reads filled and the value from the control after it reset (base-ui#5765)", () => {

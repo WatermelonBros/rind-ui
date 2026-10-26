@@ -17,9 +17,11 @@ import {
   type MessageOverrides,
   type Modality,
   makeColor,
+  mergeFieldProps,
   partId,
   pointerDragSession2D,
   textSelection,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   areaAxes,
@@ -53,6 +55,8 @@ import {
   watch,
 } from "vue"
 import { colorProp, useColorProp } from "../color-input"
+import { useFieldBindingPeek } from "../field/context"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -161,6 +165,18 @@ const Root = defineComponent({
     const firstSpace: ColorSpace = (value() ?? defaultValue())?.space ?? "hsb"
     const axes = () => areaAxes(props.colorSpace ?? firstSpace, props.xChannel, props.yChannel)
     const inputs: Record<Axis, HTMLInputElement | null> = { x: null, y: null }
+    // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>.
+    const enclosing = useFieldBindingPeek()
+    const fieldsetDisabled = useFieldsetDisabled()
+    const fieldsetDom = shallowRef(false)
+    const merged = computed(() =>
+      mergeFieldProps(
+        { role: "group", labelable: false, disabled: props.disabled, readOnly: props.readOnly },
+        enclosing?.value ?? null,
+      ),
+    )
+    const disabled = () => merged.value.disabled || fieldsetDisabled.value || fieldsetDom.value
+    const readOnly = () => merged.value.readOnly
     const thumb = shallowRef<Element | null>(null)
     const formInputs = new Map<Axis, FormInput>()
     const formInput = (axis: Axis) => {
@@ -190,8 +206,8 @@ const Root = defineComponent({
       defaultValue: defaultValue(),
       axes: axes(),
       fallback: DEFAULT,
-      disabled: props.disabled,
-      readOnly: props.readOnly,
+      disabled: disabled(),
+      readOnly: readOnly(),
       onValueChange: (c: Color, d: { reason: string; cancel(): void }) => {
         // A form reset reports nothing (spec "Form Participation").
         if (d.reason === "RESET") return
@@ -216,8 +232,8 @@ const Root = defineComponent({
         memory: view.value.context.memory,
         axes: axes(),
         dir: loc.value.dir,
-        disabled: props.disabled,
-        readOnly: props.readOnly,
+        disabled: disabled(),
+        readOnly: readOnly(),
         dragging: dragging(),
         focused: view.value.context.focused,
         tabStop: view.value.context.tabStop,
@@ -250,6 +266,11 @@ const Root = defineComponent({
     }
     onMounted(() => {
       sync()
+      if (inputs.x) {
+        const fieldset = watchFieldsetDisabled(inputs.x, (d) => (fieldsetDom.value = d))
+        fieldsetDom.value = fieldset.disabled
+        onBeforeUnmount(fieldset.stop)
+      }
       watch(() => `${shown().x}|${shown().y}`, sync, { flush: "post" })
       // The modality tracker must see the pointerdown that comes before the input's focus.
       onBeforeUnmount(env.modality.subscribe(() => {}))
@@ -264,8 +285,8 @@ const Root = defineComponent({
     const state = (): ColorAreaState => ({
       color: color(),
       dragging: dragging(),
-      disabled: props.disabled,
-      readOnly: props.readOnly,
+      disabled: disabled(),
+      readOnly: readOnly(),
     })
     provide(AreaKey, {
       api: () => api.value,
@@ -278,7 +299,7 @@ const Root = defineComponent({
       dir: () => loc.value.dir,
     })
     const press = (e: PointerEvent) => {
-      if (!isDragPress(e) || drag.active || props.disabled) return
+      if (!isDragPress(e) || drag.active || disabled()) return
       if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
       const surface = e.currentTarget as HTMLElement
       const onThumb = thumb.value?.contains(e.target as Node) === true
@@ -288,7 +309,7 @@ const Root = defineComponent({
       // Focus goes to the x input (the machine moves it): the browser must not blur it.
       e.preventDefault()
       const touch = e.pointerType === "touch"
-      if (touch && !props.readOnly) selection = textSelection(surface, env, true)
+      if (touch && !readOnly()) selection = textSelection(surface, env, true)
       send({ type: "POINTER.DOWN", point, onThumb, modality: touch ? "touch" : "pointer" })
     }
     return () => {

@@ -179,6 +179,8 @@ interface Host {
   readonly setCount: (c: CountState | null) => void
   readonly count: Accessor<{ readonly used: number; readonly max: number | undefined } | null>
   readonly setTextareaId: (id: string) => void
+  /** Set while the machine writes the draft itself (a send, history, restore). */
+  readonly takeReason: () => unknown
   readonly textarea: { current: HTMLTextAreaElement | null }
   readonly mounted: { textareas: number; submits: number }
 }
@@ -402,6 +404,7 @@ function Root(props: PromptInputRootProps) {
       return c ? { used: api().derived.used, max: c.max } : null
     },
     setTextareaId,
+    takeReason: () => reason,
     textarea,
     mounted,
   }
@@ -570,7 +573,8 @@ function Textarea(props: PromptInputTextareaProps) {
           binding?.().report({
             type: "change",
             value: (e.target as HTMLTextAreaElement).value,
-            user: true,
+            // The machine's own writes (a send clearing the draft) are not the user's.
+            user: host.takeReason() === undefined,
             composing: e.isComposing === true,
           }),
       },

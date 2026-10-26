@@ -38,6 +38,13 @@ function Code({
 afterEach(() => vi.restoreAllMocks())
 
 describe("PinInput", () => {
+  it("a case-insensitive pattern: a complete code passes the native pattern too", async () => {
+    render(<Code length={4} pattern={/[a-f0-9]/i} />)
+    await pin().type("AB12")
+    expect(input().value).toBe("AB12")
+    expect(input().validity.patternMismatch).toBe(false)
+  })
+
   it("One textbox: named, slots hidden, one tab stop", () => {
     render(<Code />)
     expect(screen.getAllByRole("textbox")).toHaveLength(1)

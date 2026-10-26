@@ -85,6 +85,13 @@ type Key = KeyboardEvent
 const imeKey = (e: Key) => e.isComposing || e.keyCode === 229
 const NO_RESULTS = createListCollection<unknown>({ items: [], getKey: String, getText: String })
 
+/**
+ * Whether a value change (by the machine event that made it) is the user's: a form reset and
+ * the API's ADD / CLEAR are not, so they never clear a Field's server errors (RA#6830).
+ */
+export const userTagsChange = (type: string): boolean =>
+  type !== "FORM.RESET" && type !== "ADD" && type !== "CLEAR"
+
 export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectEnv) {
   const ids = tagsInputIds(v.instance)
   const { send, context: c } = v
@@ -215,7 +222,8 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
         [v.field?.["aria-describedby"], chips.describedBy].filter(Boolean).join(" ") || undefined,
       "aria-labelledby": v.mounted.label ? undefined : v.field?.["aria-labelledby"],
       "aria-invalid": v.invalid ? "true" : undefined,
-      "aria-required": v.field?.["aria-required"],
+      // Native `required` goes to the hidden constraint input: the textbox says it itself.
+      "aria-required": v.field?.["aria-required"] ?? (v.required ? "true" : undefined),
       "aria-errormessage": v.field?.["aria-errormessage"],
       "data-refused": c.refusal?.reason,
       "data-empty": dataFlag(v.inputValue === ""),
@@ -251,6 +259,8 @@ export function tagsInputConnect(v: TagsInputConnectView, env: TagsInputConnectE
         const e = event as ClipboardEvent
         const text = e.clipboardData?.getData("text/plain") ?? ""
         const delimiters = v.pasteDelimiter ?? defaultPasteDelimiters(v.delimiter)
+        // Read-only or disabled: the browser's default (nothing lands in a read-only input).
+        if (v.readOnly || v.disabled) return
         if (!v.addOnPaste || c.composing || !hasDelimiter(text, delimiters)) return
         // Taken over: split into tags. A plain paste stays the browser's (undo keeps working).
         e.preventDefault()

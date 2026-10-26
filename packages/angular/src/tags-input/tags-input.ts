@@ -53,6 +53,7 @@ import {
   tagsInputIds,
   tagsInputMachine,
   tagsInputMessages,
+  userTagsChange,
 } from "@rind-ui/core"
 import { absentProps } from "../absent"
 import { bindProps } from "../bind-props"
@@ -383,7 +384,12 @@ export class TagsInputRoot implements PopupHost {
         stale: isStale({ itemsQuery: this.itemsQuery(), query: query() }),
         onValueChange: (v: readonly string[], d: { event: { type: string } }) => {
           this.pending = true
-          binding?.().report({ type: "change", value: v, user: true, composing: false })
+          binding?.().report({
+            type: "change",
+            value: v,
+            user: userTagsChange(d.event.type),
+            composing: false,
+          })
           // A value changed by a text change is always a delimiter split.
           this.valueChangeDetails.emit({
             value: v,

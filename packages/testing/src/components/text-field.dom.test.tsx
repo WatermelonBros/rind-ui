@@ -274,6 +274,63 @@ describe("Textarea attributes", () => {
     expect(control().getAttribute("rows")).toBe("4")
     expect(control().getAttribute("wrap")).toBe("hard")
   })
+
+  it("Enter in a textarea is a new line, not onSubmit", async () => {
+    const onSubmit = vi.fn()
+    render(
+      <TextField.Root onSubmit={onSubmit}>
+        <TextField.Label>Bio</TextField.Label>
+        <TextField.Textarea />
+      </TextField.Root>,
+    )
+    await userEvent.setup().type(control(), "a{Enter}b")
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect((control() as HTMLTextAreaElement).value).toBe("a\nb")
+  })
+})
+
+describe("Controlled value and the Field", () => {
+  it("a parent's change re-validates: the error clears (react-spectrum#8659)", async () => {
+    function Suggest() {
+      const [value, setValue] = useState("")
+      return (
+        <Field.Root validationMode="change" validate={(v) => (v === "admin" ? "taken" : null)}>
+          <Field.Label>User</Field.Label>
+          <TextField.Root value={value} onValueChange={setValue}>
+            <TextField.Input />
+          </TextField.Root>
+          <Field.ErrorMessage />
+          <button type="button" onClick={() => setValue("admin42")}>
+            Suggest
+          </button>
+        </Field.Root>
+      )
+    }
+    render(<Suggest />)
+    const u = userEvent.setup()
+    await u.type(screen.getByRole("textbox", { name: "User" }), "admin")
+    await waitFor(() => expect(screen.getByText("taken")).toBeTruthy())
+    await u.click(screen.getByRole("button", { name: "Suggest" }))
+    await waitFor(() => expect(screen.queryByText("taken")).toBeNull())
+    const box = screen.getByRole("textbox", { name: "User" }) as HTMLInputElement
+    expect(box.validity.customError).toBe(false)
+  })
+})
+
+describe("Field.Label substituted", () => {
+  it("rendered as a span: the input is still named by it, a press focuses it (base-ui#587)", async () => {
+    render(
+      <Field.Root>
+        <Field.Label render={<span />}>Email</Field.Label>
+        <TextField.Root>
+          <TextField.Input />
+        </TextField.Root>
+      </Field.Root>,
+    )
+    const box = await screen.findByRole("textbox", { name: "Email" })
+    await userEvent.setup().click(screen.getByText("Email"))
+    expect(document.activeElement).toBe(box)
+  })
 })
 
 describe("IME composition", () => {

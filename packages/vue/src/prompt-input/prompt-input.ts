@@ -100,6 +100,8 @@ interface Host {
   readonly setCount: (c: CountState | null) => void
   readonly count: () => { readonly used: number; readonly max: number | undefined } | null
   readonly setTextareaId: (id: string) => void
+  /** Set while the machine writes the draft itself (a send, history, restore). */
+  readonly takeReason: () => unknown
   readonly textarea: { current: HTMLTextAreaElement | null }
   readonly mounted: { textareas: number; submits: number }
 }
@@ -372,6 +374,7 @@ const Root = defineComponent({
       },
       count: () =>
         countState.value ? { used: api.value.derived.used, max: countState.value.max } : null,
+      takeReason: () => reason,
       setTextareaId: (id) => {
         textareaId.value = id
       },
@@ -538,7 +541,8 @@ const Textarea = defineComponent({
               binding?.value.report({
                 type: "change",
                 value: (e.target as HTMLTextAreaElement).value,
-                user: true,
+                // The machine's own writes (a send clearing the draft) are not the user's.
+                user: host.takeReason() === undefined,
                 composing: e.isComposing === true,
               }),
           },

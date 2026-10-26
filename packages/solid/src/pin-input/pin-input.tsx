@@ -93,6 +93,8 @@ interface Ctx {
   readonly setInputEl: (el: Element | null) => void
   readonly pendingCaret: { current: number | null }
   readonly pendingSubmit: { current: boolean }
+  /** The next value change is the user's (a reset or a parent's value is not). */
+  readonly userChange: { current: boolean }
   readonly slots: { current: number }
 }
 
@@ -123,7 +125,7 @@ export type PinInputRootProps = Omit<
     readonly onValueComplete?: ((value: string) => void) | undefined
     /** Default `"numeric"`. */
     readonly validationType?: PinValidationType | undefined
-    /** One accepted character (replaces `validationType`). */
+    /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
     readonly pattern?: RegExp | undefined
     /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
     readonly sanitize?: ((text: string) => string) | undefined
@@ -225,13 +227,17 @@ function Root(props: PinInputRootProps) {
   const [inputEl, setInputEl] = createSignal<Element | null>(null)
   const pendingCaret = { current: null as number | null }
   const pendingSubmit = { current: false }
+  const userChange = { current: false }
   const slots = { current: 0 }
   const { view, send } = useMachine(pinInputMachine, () => ({
     ...rules(),
     value: shown(),
     defaultValue: renderedValue(rules(), own.defaultValue ?? ""),
-    onValueChange: (v: string, details) =>
-      own.onValueChange?.(v, { reason: publicReason((details as { event: PinInputEvent }).event) }),
+    onValueChange: (v: string, details) => {
+      const event = (details as { event: PinInputEvent }).event
+      userChange.current = event.type !== "RESET"
+      own.onValueChange?.(v, { reason: publicReason(event) })
+    },
     onValueInvalid: (t: string) => own.onValueInvalid?.(t),
     onValueComplete: (v: string) => own.onValueComplete?.(v),
     autoSubmit: own.autoSubmit ?? false,
@@ -288,6 +294,7 @@ function Root(props: PinInputRootProps) {
     setInputEl,
     pendingCaret,
     pendingSubmit,
+    userChange,
     slots,
   }
   const rootApi = useApi(ctx, enclosing)
@@ -462,7 +469,10 @@ function Input(props: PinInputInputProps) {
       const now = value()
       if (reported === now) return
       reported = now
-      report({ type: "change", value: now, user: true, composing: false })
+      // A reset or a parent's value is reported too, but not as the user's (RA#6830).
+      const user = ctx.userChange.current
+      ctx.userChange.current = false
+      report({ type: "change", value: now, user, composing: false })
     })
     createEffect(() => {
       ctx.view()

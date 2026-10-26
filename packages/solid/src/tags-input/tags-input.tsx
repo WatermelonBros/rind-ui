@@ -31,6 +31,7 @@ import {
   tagsInputIds,
   tagsInputMachine,
   tagsInputMessages,
+  userTagsChange,
 } from "@rind-ui/core"
 import {
   type Accessor,
@@ -301,7 +302,12 @@ export function Root(all: TagsInputRootProps) {
     stale: isStale({ itemsQuery: p.itemsQuery, query: query() }),
     onValueChange: (v: readonly string[], d: { event: { type: string } }) => {
       pending.current = true
-      binding?.().report({ type: "change", value: v, user: true, composing: false })
+      binding?.().report({
+        type: "change",
+        value: v,
+        user: userTagsChange(d.event.type),
+        composing: false,
+      })
       // A value changed by a text change is always a delimiter split.
       p.onValueChange?.(v, { reason: reasonOf(d.event.type, true) })
     },

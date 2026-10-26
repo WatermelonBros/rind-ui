@@ -426,7 +426,9 @@ export const fieldMachine = /* @__PURE__ */ setup({
     "PROPS.CHANGE": { actions: ["evaluate", "decide"] },
     RESET: [
       { guard: "keepsExternal", target: "idle", actions: ["reset", "evaluate", "decide"] },
-      { target: "idle", actions: ["reset"] },
+      // Validity is computed and set again (shown stays "none"): a reset value that fails
+      // validate must still block submission (kobalte#473).
+      { target: "idle", actions: ["reset", "evaluate", "dropPending"] },
     ],
     DECIDE: [
       { guard: "pendingAsync", target: "validating", reenter: true },

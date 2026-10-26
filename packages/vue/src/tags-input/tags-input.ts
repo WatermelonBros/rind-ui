@@ -29,6 +29,7 @@ import {
   tagsInputIds,
   tagsInputMachine,
   tagsInputMessages,
+  userTagsChange,
 } from "@rind-ui/core"
 import {
   computed,
@@ -290,7 +291,12 @@ const Root = defineComponent({
       stale: isStale({ itemsQuery: props.itemsQuery, query: query.value }),
       onValueChange: (v: readonly string[], d: { event: { type: string } }) => {
         pending.current = true
-        binding?.value.report({ type: "change", value: v, user: true, composing: false })
+        binding?.value.report({
+          type: "change",
+          value: v,
+          user: userTagsChange(d.event.type),
+          composing: false,
+        })
         // A value changed by a text change is always a delimiter split.
         emit("valueChange", v, { reason: reasonOf(d.event.type, true) })
         emit("update:modelValue", v)

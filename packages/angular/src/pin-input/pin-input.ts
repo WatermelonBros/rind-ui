@@ -133,7 +133,7 @@ export class PinInputRoot {
   readonly defaultValue = input<string>("")
   /** Default `"numeric"`. */
   readonly validationType = input<PinValidationType>()
-  /** One accepted character (replaces `validationType`). */
+  /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
   readonly pattern = input<RegExp>()
   /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
   readonly sanitize = input<(text: string) => string>()
@@ -178,6 +178,8 @@ export class PinInputRoot {
   readonly pendingCaret: { current: number | null } = { current: null }
   /** @internal */
   readonly pendingSubmit = { current: false }
+  /** @internal The next value change is the user's (a reset or a parent's value is not). */
+  readonly userChange = { current: false }
   /** @internal */
   readonly slotCount = { current: 0 }
   /** The code's state, for the template (`#p="rindPinInputRoot"`, `p.state()`). */
@@ -211,10 +213,9 @@ export class PinInputRoot {
       value: shown(),
       defaultValue: renderedValue(this.rules(), this.defaultValue()),
       onValueChange: (v: string, details) => {
-        this.valueChangeDetails.emit({
-          value: v,
-          details: { reason: publicReason((details as { event: PinInputEvent }).event) },
-        })
+        const event = (details as { event: PinInputEvent }).event
+        this.userChange.current = event.type !== "RESET"
+        this.valueChangeDetails.emit({ value: v, details: { reason: publicReason(event) } })
         this.valueChange.emit(v)
       },
       onValueInvalid: (t: string) => this.valueInvalid.emit(t),
@@ -561,7 +562,10 @@ export class PinInputInput {
       }
       if (reported === now) return
       reported = now
-      untracked(() => report({ type: "change", value: now, user: true, composing: false }))
+      // A reset or a parent's value is reported too, but not as the user's (RA#6830).
+      const user = root.userChange.current
+      root.userChange.current = false
+      untracked(() => report({ type: "change", value: now, user, composing: false }))
     })
     destroy.onDestroy(() => unregister?.())
   }

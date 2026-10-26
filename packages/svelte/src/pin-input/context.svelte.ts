@@ -36,6 +36,8 @@ export const pinInputContext = createContext<{
   readonly inputEl: { current: HTMLInputElement | null }
   readonly pendingCaret: { current: number | null }
   readonly pendingSubmit: { current: boolean }
+  /** The next value change is the user's (a reset or a parent's value is not). */
+  readonly userChange: { current: boolean }
   readonly slots: { current: number }
 }>("pin-input")
 type Ctx = ReturnType<typeof pinInputContext.get>

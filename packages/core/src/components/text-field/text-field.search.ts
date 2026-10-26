@@ -22,6 +22,7 @@ type KeyLike = {
   readonly keyCode?: number
   readonly isComposing?: boolean
   readonly nativeEvent?: { readonly isComposing?: boolean }
+  readonly currentTarget?: { readonly tagName?: string } | null
   preventDefault(): void
   stopPropagation(): void
 }
@@ -46,6 +47,8 @@ export function textFieldKeysConnect(
       onKeyDown: (e: unknown) => {
         const k = e as KeyLike
         if (k.key !== "Escape" && k.key !== "Enter") return
+        // Enter in a textarea is a new line, never a submit (spec "Enter Submits": the input).
+        if (k.key === "Enter" && k.currentTarget?.tagName === "TEXTAREA") return
         const composing =
           input.composing ||
           k.isComposing === true ||
