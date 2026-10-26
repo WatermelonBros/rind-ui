@@ -48,8 +48,15 @@ describe("Tabs hydration", () => {
     expect(box.querySelector('[role="tablist"]')?.hasAttribute("tabindex")).toBe(false)
   })
 
-  it("no value: the server tab stop is the first tab", () => {
-    expect(tabs(parse()).map((t) => t.getAttribute("tabindex"))).toEqual(["0", "-1", "-1"])
+  it("no value: the server tab stop, selection and panel are the first tab", () => {
+    const box = parse()
+    expect(tabs(box).map((t) => t.getAttribute("tabindex"))).toEqual(["0", "-1", "-1"])
+    expect(tabs(box).map((t) => t.getAttribute("aria-selected"))).toEqual([
+      "true",
+      "false",
+      "false",
+    ])
+    expect(box.querySelector('[role="tabpanel"]')?.textContent).toBe("panel a")
   })
 
   it("the indicator is rendered hidden with no custom properties", () => {
