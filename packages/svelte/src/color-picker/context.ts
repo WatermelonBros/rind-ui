@@ -28,6 +28,8 @@ export interface PickerCtx {
   readonly setHiddenPart: (on: boolean) => void
   readonly triggerEl: { current: HTMLElement | null }
   readonly formValue: () => string
+  /** A native <fieldset disabled> around the hidden input (watched by it). */
+  readonly setFieldsetDom: (disabled: boolean) => void
 }
 export const colorPicker = createContext<PickerCtx>("color-picker")
 /** Inside the Trigger: the ValueSwatch is decorative (the Trigger's name carries the colour). */

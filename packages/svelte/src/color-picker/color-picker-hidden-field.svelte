@@ -1,4 +1,5 @@
 <script lang="ts">
+import { watchFieldsetDisabled } from "@rind-ui/core"
 import { untrack } from "svelte"
 import { attrs, normalizeProps } from "../normalize-props"
 import { colorPicker } from "./context"
@@ -23,7 +24,10 @@ const ref = (input: HTMLInputElement) => {
   }
   owner?.addEventListener("reset", onReset)
   input.addEventListener("change", onChange)
+  const fieldset = watchFieldsetDisabled(input, ctx.setFieldsetDom)
+  ctx.setFieldsetDom(fieldset.disabled)
   return () => {
+    fieldset.stop()
     owner?.removeEventListener("reset", onReset)
     input.removeEventListener("change", onChange)
     el = null

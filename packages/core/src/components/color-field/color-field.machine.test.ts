@@ -71,6 +71,13 @@ describe("text rules", () => {
     expect(parseColorText("hsl(10, 20%, 30%)", "css", false)?.space).toBe("hsl")
   })
 
+  it("a css commit with alpha sets it; without alpha the current one stays", () => {
+    const current = parseColor("#FF0000FF")
+    const css = "rgba(0, 255, 0, 0.5)"
+    expect(commitAlpha(parseColor(css), css, current, true).alpha).toBeCloseTo(0.5, 2)
+    expect(commitAlpha(parseColor(css), css, current, false).alpha).toBe(1)
+  })
+
   it("alpha on a hex commit (zag#884)", () => {
     const current = parseColor("#FF000080")
     expect(commitAlpha(parseColor("#00FF00"), "00FF00", current, true).alpha).toBeCloseTo(0.5, 2)
