@@ -388,4 +388,13 @@
   .stage {
     overflow-x: auto;
   }
+  /* the frame clips its edge: the focus ring of a scrolling stage is drawn inside it */
+  .stage:focus-visible {
+    outline-offset: -3px;
+  }
+  /* WebKit resolves the 100% above against the viewport-wide fit-content canvas: cap it by the
+     stage's own width (the screen less the frame's 16px gutters and the stage's 28px padding) */
+  .stage [data-scope="toast"][data-part="region"] {
+    max-inline-size: min(100%, 100vw - 88px);
+  }
 }
