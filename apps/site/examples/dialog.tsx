@@ -209,6 +209,7 @@ export function ConfirmationAsync() {
         onOpenChange={(open, details) => {
           if (open || details.reason !== "action") return
           details.cancel()
+          if (pending) return
           setPending(true)
           setTimeout(() => {
             setPending(false)
@@ -227,7 +228,9 @@ export function ConfirmationAsync() {
                 The dialog stays open until the request is done.
               </Dialog.Description>
               <Dialog.Cancel>Cancel</Dialog.Cancel>
-              <Dialog.Action disabled={pending}>
+              {/* aria-disabled, not disabled: a disabled button drops the focus to <body>, out of
+                  the dialog, while the request runs; a press meanwhile is ignored above */}
+              <Dialog.Action aria-disabled={pending || undefined} aria-busy={pending || undefined}>
                 {pending ? "Emptying…" : "Empty trash"}
               </Dialog.Action>
             </Dialog.Content>
