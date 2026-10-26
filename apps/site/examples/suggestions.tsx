@@ -4,7 +4,9 @@ import { PromptInput, Suggestions } from "@rind-ui/react"
 import { useRef, useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = { suggestions: { ready: "Basic", loading: "Loading" } }
+export const states: States = {
+  suggestions: { ready: "Basic", loading: "Loading", disabled: "Disabled" },
+}
 
 const STARTERS = [
   { label: "Summarise", value: "Summarise this thread in three bullet points" },
@@ -14,13 +16,19 @@ const STARTERS = [
 
 function Chips({
   loading = false,
+  disabled = false,
   onSelect,
 }: {
   loading?: boolean
+  disabled?: boolean
   onSelect?: (value: string) => void
 }) {
   return (
-    <Suggestions.Root loading={loading} onSelect={({ value }) => onSelect?.(value)}>
+    <Suggestions.Root
+      loading={loading}
+      disabled={disabled}
+      onSelect={({ value }) => onSelect?.(value)}
+    >
       {STARTERS.map((s) => (
         <Suggestions.Item key={s.label} {...(s.value ? { value: s.value } : {})}>
           <Suggestions.Label>{s.label}</Suggestions.Label>
@@ -43,6 +51,10 @@ export function Basic() {
 
 export function Loading() {
   return <Chips loading />
+}
+
+export function Disabled() {
+  return <Chips disabled />
 }
 
 export function WithPrompt() {
@@ -74,6 +86,10 @@ export const variants: Variants = {
   Loading: {
     title: "While the answer streams",
     description: "The chips stay, disabled but focusable; the group is busy.",
+  },
+  Disabled: {
+    title: "Disabled",
+    description: "The whole group is disabled: the chips stay visible, a press does nothing.",
   },
   WithPrompt: {
     title: "Into the prompt",
