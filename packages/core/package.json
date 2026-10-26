@@ -214,6 +214,11 @@
       "types": "./dist/components/marquee/index.d.mts",
       "default": "./dist/components/marquee/index.mjs"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/components/mentions/index.ts",
+      "types": "./dist/components/mentions/index.d.mts",
+      "default": "./dist/components/mentions/index.mjs"
+    },
     "./menu": {
       "@rind-ui/source": "./src/components/menu/index.ts",
       "types": "./dist/components/menu/index.d.mts",
@@ -591,6 +596,10 @@
       "./marquee": {
         "types": "./dist/components/marquee/index.d.mts",
         "default": "./dist/components/marquee/index.mjs"
+      },
+      "./mentions": {
+        "types": "./dist/components/mentions/index.d.mts",
+        "default": "./dist/components/mentions/index.mjs"
       },
       "./menu": {
         "types": "./dist/components/menu/index.d.mts",

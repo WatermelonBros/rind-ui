@@ -43,6 +43,7 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
 import * as marquee from "./marquee"
+import * as mentions from "./mentions"
 import * as menu from "./menu"
 import * as menubar from "./menubar"
 import * as messageThread from "./message-thread"
@@ -95,6 +96,7 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  mentions,
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,

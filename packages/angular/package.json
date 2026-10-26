@@ -207,6 +207,11 @@
       "types": "./dist/marquee/index.d.ts",
       "default": "./dist/marquee/index.js"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/mentions/index.ts",
+      "types": "./dist/mentions/index.d.ts",
+      "default": "./dist/mentions/index.js"
+    },
     "./menu": {
       "@rind-ui/source": "./src/menu/index.ts",
       "types": "./dist/menu/index.d.ts",
@@ -589,6 +594,10 @@
       "./marquee": {
         "types": "./dist/marquee/index.d.ts",
         "default": "./dist/marquee/index.js"
+      },
+      "./mentions": {
+        "types": "./dist/mentions/index.d.ts",
+        "default": "./dist/mentions/index.js"
       },
       "./menu": {
         "types": "./dist/menu/index.d.ts",

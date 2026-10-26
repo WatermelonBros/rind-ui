@@ -160,7 +160,7 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 | Component | The hard part | Status |
 |---|---|---|
 | Prompt Input | IME-safe submit, autosize, attachments, submit/stop state | done |
-| Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | todo |
+| Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | done |
 | Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | done |
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
 | Reasoning | Collapsible with a streaming state | done |

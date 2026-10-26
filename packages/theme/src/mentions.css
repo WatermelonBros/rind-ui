@@ -1,0 +1,148 @@
+/*
+ * Mentions (family: field): the Root is a one-cell grid stacking the Highlighter under the
+ * Textarea (render the Label outside the Root). Both share font, padding, border width and
+ * line height, so the mirror's text lines up with the textarea's; the Textarea is transparent
+ * and the Highlighter carries the field's surface and the mentions' marks, its own text
+ * invisible. The list is the combobox popup's look.
+ */
+@layer rind.components {
+  :where([data-scope="mentions"][data-part="root"]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--rind-space-1);
+  }
+
+  :where([data-scope="mentions"]:is([data-part="textarea"], [data-part="highlighter"])) {
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: 0;
+    margin: 0;
+    padding-block: var(--rind-mentions-padding-block, var(--rind-space-2));
+    padding-inline: var(
+      --rind-mentions-padding-inline,
+      var(--rind-space-control, var(--rind-space-3))
+    );
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-mentions-radius, var(--rind-radius-control));
+    font-family: var(--rind-font-sans);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    line-height: var(--rind-leading-normal);
+    letter-spacing: normal;
+    tab-size: 4;
+  }
+
+  :where([data-scope="mentions"][data-part="highlighter"]) {
+    overflow: hidden;
+    border-color: var(--rind-mentions-border, var(--rind-color-border-strong));
+    background: var(--rind-mentions-bg, var(--rind-color-surface-raised));
+    color: transparent;
+  }
+
+  :where([data-scope="mentions"][data-part="textarea"]) {
+    position: relative;
+    min-block-size: var(--rind-mentions-min-height, calc(var(--rind-size-md) * 2));
+    resize: vertical;
+    background: transparent;
+    color: var(--rind-mentions-fg, var(--rind-color-text));
+    caret-color: var(--rind-mentions-fg, var(--rind-color-text));
+  }
+
+  :where([data-scope="mentions"][data-part="textarea"])::placeholder {
+    color: var(--rind-mentions-placeholder, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="mentions"][data-part="textarea"]:focus-visible) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* A mention: a soft accent mark behind the textarea's own text (no padding: it would shift). */
+  :where([data-scope="mentions"][data-part="mention"]) {
+    border-radius: var(--rind-radius-sm);
+    background: var(--rind-mentions-mention-bg, var(--rind-color-accent-soft));
+    color: transparent;
+  }
+
+  :where(
+    [data-scope="mentions"]:is([data-part="textarea"], [data-part="highlighter"])[data-disabled]
+  ) {
+    cursor: not-allowed;
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="mentions"][data-part="highlighter"][data-disabled]) {
+    color: transparent;
+    background: var(--rind-mentions-disabled-bg, var(--rind-color-surface));
+  }
+
+  :where([data-scope="mentions"][data-part="description"]) {
+    margin: 0;
+    font-size: var(--rind-text-sm);
+    color: var(--rind-mentions-description-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="mentions"][data-part="popup"]) {
+    box-sizing: border-box;
+    min-inline-size: var(--rind-mentions-popup-min-width, 12rem);
+    max-inline-size: var(--rind-available-width, 100vw);
+    max-block-size: min(
+      var(--rind-mentions-popup-max-height, 16rem),
+      var(--rind-available-height, 100vh)
+    );
+    overflow: auto;
+    padding: var(--rind-mentions-popup-padding, var(--rind-space-1));
+    border: var(--rind-border-width) solid
+      var(--rind-mentions-popup-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-mentions-popup-radius, var(--rind-radius-md));
+    background: var(--rind-mentions-popup-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-mentions-popup-shadow, var(--rind-shadow-sm));
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="mentions"][data-part="list"]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--rind-space-1);
+    margin: 0;
+    padding: 0;
+  }
+
+  :where([data-scope="mentions"][data-part="item"]) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    min-block-size: var(--rind-mentions-item-height, var(--rind-hit-area));
+    padding: var(--rind-mentions-item-padding, var(--rind-space-1) var(--rind-space-2));
+    border-radius: var(--rind-radius-sm);
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    cursor: pointer;
+    user-select: none;
+  }
+
+  :where([data-scope="mentions"][data-part="item"][data-highlighted]) {
+    background: var(--rind-mentions-item-highlight-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="mentions"][data-part="item"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="mentions"]:is([data-part="empty"], [data-part="loading"])) {
+    padding: var(--rind-space-2);
+    font-size: var(--rind-text-sm);
+    color: var(--rind-color-text-muted);
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="mentions"][data-part="mention"]) {
+      background: transparent;
+      outline: 1px solid CanvasText;
+    }
+    :where([data-scope="mentions"][data-part="item"][data-highlighted]) {
+      outline: 2px solid Highlight;
+    }
+  }
+}

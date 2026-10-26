@@ -243,6 +243,12 @@
       "svelte": "./dist/marquee/index.js",
       "default": "./dist/marquee/index.js"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/mentions/index.ts",
+      "types": "./dist/mentions/index.d.ts",
+      "svelte": "./dist/mentions/index.js",
+      "default": "./dist/mentions/index.js"
+    },
     "./menu": {
       "@rind-ui/source": "./src/menu/index.ts",
       "types": "./dist/menu/index.d.ts",
@@ -689,6 +695,11 @@
         "types": "./dist/marquee/index.d.ts",
         "svelte": "./dist/marquee/index.js",
         "default": "./dist/marquee/index.js"
+      },
+      "./mentions": {
+        "types": "./dist/mentions/index.d.ts",
+        "svelte": "./dist/mentions/index.js",
+        "default": "./dist/mentions/index.js"
       },
       "./menu": {
         "types": "./dist/menu/index.d.ts",

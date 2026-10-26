@@ -92,7 +92,7 @@ export class ListboxLabel {
 
 /** The `listbox`: `<div rindListboxList>`, named by the Label or `aria-label`. */
 @Directive({
-  selector: "[rindListboxList], [rindComboboxList], [rindTagsInputList]",
+  selector: "[rindListboxList], [rindComboboxList], [rindTagsInputList], [rindMentionsList]",
   exportAs: "rindListboxList",
 })
 export class ListboxList {
@@ -125,7 +125,8 @@ export class ListboxList {
 
 /** An option: `<div rindListboxItem value="apple">`. */
 @Directive({
-  selector: "[rindListboxItem], [rindSelectItem], [rindComboboxItem], [rindTagsInputItem]",
+  selector:
+    "[rindListboxItem], [rindSelectItem], [rindComboboxItem], [rindTagsInputItem], [rindMentionsItem]",
   exportAs: "rindListboxItem",
   providers: [{ provide: ITEM, useExisting: forwardRef(() => ListboxItem) }],
 })
@@ -202,7 +203,7 @@ export class ListboxItem {
 
 @Directive({
   selector:
-    "[rindListboxItemText], [rindSelectItemText], [rindComboboxItemText], [rindTagsInputItemText]",
+    "[rindListboxItemText], [rindSelectItemText], [rindComboboxItemText], [rindTagsInputItemText], [rindMentionsItemText]",
   exportAs: "rindListboxItemText",
 })
 export class ListboxItemText {
@@ -264,7 +265,7 @@ export class ListboxItemIndicator {
  */
 @Component({
   selector:
-    "[rindListboxSection], [rindSelectSection], [rindComboboxSection], [rindTagsInputSection]",
+    "[rindListboxSection], [rindSelectSection], [rindComboboxSection], [rindTagsInputSection], [rindMentionsGroup]",
   exportAs: "rindListboxSection",
   imports: [RindProps],
   encapsulation: ViewEncapsulation.None,
@@ -323,7 +324,8 @@ export class ListboxSeparator {
 
 /** Shown while there is no option; render it after the List. */
 @Directive({
-  selector: "[rindListboxEmpty], [rindSelectEmpty], [rindComboboxEmpty], [rindTagsInputEmpty]",
+  selector:
+    "[rindListboxEmpty], [rindSelectEmpty], [rindComboboxEmpty], [rindTagsInputEmpty], [rindMentionsEmpty]",
   exportAs: "rindListboxEmpty",
 })
 export class ListboxEmpty {
@@ -333,7 +335,7 @@ export class ListboxEmpty {
     bindProps(() =>
       host.parts().isEmpty
         ? host.parts().empty()
-        : absentProps(String(host.parts().label()["data-scope"]), host.instance()),
+        : absentProps(String(host.parts().list()["data-scope"]), host.instance()),
     )
     if (inject(PLATFORM_ID) !== "browser") return
     const ready = signal(false)

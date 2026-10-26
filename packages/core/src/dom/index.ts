@@ -2,6 +2,7 @@ export { accessibleNameOf } from "./accname"
 export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { type CalendarDragOptions, calendarCellAt, createCalendarDrag } from "./calendar-drag"
+export { type CaretRect, caretRect } from "./caret-rect"
 export {
   type CellDrag,
   type CellDragMessage,

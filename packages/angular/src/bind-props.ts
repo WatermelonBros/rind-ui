@@ -327,8 +327,9 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
       if (key === "value" && el.tagName === "INPUT") set("value", String(value))
       return
     }
-    // A textarea's initial value is its content, on the server as in React's markup.
-    if (key === "defaultValue" && el.tagName === "TEXTAREA") {
+    // A textarea's initial value is its content, on the server as in React's markup (a
+    // controlled value too: a textarea has no `value` attribute).
+    if ((key === "defaultValue" || key === "value") && el.tagName === "TEXTAREA") {
       if (!(key in attrs)) renderer.setProperty(el, "textContent", String(value))
       return
     }
