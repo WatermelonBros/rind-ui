@@ -265,6 +265,11 @@
   [data-scope="color-picker"][data-part="value-text"] {
   font: 600 13px var(--font-mono, monospace);
 }
+/* over the page's sections (they stack at 2): the home builder's picker opened under its own card */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="color-picker"][data-part="positioner"] {
+  z-index: 62;
+}
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-picker"][data-part="content"] {
   display: grid;
   gap: 12px;
