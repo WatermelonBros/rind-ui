@@ -160,8 +160,15 @@ describe("tree view moves", () => {
     const { d } = setup(<Files />)
     await d.dragNode("notes.md", "archive", "inside")
     await act(async () => {})
-    expect(await rows(d)).toEqual(["readme.md", "docs", "  intro.md", "  api.md", "archive"])
-    // The archive is collapsed: notes.md is inside it.
+    // The collapsed archive opens: notes.md stays visible inside it.
+    expect(await rows(d)).toEqual([
+      "readme.md",
+      "docs",
+      "  intro.md",
+      "  api.md",
+      "archive",
+      "  notes.md",
+    ])
   })
 
   it.runIf(browser)("before and after rows", async () => {
