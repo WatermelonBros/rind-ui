@@ -33,8 +33,6 @@ const BG: Record<Phase, string> = { crisp: "#d4ff3a", juicy: "#ffd9d2" }
 const POUR_MS = 1400
 // The curtain fully covers the page between 40% and 60% of its run; flip in the middle.
 const FLIP_AT = POUR_MS / 2
-// how long surfaces ease into a new phase after a morph (html.morphing in globals.css)
-const MORPH_MS = 900
 
 interface Drop {
   readonly left: number
@@ -69,11 +67,11 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("pointerdown", press)
   }, [])
 
-  const apply = useCallback((next: Phase, morph = false) => {
+  const apply = useCallback((next: Phase) => {
     const root = document.documentElement
-    // a morph lets every surface ease into the new phase (globals.css: html.morphing); a flip
-    // paints the new phase at once, under the curtain
-    root.classList.add(morph ? "morphing" : "flipping")
+    // the new phase is painted at once, under the curtain or the wave: surfaces easing into it
+    // showed inside the wave as blocks of the old colour, and a muddy mix of the two
+    root.classList.add("flipping")
     root.dataset["phase"] = next
     setPhaseState(next)
     try {
@@ -81,9 +79,8 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
     } catch {
       // storage can be unavailable (private mode); the phase just won't persist
     }
-    if (morph) setTimeout(() => root.classList.remove("morphing"), MORPH_MS)
     // Two frames: the new styles are painted with transitions off, then transitions return.
-    else requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("flipping")))
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("flipping")))
   }, [])
 
   const setPhase = useCallback(
@@ -97,18 +94,28 @@ export function PhaseProvider({ children }: { children: ReactNode }) {
         }
       }
       if (doc.startViewTransition) {
-        // the new phase spreads from the press as a wave: inside it the page is already the new
-        // one, live, its corners, borders and shadows still easing into shape (the 3D object
-        // swells or hardens with it); juicy arrives as a round wave that overshoots and settles,
-        // crisp as a hard-edged diamond that snaps open
+        // the new phase spreads from the press as a wave over the old page, which dims under it;
+        // juicy arrives as a round wave that overshoots and settles, crisp as a hard-edged
+        // diamond that snaps open
         busy.current = true
+        // no scrolling while it runs: the live new page would slide under the old page's still
+        // snapshot, and the two would show in blocks, out of step. Caught before the smooth
+        // scroll sees it (smooth-scroll.tsx), whose glide from the last wheel stops here too.
+        const hold = (e: Event) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }
+        for (const t of ["wheel", "touchmove"])
+          addEventListener(t, hold, { passive: false, capture: true })
+        dispatchEvent(new Event("rind:scroll-sync"))
         const recent = performance.now() - origin.current.at < 1500
         const x = recent ? origin.current.x : innerWidth - 60
         const y = recent ? origin.current.y : 30
-        const vt = doc.startViewTransition(() => flushSync(() => apply(next, true)))
-        vt.ready.then(() => wave(x, y, next === "juicy"))
+        const vt = doc.startViewTransition(() => flushSync(() => apply(next)))
+        vt.ready.then(() => wave(x, y, next === "juicy", { dim: true }))
         vt.finished.finally(() => {
           busy.current = false
+          for (const t of ["wheel", "touchmove"]) removeEventListener(t, hold, { capture: true })
           // the titles answer once the wave has passed: inside it their letters would be hidden
           // behind its front (home/letters.tsx)
           document.documentElement.dataset["letters"] = next

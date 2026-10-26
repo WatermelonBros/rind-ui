@@ -330,26 +330,6 @@ html[data-stripped] [data-skinned] {
   transition: none !important;
 }
 
-/* A morph (phase.tsx, behind the wave): every surface eases into the new phase. Juicy swells
-   on a spring that overshoots; crisp tightens with no bounce. */
-.morphing,
-.morphing *,
-.morphing *::before,
-.morphing *::after {
-  /* biome-ignore lint/complexity/noImportantStyles: beats every component's own transition, for the morph's length */
-  transition-property: border-radius, border-width, box-shadow, background-color, color !important;
-  /* biome-ignore lint/complexity/noImportantStyles: beats every component's own transition, for the morph's length */
-  transition-duration: 0.8s, 0.5s, 0.8s, 0.45s, 0.35s !important;
-  /* biome-ignore lint/complexity/noImportantStyles: beats every component's own transition, for the morph's length */
-  transition-timing-function: var(--morph), var(--morph), var(--morph), ease, ease !important;
-}
-.morphing {
-  --morph: cubic-bezier(0.2, 0, 0, 1);
-}
-.morphing[data-phase="juicy"] {
-  --morph: linear(0, 0.3 12%, 0.8 26%, 1.1 40%, 1.14 48%, 1.06 62%, 0.99 78%, 1);
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
