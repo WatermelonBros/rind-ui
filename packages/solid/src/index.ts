@@ -1,6 +1,7 @@
 // @rind-ui/solid: SolidJS parts over the framework-neutral core, one component at a time.
 
 export * from "./accordion"
+export * from "./agent-presence"
 export * from "./alert"
 export * from "./avatar"
 export * from "./badge"

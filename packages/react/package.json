@@ -44,6 +44,11 @@
       "types": "./dist/accordion/index.d.mts",
       "default": "./dist/accordion/index.mjs"
     },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/agent-presence/index.ts",
+      "types": "./dist/agent-presence/index.d.mts",
+      "default": "./dist/agent-presence/index.mjs"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.mts",
@@ -440,6 +445,10 @@
       "./accordion": {
         "types": "./dist/accordion/index.d.mts",
         "default": "./dist/accordion/index.mjs"
+      },
+      "./agent-presence": {
+        "types": "./dist/agent-presence/index.d.mts",
+        "default": "./dist/agent-presence/index.mjs"
       },
       "./alert": {
         "types": "./dist/alert/index.d.mts",

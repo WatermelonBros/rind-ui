@@ -1,6 +1,7 @@
 export * from "./a11y"
 export * from "./collection"
 export * from "./components/accordion"
+export * from "./components/agent-presence"
 export * from "./components/alert"
 export * from "./components/avatar"
 export * from "./components/badge"

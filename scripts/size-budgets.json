@@ -5,6 +5,7 @@
   },
   "components": {
     "accordion": 20,
+    "agent-presence": 12,
     "alert": 14,
     "avatar": 11,
     "badge": 3,
@@ -81,6 +82,7 @@
   },
   "roots": {
     "accordion": 11,
+    "agent-presence": 11,
     "alert": 13,
     "avatar": 9,
     "badge": 3,

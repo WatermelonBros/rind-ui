@@ -2,6 +2,7 @@
   "//": "gzip kB per component subpath (Rolldown, every export of the subpath), measured + ~10% headroom; raise one only with a reason in the PR",
   "vue": {
     "accordion": 21,
+    "agent-presence": 12,
     "alert": 14,
     "avatar": 11,
     "badge": 3,
@@ -78,6 +79,7 @@
   },
   "svelte": {
     "accordion": 20,
+    "agent-presence": 12,
     "alert": 14,
     "avatar": 11,
     "badge": 3,
@@ -154,6 +156,7 @@
   },
   "solid": {
     "accordion": 20,
+    "agent-presence": 12,
     "alert": 14,
     "avatar": 11,
     "badge": 3,
@@ -231,6 +234,7 @@
   },
   "angular": {
     "accordion": 23,
+    "agent-presence": 15,
     "alert": 15,
     "avatar": 13,
     "badge": 4,

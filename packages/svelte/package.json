@@ -45,6 +45,12 @@
       "svelte": "./dist/accordion/index.js",
       "default": "./dist/accordion/index.js"
     },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/agent-presence/index.ts",
+      "types": "./dist/agent-presence/index.d.ts",
+      "svelte": "./dist/agent-presence/index.js",
+      "default": "./dist/agent-presence/index.js"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.ts",
@@ -524,6 +530,11 @@
         "types": "./dist/accordion/index.d.ts",
         "svelte": "./dist/accordion/index.js",
         "default": "./dist/accordion/index.js"
+      },
+      "./agent-presence": {
+        "types": "./dist/agent-presence/index.d.ts",
+        "svelte": "./dist/agent-presence/index.js",
+        "default": "./dist/agent-presence/index.js"
       },
       "./alert": {
         "types": "./dist/alert/index.d.ts",

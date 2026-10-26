@@ -72,6 +72,11 @@
         "solid": "./dist/accordion/index.jsx",
         "default": "./dist/accordion/index.mjs"
       },
+      "./agent-presence": {
+        "types": "./dist/agent-presence/index.d.mts",
+        "solid": "./dist/agent-presence/index.jsx",
+        "default": "./dist/agent-presence/index.mjs"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.mts",
         "solid": "./dist/alert/index.jsx",
@@ -457,6 +462,12 @@
       "types": "./dist/accordion/index.d.mts",
       "solid": "./dist/accordion/index.jsx",
       "default": "./dist/accordion/index.mjs"
+    },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/agent-presence/index.ts",
+      "types": "./dist/agent-presence/index.d.mts",
+      "solid": "./dist/agent-presence/index.jsx",
+      "default": "./dist/agent-presence/index.mjs"
     },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",

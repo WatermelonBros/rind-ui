@@ -1,0 +1,94 @@
+/* ── Agent Presence: an orb that swells with the level, its glow by state; the status under it. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="root"] {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="visual"] {
+  inline-size: 96px;
+  block-size: 96px;
+  border-radius: 50%;
+  border: var(--s-bw) solid var(--s-line);
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in oklab, var(--s-brand) 40%, #fff),
+    var(--s-brand)
+  );
+  box-shadow:
+    var(--s-lift-lo),
+    0 0 calc(var(--rind-agent-presence-level, 0) * 40px)
+    color-mix(in oklab, var(--s-brand) 60%, transparent);
+  scale: calc(1 + var(--rind-agent-presence-level, 0) * 0.3);
+  transition:
+    background 300ms,
+    opacity 300ms;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="agent-presence"][data-part="visual"]:is(
+    [data-state="idle"],
+    [data-state="connecting"]
+  ) {
+  background: var(--s-muted);
+  opacity: 0.8;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="agent-presence"][data-part="visual"][data-state="thinking"] {
+  animation: presence-breathe 1.4s ease-in-out infinite;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="agent-presence"][data-part="visual"][data-state="error"] {
+  background: var(--s-error);
+}
+@keyframes presence-breathe {
+  50% {
+    scale: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="agent-presence"][data-part="visual"] {
+    animation: none;
+    scale: 1;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="label"] {
+  font-weight: 800;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="status"] {
+  opacity: 0.8;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="detail"] {
+  color: var(--s-error);
+  font-size: 13px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .presence-demo .row {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .presence-demo .row button {
+  padding: 4px 10px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 99px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 600 12px var(--s-font);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .presence-demo .row button[aria-pressed="true"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+
+:is([data-skinned], [data-rind-theme^="skin-"]) .presence-states {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .presence-states legend {
+  inline-size: 100%;
+  margin-block-end: 6px;
+  text-align: center;
+}

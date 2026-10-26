@@ -1,0 +1,9 @@
+- text: Assistant Listening
+- group "Simulate a state":
+  - text: Simulate a state
+  - button "idle"
+  - button "connecting"
+  - button "listening" [pressed]
+  - button "thinking"
+  - button "speaking"
+  - button "error"

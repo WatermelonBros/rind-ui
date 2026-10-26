@@ -123,6 +123,13 @@ export {
   layerId,
 } from "./layer-stack"
 export {
+  type LevelChannel,
+  type LevelLoopOptions,
+  levelBand,
+  smoothLevel,
+  startLevelLoop,
+} from "./level-loop"
+export {
   activateLink,
   isExternal,
   type LinkActivation,
