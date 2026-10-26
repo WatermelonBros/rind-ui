@@ -54,6 +54,14 @@ describe("message-thread machine", () => {
     expect(m.calls).toEqual(["bottom:smooth"])
   })
 
+  it("after deletions while following, the user's next message still re-attaches", () => {
+    const m = make({ count: 10 })
+    m.set({ count: 8 })
+    m.s.send({ type: "ESCAPE" })
+    m.set({ count: 9, lastFromUser: true })
+    expect(m.state()).toBe("following")
+  })
+
   it("top layout: the user's turn goes to the top and growth is never followed", () => {
     const m = make({ anchor: "top" })
     m.set({ count: 3, lastFromUser: true })

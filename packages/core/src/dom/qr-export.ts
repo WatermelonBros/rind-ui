@@ -110,7 +110,9 @@ export async function exportQr(input: QrExportInput): Promise<QrExportResult> {
           ? (doc.defaultView?.getComputedStyle(input.overlay).backgroundColor ?? "")
           : ""
         const back = TRANSPARENT.has(bg) ? "" : `<rect ${attrs} fill="${bg}"/>`
-        svg = svg.replace("</svg>", `${back}<image ${attrs} href="${href}"/></svg>`)
+        // A raw `data:` URL keeps <, " and & (an unencoded SVG logo): escaped for the attribute.
+        const safe = href.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
+        svg = svg.replace("</svg>", `${back}<image ${attrs} href="${safe}"/></svg>`)
         overlay = "included"
       }
     }
