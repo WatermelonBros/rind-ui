@@ -8,6 +8,7 @@ import {
   mergeFieldProps,
   partId,
   readValidity,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import type { PartRegistry } from "@rind-ui/core/internal"
 import {
@@ -99,12 +100,14 @@ const Root = defineComponent({
     const instance = useRootId(() => props.id)
     const binding = useFieldControl()
     const fieldsetDisabled = useFieldsetDisabled()
+    // A native <fieldset disabled> too: the items are disabled by it (toggle.md RA#9445).
+    const fieldsetDom = shallowRef(false)
     const field = computed(() =>
       mergeFieldProps(
         {
           role: "group",
           labelable: false,
-          disabled: props.disabled || fieldsetDisabled.value,
+          disabled: props.disabled || fieldsetDisabled.value || fieldsetDom.value,
           readOnly: props.readonly,
           required: props.required,
           invalid: props.invalid,
@@ -114,6 +117,13 @@ const Root = defineComponent({
       ),
     )
     const el = shallowRef<Element | null>(null)
+    onMounted(() => {
+      const node = el.value
+      if (!node) return
+      const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom.value = d))
+      fieldsetDom.value = watch.disabled
+      onBeforeUnmount(watch.stop)
+    })
     const measured = shallowRef<string | null>(null)
     onMounted(() => (measured.value = el.value?.tagName.toLowerCase() ?? null))
     onUpdated(() => (measured.value = el.value?.tagName.toLowerCase() ?? null))

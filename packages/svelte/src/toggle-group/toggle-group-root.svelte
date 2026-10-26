@@ -8,6 +8,7 @@ import {
   toggleGroupConnect,
   toggleGroupIds,
   toggleGroupMachine,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { useCompositeHost } from "../composite-host.svelte"
@@ -52,7 +53,11 @@ const uid = $props.id()
 const instance = $derived(id ?? uid)
 const ids = $derived(toggleGroupIds(instance))
 const fieldsetDisabled = useFieldsetDisabled()
-const groupDisabled = $derived(disabled || fieldsetDisabled() || host?.disabled === true)
+// A native <fieldset disabled> too: the items' buttons are disabled by it (toggle.md RA#9445).
+let fieldsetDom = $state(false)
+const groupDisabled = $derived(
+  disabled || fieldsetDisabled() || fieldsetDom || host?.disabled === true,
+)
 const items = useCollectionItems()
 const collection = $derived(items.collection ?? EMPTY)
 const machine = useMachine(
@@ -103,6 +108,13 @@ const api = (pendingStop: string | null = null) =>
     env,
   )
 const el = elementRef("div")
+$effect(() => {
+  const node = el.current
+  if (!node) return
+  const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = watch.disabled
+  return watch.stop
+})
 // Development: a group needs a name (aria-label or aria-labelledby: radix#754).
 $effect(() => {
   const node = el.current

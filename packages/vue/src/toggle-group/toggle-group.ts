@@ -10,6 +10,7 @@ import {
   toggleGroupIds,
   toggleGroupMachine,
   toKey,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   computed,
@@ -110,7 +111,10 @@ const Root = defineComponent({
     const instance = useRootId(() => props.id)
     const ids = computed(() => toggleGroupIds(instance()))
     const fieldsetDisabled = useFieldsetDisabled()
-    const groupDisabled = () => props.disabled || fieldsetDisabled.value || host?.disabled === true
+    // A native <fieldset disabled> too: the items' buttons are disabled by it (toggle.md RA#9445).
+    const fieldsetDom = shallowRef(false)
+    const groupDisabled = () =>
+      props.disabled || fieldsetDisabled.value || fieldsetDom.value || host?.disabled === true
     const { collection: registered, registry } = useCollectionItems()
     const collection = () => registered.value ?? EMPTY
     const onValueChange = changeEmitter<readonly string[], ToggleGroupEvent>(
@@ -165,7 +169,14 @@ const Root = defineComponent({
         )
       }
     }
-    onMounted(checkName)
+    onMounted(() => {
+      checkName()
+      const node = el.value
+      if (!node) return
+      const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom.value = d))
+      fieldsetDom.value = watch.disabled
+      onBeforeUnmount(watch.stop)
+    })
     onUpdated(checkName)
     provide(GroupKey, {
       api,

@@ -11,6 +11,7 @@ import {
   toggleGroupIds,
   toggleGroupMachine,
   toKey,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -83,8 +84,11 @@ export type ToggleGroupRootProps = Omit<
 > & {
   /** The group's Items. */
   readonly children?: ReactNode
+  /** Controlled pressed values; `[]` is none. */
   readonly value?: readonly string[]
+  /** Uncontrolled initial value. */
   readonly defaultValue?: readonly string[]
+  /** Every user-caused change, once; `reason` is PRESS; `cancel()` vetoes it. */
   readonly onValueChange?: (
     value: readonly string[],
     details: ChangeDetails<ToggleGroupEvent>,
@@ -93,11 +97,15 @@ export type ToggleGroupRootProps = Omit<
   readonly selectionMode?: "single" | "multiple"
   /** The last pressed item cannot be released. */
   readonly disallowEmptySelection?: boolean
+  /** Which arrows move focus (vertical: both pairs); `data-orientation` only. */
   readonly orientation?: "horizontal" | "vertical"
   /** Arrow moves wrap at both ends (default true). */
   readonly loop?: boolean
+  /** Disables every item. */
   readonly disabled?: boolean
+  /** Disabled items stay focusable (`aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
+  /** Substitutes the rendered element without changing behaviour. */
   readonly render?: RenderProp<ToggleGroupState>
 }
 
@@ -124,7 +132,9 @@ function Root({
   const instance = useRootId(id)
   const ids = useMemo(() => toggleGroupIds(instance), [instance])
   const fieldsetDisabled = useFieldsetDisabled()
-  const groupDisabled = disabled || fieldsetDisabled || host?.disabled === true
+  // A native <fieldset disabled> too: the items' buttons are disabled by it (toggle.md RA#9445).
+  const [fieldsetDom, setFieldsetDom] = useState(false)
+  const groupDisabled = disabled || fieldsetDisabled || fieldsetDom || host?.disabled === true
   const { collection: registered, registry } = useCollectionItems()
   const collection = registered ?? EMPTY
   const { view, send } = useMachine(
@@ -164,6 +174,13 @@ function Root({
     env,
   )
   const el = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    const node = el.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   // Development: a group needs a name (aria-label or aria-labelledby: radix#754).
   useEffect(() => {
     const node = el.current

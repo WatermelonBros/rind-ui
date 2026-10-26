@@ -17,6 +17,7 @@ import {
   navigationMenuPositioning,
   type PositioningProps,
   type Service,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type Accessor,
@@ -33,6 +34,7 @@ import {
   useContext,
 } from "solid-js"
 import { insert } from "solid-js/web"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { keepStyle } from "../keep-style"
 import { LayerProvider, useParentLayer } from "../layer-context"
 import { afterMount } from "../lifecycle"
@@ -480,7 +482,11 @@ function Trigger(props: NavigationMenuTriggerProps) {
   const item = useItem("Trigger")
   const panel = useContext(PanelContext)
   const env = useEnvironment()
-  const disabled = () => local.disabled === true || ctx.disabled()
+  // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = createSignal(false)
+  const disabled = () =>
+    local.disabled === true || ctx.disabled() || fieldsetDisabled() || fieldsetDom()
   const open = () => ctx.value() === item.key()
   createEffect(() => {
     const k = item.key()
@@ -508,6 +514,13 @@ function Trigger(props: NavigationMenuTriggerProps) {
     ctx.service.send({ type: e.type, item: untrack(item.key) }),
   )
   const [el, setEl] = createSignal<Element | null>(null)
+  createEffect(() => {
+    const node = el()
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    onCleanup(watch.stop)
+  })
   const tag = useRenderedTag(
     () => "button",
     () => local.render,

@@ -34,6 +34,7 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -52,6 +53,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { LayerProvider, useParentLayer } from "../layer-context"
 import { composeRefs, mergeProps } from "../merge-props"
@@ -387,8 +389,17 @@ export interface MenuTriggerState {
   readonly open: boolean
 }
 
-function Trigger({ render, ref, disabled = false, ...rest }: Own<"button", MenuTriggerState>) {
+function Trigger({
+  render,
+  ref,
+  disabled: ownDisabled = false,
+  ...rest
+}: Own<"button", MenuTriggerState>) {
   const ctx = useLevel("Trigger")
+  // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = useState(false)
+  const disabled = ownDisabled || fieldsetDisabled || fieldsetDom
   const host = useContext(MenuHostContext)
   const { api, open } = useApi(ctx)
   const env = useEnvironment()
@@ -410,6 +421,13 @@ function Trigger({ render, ref, disabled = false, ...rest }: Own<"button", MenuT
   })
   const el = useRef<HTMLElement | null>(null)
   const tag = useRenderedTag(ctx.inMenubar ? "div" : "button", render, el)
+  useEffect(() => {
+    const node = el.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   const own = normalizeProps(
     api.trigger({
       focused,

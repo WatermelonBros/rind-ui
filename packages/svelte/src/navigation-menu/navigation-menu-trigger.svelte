@@ -1,8 +1,10 @@
 <script lang="ts">
+import { watchFieldsetDisabled } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
 import type { HTMLButtonAttributes } from "svelte/elements"
 import { elementRef } from "../element-ref.svelte"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -17,7 +19,10 @@ const ctx = navLevel.get()
 const item = navItem.get()
 const panel = navPanel.maybe() ?? null
 const env = useEnvironment()
-const disabled = $derived(own === true || ctx.disabled())
+// rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+const fieldsetDisabled = useFieldsetDisabled()
+let fieldsetDom = $state(false)
+const disabled = $derived(own === true || ctx.disabled() || fieldsetDisabled() || fieldsetDom)
 $effect(() => {
   const d = disabled
   untrack(() => {
@@ -45,6 +50,13 @@ const intent = ctx.hoverIntent.triggerProps((e) =>
   ctx.service.send({ type: e.type, item: item.key }),
 )
 const el = elementRef("button")
+$effect(() => {
+  const node = el.current
+  if (!node) return
+  const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = watch.disabled
+  return watch.stop
+})
 const merged = $derived.by(() => {
   const props = normalizeProps(
     ctx.api().trigger(item.key, {

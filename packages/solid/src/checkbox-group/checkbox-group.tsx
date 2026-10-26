@@ -9,6 +9,7 @@ import {
   mergeFieldProps,
   partId,
   readValidity,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import type { PartRegistry } from "@rind-ui/core/internal"
 import {
@@ -112,12 +113,14 @@ function Root(props: CheckboxGroupRootProps) {
   const instance = useRootId(() => local.id)
   const binding = useFieldControl()
   const fieldsetDisabled = useFieldsetDisabled()
+  // A native <fieldset disabled> too: the items are disabled by it (toggle.md RA#9445).
+  const [fieldsetDom, setFieldsetDom] = createSignal(false)
   const field = createMemo(() =>
     mergeFieldProps(
       {
         role: "group",
         labelable: false,
-        disabled: local.disabled === true || fieldsetDisabled(),
+        disabled: local.disabled === true || fieldsetDisabled() || fieldsetDom(),
         readOnly: local.readOnly === true,
         required: local.required === true,
         invalid: local.invalid === true,
@@ -127,6 +130,13 @@ function Root(props: CheckboxGroupRootProps) {
     ),
   )
   const [el, setEl] = createSignal<Element | null>(null)
+  createEffect(() => {
+    const node = el()
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    onCleanup(watch.stop)
+  })
   const rootTag = () => (local.render ? (el()?.tagName.toLowerCase() ?? "div") : "div")
   const [labelTag, setLabelTag] = createSignal("span")
   // The reason of the latest accepted change, for the Field: only a user's clears its

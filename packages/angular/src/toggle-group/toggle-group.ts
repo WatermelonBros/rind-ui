@@ -24,6 +24,7 @@ import {
   toggleGroupIds,
   toggleGroupMachine,
   toKey,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { bindProps, joinHandlers } from "../bind-props"
 import { declaredStop, injectCollectionItems, injectRegisterItem } from "../collection-items"
@@ -130,7 +131,10 @@ export class ToggleGroupRoot {
     const instance = injectRootId(() => this.id())
     const ids = computed(() => toggleGroupIds(instance()))
     const fieldsetDisabled = injectFieldsetDisabled()
-    const groupDisabled = () => this.disabled() || fieldsetDisabled() || host?.disabled === true
+    // A native <fieldset disabled> too: the items' buttons are disabled by it (toggle.md RA#9445).
+    const fieldsetDom = signal(false)
+    const groupDisabled = () =>
+      this.disabled() || fieldsetDisabled() || fieldsetDom() || host?.disabled === true
     this.groupDisabled = groupDisabled
     const { collection: registered, registry } = injectCollectionItems()
     this.registry = registry
@@ -191,6 +195,12 @@ export class ToggleGroupRoot {
     if (inject(PLATFORM_ID) !== "browser") return
     // Development: a group needs a name (aria-label or aria-labelledby: radix#754).
     const el: Element = inject(ElementRef).nativeElement
+    const destroy = inject(DestroyRef)
+    afterNextRender(() => {
+      const watch = watchFieldsetDisabled(el, (d) => fieldsetDom.set(d))
+      fieldsetDom.set(watch.disabled)
+      destroy.onDestroy(watch.stop)
+    })
     afterRenderEffect(() => {
       if (process.env.NODE_ENV === "production") return
       if (!el.getAttribute("aria-label") && !el.getAttribute("aria-labelledby")) {

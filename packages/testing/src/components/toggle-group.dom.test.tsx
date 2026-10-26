@@ -28,6 +28,22 @@ function Align(props: Partial<Parameters<typeof ToggleGroup.Root>[0]>) {
   )
 }
 
+describe("ToggleGroup in a native fieldset", () => {
+  it("<fieldset disabled>: the items carry data-disabled", async () => {
+    render(
+      <fieldset disabled>
+        <ToggleGroup.Root aria-label="Align">
+          <ToggleGroup.Item value="l">Left</ToggleGroup.Item>
+          <ToggleGroup.Item value="r">Right</ToggleGroup.Item>
+        </ToggleGroup.Root>
+      </fieldset>,
+    )
+    await vi.waitFor(() =>
+      expect(screen.getByRole("button", { name: "Left" }).hasAttribute("data-disabled")).toBe(true),
+    )
+  })
+})
+
 describe("ToggleGroup smoke", () => {
   it("single replaces and deselects; arrows only move; one tab stop", async () => {
     const onValueChange = vi.fn()
