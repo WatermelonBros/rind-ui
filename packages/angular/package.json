@@ -82,6 +82,11 @@
       "types": "./dist/checkbox-group/index.d.ts",
       "default": "./dist/checkbox-group/index.js"
     },
+    "./citation": {
+      "@rind-ui/source": "./src/citation/index.ts",
+      "types": "./dist/citation/index.d.ts",
+      "default": "./dist/citation/index.js"
+    },
     "./clipboard": {
       "@rind-ui/source": "./src/clipboard/index.ts",
       "types": "./dist/clipboard/index.d.ts",
@@ -489,6 +494,10 @@
       "./checkbox-group": {
         "types": "./dist/checkbox-group/index.d.ts",
         "default": "./dist/checkbox-group/index.js"
+      },
+      "./citation": {
+        "types": "./dist/citation/index.d.ts",
+        "default": "./dist/citation/index.js"
       },
       "./clipboard": {
         "types": "./dist/clipboard/index.d.ts",

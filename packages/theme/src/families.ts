@@ -167,7 +167,7 @@ export const familyMatrix = [
   },
   {
     family: "link",
-    components: ["link", "breadcrumbs-link", "navigation-menu-content-link"],
+    components: ["link", "breadcrumbs-link", "navigation-menu-content-link", "citation"],
     variants: [],
     size: "none", // inherits the surrounding font size
     sizes: [],

@@ -1,0 +1,63 @@
+/* ── Citation: a small superscript chip, a card with the source. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) .cite-answer {
+  max-inline-size: 520px;
+  color: var(--s-ink);
+  font: 500 15px / 1.6 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="citation"][data-part="trigger"] {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.4em;
+  padding: 0 4px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 6px;
+  background: var(--s-muted);
+  color: var(--s-ink);
+  font: 700 0.7em var(--s-font);
+  vertical-align: super;
+  line-height: 1.5;
+  text-decoration: none;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="citation"][data-part="trigger"][data-kind="pending"] {
+  opacity: 0.55;
+  cursor: default;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="citation"][data-part="trigger"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="hover-card"][data-part="content"]:has([data-scope="citation"][data-part="source"]) {
+  inline-size: min(320px, 90vw);
+  padding: 12px 14px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: var(--s-card);
+  box-shadow: var(--s-lift);
+  color: var(--s-ink);
+  font: 500 14px / 1.45 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="citation"][data-part="source"] {
+  display: grid;
+  gap: 4px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="citation"][data-part="source-title"] {
+  font-weight: 800;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="citation"][data-part="source-url"] {
+  opacity: 0.7;
+  font-size: 12px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="citation"][data-part="source-link"] {
+  color: var(--s-ink);
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .cite-sources {
+  margin: 0;
+  padding-inline-start: 1.4em;
+  font-size: 13px;
+  opacity: 0.85;
+}

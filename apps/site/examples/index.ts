@@ -10,6 +10,7 @@ import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
 import * as calendar from "./calendar"
 import * as checkboxGroup from "./checkbox-group"
+import * as citation from "./citation"
 import * as clipboard from "./clipboard"
 import * as codeBlock from "./code-block"
 import * as collapsible from "./collapsible"
@@ -95,6 +96,7 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  citation,
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,

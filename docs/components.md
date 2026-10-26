@@ -165,7 +165,7 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
 | Reasoning | Collapsible with a streaming state | done |
 | Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | todo |
-| Citation | Keyboard-reachable hover card on inline references | todo |
+| Citation | Keyboard-reachable hover card on inline references | done |
 | Message Actions | Copy, regenerate, edit, feedback, branch navigation | todo |
 | Suggestions | Prompt chips | todo |
 | Agent Presence | idle/listening/thinking/speaking, audio level, announcements (drives fx Orb) | todo |

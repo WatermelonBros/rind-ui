@@ -84,6 +84,11 @@
       "types": "./dist/checkbox-group/index.d.mts",
       "default": "./dist/checkbox-group/index.mjs"
     },
+    "./citation": {
+      "@rind-ui/source": "./src/citation/index.ts",
+      "types": "./dist/citation/index.d.mts",
+      "default": "./dist/citation/index.mjs"
+    },
     "./clipboard": {
       "@rind-ui/source": "./src/clipboard/index.ts",
       "types": "./dist/clipboard/index.d.mts",
@@ -472,6 +477,10 @@
       "./checkbox-group": {
         "types": "./dist/checkbox-group/index.d.mts",
         "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./citation": {
+        "types": "./dist/citation/index.d.mts",
+        "default": "./dist/citation/index.mjs"
       },
       "./clipboard": {
         "types": "./dist/clipboard/index.d.mts",

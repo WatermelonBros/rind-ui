@@ -188,6 +188,8 @@ function Trigger(props: HoverCardTriggerProps) {
   afterMount(() => {
     const node = ctx.trigger()
     if (process.env.NODE_ENV === "production" || !node || node.hasAttribute("href")) return
+    // A link-less citation marker is a button by design (add-citation §1).
+    if (node.getAttribute("data-scope") === "citation") return
     console.warn(
       `[rind-ui] hover-card #${node.id}: the trigger is not a link (no href); a hover card is a link's preview — use a Popover for a button`,
     )

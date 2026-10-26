@@ -112,6 +112,11 @@
         "solid": "./dist/checkbox-group/index.jsx",
         "default": "./dist/checkbox-group/index.mjs"
       },
+      "./citation": {
+        "types": "./dist/citation/index.d.mts",
+        "solid": "./dist/citation/index.jsx",
+        "default": "./dist/citation/index.mjs"
+      },
       "./clipboard": {
         "types": "./dist/clipboard/index.d.mts",
         "solid": "./dist/clipboard/index.jsx",
@@ -505,6 +510,12 @@
       "types": "./dist/checkbox-group/index.d.mts",
       "solid": "./dist/checkbox-group/index.jsx",
       "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./citation": {
+      "@rind-ui/source": "./src/citation/index.ts",
+      "types": "./dist/citation/index.d.mts",
+      "solid": "./dist/citation/index.jsx",
+      "default": "./dist/citation/index.mjs"
     },
     "./clipboard": {
       "@rind-ui/source": "./src/clipboard/index.ts",

@@ -216,6 +216,8 @@ const Trigger = defineComponent({
     onMounted(() => {
       const node = el.value
       if (process.env.NODE_ENV === "production" || !node || node.hasAttribute("href")) return
+      // A citation marker without a link is a button by design (add-citation §1).
+      if (node.getAttribute("data-scope") === "citation") return
       console.warn(
         `[rind-ui] hover-card #${node.id}: the trigger is not a link (no href); a hover card is a link's preview — use a Popover for a button`,
       )
