@@ -1,5 +1,5 @@
 <script lang="ts">
-import { stripMarker } from "@rind-ui/core/internal"
+import { closeOnSubmit, stripMarker } from "@rind-ui/core/internal"
 import type { HTMLButtonAttributes } from "svelte/elements"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -12,7 +12,7 @@ const ctx = dialogHost.get()
 const uid = $props.id()
 const own = $derived(partIdOf(ctx, "action", id ?? undefined, uid))
 const b = useButton(
-  (m) => dialogApi(ctx).pressAction(own, m),
+  (m) => closeOnSubmit(b.env, own, () => dialogApi(ctx).pressAction(own, m)),
   () => disabled === true,
 )
 const merged = $derived.by(() => {

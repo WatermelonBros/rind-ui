@@ -12,7 +12,13 @@
 
 import { isContextMenuClick } from "../a11y/keys"
 import type { DomEnv, PlatformInfo } from "../env/capabilities"
-import { getLayerStack, type LayerHandle, type LayerId, type LayerStack } from "./layer-stack"
+import {
+  containsDeep,
+  getLayerStack,
+  type LayerHandle,
+  type LayerId,
+  type LayerStack,
+} from "./layer-stack"
 import { registerReset } from "./resets"
 
 export type DismissReason = "escape-key" | "outside-press" | "outside-focus" | "parent-dismissed"
@@ -140,9 +146,9 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     if (!layer.contains(t)) return false
     const options = stack.options(layer.id)
     const surfaces = options?.surfaces?.() ?? []
-    if (!surfaces.some((s) => s === t || s.contains(t))) return true
+    if (!surfaces.some((s) => containsDeep(s, t))) return true
     const own = (options?.elements() ?? []).filter((el) => !surfaces.includes(el))
-    if (own.some((el) => el === t || el.contains(t))) return true
+    if (own.some((el) => containsDeep(el, t))) return true
     // A descendant layer whose elements hold the target.
     return stack.layers().some((l) => l !== layer && descends(l, layer.id) && l.contains(t))
   }
@@ -155,7 +161,13 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     if (t.closest("[data-rind-top-layer]")) return true
     if (reg.options.isInside?.(t)) return true
     let top: Element = t
-    while (top.parentElement && top.parentElement !== doc.body) top = top.parentElement
+    // Up through shadow hosts too: a node inside a web component is judged by its host.
+    for (;;) {
+      const up: Element | null =
+        top.parentElement ?? (top.parentNode instanceof ShadowRoot ? top.parentNode.host : null)
+      if (!up || up === doc.body) break
+      top = up
+    }
     return top.parentElement === doc.body && !reg.present.has(top)
   }
   const request = (
@@ -196,7 +208,9 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
       pointerType: e.pointerType,
       downTarget: targetOf(e),
       eligible,
-      topmostAtStart: stack.topmost()?.id,
+      // A tooltip is never interacted with: one open (or closing) over a modal must not make
+      // the modal's next backdrop press count as "not topmost".
+      topmostAtStart: stack.layers().findLast((l) => stack.options(l.id)?.kind !== "tooltip")?.id,
     }
     if (!eligible && press && touches.size > 1) press = null
   }

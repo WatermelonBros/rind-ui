@@ -466,6 +466,14 @@ describe("dismiss surfaces", () => {
     expect(dialog.requests[0]?.target).toBe(dialog.backdrop)
   })
 
+  it("a tooltip open over the modal does not swallow the backdrop click", () => {
+    const dialog = layer("dialog", { modal: true, backdrop: true })
+    const tooltip = layer("tooltip", { kind: "tooltip", parent: "dialog" })
+    press(dialog.backdrop as Element)
+    expect(tooltip.reasons()).toEqual(["outside-press"])
+    expect(dialog.reasons()).toEqual(["outside-press"])
+  })
+
   it("the backdrop still belongs to the layer", () => {
     const dialog = layer("dialog", { modal: true, backdrop: true })
     expect(dialog.handle.contains(dialog.backdrop as Element)).toBe(true)
@@ -1041,6 +1049,37 @@ describe("review fixes: shadow DOM, key repeat, stale touch press", () => {
     expect(s.requests).toHaveLength(0)
     focusIn(outsideEl)
     expect(s.requests.map((r) => r.reason)).toEqual(["outside-focus"])
+  })
+
+  /** A web component (open shadow root) inside an ordinary layer's content. */
+  function webComponentInLayer() {
+    const content = document.body.appendChild(document.createElement("div"))
+    const host = content.appendChild(document.createElement("div"))
+    const inner = host.attachShadow({ mode: "open" }).appendChild(document.createElement("input"))
+    const requests: DismissRequest[] = []
+    const handle = getLayerStack(document).push({
+      id: layerId("holds-shadow"),
+      kind: "popover",
+      modal: false,
+      elements: () => [content],
+    })
+    offs.push(
+      dismissable(makeEnv(), handle, {
+        modal: false,
+        onRequest: (r) => {
+          requests.push(r)
+          r.cancel()
+        },
+      }),
+    )
+    return { inner, requests }
+  }
+
+  it("a press or focus inside a web component inside the layer is not outside", () => {
+    const s = webComponentInLayer()
+    press(s.inner)
+    focusIn(s.inner)
+    expect(s.requests).toHaveLength(0)
   })
 
   it("a repeated Escape keydown closes nothing: holding the key does not unwind the stack", () => {

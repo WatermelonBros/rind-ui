@@ -16,6 +16,7 @@ import {
   partId,
   type Service,
 } from "@rind-ui/core"
+import { closeOnSubmit } from "@rind-ui/core/internal"
 import {
   type ComponentPropsWithRef,
   createContext,
@@ -471,8 +472,10 @@ function useCloseButton(part: "cancel" | "action", id: string | undefined, disab
     env,
     send: (e) => {
       if (e.type !== "PRESS") return
-      if (part === "cancel") api.pressCancel(e.modality)
-      else api.pressAction(own, e.modality)
+      const m = e.modality
+      closeOnSubmit(env, own, () =>
+        part === "cancel" ? api.pressCancel(m) : api.pressAction(own, m),
+      )
     },
     disabled: () => disabled,
   })
@@ -523,20 +526,9 @@ function CloseTrigger({ id, render, ref, ...rest }: Own<"button">) {
     setEmpty((el.current?.textContent ?? "").trim() === "")
   })
   const close = useCallback(
-    (m: Parameters<typeof api.pressClose>[0]) => {
-      const node = el.current as HTMLButtonElement | null
-      // A submit button of a form: close on that form's submit, so the form is still
-      // connected when it submits (radix#1109, #1779); an invalid form keeps it open.
-      if (node?.type === "submit" && node.form) {
-        const form = node.form
-        const onSubmit = () => api.pressClose(m)
-        form.addEventListener("submit", onSubmit, { once: true })
-        env.scheduler.setTimeout(() => form.removeEventListener("submit", onSubmit), 0)
-        return
-      }
-      api.pressClose(m)
-    },
-    [api, env],
+    (m: Parameters<typeof api.pressClose>[0]) =>
+      closeOnSubmit(env, closeId, () => api.pressClose(m)),
+    [api, env, closeId],
   )
   const press = usePress({
     env,

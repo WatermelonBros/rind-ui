@@ -18,6 +18,7 @@ import {
   partId,
   type Service,
 } from "@rind-ui/core"
+import { closeOnSubmit } from "@rind-ui/core/internal"
 import {
   type ComputedRef,
   defineComponent,
@@ -587,10 +588,10 @@ function closeButton(part: "cancel" | "action") {
       const ctx = useDialog(part === "cancel" ? "Cancel" : "Action")
       const id = usePartId(ctx, part, () => props.id)
       const b = useButton(
-        (m) => {
-          if (part === "cancel") dialogApi(ctx).pressCancel(m)
-          else dialogApi(ctx).pressAction(id(), m)
-        },
+        (m) =>
+          closeOnSubmit(b.env, id(), () =>
+            part === "cancel" ? dialogApi(ctx).pressCancel(m) : dialogApi(ctx).pressAction(id(), m),
+          ),
         () => props.disabled,
       )
       return () => {
@@ -628,19 +629,7 @@ export const CloseTrigger = defineComponent({
     const ctx = useDialog("CloseTrigger")
     const id = usePartId(ctx, "close", () => props.id)
     const el = shallowRef<Element | null>(null)
-    const b = useButton((m) => {
-      const node = el.value as HTMLButtonElement | null
-      // A submit button of a form: close on that form's submit, so the form is still
-      // connected when it submits (radix#1109, #1779); an invalid form keeps it open.
-      if (node?.type === "submit" && node.form) {
-        const form = node.form
-        const onSubmit = () => dialogApi(ctx).pressClose(m)
-        form.addEventListener("submit", onSubmit, { once: true })
-        b.env.scheduler.setTimeout(() => form.removeEventListener("submit", onSubmit), 0)
-        return
-      }
-      dialogApi(ctx).pressClose(m)
-    })
+    const b = useButton((m) => closeOnSubmit(b.env, id(), () => dialogApi(ctx).pressClose(m)))
     // No content of its own (an icon): named by messages.close.
     const empty = shallowRef(false)
     const measure = () => (empty.value = (el.value?.textContent ?? "").trim() === "")

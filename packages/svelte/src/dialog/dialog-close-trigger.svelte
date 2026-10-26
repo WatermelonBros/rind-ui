@@ -1,5 +1,5 @@
 <script lang="ts">
-import { stripMarker } from "@rind-ui/core/internal"
+import { closeOnSubmit, stripMarker } from "@rind-ui/core/internal"
 import type { HTMLButtonAttributes } from "svelte/elements"
 import { elementRef } from "../element-ref.svelte"
 import { joinHandlers, mergeProps } from "../merge-props"
@@ -12,19 +12,7 @@ const ctx = dialogHost.get()
 const uid = $props.id()
 const closeId = $derived(partIdOf(ctx, "close", id ?? undefined, uid))
 const el = elementRef("button")
-const b = useButton((m) => {
-  const node = el.current as HTMLButtonElement | null
-  // A submit button of a form: close on that form's submit, so the form is still connected
-  // when it submits (radix#1109, #1779); an invalid form keeps it open.
-  if (node?.type === "submit" && node.form) {
-    const form = node.form
-    const onSubmit = () => dialogApi(ctx).pressClose(m)
-    form.addEventListener("submit", onSubmit, { once: true })
-    b.env.scheduler.setTimeout(() => form.removeEventListener("submit", onSubmit), 0)
-    return
-  }
-  dialogApi(ctx).pressClose(m)
-})
+const b = useButton((m) => closeOnSubmit(b.env, closeId, () => dialogApi(ctx).pressClose(m)))
 // No content of its own (an icon): named by messages.close.
 let empty = $state(false)
 $effect(() => {

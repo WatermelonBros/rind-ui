@@ -34,6 +34,7 @@ import {
   partId,
   type Service,
 } from "@rind-ui/core"
+import { closeOnSubmit } from "@rind-ui/core/internal"
 import { absentProps } from "../absent"
 import { bindProps, joinHandlers } from "../bind-props"
 import { HEADING_LEVEL } from "../heading/heading"
@@ -510,8 +511,10 @@ abstract class CloseButton {
     const b = injectButton(
       (m) => {
         const api = untracked(() => root.api())
-        if (part === "cancel") api.pressCancel(m)
-        else api.pressAction(untracked(id), m)
+        const own = untracked(id)
+        closeOnSubmit(b.env, own, () =>
+          part === "cancel" ? api.pressCancel(m) : api.pressAction(own, m),
+        )
       },
       () => this.disabled(),
     )
@@ -566,17 +569,7 @@ export class DialogCloseTrigger {
     const id = injectPartId(root, "close", () => this.id())
     const b = injectButton((m) => {
       const api = untracked(() => root.api())
-      const node = el as HTMLButtonElement
-      // A submit button of a form: close on that form's submit, so the form is still
-      // connected when it submits (radix#1109, #1779); an invalid form keeps it open.
-      if (node.type === "submit" && node.form) {
-        const form = node.form
-        const onSubmit = () => api.pressClose(m)
-        form.addEventListener("submit", onSubmit, { once: true })
-        b.env.scheduler.setTimeout(() => form.removeEventListener("submit", onSubmit), 0)
-        return
-      }
-      api.pressClose(m)
+      closeOnSubmit(b.env, untracked(id), () => api.pressClose(m))
     })
     // No content of its own (an icon): named by messages.close.
     const empty = signal(false)
