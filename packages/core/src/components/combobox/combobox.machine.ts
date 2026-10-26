@@ -109,6 +109,8 @@ export type ComboboxEvent =
   | { readonly type: "COMPOSITION.END"; readonly text: string }
   /** A parent's value, or new items: the text follows when not dirty. */
   | { readonly type: "VALUE.SYNC" }
+  /** The `items` prop changed (onProps): texts follow it, the value did not change. */
+  | { readonly type: "ITEMS.SYNC" }
   /** A form reset: the default value and its text come back. */
   | { readonly type: "RESET" }
   /** The browser filled the hidden input: the option whose key, else whose text, it is. */
@@ -198,11 +200,25 @@ type Args = ActionArgs<Types>
 const mode = (p: Pick<ComboboxProps, "selectionMode">) => p.selectionMode ?? "single"
 const selectedKeys = (value: ComboboxValue | undefined): readonly string[] =>
   value == null ? [] : typeof value === "string" ? [value] : value
-const textOf = (p: Pick<ComboboxProps, "items">, key: string | undefined) =>
-  key === undefined ? "" : (p.items.get(toKey(key))?.textValue ?? "")
+/**
+ * A key's text: its option's, else the last text remembered for it (a selected option the
+ * current, server-filtered results no longer contain keeps its label: base-ui#3818).
+ */
+const textOf = (
+  p: Pick<ComboboxProps, "items">,
+  key: string | undefined,
+  texts?: ReadonlyMap<CollectionKey, string>,
+) => (key === undefined ? "" : (p.items.get(toKey(key))?.textValue ?? texts?.get(toKey(key)) ?? ""))
 /** The text the selection implies: the selected option's (single), else empty. */
-const selectionText = (p: ComboboxProps, value: ComboboxValue | undefined) =>
-  mode(p) === "single" ? textOf(p, selectedKeys(value)[0]) : ""
+const selectionText = (
+  p: ComboboxProps,
+  value: ComboboxValue | undefined,
+  texts?: ReadonlyMap<CollectionKey, string>,
+) => (mode(p) === "single" ? textOf(p, selectedKeys(value)[0], texts) : "")
+/** Same keys in the same order: a parent passing a new equal array is not a change. */
+const sameValue = (a: ComboboxValue, b: ComboboxValue) =>
+  a === b ||
+  (Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((k, i) => k === b[i]))
 const editable = (p: Pick<ComboboxProps, "disabled" | "readOnly">) =>
   p.disabled !== true && p.readOnly !== true
 
@@ -222,6 +238,22 @@ function setText(a: Args, text: string) {
   a.set("inputValue", text)
 }
 
+/**
+ * Whether committing `text` would reject it (revert to the selection's text): the Enter that
+ * commits it must not submit the form (combobox-pattern "Enter, Escape And Tab").
+ */
+export const rejectsText = (
+  p: Pick<ComboboxProps, "items" | "selectionMode" | "allowCustomValue" | "readOnly" | "locale">,
+  text: string,
+  dirty: boolean,
+): boolean =>
+  dirty &&
+  !p.readOnly &&
+  !p.allowCustomValue &&
+  mode(p) !== "none" &&
+  text.trim() !== "" &&
+  exactMatch(p.items, text, p.locale) === null
+
 /** The one place the commit rules live (combobox "Commit Of Typed Text"). */
 function commit(a: Args) {
   const { props, values, context } = a
@@ -229,7 +261,8 @@ function commit(a: Args) {
   if (!context.dirty) return
   a.set("dirty", false)
   const text = values.inputValue
-  if (props.readOnly) return setText(a, selectionText(props, values.value))
+  const selected = () => selectionText(props, values.value, context.texts)
+  if (props.readOnly) return setText(a, selected())
   if (mode(props) === "none") return
   const match = exactMatch(props.items, text, props.locale)
   if (mode(props) === "multiple") {
@@ -244,7 +277,7 @@ function commit(a: Args) {
     return setText(a, textOf(props, match))
   }
   if (text.trim() === "") {
-    if (props.disallowEmptySelection) return setText(a, selectionText(props, values.value))
+    if (props.disallowEmptySelection) return setText(a, selected())
     a.set("value", EMPTY)
     return setText(a, "")
   }
@@ -252,7 +285,7 @@ function commit(a: Args) {
     a.set("value", EMPTY)
     return
   }
-  setText(a, selectionText(props, values.value))
+  setText(a, selected())
 }
 
 /** Calls `onAction` for an item (inline: runs it; free text: follows the fill). */
@@ -281,6 +314,8 @@ function choose(a: Args, key: CollectionKey) {
   if (!node || node.disabled || props.readOnly) return
   a.set("completion", null)
   a.set("dirty", false)
+  // A pointer choice mid-composition ends it: the trailing compositionend is not typing.
+  a.set("composing", false)
   if (mode(props) === "multiple") {
     const keys = selectedKeys(values.value)
     a.set("value", keys.includes(key) ? keys.filter((k) => k !== key) : [...keys, key])
@@ -303,18 +338,20 @@ function choose(a: Args, key: CollectionKey) {
 export const chipsOf = (
   p: Pick<ComboboxProps, "items" | "selectionMode" | "disabled" | "readOnly">,
   value: ComboboxValue | undefined,
+  /** The remembered texts of selected keys (the machine context's `texts`). */
+  texts?: ReadonlyMap<CollectionKey, string>,
 ): readonly Chip[] =>
   mode(p) === "multiple"
     ? selectedKeys(value).map((key) => ({
         key,
-        text: textOf(p, key) || key,
+        text: textOf(p, key, texts) || key,
         disabled: !editable(p),
       }))
     : []
 
 /** Deselects a chip's key and announces it on every platform (input-chips). */
 function removeChip(a: Args, key: string) {
-  const text = textOf(a.props, key) || key
+  const text = textOf(a.props, key, a.context.texts) || key
   a.set(
     "value",
     selectedKeys(a.values.value).filter((k) => k !== key),
@@ -374,6 +411,13 @@ const comboboxSetup = /* @__PURE__ */ setup({
       context.highlightSource !== "pointer" &&
       context.highlightedKey !== null,
     closesOnSelect: ({ props }) => closesOnSelect(props),
+    /** A press on a disabled (or unknown) option is inert: it neither chooses nor closes. */
+    choosable: ({ props, event }) => {
+      if (event.type !== "ITEM.CHOOSE" || props.readOnly) return false
+      const node = props.collection.get(event.key) ?? props.items.get(event.key)
+      return node !== undefined && !node.disabled
+    },
+    isComposing: ({ context }) => context.composing,
     hasQuery: ({ values }) => values.inputValue !== "",
     /** Inline: Backspace goes back only above the root page. */
     canBack: ({ props, values }) =>
@@ -395,9 +439,12 @@ const comboboxSetup = /* @__PURE__ */ setup({
       a.set("dirty", true)
       a.set("armedChip", null)
       a.set("completion", null)
-      // A text change clears the highlight (auto highlight re-applies on the new results).
-      a.set("highlightedKey", null)
-      a.set("highlightSource", null)
+      // A text change clears the highlight (auto highlight re-applies on the new results),
+      // except mid-composition: the highlight stays until the composition ends.
+      if (!(a.event.type === "INPUT.CHANGE" && a.event.composing)) {
+        a.set("highlightedKey", null)
+        a.set("highlightSource", null)
+      }
       a.set(
         "completable",
         a.event.type === "COMPOSITION.END" ||
@@ -452,12 +499,25 @@ const comboboxSetup = /* @__PURE__ */ setup({
     clear: (a) => {
       a.set("completion", null)
       a.set("dirty", false)
-      a.set("value", mode(a.props) === "multiple" ? [] : EMPTY)
+      if (selectedKeys(a.values.value).length > 0) {
+        a.set("value", mode(a.props) === "multiple" ? [] : EMPTY)
+      }
       setText(a, "")
     },
     syncText: (a) => {
       if (a.context.dirty) return
-      const text = selectionText(a.props, a.values.value)
+      const text = selectionText(a.props, a.values.value, a.context.texts)
+      // A parent clearing the value clears the text it implied (a custom value keeps its own).
+      if (
+        a.event.type === "VALUE.SYNC" &&
+        mode(a.props) === "single" &&
+        !a.props.allowCustomValue &&
+        selectedKeys(a.values.value).length === 0 &&
+        a.values.inputValue !== ""
+      ) {
+        setText(a, "")
+        return
+      }
       if (
         mode(a.props) === "single" &&
         // An unknown key (its option not registered yet) keeps the text it has.
@@ -471,7 +531,7 @@ const comboboxSetup = /* @__PURE__ */ setup({
     /** A selection with no text yet (a default value at start) shows its text. */
     fillText: (a) => {
       if (a.values.inputValue === "" && !a.context.dirty) {
-        const text = selectionText(a.props, a.values.value)
+        const text = selectionText(a.props, a.values.value, a.context.texts)
         if (text !== "") setText(a, text)
       }
     },
@@ -480,7 +540,7 @@ const comboboxSetup = /* @__PURE__ */ setup({
       a.set("value", v as never)
       a.set("dirty", false)
       a.set("completion", null)
-      setText(a, a.props.defaultInputValue ?? selectionText(a.props, v))
+      setText(a, a.props.defaultInputValue ?? selectionText(a.props, v, a.context.texts))
     },
     autofill: (a) => {
       if (a.event.type !== "AUTOFILL") return
@@ -613,14 +673,14 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
   initial: "closed",
   context: initialContext,
   values: {
-    value: { fallback: EMPTY },
+    value: { fallback: EMPTY, equal: sameValue as never },
     inputValue: { fallback: "" },
     open: { fallback: false, states: { open: true, closed: false } },
   },
   onProps: {
     collection: "COLLECTION.CHANGE",
     value: "VALUE.SYNC",
-    items: "VALUE.SYNC",
+    items: "ITEMS.SYNC",
     loading: "LOADING.SYNC",
   },
   on: {
@@ -634,10 +694,11 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
       { guard: { and: ["keyable", "armedRemovable"] }, actions: ["removeArmed"] },
       { guard: { and: ["keyable", "armsOnBackspace"] }, actions: ["arm"] },
     ],
-    CARET: { actions: ["disarm"] },
-    "INPUT.PRESS": { actions: ["disarm"] },
+    CARET: { actions: ["disarm", "removeCompletion"] },
+    "INPUT.PRESS": { actions: ["disarm", "removeCompletion"] },
     "COMPOSITION.START": { actions: ["startComposition"] },
     "VALUE.SYNC": { actions: ["syncText"] },
+    "ITEMS.SYNC": { actions: ["syncText"] },
     RESET: { actions: ["restoreDefault"] },
     AUTOFILL: { guard: "editable", actions: ["autofill"] },
     CLEAR: { guard: "editable", actions: ["clear"] },
@@ -653,11 +714,11 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
         ],
         "COMPOSITION.END": [
           {
-            guard: "opensOnInput",
+            guard: { and: ["isComposing", "opensOnInput"] },
             target: "open",
             actions: ["endComposition", "typed", "setOpenReason"],
           },
-          { actions: ["endComposition", "typed"] },
+          { guard: "isComposing", actions: ["endComposition", "typed"] },
         ],
         ARROW: {
           guard: { and: ["keyable", "opensOnArrow"] },
@@ -672,7 +733,7 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
         "INPUT.PRESS": {
           guard: "opensOnPress",
           target: "open",
-          actions: ["disarm", "setOpenReason"],
+          actions: ["disarm", "removeCompletion", "setOpenReason"],
         },
         "INPUT.FOCUS": [
           { guard: "opensOnFocus", target: "open", actions: ["setFocused", "setOpenReason"] },
@@ -694,7 +755,7 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
       effects: ["overlay"],
       on: {
         "INPUT.CHANGE": { actions: ["typed"] },
-        "COMPOSITION.END": { actions: ["endComposition", "typed"] },
+        "COMPOSITION.END": { guard: "isComposing", actions: ["endComposition", "typed"] },
         ARROW: { guard: "keyable", actions: ["arrow"] },
         NAVIGATE: {
           actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlight", "complete"],
@@ -704,8 +765,12 @@ export const comboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
         "LIST.POINTER_LEAVE": { guard: "leaveClears", actions: ["clearHighlight"] },
         CARET: { guard: "keyable", actions: ["disarm", "clearHighlight", "removeCompletion"] },
         "ITEM.CHOOSE": [
-          { guard: "closesOnSelect", target: "closed", actions: ["choose"] },
-          { actions: ["choose"] },
+          {
+            guard: { and: ["choosable", "closesOnSelect"] },
+            target: "closed",
+            actions: ["choose"],
+          },
+          { guard: "choosable", actions: ["choose"] },
         ],
         ENTER: [
           {
@@ -775,7 +840,7 @@ export const inlineComboboxMachine = /* @__PURE__ */ comboboxSetup.machine({
       effects: ["mountLag"],
       on: {
         "INPUT.CHANGE": { guard: "editable", actions: ["typed"] },
-        "COMPOSITION.END": { actions: ["endComposition", "typed"] },
+        "COMPOSITION.END": { guard: "isComposing", actions: ["endComposition", "typed"] },
         ARROW: { guard: "keyable", actions: ["arrow"] },
         NAVIGATE: { actions: ["endLag", "navigate", "scrollToHighlighted", "announceHighlight"] },
         HIGHLIGHT: { actions: ["endLag", "highlight"] },

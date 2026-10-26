@@ -33,6 +33,8 @@ export interface ComboboxConnectView {
   readonly selectionMode: "single" | "multiple" | "none"
   readonly inputValue: string
   readonly hasValue: boolean
+  /** Committing the typed text would reject it (`rejectsText`): Enter does not submit. */
+  readonly rejectsText?: boolean | undefined
   readonly disabled: boolean
   readonly readOnly: boolean
   readonly invalid: boolean
@@ -296,8 +298,9 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
               )
               return
             }
-            // Prevented only when it chooses: otherwise the form submits with the same Enter.
-            if (chooses) e.preventDefault()
+            // Prevented only when it chooses or the commit rejects the text: otherwise the
+            // form submits with the same Enter.
+            if (chooses || v.rejectsText === true) e.preventDefault()
             send({ type: "ENTER", composing: false, modifiers })
             return
           }
@@ -329,11 +332,9 @@ export function comboboxConnect(v: ComboboxConnectView, env: ComboboxConnectEnv)
           case "ArrowRight":
           case "Home":
           case "End":
-            if (
-              !ime &&
-              (c.highlightedKey !== null || c.completion !== null || c.armedChip !== null)
-            )
-              send({ type: "CARET" })
+            // Always: a caret the user moved ends inline completion even before results
+            // arrive (ariakit#6916).
+            if (!ime) send({ type: "CARET" })
             return
         }
       },

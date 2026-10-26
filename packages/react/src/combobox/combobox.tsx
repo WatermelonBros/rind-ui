@@ -36,6 +36,7 @@ import {
   type PositioningProps,
   patternQuery,
   patternResults,
+  rejectsText,
   type ScrollToIndexDetails,
   type Service,
   selectionOf,
@@ -360,7 +361,8 @@ function Root(all: ComboboxRootProps) {
       disabled,
       readOnly,
       disallowEmptySelection: all.disallowEmptySelection,
-      loop: all.loop,
+      // Inline lists (a command palette) loop by default.
+      loop: all.loop ?? (inline ? true : undefined),
       loading: all.loading,
       onLoadMore: all.onLoadMore,
       virtualized: all.virtualized,
@@ -498,7 +500,11 @@ function Root(all: ComboboxRootProps) {
   }
   const value = view.values.value as ComboboxValue
   const keys = value == null ? [] : typeof value === "string" ? [value] : value
-  const chips = chipsOf({ items: full, selectionMode, disabled, readOnly: all.readOnly }, value)
+  const chips = chipsOf(
+    { items: full, selectionMode, disabled, readOnly },
+    value,
+    view.context.texts,
+  )
   const formInput = useMemo(
     () =>
       hiddenFormInput(
@@ -524,6 +530,11 @@ function Root(all: ComboboxRootProps) {
       selectionMode,
       inputValue: view.values.inputValue as string,
       hasValue: Array.isArray(value) ? value.length > 0 : value != null,
+      rejectsText: rejectsText(
+        { items: full, selectionMode, allowCustomValue: all.allowCustomValue, readOnly, locale },
+        view.values.inputValue as string,
+        view.context.dirty,
+      ),
       disabled,
       readOnly: readOnly,
       invalid: field.invalid,

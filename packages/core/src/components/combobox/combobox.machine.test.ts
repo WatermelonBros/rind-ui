@@ -5,7 +5,12 @@ import { toKey } from "../../collection/key"
 import { createListCollection } from "../../collection/list"
 import { platforms } from "../../dom/platform"
 import { createService } from "../../machine/service"
-import { type ComboboxProps, type ComboboxValue, comboboxMachine } from "./combobox.machine"
+import {
+  type ComboboxProps,
+  type ComboboxValue,
+  comboboxMachine,
+  rejectsText,
+} from "./combobox.machine"
 import { comboboxMessages } from "./combobox.messages"
 import { patternQuery, patternResults } from "./pattern/pattern"
 
@@ -343,5 +348,109 @@ describe("Combobox machine", () => {
     m.down()
     // A keyboard highlight is exposed at once.
     expect(m.lagging()).toBe(false)
+  })
+})
+
+describe("Combobox machine: audit regressions", () => {
+  it("a press on a disabled option neither chooses nor closes", () => {
+    const m = make()
+    m.focus()
+    m.type("gr")
+    m.choose("grape")
+    expect(m.value()).toBe(null)
+    expect(m.open()).toBe(true)
+  })
+
+  it("arrow open never highlights a disabled selected option", () => {
+    const m = make({ defaultValue: "grape" })
+    m.focus()
+    m.down()
+    expect(m.open()).toBe(true)
+    expect(m.highlighted()).not.toBe("grape")
+  })
+
+  it("a parent clearing the value clears the text it implied", () => {
+    const m = make({ value: "apple" })
+    expect(m.text()).toBe("Apple")
+    m.setProps({ value: null as never })
+    expect(m.text()).toBe("")
+  })
+
+  it("a selection the new items no longer contain keeps its text on blur (base-ui#3818)", () => {
+    const m = make()
+    m.focus()
+    m.type("app")
+    m.down()
+    m.enter()
+    expect(m.value()).toBe("apple")
+    const rest = createListCollection({
+      items: FRUITS.filter((f) => f !== "Apple").map((label) => ({
+        id: label.toLowerCase(),
+        label,
+      })),
+      getKey: (r) => r.id,
+      getText: (r) => r.label,
+    })
+    m.setProps({ items: rest } as never)
+    m.type("zz")
+    m.blur()
+    expect(m.value()).toBe("apple")
+    expect(m.text()).toBe("Apple")
+  })
+
+  it("the highlight stays while a composition is in progress", () => {
+    const m = make({ autoHighlight: true })
+    m.focus()
+    m.type("ch")
+    expect(m.highlighted()).toBe("cherry")
+    m.send({ type: "COMPOSITION.START" })
+    m.send({
+      type: "INPUT.CHANGE",
+      text: "chｅ",
+      inputType: "insertCompositionText",
+      composing: true,
+      caretAtEnd: true,
+    })
+    expect(m.highlighted()).toBe("cherry")
+  })
+
+  it("a pointer choice mid-composition is final: the trailing compositionend is not typing", () => {
+    const m = make()
+    m.focus()
+    m.type("ch")
+    m.send({ type: "COMPOSITION.START" })
+    m.choose("cherry")
+    m.send({ type: "COMPOSITION.END", text: "Cherry" })
+    expect(m.value()).toBe("cherry")
+    expect(m.open()).toBe(false)
+    m.blur()
+    expect(m.text()).toBe("Cherry")
+  })
+
+  it("a caret moved before results arrive is never overwritten by a completion (ariakit#6916)", () => {
+    const m = make({ autoComplete: "both", autoHighlight: true })
+    m.focus()
+    m.type("apr")
+    m.send({ type: "CARET" })
+    m.down()
+    expect(m.completion()).toBe(null)
+  })
+
+  it("clearing with nothing selected reports no value change", () => {
+    const m = make({ selectionMode: "multiple" })
+    m.focus()
+    m.type("ap")
+    m.send({ type: "CLEAR.PRESS" } as never)
+    expect(m.onValueChange).not.toHaveBeenCalled()
+  })
+
+  it("rejectsText: only dirty, non-empty text with no exact match and no custom values", () => {
+    const p = { items, selectionMode: "single", locale: "en" } as const
+    expect(rejectsText(p, "Romx", true)).toBe(true)
+    expect(rejectsText(p, "apple", true)).toBe(false)
+    expect(rejectsText(p, "Romx", false)).toBe(false)
+    expect(rejectsText(p, "  ", true)).toBe(false)
+    expect(rejectsText({ ...p, allowCustomValue: true }, "Romx", true)).toBe(false)
+    expect(rejectsText({ ...p, selectionMode: "none" }, "Romx", true)).toBe(false)
   })
 })

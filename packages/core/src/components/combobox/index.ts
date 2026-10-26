@@ -24,6 +24,7 @@ export {
   comboboxMachine,
   type InlineComboboxMachine,
   inlineComboboxMachine,
+  rejectsText,
 } from "./combobox.machine"
 export { type ComboboxMessages, comboboxMessages } from "./combobox.messages"
 export { comboboxMeta } from "./combobox.meta"

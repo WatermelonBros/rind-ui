@@ -33,6 +33,7 @@ import {
   type PositioningProps,
   patternQuery,
   patternResults,
+  rejectsText,
   type ScrollToIndexDetails,
   selectionOf,
   toKey,
@@ -351,7 +352,8 @@ function Root(all: ComboboxRootProps) {
       disabled: disabled(),
       readOnly: field().readOnly,
       disallowEmptySelection: p.disallowEmptySelection,
-      loop: p.loop,
+      // Inline lists (a command palette) loop by default.
+      loop: p.loop ?? (inline ? true : undefined),
       loading: p.loading,
       onLoadMore: p.onLoadMore,
       virtualized: p.virtualized,
@@ -500,8 +502,14 @@ function Root(all: ComboboxRootProps) {
   })
   const chips = createMemo(() =>
     chipsOf(
-      { items: full(), selectionMode: selectionMode(), disabled: disabled(), readOnly: p.readOnly },
+      {
+        items: full(),
+        selectionMode: selectionMode(),
+        disabled: disabled(),
+        readOnly: field().readOnly,
+      },
       value(),
+      view().context.texts,
     ),
   )
   const exposure = () => ({
@@ -538,6 +546,17 @@ function Root(all: ComboboxRootProps) {
         selectionMode: selectionMode(),
         inputValue: v.values.inputValue as string,
         hasValue: Array.isArray(val) ? val.length > 0 : val != null,
+        rejectsText: rejectsText(
+          {
+            items: full(),
+            selectionMode: selectionMode(),
+            allowCustomValue: p.allowCustomValue,
+            readOnly: f.readOnly,
+            locale: locale(),
+          },
+          v.values.inputValue as string,
+          v.context.dirty,
+        ),
         disabled: disabled(),
         readOnly: f.readOnly,
         invalid: f.invalid,

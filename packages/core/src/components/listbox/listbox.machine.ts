@@ -192,17 +192,38 @@ export const listboxMachine = /* @__PURE__ */ setup({
         NAVIGATE: [
           {
             guard: "followsFocus",
-            actions: ["navigate", "scrollToHighlighted", "focusHighlighted", "selectHighlighted"],
+            actions: [
+              "navigate",
+              "scrollToHighlighted",
+              "focusHighlighted",
+              "selectHighlighted",
+              "announceHighlighted",
+            ],
           },
-          { actions: ["navigate", "scrollToHighlighted", "focusHighlighted"] },
+          {
+            actions: ["navigate", "scrollToHighlighted", "focusHighlighted", "announceHighlighted"],
+          },
         ],
         HIGHLIGHT: { actions: ["highlight", "scrollToHighlighted", "focusHighlighted"] },
         TYPEAHEAD: [
           {
             guard: "typeaheadSelects",
-            actions: ["typeahead", "scrollToHighlighted", "focusHighlighted", "selectHighlighted"],
+            actions: [
+              "typeahead",
+              "scrollToHighlighted",
+              "focusHighlighted",
+              "selectHighlighted",
+              "announceHighlighted",
+            ],
           },
-          { actions: ["typeahead", "scrollToHighlighted", "focusHighlighted"] },
+          {
+            actions: [
+              "typeahead",
+              "scrollToHighlighted",
+              "focusHighlighted",
+              "announceHighlighted",
+            ],
+          },
         ],
         // With no selection, a press or Enter is an action.
         SELECT: [

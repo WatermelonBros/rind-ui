@@ -57,6 +57,7 @@ import {
   type PositioningProps,
   patternQuery,
   patternResults,
+  rejectsText,
   type ScrollToIndexDetails,
   selectionOf,
   toKey,
@@ -507,7 +508,8 @@ export class ComboboxRoot implements PopupHost {
           disabled: disabled(),
           readOnly: field().readOnly,
           disallowEmptySelection: this.disallowEmptySelection(),
-          loop: this.loop(),
+          // Inline lists (a command palette) loop by default.
+          loop: this.loop() ?? (inline ? true : undefined),
           loading: this.loading(),
           onLoadMore: this.onLoadMore(),
           virtualized: this.virtualized(),
@@ -621,8 +623,9 @@ export class ComboboxRoot implements PopupHost {
     })
     this.chipList = computed(() =>
       chipsOf(
-        { items: full(), selectionMode: mode(), disabled: disabled(), readOnly: this.readOnly() },
+        { items: full(), selectionMode: mode(), disabled: disabled(), readOnly: field().readOnly },
         value(),
+        view().context.texts,
       ),
     )
     this.chips = this.chipList
@@ -663,6 +666,17 @@ export class ComboboxRoot implements PopupHost {
           selectionMode: mode(),
           inputValue: v.values.inputValue as string,
           hasValue: Array.isArray(value()) ? (value() as string[]).length > 0 : value() != null,
+          rejectsText: rejectsText(
+            {
+              items: full(),
+              selectionMode: mode(),
+              allowCustomValue: this.allowCustomValue(),
+              readOnly: f.readOnly,
+              locale: locale(),
+            },
+            v.values.inputValue as string,
+            v.context.dirty,
+          ),
           disabled: disabled(),
           readOnly: f.readOnly,
           invalid: f.invalid,

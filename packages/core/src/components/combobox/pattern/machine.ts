@@ -183,7 +183,11 @@ export function patternPieces(options: {
   /** The first or last navigable option, or the selected one (arrow and keyboard opens). */
   const highlightEntry = (a: PatternArgs, edge: "first" | "last") => {
     const c = a.props.collection
-    const sel = selected(a).find((k) => c.has(toKey(k)))
+    // A disabled selected option is never highlighted by keyboard: the first enabled is.
+    const sel = selected(a).find((k) => {
+      const n = c.get(toKey(k))
+      return n !== undefined && !n.disabled
+    })
     let key: CollectionKey | null = sel === undefined ? null : toKey(sel)
     if (key === null) {
       const step = edge === "first" ? 1 : -1
