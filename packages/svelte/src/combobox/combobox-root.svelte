@@ -25,6 +25,7 @@ import {
   mergeFieldProps,
   patternQuery,
   patternResults,
+  rejectsText,
   selectionOf,
   toKey,
 } from "@rind-ui/core"
@@ -177,7 +178,8 @@ const machine = useMachine(
     disabled,
     readOnly: field.readOnly,
     disallowEmptySelection: p.disallowEmptySelection,
-    loop: p.loop,
+    // Inline lists (a command palette) loop by default.
+    loop: p.loop ?? (inline ? true : undefined),
     loading: p.loading,
     onLoadMore: p.onLoadMore,
     virtualized: p.virtualized,
@@ -323,7 +325,11 @@ const modality = useModality(env.modality, () => machine.view.context.focused)
 const current = $derived(machine.view.values.value as ComboboxValue)
 const keys = $derived(current == null ? [] : typeof current === "string" ? [current] : current)
 const chips = $derived(
-  chipsOf({ items: full, selectionMode, disabled, readOnly: p.readOnly }, current),
+  chipsOf(
+    { items: full, selectionMode, disabled, readOnly: field.readOnly },
+    current,
+    machine.view.context.texts,
+  ),
 )
 const exposure = $derived({
   open: machine.view.matches("open"),
@@ -357,6 +363,17 @@ const api = $derived.by(() => {
       selectionMode,
       inputValue: v.values.inputValue as string,
       hasValue: Array.isArray(current) ? current.length > 0 : current != null,
+      rejectsText: rejectsText(
+        {
+          items: full,
+          selectionMode,
+          allowCustomValue: p.allowCustomValue,
+          readOnly: field.readOnly,
+          locale,
+        },
+        v.values.inputValue as string,
+        v.context.dirty,
+      ),
       disabled,
       readOnly: field.readOnly,
       invalid: field.invalid,

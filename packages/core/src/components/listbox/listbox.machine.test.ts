@@ -246,3 +246,24 @@ describe("none mode", () => {
     expect(m.onAction).not.toHaveBeenCalled()
   })
 })
+
+describe("Listbox active-descendant on Apple platforms", () => {
+  it("a keyboard move announces the highlighted option (VoiceOver in Safari reads nothing)", () => {
+    const announce = vi.fn()
+    const props: ListboxProps = {
+      collection: list("a", "b", "c"),
+      strategy: "active-descendant",
+      ids: { list: "list", item: (k) => `item-${k}` },
+      selectionMode: "single",
+    }
+    const s = createService(
+      listboxMachine,
+      props as never,
+      { ...env, platform: platforms.apple, announcer: { ...env.announcer, announce } } as never,
+    )
+    s.start()
+    s.send({ type: "FOCUS", modality: "keyboard" })
+    s.send({ type: "NAVIGATE", move: "next" })
+    expect(announce).toHaveBeenCalled()
+  })
+})

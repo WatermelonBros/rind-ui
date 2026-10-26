@@ -31,6 +31,7 @@ import {
   type PositioningProps,
   patternQuery,
   patternResults,
+  rejectsText,
   type ScrollToIndexDetails,
   selectionOf,
   toKey,
@@ -341,7 +342,8 @@ const Root = defineComponent({
         disabled: disabled(),
         readOnly: field.value.readOnly,
         disallowEmptySelection: props.disallowEmptySelection,
-        loop: props.loop,
+        // Inline lists (a command palette) loop by default.
+        loop: props.loop ?? (inline ? true : undefined),
         loading: props.loading,
         onLoadMore: props.onLoadMore,
         virtualized: props.virtualized,
@@ -483,8 +485,9 @@ const Root = defineComponent({
     })
     const chips = computed(() =>
       chipsOf(
-        { items: full(), selectionMode, disabled: disabled(), readOnly: props.readOnly },
+        { items: full(), selectionMode, disabled: disabled(), readOnly: field.value.readOnly },
         value(),
+        view.value.context.texts,
       ),
     )
     const exposure = () => ({
@@ -520,6 +523,17 @@ const Root = defineComponent({
           selectionMode,
           inputValue: v.values.inputValue as string,
           hasValue: Array.isArray(value()) ? (value() as string[]).length > 0 : value() != null,
+          rejectsText: rejectsText(
+            {
+              items: full(),
+              selectionMode,
+              allowCustomValue: props.allowCustomValue,
+              readOnly: f.readOnly,
+              locale: locale(),
+            },
+            v.values.inputValue as string,
+            v.context.dirty,
+          ),
           disabled: disabled(),
           readOnly: f.readOnly,
           invalid: f.invalid,

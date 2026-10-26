@@ -229,6 +229,14 @@ describe("inline (command palette)", () => {
     expect(highlightedText()).toBe("Toggle theme")
   })
 
+  it("Navigation loops by default: ArrowUp on the first item reaches the last", async () => {
+    render(<Palette />)
+    await userEvent.click(search())
+    expect(highlightedText()).toBe("New file")
+    await userEvent.keyboard("{ArrowUp}")
+    expect(highlightedText()).toBe("Toggle theme")
+  })
+
   it("Home edits the text (dip/cmdk#341): the highlight stays", async () => {
     render(<Palette />)
     await userEvent.click(search())
@@ -364,5 +372,41 @@ describe("inline (command palette)", () => {
     render(<Palette />)
     expect(window.scrollY).toBe(0)
     spacer.remove()
+  })
+})
+
+describe("single selection: Enter on rejected text", () => {
+  it("does not submit the form while the text reverts to the selection", async () => {
+    const onSubmit = vi.fn()
+    render(
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          onSubmit()
+        }}
+      >
+        <Combobox.Root items={CITIES} defaultValue="rome" name="city">
+          <Combobox.Label>City</Combobox.Label>
+          <Combobox.Control>
+            <Combobox.Input />
+          </Combobox.Control>
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              <Combobox.List>
+                <Combobox.Items />
+              </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Root>
+        <button type="submit">Send</button>
+      </form>,
+    )
+    await userEvent.click(city())
+    await userEvent.keyboard("{Escape}")
+    await userEvent.clear(city())
+    await userEvent.type(city(), "Romx")
+    await userEvent.keyboard("{Enter}")
+    expect(city().value).toBe("Rome")
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 })
