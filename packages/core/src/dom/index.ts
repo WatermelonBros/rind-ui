@@ -175,6 +175,16 @@ export {
   withEngine,
 } from "./platform"
 export {
+  type AngleMessage,
+  angleOf,
+  onRing,
+  type PointerAngleCapability,
+  type PointerAngleSession,
+  pointerAngle,
+  pointerAngleSession,
+  pointerRadius,
+} from "./pointer-angle"
+export {
   type DragArea,
   type DragAxis,
   type DragMessage,

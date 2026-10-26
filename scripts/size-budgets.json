@@ -6,6 +6,7 @@
   "components": {
     "accordion": 20,
     "alert": 14,
+    "angle-slider": 14,
     "avatar": 11,
     "badge": 3,
     "breadcrumbs": 15,
@@ -82,6 +83,7 @@
   "roots": {
     "accordion": 11,
     "alert": 13,
+    "angle-slider": 13,
     "avatar": 9,
     "badge": 3,
     "breadcrumbs": 5,

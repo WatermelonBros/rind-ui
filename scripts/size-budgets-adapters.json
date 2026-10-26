@@ -3,6 +3,7 @@
   "vue": {
     "accordion": 21,
     "alert": 14,
+    "angle-slider": 15,
     "avatar": 11,
     "badge": 3,
     "breadcrumbs": 15,
@@ -79,6 +80,7 @@
   "svelte": {
     "accordion": 20,
     "alert": 14,
+    "angle-slider": 15,
     "avatar": 11,
     "badge": 3,
     "breadcrumbs": 15,
@@ -155,6 +157,7 @@
   "solid": {
     "accordion": 20,
     "alert": 14,
+    "angle-slider": 14,
     "avatar": 11,
     "badge": 3,
     "breadcrumbs": 15,
@@ -232,6 +235,7 @@
   "angular": {
     "accordion": 23,
     "alert": 15,
+    "angle-slider": 17,
     "avatar": 13,
     "badge": 4,
     "breadcrumbs": 18,

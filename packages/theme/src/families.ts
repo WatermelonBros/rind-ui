@@ -82,6 +82,7 @@ export const familyMatrix = [
       "prompt-input",
       "clipboard",
       "file-upload",
+      "angle-slider",
     ],
     variants: ["outline", "soft"],
     size: "own",

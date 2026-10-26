@@ -47,6 +47,11 @@
       "types": "./dist/alert/index.d.ts",
       "default": "./dist/alert/index.js"
     },
+    "./angle-slider": {
+      "@rind-ui/source": "./src/angle-slider/index.ts",
+      "types": "./dist/angle-slider/index.d.ts",
+      "default": "./dist/angle-slider/index.js"
+    },
     "./avatar": {
       "@rind-ui/source": "./src/avatar/index.ts",
       "types": "./dist/avatar/index.d.ts",
@@ -461,6 +466,10 @@
       "./alert": {
         "types": "./dist/alert/index.d.ts",
         "default": "./dist/alert/index.js"
+      },
+      "./angle-slider": {
+        "types": "./dist/angle-slider/index.d.ts",
+        "default": "./dist/angle-slider/index.js"
       },
       "./avatar": {
         "types": "./dist/avatar/index.d.ts",

@@ -49,6 +49,11 @@
       "types": "./dist/alert/index.d.mts",
       "default": "./dist/alert/index.mjs"
     },
+    "./angle-slider": {
+      "@rind-ui/source": "./src/angle-slider/index.ts",
+      "types": "./dist/angle-slider/index.d.mts",
+      "default": "./dist/angle-slider/index.mjs"
+    },
     "./avatar": {
       "@rind-ui/source": "./src/avatar/index.ts",
       "types": "./dist/avatar/index.d.mts",
@@ -444,6 +449,10 @@
       "./alert": {
         "types": "./dist/alert/index.d.mts",
         "default": "./dist/alert/index.mjs"
+      },
+      "./angle-slider": {
+        "types": "./dist/angle-slider/index.d.mts",
+        "default": "./dist/angle-slider/index.mjs"
       },
       "./avatar": {
         "types": "./dist/avatar/index.d.mts",
