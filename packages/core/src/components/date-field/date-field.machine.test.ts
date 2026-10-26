@@ -14,7 +14,7 @@ import { recordingFormInput } from "../../dom/hidden-input"
 import { platforms } from "../../dom/platform"
 import { createService } from "../../machine/service"
 import type { DateSegmentType } from "../date-segments"
-import { dateFieldKey } from "./date-field.connect"
+import { dateFieldKey, planSegmentInput } from "./date-field.connect"
 import {
   type DateFieldEvent,
   type DateFieldProps,
@@ -170,6 +170,23 @@ describe("Typing, advance and boundaries", () => {
     expect([f.text("month"), f.active()]).toEqual(["3", "day"])
   })
 
+  it("a separator right after an auto-advance does not advance again over a filled field", () => {
+    const f = make({ defaultValue: new CalendarDate(2026, 10, 14) })
+    f.focus("month")
+    f.type("12/25/2027")
+    f.send({ type: "SEGMENT.BLUR", related: "outside" })
+    expect(f.value()?.toString()).toBe("2027-12-25")
+  })
+
+  it("Enter commits the digit still waiting for a second one (a commit point)", () => {
+    const f = make({ defaultValue: new CalendarDate(2026, 10, 14) })
+    f.focus("day")
+    f.type("2")
+    expect(f.value()?.toString()).toBe("2026-10-14")
+    f.send({ type: "SETTLE" })
+    expect(f.value()?.toString()).toBe("2026-10-02")
+  })
+
   it("the last segment does not overwrite (reka-ui#2002) and reports the boundary", () => {
     const f = make()
     f.focus("month")
@@ -255,8 +272,8 @@ describe("Stepping", () => {
       composing: false,
     })
     const o = { dir: "ltr", platform: platforms.windows, selectAll: false } as const
-    // Implicit submission: no machine event, so nothing prevents the browser's default.
-    expect(dateFieldKey(k("Enter"), "minute", o)).toBeNull()
+    // Implicit submission: settle (commit), never a prevented machine event.
+    expect(dateFieldKey(k("Enter"), "minute", o)).toBe("settle")
     expect(dateFieldKey(k("ArrowUp"), "minute", o)).toMatchObject({ type: "INCREASE" })
   })
 
@@ -656,5 +673,14 @@ describe("Time Values", () => {
     expect(
       defaultPlaceholderValue({ today, maxGranularity: "hour", timeZone: "UTC" }),
     ).not.toBeInstanceOf(Time)
+  })
+})
+
+describe("planSegmentInput", () => {
+  it("never cancels Enter's line break: Chromium would cancel the implicit submission", () => {
+    expect(planSegmentInput({ inputType: "insertLineBreak", data: null }, "day")).toEqual({
+      cancel: false,
+      event: null,
+    })
   })
 })

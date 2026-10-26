@@ -60,6 +60,11 @@ const handlers = {
       ctx.selectAll.current = true
       return
     }
+    if (event === "settle") {
+      // Not prevented: the form's implicit submission follows, with the value committed.
+      ctx.send({ type: "SETTLE" })
+      return
+    }
     if (event === "open-picker") {
       // Only a picker opens; otherwise the key is the browser's. A range's ends are embedded:
       // their host's triggers count.
