@@ -18,6 +18,7 @@ import * as colorModel from "./color-model"
 import * as colorPicker from "./color-picker"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
+import * as contextMeter from "./context-meter"
 import * as controlLabel from "./control-label"
 import * as dateField from "./date-field"
 import * as dialog from "./dialog"
@@ -168,6 +169,10 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "context-meter": contextMeter,
+  suggestions,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,

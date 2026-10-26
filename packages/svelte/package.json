@@ -129,6 +129,12 @@
       "svelte": "./dist/context-menu/index.js",
       "default": "./dist/context-menu/index.js"
     },
+    "./context-meter": {
+      "@rind-ui/source": "./src/context-meter/index.ts",
+      "types": "./dist/context-meter/index.d.ts",
+      "svelte": "./dist/context-meter/index.js",
+      "default": "./dist/context-meter/index.js"
+    },
     "./date-field": {
       "@rind-ui/source": "./src/date-field/index.ts",
       "types": "./dist/date-field/index.d.ts",
@@ -594,6 +600,11 @@
         "types": "./dist/context-menu/index.d.ts",
         "svelte": "./dist/context-menu/index.js",
         "default": "./dist/context-menu/index.js"
+      },
+      "./context-meter": {
+        "types": "./dist/context-meter/index.d.ts",
+        "svelte": "./dist/context-meter/index.js",
+        "default": "./dist/context-meter/index.js"
       },
       "./date-field": {
         "types": "./dist/date-field/index.d.ts",

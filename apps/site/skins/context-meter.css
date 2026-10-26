@@ -1,0 +1,69 @@
+/* ── Context Meter: a chunky track with the fill in the brand, the short value at the end; the
+   warning zone striped, the full zone densely striped with an end mark (not colour alone). ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="context-meter"][data-part="root"] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px 10px;
+  inline-size: min(100%, 360px);
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="context-meter"][data-part="label"] {
+  grid-column: 1 / -1;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="context-meter"][data-part="track"] {
+  block-size: 12px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 99px;
+  background: var(--s-card);
+  overflow: hidden;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="indicator"] {
+  block-size: 100%;
+  inline-size: calc(var(--rind-context-meter-percent, 0) * 1%);
+  background: var(--s-brand);
+  transition: inline-size 0.45s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="indicator"][data-zone="warning"] {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--s-brand) 0 6px,
+    color-mix(in oklab, var(--s-brand) 45%, var(--s-ink)) 6px 9px
+  );
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="indicator"][data-zone="full"] {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--s-error) 0 3px,
+    color-mix(in oklab, var(--s-error) 40%, var(--s-ink)) 3px 5px
+  );
+  box-shadow: inset -4px 0 0 var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="value-text"] {
+  font-variant-numeric: tabular-nums;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="breakdown"] {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  margin: 6px 0 0;
+  font-weight: 500;
+  font-size: 13px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="breakdown-item"] {
+  display: contents;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="context-meter"][data-part="breakdown-item"]
+  dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}

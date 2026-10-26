@@ -174,7 +174,7 @@ export const familyMatrix = [
   },
   {
     family: "range",
-    components: ["slider", "progress", "meter", "rating"],
+    components: ["slider", "progress", "meter", "rating", "context-meter"],
     variants: ["solid", "soft"],
     size: "own",
     sizes,

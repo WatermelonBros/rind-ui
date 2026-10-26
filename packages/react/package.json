@@ -114,6 +114,11 @@
       "types": "./dist/context-menu/index.d.mts",
       "default": "./dist/context-menu/index.mjs"
     },
+    "./context-meter": {
+      "@rind-ui/source": "./src/context-meter/index.ts",
+      "types": "./dist/context-meter/index.d.mts",
+      "default": "./dist/context-meter/index.mjs"
+    },
     "./date-field": {
       "@rind-ui/source": "./src/date-field/index.ts",
       "types": "./dist/date-field/index.d.mts",
@@ -496,6 +501,10 @@
       "./context-menu": {
         "types": "./dist/context-menu/index.d.mts",
         "default": "./dist/context-menu/index.mjs"
+      },
+      "./context-meter": {
+        "types": "./dist/context-meter/index.d.mts",
+        "default": "./dist/context-meter/index.mjs"
       },
       "./date-field": {
         "types": "./dist/date-field/index.d.mts",
