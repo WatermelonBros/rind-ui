@@ -172,6 +172,11 @@
         "solid": "./dist/file-upload/index.jsx",
         "default": "./dist/file-upload/index.mjs"
       },
+      "./floating-panel": {
+        "types": "./dist/floating-panel/index.d.mts",
+        "solid": "./dist/floating-panel/index.jsx",
+        "default": "./dist/floating-panel/index.mjs"
+      },
       "./form": {
         "types": "./dist/form/index.d.mts",
         "solid": "./dist/form/index.jsx",
@@ -577,6 +582,12 @@
       "types": "./dist/file-upload/index.d.mts",
       "solid": "./dist/file-upload/index.jsx",
       "default": "./dist/file-upload/index.mjs"
+    },
+    "./floating-panel": {
+      "@rind-ui/source": "./src/floating-panel/index.ts",
+      "types": "./dist/floating-panel/index.d.mts",
+      "solid": "./dist/floating-panel/index.jsx",
+      "default": "./dist/floating-panel/index.mjs"
     },
     "./form": {
       "@rind-ui/source": "./src/form/index.ts",

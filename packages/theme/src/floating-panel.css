@@ -1,0 +1,231 @@
+/*
+ * Floating Panel (family: panel): the Positioner placed by the component's
+ * `--rind-floating-panel-x/-y/-width/-height` (a translate, so a drag never relayouts), the
+ * Content a raised window filling it: a header bar (the DragTrigger a grab handle, the title,
+ * the stage and close buttons) over a scrolling Body. Maximised fills the boundary (inset 0);
+ * minimised keeps the header only. Resize handles sit on the edges and corners.
+ */
+@layer rind.components {
+  :where([data-scope="floating-panel"][data-part="positioner"]) {
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: var(--rind-floating-panel-width);
+    block-size: var(--rind-floating-panel-height);
+    translate: var(--rind-floating-panel-x) var(--rind-floating-panel-y);
+    z-index: var(--rind-floating-panel-z, 50);
+  }
+
+  :where([data-scope="floating-panel"][data-part="positioner"][data-stage="maximized"]) {
+    inset: 0;
+    inline-size: auto;
+    block-size: auto;
+    translate: none;
+  }
+
+  :where([data-scope="floating-panel"][data-part="positioner"][data-stage="minimized"]) {
+    block-size: auto;
+  }
+
+  :where([data-scope="floating-panel"][data-part="content"]) {
+    position: relative;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    inline-size: 100%;
+    block-size: 100%;
+    pointer-events: auto;
+    background: var(--rind-floating-panel-bg, var(--rind-color-surface-raised));
+    color: var(--rind-floating-panel-color, var(--rind-color-text));
+    border: var(--rind-border-width) solid
+      var(--rind-floating-panel-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-floating-panel-radius, var(--rind-radius-panel));
+    box-shadow: var(--rind-floating-panel-shadow, var(--rind-shadow-lg));
+    overflow: hidden;
+  }
+
+  :where([data-scope="floating-panel"][data-part="content"]:focus-visible) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="floating-panel"][data-part="content"][data-stage="maximized"]) {
+    border-radius: 0;
+  }
+
+  :where([data-scope="floating-panel"][data-part="header"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    padding: var(--rind-floating-panel-header-padding, var(--rind-space-1) var(--rind-space-2));
+    border-block-end: var(--rind-border-width) solid var(--rind-color-border);
+    user-select: none;
+  }
+
+  :where([data-scope="floating-panel"][data-part="content"][data-stage="minimized"])
+    :where([data-part="header"]) {
+    border-block-end: 0;
+  }
+
+  :where([data-scope="floating-panel"][data-part="title"]) {
+    flex: 1;
+    min-inline-size: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--rind-floating-panel-title-font-size, var(--rind-text-sm));
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :where([data-scope="floating-panel"][data-part="control"]) {
+    display: flex;
+    gap: var(--rind-space-1);
+  }
+
+  :where(
+    [data-scope="floating-panel"]:is(
+      [data-part="drag-trigger"],
+      [data-part="stage-trigger"],
+      [data-part="close-trigger"]
+    )
+  ) {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="floating-panel"]:is(
+      [data-part="drag-trigger"],
+      [data-part="stage-trigger"],
+      [data-part="close-trigger"]
+    )
+  ):hover {
+    background: var(--rind-floating-panel-button-hover, var(--rind-color-surface));
+  }
+
+  :where(
+    [data-scope="floating-panel"]:is(
+      [data-part="drag-trigger"],
+      [data-part="stage-trigger"],
+      [data-part="close-trigger"]
+    )[data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="floating-panel"][data-part="drag-trigger"]) {
+    cursor: grab;
+  }
+
+  :where([data-scope="floating-panel"][data-part="drag-trigger"][data-dragging]) {
+    cursor: grabbing;
+  }
+
+  :where([data-scope="floating-panel"][data-part="drag-trigger"][aria-disabled="true"]) {
+    cursor: default;
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="floating-panel"][data-part="body"]) {
+    overflow: auto;
+    padding: var(--rind-floating-panel-padding, var(--rind-space-3));
+  }
+
+  /* Edges: a thin strip; corners: a square. Pointer only (aria-hidden, not focusable). */
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]) {
+    position: absolute;
+    --_edge: var(--rind-floating-panel-handle, 6px);
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="n"],
+    [data-axis="s"]
+  ) {
+    inset-inline: var(--_edge);
+    block-size: var(--_edge);
+    cursor: ns-resize;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="e"],
+    [data-axis="w"]
+  ) {
+    inset-block: var(--_edge);
+    inline-size: var(--_edge);
+    cursor: ew-resize;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="ne"],
+    [data-axis="nw"],
+    [data-axis="se"],
+    [data-axis="sw"]
+  ) {
+    inline-size: calc(var(--_edge) * 2);
+    block-size: calc(var(--_edge) * 2);
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="n"],
+    [data-axis="ne"],
+    [data-axis="nw"]
+  ) {
+    inset-block-start: 0;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="s"],
+    [data-axis="se"],
+    [data-axis="sw"]
+  ) {
+    inset-block-end: 0;
+  }
+
+  /* Physical sides: the panel's x and y are physical (a drag does not mirror). */
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="e"],
+    [data-axis="ne"],
+    [data-axis="se"]
+  ) {
+    right: 0;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="w"],
+    [data-axis="nw"],
+    [data-axis="sw"]
+  ) {
+    left: 0;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="ne"],
+    [data-axis="sw"]
+  ) {
+    cursor: nesw-resize;
+  }
+
+  :where([data-scope="floating-panel"][data-part="resize-trigger"]):is(
+    [data-axis="nw"],
+    [data-axis="se"]
+  ) {
+    cursor: nwse-resize;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="floating-panel"][data-part="content"]) {
+      border-color: CanvasText;
+    }
+  }
+}

@@ -343,6 +343,9 @@ const TRANSIENT = new Set([
   "image-viewer:settling",
   "sortable:moving",
   "sortable:dragging",
+  // While a pointer drags the panel or one of its edges.
+  "floating-panel:moving",
+  "floating-panel:resizing",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or

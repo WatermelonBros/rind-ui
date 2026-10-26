@@ -26,6 +26,7 @@ import * as field from "./field"
 import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
 import * as fileUpload from "./file-upload"
+import * as floatingPanel from "./floating-panel"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
 import * as gridList from "./grid-list"
@@ -95,6 +96,7 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  "floating-panel": floatingPanel,
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,

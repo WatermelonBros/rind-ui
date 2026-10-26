@@ -142,6 +142,11 @@
       "types": "./dist/file-upload/index.d.ts",
       "default": "./dist/file-upload/index.js"
     },
+    "./floating-panel": {
+      "@rind-ui/source": "./src/floating-panel/index.ts",
+      "types": "./dist/floating-panel/index.d.ts",
+      "default": "./dist/floating-panel/index.js"
+    },
     "./form": {
       "@rind-ui/source": "./src/form/index.ts",
       "types": "./dist/form/index.d.ts",
@@ -537,6 +542,10 @@
       "./file-upload": {
         "types": "./dist/file-upload/index.d.ts",
         "default": "./dist/file-upload/index.js"
+      },
+      "./floating-panel": {
+        "types": "./dist/floating-panel/index.d.ts",
+        "default": "./dist/floating-panel/index.js"
       },
       "./form": {
         "types": "./dist/form/index.d.ts",

@@ -10,6 +10,7 @@
 @import "./base.css";
 @import "./variants.css";
 @import "./icons.css";
+@import "./floating-panel.css";
 @import "./overlay.css";
 @import "./positioner.css";
 @import "./link.css";

@@ -143,6 +143,7 @@ export const familyMatrix = [
       "month-picker",
       "year-picker",
       "color-picker-content",
+      "floating-panel",
     ],
     variants: [],
     size: "inherited",

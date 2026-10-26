@@ -36,7 +36,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | done | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
-| Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Reado has TourCard/TourScrim |
 
 ## Menus & navigation (12)
