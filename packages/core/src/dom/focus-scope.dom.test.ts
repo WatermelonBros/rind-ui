@@ -162,6 +162,18 @@ describe("Tab containment", () => {
     expect(tab($("#b")).defaultPrevented).toBe(false)
   })
 
+  it("WebKit: Tab from a field moves to the button itself (Safari's Tab may skip buttons)", async () => {
+    html(`<div id="d"><input id="f"><button id="ok">ok</button><button id="no">no</button></div>`)
+    cleanups.push(trapTab(domEnvironment({ platform: platforms.apple }), $("#d")))
+    $("#f").focus()
+    expect(tab($("#f")).defaultPrevented).toBe(true)
+    await settle()
+    expect(document.activeElement).toBe($("#ok"))
+    tab($("#ok"), true)
+    await settle()
+    expect(document.activeElement).toBe($("#f"))
+  })
+
   it("trapTab wraps standalone", async () => {
     html(dialog)
     cleanups.push(trapTab(env, $("#d")))
