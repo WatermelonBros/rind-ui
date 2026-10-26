@@ -1,0 +1,42 @@
+/* ── Suggestions: wrapping chips in the skin's pill shape; the description smaller under the
+   label. Disabled chips dim (base.css) and keep focus. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="suggestions"][data-part="root"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-inline-size: 480px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="suggestions"][data-part="item"] {
+  display: inline-grid;
+  justify-items: start;
+  align-content: center;
+  gap: 2px;
+  padding: 8px 14px;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 99px;
+  box-shadow: var(--s-lift-lo);
+  text-align: start;
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="suggestions"][data-part="item"]:not([data-disabled]):hover {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="suggestions"][data-part="item"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="suggestions"][data-part="description"] {
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.75;
+}

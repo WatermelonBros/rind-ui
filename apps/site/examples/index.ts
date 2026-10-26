@@ -73,6 +73,7 @@ import * as sortable from "./sortable"
 import * as splitter from "./splitter"
 import * as stepper from "./stepper"
 import * as streamingMessage from "./streaming-message"
+import * as suggestions from "./suggestions"
 import * as switchEx from "./switch"
 import * as table from "./table"
 import * as tableOfContents from "./table-of-contents"
@@ -168,6 +169,10 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "context-meter": contextMeter,
+  suggestions,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,
