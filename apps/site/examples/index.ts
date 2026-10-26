@@ -170,7 +170,6 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   splitter,
   kbd,
   "json-tree-view": jsonTreeView,
-  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,
