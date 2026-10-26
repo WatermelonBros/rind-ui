@@ -252,6 +252,9 @@ function Root({
   }
   const current = value === undefined ? defaultValue : value
   const today = todayOf(env.dateClock, todayZone(timeZone, valuesOf(current ?? null)))
+  // Server markup marks no day as today (the server's day or zone may not be the viewer's).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   // The first focus: the given one, else the value, else today (calendar-navigation).
   const [initial] = useState(
     () =>
@@ -373,7 +376,7 @@ function Root({
     dragging: view.context.dragging,
     gridFocused,
     modality,
-    today: display(today, calendar),
+    today: mounted ? display(today, calendar) : null,
     dir,
     consumerNamed: rest["aria-label"] !== undefined || rest["aria-labelledby"] !== undefined,
     ids: {

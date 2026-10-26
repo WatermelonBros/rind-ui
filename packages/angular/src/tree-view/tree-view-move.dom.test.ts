@@ -144,7 +144,14 @@ describe("angular tree view moves", () => {
       await d.dragNode("notes.md", "readme.md", "before")
       expect((await rows(d))[0]).toBe("notes.md")
       await d.dragNode("notes.md", "archive", "inside")
-      expect(await rows(d)).toEqual(["readme.md", "docs", "  intro.md", "  api.md", "archive"])
+      expect(await rows(d)).toEqual([
+        "readme.md",
+        "docs",
+        "  intro.md",
+        "  api.md",
+        "archive",
+        "  notes.md",
+      ])
     },
   )
 })

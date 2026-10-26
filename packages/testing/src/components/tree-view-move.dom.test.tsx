@@ -126,6 +126,20 @@ describe("tree view moves", () => {
     ])
   })
 
+  it("Alt+Right into a collapsed branch opens it; focus stays on the moved node", async () => {
+    const { d } = setup(<Files expanded={[]} />)
+    await d.moveNode("notes.md", "in")
+    expect(await rows(d)).toEqual([
+      "readme.md",
+      "docs",
+      "  intro.md",
+      "  api.md",
+      "  notes.md",
+      "archive",
+    ])
+    expect(document.activeElement).toBe(row("notes.md"))
+  })
+
   it("nowhere to go is announced", async () => {
     const user = userEvent.setup()
     const { said } = setup(<Files />)
@@ -146,8 +160,15 @@ describe("tree view moves", () => {
     const { d } = setup(<Files />)
     await d.dragNode("notes.md", "archive", "inside")
     await act(async () => {})
-    expect(await rows(d)).toEqual(["readme.md", "docs", "  intro.md", "  api.md", "archive"])
-    // The archive is collapsed: notes.md is inside it.
+    // The collapsed archive opens: notes.md stays visible inside it.
+    expect(await rows(d)).toEqual([
+      "readme.md",
+      "docs",
+      "  intro.md",
+      "  api.md",
+      "archive",
+      "  notes.md",
+    ])
   })
 
   it.runIf(browser)("before and after rows", async () => {
