@@ -132,6 +132,9 @@ export function checkboxConnect(input: CheckboxConnectInput, env: LinkEnv) {
       type: "checkbox",
       id: input.ids.hiddenInput,
       "aria-hidden": "true",
+      // Named by the visible control, for checkers that flag an unlabelled input anyway
+      // (WAVE, reka-ui#3014); assistive technology never reaches it.
+      "aria-labelledby": input.ids.control,
       tabIndex: -1,
       name: field.name,
       value: input.value,

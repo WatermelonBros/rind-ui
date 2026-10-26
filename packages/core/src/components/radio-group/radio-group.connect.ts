@@ -293,6 +293,9 @@ export function radioGroupConnect(
       type: "radio",
       id: ids.hiddenInput(key),
       "aria-hidden": "true",
+      // Named by the visible radio, for checkers that flag an unlabelled input anyway (WAVE,
+      // reka-ui#3014); assistive technology never reaches it.
+      "aria-labelledby": ids.item(key),
       tabIndex: -1,
       name: input.name ?? ids.name,
       value: key,
