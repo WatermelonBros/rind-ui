@@ -1,4 +1,5 @@
 <script lang="ts">
+import { dropzoneClickOpens } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
 import { elementRef } from "../element-ref.svelte"
@@ -7,8 +8,6 @@ import { attrs, normalizeProps } from "../normalize-props"
 import { fileUploadContext } from "./context"
 import type { FileUploadDivProps } from "./types"
 
-const INTERACTIVE =
-  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
 const { child, children, ...rest }: FileUploadDivProps = $props()
 const ctx = fileUploadContext.get()
 const el = elementRef("div")
@@ -40,7 +39,7 @@ const merged = $derived(
           onclick: (e: MouseEvent) => {
             if (e.defaultPrevented || e.button !== 0) return
             const target = e.target as Element
-            if (target !== e.currentTarget && target.closest(INTERACTIVE)) return
+            if (!dropzoneClickOpens(target, e.currentTarget as Element)) return
             ctx.send({ type: "PICKER.OPEN" })
           },
         }),

@@ -283,3 +283,18 @@ export function domDropSource(
       },
     })
 }
+
+const INTERACTIVE =
+  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
+
+/**
+ * Whether a click inside a dropzone opens the file chooser: on the zone itself or its plain
+ * content, never on a control, label or the input inside it (no double open: zag#3387,
+ * react-dropzone#182). Only interactive elements inside the zone count: a focusable ancestor
+ * (a Dialog's content) does not.
+ */
+export function dropzoneClickOpens(target: Element, zone: Element): boolean {
+  if (target === zone) return true
+  const hit = target.closest(INTERACTIVE)
+  return hit === null || hit === zone || !zone.contains(hit)
+}

@@ -53,8 +53,16 @@ describe("buttonConnect", () => {
     expect(p["data-disabled"]).toBe("")
   })
 
-  it("pending submit is rendered as type button; idle keeps its type", () => {
-    expect(connect({ type: "submit", pending: true })["type"]).toBe("button")
+  it("a pending submit stays a submit (the default button) and cancels its click", () => {
+    const pending = connect({ type: "submit", pending: true })
+    expect(pending["type"]).toBe("submit")
+    let prevented = false
+    ;(pending["onClick"] as (e: unknown) => void)({
+      preventDefault: () => {
+        prevented = true
+      },
+    })
+    expect(prevented).toBe(true)
     expect(connect({ type: "submit" })["type"]).toBe("submit")
     expect(connect({ type: "reset" })["type"]).toBe("reset")
   })

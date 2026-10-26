@@ -169,6 +169,17 @@ describe("streaming-message machine: announcements", () => {
     f.set({ status: "error" })
     expect(f.said()).toEqual(["The response failed"])
   })
+
+  it("an error or a reply before any token is announced; a message mounted final is not", () => {
+    const failed = make({ status: "pending" })
+    failed.set({ status: "error" })
+    expect(failed.said()).toEqual(["The response failed"])
+    const cached = make({ status: "pending", announce: "text" })
+    cached.set({ text: "Hello there.", status: "complete" })
+    cached.advance(10_000)
+    expect(cached.said()).toEqual(["Hello there."])
+    expect(make({ status: "complete", text: "Old reply." }).said()).toEqual([])
+  })
 })
 
 describe("revealStep", () => {

@@ -16,7 +16,7 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks())
 
 describe("Button smoke", () => {
-  it("presses once per input; pending ignores; submit swaps to button while pending", async () => {
+  it("presses once per input; pending ignores; a pending submit stays the default button", async () => {
     const onPress = vi.fn()
     const onSubmit = vi.fn((e: Event) => e.preventDefault())
     const { rerender } = render(
@@ -46,7 +46,7 @@ describe("Button smoke", () => {
       </form>,
     )
     const el = screen.getByRole("button")
-    expect(el.getAttribute("type")).toBe("button")
+    expect(el.getAttribute("type")).toBe("submit")
     expect(el.getAttribute("aria-disabled")).toBe("true")
     expect(el.hasAttribute("disabled")).toBe(false)
     expect(await b.isPending()).toBe(true)
@@ -560,6 +560,33 @@ describe("pending", () => {
     await user.keyboard("{Enter}")
     expect(onSubmit).not.toHaveBeenCalled()
   })
+
+  for (const [label, extra] of [
+    ["a single text field", null],
+    [
+      "another submit button after it",
+      <button key="b" type="submit">
+        Draft
+      </button>,
+    ],
+  ] as const) {
+    it(`pending: Enter in ${label} does not submit (RA#7543)`, async () => {
+      const onSubmit = vi.fn((e: Event) => e.preventDefault())
+      render(
+        <form onSubmit={(e) => onSubmit(e.nativeEvent)}>
+          <input aria-label="Email" />
+          <Button type="submit" pending>
+            Subscribe
+          </Button>
+          {extra}
+        </form>,
+      )
+      const user = userEvent.setup()
+      await user.click(screen.getByLabelText("Email"))
+      await user.keyboard("{Enter}")
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+  }
 
   it("hover still sets data-hover while pending (react-spectrum#9460)", async () => {
     render(<Button pending>Wait</Button>)

@@ -25,6 +25,7 @@ import {
   announcerCapability,
   type DropSource,
   domDropSource,
+  dropzoneClickOpens,
   type FileLike,
   type FileRejection,
   type FileUploadEvent,
@@ -484,9 +485,6 @@ export class FileUploadLabel {
   }
 }
 
-const INTERACTIVE =
-  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
-
 /** Where files are dropped; a press on its own area opens the chooser. */
 @Directive({ selector: "[rindFileUploadDropzone]", exportAs: "rindFileUploadDropzone" })
 export class FileUploadDropzone {
@@ -500,7 +498,7 @@ export class FileUploadDropzone {
         onClick: (e: MouseEvent) => {
           if (e.defaultPrevented || e.button !== 0) return
           const target = e.target as Element
-          if (target !== e.currentTarget && target.closest(INTERACTIVE)) return
+          if (!dropzoneClickOpens(target, e.currentTarget as Element)) return
           root.send({ type: "PICKER.OPEN" })
         },
       }),

@@ -37,8 +37,9 @@ export function buttonConnect(state: ButtonConnectState, env: LinkEnv): PartProp
       // Pending is disabled for activation but keeps focus: aria-disabled, never native.
       disabled: disabled || pending,
       focusableWhenDisabled: state.focusableWhenDisabled || (pending && !disabled),
-      // A pending submit must not submit again (its own press or implicit submission).
-      type: pending ? "button" : state.type,
+      // A pending submit stays the form's default button: as "button", Enter in a field
+      // would submit through another button, or alone (RA#7543). Its click is cancelled below.
+      type: state.type,
     },
     env,
   )
@@ -52,5 +53,14 @@ export function buttonConnect(state: ButtonConnectState, env: LinkEnv): PartProp
     ...focusAttrs(state.focused, state.modality),
     "data-pressed": dataFlag(state.pressed),
     "data-hover": dataFlag(state.hovered),
+    // Pending: its own press and implicit submission (a synthetic click on the default
+    // button) are cancelled, so the form is not submitted again.
+    ...(pending
+      ? {
+          onClick: (e: unknown) => {
+            ;(e as Event).preventDefault()
+          },
+        }
+      : {}),
   }
 }

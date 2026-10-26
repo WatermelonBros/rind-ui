@@ -48,6 +48,8 @@ export interface StreamingMessageContext {
   readonly reduced: boolean
   /** A start was announced; completion is announced only after one. */
   readonly started: boolean
+  /** Mounted before its final status (pending or streaming): its live outcome is announced. */
+  readonly live: boolean
   /** Characters already announced in sentence mode. */
   readonly spoken: number
   /** Characters per tick, set when a chunk arrives (`revealStep` of the backlog then). */
@@ -167,21 +169,24 @@ export const streamingMessageMachine = /* @__PURE__ */ setup({
     announceProgress: (args) => {
       if (mode(args.props) === "sentences" && args.context.started) speakSentences(args, false)
     },
+    // Only a message that mounts in its final state stays silent: one that went final
+    // without streaming (a cached reply, an error before the first token) is announced.
     announceComplete: (args) => {
-      if (!args.context.started) return
+      if (!args.context.started && !args.context.live) return
       const m = mode(args.props)
       if (m === "status") say(args, args.props.messages.completed)
       else if (m === "text") say(args, args.props.text)
       else if (m === "sentences") speakSentences(args, true)
     },
     announceCancelled: (args) => {
-      if (!args.context.started) return
+      if (!args.context.started && !args.context.live) return
       if (mode(args.props) === "status") say(args, args.props.messages.cancelled)
       else if (mode(args.props) !== "none")
         args.env.announcer.cancel(`streaming-message-${args.props.id}`)
     },
     announceFailed: (args) => {
-      if (args.context.started && mode(args.props) !== "none") say(args, args.props.messages.failed)
+      if ((args.context.started || args.context.live) && mode(args.props) !== "none")
+        say(args, args.props.messages.failed)
     },
   },
   delays: { tick: () => REVEAL_TICK_MS },
@@ -199,6 +204,7 @@ export const streamingMessageMachine = /* @__PURE__ */ setup({
     shown: props.text.length,
     reduced: false,
     started: false,
+    live: props.status === "pending" || props.status === "streaming",
     spoken: props.status === "streaming" ? 0 : props.text.length,
     rate: 0,
   }),

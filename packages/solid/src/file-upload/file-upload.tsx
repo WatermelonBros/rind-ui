@@ -4,6 +4,7 @@ import {
   type ChangeDetails,
   type DropSource,
   domDropSource,
+  dropzoneClickOpens,
   type FileLike,
   type FileRejection,
   type FileUploadEvent,
@@ -497,9 +498,6 @@ function Label(props: FileUploadLabelProps) {
   ))
 }
 
-const INTERACTIVE =
-  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
-
 export type FileUploadDropzoneProps = PartProps<JSX.HTMLAttributes<HTMLDivElement>>
 
 function Dropzone(props: FileUploadDropzoneProps) {
@@ -536,7 +534,7 @@ function Dropzone(props: FileUploadDropzoneProps) {
           onClick: (e: MouseEvent) => {
             if (e.defaultPrevented || e.button !== 0) return
             const target = e.target as Element
-            if (target !== e.currentTarget && target.closest(INTERACTIVE)) return
+            if (!dropzoneClickOpens(target, e.currentTarget as Element)) return
             send({ type: "PICKER.OPEN" })
           },
         }),

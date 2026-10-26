@@ -53,6 +53,7 @@ export {
   dragHasFiles,
   dragLeftRoot,
   dragPresence,
+  dropzoneClickOpens,
   filePath,
   filesFromClipboard,
   filesFromDataTransfer,
