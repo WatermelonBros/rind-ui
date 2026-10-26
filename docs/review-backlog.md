@@ -7,6 +7,7 @@ See CLAUDE.md "Review rules".
 
 | Change | Reado id | File | Finding |
 |---|---|---|---|
+| site mobile pass (2026-10-26) | — | apps/site/examples/date-field.tsx | React #418 hydration text mismatch on /docs/date-field/ in WebKit only (390/768/1180, 360/1024): likely a WebKit Intl date label differing from Node's at build time; render the locale-dependent label client-only or pin it |
 | merge-alert-dialog-into-dialog (review) | — | packages/testing/src/components/dialog-alert-role.dom.test.tsx | `frames(6)` waits (pre-existing from add-alert-dialog): wait on a postcondition instead of a frame count |
 | test-warning-guard (#103) | — | vitest.config.ts | Warning guard in the browser project: re-enable after the Chromium connection-drop root cause (console/task.meta traffic suspected; with the guard, browser-chromium-1 dropped 2/2 runs, without it passed) |
 | add-combobox-variants (spec) | — | openspec/changes/add-combobox-variants | The retired Autocomplete mode `inline` (completion without filtering) is out of scope; revisit when a user asks (mode `none`, a static list, is `autoComplete="list"` with `filter: null`) |
