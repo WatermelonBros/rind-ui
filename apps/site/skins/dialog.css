@@ -180,7 +180,9 @@
   border-color: var(--s-brand-deep);
 }
 /* muted by colour, not opacity: opacity stacks on a muted skin (contrast) */
-[data-rind-theme^="skin-"] [data-scope="dialog"][role="alertdialog"] [data-part="action"]:disabled {
+[data-rind-theme^="skin-"]
+  [data-scope="dialog"][role="alertdialog"]
+  [data-part="action"]:is(:disabled, [aria-disabled="true"]) {
   background: color-mix(in oklab, var(--s-brand) 55%, var(--s-card));
   cursor: progress;
 }
