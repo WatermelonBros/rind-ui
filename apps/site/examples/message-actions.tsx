@@ -4,7 +4,7 @@ import { MessageActions } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = {}
+export const states: States = { "message-actions": { live: "Basic" } }
 
 /** Phosphor (regular) icons; the buttons are named by the component, not by these. */
 function Icon({ d }: { readonly d: string }) {

@@ -343,6 +343,8 @@ const TRANSIENT = new Set([
   "image-viewer:settling",
   "sortable:moving",
   "sortable:dragging",
+  // After a copy or a regenerate, until the status settles.
+  "message-actions:settling",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
