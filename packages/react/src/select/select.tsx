@@ -26,6 +26,7 @@ import {
   selectLayerId,
   selectMachine,
   selectPositioning,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -285,6 +286,8 @@ function Root(all: SelectRootProps) {
   const parent = useParentLayer()
   const enclosing = useFieldBindingPeek()
   const fieldsetDisabled = useFieldsetDisabled()
+  // A native <fieldset disabled> around the trigger, not only rind's Fieldset (radix#2417).
+  const [fieldsetDom, setFieldsetDom] = useState(false)
   const field = mergeFieldProps(
     {
       role: "combobox",
@@ -297,7 +300,7 @@ function Root(all: SelectRootProps) {
     },
     enclosing,
   )
-  const disabled = field.disabled || fieldsetDisabled
+  const disabled = field.disabled || fieldsetDisabled || fieldsetDom
   const { collection: registered, registry } = useCollectionItems()
   const data = useMemo(() => (items ? fromData(items) : null), [items])
   const collection = given ?? data ?? registered ?? EMPTY
@@ -308,6 +311,13 @@ function Root(all: SelectRootProps) {
   const triggerRef = useRef<HTMLElement | null>(null)
   const labelRef = useRef<HTMLElement | null>(null)
   const hiddenRef = useRef<HTMLInputElement | null>(null)
+  useEffect(() => {
+    const node = triggerRef.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   const [formInput] = useState(() =>
     hiddenFormInput({ input: () => hiddenRef.current, control: () => triggerRef.current }, env),
   )
@@ -447,7 +457,9 @@ function HiddenInputs({
         current: mirror,
         onNativeInput: (input) => {
           service.send({ type: "FORM.AUTOFILL", text: input.value })
-          return true
+          // Re-sync either way: an unmatched text (or a multiple select) leaves the machine as it
+          // was, and the input must not keep what the browser wrote (select spec "Browser Autofill").
+          return false
         },
       }),
     [formInput, service, mirror],
@@ -576,7 +588,17 @@ function Trigger({
   const own = normalizeProps(
     api.trigger({ tag, focused, modality, pressed: press.pressed, label, labelledBy, describedBy }),
   )
-  const fieldAria = binding ? mergeFieldProps({ role: "combobox", labelable: true }, binding) : null
+  const fieldAria = binding
+    ? mergeFieldProps(
+        // Sound: the connect writes the trigger's id list as a string (or leaves it out).
+        {
+          role: "combobox",
+          labelable: true,
+          describedBy: own["aria-describedby"] as string | undefined,
+        },
+        binding,
+      )
+    : null
   // Space continuing a search must not press the trigger (the trigger's handler acts first).
   const { onKeyDown: pressKeyDown, ...pressProps } = press.props
   const props = mergeProps(
@@ -590,7 +612,7 @@ function Trigger({
       }),
       ...(fieldAria
         ? {
-            "aria-describedby": fieldAria["aria-describedby"] ?? own["aria-describedby"],
+            "aria-describedby": fieldAria["aria-describedby"],
             "aria-required": own["aria-required"] ?? fieldAria["aria-required"],
           }
         : {}),

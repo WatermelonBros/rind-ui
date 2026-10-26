@@ -233,13 +233,17 @@ export class ContextMenuTrigger {
     const env = injectEnvironment()
     const el: Element = inject(ElementRef).nativeElement
     // The hint only for a region the consumer made focusable, read after render (as React's).
-    const focusable = el.hasAttribute("tabindex")
+    // A bound [attr.tabindex] / [tabIndex] lands with the first render, after the constructor.
+    const focusable = signal(false)
     const ready = injectRendered()
-    this.hint = computed(() => ready() && focusable && region.longPress())
+    this.hint = computed(() => ready() && focusable() && region.longPress())
     if (inject(PLATFORM_ID) === "browser") {
       // The modality tracker classifies a contextmenu with no press before it (AT, keyboard).
       const destroy = inject(DestroyRef)
-      afterNextRender(() => destroy.onDestroy(env.modality.subscribe(() => {})))
+      afterNextRender(() => {
+        focusable.set(el.hasAttribute("tabindex"))
+        destroy.onDestroy(env.modality.subscribe(() => {}))
+      })
       level.trigger.set(el instanceof HTMLElement ? el : null)
       destroy.onDestroy(() => {
         if (untracked(level.trigger) === el) level.trigger.set(null)

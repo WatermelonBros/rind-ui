@@ -32,6 +32,7 @@ export { type CropDragTarget, type CropGestureHandlers, cropGestures } from "./c
 export { CropError, type CropErrorCode, type CropImageOptions, cropImage } from "./crop-image"
 export { cssZoom } from "./css-zoom"
 export { domDelayGroup } from "./delay-group"
+export { elementDir } from "./direction"
 export {
   type DismissOptions,
   type DismissReason,

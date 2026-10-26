@@ -250,6 +250,33 @@ describe("ContextMenu scenarios: while open", () => {
     expect(open).toBe(false)
     expect(details.reason).toBe("scroll")
   })
+
+  it("Non-modal on a focusable region: Tab moves on from the row, not into the region (base-ui#6063 class)", async () => {
+    render(
+      <>
+        <ContextMenu.Root modal={false}>
+          <ContextMenu.Trigger tabIndex={0}>
+            <button type="button">first.md</button>
+            <button type="button">second.md</button>
+          </ContextMenu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content aria-label="File actions">
+                <Menu.Item>Rename</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </ContextMenu.Root>
+        <button type="button">After</button>
+      </>,
+    )
+    const row = screen.getByRole("button", { name: "second.md" })
+    act(() => row.focus())
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}")
+    await waitFor(() => expect(active()?.textContent).toBe("Rename"))
+    await userEvent.keyboard("{Tab}")
+    await waitFor(() => expect(active()).toBe(screen.getByRole("button", { name: "After" })))
+  })
 })
 
 describe("ContextMenu scenarios: programmatic and dev warnings", () => {

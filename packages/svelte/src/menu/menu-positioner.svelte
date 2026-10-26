@@ -1,4 +1,5 @@
 <script lang="ts">
+import { elementDir } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { elementRef } from "../element-ref.svelte"
 import { keepStyle } from "../keep-style"
@@ -18,8 +19,7 @@ const open = $derived(isOpen(ctx))
 let dir = $state<"ltr" | "rtl" | undefined>(undefined)
 $effect(() => {
   if (!open) return
-  const found = ctx.shared.trigger?.closest("[dir]")?.getAttribute("dir")
-  dir = found === "rtl" ? "rtl" : "ltr"
+  dir = elementDir(ctx.shared.trigger, env.locale.dir())
 })
 // It holds the content: it stays while the content's exit animations run.
 const presence = usePresence(

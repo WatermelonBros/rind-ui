@@ -6,6 +6,7 @@ import {
   createMenuTree,
   domHoverIntent,
   domPositioning,
+  elementDir,
   getLayerStack,
   type HoverIntent,
   type LayerMeta,
@@ -476,12 +477,12 @@ function usePartPresence(ctx: Level, subtree = false) {
 
 /** The trigger's direction: the portalled positioner carries it (inline sides, RTL). */
 function useTriggerDir(ctx: Level) {
+  const env = useEnvironment()
   const [dir, setDir] = createSignal<"ltr" | "rtl" | undefined>(undefined)
   afterMount(() => {
     createEffect(() => {
       if (!isOpen(ctx)) return
-      const found = ctx.trigger()?.closest("[dir]")?.getAttribute("dir")
-      setDir(found === "rtl" ? "rtl" : "ltr")
+      setDir(elementDir(ctx.trigger(), env.locale.dir()))
     })
   })
   return dir

@@ -46,6 +46,7 @@ import {
   selectLayerId,
   selectMachine,
   selectPositioning,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { absentProps } from "../absent"
 import { bindProps, joinHandlers } from "../bind-props"
@@ -226,6 +227,8 @@ export class SelectRoot implements OnInit {
   readonly field: Signal<ReturnType<typeof mergeFieldProps>>
   /** @internal */
   readonly trigger = signal<HTMLElement | null>(null)
+  // A native <fieldset disabled> around the trigger, not only rind's Fieldset (radix#2417).
+  private readonly fieldsetDom = signal(false)
   /** @internal */
   readonly label = signal<HTMLElement | null>(null)
   /** @internal */
@@ -270,7 +273,7 @@ export class SelectRoot implements OnInit {
         enclosing?.() ?? null,
       )
     })
-    this.disabledState = () => this.field().disabled || fieldsetDisabled()
+    this.disabledState = () => this.field().disabled || fieldsetDisabled() || this.fieldsetDom()
     const { collection: registered, registry } = injectCollectionItems()
     const data = computed(() => {
       const items = this.items()
@@ -408,6 +411,13 @@ export class SelectRoot implements OnInit {
       formInput.sync(mirror(), { dispatch })
     })
     const destroy = inject(DestroyRef)
+    afterNextRender(() => {
+      const node = untracked(this.trigger)
+      if (!node) return
+      const watch = watchFieldsetDisabled(node, (d) => this.fieldsetDom.set(d))
+      this.fieldsetDom.set(watch.disabled)
+      destroy.onDestroy(watch.stop)
+    })
     afterNextRender(() =>
       destroy.onDestroy(
         formInput.track({
@@ -415,7 +425,9 @@ export class SelectRoot implements OnInit {
           current: mirror,
           onNativeInput: (el) => {
             send({ type: "FORM.AUTOFILL", text: el.value })
-            return true
+            // Re-sync either way: an unmatched text (or a multiple select) leaves the machine as it
+            // was, and the input must not keep what the browser wrote (select spec "Browser Autofill").
+            return false
           },
         }),
       ),
@@ -568,7 +580,15 @@ export class SelectTrigger {
           ...naming,
         })
         const fieldAria = binding
-          ? mergeFieldProps({ role: "combobox", labelable: true }, binding())
+          ? mergeFieldProps(
+              // Sound: the connect writes the trigger's id list as a string (or leaves it out).
+              {
+                role: "combobox",
+                labelable: true,
+                describedBy: own["aria-describedby"] as string | undefined,
+              },
+              binding(),
+            )
           : null
         return {
           ...joinHandlers(own, pressProps, {
@@ -580,7 +600,7 @@ export class SelectTrigger {
           }),
           ...(fieldAria
             ? {
-                "aria-describedby": fieldAria["aria-describedby"] ?? own["aria-describedby"],
+                "aria-describedby": fieldAria["aria-describedby"],
                 "aria-required": own["aria-required"] ?? fieldAria["aria-required"],
               }
             : {}),

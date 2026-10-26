@@ -476,7 +476,7 @@ export const selectMachine = /* @__PURE__ */ setup({
           actions: ["enterOpen", "resetTypeahead"],
         },
         TYPEAHEAD: { guard: { and: ["interactive", "isSingle"] }, actions: ["typeaheadSelect"] },
-        "FORM.AUTOFILL": { guard: "isSingle", actions: ["autofill"] },
+        "FORM.AUTOFILL": { guard: { and: ["interactive", "isSingle"] }, actions: ["autofill"] },
       },
     },
     open: {

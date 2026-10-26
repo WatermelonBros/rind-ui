@@ -60,7 +60,10 @@ export interface MenuTree {
   closeTree(reason: MenuCloseReason): void
   /** The open levels below the root, outermost first. */
   openPath(): readonly MenuLevelId[]
-  /** Tab leaves the tree from the root trigger. */
+  /**
+   * Tab leaves the tree from the root trigger. A context menu has none (null): the overlay
+   * returns focus to what was focused at open, and Tab moves on from there.
+   */
   rootTrigger(): HTMLElement | null
   parentKind(): MenuParentKind | null
   parentElements(): readonly HTMLElement[]
@@ -115,7 +118,9 @@ export function createMenuTree(
       }
       return path
     },
-    rootTrigger: () => root()?.trigger() ?? null,
+    // A region is no trigger: focusing it would put Tab at its first descendant, not past the
+    // row the menu opened on (base-ui#6063 class).
+    rootTrigger: () => (options.parentKind === "context-menu" ? null : (root()?.trigger() ?? null)),
     parentKind: () => options.parentKind ?? null,
     parentElements: () => options.host?.elements() ?? [],
     parentNavigate: (input) => options.host?.navigate(input),
