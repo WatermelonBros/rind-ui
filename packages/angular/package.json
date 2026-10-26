@@ -332,6 +332,11 @@
       "types": "./dist/streaming-message/index.d.ts",
       "default": "./dist/streaming-message/index.js"
     },
+    "./suggestions": {
+      "@rind-ui/source": "./src/suggestions/index.ts",
+      "types": "./dist/suggestions/index.d.ts",
+      "default": "./dist/suggestions/index.js"
+    },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
       "types": "./dist/switch/index.d.ts",
@@ -689,6 +694,10 @@
       "./streaming-message": {
         "types": "./dist/streaming-message/index.d.ts",
         "default": "./dist/streaming-message/index.js"
+      },
+      "./suggestions": {
+        "types": "./dist/suggestions/index.d.ts",
+        "default": "./dist/suggestions/index.js"
       },
       "./switch": {
         "types": "./dist/switch/index.d.ts",
