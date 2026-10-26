@@ -8,6 +8,11 @@ import { platforms } from "./platform"
 const ATTR = "data-rind-scroll-locked"
 const html = document.documentElement
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()))
+/** A released layer is disposed a frame later, once its exit animations settle. */
+const exited = async () => {
+  await frame()
+  await frame()
+}
 const q = (sel: string) => document.querySelector(sel) as HTMLElement
 
 const cleanups: (() => void)[] = []
@@ -86,9 +91,12 @@ describe("modal overlayEffect", () => {
     await frame()
     pressEscape()
     expect(requests).toEqual(["escape-key"])
-    expect(anyInert()).toBe(false)
+    expect(q("#app").hasAttribute("inert")).toBe(false)
     expect(locked()).toBe(false)
     expect(document.activeElement).toBe(trigger)
+    // The released content stays inert while it exits (nothing animates here: one frame).
+    await exited()
+    expect(anyInert()).toBe(false)
   })
 
   it("an unmount mid-open leaves html and body attributes and styles as they were", () => {
@@ -191,6 +199,27 @@ describe("modal overlayEffect", () => {
     expect(anyInert()).toBe(false)
   })
 
+  it("a released layer stays exiting until its parts settle (react-spectrum#10291)", async () => {
+    const { stop, content } = openDialog()
+    // The content fades out (the theme's transition): the layer waits for it.
+    content.style.transitionProperty = "opacity"
+    content.style.transitionDuration = "20ms"
+    await frame()
+    stop()
+    const stack = getLayerStack(document)
+    expect(stack.layers()).toHaveLength(0)
+    expect(stack.exiting()).toHaveLength(1)
+    await exited()
+    expect(stack.exiting()).toHaveLength(0)
+  })
+
+  it("a layer with nothing to animate is disposed at close", async () => {
+    const { stop } = openDialog()
+    await frame()
+    stop()
+    expect(getLayerStack(document).exiting()).toHaveLength(0)
+  })
+
   it("survives start, cleanup, start again (Strict Mode)", async () => {
     const ctx = setup()
     const reference = snapshot()
@@ -213,8 +242,9 @@ describe("modal overlayEffect", () => {
     expect(stack.exiting()).toHaveLength(0)
     expect(locked()).toBe(true)
     stop()
-    expect(anyInert()).toBe(false)
     expect(locked()).toBe(false)
+    await exited()
+    expect(anyInert()).toBe(false)
     expect(snapshot()).toEqual(reference)
   })
 

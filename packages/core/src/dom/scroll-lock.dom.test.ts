@@ -316,6 +316,11 @@ describe.runIf(inBrowser && typeof Touch !== "undefined" && canConstructTouch())
       expect(swipe(behind, -30).defaultPrevented).toBe(true)
     })
 
+    it("leaves a stationary tap's sub-pixel move alone, so its click survives (reka-ui#3054)", () => {
+      const { behind } = setup()
+      expect(swipe(behind, 1e-14).defaultPrevented).toBe(false)
+    })
+
     it("allows a two-finger move", () => {
       const { behind } = setup()
       expect(swipe(behind, -30, 2).defaultPrevented).toBe(false)

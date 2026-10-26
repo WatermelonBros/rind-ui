@@ -119,4 +119,6 @@ const firstDay = $derived(ctx.firstDayOfWeek())
   readOnly={endProps.readOnly}
   invalid={ctx.state().message !== ""}
   {...firstDay ? { firstDayOfWeek: firstDay } : {}}
+  {...endProps.locale ? { locale: endProps.locale } : {}}
+  {...endProps.dir ? { dir: endProps.dir } : {}}
 />

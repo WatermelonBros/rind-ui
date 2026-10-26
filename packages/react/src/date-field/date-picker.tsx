@@ -289,6 +289,10 @@ function SingleCalendar(props: DatePickerCalendarProps) {
       readOnly={ctx.readOnly}
       invalid={api.validity.message !== "" || ctx.own.invalid === true}
       {...(ctx.picker.firstDayOfWeek ? { firstDayOfWeek: ctx.picker.firstDayOfWeek } : {})}
+      // The field's locale, direction and calendar system (spec "Picker — Calendar Binding").
+      locale={ctx.picker.locale}
+      dir={ctx.dir}
+      {...(ctx.picker.createCalendar ? { createCalendar: ctx.picker.createCalendar } : {})}
     />
   )
 }
@@ -385,6 +389,9 @@ function RangeCalendar(props: DatePickerCalendarProps) {
       readOnly={ctx.end.readOnly}
       invalid={ctx.state.message !== ""}
       {...(ctx.firstDayOfWeek ? { firstDayOfWeek: ctx.firstDayOfWeek } : {})}
+      // The field's locale and direction (spec "Picker — Calendar Binding").
+      {...(ctx.end.locale ? { locale: ctx.end.locale } : {})}
+      {...(ctx.end.dir ? { dir: ctx.end.dir } : {})}
     />
   )
 }

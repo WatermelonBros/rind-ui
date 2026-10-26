@@ -1005,8 +1005,13 @@ export const tourMachine = /* @__PURE__ */ setup({
         if (t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement) return
         if (
           t instanceof HTMLInputElement &&
-          !["checkbox", "radio", "button", "submit", "reset", "file", "image", "color"].includes(
-            t.type,
+          !["checkbox", "button", "submit", "reset", "file", "image", "color"].includes(t.type)
+        )
+          return
+        // Widgets whose own arrows move inside them (a radio group, a slider, tabs, a menu).
+        if (
+          t.closest(
+            '[role="radiogroup"],[role="slider"],[role="tablist"],[role="menu"],[role="menubar"],[role="listbox"],[role="grid"],[role="tree"]',
           )
         )
           return

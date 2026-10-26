@@ -33,8 +33,9 @@ export function parseColorText(
 }
 
 /**
- * The colour a parsed hex commit sets: a 3/6-digit hex keeps the current alpha (zag#884); with
- * `alpha` an 8/4-digit hex sets it; without `alpha` the alpha never changes.
+ * The colour a parsed commit sets: a 3/6-digit hex keeps the current alpha (zag#884); with
+ * `alpha` an 8/4-digit hex, or any css colour (`rgb(255 0 0 / 50%)`), sets it; without `alpha`
+ * the alpha never changes.
  */
 export function commitAlpha(
   parsed: Color,
@@ -43,7 +44,8 @@ export function commitAlpha(
   alpha: boolean,
 ): Color {
   const digits = text.trim().replace(/^#/, "")
-  const hasAlpha = digits.length === 4 || digits.length === 8
+  const hex = /^[0-9a-f]+$/i.test(digits)
+  const hasAlpha = !hex || digits.length === 4 || digits.length === 8
   if (alpha && hasAlpha) return parsed
   return makeColor(parsed.space, parsed.channels, current?.alpha ?? 1)
 }

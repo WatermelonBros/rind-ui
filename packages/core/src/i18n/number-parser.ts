@@ -208,6 +208,9 @@ function build(locale: string, options: NumberParseOptions): LocaleNumberParser 
       return signed.replace(/-/g, "−")
     },
     numberingSystem(text) {
+      // Persian digits are converted for the parser, which does not know them: kept on reformat
+      // (BU#4718).
+      if (/[۰-۹]/.test(text)) return "arabext"
       try {
         return parser.getNumberingSystem(fromArabext(text))
       } catch {

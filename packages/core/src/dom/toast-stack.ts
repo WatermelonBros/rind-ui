@@ -15,7 +15,17 @@ export function measureToast(el: HTMLElement, onHeight: (height: number) => void
   }
   measure()
   if (typeof ResizeObserver === "undefined") return () => {}
-  const observer = new ResizeObserver(() => measure())
+  // The read lifts the inline height, which resizes the observed box: inside the observer's own
+  // callback that is a resize it cannot deliver ("ResizeObserver loop completed with undelivered
+  // notifications" in WebKit). The next frame reads the same layout, outside the delivery.
+  let frame = 0
+  const observer = new ResizeObserver(() => {
+    cancelAnimationFrame(frame)
+    frame = requestAnimationFrame(measure)
+  })
   observer.observe(el)
-  return () => observer.disconnect()
+  return () => {
+    cancelAnimationFrame(frame)
+    observer.disconnect()
+  }
 }

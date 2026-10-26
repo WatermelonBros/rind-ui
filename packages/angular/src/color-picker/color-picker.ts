@@ -43,6 +43,7 @@ import {
   formatColor,
   isEyeDropperSupported,
   type MessageOverrides,
+  mergeFieldProps,
   nextFormat,
   type PartProps,
   PICKER_FORMATS,
@@ -51,6 +52,7 @@ import {
   pickerValueOf,
   pickerWorking,
   pickScreenColor,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { COLOR_PICKER_SCOPE } from "@rind-ui/core/internal"
 import { absentProps } from "../absent"
@@ -58,8 +60,14 @@ import { bindProps, joinHandlers } from "../bind-props"
 import { COLOR_BINDING, COLOR_FLUSH, type ColorBinding } from "../color-binding"
 import { colorReader } from "../color-input"
 import { ColorSwatchBase, TransparencyGridBase } from "../color-swatch/color-swatch"
-import { FIELD_HOST, FieldControlBoundary, injectFieldControl } from "../field/context"
+import {
+  FIELD_HOST,
+  FieldControlBoundary,
+  injectFieldBindingPeek,
+  injectFieldControl,
+} from "../field/context"
 import { FieldRoot } from "../field/field"
+import { injectFieldsetDisabled } from "../fieldset/context"
 import { injectMachine } from "../inject-machine"
 import { injectModality } from "../inject-press"
 import {
@@ -220,6 +228,8 @@ export class ColorPickerRoot {
   /** @internal */
   protected readonly hiddenProps: Signal<PartProps>
   private readonly hiddenRef = viewChild<ElementRef<HTMLInputElement>>("hidden")
+  /** @internal A native <fieldset disabled> around the hidden input (watched by it). */
+  readonly fieldsetDom = signal(false)
 
   constructor() {
     const loc = injectLocale(
@@ -241,8 +251,24 @@ export class ColorPickerRoot {
     const isInline = () => (inline ??= untracked(this.inline))
     this.isInline = isInline
     let latestFormat: ColorPickerFormat | undefined
-    const disabled = () => this.field.disabled()
-    const readOnly = () => this.field.readonly()
+    // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>
+    // (spec: passed to every child).
+    const enclosing = injectFieldBindingPeek()
+    const fieldsetDisabled = injectFieldsetDisabled()
+    const merged = computed(() =>
+      mergeFieldProps(
+        {
+          role: "group",
+          labelable: false,
+          disabled: this.field.disabled(),
+          readOnly: this.field.readonly(),
+          invalid: this.invalid(),
+        },
+        enclosing?.() ?? null,
+      ),
+    )
+    const disabled = () => merged().disabled || fieldsetDisabled() || this.fieldsetDom()
+    const readOnly = () => merged().readOnly
     const machineProps = () => ({
       value: value(),
       defaultValue: defaultValue(),
@@ -300,7 +326,7 @@ export class ColorPickerRoot {
         inline: isInline(),
         disabled: disabled(),
         readOnly: readOnly(),
-        invalid: this.invalid(),
+        invalid: merged().invalid,
         dragging: false,
         messages: this.texts(),
         locale: loc().locale,
@@ -411,7 +437,10 @@ function injectHiddenSync(picker: ColorPickerRoot, el: () => HTMLInputElement | 
     }
     owner?.addEventListener("reset", onReset)
     input?.addEventListener("change", onChange)
+    const fieldset = input ? watchFieldsetDisabled(input, (d) => picker.fieldsetDom.set(d)) : null
+    if (fieldset) picker.fieldsetDom.set(fieldset.disabled)
     destroy.onDestroy(() => {
+      fieldset?.stop()
       owner?.removeEventListener("reset", onReset)
       input?.removeEventListener("change", onChange)
     })

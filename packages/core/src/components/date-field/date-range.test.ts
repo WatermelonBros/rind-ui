@@ -163,6 +163,24 @@ describe("dateRangeFieldMachine", () => {
     expect(m.ctx().endValue).toEqual(d(9, 1))
   })
 
+  it("an end committing a new value with the same problem stays invalid (no re-report)", () => {
+    const m = make()
+    const tooEarly = {
+      message: "Value must be 10/1/2026 or later",
+      flags: validityFlags("rangeUnderflow"),
+    }
+    m.commit("START", d(9, 28))
+    m.s.send({ type: "START.VALIDITY", ...tooEarly })
+    m.commit("END", d(10, 2))
+    // Still before minValue: the end's report is unchanged, so it sends none.
+    m.commit("START", d(9, 29))
+    expect(m.onValueChange.mock.calls.every(([v]) => v === null)).toBe(true)
+    // Fixed: the end reports valid, and the pair emits.
+    m.commit("START", d(10, 1))
+    m.s.send({ type: "START.VALIDITY", message: "", flags: VALID })
+    expect(m.onValueChange.mock.calls.at(-1)?.[0]).toEqual({ start: d(10, 1), end: d(10, 2) })
+  })
+
   it("CLEAR clears both ends; RESET restores the default range", () => {
     const m = make({ defaultValue: { start: d(10, 1), end: d(10, 3) } })
     m.s.send({ type: "CLEAR" })
