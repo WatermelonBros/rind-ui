@@ -367,6 +367,11 @@
   place-items: start center;
   min-height: 360px;
 }
+/* an example open from the start (date-field's "Picker open"): its calendar has room under the field */
+.stage:has([data-open-demo]) {
+  place-items: start center;
+  min-height: 440px;
+}
 /* an open popup in the parts view: the trigger moves up so the popup stays clear of the legend */
 .stage[data-view="parts"]:has([aria-haspopup][aria-expanded="true"]) {
   place-items: start center;

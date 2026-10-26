@@ -98,7 +98,14 @@ export function DateRangePicker() {
 /** The picker open on its value (a state example). */
 export function DatePickerOpen() {
   return (
-    <DateField.Root defaultValue={fixed} defaultOpen>
+    // open from the start, inside its stage: always below the field (a flip near the viewport's
+    // foot threw it over the tabs and heading above, and back as the page scrolled)
+    <DateField.Root
+      defaultValue={fixed}
+      defaultOpen
+      positioning={{ collisionAvoidance: { side: "none", align: "shift", fallbackAxis: "none" } }}
+      data-open-demo=""
+    >
       <DateField.Label>Departure</DateField.Label>
       <PickerParts />
     </DateField.Root>
