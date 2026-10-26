@@ -178,6 +178,8 @@ describe("React Carousel", () => {
     container.innerHTML = renderToString(tree)
     expect(container.querySelectorAll('[role="tab"]')).toHaveLength(4)
     document.body.append(container)
+    // This test drives React with act(): say so, whatever another file in the same page set.
+    ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
     const error = vi.spyOn(console, "error").mockImplementation(() => {})
     let root: ReturnType<typeof hydrateRoot> | undefined
     await act(async () => {

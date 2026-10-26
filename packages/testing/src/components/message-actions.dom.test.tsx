@@ -104,6 +104,11 @@ describe("React MessageActions", () => {
     const t = setup({ text: "Hello" })
     await settle()
     const d = t.d()
+    // A clean start: the real pointer or a previous test's focus may rest on the message.
+    act(() => {
+      ;(document.activeElement as HTMLElement | null)?.blur()
+      t.q('[data-testid="message"]').dispatchEvent(new PointerEvent("pointerleave"))
+    })
     expect(await d.isActive()).toBe(false)
     act(() => {
       t.q('[data-testid="message"]').dispatchEvent(new PointerEvent("pointerenter"))

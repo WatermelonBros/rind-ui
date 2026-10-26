@@ -21,7 +21,17 @@ export function Basic() {
         <ColorWheel.Value />
       </ColorWheel.Root>
       <div className="wheel-preview" style={{ background: formatColor(color, "css") }}>
-        <span>{formatColor(color, "hex")}</span>
+        {/* Its own surface: readable over any hue, with or without a skin. */}
+        <span
+          style={{
+            background: "Canvas",
+            color: "CanvasText",
+            padding: "2px 8px",
+            borderRadius: 99,
+          }}
+        >
+          {formatColor(color, "hex")}
+        </span>
       </div>
     </div>
   )
