@@ -467,14 +467,26 @@ export function SkinScene() {
     // seconds at the top sees the object pulled off its place, the page come off with it, and
     // the spring bring both back (the same pull a hand makes; never again once they act)
     let demoed = false
+    let demoing = false
+    // let go, as a hand would: the page dresses again and the spring takes it home
+    const letGo = () => {
+      demoing = false
+      cancelAnimationFrame(grab.spring)
+      grab.down = true
+      grab.moved = true
+      onGrabUp()
+    }
     const quiet = () => {
       demoed = true
       clearTimeout(demoTimer)
+      // acting mid-demo lets go at once: only cancelling the release left the page stripped
+      if (demoing) letGo()
     }
     const demo = () => {
       if (demoed || grab.down || window.scrollY > 40 || !fine.matches || !drawn || document.hidden)
         return
       demoed = true
+      demoing = true
       const cx = drawn.x + drawn.width / 2
       const cy = drawn.y + drawn.height / 2
       const start = performance.now()
@@ -488,13 +500,7 @@ export function SkinScene() {
         if (!stripped && k > 0.45) strip(true, lastPull[0], lastPull[1])
         scene.current?.wake()
         if (k < 1) grab.spring = requestAnimationFrame(pull)
-        else
-          demoTimer = window.setTimeout(() => {
-            // let go, as a hand would: the page dresses again and the spring takes it home
-            grab.down = true
-            grab.moved = true
-            onGrabUp()
-          }, 1100)
+        else demoTimer = window.setTimeout(letGo, 1100)
       }
       grab.spring = requestAnimationFrame(pull)
     }
