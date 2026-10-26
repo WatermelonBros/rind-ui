@@ -72,6 +72,8 @@ interface Ctx {
   readonly state: SplitterState
   readonly send: (e: SplitterEvent) => void
   readonly handles: { current: (HTMLElement | null)[] }
+  /** A handle mounted after the Root: measured and observed too. */
+  readonly observeHandle: { current: ((el: HTMLElement) => void) | null }
   readonly press: (e: PointerEvent<HTMLElement>) => boolean
   readonly setHandleDisabled: (index: number, disabled: boolean | undefined) => void
   readonly orientation: SplitterOrientation
@@ -155,6 +157,7 @@ function Root({
   const vertical = orientation === "vertical"
   const root = useRef<HTMLElement | null>(null)
   const handles = useRef<(HTMLElement | null)[]>([])
+  const observeHandle = useRef<((el: HTMLElement) => void) | null>(null)
   const [layout, setLayout] = useState<{ space: number; scale: number } | null>(null)
   // Same content, same array: the machine's onProps compares content anyway.
   const resolved = resolveConstraints(panels, layout?.space ?? null)
@@ -247,7 +250,15 @@ function Root({
     const observer = new win.ResizeObserver(update)
     observer.observe(el)
     for (const h of handles.current) if (h) observer.observe(h)
-    return () => observer.disconnect()
+    // A handle that mounts later (a conditional panel) takes space too.
+    observeHandle.current = (h) => {
+      observer.observe(h)
+      update()
+    }
+    return () => {
+      observeHandle.current = null
+      observer.disconnect()
+    }
   }, [vertical])
 
   const state: SplitterState = { sizes: current, dragging, disabled, orientation }
@@ -256,6 +267,7 @@ function Root({
     state,
     send,
     handles,
+    observeHandle,
     orientation,
     dir,
     setHandleDisabled,
@@ -341,6 +353,7 @@ function Handle({ index, disabled, render, ref, ...rest }: SplitterHandleProps) 
         onBlur: () => send({ ...blurEvent(env.modality), handle: index }),
       }),
       ref: composeRefs((el: HTMLElement | null) => {
+        if (el && ctx.handles.current[index] !== el) ctx.observeHandle.current?.(el)
         ctx.handles.current[index] = el
       }, ref),
     },
