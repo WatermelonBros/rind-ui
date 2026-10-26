@@ -4,7 +4,7 @@ import { ContextMeter } from "@rind-ui/react"
 import { useState } from "react"
 import type { States, Variants } from "./types"
 
-export const states: States = {}
+export const states: States = { "context-meter": { live: "Basic" } }
 
 function Meter({ used, max }: { used: number; max: number | null }) {
   return (
