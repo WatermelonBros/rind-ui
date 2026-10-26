@@ -255,9 +255,7 @@ export function ExampleFrame({
         data-skin={skin === "parts" ? "bare" : skin}
         data-rind-theme={`skin-${skin === "parts" ? "bare" : skin}`}
         data-inspecting={inspect ? "" : undefined}
-        tabIndex={scrolls ? 0 : undefined}
-        role={scrolls ? "group" : undefined}
-        aria-label={scrolls ? `${label}: scrolls sideways` : undefined}
+        {...(scrolls && { tabIndex: 0, role: "group", "aria-label": `${label}: scrolls sideways` })}
         style={skin === "parts" && reach ? { minHeight: Math.ceil(reach) } : undefined}
       >
         {tags.map((t) => (
