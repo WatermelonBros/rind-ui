@@ -432,6 +432,7 @@ export const dateFieldContract = contract("date-field", {
       event: (view) => ({ segment: ctx(view).active ?? firstSegment(view) }),
     },
     CLEAR_ALL: { action: "clear" },
+    SETTLE: { skip: "Enter's commit point: machine tests and the form submission scenario" },
     PASTE: {
       action: "paste",
       args: ((view: { values: Record<string, unknown>; context: unknown }) => [

@@ -51,15 +51,18 @@ export type DateFieldPart =
 
 /**
  * A key on a segment as a machine event, `"select-all"` (⌘/Ctrl+A: the next Backspace
- * clears every segment), `"open-picker"` (Alt+ArrowDown / Alt+ArrowUp), or null (left to the browser: Tab, Enter's implicit submission,
- * shortcuts). Up/Down step and Left/Right move (`value: "vertical"`).
+ * clears every segment), `"open-picker"` (Alt+ArrowDown / Alt+ArrowUp), `"settle"` (Enter:
+ * send SETTLE and leave the key to the browser, whose implicit submission then reads the
+ * committed value), or null (left to the browser: Tab, shortcuts). Up/Down step and
+ * Left/Right move (`value: "vertical"`).
  */
 export function dateFieldKey(
   k: KeyDescription,
   segment: DateSegmentType,
   o: { readonly dir: "ltr" | "rtl"; readonly platform: PlatformFlags; readonly selectAll: boolean },
-): DateFieldEvent | "select-all" | "open-picker" | null {
+): DateFieldEvent | "select-all" | "open-picker" | "settle" | null {
   if (k.composing) return null
+  if (k.key === "Enter" && !k.alt && !k.ctrl && !k.meta) return "settle"
   const mod = isMod(k, o.platform)
   if (mod && !k.alt && !k.shift && k.key.toLowerCase() === "a") return "select-all"
   // Alt+ArrowDown / Alt+ArrowUp open a picker's popover (the segment's value is untouched).
@@ -104,6 +107,11 @@ export function planSegmentInput(
 ): { readonly cancel: boolean; readonly event: DateFieldEvent | null } {
   if (e.inputType === "insertCompositionText") return { cancel: false, event: null }
   if (e.inputType === "insertFromPaste") return { cancel: true, event: null }
+  // Enter's line break: cancelling it cancels Chromium's implicit submission, and a
+  // single-line input ignores it anyway.
+  if (e.inputType === "insertLineBreak" || e.inputType === "insertParagraph") {
+    return { cancel: false, event: null }
+  }
   if (e.inputType.startsWith("insert") && e.data) {
     return { cancel: true, event: { type: "INPUT", segment, data: e.data } }
   }

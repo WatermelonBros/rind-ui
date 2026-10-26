@@ -82,6 +82,8 @@ export type DateFieldEvent =
   /** Select all, then Backspace or Delete. */
   | { readonly type: "CLEAR_ALL" }
   | { readonly type: "PASTE"; readonly text: string }
+  /** Enter: the digits still buffered commit before the browser's implicit submission. */
+  | { readonly type: "SETTLE" }
   | { readonly type: "RESET" }
   /** A picker's calendar picked a value (already of the field's type: `pickedValue`). */
   | { readonly type: "PICK"; readonly value: DateValue; readonly modality: Modality }
@@ -159,6 +161,11 @@ export interface DateFieldContext {
   active: DateSegmentType | null
   /** The focused segment's typed text since focus (Latin digits or typed letters). */
   buffer: string
+  /**
+   * The focused segment was reached by auto-advance: the separator the user types next
+   * ("12/25") belongs to the segment just left and must not advance again.
+   */
+  advanced: boolean
   /** The last draft hint reported (called only when it changes). */
   hint: DateFieldDraftHint
   /** The value this field proposed and the parent has not answered yet (controlled). */
@@ -311,14 +318,17 @@ function focusSegment(args: Args, type: DateSegmentType) {
   settleActive(args)
   args.set("active", type)
   args.set("buffer", "")
+  args.set("advanced", false)
   args.props.focusSegment?.(type)
 }
 
 /** Auto-advance after a commit: the next segment in format order, else the boundary. */
 function advance(args: Args, from: DateSegmentType) {
   const next = neighbour(fmt(args), from, 1)
-  if (next) focusSegment(args, next)
-  else args.props.onBoundary?.({ direction: "next", reason: "advance" })
+  if (next) {
+    focusSegment(args, next)
+    args.set("advanced", true)
+  } else args.props.onBoundary?.({ direction: "next", reason: "advance" })
 }
 
 /** Typed text into a segment: digits, a separator, or a day period / era name. */
@@ -348,8 +358,14 @@ function typeText(args: Args, segment: DateSegmentType, text: string) {
       continue
     }
     if (digitOf(char, f) === null) {
+      if (!isSeparator(char, f)) continue
+      // The separator right after an auto-advance closes the segment just left: swallowed.
+      if (context.advanced && context.buffer === "") {
+        args.set("advanced", false)
+        continue
+      }
       // A separator in a non-empty segment advances (react-spectrum#5364).
-      if (isSeparator(char, f) && (context.buffer !== "" || context.draft[type])) {
+      if (context.buffer !== "" || context.draft[type]) {
         commit(args)
         advance(args, type)
         type = args.context.active ?? type
@@ -474,11 +490,18 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
     leaves: ({ event }) => event.type === "SEGMENT.BLUR" && event.related === "outside",
   },
   actions: {
+    /** A commit point (Enter): what is typed is the value the form submits. */
+    settle: (args) => {
+      settleActive(args)
+      args.set("buffer", "")
+      commit(args)
+    },
     setActive: ({ event, set, context }) => {
       // The focus this field requested arriving: the segment's typing goes on.
       if (event.type !== "SEGMENT.FOCUS" || event.segment === context.active) return
       set("active", event.segment)
       set("buffer", "")
+      set("advanced", false)
     },
     /** Focus moved to another segment: the one left commits. */
     commitPrevious: (args) => {
@@ -613,6 +636,7 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
       draft,
       active: null,
       buffer: "",
+      advanced: false,
       hint: draftHint(draft),
       proposed: null,
       format: formatFor(props, v),
@@ -659,6 +683,7 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
         BACKSPACE: { guard: "editable", actions: ["backspace"] },
         CLEAR_ALL: { guard: "editable", actions: ["clearAll"] },
         PASTE: { guard: "editable", actions: ["paste"] },
+        SETTLE: { guard: "editable", actions: ["settle"] },
         "COMPOSITION.START": { guard: "editable", target: "composing" },
       },
     },
