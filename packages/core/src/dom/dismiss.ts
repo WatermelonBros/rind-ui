@@ -73,6 +73,14 @@ interface Registration {
   readonly present: WeakSet<Element>
 }
 
+/** A touch held this long is a long press: no click follows, and it dismisses nothing. */
+const LONG_TOUCH_MS = 500
+/**
+ * Past this after a short tap's pointerup, the click is not coming. Longer than the 300 ms a
+ * zoomable page may delay it, so a click that does come always decides first.
+ */
+const CLICK_OVERDUE_MS = 350
+
 interface Press {
   readonly seq: number
   readonly pointerType: string
@@ -80,6 +88,7 @@ interface Press {
   /** Primary, not macOS Ctrl+click, single touch, not on a scrollbar. */
   readonly eligible: boolean
   readonly topmostAtStart: LayerId | undefined
+  readonly downAt: number
   upTarget?: EventTarget | null
   upPoint?: { readonly x: number; readonly y: number }
 }
@@ -211,6 +220,7 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
       // A tooltip is never interacted with: one open (or closing) over a modal must not make
       // the modal's next backdrop press count as "not topmost".
       topmostAtStart: stack.layers().findLast((l) => stack.options(l.id)?.kind !== "tooltip")?.id,
+      downAt: e.timeStamp,
     }
     if (!eligible && press && touches.size > 1) press = null
   }
@@ -221,7 +231,18 @@ function install(doc: Document, stack: LayerStack, platform: () => PlatformInfo[
     press.upTarget = targetOf(e)
     press.upPoint = { x: e.clientX, y: e.clientY }
     // Touch and pen wait for the click that follows; mouse decides now.
-    if (press.pointerType === "mouse" || press.pointerType === "") outsidePress(e)
+    if (press.pointerType === "mouse" || press.pointerType === "") {
+      outsidePress(e)
+      return
+    }
+    // iOS often sends no click for a tap on an element it does not deem clickable (a backdrop,
+    // page text: radix#4207): a short tap decides on its own once the click is overdue. A long
+    // touch never does (no click follows it by design).
+    if (e.timeStamp - press.downAt >= LONG_TOUCH_MS) return
+    const pending = press
+    doc.defaultView?.setTimeout(() => {
+      if (press === pending) outsidePress(e)
+    }, CLICK_OVERDUE_MS)
   }
   const onPointerCancel = (e: PointerEvent) => {
     pressing = false

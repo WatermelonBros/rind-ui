@@ -126,6 +126,20 @@ describe("tree view moves", () => {
     ])
   })
 
+  it("Alt+Right into a collapsed branch opens it; focus stays on the moved node", async () => {
+    const { d } = setup(<Files expanded={[]} />)
+    await d.moveNode("notes.md", "in")
+    expect(await rows(d)).toEqual([
+      "readme.md",
+      "docs",
+      "  intro.md",
+      "  api.md",
+      "  notes.md",
+      "archive",
+    ])
+    expect(document.activeElement).toBe(row("notes.md"))
+  })
+
   it("nowhere to go is announced", async () => {
     const user = userEvent.setup()
     const { said } = setup(<Files />)

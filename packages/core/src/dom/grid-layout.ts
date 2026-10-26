@@ -1,10 +1,12 @@
 // collection-grid "Spatial Navigation": the item above or below an item in a wrapped layout,
 // measured from the items' boxes (by `data-key`). Null when nothing can be measured (zero
-// rects, jsdom): the caller falls back to collection order.
+// rects, jsdom): the caller falls back to collection order. On the first or last visual row
+// it is `key` itself: the highlight stays (APG grid), never sideways in collection order.
 
 /**
  * The key of the item nearest above (`up`) or below (`down`) `key`'s centre horizontally,
- * among `items` (the list's rows in collection order); clamped to the last short row.
+ * among `items` (the list's rows in collection order); clamped to the last short row. `key`
+ * itself on an edge row, null when nothing can be measured.
  */
 export function spatialTarget(
   items: readonly Element[],
@@ -24,7 +26,7 @@ export function spatialTarget(
     const mid = b.r.top + b.r.height / 2
     return direction === "down" ? mid > rowTop + 1 : mid < rowTop - 1
   })
-  if (candidates.length === 0) return null
+  if (candidates.length === 0) return key
   // The nearest visual row in that direction, then the item nearest horizontally in it.
   const rowMid = (b: (typeof boxes)[number]) => b.r.top + b.r.height / 2
   const target = candidates.reduce((best, b) =>
