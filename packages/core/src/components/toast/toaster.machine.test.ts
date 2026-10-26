@@ -97,7 +97,7 @@ describe("toaster region unmount", () => {
     }
     const s = createService(toasterMachine, props as never, {} as never)
     s.start()
-    s.send({ type: "HOVER.START", modality: "mouse" })
+    s.send({ type: "HOVER.START", modality: "pointer" })
     s.send({ type: "FOCUS.ENTER", modality: "keyboard" })
     expect(s.getSnapshot().state).toBe("expanded")
     s.setProps({ ...props, visible: false } as never)
