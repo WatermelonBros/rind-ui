@@ -103,6 +103,18 @@ export function ExampleFrame({
   // parts view: the stage height an open portalled popup needs (0 when none is open)
   const [reach, setReach] = useState(0)
   const [tags, setTags] = useState<readonly { x: number; y: number }[]>([])
+  // a stage that scrolls sideways (a wide example on a phone) takes the keyboard's focus, so a
+  // keyboard user can scroll it even when the example holds nothing focusable (a table)
+  const [scrolls, setScrolls] = useState(false)
+  useEffect(() => {
+    const root = stage.current
+    if (!root) return
+    const check = () => setScrolls(root.scrollWidth > root.clientWidth)
+    const sizes = new ResizeObserver(check)
+    sizes.observe(root)
+    if (root.lastElementChild) sizes.observe(root.lastElementChild)
+    return () => sizes.disconnect()
+  }, [])
   useEffect(() => {
     const root = stage.current
     if (skin !== "parts" || !root) return
@@ -243,6 +255,9 @@ export function ExampleFrame({
         data-skin={skin === "parts" ? "bare" : skin}
         data-rind-theme={`skin-${skin === "parts" ? "bare" : skin}`}
         data-inspecting={inspect ? "" : undefined}
+        tabIndex={scrolls ? 0 : undefined}
+        role={scrolls ? "group" : undefined}
+        aria-label={scrolls ? `${label}: scrolls sideways` : undefined}
         style={skin === "parts" && reach ? { minHeight: Math.ceil(reach) } : undefined}
       >
         {tags.map((t) => (
