@@ -113,6 +113,46 @@ describe("Drawer nesting", () => {
   )
 })
 
+describe("Drawer metrics after mount", () => {
+  it.skipIf(inJsdom)("the parent's frontmost size follows the nested drawer's resize", async () => {
+    function Resizing() {
+      const [height, setHeight] = useState(300)
+      return (
+        <Sheet name="Outer">
+          <Sheet name="Inner" height={height}>
+            <button type="button" onClick={() => setHeight(200)}>
+              Shrink
+            </button>
+          </Sheet>
+        </Sheet>
+      )
+    }
+    render(<Resizing />)
+    await getDrawer(screen, { name: "Outer", trigger: "Open Outer" }).via("keyboard").open()
+    await getDrawer(screen, { name: "Inner", trigger: "Open Inner" }).via("keyboard").open()
+    await vi.waitFor(() =>
+      expect(contentOf("Outer").style.getPropertyValue("--rind-drawer-frontmost-size")).toBe(
+        "300px",
+      ),
+    )
+    await act(async () => screen.getByRole("button", { name: "Shrink" }).click())
+    await vi.waitFor(() =>
+      expect(contentOf("Outer").style.getPropertyValue("--rind-drawer-frontmost-size")).toBe(
+        "200px",
+      ),
+    )
+  })
+
+  it.skipIf(inJsdom)("a portalled bottom drawer gets its keyboard inset", async () => {
+    render(<Sheet name="Sheet" />)
+    await getDrawer(screen, { name: "Sheet", trigger: "Open Sheet" }).via("keyboard").open()
+    await vi.waitFor(() => {
+      const positioner = contentOf("Sheet").parentElement as HTMLElement
+      expect(positioner.style.getPropertyValue("--rind-drawer-keyboard-inset")).toBe("0px")
+    })
+  })
+})
+
 const getDialogLike = (name: string, trigger: string) =>
   getDialog(screen, { name, trigger }).via("keyboard")
 

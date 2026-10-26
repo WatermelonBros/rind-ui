@@ -12,7 +12,10 @@ import type {
   SchedulerEnv,
 } from "../env/capabilities"
 import { focusSafely } from "./focus-safely"
-import { getLayerStack, type LayerHandle, type LayerId } from "./layer-stack"
+import { containsDeep, getLayerStack, type LayerHandle, type LayerId } from "./layer-stack"
+
+export { containsDeep }
+
 import { registerReset } from "./resets"
 
 /** `false`: do not move focus; `null`: the default target. */
@@ -29,16 +32,6 @@ export function deepActiveElement(doc: Document): Element | null {
   let active: Element | null = doc.activeElement
   while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement
   return active
-}
-
-/** `node` inside `container`, through shadow roots the node lives in. */
-export function containsDeep(container: Node, node: Node | null): boolean {
-  for (let n: Node | null = node; n; ) {
-    if (n === container || container.contains(n)) return true
-    const root = n.getRootNode()
-    n = root instanceof ShadowRoot ? root.host : null
-  }
-  return false
 }
 
 const hiddenByStyle = (el: Element) => {

@@ -6,6 +6,16 @@
 
 import { registerReset } from "./resets"
 
+/** `node` inside `container`, through shadow roots the node lives in. */
+export function containsDeep(container: Node, node: Node | null): boolean {
+  for (let n: Node | null = node; n; ) {
+    if (n === container || container.contains(n)) return true
+    const root = n.getRootNode()
+    n = root instanceof ShadowRoot ? root.host : null
+  }
+  return false
+}
+
 declare const process: { env: { NODE_ENV?: string } }
 
 /** A layer's identity; ids from the adapter (one per component instance). */
@@ -143,7 +153,7 @@ function createStack(): LayerStack {
   }
   const descendants = (e: Entry) => open().filter((d) => ancestors(d).includes(e))
   const ownContains = (e: Entry, target: Node) =>
-    e.options.elements().some((el) => el === target || el.contains(target))
+    e.options.elements().some((el) => containsDeep(el, target))
   const contains = (e: Entry, target: EventTarget | null) =>
     isNode(target) && [e, ...descendants(e)].some((x) => ownContains(x, target))
   /** The deepest open layer whose own elements hold `target`. */
@@ -237,7 +247,7 @@ function createStack(): LayerStack {
     },
     isLogicallyInside(target, element) {
       if (!isNode(target)) return false
-      if (element.contains(target)) return true
+      if (containsDeep(element, target)) return true
       const layer = entryOf(target)
       if (!layer) return false
       return [layer, ...ancestors(layer)].some((e) => {

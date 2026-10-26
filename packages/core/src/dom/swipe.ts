@@ -322,6 +322,13 @@ export function trackSwipe(
       // Rebaseline at the lock point: the element does not jump by the slop.
       g.origin = { x, y, t }
       g.size = sizeOn(axis)
+      if (g.pointerId !== null) {
+        try {
+          el.setPointerCapture?.(g.pointerId)
+        } catch {
+          // A synthetic event: moves still reach the document.
+        }
+      }
       write(0, 0, 0)
       options.onStart({ modality: g.modality })
       if (!g) return true
@@ -430,11 +437,9 @@ export function trackSwipe(
       frame: null,
       progress: 0,
     }
-    try {
-      el.setPointerCapture?.(e.pointerId)
-    } catch {
-      // A synthetic event: moves still reach the document.
-    }
+    // No capture yet: capturing at pointerdown retargets the click to the element, so a
+    // checkbox, label or clickable row inside it would never get one. `move` captures once
+    // the gesture claims the movement.
     attach(false)
   }
 

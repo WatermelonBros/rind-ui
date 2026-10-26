@@ -121,7 +121,8 @@ export const resolvedPoints = (
 
 /**
  * Runs `start` once `el()` exists: a portalled content mounts after the state's effects
- * start. Frames, bounded; returns the cleanup of whichever ran.
+ * start. Every frame until it exists or the effect is cleaned up, never giving up (a lazy
+ * chunk may take seconds); returns the cleanup of whichever ran.
  */
 function whenMounted(
   env: BaseDomEnvironment,
@@ -130,13 +131,13 @@ function whenMounted(
 ): () => void {
   let stop: (() => void) | null = null
   let frame: ReturnType<BaseDomEnvironment["scheduler"]["requestAnimationFrame"]> | null = null
-  const attempt = (left: number) => {
+  const attempt = () => {
     frame = null
     const node = el()
     if (node) stop = start(node)
-    else if (left > 0) frame = env.scheduler.requestAnimationFrame(() => attempt(left - 1))
+    else frame = env.scheduler.requestAnimationFrame(attempt)
   }
-  attempt(60)
+  attempt()
   return () => {
     if (frame !== null) env.scheduler.cancelAnimationFrame(frame)
     stop?.()
@@ -282,13 +283,17 @@ export const drawerMachine = /* @__PURE__ */ setup({
           })
         }
         measure()
-        const observer =
-          typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => measure())
+        // The parents' `--rind-drawer-frontmost-size` follows this drawer's size.
+        const resized = () => {
+          measure()
+          drawerStack(env).refresh()
+        }
+        const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resized)
         observer?.observe(el, { box: "border-box" })
-        win.addEventListener("resize", measure)
+        win.addEventListener("resize", resized)
         return () => {
           observer?.disconnect()
-          win.removeEventListener("resize", measure)
+          win.removeEventListener("resize", resized)
         }
       })
     },
@@ -322,21 +327,25 @@ export const drawerMachine = /* @__PURE__ */ setup({
       const side = drawerSide(props)
       if (side !== "top" && side !== "bottom") return undefined
       const positioner = () => env.dom.getById(partId("drawer", props.root, "positioner"))
-      const win = positioner()?.ownerDocument.defaultView
-      const vv = win?.visualViewport
-      if (!win || !vv) return undefined
-      const write = () => {
-        const inset = Math.max(0, win.innerHeight - vv.height - vv.offsetTop)
-        positioner()?.style.setProperty("--rind-drawer-keyboard-inset", `${Math.round(inset)}px`)
-      }
-      write()
-      vv.addEventListener("resize", write)
-      vv.addEventListener("scroll", write)
-      return () => {
-        vv.removeEventListener("resize", write)
-        vv.removeEventListener("scroll", write)
-        positioner()?.style.removeProperty("--rind-drawer-keyboard-inset")
-      }
+      // After the positioner mounts (portalled, presence-mounted): read once at the open
+      // transition it does not exist yet.
+      return whenMounted(env, positioner, (el) => {
+        const vv = el.ownerDocument.defaultView?.visualViewport
+        const win = el.ownerDocument.defaultView
+        if (!win || !vv) return () => {}
+        const write = () => {
+          const inset = Math.max(0, win.innerHeight - vv.height - vv.offsetTop)
+          el.style.setProperty("--rind-drawer-keyboard-inset", `${Math.round(inset)}px`)
+        }
+        write()
+        vv.addEventListener("resize", write)
+        vv.addEventListener("scroll", write)
+        return () => {
+          vv.removeEventListener("resize", write)
+          vv.removeEventListener("scroll", write)
+          el.style.removeProperty("--rind-drawer-keyboard-inset")
+        }
+      })
     },
     /** One development warning when the gesture is the only way out (touch screen readers). */
     onlyWayOut: ({ env, props }) => {
