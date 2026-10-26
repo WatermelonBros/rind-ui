@@ -104,7 +104,10 @@ describe("Svelte JsonTreeView", () => {
     expect(await d.valueText("/address/city")).toBe("Paris")
   })
 
-  it("groups a 100k array lazily: fewer than 200 items exist", async () => {
+  // 20 s: in the dev build tests use, Svelte walks every object handed to a component as a prop
+  // (ownership checks), here a 100k array: about 1 s locally, over 5 s on a busy CI runner. A
+  // production build does none of it; the assertion is the laziness, not the time.
+  it("groups a 100k array lazily: fewer than 200 items exist", { timeout: 20_000 }, async () => {
     const t = setup({}, { list: Array.from({ length: 100_000 }, (_, i) => i) })
     await settle()
     await t.d().expand("list: array, 100000 entries")
