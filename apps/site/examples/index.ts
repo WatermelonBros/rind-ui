@@ -17,6 +17,7 @@ import * as collapsible from "./collapsible"
 import * as collections from "./collections"
 import * as colorModel from "./color-model"
 import * as colorPicker from "./color-picker"
+import * as colorWheel from "./color-wheel"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
 import * as controlLabel from "./control-label"
@@ -124,6 +125,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "code-block": codeBlock,
   collapsible,
   "color-picker": colorPicker,
+  "color-wheel": colorWheel,
   combobox,
   collections,
   "context-menu": contextMenu,

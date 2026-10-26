@@ -1,0 +1,111 @@
+/*
+ * Color Wheel (family: field): the Track's ::before paints the hue ring
+ * (`--rind-color-wheel-gradient`, set by the component) masked to the ring's thickness, so the
+ * Thumb inside the Track is not masked. The Thumb is a box the size of the Track rotated by
+ * `--rind-color-wheel-angle`; its ::before is the dot, centred in the ring at the top, filled
+ * with the hue and outlined light then dark so it stands out on every hue.
+ * `--rind-color-wheel-thickness` is read by the component's hit test too (default 30px: keep
+ * the two in step).
+ */
+@layer rind.components {
+  :where([data-scope="color-wheel"][data-part="root"]) {
+    display: inline-grid;
+    justify-items: center;
+    gap: var(--rind-color-wheel-gap, var(--rind-space-2));
+    color: var(--rind-color-wheel-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="color-wheel"][data-part="label"]) {
+    font-size: var(--rind-color-wheel-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-color-wheel-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-color-wheel-size, 12rem);
+    block-size: var(--rind-color-wheel-size, 12rem);
+    border-radius: 50%;
+    cursor: crosshair;
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--rind-color-wheel-gradient);
+    /* A mask reads only alpha: currentcolor is opaque. */
+    mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - var(--rind-color-wheel-thickness, 30px)),
+      currentcolor calc(100% - var(--rind-color-wheel-thickness, 30px) + 1px)
+    );
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"][data-dragging]) {
+    cursor: grabbing;
+  }
+
+  :where([data-scope="color-wheel"][data-part="thumb"]) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  :where([data-scope="color-wheel"][data-part="thumb"])::before {
+    content: "";
+    position: absolute;
+    inset-block-start: calc(var(--rind-color-wheel-thickness, 30px) / 2);
+    inset-inline-start: 50%;
+    box-sizing: border-box;
+    inline-size: var(--rind-color-wheel-thumb-size, 1.25rem);
+    block-size: var(--rind-color-wheel-thumb-size, 1.25rem);
+    translate: -50% -50%;
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-color-wheel-thumb-color);
+    box-shadow:
+      0 0 0 2px var(--rind-color-wheel-thumb-inner, var(--rind-color-surface)),
+      0 0 0 3px var(--rind-color-wheel-thumb-outer, var(--rind-color-text));
+    pointer-events: auto;
+    cursor: grab;
+  }
+
+  :where([data-scope="color-wheel"][data-part="thumb"][data-focus-visible])::before {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: calc(var(--rind-focus-offset) + 3px);
+  }
+
+  :where([data-scope="color-wheel"][data-part="value"]) {
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-color-wheel-value-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"][data-disabled]) {
+    cursor: not-allowed;
+    opacity: var(--rind-color-wheel-disabled-opacity, 0.5);
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"][data-readonly]) {
+    cursor: default;
+  }
+
+  :where([data-scope="color-wheel"][data-part="track"][data-invalid]) {
+    outline: var(--rind-border-width) solid
+      var(--rind-color-wheel-invalid, var(--rind-color-danger-border));
+    outline-offset: var(--rind-space-1);
+  }
+
+  /* The hues stay (forced-color-adjust: none from the component); the dot is a system pair. */
+  @media (forced-colors: active) {
+    :where([data-scope="color-wheel"][data-part="thumb"])::before {
+      box-shadow:
+        0 0 0 2px Canvas,
+        0 0 0 3px CanvasText;
+    }
+    :where([data-scope="color-wheel"][data-part="thumb"][data-focus-visible])::before {
+      outline-color: Highlight;
+    }
+  }
+}

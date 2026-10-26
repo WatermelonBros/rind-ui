@@ -345,6 +345,8 @@ const TRANSIENT = new Set([
   "sortable:dragging",
   // While a pointer drags the thumb.
   "angle-slider:dragging",
+  // While a pointer drags the thumb around the ring.
+  "color-wheel:dragging",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or

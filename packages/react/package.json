@@ -109,6 +109,11 @@
       "types": "./dist/color-picker/index.d.mts",
       "default": "./dist/color-picker/index.mjs"
     },
+    "./color-wheel": {
+      "@rind-ui/source": "./src/color-wheel/index.ts",
+      "types": "./dist/color-wheel/index.d.mts",
+      "default": "./dist/color-wheel/index.mjs"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.mts",
@@ -497,6 +502,10 @@
       "./color-picker": {
         "types": "./dist/color-picker/index.d.mts",
         "default": "./dist/color-picker/index.mjs"
+      },
+      "./color-wheel": {
+        "types": "./dist/color-wheel/index.d.mts",
+        "default": "./dist/color-wheel/index.mjs"
       },
       "./combobox": {
         "types": "./dist/combobox/index.d.mts",

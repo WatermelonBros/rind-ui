@@ -83,6 +83,7 @@ export const familyMatrix = [
       "clipboard",
       "file-upload",
       "angle-slider",
+      "color-wheel",
     ],
     variants: ["outline", "soft"],
     size: "own",

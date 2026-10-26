@@ -1,0 +1,4 @@
+- group "Accent hue":
+  - text: Accent hue
+  - slider "Accent hue": "225"
+- text: "#305EE8"

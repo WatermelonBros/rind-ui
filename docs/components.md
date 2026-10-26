@@ -123,7 +123,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Color Picker | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | One component: area, channel sliders, hex and channel inputs (field), swatch group and swatches are its parts |
-| Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
+| Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | done | Missing in Ark |
 
 ## Display & feedback (22)
 
