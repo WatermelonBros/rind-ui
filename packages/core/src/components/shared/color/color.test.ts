@@ -245,6 +245,16 @@ describe("gradients", () => {
     expect(g).not.toContain("NaN")
   })
 
+  it("hue strip is at full colour whatever the colour (a dark, a grey, an hsl one)", () => {
+    const hex = (c: Color) => channelStops(c, "hue").map((st) => formatColor(st.color, "hex"))
+    const full = ["#FF0000", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF", "#FF0000"]
+    expect(hex(parseColor("#242325"))).toEqual(full)
+    expect(hex(makeColor("hsb", [200, 0, 50]))).toEqual(full)
+    expect(hex(makeColor("hsl", [120, 20, 90]))).toEqual(full)
+    // the other channels keep the colour's context
+    expect(channelGradient(makeColor("hsb", [200, 50, 50]), "saturation")).not.toContain("#FF0000")
+  })
+
   it("any space, any channel", () => {
     expect(() => channelGradient(rgb(255, 0, 0), "hue")).not.toThrow()
     expect(channelStops(rgb(255, 0, 0), "lightness")).toHaveLength(3)

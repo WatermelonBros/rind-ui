@@ -73,8 +73,13 @@ theme draws one.
 
 #### Scenario: Gradient follows the colour
 
-- **WHEN** the area changes the saturation of the shared colour while a hue slider is rendered
-- **THEN** the hue slider's track gradient now uses the new saturation and brightness in the same task
+- **WHEN** the area changes the hue of the shared colour while a saturation slider is rendered
+- **THEN** the saturation slider's track gradient now uses the new hue in the same task
+
+#### Scenario: Hue track at full colour
+
+- **WHEN** the area changes the saturation and brightness of the shared colour while a hue slider is rendered
+- **THEN** the hue slider's track gradient stays the full-colour strip; only its thumb's `--rind-color` changes
 
 #### Scenario: Vertical (zag#3010)
 

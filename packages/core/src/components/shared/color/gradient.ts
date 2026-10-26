@@ -28,7 +28,13 @@ export function channelStops(
   channel: ColorChannel,
   memory?: ColorMemory,
 ): readonly { readonly at: number; readonly color: Color }[] {
-  const base = colorWithChannel(color, channel, memory)
+  let base = colorWithChannel(color, channel, memory)
+  // the hue strip is always at full colour: at the colour's own saturation and brightness a
+  // dark or grey colour painted it near-black, and no hue could be told apart on it
+  if (channel === "hue") {
+    const [hue = 0] = base.channels
+    base = makeColor(base.space, [hue, 100, base.space === "hsl" ? 50 : 100], base.alpha)
+  }
   if (channel === "alpha") {
     return [
       { at: 0, color: makeColor(base.space, base.channels, 0) },
