@@ -32,6 +32,7 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
   watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
@@ -577,6 +578,7 @@ const Content = defineComponent({
     )
     // Any other element directly inside the menu is presentational for the menu role.
     const presentational = () => {
+      if (el.value) warnMenuInMenubar(el.value)
       for (const child of el.value?.children ?? []) {
         if (
           !child.hasAttribute("data-scope") &&

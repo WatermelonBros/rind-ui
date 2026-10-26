@@ -54,6 +54,7 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
   watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { absentProps } from "../absent"
@@ -655,6 +656,7 @@ export class MenuContent {
     // Any other element directly inside the menu is presentational for the menu role.
     afterEveryRender({
       write: () => {
+        warnMenuInMenubar(el)
         for (const child of Array.from(el.children)) {
           if (
             !child.hasAttribute("data-scope") &&

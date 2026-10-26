@@ -34,6 +34,7 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
   watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
@@ -510,6 +511,7 @@ function Content({
   }, [mounted, setContentMounted])
   // Any other element directly inside the menu is presentational for the menu role.
   useIsoLayoutEffect(() => {
+    if (node.current) warnMenuInMenubar(node.current)
     for (const child of node.current?.children ?? []) {
       if (
         !child.hasAttribute("data-scope") &&

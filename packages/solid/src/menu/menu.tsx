@@ -33,6 +33,7 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
   watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
@@ -550,6 +551,7 @@ function Content(props: MenuContentProps) {
       onCleanup(() => ctx.setContentMounted(false))
       // Any other element directly inside the menu is presentational for the menu role.
       const mark = () => {
+        warnMenuInMenubar(el)
         for (const child of el.children) {
           if (
             !child.hasAttribute("data-scope") &&

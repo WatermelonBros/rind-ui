@@ -4,6 +4,7 @@ export {
   type MenubarItemState,
   menubarConnect,
   menubarIds,
+  warnMenuInMenubar,
 } from "./menubar.connect"
 export { menubarArgs, menubarContract, menubarInvariants } from "./menubar.contract"
 export {
