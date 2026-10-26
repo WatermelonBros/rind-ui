@@ -189,6 +189,8 @@ export const singleRootProps = {
   onDraftChange: fn<(hint: DateFieldDraftHint) => void>(),
   /** Embedded: select all + Backspace cleared the field (a range clears both ends). */
   onClearAll: fn<() => void>(),
+  /** Embedded: a new number drops every partial segment for `value` (a range's clear or reset). */
+  revision: Number,
   /** Arrows move across every field's segments inside this element (paired fields). */
   segmentScope: Object as PropType<{ readonly value: HTMLElement | null }>,
   /** The Field's messages when the Root is the Field. */
@@ -231,19 +233,16 @@ const SingleRoot = defineComponent({
     const required = () => props.required === true || enclosing()?.state.required === true
     const current = props.modelValue === undefined ? props.defaultValue : props.modelValue
     // Today is read once: a placeholder that moved at midnight would rewrite a stepped segment.
-    const placeholder =
-      props.placeholderValue ??
-      defaultPlaceholderValue({
-        today: todayOf(
-          env.dateClock,
-          todayZone(undefined, current instanceof Time ? null : current),
-        ),
-        granularity: props.granularity,
-        maxGranularity: props.maxGranularity,
-        timeZone: current && "timeZone" in current ? current.timeZone : undefined,
-        minValue: props.minValue,
-        maxValue: props.maxValue,
-      })
+    // The consumer's placeholderValue is followed (it also decides the value's kind).
+    const defaultPlaceholder = defaultPlaceholderValue({
+      today: todayOf(env.dateClock, todayZone(undefined, current instanceof Time ? null : current)),
+      granularity: props.granularity,
+      maxGranularity: props.maxGranularity,
+      timeZone: current && "timeZone" in current ? current.timeZone : undefined,
+      minValue: props.minValue,
+      maxValue: props.maxValue,
+    })
+    const placeholder = (): FieldValue => props.placeholderValue ?? defaultPlaceholder
     const inputEl = shallowRef<HTMLElement | null>(null)
     const hiddenEl = shallowRef<HTMLInputElement | null>(null)
     const selectAll = { current: false }
@@ -279,6 +278,7 @@ const SingleRoot = defineComponent({
     }
     const machineProps = () => ({
       value: props.modelValue,
+      revision: props.revision,
       defaultValue: props.defaultValue,
       onValueChange: (
         v: FieldValue | null,
@@ -296,7 +296,7 @@ const SingleRoot = defineComponent({
         props.onValueChange?.(v, d)
         props["onUpdate:modelValue"]?.(v)
       },
-      placeholderValue: placeholder,
+      placeholderValue: placeholder(),
       locale: resolved.value.formatLocale,
       calendar: resolved.value.calendar,
       granularity: props.granularity,
@@ -337,7 +337,7 @@ const SingleRoot = defineComponent({
       const v = view.value
       const valueNow = v.values.value ?? null
       const format = formatFor(machineProps() as never, valueNow)
-      const kindSource = valueNow ?? props.defaultValue ?? placeholder
+      const kindSource = valueNow ?? props.defaultValue ?? placeholder()
       return {
         instance,
         format,
@@ -428,7 +428,11 @@ const SingleRoot = defineComponent({
       picker: {
         closeOnSelect: () => props.closeOnSelect,
         firstDayOfWeek: () => props.firstDayOfWeek as DayOfWeek | undefined,
-        placeholder,
+        locale: () => loc.value.locale,
+        createCalendar: () => props.createCalendar,
+        get placeholder() {
+          return placeholder()
+        },
         cancelled,
         triggers,
       },
@@ -629,6 +633,7 @@ const RangeEnd = defineComponent({
               ctx.send({ type: `${EDGE}.COMMIT`, value: v, reason: details.reason }),
             // Select all + Backspace in either end clears the pair (both ends).
             onClearAll: () => ctx.send({ type: "CLEAR" }),
+            revision: ctx.view.value.context.revision,
             onValidityChange: (flags: DateValidityFlags, message: string) =>
               ctx.send({ type: `${EDGE}.VALIDITY`, flags, message }),
             labelledBy,

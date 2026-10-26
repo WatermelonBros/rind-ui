@@ -1,5 +1,6 @@
-// Server markup hydrates without a mismatch in Strict Mode with a fixed clock: today, the
-// visible month and the tab stop are the same on both sides.
+// Server markup hydrates without a mismatch in Strict Mode with a fixed clock: the visible
+// month and the tab stop are the same on both sides; today is marked only after hydration
+// (the server's day or zone may not be the viewer's, RA#9786).
 import { CalendarDate } from "@internationalized/date"
 import { Calendar, RindProvider } from "@rind-ui/react"
 import { act } from "@testing-library/react"
@@ -27,9 +28,9 @@ const tree = (
 )
 
 describe("Calendar hydration", () => {
-  it("no mismatch; today, the selection and one tab stop survive", async () => {
+  it("no mismatch; the selection and one tab stop survive; today is marked after hydration", async () => {
     const html = renderToString(tree)
-    expect(html).toContain('aria-current="date"')
+    expect(html).not.toContain('aria-current="date"')
     const container = document.createElement("div")
     container.innerHTML = html
     document.body.append(container)

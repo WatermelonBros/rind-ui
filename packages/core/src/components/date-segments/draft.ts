@@ -281,6 +281,18 @@ export function toValue(
   if (previous instanceof ZonedDateTime && toCalendarDateTime(previous).compare(time) === 0) {
     return { state, value: previous }
   }
+  // The repeated hour of a fall-back day: a minute or second edit keeps the occurrence the
+  // value was in (both are reachable by stepping the hour), never the default first one.
+  if (
+    previous instanceof ZonedDateTime &&
+    previous.timeZone === shape.timeZone &&
+    toCalendarDateTime(previous)
+      .set({ minute: 0, second: 0, millisecond: 0 })
+      .compare(time.set({ minute: 0, second: 0, millisecond: 0 })) === 0
+  ) {
+    const later = toZoned(time, shape.timeZone, "later")
+    if (later.offset === previous.offset) return { state, value: later }
+  }
   return { state, value: toZoned(time, shape.timeZone) }
 }
 

@@ -302,8 +302,12 @@ function reportMove(
   reason: "keyboard" | "pointer",
 ) {
   const tree = a.props.tree
-  a.props.onMove?.(key, { ...target, reason })
   const parent = target.parent === null ? null : toKey(target.parent)
+  // Into a collapsed branch: it opens first, so the moved node stays visible and focused
+  // (a move can be repeated or undone at once).
+  const expanded = expandedOf(a)
+  if (parent !== null && !expanded.has(parent)) writeExpanded(a, new Set(expanded).add(parent))
+  a.props.onMove?.(key, { ...target, reason })
   // The root level is the children of null (the tree's own bookkeeping).
   const count = tree.children(parent as CollectionKey).filter((k) => k !== key).length + 1
   announce(
@@ -364,8 +368,9 @@ function endLoad(a: WriteArgs, key: CollectionKey, ok: boolean) {
 }
 
 /**
- * After the expanded keys changed: loads collapsed while pending are aborted, and every
- * expanded branch with no loaded children (never loaded, not failed) starts loading.
+ * After the expanded keys changed: loads collapsed while pending are aborted, collapsed
+ * branches forget a failed load, and every expanded branch with no loaded children (never
+ * loaded, not failed) starts loading.
  */
 function syncLoads(a: WriteArgs) {
   const expanded = expandedOf(a)
@@ -380,9 +385,13 @@ function syncLoads(a: WriteArgs) {
     a.set("loading", loading)
     a.set("controllers", controllers)
   }
+  // A failed branch the user collapsed forgets the failure: expanding it again (a click,
+  // the indicator, the api, expand-all) is the retry the failure state promises.
+  const failed = [...a.context.failed].filter((key) => expanded.has(key))
+  if (failed.length !== a.context.failed.size) a.set("failed", new Set(failed))
   for (const key of expanded) {
     if (!isBranch(tree, key) || tree.children(key).length > 0) continue
-    if (a.context.loaded.has(key) || a.context.failed.has(key)) continue
+    if (a.context.loaded.has(key) || failed.includes(key)) continue
     startLoad(a, key)
   }
 }

@@ -210,6 +210,19 @@ describe("Date Field range", () => {
     )
   })
 
+  it("a form reset clears a partial end whose value was already null (react-spectrum#9296)", async () => {
+    render(<Stay />)
+    const user = userEvent.setup()
+    await user.click(spin("month Start date Stay"))
+    await user.keyboard("1014202610")
+    expect(spin("month End date Stay").getAttribute("aria-valuenow")).toBe("10")
+    ;(screen.getByTestId("form") as HTMLFormElement).reset()
+    await waitFor(() =>
+      expect(spin("month End date Stay").getAttribute("aria-valuenow")).toBeNull(),
+    )
+    expect(spin("year Start date Stay").getAttribute("aria-valuenow")).toBeNull()
+  })
+
   it("Backspace in one segment of the start leaves the end alone (bits-ui#1348)", async () => {
     render(<Stay defaultValue={{ start: d(10, 12), end: d(10, 16) }} />)
     const user = userEvent.setup()
