@@ -1,0 +1,5 @@
+- button "search_flights, running": search_flights
+- region "search_flights, running": "{ \"from\": \"MXP\", \"to\": \"LIS\", \"date\": \"2026-11-14\" }"
+- button "Run again"
+- log
+- log

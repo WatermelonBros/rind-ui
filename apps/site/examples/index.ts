@@ -83,6 +83,7 @@ import * as textField from "./text-field"
 import * as timeline from "./timeline"
 import * as toast from "./toast"
 import * as toggleGroup from "./toggle-group"
+import * as toolCall from "./tool-call"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
 import * as tour from "./tour"
@@ -168,6 +169,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "tool-call": toolCall,
   sortable,
   stepper,
   timeline,

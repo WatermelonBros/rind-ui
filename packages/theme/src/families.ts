@@ -125,6 +125,7 @@ export const familyMatrix = [
   {
     family: "panel",
     components: [
+      "tool-call",
       "dialog",
       "drawer",
       "popover",

@@ -387,6 +387,11 @@
       "types": "./dist/toggle-group/index.d.mts",
       "default": "./dist/toggle-group/index.mjs"
     },
+    "./tool-call": {
+      "@rind-ui/source": "./src/tool-call/index.ts",
+      "types": "./dist/tool-call/index.d.mts",
+      "default": "./dist/tool-call/index.mjs"
+    },
     "./toolbar": {
       "@rind-ui/source": "./src/toolbar/index.ts",
       "types": "./dist/toolbar/index.d.mts",
@@ -718,6 +723,10 @@
       "./toggle-group": {
         "types": "./dist/toggle-group/index.d.mts",
         "default": "./dist/toggle-group/index.mjs"
+      },
+      "./tool-call": {
+        "types": "./dist/tool-call/index.d.mts",
+        "default": "./dist/tool-call/index.mjs"
       },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.mts",

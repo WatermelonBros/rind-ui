@@ -417,6 +417,11 @@
         "solid": "./dist/toggle-group/index.jsx",
         "default": "./dist/toggle-group/index.mjs"
       },
+      "./tool-call": {
+        "types": "./dist/tool-call/index.d.mts",
+        "solid": "./dist/tool-call/index.jsx",
+        "default": "./dist/tool-call/index.mjs"
+      },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.mts",
         "solid": "./dist/toolbar/index.jsx",
@@ -871,6 +876,12 @@
       "types": "./dist/toggle-group/index.d.mts",
       "solid": "./dist/toggle-group/index.jsx",
       "default": "./dist/toggle-group/index.mjs"
+    },
+    "./tool-call": {
+      "@rind-ui/source": "./src/tool-call/index.ts",
+      "types": "./dist/tool-call/index.d.mts",
+      "solid": "./dist/tool-call/index.jsx",
+      "default": "./dist/tool-call/index.mjs"
     },
     "./toolbar": {
       "@rind-ui/source": "./src/toolbar/index.ts",

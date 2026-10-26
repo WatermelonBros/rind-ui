@@ -164,7 +164,7 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 | Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | done |
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
 | Reasoning | Collapsible with a streaming state | done |
-| Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | todo |
+| Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | done |
 | Citation | Keyboard-reachable hover card on inline references | todo |
 | Message Actions | Copy, regenerate, edit, feedback, branch navigation | todo |
 | Suggestions | Prompt chips | todo |

@@ -459,6 +459,12 @@
       "svelte": "./dist/toggle-group/index.js",
       "default": "./dist/toggle-group/index.js"
     },
+    "./tool-call": {
+      "@rind-ui/source": "./src/tool-call/index.ts",
+      "types": "./dist/tool-call/index.d.ts",
+      "svelte": "./dist/tool-call/index.js",
+      "default": "./dist/tool-call/index.js"
+    },
     "./toolbar": {
       "@rind-ui/source": "./src/toolbar/index.ts",
       "types": "./dist/toolbar/index.d.ts",
@@ -869,6 +875,11 @@
         "types": "./dist/toggle-group/index.d.ts",
         "svelte": "./dist/toggle-group/index.js",
         "default": "./dist/toggle-group/index.js"
+      },
+      "./tool-call": {
+        "types": "./dist/tool-call/index.d.ts",
+        "svelte": "./dist/tool-call/index.js",
+        "default": "./dist/tool-call/index.js"
       },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
