@@ -18,6 +18,7 @@ import {
   selectionOf,
   selectLayerId,
   selectMachine,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { untrack } from "svelte"
 import { useFieldBindingPeek } from "../field/context.svelte"
@@ -96,7 +97,9 @@ const field = $derived(
     enclosing?.() ?? null,
   ),
 )
-const disabled = $derived(field.disabled || fieldsetDisabled())
+// A native <fieldset disabled> around the trigger, not only rind's Fieldset (radix#2417).
+let fieldsetDom = $state(false)
+const disabled = $derived(field.disabled || fieldsetDisabled() || fieldsetDom)
 const items_ = useCollectionItems()
 const data = $derived(items ? fromData(items) : null)
 const collection = $derived(given ?? data ?? items_.collection ?? EMPTY)
@@ -234,6 +237,13 @@ $effect(() => {
     formInput.sync(mirror(), { dispatch })
   })
 })
+$effect(() => {
+  const node = shared.trigger
+  if (!node) return
+  const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = watch.disabled
+  return watch.stop
+})
 $effect(() =>
   untrack(() =>
     formInput.track({
@@ -241,7 +251,9 @@ $effect(() =>
       current: mirror,
       onNativeInput: (input) => {
         machine.send({ type: "FORM.AUTOFILL", text: input.value })
-        return true
+        // Re-sync either way: an unmatched text (or a multiple select) leaves the machine as it
+        // was, and the input must not keep what the browser wrote (select spec "Browser Autofill").
+        return false
       },
     }),
   ),

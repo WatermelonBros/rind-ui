@@ -8,6 +8,7 @@ import type { CollectionKey } from "../../collection/key"
 import type { Collection } from "../../collection/list"
 import { dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
+import { keyDir } from "../../dom/direction"
 import { describeKey, isTypeaheadKey } from "../../dom/keyboard"
 import type { PlatformInfo } from "../../env/capabilities"
 import { partId } from "../../ids"
@@ -54,7 +55,7 @@ function barMove(
 ): "next" | "previous" | "first" | "last" | null {
   const k = describeKey(e, env)
   if (k.alt || k.ctrl || k.meta || k.composing) return null
-  const ctx: KeyContext = { dir: env.locale.dir(), orientation, platform: env.platform }
+  const ctx: KeyContext = { dir: keyDir(e, env.locale.dir()), orientation, platform: env.platform }
   const logical = toLogicalKey(k, ctx)
   if (logical === "NEXT") return "next"
   if (logical === "PREV") return "previous"
@@ -153,8 +154,8 @@ export function menubarConnect(
           if (k.alt || k.ctrl || k.meta || k.composing) return
           const expand =
             vertical &&
-            ((env.locale.dir() === "rtl" && e.key === "ArrowLeft") ||
-              (env.locale.dir() !== "rtl" && e.key === "ArrowRight"))
+            ((keyDir(e, env.locale.dir()) === "rtl" && e.key === "ArrowLeft") ||
+              (keyDir(e, env.locale.dir()) !== "rtl" && e.key === "ArrowRight"))
           // Enter and Space are the trigger's press (TRIGGER_PRESS with its modality).
           const edge =
             expand || (!vertical && e.key === "ArrowDown")

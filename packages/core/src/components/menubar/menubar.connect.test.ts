@@ -44,7 +44,8 @@ function keydown(key: string, on = "file", extra: Partial<KeyboardEventInit> = {
   // A fake bar item: its key, inside a menubar root.
   const item = {
     getAttribute: (n: string) => (n === "data-key" ? on : null),
-    closest: () => ({}),
+    // No `[dir]` ancestor: keys follow the locale's direction.
+    closest: (selector: string) => (selector === "[dir]" ? null : {}),
   }
   let prevented = false
   const e = {

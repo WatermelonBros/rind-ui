@@ -22,6 +22,7 @@ import {
   selectLayerId,
   selectMachine,
   selectPositioning,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComputedRef,
@@ -277,7 +278,9 @@ const Root = defineComponent({
         enclosing?.value ?? null,
       ),
     )
-    const disabled = () => field.value.disabled || fieldsetDisabled.value
+    // A native <fieldset disabled> around the trigger, not only rind's Fieldset (radix#2417).
+    const fieldsetDom = shallowRef(false)
+    const disabled = () => field.value.disabled || fieldsetDisabled.value || fieldsetDom.value
     const { collection: registered, registry } = useCollectionItems()
     const data = computed(() => (props.items ? fromData(props.items) : null))
     const collection = () => props.collection ?? data.value ?? registered.value ?? EMPTY
@@ -412,13 +415,21 @@ const Root = defineComponent({
     }
     onMounted(() => {
       sync()
+      const node = trigger.value
+      if (node) {
+        const w = watchFieldsetDisabled(node, (d) => (fieldsetDom.value = d))
+        fieldsetDom.value = w.disabled
+        onBeforeUnmount(w.stop)
+      }
       onBeforeUnmount(
         formInput.track({
           onReset: () => service.send({ type: "FORM.RESET" }),
           current: mirror,
           onNativeInput: (input) => {
             service.send({ type: "FORM.AUTOFILL", text: input.value })
-            return true
+            // Re-sync either way: an unmatched text (or a multiple select) leaves the machine as it
+            // was, and the input must not keep what the browser wrote (select spec "Browser Autofill").
+            return false
           },
         }),
       )
@@ -596,7 +607,15 @@ const Trigger = defineComponent({
         }),
       )
       const fieldAria = binding
-        ? mergeFieldProps({ role: "combobox", labelable: true }, binding.value)
+        ? mergeFieldProps(
+            // Sound: the connect writes the trigger's id list as a string (or leaves it out).
+            {
+              role: "combobox",
+              labelable: true,
+              describedBy: own["aria-describedby"] as string | undefined,
+            },
+            binding.value,
+          )
         : null
       // Space continuing a search must not press the trigger (the trigger's handler acts first).
       const { onKeydown: pressKeyDown, ...pressProps } = press.props as Record<
@@ -614,7 +633,7 @@ const Trigger = defineComponent({
           }),
           ...(fieldAria
             ? {
-                "aria-describedby": fieldAria["aria-describedby"] ?? own["aria-describedby"],
+                "aria-describedby": fieldAria["aria-describedby"],
                 "aria-required": own["aria-required"] ?? fieldAria["aria-required"],
               }
             : {}),

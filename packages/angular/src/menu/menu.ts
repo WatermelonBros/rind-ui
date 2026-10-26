@@ -26,6 +26,7 @@ import {
   createMenuTree,
   domHoverIntent,
   domPositioning,
+  elementDir,
   type HoverIntent,
   type Href,
   type ItemRegistry,
@@ -533,12 +534,12 @@ export function wireMenuTrigger(level: MenuLevel, disabled: () => boolean): void
 
 /** The trigger's direction: the portalled positioner carries it (inline sides, RTL). */
 function injectTriggerDir(level: MenuLevel): Signal<"ltr" | "rtl" | undefined> {
+  const env = injectEnvironment()
   const dir = signal<"ltr" | "rtl" | undefined>(undefined)
   const ready = injectRendered()
   effect(() => {
     if (!ready() || !isOpen(level)) return
-    const found = level.trigger()?.closest("[dir]")?.getAttribute("dir")
-    dir.set(found === "rtl" ? "rtl" : "ltr")
+    dir.set(elementDir(level.trigger(), env.locale.dir()))
   })
   return dir
 }

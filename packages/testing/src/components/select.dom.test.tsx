@@ -1,10 +1,10 @@
 // Select scenarios (openspec add-select) through the select driver, in jsdom and real browsers.
-import { Dialog, Field, Select, type SelectRootProps } from "@rind-ui/react"
-import { render, screen } from "@testing-library/react"
+import { Dialog, Field, RindProvider, Select, type SelectRootProps } from "@rind-ui/react"
+import { act, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
-import { getSelect } from "../index"
+import { getSelect, virtualClock } from "../index"
 
 const FRUITS = ["Apple", "Banana", "Cherry"]
 
@@ -251,6 +251,28 @@ describe("Select: forms", () => {
     expect(trigger().hasAttribute("data-autofill")).toBe(true)
   })
 
+  for (const [label, root, text] of [
+    ["an unmatched text", {}, "Atlantis"],
+    ["a read-only select", { readOnly: true }, "Cherry"],
+    ["a multiple select", { multiple: true }, "Cherry"],
+  ] as const) {
+    it(`Autofill on ${label}: the selection stays and the hidden input is re-synced`, async () => {
+      const onValueChange = vi.fn()
+      const { container } = render(
+        <Fruit name="fruit" items={DATA} onValueChange={onValueChange} {...root} />,
+      )
+      const hidden = container.ownerDocument.querySelector<HTMLInputElement>(
+        '[data-scope="select"][data-part="hidden-input"]',
+      )
+      if (!hidden) throw new Error("no hidden input")
+      hidden.value = text
+      hidden.dispatchEvent(new Event("input", { bubbles: true }))
+      await vi.waitFor(() => expect(hidden.value).toBe(""))
+      expect(onValueChange).not.toHaveBeenCalled()
+      expect(await fruit().isPlaceholder()).toBe(true)
+    })
+  }
+
   it("A user change: one input and one change from the hidden input; a controlled change: none (radix#4102)", async () => {
     const events: string[] = []
     function Controlled() {
@@ -356,6 +378,48 @@ describe("Select: naming, Field and nesting", () => {
     expect(trigger().hasAttribute("data-disabled")).toBe(true)
     const hidden = document.querySelector<HTMLInputElement>('[data-part="hidden-input"]')
     expect(hidden?.disabled).toBe(true)
+  })
+
+  it("Field: the trigger keeps its own description and the consumer's ids after the Field's (ark#4215)", () => {
+    render(
+      <Field.Root>
+        <Field.Label>Fruit</Field.Label>
+        <Select.Root items={DATA} placeholder="Pick one">
+          <Select.Trigger aria-describedby="hint">
+            <Select.ValueText />
+          </Select.Trigger>
+          <Select.Description>Billed monthly</Select.Description>
+        </Select.Root>
+        <Field.Description>Your favourite</Field.Description>
+        <span id="hint">Hint</span>
+      </Field.Root>,
+    )
+    const ids = trigger().getAttribute("aria-describedby")?.split(" ") ?? []
+    expect(ids).toContain(screen.getByText("Your favourite").id)
+    expect(ids).toContain(screen.getByText("Billed monthly").id)
+    expect(ids).toContain("hint")
+    expect(ids.indexOf(screen.getByText("Your favourite").id)).toBe(0)
+  })
+
+  it("Native <fieldset disabled>: the trigger is disabled and the select does not open (radix#2417)", async () => {
+    // The press's no-click fallback runs on this clock: advanced past it below.
+    const clock = virtualClock()
+    render(
+      <RindProvider environment={{ scheduler: clock.scheduler }}>
+        <fieldset disabled>
+          <legend>Order</legend>
+          <Fruit name="fruit" items={DATA} />
+        </fieldset>
+      </RindProvider>,
+    )
+    await vi.waitFor(() => expect(trigger().hasAttribute("data-disabled")).toBe(true))
+    for (const type of ["pointerdown", "pointerup"]) {
+      trigger().dispatchEvent(
+        new PointerEvent(type, { bubbles: true, pointerType: "mouse", isPrimary: true }),
+      )
+    }
+    act(() => clock.advance(100))
+    expect(trigger().getAttribute("aria-expanded")).toBe("false")
   })
 
   it("Wrapping label: names the trigger; a press on its text focuses without opening (radix#3679)", async () => {

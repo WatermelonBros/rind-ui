@@ -305,6 +305,9 @@ export const navigationMenuMachine = /* @__PURE__ */ setup({
       set("closeReason", null)
       set("placement", initialPlacement(props))
       set("value", item)
+      // A suppression from an earlier keyboard close must not outlive the next open: the
+      // pointer may never have been on that trigger to leave it (radix#1529 is about one that was).
+      set("suppressHover", null)
     },
     warmOpen: ({ set }) => set("instant", true),
     delayedOpen: ({ set }) => set("instant", false),
@@ -321,6 +324,7 @@ export const navigationMenuMachine = /* @__PURE__ */ setup({
       set("openedAt", env.clock.now())
       set("instant", true)
       set("value", item)
+      set("suppressHover", null)
     },
     keepByPress: ({ set }) => set("openedBy", "press"),
     /** The open panel closed or changed: its nested levels close (even while opening). */
@@ -330,7 +334,15 @@ export const navigationMenuMachine = /* @__PURE__ */ setup({
       if (event.type === "$start" && values.value !== null && values.value !== undefined)
         send({ type: "VALUE.SYNC" })
     },
-    suppress: ({ values, set }) => set("suppressHover", values.value),
+    /**
+     * Hover stays off the item just closed while the pointer is still on it (radix#1529). A
+     * panel the keyboard or the API opened says nothing about the pointer: no suppression,
+     * or a mouse arriving later would find the trigger dead until it left and came back.
+     */
+    suppress: ({ context, values, set }) => {
+      if (context.openedBy === "keyboard" || context.openedBy === "api") return
+      set("suppressHover", values.value)
+    },
     clearSuppress: ({ event, context, set }) => {
       if (event.type === "HOVER.END" && event.item !== null && event.item === context.suppressHover)
         set("suppressHover", null)

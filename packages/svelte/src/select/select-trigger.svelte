@@ -119,7 +119,15 @@ const merged = $derived.by(() => {
     }),
   )
   const fieldAria = binding
-    ? mergeFieldProps({ role: "combobox", labelable: true }, binding())
+    ? mergeFieldProps(
+        // Sound: the connect writes the trigger's id list as a string (or leaves it out).
+        {
+          role: "combobox",
+          labelable: true,
+          describedBy: own["aria-describedby"] as string | undefined,
+        },
+        binding(),
+      )
     : null
   // Space continuing a search must not press the trigger (the trigger's handler acts first).
   const { onkeydown: pressKeyDown, ...pressProps } = press.props as Record<
@@ -142,7 +150,7 @@ const merged = $derived.by(() => {
         }),
         ...(fieldAria
           ? {
-              "aria-describedby": fieldAria["aria-describedby"] ?? own["aria-describedby"],
+              "aria-describedby": fieldAria["aria-describedby"],
               "aria-required": own["aria-required"] ?? fieldAria["aria-required"],
             }
           : {}),

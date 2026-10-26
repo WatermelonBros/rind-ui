@@ -24,6 +24,7 @@ import {
   selectLayerId,
   selectMachine,
   selectPositioning,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type Accessor,
@@ -282,7 +283,9 @@ function Root(all: SelectRootProps) {
       enclosing?.() ?? null,
     ),
   )
-  const disabled = () => field().disabled || fieldsetDisabled()
+  // A native <fieldset disabled> around the trigger, not only rind's Fieldset (radix#2417).
+  const [fieldsetDom, setFieldsetDom] = createSignal(false)
+  const disabled = () => field().disabled || fieldsetDisabled() || fieldsetDom()
   const { collection: registered, registry } = useCollectionItems()
   const data = createMemo(() => (p.items ? fromData(p.items) : null))
   const collection = createMemo(() => p.collection ?? data() ?? registered() ?? EMPTY)
@@ -354,6 +357,13 @@ function Root(all: SelectRootProps) {
   // The stack's metadata for this layer, followed while open.
   const [meta, setMeta] = createSignal<LayerMeta | undefined>(undefined)
   const isOpen = createMemo(() => view().matches("open"))
+  createEffect(() => {
+    const node = trigger()
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    onCleanup(watch.stop)
+  })
   afterMount(() => {
     createEffect(() => {
       setMeta(undefined)
@@ -437,7 +447,9 @@ function HiddenInputs(props: {
         current: () => untrack(mirror),
         onNativeInput: (input) => {
           ctx.service.send({ type: "FORM.AUTOFILL", text: input.value })
-          return true
+          // Re-sync either way: an unmatched text (or a multiple select) leaves the machine as it
+          // was, and the input must not keep what the browser wrote (select spec "Browser Autofill").
+          return false
         },
       }),
     )
@@ -616,7 +628,17 @@ function Trigger(props: SelectTriggerProps) {
       }),
     )
     const b = binding?.()
-    const fieldAria = b ? mergeFieldProps({ role: "combobox", labelable: true }, b) : null
+    const fieldAria = b
+      ? mergeFieldProps(
+          // Sound: the connect writes the trigger's id list as a string (or leaves it out).
+          {
+            role: "combobox",
+            labelable: true,
+            describedBy: own["aria-describedby"] as string | undefined,
+          },
+          b,
+        )
+      : null
     // Space continuing a search must not press the trigger (the trigger's handler acts first).
     const { onKeyDown: pressKeyDown, ...pressProps } = press.props as Record<
       string,
@@ -633,7 +655,7 @@ function Trigger(props: SelectTriggerProps) {
         }),
         ...(fieldAria
           ? {
-              "aria-describedby": fieldAria["aria-describedby"] ?? own["aria-describedby"],
+              "aria-describedby": fieldAria["aria-describedby"],
               "aria-required": own["aria-required"] ?? fieldAria["aria-required"],
             }
           : {}),

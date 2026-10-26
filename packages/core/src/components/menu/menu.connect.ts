@@ -9,6 +9,7 @@ import type { CollectionKey } from "../../collection/key"
 import type { Collection } from "../../collection/list"
 import { CRITICAL, dataFlag, type PartProps, scopeAttrs } from "../../connect/props"
 import type { Modality } from "../../contract/env"
+import { keyDir } from "../../dom/direction"
 import { describeKey, isTypeaheadKey } from "../../dom/keyboard"
 import type { LayerMeta } from "../../dom/layer-stack"
 import type { LinkEnv } from "../../dom/link"
@@ -160,7 +161,7 @@ export function menuConnect(
       return
     }
     const logical = toLogicalKeyEvent(k, {
-      dir: env.locale.dir(),
+      dir: keyDir(e, env.locale.dir()),
       orientation,
       platform: env.platform,
     })

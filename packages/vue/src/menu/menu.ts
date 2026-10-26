@@ -5,6 +5,7 @@ import {
   createMenuTree,
   domHoverIntent,
   domPositioning,
+  elementDir,
   getLayerStack,
   type HoverIntent,
   type LayerMeta,
@@ -487,14 +488,14 @@ const Trigger = defineComponent({
 
 /** The trigger's direction: the portalled positioner carries it (inline sides, RTL). */
 function useTriggerDir(ctx: MenuLevel) {
+  const env = useEnvironment()
   const dir = shallowRef<"ltr" | "rtl" | undefined>(undefined)
   onMounted(() =>
     watch(
       () => isOpen(ctx),
       (open) => {
         if (!open) return
-        const found = ctx.trigger.value?.closest("[dir]")?.getAttribute("dir")
-        dir.value = found === "rtl" ? "rtl" : "ltr"
+        dir.value = elementDir(ctx.trigger.value, env.locale.dir())
       },
       { immediate: true, flush: "post" },
     ),

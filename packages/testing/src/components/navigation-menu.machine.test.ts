@@ -229,6 +229,16 @@ describe("navigation menu machine: closing", () => {
     expect(m.value()).toBe(null)
   })
 
+  it("a keyboard open closed with Escape leaves hover working on that item", () => {
+    const m = make()
+    m.send(press("a", "keyboard"))
+    m.send({ type: "ESCAPE" })
+    m.advance(1000)
+    m.send(hover("a"))
+    m.advance(500)
+    expect(m.value()).toBe("a")
+  })
+
   it("disabling the open item's trigger closes it with reason api", () => {
     let off = false
     const m = make({ isItemDisabled: () => off })
