@@ -76,6 +76,8 @@ export function accordionConnect(input: AccordionConnectInput, send: (e: Accordi
       ...(locked(s) ? { "aria-disabled": "true", "data-disabled": "" } : {}),
       onKeyDown: (e: TriggerKeyEvent) => {
         if (!input.keyboardNavigation || !e.onTrigger || e.composing) return
+        // Modified keys stay the browser's (Ctrl/Cmd+Home scrolls the page, base-ui#1465).
+        if (e.alt || e.ctrl || e.meta) return
         const logical = toLogicalKey(e, {
           dir: input.dir,
           orientation: input.orientation,

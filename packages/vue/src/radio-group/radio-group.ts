@@ -8,6 +8,7 @@ import {
   type ItemRegistry,
   implicitSubmit,
   isImeKey,
+  labelInteraction,
   layoutCapability,
   mergeFieldProps,
   type RadioGroupEvent,
@@ -668,6 +669,25 @@ function itemText(name: "ItemLabel" | "ItemDescription", tag: "label" | "p") {
       const set = name === "ItemLabel" ? item.setLabelRendered : item.setDescriptionRendered
       onMounted(() => set(true))
       onBeforeUnmount(() => set(false))
+      const env = useEnvironment()
+      const labelable = () => item.controlTag() === "button" || item.controlTag() === "input"
+      // A non-labelable control (a substituted span): a press on the label focuses and checks
+      // it (spec "Activation"), with the double-click text-selection guard.
+      const interaction =
+        name === "ItemLabel"
+          ? normalizeProps(
+              labelInteraction(env, {
+                target: () => item.controlEl.value as HTMLElement | null,
+                forwardsFocus: () => !labelable(),
+                focusTarget: () => {
+                  const control = item.controlEl.value as HTMLElement | null
+                  if (control) void focusSafely(control, env, "programmatic")
+                  if (!item.disabled())
+                    ctx.send({ type: "PRESS", key: item.key(), modality: env.modality.modality() })
+                },
+              }),
+            )
+          : {}
       return () => {
         const own =
           name === "ItemLabel"
@@ -678,7 +698,7 @@ function itemText(name: "ItemLabel" | "ItemDescription", tag: "label" | "p") {
             : ctx.api().itemDescription(item.key(), { disabled: item.disabled() })
         return renderPart(
           tag,
-          mergeProps(normalizeProps(own), attrs),
+          mergeProps({ ...normalizeProps(own), ...interaction }, attrs),
           slots.default?.({ checked: ctx.value() === item.key(), disabled: item.disabled() }),
           props.asChild,
         )

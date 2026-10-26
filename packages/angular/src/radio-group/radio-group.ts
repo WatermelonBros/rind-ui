@@ -30,6 +30,7 @@ import {
   hiddenFormInput,
   implicitSubmit,
   isImeKey,
+  labelInteraction,
   layoutCapability,
   mergeFieldProps,
   type PartProps,
@@ -685,11 +686,31 @@ export class RadioGroupItemLabel {
     const item = injectItem("ItemLabel")
     item.labelRendered.set(true)
     inject(DestroyRef).onDestroy(() => item.labelRendered.set(false))
+    const env = injectEnvironment()
+    const labelable = () => item.controlTag() === "button" || item.controlTag() === "input"
+    // A non-labelable control (a directive on a span): a press on the label focuses and checks
+    // it (spec "Activation"), with the double-click text-selection guard.
+    const interaction = labelInteraction(env, {
+      target: () => item.controlEl.value as HTMLElement | null,
+      forwardsFocus: () => !labelable(),
+      focusTarget: () => {
+        const control = item.controlEl.value as HTMLElement | null
+        if (control) void focusSafely(control, env, "programmatic")
+        if (!untracked(item.disabled))
+          item.group.send({
+            type: "PRESS",
+            key: untracked(item.key),
+            modality: env.modality.modality(),
+          })
+      },
+    })
     bindProps(() =>
-      item.group.api().itemLabel(item.key(), {
-        disabled: item.disabled(),
-        labelable: item.controlTag() === "button" || item.controlTag() === "input",
-      }),
+      joinHandlers(
+        item.group
+          .api()
+          .itemLabel(item.key(), { disabled: item.disabled(), labelable: labelable() }),
+        interaction,
+      ),
     )
   }
 }

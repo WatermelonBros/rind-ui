@@ -67,14 +67,19 @@ export function tabsConnect(
   const c = input.collection
   const selected = input.value
   const vertical = input.orientation === "vertical"
-  const stop = tabStop({
-    collection: c,
-    highlightedKey: input.highlightedKey,
-    highlightSource: null,
-    selection: new Set(selected === null ? [] : [selected as CollectionKey]), // keys as stored
-    selectionMode: "single",
-    focusableWhenDisabled: input.focusableWhenDisabled,
-  })
+  // A disabled root disables every tab: no tab can be the stop, the list is (spec "Tab Stop
+  // And Focus"), unless disabled tabs stay focusable.
+  const rootInert = input.disabled === true && input.focusableWhenDisabled !== true
+  const stop = rootInert
+    ? null
+    : tabStop({
+        collection: c,
+        highlightedKey: input.highlightedKey,
+        highlightSource: null,
+        selection: new Set(selected === null ? [] : [selected as CollectionKey]), // keys as stored
+        selectionMode: "single",
+        focusableWhenDisabled: input.focusableWhenDisabled,
+      })
   const common = { "data-orientation": input.orientation }
   return {
     root: (): PartProps => ({
@@ -162,7 +167,8 @@ export function tabsConnect(
         "data-pressed": dataFlag(s.pressed),
         "data-hover": dataFlag(s.hovered),
         onFocus: () => send({ type: "FOCUS", key, modality: env.modality.modality() }),
-        [CRITICAL]: ["aria-selected"],
+        // The id is the part's: the panel's aria-labelledby and the roving focus resolve it.
+        [CRITICAL]: ["aria-selected", "!id"],
       }
     },
     /** Whether the panel element of `key` renders at all. */

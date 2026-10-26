@@ -6,7 +6,10 @@
 //   `onPointerDown`, `onDblClick`, `onFocusIn` / `onFocusOut` (bubbling focus), `onInput`.
 // - `style` keys are CSS property names in kebab case (`z-index`, `--rind-x`).
 
-/** Attributes a pattern's accessibility depends on; overriding one warns in development. */
+/**
+ * Attributes a pattern's accessibility depends on; overriding one warns in development. An
+ * entry `"!name"` marks an attribute the part owns outright: a consumer's value is dropped.
+ */
 export const CRITICAL: unique symbol = Symbol.for("rind-ui.critical")
 
 export type DataAttributes = { readonly [K in `data-${string}`]?: string | undefined }

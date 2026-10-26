@@ -217,6 +217,10 @@ export abstract class FormToggleRoot<V extends CheckedState, D> {
   protected readonly uncheckedInput: Signal<PartProps | null>
   /** @internal */
   protected readonly inputRef = viewChild<ElementRef<HTMLInputElement>>("input")
+  /** @internal The hidden input's form owner (its `form` attribute included). */
+  formOwner(): HTMLFormElement | null {
+    return this.inputRef()?.nativeElement.form ?? null
+  }
 
   constructor() {
     const env = injectEnvironment()
@@ -506,8 +510,8 @@ export abstract class FormToggleControl {
             // still cancels the submission.
             onKeyDown: (e: KeyboardEvent) => {
               if (e.key !== "Enter" || e.defaultPrevented || isImeKey(e)) return
-              const input = root.controlEl.value?.closest("form") ?? null
-              implicitSubmit(input instanceof HTMLFormElement ? input : null)
+              // The hidden input's form owner: the `form` prop names another form.
+              implicitSubmit(root.formOwner())
             },
           },
           press.props,

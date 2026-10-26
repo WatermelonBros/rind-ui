@@ -246,6 +246,18 @@ export function bindProps(props: () => PartProps, options: BindOptions = {}): Bo
     }
     for (const [key, value] of Object.entries(nextAttrs)) {
       const own = consumer(key)
+      // "!key" in the marker: the part owns the attribute (a roving item's id): it is written
+      // over the consumer's.
+      if (own !== null && critical.includes(`!${key}`)) {
+        if (process.env.NODE_ENV !== "production" && own !== String(value) && !warned.has(key)) {
+          warned.add(key)
+          console.warn(
+            `[rind-ui] ${String(next["data-scope"])}.${String(next["data-part"])}: "${key}" is the part's own; the given value is ignored.`,
+          )
+        }
+        write(key, value)
+        continue
+      }
       if (own !== null) {
         if (
           process.env.NODE_ENV !== "production" &&

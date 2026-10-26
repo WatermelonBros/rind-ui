@@ -133,6 +133,14 @@ function mergeTwo(base: Props, top: Props): Props {
       }
       continue
     }
+    // "!key" in the marker: the part owns the attribute (a roving item's id, which its
+    // relations and focus resolve): the consumer's value is dropped.
+    if (a !== undefined && critical.includes(`!${key}`)) {
+      if (process.env.NODE_ENV !== "production" && a !== b) {
+        warnCritical(base, key, `"${key}" is the part's own; the given value is ignored.`)
+      }
+      continue
+    }
     if (a === undefined) {
       out[key] = isHandler(key, b) ? chain(linksOf(b, false)) : b
     } else if (isHandler(key, a) && isHandler(key, b)) {

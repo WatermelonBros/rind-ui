@@ -267,7 +267,8 @@ export function radioGroupConnect(
         "data-pressed": dataFlag(s.pressed),
         "data-hover": dataFlag(s.hovered),
         onFocus: () => send({ type: "FOCUS", key, modality: env.modality.modality() }),
-        [CRITICAL]: ["aria-checked", "role"],
+        // The id is the part's: item labels, the roving focus and the group resolve it.
+        [CRITICAL]: ["aria-checked", "role", "!id"],
       }
     },
     itemIndicator: (key: CollectionKey, own: { disabled: boolean }): PartProps => ({
