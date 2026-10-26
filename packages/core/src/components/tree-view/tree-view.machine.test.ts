@@ -395,6 +395,20 @@ describe("lazy children", () => {
     expect(onLoadChildren).toHaveBeenCalledTimes(2)
   })
 
+  it("a failed branch collapsed and expanded again retries the load", async () => {
+    let fail = true
+    const onLoadChildren = vi.fn(() => (fail ? Promise.reject(new Error("x")) : undefined))
+    const t = make({ tree: lazyTree, onLoadChildren })
+    t.focus()
+    t.key("expand")
+    await vi.waitFor(() => expect(t.s.getSnapshot().context.failed.has(toKey("src"))).toBe(true))
+    fail = false
+    t.key("collapse")
+    expect(t.s.getSnapshot().context.failed.size).toBe(0)
+    t.key("expand")
+    expect(onLoadChildren).toHaveBeenCalledTimes(2)
+  })
+
   it("children arriving in a new tree settle the load: '3 items loaded in src'", () => {
     announce.mockClear()
     const onLoadChildren = vi.fn(() => undefined)

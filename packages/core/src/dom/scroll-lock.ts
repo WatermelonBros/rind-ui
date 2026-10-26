@@ -238,6 +238,9 @@ function touchPolicy(doc: Document): () => void {
     if (!start || !touch || e.touches.length > 1 || start.allowed) return
     const dx = touch.clientX - start.x
     const dy = touch.clientY - start.y
+    // Sub-pixel noise from a stationary tap (iOS reports ~1e-14 px moves): cancelling it would
+    // also cancel the tap's click (reka-ui#3054). A real drag gets here again past the pixel.
+    if (Math.hypot(dx, dy) < 1) return
     // A touch-action that excludes this axis: the element handles the gesture (RA#9493).
     const vertical = Math.abs(dy) >= Math.abs(dx)
     for (let n = start.target; n; n = n.parentElement) {
