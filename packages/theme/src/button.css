@@ -3,10 +3,26 @@
  * Raised keys (solid, soft, outline) carry --rind-shadow-key: a lit top edge, a contact edge and
  * a short shadow; pressing sinks the key 1px and turns the light into an inset. Ghost keys sit
  * flush with the panel. The border is always present (transparent unless drawn) so forced
- * colors can paint it.
+ * colors can paint it. The triggers that open an overlay are keys too (family matrix: "triggers
+ * styled as buttons"): a dialog, drawer, popover, tour, tooltip or menu trigger (not a menubar's,
+ * menubar.css) looks like a Button, as rendering a Button there replaces its data-scope; so
+ * do a Timer's ActionTriggers.
  */
 @layer rind.components {
-  :where([data-scope="button"][data-part="root"]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )
+  ) {
     position: relative;
     box-sizing: border-box;
     display: inline-flex;
@@ -37,51 +53,201 @@
     transition: translate var(--rind-duration-fast) var(--rind-ease-out);
   }
 
-  :where([data-scope="button"][data-part="root"][data-variant="solid"][data-hover]),
-  :where([data-scope="button"][data-part="root"]:not([data-variant])[data-hover]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="solid"]:is(
+      [data-hover],
+      [data-part="trigger"]:hover,
+      [data-part="action-trigger"]:hover
+    )
+  ),
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    ):not([data-variant]):is(
+      [data-hover],
+      [data-part="trigger"]:hover,
+      [data-part="action-trigger"]:hover
+    )
+  ) {
     background: var(--rind-button-solid-bg-hover, var(--rind-color-accent-solid-hover));
   }
 
   /* Soft: a satin key in the accent's tint. */
-  :where([data-scope="button"][data-part="root"][data-variant="soft"]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="soft"]
+  ) {
     background: var(--rind-button-soft-bg, var(--rind-color-accent-soft));
     color: var(--rind-button-soft-fg, var(--rind-color-accent-text));
   }
 
-  :where([data-scope="button"][data-part="root"][data-variant="soft"][data-hover]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="soft"]:is(
+      [data-hover],
+      [data-part="trigger"]:hover,
+      [data-part="action-trigger"]:hover
+    )
+  ) {
     background: var(--rind-button-soft-bg-hover, var(--rind-color-accent-soft-hover));
   }
 
   /* Outline: a neutral satin key with an engraved accent legend and a drawn edge. */
-  :where([data-scope="button"][data-part="root"][data-variant="outline"]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="outline"]
+  ) {
     background: var(--rind-button-outline-bg, var(--rind-color-surface-raised));
     color: var(--rind-button-outline-fg, var(--rind-color-accent-text));
     border-color: var(--rind-button-outline-border, var(--rind-color-border));
   }
 
-  :where([data-scope="button"][data-part="root"][data-variant="outline"][data-hover]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="outline"]:is(
+      [data-hover],
+      [data-part="trigger"]:hover,
+      [data-part="action-trigger"]:hover
+    )
+  ) {
     background: var(--rind-button-outline-bg-hover, var(--rind-color-surface));
     border-color: var(--rind-button-outline-border-hover, var(--rind-color-border-strong));
   }
 
   /* Ghost: flush with the panel until touched. */
-  :where([data-scope="button"][data-part="root"][data-variant="ghost"]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="ghost"]
+  ) {
     background: transparent;
     color: var(--rind-button-ghost-fg, var(--rind-color-accent-text));
     box-shadow: none;
   }
 
-  :where([data-scope="button"][data-part="root"][data-variant="ghost"][data-hover]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-variant="ghost"]:is(
+      [data-hover],
+      [data-part="trigger"]:hover,
+      [data-part="action-trigger"]:hover
+    )
+  ) {
     background: var(--rind-button-ghost-bg-hover, var(--rind-color-accent-soft));
   }
 
   /* The key sinks: 1px down, its light edge becomes an inset. */
-  :where([data-scope="button"][data-part="root"][data-pressed]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-pressed]
+  ) {
     translate: 0 1px;
     box-shadow: var(--rind-button-shadow-pressed, var(--rind-shadow-key-pressed));
   }
 
-  :where([data-scope="button"][data-part="root"][data-pending]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-pending]
+  ) {
     cursor: progress;
   }
 
@@ -91,7 +257,20 @@
    * state indicator; only opacity steps, reduced motion leaves it lit, forced colours paint it
    * as Highlight.
    */
-  :where([data-scope="button"][data-part="root"][data-pending])::after {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-pending]
+  )::after {
     content: "";
     position: absolute;
     inset-block-start: var(--rind-button-pilot-inset, 0.3125rem);
@@ -113,28 +292,74 @@
   }
 
   :where(
-    [data-scope="button"][data-part="root"][data-pending]:is(
-      [data-variant="soft"],
-      [data-variant="outline"],
-      [data-variant="ghost"]
-    )
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-pending]:is([data-variant="soft"], [data-variant="outline"], [data-variant="ghost"])
   )::after {
     background: var(--rind-button-pilot-color, var(--rind-color-accent-text));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :where([data-scope="button"][data-part="root"][data-pending])::after {
+    :where(
+        :is(
+          [data-scope="button"][data-part="root"],
+          [data-part="trigger"]:is(
+            [data-scope="dialog"],
+            [data-scope="drawer"],
+            [data-scope="popover"],
+            [data-scope="tour"],
+            [data-scope="tooltip"],
+            [data-scope="menu"]:not([data-host])
+          ),
+          [data-scope="timer"][data-part="action-trigger"]
+        )[data-pending]
+      )::after {
       animation: none;
     }
   }
 
   /* Pending keeps its look and dims its legend; the key stays where it is. */
-  :where([data-scope="button"][data-part="root"][data-pending]:not([data-disabled])) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-pending]:not([data-disabled])
+  ) {
     color: color-mix(in oklab, currentColor 70%, transparent);
   }
 
   /* Disabled: an unlit, recessed blank key. */
-  :where([data-scope="button"][data-part="root"][data-disabled]:not([data-pending])) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-disabled]:not([data-pending])
+  ) {
     background: var(--rind-button-disabled-bg, var(--rind-color-surface));
     color: var(--rind-button-disabled-fg, var(--rind-color-text-disabled));
     border-color: var(--rind-button-disabled-border, var(--rind-color-border));
@@ -143,24 +368,76 @@
     translate: none;
   }
 
-  :where([data-scope="button"][data-part="root"][data-disabled][data-variant="ghost"]) {
+  :where(
+    :is(
+      [data-scope="button"][data-part="root"],
+      [data-part="trigger"]:is(
+        [data-scope="dialog"],
+        [data-scope="drawer"],
+        [data-scope="popover"],
+        [data-scope="tour"],
+        [data-scope="tooltip"],
+        [data-scope="menu"]:not([data-host])
+      ),
+      [data-scope="timer"][data-part="action-trigger"]
+    )[data-disabled][data-variant="ghost"]
+  ) {
     background: transparent;
     border-color: transparent;
   }
 
   @media (forced-colors: active) {
-    :where([data-scope="button"][data-part="root"]) {
+    :where(
+        :is(
+          [data-scope="button"][data-part="root"],
+          [data-part="trigger"]:is(
+            [data-scope="dialog"],
+            [data-scope="drawer"],
+            [data-scope="popover"],
+            [data-scope="tour"],
+            [data-scope="tooltip"],
+            [data-scope="menu"]:not([data-host])
+          ),
+          [data-scope="timer"][data-part="action-trigger"]
+        )
+      ) {
       background: ButtonFace;
       color: ButtonText;
       border-color: ButtonText;
     }
 
-    :where([data-scope="button"][data-part="root"][data-disabled]) {
+    :where(
+        :is(
+          [data-scope="button"][data-part="root"],
+          [data-part="trigger"]:is(
+            [data-scope="dialog"],
+            [data-scope="drawer"],
+            [data-scope="popover"],
+            [data-scope="tour"],
+            [data-scope="tooltip"],
+            [data-scope="menu"]:not([data-host])
+          ),
+          [data-scope="timer"][data-part="action-trigger"]
+        )[data-disabled]
+      ) {
       color: GrayText;
       border-color: GrayText;
     }
 
-    :where([data-scope="button"][data-part="root"][data-pending])::after {
+    :where(
+        :is(
+          [data-scope="button"][data-part="root"],
+          [data-part="trigger"]:is(
+            [data-scope="dialog"],
+            [data-scope="drawer"],
+            [data-scope="popover"],
+            [data-scope="tour"],
+            [data-scope="tooltip"],
+            [data-scope="menu"]:not([data-host])
+          ),
+          [data-scope="timer"][data-part="action-trigger"]
+        )[data-pending]
+      )::after {
       background: Highlight;
     }
   }

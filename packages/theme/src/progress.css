@@ -8,6 +8,13 @@
  * data-tone re-points the accent roles (variants.css).
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="progress"][data-part="label"]) {
+    font-size: var(--rind-progress-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-progress-label-font-weight, 580);
+    line-height: var(--rind-progress-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-progress-label-color, var(--rind-color-text));
+  }
   :where([data-scope="progress"][data-part="root"]) {
     --_track: var(--rind-progress-track-size, 0.5rem);
     --_ring: var(--rind-progress-ring-size, 2.5rem);

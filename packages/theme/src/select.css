@@ -8,6 +8,13 @@
  * ring comes from base.css.
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="select"][data-part="label"]) {
+    font-size: var(--rind-select-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-select-label-font-weight, 580);
+    line-height: var(--rind-select-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-select-label-color, var(--rind-color-text));
+  }
   [data-scope="select"][data-part="trigger"] {
     box-sizing: border-box;
     display: inline-flex;
@@ -61,6 +68,21 @@
 
   [data-scope="select"][data-part="indicator"][data-state="open"] {
     transform: rotate(180deg);
+  }
+
+  /* an empty indicator draws the theme's caret (icons.css), as the combobox trigger does;
+     children (a glyph, an svg) replace it */
+  [data-scope="select"][data-part="indicator"]:empty {
+    background-color: currentColor;
+    mask: var(--rind-select-indicator-icon, var(--rind-icon-caret-down)) center / contain no-repeat;
+  }
+
+  @media (forced-colors: active) {
+    /* a mask icon paints with its background: keep it the trigger's text colour */
+    [data-scope="select"][data-part="indicator"]:empty {
+      background-color: ButtonText;
+      forced-color-adjust: none;
+    }
   }
 
   [data-scope="select"][data-part="label"][data-disabled],

@@ -7,6 +7,13 @@
  * in system colours.
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="rating"][data-part="label"]) {
+    font-size: var(--rind-rating-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-rating-label-font-weight, 580);
+    line-height: var(--rind-rating-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-rating-label-color, var(--rind-color-text));
+  }
   :where([data-scope="rating"][data-part="root"]) {
     --_star: var(--rind-rating-star-size, 1.75rem);
     --_fill: var(--rind-rating-fill, var(--rind-color-accent-solid));
