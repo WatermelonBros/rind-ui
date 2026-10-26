@@ -31,7 +31,8 @@ function variant(announce: StreamingAnnounce) {
   const base = { text: "", status: "pending" as const, announce, smooth: true }
   describe(`svelte streaming-message model: announce ${announce}`, () => {
     testMachine(streamingMessageContract, {
-      test: it,
+      // Three announced outcomes in one path take about a second each in the DOM announcer.
+      test: (name: string, fn: () => Promise<void>) => it(name, fn, 20_000),
       setup: () =>
         mount(Reply, {
           role: "article",

@@ -3,6 +3,7 @@ import {
   type ChangeDetails,
   type DropSource,
   domDropSource,
+  dropzoneClickOpens,
   type FileLike,
   type FileRejection,
   type FileUploadEvent,
@@ -447,9 +448,6 @@ const Label = defineComponent({
   },
 })
 
-const INTERACTIVE =
-  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
-
 const Dropzone = defineComponent({
   name: "FileUploadDropzone",
   inheritAttrs: false,
@@ -492,7 +490,7 @@ const Dropzone = defineComponent({
               onClick: (e: MouseEvent) => {
                 if (e.defaultPrevented || e.button !== 0) return
                 const target = e.target as Element
-                if (target !== e.currentTarget && target.closest(INTERACTIVE)) return
+                if (!dropzoneClickOpens(target, e.currentTarget as Element)) return
                 ctx.send({ type: "PICKER.OPEN" })
               },
             }),

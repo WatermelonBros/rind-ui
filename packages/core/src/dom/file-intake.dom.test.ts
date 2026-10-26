@@ -1,7 +1,13 @@
 // add-file-upload 1.2: drag presence by the set of entered elements, folder traversal in
 // batches, unreadable entries refused without losing the drop.
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { dragPresence, filePath, filesFromDataTransfer, isDroppedFolder } from "./file-intake"
+import {
+  dragPresence,
+  dropzoneClickOpens,
+  filePath,
+  filesFromDataTransfer,
+  isDroppedFolder,
+} from "./file-intake"
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -120,5 +126,18 @@ describe("filesFromDataTransfer", () => {
     const { files } = await filesFromDataTransfer(data as never)
     expect(files).toHaveLength(1)
     expect(isDroppedFolder(files[0])).toBe(true)
+  })
+})
+
+describe("dropzoneClickOpens", () => {
+  it("plain content opens even under a focusable ancestor (a Dialog); controls inside do not", () => {
+    document.body.innerHTML = `<div tabindex="-1"><div id="z"><span id="t">Drop files</span><button id="b">Browse</button><label id="l">x</label></div></div>`
+    const zone = document.getElementById("z") as Element
+    const at = (id: string) => document.getElementById(id) as Element
+    expect(dropzoneClickOpens(at("t"), zone)).toBe(true)
+    expect(dropzoneClickOpens(zone, zone)).toBe(true)
+    expect(dropzoneClickOpens(at("b"), zone)).toBe(false)
+    expect(dropzoneClickOpens(at("l"), zone)).toBe(false)
+    document.body.innerHTML = ""
   })
 })

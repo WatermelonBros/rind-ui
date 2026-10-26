@@ -5,6 +5,7 @@ import {
   type ChangeDetails,
   type DropSource,
   domDropSource,
+  dropzoneClickOpens,
   type FileLike,
   type FileRejection,
   type FileUploadEvent,
@@ -473,9 +474,6 @@ function Label({ render, id, ...rest }: PartProps<"span">) {
   return renderPart("span", props, render, ctx.state)
 }
 
-const INTERACTIVE =
-  'button, a[href], input, select, textarea, label, [role="button"], [contenteditable=""], [contenteditable="true"], [tabindex]'
-
 function Dropzone({ render, ref, ...rest }: PartProps<"div">) {
   const ctx = useFileUpload("Dropzone")
   const el = useRef<HTMLDivElement | null>(null)
@@ -503,7 +501,7 @@ function Dropzone({ render, ref, ...rest }: PartProps<"div">) {
         onClick: (e: React.MouseEvent<HTMLDivElement>) => {
           if (e.defaultPrevented || e.button !== 0) return
           const target = e.target as Element
-          if (target !== e.currentTarget && target.closest(INTERACTIVE)) return
+          if (!dropzoneClickOpens(target, e.currentTarget as Element)) return
           send({ type: "PICKER.OPEN" })
         },
       }),

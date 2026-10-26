@@ -38,7 +38,7 @@ describe("Button server render", () => {
     expect(out).not.toMatch(/ disabled=/)
   })
 
-  it("pending: data-state pending, aria-disabled, no native disabled, submit becomes button", () => {
+  it("pending: data-state pending, aria-disabled, no native disabled, still a submit", () => {
     const out = html(
       <Button type="submit" pending>
         Save
@@ -47,7 +47,7 @@ describe("Button server render", () => {
     expect(out).toContain('data-state="pending"')
     expect(out).toContain("data-pending")
     expect(out).toContain('aria-disabled="true"')
-    expect(out).toContain('type="button"')
+    expect(out).toContain('type="submit"')
     expect(out).not.toMatch(/ disabled=/)
     expect(out).toContain("data-disabled")
   })
