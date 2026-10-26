@@ -379,10 +379,22 @@ export function domScrollMetrics(env: Env): ScrollMetricsCapability {
       // ---- observers ----
       const view = doc?.defaultView
       const resize = view?.ResizeObserver ? new view.ResizeObserver(schedule) : null
+      // The Content's children, each observed once; a removed child is unobserved.
+      const observed = new Set<Element>()
       const observeChildren = () => {
         const content = byId(ids.content)
         if (!resize || !content) return
-        for (const child of Array.from(content.children)) resize.observe(child)
+        const now = new Set(Array.from(content.children))
+        for (const child of observed) {
+          if (now.has(child)) continue
+          resize.unobserve(child)
+          observed.delete(child)
+        }
+        for (const child of now) {
+          if (observed.has(child)) continue
+          resize.observe(child)
+          observed.add(child)
+        }
       }
       const mutation = view?.MutationObserver
         ? new view.MutationObserver(() => {

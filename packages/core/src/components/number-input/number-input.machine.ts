@@ -302,7 +302,9 @@ export const numberInputMachine = /* @__PURE__ */ setup({
       if (event.type === "FIRST" || event.type === "LAST") {
         const bound = event.type === "FIRST" ? props.min : props.max
         if (bound === undefined) return
-        write(args, bound, { user: true, commit: "EDGE" })
+        // An off-grid bound (max 10.5, step 1): the last grid value inside it, as native
+        // stepUp does, so the hidden input never reports a step mismatch.
+        write(args, snapValue(bound, props), { user: true, commit: "EDGE" })
         resyncAfterWrite(args)
         return
       }

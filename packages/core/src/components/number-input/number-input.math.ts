@@ -35,12 +35,20 @@ export function nextStep(
   const { step, large } = stepsOf(r, percent)
   const origin = r.min ?? 0
   const round = (v: number) => roundToStepPrecision(v, step, origin)
-  if (base === null) return round(clampTo(0, r))
-  if (size === "large") return round(clampTo(snap(base + direction * large, step, origin), r))
+  // Clamped, then rounded to the grid's precision: a bound with more decimals than the grid
+  // (max 10.5, step 1) must not be rounded past (11 > max): back one line, inside the range.
+  const inRange = (v: number) => {
+    let x = round(clampTo(v, r))
+    if (r.max !== undefined && x > r.max) x = round(x - step)
+    if (r.min !== undefined && x < r.min) x = round(x + step)
+    return x
+  }
+  if (base === null) return inRange(0)
+  if (size === "large") return inRange(snap(base + direction * large, step, origin))
   // Grid index, with float noise removed (40.1 / 0.1 is 400.99999…).
   const k = Math.round(((base - origin) / step) * 1e9) / 1e9
   const next = direction > 0 ? Math.floor(k) + 1 : Math.ceil(k) - 1
-  return round(clampTo(origin + next * step, r))
+  return inRange(origin + next * step)
 }
 
 /** Whether a step in `direction` can change `value` (false at the bound). */
