@@ -13,13 +13,16 @@ import {
   colorPickerMessages,
   createFlushRegistry,
   formatColor,
+  mergeFieldProps,
   partId,
   pickerValueOf,
   pickerWorking,
 } from "@rind-ui/core"
 import { untrack } from "svelte"
 import { useColorProp } from "../color-input"
+import { useFieldBindingPeek } from "../field/context.svelte"
 import FieldHost from "../field/field-host.svelte"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { normalizeProps } from "../normalize-props"
 import PopoverRoot from "../popover/popover-root.svelte"
 import { useLocale, useMessages } from "../provider"
@@ -48,10 +51,10 @@ let {
   name,
   form,
   formFormat,
-  disabled = false,
-  readonly = false,
+  disabled: ownDisabled = false,
+  readonly: ownReadonly = false,
   required = false,
-  invalid = false,
+  invalid: ownInvalid = false,
   colorName,
   locale: ownLocale,
   dir: ownDir,
@@ -61,6 +64,27 @@ let {
   style,
   ...rest
 }: ColorPickerRootProps = $props()
+
+// OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>
+// (spec: passed to every child).
+const enclosing = useFieldBindingPeek()
+const fieldsetDisabled = useFieldsetDisabled()
+let fieldsetDom = $state(false)
+const merged = $derived(
+  mergeFieldProps(
+    {
+      role: "group",
+      labelable: false,
+      disabled: ownDisabled,
+      readOnly: ownReadonly,
+      invalid: ownInvalid,
+    },
+    enclosing?.() ?? null,
+  ),
+)
+const disabled = $derived(merged.disabled || fieldsetDisabled() || fieldsetDom)
+const readonly = $derived(merged.readOnly)
+const invalid = $derived(merged.invalid)
 
 /** The default format of the first colour given: a hex string `hex`, otherwise its space. */
 function firstFormat(input: ColorInput | undefined, color: Color | undefined): ColorPickerFormat {
@@ -195,6 +219,9 @@ colorPicker.set({
     }),
   triggerEl,
   formValue: () => api.formValue,
+  setFieldsetDom: (d) => {
+    fieldsetDom = d
+  },
 })
 const rootProps = $derived(
   normalizeProps(api.root()) as { style?: string } & Record<string, unknown>,

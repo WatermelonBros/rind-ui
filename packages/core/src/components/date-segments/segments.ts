@@ -153,6 +153,15 @@ function build(o: SegmentOptions): SegmentFormat {
     const type = typeOf(part.type, o, hour12)
     return { type, text: type === "literal" || type === "timeZoneName" ? part.value : "" }
   })
+  // A 12-hour hour some locales format with no day period (fr-CM): without one, PM could
+  // never be typed and 13:01 would read 01:01 (react-spectrum#10833). Added after the time.
+  if (hour12 && !parts.some((p) => p.type === "dayPeriod")) {
+    const last = parts.findLastIndex(
+      (p) => p.type === "hour" || p.type === "minute" || p.type === "second",
+    )
+    if (last !== -1)
+      parts.splice(last + 1, 0, { type: "literal", text: " " }, { type: "dayPeriod", text: "" })
+  }
   const segments = mergeLiterals(isolateTime(parts))
 
   const pads = new Map<string, number>()

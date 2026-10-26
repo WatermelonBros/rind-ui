@@ -172,6 +172,9 @@ export interface Ctx {
   readonly picker: {
     readonly closeOnSelect: boolean
     readonly firstDayOfWeek: DayOfWeek | undefined
+    /** The field's own locale and calendar system: the bound Calendar shows the same. */
+    readonly locale: string
+    readonly createCalendar: CreateCalendar | undefined
     readonly placeholder: FieldValue
     readonly cancelled: { current: boolean }
     readonly triggers: number
@@ -270,6 +273,8 @@ export type DateFieldRootProps = Omit<
   readonly onDraftChange?: (hint: DateFieldDraftHint) => void
   /** Embedded: select all + Backspace cleared the field (a range clears both ends). */
   readonly onClearAll?: () => void
+  /** Embedded: a new number drops every partial segment for `value` (a range's clear or reset). */
+  readonly revision?: number
   /** Arrows move across every field's segments inside this element (paired fields). */
   readonly segmentScope?: { readonly current: HTMLElement | null }
   // Field props (the Root is a Field when not inside one).
@@ -330,6 +335,7 @@ function SingleRoot({
   onBoundary,
   onDraftChange,
   onClearAll,
+  revision,
   segmentScope,
   fieldMessages: ownFieldMessages,
   children,
@@ -371,21 +377,18 @@ function SingleRoot({
   const required = fieldProps.required === true || enclosing?.state.required === true
   const current = value === undefined ? defaultValue : value
   // Today is read once: a placeholder that moved at midnight would rewrite a stepped segment.
-  const [placeholder] = useState(
-    () =>
-      placeholderValue ??
-      defaultPlaceholderValue({
-        today: todayOf(
-          env.dateClock,
-          todayZone(undefined, current instanceof Time ? null : current),
-        ),
-        granularity,
-        maxGranularity,
-        timeZone: current && "timeZone" in current ? current.timeZone : undefined,
-        minValue,
-        maxValue,
-      }),
+  // The consumer's placeholderValue is followed (it also decides the value's kind).
+  const [defaultPlaceholder] = useState(() =>
+    defaultPlaceholderValue({
+      today: todayOf(env.dateClock, todayZone(undefined, current instanceof Time ? null : current)),
+      granularity,
+      maxGranularity,
+      timeZone: current && "timeZone" in current ? current.timeZone : undefined,
+      minValue,
+      maxValue,
+    }),
   )
+  const placeholder = placeholderValue ?? defaultPlaceholder
   const inputEl = useRef<HTMLDivElement | null>(null)
   const hiddenEl = useRef<HTMLInputElement | null>(null)
   const selectAll = useRef(false)
@@ -427,6 +430,7 @@ function SingleRoot({
   }))
   const machineProps = {
     value,
+    revision,
     defaultValue,
     onValueChange: (v: FieldValue | null, details: { event: { type: string }; cancel(): void }) => {
       cancelled.current = false
@@ -548,6 +552,8 @@ function SingleRoot({
     picker: {
       closeOnSelect,
       firstDayOfWeek,
+      locale,
+      createCalendar,
       placeholder,
       cancelled,
       triggers,
@@ -731,6 +737,7 @@ function RangeEnd({
           }
           // Select all + Backspace in either end clears the pair (both ends).
           onClearAll={() => ctx.send({ type: "CLEAR" })}
+          revision={ctx.view.context.revision}
           onValidityChange={(flags, message) =>
             ctx.send({ type: `${EDGE}.VALIDITY`, flags, message })
           }

@@ -105,6 +105,12 @@ describe("math", () => {
     expect(nextStep(95, 1, "large", { max: 100 })).toBe(100)
     expect(nextStep(10.5, 1, "step", {})).toBe(11)
   })
+  it("an off-grid max is never stepped past (max 10.5, step 1)", () => {
+    const r = { min: 0, max: 10.5, step: 1 }
+    expect(nextStep(10, 1, "step", r)).toBe(10)
+    expect(nextStep(5, 1, "large", r)).toBe(10)
+    expect(nextStep(9, 1, "step", r)).toBe(10)
+  })
   it("snaps and clamps at commit; knows the bounds", () => {
     expect(snapValue(103, { min: 0, max: 100, step: 5 })).toBe(100)
     expect(snapValue(12, { step: 5 })).toBe(10)
@@ -247,6 +253,12 @@ describe("keys", () => {
     expect(m.value()).toBe(100)
     m.key("FIRST")
     expect(m.onValueCommit.mock.calls.at(-1)).toEqual([0, { reason: "EDGE" }])
+  })
+
+  it("End on an off-grid max stops at the last grid value (no native step mismatch)", () => {
+    const m = make({ defaultValue: 5, min: 0, max: 10.5, step: 1 })
+    m.key("LAST")
+    expect(m.value()).toBe(10)
   })
 
   it("Step from edited text (ark#1838): parses 10,50 then the next grid line", () => {

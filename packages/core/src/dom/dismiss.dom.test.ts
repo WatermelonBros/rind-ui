@@ -552,6 +552,25 @@ describe("touch presses dismiss on click", () => {
     },
   )
 
+  it("a short tap that iOS sends no click for dismisses once the click is overdue (radix#4207)", () => {
+    vi.useFakeTimers()
+    try {
+      const a = layer("a")
+      const other = outside()
+      down(other, { type: "touch" })
+      up(other, { type: "touch" })
+      vi.advanceTimersByTime(349)
+      expect(a.requests).toHaveLength(0)
+      vi.advanceTimersByTime(1)
+      expect(a.reasons()).toEqual(["outside-press"])
+      // The late click, if any, finds the gesture consumed.
+      click(other)
+      expect(a.requests).toHaveLength(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it("ghost click: the select is already asked to close before the button underneath is clicked", () => {
     const select = layer("select", { kind: "listbox" })
     const under = outside()

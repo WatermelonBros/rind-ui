@@ -223,7 +223,8 @@ export const colorPickerMachine = /* @__PURE__ */ setup({
     "FORMAT.SET": { actions: ["setFormat"] },
     "EYEDROPPER.RESULT": { guard: "canChange", actions: ["setPicked"] },
     RESET: { actions: ["restoreDefault"] },
-    ADOPT: { actions: ["adopt"] },
+    // A read-only or disabled picker ignores autofill and native changes (re-synced instead).
+    ADOPT: { guard: "canChange", actions: ["adopt"] },
     "VALUE.SYNCED": { actions: ["applySynced"] },
     $reverted: { actions: ["revert"] },
   },

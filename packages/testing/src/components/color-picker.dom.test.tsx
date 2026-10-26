@@ -1,7 +1,7 @@
 // Color Picker scenarios (color-picker spec) through its driver and its children's drivers.
 // Runs in jsdom and in real browsers.
 import { type Color, formatColor } from "@rind-ui/core"
-import { ColorPicker, type ColorPickerRootProps } from "@rind-ui/react"
+import { ColorPicker, type ColorPickerRootProps, Field } from "@rind-ui/react"
 import { act, render, screen } from "@testing-library/react"
 import axe from "axe-core"
 import { useState } from "react"
@@ -88,6 +88,32 @@ describe("inline (Reado's anatomy)", () => {
     expect(onValueChange).toHaveBeenCalledTimes(2)
     expect((onValueChange.mock.calls[1]?.[0] as Color | undefined)?.alpha).toBe(0.99)
     await a11y()
+  })
+
+  it("a native <fieldset disabled> disables the picker and its sliders", async () => {
+    const onValueChange = vi.fn()
+    render(
+      <fieldset disabled>
+        <Inline onValueChange={onValueChange} />
+      </fieldset>,
+    )
+    await vi.waitFor(() =>
+      expect(
+        document.querySelector('[data-scope="color-picker"][data-part="root"][data-disabled]'),
+      ).not.toBeNull(),
+    )
+    for (const thumb of document.querySelectorAll('[role="slider"]')) {
+      expect(thumb.getAttribute("aria-disabled")).toBe("true")
+    }
+  })
+
+  it("inside a disabled Field the picker is disabled", () => {
+    render(
+      <Field.Root disabled>
+        <Inline />
+      </Field.Root>,
+    )
+    expect(document.querySelector('[data-scope="color-picker"][data-disabled]')).not.toBeNull()
   })
 
   it("no layer and no dismissal while idle: Escape reaches the host unhandled", () => {

@@ -477,6 +477,20 @@ describe("keyboard", () => {
     expect(step()).toBe("toolbar")
   })
 
+  it("ArrowRight on a native radio selects the next radio, not the next step (Shepherd #1873)", async () => {
+    render(
+      <App>
+        <input type="radio" name="use" aria-label="Work" />
+        <input type="radio" name="use" aria-label="Home" />
+      </App>,
+    )
+    const user = userEvent.setup()
+    await getTour(screen, { name: "Take the tour" }).start()
+    screen.getByRole("radio", { name: "Work" }).focus()
+    await user.keyboard("{ArrowRight}")
+    expect(step()).toBe("welcome")
+  })
+
   it("right-to-left: ArrowLeft is Next (intro.js#2035); keyboardNavigation off ignores arrows", async () => {
     render(
       <div dir="rtl">
