@@ -182,6 +182,11 @@
       "types": "./dist/image-viewer/index.d.ts",
       "default": "./dist/image-viewer/index.js"
     },
+    "./json-tree-view": {
+      "@rind-ui/source": "./src/json-tree-view/index.ts",
+      "types": "./dist/json-tree-view/index.d.ts",
+      "default": "./dist/json-tree-view/index.js"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
       "types": "./dist/kbd/index.d.ts",
@@ -569,6 +574,10 @@
       "./image-viewer": {
         "types": "./dist/image-viewer/index.d.ts",
         "default": "./dist/image-viewer/index.js"
+      },
+      "./json-tree-view": {
+        "types": "./dist/json-tree-view/index.d.ts",
+        "default": "./dist/json-tree-view/index.js"
       },
       "./kbd": {
         "types": "./dist/kbd/index.d.ts",
