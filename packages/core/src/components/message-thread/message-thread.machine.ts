@@ -114,6 +114,9 @@ export const messageThreadMachine = /* @__PURE__ */ setup({
           // The top layout never follows: the user's turn goes to the top instead.
           { guard: "topAnchor", target: "detached", actions: ["revealTurn"] },
           { guard: "grew", actions: ["clearUnread", "follow"] },
+          // Fewer messages (a deletion, a regenerate, a shorter thread): the count seen drops
+          // too, or the user's next message would not read as new.
+          { actions: ["clearUnread"] },
         ],
       },
     },
