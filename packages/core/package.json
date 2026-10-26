@@ -309,6 +309,11 @@
       "types": "./dist/components/separator/index.d.mts",
       "default": "./dist/components/separator/index.mjs"
     },
+    "./signature-pad": {
+      "@rind-ui/source": "./src/components/signature-pad/index.ts",
+      "types": "./dist/components/signature-pad/index.d.mts",
+      "default": "./dist/components/signature-pad/index.mjs"
+    },
     "./skeleton": {
       "@rind-ui/source": "./src/components/skeleton/index.ts",
       "types": "./dist/components/skeleton/index.d.mts",
@@ -667,6 +672,10 @@
       "./separator": {
         "types": "./dist/components/separator/index.d.mts",
         "default": "./dist/components/separator/index.mjs"
+      },
+      "./signature-pad": {
+        "types": "./dist/components/signature-pad/index.d.mts",
+        "default": "./dist/components/signature-pad/index.mjs"
       },
       "./skeleton": {
         "types": "./dist/components/skeleton/index.d.mts",

@@ -264,6 +264,16 @@ export {
   stickToBottom,
 } from "./stick-to-bottom"
 export {
+  preventTouchScribble,
+  type StrokeInputPoint,
+  type StrokeMessage,
+  startStroke,
+  startsStroke,
+  strokeBox,
+  strokePoint,
+} from "./stroke-input"
+export { rasterizeSvg, type SvgRasterInput } from "./svg-raster"
+export {
   damp,
   lockAxis,
   measureRelease,

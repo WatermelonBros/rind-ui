@@ -67,6 +67,7 @@ import * as scrollArea from "./scroll-area"
 import * as segmentedControl from "./segmented-control"
 import * as select from "./select"
 import * as separator from "./separator"
+import * as signaturePad from "./signature-pad"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as sortable from "./sortable"
@@ -168,6 +169,12 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "tool-call": toolCall,
+  "message-actions": messageActions,
+  "context-meter": contextMeter,
+  suggestions,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,

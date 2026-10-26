@@ -89,6 +89,11 @@ export interface PointerStepOptions {
   readonly at: { readonly x: number; readonly y: number }
   /** Default "mouse". One pointer id is kept across a gesture (down, moves, up). */
   readonly pointerType?: "mouse" | "pen" | "touch"
+  /**
+   * A pointer of its own (a second finger): its events are dispatched with this id and are
+   * not the primary pointer's. Default: the pointer type's one id.
+   */
+  readonly pointerId?: number
 }
 
 /** A file a test hands to a file input (serialisable: it crosses into a Playwright page). */

@@ -357,6 +357,12 @@
       "svelte": "./dist/separator/index.js",
       "default": "./dist/separator/index.js"
     },
+    "./signature-pad": {
+      "@rind-ui/source": "./src/signature-pad/index.ts",
+      "types": "./dist/signature-pad/index.d.ts",
+      "svelte": "./dist/signature-pad/index.js",
+      "default": "./dist/signature-pad/index.js"
+    },
     "./skeleton": {
       "@rind-ui/source": "./src/skeleton/index.ts",
       "types": "./dist/skeleton/index.d.ts",
@@ -784,6 +790,11 @@
         "types": "./dist/separator/index.d.ts",
         "svelte": "./dist/separator/index.js",
         "default": "./dist/separator/index.js"
+      },
+      "./signature-pad": {
+        "types": "./dist/signature-pad/index.d.ts",
+        "svelte": "./dist/signature-pad/index.js",
+        "default": "./dist/signature-pad/index.js"
       },
       "./skeleton": {
         "types": "./dist/skeleton/index.d.ts",
