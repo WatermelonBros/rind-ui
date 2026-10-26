@@ -116,7 +116,7 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | done | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
 | Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | done | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
-| Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 
 ## Color (2)
 

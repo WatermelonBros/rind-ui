@@ -379,6 +379,11 @@
       "types": "./dist/components/timeline/index.d.mts",
       "default": "./dist/components/timeline/index.mjs"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/components/timer/index.ts",
+      "types": "./dist/components/timer/index.d.mts",
+      "default": "./dist/components/timer/index.mjs"
+    },
     "./toast": {
       "@rind-ui/source": "./src/components/toast/index.ts",
       "types": "./dist/components/toast/index.d.mts",
@@ -723,6 +728,10 @@
       "./timeline": {
         "types": "./dist/components/timeline/index.d.mts",
         "default": "./dist/components/timeline/index.mjs"
+      },
+      "./timer": {
+        "types": "./dist/components/timer/index.d.mts",
+        "default": "./dist/components/timer/index.mjs"
       },
       "./toast": {
         "types": "./dist/components/toast/index.d.mts",

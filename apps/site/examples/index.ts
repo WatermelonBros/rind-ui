@@ -81,6 +81,7 @@ import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as timeline from "./timeline"
+import * as timer from "./timer"
 import * as toast from "./toast"
 import * as toggleGroup from "./toggle-group"
 import * as toolbar from "./toolbar"
@@ -171,6 +172,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   sortable,
   stepper,
   timeline,
+  timer,
   "table-of-contents": tableOfContents,
   "streaming-message": streamingMessage,
   switch: switchEx,

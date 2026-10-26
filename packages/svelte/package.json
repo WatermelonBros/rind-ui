@@ -441,6 +441,12 @@
       "svelte": "./dist/timeline/index.js",
       "default": "./dist/timeline/index.js"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/timer/index.ts",
+      "types": "./dist/timer/index.d.ts",
+      "svelte": "./dist/timer/index.js",
+      "default": "./dist/timer/index.js"
+    },
     "./toast": {
       "@rind-ui/source": "./src/toast/index.ts",
       "types": "./dist/toast/index.d.ts",
@@ -854,6 +860,11 @@
         "types": "./dist/timeline/index.d.ts",
         "svelte": "./dist/timeline/index.js",
         "default": "./dist/timeline/index.js"
+      },
+      "./timer": {
+        "types": "./dist/timer/index.d.ts",
+        "svelte": "./dist/timer/index.js",
+        "default": "./dist/timer/index.js"
       },
       "./toast": {
         "types": "./dist/toast/index.d.ts",

@@ -374,6 +374,11 @@
       "types": "./dist/timeline/index.d.mts",
       "default": "./dist/timeline/index.mjs"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/timer/index.ts",
+      "types": "./dist/timer/index.d.mts",
+      "default": "./dist/timer/index.mjs"
+    },
     "./toast": {
       "@rind-ui/source": "./src/toast/index.ts",
       "types": "./dist/toast/index.d.mts",
@@ -704,6 +709,10 @@
       "./timeline": {
         "types": "./dist/timeline/index.d.mts",
         "default": "./dist/timeline/index.mjs"
+      },
+      "./timer": {
+        "types": "./dist/timer/index.d.mts",
+        "default": "./dist/timer/index.mjs"
       },
       "./toast": {
         "types": "./dist/toast/index.d.mts",
