@@ -253,6 +253,10 @@ describe("Day Period And Era Typing", () => {
     expect(planName("dayPeriod", "오후", ko)).toEqual({ kind: "match", value: 1 })
   })
 
+  it("a 12-hour locale that formats no day period still gets one (react-spectrum#10833)", () => {
+    expect(order(fmt("fr-CM", { ...date("minute"), hourCycle: 12 }))).toMatch(/minute dayPeriod/)
+  })
+
   it('a lowercase "p" is PM in every locale (reka-ui#980)', () => {
     expect(planName("dayPeriod", "p", fmt("en-US", date("minute")))).toEqual({
       kind: "match",
@@ -311,6 +315,16 @@ describe("Stepping Keys", () => {
     // The draft of either shows 01:30; the conversion keeps the occurrence it came from.
     const d = draftOf(second, z)
     expect(toValue(d, z, shapeOf(second), second, second).value?.toString()).toBe(second.toString())
+  })
+
+  it("a minute edit in the second occurrence of a repeated hour keeps that occurrence", () => {
+    const z = fmt("en-US", { ...date("minute"), hourCycle: 24, timeZone: "Europe/Lisbon" })
+    const second = parseZonedDateTime("2026-10-25T01:30+00:00[Europe/Lisbon]")
+    const d = draftOf(second, z)
+    const edited = { ...d, minute: { value: 45, text: "45" } }
+    expect(toValue(edited, z, shapeOf(second), second, second).value?.toString()).toBe(
+      "2026-10-25T01:45:00+00:00[Europe/Lisbon]",
+    )
   })
 })
 

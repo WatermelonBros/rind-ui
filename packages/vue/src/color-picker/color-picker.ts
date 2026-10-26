@@ -23,6 +23,7 @@ import {
   formatColor,
   isEyeDropperSupported,
   type MessageOverrides,
+  mergeFieldProps,
   nextFormat,
   PICKER_FORMATS,
   type PopoverProps,
@@ -30,6 +31,7 @@ import {
   pickerValueOf,
   pickerWorking,
   pickScreenColor,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   computed,
@@ -59,8 +61,9 @@ import {
   SwatchNamingKey,
 } from "../color-swatch/color-swatch"
 import { ColorSwatchPicker } from "../color-swatch-picker/color-swatch-picker"
-import { FieldControlBoundary, useFieldControl } from "../field/context"
+import { FieldControlBoundary, useFieldBindingPeek, useFieldControl } from "../field/context"
 import { FieldHost, HostDescription, HostErrorMessage } from "../field/field-host"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -116,6 +119,8 @@ interface Ctx {
   readonly hiddenPart: ShallowRef<boolean>
   readonly triggerEl: ShallowRef<Element | null>
   readonly formValue: () => string
+  /** A native <fieldset disabled> around the hidden input (watched by it). */
+  readonly setFieldsetDom: (disabled: boolean) => void
 }
 
 const PickerKey: InjectionKey<Ctx> = Symbol("rind-ui.color-picker")
@@ -211,6 +216,26 @@ const Root = defineComponent({
       firstFormat(props.modelValue ?? props.defaultValue ?? undefined, value() ?? defaultValue())
     let latestFormat: ColorPickerFormat = initialFormat
     const inline = props.inline
+    // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>
+    // (spec: passed to every child).
+    const enclosing = useFieldBindingPeek()
+    const fieldsetDisabled = useFieldsetDisabled()
+    const fieldsetDom = shallowRef(false)
+    const merged = computed(() =>
+      mergeFieldProps(
+        {
+          role: "group",
+          labelable: false,
+          disabled: props.disabled,
+          readOnly: props.readonly,
+          invalid: props.invalid,
+        },
+        enclosing?.value ?? null,
+      ),
+    )
+    const disabled = () => merged.value.disabled || fieldsetDisabled.value || fieldsetDom.value
+    const readOnly = () => merged.value.readOnly
+    const invalid = () => merged.value.invalid
     const machineProps = () => ({
       value: value(),
       defaultValue: defaultValue(),
@@ -219,8 +244,8 @@ const Root = defineComponent({
       open: inline ? undefined : props.open,
       defaultOpen: props.defaultOpen ?? false,
       inline,
-      disabled: props.disabled,
-      readOnly: props.readonly,
+      disabled: disabled(),
+      readOnly: readOnly(),
       closeOnSelect: props.closeOnSelect,
       onValueChange: (c: Color, d: { reason: string; event: unknown; cancel(): void }) => {
         const e = d.event as { reason?: ColorPickerReason; channel?: string }
@@ -265,9 +290,9 @@ const Root = defineComponent({
         format: format(),
         open: open(),
         inline,
-        disabled: props.disabled,
-        readOnly: props.readonly,
-        invalid: props.invalid,
+        disabled: disabled(),
+        readOnly: readOnly(),
+        invalid: invalid(),
         dragging: false,
         messages: messages.value,
         locale: loc.value.locale,
@@ -293,8 +318,8 @@ const Root = defineComponent({
       format: format(),
       open: open(),
       inline,
-      disabled: props.disabled,
-      readOnly: props.readonly,
+      disabled: disabled(),
+      readOnly: readOnly(),
     })
     provide(PickerKey, {
       instance,
@@ -314,6 +339,7 @@ const Root = defineComponent({
       hiddenPart,
       triggerEl,
       formValue: () => api.value.formValue,
+      setFieldsetDom: (d: boolean) => (fieldsetDom.value = d),
     })
     return () => {
       const rootProps = normalizeProps(api.value.root()) as { style?: unknown } & Record<
@@ -328,10 +354,10 @@ const Root = defineComponent({
           scope: "color-picker",
           id: instance(),
           dir: loc.value.dir,
-          disabled: props.disabled,
-          readonly: props.readonly,
+          disabled: disabled(),
+          readonly: readOnly(),
           required: props.required,
-          invalid: props.invalid,
+          invalid: invalid(),
           ...rest,
           ...rootProps,
           style: [rootProps.style, style],
@@ -354,7 +380,7 @@ const Root = defineComponent({
                     registry.flushAll()
                     send({ type: "CLOSE", reason: d.reason })
                   },
-                  disabled: props.disabled,
+                  disabled: disabled(),
                   ...(props.modal === undefined ? {} : { modal: props.modal }),
                   ...(props.positioning === undefined ? {} : { positioning: props.positioning }),
                   ...(props.initialFocus === undefined ? {} : { initialFocus: props.initialFocus }),
@@ -385,6 +411,11 @@ const HiddenField = defineComponent({
       sync()
       watch(ctx.formValue, sync, { flush: "post" })
       const input = el.value as HTMLInputElement | null
+      if (input) {
+        const fieldset = watchFieldsetDisabled(input, ctx.setFieldsetDom)
+        ctx.setFieldsetDom(fieldset.disabled)
+        onBeforeUnmount(fieldset.stop)
+      }
       const owner = input?.form
       const onReset = () => ctx.send({ type: "RESET" })
       const onChange = (e: Event) => {

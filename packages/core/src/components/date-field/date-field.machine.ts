@@ -93,6 +93,8 @@ export type DateFieldEvent =
   | { readonly type: "INPUT.ADOPT"; readonly value: string }
   /** The controlled value changed (onProps). */
   | { readonly type: "VALUE.SYNCED" }
+  /** A range end's `revision` changed: its partial draft gives way to the controlled value. */
+  | { readonly type: "DRAFT.RESET" }
   /** Locale, calendar, granularity, hour cycle or zone display changed (onProps). */
   | { readonly type: "FORMAT.CHANGED" }
 
@@ -112,6 +114,11 @@ export interface DateFieldDraftHint {
 
 export interface DateFieldProps {
   readonly value?: FieldValue | null | undefined
+  /**
+   * A range end: a new number drops every partial segment for the controlled value (the pair
+   * cleared, reset or picked, even when this end's value was already null).
+   */
+  readonly revision?: number | undefined
   readonly defaultValue?: FieldValue | null | undefined
   readonly onValueChange?:
     | ((value: FieldValue | null, details: ChangeDetails<DateFieldEvent>) => void)
@@ -518,10 +525,9 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
     type: (args) => {
       const { event } = args
       if (event.type === "INPUT") typeText(args, event.segment, event.data)
-      if (event.type === "COMPOSITION.END") {
-        args.set("buffer", "")
-        typeText(args, event.segment, event.text)
-      }
+      // A composition adds to the buffer like typing: a Korean IME commits 오 and 후 as two
+      // compositions, a full-width IME may commit １ and ２ apart (react-spectrum#5832).
+      if (event.type === "COMPOSITION.END") typeText(args, event.segment, event.text)
     },
     step: (args) => {
       const { event } = args
@@ -605,6 +611,14 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
         reportHint(args)
       }
     },
+    resetDraft: (args) => {
+      const v = current(args)
+      args.set("proposed", null)
+      args.set("draft", draftOf(v, formatFor(args.props, v)))
+      args.set("buffer", "")
+      syncHidden(args, v, false)
+      reportHint(args)
+    },
     /** A refused proposal: the draft shows the value again. */
     revert: (args) => {
       const v = current(args)
@@ -645,6 +659,7 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
   values: { value: { fallback: EMPTY, equal: sameDateValue } },
   onProps: {
     value: "VALUE.SYNCED",
+    revision: "DRAFT.RESET",
     locale: "FORMAT.CHANGED",
     calendar: "FORMAT.CHANGED",
     granularity: "FORMAT.CHANGED",
@@ -658,6 +673,7 @@ export const dateFieldMachine = /* @__PURE__ */ setup({
     CLEAR: { guard: "editable", actions: ["clearAll"] },
     "INPUT.ADOPT": [{ guard: "editable", actions: ["adopt"] }, { actions: ["resyncHidden"] }],
     "VALUE.SYNCED": { actions: ["applySynced"] },
+    "DRAFT.RESET": { actions: ["resetDraft"] },
     "FORMAT.CHANGED": { actions: ["reformat"] },
     $reverted: { actions: ["revert"] },
   },

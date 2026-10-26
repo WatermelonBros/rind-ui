@@ -33,6 +33,7 @@ import {
   planSegmentInput,
   quirkActive,
   resolveCalendar,
+  restoreText,
   type SegmentPart,
   segmentAtPress,
   segmentId,
@@ -195,6 +196,8 @@ export type DateFieldRootProps = Omit<
   readonly onDraftChange?: ((hint: DateFieldDraftHint) => void) | undefined
   /** Embedded: select all + Backspace cleared the field (a range clears both ends). */
   readonly onClearAll?: (() => void) | undefined
+  /** Embedded: a new number drops every partial segment for `value` (a range's clear or reset). */
+  readonly revision?: number | undefined
   /** Arrows move across every field's segments inside this element (paired fields). */
   readonly segmentScope?: Accessor<Element | null> | undefined
   // Field props (the Root is a Field when not inside one).
@@ -258,6 +261,7 @@ const SINGLE_KEYS = [
   "onBoundary",
   "onDraftChange",
   "onClearAll",
+  "revision",
   "segmentScope",
   "fieldMessages",
   "children",
@@ -315,20 +319,19 @@ export function SingleRoot(props: DateFieldRootProps) {
   const current = () => (o.value === undefined ? o.defaultValue : o.value)
   const defaultValue = () => o.defaultValue ?? null
   // Today is read once: a placeholder that moved at midnight would rewrite a stepped segment.
-  const placeholder: FieldValue = untrack(() => {
+  // The consumer's placeholderValue is followed (it also decides the value's kind).
+  const defaultPlaceholder: FieldValue = untrack(() => {
     const now = current() ?? null
-    return (
-      o.placeholderValue ??
-      defaultPlaceholderValue({
-        today: todayOf(env.dateClock, todayZone(undefined, now instanceof Time ? null : now)),
-        granularity: o.granularity,
-        maxGranularity: o.maxGranularity,
-        timeZone: now && "timeZone" in now ? now.timeZone : undefined,
-        minValue: o.minValue ?? null,
-        maxValue: o.maxValue ?? null,
-      })
-    )
+    return defaultPlaceholderValue({
+      today: todayOf(env.dateClock, todayZone(undefined, now instanceof Time ? null : now)),
+      granularity: o.granularity,
+      maxGranularity: o.maxGranularity,
+      timeZone: now && "timeZone" in now ? now.timeZone : undefined,
+      minValue: o.minValue ?? null,
+      maxValue: o.maxValue ?? null,
+    })
   })
+  const placeholder = (): FieldValue => o.placeholderValue ?? defaultPlaceholder
   const [inputEl, setInputEl] = createSignal<Element | null>(null)
   const [hiddenEl, setHiddenEl] = createSignal<Element | null>(null)
   const selectAll = { current: false }
@@ -371,6 +374,7 @@ export function SingleRoot(props: DateFieldRootProps) {
     () =>
       ({
         value: o.value,
+        revision: o.revision,
         defaultValue: defaultValue(),
         onValueChange: (
           v: FieldValue | null,
@@ -386,7 +390,7 @@ export function SingleRoot(props: DateFieldRootProps) {
             },
           })
         },
-        placeholderValue: placeholder,
+        placeholderValue: placeholder(),
         locale: resolved().formatLocale,
         calendar: resolved().calendar,
         granularity: o.granularity,
@@ -427,7 +431,7 @@ export function SingleRoot(props: DateFieldRootProps) {
     const v = view()
     const valueNow = v.values.value ?? null
     const format = formatFor(machineProps(), valueNow)
-    const kindSource = valueNow ?? defaultValue() ?? placeholder
+    const kindSource = valueNow ?? defaultValue() ?? placeholder()
     return {
       instance: instance(),
       format,
@@ -523,7 +527,11 @@ export function SingleRoot(props: DateFieldRootProps) {
     picker: {
       closeOnSelect: () => o.closeOnSelect ?? true,
       firstDayOfWeek: () => o.firstDayOfWeek,
-      placeholder,
+      locale: () => loc().locale,
+      createCalendar: () => o.createCalendar,
+      get placeholder() {
+        return placeholder()
+      },
       cancelled,
       triggers,
       setTriggers,
@@ -699,6 +707,7 @@ function RangeEnd(
       }
       // Select all + Backspace in either end clears the pair (both ends).
       onClearAll={() => ctx.send({ type: "CLEAR" })}
+      revision={ctx.view().context.revision}
       onValidityChange={(flags, message) =>
         ctx.send({ type: `${EDGE}.VALIDITY`, flags, message } as never)
       }
@@ -1045,8 +1054,11 @@ function EditableSegment(props: {
       ctx.send(event)
     },
     onCompositionStart: () => ctx.send({ type: "COMPOSITION.START" }),
-    onCompositionEnd: (e: CompositionEvent) =>
-      ctx.send({ type: "COMPOSITION.END", segment: type, text: e.data }),
+    onCompositionEnd: (e: CompositionEvent) => {
+      ctx.send({ type: "COMPOSITION.END", segment: type, text: e.data })
+      // A refused or unchanged composition changes no prop: the composed text would stay.
+      restoreText(e.currentTarget, props.own()["value"])
+    },
     onPaste: (e: ClipboardEvent) => {
       e.preventDefault()
       if (ctx.disabled() || ctx.readOnly()) return

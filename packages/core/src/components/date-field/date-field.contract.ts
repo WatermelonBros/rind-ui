@@ -458,6 +458,7 @@ export const dateFieldContract = contract("date-field", {
     CLEAR: { skip: "a picker's Clear trigger: the picker tests" },
     "VALUE.SYNCED": { skip: "the parent's prop change; walked by the controlled configurations" },
     "FORMAT.CHANGED": { skip: "a locale change is a scenario test" },
+    "DRAFT.RESET": { skip: "a range end's revision: the range clear and reset tests" },
     "$props:value": { skip: "the parent's prop change; walked by the controlled configurations" },
     "$props:locale": { skip: "a locale change is a scenario test" },
     "$props:calendar": { skip: "a calendar change is a scenario test" },
@@ -465,6 +466,7 @@ export const dateFieldContract = contract("date-field", {
     "$props:hourCycle": { skip: "an hour-cycle change is a scenario test" },
     "$props:hideTimeZone": { skip: "a zone display change is a scenario test" },
     "$props:shouldForceLeadingZeros": { skip: "a padding change is a scenario test" },
+    "$props:revision": { skip: "a range end's revision: the range clear and reset tests" },
   },
   traits: ["valued", "form-associated", "field-associated"],
   valued: {

@@ -199,6 +199,15 @@ function wrap(env: FocusEnv, container: HTMLElement, e: KeyboardEvent) {
   }
   if (!first || !last) return move(focusableContainer(container))
   if (stops.length === 1) return move(first)
+  // Safari with "Press Tab to highlight each item" off skips buttons and links: its native
+  // Tab from a field leaves the layer even though a button follows. In WebKit every Tab is
+  // moved here, along the layer's own stops (the option cannot be read).
+  // platform-convention: Safari's Tab preference, which no script can query
+  const at = env.platform?.webkit === true ? stops.indexOf(active as HTMLElement) : -1
+  if (at !== -1) {
+    const step = e.shiftKey ? -1 : 1
+    return move(stops[(at + step + stops.length) % stops.length] as HTMLElement)
+  }
   const outside = !active || active === doc.body || !stops.includes(active as HTMLElement)
   if (e.shiftKey && (active === first || active === container || (outside && active !== last))) {
     return move(last)

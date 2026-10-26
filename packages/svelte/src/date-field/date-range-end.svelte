@@ -67,6 +67,7 @@ const onBoundary = (b: DateFieldBoundary) => {
     onValueChange={(v: FieldValue | null, details: DateFieldChangeDetails) =>
       ctx.send({ type: `${EDGE}.COMMIT` as "START.COMMIT", value: v, reason: details.reason })}
     onClearAll={() => ctx.send({ type: "CLEAR" })}
+    revision={ctx.view().context.revision}
     onValidityChange={(flags: DateValidityFlags, message: string) =>
       ctx.send({ type: `${EDGE}.VALIDITY` as "START.VALIDITY", flags, message })}
     {labelledBy}

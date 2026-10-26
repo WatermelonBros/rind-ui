@@ -325,7 +325,12 @@ const Root = defineComponent({
     })
     onBeforeUnmount(() => drag.dispose())
     // The modality is tracked from mount: a pointer press that focuses a cell is seen as one.
-    onMounted(() => onBeforeUnmount(env.modality.subscribe(() => {})))
+    // Server markup marks no day as today (the server's day or zone may not be the viewer's).
+    const mounted = shallowRef(false)
+    onMounted(() => {
+      mounted.value = true
+      onBeforeUnmount(env.modality.subscribe(() => {}))
+    })
     const modality = useModality(env.modality, () => view.value.matches("focused"))
     const anchored = () =>
       props.selectionMode === "range" ? (view.value.values.anchor ?? null) : null
@@ -359,7 +364,7 @@ const Root = defineComponent({
         dragging: v.context.dragging,
         gridFocused: v.matches("focused"),
         modality: modality.value,
-        today: display(today(), calendar),
+        today: mounted.value ? display(today(), calendar) : null,
         dir: loc.value.dir,
         consumerNamed: attrs["aria-label"] !== undefined || attrs["aria-labelledby"] !== undefined,
         ids: {

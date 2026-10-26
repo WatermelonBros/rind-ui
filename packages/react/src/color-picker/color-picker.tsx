@@ -26,6 +26,7 @@ import {
   formatColor,
   isEyeDropperSupported,
   type MessageOverrides,
+  mergeFieldProps,
   nextFormat,
   PICKER_FORMATS,
   type PopoverProps,
@@ -33,6 +34,7 @@ import {
   pickerValueOf,
   pickerWorking,
   pickScreenColor,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -55,8 +57,9 @@ import {
   type ColorSwatchPickerItemProps,
   type ColorSwatchPickerRootProps,
 } from "../color-swatch-picker/color-swatch-picker"
-import { FieldControlBoundary, useFieldControl } from "../field/field"
+import { FieldControlBoundary, useFieldBindingPeek, useFieldControl } from "../field/field"
 import { FieldHost, HostDescription, HostErrorMessage } from "../field/use-field-host"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
@@ -113,6 +116,8 @@ interface Ctx {
   readonly hiddenPart: boolean
   readonly triggerEl: { current: HTMLElement | null }
   readonly formValue: string
+  /** A native <fieldset disabled> around the hidden input (watched by it). */
+  readonly setFieldsetDom: (disabled: boolean) => void
 }
 
 const PickerContext = createContext<Ctx | null>(null)
@@ -198,10 +203,10 @@ function Root({
   name,
   form,
   formFormat,
-  disabled = false,
-  readOnly = false,
+  disabled: ownDisabled = false,
+  readOnly: ownReadOnly = false,
   required = false,
-  invalid = false,
+  invalid: ownInvalid = false,
   colorName,
   locale: ownLocale,
   dir: ownDir,
@@ -213,6 +218,24 @@ function Root({
 }: ColorPickerRootProps) {
   const generated = useId()
   const instance = id ?? generated
+  // OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>
+  // (spec: passed to every child).
+  const enclosing = useFieldBindingPeek()
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = useState(false)
+  const merged = mergeFieldProps(
+    {
+      role: "group",
+      labelable: false,
+      disabled: ownDisabled,
+      readOnly: ownReadOnly,
+      invalid: ownInvalid,
+    },
+    enclosing,
+  )
+  const disabled = merged.disabled || fieldsetDisabled || fieldsetDom
+  const readOnly = merged.readOnly
+  const invalid = merged.invalid
   const { locale, dir } = useLocale(ownLocale, ownDir)
   const messages = useMessages("color-picker", colorPickerMessages, ownMessages)
   const value = useColorProp(valueProp, "value", "color-picker")
@@ -312,6 +335,7 @@ function Root({
     hiddenPart,
     triggerEl,
     formValue: api.formValue,
+    setFieldsetDom,
   }
   void emitted
   const rootProps = normalizeProps(api.root()) as { style?: object } & Record<string, unknown>
@@ -379,6 +403,14 @@ function HiddenField({ ctx }: { readonly ctx: Ctx }) {
   useIsoLayoutEffect(() => {
     if (el.current && el.current.value !== latest.current) el.current.value = latest.current
   })
+  const { setFieldsetDom } = ctx
+  useEffect(() => {
+    const node = el.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [setFieldsetDom])
   useEffect(() => {
     const input = el.current
     const owner = input?.form
