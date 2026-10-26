@@ -52,27 +52,27 @@
 }
 
 /*
- * Fills the gaps between expanded toasts (and the space they grow into) so the pointer
- * never leaves the region between two toasts and the stack does not collapse under it.
+ * Fills the gap on each expanded toast's far side, so the pointer never leaves the stack between
+ * two toasts and it does not collapse under it. On the toasts, not the region: a filler sized
+ * for a full stack ran far past a short one and took the clicks meant for the page above it.
  */
 :is([data-skinned], [data-rind-theme^="skin-"])
-[data-scope="toast"][data-part="region"][data-expanded]::after {
+[data-scope="toast"][data-part="root"][data-expanded]::after {
   content: "";
   position: absolute;
   inset-inline: 0;
-  block-size: calc(
-    (var(--rind-toast-front-height, 0px) + var(--rind-toast-gap, 14px)) *
-    var(--rind-toast-fill, 6)
-  );
+  block-size: var(--rind-toast-gap, 14px);
   pointer-events: auto;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="toast"][data-part="region"][data-side="bottom"][data-expanded]::after {
-  inset-block-end: 0;
+  [data-scope="toast"][data-part="region"][data-side="bottom"]
+  [data-part="root"][data-expanded]::after {
+  inset-block-end: 100%;
 }
 :is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="toast"][data-part="region"][data-side="top"][data-expanded]::after {
-  inset-block-start: 0;
+  [data-scope="toast"][data-part="region"][data-side="top"]
+  [data-part="root"][data-expanded]::after {
+  inset-block-start: 100%;
 }
 
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="toast"][data-part="list"] {
