@@ -18,6 +18,7 @@ import type { AnnouncerEnv } from "../../env/capabilities"
 import { fullDate, periodName, toEmitted } from "../../i18n/date"
 import { setup, type } from "../../machine/setup"
 import type { ActionArgs } from "../../machine/types"
+import { warnBounds } from "../date-segments/bounds"
 import type { CalendarMessages } from "./calendar.messages"
 import {
   align,
@@ -412,6 +413,15 @@ function drillDown(args: Args, date: CalendarDate) {
   if (below) showView(args, below, clamp(date, args.props))
 }
 
+/**
+ * The same day (or both absent): date props compared by value. Sound: both are dates of the
+ * library, which compare across its date types.
+ */
+const sameDate = (
+  a: { compare(b: never): number } | null | undefined,
+  b: { compare(b: never): number } | null | undefined,
+) => (a && b ? a.compare(b as never) === 0 : (a ?? null) === (b ?? null))
+
 export const calendarMachine = /* @__PURE__ */ setup({
   types: type<Types>(),
   guards: {
@@ -599,6 +609,7 @@ export const calendarMachine = /* @__PURE__ */ setup({
       if (after !== before) announceHeading(args.env, after, args.props, "calendar")
     },
     constrain: (args) => {
+      warnBounds("calendar", args.props.minValue, args.props.maxValue)
       const focused = toCalendar(args.values.focusedValue, args.props.calendar)
       const date = clamp(focused, args.props)
       if (!isSameDay(date, focused))
@@ -612,6 +623,7 @@ export const calendarMachine = /* @__PURE__ */ setup({
   id: "calendar",
   initial: "idle",
   context: (props) => {
+    warnBounds("calendar", props.minValue, props.maxValue)
     const focused = toCalendar(
       props.focusedValue ??
         props.defaultFocusedValue ??
@@ -635,9 +647,11 @@ export const calendarMachine = /* @__PURE__ */ setup({
   },
   effects: ["prepareAnnouncer"],
   onProps: {
-    focusedValue: "FOCUS.SYNC",
-    minValue: "CONSTRAINTS",
-    maxValue: "CONSTRAINTS",
+    // A new object for the same day (an adapter's per-render conversion) is no change: a
+    // controlled focus held outside the bounds would otherwise be re-clamped every render.
+    focusedValue: { event: "FOCUS.SYNC", equal: sameDate },
+    minValue: { event: "CONSTRAINTS", equal: sameDate },
+    maxValue: { event: "CONSTRAINTS", equal: sameDate },
     // A new object with the same days (an inline value={{ start, end }}) is no change.
     value: { event: "VALUE.SYNC", equal: (a, b) => sameDays(a ?? null, b ?? null) },
   },

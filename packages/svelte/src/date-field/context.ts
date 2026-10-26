@@ -1,4 +1,5 @@
 import {
+  type CreateCalendar,
   type DateFieldMessages,
   type DateGranularity,
   type DateRangeEdge,
@@ -45,6 +46,9 @@ export interface Ctx {
   readonly picker: {
     readonly closeOnSelect: () => boolean
     readonly firstDayOfWeek: () => DayOfWeek | undefined
+    /** The field's own locale and calendar system: the bound Calendar shows the same. */
+    readonly locale: () => string
+    readonly createCalendar: () => CreateCalendar | undefined
     readonly placeholder: FieldValue
     readonly cancelled: { current: boolean }
     readonly triggers: { count: number }

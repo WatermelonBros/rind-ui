@@ -56,6 +56,7 @@ import {
   planSegmentInput,
   quirkActive,
   resolveCalendar,
+  restoreText,
   type SegmentPart,
   segmentAtPress,
   segmentId,
@@ -176,6 +177,8 @@ export interface SingleOptions {
   readonly instance: () => string
   readonly embedded: boolean
   readonly value: () => FieldValue | null | undefined
+  /** Embedded: a new number drops every partial segment for `value` (a range's clear or reset). */
+  readonly revision?: () => number
   readonly defaultValue: () => FieldValue | null
   readonly placeholderValue: () => FieldValue | undefined
   readonly granularity: () => DateGranularity | undefined
@@ -232,14 +235,12 @@ export function injectSingleField(o: SingleOptions): {
   const readOnly = () => o.readOnly() || enclosing()?.state.readOnly === true
   const required = () => o.required() || enclosing()?.state.required === true
   // Today is read once: a placeholder that moved at midnight would rewrite a stepped segment.
+  // The consumer's placeholderValue is followed (it also decides the value's kind).
   let placeholder: FieldValue | undefined
   const placeholderNow = () => {
+    const given = o.placeholderValue()
+    if (given) return given
     if (placeholder) return placeholder
-    const given = untracked(o.placeholderValue)
-    if (given) {
-      placeholder = given
-      return given
-    }
     const v = untracked(o.value)
     const current = v === undefined ? untracked(o.defaultValue) : v
     placeholder = defaultPlaceholderValue({
@@ -286,6 +287,7 @@ export function injectSingleField(o: SingleOptions): {
   }
   const machineProps = () => ({
     value: o.value(),
+    revision: o.revision?.(),
     defaultValue: o.defaultValue(),
     onValueChange: (v: FieldValue | null, details: { event: { type: string }; cancel(): void }) => {
       cancelled.current = false
@@ -400,6 +402,8 @@ export function injectSingleField(o: SingleOptions): {
     picker: {
       closeOnSelect: o.closeOnSelect,
       firstDayOfWeek: o.firstDayOfWeek,
+      locale: () => loc().locale,
+      createCalendar: o.createCalendar,
       placeholder: placeholderNow,
       cancelled,
       triggers,
@@ -814,8 +818,11 @@ export class DateFieldSegment {
           ctx.send(event)
         },
         onCompositionStart: () => ctx.send({ type: "COMPOSITION.START" }),
-        onCompositionEnd: (e: CompositionEvent) =>
-          ctx.send({ type: "COMPOSITION.END", segment: type(), text: e.data }),
+        onCompositionEnd: (e: CompositionEvent) => {
+          ctx.send({ type: "COMPOSITION.END", segment: type(), text: e.data })
+          // A refused or unchanged composition changes no prop: the composed text would stay.
+          restoreText(e.currentTarget, api().segment(untracked(this.segment))["value"])
+        },
         onPaste: (e: ClipboardEvent) => {
           e.preventDefault()
           if (ctx.disabled() || ctx.readOnly()) return
@@ -1070,6 +1077,7 @@ abstract class RangeEndBase {
       options: {
         value: () =>
           edge === "start" ? range.view().context.startValue : range.view().context.endValue,
+        revision: () => range.view().context.revision,
         defaultValue: () => null,
         placeholderValue: () => end().placeholderValue,
         granularity: () => end().granularity,

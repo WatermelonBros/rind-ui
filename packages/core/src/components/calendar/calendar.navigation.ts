@@ -46,7 +46,9 @@ export function clamp(date: CalendarDate, o: Pick<NavigationOptions, "minValue" 
   const min = inCalendar(o.minValue, date)
   const max = inCalendar(o.maxValue, date)
   if (min && date.compare(min) < 0) return min
-  if (max && date.compare(max) > 0) return max
+  // Min after max (a development warning says so): min is the one fixed point, or a
+  // controlled focus would bounce between the two forever.
+  if (max && date.compare(max) > 0) return min && min.compare(max) > 0 ? min : max
   return date
 }
 

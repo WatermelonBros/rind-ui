@@ -137,6 +137,8 @@ export type DateFieldSingleRootProps = Div &
     readonly onDraftChange?: ((hint: DateFieldDraftHint) => void) | undefined
     /** Embedded: select all + Backspace cleared the field (a range clears both ends). */
     readonly onClearAll?: (() => void) | undefined
+    /** Embedded: a new number drops every partial segment for `value` (a range's clear or reset). */
+    readonly revision?: number | undefined
     /** Arrows move across every field's segments inside this element (paired fields). */
     readonly segmentScope?: (() => HTMLElement | null) | undefined
   }

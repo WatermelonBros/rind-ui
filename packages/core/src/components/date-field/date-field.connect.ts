@@ -29,6 +29,7 @@ import {
   type SegmentType,
   validityFlags,
 } from "../date-segments"
+import { warnBounds } from "../date-segments/bounds"
 import type { FieldControlProps } from "../shared/field-control"
 import { type DateFieldEvent, formValueOf } from "./date-field.machine"
 import { type DateFieldMessages, defaultPlaceholder } from "./date-field.messages"
@@ -101,6 +102,16 @@ export function dateFieldKey(
  * cancelled, so the input only ever shows the machine's text. A composition cannot be
  * cancelled: its text arrives at `compositionend`.
  */
+/**
+ * After a composition ends: the segment input shows the draft's text again (a composition the
+ * field refused, or one that left the draft as it was, changes no prop to rewrite it).
+ */
+export function restoreText(el: EventTarget | null, text: unknown): void {
+  // Sound: the segment parts are inputs (connect renders them so).
+  const input = el as HTMLInputElement | null
+  if (input && typeof text === "string" && input.value !== text) input.value = text
+}
+
 export function planSegmentInput(
   e: { readonly data: string | null; readonly inputType: string },
   segment: DateSegmentType,
@@ -214,6 +225,7 @@ const NUMERIC: ReadonlySet<SegmentType> = new Set([
 ])
 
 export function dateFieldConnect(input: DateFieldConnectInput) {
+  warnBounds("date-field", input.minValue, input.maxValue)
   const { field, format: f, draft } = input
   const part = (name: DateFieldPart) => scopeAttrs("date-field", name, input.instance)
   const conversion = draftState(draft, f)

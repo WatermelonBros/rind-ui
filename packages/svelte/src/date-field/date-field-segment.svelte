@@ -1,5 +1,11 @@
 <script lang="ts">
-import { type DateSegmentType, dateFieldKey, describeKey, planSegmentInput } from "@rind-ui/core"
+import {
+  type DateSegmentType,
+  dateFieldKey,
+  describeKey,
+  planSegmentInput,
+  restoreText,
+} from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import type { HTMLInputAttributes } from "svelte/elements"
 import { joinHandlers, mergeProps } from "../merge-props"
@@ -83,8 +89,11 @@ const handlers = {
     ctx.send(event)
   },
   oncompositionstart: () => ctx.send({ type: "COMPOSITION.START" }),
-  oncompositionend: (e: CompositionEvent) =>
-    ctx.send({ type: "COMPOSITION.END", segment: type, text: e.data }),
+  oncompositionend: (e: CompositionEvent) => {
+    ctx.send({ type: "COMPOSITION.END", segment: type, text: e.data })
+    // A refused or unchanged composition changes no prop: the composed text would stay.
+    restoreText(e.currentTarget, api().segment(segment)["value"])
+  },
   onpaste: (e: ClipboardEvent) => {
     e.preventDefault()
     if (ctx.disabled() || ctx.readOnly()) return

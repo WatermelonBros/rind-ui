@@ -55,6 +55,8 @@ const close = (modality: Modality) => {
 }
 const base = $derived(ctx.base())
 const firstDay = $derived(ctx.picker.firstDayOfWeek())
+// The field's locale, direction and calendar system (spec "Picker — Calendar Binding").
+const calendarSystem = $derived(ctx.picker.createCalendar())
 const onValueChange = (v: unknown, details: { modality: string | undefined }) => {
   if (v === null || Array.isArray(v) || !("calendar" in (v as object)) || "start" in (v as object))
     return
@@ -84,4 +86,7 @@ const invalid = $derived((host?.api().validity.message ?? "") !== "" || ctx.own(
   readOnly={ctx.readOnly()}
   {invalid}
   {...firstDay ? { firstDayOfWeek: firstDay } : {}}
+  locale={ctx.picker.locale()}
+  dir={ctx.dir()}
+  {...calendarSystem ? { createCalendar: calendarSystem } : {}}
 />
