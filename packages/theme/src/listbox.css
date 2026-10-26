@@ -5,6 +5,13 @@
  * these rules through `--rind-select-item-*`. The focus ring comes from base.css.
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="listbox"][data-part="label"]) {
+    font-size: var(--rind-listbox-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-listbox-label-font-weight, 580);
+    line-height: var(--rind-listbox-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-listbox-label-color, var(--rind-color-text));
+  }
   :where([data-scope="listbox"][data-part="list"]) {
     box-sizing: border-box;
     display: flex;

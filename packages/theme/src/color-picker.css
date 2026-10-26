@@ -11,6 +11,13 @@
  * --rind-color-checker-*.
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="color-picker"][data-part="label"]) {
+    font-size: var(--rind-color-picker-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-color-picker-label-font-weight, 580);
+    line-height: var(--rind-color-picker-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-color-picker-label-color, var(--rind-color-text));
+  }
   :where([data-scope="color-picker"][data-part="control"]) {
     display: inline-flex;
     align-items: center;

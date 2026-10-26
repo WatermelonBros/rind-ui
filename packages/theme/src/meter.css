@@ -7,6 +7,13 @@
  * data-tone re-points the accent roles (variants.css).
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="meter"][data-part="label"]) {
+    font-size: var(--rind-meter-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-meter-label-font-weight, 580);
+    line-height: var(--rind-meter-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-meter-label-color, var(--rind-color-text));
+  }
   :where([data-scope="meter"][data-part="root"]) {
     --_track: var(--rind-meter-track-size, 0.5rem);
     display: grid;
