@@ -127,6 +127,11 @@
       "types": "./dist/drawer/index.d.ts",
       "default": "./dist/drawer/index.js"
     },
+    "./editable": {
+      "@rind-ui/source": "./src/editable/index.ts",
+      "types": "./dist/editable/index.d.ts",
+      "default": "./dist/editable/index.js"
+    },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
       "types": "./dist/field/index.d.ts",
@@ -525,6 +530,10 @@
       "./drawer": {
         "types": "./dist/drawer/index.d.ts",
         "default": "./dist/drawer/index.js"
+      },
+      "./editable": {
+        "types": "./dist/editable/index.d.ts",
+        "default": "./dist/editable/index.js"
       },
       "./field": {
         "types": "./dist/field/index.d.ts",

@@ -22,6 +22,7 @@ import * as controlLabel from "./control-label"
 import * as dateField from "./date-field"
 import * as dialog from "./dialog"
 import * as drawer from "./drawer"
+import * as editable from "./editable"
 import * as field from "./field"
 import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
@@ -128,6 +129,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "date-field": dateField,
   dialog,
   drawer,
+  editable,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,

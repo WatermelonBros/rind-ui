@@ -1,0 +1,185 @@
+/*
+ * Editable (family: field): the Preview and the Input share one grid cell (the Area) and the
+ * same box (padding, border width, font, block size), so entering and leaving edit never moves
+ * the layout. The Preview is quiet text with a hover and focus affordance; the Input is the
+ * recessed field surface. The triggers are ghost icon buttons of at least 24 x 24 CSS px
+ * (WCAG 2.5.8). `data-variant` (outline, soft) and `data-size` go on the Root.
+ */
+@layer rind.components {
+  :where([data-scope="editable"][data-part="root"]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--rind-editable-gap, var(--rind-space-1));
+    row-gap: var(--rind-space-1);
+    color: var(--rind-editable-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="editable"][data-part="label"]) {
+    grid-column: 1 / -1;
+    font-size: var(--rind-editable-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-editable-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  /* One cell for both: the visible one sizes it. */
+  :where([data-scope="editable"][data-part="area"]) {
+    display: grid;
+    grid-template-areas: "cell";
+    min-inline-size: 0;
+  }
+
+  /* The shared box. */
+  :where([data-scope="editable"][data-part="preview"]),
+  :where([data-scope="editable"][data-part="input"]) {
+    grid-area: cell;
+    box-sizing: border-box;
+    min-inline-size: 0;
+    min-block-size: var(--rind-editable-height, var(--rind-size-control, var(--rind-size-md)));
+    margin: 0;
+    padding-block: var(--rind-space-1);
+    padding-inline: var(--rind-space-control, var(--rind-space-3));
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-editable-radius, var(--rind-radius-control));
+    font: inherit;
+    font-size: var(--rind-text-control, var(--rind-text-sm));
+    line-height: var(--rind-leading-normal);
+    color: inherit;
+  }
+
+  :where([data-scope="editable"][data-part="preview"]) {
+    inline-size: 100%;
+    background: transparent;
+    text-align: start;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    cursor: text;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where([data-scope="editable"][data-part="preview"]):hover {
+    background: var(--rind-editable-preview-hover-bg, var(--rind-color-neutral-soft-hover));
+  }
+
+  :where([data-scope="editable"][data-part="preview"][data-empty]) {
+    color: var(--rind-editable-placeholder-color, var(--rind-color-text-muted));
+  }
+
+  /* The field surface while editing. */
+  :where([data-scope="editable"][data-part="input"]) {
+    border-color: var(--rind-editable-border, var(--rind-color-border-strong));
+    background: var(--rind-editable-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-editable-shadow, var(--rind-shadow-key-pressed));
+    outline: none;
+    resize: vertical;
+    /* A textarea as tall as its text, like the Preview it replaces: no jump on entering edit. */
+    field-sizing: content;
+  }
+
+  :where([data-scope="editable"][data-part="input"])::placeholder {
+    color: var(--rind-editable-placeholder-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="editable"][data-part="root"][data-variant="soft"] [data-part="input"]) {
+    background: var(--rind-editable-soft-bg, var(--rind-color-accent-soft));
+    box-shadow: none;
+  }
+
+  :where([data-scope="editable"][data-part="input"][data-invalid]) {
+    border-color: var(--rind-editable-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="editable"][data-part="preview"])[data-focus-visible],
+  :where([data-scope="editable"][data-part="input"])[data-focus-visible],
+  :where([data-scope="editable"][data-part="input"]):focus-visible {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="editable"][data-part="control"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-space-1);
+  }
+
+  :where(
+    [data-scope="editable"][data-part="edit-trigger"],
+    [data-scope="editable"][data-part="submit-trigger"],
+    [data-scope="editable"][data-part="cancel-trigger"]
+  ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding-inline: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-editable-trigger-radius, var(--rind-radius-control));
+    background: transparent;
+    color: var(--rind-editable-trigger-color, var(--rind-color-text-muted));
+    font: inherit;
+    font-size: var(--rind-text-sm);
+    cursor: pointer;
+    transition: background-color var(--rind-duration-fast) ease;
+  }
+
+  :where(
+    [data-scope="editable"][data-part="edit-trigger"],
+    [data-scope="editable"][data-part="submit-trigger"],
+    [data-scope="editable"][data-part="cancel-trigger"]
+  ):hover {
+    background: var(--rind-color-neutral-soft-hover);
+    color: var(--rind-color-text);
+  }
+
+  :where(
+    [data-scope="editable"][data-part="edit-trigger"],
+    [data-scope="editable"][data-part="submit-trigger"],
+    [data-scope="editable"][data-part="cancel-trigger"]
+  )[data-focus-visible] {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="editable"][data-part="submit-trigger"]) {
+    color: var(--rind-editable-submit-color, var(--rind-color-accent-text));
+  }
+
+  /* The display above would beat the UA's [hidden] (the triggers of the other mode). */
+  :where(
+    [data-scope="editable"][data-part="edit-trigger"][hidden],
+    [data-scope="editable"][data-part="submit-trigger"][hidden],
+    [data-scope="editable"][data-part="cancel-trigger"][hidden]
+  ) {
+    display: none;
+  }
+
+  :where([data-scope="editable"][data-part="root"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="editable"][data-part="root"][data-disabled] [data-part="preview"]),
+  :where([data-scope="editable"][data-part="root"][data-readonly] [data-part="preview"]) {
+    cursor: default;
+    background: transparent;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="editable"][data-part="input"]) {
+      border-color: CanvasText;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(
+        [data-scope="editable"][data-part="preview"],
+        [data-scope="editable"][data-part="edit-trigger"],
+        [data-scope="editable"][data-part="submit-trigger"],
+        [data-scope="editable"][data-part="cancel-trigger"]
+      ) {
+      transition: none;
+    }
+  }
+}

@@ -1,0 +1,93 @@
+/* ── Editable: quiet text that becomes the field in the same box (no jump); a hover hint on the
+   Preview, ghost triggers beside it. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="root"] {
+  display: grid;
+  gap: 6px;
+  inline-size: min(100%, 420px);
+  color: var(--s-ink);
+  font: 500 15px / 1.4 var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="label"] {
+  font-weight: 700;
+  font-size: 13px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="area"] {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"]:is([data-part="preview"], [data-part="input"]) {
+  grid-area: 1 / 1;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 40px;
+  margin: 0;
+  padding: 8px 10px;
+  border: var(--s-bw) solid transparent;
+  border-radius: var(--s-r-sm);
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  white-space: pre-wrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="preview"] {
+  background: transparent;
+  cursor: text;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="preview"]:hover {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"][data-part="preview"][data-empty] {
+  color: color-mix(in oklab, var(--s-ink) 62%, transparent);
+  font-style: italic;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="input"] {
+  background: var(--s-card);
+  border-color: var(--s-line);
+  box-shadow: var(--s-lift-lo);
+  resize: none;
+  /* A textarea as tall as its text, like the Preview it replaces (no jump). */
+  field-sizing: content;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"]:is([data-part="preview"], [data-part="input"]):focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part="control"] {
+  display: flex;
+  gap: 6px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="editable"][data-part$="-trigger"] {
+  padding: 8px 12px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  background: var(--s-card);
+  color: var(--s-ink);
+  font: 700 13px var(--s-font);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"][data-part="submit-trigger"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"][data-part$="-trigger"][hidden] {
+  display: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="editable"][data-part$="-trigger"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .editable-list {
+  display: grid;
+  gap: 4px;
+  inline-size: min(100%, 320px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

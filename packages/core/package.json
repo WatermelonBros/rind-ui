@@ -129,6 +129,11 @@
       "types": "./dist/components/drawer/index.d.mts",
       "default": "./dist/components/drawer/index.mjs"
     },
+    "./editable": {
+      "@rind-ui/source": "./src/components/editable/index.ts",
+      "types": "./dist/components/editable/index.d.mts",
+      "default": "./dist/components/editable/index.mjs"
+    },
     "./field": {
       "@rind-ui/source": "./src/components/field/index.ts",
       "types": "./dist/components/field/index.d.mts",
@@ -523,6 +528,10 @@
       "./drawer": {
         "types": "./dist/components/drawer/index.d.mts",
         "default": "./dist/components/drawer/index.mjs"
+      },
+      "./editable": {
+        "types": "./dist/components/editable/index.d.mts",
+        "default": "./dist/components/editable/index.mjs"
       },
       "./field": {
         "types": "./dist/components/field/index.d.mts",

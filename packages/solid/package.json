@@ -157,6 +157,11 @@
         "solid": "./dist/drawer/index.jsx",
         "default": "./dist/drawer/index.mjs"
       },
+      "./editable": {
+        "types": "./dist/editable/index.d.mts",
+        "solid": "./dist/editable/index.jsx",
+        "default": "./dist/editable/index.mjs"
+      },
       "./field": {
         "types": "./dist/field/index.d.mts",
         "solid": "./dist/field/index.jsx",
@@ -559,6 +564,12 @@
       "types": "./dist/drawer/index.d.mts",
       "solid": "./dist/drawer/index.jsx",
       "default": "./dist/drawer/index.mjs"
+    },
+    "./editable": {
+      "@rind-ui/source": "./src/editable/index.ts",
+      "types": "./dist/editable/index.d.mts",
+      "solid": "./dist/editable/index.jsx",
+      "default": "./dist/editable/index.mjs"
     },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
