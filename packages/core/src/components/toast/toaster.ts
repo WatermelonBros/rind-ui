@@ -210,6 +210,12 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
     if (!r) return
     r.service?.stop()
     records = records.filter((x) => x !== r)
+    // The last toast gone takes the region's hover and focus with it: the region unmounts
+    // under the pointer (no pointerleave) or with the focus (no blur), and a reason left on
+    // would pause every later toast forever (zag#3464).
+    if (!records.some(live)) {
+      for (const reason of ["hover", "focus"] as const) setRegion(reason, false)
+    }
     applyLimit()
     notify()
   }
@@ -352,6 +358,9 @@ export function createToaster(options: ToasterOptions = {}): Toaster {
         offVisibility()
         attached -= 1
         if (attached > 0) return
+        // A toast still playing its exit has no region left to finish it: it goes now, or a
+        // later region would render an empty landmark for it (zag#2988).
+        for (const r of records.filter((x) => !live(x))) removeRecord(r.instance)
         // No region: every lifetime pauses until one mounts again (sonner#786).
         for (const r of records) pause(r, "unmounted")
         // Every region-level reason ends with its region (a route change under the pointer

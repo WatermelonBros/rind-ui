@@ -100,6 +100,7 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
   const { view, send } = useMachine(toasterMachine, {
     expand: toaster.options.expand,
     onReason: (reason, on) => toaster.regionReason(reason, on),
+    visible: toasts.length > 0,
   })
   // Bound to this environment while mounted; the announcer's regions created eagerly.
   // The region renders after mount only: the server and the first client render show no

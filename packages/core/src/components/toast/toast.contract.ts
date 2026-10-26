@@ -88,6 +88,8 @@ export const toasterContract = contract("toast", {
     "FOCUS.LEAVE": "leave",
     HOTKEY: "enter",
     SWIPING: { skip: "covered by the toast's swipe" },
+    "VISIBLE.SYNC": { skip: "sent by the $props:visible edge" },
+    "$props:visible": { skip: "the region stops rendering: store and machine tests" },
   },
   traits: ["timed", "presence"],
   // Focus in the region pauses and (by keyboard) expands: focusing it commits.

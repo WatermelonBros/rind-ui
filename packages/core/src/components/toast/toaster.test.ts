@@ -276,6 +276,27 @@ describe("toasts without a region", () => {
     expect(t.toasts()).toEqual([])
   })
 
+  it("zag#3464: the last toast removed under the pointer ends the hover; the next times out", () => {
+    const { t, advance } = setup({ duration: 1000 })
+    const a = t.show("A")
+    t.regionReason("hover", true)
+    t.dismiss(a)
+    const instance = t.get(a)?.instance
+    if (instance) t.remove(instance) // its exit played: the region unmounts, no pointerleave
+    const b = t.show("B")
+    advance(1000) // fake-time: B's lifetime
+    expect(state(t, b)).toBe("dismissed")
+  })
+
+  it("zag#2988: a toast exiting when the region unmounts is not shown by a later region", () => {
+    const { t, env, detach } = setup()
+    const id = t.show("A")
+    t.dismiss(id)
+    detach()
+    t.attach(env)
+    expect(t.toasts()).toEqual([])
+  })
+
   it("a toast dismissed with no region is gone at once", () => {
     const { t } = setup(undefined, false)
     const id = t.show("A")

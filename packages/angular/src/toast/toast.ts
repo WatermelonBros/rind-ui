@@ -125,6 +125,7 @@ export class Toaster {
     const { view, send } = injectMachine(toasterMachine, () => ({
       expand: this.toaster().options.expand,
       onReason: (reason, on) => this.toaster().regionReason(reason, on),
+      visible: this.toasts().length > 0,
     }))
     // Stable across renders: the toasts' swipe effects depend on them (a re-run mid-drag
     // would stop the gesture).
