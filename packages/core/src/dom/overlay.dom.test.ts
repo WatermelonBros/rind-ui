@@ -200,7 +200,10 @@ describe("modal overlayEffect", () => {
   })
 
   it("a released layer stays exiting until its parts settle (react-spectrum#10291)", async () => {
-    const { stop } = openDialog()
+    const { stop, content } = openDialog()
+    // The content fades out (the theme's transition): the layer waits for it.
+    content.style.transitionProperty = "opacity"
+    content.style.transitionDuration = "20ms"
     await frame()
     stop()
     const stack = getLayerStack(document)
@@ -208,6 +211,13 @@ describe("modal overlayEffect", () => {
     expect(stack.exiting()).toHaveLength(1)
     await exited()
     expect(stack.exiting()).toHaveLength(0)
+  })
+
+  it("a layer with nothing to animate is disposed at close", async () => {
+    const { stop } = openDialog()
+    await frame()
+    stop()
+    expect(getLayerStack(document).exiting()).toHaveLength(0)
   })
 
   it("survives start, cleanup, start again (Strict Mode)", async () => {

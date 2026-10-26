@@ -125,6 +125,17 @@ export function overlayEffect(
   }
 }
 
+const seconds = (list: string) => list.split(",").some((t) => Number.parseFloat(t) > 0)
+/** A transition or an animation declared on the part (an exit animation can only be these). */
+function mayAnimate(el: Element): boolean {
+  const style = el.ownerDocument.defaultView?.getComputedStyle(el)
+  if (!style) return false
+  return (
+    seconds(style.transitionDuration) ||
+    (style.animationName !== "" && style.animationName !== "none")
+  )
+}
+
 /**
  * The released layer stays known as exiting while its parts animate out, so a press on its
  * fading backdrop is not outside the layer beneath (react-spectrum#10291). One frame first:
@@ -135,6 +146,9 @@ function disposeAfterExit(
   elements: () => readonly Element[],
   dispose: () => void,
 ): void {
+  // No part declares a transition or an animation: there is no exit to wait for (and a
+  // part kept mounted must not stay inert a frame longer than its close).
+  if (!elements().some(mayAnimate)) return dispose()
   env.scheduler.requestAnimationFrame(() => {
     void Promise.all(elements().map((el) => waitForExit(el))).then(dispose)
   })
