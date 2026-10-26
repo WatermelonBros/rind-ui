@@ -1,0 +1,97 @@
+/*
+ * JSON Tree View (family: decoration): Tree View's rows (tree-view.css) with the item text in
+ * the monospaced face and each type in the code block's colours (--rind-color-code-*, 4.5:1
+ * on the surface in light and dark). Strings are quoted by the theme and clipped with an
+ * ellipsis; the full text stays in the DOM and the name. Forced colors: CanvasText for all.
+ */
+@layer rind.components {
+  :where([data-scope="tree-view"][data-part="item"][data-key]) :where([data-part="item-text"]) {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4ch;
+    min-inline-size: 0;
+    font-family: var(--rind-json-tree-view-font-family, var(--rind-font-mono));
+    font-size: var(--rind-json-tree-view-font-size, var(--rind-text-sm));
+    white-space: nowrap;
+  }
+
+  :where([data-scope="json-tree-view"][data-part="key"]) {
+    color: var(--rind-json-tree-view-key-color, var(--rind-color-code-property));
+  }
+
+  :where([data-scope="json-tree-view"][data-part="key"][data-type="range"]) {
+    color: var(--rind-json-tree-view-range-color, var(--rind-color-text-muted));
+    font-style: italic;
+  }
+
+  :where([data-scope="json-tree-view"][data-part="separator"]),
+  :where([data-scope="json-tree-view"]:is([data-part="summary"], [data-part="preview"])) {
+    color: var(--rind-json-tree-view-punctuation-color, var(--rind-color-code-punctuation));
+  }
+
+  :where([data-scope="json-tree-view"][data-part="preview"]) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--rind-json-tree-view-preview-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="json-tree-view"][data-part="value"]) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-inline-size: var(--rind-json-tree-view-value-max-width, 60ch);
+    color: var(--rind-color-code-text);
+  }
+
+  :where([data-scope="json-tree-view"][data-part="value"][data-quoted])::before,
+  :where([data-scope="json-tree-view"][data-part="value"][data-quoted])::after {
+    content: '"';
+  }
+
+  :where([data-scope="json-tree-view"][data-part="value"][data-type="string"]) {
+    color: var(--rind-json-tree-view-string-color, var(--rind-color-code-string));
+  }
+
+  :where(
+    [data-scope="json-tree-view"][data-part="value"]:is([data-type="number"], [data-type="bigint"])
+  ) {
+    color: var(--rind-json-tree-view-number-color, var(--rind-color-code-number));
+  }
+
+  :where([data-scope="json-tree-view"][data-part="value"][data-type="bigint"])::after {
+    content: "n";
+    opacity: 0.7;
+  }
+
+  :where(
+    [data-scope="json-tree-view"][data-part="value"]:is(
+      [data-type="boolean"],
+      [data-type="null"],
+      [data-type="undefined"]
+    )
+  ) {
+    color: var(--rind-json-tree-view-keyword-color, var(--rind-color-code-keyword));
+  }
+
+  :where(
+    [data-scope="json-tree-view"][data-part="value"]:is(
+      [data-type="date"],
+      [data-type="regexp"],
+      [data-type="function"],
+      [data-type="symbol"],
+      [data-type="instance"]
+    )
+  ) {
+    color: var(--rind-json-tree-view-special-color, var(--rind-color-code-type));
+  }
+
+  :where([data-scope="json-tree-view"][data-part="value"][data-type="circular"]) {
+    color: var(--rind-json-tree-view-circular-color, var(--rind-color-text-muted));
+    font-style: italic;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="json-tree-view"]) {
+      color: CanvasText;
+    }
+  }
+}

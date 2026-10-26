@@ -1,0 +1,84 @@
+/*
+ * Agent Presence (family: decoration): the Visual draws three bars from
+ * --rind-agent-presence-level when the consumer puts nothing in it. Each state has its own
+ * shape, not only a colour: idle a flat dash, connecting dots, listening and speaking bars that
+ * follow the level, thinking a slow pulse, error a cross. No motion under reduced motion.
+ */
+@layer rind.components {
+  :where([data-scope="agent-presence"][data-part="root"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-agent-presence-gap, var(--rind-space-2));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty) {
+    --_l: var(--rind-agent-presence-level, 0);
+    position: relative;
+    inline-size: var(--rind-agent-presence-size, 1.75rem);
+    block-size: var(--rind-agent-presence-size, 1.75rem);
+    border-radius: var(--rind-radius-full);
+    background:
+      linear-gradient(currentColor, currentColor) 25% 50% / 15% calc(20% + var(--_l) * 50%)
+      no-repeat,
+      linear-gradient(currentColor, currentColor) 50% 50% / 15% calc(20% + var(--_l) * 80%)
+      no-repeat,
+      linear-gradient(currentColor, currentColor) 75% 50% / 15% calc(20% + var(--_l) * 50%)
+      no-repeat,
+      var(--rind-color-accent-soft);
+    color: var(--rind-color-accent-text);
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="idle"]) {
+    background:
+      linear-gradient(currentColor, currentColor) 50% 50% / 50% 12% no-repeat,
+      var(--rind-color-neutral-soft);
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="connecting"]) {
+    background:
+      radial-gradient(circle, currentColor 0 12%, transparent 13%) 0 0 / 33% 100% repeat-x,
+      var(--rind-color-neutral-soft);
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="thinking"]) {
+    background:
+      radial-gradient(circle, currentColor 0 30%, transparent 31%), var(--rind-color-accent-soft);
+    animation: rind-agent-presence-pulse
+      var(--rind-agent-presence-pulse-duration, calc(var(--rind-duration-slow) * 4)) ease-in-out
+      infinite alternate;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="error"]) {
+    background:
+      linear-gradient(45deg, transparent 44%, currentColor 45% 55%, transparent 56%),
+      linear-gradient(-45deg, transparent 44%, currentColor 45% 55%, transparent 56%),
+      var(--rind-color-danger-soft);
+    color: var(--rind-color-danger-text);
+  }
+
+  :where([data-scope="agent-presence"][data-part="detail"]) {
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+  }
+
+  :where([data-scope="agent-presence"][data-part="root"][data-stale]) :where([data-part="status"]) {
+    font-style: italic;
+  }
+
+  @keyframes rind-agent-presence-pulse {
+    to {
+      scale: 0.85;
+      opacity: 0.7;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="agent-presence"][data-part="visual"]) {
+      animation: none;
+    }
+  }
+}

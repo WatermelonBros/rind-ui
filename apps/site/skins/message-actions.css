@@ -1,0 +1,112 @@
+/* ── Message Actions: a message card with its row of small icon keys under the text. The row
+   fades when inactive (hover, focus within or a touch shows it) and never leaves the page. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) .message {
+  display: grid;
+  gap: 8px;
+  inline-size: min(100%, 420px);
+  padding: 14px 16px 10px;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-lo);
+  font: 500 15px / 1.5 var(--s-font);
+  color: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .message p {
+  margin: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .message textarea {
+  font: inherit;
+  min-block-size: 4em;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="message-actions"][data-part="root"] {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part="root"]:is([data-active], :focus-within) {
+  opacity: 1;
+}
+@media (hover: none) {
+  :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="message-actions"][data-part="root"] {
+    opacity: 1;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"]:is(
+    [data-part="item"],
+    [data-part="regenerate"],
+    [data-part="edit"],
+    [data-part="feedback-item"],
+    [data-part="version-previous"],
+    [data-part="version-next"]
+  ),
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part="copy"]
+  button {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 30px;
+  block-size: 30px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--s-r-sm);
+  background: transparent;
+  color: var(--s-ink);
+  font: 700 16px var(--s-font);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part]:is(button, [role="button"]):not([data-disabled]):hover,
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part="copy"]
+  button:hover {
+  background: var(--s-muted);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"]:is(
+    [data-part="edit"][data-state="on"],
+    [data-part="feedback-item"][aria-pressed="true"]
+  ) {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part="regenerate"][data-state="pending"]
+  svg {
+  animation: s-spin 1s linear infinite;
+}
+@keyframes s-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is([data-skinned], [data-rind-theme^="skin-"])
+    [data-scope="message-actions"][data-part="regenerate"]
+    svg {
+    animation: none;
+  }
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"]:is([data-part="feedback"], [data-part="versions"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"][data-part="version-status"] {
+  min-inline-size: 3ch;
+  text-align: center;
+  font: 600 12px var(--s-font);
+  font-variant-numeric: tabular-nums;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="message-actions"]
+  :is(button, [role="button"]):focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 1px;
+}

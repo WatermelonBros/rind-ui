@@ -1,0 +1,7 @@
+- text: Signature
+- img "Signature"
+- text: Not signed
+- button "Undo Signature" [disabled]: Undo
+- button "Clear Signature" [disabled]: Clear
+- log
+- log

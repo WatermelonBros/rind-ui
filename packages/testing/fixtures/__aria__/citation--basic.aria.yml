@@ -1,0 +1,13 @@
+- paragraph:
+  - text: A combobox keeps focus in its input and points at the highlighted option with aria-activedescendant
+  - 'link "Source 1: WAI-ARIA Authoring Practices: Combobox"':
+    - /url: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
+    - text: "1"
+  - text: . The team settled on auto-highlighting the first result while typing
+  - 'button "Source 2: Internal design notes"': "2"
+  - text: ", and a third source is still streaming in 3 ."
+- list "Sources":
+  - listitem:
+    - 'link "WAI-ARIA Authoring Practices: Combobox"':
+      - /url: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
+  - listitem: Internal design notes

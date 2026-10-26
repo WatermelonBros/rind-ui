@@ -51,6 +51,14 @@ import { injectEnvironment, withCapabilities } from "../provider"
 
 const HOVER_CARD = new InjectionToken<HoverCardRoot>("rind-ui.hover-card")
 
+/**
+ * @internal A component composing a Hover Card on its own element (Citation, through
+ * `hostDirectives`) provides this: its props win over the inputs, which a host cannot set.
+ */
+export const HOVER_CARD_OVERRIDES = new InjectionToken<{
+  props: () => Partial<Pick<HoverCardProps, "open" | "openDelay" | "closeDelay" | "disabled">>
+}>("rind-ui.hover-card-overrides")
+
 function injectHoverCard(part: string): HoverCardRoot {
   const root = inject(HOVER_CARD, { optional: true })
   if (!root) throw new Error(`rindHoverCard${part} must be inside rindHoverCardRoot`)
@@ -156,6 +164,7 @@ export class HoverCardRoot {
       })
       if (!cancelled) this.openChange.emit(value)
     }
+    const overrides = inject(HOVER_CARD_OVERRIDES, { optional: true, self: true })
     this.props = (): HoverCardProps => ({
       open: this.open(),
       defaultOpen: this.defaultOpen(),
@@ -167,6 +176,7 @@ export class HoverCardRoot {
       root: root(),
       parent: parent(),
       getTrigger: () => untracked(this.trigger),
+      ...overrides?.props(),
     })
     const { view, send } = injectMachine(hoverCardMachine, this.props, hoverEnv)
     this.view = view
@@ -244,6 +254,8 @@ export class HoverCardTrigger {
       destroy.onDestroy(env.modality.subscribe(() => {}))
       // Development: a hover card is a link's preview; a button wants a Popover.
       if (!isDevMode() || el.hasAttribute("href")) return
+      // A link-less citation marker is a button by design (add-citation §1).
+      if (el.getAttribute("data-scope") === "citation") return
       console.warn(
         `[rind-ui] hover-card #${el.id}: the trigger is not a link (no href); a hover card is a link's preview — use a Popover for a button`,
       )
@@ -381,7 +393,7 @@ export class HoverCardArrow {
  * logical parent: the host carries its theme, dir and lang.
  */
 @Directive({
-  selector: "ng-template[rindHoverCardPortal]",
+  selector: "ng-template[rindHoverCardPortal], ng-template[rindCitationPortal]",
   exportAs: "rindHoverCardPortal",
   providers: PORTAL_PROVIDERS,
 })

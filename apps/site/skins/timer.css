@@ -1,0 +1,76 @@
+/* ── Timer: big tabular digits on a card, captions small under each unit, and keys styled as
+   the skin's popover triggers. An inapplicable key is disabled (base.css dims it) but stays,
+   so the focus never drops. Completed: the accent ink. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="root"] {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="area"] {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 22px;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift);
+  color: var(--s-ink);
+  font: 700 clamp(32px, 9vw, 52px) / 1 var(--s-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="item"] {
+  display: inline-grid;
+  justify-items: center;
+  gap: 6px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="item-label"] {
+  font: 600 11px / 1 var(--s-font);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="separator"] {
+  opacity: 0.55;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timer"][data-part="area"][data-state="completed"] {
+  color: var(--s-acc-deep);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="control"] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="timer"][data-part="action-trigger"] {
+  min-inline-size: 88px;
+  font: 600 14px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 9px 16px;
+  cursor: pointer;
+  transition:
+    translate 0.25s var(--s-ease),
+    box-shadow 0.25s var(--s-ease),
+    background 0.25s var(--s-ease);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timer"][data-part="action-trigger"][data-action="toggle"] {
+  background: var(--s-brand);
+  color: var(--s-brand-text);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timer"][data-part="action-trigger"]:not([data-disabled]):hover {
+  translate: 0 -1px;
+  box-shadow: var(--s-lift);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="timer"][data-part="action-trigger"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}

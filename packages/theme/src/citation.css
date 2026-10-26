@@ -1,0 +1,80 @@
+/*
+ * Citation (family: link): the marker is a small raised chip set on the text's baseline, its
+ * target padded to 24 × 24 px; the card is the hover card (hover-card.css) with the source's
+ * title, domain and a snippet clipped to three lines.
+ */
+@layer rind.components {
+  :where([data-scope="citation"][data-part="trigger"]) {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 1.4em;
+    padding: 0 0.35em;
+    border: 0;
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-citation-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-citation-color, var(--rind-color-accent-text));
+    font: inherit;
+    font-size: 0.75em;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+    vertical-align: super;
+    cursor: pointer;
+  }
+
+  /* the 24 px target without moving the text around it */
+  :where([data-scope="citation"][data-part="trigger"])::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    inline-size: max(100%, 24px);
+    block-size: max(100%, 24px);
+    translate: -50% -50%;
+  }
+
+  :where(
+    [data-scope="citation"][data-part="trigger"]:is([data-state="open"], [data-state="pinned"])
+  ) {
+    background: var(--rind-citation-open-bg, var(--rind-color-accent-soft));
+  }
+
+  :where([data-scope="citation"][data-part="trigger"][data-state="pending"]) {
+    color: var(--rind-color-text-muted);
+    cursor: default;
+  }
+
+  :where([data-scope="citation"][data-part="source"]) {
+    display: grid;
+    gap: var(--rind-space-1);
+    max-inline-size: 22rem;
+  }
+
+  :where([data-scope="citation"][data-part="source-title"]) {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  :where([data-scope="citation"][data-part="source-url"]) {
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-xs);
+  }
+
+  :where([data-scope="citation"][data-part="source-snippet"]) {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    color: var(--rind-color-text-muted);
+    font-size: var(--rind-text-sm);
+  }
+
+  :where(
+    [data-scope="citation"][data-part="cited-text"]:is([data-state="open"], [data-state="pinned"])
+  ) {
+    background: var(--rind-citation-highlight, var(--rind-color-accent-soft));
+  }
+}

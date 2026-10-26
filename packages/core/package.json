@@ -39,10 +39,20 @@
       "types": "./dist/components/accordion/index.d.mts",
       "default": "./dist/components/accordion/index.mjs"
     },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/components/agent-presence/index.ts",
+      "types": "./dist/components/agent-presence/index.d.mts",
+      "default": "./dist/components/agent-presence/index.mjs"
+    },
     "./alert": {
       "@rind-ui/source": "./src/components/alert/index.ts",
       "types": "./dist/components/alert/index.d.mts",
       "default": "./dist/components/alert/index.mjs"
+    },
+    "./angle-slider": {
+      "@rind-ui/source": "./src/components/angle-slider/index.ts",
+      "types": "./dist/components/angle-slider/index.d.mts",
+      "default": "./dist/components/angle-slider/index.mjs"
     },
     "./avatar": {
       "@rind-ui/source": "./src/components/avatar/index.ts",
@@ -69,6 +79,11 @@
       "types": "./dist/components/calendar/index.d.mts",
       "default": "./dist/components/calendar/index.mjs"
     },
+    "./carousel": {
+      "@rind-ui/source": "./src/components/carousel/index.ts",
+      "types": "./dist/components/carousel/index.d.mts",
+      "default": "./dist/components/carousel/index.mjs"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/components/checkbox/index.ts",
       "types": "./dist/components/checkbox/index.d.mts",
@@ -78,6 +93,11 @@
       "@rind-ui/source": "./src/components/checkbox-group/index.ts",
       "types": "./dist/components/checkbox-group/index.d.mts",
       "default": "./dist/components/checkbox-group/index.mjs"
+    },
+    "./citation": {
+      "@rind-ui/source": "./src/components/citation/index.ts",
+      "types": "./dist/components/citation/index.d.mts",
+      "default": "./dist/components/citation/index.mjs"
     },
     "./clipboard": {
       "@rind-ui/source": "./src/components/clipboard/index.ts",
@@ -99,6 +119,11 @@
       "types": "./dist/components/color-picker/index.d.mts",
       "default": "./dist/components/color-picker/index.mjs"
     },
+    "./color-wheel": {
+      "@rind-ui/source": "./src/components/color-wheel/index.ts",
+      "types": "./dist/components/color-wheel/index.d.mts",
+      "default": "./dist/components/color-wheel/index.mjs"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/components/combobox/index.ts",
       "types": "./dist/components/combobox/index.d.mts",
@@ -108,6 +133,11 @@
       "@rind-ui/source": "./src/components/context-menu/index.ts",
       "types": "./dist/components/context-menu/index.d.mts",
       "default": "./dist/components/context-menu/index.mjs"
+    },
+    "./context-meter": {
+      "@rind-ui/source": "./src/components/context-meter/index.ts",
+      "types": "./dist/components/context-meter/index.d.mts",
+      "default": "./dist/components/context-meter/index.mjs"
     },
     "./date-field": {
       "@rind-ui/source": "./src/components/date-field/index.ts",
@@ -129,6 +159,11 @@
       "types": "./dist/components/drawer/index.d.mts",
       "default": "./dist/components/drawer/index.mjs"
     },
+    "./editable": {
+      "@rind-ui/source": "./src/components/editable/index.ts",
+      "types": "./dist/components/editable/index.d.mts",
+      "default": "./dist/components/editable/index.mjs"
+    },
     "./field": {
       "@rind-ui/source": "./src/components/field/index.ts",
       "types": "./dist/components/field/index.d.mts",
@@ -143,6 +178,11 @@
       "@rind-ui/source": "./src/components/file-upload/index.ts",
       "types": "./dist/components/file-upload/index.d.mts",
       "default": "./dist/components/file-upload/index.mjs"
+    },
+    "./floating-panel": {
+      "@rind-ui/source": "./src/components/floating-panel/index.ts",
+      "types": "./dist/components/floating-panel/index.d.mts",
+      "default": "./dist/components/floating-panel/index.mjs"
     },
     "./form": {
       "@rind-ui/source": "./src/components/form/index.ts",
@@ -189,6 +229,11 @@
       "types": "./dist/components/input-chips/index.d.mts",
       "default": "./dist/components/input-chips/index.mjs"
     },
+    "./json-tree-view": {
+      "@rind-ui/source": "./src/components/json-tree-view/index.ts",
+      "types": "./dist/components/json-tree-view/index.d.mts",
+      "default": "./dist/components/json-tree-view/index.mjs"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/components/kbd/index.ts",
       "types": "./dist/components/kbd/index.d.mts",
@@ -214,6 +259,11 @@
       "types": "./dist/components/marquee/index.d.mts",
       "default": "./dist/components/marquee/index.mjs"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/components/mentions/index.ts",
+      "types": "./dist/components/mentions/index.d.mts",
+      "default": "./dist/components/mentions/index.mjs"
+    },
     "./menu": {
       "@rind-ui/source": "./src/components/menu/index.ts",
       "types": "./dist/components/menu/index.d.mts",
@@ -223,6 +273,11 @@
       "@rind-ui/source": "./src/components/menubar/index.ts",
       "types": "./dist/components/menubar/index.d.mts",
       "default": "./dist/components/menubar/index.mjs"
+    },
+    "./message-actions": {
+      "@rind-ui/source": "./src/components/message-actions/index.ts",
+      "types": "./dist/components/message-actions/index.d.mts",
+      "default": "./dist/components/message-actions/index.mjs"
     },
     "./message-thread": {
       "@rind-ui/source": "./src/components/message-thread/index.ts",
@@ -309,6 +364,11 @@
       "types": "./dist/components/separator/index.d.mts",
       "default": "./dist/components/separator/index.mjs"
     },
+    "./signature-pad": {
+      "@rind-ui/source": "./src/components/signature-pad/index.ts",
+      "types": "./dist/components/signature-pad/index.d.mts",
+      "default": "./dist/components/signature-pad/index.mjs"
+    },
     "./skeleton": {
       "@rind-ui/source": "./src/components/skeleton/index.ts",
       "types": "./dist/components/skeleton/index.d.mts",
@@ -338,6 +398,11 @@
       "@rind-ui/source": "./src/components/streaming-message/index.ts",
       "types": "./dist/components/streaming-message/index.d.mts",
       "default": "./dist/components/streaming-message/index.mjs"
+    },
+    "./suggestions": {
+      "@rind-ui/source": "./src/components/suggestions/index.ts",
+      "types": "./dist/components/suggestions/index.d.mts",
+      "default": "./dist/components/suggestions/index.mjs"
     },
     "./switch": {
       "@rind-ui/source": "./src/components/switch/index.ts",
@@ -379,6 +444,11 @@
       "types": "./dist/components/timeline/index.d.mts",
       "default": "./dist/components/timeline/index.mjs"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/components/timer/index.ts",
+      "types": "./dist/components/timer/index.d.mts",
+      "default": "./dist/components/timer/index.mjs"
+    },
     "./toast": {
       "@rind-ui/source": "./src/components/toast/index.ts",
       "types": "./dist/components/toast/index.d.mts",
@@ -393,6 +463,11 @@
       "@rind-ui/source": "./src/components/toggle-group/index.ts",
       "types": "./dist/components/toggle-group/index.d.mts",
       "default": "./dist/components/toggle-group/index.mjs"
+    },
+    "./tool-call": {
+      "@rind-ui/source": "./src/components/tool-call/index.ts",
+      "types": "./dist/components/tool-call/index.d.mts",
+      "default": "./dist/components/tool-call/index.mjs"
     },
     "./toolbar": {
       "@rind-ui/source": "./src/components/toolbar/index.ts",
@@ -452,9 +527,17 @@
         "types": "./dist/components/accordion/index.d.mts",
         "default": "./dist/components/accordion/index.mjs"
       },
+      "./agent-presence": {
+        "types": "./dist/components/agent-presence/index.d.mts",
+        "default": "./dist/components/agent-presence/index.mjs"
+      },
       "./alert": {
         "types": "./dist/components/alert/index.d.mts",
         "default": "./dist/components/alert/index.mjs"
+      },
+      "./angle-slider": {
+        "types": "./dist/components/angle-slider/index.d.mts",
+        "default": "./dist/components/angle-slider/index.mjs"
       },
       "./avatar": {
         "types": "./dist/components/avatar/index.d.mts",
@@ -476,6 +559,10 @@
         "types": "./dist/components/calendar/index.d.mts",
         "default": "./dist/components/calendar/index.mjs"
       },
+      "./carousel": {
+        "types": "./dist/components/carousel/index.d.mts",
+        "default": "./dist/components/carousel/index.mjs"
+      },
       "./checkbox": {
         "types": "./dist/components/checkbox/index.d.mts",
         "default": "./dist/components/checkbox/index.mjs"
@@ -483,6 +570,10 @@
       "./checkbox-group": {
         "types": "./dist/components/checkbox-group/index.d.mts",
         "default": "./dist/components/checkbox-group/index.mjs"
+      },
+      "./citation": {
+        "types": "./dist/components/citation/index.d.mts",
+        "default": "./dist/components/citation/index.mjs"
       },
       "./clipboard": {
         "types": "./dist/components/clipboard/index.d.mts",
@@ -500,6 +591,10 @@
         "types": "./dist/components/color-picker/index.d.mts",
         "default": "./dist/components/color-picker/index.mjs"
       },
+      "./color-wheel": {
+        "types": "./dist/components/color-wheel/index.d.mts",
+        "default": "./dist/components/color-wheel/index.mjs"
+      },
       "./combobox": {
         "types": "./dist/components/combobox/index.d.mts",
         "default": "./dist/components/combobox/index.mjs"
@@ -507,6 +602,10 @@
       "./context-menu": {
         "types": "./dist/components/context-menu/index.d.mts",
         "default": "./dist/components/context-menu/index.mjs"
+      },
+      "./context-meter": {
+        "types": "./dist/components/context-meter/index.d.mts",
+        "default": "./dist/components/context-meter/index.mjs"
       },
       "./date-field": {
         "types": "./dist/components/date-field/index.d.mts",
@@ -524,6 +623,10 @@
         "types": "./dist/components/drawer/index.d.mts",
         "default": "./dist/components/drawer/index.mjs"
       },
+      "./editable": {
+        "types": "./dist/components/editable/index.d.mts",
+        "default": "./dist/components/editable/index.mjs"
+      },
       "./field": {
         "types": "./dist/components/field/index.d.mts",
         "default": "./dist/components/field/index.mjs"
@@ -535,6 +638,10 @@
       "./file-upload": {
         "types": "./dist/components/file-upload/index.d.mts",
         "default": "./dist/components/file-upload/index.mjs"
+      },
+      "./floating-panel": {
+        "types": "./dist/components/floating-panel/index.d.mts",
+        "default": "./dist/components/floating-panel/index.mjs"
       },
       "./form": {
         "types": "./dist/components/form/index.d.mts",
@@ -572,6 +679,10 @@
         "types": "./dist/components/input-chips/index.d.mts",
         "default": "./dist/components/input-chips/index.mjs"
       },
+      "./json-tree-view": {
+        "types": "./dist/components/json-tree-view/index.d.mts",
+        "default": "./dist/components/json-tree-view/index.mjs"
+      },
       "./kbd": {
         "types": "./dist/components/kbd/index.d.mts",
         "default": "./dist/components/kbd/index.mjs"
@@ -592,6 +703,10 @@
         "types": "./dist/components/marquee/index.d.mts",
         "default": "./dist/components/marquee/index.mjs"
       },
+      "./mentions": {
+        "types": "./dist/components/mentions/index.d.mts",
+        "default": "./dist/components/mentions/index.mjs"
+      },
       "./menu": {
         "types": "./dist/components/menu/index.d.mts",
         "default": "./dist/components/menu/index.mjs"
@@ -599,6 +714,10 @@
       "./menubar": {
         "types": "./dist/components/menubar/index.d.mts",
         "default": "./dist/components/menubar/index.mjs"
+      },
+      "./message-actions": {
+        "types": "./dist/components/message-actions/index.d.mts",
+        "default": "./dist/components/message-actions/index.mjs"
       },
       "./message-thread": {
         "types": "./dist/components/message-thread/index.d.mts",
@@ -668,6 +787,10 @@
         "types": "./dist/components/separator/index.d.mts",
         "default": "./dist/components/separator/index.mjs"
       },
+      "./signature-pad": {
+        "types": "./dist/components/signature-pad/index.d.mts",
+        "default": "./dist/components/signature-pad/index.mjs"
+      },
       "./skeleton": {
         "types": "./dist/components/skeleton/index.d.mts",
         "default": "./dist/components/skeleton/index.mjs"
@@ -691,6 +814,10 @@
       "./streaming-message": {
         "types": "./dist/components/streaming-message/index.d.mts",
         "default": "./dist/components/streaming-message/index.mjs"
+      },
+      "./suggestions": {
+        "types": "./dist/components/suggestions/index.d.mts",
+        "default": "./dist/components/suggestions/index.mjs"
       },
       "./switch": {
         "types": "./dist/components/switch/index.d.mts",
@@ -724,6 +851,10 @@
         "types": "./dist/components/timeline/index.d.mts",
         "default": "./dist/components/timeline/index.mjs"
       },
+      "./timer": {
+        "types": "./dist/components/timer/index.d.mts",
+        "default": "./dist/components/timer/index.mjs"
+      },
       "./toast": {
         "types": "./dist/components/toast/index.d.mts",
         "default": "./dist/components/toast/index.mjs"
@@ -735,6 +866,10 @@
       "./toggle-group": {
         "types": "./dist/components/toggle-group/index.d.mts",
         "default": "./dist/components/toggle-group/index.mjs"
+      },
+      "./tool-call": {
+        "types": "./dist/components/tool-call/index.d.mts",
+        "default": "./dist/components/tool-call/index.mjs"
       },
       "./toolbar": {
         "types": "./dist/components/toolbar/index.d.mts",

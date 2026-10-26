@@ -1,0 +1,5 @@
+- text: Comment
+- textbox "Comment":
+  - /placeholder: Type @ to mention, / for a command
+- paragraph: Type @ or / to insert a mention
+- paragraph

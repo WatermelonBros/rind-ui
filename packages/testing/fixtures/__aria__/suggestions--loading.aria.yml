@@ -1,0 +1,6 @@
+- group "Suggestions":
+  - button "Summarise" [disabled]
+  - button "Draft a reply Polite, two paragraphs" [disabled]
+  - button "Find action items" [disabled]
+- log
+- log

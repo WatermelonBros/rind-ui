@@ -1,0 +1,92 @@
+/*
+ * Context Meter (family: range): a thin track with the fill at --rind-context-meter-percent,
+ * the short value at the end. The zone is never colour alone: warning re-points the fill to
+ * the warning palette with sparse stripes, full to the danger palette with dense stripes and
+ * an end mark (as Meter); forced colors keep them apart by border style.
+ */
+@layer rind.components {
+  :where([data-scope="context-meter"][data-part="root"]) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--rind-context-meter-gap, var(--rind-space-2));
+    font-size: var(--rind-text-sm);
+    color: var(--rind-color-text);
+  }
+
+  :where([data-scope="context-meter"][data-part="label"]) {
+    grid-column: 1 / -1;
+    font-weight: 580;
+  }
+
+  :where([data-scope="context-meter"][data-part="value-text"]) {
+    color: var(--rind-color-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where([data-scope="context-meter"][data-part="track"]) {
+    position: relative;
+    block-size: var(--rind-context-meter-track-size, 0.375rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-context-meter-track-bg, var(--rind-color-neutral-soft));
+    overflow: hidden;
+  }
+
+  :where([data-scope="context-meter"][data-part="indicator"]) {
+    block-size: 100%;
+    inline-size: calc(var(--rind-context-meter-percent, 0) * 1%);
+    border-radius: inherit;
+    background: var(--rind-context-meter-fill, var(--rind-color-accent-solid));
+    transition: inline-size var(--rind-duration-normal) var(--rind-ease-out);
+  }
+
+  :where([data-scope="context-meter"][data-part="indicator"][data-zone="warning"]) {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--rind-color-warning-solid) 0 6px,
+      color-mix(in oklab, var(--rind-color-warning-solid) 70%, transparent) 6px 9px
+    );
+  }
+
+  :where([data-scope="context-meter"][data-part="indicator"][data-zone="full"]) {
+    background: repeating-linear-gradient(
+      135deg,
+      var(--rind-color-danger-solid) 0 3px,
+      color-mix(in oklab, var(--rind-color-danger-solid) 65%, transparent) 3px 5px
+    );
+    box-shadow: inset -3px 0 0 var(--rind-color-danger-text);
+  }
+
+  :where([data-scope="context-meter"][data-part="breakdown"]) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--rind-space-1) var(--rind-space-4);
+    margin: 0;
+    font-size: var(--rind-text-sm);
+  }
+
+  :where([data-scope="context-meter"][data-part="breakdown-item"]) {
+    display: contents;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="context-meter"][data-part="indicator"]) {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="context-meter"][data-part="track"]) {
+      border: 1px solid CanvasText;
+    }
+    :where([data-scope="context-meter"][data-part="indicator"]) {
+      background: Highlight;
+    }
+    :where([data-scope="context-meter"][data-part="indicator"][data-zone="warning"]) {
+      border-inline-end: 3px dashed CanvasText;
+    }
+    :where([data-scope="context-meter"][data-part="indicator"][data-zone="full"]) {
+      border-inline-end: 4px double CanvasText;
+    }
+  }
+}

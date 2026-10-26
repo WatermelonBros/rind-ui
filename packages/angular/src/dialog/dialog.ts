@@ -288,7 +288,7 @@ function injectPartId(root: DialogRootBase, part: string, own: () => string | un
 
 /** Opens the dialog: `<button rindDialogTrigger>`. Several triggers may open one dialog. */
 @Directive({
-  selector: "[rindDialogTrigger], [rindDrawerTrigger]",
+  selector: "[rindDialogTrigger], [rindDrawerTrigger], [rindFloatingPanelTrigger]",
   exportAs: "rindDialogTrigger",
 })
 export class DialogTrigger {
@@ -558,7 +558,7 @@ export class DialogAction extends CloseButton {
 
 /** Closes it: `<button rindDialogCloseTrigger>`; an empty one (an icon) is named "Close". */
 @Directive({
-  selector: "[rindDialogCloseTrigger], [rindDrawerCloseTrigger]",
+  selector: "[rindDialogCloseTrigger], [rindDrawerCloseTrigger], [rindFloatingPanelCloseTrigger]",
   exportAs: "rindDialogCloseTrigger",
 })
 export class DialogCloseTrigger {
@@ -599,7 +599,8 @@ export class DialogCloseTrigger {
  * carries the trigger's theme, dir and lang from the first open on.
  */
 @Directive({
-  selector: "ng-template[rindDialogPortal], ng-template[rindDrawerPortal]",
+  selector:
+    "ng-template[rindDialogPortal], ng-template[rindDrawerPortal], ng-template[rindFloatingPanelPortal]",
   exportAs: "rindDialogPortal",
   providers: PORTAL_PROVIDERS,
 })

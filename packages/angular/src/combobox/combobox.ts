@@ -951,7 +951,7 @@ export class ComboboxLoading {
 
 /** Places the popup against the control: `<div rindComboboxPositioner>`, in the top layer. */
 @Directive({
-  selector: "[rindComboboxPositioner], [rindTagsInputPositioner]",
+  selector: "[rindComboboxPositioner], [rindTagsInputPositioner], [rindMentionsPositioner]",
   exportAs: "rindComboboxPositioner",
 })
 export class ComboboxPositioner {
@@ -1012,7 +1012,7 @@ export class ComboboxPositioner {
 
 /** The popup: `<div rindComboboxPopup>`, holding the List. */
 @Directive({
-  selector: "[rindComboboxPopup], [rindTagsInputPopup]",
+  selector: "[rindComboboxPopup], [rindTagsInputPopup], [rindMentionsPopup]",
   exportAs: "rindComboboxPopup",
 })
 export class ComboboxPopup {

@@ -1,0 +1,114 @@
+/*
+ * Tool Call (family: panel): a bordered panel whose Header is a full-width disclosure row:
+ * an icon per status (never colour alone: the shape changes, and the word is next to it), the
+ * name in the mono face, the duration muted. The Approval is a tinted box with Approve and
+ * Deny as keys; a high-risk request takes the danger tone.
+ */
+@layer rind.components {
+  :where([data-scope="tool-call"][data-part="root"]) {
+    border: var(--rind-border-width) solid var(--rind-tool-call-border, var(--rind-color-border));
+    border-radius: var(--rind-tool-call-radius, var(--rind-radius-lg));
+    background: var(--rind-tool-call-bg, var(--rind-color-surface));
+    color: var(--rind-color-text);
+    font-size: var(--rind-text-sm);
+    overflow: hidden;
+  }
+
+  :where([data-scope="tool-call"][data-part="header"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+    inline-size: 100%;
+    min-block-size: max(24px, var(--rind-size-md));
+    padding: var(--rind-space-2) var(--rind-space-3);
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  :where([data-scope="tool-call"][data-part="header"])::before {
+    content: "";
+    flex: none;
+    inline-size: 1em;
+    block-size: 1em;
+    background-color: currentColor;
+    mask: var(--rind-icon-dots-three) center / contain no-repeat;
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="tool-call"][data-part="header"][data-state="done"])::before {
+    mask-image: var(--rind-icon-check-circle);
+    color: var(--rind-color-success-text);
+  }
+
+  :where(
+    [data-scope="tool-call"][data-part="header"]:is([data-state="error"], [data-state="denied"])
+  )::before {
+    mask-image: var(--rind-icon-x-circle);
+    color: var(--rind-color-danger-text);
+  }
+
+  :where([data-scope="tool-call"][data-part="header"][data-state="awaiting"])::before {
+    mask-image: var(--rind-icon-warning);
+    color: var(--rind-color-warning-text);
+  }
+
+  :where([data-scope="tool-call"][data-part="name"]) {
+    font-family: var(--rind-font-mono);
+    font-weight: 600;
+  }
+
+  :where([data-scope="tool-call"]:is([data-part="status"], [data-part="duration"])) {
+    color: var(--rind-color-text-muted);
+  }
+
+  :where([data-scope="tool-call"][data-part="duration"]) {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where([data-scope="tool-call"][data-part="content"]) {
+    display: grid;
+    gap: var(--rind-space-3);
+    padding: var(--rind-space-3);
+    border-block-start: var(--rind-border-width) solid var(--rind-color-border);
+  }
+
+  :where([data-scope="tool-call"][data-part="error"]) {
+    color: var(--rind-color-danger-text);
+  }
+
+  :where([data-scope="tool-call"][data-part="approval"]) {
+    display: grid;
+    gap: var(--rind-space-2);
+    padding: var(--rind-space-3);
+    border-radius: var(--rind-radius-md);
+    background: var(--rind-color-warning-soft);
+  }
+
+  :where([data-scope="tool-call"][data-part="approval"][data-risk="high"]) {
+    background: var(--rind-color-danger-soft);
+  }
+
+  :where([data-scope="tool-call"][data-part="approval-title"]) {
+    font-weight: 600;
+  }
+
+  :where([data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])) {
+    min-block-size: max(24px, var(--rind-size-sm));
+  }
+
+  :where([data-scope="tool-call"][data-part="receipt"]) {
+    font-weight: 600;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="tool-call"][data-part="header"])::before {
+      background-color: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+}

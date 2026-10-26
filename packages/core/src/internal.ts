@@ -20,3 +20,13 @@ export {
 export * from "./components/color-slider"
 export * from "./components/color-swatch"
 export * from "./components/color-swatch-picker"
+// Floating Panel's clamp rules: the adapters preview a drag with them (add-floating-panel §3).
+export {
+  clampRect,
+  type Point,
+  type Rect,
+  type RectLimits,
+  type ResizeAxis,
+  resizeRect,
+  type Size,
+} from "./dom/rect-bounds"

@@ -343,6 +343,26 @@ const TRANSIENT = new Set([
   "image-viewer:settling",
   "sortable:moving",
   "sortable:dragging",
+  // Reached by an action: pausing a running timer, running out.
+  "timer:paused",
+  "timer:completed",
+  // While a pointer draws a stroke.
+  "signature-pad:drawing",
+  // After a copy or a regenerate, until the status settles.
+  "message-actions:settling",
+  // A press pins the card open.
+  "citation:pinned",
+  // While a pointer drags the thumb.
+  "angle-slider:dragging",
+  // While a pointer drags the thumb around the ring.
+  "color-wheel:dragging",
+  // While a pointer drags the panel or one of its edges.
+  "floating-panel:moving",
+  "floating-panel:resizing",
+  // Autoplay held by hover or a hidden page.
+  "carousel:paused",
+  // The list at a trigger: entered by typing "@".
+  "mentions:open",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or

@@ -1,0 +1,16 @@
+- region "Destinations":
+  - group "1 of 5":
+    - article:
+      - heading "Lisbon" [level=3]
+      - paragraph: Trams and tiles
+      - link "Plan a trip":
+        - /url: "#lisbon"
+  - button "Previous slide": ‹
+  - button "Next slide": ›
+  - button "Stop automatic slide show": ⏯
+  - tablist "Choose a slide":
+    - tab "Slide 1" [selected]
+    - tab "Slide 2"
+    - tab "Slide 3"
+    - tab "Slide 4"
+    - tab "Slide 5"

@@ -589,7 +589,11 @@ function createPlaywrightEnv(
         const pointerType = pointerOptions.pointerType ?? "mouse"
         const { page } = await getBase()
         // The real mouse: capture, hit testing and compatibility events are the browser's.
-        if (pointerType === "mouse" && phase !== "cancel") {
+        if (
+          pointerType === "mouse" &&
+          phase !== "cancel" &&
+          pointerOptions.pointerId === undefined
+        ) {
           await page.mouse.move(x, y)
           if (phase === "down") await page.mouse.down()
           if (phase === "up") await page.mouse.up()
@@ -606,9 +610,9 @@ function createPlaywrightEnv(
                 bubbles: true,
                 cancelable: o.phase !== "cancel",
                 composed: true,
-                pointerId: o.pointerType === "mouse" ? 1 : 2,
+                pointerId: o.pointerId ?? (o.pointerType === "mouse" ? 1 : 2),
                 pointerType: o.pointerType,
-                isPrimary: true,
+                isPrimary: o.pointerId === null,
                 clientX: o.x,
                 clientY: o.y,
                 button: o.phase === "move" ? -1 : 0,
@@ -617,7 +621,7 @@ function createPlaywrightEnv(
               }),
             )
           },
-          { phase, x, y, pointerType },
+          { phase, x, y, pointerType, pointerId: pointerOptions.pointerId ?? null },
         )
       },
       async fill(value) {

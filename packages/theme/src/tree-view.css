@@ -104,6 +104,11 @@
     transition: rotate var(--rind-duration-fast, 120ms) var(--rind-ease-out);
   }
 
+  /* a leaf's indicator (no open or closed state) keeps its place, without a caret */
+  :where([data-scope="tree-view"][data-part="item-indicator"]:not([data-state])) {
+    visibility: hidden;
+  }
+
   :where([data-scope="tree-view"][data-part="item-indicator"][data-state="open"]) {
     rotate: 90deg;
   }
