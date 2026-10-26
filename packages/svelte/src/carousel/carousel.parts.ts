@@ -1,0 +1,11 @@
+// The Carousel namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as AutoplayTrigger } from "./carousel-autoplay-trigger.svelte"
+export { default as Control } from "./carousel-control.svelte"
+export { default as Indicator } from "./carousel-indicator.svelte"
+export { default as IndicatorGroup } from "./carousel-indicator-group.svelte"
+export { default as NextTrigger } from "./carousel-next-trigger.svelte"
+export { default as PrevTrigger } from "./carousel-prev-trigger.svelte"
+export { default as Root } from "./carousel-root.svelte"
+export { default as Slide } from "./carousel-slide.svelte"
+export { default as Status } from "./carousel-status.svelte"
+export { default as Viewport } from "./carousel-viewport.svelte"

@@ -9,6 +9,7 @@ import * as badge from "./badge"
 import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
 import * as calendar from "./calendar"
+import * as carousel from "./carousel"
 import * as checkboxGroup from "./checkbox-group"
 import * as clipboard from "./clipboard"
 import * as codeBlock from "./code-block"
@@ -95,6 +96,7 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  carousel,
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,

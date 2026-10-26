@@ -1,0 +1,116 @@
+/* ── Carousel: rounded slides in the viewport, a bar with round arrows, pill dots, "2 / 5". ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="root"] {
+  inline-size: min(100%, 560px);
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+  display: grid;
+  gap: 12px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="viewport"] {
+  gap: var(--rind-carousel-spacing, 0px);
+  scrollbar-width: none;
+  border-radius: var(--s-r);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="slide"] {
+  inline-size: calc(
+    (100% - (var(--rind-carousel-slides-per-page) - 1) * var(--rind-carousel-spacing)) /
+    var(--rind-carousel-slides-per-page)
+  );
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .trip {
+  display: grid;
+  align-content: end;
+  gap: 4px;
+  block-size: 200px;
+  padding: 18px;
+  box-sizing: border-box;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r);
+  background: linear-gradient(
+    160deg,
+    hsl(var(--trip-hue) 80% 72%),
+    hsl(calc(var(--trip-hue) + 30) 70% 45%)
+  );
+  color: #111;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .trip h3 {
+  margin: 0;
+  font: 800 22px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .trip p {
+  margin: 0;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .trip a {
+  color: #111;
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .carousel-bar {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="control"] {
+  display: flex;
+  gap: 8px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="carousel"]:is(
+    [data-part="prev-trigger"],
+    [data-part="next-trigger"],
+    [data-part="autoplay-trigger"]
+  ) {
+  inline-size: 40px;
+  block-size: 40px;
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: 50%;
+  background: var(--s-card);
+  color: var(--s-ink);
+  box-shadow: var(--s-lift-lo);
+  font: 800 18px var(--s-font);
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="carousel"][data-disabled]:is(
+    [data-part="prev-trigger"],
+    [data-part="next-trigger"]
+  ) {
+  opacity: 0.4;
+  cursor: default;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="carousel"][data-part="indicator-group"] {
+  display: flex;
+  gap: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="indicator"] {
+  display: grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="carousel"][data-part="indicator"]::before {
+  content: "";
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 99px;
+  background: color-mix(in oklab, var(--s-ink) 35%, transparent);
+  transition: inline-size 200ms;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="carousel"][data-part="indicator"][data-current]::before {
+  inline-size: 22px;
+  background: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="carousel"][data-part="status"] {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}

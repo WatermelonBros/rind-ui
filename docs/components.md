@@ -139,7 +139,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done |  |
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
-| Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |

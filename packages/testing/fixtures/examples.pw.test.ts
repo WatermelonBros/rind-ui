@@ -343,6 +343,8 @@ const TRANSIENT = new Set([
   "image-viewer:settling",
   "sortable:moving",
   "sortable:dragging",
+  // Autoplay held by hover or a hidden page.
+  "carousel:paused",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or

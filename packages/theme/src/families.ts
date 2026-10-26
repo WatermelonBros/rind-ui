@@ -194,6 +194,7 @@ export const familyMatrix = [
       "splitter",
       "table",
       "marquee",
+      "carousel",
       "streaming-message",
       "message-thread",
       "reasoning",

@@ -72,6 +72,11 @@
       "types": "./dist/calendar/index.d.mts",
       "default": "./dist/calendar/index.mjs"
     },
+    "./carousel": {
+      "@rind-ui/source": "./src/carousel/index.ts",
+      "types": "./dist/carousel/index.d.mts",
+      "default": "./dist/carousel/index.mjs"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.mts",
@@ -466,6 +471,10 @@
       "./calendar": {
         "types": "./dist/calendar/index.d.mts",
         "default": "./dist/calendar/index.mjs"
+      },
+      "./carousel": {
+        "types": "./dist/carousel/index.d.mts",
+        "default": "./dist/carousel/index.mjs"
       },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.mts",

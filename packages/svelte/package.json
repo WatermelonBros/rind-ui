@@ -81,6 +81,12 @@
       "svelte": "./dist/calendar/index.js",
       "default": "./dist/calendar/index.js"
     },
+    "./carousel": {
+      "@rind-ui/source": "./src/carousel/index.ts",
+      "types": "./dist/carousel/index.d.ts",
+      "svelte": "./dist/carousel/index.js",
+      "default": "./dist/carousel/index.js"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.ts",
@@ -554,6 +560,11 @@
         "types": "./dist/calendar/index.d.ts",
         "svelte": "./dist/calendar/index.js",
         "default": "./dist/calendar/index.js"
+      },
+      "./carousel": {
+        "types": "./dist/carousel/index.d.ts",
+        "svelte": "./dist/carousel/index.js",
+        "default": "./dist/carousel/index.js"
       },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.ts",
