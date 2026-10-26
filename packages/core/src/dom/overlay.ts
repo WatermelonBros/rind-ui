@@ -148,7 +148,10 @@ function disposeAfterExit(
 ): void {
   // No part declares a transition or an animation: there is no exit to wait for (and a
   // part kept mounted must not stay inert a frame longer than its close).
-  if (!elements().some(mayAnimate)) return dispose()
+  if (!elements().some(mayAnimate)) {
+    dispose()
+    return
+  }
   env.scheduler.requestAnimationFrame(() => {
     void Promise.all(elements().map((el) => waitForExit(el))).then(dispose)
   })
