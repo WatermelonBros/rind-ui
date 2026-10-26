@@ -60,7 +60,8 @@ const serif = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL("https://rind.watermelon-studio.it"),
   title: { default: "rind — headless components", template: "%s · rind" },
-  description: "Behaviour, accessibility and state for React. The look is yours.",
+  description:
+    "Behaviour, accessibility and state for React, Vue, Svelte, Solid and Angular. The look is yours.",
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
