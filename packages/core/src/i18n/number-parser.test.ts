@@ -56,6 +56,10 @@ describe("number-parsing: numbering systems", () => {
     const nu = ar.numberingSystem("123")
     expect(ar.format(123, { numberingSystem: nu })).toBe("123")
   })
+  it("keeps Persian digits when formatting (BU#4718)", () => {
+    const fa = p("fa-IR")
+    expect(fa.format(123, { numberingSystem: fa.numberingSystem("۱۲۳") })).toBe("۱۲۳")
+  })
 })
 
 describe("number-parsing: partial input", () => {

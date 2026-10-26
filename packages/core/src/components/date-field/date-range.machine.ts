@@ -60,6 +60,10 @@ export interface DateRangeFieldContext {
   readonly endValue: DateRangeEndValue | null
   /** The last value this pair emitted: a parent applying it is not a new value. */
   readonly emitted: DateRangeFieldValue
+  /** Bumped when the pair replaces both ends: each end drops its partial segments. */
+  readonly revision: number
+  /** An end committed and has not reported its validity since: its report derives the pair. */
+  readonly awaiting: { readonly start: boolean; readonly end: boolean }
 }
 
 const VALID = validityFlags(null)
@@ -92,13 +96,19 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
     newFromParent: ({ values, context }) => !sameRange(values.value ?? null, context.emitted),
   },
   actions: {
-    commitEnd: ({ event, set }) => {
+    /**
+     * The end's problem stays until the end reports again: a new value with the same problem
+     * (still before `minValue`) is reported by no one, and must not read as valid.
+     */
+    commitEnd: ({ event, context, set }) => {
       if (event.type === "START.COMMIT") {
-        set("start", { value: event.value, message: "", flags: VALID })
+        set("start", { ...context.start, value: event.value })
         set("startValue", event.value)
+        set("awaiting", { ...context.awaiting, start: true })
       } else if (event.type === "END.COMMIT") {
-        set("end", { value: event.value, message: "", flags: VALID })
+        set("end", { ...context.end, value: event.value })
         set("endValue", event.value)
+        set("awaiting", { ...context.awaiting, end: true })
       }
     },
     validityOfEnd: ({ event, context, set }) => {
@@ -108,6 +118,16 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
         set("end", { ...context.end, message: event.message, flags: event.flags })
       }
     },
+    /** After a commit, the end's new validity decides the pair (a value that became valid). */
+    deriveIfAwaited: ({ event, context, props, values, set }) => {
+      const which = event.type === "START.VALIDITY" ? "start" : "end"
+      if (!context.awaiting[which]) return
+      set("awaiting", { ...context.awaiting, [which]: false })
+      const next = rangeStateOf(context, props).value
+      if (sameRange(next, values.value ?? null)) return
+      set("emitted", next)
+      set("value", next ?? NONE)
+    },
     /** The derived value, emitted once when it changes. */
     derive: ({ context, props, values, set }) => {
       const next = rangeStateOf(context, props).value
@@ -116,7 +136,7 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
       set("value", next ?? NONE)
     },
     /** A parent's value (or a clear, or a reset) replaces both ends and their partial text. */
-    pushValue: ({ event, values, props, set }) => {
+    pushValue: ({ event, context, values, props, set }) => {
       const v: DateRangeFieldValue =
         event.type === "CLEAR"
           ? null
@@ -130,6 +150,8 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
       set("startValue", v?.start ?? null)
       set("endValue", v?.end ?? null)
       set("emitted", v)
+      set("awaiting", { start: false, end: false })
+      set("revision", context.revision + 1)
     },
   },
 }).machine({
@@ -143,6 +165,8 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
       startValue: v?.start ?? null,
       endValue: v?.end ?? null,
       emitted: v,
+      awaiting: { start: false, end: false },
+      revision: 0,
     }
   },
   values: { value: { fallback: NONE, equal: (a, b) => sameRange(a ?? null, b ?? null) } },
@@ -152,8 +176,8 @@ export const dateRangeFieldMachine = /* @__PURE__ */ setup({
       on: {
         "START.COMMIT": { actions: ["commitEnd", "derive"] },
         "END.COMMIT": { actions: ["commitEnd", "derive"] },
-        "START.VALIDITY": { actions: ["validityOfEnd"] },
-        "END.VALIDITY": { actions: ["validityOfEnd"] },
+        "START.VALIDITY": { actions: ["validityOfEnd", "deriveIfAwaited"] },
+        "END.VALIDITY": { actions: ["validityOfEnd", "deriveIfAwaited"] },
         "VALUE.SYNC": { guard: "newFromParent", actions: ["pushValue"] },
         CLEAR: { reason: "CLEAR", actions: ["pushValue", "derive"] },
         PICK: { reason: "CALENDAR", actions: ["pushValue", "derive"] },

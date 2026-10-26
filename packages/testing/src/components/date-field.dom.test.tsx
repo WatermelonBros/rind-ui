@@ -640,4 +640,35 @@ describe("IME scenarios (7.2)", () => {
     await drv("시간").composeEnd("오후")
     expect(await drv("시간").value()).toBe("2026-10-14T21:30")
   })
+
+  it("compositions add up: １ then ２ committed apart is month 12", async () => {
+    render(<D />)
+    await drv().enter()
+    await drv().composeOpen("１")
+    await drv().composeEnd("１")
+    await drv().composeOpen("２")
+    await drv().composeEnd("２")
+    expect(segment("month Birthday").getAttribute("aria-valuenow")).toBe("12")
+  })
+
+  it("Korean day period in two compositions (오, then 후) is PM", async () => {
+    render(
+      <D
+        locale="ko-KR"
+        label="시간"
+        granularity="minute"
+        hourCycle={12}
+        defaultValue={new CalendarDateTime(2026, 10, 14, 9, 30)}
+      />,
+    )
+    const period = screen
+      .getAllByRole("spinbutton")
+      .find((s) => s.getAttribute("data-type") === "dayPeriod") as HTMLInputElement
+    act(() => period.focus())
+    for (const syllable of ["오", "후"]) {
+      await drv("시간").composeOpen(syllable)
+      await drv("시간").composeEnd(syllable)
+    }
+    expect(await drv("시간").value()).toBe("2026-10-14T21:30")
+  })
 })

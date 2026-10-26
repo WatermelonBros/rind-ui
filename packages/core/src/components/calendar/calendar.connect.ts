@@ -60,7 +60,11 @@ export interface CalendarConnectInput extends Omit<CalendarProps, "view"> {
   /** Focus is inside a grid (state `focused`). */
   readonly gridFocused: boolean
   readonly modality: Modality
-  readonly today: CalendarDate
+  /**
+   * Today in the viewer's zone; null until the component mounted (server markup has no today:
+   * the server's day or zone may not be the viewer's, RA#9786).
+   */
+  readonly today: CalendarDate | null
   readonly dir: "ltr" | "rtl"
   /** The consumer names the root (`aria-label` / `aria-labelledby`): the heading does not. */
   readonly consumerNamed: boolean
@@ -344,7 +348,7 @@ export function calendarConnect(input: CalendarConnectInput) {
       const cellUnavailable = !disabled && isUnavailable(date)
       // Range mode: only selectable cells of the committed range are selected.
       const sel = !placeholder && isSelected(date) && (!isRange || (!disabled && !cellUnavailable))
-      const today = isSameDay(date, at(input.today))
+      const today = input.today !== null && isSameDay(date, at(input.today))
       const isFocused = !placeholder && isSameDay(date, focusedDate)
       const focusHere = isFocused && input.gridFocused
       const cellInvalid = isRange
