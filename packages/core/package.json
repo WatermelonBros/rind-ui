@@ -189,6 +189,11 @@
       "types": "./dist/components/input-chips/index.d.mts",
       "default": "./dist/components/input-chips/index.mjs"
     },
+    "./json-tree-view": {
+      "@rind-ui/source": "./src/components/json-tree-view/index.ts",
+      "types": "./dist/components/json-tree-view/index.d.mts",
+      "default": "./dist/components/json-tree-view/index.mjs"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/components/kbd/index.ts",
       "types": "./dist/components/kbd/index.d.mts",
@@ -571,6 +576,10 @@
       "./input-chips": {
         "types": "./dist/components/input-chips/index.d.mts",
         "default": "./dist/components/input-chips/index.mjs"
+      },
+      "./json-tree-view": {
+        "types": "./dist/components/json-tree-view/index.d.mts",
+        "default": "./dist/components/json-tree-view/index.mjs"
       },
       "./kbd": {
         "types": "./dist/components/kbd/index.d.mts",

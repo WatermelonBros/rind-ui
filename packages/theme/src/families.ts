@@ -198,6 +198,8 @@ export const familyMatrix = [
       "message-thread",
       "reasoning",
       "stepper",
+      "timer",
+      "json-tree-view",
       "sortable",
       "image-cropper",
       "image-viewer",

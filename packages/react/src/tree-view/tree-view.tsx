@@ -93,20 +93,31 @@ export interface TreeViewExpandedDetails {
 
 type Selection =
   | {
+      /** Single (default): one selected node; none: activation only. */
       readonly selectionMode?: "single"
+      /** Controlled selection. */
       readonly value?: string | null
+      /** Uncontrolled selection. */
       readonly defaultValue?: string | null
+      /** Every selection change. */
       readonly onValueChange?: (value: string | null, details: TreeViewChangeDetails) => void
     }
   | {
+      /** Multiple: any number of selected nodes. */
       readonly selectionMode: "multiple"
+      /** Controlled selection. */
       readonly value?: readonly string[]
+      /** Uncontrolled selection. */
       readonly defaultValue?: readonly string[]
+      /** Every selection change. */
       readonly onValueChange?: (value: readonly string[], details: TreeViewChangeDetails) => void
       /** The last selected item cannot be deselected. */
       readonly disallowEmptySelection?: boolean
     }
-  | { readonly selectionMode: "none" }
+  | {
+      /** None: activation only. */
+      readonly selectionMode: "none"
+    }
 
 export type TreeViewRootProps = {
   /** Base of the parts' generated ids (default: a `useId`). */
@@ -117,21 +128,34 @@ export type TreeViewRootProps = {
   readonly items?: readonly TreeViewItemData[]
   /** A tree collection you built, used instead of `items`. */
   readonly collection?: TreeCollection<unknown>
+  /** Replace: selection follows focus; mod+press toggles. */
   readonly selectionBehavior?: "toggle" | "replace"
+  /** Controlled expanded branch keys. */
   readonly expandedValue?: readonly string[]
+  /** Uncontrolled expanded keys. */
   readonly defaultExpandedValue?: readonly string[]
+  /** Every expansion change. */
   readonly onExpandedChange?: (keys: readonly string[], details: TreeViewExpandedDetails) => void
+  /** Items carry `aria-checked`; no selection. */
   readonly checkable?: boolean
+  /** Controlled checked leaf keys. */
   readonly checkedValue?: readonly string[]
+  /** Uncontrolled checked leaf keys. */
   readonly defaultCheckedValue?: readonly string[]
+  /** Once per user action. */
   readonly onCheckedChange?: (keys: readonly string[], details: TreeViewChangeDetails) => void
+  /** Both: a branch is derived from its leaves. */
   readonly checkPropagation?: "both" | "none"
+  /** A press on a branch toggles it. */
   readonly expandOnClick?: boolean
+  /** Enter, and a press when the selection does not consume it. */
   readonly onAction?: (key: string, details: TreeViewActionDetails) => void
+  /** Called once per unloaded branch when first expanded. */
   readonly onLoadChildren?: (
     key: string,
     options: { readonly signal: AbortSignal },
   ) => Promise<unknown> | undefined
+  /** No Tab stop, no keys or presses. */
   readonly disabled?: boolean
   /** Disabled items (and a disabled tree) stay focusable and reachable by arrows; nothing toggles. */
   readonly focusableWhenDisabled?: boolean

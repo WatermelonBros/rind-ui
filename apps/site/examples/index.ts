@@ -36,6 +36,7 @@ import * as hoverCard from "./hover-card"
 import * as image from "./image"
 import * as imageCropper from "./image-cropper"
 import * as imageViewer from "./image-viewer"
+import * as jsonTreeView from "./json-tree-view"
 import * as kbd from "./kbd"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
@@ -168,6 +169,8 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,

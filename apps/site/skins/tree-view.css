@@ -91,6 +91,11 @@
   translate: -1px 0;
   rotate: 45deg;
 }
+/* a leaf's indicator (no open or closed state) keeps its place, without a caret */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="tree-view"][data-part="item-indicator"]:not([data-state]) {
+  visibility: hidden;
+}
 :is([data-skinned], [data-rind-theme^="skin-"])
   [data-scope="tree-view"][data-part="item-indicator"][data-state="open"] {
   rotate: 90deg;

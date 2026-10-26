@@ -6,6 +6,13 @@
  * The indicator rotates open and mirrors in right-to-left. The focus ring comes from base.css.
  */
 @layer rind.components {
+  /* the field label, as every field's (text-field.css): not the body text of its item labels */
+  :where([data-scope="tree-view"][data-part="label"]) {
+    font-size: var(--rind-tree-view-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-tree-view-label-font-weight, 580);
+    line-height: var(--rind-tree-view-label-line-height, var(--rind-leading-normal));
+    color: var(--rind-tree-view-label-color, var(--rind-color-text));
+  }
   :where([data-scope="tree-view"][data-part="tree"]) {
     box-sizing: border-box;
     display: block;
@@ -95,6 +102,11 @@
     line-height: 1;
     color: var(--rind-color-text-muted);
     transition: rotate var(--rind-duration-fast, 120ms) var(--rind-ease-out);
+  }
+
+  /* a leaf's indicator (no open or closed state) keeps its place, without a caret */
+  :where([data-scope="tree-view"][data-part="item-indicator"]:not([data-state])) {
+    visibility: hidden;
   }
 
   :where([data-scope="tree-view"][data-part="item-indicator"][data-state="open"]) {
