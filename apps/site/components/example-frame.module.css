@@ -6,6 +6,10 @@
   overflow: hidden;
   margin: 8px 0 28px;
 }
+/* an example's toaster stacks over its own bar (skins/toast.css: 62), never over the site's nav */
+.frame:has([data-scope="toast"][data-part="region"]) {
+  isolation: isolate;
+}
 .frame[data-hero] {
   box-shadow: var(--shadow);
   margin-bottom: 40px;
