@@ -65,6 +65,10 @@ export function jsonItemConnect(input: JsonItemConnectInput) {
     isContainer: container,
     /** Item attributes added to Tree View's. */
     item: (): PartProps => ({
+      // Named by its content, not by the item text: the glyph and the preview are visible but
+      // aria-hidden, so a name taken from the item text would not contain them (WCAG 2.5.3,
+      // axe label-content-name-mismatch). The content's name is the same words.
+      "aria-labelledby": null,
       "data-type": node.type,
       "data-key": node.key,
       "data-range": dataFlag(node.type === "range"),
