@@ -343,6 +343,9 @@ const TRANSIENT = new Set([
   "image-viewer:settling",
   "sortable:moving",
   "sortable:dragging",
+  // Reached by an action: pausing a running timer, running out.
+  "timer:paused",
+  "timer:completed",
   // A followed link's jump: entered by clicking a link.
   "table-of-contents:navigating",
   // Focus-driven: entered by focusing the input or a chip, by editing a chip, or by typing or
