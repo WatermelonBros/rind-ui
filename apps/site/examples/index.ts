@@ -45,6 +45,7 @@ import * as listbox from "./listbox"
 import * as marquee from "./marquee"
 import * as menu from "./menu"
 import * as menubar from "./menubar"
+import * as messageActions from "./message-actions"
 import * as messageThread from "./message-thread"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
@@ -168,6 +169,11 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "message-actions": messageActions,
+  "context-meter": contextMeter,
+  suggestions,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,

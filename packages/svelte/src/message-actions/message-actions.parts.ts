@@ -1,0 +1,12 @@
+// The MessageActions namespace: a module namespace, so bundlers drop the parts never referenced.
+export { default as Copy } from "./message-actions-copy.svelte"
+export { default as Edit } from "./message-actions-edit.svelte"
+export { default as Feedback } from "./message-actions-feedback.svelte"
+export { default as FeedbackItem } from "./message-actions-feedback-item.svelte"
+export { default as Item } from "./message-actions-item.svelte"
+export { default as Regenerate } from "./message-actions-regenerate.svelte"
+export { default as Root } from "./message-actions-root.svelte"
+export { default as VersionNext } from "./message-actions-version-next.svelte"
+export { default as VersionPrevious } from "./message-actions-version-previous.svelte"
+export { default as VersionStatus } from "./message-actions-version-status.svelte"
+export { default as Versions } from "./message-actions-versions.svelte"

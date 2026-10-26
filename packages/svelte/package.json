@@ -255,6 +255,12 @@
       "svelte": "./dist/menubar/index.js",
       "default": "./dist/menubar/index.js"
     },
+    "./message-actions": {
+      "@rind-ui/source": "./src/message-actions/index.ts",
+      "types": "./dist/message-actions/index.d.ts",
+      "svelte": "./dist/message-actions/index.js",
+      "default": "./dist/message-actions/index.js"
+    },
     "./message-thread": {
       "@rind-ui/source": "./src/message-thread/index.ts",
       "types": "./dist/message-thread/index.d.ts",
@@ -699,6 +705,11 @@
         "types": "./dist/menubar/index.d.ts",
         "svelte": "./dist/menubar/index.js",
         "default": "./dist/menubar/index.js"
+      },
+      "./message-actions": {
+        "types": "./dist/message-actions/index.d.ts",
+        "svelte": "./dist/message-actions/index.js",
+        "default": "./dist/message-actions/index.js"
       },
       "./message-thread": {
         "types": "./dist/message-thread/index.d.ts",

@@ -83,8 +83,11 @@ export type ToggleGroupRootProps = Omit<
 > & {
   /** The group's Items. */
   readonly children?: ReactNode
+  /** Controlled pressed values; `[]` is none. */
   readonly value?: readonly string[]
+  /** Uncontrolled initial value. */
   readonly defaultValue?: readonly string[]
+  /** Every user-caused change, once; `reason` is PRESS; `cancel()` vetoes it. */
   readonly onValueChange?: (
     value: readonly string[],
     details: ChangeDetails<ToggleGroupEvent>,
@@ -93,11 +96,15 @@ export type ToggleGroupRootProps = Omit<
   readonly selectionMode?: "single" | "multiple"
   /** The last pressed item cannot be released. */
   readonly disallowEmptySelection?: boolean
+  /** Which arrows move focus (vertical: both pairs); `data-orientation` only. */
   readonly orientation?: "horizontal" | "vertical"
   /** Arrow moves wrap at both ends (default true). */
   readonly loop?: boolean
+  /** Disables every item. */
   readonly disabled?: boolean
+  /** Disabled items stay focusable (`aria-disabled`). */
   readonly focusableWhenDisabled?: boolean
+  /** Substitutes the rendered element without changing behaviour. */
   readonly render?: RenderProp<ToggleGroupState>
 }
 

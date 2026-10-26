@@ -219,6 +219,11 @@
       "types": "./dist/menubar/index.d.mts",
       "default": "./dist/menubar/index.mjs"
     },
+    "./message-actions": {
+      "@rind-ui/source": "./src/message-actions/index.ts",
+      "types": "./dist/message-actions/index.d.mts",
+      "default": "./dist/message-actions/index.mjs"
+    },
     "./message-thread": {
       "@rind-ui/source": "./src/message-thread/index.ts",
       "types": "./dist/message-thread/index.d.mts",
@@ -580,6 +585,10 @@
       "./menubar": {
         "types": "./dist/menubar/index.d.mts",
         "default": "./dist/menubar/index.mjs"
+      },
+      "./message-actions": {
+        "types": "./dist/message-actions/index.d.mts",
+        "default": "./dist/message-actions/index.mjs"
       },
       "./message-thread": {
         "types": "./dist/message-thread/index.d.mts",

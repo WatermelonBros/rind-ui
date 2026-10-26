@@ -59,6 +59,8 @@ export const familyMatrix = [
       "navigation-menu-trigger",
       "navigation-menu-link",
       "pagination",
+      "suggestions",
+      "message-actions",
     ],
     variants: ["ghost", "soft", "outline"],
     size: "own",

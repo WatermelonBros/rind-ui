@@ -58,6 +58,7 @@
 @import "./progress.css";
 @import "./prompt-input.css";
 @import "./streaming-message.css";
+@import "./message-actions.css";
 @import "./message-thread.css";
 @import "./reasoning.css";
 @import "./stepper.css";
