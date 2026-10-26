@@ -87,3 +87,21 @@ describe("toaster machine", () => {
     expect(m.state()).toBe("expanded")
   })
 })
+
+describe("toaster region unmount", () => {
+  it("hover and focus end with the region: no reason and no expansion left behind", () => {
+    const reasons: string[] = []
+    const props = {
+      onReason: (r: string, on: boolean) => reasons.push(`${r}:${on}`),
+      visible: true,
+    }
+    const s = createService(toasterMachine, props as never, {} as never)
+    s.start()
+    s.send({ type: "HOVER.START", modality: "mouse" })
+    s.send({ type: "FOCUS.ENTER", modality: "keyboard" })
+    expect(s.getSnapshot().state).toBe("expanded")
+    s.setProps({ ...props, visible: false } as never)
+    expect(s.getSnapshot().state).toBe("collapsed")
+    expect(reasons.slice(-2)).toEqual(["hover:false", "focus:false"])
+  })
+})

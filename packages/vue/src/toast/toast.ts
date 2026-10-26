@@ -120,6 +120,7 @@ export const Toaster = defineComponent({
     const { view, send } = useMachine(toasterMachine, () => ({
       expand: props.toaster.options.expand,
       onReason: (reason, on) => props.toaster.regionReason(reason, on),
+      visible: toasts.value.length > 0,
     }))
     // Bound to this environment while mounted; the announcer's regions created eagerly. The
     // region renders after mount only: the server and the first client render show no toast
