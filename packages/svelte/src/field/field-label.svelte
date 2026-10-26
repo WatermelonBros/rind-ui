@@ -17,11 +17,13 @@ const own = $derived(id ?? partId("field", ctx.instance(), "label"))
 useRegisterPart(ctx.registry, "label", () => own)
 const el = elementRef("label")
 $effect(() => ctx.setLabel(el.current))
-// A non-labelable control (a group) is named by aria-labelledby; a press focuses it.
+// A non-labelable control (a group), or a Label that is not a <label> (base-ui#587): named
+// by aria-labelledby; a press focuses the control.
 const interaction = normalizeProps(
   labelInteraction(env, {
     target: () => null,
-    forwardsFocus: () => ctx.control()?.labelable === false,
+    forwardsFocus: () =>
+      (el.current !== null && el.current.tagName !== "LABEL") || ctx.control()?.labelable === false,
     focusTarget: () => ctx.control()?.focus("pointer"),
   }),
 )

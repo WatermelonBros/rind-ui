@@ -53,13 +53,18 @@ const OVERLAY = {
   "white-space": "nowrap",
 } as const
 
-/** An anchored pattern requiring exactly `length` accepted characters. */
+/**
+ * An anchored pattern requiring exactly `length` accepted characters. A consumer's RegExp is
+ * not reused: its flags would be dropped and HTML compiles `pattern` with `v` and implicit
+ * anchors (`/[a-f]/i`, `/^[A-Z]$/`, `/[\w-]/` would all disagree with what is accepted).
+ * Every character already passed it, so only the count is checked.
+ */
 export function codePattern(rules: PinRules): string {
-  const one =
-    rules.pattern?.source ??
-    { numeric: "[0-9]", alphanumeric: "[A-Za-z0-9]", alpha: "[A-Za-z]" }[
-      rules.validationType ?? "numeric"
-    ]
+  const one = rules.pattern
+    ? "[\\s\\S]"
+    : { numeric: "[0-9]", alphanumeric: "[A-Za-z0-9]", alpha: "[A-Za-z]" }[
+        rules.validationType ?? "numeric"
+      ]
   return `(?:${one}){${rules.length}}`
 }
 

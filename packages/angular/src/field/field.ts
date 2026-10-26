@@ -183,6 +183,9 @@ export class FieldRoot {
     const fieldsetDisabled = injectFieldsetDisabled()
     const disabled = () => this.disabled() || fieldsetDisabled()
     let labelEl: Element | null = null
+    // The Label directive on another element (a <span>): the control is named by
+    // aria-labelledby.
+    const labelNotNative = signal(false)
     let registered: { control: RegisteredControl; label: string } | null = null
     /** The dirty baseline: the value at the first registration, once per Field. */
     let baseline: { value: unknown } | null = null
@@ -286,6 +289,7 @@ export class FieldRoot {
     }
     this.binding = computed<FieldControlBinding>(() => ({
       ids: { label: labelId(), description: descriptionId(), error: errorId() },
+      labelNotNative: labelNotNative(),
       data: api().controlData(),
       state: {
         disabled: disabled(),
@@ -310,6 +314,7 @@ export class FieldRoot {
       api,
       setLabel: (el) => {
         labelEl = el
+        labelNotNative.set(el !== null && el.tagName !== "LABEL")
       },
       control: () => registered?.control ?? null,
       hasErrorPart,
@@ -491,10 +496,11 @@ export class FieldLabel {
     parts.setLabel(el)
     const own = () => this.id() ?? partId("field", parts.instance(), "label")
     injectRegisterPart(parts.registry, "label", own)
-    // A non-labelable control (a group) is named by aria-labelledby; a press focuses it.
+    // A non-labelable control (a group), or a Label that is not a <label> (base-ui#587): named
+    // by aria-labelledby; a press focuses the control.
     const interaction = labelInteraction(env, {
       target: () => null,
-      forwardsFocus: () => parts.control()?.labelable === false,
+      forwardsFocus: () => el.tagName !== "LABEL" || parts.control()?.labelable === false,
       focusTarget: () => parts.control()?.focus("pointer"),
     })
     bindProps(

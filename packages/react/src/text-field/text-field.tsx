@@ -445,7 +445,9 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
     const named =
       (node.labels?.length ?? 0) > 0 ||
       node.hasAttribute("aria-label") ||
-      node.hasAttribute("aria-labelledby")
+      node.hasAttribute("aria-labelledby") ||
+      // A Field's Label rendered as another element names it a commit later (aria-labelledby).
+      node.closest('[data-scope="field"]')?.querySelector('[data-part="label"]') != null
     if (!named) {
       console.warn(
         `[rind-ui] ${ctx.scope}: the ${part} has no accessible name (a placeholder is not one); render a Label or pass aria-label / aria-labelledby.`,
@@ -478,6 +480,19 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
     binding,
   )
   const modality = useModality(env.modality, ctx.view.context.focused)
+  // The value the Field last heard of: a parent's controlled change is reported too (not a
+  // user change), so its validity and data-filled follow (react-spectrum#8659).
+  const reported = useRef<string | null>(null)
+  const current = ctx.view.values.value ?? ""
+  useEffect(() => {
+    if (!ctx.controlled || !binding) return
+    if (reported.current === null || reported.current === current) {
+      reported.current = current
+      return
+    }
+    reported.current = current
+    binding.report({ type: "change", value: current, user: false, composing: false })
+  }, [current, ctx.controlled, binding])
   const api = textFieldConnect(
     {
       scope: ctx.scope,
@@ -500,7 +515,10 @@ function useControl<T extends "input" | "textarea">(part: T, props: ControlProps
     {
       send: ctx.send,
       report: (event) => {
-        if (event.type === "change") ctx.applySoftLimit(String(event.value))
+        if (event.type === "change") {
+          ctx.applySoftLimit(String(event.value))
+          reported.current = String(event.value)
+        }
         binding?.report(event)
       },
       takeReason: ctx.takeReason,

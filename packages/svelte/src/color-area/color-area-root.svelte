@@ -11,9 +11,11 @@ import {
   isDragPress,
   type Modality,
   makeColor,
+  mergeFieldProps,
   partId,
   pointerDragSession2D,
   textSelection,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   areaAxes,
@@ -28,6 +30,8 @@ import {
 } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
 import { useColorProp } from "../color-input"
+import { useFieldBindingPeek } from "../field/context.svelte"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { attrs, normalizeProps } from "../normalize-props"
 import { useEnvironment, useLocale, useMessages } from "../provider"
@@ -47,8 +51,8 @@ let {
   xName,
   yName,
   form,
-  disabled = false,
-  readOnly = false,
+  disabled: ownDisabled = false,
+  readOnly: ownReadOnly = false,
   colorName,
   locale: ownLocale,
   dir: ownDir,
@@ -62,6 +66,25 @@ let {
   ...rest
 }: ColorAreaRootProps = $props()
 const DEFAULT = makeColor("hsb", [0, 0, 100])
+// OR-merged with an enclosing Field, rind's Fieldset and a native <fieldset disabled>.
+const enclosing = useFieldBindingPeek()
+const fieldsetDisabled = useFieldsetDisabled()
+let fieldsetDom = $state(false)
+const fieldFlags = $derived(
+  mergeFieldProps(
+    { role: "group", labelable: false, disabled: ownDisabled, readOnly: ownReadOnly },
+    enclosing?.() ?? null,
+  ),
+)
+const disabled = $derived(fieldFlags.disabled || fieldsetDisabled() || fieldsetDom)
+const readOnly = $derived(fieldFlags.readOnly)
+$effect(() => {
+  const node = inputs.x
+  if (!node) return
+  const fieldset = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = fieldset.disabled
+  return fieldset.stop
+})
 const env = useEnvironment()
 const uid = $props.id()
 const instance = $derived(id ?? uid)
@@ -169,10 +192,10 @@ $effect(() => {
     selection = null
   })
 })
-const state = $derived({ color, dragging, disabled, readOnly })
+const areaState = $derived({ color, dragging, disabled, readOnly })
 colorArea.set({
   api: () => api,
-  state: () => state,
+  state: () => areaState,
   send: machine.send,
   inputs,
   formInput,
@@ -200,7 +223,7 @@ const merged = $derived(
 </script>
 
 {#if child}
-  {@render child({ props: merged, state })}
+  {@render child({ props: merged, state: areaState })}
 {:else}
-  <div {...attrs(merged)}>{@render children?.(state)}</div>
+  <div {...attrs(merged)}>{@render children?.(areaState)}</div>
 {/if}

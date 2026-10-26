@@ -30,6 +30,7 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -50,6 +51,7 @@ import {
 import { useMachine } from "../use-machine"
 import { useModality } from "../use-modality"
 import { usePresence } from "../use-presence"
+import { useRenderedTag } from "../use-rendered-tag"
 
 declare const process: { env: { NODE_ENV?: string } }
 
@@ -60,6 +62,8 @@ declare module "../provider" {
 }
 
 /** The binding a rind-ui form control reads in its Root (field-control). */
+const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
+
 const FieldControlContext = createContext<FieldControlBinding | null>(null)
 
 /** Under an embedded boundary: controls join no Field and create none (field-control). */
@@ -116,6 +120,7 @@ interface PartsCtx {
   readonly api: ReturnType<typeof fieldConnect>
   readonly label: () => Element | null
   readonly setLabel: (el: Element | null) => void
+  readonly setLabelNotNative: (notNative: boolean) => void
   readonly control: () => RegisteredControl | null
   readonly hasErrorPart: { current: number }
 }
@@ -231,6 +236,7 @@ function Root({
     env,
   )
   const registry = usePartRegistry<FieldPart>({ scope: "field", root: instance })
+  const [labelNotNative, setLabelNotNative] = useState(false)
   const labelId = useRenderedId(registry, "label")
   const descriptionId = useRenderedId(registry, "description")
   const errorId = useRenderedId(registry, "error-message")
@@ -305,6 +311,7 @@ function Root({
   const binding: FieldControlBinding = useMemo(
     () => ({
       ids: { label: labelId, description: descriptionId, error: errorId },
+      labelNotNative,
       data: controlData,
       state: {
         disabled,
@@ -323,6 +330,7 @@ function Root({
     }),
     [
       controlData,
+      labelNotNative,
       labelId,
       descriptionId,
       errorId,
@@ -375,6 +383,7 @@ function Root({
     setLabel: (el) => {
       labelEl.current = el
     },
+    setLabelNotNative,
     control: () => registered.current?.control ?? null,
     hasErrorPart,
   }
@@ -501,11 +510,20 @@ function Label({ render, id, ref, ...rest }: PartProps<"label">) {
   const env = useEnvironment()
   const own = id ?? partId("field", ctx.instance, "label")
   useRegisterPart(ctx.registry, "label", own)
+  const el = useRef<HTMLElement | null>(null)
+  // Substituted by a non-<label> (render={<span/>}): `for` names nothing, so the control is
+  // named by aria-labelledby and a press focuses it (base-ui#587).
+  const notNative = useRenderedTag("label", render, el) !== "label"
+  const { setLabelNotNative } = ctx
+  useIsoLayoutEffect(() => {
+    setLabelNotNative(notNative)
+    return () => setLabelNotNative(false)
+  }, [notNative, setLabelNotNative])
   const control = ctx.control()
   // A non-labelable control (a group) is named by aria-labelledby; a press focuses it.
   const interaction = labelInteraction(env, {
     target: () => null,
-    forwardsFocus: () => ctx.control()?.labelable === false,
+    forwardsFocus: () => notNative || ctx.control()?.labelable === false,
     focusTarget: () => ctx.control()?.focus("pointer"),
   })
   const part = ctx.api.label(own)
@@ -517,7 +535,7 @@ function Label({ render, id, ref, ...rest }: PartProps<"label">) {
         for: control ? part["for"] : partId("field", ctx.instance, "control"),
       }),
       ...interaction,
-      ref: composeRefs(ctx.setLabel, ref),
+      ref: composeRefs(composeRefs(ctx.setLabel, el), ref),
     },
     rest,
   )

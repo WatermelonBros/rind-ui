@@ -234,6 +234,7 @@ promptInput.set({
       countState = c
     }),
   count: () => (countState ? { used: api.derived.used, max: countState.max } : null),
+  takeReason: () => reason,
   setTextareaId: (next) =>
     untrack(() => {
       textareaId = next

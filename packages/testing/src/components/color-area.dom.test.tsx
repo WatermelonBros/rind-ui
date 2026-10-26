@@ -98,6 +98,17 @@ describe("native adjustment and read-only", () => {
     ).toBe("70")
   })
 
+  it("a native <fieldset disabled> disables the area (pointer drags too)", async () => {
+    render(
+      <fieldset disabled>
+        <Area data-testid="area" />
+      </fieldset>,
+    )
+    await vi.waitFor(() =>
+      expect(screen.getByTestId("area").hasAttribute("data-disabled")).toBe(true),
+    )
+  })
+
   it("read-only refuses and re-syncs the input", async () => {
     const onValueChange = vi.fn()
     render(<Area readOnly onValueChange={onValueChange} />)

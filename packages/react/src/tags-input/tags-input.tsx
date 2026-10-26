@@ -34,6 +34,7 @@ import {
   tagsInputIds,
   tagsInputMachine,
   tagsInputMessages,
+  userTagsChange,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -301,7 +302,12 @@ function Root(all: TagsInputRootProps) {
     stale,
     onValueChange: (v: readonly string[], d: { event: { type: string } }) => {
       pending.current = true
-      binding?.report({ type: "change", value: v, user: true, composing: false })
+      binding?.report({
+        type: "change",
+        value: v,
+        user: userTagsChange(d.event.type),
+        composing: false,
+      })
       // A value changed by a text change is always a delimiter split.
       latest.current.onValueChange?.(v, { reason: reasonOf(d.event.type, true) })
     },

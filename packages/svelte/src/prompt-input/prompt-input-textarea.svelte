@@ -122,7 +122,8 @@ const merged = $derived.by(() => {
           binding?.().report({
             type: "change",
             value: (e.currentTarget as HTMLTextAreaElement).value,
-            user: true,
+            // The machine's own writes (a send clearing the draft) are not the user's.
+            user: host.takeReason() === undefined,
             composing: (e as InputEvent).isComposing === true,
           }),
       },

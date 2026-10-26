@@ -410,6 +410,22 @@ function useControl(
   })
   onBeforeUnmount(() => unregister?.())
   const modality = useModality(env.modality, () => ctx.view().context.focused)
+  // The value the Field last heard of: a parent's controlled change is reported too (not a
+  // user change), so its validity and data-filled follow (react-spectrum#8659).
+  let reported: string | null = null
+  watch(
+    () => ctx.view().values.value ?? "",
+    (current) => {
+      if (!ctx.controlled() || !binding) return
+      if (reported === null || reported === current) {
+        reported = current
+        return
+      }
+      reported = current
+      binding.value.report({ type: "change", value: current, user: false, composing: false })
+    },
+    { immediate: true, flush: "post" },
+  )
   const render = () => {
     const {
       required,
@@ -456,7 +472,10 @@ function useControl(
       {
         send: ctx.send,
         report: (event) => {
-          if (event.type === "change") ctx.applySoftLimit(String(event.value))
+          if (event.type === "change") {
+            ctx.applySoftLimit(String(event.value))
+            reported = String(event.value)
+          }
           binding?.value.report(event)
         },
         takeReason: ctx.takeReason,

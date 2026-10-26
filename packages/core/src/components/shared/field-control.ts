@@ -30,6 +30,11 @@ export interface FieldControlBinding {
     readonly error?: string | undefined
   }
   readonly state: FieldControlState
+  /**
+   * The Label is rendered as an element other than `<label>` (its `for` names nothing): a
+   * labelable control is then named by `aria-labelledby` too (base-ui#587).
+   */
+  readonly labelNotNative?: boolean | undefined
   /** The validation data attributes the control's own root carries too. */
   readonly data: Readonly<Record<`data-${string}`, string | undefined>>
   readonly name?: string | undefined
@@ -105,7 +110,10 @@ export function mergeFieldProps(
     "aria-invalid": invalid && own.role !== "button" ? "true" : undefined,
     "aria-describedby": join(ids.description, error, own.describedBy, own.consumerDescribedBy),
     "aria-labelledby":
-      own.ariaLabelledBy ?? (namedByConsumer || own.labelable ? undefined : ids.label),
+      own.ariaLabelledBy ??
+      (namedByConsumer || (own.labelable && binding?.labelNotNative !== true)
+        ? undefined
+        : ids.label),
     "aria-errormessage":
       binding?.errorMessageAttribute === "both" && invalid && own.role !== "button"
         ? error

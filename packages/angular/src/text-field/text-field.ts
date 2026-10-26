@@ -418,6 +418,22 @@ function injectControl(part: "input" | "textarea", id: () => string | undefined)
   const controlId = () => id() ?? binding?.().controlId ?? generated
   const el: HTMLInputElement | HTMLTextAreaElement = inject(ElementRef).nativeElement
   const attrs = injectControlAttrs()
+  // The value the Field last heard of: a parent's controlled change is reported too (not a
+  // user change), so its validity and data-filled follow (react-spectrum#8659).
+  let reported: string | null = null
+  effect(() => {
+    const current = root.view().values.value ?? ""
+    untracked(() => {
+      const b = binding?.()
+      if (root.value() === undefined || !b) return
+      if (reported === null || reported === current) {
+        reported = current
+        return
+      }
+      reported = current
+      b.report({ type: "change", value: current, user: false, composing: false })
+    })
+  })
   const maxlength = attrs.maxlength === undefined ? undefined : Number(attrs.maxlength)
   root.controls.current += 1
   const destroy = inject(DestroyRef)
@@ -526,7 +542,10 @@ function injectControl(part: "input" | "textarea", id: () => string | undefined)
         {
           send: root.send,
           report: (event) => {
-            if (event.type === "change") root.applySoftLimit(String(event.value))
+            if (event.type === "change") {
+              root.applySoftLimit(String(event.value))
+              reported = String(event.value)
+            }
             binding?.().report(event)
           },
           takeReason: root.takeReason,

@@ -42,7 +42,7 @@ export type PinInputRootProps = Omit<
     readonly onValueComplete?: ((value: string) => void) | undefined
     /** Default `"numeric"`. */
     readonly validationType?: PinValidationType | undefined
-    /** One accepted character (replaces `validationType`). */
+    /** One accepted character (replaces `validationType`); characters of the Basic Multilingual Plane only (no emoji). */
     readonly pattern?: RegExp | undefined
     /** Applied after NFKC (e.g. `(t) => t.toUpperCase()`). */
     readonly sanitize?: ((text: string) => string) | undefined

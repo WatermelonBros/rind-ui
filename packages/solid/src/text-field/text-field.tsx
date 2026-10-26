@@ -429,6 +429,21 @@ function useControl(
     }
   })
   const modality = useModality(env.modality, () => ctx.view().context.focused)
+  // The value the Field last heard of: a parent's controlled change is reported too (not a
+  // user change), so its validity and data-filled follow (react-spectrum#8659).
+  let reported: string | null = null
+  createEffect(() => {
+    const current = ctx.view().values.value ?? ""
+    if (!ctx.controlled()) return
+    const b = untrack(() => binding?.())
+    if (!b) return
+    if (reported === null || reported === current) {
+      reported = current
+      return
+    }
+    reported = current
+    b.report({ type: "change", value: current, user: false, composing: false })
+  })
   const api = createMemo(() => {
     const field = mergeFieldProps(
       {
@@ -466,7 +481,10 @@ function useControl(
       {
         send: ctx.send,
         report: (event) => {
-          if (event.type === "change") ctx.applySoftLimit(String(event.value))
+          if (event.type === "change") {
+            ctx.applySoftLimit(String(event.value))
+            reported = String(event.value)
+          }
           binding?.().report(event)
         },
         takeReason: ctx.takeReason,

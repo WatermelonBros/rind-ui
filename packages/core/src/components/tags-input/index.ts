@@ -11,6 +11,7 @@ export {
   type TagsInputConnectView,
   tagsInputConnect,
   tagsInputIds,
+  userTagsChange,
 } from "./tags-input.connect"
 export { tagsInputContract, tagsInputInvariants, tagsInputTraits } from "./tags-input.contract"
 export {

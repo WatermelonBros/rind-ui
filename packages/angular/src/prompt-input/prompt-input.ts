@@ -222,6 +222,8 @@ export class PromptInputRoot {
   readonly list: () => readonly PromptAttachment[]
   /** @internal */
   readonly controlled = () => this.value() !== undefined
+  /** @internal Set while the machine writes the draft itself (a send, history, restore). */
+  takeReason: () => unknown = () => undefined
   /** @internal */
   readonly disabledState: () => boolean
   /** @internal */
@@ -258,6 +260,7 @@ export class PromptInputRoot {
     const focusedButton = signal<"submit" | "attach-trigger" | null>(null)
     const textarea = this.textarea
     let reason: PromptValueReason | undefined
+    this.takeReason = () => reason
     let thrown: { readonly error: unknown } | null = null
     const nativeAction = inject(new HostAttributeToken("action"), { optional: true }) !== null
     const machineProps = () => ({
@@ -524,7 +527,8 @@ export class PromptInputTextarea {
               binding?.().report({
                 type: "change",
                 value: (e.target as HTMLTextAreaElement).value,
-                user: true,
+                // The machine's own writes (a send clearing the draft) are not the user's.
+                user: root.takeReason() === undefined,
                 composing: e.isComposing === true,
               }),
           },
