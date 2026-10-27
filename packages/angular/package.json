@@ -1,6 +1,6 @@
 {
   "name": "@rind-ui/angular",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Accessible headless Angular directives: behaviour, keyboard, ARIA and state, styled through data-* attributes. Every component ships a test driver.",
   "license": "MIT",
   "author": "Watermelon Bros",
