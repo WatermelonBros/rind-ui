@@ -112,7 +112,7 @@ export class TabsRoot {
   /** @internal */
   readonly current: () => string | null
   /** @internal */
-  readonly stop = declaredStop()
+  readonly stop: (value: string, disabled: boolean) => string | null
   /** @internal The tabs whose props applied before the tabs registered (server render). */
   readonly declared = new Set<string>()
   /** @internal A panel element is rendered for `key` (aria-controls). */
@@ -149,7 +149,22 @@ export class TabsRoot {
     )
     this.send = send
     const current = () => view().values.value ?? null
-    this.current = current
+    // Uncontrolled with no default, the first declared enabled tab is shown already, so the
+    // server HTML has a selected tab and its panel (the machine selects the same one once the
+    // tabs register).
+    const firstEnabled = signal<string | null>(null)
+    const shown = () =>
+      registered() === null && current() === null && this.value() === undefined
+        ? firstEnabled()
+        : current()
+    this.current = shown
+    const baseStop = declaredStop()
+    this.stop = (key, keyDisabled) => {
+      const first = baseStop(key, keyDisabled, [])
+      if (first !== null && untracked(firstEnabled) === null) firstEnabled.set(first)
+      const now = shown()
+      return baseStop(key, keyDisabled, now === null ? [] : [now])
+    }
     const panels = signal<ReadonlySet<string>>(new Set())
     this.registerPanel = (key) => {
       if (!panels().has(key)) panels.set(new Set(panels()).add(key))
@@ -165,7 +180,7 @@ export class TabsRoot {
     // the tabs register.
     const pendingPanels = (): ReadonlySet<string> => {
       if (this.inactivePanels() !== "unmount") return this.declared
-      const now = current()
+      const now = shown()
       return new Set(now === null ? [] : [now])
     }
     this.api = (pendingStop: string | null = null) =>
@@ -173,7 +188,7 @@ export class TabsRoot {
         {
           instance: instance(),
           collection: collection(),
-          value: current(),
+          value: shown(),
           highlightedKey: view().context.highlightedKey,
           pending: registered() === null,
           pendingStop,
@@ -192,7 +207,7 @@ export class TabsRoot {
         send,
         env,
       )
-    this.state = computed(() => ({ value: current(), orientation: this.orientation() }))
+    this.state = computed(() => ({ value: shown(), orientation: this.orientation() }))
     bindProps(() => this.api().root(), {
       owns: [
         "activationmode",
@@ -268,8 +283,7 @@ export class TabsTab {
     this.state = computed(() => ({ selected: root.current() === key(), disabled: isDisabled() }))
     const pendingStop = () => {
       root.declared.add(this.value())
-      const now = root.current()
-      return root.stop(this.value(), isDisabled(), now === null ? [] : [now])
+      return root.stop(this.value(), isDisabled())
     }
     bindProps(
       () =>

@@ -39,7 +39,7 @@ const hover = useHover({ env, send: () => {}, disabled: isDisabled })
 // Read once, in document order: this tab's view of the server tab stop.
 const pendingStop = untrack(() => {
   ctx.declared.push(value)
-  return ctx.stop(value, isDisabled(), ctx.value() === null ? [] : [ctx.value() as string])
+  return ctx.stop(value, isDisabled())
 })
 const merged = $derived(
   stripMarker(
