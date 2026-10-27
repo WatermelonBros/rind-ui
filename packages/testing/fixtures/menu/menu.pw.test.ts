@@ -138,12 +138,14 @@ describe("context menu driver through Playwright", () => {
     await page.mouse.click(box.x + 30, box.y + 20, { button: "right" })
     const content = page.getByRole("menu", { name: "File actions" })
     await content.waitFor()
+    // Within a pixel: the positioner snaps to device pixels, so rounding each side alone can
+    // land a half-pixel origin on either neighbour (339 vs 340).
     await expect
       .poll(async () => {
         const b = await content.boundingBox()
-        return b ? [Math.round(b.x), Math.round(b.y)] : null
+        return b ? Math.max(Math.abs(b.x - (box.x + 30)), Math.abs(b.y - (box.y + 20))) : null
       })
-      .toEqual([Math.round(box.x + 30), Math.round(box.y + 20)])
+      .toBeLessThanOrEqual(1)
   })
 })
 
