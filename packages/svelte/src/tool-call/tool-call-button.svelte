@@ -65,6 +65,6 @@ const attachApprove = (node: HTMLElement) =>
   {#if child}
     {@render child({ props: merged, state: ctx.state() })}
   {:else}
-    <button {...merged as HTMLButtonAttributes} {@attach attachApprove}>{@render children?.(ctx.state())}</button>
+    <button {...merged as HTMLButtonAttributes} {@attach attachApprove}>{#if children}{@render children(ctx.state())}{:else if kind !== "header"}{ctx.api()[`${kind}Text`]}{/if}</button>
   {/if}
 {/if}

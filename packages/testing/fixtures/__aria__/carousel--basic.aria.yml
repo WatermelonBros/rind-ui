@@ -1,7 +1,7 @@
 - region "Destinations":
   - group "1 of 5":
     - article:
-      - heading "Lisbon" [level=3]
+      - strong: Lisbon
       - paragraph: Trams and tiles
       - link "Plan a trip":
         - /url: "#lisbon"

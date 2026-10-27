@@ -76,6 +76,7 @@ export function toolCallConnect(input: ToolCallConnectInput, env: LinkEnv) {
     "aria-busy": busy ? "true" : undefined,
     "data-disabled": dataFlag(!canDecide),
   })
+  const durationText = input.duration === null ? "" : m.duration(input.duration)
   const receiptText =
     input.approval === "expired"
       ? m.expired
@@ -86,7 +87,10 @@ export function toolCallConnect(input: ToolCallConnectInput, env: LinkEnv) {
           : ""
   return {
     statusText,
-    durationText: input.duration === null ? "" : m.duration(input.duration),
+    durationText,
+    /** The buttons' default text (a part with no children shows it). */
+    approveText: m.approve,
+    denyText: m.deny,
     receiptText,
     /** The Approval's buttons are rendered (an `onDecision` was given). */
     decides: input.decides,
@@ -109,7 +113,9 @@ export function toolCallConnect(input: ToolCallConnectInput, env: LinkEnv) {
       id: input.ids.header,
       "aria-expanded": input.open ? "true" : "false",
       "aria-controls": input.ids.content,
-      "aria-label": `${input.name}, ${statusText}`,
+      // The visible text, in order (name, status, duration): a voice user says what they see
+      // (WCAG 2.5.3; axe label-content-name-mismatch flagged the duration missing from the name).
+      "aria-label": [input.name, statusText, durationText].filter(Boolean).join(", "),
     }),
     name: (): PartProps => base("name"),
     status: (): PartProps => ({ ...base("status"), "aria-hidden": "true" }),

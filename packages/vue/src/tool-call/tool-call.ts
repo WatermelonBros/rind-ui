@@ -212,7 +212,12 @@ function buttonPart(
   name: string,
   own: (api: Api, b: Parameters<Api["header"]>[0]) => PartProps,
   event: ToolCallEvent,
-  options: { readonly decision?: boolean; readonly approve?: boolean } = {},
+  options: {
+    readonly decision?: boolean
+    readonly approve?: boolean
+    /** The default label when the part has no children. */
+    readonly text?: (api: Api) => string
+  } = {},
 ) {
   return defineComponent({
     name: `ToolCall${name}`,
@@ -237,7 +242,7 @@ function buttonPart(
       }
       return () => {
         if (options.decision && !ctx.api().decides) return null
-        const children = slots.default?.(ctx.state())
+        const children = slots.default?.(ctx.state()) ?? options.text?.(ctx.api())
         const tag = renderedTag("button", children, props.asChild, measured.value)
         const native = tag === "button" || tag === "input"
         return renderPart(
@@ -282,10 +287,18 @@ const Approve = buttonPart(
   "Approve",
   (api, b) => api.approve(b),
   { type: "APPROVE" },
-  { decision: true, approve: true },
+  { decision: true, approve: true, text: (api) => api.approveText },
 )
 /** Sends `onDecision({ id, approved: false })`. */
-const Deny = buttonPart("Deny", (api, b) => api.deny(b), { type: "DENY" }, { decision: true })
+const Deny = buttonPart(
+  "Deny",
+  (api, b) => api.deny(b),
+  { type: "DENY" },
+  {
+    decision: true,
+    text: (api) => api.denyText,
+  },
+)
 
 /** A part whose default content comes from the call. */
 function textPart(

@@ -154,7 +154,7 @@ describe("React ToolCall", () => {
     const container = document.createElement("div")
     container.innerHTML = renderToString(tree)
     expect(container.querySelector('[data-part="header"]')?.getAttribute("aria-label")).toBe(
-      "search, done",
+      "search, done, 2 seconds",
     )
     document.body.append(container)
     const error = vi.spyOn(console, "error").mockImplementation(() => {})

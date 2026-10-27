@@ -248,21 +248,37 @@ export class ToolCallHeader {
  * Sends `onDecision({ id, approved: true })`; one decision, focusable while submitting.
  * Rendered (not `hidden`) only with `onDecision`: put it under `@if (t.decides())`.
  */
-@Directive({ selector: "[rindToolCallApprove]", exportAs: "rindToolCallApprove" })
+@Component({
+  selector: "[rindToolCallApprove]",
+  exportAs: "rindToolCallApprove",
+  encapsulation: ViewEncapsulation.None,
+  template: "<ng-content>{{ text() }}</ng-content>",
+})
 export class ToolCallApprove {
+  /** @internal */
+  protected readonly text: Signal<string>
   constructor() {
     const { root, el } = injectButton("Approve", (api, b) => api.approve(b), { type: "APPROVE" })
     root.approveEl = el
     bindProps(() => ({ hidden: root.api().decides ? undefined : "" }))
+    this.text = computed(() => root.api().approveText)
   }
 }
 
 /** Sends `onDecision({ id, approved: false })`; `hidden` without `onDecision`. */
-@Directive({ selector: "[rindToolCallDeny]", exportAs: "rindToolCallDeny" })
+@Component({
+  selector: "[rindToolCallDeny]",
+  exportAs: "rindToolCallDeny",
+  encapsulation: ViewEncapsulation.None,
+  template: "<ng-content>{{ text() }}</ng-content>",
+})
 export class ToolCallDeny {
+  /** @internal */
+  protected readonly text: Signal<string>
   constructor() {
     const { root } = injectButton("Deny", (api, b) => api.deny(b), { type: "DENY" })
     bindProps(() => ({ hidden: root.api().decides ? undefined : "" }))
+    this.text = computed(() => root.api().denyText)
   }
 }
 

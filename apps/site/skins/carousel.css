@@ -33,7 +33,7 @@
   );
   color: #111;
 }
-:is([data-skinned], [data-rind-theme^="skin-"]) .trip h3 {
+:is([data-skinned], [data-rind-theme^="skin-"]) .trip strong {
   margin: 0;
   font: 800 22px var(--s-font);
 }
@@ -41,6 +41,10 @@
   margin: 0;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) .trip a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+  justify-self: start;
   color: #111;
   font-weight: 700;
 }

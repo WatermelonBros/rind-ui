@@ -160,9 +160,9 @@ const dataKeys = (p: Record<string, unknown>) =>
     .sort()
 
 describe("tool call connect", () => {
-  it("the Header is named by the tool and the status (assistant-ui#7957)", () => {
+  it("the Header is named by its visible text: tool, status, duration (assistant-ui#7957)", () => {
     expect(api().header(b)).toMatchObject({
-      "aria-label": "search_flights, running",
+      "aria-label": "search_flights, running, 2.4 seconds",
       "aria-expanded": "true",
       "aria-controls": "c",
     })

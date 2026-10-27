@@ -83,6 +83,13 @@ describe("Svelte ToolCall", () => {
     expect(document.activeElement).toBe(t.q('[data-part="receipt"]'))
   })
 
+  it("an Approve and a Deny with no children show their default labels", async () => {
+    const t = setup({ status: "awaiting", onDecision: () => {} })
+    await settle()
+    expect(t.q('[data-part="approve"]')?.textContent).toBe("Approve")
+    expect(t.q('[data-part="deny"]')?.textContent).toBe("Deny")
+  })
+
   it("measures the duration from the first live status", async () => {
     const t = setup({})
     await settle()

@@ -33,7 +33,7 @@ let current: {
         <div rindToolCallInput>{{ "{ from: 'MXP' }" }}</div>
         <div rindToolCallApproval>
           <div rindToolCallApprovalTitle>Book this flight?</div>
-          <button rindToolCallApprove>Approve</button>
+          <button rindToolCallApprove></button>
           <button rindToolCallDeny>Deny</button>
           <div rindToolCallReceipt></div>
         </div>
@@ -101,6 +101,9 @@ describe("Angular ToolCall", () => {
     t.clock.advance(2500)
     await t.rerender({ status: "done" })
     expect(t.q('[data-part="duration"]').textContent?.trim()).toBe("2.5 seconds")
+    expect(t.q('[data-part="header"]').getAttribute("aria-label")).toBe(
+      "search_flights, done, 2.5 seconds",
+    )
   })
 
   it("asks for approval, takes one decision, and lands the focus on the Receipt", async () => {
@@ -112,6 +115,9 @@ describe("Angular ToolCall", () => {
     await t.stable()
     expect(t.decisions).toEqual([{ id: "call-1", approved: true }])
     const approve = t.q('[data-part="approve"]')
+    // No children: the button says its own text; the Deny's content wins.
+    expect(approve.textContent?.trim()).toBe("Approve")
+    expect(t.q('[data-part="deny"]').textContent?.trim()).toBe("Deny")
     expect(approve.getAttribute("aria-busy")).toBe("true")
     approve.click()
     expect(t.decisions).toHaveLength(1)

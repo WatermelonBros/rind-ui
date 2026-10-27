@@ -254,7 +254,7 @@ function Header({ render, ref, ...rest }: PartProps<"button">) {
 }
 
 /** Sends `onDecision({ id, approved: true })`; one decision, focusable while submitting. */
-function Approve({ render, ref, ...rest }: PartProps<"button">) {
+function Approve({ render, ref, children, ...rest }: PartProps<"button">) {
   const { ctx, props, el } = useButton(
     "Approve",
     (c, b) => c.api.approve(b),
@@ -264,14 +264,17 @@ function Approve({ render, ref, ...rest }: PartProps<"button">) {
   if (!ctx.api.decides) return null
   return renderPart(
     "button",
-    mergeProps({ ...props, ref: composeRefs(composeRefs(el, ctx.approveEl), ref) }, rest),
+    {
+      ...mergeProps({ ...props, ref: composeRefs(composeRefs(el, ctx.approveEl), ref) }, rest),
+      children: children ?? ctx.api.approveText,
+    },
     render,
     ctx.state,
   )
 }
 
 /** Sends `onDecision({ id, approved: false })`. */
-function Deny({ render, ref, ...rest }: PartProps<"button">) {
+function Deny({ render, ref, children, ...rest }: PartProps<"button">) {
   const { ctx, props, el } = useButton(
     "Deny",
     (c, b) => c.api.deny(b),
@@ -281,7 +284,10 @@ function Deny({ render, ref, ...rest }: PartProps<"button">) {
   if (!ctx.api.decides) return null
   return renderPart(
     "button",
-    mergeProps({ ...props, ref: composeRefs(el, ref) }, rest),
+    {
+      ...mergeProps({ ...props, ref: composeRefs(el, ref) }, rest),
+      children: children ?? ctx.api.denyText,
+    },
     render,
     ctx.state,
   )

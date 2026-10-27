@@ -37,8 +37,9 @@ function setup(initial: Props) {
             h(ToolCall.Input, null, () => '{ "to": "LIS" }'),
             h(ToolCall.Approval, null, () => [
               h(ToolCall.ApprovalTitle, null, () => "Book this flight?"),
-              h(ToolCall.Approve, null, () => "Approve"),
-              h(ToolCall.Deny, null, () => "Deny"),
+              // No children: the buttons show their default labels.
+              h(ToolCall.Approve),
+              h(ToolCall.Deny),
               h(ToolCall.Receipt),
             ]),
           ]),
@@ -99,6 +100,13 @@ describe("Vue ToolCall", () => {
     await settle()
     expect(await t.d().receiptText()).toBe("Approved")
     expect(document.activeElement).toBe(t.q('[data-part="receipt"]'))
+  })
+
+  it("an Approve and a Deny with no children show their default labels", async () => {
+    const t = setup({ status: "awaiting", onDecision: () => {} })
+    await settle()
+    expect(t.q('[data-part="approve"]')?.textContent).toBe("Approve")
+    expect(t.q('[data-part="deny"]')?.textContent).toBe("Deny")
   })
 
   it("measures the duration from the first live status", async () => {

@@ -43,7 +43,7 @@
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="mentions"][data-part="description"] {
   margin: 6px 0 0;
-  opacity: 0.7;
+  color: color-mix(in oklab, var(--s-ink) 78%, var(--s-card));
   font-size: 12px;
   font-weight: 500;
 }

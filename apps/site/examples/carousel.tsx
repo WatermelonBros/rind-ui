@@ -13,10 +13,18 @@ const slides = [
   { id: "hanoi", title: "Hanoi", note: "Lanterns and noodles", hue: 150 },
 ]
 
-function Deck({ perPage, autoplay }: { readonly perPage: number; readonly autoplay?: boolean }) {
+function Deck({
+  label,
+  perPage,
+  autoplay,
+}: {
+  readonly label: string
+  readonly perPage: number
+  readonly autoplay?: boolean
+}) {
   return (
     <Carousel.Root
-      aria-label="Destinations"
+      aria-label={label}
       slidesPerPage={perPage}
       spacing="12px"
       autoplay={autoplay === true}
@@ -26,7 +34,7 @@ function Deck({ perPage, autoplay }: { readonly perPage: number; readonly autopl
         {slides.map((s, i) => (
           <Carousel.Slide key={s.id} index={i}>
             <article className="trip" style={{ "--trip-hue": s.hue } as React.CSSProperties}>
-              <h3>{s.title}</h3>
+              <strong>{s.title}</strong>
               <p>{s.note}</p>
               <a href={`#${s.id}`}>Plan a trip</a>
             </article>
@@ -53,15 +61,15 @@ function Deck({ perPage, autoplay }: { readonly perPage: number; readonly autopl
 }
 
 export function Basic() {
-  return <Deck perPage={1} />
+  return <Deck label="Destinations" perPage={1} />
 }
 
 export function TwoPerPage() {
-  return <Deck perPage={2} />
+  return <Deck label="Destinations, two at a time" perPage={2} />
 }
 
 export function Autoplay() {
-  return <Deck perPage={1} autoplay />
+  return <Deck label="Featured destinations" perPage={1} autoplay />
 }
 
 export const variants: Variants = {

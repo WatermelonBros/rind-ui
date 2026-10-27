@@ -49,7 +49,7 @@ function setup(initial: Props) {
             <ToolCall.Input>{"{ from: 'MXP' }"}</ToolCall.Input>
             <ToolCall.Approval>
               <ToolCall.ApprovalTitle>Book this flight?</ToolCall.ApprovalTitle>
-              <ToolCall.Approve>Approve</ToolCall.Approve>
+              <ToolCall.Approve />
               <ToolCall.Deny>Deny</ToolCall.Deny>
               <ToolCall.Receipt />
             </ToolCall.Approval>
@@ -98,6 +98,9 @@ describe("Solid ToolCall", () => {
     t.clock.advance(2500)
     await t.rerender({ status: "done" })
     expect(t.q('[data-part="duration"]')?.textContent).toBe("2.5 seconds")
+    expect(t.q('[data-part="header"]')?.getAttribute("aria-label")).toBe(
+      "search_flights, done, 2.5 seconds",
+    )
   })
 
   it("asks for approval, takes one decision, and lands the focus on the Receipt", async () => {
@@ -110,6 +113,9 @@ describe("Solid ToolCall", () => {
     await t.d().via("keyboard").approve()
     expect(t.decisions).toEqual([{ id: "call-1", approved: true }])
     const approve = t.q('[data-part="approve"]') as HTMLElement
+    // No children: the button says its own text; the Deny's content wins.
+    expect(approve.textContent).toBe("Approve")
+    expect(t.q('[data-part="deny"]')?.textContent).toBe("Deny")
     expect(approve.getAttribute("aria-busy")).toBe("true")
     expect(approve.getAttribute("aria-disabled")).toBe("true")
     approve.click()

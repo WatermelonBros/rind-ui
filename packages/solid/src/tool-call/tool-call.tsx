@@ -299,7 +299,7 @@ function Approve(props: ButtonProps) {
   const ctx = useToolCall("Approve")
   return (
     <Show when={ctx.api().decides}>
-      <ApproveButton {...props} />
+      <ApproveButton {...props}>{props.children ?? ctx.api().approveText}</ApproveButton>
     </Show>
   )
 }
@@ -314,7 +314,7 @@ function Deny(props: ButtonProps) {
   const ctx = useToolCall("Deny")
   return (
     <Show when={ctx.api().decides}>
-      <DenyButton {...props} />
+      <DenyButton {...props}>{props.children ?? ctx.api().denyText}</DenyButton>
     </Show>
   )
 }

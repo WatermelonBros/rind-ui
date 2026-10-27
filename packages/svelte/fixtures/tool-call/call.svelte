@@ -20,8 +20,9 @@ const {
         <ToolCall.Duration />
         <ToolCall.Approval>
           <ToolCall.ApprovalTitle>Book this flight?</ToolCall.ApprovalTitle>
-          <ToolCall.Approve>Approve</ToolCall.Approve>
-          <ToolCall.Deny>Deny</ToolCall.Deny>
+          <!-- No children: the buttons show their default labels. -->
+          <ToolCall.Approve />
+          <ToolCall.Deny />
           <ToolCall.Receipt />
         </ToolCall.Approval>
       {:else}
