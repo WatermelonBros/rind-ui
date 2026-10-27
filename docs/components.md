@@ -36,7 +36,7 @@ seen in docs or source but not confirmed as public, stable API.
 | Hover Card | ● | ● | ● | ● |  | ● | ● | ● | ● | 8 | 2 | done | Base: Preview Card · Bits: Link Preview · Ariakit: Hovercard · RAC: PreviewTrigger (unverified) |
 | Toast | ● | ● | ● | ● |  |  | ● |  | ● | 6 | 2 | done |  |
 | Drawer | ● |  |  | ● |  |  | ● |  |  | 3 | 1 | done | Used by Reado |
-| Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Floating Panel | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Tour | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Reado has TourCard/TourScrim |
 
 ## Menus & navigation (12)
@@ -97,9 +97,9 @@ seen in docs or source but not confirmed as public, stable API.
 | Rating | ● |  |  |  |  |  | ● | ● | ● | 4 | 3 | done | Rating Group |
 | Text Field |  |  | ● | ● | ● |  |  |  | ● | 4 | 1 | done | Input / Textarea; Ark via Field; Password Input (`type="password"`, Radix: Password Toggle Field) and Search Field (`type="search"`) are its parts |
 | File Upload | ● |  | ● |  |  |  |  |  | ● | 3 | 3 | done | RAC: DropZone + FileTrigger · Kobalte: File Field |
-| Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | todo |  |
-| Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
-| Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Editable | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done |  |
+| Angle Slider | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
+| Signature Pad | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 
 ## Form structure (4)
 
@@ -116,14 +116,14 @@ seen in docs or source but not confirmed as public, stable API.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Calendar | ● |  | ● |  |  |  | ● | ● |  | 4 | 3 | done | Includes Range Calendar (`selectionMode="range"`) and Month / Year Picker (`view`); Reka: Month/MonthRange/Year/YearRange Picker |
 | Date Field | ● |  | ● |  |  |  | ● | ● | ● | 5 | 3 | done | Includes Time Field (no date segments), Date / Time Range Field (`selectionMode="range"`) and Date (Range) Picker (picker parts); Ark: Date Input, range mode of Date Picker |
-| Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Timer | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 
 ## Color (2)
 
 | Component | Ark | Radix | RAC | Base | HUI | Ariakit | Reka | Bits | Kobalte | # | Wave | Status | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Color Picker | ● |  | ● |  |  |  | ● |  | ● | 4 | 3 | done | One component: area, channel sliders, hex and channel inputs (field), swatch group and swatches are its parts |
-| Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | todo | Missing in Ark |
+| Color Wheel |  |  | ● |  |  |  |  |  | ● | 2 | 3 | done | Missing in Ark |
 
 ## Display & feedback (22)
 
@@ -139,12 +139,12 @@ seen in docs or source but not confirmed as public, stable API.
 | Splitter | ● |  |  |  |  |  | ● |  |  | 2 | 3 | done |  |
 | Alert |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
 | Badge |  |  |  |  |  |  |  |  | ● | 1 | 3 | done |  |
-| Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| Carousel | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Clipboard | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Code Block |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Requested for the docs site: copy, language tabs, line highlight, focusable scroll region; composes Tabs + Clipboard |
 | Image |  |  |  |  |  |  |  |  | ● | 1 | 3 | done | Loading/fallback states |
 | Image Cropper | ● |  |  |  |  |  |  |  |  | 1 | 3 | done | Ark: Image Cropper |
-| JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | todo |  |
+| JSON Tree View | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
 | Image Viewer |  |  |  |  |  |  |  |  |  | 0 | 3 | done | Zoom and pan, keyboard and pinch; Reado has ImageView |
 | Kbd |  |  |  |  |  |  |  |  |  | 0 | 2 | done | Keyboard shortcut display, platform-aware modifiers; Reado has Kbd |
 | Marquee | ● |  |  |  |  |  |  |  |  | 1 | 3 | done |  |
@@ -160,16 +160,16 @@ accessibility and a contract — no model inside. Wave: AI (after wave 1).
 | Component | The hard part | Status |
 |---|---|---|
 | Prompt Input | IME-safe submit, autosize, attachments, submit/stop state | done |
-| Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | todo |
+| Mentions / Slash Commands | Inline combobox anchored to the caret (Reado: CompletingTextarea) | done |
 | Message Thread | Stick-to-bottom scroll, jump-to-latest, virtualization | done |
 | Streaming Message | Chunked live-region announcements (Reado: Announcer) | done |
 | Reasoning | Collapsible with a streaming state | done |
-| Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | todo |
-| Citation | Keyboard-reachable hover card on inline references | todo |
-| Message Actions | Copy, regenerate, edit, feedback, branch navigation | todo |
-| Suggestions | Prompt chips | todo |
-| Agent Presence | idle/listening/thinking/speaking, audio level, announcements (drives fx Orb) | todo |
-| Context Meter | Token/context usage meter | todo |
+| Tool Call / Tool Approval | pending/running/done/error; human confirmation with managed focus | done |
+| Citation | Keyboard-reachable hover card on inline references | done |
+| Message Actions | Copy, regenerate, edit, feedback, branch navigation | done |
+| Suggestions | Prompt chips | done |
+| Agent Presence | idle/listening/thinking/speaking, audio level, announcements (drives fx Orb) | done |
+| Context Meter | Token/context usage meter | done |
 
 ## Utilities (not components)
 

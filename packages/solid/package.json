@@ -72,10 +72,20 @@
         "solid": "./dist/accordion/index.jsx",
         "default": "./dist/accordion/index.mjs"
       },
+      "./agent-presence": {
+        "types": "./dist/agent-presence/index.d.mts",
+        "solid": "./dist/agent-presence/index.jsx",
+        "default": "./dist/agent-presence/index.mjs"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.mts",
         "solid": "./dist/alert/index.jsx",
         "default": "./dist/alert/index.mjs"
+      },
+      "./angle-slider": {
+        "types": "./dist/angle-slider/index.d.mts",
+        "solid": "./dist/angle-slider/index.jsx",
+        "default": "./dist/angle-slider/index.mjs"
       },
       "./avatar": {
         "types": "./dist/avatar/index.d.mts",
@@ -102,6 +112,11 @@
         "solid": "./dist/calendar/index.jsx",
         "default": "./dist/calendar/index.mjs"
       },
+      "./carousel": {
+        "types": "./dist/carousel/index.d.mts",
+        "solid": "./dist/carousel/index.jsx",
+        "default": "./dist/carousel/index.mjs"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.mts",
         "solid": "./dist/checkbox/index.jsx",
@@ -111,6 +126,11 @@
         "types": "./dist/checkbox-group/index.d.mts",
         "solid": "./dist/checkbox-group/index.jsx",
         "default": "./dist/checkbox-group/index.mjs"
+      },
+      "./citation": {
+        "types": "./dist/citation/index.d.mts",
+        "solid": "./dist/citation/index.jsx",
+        "default": "./dist/citation/index.mjs"
       },
       "./clipboard": {
         "types": "./dist/clipboard/index.d.mts",
@@ -132,6 +152,11 @@
         "solid": "./dist/color-picker/index.jsx",
         "default": "./dist/color-picker/index.mjs"
       },
+      "./color-wheel": {
+        "types": "./dist/color-wheel/index.d.mts",
+        "solid": "./dist/color-wheel/index.jsx",
+        "default": "./dist/color-wheel/index.mjs"
+      },
       "./combobox": {
         "types": "./dist/combobox/index.d.mts",
         "solid": "./dist/combobox/index.jsx",
@@ -141,6 +166,11 @@
         "types": "./dist/context-menu/index.d.mts",
         "solid": "./dist/context-menu/index.jsx",
         "default": "./dist/context-menu/index.mjs"
+      },
+      "./context-meter": {
+        "types": "./dist/context-meter/index.d.mts",
+        "solid": "./dist/context-meter/index.jsx",
+        "default": "./dist/context-meter/index.mjs"
       },
       "./date-field": {
         "types": "./dist/date-field/index.d.mts",
@@ -157,6 +187,11 @@
         "solid": "./dist/drawer/index.jsx",
         "default": "./dist/drawer/index.mjs"
       },
+      "./editable": {
+        "types": "./dist/editable/index.d.mts",
+        "solid": "./dist/editable/index.jsx",
+        "default": "./dist/editable/index.mjs"
+      },
       "./field": {
         "types": "./dist/field/index.d.mts",
         "solid": "./dist/field/index.jsx",
@@ -171,6 +206,11 @@
         "types": "./dist/file-upload/index.d.mts",
         "solid": "./dist/file-upload/index.jsx",
         "default": "./dist/file-upload/index.mjs"
+      },
+      "./floating-panel": {
+        "types": "./dist/floating-panel/index.d.mts",
+        "solid": "./dist/floating-panel/index.jsx",
+        "default": "./dist/floating-panel/index.mjs"
       },
       "./form": {
         "types": "./dist/form/index.d.mts",
@@ -212,6 +252,11 @@
         "solid": "./dist/image-viewer/index.jsx",
         "default": "./dist/image-viewer/index.mjs"
       },
+      "./json-tree-view": {
+        "types": "./dist/json-tree-view/index.d.mts",
+        "solid": "./dist/json-tree-view/index.jsx",
+        "default": "./dist/json-tree-view/index.mjs"
+      },
       "./kbd": {
         "types": "./dist/kbd/index.d.mts",
         "solid": "./dist/kbd/index.jsx",
@@ -237,6 +282,11 @@
         "solid": "./dist/marquee/index.jsx",
         "default": "./dist/marquee/index.mjs"
       },
+      "./mentions": {
+        "types": "./dist/mentions/index.d.mts",
+        "solid": "./dist/mentions/index.jsx",
+        "default": "./dist/mentions/index.mjs"
+      },
       "./menu": {
         "types": "./dist/menu/index.d.mts",
         "solid": "./dist/menu/index.jsx",
@@ -246,6 +296,11 @@
         "types": "./dist/menubar/index.d.mts",
         "solid": "./dist/menubar/index.jsx",
         "default": "./dist/menubar/index.mjs"
+      },
+      "./message-actions": {
+        "types": "./dist/message-actions/index.d.mts",
+        "solid": "./dist/message-actions/index.jsx",
+        "default": "./dist/message-actions/index.mjs"
       },
       "./message-thread": {
         "types": "./dist/message-thread/index.d.mts",
@@ -332,6 +387,11 @@
         "solid": "./dist/separator/index.jsx",
         "default": "./dist/separator/index.mjs"
       },
+      "./signature-pad": {
+        "types": "./dist/signature-pad/index.d.mts",
+        "solid": "./dist/signature-pad/index.jsx",
+        "default": "./dist/signature-pad/index.mjs"
+      },
       "./skeleton": {
         "types": "./dist/skeleton/index.d.mts",
         "solid": "./dist/skeleton/index.jsx",
@@ -361,6 +421,11 @@
         "types": "./dist/streaming-message/index.d.mts",
         "solid": "./dist/streaming-message/index.jsx",
         "default": "./dist/streaming-message/index.mjs"
+      },
+      "./suggestions": {
+        "types": "./dist/suggestions/index.d.mts",
+        "solid": "./dist/suggestions/index.jsx",
+        "default": "./dist/suggestions/index.mjs"
       },
       "./switch": {
         "types": "./dist/switch/index.d.mts",
@@ -402,6 +467,11 @@
         "solid": "./dist/timeline/index.jsx",
         "default": "./dist/timeline/index.mjs"
       },
+      "./timer": {
+        "types": "./dist/timer/index.d.mts",
+        "solid": "./dist/timer/index.jsx",
+        "default": "./dist/timer/index.mjs"
+      },
       "./toast": {
         "types": "./dist/toast/index.d.mts",
         "solid": "./dist/toast/index.jsx",
@@ -416,6 +486,11 @@
         "types": "./dist/toggle-group/index.d.mts",
         "solid": "./dist/toggle-group/index.jsx",
         "default": "./dist/toggle-group/index.mjs"
+      },
+      "./tool-call": {
+        "types": "./dist/tool-call/index.d.mts",
+        "solid": "./dist/tool-call/index.jsx",
+        "default": "./dist/tool-call/index.mjs"
       },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.mts",
@@ -458,11 +533,23 @@
       "solid": "./dist/accordion/index.jsx",
       "default": "./dist/accordion/index.mjs"
     },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/agent-presence/index.ts",
+      "types": "./dist/agent-presence/index.d.mts",
+      "solid": "./dist/agent-presence/index.jsx",
+      "default": "./dist/agent-presence/index.mjs"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.mts",
       "solid": "./dist/alert/index.jsx",
       "default": "./dist/alert/index.mjs"
+    },
+    "./angle-slider": {
+      "@rind-ui/source": "./src/angle-slider/index.ts",
+      "types": "./dist/angle-slider/index.d.mts",
+      "solid": "./dist/angle-slider/index.jsx",
+      "default": "./dist/angle-slider/index.mjs"
     },
     "./avatar": {
       "@rind-ui/source": "./src/avatar/index.ts",
@@ -494,6 +581,12 @@
       "solid": "./dist/calendar/index.jsx",
       "default": "./dist/calendar/index.mjs"
     },
+    "./carousel": {
+      "@rind-ui/source": "./src/carousel/index.ts",
+      "types": "./dist/carousel/index.d.mts",
+      "solid": "./dist/carousel/index.jsx",
+      "default": "./dist/carousel/index.mjs"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.mts",
@@ -505,6 +598,12 @@
       "types": "./dist/checkbox-group/index.d.mts",
       "solid": "./dist/checkbox-group/index.jsx",
       "default": "./dist/checkbox-group/index.mjs"
+    },
+    "./citation": {
+      "@rind-ui/source": "./src/citation/index.ts",
+      "types": "./dist/citation/index.d.mts",
+      "solid": "./dist/citation/index.jsx",
+      "default": "./dist/citation/index.mjs"
     },
     "./clipboard": {
       "@rind-ui/source": "./src/clipboard/index.ts",
@@ -530,6 +629,12 @@
       "solid": "./dist/color-picker/index.jsx",
       "default": "./dist/color-picker/index.mjs"
     },
+    "./color-wheel": {
+      "@rind-ui/source": "./src/color-wheel/index.ts",
+      "types": "./dist/color-wheel/index.d.mts",
+      "solid": "./dist/color-wheel/index.jsx",
+      "default": "./dist/color-wheel/index.mjs"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.mts",
@@ -541,6 +646,12 @@
       "types": "./dist/context-menu/index.d.mts",
       "solid": "./dist/context-menu/index.jsx",
       "default": "./dist/context-menu/index.mjs"
+    },
+    "./context-meter": {
+      "@rind-ui/source": "./src/context-meter/index.ts",
+      "types": "./dist/context-meter/index.d.mts",
+      "solid": "./dist/context-meter/index.jsx",
+      "default": "./dist/context-meter/index.mjs"
     },
     "./date-field": {
       "@rind-ui/source": "./src/date-field/index.ts",
@@ -560,6 +671,12 @@
       "solid": "./dist/drawer/index.jsx",
       "default": "./dist/drawer/index.mjs"
     },
+    "./editable": {
+      "@rind-ui/source": "./src/editable/index.ts",
+      "types": "./dist/editable/index.d.mts",
+      "solid": "./dist/editable/index.jsx",
+      "default": "./dist/editable/index.mjs"
+    },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
       "types": "./dist/field/index.d.mts",
@@ -577,6 +694,12 @@
       "types": "./dist/file-upload/index.d.mts",
       "solid": "./dist/file-upload/index.jsx",
       "default": "./dist/file-upload/index.mjs"
+    },
+    "./floating-panel": {
+      "@rind-ui/source": "./src/floating-panel/index.ts",
+      "types": "./dist/floating-panel/index.d.mts",
+      "solid": "./dist/floating-panel/index.jsx",
+      "default": "./dist/floating-panel/index.mjs"
     },
     "./form": {
       "@rind-ui/source": "./src/form/index.ts",
@@ -626,6 +749,12 @@
       "solid": "./dist/image-viewer/index.jsx",
       "default": "./dist/image-viewer/index.mjs"
     },
+    "./json-tree-view": {
+      "@rind-ui/source": "./src/json-tree-view/index.ts",
+      "types": "./dist/json-tree-view/index.d.mts",
+      "solid": "./dist/json-tree-view/index.jsx",
+      "default": "./dist/json-tree-view/index.mjs"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
       "types": "./dist/kbd/index.d.mts",
@@ -656,6 +785,12 @@
       "solid": "./dist/marquee/index.jsx",
       "default": "./dist/marquee/index.mjs"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/mentions/index.ts",
+      "types": "./dist/mentions/index.d.mts",
+      "solid": "./dist/mentions/index.jsx",
+      "default": "./dist/mentions/index.mjs"
+    },
     "./menu": {
       "@rind-ui/source": "./src/menu/index.ts",
       "types": "./dist/menu/index.d.mts",
@@ -667,6 +802,12 @@
       "types": "./dist/menubar/index.d.mts",
       "solid": "./dist/menubar/index.jsx",
       "default": "./dist/menubar/index.mjs"
+    },
+    "./message-actions": {
+      "@rind-ui/source": "./src/message-actions/index.ts",
+      "types": "./dist/message-actions/index.d.mts",
+      "solid": "./dist/message-actions/index.jsx",
+      "default": "./dist/message-actions/index.mjs"
     },
     "./message-thread": {
       "@rind-ui/source": "./src/message-thread/index.ts",
@@ -770,6 +911,12 @@
       "solid": "./dist/separator/index.jsx",
       "default": "./dist/separator/index.mjs"
     },
+    "./signature-pad": {
+      "@rind-ui/source": "./src/signature-pad/index.ts",
+      "types": "./dist/signature-pad/index.d.mts",
+      "solid": "./dist/signature-pad/index.jsx",
+      "default": "./dist/signature-pad/index.mjs"
+    },
     "./skeleton": {
       "@rind-ui/source": "./src/skeleton/index.ts",
       "types": "./dist/skeleton/index.d.mts",
@@ -805,6 +952,12 @@
       "types": "./dist/streaming-message/index.d.mts",
       "solid": "./dist/streaming-message/index.jsx",
       "default": "./dist/streaming-message/index.mjs"
+    },
+    "./suggestions": {
+      "@rind-ui/source": "./src/suggestions/index.ts",
+      "types": "./dist/suggestions/index.d.mts",
+      "solid": "./dist/suggestions/index.jsx",
+      "default": "./dist/suggestions/index.mjs"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -854,6 +1007,12 @@
       "solid": "./dist/timeline/index.jsx",
       "default": "./dist/timeline/index.mjs"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/timer/index.ts",
+      "types": "./dist/timer/index.d.mts",
+      "solid": "./dist/timer/index.jsx",
+      "default": "./dist/timer/index.mjs"
+    },
     "./toast": {
       "@rind-ui/source": "./src/toast/index.ts",
       "types": "./dist/toast/index.d.mts",
@@ -871,6 +1030,12 @@
       "types": "./dist/toggle-group/index.d.mts",
       "solid": "./dist/toggle-group/index.jsx",
       "default": "./dist/toggle-group/index.mjs"
+    },
+    "./tool-call": {
+      "@rind-ui/source": "./src/tool-call/index.ts",
+      "types": "./dist/tool-call/index.d.mts",
+      "solid": "./dist/tool-call/index.jsx",
+      "default": "./dist/tool-call/index.mjs"
     },
     "./toolbar": {
       "@rind-ui/source": "./src/toolbar/index.ts",

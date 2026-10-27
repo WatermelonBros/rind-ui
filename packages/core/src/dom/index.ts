@@ -2,6 +2,7 @@ export { accessibleNameOf } from "./accname"
 export { announceableText, observeText } from "./alert-text"
 export { type Autosize, autosize, supportsFieldSizing } from "./autosize"
 export { type CalendarDragOptions, calendarCellAt, createCalendarDrag } from "./calendar-drag"
+export { type CaretRect, caretRect } from "./caret-rect"
 export {
   type CellDrag,
   type CellDragMessage,
@@ -123,6 +124,13 @@ export {
   layerId,
 } from "./layer-stack"
 export {
+  type LevelChannel,
+  type LevelLoopOptions,
+  levelBand,
+  smoothLevel,
+  startLevelLoop,
+} from "./level-loop"
+export {
   activateLink,
   isExternal,
   type LinkActivation,
@@ -174,6 +182,16 @@ export {
   readPlatform,
   withEngine,
 } from "./platform"
+export {
+  type AngleMessage,
+  angleOf,
+  onRing,
+  type PointerAngleCapability,
+  type PointerAngleSession,
+  pointerAngle,
+  pointerAngleSession,
+  pointerRadius,
+} from "./pointer-angle"
 export {
   type DragArea,
   type DragAxis,
@@ -264,6 +282,16 @@ export {
   type StickOptions,
   stickToBottom,
 } from "./stick-to-bottom"
+export {
+  preventTouchScribble,
+  type StrokeInputPoint,
+  type StrokeMessage,
+  startStroke,
+  startsStroke,
+  strokeBox,
+  strokePoint,
+} from "./stroke-input"
+export { rasterizeSvg, type SvgRasterInput } from "./svg-raster"
 export {
   damp,
   lockAxis,

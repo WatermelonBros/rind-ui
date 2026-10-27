@@ -132,6 +132,11 @@ function injectItemKey(part: string): () => CollectionKey {
   return item.key
 }
 
+/** The enclosing `rindTreeViewItem`'s key, or null outside one (parts built on Tree View). */
+export function injectTreeViewItemKey(): (() => CollectionKey) | null {
+  return inject(ITEM, { optional: true })?.key ?? null
+}
+
 const optionalBoolean = (v: boolean | "" | undefined) => (v === undefined ? undefined : v !== false)
 
 /**

@@ -1,0 +1,77 @@
+/* ── Color Wheel: the hue ring with a soft frame, a knob on the ring in the hue's colour with a
+   two-tone edge, the hue under it; a preview chip beside the first example. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-wheel"][data-part="root"] {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-wheel"][data-part="track"] {
+  --rind-color-wheel-thickness: 26px;
+  inline-size: 168px;
+  block-size: 168px;
+  border-radius: 50%;
+  background: var(--rind-color-wheel-gradient);
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--rind-color-wheel-thickness)),
+    #000 calc(100% - var(--rind-color-wheel-thickness) + 1px)
+  );
+  cursor: crosshair;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-wheel"][data-part="thumb"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-wheel"][data-part="thumb"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 1px;
+  inset-inline-start: calc(50% - 12px);
+  inline-size: 24px;
+  block-size: 24px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--rind-color-wheel-thumb-color);
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 1.5px rgb(0 0 0 / 0.6),
+    0 2px 6px rgb(0 0 0 / 0.25);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="color-wheel"][data-part="thumb"][data-focus-visible]::before {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 3px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="color-wheel"][data-part="value"] {
+  font: 800 18px var(--s-font);
+  font-variant-numeric: tabular-nums;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .wheel-row {
+  align-items: center;
+  gap: 28px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .wheel-preview {
+  display: grid;
+  place-items: end start;
+  inline-size: 140px;
+  block-size: 140px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: var(--s-r);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .wheel-preview span {
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--s-card);
+  color: var(--s-ink);
+  font:
+    700 12px ui-monospace,
+    Menlo,
+    monospace;
+}

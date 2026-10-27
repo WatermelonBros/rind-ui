@@ -1,6 +1,8 @@
 import type { ComponentType } from "react"
 import * as accordion from "./accordion"
+import * as agentPresence from "./agent-presence"
 import * as alert from "./alert"
+import * as angleSlider from "./angle-slider"
 import * as announcements from "./announcements"
 import * as aspectRatio from "./aspect-ratio"
 import * as autosize from "./autosize"
@@ -9,23 +11,29 @@ import * as badge from "./badge"
 import * as breadcrumbs from "./breadcrumbs"
 import * as button from "./button"
 import * as calendar from "./calendar"
+import * as carousel from "./carousel"
 import * as checkboxGroup from "./checkbox-group"
+import * as citation from "./citation"
 import * as clipboard from "./clipboard"
 import * as codeBlock from "./code-block"
 import * as collapsible from "./collapsible"
 import * as collections from "./collections"
 import * as colorModel from "./color-model"
 import * as colorPicker from "./color-picker"
+import * as colorWheel from "./color-wheel"
 import * as combobox from "./combobox"
 import * as contextMenu from "./context-menu"
+import * as contextMeter from "./context-meter"
 import * as controlLabel from "./control-label"
 import * as dateField from "./date-field"
 import * as dialog from "./dialog"
 import * as drawer from "./drawer"
+import * as editable from "./editable"
 import * as field from "./field"
 import * as fieldControl from "./field-control"
 import * as fieldset from "./fieldset"
 import * as fileUpload from "./file-upload"
+import * as floatingPanel from "./floating-panel"
 import * as focusAndModality from "./focus-and-modality"
 import * as form from "./form"
 import * as gridList from "./grid-list"
@@ -36,6 +44,7 @@ import * as hoverCard from "./hover-card"
 import * as image from "./image"
 import * as imageCropper from "./image-cropper"
 import * as imageViewer from "./image-viewer"
+import * as jsonTreeView from "./json-tree-view"
 import * as kbd from "./kbd"
 import * as keyboardAndRtl from "./keyboard-and-rtl"
 import * as label from "./label"
@@ -43,8 +52,10 @@ import * as labels from "./labels"
 import * as link from "./link"
 import * as listbox from "./listbox"
 import * as marquee from "./marquee"
+import * as mentions from "./mentions"
 import * as menu from "./menu"
 import * as menubar from "./menubar"
+import * as messageActions from "./message-actions"
 import * as messageThread from "./message-thread"
 import * as messagesAndProvider from "./messages-and-provider"
 import * as meter from "./meter"
@@ -67,12 +78,14 @@ import * as scrollArea from "./scroll-area"
 import * as segmentedControl from "./segmented-control"
 import * as select from "./select"
 import * as separator from "./separator"
+import * as signaturePad from "./signature-pad"
 import * as skeleton from "./skeleton"
 import * as slider from "./slider"
 import * as sortable from "./sortable"
 import * as splitter from "./splitter"
 import * as stepper from "./stepper"
 import * as streamingMessage from "./streaming-message"
+import * as suggestions from "./suggestions"
 import * as switchEx from "./switch"
 import * as table from "./table"
 import * as tableOfContents from "./table-of-contents"
@@ -81,8 +94,10 @@ import * as tagGroup from "./tag-group"
 import * as tagsInput from "./tags-input"
 import * as textField from "./text-field"
 import * as timeline from "./timeline"
+import * as timer from "./timer"
 import * as toast from "./toast"
 import * as toggleGroup from "./toggle-group"
+import * as toolCall from "./tool-call"
 import * as toolbar from "./toolbar"
 import * as tooltip from "./tooltip"
 import * as tour from "./tour"
@@ -95,6 +110,11 @@ export type ExampleModule = { readonly variants: Variants } & Readonly<Record<st
 
 /** Component page slug → its examples. A page without an entry shows no live example. */
 export const examples: Readonly<Record<string, ExampleModule>> = {
+  mentions,
+  "floating-panel": floatingPanel,
+  carousel,
+  citation,
+  "agent-presence": agentPresence,
   announcements,
   autosize: autosize,
   "hidden-form-input": hiddenFormInput,
@@ -112,6 +132,7 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   accordion,
   alert,
   "aspect-ratio": aspectRatio,
+  "angle-slider": angleSlider,
   avatar,
   badge,
   breadcrumbs,
@@ -122,12 +143,14 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   "code-block": codeBlock,
   collapsible,
   "color-picker": colorPicker,
+  "color-wheel": colorWheel,
   combobox,
   collections,
   "context-menu": contextMenu,
   "date-field": dateField,
   dialog,
   drawer,
+  editable,
   field,
   "focus-and-modality": focusAndModality,
   fieldset,
@@ -168,9 +191,16 @@ export const examples: Readonly<Record<string, ExampleModule>> = {
   slider,
   splitter,
   kbd,
+  "tool-call": toolCall,
+  "message-actions": messageActions,
+  "context-meter": contextMeter,
+  suggestions,
+  "json-tree-view": jsonTreeView,
+  "signature-pad": signaturePad,
   sortable,
   stepper,
   timeline,
+  timer,
   "table-of-contents": tableOfContents,
   "streaming-message": streamingMessage,
   switch: switchEx,

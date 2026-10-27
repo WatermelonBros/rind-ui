@@ -18,9 +18,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )
   ) {
     position: relative;
@@ -62,9 +63,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="solid"]:is(
       [data-hover],
       [data-part="trigger"]:hover,
@@ -80,9 +82,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     ):not([data-variant]):is(
       [data-hover],
       [data-part="trigger"]:hover,
@@ -102,9 +105,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="soft"]
   ) {
     background: var(--rind-button-soft-bg, var(--rind-color-accent-soft));
@@ -120,9 +124,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="soft"]:is(
       [data-hover],
       [data-part="trigger"]:hover,
@@ -142,9 +147,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="outline"]
   ) {
     background: var(--rind-button-outline-bg, var(--rind-color-surface-raised));
@@ -161,9 +167,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="outline"]:is(
       [data-hover],
       [data-part="trigger"]:hover,
@@ -184,9 +191,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="ghost"]
   ) {
     background: transparent;
@@ -203,9 +211,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-variant="ghost"]:is(
       [data-hover],
       [data-part="trigger"]:hover,
@@ -225,9 +234,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-pressed]
   ) {
     translate: 0 1px;
@@ -243,9 +253,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-pending]
   ) {
     cursor: progress;
@@ -266,9 +277,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-pending]
   )::after {
     content: "";
@@ -300,9 +312,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-pending]:is([data-variant="soft"], [data-variant="outline"], [data-variant="ghost"])
   )::after {
     background: var(--rind-button-pilot-color, var(--rind-color-accent-text));
@@ -318,9 +331,10 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
-          [data-scope="timer"][data-part="action-trigger"]
+          [data-scope="timer"][data-part="action-trigger"],
+          [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
         )[data-pending]
       )::after {
       animation: none;
@@ -337,9 +351,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-pending]:not([data-disabled])
   ) {
     color: color-mix(in oklab, currentColor 70%, transparent);
@@ -355,9 +370,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-disabled]:not([data-pending])
   ) {
     background: var(--rind-button-disabled-bg, var(--rind-color-surface));
@@ -377,9 +393,10 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
-      [data-scope="timer"][data-part="action-trigger"]
+      [data-scope="timer"][data-part="action-trigger"],
+      [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
     )[data-disabled][data-variant="ghost"]
   ) {
     background: transparent;
@@ -396,9 +413,10 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
-          [data-scope="timer"][data-part="action-trigger"]
+          [data-scope="timer"][data-part="action-trigger"],
+          [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
         )
       ) {
       background: ButtonFace;
@@ -415,9 +433,10 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
-          [data-scope="timer"][data-part="action-trigger"]
+          [data-scope="timer"][data-part="action-trigger"],
+          [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
         )[data-disabled]
       ) {
       color: GrayText;
@@ -433,9 +452,10 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
-          [data-scope="timer"][data-part="action-trigger"]
+          [data-scope="timer"][data-part="action-trigger"],
+          [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
         )[data-pending]
       )::after {
       background: Highlight;

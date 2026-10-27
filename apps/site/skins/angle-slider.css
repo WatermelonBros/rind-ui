@@ -1,0 +1,90 @@
+/* ── Angle Slider: a dial with a thick ring, ticks inside it, a knob on the ring and the angle
+   under it; the gradient swatch beside it in the first example. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="angle-slider"][data-part="root"] {
+  display: grid;
+  justify-items: center;
+  /* The knob rides 2px outside the ring: keep it clear of the label. */
+  gap: 16px;
+  color: var(--s-ink);
+  font: 600 14px var(--s-font);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="angle-slider"][data-part="control"] {
+  inline-size: 140px;
+  block-size: 140px;
+  border-radius: 50%;
+  border: 10px solid var(--s-muted);
+  box-sizing: border-box;
+  background: var(--s-card);
+  box-shadow: var(--s-lift-lo);
+  cursor: grab;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="angle-slider"][data-part="control"][data-dragging] {
+  cursor: grabbing;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="angle-slider"][data-part="marker"] {
+  position: absolute;
+  inset: 0;
+  rotate: var(--rind-angle-slider-marker-angle);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="angle-slider"][data-part="marker"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-start: calc(50% - 1px);
+  inline-size: 2px;
+  block-size: 8px;
+  border-radius: 1px;
+  background: color-mix(in oklab, var(--s-ink) 40%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="angle-slider"][data-part="marker"][data-state="at-value"]::before {
+  background: var(--s-ink);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="angle-slider"][data-part="thumb"] {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="angle-slider"][data-part="thumb"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-start: calc(50% - 12px);
+  inline-size: 24px;
+  block-size: 24px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--s-brand);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift-lo);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="angle-slider"][data-part="thumb"][data-focus-visible]::before {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="angle-slider"][data-part="value"] {
+  font: 800 20px var(--s-font);
+  font-variant-numeric: tabular-nums;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .angle-row {
+  align-items: center;
+  gap: 28px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) .angle-swatch {
+  inline-size: 120px;
+  block-size: 120px;
+  border-radius: var(--s-r);
+  border: var(--s-bw) solid var(--s-line);
+  box-shadow: var(--s-lift-lo);
+}
+
+/* Keyboard focus on the hidden input shows on the dial too: the ring a sighted keyboard user looks for. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="angle-slider"][data-part="control"]:has([data-focus-visible]) {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 4px;
+}

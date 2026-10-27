@@ -1,0 +1,58 @@
+/*
+ * Suggestions (family: toggle item): a wrapping row of chips. Each Item is a soft pill by
+ * default (outline, ghost through data-variant), at least 24 px tall; a disabled one keeps its
+ * place and focus, dimmed. The Description sits under the Label in a smaller, muted face.
+ */
+@layer rind.components {
+  :where([data-scope="suggestions"][data-part="root"]) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rind-suggestions-gap, var(--rind-space-2));
+  }
+
+  :where([data-scope="suggestions"][data-part="item"]) {
+    display: inline-grid;
+    justify-items: start;
+    gap: 0.1em;
+    min-block-size: max(24px, var(--rind-suggestions-item-height, var(--rind-size-md)));
+    padding: var(--rind-space-1) var(--rind-space-3);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-suggestions-item-radius, var(--rind-radius-full));
+    background: var(--rind-suggestions-item-bg, var(--rind-color-neutral-soft));
+    color: var(--rind-suggestions-item-color, var(--rind-color-text));
+    font: inherit;
+    font-size: var(--rind-text-sm);
+    text-align: start;
+    cursor: pointer;
+    transition: background var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  :where([data-scope="suggestions"][data-part="item"]:not([data-disabled]):hover) {
+    background: var(--rind-suggestions-item-hover-bg, var(--rind-color-neutral-soft-hover));
+  }
+
+  :where([data-scope="suggestions"][data-part="item"][data-variant="outline"]) {
+    background: transparent;
+    border-color: var(--rind-color-border-strong);
+  }
+
+  :where([data-scope="suggestions"][data-part="item"][data-variant="ghost"]) {
+    background: transparent;
+  }
+
+  :where([data-scope="suggestions"][data-part="item"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  :where([data-scope="suggestions"][data-part="description"]) {
+    font-size: var(--rind-text-xs);
+    color: var(--rind-suggestions-description-color, var(--rind-color-text-muted));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="suggestions"][data-part="item"]) {
+      transition: none;
+    }
+  }
+}

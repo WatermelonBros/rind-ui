@@ -1,0 +1,149 @@
+/*
+ * Angle Slider (family: field): a round Control with a ring track; the Thumb is a box the size
+ * of the Control rotated by `--rind-angle-slider-angle` (set on the Root), with its dot drawn at
+ * the top of the ring, so the dot travels the ring. The focus ring is on the dot while the
+ * hidden input has keyboard focus. Markers are ticks placed the same way by their own angle.
+ * `data-size` on the Root picks the diameter.
+ */
+@layer rind.components {
+  :where([data-scope="angle-slider"][data-part="root"]) {
+    display: inline-grid;
+    justify-items: center;
+    gap: var(--rind-angle-slider-gap, var(--rind-space-2));
+    color: var(--rind-angle-slider-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="angle-slider"][data-part="label"]) {
+    font-size: var(--rind-angle-slider-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-angle-slider-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+  }
+
+  /* The ring: a round surface with a thick border as the track. */
+  :where([data-scope="angle-slider"][data-part="control"]) {
+    box-sizing: border-box;
+    inline-size: var(--rind-angle-slider-size, calc(var(--rind-size-md) * 3));
+    block-size: var(--rind-angle-slider-size, calc(var(--rind-size-md) * 3));
+    border: var(--rind-angle-slider-track-width, var(--rind-space-2)) solid
+      var(--rind-angle-slider-track, var(--rind-color-border));
+    border-radius: 50%;
+    background: var(--rind-angle-slider-bg, var(--rind-color-surface-raised));
+    box-shadow: var(--rind-angle-slider-shadow, var(--rind-shadow-key-pressed));
+    cursor: grab;
+  }
+
+  :where([data-scope="angle-slider"][data-part="root"][data-size="sm"] [data-part="control"]) {
+    inline-size: var(--rind-angle-slider-size, calc(var(--rind-size-sm) * 3));
+    block-size: var(--rind-angle-slider-size, calc(var(--rind-size-sm) * 3));
+  }
+
+  :where([data-scope="angle-slider"][data-part="root"][data-size="lg"] [data-part="control"]) {
+    inline-size: var(--rind-angle-slider-size, calc(var(--rind-size-lg) * 3));
+    block-size: var(--rind-angle-slider-size, calc(var(--rind-size-lg) * 3));
+  }
+
+  :where([data-scope="angle-slider"][data-part="control"][data-dragging]) {
+    cursor: grabbing;
+  }
+
+  /* The Thumb fills the ring's inside and turns; its dot sits on the ring at the top. */
+  :where([data-scope="angle-slider"][data-part="thumb"]) {
+    position: absolute;
+    inset: calc(-1 * var(--rind-angle-slider-track-width, var(--rind-space-2)));
+    pointer-events: none;
+  }
+
+  :where([data-scope="angle-slider"][data-part="thumb"])::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 50%;
+    box-sizing: border-box;
+    inline-size: var(--rind-angle-slider-thumb-size, var(--rind-hit-area));
+    block-size: var(--rind-angle-slider-thumb-size, var(--rind-hit-area));
+    translate: -50%
+      calc(
+        (
+          var(--rind-angle-slider-track-width, var(--rind-space-2)) -
+          var(--rind-angle-slider-thumb-size, var(--rind-hit-area))
+        ) /
+        2
+      );
+    border: var(--rind-border-width) solid var(--rind-color-border-strong);
+    border-radius: 50%;
+    background: var(--rind-angle-slider-thumb, var(--rind-color-accent));
+    box-shadow: var(--rind-shadow-sm);
+    pointer-events: auto;
+  }
+
+  :where([data-scope="angle-slider"][data-part="thumb"][data-focus-visible])::before {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  :where([data-scope="angle-slider"][data-part="value"]) {
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-angle-slider-value-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="angle-slider"][data-part="marker-group"]) {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* A tick at the inner edge of the ring, turned to its own angle. */
+  :where([data-scope="angle-slider"][data-part="marker"]) {
+    position: absolute;
+    inset: 0;
+    rotate: var(--rind-angle-slider-marker-angle);
+  }
+
+  :where([data-scope="angle-slider"][data-part="marker"])::before {
+    content: "";
+    position: absolute;
+    inset-block-start: var(--rind-space-1);
+    inset-inline-start: 50%;
+    inline-size: var(--rind-border-width);
+    block-size: var(--rind-space-2);
+    translate: -50% 0;
+    background: var(--rind-angle-slider-marker, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="angle-slider"][data-part="root"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="angle-slider"][data-part="control"][data-disabled]) {
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  :where([data-scope="angle-slider"][data-part="thumb"][data-disabled])::before {
+    background: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="angle-slider"][data-part="control"][data-readonly]) {
+    cursor: default;
+  }
+
+  :where([data-scope="angle-slider"][data-part="control"][data-invalid]) {
+    border-color: var(--rind-angle-slider-invalid, var(--rind-color-danger-border));
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="angle-slider"][data-part="control"]) {
+      border-color: CanvasText;
+    }
+    :where([data-scope="angle-slider"][data-part="thumb"])::before {
+      background: Highlight;
+      border-color: CanvasText;
+      forced-color-adjust: none;
+    }
+    :where([data-scope="angle-slider"][data-part="marker"])::before {
+      background: CanvasText;
+      forced-color-adjust: none;
+    }
+  }
+}

@@ -1,0 +1,7 @@
+- group "Suggestions":
+  - button "Summarise"
+  - button "Draft a reply Polite, two paragraphs"
+  - button "Find action items"
+- paragraph: "Picked: nothing yet"
+- log
+- log

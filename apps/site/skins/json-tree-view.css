@@ -1,0 +1,53 @@
+/* ── JSON Tree View: the Tree View's rows (tree-view.css) with the item text in the mono face
+   and the value types told apart by colour and by form (strings quoted, ranges italic). ── */
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="tree-view"][data-part="item"][data-key]
+  [data-part="item-text"] {
+  font:
+    500 13px / 1.5 ui-monospace,
+    "SF Mono",
+    Menlo,
+    monospace;
+  white-space: nowrap;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="json-tree-view"][data-part="key"] {
+  font-weight: 700;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="key"][data-type="range"] {
+  font-style: italic;
+  font-weight: 500;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"]:is(
+    [data-part="summary"],
+    [data-part="preview"],
+    [data-part="separator"]
+  ) {
+  opacity: 0.7;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="value"][data-quoted]::before,
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="value"][data-quoted]::after {
+  content: '"';
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="value"][data-type="string"] {
+  color: var(--s-acc-deep);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="value"]:is([data-type="number"], [data-type="bigint"]) {
+  color: var(--s-brand-deep);
+  text-decoration: underline dotted 1px;
+  text-underline-offset: 3px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="json-tree-view"][data-part="value"]:is(
+    [data-type="null"],
+    [data-type="undefined"],
+    [data-type="boolean"],
+    [data-type="circular"]
+  ) {
+  font-style: italic;
+}

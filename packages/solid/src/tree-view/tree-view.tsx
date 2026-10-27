@@ -209,6 +209,8 @@ const useHost = (part: string): Host => {
   return host
 }
 const ItemContext = createContext<Accessor<CollectionKey>>()
+/** The enclosing `TreeView.Item`'s key, or undefined outside one (parts built on Tree View). */
+export const useTreeViewItemKey = (): Accessor<CollectionKey> | undefined => useContext(ItemContext)
 const useItemKey = (part: string) => {
   const key = useContext(ItemContext)
   if (!key) throw new Error(`TreeView.${part} must be inside TreeView.Item`)

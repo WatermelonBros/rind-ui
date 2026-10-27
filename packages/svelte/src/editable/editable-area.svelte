@@ -1,0 +1,17 @@
+<script lang="ts">
+import { stripMarker } from "@rind-ui/core/internal"
+import { mergeProps } from "../merge-props"
+import { attrs, normalizeProps } from "../normalize-props"
+import { editableContext } from "./context"
+import type { EditableDivProps } from "./types"
+
+const { child, children, ...rest }: EditableDivProps = $props()
+const ctx = editableContext.get()
+const merged = $derived(stripMarker(mergeProps(normalizeProps(ctx.api().area()), rest)))
+</script>
+
+{#if child}
+  {@render child({ props: merged, state: ctx.state() })}
+{:else}
+  <div {...attrs(merged)}>{@render children?.(ctx.state())}</div>
+{/if}

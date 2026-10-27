@@ -1,0 +1,13 @@
+- article "Assistant message":
+  - paragraph: Rind gives you the behaviour, keyboard and accessibility of each component; the look is yours.
+  - toolbar "Message actions":
+    - button "Copy"
+    - button "Regenerate"
+    - group "Feedback":
+      - button "Good response"
+      - button "Bad response"
+    - group "Versions":
+      - button "Previous version": ‹
+      - button "Next version": ›
+- log
+- log

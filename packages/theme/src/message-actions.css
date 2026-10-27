@@ -1,0 +1,99 @@
+/*
+ * Message Actions (family: toggle item): a row of ghost icon keys (at least 24 × 24 px). An
+ * inactive row fades out but keeps its place and its items (never removed: focus stays); it
+ * is fully shown when active, focused within, or on a device without hover. Versions sit as a
+ * small "‹ 2 / 3 ›" group.
+ */
+@layer rind.components {
+  :where([data-scope="message-actions"][data-part="root"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--rind-message-actions-gap, var(--rind-space-1));
+    opacity: 0;
+    transition: opacity var(--rind-duration-fast) var(--rind-ease-out);
+  }
+
+  :where([data-scope="message-actions"][data-part="root"]:is([data-active], :focus-within)) {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    :where([data-scope="message-actions"][data-part="root"]) {
+      opacity: 1;
+    }
+  }
+
+  :where(
+    [data-scope="message-actions"]:is(
+      [data-part="item"],
+      [data-part="regenerate"],
+      [data-part="edit"],
+      [data-part="feedback-item"],
+      [data-part="version-previous"],
+      [data-part="version-next"]
+    )
+  ),
+  :where([data-scope="message-actions"][data-part="copy"] [data-part="trigger"]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 24px;
+    min-block-size: max(24px, var(--rind-size-sm));
+    padding-inline: var(--rind-space-1);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="message-actions"]:is(
+      [data-part="item"],
+      [data-part="regenerate"],
+      [data-part="edit"],
+      [data-part="feedback-item"],
+      [data-part="version-previous"],
+      [data-part="version-next"]
+    ):not([data-disabled]):hover
+  ) {
+    background: var(--rind-color-neutral-soft);
+    color: var(--rind-color-text);
+  }
+
+  :where(
+    [data-scope="message-actions"]:is(
+      [data-part="edit"][data-state="on"],
+      [data-part="feedback-item"][aria-pressed="true"]
+    )
+  ) {
+    color: var(--rind-color-accent-text);
+    background: var(--rind-color-accent-soft);
+  }
+
+  :where([data-scope="message-actions"][data-part][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  :where([data-scope="message-actions"]:is([data-part="feedback"], [data-part="versions"])) {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  :where([data-scope="message-actions"][data-part="version-status"]) {
+    min-inline-size: 3ch;
+    text-align: center;
+    font-size: var(--rind-text-xs);
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-color-text-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="message-actions"][data-part="root"]) {
+      transition: none;
+    }
+  }
+}

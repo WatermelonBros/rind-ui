@@ -1,0 +1,13 @@
+- button "Inspector"
+- dialog "Inspector":
+  - button "Move panel": ⠿ Arrow keys move, Alt plus arrow keys resize, Enter maximises
+  - heading "Inspector" [level=2]
+  - button "Minimise": –
+  - button "Maximise": □
+  - button "×"
+  - term: Element
+  - definition: button.primary
+  - term: Size
+  - definition: 120 × 40
+  - term: Contrast
+  - definition: "7.2 : 1"

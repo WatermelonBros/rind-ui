@@ -1,0 +1,72 @@
+/* ── Signature Pad: the card surface to sign on (ink is the skin's ink), a dashed line with an
+   "×", and Undo / Clear as small keys under it. Disabled keys dim (base.css) and keep focus. ── */
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="signature-pad"][data-part="root"] {
+  display: grid;
+  gap: 8px;
+  inline-size: min(100%, 380px);
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="signature-pad"][data-part="label"] {
+  font-weight: 600;
+  font-size: 15px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="signature-pad"][data-part="control"] {
+  position: relative;
+  block-size: 150px;
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-field-line);
+  border-radius: var(--s-r);
+  box-shadow: var(--s-lift-lo);
+  color: var(--s-ink);
+  cursor: crosshair;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="signature-pad"][data-part="control"][data-invalid] {
+  border-color: var(--s-error);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="signature-pad"][data-part="control"]:focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="signature-pad"][data-part="segment"] {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  stroke-width: 2.75px;
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="signature-pad"][data-part="guide"] {
+  position: absolute;
+  inset-inline: 22px;
+  inset-block-end: 30%;
+  border-block-end: 2px dashed color-mix(in oklab, var(--s-ink) 35%, transparent);
+  pointer-events: none;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="signature-pad"][data-part="guide"]::before {
+  content: "×";
+  position: absolute;
+  inset-block-end: 2px;
+  font: 600 18px / 1 var(--s-font);
+  color: color-mix(in oklab, var(--s-ink) 60%, transparent);
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="signature-pad"]:is([data-part="clear-trigger"], [data-part="undo-trigger"]) {
+  font: 600 13px var(--s-font);
+  color: var(--s-ink);
+  background: var(--s-card);
+  border: var(--s-bw) solid var(--s-line);
+  border-radius: var(--s-r-sm);
+  box-shadow: var(--s-lift-lo);
+  padding: 7px 14px;
+  cursor: pointer;
+}
+:is([data-skinned], [data-rind-theme^="skin-"])
+  [data-scope="signature-pad"]:is(
+    [data-part="clear-trigger"],
+    [data-part="undo-trigger"]
+  ):focus-visible {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 2px;
+}

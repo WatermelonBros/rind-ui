@@ -251,6 +251,7 @@ const Root = <R extends DialogRole = "dialog">(props: DialogRootProps<R>) => (
 )
 
 type Own<T extends keyof React.JSX.IntrinsicElements, S = undefined> = ComponentPropsWithRef<T> & {
+  /** Another element or a render function receiving the props and the part's state. */
   readonly render?: RenderProp<S>
 }
 

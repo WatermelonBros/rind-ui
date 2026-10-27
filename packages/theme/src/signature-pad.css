@@ -1,0 +1,122 @@
+/*
+ * Signature Pad (family: field): the Control is the field surface (border, radius, soft or
+ * outline), the ink is the text colour (currentColor on the paths), the Guide a dashed
+ * baseline with an "×" at its start. Clear and Undo are small ghost keys in the top end corner,
+ * outside the strokes' usual area, at least 24 × 24 px. Forced colors: CanvasText ink, GrayText
+ * guide; the border is a border, so it survives.
+ */
+@layer rind.components {
+  :where([data-scope="signature-pad"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-signature-pad-gap, var(--rind-space-2));
+    inline-size: min(100%, var(--rind-signature-pad-width, 28rem));
+  }
+
+  :where([data-scope="signature-pad"][data-part="label"]) {
+    font-size: var(--rind-signature-pad-label-font-size, var(--rind-text-sm));
+    font-weight: var(--rind-signature-pad-label-font-weight, 580);
+    line-height: var(--rind-leading-normal);
+    color: var(--rind-signature-pad-label-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="signature-pad"][data-part="control"]) {
+    position: relative;
+    block-size: var(--rind-signature-pad-height, 10rem);
+    border: var(--rind-border-width) solid
+      var(--rind-signature-pad-border, var(--rind-color-border-strong));
+    border-radius: var(--rind-signature-pad-radius, var(--rind-radius-control));
+    background: var(--rind-signature-pad-bg, var(--rind-color-surface));
+    color: var(--rind-signature-pad-ink, var(--rind-color-text));
+    cursor: crosshair;
+  }
+
+  :where([data-scope="signature-pad"][data-part="root"][data-variant="soft"])
+    :where([data-part="control"]) {
+    background: var(--rind-signature-pad-soft-bg, var(--rind-color-neutral-soft));
+  }
+
+  :where([data-scope="signature-pad"][data-part="control"][data-invalid]) {
+    border-color: var(--rind-signature-pad-invalid-border, var(--rind-color-danger-border));
+  }
+
+  :where([data-scope="signature-pad"][data-part="control"]:is([data-disabled], [data-readonly])) {
+    cursor: default;
+  }
+
+  :where([data-scope="signature-pad"][data-part="control"][data-disabled]) {
+    color: var(--rind-color-text-disabled);
+  }
+
+  :where([data-scope="signature-pad"][data-part="segment"]) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    stroke-width: var(--rind-signature-pad-stroke-width, 2.5px);
+    pointer-events: none;
+  }
+
+  :where([data-scope="signature-pad"][data-part="guide"]) {
+    position: absolute;
+    inset-inline: var(--rind-space-6);
+    inset-block-end: 28%;
+    border-block-end: 1px dashed
+      var(--rind-signature-pad-guide-color, var(--rind-color-border-strong));
+    pointer-events: none;
+  }
+
+  :where([data-scope="signature-pad"][data-part="guide"])::before {
+    content: "×";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-end: 0.15em;
+    color: var(--rind-signature-pad-guide-color, var(--rind-color-text-muted));
+    font-size: var(--rind-text-md);
+    line-height: 1;
+  }
+
+  :where([data-scope="signature-pad"]:is([data-part="clear-trigger"], [data-part="undo-trigger"])) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--rind-space-1);
+    min-inline-size: 24px;
+    min-block-size: max(24px, var(--rind-size-sm));
+    padding-inline: var(--rind-space-2);
+    border: var(--rind-border-width) solid transparent;
+    border-radius: var(--rind-radius-control);
+    background: transparent;
+    color: var(--rind-color-text-muted);
+    font: inherit;
+    font-size: var(--rind-text-xs);
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="signature-pad"]:is([data-part="clear-trigger"], [data-part="undo-trigger"]):not(
+      [data-disabled]
+    ):hover
+  ) {
+    background: var(--rind-color-neutral-soft);
+    color: var(--rind-color-text);
+  }
+
+  :where(
+    [data-scope="signature-pad"]:is(
+      [data-part="clear-trigger"],
+      [data-part="undo-trigger"]
+    )[data-disabled]
+  ) {
+    color: var(--rind-color-text-disabled);
+    cursor: default;
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="signature-pad"][data-part="control"]) {
+      color: CanvasText;
+    }
+    :where([data-scope="signature-pad"][data-part="guide"]) {
+      border-color: GrayText;
+    }
+  }
+}

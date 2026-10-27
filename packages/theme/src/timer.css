@@ -1,0 +1,59 @@
+/*
+ * Timer (family: decoration): the time as a row of units in tabular figures, each unit's
+ * caption small and muted under it. The ActionTriggers are keys (button.css: triggers styled
+ * as buttons). A completed timer turns the accent's text colour; a paused one dims its time a
+ * little, never below 4.5:1 (it stays the text colour, at reduced emphasis by weight).
+ */
+@layer rind.components {
+  :where([data-scope="timer"][data-part="root"]) {
+    display: grid;
+    justify-items: start;
+    gap: var(--rind-timer-gap, var(--rind-space-3));
+    color: var(--rind-timer-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="timer"][data-part="area"]) {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--rind-timer-area-gap, var(--rind-space-1));
+    font-family: var(--rind-timer-font-family, var(--rind-font-sans));
+    font-size: var(--rind-timer-font-size, calc(var(--rind-text-lg) * 2));
+    font-weight: var(--rind-timer-font-weight, 600);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--rind-tracking-tight);
+    line-height: var(--rind-leading-tight);
+  }
+
+  :where([data-scope="timer"][data-part="item"]) {
+    display: inline-grid;
+    justify-items: center;
+    gap: var(--rind-timer-item-gap, 0.15em);
+    min-inline-size: 2ch;
+  }
+
+  :where([data-scope="timer"][data-part="item-label"]) {
+    font-size: var(--rind-timer-label-font-size, var(--rind-text-xs));
+    font-weight: var(--rind-timer-label-font-weight, 500);
+    letter-spacing: var(--rind-tracking-label);
+    text-transform: uppercase;
+    color: var(--rind-timer-label-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="timer"][data-part="separator"]) {
+    color: var(--rind-timer-separator-color, var(--rind-color-text-muted));
+  }
+
+  :where([data-scope="timer"][data-part="control"]) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rind-timer-control-gap, var(--rind-space-2));
+  }
+
+  :where([data-scope="timer"][data-part="area"][data-state="paused"]) {
+    font-weight: var(--rind-timer-paused-font-weight, 450);
+  }
+
+  :where([data-scope="timer"][data-part="area"][data-state="completed"]) {
+    color: var(--rind-timer-completed-color, var(--rind-color-accent-text));
+  }
+}

@@ -21,10 +21,16 @@ afterEach(() => {
 
 let count = 0
 
-/** Attributes of every element below `root`, in document order. */
+/**
+ * Attributes of every element below `root`, in document order; not `ngh`, Angular's own
+ * hydration annotation on a component's host, which it removes once that view is hydrated.
+ */
 const snapshot = (root: Element) =>
   Array.from(root.querySelectorAll("*"), (el) =>
-    el.getAttributeNames().map((name) => `${name}=${el.getAttribute(name)}`),
+    el
+      .getAttributeNames()
+      .filter((name) => name !== "ngh")
+      .map((name) => `${name}=${el.getAttribute(name)}`),
   )
 
 /** Hydrates `fixture`'s server HTML; returns its host once the client is stable. */

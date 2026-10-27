@@ -1,0 +1,164 @@
+/*
+ * Carousel (family: decoration): the Viewport a scroll-snap row (or column) with its scrollbar
+ * hidden, slides sized from the Root's `--rind-carousel-slides-per-page` and
+ * `--rind-carousel-spacing` (set by the component), round Prev and Next buttons, and dot
+ * indicators where the current one is a wider pill (not only a colour). Reduced motion: no
+ * smooth scroll.
+ */
+@layer rind.components {
+  :where([data-scope="carousel"][data-part="root"]) {
+    display: grid;
+    gap: var(--rind-carousel-gap, var(--rind-space-3));
+    color: var(--rind-carousel-color, var(--rind-color-text));
+  }
+
+  :where([data-scope="carousel"][data-part="viewport"]) {
+    gap: var(--rind-carousel-spacing, 0px);
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    border-radius: var(--rind-carousel-radius, var(--rind-radius-md));
+  }
+
+  :where([data-scope="carousel"][data-part="viewport"])::-webkit-scrollbar {
+    display: none;
+  }
+
+  :where([data-scope="carousel"][data-part="viewport"]:focus-visible) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* n slides per page, n - 1 gaps between them. */
+  :where([data-scope="carousel"][data-part="slide"][data-orientation="horizontal"]) {
+    inline-size: calc(
+      (100% - (var(--rind-carousel-slides-per-page, 1) - 1) * var(--rind-carousel-spacing, 0px)) /
+      var(--rind-carousel-slides-per-page, 1)
+    );
+  }
+
+  :where([data-scope="carousel"][data-part="slide"][data-orientation="vertical"]) {
+    block-size: calc(
+      (100% - (var(--rind-carousel-slides-per-page, 1) - 1) * var(--rind-carousel-spacing, 0px)) /
+      var(--rind-carousel-slides-per-page, 1)
+    );
+  }
+
+  :where([data-scope="carousel"][data-part="control"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--rind-space-2);
+  }
+
+  :where(
+    [data-scope="carousel"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"],
+      [data-part="autoplay-trigger"]
+    )
+  ) {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    inline-size: var(--rind-carousel-trigger-size, var(--rind-size-md));
+    block-size: var(--rind-carousel-trigger-size, var(--rind-size-md));
+    padding: 0;
+    border: var(--rind-border-width) solid var(--rind-color-border);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-carousel-trigger-bg, var(--rind-color-surface-raised));
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  :where(
+    [data-scope="carousel"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"],
+      [data-part="autoplay-trigger"]
+    )
+  ):hover {
+    border-color: var(--rind-color-border-strong);
+  }
+
+  :where(
+    [data-scope="carousel"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"],
+      [data-part="autoplay-trigger"],
+      [data-part="indicator"]
+    )[data-focus-visible]
+  ) {
+    outline: var(--rind-focus-width) solid var(--rind-focus-color);
+    outline-offset: var(--rind-focus-offset);
+  }
+
+  /* At an end without loop: still focusable (aria-disabled), visibly inactive. */
+  :where(
+    [data-scope="carousel"]:is(
+      [data-part="prev-trigger"],
+      [data-part="next-trigger"]
+    )[data-disabled]
+  ) {
+    color: var(--rind-color-text-disabled);
+    cursor: not-allowed;
+  }
+
+  :where([data-scope="carousel"][data-part="indicator-group"]) {
+    display: flex;
+    justify-content: center;
+    gap: var(--rind-space-1);
+  }
+
+  /* A dot; the hit area is the button, the dot its ::before. */
+  :where([data-scope="carousel"][data-part="indicator"]) {
+    display: inline-grid;
+    place-items: center;
+    box-sizing: border-box;
+    min-inline-size: var(--rind-hit-area);
+    min-block-size: var(--rind-hit-area);
+    padding: 0;
+    border: 0;
+    border-radius: var(--rind-radius-full);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  :where([data-scope="carousel"][data-part="indicator"])::before {
+    content: "";
+    inline-size: var(--rind-carousel-dot-size, 0.5rem);
+    block-size: var(--rind-carousel-dot-size, 0.5rem);
+    border-radius: var(--rind-radius-full);
+    background: var(--rind-carousel-dot, var(--rind-color-text-muted));
+    transition: inline-size var(--rind-duration-fast) ease;
+  }
+
+  /* The current page: a wider pill in the accent, not only a different colour. */
+  :where([data-scope="carousel"][data-part="indicator"][data-current])::before {
+    inline-size: calc(var(--rind-carousel-dot-size, 0.5rem) * 3);
+    background: var(--rind-carousel-dot-current, var(--rind-color-accent-solid));
+  }
+
+  :where([data-scope="carousel"][data-part="status"]) {
+    font-size: var(--rind-text-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--rind-carousel-status-color, var(--rind-color-text-muted));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where([data-scope="carousel"][data-part="viewport"]) {
+      scroll-behavior: auto;
+    }
+    :where([data-scope="carousel"][data-part="indicator"])::before {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where([data-scope="carousel"][data-part="indicator"])::before {
+      background: CanvasText;
+    }
+    :where([data-scope="carousel"][data-part="indicator"][data-current])::before {
+      background: Highlight;
+    }
+  }
+}

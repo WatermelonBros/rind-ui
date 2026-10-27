@@ -67,12 +67,15 @@ export interface ToolbarState {
 export type ToolbarRootProps = Omit<ComponentPropsWithRef<"div">, "children"> & {
   /** The toolbar's controls and separators. */
   readonly children?: ReactNode
+  /** Which arrows move focus (vertical: Up and Down); `aria-orientation` only when vertical. */
   readonly orientation?: "horizontal" | "vertical"
   /** Arrow moves wrap at both ends (default true). */
   readonly loop?: boolean
+  /** Disables every control. */
   readonly disabled?: boolean
   /** Disabled controls stay focusable and reachable by arrows (default true). */
   readonly focusableWhenDisabled?: boolean
+  /** `focus()` moves focus to the toolbar's tab stop (an application shortcut). */
   readonly actionsRef?: Ref<ToolbarActions>
   readonly render?: RenderProp<ToolbarState>
 }

@@ -42,10 +42,20 @@
       "types": "./dist/accordion/index.d.ts",
       "default": "./dist/accordion/index.js"
     },
+    "./agent-presence": {
+      "@rind-ui/source": "./src/agent-presence/index.ts",
+      "types": "./dist/agent-presence/index.d.ts",
+      "default": "./dist/agent-presence/index.js"
+    },
     "./alert": {
       "@rind-ui/source": "./src/alert/index.ts",
       "types": "./dist/alert/index.d.ts",
       "default": "./dist/alert/index.js"
+    },
+    "./angle-slider": {
+      "@rind-ui/source": "./src/angle-slider/index.ts",
+      "types": "./dist/angle-slider/index.d.ts",
+      "default": "./dist/angle-slider/index.js"
     },
     "./avatar": {
       "@rind-ui/source": "./src/avatar/index.ts",
@@ -72,6 +82,11 @@
       "types": "./dist/calendar/index.d.ts",
       "default": "./dist/calendar/index.js"
     },
+    "./carousel": {
+      "@rind-ui/source": "./src/carousel/index.ts",
+      "types": "./dist/carousel/index.d.ts",
+      "default": "./dist/carousel/index.js"
+    },
     "./checkbox": {
       "@rind-ui/source": "./src/checkbox/index.ts",
       "types": "./dist/checkbox/index.d.ts",
@@ -81,6 +96,11 @@
       "@rind-ui/source": "./src/checkbox-group/index.ts",
       "types": "./dist/checkbox-group/index.d.ts",
       "default": "./dist/checkbox-group/index.js"
+    },
+    "./citation": {
+      "@rind-ui/source": "./src/citation/index.ts",
+      "types": "./dist/citation/index.d.ts",
+      "default": "./dist/citation/index.js"
     },
     "./clipboard": {
       "@rind-ui/source": "./src/clipboard/index.ts",
@@ -102,6 +122,11 @@
       "types": "./dist/color-picker/index.d.ts",
       "default": "./dist/color-picker/index.js"
     },
+    "./color-wheel": {
+      "@rind-ui/source": "./src/color-wheel/index.ts",
+      "types": "./dist/color-wheel/index.d.ts",
+      "default": "./dist/color-wheel/index.js"
+    },
     "./combobox": {
       "@rind-ui/source": "./src/combobox/index.ts",
       "types": "./dist/combobox/index.d.ts",
@@ -111,6 +136,11 @@
       "@rind-ui/source": "./src/context-menu/index.ts",
       "types": "./dist/context-menu/index.d.ts",
       "default": "./dist/context-menu/index.js"
+    },
+    "./context-meter": {
+      "@rind-ui/source": "./src/context-meter/index.ts",
+      "types": "./dist/context-meter/index.d.ts",
+      "default": "./dist/context-meter/index.js"
     },
     "./date-field": {
       "@rind-ui/source": "./src/date-field/index.ts",
@@ -127,6 +157,11 @@
       "types": "./dist/drawer/index.d.ts",
       "default": "./dist/drawer/index.js"
     },
+    "./editable": {
+      "@rind-ui/source": "./src/editable/index.ts",
+      "types": "./dist/editable/index.d.ts",
+      "default": "./dist/editable/index.js"
+    },
     "./field": {
       "@rind-ui/source": "./src/field/index.ts",
       "types": "./dist/field/index.d.ts",
@@ -141,6 +176,11 @@
       "@rind-ui/source": "./src/file-upload/index.ts",
       "types": "./dist/file-upload/index.d.ts",
       "default": "./dist/file-upload/index.js"
+    },
+    "./floating-panel": {
+      "@rind-ui/source": "./src/floating-panel/index.ts",
+      "types": "./dist/floating-panel/index.d.ts",
+      "default": "./dist/floating-panel/index.js"
     },
     "./form": {
       "@rind-ui/source": "./src/form/index.ts",
@@ -182,6 +222,11 @@
       "types": "./dist/image-viewer/index.d.ts",
       "default": "./dist/image-viewer/index.js"
     },
+    "./json-tree-view": {
+      "@rind-ui/source": "./src/json-tree-view/index.ts",
+      "types": "./dist/json-tree-view/index.d.ts",
+      "default": "./dist/json-tree-view/index.js"
+    },
     "./kbd": {
       "@rind-ui/source": "./src/kbd/index.ts",
       "types": "./dist/kbd/index.d.ts",
@@ -207,6 +252,11 @@
       "types": "./dist/marquee/index.d.ts",
       "default": "./dist/marquee/index.js"
     },
+    "./mentions": {
+      "@rind-ui/source": "./src/mentions/index.ts",
+      "types": "./dist/mentions/index.d.ts",
+      "default": "./dist/mentions/index.js"
+    },
     "./menu": {
       "@rind-ui/source": "./src/menu/index.ts",
       "types": "./dist/menu/index.d.ts",
@@ -216,6 +266,11 @@
       "@rind-ui/source": "./src/menubar/index.ts",
       "types": "./dist/menubar/index.d.ts",
       "default": "./dist/menubar/index.js"
+    },
+    "./message-actions": {
+      "@rind-ui/source": "./src/message-actions/index.ts",
+      "types": "./dist/message-actions/index.d.ts",
+      "default": "./dist/message-actions/index.js"
     },
     "./message-thread": {
       "@rind-ui/source": "./src/message-thread/index.ts",
@@ -302,6 +357,11 @@
       "types": "./dist/separator/index.d.ts",
       "default": "./dist/separator/index.js"
     },
+    "./signature-pad": {
+      "@rind-ui/source": "./src/signature-pad/index.ts",
+      "types": "./dist/signature-pad/index.d.ts",
+      "default": "./dist/signature-pad/index.js"
+    },
     "./skeleton": {
       "@rind-ui/source": "./src/skeleton/index.ts",
       "types": "./dist/skeleton/index.d.ts",
@@ -331,6 +391,11 @@
       "@rind-ui/source": "./src/streaming-message/index.ts",
       "types": "./dist/streaming-message/index.d.ts",
       "default": "./dist/streaming-message/index.js"
+    },
+    "./suggestions": {
+      "@rind-ui/source": "./src/suggestions/index.ts",
+      "types": "./dist/suggestions/index.d.ts",
+      "default": "./dist/suggestions/index.js"
     },
     "./switch": {
       "@rind-ui/source": "./src/switch/index.ts",
@@ -372,6 +437,11 @@
       "types": "./dist/timeline/index.d.ts",
       "default": "./dist/timeline/index.js"
     },
+    "./timer": {
+      "@rind-ui/source": "./src/timer/index.ts",
+      "types": "./dist/timer/index.d.ts",
+      "default": "./dist/timer/index.js"
+    },
     "./toast": {
       "@rind-ui/source": "./src/toast/index.ts",
       "types": "./dist/toast/index.d.ts",
@@ -386,6 +456,11 @@
       "@rind-ui/source": "./src/toggle-group/index.ts",
       "types": "./dist/toggle-group/index.d.ts",
       "default": "./dist/toggle-group/index.js"
+    },
+    "./tool-call": {
+      "@rind-ui/source": "./src/tool-call/index.ts",
+      "types": "./dist/tool-call/index.d.ts",
+      "default": "./dist/tool-call/index.js"
     },
     "./toolbar": {
       "@rind-ui/source": "./src/toolbar/index.ts",
@@ -458,9 +533,17 @@
         "types": "./dist/accordion/index.d.ts",
         "default": "./dist/accordion/index.js"
       },
+      "./agent-presence": {
+        "types": "./dist/agent-presence/index.d.ts",
+        "default": "./dist/agent-presence/index.js"
+      },
       "./alert": {
         "types": "./dist/alert/index.d.ts",
         "default": "./dist/alert/index.js"
+      },
+      "./angle-slider": {
+        "types": "./dist/angle-slider/index.d.ts",
+        "default": "./dist/angle-slider/index.js"
       },
       "./avatar": {
         "types": "./dist/avatar/index.d.ts",
@@ -482,6 +565,10 @@
         "types": "./dist/calendar/index.d.ts",
         "default": "./dist/calendar/index.js"
       },
+      "./carousel": {
+        "types": "./dist/carousel/index.d.ts",
+        "default": "./dist/carousel/index.js"
+      },
       "./checkbox": {
         "types": "./dist/checkbox/index.d.ts",
         "default": "./dist/checkbox/index.js"
@@ -489,6 +576,10 @@
       "./checkbox-group": {
         "types": "./dist/checkbox-group/index.d.ts",
         "default": "./dist/checkbox-group/index.js"
+      },
+      "./citation": {
+        "types": "./dist/citation/index.d.ts",
+        "default": "./dist/citation/index.js"
       },
       "./clipboard": {
         "types": "./dist/clipboard/index.d.ts",
@@ -506,6 +597,10 @@
         "types": "./dist/color-picker/index.d.ts",
         "default": "./dist/color-picker/index.js"
       },
+      "./color-wheel": {
+        "types": "./dist/color-wheel/index.d.ts",
+        "default": "./dist/color-wheel/index.js"
+      },
       "./combobox": {
         "types": "./dist/combobox/index.d.ts",
         "default": "./dist/combobox/index.js"
@@ -513,6 +608,10 @@
       "./context-menu": {
         "types": "./dist/context-menu/index.d.ts",
         "default": "./dist/context-menu/index.js"
+      },
+      "./context-meter": {
+        "types": "./dist/context-meter/index.d.ts",
+        "default": "./dist/context-meter/index.js"
       },
       "./date-field": {
         "types": "./dist/date-field/index.d.ts",
@@ -526,6 +625,10 @@
         "types": "./dist/drawer/index.d.ts",
         "default": "./dist/drawer/index.js"
       },
+      "./editable": {
+        "types": "./dist/editable/index.d.ts",
+        "default": "./dist/editable/index.js"
+      },
       "./field": {
         "types": "./dist/field/index.d.ts",
         "default": "./dist/field/index.js"
@@ -537,6 +640,10 @@
       "./file-upload": {
         "types": "./dist/file-upload/index.d.ts",
         "default": "./dist/file-upload/index.js"
+      },
+      "./floating-panel": {
+        "types": "./dist/floating-panel/index.d.ts",
+        "default": "./dist/floating-panel/index.js"
       },
       "./form": {
         "types": "./dist/form/index.d.ts",
@@ -570,6 +677,10 @@
         "types": "./dist/image-viewer/index.d.ts",
         "default": "./dist/image-viewer/index.js"
       },
+      "./json-tree-view": {
+        "types": "./dist/json-tree-view/index.d.ts",
+        "default": "./dist/json-tree-view/index.js"
+      },
       "./kbd": {
         "types": "./dist/kbd/index.d.ts",
         "default": "./dist/kbd/index.js"
@@ -590,6 +701,10 @@
         "types": "./dist/marquee/index.d.ts",
         "default": "./dist/marquee/index.js"
       },
+      "./mentions": {
+        "types": "./dist/mentions/index.d.ts",
+        "default": "./dist/mentions/index.js"
+      },
       "./menu": {
         "types": "./dist/menu/index.d.ts",
         "default": "./dist/menu/index.js"
@@ -597,6 +712,10 @@
       "./menubar": {
         "types": "./dist/menubar/index.d.ts",
         "default": "./dist/menubar/index.js"
+      },
+      "./message-actions": {
+        "types": "./dist/message-actions/index.d.ts",
+        "default": "./dist/message-actions/index.js"
       },
       "./message-thread": {
         "types": "./dist/message-thread/index.d.ts",
@@ -666,6 +785,10 @@
         "types": "./dist/separator/index.d.ts",
         "default": "./dist/separator/index.js"
       },
+      "./signature-pad": {
+        "types": "./dist/signature-pad/index.d.ts",
+        "default": "./dist/signature-pad/index.js"
+      },
       "./skeleton": {
         "types": "./dist/skeleton/index.d.ts",
         "default": "./dist/skeleton/index.js"
@@ -689,6 +812,10 @@
       "./streaming-message": {
         "types": "./dist/streaming-message/index.d.ts",
         "default": "./dist/streaming-message/index.js"
+      },
+      "./suggestions": {
+        "types": "./dist/suggestions/index.d.ts",
+        "default": "./dist/suggestions/index.js"
       },
       "./switch": {
         "types": "./dist/switch/index.d.ts",
@@ -722,6 +849,10 @@
         "types": "./dist/timeline/index.d.ts",
         "default": "./dist/timeline/index.js"
       },
+      "./timer": {
+        "types": "./dist/timer/index.d.ts",
+        "default": "./dist/timer/index.js"
+      },
       "./toast": {
         "types": "./dist/toast/index.d.ts",
         "default": "./dist/toast/index.js"
@@ -733,6 +864,10 @@
       "./toggle-group": {
         "types": "./dist/toggle-group/index.d.ts",
         "default": "./dist/toggle-group/index.js"
+      },
+      "./tool-call": {
+        "types": "./dist/tool-call/index.d.ts",
+        "default": "./dist/tool-call/index.js"
       },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
