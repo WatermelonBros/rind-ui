@@ -69,6 +69,7 @@
   gap: 6px;
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) .presence-demo .row button {
+  min-block-size: 24px;
   padding: 4px 10px;
   border: var(--s-bw) solid var(--s-line);
   border-radius: 99px;

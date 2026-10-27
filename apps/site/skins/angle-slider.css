@@ -81,3 +81,10 @@
   border: var(--s-bw) solid var(--s-line);
   box-shadow: var(--s-lift-lo);
 }
+
+/* Keyboard focus on the hidden input shows on the dial too: the ring a sighted keyboard user looks for. */
+:is([data-skinned], [data-rind-theme^="skin-"])
+[data-scope="angle-slider"][data-part="control"]:has([data-focus-visible]) {
+  outline: 3px solid var(--s-focus);
+  outline-offset: 4px;
+}

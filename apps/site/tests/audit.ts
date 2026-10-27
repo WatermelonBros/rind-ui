@@ -119,6 +119,9 @@ async function targets(frame: Locator, url: string, where: string) {
         const cs = getComputedStyle(el)
         if (cs.visibility === "hidden" || (el.matches("a[href]") && cs.display === "inline"))
           continue
+        // a visually hidden input is not the target: its visible part is (an angle slider's
+        // dial, a colour wheel's ring), as the focus check below treats it
+        if (el.matches("input") && cs.clipPath !== "none") continue
         if (r.width < 23.5 || r.height < 23.5)
           out.push(
             `${el.tagName.toLowerCase()}[data-part=${el.dataset["part"] ?? ""}] ${Math.round(r.width)}x${Math.round(r.height)}`,
