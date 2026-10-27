@@ -18,7 +18,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -63,7 +63,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -82,7 +82,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -105,7 +105,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -124,7 +124,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -147,7 +147,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -167,7 +167,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -191,7 +191,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -211,7 +211,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -234,7 +234,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -253,7 +253,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -277,7 +277,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -312,7 +312,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -331,7 +331,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"],
           [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -351,7 +351,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -370,7 +370,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -393,7 +393,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"],
       [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -413,7 +413,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"],
           [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -433,7 +433,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"],
           [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
@@ -452,7 +452,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"],
           [data-scope="tool-call"]:is([data-part="approve"], [data-part="deny"])
