@@ -39,7 +39,13 @@ function setup(root: Record<string, unknown> = {}, slides = 4) {
       RindProvider,
       {
         announcer: rec.announcer,
-        environment: { scheduler: clock.scheduler, clock: clock.clock, reducedMotion: false },
+        environment: {
+          scheduler: clock.scheduler,
+          clock: clock.clock,
+          reducedMotion: false,
+          // A visible page whatever the test browser's tab is (a CI runner's background tab is hidden).
+          visibility: { hidden: () => false, subscribe: () => () => {} },
+        },
       },
       () => gallery(root, slides),
     ),

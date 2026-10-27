@@ -22,7 +22,13 @@ function setup(root: Record<string, unknown> = {}) {
     root,
     provider: {
       announcer: rec.announcer,
-      environment: { scheduler: clock.scheduler, clock: clock.clock, reducedMotion: false },
+      environment: {
+        scheduler: clock.scheduler,
+        clock: clock.clock,
+        reducedMotion: false,
+        // A visible page whatever the test browser's tab is (a CI runner's background tab is hidden).
+        visibility: { hidden: () => false, subscribe: () => () => {} },
+      },
     },
   } as never)
   const q = (sel: string) => m.host.querySelector<HTMLElement>(sel)

@@ -94,7 +94,13 @@ async function setup(
       announcer: rec.announcer,
       environment: p.real
         ? { reducedMotion: true }
-        : { scheduler: clock.scheduler, clock: clock.clock, reducedMotion: false },
+        : {
+            scheduler: clock.scheduler,
+            clock: clock.clock,
+            reducedMotion: false,
+            // A visible page whatever the test browser's tab is (a CI runner's background tab is hidden).
+            visibility: { hidden: () => false, subscribe: () => () => {} },
+          },
     }),
   ])
   const stable = () => m.rerender({})

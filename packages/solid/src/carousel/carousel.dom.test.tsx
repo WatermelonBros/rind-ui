@@ -30,7 +30,13 @@ function setup(props: Props = {}, env: { reducedMotion?: boolean; real?: boolean
       environment={
         env.real
           ? { reducedMotion: true }
-          : { scheduler: clock.scheduler, clock: clock.clock, reducedMotion: false }
+          : {
+              scheduler: clock.scheduler,
+              clock: clock.clock,
+              reducedMotion: false,
+              // A visible page whatever the test browser's tab is (a CI runner's background tab is hidden).
+              visibility: { hidden: () => false, subscribe: () => () => {} },
+            }
       }
     >
       <Carousel.Root aria-label="Featured" {...root}>

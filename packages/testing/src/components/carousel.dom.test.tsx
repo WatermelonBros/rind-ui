@@ -46,7 +46,14 @@ function setup(props: Parameters<typeof Gallery>[0] = {}) {
   const r = render(
     <RindProvider
       announcer={rec.announcer}
-      environment={{ scheduler: clock.scheduler, clock: clock.clock, reducedMotion: false }}
+      environment={{
+        scheduler: clock.scheduler,
+        clock: clock.clock,
+        reducedMotion: false,
+        // A visible page, whatever the test browser's tab is: a hidden page pauses autoplay
+        // (its own test), and a CI runner's background tab is hidden.
+        visibility: { hidden: () => false, subscribe: () => () => {} },
+      }}
     >
       <Gallery {...props} />
       <button type="button">Outside</button>
