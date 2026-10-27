@@ -1,8 +1,11 @@
 /*
- * Agent Presence (family: decoration): the Visual draws three bars from
- * --rind-agent-presence-level when the consumer puts nothing in it. Each state has its own
- * shape, not only a colour: idle a flat dash, connecting dots, listening and speaking bars that
- * follow the level, thinking a slow pulse, error a cross. No motion under reduced motion.
+ * Agent Presence (family: decoration): when the consumer puts nothing in the Visual, it is a
+ * dark glass orb with a ribbon of coloured light across it (::before) under a still rim and
+ * highlight (::after). Each state has its own shape and motion, not only a colour: idle a thin
+ * dim line, connecting a dot that stretches and shrinks, listening a short cool ribbon that
+ * rises with the input level, thinking a ribbon turning on itself, speaking a wide warm ribbon
+ * that swells and glows with the output level, error a flat still line. The level comes from
+ * --rind-agent-presence-level. Under reduced motion each state keeps its shape, still.
  */
 @layer rind.components {
   :where([data-scope="agent-presence"][data-part="root"]) {
@@ -14,50 +17,153 @@
   }
 
   :where([data-scope="agent-presence"][data-part="visual"]:empty) {
+    --_size: var(--rind-agent-presence-size, 2rem);
     --_l: var(--rind-agent-presence-level, 0);
+    --_c1: var(--rind-agent-presence-color, var(--rind-color-accent-solid));
+    --_c2: oklch(from var(--_c1) 0.82 0.14 calc(h - 150));
+    --_c3: oklch(from var(--_c1) 0.72 0.22 h);
+    /* the ribbon's scale per state, how much the level swells it, and how lit it is */
+    --_sx: 1;
+    --_sy: 1;
+    --_gain: 0;
+    --_dim: 1;
     position: relative;
-    inline-size: var(--rind-agent-presence-size, 1.75rem);
-    block-size: var(--rind-agent-presence-size, 1.75rem);
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
     border-radius: var(--rind-radius-full);
+    overflow: hidden;
+    isolation: isolate;
     background:
-      linear-gradient(currentColor, currentColor) 25% 50% / 15% calc(20% + var(--_l) * 50%)
+      radial-gradient(
+        ellipse 48% 26% at 50% 52%,
+        oklch(from var(--_c3) l c h / calc(0.28 * var(--_dim))),
+        transparent 70%
+      ),
+      radial-gradient(
+        circle at 50% 40%,
+        oklch(from var(--_c1) 0.24 0.05 h),
+        oklch(from var(--_c1) 0.1 0.02 h) 72%
+      );
+    box-shadow: 0 0 calc(var(--_size) * (0.06 + var(--_l) * var(--_gain) * 0.25))
+      oklch(from var(--_c3) l c h / calc(0.15 + var(--_l) * var(--_gain) * 0.5));
+    filter: saturate(var(--_dim));
+    transition:
+      box-shadow var(--rind-duration-fast),
+      filter var(--rind-duration-slow);
+  }
+
+  /* the ribbon: a white core between two colours over a wide glow, each drifting on its own */
+  :where([data-scope="agent-presence"][data-part="visual"]:empty)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 44% 5% at 50% 50%, oklch(from var(--_c1) 0.99 0.02 h), transparent)
+      50% 50% / 100% 100% no-repeat,
+      radial-gradient(ellipse 46% 13% at 50% 50%, var(--_c3), transparent) 47% 42% / 100% 100%
       no-repeat,
-      linear-gradient(currentColor, currentColor) 50% 50% / 15% calc(20% + var(--_l) * 80%)
+      radial-gradient(ellipse 46% 13% at 50% 50%, var(--_c2), transparent) 53% 57% / 100% 100%
       no-repeat,
-      linear-gradient(currentColor, currentColor) 75% 50% / 15% calc(20% + var(--_l) * 50%)
-      no-repeat,
-      var(--rind-color-accent-soft);
-    color: var(--rind-color-accent-text);
+      radial-gradient(
+        ellipse 48% 24% at 50% 50%,
+        oklch(from var(--_c1) 0.55 0.22 calc(h - 60) / 0.85),
+        transparent
+      )
+      50% 62% / 100% 100% no-repeat;
+    filter: blur(calc(var(--_size) * 0.03));
+    opacity: calc(0.35 + 0.65 * var(--_dim));
+    scale: var(--_sx) calc(var(--_sy) * (1 + var(--_l) * var(--_gain)));
+    animation:
+      rind-agent-presence-wave 2.6s ease-in-out infinite alternate,
+      rind-agent-presence-drift 3.4s ease-in-out infinite alternate;
+    transition:
+      scale var(--rind-duration-fast),
+      opacity var(--rind-duration-slow);
+  }
+
+  /* the glass: a lit rim and a soft highlight at the top */
+  :where([data-scope="agent-presence"][data-part="visual"]:empty)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      ellipse 30% 14% at 50% 10%,
+      oklch(from var(--_c1) 1 0 h / 0.22),
+      transparent
+    );
+    box-shadow:
+      inset 0 0 0 1.5px oklch(from var(--_c3) 0.88 0.06 h / 0.55),
+      inset 0 0 calc(var(--_size) * 0.12) oklch(from var(--_c2) 0.85 0.08 h / 0.35);
   }
 
   :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="idle"]) {
-    background:
-      linear-gradient(currentColor, currentColor) 50% 50% / 50% 12% no-repeat,
-      var(--rind-color-neutral-soft);
-    color: var(--rind-color-text-muted);
+    --_sy: 0.35;
+    --_dim: 0.35;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="idle"])::before {
+    animation-duration: 6s, 8s;
   }
 
   :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="connecting"]) {
-    background:
-      radial-gradient(circle, currentColor 0 12%, transparent 13%) 0 0 / 33% 100% repeat-x,
-      var(--rind-color-neutral-soft);
-    color: var(--rind-color-text-muted);
+    --_sy: 0.5;
+    --_dim: 0.15;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="connecting"])::before {
+    transform: scaleX(0.3);
+    animation: rind-agent-presence-seek 1.3s ease-in-out infinite alternate;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="listening"]) {
+    --_sx: 0.7;
+    --_sy: 0.8;
+    --_gain: 2.4;
+    --_c3: oklch(from var(--_c1) 0.75 0.16 calc(h - 160));
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="listening"])::before {
+    animation-duration: 1.4s, 2.2s;
   }
 
   :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="thinking"]) {
-    background:
-      radial-gradient(circle, currentColor 0 30%, transparent 31%), var(--rind-color-accent-soft);
-    animation: rind-agent-presence-pulse
-      var(--rind-agent-presence-pulse-duration, calc(var(--rind-duration-slow) * 4)) ease-in-out
-      infinite alternate;
+    --_sx: 0.9;
+    --_sy: 1.3;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="thinking"])::before {
+    rotate: -35deg;
+    animation:
+      rind-agent-presence-spin 2.2s linear infinite,
+      rind-agent-presence-drift 1.6s ease-in-out infinite alternate;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="speaking"]) {
+    --_sx: 1.15;
+    --_gain: 3.2;
+    --_c2: oklch(from var(--_c1) 0.85 0.15 calc(h + 100));
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="speaking"])::before {
+    animation-duration: 0.9s, 1.5s;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-muted]) {
+    --_dim: 0.4;
   }
 
   :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="error"]) {
-    background:
-      linear-gradient(45deg, transparent 44%, currentColor 45% 55%, transparent 56%),
-      linear-gradient(-45deg, transparent 44%, currentColor 45% 55%, transparent 56%),
-      var(--rind-color-danger-soft);
-    color: var(--rind-color-danger-text);
+    --_c1: var(--rind-color-danger-solid);
+    --_c2: var(--rind-color-danger-solid);
+    --_c3: var(--rind-color-danger-solid);
+    --_sx: 1.1;
+    --_sy: 0.2;
+  }
+
+  :where([data-scope="agent-presence"][data-part="visual"]:empty[data-state="error"])::before {
+    animation: none;
   }
 
   :where([data-scope="agent-presence"][data-part="detail"]) {
@@ -69,16 +175,72 @@
     font-style: italic;
   }
 
-  @keyframes rind-agent-presence-pulse {
+  @keyframes rind-agent-presence-wave {
+    from {
+      transform: skewY(-6deg) translateY(-3%);
+    }
     to {
-      scale: 0.85;
-      opacity: 0.7;
+      transform: skewY(6deg) translateY(3%);
+    }
+  }
+
+  @keyframes rind-agent-presence-drift {
+    from {
+      background-position:
+        50% 50%,
+        43% 44%,
+        57% 55%,
+        46% 62%;
+    }
+    to {
+      background-position:
+        50% 50%,
+        55% 40%,
+        45% 59%,
+        54% 60%;
+    }
+  }
+
+  @keyframes rind-agent-presence-seek {
+    from {
+      transform: scaleX(0.12);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes rind-agent-presence-spin {
+    from {
+      rotate: -35deg;
+    }
+    to {
+      rotate: 325deg;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :where([data-scope="agent-presence"][data-part="visual"]) {
+    :where([data-scope="agent-presence"][data-part="visual"])::before {
       animation: none;
+    }
+  }
+
+  /* forced colours drop the gradients: an outlined circle, filled while the agent is active */
+  @media (forced-colors: active) {
+    :where([data-scope="agent-presence"][data-part="visual"]:empty) {
+      border: 1px solid CanvasText;
+    }
+
+    :where(
+        [data-scope="agent-presence"][data-part="visual"]:empty:is(
+          [data-state="listening"],
+          [data-state="thinking"],
+          [data-state="speaking"]
+        )
+      )::after {
+      inset: 25%;
+      background: CanvasText;
+      forced-color-adjust: none;
     }
   }
 }
