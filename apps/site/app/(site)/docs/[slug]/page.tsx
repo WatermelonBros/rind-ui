@@ -7,6 +7,7 @@ import { ExampleFrame } from "@/components/example-frame"
 import { ExamplesSection } from "@/components/examples-section"
 import { Letters } from "@/components/letters"
 import { ReleaseSync } from "@/components/release"
+import { ThemePreview } from "@/components/theme-preview"
 import { Toc } from "@/components/toc"
 import { exampleCode, pageBySlug, pages, partId, render } from "@/lib/docs"
 import { frameworks } from "@/lib/frameworks"
@@ -125,6 +126,8 @@ export default async function DocPage({ params }: Props) {
           // biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs
           dangerouslySetInnerHTML={{ __html: intro }}
         />
+        {/* the theme page's live preview, under its intro */}
+        {page.slug === "theme" && <ThemePreview />}
         {source && <ExamplesSection slug={page.slug} source={source} />}
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: built at compile time from the repo's own docs */}
         <div className={styles.prose} dangerouslySetInnerHTML={{ __html: html }} />
