@@ -54,10 +54,13 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { absentProps } from "../absent"
 import { bindProps, joinHandlers } from "../bind-props"
 import { injectCollectionItems, injectRegisterItem } from "../collection-items"
+import { injectFieldsetDisabled } from "../fieldset/context"
 import { injectRootId, RindIds } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectPresence } from "../inject-presence"
@@ -488,15 +491,24 @@ export class MenuTrigger {
 }
 
 /** A menu trigger's press, focus and props on this element (a menubar's trigger too). Internal. */
-export function wireMenuTrigger(level: MenuLevel, disabled: () => boolean): void {
+export function wireMenuTrigger(level: MenuLevel, ownDisabled: () => boolean): void {
   const host = inject(MENU_HOST, { optional: true })
   const env = injectEnvironment()
   const el: Element = inject(ElementRef).nativeElement
   const tag = el.tagName.toLowerCase()
+  // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+  const fieldsetDisabled = injectFieldsetDisabled()
+  const fieldsetDom = signal(false)
+  const disabled = () => ownDisabled() || fieldsetDisabled() || fieldsetDom()
   if (inject(PLATFORM_ID) === "browser") {
     // The modality tracker needs a subscriber while the trigger is rendered.
     const destroy = inject(DestroyRef)
-    afterNextRender(() => destroy.onDestroy(env.modality.subscribe(() => {})))
+    afterNextRender(() => {
+      destroy.onDestroy(env.modality.subscribe(() => {}))
+      const watch = watchFieldsetDisabled(el, (d) => fieldsetDom.set(d))
+      fieldsetDom.set(watch.disabled)
+      destroy.onDestroy(watch.stop)
+    })
   }
   const focused = signal(false)
   const modality = injectModality(env.modality, focused)
@@ -644,6 +656,7 @@ export class MenuContent {
     // Any other element directly inside the menu is presentational for the menu role.
     afterEveryRender({
       write: () => {
+        warnMenuInMenubar(el)
         for (const child of Array.from(el.children)) {
           if (
             !child.hasAttribute("data-scope") &&

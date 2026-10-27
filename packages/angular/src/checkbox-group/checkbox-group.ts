@@ -15,6 +15,7 @@ import {
   output,
   PLATFORM_ID,
   type Signal,
+  signal,
   untracked,
   ViewEncapsulation,
 } from "@angular/core"
@@ -27,6 +28,7 @@ import {
   mergeFieldProps,
   partId,
   readValidity,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import type { PartRegistry } from "@rind-ui/core/internal"
 import { absentProps } from "../absent"
@@ -138,13 +140,23 @@ export class CheckboxGroupRoot {
     this.inField = binding !== null
     const fieldsetDisabled = injectFieldsetDisabled()
     const el: Element = inject(ElementRef).nativeElement
+    // A native <fieldset disabled> too: the items are disabled by it (toggle.md RA#9445).
+    const fieldsetDom = signal(false)
+    if (inject(PLATFORM_ID) === "browser") {
+      const destroy = inject(DestroyRef)
+      afterNextRender(() => {
+        const watch = watchFieldsetDisabled(el, (d) => fieldsetDom.set(d))
+        fieldsetDom.set(watch.disabled)
+        destroy.onDestroy(watch.stop)
+      })
+    }
     const tag = el.tagName.toLowerCase()
     const field = computed(() =>
       mergeFieldProps(
         {
           role: "group",
           labelable: false,
-          disabled: this.disabled() || fieldsetDisabled(),
+          disabled: this.disabled() || fieldsetDisabled() || fieldsetDom(),
           readOnly: this.readonly(),
           required: this.required(),
           invalid: this.invalid(),

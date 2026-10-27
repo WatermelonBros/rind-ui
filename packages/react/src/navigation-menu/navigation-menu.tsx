@@ -18,6 +18,7 @@ import {
   navigationMenuPositioning,
   type PositioningProps,
   type Service,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -33,6 +34,7 @@ import {
   useState,
 } from "react"
 import { createPortal } from "react-dom"
+import { useFieldsetDisabled } from "../fieldset/fieldset"
 import { joinHandlers } from "../join-handlers"
 import { LayerProvider, useParentLayer } from "../layer-context"
 import { Link, type LinkProps } from "../link/link"
@@ -442,7 +444,10 @@ function Trigger({ render, ref, disabled: own = false, ...rest }: NavigationMenu
   const item = useItem("Trigger")
   const panel = useContext(PanelContext)
   const env = useEnvironment()
-  const disabled = own || ctx.disabled
+  // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+  const fieldsetDisabled = useFieldsetDisabled()
+  const [fieldsetDom, setFieldsetDom] = useState(false)
+  const disabled = own || ctx.disabled || fieldsetDisabled || fieldsetDom
   const open = ctx.value === item.key
   useIsoLayoutEffect(() => {
     ctx.disabledItems.set(item.key, disabled)
@@ -470,6 +475,13 @@ function Trigger({ render, ref, disabled: own = false, ...rest }: NavigationMenu
     [hoverIntent, service, item.key],
   )
   const el = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    const node = el.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   const tag = useRenderedTag("button", render, el)
   const own_ = normalizeProps(
     api.trigger(item.key, {

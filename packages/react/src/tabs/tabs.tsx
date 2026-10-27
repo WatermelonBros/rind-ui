@@ -148,14 +148,21 @@ function Root({
       })
   }, [])
   const declared = declaredItems(children, Tab)
+  // Server render (and hydration), uncontrolled with no default: the first declared enabled tab
+  // is shown already, so the server HTML has a selected tab and its panel (the machine
+  // selects the same one once the tabs register).
+  const shown =
+    current === null && registered === null && value === undefined
+      ? serverStop(declared, [])
+      : current
   const api = tabsConnect(
     {
       instance,
       collection,
-      value: current,
+      value: shown,
       highlightedKey: view.context.highlightedKey,
       pending: registered === null,
-      pendingStop: serverStop(declared, current === null ? [] : [current]),
+      pendingStop: serverStop(declared, shown === null ? [] : [shown]),
       orientation,
       activationMode,
       inactivePanels,
@@ -168,7 +175,7 @@ function Root({
           ? new Set(
               declaredItems(children, Panel)
                 .map((p) => p.value)
-                .filter((k) => inactivePanels !== "unmount" || k === current),
+                .filter((k) => inactivePanels !== "unmount" || k === shown),
             )
           : panels,
       panelTabbable: view.context.panelTabbable,
@@ -184,7 +191,7 @@ function Root({
     send,
     registry,
     instance,
-    value: current,
+    value: shown,
     disabled,
     inactivePanels,
     orientation,
@@ -194,7 +201,7 @@ function Root({
   const props = mergeProps(normalizeProps(api.root()), rest)
   return (
     <TabsContext value={ctx}>
-      {renderPart("div", { ...props, children }, render, { value: current, orientation })}
+      {renderPart("div", { ...props, children }, render, { value: shown, orientation })}
     </TabsContext>
   )
 }

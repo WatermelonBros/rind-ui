@@ -178,3 +178,21 @@ export function menubarConnect(
     },
   }
 }
+
+declare const process: { env: { NODE_ENV?: string } }
+const warnedInBar = new WeakSet<Element>()
+
+/**
+ * Development: a menu's content rendered inside its menubar (no Portal) puts `role="menu"`
+ * among the bar's children, which a menubar may not own (axe aria-required-children,
+ * base-ui#4004). One warning per bar.
+ */
+export function warnMenuInMenubar(content: Element): void {
+  if (process.env.NODE_ENV === "production") return
+  const bar = content.parentElement?.closest('[role="menubar"]')
+  if (!bar || warnedInBar.has(bar)) return
+  warnedInBar.add(bar)
+  console.warn(
+    "[rind-ui] menubar: a menu's content is rendered inside the bar; wrap it in Menu.Portal (a menubar may only own its items).",
+  )
+}

@@ -1,7 +1,9 @@
 <script lang="ts">
+import { watchFieldsetDisabled } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import type { HTMLAttributes } from "svelte/elements"
 import { elementRef } from "../element-ref.svelte"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { useEnvironment } from "../provider"
@@ -10,8 +12,12 @@ import { usePress } from "../use-press.svelte"
 import { isOpen, menuApi, menuHost, menuLevel } from "./context.svelte"
 import type { MenuTriggerProps } from "./types"
 
-const { disabled = false, child, children, ...rest }: MenuTriggerProps = $props()
+const { disabled: ownDisabled = false, child, children, ...rest }: MenuTriggerProps = $props()
 const ctx = menuLevel.get()
+// rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+const fieldsetDisabled = useFieldsetDisabled()
+let fieldsetDom = $state(false)
+const disabled = $derived(ownDisabled === true || fieldsetDisabled() || fieldsetDom)
 const host = menuHost.maybe() ?? null
 const env = useEnvironment()
 // The modality tracker needs a subscriber while the trigger is mounted.
@@ -27,7 +33,7 @@ const press = usePress({
     if (ctx.inMenubar && key !== undefined) ctx.tree.parentPress(key, e.modality)
     else menuApi(ctx, env).pressTrigger(e.modality)
   },
-  disabled: () => disabled === true,
+  disabled: () => disabled,
   // A label's forwarded click focuses the trigger and never opens the menu.
   labelActivation: "focus",
 })
@@ -37,6 +43,13 @@ $effect(() => {
   const node = el.current
   ctx.shared.trigger = node instanceof HTMLElement ? node : null
 })
+$effect(() => {
+  const node = el.current
+  if (!node) return
+  const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = watch.disabled
+  return watch.stop
+})
 const merged = $derived.by(() => {
   const own = normalizeProps(
     menuApi(ctx, env).trigger({
@@ -44,7 +57,7 @@ const merged = $derived.by(() => {
       modality: modality.current,
       pressed: press.pressed,
       tag: el.tag,
-      disabled: disabled === true,
+      disabled,
       tabIndex: host?.tabIndex?.(),
     }),
   )

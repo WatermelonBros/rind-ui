@@ -61,7 +61,8 @@ interface Ctx {
   readonly collection: () => unknown
   /** A panel element is rendered for `key` (aria-controls). */
   readonly registerPanel: (key: string) => () => void
-  readonly stop: ReturnType<typeof declaredStop>
+  /** This tab's view of the server tab stop, read once per tab in document order. */
+  readonly stop: (value: string, disabled: boolean) => string | null
 }
 const TabsContext = createContext<Ctx>()
 function useTabs(part: string): Ctx {
@@ -159,6 +160,20 @@ function Root(props: TabsRootProps) {
     env,
   )
   const current = (): string | null => view().values.value ?? null
+  // Uncontrolled with no default, the first declared enabled tab is shown already, so the server
+  // HTML has a selected tab and its panel (the machine selects the same one once the tabs
+  // register).
+  let firstEnabled: string | null = null
+  const shown = (): string | null =>
+    registered() === null && current() === null && local.value === undefined
+      ? firstEnabled
+      : current()
+  const baseStop = declaredStop()
+  const stop = (key: string, keyDisabled: boolean) => {
+    firstEnabled ??= baseStop(key, keyDisabled, [])
+    const now = shown()
+    return baseStop(key, keyDisabled, now === null ? [] : [now])
+  }
   const [panels, setPanels] = createSignal<ReadonlySet<string>>(new Set())
   const registerPanel = (key: string) => {
     // Untracked: called inside the Panel's effect, which must not depend on the set it writes.
@@ -177,7 +192,7 @@ function Root(props: TabsRootProps) {
       {
         instance: instance(),
         collection: collection(),
-        value: current(),
+        value: shown(),
         highlightedKey: view().context.highlightedKey,
         pending: registered() === null,
         pendingStop,
@@ -189,7 +204,7 @@ function Root(props: TabsRootProps) {
         focusWithin: view().matches("focused"),
         renderedPanels:
           registered() === null
-            ? new PendingPanels(inactivePanels() !== "unmount", current())
+            ? new PendingPanels(inactivePanels() !== "unmount", shown())
             : panels(),
         panelTabbable: view().context.panelTabbable,
         direction: view().context.direction,
@@ -199,7 +214,7 @@ function Root(props: TabsRootProps) {
       send,
       env,
     )
-  const state = reactive<TabsState>(() => ({ value: current(), orientation: orientation() }))
+  const state = reactive<TabsState>(() => ({ value: shown(), orientation: orientation() }))
   const merged = createMemo(() => mergeProps(normalizeProps(api().root()), rest))
   const children = () => resolveChildren(local.children, state)
   return (
@@ -209,13 +224,13 @@ function Root(props: TabsRootProps) {
         send,
         registry,
         instance,
-        value: current,
+        value: shown,
         disabled: () => local.disabled === true,
         inactivePanels,
         orientation,
         collection: registered,
         registerPanel,
-        stop: declaredStop(),
+        stop,
       }}
     >
       {renderPart(local.render, merged, state, children, (p) => (
@@ -292,12 +307,7 @@ function Tab(props: TabsTabProps) {
     el,
   )
   // Read once, in document order: this tab's view of the server tab stop.
-  const current = untrack(ctx.value)
-  const pendingStop = ctx.stop(
-    local.value,
-    untrack(ctx.disabled) || ownDisabled(),
-    current === null ? [] : [current],
-  )
+  const pendingStop = untrack(() => ctx.stop(local.value, ctx.disabled() || ownDisabled()))
   const [focused, setFocused] = createSignal(false)
   const modality = useModality(env.modality, focused)
   const isDisabled = () => ctx.disabled() || ownDisabled()

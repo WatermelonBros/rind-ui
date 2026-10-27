@@ -79,6 +79,30 @@ function Encoding({ onSelect }: { onSelect: (v: string) => void }) {
   )
 }
 
+describe("Menu trigger in a native fieldset", () => {
+  it("<fieldset disabled>: the trigger carries data-disabled", async () => {
+    render(
+      <fieldset disabled>
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Content aria-label="Actions">
+                <Menu.Item>Copy</Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </fieldset>,
+    )
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Actions" }).hasAttribute("data-disabled")).toBe(
+        true,
+      ),
+    )
+  })
+})
+
 describe("Menu: opening and initial focus", () => {
   it("Closed menu: aria-expanded=false and no aria-controls (radix#3013)", () => {
     render(<Basic />)

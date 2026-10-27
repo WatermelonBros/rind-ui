@@ -12,6 +12,7 @@ import {
   toggleGroupIds,
   toggleGroupMachine,
   toKey,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type Accessor,
@@ -121,8 +122,10 @@ function Root(props: ToggleGroupRootProps) {
   const instance = useRootId(() => local.id)
   const ids = createMemo(() => toggleGroupIds(instance()))
   const fieldsetDisabled = useFieldsetDisabled()
+  // A native <fieldset disabled> too: the items' buttons are disabled by it (toggle.md RA#9445).
+  const [fieldsetDom, setFieldsetDom] = createSignal(false)
   const groupDisabled = () =>
-    local.disabled === true || fieldsetDisabled() || host?.disabled === true
+    local.disabled === true || fieldsetDisabled() || fieldsetDom() || host?.disabled === true
   const { collection: registered, registry } = useCollectionItems()
   const collection = () => registered() ?? EMPTY
   const selectionMode = () => local.selectionMode ?? "single"
@@ -164,6 +167,13 @@ function Root(props: ToggleGroupRootProps) {
       env,
     )
   const [el, setEl] = createSignal<Element | null>(null)
+  createEffect(() => {
+    const node = el()
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    onCleanup(watch.stop)
+  })
   // Development: a group needs a name (aria-label or aria-labelledby: radix#754).
   afterMount(() =>
     createEffect(() => {

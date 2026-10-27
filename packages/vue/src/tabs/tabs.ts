@@ -145,13 +145,21 @@ const Root = defineComponent({
       }
     }
     // The declared tabs and panels of the latest render, until the tabs register (server render).
-    let declared = { stop: null as string | null, panels: [] as readonly string[] }
+    // Uncontrolled with no default, the first declared enabled tab is shown already, so the
+    // server HTML has a selected tab and its panel (the machine selects the same one once the
+    // tabs register).
+    let declared = {
+      stop: null as string | null,
+      panels: [] as readonly string[],
+      shown: null as string | null,
+    }
+    const shown = () => (registered.value === null ? (declared.shown ?? current()) : current())
     const api = () =>
       tabsConnect(
         {
           instance: instance(),
           collection: collection(),
-          value: current(),
+          value: shown(),
           highlightedKey: view.value.context.highlightedKey,
           pending: registered.value === null,
           pendingStop: declared.stop,
@@ -165,7 +173,7 @@ const Root = defineComponent({
             registered.value === null
               ? new Set(
                   declared.panels.filter(
-                    (k) => props.inactivePanels !== "unmount" || k === current(),
+                    (k) => props.inactivePanels !== "unmount" || k === shown(),
                   ),
                 )
               : panels.value,
@@ -182,7 +190,7 @@ const Root = defineComponent({
       send,
       registry,
       instance,
-      value: current,
+      value: shown,
       disabled: () => props.disabled,
       inactivePanels: () => props.inactivePanels,
       orientation: () => props.orientation,
@@ -192,10 +200,12 @@ const Root = defineComponent({
     return () => {
       const children = slots.default?.({ value: current(), orientation: props.orientation })
       if (registered.value === null) {
-        const now = current()
+        const tabs = declaredItems(children, Tab)
+        const now = current() ?? (props.modelValue === undefined ? serverStop(tabs, []) : null)
         declared = {
-          stop: serverStop(declaredItems(children, Tab), now === null ? [] : [now]),
+          stop: serverStop(tabs, now === null ? [] : [now]),
           panels: declaredItems(children, Panel).map((p) => p.value),
+          shown: now,
         }
       }
       return renderPart(

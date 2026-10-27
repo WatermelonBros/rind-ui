@@ -9,6 +9,7 @@ import {
   mergeFieldProps,
   partId,
   readValidity,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
@@ -48,12 +49,14 @@ const uid = $props.id()
 const instance = $derived(id ?? uid)
 const binding = useFieldControl(uid)
 const fieldsetDisabled = useFieldsetDisabled()
+// A native <fieldset disabled> too: the items are disabled by it (toggle.md RA#9445).
+let fieldsetDom = $state(false)
 const field = $derived(
   mergeFieldProps(
     {
       role: "group",
       labelable: false,
-      disabled: disabled || fieldsetDisabled(),
+      disabled: disabled || fieldsetDisabled() || fieldsetDom,
       readOnly,
       required,
       invalid,
@@ -63,6 +66,13 @@ const field = $derived(
   ),
 )
 const el = elementRef("div")
+$effect(() => {
+  const node = el.current
+  if (!node) return
+  const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom = d))
+  fieldsetDom = watch.disabled
+  return watch.stop
+})
 let labelTag = "span"
 // The reason of the latest accepted change, for the Field: only a user's clears its external
 // (server) errors (base-ui#1745); a parent's value or a reset does not.

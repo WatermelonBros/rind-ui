@@ -10,6 +10,7 @@ import {
   mergeFieldProps,
   partId,
   readValidity,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComponentPropsWithRef,
@@ -19,6 +20,7 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
 } from "react"
 import {
   Checkbox,
@@ -115,11 +117,13 @@ function Root({
   const instance = useRootId(id)
   const binding = useFieldControl()
   const fieldsetDisabled = useFieldsetDisabled()
+  // A native <fieldset disabled> too: the items are disabled by it (toggle.md RA#9445).
+  const [fieldsetDom, setFieldsetDom] = useState(false)
   const field = mergeFieldProps(
     {
       role: "group",
       labelable: false,
-      disabled: disabled || fieldsetDisabled,
+      disabled: disabled || fieldsetDisabled || fieldsetDom,
       readOnly,
       required,
       invalid,
@@ -129,6 +133,13 @@ function Root({
   )
   const el = useRef<HTMLElement | null>(null)
   const rootTag = useRenderedTag("div", render, el)
+  useEffect(() => {
+    const node = el.current
+    if (!node) return
+    const watch = watchFieldsetDisabled(node, setFieldsetDom)
+    setFieldsetDom(watch.disabled)
+    return watch.stop
+  }, [])
   const labelTag = useRef("span")
   // The reason of the latest accepted change, for the Field: only a user's clears its
   // external (server) errors (base-ui#1745); a parent's value or a reset does not.

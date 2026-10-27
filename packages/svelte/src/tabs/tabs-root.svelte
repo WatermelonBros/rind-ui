@@ -81,12 +81,18 @@ const panels = new SvelteSet<string>()
 // ponytail: before the tabs register (server render), every declared tab is taken to have a
 // panel (React reads its declared panels); a tab without one gets aria-controls until mount.
 const declared: string[] = []
+// Uncontrolled with no default, the first declared enabled tab is shown already, so the server
+// HTML has a selected tab and its panel (the machine selects the same one once the tabs register).
+let firstEnabled: string | null = null
+const shown = () =>
+  items.collection === null && current === null && value === undefined ? firstEnabled : current
+const baseStop = declaredStop()
 const api = (pendingStop: string | null = null) =>
   tabsConnect(
     {
       instance,
       collection,
-      value: current,
+      value: shown(),
       highlightedKey: machine.view.context.highlightedKey,
       pending: items.collection === null,
       pendingStop,
@@ -98,7 +104,7 @@ const api = (pendingStop: string | null = null) =>
       focusWithin: machine.view.matches("focused"),
       renderedPanels:
         items.collection === null
-          ? new Set(declared.filter((k) => inactivePanels !== "unmount" || k === current))
+          ? new Set(declared.filter((k) => inactivePanels !== "unmount" || k === shown()))
           : panels,
       panelTabbable: machine.view.context.panelTabbable,
       direction: machine.view.context.direction,
@@ -113,7 +119,7 @@ tabsContext.set({
   send: machine.send,
   registry: items.registry,
   instance: () => instance,
-  value: () => current,
+  value: shown,
   disabled: () => disabled,
   inactivePanels: () => inactivePanels,
   orientation: () => orientation,
@@ -123,10 +129,14 @@ tabsContext.set({
     return () => panels.delete(key)
   },
   declared,
-  stop: declaredStop(),
+  stop: (key, keyDisabled) => {
+    firstEnabled ??= baseStop(key, keyDisabled, [])
+    const now = shown()
+    return baseStop(key, keyDisabled, now === null ? [] : [now])
+  },
 })
 const merged = $derived(stripMarker(mergeProps(normalizeProps(api().root()), rest)))
-const rootState = $derived({ value: current, orientation })
+const rootState = $derived({ value: shown(), orientation })
 </script>
 
 {#if child}

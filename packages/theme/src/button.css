@@ -5,8 +5,8 @@
  * flush with the panel. The border is always present (transparent unless drawn) so forced
  * colors can paint it. The triggers that open an overlay are keys too (family matrix: "triggers
  * styled as buttons"): a dialog, drawer, popover, tour, tooltip or menu trigger (not a menubar's,
- * menubar.css) looks like a Button, as rendering a Button there replaces its data-scope; so
- * do a Timer's ActionTriggers.
+ * menubar.css, nor a context menu's region) looks like a Button, as rendering a Button there
+ * replaces its data-scope; so do a Timer's ActionTriggers.
  */
 @layer rind.components {
   :where(

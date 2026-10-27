@@ -37,9 +37,11 @@ import {
   navigationMenuPositioning,
   type PositioningProps,
   type Service,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import { absentProps } from "../absent"
 import { bindProps, joinHandlers } from "../bind-props"
+import { injectFieldsetDisabled } from "../fieldset/context"
 import { CONTROL_OVERRIDE, HostedControl } from "../hosted-control"
 import { injectRootId, RindIds } from "../ids"
 import { injectMachine } from "../inject-machine"
@@ -483,7 +485,12 @@ export class NavigationMenuTrigger {
     const panel = inject(PANEL, { optional: true })
     const env = injectEnvironment()
     const tag = (inject(ElementRef).nativeElement as Element).tagName.toLowerCase()
-    const disabled = computed(() => this.disabled() || ctx.disabled())
+    // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+    const fieldsetDisabled = injectFieldsetDisabled()
+    const fieldsetDom = signal(false)
+    const disabled = computed(
+      () => this.disabled() || ctx.disabled() || fieldsetDisabled() || fieldsetDom(),
+    )
     this.state = computed(() => ({ open: ctx.value() === item.key() }))
     const ready = injectRendered()
     effect((onCleanup) => {
@@ -499,7 +506,13 @@ export class NavigationMenuTrigger {
     if (inject(PLATFORM_ID) === "browser") {
       // The modality tracker needs a subscriber while the trigger is rendered.
       const destroy = inject(DestroyRef)
-      afterNextRender(() => destroy.onDestroy(env.modality.subscribe(() => {})))
+      const host: Element = inject(ElementRef).nativeElement
+      afterNextRender(() => {
+        destroy.onDestroy(env.modality.subscribe(() => {}))
+        const watch = watchFieldsetDisabled(host, (d) => fieldsetDom.set(d))
+        fieldsetDom.set(watch.disabled)
+        destroy.onDestroy(watch.stop)
+      })
     }
     const focused = signal(false)
     const modality = injectModality(env.modality, focused)

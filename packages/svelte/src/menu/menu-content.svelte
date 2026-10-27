@@ -1,5 +1,5 @@
 <script lang="ts">
-import { menuLayerId } from "@rind-ui/core"
+import { menuLayerId, warnMenuInMenubar } from "@rind-ui/core"
 import { stripMarker } from "@rind-ui/core/internal"
 import { untrack } from "svelte"
 import { elementRef } from "../element-ref.svelte"
@@ -49,6 +49,7 @@ $effect(() => {
 $effect(() => {
   void children
   void open
+  if (el.current) warnMenuInMenubar(el.current)
   for (const c of el.current?.children ?? []) {
     if (!c.hasAttribute("data-scope") && !c.hasAttribute("role") && !c.matches(INTERACTIVE)) {
       c.setAttribute("role", "none")

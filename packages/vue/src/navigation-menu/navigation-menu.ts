@@ -16,6 +16,7 @@ import {
   navigationMenuPositioning,
   type PositioningProps,
   type Service,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComputedRef,
@@ -37,6 +38,7 @@ import {
   type VNodeChild,
   watch,
 } from "vue"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { keepStyle } from "../keep-style"
 import { provideLayer, useParentLayer } from "../layer-context"
@@ -474,7 +476,11 @@ const Trigger = defineComponent({
     const item = useItem("Trigger")
     const panel = inject(PanelKey, null)
     const env = useEnvironment()
-    const disabled = () => props.disabled || ctx.disabled()
+    // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+    const fieldsetDisabled = useFieldsetDisabled()
+    const fieldsetDom = shallowRef(false)
+    const disabled = () =>
+      props.disabled || ctx.disabled() || fieldsetDisabled.value || fieldsetDom.value
     onMounted(() =>
       watch(
         disabled,
@@ -505,7 +511,14 @@ const Trigger = defineComponent({
     const el = shallowRef<Element | null>(null)
     const measured = shallowRef<string | null>(null)
     const measure = () => (measured.value = el.value?.tagName.toLowerCase() ?? null)
-    onMounted(measure)
+    onMounted(() => {
+      measure()
+      const node = el.value
+      if (!node) return
+      const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom.value = d))
+      fieldsetDom.value = watch.disabled
+      onBeforeUnmount(watch.stop)
+    })
     onUpdated(measure)
     return () => {
       const children = slots.default?.({ open: ctx.value() === item.key })

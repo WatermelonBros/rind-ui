@@ -33,6 +33,23 @@ function Toppings(props: Partial<Parameters<typeof CheckboxGroup.Root>[0]>) {
   )
 }
 
+describe("CheckboxGroup in a native fieldset", () => {
+  it("<fieldset disabled> disables the group root (data-disabled)", async () => {
+    render(
+      <fieldset disabled>
+        <Toppings />
+      </fieldset>,
+    )
+    await waitFor(() =>
+      expect(
+        document
+          .querySelector('[data-scope="checkbox-group"][data-part="root"]')
+          ?.hasAttribute("data-disabled"),
+      ).toBe(true),
+    )
+  })
+})
+
 describe("CheckboxGroup smoke", () => {
   it("toggles items, submits the group name, runs the parent cycle", async () => {
     const onValueChange = vi.fn()

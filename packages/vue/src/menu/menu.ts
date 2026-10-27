@@ -32,6 +32,8 @@ import {
   type Service,
   toggleMachine,
   toKey,
+  warnMenuInMenubar,
+  watchFieldsetDisabled,
 } from "@rind-ui/core"
 import {
   type ComputedRef,
@@ -51,6 +53,7 @@ import {
   type VNodeChild,
   watch,
 } from "vue"
+import { useFieldsetDisabled } from "../fieldset/context"
 import { joinHandlers } from "../join-handlers"
 import { keepStyle } from "../keep-style"
 import { provideLayer, useParentLayer } from "../layer-context"
@@ -432,6 +435,10 @@ const Trigger = defineComponent({
   slots: Object as Slots<MenuTriggerState>,
   setup(props, { attrs, slots }) {
     const ctx = useLevel("Trigger")
+    // rind's Fieldset and a native <fieldset disabled> disable it too (button-like-element).
+    const fieldsetDisabled = useFieldsetDisabled()
+    const fieldsetDom = shallowRef(false)
+    const disabled = () => props.disabled || fieldsetDisabled.value || fieldsetDom.value
     const host = inject(MenuHostKey, null)
     const env = useEnvironment()
     // The modality tracker needs a subscriber while the trigger is mounted.
@@ -447,14 +454,21 @@ const Trigger = defineComponent({
         if (ctx.inMenubar && key !== undefined) ctx.tree.parentPress(key, e.modality)
         else menuApi(ctx, env).pressTrigger(e.modality)
       },
-      disabled: () => props.disabled,
+      disabled,
       // A label's forwarded click focuses the trigger and never opens the menu.
       labelActivation: "focus",
     })
     const el = shallowRef<Element | null>(null)
     const measured = shallowRef<string | null>(null)
     const measure = () => (measured.value = el.value?.tagName.toLowerCase() ?? null)
-    onMounted(measure)
+    onMounted(() => {
+      measure()
+      const node = el.value
+      if (!node) return
+      const watch = watchFieldsetDisabled(node, (d) => (fieldsetDom.value = d))
+      fieldsetDom.value = watch.disabled
+      onBeforeUnmount(watch.stop)
+    })
     onUpdated(measure)
     const setEl = triggerRef(ctx, el)
     return () => {
@@ -467,7 +481,7 @@ const Trigger = defineComponent({
           modality: modality.value,
           pressed: press.pressed.value,
           tag,
-          disabled: props.disabled,
+          disabled: disabled(),
           tabIndex: host?.tabIndex?.(),
         }),
       )
@@ -564,6 +578,7 @@ const Content = defineComponent({
     )
     // Any other element directly inside the menu is presentational for the menu role.
     const presentational = () => {
+      if (el.value) warnMenuInMenubar(el.value)
       for (const child of el.value?.children ?? []) {
         if (
           !child.hasAttribute("data-scope") &&
