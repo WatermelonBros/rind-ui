@@ -1,5 +1,62 @@
 # @rind-ui/testing
 
+## 1.3.0
+
+### Minor Changes
+
+- e04eece: Agent Presence: what a voice agent is doing (connecting, listening, thinking, speaking, error), spoken once per change, with an audio level written straight to CSS variables (no re-render per frame). Testing: `getAgentPresence`. Theme: `agent-presence.css`.
+- e04eece: Angle Slider: a dial from 0 to 359 degrees on a native range input; press or drag sets the angle, arrows step, Shift steps 15, the ends wrap, Escape cancels a drag. Testing: `getAngleSlider`. Theme: `angle-slider.css`.
+- e04eece: Carousel: slides on native scroll snap with pages, Prev/Next, a roving tablist of indicators and a status; autoplay off by default and, when on, paused by hover and a hidden page, stopped by focus, never with reduced motion; hidden slides inert. Testing: `getCarousel`. Theme: `carousel.css`.
+- e04eece: Citation: a numbered source marker in an answer, named by its source, with a hover card (Portal, Positioner, Content, Source parts); a link for a safe URL, a pinning button otherwise, plain text while pending. Testing: `getCitation`. Theme: `citation.css`.
+- e04eece: Color Wheel: a hue ring on the Angle Slider machine with Color Slider's colour binding; a press counts only on the ring, the other channels and a grey's hue are kept, the colour submits as hex. Testing: `getColorWheel`. Theme: `color-wheel.css`.
+- e04eece: Context Meter: a model's context usage as a `role="meter"` named in words ("21K of 128K tokens, 17%"), with zones that never rely on colour alone, a rising threshold crossing announced once (`warnAt`, `fullAt`, `resetKey` re-arms), the stream itself silent, and a breakdown list. Testing: `getContextMeter`. Theme: `context-meter.css`.
+- e04eece: Editable: text shown in place that becomes an input; Enter saves, Escape restores the value at entry, an outside press or Tab-out saves or cancels by `submitMode`, the Preview and the Input share one box. Testing: `getEditable`. Theme: `editable.css`.
+- e04eece: Floating Panel: a non-modal window (the Dialog machine) moved and resized by pointer or keys on its grip, kept inside its boundary, minimised and maximised; a drag is seen at its start and end only. Testing: `getFloatingPanel`. Theme: `floating-panel.css`.
+- e04eece: JSON Tree View: a Tree View of any JSON or JavaScript value. Children are built only when their container opens, so a huge value opens at once; keys are JSON Pointers (no dotted-path collision); large containers are grouped in ranges; a cycle shows where it loops while a shared value shows twice; BigInt, Map, Set, Date, RegExp, Error and sparse arrays render exactly. The visible text is the item's name ("address: object, 4 entries"). Ctrl/⌘+C copies the focused node as JSON, its value or its pointer, announced. Testing: `getJsonTreeView`. Theme: `json-tree-view.css`; a Tree View leaf's indicator keeps its place without a caret.
+- e04eece: Mentions: @-mentions and /-commands in a textarea; plain text plus ranges reconciled from each edit (Backspace removes a mention whole), a list on the combobox pattern anchored at the trigger, IME-safe. Testing: `getMentions`. Theme: `mentions.css`.
+- e04eece: Message Actions: the row of actions under a chat message, one Tab stop (a Toolbar). Copy (Clipboard's states, the value read at press time), Regenerate (busy until its promise settles, a second press ignored), Edit (`aria-pressed`, the focus back when the editor closes), thumbs up/down (a single, deselectable Toggle Group), and versions that announce "Version 2 of 3" and do not wrap silently. The row hides by style and never unmounts, so the focus never drops. Testing: `getMessageActions`. Theme: `message-actions.css`.
+- e04eece: Signature Pad: sign with a mouse, a pen or a finger. The value is stroke data rendered as SVG in the text colour, so it never clears or misaligns on a resize, a zoom or a high-DPI screen; one pointer owns a stroke; every way a stroke can end is handled. It submits with its form (an SVG data URL, or JSON), `required` validates, Clear and Undo stay focusable and announce. `toBlob` / `download` rasterise at the stroke size. Core: `startStroke` (dom/stroke-input) and `rasterizeSvg` (dom/svg-raster). Testing: `getSignaturePad`, and a `pointerId` option on `Part.pointer` for a second finger. Theme: `signature-pad.css` (family `field`).
+- e04eece: Suggestions: prompt chips. A press calls `onSelect({ value, index, key })` and sends nothing itself; while `loading` the chips stay disabled but focusable (the focus never drops); a new set is announced only with `announce="polite"`, never on mount; `focusTarget` takes the focus back to the prompt after a press that began inside. Testing: `getSuggestions`. Theme: `suggestions.css`.
+- e04eece: Timer: a countdown or a stopwatch. The time is derived from the injected monotonic clock, never added up from ticks, so it stays right after a background tab or a slow frame; ticks land on the value's whole interval; a countdown completes exactly at its target, once, and catches up when the page becomes visible. Actions `start`, `pause`, `resume`, `reset`, `restart`, `toggle`: an action that does nothing now leaves its trigger disabled but focusable, never hidden. The Area is `role="timer"` named by the time in words (`Intl.DurationFormat`); completion is announced. Testing: `getTimer`. Theme: `timer.css` (family `decoration`).
+- e04eece: Tool Call: an AI tool call's name, status and duration in a disclosure, its input and output, and a human approval that sends one decision, keeps the buttons focusable while it is sent and puts the focus on a receipt. Testing: `getToolCall`. Theme: `tool-call.css`.
+
+### Patch Changes
+
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [e04eece]
+- Updated dependencies [2f7ee89]
+- Updated dependencies [56f87a7]
+- Updated dependencies [f47b58c]
+- Updated dependencies [f7db9f7]
+- Updated dependencies [2c1f7d7]
+- Updated dependencies [4124627]
+- Updated dependencies [d42779f]
+- Updated dependencies [d42779f]
+- Updated dependencies [0c4d74c]
+- Updated dependencies [5d177e9]
+- Updated dependencies [7c30d18]
+- Updated dependencies [ce8ab06]
+- Updated dependencies [cafa48e]
+- Updated dependencies [7becc63]
+- Updated dependencies [7776d8c]
+- Updated dependencies [a4c9e6a]
+- Updated dependencies [5308d68]
+- Updated dependencies [8196675]
+  - @rind-ui/core@1.3.0
+
 ## 1.2.0
 
 ### Patch Changes
