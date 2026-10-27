@@ -1,57 +1,10 @@
-/* ── Agent Presence: an orb that swells with the level, its glow by state; the status under it. ── */
+/* ── Agent Presence: the status under the example's WebGL orb. ── */
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="root"] {
   display: grid;
   justify-items: center;
   gap: 8px;
   color: var(--s-ink);
   font: 600 14px var(--s-font);
-}
-:is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="visual"] {
-  inline-size: 96px;
-  block-size: 96px;
-  border-radius: 50%;
-  border: var(--s-bw) solid var(--s-line);
-  background: radial-gradient(
-    circle at 35% 30%,
-    color-mix(in oklab, var(--s-brand) 40%, #fff),
-    var(--s-brand)
-  );
-  box-shadow:
-    var(--s-lift-lo),
-    0 0 calc(var(--rind-agent-presence-level, 0) * 40px)
-    color-mix(in oklab, var(--s-brand) 60%, transparent);
-  scale: calc(1 + var(--rind-agent-presence-level, 0) * 0.3);
-  transition:
-    background 300ms,
-    opacity 300ms;
-}
-:is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="agent-presence"][data-part="visual"]:is(
-    [data-state="idle"],
-    [data-state="connecting"]
-  ) {
-  background: var(--s-muted);
-  opacity: 0.8;
-}
-:is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="agent-presence"][data-part="visual"][data-state="thinking"] {
-  animation: presence-breathe 1.4s ease-in-out infinite;
-}
-:is([data-skinned], [data-rind-theme^="skin-"])
-  [data-scope="agent-presence"][data-part="visual"][data-state="error"] {
-  background: var(--s-error);
-}
-@keyframes presence-breathe {
-  50% {
-    scale: 0.9;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  :is([data-skinned], [data-rind-theme^="skin-"])
-    [data-scope="agent-presence"][data-part="visual"] {
-    animation: none;
-    scale: 1;
-  }
 }
 :is([data-skinned], [data-rind-theme^="skin-"]) [data-scope="agent-presence"][data-part="label"] {
   font-weight: 800;

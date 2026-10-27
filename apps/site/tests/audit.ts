@@ -58,6 +58,9 @@ const ignored: readonly RegExp[] = [
   // Next's static export preloads every route's CSS chunk; the browser warns when a page does
   // not use one within a few seconds. Harmless, and not fixable from the site.
   /was preloaded using link preload but not used within a few seconds/,
+  // Chrome's GPU driver diagnostics (a WebGL canvas read back for a screenshot or axe): the
+  // browser's own performance notes, not the page's.
+  /^\[\.WebGL-0x[0-9a-f]+\]GL Driver Message/,
 ]
 // other component libraries, by name: case-sensitive, so plain words ("ark", "bits") pass
 const otherLibraries =
