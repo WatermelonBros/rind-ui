@@ -5,8 +5,8 @@
  * flush with the panel. The border is always present (transparent unless drawn) so forced
  * colors can paint it. The triggers that open an overlay are keys too (family matrix: "triggers
  * styled as buttons"): a dialog, drawer, popover, tour, tooltip or menu trigger (not a menubar's,
- * menubar.css) looks like a Button, as rendering a Button there replaces its data-scope; so
- * do a Timer's ActionTriggers.
+ * menubar.css, nor a context menu's region) looks like a Button, as rendering a Button there
+ * replaces its data-scope; so do a Timer's ActionTriggers.
  */
 @layer rind.components {
   :where(
@@ -18,7 +18,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )
@@ -62,7 +62,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="solid"]:is(
@@ -80,7 +80,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     ):not([data-variant]):is(
@@ -102,7 +102,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="soft"]
@@ -120,7 +120,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="soft"]:is(
@@ -142,7 +142,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="outline"]
@@ -161,7 +161,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="outline"]:is(
@@ -184,7 +184,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="ghost"]
@@ -203,7 +203,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-variant="ghost"]:is(
@@ -225,7 +225,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-pressed]
@@ -243,7 +243,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-pending]
@@ -266,7 +266,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-pending]
@@ -300,7 +300,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-pending]:is([data-variant="soft"], [data-variant="outline"], [data-variant="ghost"])
@@ -318,7 +318,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"]
         )[data-pending]
@@ -337,7 +337,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-pending]:not([data-disabled])
@@ -355,7 +355,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-disabled]:not([data-pending])
@@ -377,7 +377,7 @@
         [data-scope="popover"],
         [data-scope="tour"],
         [data-scope="tooltip"],
-        [data-scope="menu"]:not([data-host])
+        [data-scope="menu"]:not([data-host], [data-context-menu])
       ),
       [data-scope="timer"][data-part="action-trigger"]
     )[data-disabled][data-variant="ghost"]
@@ -396,7 +396,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"]
         )
@@ -415,7 +415,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"]
         )[data-disabled]
@@ -433,7 +433,7 @@
             [data-scope="popover"],
             [data-scope="tour"],
             [data-scope="tooltip"],
-            [data-scope="menu"]:not([data-host])
+            [data-scope="menu"]:not([data-host], [data-context-menu])
           ),
           [data-scope="timer"][data-part="action-trigger"]
         )[data-pending]
