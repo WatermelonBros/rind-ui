@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from "vitest"
 import { h, nextTick } from "vue"
 import { mount } from "../../fixtures/mount"
 import { clientParity } from "../../fixtures/parity"
-import { Toast, Toaster } from "../index"
+import { RindProvider, Toast, Toaster } from "../index"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -106,6 +106,33 @@ describe("vue toast", () => {
     expect(region.querySelector("ol")).toBeTruthy()
     const item = screen.getByRole("listitem", { name: "Saved" })
     expect(item.getAttribute("tabindex")).toBe("0")
+  })
+
+  it("RindProvider's toast messages reach the region; the Toaster's own prop wins", async () => {
+    const store = createToaster()
+    mount(() =>
+      h(
+        RindProvider,
+        { messages: { toast: { regionLabel: (k: string) => `Avvisi (${k})`, close: "Chiudi" } } },
+        () =>
+          h(
+            Toaster,
+            { toaster: store, messages: { close: "Ferme" } },
+            {
+              default: () =>
+                h(Toast.Root, null, () => [
+                  h(Toast.Title),
+                  h(Toast.CloseTrigger, null, () =>
+                    h("svg", { "aria-hidden": "true", width: 12, height: 12 }),
+                  ),
+                ]),
+            },
+          ),
+      ),
+    )
+    store.show({ title: "Saved" })
+    expect(await screen.findByRole("region", { name: "Avvisi (F6)" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Ferme" })).toBeTruthy()
   })
 
   it("one polite announcement: 'Saved. 3 files' (reka-ui#2611)", async () => {

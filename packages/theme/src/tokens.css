@@ -13,6 +13,9 @@
  * would stop inheriting the scope's derivation.
  */
 @layer rind.tokens, rind.themes, rind.components, rind.preferences;
+/* The icon tokens travel with the design tokens: a component sheet loaded on its own draws its
+ * glyphs as masks, and a missing token would paint the whole box in currentColor. */
+@import "./icons.css";
 
 @layer rind.tokens {
   /* Tier 1: the calm preset's inputs, so this file alone themes everything. */

@@ -174,6 +174,12 @@ describe("review type holes", () => {
     void r
   })
 
+  it("a machine that renames its reasons types them as R, not as event types", () => {
+    expectTypeOf<ChangeDetails<PayloadEvent, "add" | "api">["reason"]>().toEqualTypeOf<
+      "add" | "api"
+    >()
+  })
+
   it("controllables are checked by type, not only by name", () => {
     interface BadProps {
       open?: boolean

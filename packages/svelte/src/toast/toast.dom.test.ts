@@ -12,6 +12,7 @@ import { describe, expect, it, vi } from "vitest"
 import { mount } from "../../fixtures/mount"
 import { clientParity } from "../../fixtures/parity"
 import App from "../../fixtures/toast/app.svelte"
+import Provided from "../../fixtures/toast/provided.svelte"
 
 const a11y = async () => {
   const { violations } = await axe.run(document.body, {
@@ -71,6 +72,14 @@ describe("svelte toast", () => {
     expect(region.querySelector("ol")).toBeTruthy()
     const item = screen.getByRole("listitem", { name: "Saved" })
     expect(item.getAttribute("tabindex")).toBe("0")
+  })
+
+  it("RindProvider's toast messages reach the region; the Toaster's own prop wins", async () => {
+    const store = createToaster()
+    mount(Provided, { store } as never)
+    store.show({ title: "Saved" })
+    expect(await screen.findByRole("region", { name: "Avvisi (F6)" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Ferme" })).toBeTruthy()
   })
 
   it("one polite announcement: 'Saved. 3 files' (reka-ui#2611)", async () => {

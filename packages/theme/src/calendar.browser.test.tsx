@@ -50,6 +50,18 @@ describe("Calendar stylesheet", () => {
     }
   })
 
+  it("the documented import (tokens + calendar, no icons.css) still masks the chevrons", () => {
+    inject(
+      `@layer rind.tokens, rind.themes, rind.components, rind.preferences;\n${files.tokens}\n${calendar}`,
+    )
+    const host = mount(markup())
+    for (const part of ["prev-trigger", "next-trigger"]) {
+      const after = getComputedStyle(q(host, `[data-part="${part}"]`), "::after")
+      // No token: mask-image computes to none and the box paints solid currentColor.
+      expect(after.maskImage, part).toMatch(/^url\("data:image\/svg\+xml/)
+    }
+  })
+
   it("selected differs from plain by more than colour", () => {
     sheet()
     const host = mount(markup())

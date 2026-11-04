@@ -1,9 +1,8 @@
 import type {
-  ChangeDetails,
   DropSource,
   FileLike,
   FileRejection,
-  FileUploadEvent,
+  FileUploadChangeDetails,
   FileUploadMessages,
   MessageOverrides,
 } from "@rind-ui/core"
@@ -42,7 +41,7 @@ export type FileUploadRootProps = Part<HTMLAttributes<HTMLDivElement>> & {
   readonly defaultFiles?: readonly FileLike[] | undefined
   /** The whole new list; `details.reason`: "add", "remove", "clear", "reset" or "api". */
   readonly onFilesChange?:
-    | ((files: readonly FileLike[], details: ChangeDetails<FileUploadEvent>) => void)
+    | ((files: readonly FileLike[], details: FileUploadChangeDetails) => void)
     | undefined
   /** MIME types, `type/*` and `.ext`; an empty type falls back to the extension. */
   readonly accept?: string | readonly string[] | undefined

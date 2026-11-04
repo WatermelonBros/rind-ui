@@ -6,6 +6,7 @@ export {
 } from "./file-upload.connect"
 export { fileUploadContract } from "./file-upload.contract"
 export {
+  type FileUploadChangeDetails,
   type FileUploadChangeReason,
   type FileUploadContext,
   type FileUploadEnv,

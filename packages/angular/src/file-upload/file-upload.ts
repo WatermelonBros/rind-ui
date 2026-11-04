@@ -28,6 +28,7 @@ import {
   dropzoneClickOpens,
   type FileLike,
   type FileRejection,
+  type FileUploadChangeReason,
   type FileUploadEvent,
   type FileUploadMessages,
   filesFromClipboard,
@@ -161,7 +162,8 @@ export class FileUploadRoot {
   readonly locale = input<string>()
   readonly id = input<string>()
   /** The whole new list; `details.reason`: "add", "remove", "clear", "reset" or "api". */
-  readonly filesChangeDetails = output<ChangeEvent<readonly FileLike[], FileUploadEvent>>()
+  readonly filesChangeDetails =
+    output<ChangeEvent<readonly FileLike[], FileUploadEvent, FileUploadChangeReason>>()
   /** The accepted list, for `[(files)]`. */
   readonly filesChange = output<readonly FileLike[]>()
   /** Once per gesture with any rejection. */
@@ -248,7 +250,7 @@ export class FileUploadRoot {
       }
     }
     let lastReason: string | null = null
-    const emitChange = changeEmitter<readonly FileLike[], FileUploadEvent>(
+    const emitChange = changeEmitter<readonly FileLike[], FileUploadEvent, FileUploadChangeReason>(
       this.filesChangeDetails,
       this.filesChange,
     )

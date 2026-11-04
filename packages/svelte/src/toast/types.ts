@@ -3,6 +3,12 @@ import type { Snippet } from "svelte"
 import type { HTMLAttributes, HTMLButtonAttributes, HTMLLiAttributes } from "svelte/elements"
 import type { ChildArgs } from "../child"
 
+declare module "../provider" {
+  interface RindMessageScopes {
+    toast: ToastMessages
+  }
+}
+
 export interface ToasterProps {
   readonly toaster: Toaster
   /** Base of the region's generated ids (default: generated). */

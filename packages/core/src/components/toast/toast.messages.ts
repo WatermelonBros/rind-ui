@@ -11,6 +11,8 @@ export const toastMessages = {
 } as const
 
 export interface ToastMessages {
+  /** A Messages record, so `RindProvider` can override it under the `toast` scope. */
+  readonly [key: string]: string | ((...args: never) => string)
   readonly regionLabel: (hotkey: string) => string
   readonly close: string
   readonly actionHint: (hotkey: string) => string

@@ -67,6 +67,18 @@ describe.runIf(browser)("stick-to-bottom", () => {
     expect(facts).toEqual([])
   })
 
+  it("the browser clamping scrollTop at the bottom (the viewport grew) is not the user's", async () => {
+    const { v, add, s, facts } = setup(false)
+    add(10)
+    s.scrollToBottom("instant")
+    await frames()
+    // A composer that shrinks after a send: the viewport grows, the browser pulls scrollTop up.
+    v.style.height = "300px"
+    await frames()
+    expect(v.scrollTop).toBe(v.scrollHeight - v.clientHeight)
+    expect(facts).toEqual([])
+  })
+
   it("a user scroll up is reported, an upward wheel escapes", async () => {
     const { v, add, s, facts, escapes } = setup(false)
     add(10)

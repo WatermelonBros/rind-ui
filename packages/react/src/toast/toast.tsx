@@ -35,7 +35,7 @@ import { joinHandlers } from "../join-handlers"
 import { composeRefs, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { Portal } from "../portal"
-import { useEnvironment, useLocale } from "../provider"
+import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -44,6 +44,12 @@ import { usePresence } from "../use-presence"
 import { usePress } from "../use-press"
 
 declare const process: { env: { NODE_ENV?: string } }
+
+declare module "../provider" {
+  interface RindMessageScopes {
+    toast: ToastMessages
+  }
+}
 
 const useIsoLayoutEffect = typeof document === "undefined" ? useEffect : useLayoutEffect
 
@@ -92,7 +98,7 @@ export function Toaster({ toaster, id, children, messages: own, portal = true }:
   const env = useEnvironment(announcerCapability, visibilityCapability)
   const instance = useRootId(id)
   const { locale, dir } = useLocale()
-  const messages: ToastMessages = { ...toastMessages, ...own }
+  const messages = useMessages("toast", toastMessages, own)
   // Read when the store starts a toast: the latest, without re-attaching.
   const latestMessages = useRef(messages)
   latestMessages.current = messages

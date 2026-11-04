@@ -2,12 +2,12 @@
 
 import {
   announcerCapability,
-  type ChangeDetails,
   type DropSource,
   domDropSource,
   dropzoneClickOpens,
   type FileLike,
   type FileRejection,
+  type FileUploadChangeDetails,
   type FileUploadEvent,
   type FileUploadMessages,
   filesFromClipboard,
@@ -119,7 +119,7 @@ export type FileUploadRootProps<F extends FileLike = File> = Omit<
   /** Uncontrolled initial files; a later change only changes what a form reset restores. */
   readonly defaultFiles?: readonly F[]
   /** The whole new list; `details.reason`: "add", "remove", "clear", "reset" or "api". */
-  readonly onFilesChange?: (files: readonly F[], details: ChangeDetails<FileUploadEvent<F>>) => void
+  readonly onFilesChange?: (files: readonly F[], details: FileUploadChangeDetails<F>) => void
   /** MIME types, `type/*` and `.ext`; an empty type falls back to the extension. */
   readonly accept?: string | readonly string[]
   /** The most files held (default 1: a new file replaces the held one). */
@@ -251,7 +251,7 @@ function Root<F extends FileLike = File>(props: FileUploadRootProps<F>) {
       onFilesChange: onFilesChange
         ? (next, details) => {
             lastReason.current = details.reason
-            onFilesChange(next as readonly F[], details as ChangeDetails<FileUploadEvent<F>>)
+            onFilesChange(next as readonly F[], details as FileUploadChangeDetails<F>)
           }
         : (_next, details) => {
             lastReason.current = details.reason

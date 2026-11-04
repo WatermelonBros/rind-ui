@@ -1,12 +1,12 @@
 /** @jsxImportSource solid-js */
 import {
   announcerCapability,
-  type ChangeDetails,
   type DropSource,
   domDropSource,
   dropzoneClickOpens,
   type FileLike,
   type FileRejection,
+  type FileUploadChangeDetails,
   type FileUploadEvent,
   type FileUploadMessages,
   filesFromClipboard,
@@ -123,7 +123,7 @@ export type FileUploadRootProps<F extends FileLike = File> = Omit<
   readonly defaultFiles?: readonly F[] | undefined
   /** The whole new list; `details.reason`: "add", "remove", "clear", "reset" or "api". */
   readonly onFilesChange?:
-    | ((files: readonly F[], details: ChangeDetails<FileUploadEvent<F>>) => void)
+    | ((files: readonly F[], details: FileUploadChangeDetails<F>) => void)
     | undefined
   /** MIME types, `type/*` and `.ext`; an empty type falls back to the extension. */
   readonly accept?: string | readonly string[] | undefined
@@ -250,7 +250,7 @@ function Root<F extends FileLike = File>(props: FileUploadRootProps<F>) {
       lang: locale().locale,
       files: own.files,
       defaultFiles: own.defaultFiles,
-      onFilesChange: (next: readonly FileLike[], details: ChangeDetails<FileUploadEvent>) => {
+      onFilesChange: (next: readonly FileLike[], details: FileUploadChangeDetails) => {
         lastReason = details.reason
         ;(own.onFilesChange as ((f: readonly FileLike[], d: typeof details) => void) | undefined)?.(
           next,
