@@ -12,6 +12,7 @@ import { createElement as r } from "react"
 import { describe, expect, it, vi } from "vitest"
 import { mount } from "../../fixtures/mount"
 import { clientParity } from "../../fixtures/parity"
+import { provideRind } from "../provider"
 import { Toast } from "./toast"
 
 const a11y = async () => {
@@ -61,6 +62,20 @@ class App {
   </div>`,
 })
 class Model {
+  readonly store = current.store
+}
+
+@Component({
+  selector: "rind-f",
+  imports: [Toast],
+  template: `<ng-template [rindToaster]="store" [messages]="{ close: 'Ferme' }">
+    <li rindToastRoot>
+      <div rindToastTitle></div>
+      <button rindToastCloseTrigger><svg aria-hidden="true" width="12" height="12"></svg></button>
+    </li>
+  </ng-template>`,
+})
+class Provided {
   readonly store = current.store
 }
 
@@ -121,6 +136,19 @@ describe("angular toast", () => {
     expect(region.querySelector("ol")).toBeTruthy()
     const item = screen.getByRole("listitem", { name: "Saved" })
     expect(item.getAttribute("tabindex")).toBe("0")
+  })
+
+  it("RindProvider's toast messages reach the region; the Toaster's own prop wins", async () => {
+    const store = createToaster()
+    current = { store, portal: true }
+    await mount(Provided, {}, [
+      provideRind({
+        messages: { toast: { regionLabel: (k: string) => `Avvisi (${k})`, close: "Chiudi" } },
+      }),
+    ])
+    store.show({ title: "Saved" })
+    expect(await screen.findByRole("region", { name: "Avvisi (F6)" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Ferme" })).toBeTruthy()
   })
 
   it("one polite announcement: 'Saved. 3 files' (reka-ui#2611)", async () => {

@@ -5,11 +5,12 @@ import type { ChangeDetails, EventObject } from "@rind-ui/core"
  * whose `cancel()` vetoes the change) first, then `update:<name>` for `v-model`, only when no
  * listener cancelled.
  */
-export function changeEmitter<V, E extends EventObject>(
-  change: (value: V, details: ChangeDetails<E>) => void,
-  update: (value: V) => void,
-) {
-  return (value: V, details: ChangeDetails<E>) => {
+export function changeEmitter<
+  V,
+  E extends EventObject,
+  R extends string = ChangeDetails<E>["reason"],
+>(change: (value: V, details: ChangeDetails<E, R>) => void, update: (value: V) => void) {
+  return (value: V, details: ChangeDetails<E, R>) => {
     let cancelled = false
     change(value, {
       ...details,

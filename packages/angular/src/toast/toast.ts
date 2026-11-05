@@ -50,7 +50,7 @@ import { injectRootId } from "../ids"
 import { injectMachine } from "../inject-machine"
 import { injectPresence } from "../inject-presence"
 import { injectModality, injectPress } from "../inject-press"
-import { injectEnvironment, injectLocale } from "../provider"
+import { injectEnvironment, injectLocale, injectMessages } from "../provider"
 
 /** What the region gives its toasts. */
 interface RegionCtx {
@@ -121,7 +121,7 @@ export class Toaster {
     const env = injectEnvironment(announcerCapability, visibilityCapability)
     const instance = injectRootId(() => this.id())
     const locale = injectLocale(() => undefined)
-    const messages = computed((): ToastMessages => ({ ...toastMessages, ...this.messages() }))
+    const messages = injectMessages<ToastMessages>("toast", toastMessages, () => this.messages())
     const { view, send } = injectMachine(toasterMachine, () => ({
       expand: this.toaster().options.expand,
       onReason: (reason, on) => this.toaster().regionReason(reason, on),

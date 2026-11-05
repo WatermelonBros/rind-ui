@@ -1,11 +1,10 @@
 <script lang="ts">
 import {
   announcerCapability,
-  type ChangeDetails,
   domDropSource,
   type FileLike,
   type FileRejection,
-  type FileUploadEvent,
+  type FileUploadChangeDetails,
   filesFromClipboard,
   fileUploadConnect,
   fileUploadMachine,
@@ -116,7 +115,7 @@ const machine = useMachine(
     lang: locale.current.locale,
     files,
     defaultFiles,
-    onFilesChange: (next: readonly FileLike[], details: ChangeDetails<FileUploadEvent>) => {
+    onFilesChange: (next: readonly FileLike[], details: FileUploadChangeDetails) => {
       lastReason = details.reason
       let cancelled = false
       onFilesChange?.(next, {

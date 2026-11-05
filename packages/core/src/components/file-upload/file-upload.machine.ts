@@ -34,6 +34,12 @@ export type FileUploadEvent<F extends FileLike = FileLike> =
 /** The change reason `onFilesChange` receives. */
 export type FileUploadChangeReason = "add" | "remove" | "clear" | "reset" | "api"
 
+/** The details `onFilesChange` receives: `reason` is a {@link FileUploadChangeReason}. */
+export type FileUploadChangeDetails<F extends FileLike = FileLike> = ChangeDetails<
+  FileUploadEvent<F>,
+  FileUploadChangeReason
+>
+
 export interface FileUploadProps<F extends FileLike = FileLike> {
   /** The instance id (the announcements' key). */
   readonly id: string
@@ -42,7 +48,7 @@ export interface FileUploadProps<F extends FileLike = FileLike> {
   readonly files?: readonly F[] | undefined
   readonly defaultFiles?: readonly F[] | undefined
   readonly onFilesChange?:
-    | ((files: readonly F[], details: ChangeDetails<FileUploadEvent<F>>) => void)
+    | ((files: readonly F[], details: FileUploadChangeDetails<F>) => void)
     | undefined
   /** The native `accept` grammar: MIME types, `type/*`, `.ext`. */
   readonly accept?: string | readonly string[] | undefined

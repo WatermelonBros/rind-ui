@@ -1,6 +1,6 @@
 // Toast scenarios (openspec add-toast) through the toast drivers, in jsdom and browsers.
 import { createToaster, type Toaster as ToasterStore } from "@rind-ui/core"
-import { Dialog, Toast, Toaster } from "@rind-ui/react"
+import { Dialog, RindProvider, Toast, Toaster } from "@rind-ui/react"
 import { act, cleanup, render, screen } from "@testing-library/react"
 import { userEvent } from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -217,6 +217,27 @@ describe("Toast: focus, limit, stores, swipe", () => {
     expect(a.hasAttribute("inert")).toBe(true)
     act(() => store.dismiss(newest as never))
     await vi.waitFor(() => expect(a.hasAttribute("data-limited")).toBe(false))
+  })
+
+  it("RindProvider's toast messages reach the region; the Toaster's own prop wins", async () => {
+    const store = createToaster()
+    render(
+      <RindProvider messages={{ toast: { regionLabel: (k) => `Avvisi (${k})`, close: "Chiudi" } }}>
+        <Toaster toaster={store} messages={{ close: "Ferme" }}>
+          {() => (
+            <Toast.Root>
+              <Toast.Title />
+              <Toast.CloseTrigger>
+                <svg aria-hidden="true" width="12" height="12" />
+              </Toast.CloseTrigger>
+            </Toast.Root>
+          )}
+        </Toaster>
+      </RindProvider>,
+    )
+    act(() => void store.show({ title: "Saved" }))
+    expect(await screen.findByRole("region", { name: "Avvisi (F6)" })).toBeTruthy()
+    expect(screen.getByRole("button", { name: "Ferme" })).toBeTruthy()
   })
 
   it("two stores: each toast only in its own region", async () => {

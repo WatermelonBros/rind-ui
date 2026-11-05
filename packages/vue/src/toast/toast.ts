@@ -36,7 +36,7 @@ import { joinHandlers } from "../join-handlers"
 import { mergeProps, refTo } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { Portal } from "../portal"
-import { useEnvironment, useLocale } from "../provider"
+import { useEnvironment, useLocale, useMessages } from "../provider"
 import { asChildProp, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -46,6 +46,12 @@ import { usePress } from "../use-press"
 
 // Bundlers replace `process.env.NODE_ENV` and drop the dead branch in production builds.
 declare const process: { env: { NODE_ENV?: string } }
+
+declare module "../provider" {
+  interface RindMessageScopes {
+    toast: ToastMessages
+  }
+}
 
 interface RegionCtx {
   readonly store: ToasterStore
@@ -115,7 +121,7 @@ export const Toaster = defineComponent({
     const env = useEnvironment(announcerCapability, visibilityCapability)
     const instance = useRootId(() => props.id)
     const locale = useLocale(() => undefined)
-    const messages = computed((): ToastMessages => ({ ...toastMessages, ...props.messages }))
+    const messages = useMessages("toast", toastMessages, () => props.messages)
     const toasts = shallowRef<readonly ToastSnapshot[]>(props.toaster.toasts())
     const { view, send } = useMachine(toasterMachine, () => ({
       expand: props.toaster.options.expand,

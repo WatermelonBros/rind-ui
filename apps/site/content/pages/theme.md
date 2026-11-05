@@ -14,7 +14,7 @@ pnpm add @rind-ui/theme
 import "@rind-ui/theme"
 ```
 
-That is the whole theme: tokens, the `calm` preset, fonts, icons and every component's stylesheet. To load only what you use, import the tokens and the components one by one:
+That is the whole theme: tokens, the `calm` preset, fonts, icons and every component's stylesheet. To load only what you use, import the tokens (they bring the icon tokens with them) and the components one by one:
 
 ```ts
 import "@rind-ui/theme/tokens.css"

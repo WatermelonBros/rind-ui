@@ -37,8 +37,12 @@ describe("package exports", () => {
     expect(pkg.sideEffects).toContain("*.css")
   })
 
-  it("index.css imports icons.css", () => {
+  it("tokens.css imports icons.css, so every entry that loads the tokens has the icons", () => {
+    const tokens = readFileSync(new URL("src/tokens.css", root), "utf8")
     const index = readFileSync(new URL("src/index.css", root), "utf8")
-    expect(index).toContain('@import "./icons.css";')
+    expect(tokens).toContain('@import "./icons.css";')
+    expect(index).toContain('@import "./tokens.css";')
+    // Once: index.css no longer imports it a second time.
+    expect(index).not.toContain('@import "./icons.css";')
   })
 })

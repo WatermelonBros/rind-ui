@@ -3,7 +3,6 @@
 import {
   announcerCapability,
   type SwipeDirection,
-  type ToastMessages,
   type ToastSnapshot,
   toasterConnect,
   toasterMachine,
@@ -16,7 +15,7 @@ import { elementRef } from "../element-ref.svelte"
 import { joinHandlers } from "../merge-props"
 import { attrs, normalizeProps } from "../normalize-props"
 import Portal from "../portal/portal.svelte"
-import { useEnvironment, useLocale } from "../provider"
+import { useEnvironment, useLocale, useMessages } from "../provider"
 import { useMachine } from "../use-machine.svelte"
 import { regionHost } from "./context.svelte"
 import ToastSlot from "./toast-slot.svelte"
@@ -27,7 +26,8 @@ const env = useEnvironment(announcerCapability, visibilityCapability)
 const uid = $props.id()
 const instance = $derived(id ?? uid)
 const locale = useLocale(() => undefined)
-const messages = $derived<ToastMessages>({ ...toastMessages, ...own })
+const resolved = useMessages("toast", toastMessages, () => own)
+const messages = $derived(resolved())
 let toasts = $state.raw<readonly ToastSnapshot[]>(untrack(() => toaster.toasts()))
 const machine = useMachine(toasterMachine, () => ({
   expand: toaster.options.expand,

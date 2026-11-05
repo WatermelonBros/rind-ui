@@ -1,11 +1,12 @@
 import {
   announcerCapability,
-  type ChangeDetails,
   type DropSource,
   domDropSource,
   dropzoneClickOpens,
   type FileLike,
   type FileRejection,
+  type FileUploadChangeDetails,
+  type FileUploadChangeReason,
   type FileUploadEvent,
   type FileUploadMessages,
   filesFromClipboard,
@@ -153,7 +154,7 @@ const Root = defineComponent({
   },
   emits: {
     /** The whole new list; `details.reason`: "add", "remove", "clear", "reset" or "api". */
-    filesChange: (_files: readonly FileLike[], _details: ChangeDetails<FileUploadEvent>) => true,
+    filesChange: (_files: readonly FileLike[], _details: FileUploadChangeDetails) => true,
     "update:files": (_files: readonly FileLike[]) => true,
     /** Once per gesture with any rejection. */
     reject: (_rejections: readonly FileRejection<FileLike>[]) => true,
@@ -210,7 +211,11 @@ const Root = defineComponent({
       }
     }
     let lastReason: string | null = null
-    const onFilesChange = changeEmitter<readonly FileLike[], FileUploadEvent>(
+    const onFilesChange = changeEmitter<
+      readonly FileLike[],
+      FileUploadEvent,
+      FileUploadChangeReason
+    >(
       (v, d) => {
         lastReason = d.reason
         emit("filesChange", v, d)

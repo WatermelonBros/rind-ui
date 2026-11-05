@@ -63,6 +63,13 @@ export function stickToBottom(
     const top = el.scrollTop
     const up = top < last
     last = top
+    // Moved up yet resting on the very bottom: the browser clamped `scrollTop` because the
+    // scroll range shrank (the viewport grew, e.g. a composer emptied after a send). No user
+    // scroll up ends there, so it is not the user's; an own scroll to the bottom is done.
+    if (up && top >= el.scrollHeight - el.clientHeight - 1) {
+      if (own && own.to >= top) own = null
+      return
+    }
     if (own) {
       const towards = own.to > top ? !up : own.to < top ? up : true
       if (Math.abs(top - own.to) <= 1) {

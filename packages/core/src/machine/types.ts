@@ -76,9 +76,16 @@ export type SystemEvent = SyncEvent | RevertedEvent | DelayEvent | StartEvent
 export type AnyEventOf<T extends Types> = T["events"] | SystemEvent
 
 /** Passed as the second argument of every `onXChange`. */
-export interface ChangeDetails<E extends EventObject = EventObject> {
-  /** The type of the event that caused the change (a declared or a runtime event). */
-  readonly reason: (E | SystemEvent)["type"]
+export interface ChangeDetails<
+  E extends EventObject = EventObject,
+  R extends string = (E | SystemEvent)["type"],
+> {
+  /**
+   * The type of the event that caused the change (a declared or a runtime event), or the
+   * transition's own `reason` when it declares one: a machine that renames its reasons
+   * passes their union as `R`.
+   */
+  readonly reason: R
   readonly event: E | SystemEvent
   /** Prevents the change (uncontrolled) or refuses it (controlled). */
   cancel(): void

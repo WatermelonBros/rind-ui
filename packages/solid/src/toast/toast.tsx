@@ -37,7 +37,7 @@ import { afterMount } from "../lifecycle"
 import { joinHandlers, mergeProps } from "../merge-props"
 import { normalizeProps } from "../normalize-props"
 import { Portal } from "../portal"
-import { useEnvironment, useLocale } from "../provider"
+import { useEnvironment, useLocale, useMessages } from "../provider"
 import { type RenderProp, reactive, renderPart } from "../render"
 import { useRootId } from "../use-ids"
 import { useMachine } from "../use-machine"
@@ -47,6 +47,12 @@ import { usePress } from "../use-press"
 
 // Bundlers replace `process.env.NODE_ENV` and drop the dead branch in production builds.
 declare const process: { env: { NODE_ENV?: string } }
+
+declare module "../provider" {
+  interface RindMessageScopes {
+    toast: ToastMessages
+  }
+}
 
 interface RegionCtx {
   readonly store: ToasterStore
@@ -111,7 +117,7 @@ export function Toaster(props: ToasterProps) {
   const env = useEnvironment(announcerCapability, visibilityCapability)
   const instance = useRootId(() => props.id)
   const locale = useLocale(() => undefined)
-  const messages = createMemo((): ToastMessages => ({ ...toastMessages, ...props.messages }))
+  const messages = useMessages("toast", toastMessages, () => props.messages)
   const [toasts, setToasts] = createSignal<readonly ToastSnapshot[]>(props.toaster.toasts())
   const { view, send } = useMachine(toasterMachine, () => ({
     expand: props.toaster.options.expand,
