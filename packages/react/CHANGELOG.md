@@ -1,5 +1,11 @@
 # @rind-ui/react
 
+## 1.4.0
+
+### Patch Changes
+
+- @rind-ui/core@1.4.0
+
 ## 1.3.0
 
 ### Minor Changes

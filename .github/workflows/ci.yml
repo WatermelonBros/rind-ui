@@ -87,7 +87,9 @@ jobs:
   test:
     needs: [changes, static]
     if: needs.changes.outputs.components == 'true'
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04, where Playwright's WebKit build cannot start
+    # (libicudata.so.74 missing). Back to ubuntu-latest once Playwright supports 26.04.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       # jsdom and Chromium on pull requests, every engine on main (scripts/ci-matrix.mjs). Real
