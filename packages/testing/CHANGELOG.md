@@ -1,5 +1,12 @@
 # @rind-ui/testing
 
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [c3a0ac6]
+  - @rind-ui/core@1.4.1
+
 ## 1.4.0
 
 ### Patch Changes
